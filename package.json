@@ -8,7 +8,8 @@
     "start": "electron ."
   },
   "dependencies": {
-    "vue": "^2.1.10"
+    "vue": "^2.1.10",
+    "vuex": "^2.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
