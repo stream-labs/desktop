@@ -1,5 +1,5 @@
 const state = {
-  currentPage: 'studio'
+  currentPage: 'Studio'
 };
 
 const mutations = {

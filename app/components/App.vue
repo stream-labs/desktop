@@ -1,42 +1,23 @@
 <template>
 <div>
-  <div class="button-group">
-    <button
-      @click="navigateStudio"
-      class="button button--default button--lg"
-      :class="{ active: page === 'studio' }">
-      Studio
-    </button>
-    <button
-      @click="navigateDashboard"
-      class="button button--default button--lg"
-      :class="{ active: page === 'dashboard' }">
-      Dashboard
-    </button>
-  </div>
+  <top-nav></top-nav>
   <component :is="page">
   </component>
 </div>
 </template>
 
 <script>
-import studio from './pages/Studio.vue';
-import dashboard from './pages/Dashboard.vue';
+import TopNav from './TopNav.vue';
+
+// Pages
+import Studio from './pages/Studio.vue';
+import Dashboard from './pages/Dashboard.vue';
 
 export default {
   components: {
-    studio,
-    dashboard
-  },
-
-  methods: {
-    navigateStudio() {
-      this.$store.dispatch('navigate', 'studio');
-    },
-
-    navigateDashboard() {
-      this.$store.dispatch('navigate', 'dashboard');
-    }
+    TopNav,
+    Studio,
+    Dashboard
   },
 
   computed: {
@@ -46,11 +27,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.button {
-  &:focus {
-    outline: 0;
-  }
-}
-</style>
