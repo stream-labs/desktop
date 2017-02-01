@@ -1,11 +1,19 @@
 <template>
 <div>
-  <button @click="navigateStudio">
-    Studio
-  </button>
-  <button @click="navigateDashboard">
-    Dashboard
-  </button>
+  <div class="button-group">
+    <button
+      @click="navigateStudio"
+      class="button button--default button--lg"
+      :class="{ active: page === 'studio' }">
+      Studio
+    </button>
+    <button
+      @click="navigateDashboard"
+      class="button button--default button--lg"
+      :class="{ active: page === 'dashboard' }">
+      Dashboard
+    </button>
+  </div>
   <component :is="page">
   </component>
 </div>
@@ -38,3 +46,11 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.button {
+  &:focus {
+    outline: 0;
+  }
+}
+</style>
