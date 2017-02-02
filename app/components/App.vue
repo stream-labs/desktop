@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="top-layout">
   <title-bar></title-bar>
   <div class="title-spacer bgColor-teal"></div>
   <top-nav></top-nav>
@@ -33,6 +33,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.top-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .title-spacer {
   height: 4px;
 }
