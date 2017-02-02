@@ -1,44 +1,44 @@
 <template>
-  <div class="button-group no-margin top-nav">
-    <button
-      @click="navigateStudio"
-      class="button button--default button--lg"
-      :class="{ active: page === 'Studio' }">
-      Studio
-    </button>
-    <button
-      @click="navigateDashboard"
-      class="button button--default button--lg"
-      :class="{ active: page === 'Dashboard' }">
-      Dashboard
-    </button>
-  </div>
+<div class="button-group no-margin top-nav">
+  <button
+    @click="navigateStudio"
+    class="button button--default button--lg"
+    :class="{ active: page === 'Studio' }">
+    Studio
+  </button>
+  <button
+    @click="navigateDashboard"
+    class="button button--default button--lg"
+    :class="{ active: page === 'Dashboard' }">
+    Dashboard
+  </button>
+</div>
 </template>
 
 <script>
-  export default {
+export default {
 
-    methods: {
-      navigateStudio() {
-        this.$store.dispatch('navigate', 'Studio');
-      },
-
-      navigateDashboard() {
-        this.$store.dispatch('navigate', 'Dashboard');
-      }
+  methods: {
+    navigateStudio() {
+      this.$store.dispatch('navigate', 'Studio');
     },
 
-    computed: {
-      page() {
-        return this.$store.state.navigation.currentPage;
-      }
+    navigateDashboard() {
+      this.$store.dispatch('navigate', 'Dashboard');
     }
+  },
 
-  };
+  computed: {
+    page() {
+      return this.$store.state.navigation.currentPage;
+    }
+  }
+
+};
 </script>
 
 <style lang="less" scoped>
-  .top-nav {
-    padding: 20px 40px;
-  }
+.top-nav {
+  padding: 20px 40px;
+}
 </style>
