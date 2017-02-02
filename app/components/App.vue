@@ -1,7 +1,7 @@
 <template>
 <div>
   <title-bar></title-bar>
-  <div class="title-spacer"></div>
+  <div class="title-spacer bgColor-teal"></div>
   <top-nav></top-nav>
   <component :is="page">
   </component>
@@ -35,6 +35,5 @@ export default {
 <style lang="less" scoped>
 .title-spacer {
   height: 4px;
-  background-color: #32c3a2;
 }
 </style>
