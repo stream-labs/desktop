@@ -1,5 +1,5 @@
 NODE_OBS_DIR="./node_modules/node-obs/"
-OBS_BUILD_DIR="${NODE_OBS_DIR}vendors/obs-studio/build/"
+OBS_BUILD_DIR="${NODE_OBS_DIR}vendors/obs-studio_fork/build/"
 PLUGIN_DIR="${OBS_BUILD_DIR}/plugins/"
 LIB_DIR="./lib"
 
@@ -22,3 +22,5 @@ cp ${PLUGIN_DIR}coreaudio-encoder/coreaudio-encoder.so ${LIB_DIR}
 
 cp ${OBS_BUILD_DIR}libobs-opengl/libobs-opengl.so ${LIB_DIR}
 cp ${OBS_BUILD_DIR}deps/glad/libobsglad.0.dylib ${LIB_DIR}
+
+cp -r ${OBS_BUILD_DIR}rundir/RelWithDebInfo/data .

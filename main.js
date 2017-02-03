@@ -20,6 +20,8 @@ app.on('ready', () => {
   mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL('file://' + __dirname + '/index.html');
+
+  startOBS();
 });
 
 ipcMain.on('window.minimize', () => {
