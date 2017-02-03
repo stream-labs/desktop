@@ -1,5 +1,6 @@
 NODE_OBS_DIR="./node_modules/node-obs/"
-PLUGIN_DIR="${NODE_OBS_DIR}vendors/obs-studio/build/plugins/"
+OBS_BUILD_DIR="${NODE_OBS_DIR}vendors/obs-studio/build/"
+PLUGIN_DIR="${OBS_BUILD_DIR}/plugins/"
 LIB_DIR="./lib"
 
 mkdir lib
@@ -19,5 +20,5 @@ cp ${PLUGIN_DIR}mac-avcapture/mac-avcapture.so ${LIB_DIR}
 cp ${PLUGIN_DIR}image-source/image-source.so ${LIB_DIR}
 cp ${PLUGIN_DIR}coreaudio-encoder/coreaudio-encoder.so ${LIB_DIR}
 
-cp ${NODE_OBS_DIR}vendors/obs-studio/build/libobs-opengl/libobs-opengl.so ${LIB_DIR}
-cp ${NODE_OBS_DIR}vendors/obs-studio/build/deps/glad/libobsglad.0.dylib ${LIB_DIR}
+cp ${OBS_BUILD_DIR}libobs-opengl/libobs-opengl.so ${LIB_DIR}
+cp ${OBS_BUILD_DIR}deps/glad/libobsglad.0.dylib ${LIB_DIR}
