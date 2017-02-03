@@ -4,10 +4,10 @@
     CPU STATS GO HERE
   </div>
   <div class="studioFooter-buttons text-right">
-    <button class="button button--default button--lg studioFooter-button">
+    <button class="button button--default button--md studioFooter-button studioFooter-button--startRecording">
       Start Recording
     </button>
-    <button class="button button--purple button--lg studioFooter-button">
+    <button class="button button--default button--md studioFooter-button studioFooter-button--startStreaming">
       Start Streaming
     </button>
   </div>
@@ -35,7 +35,16 @@ export default {};
 }
 
 .studioFooter-button {
-  width: 200px;
+  width: 170px;
   margin: 10px 5px;
+}
+
+/* Button styles have to be overridden with !important */
+.studioFooter-button--startRecording {
+  color: #ff4141 !important;
+}
+
+.studioFooter-button--startStreaming {
+  color: #644899 !important;
 }
 </style>

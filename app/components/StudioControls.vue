@@ -25,7 +25,7 @@ export default {
 
 <style lang="less" scoped>
 .studioControls {
-  height: 300px;
+  height: 280px;
   width: 100%;
 
   padding: 30px 25px;
