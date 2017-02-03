@@ -3,6 +3,13 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 let mainWindow;
 let maximized = false;
 
+const startOBS = () => {
+  let obs = require('node-obs');
+  console.log(obs);
+
+  obs.test_startStreamingFromConfigFile();
+}
+
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 1600,

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
-    "start": "electron ."
+    "start": "electron .",
+    "extract-libs": "bin/extract_libs.sh"
   },
   "dependencies": {
     "vue": "^2.1.10",
