@@ -1,8 +1,10 @@
 <template>
 <div>
-  <h4 class="studio-control-label">
+  <h4 class="studioControls-label">
     Scenes
   </h4>
+  <div class="studioControls-selector">
+  </div>
 </div>
 </template>
 

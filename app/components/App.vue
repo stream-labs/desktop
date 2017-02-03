@@ -1,9 +1,9 @@
 <template>
-<div class="top-layout">
+<div class="topLayout">
   <title-bar></title-bar>
-  <div class="title-spacer bgColor-teal"></div>
+  <div class="topLayout-spacer bgColor-teal"></div>
   <top-nav></top-nav>
-  <component :is="page">
+  <component class="pageContainer" :is="page">
   </component>
 </div>
 </template>
@@ -33,13 +33,18 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.top-layout {
+.topLayout {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.title-spacer {
+.topLayout-spacer {
   height: 4px;
+}
+
+.pageContainer {
+  /* Page always takes up remaining space */
+  flex-grow: 1;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
 <div>
   <h4 class="studioControls-label">
-    Sources
+    Themes
   </h4>
   <div class="studioControls-selector">
   </div>

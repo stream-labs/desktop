@@ -7,7 +7,11 @@ const startOBS = () => {
   let obs = require('node-obs');
   console.log(obs);
 
-  obs.test_startStreamingFromConfigFile();
+
+  obs.OBS_API_initOBS_API();
+  obs.OBS_API_openAllModules();
+  obs.OBS_API_initAllModules();
+  //obs.test_startStreamingFromConfigFile();
 }
 
 app.on('ready', () => {
@@ -21,7 +25,7 @@ app.on('ready', () => {
 
   mainWindow.loadURL('file://' + __dirname + '/index.html');
 
-  startOBS();
+  //startOBS();
 });
 
 ipcMain.on('window.minimize', () => {

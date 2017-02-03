@@ -1,5 +1,5 @@
 <template>
-<div class="button-group no-margin top-nav">
+<div class="button-group no-margin topNav">
   <button
     @click="navigateStudio"
     class="button button--default button--lg"
@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.top-nav {
+.topNav {
   padding: 20px 40px;
 }
 </style>
