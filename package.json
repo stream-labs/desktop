@@ -6,9 +6,11 @@
     "build": "webpack",
     "watch": "webpack --watch",
     "start": "electron .",
-    "extract-libs": "bin/extract_libs.sh"
+    "extract-libs": "bin/extract_libs.sh",
+    "rebuild": "electron-rebuild && electron-rebuild -w node-obs"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "vue": "^2.1.10",
     "vuex": "^2.1.1"
   },
@@ -18,6 +20,7 @@
     "babel-preset-es2015": "^6.22.0",
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",
+    "electron-devtools-installer": "^2.1.0",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",

@@ -9,5 +9,9 @@
 </template>
 
 <script>
-export default {};
+export default {
+  created() {
+
+  }
+};
 </script>
