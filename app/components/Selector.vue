@@ -21,7 +21,8 @@ export default {
   list-style-type: none;
   margin: 0;
   overflow: auto;
-  border: 1px solid gray;
+  border: 1px solid #ddd;
+  background-color: #fcfcfc;
 }
 
 .selector-item {
@@ -31,6 +32,10 @@ export default {
   &.active {
     background-color: #1ae6a8;
     color: white;
+  }
+
+  &:hover:not(.active) {
+    background-color: #f6f6f6;
   }
 }
 </style>

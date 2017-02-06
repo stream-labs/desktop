@@ -4,6 +4,7 @@
     Scenes
   </h4>
   <selector
+    class="studioControls-selector"
     :items="scenes"
     :activeItem="activeScene"
     @select="makeActive"/>

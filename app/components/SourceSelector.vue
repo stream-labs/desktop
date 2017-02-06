@@ -3,15 +3,29 @@
   <h4 class="studioControls-label">
     Sources
   </h4>
-  <div class="studioControls-selector">
-  </div>
+  <selector
+    class="studioControls-selector"
+    :items="sources"
+    :activeItem="activeSource"/>
 </div>
 </template>
 
 <script>
-export default {
-  created() {
+import Selector from './Selector.vue';
 
+export default {
+  components: {
+    Selector
+  },
+
+  computed: {
+    sources() {
+      return [];
+    },
+
+    activeSource() {
+      return undefined;
+    }
   }
 };
 </script>
