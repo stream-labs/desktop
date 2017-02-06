@@ -13,22 +13,30 @@
 </template>
 
 <script>
-// using window.require to bypass webpack require
-const { send } = window.require('electron').ipcRenderer;
+const { remote } = window.require('electron');
+const thisWindow = remote.getCurrentWindow();
+
+let maximized = false;
 
 export default {
 
   methods: {
     handleMinimize() {
-      send('window.minimize');
+      thisWindow.minimize();
     },
 
     handleMaximize() {
-      send('window.maximize');
+      if (maximized) {
+        thisWindow.unmaximize();
+        maximized = false;
+      } else {
+        thisWindow.maximize();
+        maximized = true;
+      }
     },
 
     handleClose() {
-      send('window.close');
+      thisWindow.close();
     }
   }
 

@@ -1,17 +1,28 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const obs = require('node-obs');
 
 let mainWindow;
 let maximized = false;
 
 const startOBS = () => {
-  let obs = require('node-obs');
-  console.log(obs);
 
 
+  //obs.OBS_service_test_startStreaming();
+
+  //obs.test_startStreamingFromConfigFile();
+}
+
+const initObs = () => {
   obs.OBS_API_initOBS_API();
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
-  //obs.test_startStreamingFromConfigFile();
+}
+
+// For now, create a fresh scene when we start up
+const initScenes = () => {
+  obs.OBS_content_createScene('test');
+
+  console.log(obs.OBS_content_getListCurrentScenes());
 }
 
 app.on('ready', () => {
@@ -26,22 +37,10 @@ app.on('ready', () => {
   mainWindow.loadURL('file://' + __dirname + '/index.html');
 
   //startOBS();
-});
 
-ipcMain.on('window.minimize', () => {
-  mainWindow.minimize();
-});
+  //initObs();
 
-ipcMain.on('window.maximize', () => {
-  if (maximized) {
-    mainWindow.unmaximize();
-    maximized = false;
-  } else {
-    mainWindow.maximize();
-    maximized = true;
-  }
-});
+  //initScenes();
 
-ipcMain.on('window.close', () => {
-  mainWindow.close();
+  //obs.OBS_service_test_startStreaming();
 });
