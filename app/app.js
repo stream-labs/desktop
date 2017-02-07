@@ -8,6 +8,8 @@ require('./app.less');
 document.addEventListener('DOMContentLoaded', function() {
   Obs.init();
 
+  store.dispatch('initTestData');
+
   new Vue({
     el: '#app',
     store,

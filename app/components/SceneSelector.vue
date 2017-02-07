@@ -5,29 +5,33 @@
   </h4>
   <selector
     class="studioControls-selector"
-    :items="scenes"
-    :activeItem="activeScene"
+    :items="sceneNames"
+    :activeItem="activeSceneName"
     @select="makeActive"/>
 </div>
 </template>
 
 <script>
 import Selector from './Selector.vue';
+import _ from 'lodash';
 
 export default {
   methods: {
     makeActive(scene) {
-      this.$store.dispatch('makeSceneActive', scene);
+      this.$store.dispatch({
+        type: 'makeSceneActive',
+        sceneName: scene
+      });
     }
   },
 
   computed: {
-    scenes() {
-      return this.$store.state.scenes.scenes;
+    sceneNames() {
+      return _.map(this.$store.state.scenes.scenes, scene => scene.name);
     },
 
-    activeScene() {
-      return this.$store.state.scenes.activeScene;
+    activeSceneName() {
+      return this.$store.state.scenes.activeSceneName;
     }
   },
 
