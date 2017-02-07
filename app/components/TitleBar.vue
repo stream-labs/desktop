@@ -13,8 +13,8 @@
 </template>
 
 <script>
-const { remote } = window.require('electron');
-const thisWindow = remote.getCurrentWindow();
+const { getCurrentWindow } = window.require('electron').remote;
+const thisWindow = getCurrentWindow();
 
 let maximized = false;
 

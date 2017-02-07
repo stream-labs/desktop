@@ -1,18 +1,42 @@
+window.eval = global.eval = function() {
+  throw new Error("window.eval() is disabled for security");
+}
+
 import App from './components/App.vue';
 import Vue from 'vue';
-import store from './store';
+import storeFactory from './store';
 import Obs from './api/Obs.js';
+import windowManager from './util/WindowManager.js';
+
+const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', function() {
-  Obs.init();
+  const component = window.location.search.match(/^\?component=(.*)$/);
 
-  store.dispatch('initTestData');
+  if (component && component[1]) {
+    // This is a child window
 
-  new Vue({
-    el: '#app',
-    store,
-    render: h => h(App)
-  });
+    new Vue({
+      el: '#app',
+      store: storeFactory(false),
+      render: h => h(windowManager.components[component[1]])
+    });
+  } else {
+    // This is the main window
+    Obs.init();
+
+    let store = storeFactory(true);
+
+    store.dispatch('initTestData');
+
+    window.MAIN_WINDOW = true;
+
+    new Vue({
+      el: '#app',
+      store,
+      render: h => h(App)
+    });
+  }
 });

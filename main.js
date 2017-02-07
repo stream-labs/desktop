@@ -4,6 +4,8 @@ const obs = require('node-obs');
 let mainWindow;
 
 app.on('ready', () => {
+  global.pageUrl = 'file://' + __dirname + '/index.html';
+
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -12,7 +14,7 @@ app.on('ready', () => {
 
   mainWindow.webContents.openDevTools();
 
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
+  mainWindow.loadURL(global.pageUrl);
 
   // TODO: NODE_ENV is not getting set yet
   if (process.env.NODE_ENV !== 'production') {
@@ -20,4 +22,9 @@ app.on('ready', () => {
 
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
   }
+});
+
+// Lets other windows discover the main window
+ipcMain.on('getMainWindowId', event => {
+  event.returnValue = mainWindow.id;
 });

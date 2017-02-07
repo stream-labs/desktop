@@ -15,7 +15,9 @@
     </button>
   </div>
   <div class="topNav-rightButtons">
-  <button class="button button--default button--md">
+  <button
+    class="button button--default button--md"
+    @click="openSettingsWindow">
     Settings
   </button>
   </div>
@@ -23,6 +25,8 @@
 </template>
 
 <script>
+import windowManager from '../util/WindowManager.js';
+
 export default {
 
   methods: {
@@ -32,6 +36,10 @@ export default {
 
     navigateDashboard() {
       this.$store.dispatch('navigate', 'Dashboard');
+    },
+
+    openSettingsWindow() {
+      windowManager.showChildWindow('Settings')
     }
   },
 
