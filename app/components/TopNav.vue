@@ -31,11 +31,17 @@ export default {
 
   methods: {
     navigateStudio() {
-      this.$store.dispatch('navigate', 'Studio');
+      this.$store.dispatch({
+        type: 'navigate',
+        pageName: 'Studio'
+      });
     },
 
     navigateDashboard() {
-      this.$store.dispatch('navigate', 'Dashboard');
+      this.$store.dispatch({
+        type: 'navigate',
+        pageName: 'Dashboard'
+      });
     },
 
     openSettingsWindow() {

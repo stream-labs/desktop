@@ -21,6 +21,10 @@ class ObsApi {
     nodeObs.OBS_content_createScene(name);
   }
 
+  removeScene(name) {
+    nodeObs.OBS_content_removeScene(name);
+  }
+
   getScenes() {
     return nodeObs.OBS_content_getListCurrentScenes();
   }

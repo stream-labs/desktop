@@ -3,14 +3,16 @@ const state = {
 };
 
 const mutations = {
-  navigate(state, newPage) {
-    state.currentPage = newPage;
+  navigate(state, data) {
+    state.currentPage = data.pageName;
   }
 };
 
 const actions = {
-  navigate({ commit }, newPage) {
-    commit('navigate', newPage);
+  navigate({ commit }, data) {
+    commit('navigate', {
+      pageName: data.pageName
+    });
   }
 };
 

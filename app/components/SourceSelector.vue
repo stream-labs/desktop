@@ -14,7 +14,8 @@
   <selector
     class="studioControls-selector"
     :items="sourceNames"
-    :activeItem="activeSource"/>
+    :activeItem="activeSourceName"
+    @select="makeActive"/>
 </div>
 </template>
 
@@ -34,6 +35,14 @@ export default {
 
     removeSource() {
       console.log('Click Remove Source');
+    },
+
+    makeActive(sourceName) {
+      this.$store.dispatch({
+        type: 'makeSourceActive',
+        sceneName: this.$store.getters.activeSceneName,
+        sourceName: sourceName
+      });
     }
   },
 
@@ -43,8 +52,8 @@ export default {
       return _.map(scene.sources, source => source.name);
     },
 
-    activeSource() {
-      return undefined;
+    activeSourceName() {
+      return this.$store.getters.activeSourceName;
     }
   }
 };

@@ -48,6 +48,15 @@ const actions = {
       settings: {},
       hotkeyData: {}
     });
+
+    dispatch({
+      type: 'addSourceToScene',
+      sceneName: 'Example Scene 1',
+      sourceType: 'Video Capture Device',
+      sourceName: 'Video Capture 2',
+      settings: {},
+      hotkeyData: {}
+    });
   }
 };
 
