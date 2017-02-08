@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import TitleBar from './TitleBar.vue';
-import TopNav from './TopNav.vue';
+import TitleBar from '../TitleBar.vue';
+import TopNav from '../TopNav.vue';
 
 // Pages
-import Studio from './pages/Studio.vue';
-import Dashboard from './pages/Dashboard.vue';
+import Studio from '../pages/Studio.vue';
+import Dashboard from '../pages/Dashboard.vue';
 
 export default {
   components: {
@@ -22,6 +22,10 @@ export default {
     TopNav,
     Studio,
     Dashboard
+  },
+
+  created() {
+    console.log('STARTING MAIN WINDOW');
   },
 
   computed: {

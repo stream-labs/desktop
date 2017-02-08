@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import TitleBar from './TitleBar.vue';
-import windowManager from '../util/WindowManager.js';
+import TitleBar from '../TitleBar.vue';
+import windowManager from '../../util/WindowManager.js';
 
 export default {
 

@@ -3,8 +3,9 @@
 
 const { ipcRenderer } = window.require('electron');
 
-import Settings from '../components/Settings.vue';
-import AddSource from '../components/AddSource.vue';
+import Main from '../components/windows/Main.vue';
+import Settings from '../components/windows/Settings.vue';
+import AddSource from '../components/windows/AddSource.vue';
 
 class WindowManager {
 
@@ -12,6 +13,7 @@ class WindowManager {
     // This is a list of components that are registered to be
     // top level components in new child windows.
     this.components = {
+      Main,
       Settings,
       AddSource
     };
@@ -22,7 +24,9 @@ class WindowManager {
 
   showSettings() {
     ipcRenderer.send('window-spawnChildWindow', {
-      component: 'Settings',
+      startupOptions: {
+        component: 'Settings'
+      },
       options: {
         frame: false
       }
@@ -31,7 +35,9 @@ class WindowManager {
 
   showAddSource() {
     ipcRenderer.send('window-spawnChildWindow', {
-      component: 'AddSource',
+      startupOptions: {
+        component: 'AddSource'
+      },
       options: {
         frame: false
       }

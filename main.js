@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const obs = require('node-obs');
 const _ = require('lodash');
+const URI = require('urijs');
 
 let mainWindow;
 const indexUrl = 'file://' + __dirname + '/index.html';
@@ -14,7 +15,9 @@ app.on('ready', () => {
 
   mainWindow.webContents.openDevTools();
 
-  mainWindow.loadURL(indexUrl);
+  let mainUrl = URI(indexUrl).query({ component: 'Main' })
+
+  mainWindow.loadURL(mainUrl.toString());
 
   // TODO: NODE_ENV is not getting set yet
   if (process.env.NODE_ENV !== 'production') {
@@ -41,7 +44,11 @@ ipcMain.on('window-spawnChildWindow', (event, data) => {
   });
 
   childWindow = new BrowserWindow(options);
-  childWindow.loadURL(indexUrl + '?component=' + data.component);
+  childWindow.webContents.openDevTools();
+
+  let childUrl = URI(indexUrl).query(data.startupOptions);
+
+  childWindow.loadURL(childUrl.toString());
 });
 
 
