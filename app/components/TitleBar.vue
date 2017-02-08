@@ -65,6 +65,7 @@ export default {
 
 .titlebar-title {
   flex-grow: 1;
+  padding-left: 30px;
 }
 
 .titlebar-action {

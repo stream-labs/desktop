@@ -1,47 +1,41 @@
-// This singleton class handles spawning of child windows.
-// It will make sure there is only 1 child window open at
-// a time, and make sure it is parented to the main window.
+// This singleton class provides a renderer-space API
+// for spawning various child windows.
 
-const { remote } = window.require('electron');
+const { ipcRenderer } = window.require('electron');
 
 import Settings from '../components/Settings.vue';
-import Vue from 'vue';
+import AddSource from '../components/AddSource.vue';
 
 class WindowManager {
 
   constructor() {
-    this.childWindow = null;
-
     // This is a list of components that are registered to be
     // top level components in new child windows.
     this.components = {
-      Settings
+      Settings,
+      AddSource
     };
   }
 
-  showChildWindow(componentName, options) {
-    // Only the main window can show child windows.
-    if (!window.MAIN_WINDOW) {
-      throw new Error('Only the main window can show child windows!');
-    }
+  // These methods are basically presets for showing
+  // various dialog windows.
 
-    // Only show 1 window at a time
-    if (!this.childWindow) {
-      const opts = Object.assign({}, options, {
-        parent: remote.getCurrentWindow()
-      });
+  showSettings() {
+    ipcRenderer.send('window-spawnChildWindow', {
+      component: 'Settings',
+      options: {
+        frame: false
+      }
+    });
+  }
 
-      this.childWindow = new remote.BrowserWindow(opts);
-      this.childWindow.webContents.openDevTools();
-
-      this.childWindow.on('closed', () => {
-        this.childWindow = null;
-      });
-
-      this.childWindow.loadURL(
-        remote.getGlobal('pageUrl') + '?component=' + componentName
-      );
-    }
+  showAddSource() {
+    ipcRenderer.send('window-spawnChildWindow', {
+      component: 'AddSource',
+      options: {
+        frame: false
+      }
+    });
   }
 
 }

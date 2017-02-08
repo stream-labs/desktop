@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     store.dispatch('initTestData');
 
-    window.MAIN_WINDOW = true;
-
     new Vue({
       el: '#app',
       store,

@@ -3,10 +3,9 @@ const obs = require('node-obs');
 const _ = require('lodash');
 
 let mainWindow;
+const indexUrl = 'file://' + __dirname + '/index.html';
 
 app.on('ready', () => {
-  global.pageUrl = 'file://' + __dirname + '/index.html';
-
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -15,7 +14,7 @@ app.on('ready', () => {
 
   mainWindow.webContents.openDevTools();
 
-  mainWindow.loadURL(global.pageUrl);
+  mainWindow.loadURL(indexUrl);
 
   // TODO: NODE_ENV is not getting set yet
   if (process.env.NODE_ENV !== 'production') {
@@ -24,6 +23,28 @@ app.on('ready', () => {
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
   }
 });
+
+
+
+// Used for spawning child windows. Will automatically
+// replace any child window currently showing.
+let childWindow;
+
+ipcMain.on('window-spawnChildWindow', (event, data) => {
+  // Close the existing child window
+  if (childWindow && !childWindow.isDestroyed()) {
+    childWindow.close();
+  }
+
+  const options = Object.assign({}, data.options, {
+    parent: mainWindow
+  });
+
+  childWindow = new BrowserWindow(options);
+  childWindow.loadURL(indexUrl + '?component=' + data.component);
+});
+
+
 
 // The main process acts as a hub for various windows
 // syncing their vuex stores.

@@ -21,6 +21,8 @@
 
 <script>
 import Selector from './Selector.vue';
+import windowManager from '../util/WindowManager.js';
+
 import _ from 'lodash';
 
 export default {
@@ -30,7 +32,7 @@ export default {
 
   methods: {
     addSource() {
-      console.log('Click Add Source');
+      windowManager.showAddSource();
     },
 
     removeSource() {
