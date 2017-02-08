@@ -2,7 +2,7 @@
 // It will make sure there is only 1 child window open at
 // a time, and make sure it is parented to the main window.
 
-const remote = window.require('electron').remote;
+const { remote } = window.require('electron');
 
 import Settings from '../components/Settings.vue';
 import Vue from 'vue';
@@ -33,6 +33,10 @@ class WindowManager {
 
       this.childWindow = new remote.BrowserWindow(opts);
       this.childWindow.webContents.openDevTools();
+
+      this.childWindow.on('closed', () => {
+        this.childWindow = null;
+      });
 
       this.childWindow.loadURL(
         remote.getGlobal('pageUrl') + '?component=' + componentName

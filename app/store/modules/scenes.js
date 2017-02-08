@@ -1,4 +1,4 @@
-import Obs from '../../api/Obs.js';
+const Obs = require('../../api/Obs.js').default;
 
 const state = {
   activeSceneName: null,
@@ -43,8 +43,6 @@ const actions = {
   },
 
   addSourceToScene({ commit }, data) {
-    debugger;
-
     Obs.createSource(
       data.sceneName,
       data.sourceType,

@@ -4,11 +4,9 @@ window.eval = global.eval = function() {
 
 import App from './components/App.vue';
 import Vue from 'vue';
-import storeFactory from './store';
+import store from './store';
 import Obs from './api/Obs.js';
 import windowManager from './util/WindowManager.js';
-
-const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
@@ -20,14 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     new Vue({
       el: '#app',
-      store: storeFactory(false),
+      store: store,
       render: h => h(windowManager.components[component[1]])
     });
   } else {
     // This is the main window
     Obs.init();
-
-    let store = storeFactory(true);
 
     store.dispatch('initTestData');
 

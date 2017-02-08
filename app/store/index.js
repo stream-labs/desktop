@@ -11,8 +11,8 @@ const debug = process.env.NODE_ENV !== 'production';
 const { ipcRenderer, remote } = window.require('electron');
 
 const mutations = {
-  BULK_LOAD_STATE(state, newState) {
-    _.each(newState, (value, key) => {
+  BULK_LOAD_STATE(state, data) {
+    _.each(data.state, (value, key) => {
       state[key] = value;
     });
   }
@@ -51,77 +51,51 @@ const actions = {
   }
 };
 
+const plugins = [];
 
-export default isMaster => {
-  const store = new Vuex.Store({
-    modules: {
-      navigation,
-      scenes
-    },
-    mutations,
-    actions,
-    strict: debug
+// This plugin will keep all vuex stores in sync via
+// IPC with the main process.
+plugins.push(store => {
+  store.subscribe(mutation => {
+    if (!mutation.payload.__vuexSyncIgnore) {
+      ipcRenderer.send('vuex-mutation', {
+        type: mutation.type,
+        payload: mutation.payload
+      });
+    }
   });
 
-  // The following code handles syncing vuex stores
-  // in other windows with the main window.
+  // Only the main window should ever receive this
+  ipcRenderer.on('vuex-sendState', (event, windowId) => {
+    let win = remote.BrowserWindow.fromId(windowId);
+    win.webContents.send('vuex-loadState', store.state);
+  });
 
-  // The main window owns the "master" store
-  if (isMaster) {
-    // These are stored as window ids
-    let registeredStores = [];
-
-    ipcRenderer.on('vuex-register', (event, windowId) => {
-      console.log("GOT REGISTER");
-
-      registeredStores.push(windowId);
-
-      let win = remote.BrowserWindow.fromId(windowId);
-
-      win.webContents.send('vuex-load', store.state);
+  // Only child windows should ever receive this
+  ipcRenderer.on('vuex-loadState', (event, state) => {
+    store.commit('BULK_LOAD_STATE', {
+      state: state,
+      __vuexSyncIgnore: true
     });
+  });
 
-    store.subscribe(mutation => {
-      _.each(registeredStores, windowId => {
-        let win = remote.BrowserWindow.fromId(windowId);
-        win.webContents.send('vuex-mutation', Object.assign({}, mutation.payload, {
-          type: mutation.type
-        }));
-      });
-    });
+  // All windows can receive this
+  ipcRenderer.on('vuex-mutation', (event, mutation) => {
+    store.commit(mutation.type, Object.assign(mutation.payload, {
+      __vuexSyncIgnore: true
+    }));
+  });
 
-    ipcRenderer.on('vuex-mutation', (event, args) => {
-      store.commit(args);
-    });
-  } else {
-    const _commit = store.commit;
-    const mainWindowId = ipcRenderer.sendSync('getMainWindowId');
-    const mainWindow = remote.BrowserWindow.fromId(mainWindowId);
+  ipcRenderer.send('vuex-register');
+});
 
-    store.commit = function() {
-      // Always send object style commits
-      let commit = arguments[0];
-
-      if (arguments[1]) {
-        commit = Object.assign({}, arguments[1], {
-          type: arguments[0]
-        });
-      }
-
-      mainWindow.webContents.send('vuex-mutation', commit);
-    };
-
-    ipcRenderer.on('vuex-load', (event, state) => {
-      console.log("GOT BULK LOAD");
-      _commit('BULK_LOAD_STATE', state);
-    });
-
-    ipcRenderer.on('vuex-mutation', (event, mutation) => {
-      _commit(mutation);
-    });
-
-    mainWindow.webContents.send('vuex-register', remote.getCurrentWindow().id);
-  }
-
-  return store;
-}
+export default new Vuex.Store({
+  modules: {
+    navigation,
+    scenes
+  },
+  plugins,
+  mutations,
+  actions,
+  strict: debug
+});
