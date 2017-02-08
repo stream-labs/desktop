@@ -25,22 +25,26 @@ app.on('ready', () => {
   }
 });
 
-// Vuex store syncing code
-let registeredStores = [];
+// The main process acts as a hub for various windows
+// syncing their vuex stores.
+let registeredStores = {};
 
 ipcMain.on('vuex-register', event => {
   let win = BrowserWindow.fromWebContents(event.sender);
   let windowId = win.id;
 
-  registeredStores.push(windowId);
+  // Register can be received multiple times if the window is
+  // refreshed.  We only want to register it once.
+  if (!registeredStores[windowId]) {
+    registeredStores[windowId] = win;
+    console.log('Registered vuex stores: ', _.keys(registeredStores));
 
-  // Make sure we unregister is when it is closed
-  win.on('closed', () => {
-    _.pull(registeredStores, windowId);
-    console.log('Registered vuex stores: ', registeredStores);
-  });
-
-  console.log('Registered vuex stores: ', registeredStores);
+    // Make sure we unregister is when it is closed
+    win.on('closed', () => {
+      delete registeredStores[windowId];
+      console.log('Registered vuex stores: ', _.keys(registeredStores));
+    });
+  }
 
   if (windowId !== mainWindow.id) {
     // Tell the mainWindow to send its current store state
@@ -54,8 +58,7 @@ ipcMain.on('vuex-register', event => {
 ipcMain.on('vuex-mutation', (event, mutation) => {
   let windowId = BrowserWindow.fromWebContents(event.sender).id;
 
-  _.each(_.without(registeredStores, windowId), subscribedId => {
-    let win = BrowserWindow.fromId(subscribedId);
+  _.each(_.omit(registeredStores, [windowId]), win => {
     win.webContents.send('vuex-mutation', mutation);
   });
 });

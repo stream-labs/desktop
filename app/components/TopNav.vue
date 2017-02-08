@@ -39,7 +39,9 @@ export default {
     },
 
     openSettingsWindow() {
-      windowManager.showChildWindow('Settings')
+      windowManager.showChildWindow('Settings', {
+        frame: false
+      });
     }
   },
 

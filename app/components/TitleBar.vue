@@ -1,14 +1,19 @@
 <template>
 <div class="titlebar">
-  <i
-    class="fa fa-window-minimize titlebar-action"
-    @click="handleMinimize" />
-  <i
-    class="fa fa-window-maximize titlebar-action"
-    @click="handleMaximize" />
-  <i
-    class="fa fa-window-close titlebar-action"
-    @click="handleClose" />
+  <div class="titlebar-title">
+    {{ windowTitle }}
+  </div>
+  <div>
+    <i
+      class="fa fa-window-minimize titlebar-action"
+      @click="handleMinimize" />
+    <i
+      class="fa fa-window-maximize titlebar-action"
+      @click="handleMaximize" />
+    <i
+      class="fa fa-window-close titlebar-action"
+      @click="handleClose" />
+  </div>
 </div>
 </template>
 
@@ -38,19 +43,28 @@ export default {
     handleClose() {
       thisWindow.close();
     }
-  }
+  },
+
+  props: ['windowTitle']
 
 };
 </script>
 
 <style lang="less" scoped>
 .titlebar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
   height: 30px;
   -webkit-user-select: none;
   -webkit-app-region: drag;
 
   cursor: move;
-  text-align: right;
+}
+
+.titlebar-title {
+  flex-grow: 1;
 }
 
 .titlebar-action {
@@ -58,7 +72,6 @@ export default {
   opacity: 0.6;
 
   font-size: 16px;
-  line-height: 30px;
 
   margin: 0 8px;
 
