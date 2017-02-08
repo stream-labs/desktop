@@ -7,6 +7,11 @@
     <h4 class="AddSource-heading">
       Standard
     </h4>
+    <ul>
+      <li v-for="source in availableSources">
+        {{ source }}
+      </li>
+    </ul>
   </div>
 </div>
 </template>
@@ -14,6 +19,7 @@
 <script>
 import TitleBar from '../TitleBar.vue';
 import windowManager from '../../util/WindowManager.js';
+import Obs from '../../api/Obs.js';
 
 export default {
 
@@ -22,9 +28,13 @@ export default {
   },
 
   methods: {
-    handleDone() {
-      windowManager.showSettings();
-    }
+
+  },
+
+  data() {
+    return {
+      availableSources: Obs.availableSources()
+    };
   }
 
 };

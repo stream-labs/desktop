@@ -90,3 +90,15 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
     win.webContents.send('vuex-mutation', mutation);
   });
 });
+
+
+
+// Proxy node OBS calls
+ipcMain.on('obs-apiCall', (event, data) => {
+  const retVal = obs[data.method].apply(obs, data.args);
+
+  // electron ipc doesn't like returning undefined, so
+  // we return null instead.
+  event.returnValue = retVal || null;
+});
+

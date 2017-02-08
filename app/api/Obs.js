@@ -1,7 +1,20 @@
 // This class provides the "glue" between the node-obs module
 // and the Vue app. This class is intended to be a singleton.
 
-const nodeObs = window.require('node-obs');
+const { ipcRenderer } = window.require('electron');
+
+// Behaves just like the node-obs library, but proxies
+// all methods via the main process
+const nodeObs = new Proxy({}, {
+  get(target, key) {
+    return function() {
+      return ipcRenderer.sendSync('obs-apiCall', {
+        method: key,
+        args: Array.from(arguments)
+      });
+    };
+  }
+});
 
 class ObsApi {
 
@@ -37,6 +50,10 @@ class ObsApi {
       hotkeyData,
       sceneName
     );
+  }
+
+  availableSources() {
+    return nodeObs.OBS_content_getListInputSources();
   }
 
 }

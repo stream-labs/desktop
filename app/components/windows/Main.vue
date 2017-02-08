@@ -16,6 +16,8 @@ import TopNav from '../TopNav.vue';
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
 
+import Obs from '../../api/Obs.js';
+
 export default {
   components: {
     TitleBar,
@@ -25,7 +27,12 @@ export default {
   },
 
   created() {
+
     console.log('STARTING MAIN WINDOW');
+
+    Obs.init();
+    this.$store.dispatch('initTestData');
+
   },
 
   computed: {
