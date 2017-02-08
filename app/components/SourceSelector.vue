@@ -1,8 +1,16 @@
 <template>
 <div>
-  <h4 class="studioControls-label">
-    Sources
-  </h4>
+  <div class="studioControls-top">
+    <h4 class="studioControls-label">
+      Sources
+    </h4>
+    <i
+      class="fa fa-plus studioControls-button"
+      @click="addSource"/>
+    <i
+      class="fa fa-minus studioControls-button"
+      @click="removeSource"/>
+  </div>
   <selector
     class="studioControls-selector"
     :items="sourceNames"
@@ -17,6 +25,16 @@ import _ from 'lodash';
 export default {
   components: {
     Selector
+  },
+
+  methods: {
+    addSource() {
+      console.log('Click Add Source');
+    },
+
+    removeSource() {
+      console.log('Click Remove Source');
+    }
   },
 
   computed: {

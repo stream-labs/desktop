@@ -1,8 +1,10 @@
 <template>
 <div>
-  <h4 class="studioControls-label">
-    Mixer
-  </h4>
+  <div class="studioControls-top">
+    <h4 class="studioControls-label">
+      Mixer
+    </h4>
+  </div>
   <div class="studioControls-selector mixerPanel">
   </div>
 </div>

@@ -1,8 +1,10 @@
 <template>
 <div>
-  <h4 class="studioControls-label">
-    Themes
-  </h4>
+  <div class="studioControls-top">
+    <h4 class="studioControls-label">
+      Themes
+    </h4>
+  </div>
   <selector
     class="studioControls-selector"
     :items="themes"

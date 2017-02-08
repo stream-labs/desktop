@@ -45,6 +45,30 @@ export default {
   font-size: 12px;
   letter-spacing: 1px;
   font-weight: 500;
+
+  flex-grow: 1;
+
+  margin: 0;
+}
+
+.studioControls-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  margin-bottom: 15px;
+}
+
+.studioControls-button {
+  margin-left: 15px;
+  font-size: 16px !important;
+  cursor: pointer;
+  color: #999;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1.0;
+  }
 }
 
 .studioControls-selector {

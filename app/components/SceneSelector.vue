@@ -1,8 +1,16 @@
 <template>
 <div>
-  <h4 class="studioControls-label">
-    Scenes
-  </h4>
+  <div class="studioControls-top">
+    <h4 class="studioControls-label">
+      Scenes
+    </h4>
+    <i
+      class="fa fa-plus studioControls-button"
+      @click="addScene"/>
+    <i
+      class="fa fa-minus studioControls-button"
+      @click="removeScene"/>
+  </div>
   <selector
     class="studioControls-selector"
     :items="sceneNames"
@@ -22,6 +30,14 @@ export default {
         type: 'makeSceneActive',
         sceneName: scene
       });
+    },
+
+    addScene() {
+      console.log('Click Add Scene');
+    },
+
+    removeScene() {
+      console.log('Click Remove Scene');
     }
   },
 
