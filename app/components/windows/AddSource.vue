@@ -7,8 +7,11 @@
     <h4 class="AddSource-heading">
       Standard
     </h4>
-    <ul>
-      <li v-for="source in availableSources">
+    <ul class="AddSource-sourceList">
+      <li
+        v-for="source in availableSources"
+        class="AddSource-source"
+        @click="createSource(source)">
         {{ source }}
       </li>
     </ul>
@@ -28,7 +31,9 @@ export default {
   },
 
   methods: {
-
+    createSource(source) {
+      console.log("CREATING SOURCE", source);
+    }
   },
 
   data() {
@@ -55,5 +60,18 @@ export default {
   font-size: 11px;
   letter-spacing: 1px;
   color: #777;
+}
+
+.AddSource-sourceList {
+  list-style-type: none;
+  margin: 0;
+}
+
+.AddSource-source {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #eee;
+  }
 }
 </style>
