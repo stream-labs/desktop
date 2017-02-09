@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "main.js",
   "scripts": {
-    "build": "webpack",
+    "compile": "webpack",
     "watch": "webpack --watch",
     "start": "electron .",
     "extract-libs": "bin/extract_libs.sh",
