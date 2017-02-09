@@ -30,7 +30,6 @@ export default {
 
     console.log('STARTING MAIN WINDOW');
 
-    Obs.init();
     this.$store.dispatch('initTestData');
 
   },

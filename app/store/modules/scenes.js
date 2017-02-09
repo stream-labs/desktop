@@ -66,9 +66,9 @@ const actions = {
     });
   },
 
-  addSourceToScene({ commit }, data) {
+  addSourceToScene({ commit, getters }, data) {
     Obs.createSource(
-      data.sceneName,
+      getters.activeSceneName,
       data.sourceType,
       data.sourceName,
       data.settings,
@@ -76,7 +76,7 @@ const actions = {
     );
 
     commit('ADD_SOURCE', {
-      sceneName: data.sceneName,
+      sceneName: getters.activeSceneName,
       source: {
         type: data.sourceType,
         name: data.sourceName,

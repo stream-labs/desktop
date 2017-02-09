@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // it was created.  They are unique to this window.
   window.startupOptions = URI.parseQuery(URI.parse(window.location.href).query);
 
+  window.obs = Obs.nodeObs;
+
   const component = windowManager.components[startupOptions.component];
 
   new Vue({

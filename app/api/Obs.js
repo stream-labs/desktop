@@ -18,16 +18,8 @@ const nodeObs = new Proxy({}, {
 
 class ObsApi {
 
-  init() {
-    this.initApi();
-  }
-
-  initApi() {
-    console.log('OBS INITIALIZING');
-
-    nodeObs.OBS_API_initOBS_API();
-    nodeObs.OBS_API_openAllModules();
-    nodeObs.OBS_API_initAllModules();
+  constructor() {
+    this.nodeObs = nodeObs;
   }
 
   createScene(name) {

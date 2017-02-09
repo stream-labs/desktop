@@ -25,6 +25,10 @@ app.on('ready', () => {
 
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
   }
+
+    obs.OBS_API_initOBS_API();
+    obs.OBS_API_openAllModules();
+    obs.OBS_API_initAllModules();
 });
 
 
@@ -44,7 +48,7 @@ ipcMain.on('window-spawnChildWindow', (event, data) => {
   });
 
   childWindow = new BrowserWindow(options);
-  childWindow.webContents.openDevTools();
+  //childWindow.webContents.openDevTools();
 
   let childUrl = URI(indexUrl).query(data.startupOptions);
 
@@ -96,6 +100,8 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
   const retVal = obs[data.method].apply(obs, data.args);
+
+  console.log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.

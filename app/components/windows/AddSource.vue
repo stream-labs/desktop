@@ -33,6 +33,16 @@ export default {
   methods: {
     createSource(source) {
       console.log("CREATING SOURCE", source);
+
+      this.$store.dispatch({
+        type: 'addSourceToScene',
+        sourceType: source,
+        sourceName: source,
+        settings: {},
+        hotkeyData: {}
+      });
+
+      window.require('electron').remote.getCurrentWindow().close();
     }
   },
 
