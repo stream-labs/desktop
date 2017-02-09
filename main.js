@@ -26,9 +26,9 @@ app.on('ready', () => {
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
   }
 
-    obs.OBS_API_initOBS_API();
-    obs.OBS_API_openAllModules();
-    obs.OBS_API_initAllModules();
+  obs.OBS_API_initOBS_API();
+  obs.OBS_API_openAllModules();
+  obs.OBS_API_initAllModules();
 });
 
 
