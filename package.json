@@ -22,6 +22,7 @@
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",
     "electron-devtools-installer": "^2.1.0",
+    "electron-rebuild": "^1.5.7",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",
