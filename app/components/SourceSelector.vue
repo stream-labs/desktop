@@ -59,13 +59,7 @@ export default {
 
   computed: {
     sourceNames() {
-      let scene = this.$store.getters.activeScene;
-
-      if (scene) {
-        return _.map(scene.sources, source => source.name);
-      } else {
-        return [];
-      }
+      return this.$store.getters.activeScene.sources;
     },
 
     activeSourceName() {

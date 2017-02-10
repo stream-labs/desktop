@@ -22,27 +22,22 @@ const mutations = {
     state.activeSceneName = data.sceneName;
   },
 
-  ADD_SOURCE(state, data) {
+  ADD_SOURCE_TO_SCENE(state, data) {
     state.scenes.find(scene => { 
       return scene.name === data.sceneName;
-    }).sources.push(data.source);
+    }).sources.push(data.sourceName);
+  },
+
+  REMOVE_SOURCE_FROM_ALL_SCENES(state, data) {
+    _.each(state.scenes, scene => {
+      scene.sources = _.without(scene.sources, data.sourceName);
+    });
   },
 
   MAKE_SOURCE_ACTIVE(state, data) {
     state.scenes.find(scene => {
       return scene.name === data.sceneName;
     }).activeSourceName = data.sourceName;
-  },
-
-  REMOVE_SOURCE(state, data) {
-    // For now, assume the source is in the active
-    let scene = state.scenes.find(scene => {
-      return scene.name === data.sceneName;
-    });
-
-    scene.sources = _.reject(scene.sources, source => {
-      return source.name === data.sourceName;
-    });
   }
 };
 
@@ -77,39 +72,10 @@ const actions = {
     });
   },
 
-  addSourceToScene({ commit, getters }, data) {
-    Obs.createSource(
-      getters.activeSceneName,
-      data.sourceType,
-      data.sourceName,
-      data.settings,
-      data.hotkeyData
-    );
-
-    commit('ADD_SOURCE', {
-      sceneName: getters.activeSceneName,
-      source: {
-        type: data.sourceType,
-        name: data.sourceName,
-        settings: data.settings,
-        hotkeyData: data.hotkeyData
-      }
-    });
-  },
-
   makeSourceActive({ commit }, data) {
     commit('MAKE_SOURCE_ACTIVE', {
       sceneName: data.sceneName,
       sourceName: data.sourceName
-    });
-  },
-
-  removeSource({ commit, getters }, data) {
-    Obs.removeSource(data.sourceName);
-
-    commit('REMOVE_SOURCE', {
-      sourceName: data.sourceName,
-      sceneName: data.sceneName
     });
   }
 };
@@ -125,17 +91,9 @@ const getters = {
     return state.activeSceneName;
   },
 
-  activeSource(state, getters) {
-    return getters.activeScene.sources.find(source => {
-      return source.name === getters.activeScene.activeSourceName;
-    });
-  },
-
   activeSourceName(state, getters) {
     if (getters.activeScene) {
       return getters.activeScene.activeSourceName;
-    } else {
-      return null;
     }
   }
 };

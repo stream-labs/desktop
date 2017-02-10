@@ -57,7 +57,7 @@ ipcMain.on('window-spawnChildWindow', (event, data) => {
   });
 
   childWindow = new BrowserWindow(options);
-  childWindow.webContents.openDevTools();
+  //childWindow.webContents.openDevTools();
 
   let childUrl = URI(indexUrl).query(data.startupOptions);
 

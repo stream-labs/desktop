@@ -49,7 +49,8 @@ export default {
 
     submit() {
       this.$store.dispatch({
-        type: 'addSourceToScene',
+        type: 'createSourceAndAddToScene',
+        sceneName: this.$store.getters.activeSceneName,
         sourceType: window.startupOptions.sourceType,
         sourceName: this.name,
         settings: {},

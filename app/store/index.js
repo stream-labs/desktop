@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import navigation from './modules/navigation.js';
 import scenes from './modules/scenes.js';
+import sources from './modules/sources.js';
 import streaming from './modules/streaming.js';
 import _ from 'lodash';
 
@@ -42,7 +43,7 @@ const actions = {
     })
 
     dispatch({
-      type: 'addSourceToScene',
+      type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
       sourceType: 'Video Capture Device',
       sourceName: 'Video Capture 1',
@@ -51,7 +52,7 @@ const actions = {
     });
 
     dispatch({
-      type: 'addSourceToScene',
+      type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
       sourceType: 'Video Capture Device',
       sourceName: 'Video Capture 2',
@@ -103,6 +104,7 @@ export default new Vuex.Store({
   modules: {
     navigation,
     scenes,
+    sources,
     streaming
   },
   plugins,
