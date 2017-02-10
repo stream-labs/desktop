@@ -12,16 +12,20 @@ require('./app.less');
 
 document.addEventListener('DOMContentLoaded', function() {
   // These are options passed into this window when
-  // it was created.  They are unique to this window.
+  // it was created.  They are unique to this window,
+  // and should be considered immutable, except when doing
+  // an in-place window replacement.
   window.startupOptions = URI.parseQuery(URI.parse(window.location.href).query);
 
   window.obs = Obs.nodeObs;
 
-  const component = windowManager.components[startupOptions.component];
-
-  new Vue({
+  let vm = new Vue({
     el: '#app',
     store: store,
-    render: h => h(component)
+    render: h => h(windowManager.components[startupOptions.component])
   });
+
+  window.reset = () => {
+    vm.$forceUpdate();
+  };
 });

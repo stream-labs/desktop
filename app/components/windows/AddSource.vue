@@ -11,7 +11,7 @@
       <li
         v-for="source in availableSources"
         class="AddSource-source"
-        @click="createSource(source)">
+        @click="selectSource(source)">
         {{ source }}
       </li>
     </ul>
@@ -31,18 +31,8 @@ export default {
   },
 
   methods: {
-    createSource(source) {
-      console.log("CREATING SOURCE", source);
-
-      this.$store.dispatch({
-        type: 'addSourceToScene',
-        sourceType: source,
-        sourceName: source,
-        settings: {},
-        hotkeyData: {}
-      });
-
-      window.require('electron').remote.getCurrentWindow().close();
+    selectSource(source) {
+      windowManager.showNameSource(true, source);
     }
   },
 

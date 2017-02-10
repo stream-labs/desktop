@@ -29,6 +29,8 @@ app.on('ready', () => {
   obs.OBS_API_initOBS_API();
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
+  obs.OBS_service_resetAudioContext();
+  obs.OBS_service_resetVideoContext();
 });
 
 
@@ -43,7 +45,7 @@ ipcMain.on('window-spawnChildWindow', (event, data) => {
     childWindow.close();
   }
 
-  const options = Object.assign({}, data.options, {
+  const options = Object.assign({}, data.windowOptions, {
     parent: mainWindow
   });
 
@@ -99,6 +101,8 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
 
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
+  console.log('OBS API CALL', data);
+
   const retVal = obs[data.method].apply(obs, data.args);
 
   console.log('OBS RETURN VALUE', retVal);
