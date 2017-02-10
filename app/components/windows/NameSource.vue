@@ -3,15 +3,19 @@
   <title-bar
     class="NameSource-titleBar"
     window-title="Name Source"/>
-  <div class="NameSource-content">
+  <form
+    class="NameSource-content"
+    id="nameForm"
+    @submit.prevent="submit">
     <p
       class="NameSource-label">
       Please enter the name of the source
     </p>
     <input
+      autofocus
       type="text"
       v-model="name"/>
-  </div>
+  </form>
   <div class="NameSource-controls">
     <button
       class="button button--default"
@@ -20,7 +24,8 @@
     </button>
     <button
       class="button button--action NameSource-button"
-      @click="submit">
+      type="submit"
+      form="nameForm">
       Submit
     </button>
   </div>

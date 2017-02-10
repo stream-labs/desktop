@@ -107,7 +107,6 @@ const actions = {
   removeSource({ commit, getters }, data) {
     Obs.removeSource(data.sourceName);
 
-    // For now, assume the active source and scene
     commit('REMOVE_SOURCE', {
       sourceName: data.sourceName,
       sceneName: data.sceneName
