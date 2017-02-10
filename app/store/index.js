@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import navigation from './modules/navigation.js';
 import scenes from './modules/scenes.js';
+import streaming from './modules/streaming.js';
 import _ from 'lodash';
 
 Vue.use(Vuex);
@@ -66,7 +67,7 @@ const plugins = [];
 // IPC with the main process.
 plugins.push(store => {
   store.subscribe(mutation => {
-    if (!mutation.payload.__vuexSyncIgnore) {
+    if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
       ipcRenderer.send('vuex-mutation', {
         type: mutation.type,
         payload: mutation.payload
@@ -90,7 +91,7 @@ plugins.push(store => {
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event, mutation) => {
-    store.commit(mutation.type, Object.assign(mutation.payload, {
+    store.commit(mutation.type, Object.assign({}, mutation.payload, {
       __vuexSyncIgnore: true
     }));
   });
@@ -101,7 +102,8 @@ plugins.push(store => {
 export default new Vuex.Store({
   modules: {
     navigation,
-    scenes
+    scenes,
+    streaming
   },
   plugins,
   mutations,

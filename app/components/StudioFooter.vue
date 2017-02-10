@@ -7,15 +7,78 @@
     <button class="button button--default button--md studioFooter-button studioFooter-button--startRecording">
       Start Recording
     </button>
-    <button class="button button--default button--md studioFooter-button studioFooter-button--startStreaming">
-      Start Streaming
+    <button
+      class="button button--default button--md studioFooter-button studioFooter-button--startStreaming"
+      @click="toggleStreaming">
+      {{ streamButtonLabel }}
     </button>
   </div>
 </div>
 </template>
 
 <script>
-export default {};
+import moment from 'moment';
+import _ from 'lodash';
+
+export default {
+
+  data() {
+    return {
+      streamElapsed: ''
+    };
+  },
+
+  methods: {
+    toggleStreaming() {
+      if (this.streaming) {
+        this.$store.dispatch({
+          type: 'stopStreaming'
+        });
+
+        clearInterval(this.counterInterval);
+      } else {
+        this.$store.dispatch({
+          type: 'startStreaming'
+        });
+
+        this.counterInterval = setInterval(() => {
+          this.streamElapsed = this.elapsedStreamTime;
+        }, 100);
+      }
+    }
+  },
+
+  computed: {
+    streaming() {
+      return this.$store.getters.isStreaming;
+    },
+
+    streamStartTime() {
+      return this.$store.getters.streamStartTime;
+    },
+
+    streamButtonLabel() {
+      if (this.streaming) {
+        return this.streamElapsed;
+      } else {
+        return 'Start Streaming';
+      }
+    },
+
+    elapsedStreamTime: {
+      cache: false,
+      get() {
+        const duration = moment.duration(moment() - this.streamStartTime);
+        const seconds = _.padStart(duration.seconds(), 2, 0);
+        const minutes = _.padStart(duration.minutes(), 2, 0);
+        const hours = _.padStart(duration.hours(), 2, 0);
+
+        return hours + ':' + minutes + ':' + seconds;
+      }
+    }
+  }
+
+};
 </script>
 
 <style lang="less" scoped>

@@ -29,8 +29,15 @@ app.on('ready', () => {
   obs.OBS_API_initOBS_API();
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
+  obs.OBS_service_createStreamingOutput();
+  obs.OBS_service_createVideoStreamingEncoder();
+  obs.OBS_service_createAudioEncoder();
   obs.OBS_service_resetAudioContext();
   obs.OBS_service_resetVideoContext();
+  obs.OBS_service_associateAudioAndVideoToTheCurrentStreamingContext();
+  obs.OBS_service_createService();
+  obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentStreamingOutput();
+  obs.OBS_service_setServiceToTheStreamingOutput();
 });
 
 
@@ -50,7 +57,7 @@ ipcMain.on('window-spawnChildWindow', (event, data) => {
   });
 
   childWindow = new BrowserWindow(options);
-  //childWindow.webContents.openDevTools();
+  childWindow.webContents.openDevTools();
 
   let childUrl = URI(indexUrl).query(data.startupOptions);
 

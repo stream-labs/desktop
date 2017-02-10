@@ -54,6 +54,14 @@ class ObsApi {
     return nodeObs.OBS_content_getListInputSources();
   }
 
+  startStreaming() {
+    nodeObs.OBS_service_startStreaming();
+  }
+
+  stopStreaming() {
+    nodeObs.OBS_service_stopStreaming();
+  }
+
 }
 
 export default new ObsApi();
