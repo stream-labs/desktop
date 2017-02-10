@@ -37,6 +37,15 @@ export default {
 
     removeSource() {
       console.log('Click Remove Source');
+
+      // We can only remove a source if one is selected
+      if(this.$store.getters.activeSourceName) {
+        this.$store.dispatch({
+          type: 'removeSource',
+          sceneName: this.$store.getters.activeSceneName,
+          sourceName: this.$store.getters.activeSourceName
+        });
+      }
     },
 
     makeActive(sourceName) {

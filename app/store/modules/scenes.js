@@ -32,6 +32,17 @@ const mutations = {
     state.scenes.find(scene => {
       return scene.name === data.sceneName;
     }).activeSourceName = data.sourceName;
+  },
+
+  REMOVE_SOURCE(state, data) {
+    // For now, assume the source is in the active
+    let scene = state.scenes.find(scene => {
+      return scene.name === data.sceneName;
+    });
+
+    scene.sources = _.reject(scene.sources, source => {
+      return source.name === data.sourceName;
+    });
   }
 };
 
@@ -90,6 +101,16 @@ const actions = {
     commit('MAKE_SOURCE_ACTIVE', {
       sceneName: data.sceneName,
       sourceName: data.sourceName
+    });
+  },
+
+  removeSource({ commit, getters }, data) {
+    Obs.removeSource(data.sourceName);
+
+    // For now, assume the active source and scene
+    commit('REMOVE_SOURCE', {
+      sourceName: data.sourceName,
+      sceneName: data.sceneName
     });
   }
 };

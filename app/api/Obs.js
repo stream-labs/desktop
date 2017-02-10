@@ -44,6 +44,12 @@ class ObsApi {
     );
   }
 
+  removeSource(sourceName) {
+    nodeObs.OBS_content_removeSource(
+      sourceName
+    );
+  }
+
   availableSources() {
     return nodeObs.OBS_content_getListInputSources();
   }
