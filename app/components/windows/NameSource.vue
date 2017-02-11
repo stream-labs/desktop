@@ -1,10 +1,7 @@
 <template>
-<div class="NameSource">
-  <title-bar
-    class="NameSource-titleBar"
-    window-title="Name Source"/>
+<modal-layout title="Name Source">
   <form
-    class="NameSource-content"
+    slot="content"
     id="nameForm"
     @submit.prevent="submit">
     <p
@@ -16,7 +13,7 @@
       type="text"
       v-model="name"/>
   </form>
-  <div class="NameSource-controls">
+  <div slot="controls" class="NameSource-controls">
     <button
       class="button button--default"
       @click="cancel">
@@ -29,17 +26,17 @@
       Submit
     </button>
   </div>
-</div>
+</modal-layout>
 </template>
 
 <script>
-import TitleBar from '../TitleBar.vue';
+import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager.js';
 
 export default {
 
   components: {
-    TitleBar
+    ModalLayout
   },
 
   methods: {
@@ -71,19 +68,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.NameSource-titleBar {
-  border-bottom: 1px solid #eee;
-}
-
-.NameSource-content {
-  padding: 15px 30px;
-  flex-grow: 1;
-}
-
 .NameSource-controls {
   padding: 15px 30px;
-  background-color: #fcfcfc;
-  border-top: 1px solid #ededed;
   text-align: right;
 }
 
@@ -93,11 +79,5 @@ export default {
 
 .NameSource-label {
   margin-bottom: 10px;
-}
-
-.NameSource {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
 }
 </style>

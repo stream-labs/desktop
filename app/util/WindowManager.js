@@ -82,7 +82,7 @@ class WindowManager {
       windowOptions: {
         frame: false,
         width: 400,
-        height: 220
+        height: 240
       },
       inPlace
     });

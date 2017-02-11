@@ -1,9 +1,6 @@
 <template>
-<div>
-  <title-bar
-    class="AddSource-titleBar"
-    window-title="Add Source" />
-  <div class="AddSource-content">
+<modal-layout title="Add Source">
+  <div slot="content">
     <h4 class="AddSource-heading">
       Standard
     </h4>
@@ -16,18 +13,18 @@
       </li>
     </ul>
   </div>
-</div>
+</modal-layout>
 </template>
 
 <script>
-import TitleBar from '../TitleBar.vue';
+import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager.js';
 import Obs from '../../api/Obs.js';
 
 export default {
 
   components: {
-    TitleBar
+    ModalLayout
   },
 
   methods: {
