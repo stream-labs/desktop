@@ -7,6 +7,7 @@ import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
 import NameSource from '../components/windows/NameSource.vue';
+import SourceProperties from '../components/windows/SourceProperties.vue';
 
 class WindowManager {
 
@@ -17,7 +18,8 @@ class WindowManager {
       Main,
       Settings,
       AddSource,
-      NameSource
+      NameSource,
+      SourceProperties
     };
   }
 
@@ -83,6 +85,24 @@ class WindowManager {
         frame: false,
         width: 400,
         height: 240
+      },
+      inPlace
+    });
+  }
+
+  showSourceProperties(inPlace = false, data) {
+    this.showWindow({
+      startupOptions: {
+        component: 'SourceProperties',
+        sourceName: data.sourceName,
+        sourceType: data.sourceType,
+        isNew: data.isNew
+      },
+      windowOptions: {
+        // Eventually souceType will determine window size
+        frame: false,
+        width: 400,
+        height: 700
       },
       inPlace
     });

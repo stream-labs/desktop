@@ -1,8 +1,10 @@
 <template>
-<modal-layout title="Name Source">
+<modal-layout
+  title="Name Source"
+  :show-controls="true"
+  :done-handler="submit">
   <form
     slot="content"
-    id="nameForm"
     @submit.prevent="submit">
     <p
       class="NameSource-label">
@@ -13,19 +15,6 @@
       type="text"
       v-model="name"/>
   </form>
-  <div slot="controls" class="NameSource-controls">
-    <button
-      class="button button--default"
-      @click="cancel">
-      Cancel
-    </button>
-    <button
-      class="button button--action NameSource-button"
-      type="submit"
-      form="nameForm">
-      Submit
-    </button>
-  </div>
 </modal-layout>
 </template>
 
@@ -40,21 +29,12 @@ export default {
   },
 
   methods: {
-    cancel() {
-      windowManager.closeWindow();
-    },
-
     submit() {
-      this.$store.dispatch({
-        type: 'createSourceAndAddToScene',
-        sceneName: this.$store.getters.activeSceneName,
-        sourceType: window.startupOptions.sourceType,
+      windowManager.showSourceProperties(true, {
         sourceName: this.name,
-        settings: {},
-        hotkeyData: {}
+        sourceType: window.startupOptions.sourceType,
+        isNew: true
       });
-
-      windowManager.closeWindow();
     }
   },
 
@@ -68,15 +48,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.NameSource-controls {
-  padding: 15px 30px;
-  text-align: right;
-}
-
-.NameSource-button {
-  margin-left: 15px;
-}
-
 .NameSource-label {
   margin-bottom: 10px;
 }
