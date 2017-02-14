@@ -3,7 +3,7 @@
   <label>{{ property.name }}</label>
   <input
     type="checkbox"
-    :checked="propertyValue"
+    :checked="property.value"
     @change="setValue"/>
 </div>
 </template>
@@ -12,7 +12,6 @@
 export default {
 
   props: [
-    'sourceName',
     'property'
   ],
 
@@ -20,17 +19,9 @@ export default {
     setValue(event) {
       this.$store.dispatch({
         type: 'setSourceProperty',
-        sourceName: this.sourceName,
-        propertyName: this.property.name,
+        property: this.property,
         propertyValue: event.target.checked
       });
-    }
-  },
-
-  computed: {
-    propertyValue() {
-      return this.$store.state.sources.sources[this.sourceName].
-        propertyValues[this.property.name];
     }
   }
 

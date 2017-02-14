@@ -11,7 +11,6 @@
     <component
       v-for="property in properties"
       :is="propertyComponentForType(property.type)"
-      :source-name="sourceName"
       :property="property"/>
     </div>
   </div>
@@ -73,13 +72,7 @@ export default {
     },
 
     properties() {
-      let source = this.$store.state.sources.sources[this.sourceName];
-
-      if (source) {
-        return source.availableProperties;
-      } else {
-        return [];
-      }
+      return this.$store.getters.sourceProperties(this.sourceName);
     }
   }
 
