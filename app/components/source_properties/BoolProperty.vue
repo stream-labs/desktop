@@ -1,6 +1,6 @@
 <template>
 <div>
-  <label>{{ property.name }}</label>
+  <label>{{ property.description }}</label>
   <input
     type="checkbox"
     :checked="property.value"

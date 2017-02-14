@@ -1,6 +1,6 @@
 <template>
 <div>
-  <label>{{ property.name }}</label>
+  <label>{{ property.description }}</label>
   <select @change="setValue">
     <option
       v-for="option in property.options"

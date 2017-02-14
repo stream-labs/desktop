@@ -6,13 +6,6 @@ const state = {
   sources: {}
 };
 
-// There are some duplicate property names, so in
-// order to uniquely identify a property, we combine
-// the name and the type into a key.
-const propertyKey = (name, type) => {
-  return name + type;
-};
-
 const mutations = {
   ADD_SOURCE(state, data) {
     Vue.set(state.sources, data.sourceName, data.source);
@@ -22,17 +15,10 @@ const mutations = {
     Vue.delete(state.sources, data.sourceName);
   },
 
-  SET_SOURCE_AVAILABLE_PROPERTIES(state, data) {
+  SET_SOURCE_PROPERTIES(state, data) {
     let source = state.sources[data.sourceName];
 
-    source.availableProperties = data.availableProperties;
-  },
-
-  SET_SOURCE_PROPERTY_VALUE(state, data) {
-    let source = state.sources[data.sourceName];
-    let key = propertyKey(data.propertyName, data.propertyType);
-
-    Vue.set(source.propertyValues, key, data.propertyValue);
+    source.properties = data.properties;
   }
 };
 
@@ -45,19 +31,17 @@ const actions = {
     Obs.createSource(
       data.sceneName,
       data.sourceType,
-      data.sourceName,
-      {},
-      {}
+      data.sourceName
     );
 
-    // TODO: Get default source settings from Obs
+    const properties = Obs.sourceProperties(data.sourceName);
 
     commit('ADD_SOURCE', {
       sourceName: data.sourceName,
       source: {
         type: data.sourceType,
-        availableProperties: Obs.sourceProperties(data.sourceName),
-        propertyValues: {}
+        properties,
+        restorePoints: {}
       }
     });
 
@@ -82,21 +66,12 @@ const actions = {
   setSourceProperty({ commit }, data) {
     // TODO: Set sources in OBS
 
-    commit('SET_SOURCE_PROPERTY_VALUE', {
-      sourceName: data.property.source,
-      propertyName: data.property.name,
-      propertyType: data.property.type,
-      propertyValue: data.propertyValue
-    });
+    // Refresh the state of source properties
+    const properties = Obs.sourceProperties(data.property.source);
 
-    // Any time we set a property, we need to refresh the
-    // set of available options on that source, since they
-    // can change depending on what is selected.
-    let availableProperties = Obs.sourceProperties(data.property.source);
-
-    commit('SET_SOURCE_AVAILABLE_PROPERTIES', {
+    commit('SET_SOURCE_PROPERTIES', {
       sourceName: data.property.source,
-      availableProperties
+      properties
     });
   }
 };
@@ -114,10 +89,9 @@ const getters = {
       let source = state.sources[sourceName]
 
       if (source) {
-        return _.map(source.availableProperties, prop => {
+        return _.map(source.properties, prop => {
           return Object.assign(prop, {
-            source: sourceName,
-            value: source.propertyValues[propertyKey(prop.name, prop.type)]
+            source: sourceName
           });
         });
       } else {

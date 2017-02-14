@@ -91,6 +91,5 @@ export default {
 
 .SourceProperties-form {
   padding: 30px;
-  max-height: calc(100% - 220px);
 }
 </style>
