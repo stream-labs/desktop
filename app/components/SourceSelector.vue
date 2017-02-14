@@ -10,6 +10,9 @@
     <i
       class="fa fa-minus studioControls-button"
       @click="removeSource"/>
+    <i
+      class="fa fa-cog studioControls-button"
+      @click="sourceProperties"/>
   </div>
   <selector
     class="studioControls-selector"
@@ -45,6 +48,13 @@ export default {
           sceneName: this.$store.getters.activeSceneName,
           sourceName: this.$store.getters.activeSourceName
         });
+      }
+    },
+
+    sourceProperties() {
+      if (this.$store.getters.activeSourceName) {
+        windowManager.showSourceProperties(false,
+          this.$store.getters.activeSourceName);
       }
     },
 

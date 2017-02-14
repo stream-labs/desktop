@@ -90,13 +90,11 @@ class WindowManager {
     });
   }
 
-  showSourceProperties(inPlace = false, data) {
+  showSourceProperties(inPlace = false, sourceName) {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
-        sourceName: data.sourceName,
-        sourceType: data.sourceType,
-        isNew: data.isNew
+        sourceName
       },
       windowOptions: {
         // Eventually souceType will determine window size

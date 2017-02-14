@@ -28,11 +28,12 @@ import windowManager from '../util/WindowManager.js';
 export default {
 
   data() {
-    let contentStyle  = {};
+    let contentStyle  = {
+      padding: '30px',
+      overflow: 'auto'
+    };
 
-    if (!this.noContentPadding) {
-      contentStyle.padding = '30px';
-    }
+    Object.assign(contentStyle, this.contentStyles);
 
     return {
       contentStyle
@@ -61,8 +62,8 @@ export default {
     // are enabled
     'doneHandler',
 
-    // Disables padding around the content section
-    'noContentPadding'
+    // Additional CSS styles for the content section
+    'contentStyles'
   ]
 
 };
@@ -77,6 +78,7 @@ export default {
 
 .ModalLayout-titleBar {
   border-bottom: 1px solid #eee;
+  flex-shrink: 0;
 }
 
 .ModalLayout-content {
@@ -88,6 +90,7 @@ export default {
   border-top: 1px solid #ededed;
   padding: 15px 30px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .ModalLayout-button {

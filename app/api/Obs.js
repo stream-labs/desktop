@@ -3,6 +3,8 @@
 
 const { ipcRenderer } = window.require('electron');
 
+import _ from 'lodash';
+
 // Behaves just like the node-obs library, but proxies
 // all methods via the main process
 const nodeObs = new Proxy({}, {
@@ -48,6 +50,26 @@ class ObsApi {
     nodeObs.OBS_content_removeSource(
       sourceName
     );
+  }
+
+  sourceProperties(sourceName) {
+    const propertyArr = nodeObs.OBS_content_getSourceProperties(sourceName);
+
+    return _.map(_.chunk(propertyArr, 2), prop => {
+      let propertyObj = {
+        name: prop[0],
+        type: prop[1]
+      };
+
+      // For list types, we must separately fetch the
+      // list options.
+      if (propertyObj.type === 'OBS_PROPERTY_LIST') {
+        propertyObj.options = nodeObs.
+          OBS_content_getSourcePropertiesSubParameters(sourceName, propertyObj.name);
+      }
+
+      return propertyObj;
+    });
   }
 
   availableSources() {

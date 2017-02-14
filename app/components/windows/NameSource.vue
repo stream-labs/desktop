@@ -30,11 +30,16 @@ export default {
 
   methods: {
     submit() {
-      windowManager.showSourceProperties(true, {
-        sourceName: this.name,
+      this.$store.dispatch({
+        type: 'createSourceAndAddToScene',
+        sceneName: this.$store.getters.activeSceneName,
         sourceType: window.startupOptions.sourceType,
-        isNew: true
+        sourceName: this.name,
+        settings: {},
+        hotkeyData: {}
       });
+
+      windowManager.showSourceProperties(true, this.name);
     }
   },
 
