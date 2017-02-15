@@ -57,6 +57,7 @@ class ObsApi {
 
     return _.map(_.chunk(propertyArr, 3), prop => {
       let propertyObj = {
+        source: sourceName,
         name: prop[0],
         description: prop[1],
         type: prop[2]
@@ -69,16 +70,35 @@ class ObsApi {
           OBS_content_getSourcePropertiesSubParameters(sourceName, propertyObj.name);
       }
 
-      let value = nodeObs.OBS_content_getSourcePropertyCurrentValue(sourceName, prop[0]);
-
-      if (propertyObj.type === 'OBS_PROPERTY_BOOL') {
-        // Convert from string to boolean value
-        value = value === 'true';
-      }
-
-      propertyObj.value = value;
+      propertyObj.value = this.getPropertyValue(propertyObj);
 
       return propertyObj;
+    });
+  }
+
+  getPropertyValue(property) {
+    let value = nodeObs.OBS_content_getSourcePropertyCurrentValue(
+      property.source,
+      property.name
+    );
+
+    if (property.type === 'OBS_PROPERTY_LIST') {
+      value = this.findClosestOption(property.options, value);
+    }
+
+    if (property.type === 'OBS_PROPERTY_BOOL') {
+      // Convert from string to boolean value
+      value = value === 'true';
+    }
+
+    return value;
+  }
+
+  // Sometimes the value we receive from OBS is not a perfect
+  // match.  So we need to find the closest option.
+  findClosestOption(options, value) {
+    return _.find(options, option => {
+      return value.includes(option);
     });
   }
 

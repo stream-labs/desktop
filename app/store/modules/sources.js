@@ -110,17 +110,13 @@ const getters = {
     }
   },
 
-  // Returns a function for fetching saturated source properties
+  // Returns a function for fetching source properties
   sourceProperties(state) {
     return sourceName => {
       let source = state.sources[sourceName]
 
       if (source) {
-        return _.map(source.properties, prop => {
-          return Object.assign(prop, {
-            source: sourceName
-          });
-        });
+        return source.properties;
       } else {
         return [];
       }
