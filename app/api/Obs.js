@@ -126,6 +126,14 @@ class ObsApi {
     nodeObs.OBS_service_stopStreaming();
   }
 
+  startRecording() {
+    nodeObs.OBS_service_startRecording();
+  }
+
+  stopRecording() {
+    nodeObs.OBS_service_stopRecording();
+  }
+
 }
 
 export default new ObsApi();

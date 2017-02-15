@@ -4,8 +4,10 @@
     CPU STATS GO HERE
   </div>
   <div class="studioFooter-buttons text-right">
-    <button class="button button--default button--md studioFooter-button studioFooter-button--startRecording">
-      Start Recording
+    <button
+      class="button button--default button--md studioFooter-button studioFooter-button--startRecording"
+      @click="toggleRecording">
+      {{ recordButtonLabel }}
     </button>
     <button
       class="button button--default button--md studioFooter-button studioFooter-button--startStreaming"
@@ -24,7 +26,8 @@ export default {
 
   data() {
     return {
-      streamElapsed: ''
+      streamElapsed: '',
+      recordElapsed: ''
     };
   },
 
@@ -35,16 +38,47 @@ export default {
           type: 'stopStreaming'
         });
 
-        clearInterval(this.counterInterval);
+        clearInterval(this.streamInterval);
       } else {
         this.$store.dispatch({
           type: 'startStreaming'
         });
 
-        this.counterInterval = setInterval(() => {
+        this.streamElapsed = '00:00:00';
+
+        this.streamInterval = setInterval(() => {
           this.streamElapsed = this.elapsedStreamTime;
         }, 100);
       }
+    },
+
+    toggleRecording() {
+      if (this.recording) {
+        this.$store.dispatch({
+          type: 'stopRecording'
+        });
+
+        clearInterval(this.recordInterval);
+      } else {
+        this.$store.dispatch({
+          type: 'startRecording'
+        });
+
+        this.recordElapsed = '00:00:00';
+
+        this.recordInterval = setInterval(() => {
+          this.recordElapsed = this.elapsedRecordTime;
+        }, 100);
+      }
+    },
+
+    formattedDurationSince(timestamp) {
+      const duration = moment.duration(moment() - timestamp);
+      const seconds = _.padStart(duration.seconds(), 2, 0);
+      const minutes = _.padStart(duration.minutes(), 2, 0);
+      const hours = _.padStart(duration.hours(), 2, 0);
+
+      return hours + ':' + minutes + ':' + seconds;
     }
   },
 
@@ -68,12 +102,30 @@ export default {
     elapsedStreamTime: {
       cache: false,
       get() {
-        const duration = moment.duration(moment() - this.streamStartTime);
-        const seconds = _.padStart(duration.seconds(), 2, 0);
-        const minutes = _.padStart(duration.minutes(), 2, 0);
-        const hours = _.padStart(duration.hours(), 2, 0);
+        return this.formattedDurationSince(this.streamStartTime);
+      }
+    },
 
-        return hours + ':' + minutes + ':' + seconds;
+    recording() {
+      return this.$store.getters.isRecording;
+    },
+
+    recordStartTime() {
+      return this.$store.getters.recordStartTime;
+    },
+
+    recordButtonLabel() {
+      if (this.recording) {
+        return this.recordElapsed;
+      } else {
+        return 'Start Recording';
+      }
+    },
+
+    elapsedRecordTime: {
+      cache: false,
+      get() {
+        return this.formattedDurationSince(this.recordStartTime);
       }
     }
   }

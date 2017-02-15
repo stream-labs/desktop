@@ -4,7 +4,9 @@ import _ from 'lodash';
 
 const state = {
   streaming: false,
-  streamStartTime: null
+  streamStartTime: null,
+  recording: false,
+  recordStartTime: null
 };
 
 const mutations = {
@@ -16,6 +18,16 @@ const mutations = {
   STOP_STREAMING(state, data) {
     state.streaming = false;
     state.streamStartTime = null;
+  },
+
+  START_RECORDING(state, data) {
+    state.recording = true;
+    state.recordStartTime = data.recordStartTime;
+  },
+
+  STOP_RECORDING(state, data) {
+    state.recording = false;
+    state.recordStartTime = null;
   }
 };
 
@@ -33,6 +45,21 @@ const actions = {
     Obs.stopStreaming();
 
     commit('STOP_STREAMING');
+  },
+
+  startRecording({ commit }, data) {
+    Obs.startRecording();
+
+    // Since commits are serialized, we always convert to a string
+    commit('START_RECORDING', {
+      recordStartTime: (new Date()).toISOString()
+    });
+  },
+
+  stopRecording({ commit }, data) {
+    Obs.stopRecording();
+
+    commit('STOP_RECORDING');
   }
 };
 
@@ -44,6 +71,15 @@ const getters = {
   streamStartTime(state) {
     // De-serialize the timestamp
     return moment(state.streamStartTime);
+  },
+
+  isRecording(state) {
+    return state.recording;
+  },
+
+  recordStartTime(state) {
+    // De-serialize the timestamp
+    return moment(state.recordStartTime);
   }
 }
 
