@@ -91,6 +91,10 @@ class ObsApi {
       value = value === 'true';
     }
 
+    if (property.type === 'OBS_PROPERTY_FLOAT') {
+      value = parseFloat(value);
+    }
+
     return value;
   }
 
@@ -100,6 +104,14 @@ class ObsApi {
     return _.find(options, option => {
       return value.includes(option);
     });
+  }
+
+  setProperty(property, value) {
+    nodeObs.OBS_content_setProperty(
+      property.source,
+      property.name,
+      value.toString()
+    );
   }
 
   availableSources() {

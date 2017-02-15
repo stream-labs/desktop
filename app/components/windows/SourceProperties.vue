@@ -26,6 +26,7 @@ import _ from 'lodash';
 
 import ListProperty from '../source_properties/ListProperty.vue';
 import BoolProperty from '../source_properties/BoolProperty.vue';
+import FloatProperty from '../source_properties/FloatProperty.vue';
 
 export default {
 
@@ -43,7 +44,8 @@ export default {
   components: {
     ModalLayout,
     ListProperty,
-    BoolProperty
+    BoolProperty,
+    FloatProperty
   },
 
   methods: {
@@ -63,7 +65,8 @@ export default {
     propertyComponentForType(type) {
       return {
         OBS_PROPERTY_LIST: ListProperty,
-        OBS_PROPERTY_BOOL: BoolProperty
+        OBS_PROPERTY_BOOL: BoolProperty,
+        OBS_PROPERTY_FLOAT: FloatProperty
       }[type];
     }
   },

@@ -77,7 +77,7 @@ const actions = {
   },
 
   setSourceProperty({ dispatch }, data) {
-    // TODO: Set property in OBS
+    Obs.setProperty(data.property, data.propertyValue);
 
     dispatch({
       type: 'refreshProperties',
