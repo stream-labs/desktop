@@ -19,6 +19,12 @@ const mutations = {
     let source = state.sources[data.sourceName];
 
     source.properties = data.properties;
+  },
+
+  CREATE_PROPERTIES_RESTORE_POINT(state, data) {
+    let source = state.sources[data.sourceName];
+
+    source.restorePoint = _.cloneDeep(source.properties);
   }
 };
 
@@ -41,7 +47,7 @@ const actions = {
       source: {
         type: data.sourceType,
         properties,
-        restorePoints: {}
+        restorePoint: null
       }
     });
 
@@ -63,15 +69,36 @@ const actions = {
     });
   },
 
-  setSourceProperty({ commit }, data) {
-    // TODO: Set sources in OBS
-
-    // Refresh the state of source properties
-    const properties = Obs.sourceProperties(data.property.source);
-
+  refreshProperties({ commit }, data) {
     commit('SET_SOURCE_PROPERTIES', {
-      sourceName: data.property.source,
-      properties
+      sourceName: data.sourceName,
+      properties: Obs.sourceProperties(data.sourceName)
+    });
+  },
+
+  setSourceProperty({ dispatch }, data) {
+    // TODO: Set property in OBS
+
+    dispatch({
+      type: 'refreshProperties',
+      sourceName: data.property.source
+    });
+  },
+
+  createPropertiesRestorePoint({ commit }, data) {
+    commit('CREATE_PROPERTIES_RESTORE_POINT', {
+      sourceName: data.sourceName
+    });
+  },
+
+  restoreProperties({ dispatch, state }, data) {
+    let restorePoint = state.sources[data.sourceName].restorePoint;
+
+    // TODO: Set each property in OBS
+
+    dispatch({
+      type: 'refreshProperties',
+      sourceName: data.sourceName
     });
   }
 };

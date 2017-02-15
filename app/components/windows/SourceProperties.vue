@@ -3,6 +3,7 @@
   :title="windowTitle"
   :show-controls="true"
   :done-handler="done"
+  :cancel-handler="cancel"
   :content-styles="contentStyles">
   <div slot="content">
     <div class="SourceProperties-preview">
@@ -47,11 +48,16 @@ export default {
 
   methods: {
     done() {
-      console.log('Source Properties Submit');
+      windowManager.closeWindow();
     },
 
-    handleInput(event) {
-      debugger;
+    cancel() {
+      this.$store.dispatch({
+        type: 'restoreProperties',
+        sourceName: this.sourceName
+      });
+
+      windowManager.closeWindow();
     },
 
     propertyComponentForType(type) {
@@ -64,6 +70,18 @@ export default {
 
   created() {
     console.log(this.properties);
+  },
+
+  watch: {
+    properties() {
+      if (this.properties && !this.restorePointSet) {
+        this.restorePointSet = true;
+        this.$store.dispatch({
+          type: 'createPropertiesRestorePoint',
+          sourceName: this.sourceName
+        });
+      }
+    }
   },
 
   computed: {

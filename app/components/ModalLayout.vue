@@ -46,7 +46,11 @@ export default {
 
   methods: {
     cancel() {
-      windowManager.closeWindow();
+      if (this.cancelHandler) {
+        this.cancelHandler();
+      } else {
+        windowManager.closeWindow();
+      }
     }
   },
 
@@ -61,6 +65,10 @@ export default {
     // Will be called when "done" is clicked if controls
     // are enabled
     'doneHandler',
+
+    // Will be called when "cancel" is clicked.  By default
+    // this will just close the window.
+    'cancelHandler',
 
     // Additional CSS styles for the content section
     'contentStyles'
