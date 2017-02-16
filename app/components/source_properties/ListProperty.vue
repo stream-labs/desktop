@@ -4,9 +4,9 @@
   <select @change="setValue">
     <option
       v-for="option in property.options"
-      :value="option"
-      :selected="option === property.value">
-      {{ option }}
+      :value="option.value"
+      :selected="option.value === property.value">
+      {{ option.name }}
     </option>
   </select>
 </div>

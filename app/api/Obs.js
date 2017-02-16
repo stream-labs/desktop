@@ -66,8 +66,8 @@ class ObsApi {
       // For list types, we must separately fetch the
       // list options.
       if (propertyObj.type === 'OBS_PROPERTY_LIST') {
-        propertyObj.options = nodeObs.
-          OBS_content_getSourcePropertiesSubParameters(sourceName, propertyObj.name);
+        propertyObj.options = _.compact(nodeObs.
+          OBS_content_getSourcePropertiesSubParameters(sourceName, propertyObj.name));
       }
 
       propertyObj.value = this.getPropertyValue(sourceName, propertyObj);
@@ -82,10 +82,6 @@ class ObsApi {
       property.name
     );
 
-    if (property.type === 'OBS_PROPERTY_LIST') {
-      value = this.findClosestOption(property.options, value);
-    }
-
     if (property.type === 'OBS_PROPERTY_BOOL') {
       // Convert from string to boolean value
       value = value === 'true';
@@ -96,14 +92,6 @@ class ObsApi {
     }
 
     return value;
-  }
-
-  // Sometimes the value we receive from OBS is not a perfect
-  // match.  So we need to find the closest option.
-  findClosestOption(options, value) {
-    return _.find(options, option => {
-      return value.includes(option);
-    });
   }
 
   setProperty(sourceName, propertyName, value) {
