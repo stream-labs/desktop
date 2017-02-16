@@ -52,12 +52,12 @@ class ObsApi {
     );
   }
 
-  sourceProperties(sourceName) {
+  sourceProperties(sourceName, sourceId) {
     const propertyArr = nodeObs.OBS_content_getSourceProperties(sourceName);
 
     return _.map(_.chunk(propertyArr, 3), prop => {
       let propertyObj = {
-        source: sourceName,
+        sourceId: sourceId,
         name: prop[0],
         description: prop[1],
         type: prop[2]
@@ -70,15 +70,15 @@ class ObsApi {
           OBS_content_getSourcePropertiesSubParameters(sourceName, propertyObj.name);
       }
 
-      propertyObj.value = this.getPropertyValue(propertyObj);
+      propertyObj.value = this.getPropertyValue(sourceName, propertyObj);
 
       return propertyObj;
     });
   }
 
-  getPropertyValue(property) {
+  getPropertyValue(sourceName, property) {
     let value = nodeObs.OBS_content_getSourcePropertyCurrentValue(
-      property.source,
+      sourceName,
       property.name
     );
 
@@ -106,10 +106,10 @@ class ObsApi {
     });
   }
 
-  setProperty(property, value) {
+  setProperty(sourceName, propertyName, value) {
     nodeObs.OBS_content_setProperty(
-      property.source,
-      property.name,
+      sourceName,
+      propertyName,
       value.toString()
     );
   }

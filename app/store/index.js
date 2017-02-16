@@ -47,8 +47,7 @@ const actions = {
       sceneName: 'Example Scene 1',
       sourceType: 'Video Capture Device',
       sourceName: 'Video Capture 1',
-      settings: {},
-      hotkeyData: {}
+      sourceId: ipcRenderer.sendSync('getUniqueId')
     });
 
     dispatch({
@@ -56,8 +55,7 @@ const actions = {
       sceneName: 'Example Scene 1',
       sourceType: 'Video Capture Device',
       sourceName: 'Video Capture 2',
-      settings: {},
-      hotkeyData: {}
+      sourceId: ipcRenderer.sendSync('getUniqueId')
     });
   }
 };

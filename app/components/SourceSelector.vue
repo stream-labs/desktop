@@ -16,8 +16,8 @@
   </div>
   <selector
     class="studioControls-selector"
-    :items="sourceNames"
-    :activeItem="activeSourceName"
+    :items="sources"
+    :activeItem="activeSourceId"
     @select="makeActive"/>
 </div>
 </template>
@@ -42,38 +42,45 @@ export default {
       console.log('Click Remove Source');
 
       // We can only remove a source if one is selected
-      if(this.$store.getters.activeSourceName) {
+      if(this.$store.getters.activeSourceId) {
         this.$store.dispatch({
           type: 'removeSource',
-          sceneName: this.$store.getters.activeSceneName,
-          sourceName: this.$store.getters.activeSourceName
+          sourceId: this.$store.getters.activeSourceId
         });
       }
     },
 
     sourceProperties() {
-      if (this.$store.getters.activeSourceName) {
+      if (this.$store.getters.activeSourceId) {
         windowManager.showSourceProperties(false,
-          this.$store.getters.activeSourceName);
+          this.$store.getters.activeSourceId);
       }
     },
 
-    makeActive(sourceName) {
+    makeActive(sourceId) {
       this.$store.dispatch({
         type: 'makeSourceActive',
         sceneName: this.$store.getters.activeSceneName,
-        sourceName: sourceName
+        sourceId
       });
     }
   },
 
   computed: {
-    sourceNames() {
-      return this.$store.getters.activeScene.sources;
+    sources() {
+      return _.map(this.$store.getters.activeScene.sources, sourceId => {
+        let source = this.$store.state.sources.sources[sourceId];
+
+        // This is the format that the Selector component wants
+        return {
+          name: source.name,
+          value: source.id
+        }
+      });
     },
 
-    activeSourceName() {
-      return this.$store.getters.activeSourceName;
+    activeSourceId() {
+      return this.$store.getters.activeSourceId;
     }
   }
 };

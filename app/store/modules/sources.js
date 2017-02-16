@@ -8,21 +8,21 @@ const state = {
 
 const mutations = {
   ADD_SOURCE(state, data) {
-    Vue.set(state.sources, data.sourceName, data.source);
+    Vue.set(state.sources, data.source.id, data.source);
   },
 
   REMOVE_SOURCE(state, data) {
-    Vue.delete(state.sources, data.sourceName);
+    Vue.delete(state.sources, data.sourceId);
   },
 
   SET_SOURCE_PROPERTIES(state, data) {
-    let source = state.sources[data.sourceName];
+    let source = state.sources[data.sourceId];
 
     source.properties = data.properties;
   },
 
   CREATE_PROPERTIES_RESTORE_POINT(state, data) {
-    let source = state.sources[data.sourceName];
+    let source = state.sources[data.sourceId];
 
     source.restorePoint = _.cloneDeep(source.properties);
   }
@@ -40,11 +40,12 @@ const actions = {
       data.sourceName
     );
 
-    const properties = Obs.sourceProperties(data.sourceName);
+    const properties = Obs.sourceProperties(data.sourceName, data.sourceId);
 
     commit('ADD_SOURCE', {
-      sourceName: data.sourceName,
       source: {
+        id: data.sourceId,
+        name: data.sourceName,
         type: data.sourceType,
         properties,
         restorePoint: null
@@ -52,68 +53,78 @@ const actions = {
     });
 
     commit('ADD_SOURCE_TO_SCENE', {
-      sourceName: data.sourceName,
+      sourceId: data.sourceId,
       sceneName: data.sceneName
     });
   },
 
-  removeSource({ commit }, data) {
-    Obs.removeSource(data.sourceName);
+  removeSource({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+
+    Obs.removeSource(source.name);
 
     commit('REMOVE_SOURCE', {
-      sourceName: data.sourceName
+      sourceId: data.sourceId
     });
 
     commit('REMOVE_SOURCE_FROM_ALL_SCENES', {
-      sourceName: data.sourceName
+      sourceId: data.sourceId
     });
   },
 
-  refreshProperties({ commit }, data) {
+  refreshProperties({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+
     commit('SET_SOURCE_PROPERTIES', {
-      sourceName: data.sourceName,
-      properties: Obs.sourceProperties(data.sourceName)
+      sourceId: data.sourceId,
+      properties: Obs.sourceProperties(source.name, source.id)
     });
   },
 
-  setSourceProperty({ dispatch }, data) {
-    Obs.setProperty(data.property, data.propertyValue);
+  setSourceProperty({ dispatch, state }, data) {
+    let source = state.sources[data.property.sourceId];
+
+    Obs.setProperty(
+      source.name,
+      data.property.name,
+      data.propertyValue
+    );
 
     dispatch({
       type: 'refreshProperties',
-      sourceName: data.property.source
+      sourceId: data.property.sourceId
     });
   },
 
   createPropertiesRestorePoint({ commit }, data) {
     commit('CREATE_PROPERTIES_RESTORE_POINT', {
-      sourceName: data.sourceName
+      sourceId: data.sourceId
     });
   },
 
   restoreProperties({ dispatch, state }, data) {
-    let restorePoint = state.sources[data.sourceName].restorePoint;
+    let restorePoint = state.sources[data.sourceId].restorePoint;
 
     // TODO: Set each property in OBS
 
     dispatch({
       type: 'refreshProperties',
-      sourceName: data.sourceName
+      sourceId: data.sourceId
     });
   }
 };
 
 const getters = {
   activeSource(state, getters) {
-    if (getters.activeSourceName) {
-      return state.sources[getters.activeSourceName];
+    if (getters.activeSourceId) {
+      return state.sources[getters.activeSourceId];
     }
   },
 
   // Returns a function for fetching source properties
   sourceProperties(state) {
-    return sourceName => {
-      let source = state.sources[sourceName]
+    return sourceId => {
+      let source = state.sources[sourceId];
 
       if (source) {
         return source.properties;

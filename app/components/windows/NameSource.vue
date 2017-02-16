@@ -21,6 +21,7 @@
 <script>
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager.js';
+const { ipcRenderer } = window.require('electron');
 
 export default {
 
@@ -30,16 +31,18 @@ export default {
 
   methods: {
     submit() {
+      // Choose a unique id for the source
+      const id = ipcRenderer.sendSync('getUniqueId');
+
       this.$store.dispatch({
         type: 'createSourceAndAddToScene',
         sceneName: this.$store.getters.activeSceneName,
         sourceType: window.startupOptions.sourceType,
         sourceName: this.name,
-        settings: {},
-        hotkeyData: {}
+        sourceId: id
       });
 
-      windowManager.showSourceProperties(true, this.name);
+      windowManager.showSourceProperties(true, id);
     }
   },
 

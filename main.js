@@ -132,3 +132,10 @@ ipcMain.on('obs-apiCall', (event, data) => {
   event.returnValue = retVal || null;
 });
 
+
+
+// Used for guaranteeing unique ids for objects in the vuex store
+ipcMain.on('getUniqueId', event => {
+  event.returnValue = _.uniqueId();
+});
+

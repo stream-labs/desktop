@@ -32,7 +32,7 @@ export default {
 
   data() {
     return {
-      sourceName: window.startupOptions.sourceName,
+      sourceId: window.startupOptions.sourceId,
 
       contentStyles: {
         padding: 0,
@@ -56,7 +56,7 @@ export default {
     cancel() {
       this.$store.dispatch({
         type: 'restoreProperties',
-        sourceName: this.sourceName
+        sourceId: this.sourceId
       });
 
       windowManager.closeWindow();
@@ -81,7 +81,7 @@ export default {
         this.restorePointSet = true;
         this.$store.dispatch({
           type: 'createPropertiesRestorePoint',
-          sourceName: this.sourceName
+          sourceId: this.sourceId
         });
       }
     }
@@ -89,11 +89,23 @@ export default {
 
   computed: {
     windowTitle() {
-      return "Properties for '" + this.sourceName + "'";
+      let source = this.$store.state.sources.sources[this.sourceId];
+
+      if (source) {
+        return "Properties for '" + source.name + "'";
+      } else {
+        return '';
+      }
     },
 
     properties() {
-      return this.$store.getters.sourceProperties(this.sourceName);
+      let source = this.$store.state.sources.sources[this.sourceId];
+      
+      if (source) {
+        return source.properties;
+      } else {
+        return [];
+      }
     }
   }
 

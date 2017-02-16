@@ -25,19 +25,19 @@ const mutations = {
   ADD_SOURCE_TO_SCENE(state, data) {
     state.scenes.find(scene => { 
       return scene.name === data.sceneName;
-    }).sources.push(data.sourceName);
+    }).sources.push(data.sourceId);
   },
 
   REMOVE_SOURCE_FROM_ALL_SCENES(state, data) {
     _.each(state.scenes, scene => {
-      scene.sources = _.without(scene.sources, data.sourceName);
+      scene.sources = _.without(scene.sources, data.sourceId);
     });
   },
 
   MAKE_SOURCE_ACTIVE(state, data) {
     state.scenes.find(scene => {
       return scene.name === data.sceneName;
-    }).activeSourceName = data.sourceName;
+    }).activeSourceId = data.sourceId;
   }
 };
 
@@ -48,7 +48,7 @@ const actions = {
     commit('ADD_SCENE', {
       scene: {
         name: data.sceneName,
-        activeSourceName: null,
+        activeSourceId: null,
         sources: []
       }
     });
@@ -75,7 +75,7 @@ const actions = {
   makeSourceActive({ commit }, data) {
     commit('MAKE_SOURCE_ACTIVE', {
       sceneName: data.sceneName,
-      sourceName: data.sourceName
+      sourceId: data.sourceId
     });
   }
 };
@@ -91,9 +91,9 @@ const getters = {
     return state.activeSceneName;
   },
 
-  activeSourceName(state, getters) {
+  activeSourceId(state, getters) {
     if (getters.activeScene) {
-      return getters.activeScene.activeSourceName;
+      return getters.activeScene.activeSourceId;
     }
   }
 };

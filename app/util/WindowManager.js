@@ -90,11 +90,11 @@ class WindowManager {
     });
   }
 
-  showSourceProperties(inPlace = false, sourceName) {
+  showSourceProperties(inPlace = false, sourceId) {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
-        sourceName
+        sourceId
       },
       windowOptions: {
         // Eventually souceType will determine window size

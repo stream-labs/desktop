@@ -1,18 +1,35 @@
 <template>
 <ul class="selector">
   <li
-    v-for="item in items"
+    v-for="item in normalizedItems"
     class="selector-item"
-    :class="{ active: item === activeItem }"
-    @click="$emit('select', item)">
-    {{ item }}
+    :class="{ active: item.value === activeItem }"
+    @click="$emit('select', item.value)">
+    {{ item.name }}
   </li>
 </ul>
 </template>
 
 <script>
 export default {
-  props: ['items', 'activeItem']
+  props: ['items', 'activeItem'],
+
+  computed: {
+    // Items can be either an array of strings, or an
+    // array of objects, so we normalize those here.
+    normalizedItems() {
+      return _.map(this.items, item => {
+        if (typeof(item) === 'string') {
+          return {
+            name: item,
+            value: item
+          };
+        } else {
+          return item;
+        }
+      });
+    }
+  }
 }
 </script>
 
