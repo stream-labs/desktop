@@ -1,31 +1,39 @@
 <template>
 <div>
   <label>{{ property.description }}</label>
-  <div class="ColorPicker-text">
+  <div
+    class="ColorPicker-text"
+    @click="togglePicker">
     <input
+      class="ColorPicker-input"
       type="text"
-      :value="hexWithAlpha"
-      @focus="showPicker">
+      readonly
+      :value="hexARGB">
     <div
       class="ColorPicker-swatch"
       :style="swatchStyle"/>
   </div>
-  <div
+  <color-picker
+    v-model="color"
     v-if="pickerVisible"
-    @click="hidePicker">
-    <div
-      style="display: inline-block;"
-      @click.stop>
-      <color-picker
-        v-model="color"
-        @change-color="onChange"/>
-    </div>
-  </div>
+    @change-color="onChange"/>
 </div>
 </template>
 
 <script>
 import { Sketch } from 'vue-color';
+import _ from 'lodash';
+
+/* Notes:
+ *
+ * The color picker works a bit differently than most
+ * property controls.  Since it can change very rapidly,
+ * it uses separate internal state to keep track of the
+ * current value that is displayed to the user.  Once
+ * they stop interacting with the color picker, then we
+ * set the value in OBS, which will ripple back to this
+ * component.
+ */
 
 export default {
 
@@ -36,7 +44,7 @@ export default {
   data() {
     return {
       color: {
-        hex: '#ff0077',
+        hex: '#ffffff',
         a: 1
       },
 
@@ -50,39 +58,72 @@ export default {
 
   methods: {
     onChange(color) {
-      this.color = color
+      this.color = color;
     },
 
-    showPicker() {
-      this.pickerVisible = true;
+    togglePicker() {
+      this.pickerVisible = !this.pickerVisible;
     },
 
-    hidePicker() {
-      this.pickerVisible = false;
+    setValue: _.debounce(function() {
+      if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
+        this.$store.dispatch({
+          type: 'setSourceProperty',
+          property: this.property,
+          propertyValue: this.hexRGBA
+        });
+      }
+    }, 500),
+  },
+
+  watch: {
+    color() {
+      this.setValue();
     },
 
-    setValue(event) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: event.target.value
-      });
+    obsColor() {
+      this.color = this.obsColor;
     }
   },
 
-  computed: {
-    hexWithAlpha() {
-      let alpha = this.color.a || 1;
-      let hexAlpha = Math.floor(alpha * 255).toString(16);
-      let hexColor = this.color.hex.substr(1);
+  created() {
+    this.color = this.obsColor;
+  },
 
-      return '#' + hexAlpha + hexColor;
+  computed: {
+    hexAlpha() {
+      let alpha = this.color.a;
+      return _.padStart(Math.floor(alpha * 255).toString(16), 2, '0');
+    },
+
+    hexColor() {
+      return this.color.hex.substr(1);
+    },
+
+    // This is what node-obs uses
+    hexRGBA() {
+      return (this.hexColor + this.hexAlpha).toLowerCase();
+    },
+
+    // This is displayed to the user
+    hexARGB() {
+      return ('#' + this.hexAlpha + this.hexColor).toLowerCase();
     },
 
     swatchStyle() {
       return {
         backgroundColor: this.color.hex,
         opacity: this.color.a || 1
+      };
+    },
+
+    // This represents the actual value in the property in OBS
+    obsColor() {
+      let obsStr = this.property.value;
+
+      return {
+        hex: '#' + obsStr.substr(0, 6),
+        a: parseInt(obsStr.substr(6), 16) / 255
       };
     }
   }
@@ -93,6 +134,11 @@ export default {
 <style lang="less">
 .ColorPicker-text {
   position: relative;
+  cursor: pointer;
+}
+
+.ColorPicker-input {
+  cursor: pointer !important;
 }
 
 .ColorPicker-swatch {
@@ -100,6 +146,7 @@ export default {
   top: 8px;
   right: 8px;
   border-radius: 2px;
+  border: 1px solid #ccc;
 
   width: 20px;
   height: 20px;
