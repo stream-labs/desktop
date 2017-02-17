@@ -4,4 +4,5 @@ dist/
 npm-debug.log
 lib/
 rtmp-services/
+text-freetype2/
 data/

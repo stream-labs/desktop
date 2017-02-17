@@ -29,6 +29,7 @@ import ListProperty from '../source_properties/ListProperty.vue';
 import BoolProperty from '../source_properties/BoolProperty.vue';
 import FloatProperty from '../source_properties/FloatProperty.vue';
 import IntProperty from '../source_properties/IntProperty.vue';
+import ColorProperty from '../source_properties/ColorProperty.vue';
 
 export default {
 
@@ -48,7 +49,8 @@ export default {
     ListProperty,
     BoolProperty,
     FloatProperty,
-    IntProperty
+    IntProperty,
+    ColorProperty
   },
 
   methods: {
@@ -70,7 +72,8 @@ export default {
         OBS_PROPERTY_LIST: ListProperty,
         OBS_PROPERTY_BOOL: BoolProperty,
         OBS_PROPERTY_FLOAT: FloatProperty,
-        OBS_PROPERTY_INT: IntProperty
+        OBS_PROPERTY_INT: IntProperty,
+        OBS_PROPERTY_COLOR: ColorProperty
       }[type];
     }
   },

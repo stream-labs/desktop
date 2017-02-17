@@ -14,6 +14,7 @@
     "moment": "^2.17.1",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
+    "vue-color": "git+https://github.com/andycreeth/vue-color.git",
     "vuex": "^2.1.1"
   },
   "devDependencies": {
