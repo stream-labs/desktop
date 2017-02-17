@@ -53,8 +53,8 @@ const actions = {
     dispatch({
       type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
-      sourceType: 'Video Capture Device',
-      sourceName: 'Video Capture 2',
+      sourceType: 'Game Capture (Syphon)',
+      sourceName: 'Game Capture 1',
       sourceId: ipcRenderer.sendSync('getUniqueId')
     });
   }

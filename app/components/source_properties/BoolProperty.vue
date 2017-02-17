@@ -4,6 +4,7 @@
   <input
     type="checkbox"
     :checked="property.value"
+    :disabled="!property.enabled"
     @change="setValue"/>
 </div>
 </template>

@@ -53,14 +53,17 @@ class ObsApi {
   }
 
   sourceProperties(sourceName, sourceId) {
-    const propertyArr = nodeObs.OBS_content_getSourceProperties(sourceName);
+    const properties = nodeObs.OBS_content_getSourceProperties(sourceName);
 
-    return _.map(_.chunk(propertyArr, 3), prop => {
+    return _.map(properties, prop => {
       let propertyObj = {
         sourceId: sourceId,
-        name: prop[0],
-        description: prop[1],
-        type: prop[2]
+        name: prop.name,
+        description: prop.description,
+        longDescription: prop.long_description,
+        type: prop.type,
+        visible: (prop.visible === 'true'),
+        enabled: (prop.enabled === 'true')
       };
 
       // For list types, we must separately fetch the

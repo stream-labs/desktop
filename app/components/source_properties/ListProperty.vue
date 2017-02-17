@@ -1,7 +1,9 @@
 <template>
 <div>
   <label>{{ property.description }}</label>
-  <select @change="setValue">
+  <select
+    @change="setValue"
+    :disabled="!property.enabled">
     <option
       v-for="option in property.options"
       :value="option.value"

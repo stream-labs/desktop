@@ -4,6 +4,7 @@
   <input
     type="text"
     :value="property.value"
+    :disabled="!property.enabled"
     @change="setValue"/>
 </div>
 </template>

@@ -11,6 +11,7 @@
     <div class="SourceProperties-form">
     <component
       v-for="property in properties"
+      v-if="property.visible"
       :is="propertyComponentForType(property.type)"
       :property="property"/>
     </div>
