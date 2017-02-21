@@ -30,6 +30,7 @@ import BoolProperty from '../source_properties/BoolProperty.vue';
 import FloatProperty from '../source_properties/FloatProperty.vue';
 import IntProperty from '../source_properties/IntProperty.vue';
 import ColorProperty from '../source_properties/ColorProperty.vue';
+import FrameRateProperty from '../source_properties/FrameRateProperty.vue';
 
 export default {
 
@@ -50,7 +51,8 @@ export default {
     BoolProperty,
     FloatProperty,
     IntProperty,
-    ColorProperty
+    ColorProperty,
+    FrameRateProperty
   },
 
   methods: {
@@ -73,7 +75,8 @@ export default {
         OBS_PROPERTY_BOOL: BoolProperty,
         OBS_PROPERTY_FLOAT: FloatProperty,
         OBS_PROPERTY_INT: IntProperty,
-        OBS_PROPERTY_COLOR: ColorProperty
+        OBS_PROPERTY_COLOR: ColorProperty,
+        OBS_PROPERTY_FRAME_RATE: FrameRateProperty
       }[type];
     }
   },

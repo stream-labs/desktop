@@ -99,7 +99,7 @@ class WindowManager {
       windowOptions: {
         // Eventually souceType will determine window size
         frame: false,
-        width: 400,
+        width: 600,
         height: 700
       },
       inPlace
