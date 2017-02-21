@@ -63,7 +63,6 @@ export default {
 }
 
 .Tabs-contentContainer {
-  padding: 10px;
   border: 1px solid #ccc;
   border-top: 0;
 }
