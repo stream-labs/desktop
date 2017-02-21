@@ -8,8 +8,6 @@ import Obs from './api/Obs.js';
 import windowManager from './util/WindowManager.js';
 import URI from 'urijs';
 
-import fr from './util/FrameRate.js';
-
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,8 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.startupOptions = URI.parseQuery(URI.parse(window.location.href).query);
 
   window.obs = Obs.nodeObs;
-
-  window.fr = fr;
 
   let vm = new Vue({
     el: '#app',
