@@ -8,6 +8,10 @@ export default {
     return rational.denominator / rational.numerator;
   },
 
+  rationalToFramesPerSecond(rational) {
+    return rational.numerator / rational.denominator;
+  },
+
   // Operates on rational values. Determines if the rate
   // is within the given range.
   rateInRange(rate, min, max) {

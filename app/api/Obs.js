@@ -85,12 +85,16 @@ class ObsApi {
       property.name
     );
 
-    if (property.type !== 'OBS_PROPERTY_FRAME_RATE') {
+    // If this is a simple value, there's no need to keep it
+    // as an object
+    if (value.value) {
       value = value.value;
     }
 
+    // All of these values come back as strings for now, so
+    // we need to do some basic type coersion.
+
     if (property.type === 'OBS_PROPERTY_BOOL') {
-      // Convert from string to boolean value
       value = value === 'true';
     }
 
@@ -98,14 +102,38 @@ class ObsApi {
       value = parseFloat(value);
     }
 
+    if (property.type === 'OBS_PROPERTY_INT') {
+      value = parseInt(value);
+    }
+
+    if (property.type === 'OBS_PROPERTY_FRAME_RATE') {
+      value.numerator = parseInt(value.numerator);
+      value.denominator = parseInt(value.denominator);
+
+      _.each(value.ranges, range => {
+        range.max.numerator = parseInt(range.max.numerator);
+        range.max.denominator = parseInt(range.max.denominator);
+        range.min.numerator = parseInt(range.min.numerator);
+        range.min.denominator = parseInt(range.min.denominator);
+      });
+    }
+
     return value;
   }
 
   setProperty(sourceName, propertyName, value) {
+    let valueObj;
+
+    if (typeof(value) !== 'object') {
+      valueObj = {
+        value: value.toString()
+      };
+    }
+
     nodeObs.OBS_content_setProperty(
       sourceName,
       propertyName,
-      value.toString()
+      valueObj || value
     );
   }
 

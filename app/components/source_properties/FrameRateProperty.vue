@@ -5,23 +5,36 @@
   <div>
     <tabs :tabs="tabs" style="margin-bottom: 10px;">
       <div slot="simple" class="FrameRate-simple">
-        <select>
-          <option>30</option>
+        <select @change="setSimpleValue">
+          <option
+            v-for="(option, index) in simpleOptions"
+            :value="index"
+            :selected="selectedSimpleOptionIndex === index">
+            {{ option.name }}
+          </option>
         </select>
       </div>
       <div slot="rational" class="row FrameRate-rational">
         <div class="small-6 column">
           <label>Numerator</label>
-          <input type="text"/>
+          <input
+            ref="numerator"
+            type="text"
+            :value="numerator"
+            @change="setRationalValue"/>
           <label>Denominator</label>
-          <input type="text"/>
+          <input
+            ref="denominator"
+            type="text"
+            :value="denominator"
+            @change="setRationalValue"/>
         </div>
         <div class="small-6 column">
           <ul class="FrameRate-rationalStats">
             <li>FPS: {{ framesPerSecond }}</li>
-            <li>Frame Interval: {{ frameInterval }}</li>
-            <li>Min FPS: {{ minFPS }}</li>
-            <li>Max FPS: {{ maxFPS }}</li>
+            <li>Frame Interval: {{ frameIntervalMilliseconds }}</li>
+            <li>Min FPS: {{ minRational }}</li>
+            <li>Max FPS: {{ maxRational }}</li>
           </ul>
         </div>
       </div>
@@ -32,6 +45,7 @@
 
 <script>
 import Tabs from '../Tabs.vue';
+import fr from '../../util/FrameRate.js';
 
 export default {
 
@@ -62,39 +76,105 @@ export default {
   },
 
   methods: {
+    setSimpleValue(event) {
+      let optionIndex = parseInt(event.target.value);
+      let option = this.simpleOptions[optionIndex];
 
-    setValue(event) {
       this.$store.dispatch({
         type: 'setSourceProperty',
         property: this.property,
-        propertyValue: event.target.value
+        propertyValue: {
+          numerator: option.numerator.toString(),
+          denominator: option.denominator.toString()
+        }
       });
+    },
+
+    setRationalValue(event) {
+      let numerator = this.$refs.numerator.value;
+      let denominator = this.$refs.denominator.value;
+
+      if (numerator && denominator) {
+        this.$store.dispatch({
+          type: 'setSourceProperty',
+          property: this.property,
+          propertyValue: {
+            numerator,
+            denominator
+          }
+        });
+      }
     }
   },
 
   computed: {
+    numerator() {
+      return this.property.value.numerator;
+    },
+
+    denominator() {
+      return this.property.value.denominator;
+    },
+
     framesPerSecond() {
-      return '30';
+      return fr.rationalToFramesPerSecond(this.property.value);
     },
 
     frameInterval() {
-      return '33.33ms';
+      return fr.rationalToFrameInterval(this.property.value);
     },
 
-    minFPS() {
-      return '1/1';
+    frameIntervalMilliseconds() {
+      return '' + (this.frameInterval * 1000).toFixed(2) + 'ms';
     },
 
-    maxFPS() {
-      return '30/1';
+    minRational() {
+      if (this.property.value.ranges[0]) {
+        let min = this.property.value.ranges[0].min;
+
+        return '' + min.numerator + '/' + min.denominator;
+      }
     },
 
-    rationalNumerator() {
-      return '30';
+    maxRational() {
+      if (this.property.value.ranges[0]) {
+        let max = this.property.value.ranges[0].max;
+
+        return '' + max.numerator + '/' + max.denominator;
+      }
     },
 
-    rationalDenominator() {
-      return '1';
+    simpleOptions() {
+      // This is the default option
+      let options = [{
+        name: '',
+        numerator: 0,
+        denominator: 0
+      }];
+
+
+      if (this.property.value.ranges[0]) {
+        options = options.concat(fr.simpleFPSValuesForRanges(this.property.value.ranges));
+      }
+
+      return options;
+    },
+
+    selectedSimpleOptionIndex() {
+      // 0 is the default option
+      let index = 0;
+      let currentInterval = fr.rationalToFrameInterval(this.property.value);
+
+      _.each(this.simpleOptions, (option, i) => {
+        let interval = fr.rationalToFrameInterval(option);
+
+        // TODO: Do a better floating point comparison with EPSILON
+        if (interval === currentInterval) {
+          index = i;
+        }
+      });
+
+      return index;
     }
   }
 
