@@ -31,6 +31,7 @@ import FloatProperty from '../source_properties/FloatProperty.vue';
 import IntProperty from '../source_properties/IntProperty.vue';
 import ColorProperty from '../source_properties/ColorProperty.vue';
 import FrameRateProperty from '../source_properties/FrameRateProperty.vue';
+import FontProperty from '../source_properties/FontProperty.vue';
 
 export default {
 
@@ -52,7 +53,8 @@ export default {
     FloatProperty,
     IntProperty,
     ColorProperty,
-    FrameRateProperty
+    FrameRateProperty,
+    FontProperty
   },
 
   methods: {
@@ -76,7 +78,8 @@ export default {
         OBS_PROPERTY_FLOAT: FloatProperty,
         OBS_PROPERTY_INT: IntProperty,
         OBS_PROPERTY_COLOR: ColorProperty,
-        OBS_PROPERTY_FRAME_RATE: FrameRateProperty
+        OBS_PROPERTY_FRAME_RATE: FrameRateProperty,
+        OBS_PROPERTY_FONT: FontProperty
       }[type];
     }
   },

@@ -85,6 +85,10 @@ class ObsApi {
       property.name
     );
 
+    if (property.type !== 'OBS_PROPERTY_FRAME_RATE') {
+      value = value.value;
+    }
+
     if (property.type === 'OBS_PROPERTY_BOOL') {
       // Convert from string to boolean value
       value = value === 'true';
