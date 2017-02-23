@@ -247,8 +247,7 @@ export default {
 <style lang="less" scoped>
 .FontProperty-container {
   border-left: 2px solid #ccc;
-  padding: 15px;
-  // border-radius: 5px;
+  padding: 15px 0 15px 15px;
   margin-bottom: 20px;
 }
 

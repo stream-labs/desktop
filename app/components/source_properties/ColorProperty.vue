@@ -70,7 +70,9 @@ export default {
         this.$store.dispatch({
           type: 'setSourceProperty',
           property: this.property,
-          propertyValue: this.hexRGBA
+          propertyValue: {
+            value: this.hexRGBA
+          }
         });
       }
     }, 500),
@@ -119,7 +121,7 @@ export default {
 
     // This represents the actual value in the property in OBS
     obsColor() {
-      let obsStr = this.property.value;
+      let obsStr = this.property.value.value;
 
       return {
         hex: '#' + obsStr.substr(0, 6),

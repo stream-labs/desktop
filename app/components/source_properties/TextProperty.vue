@@ -3,7 +3,7 @@
   <label>{{ property.description }}</label>
   <textarea
     rows="5"
-    :value="property.value"
+    :value="property.value.value"
     :disabled="!property.enabled"
     @input="setValue"/>
 </div>
@@ -21,7 +21,9 @@ export default {
       this.$store.dispatch({
         type: 'setSourceProperty',
         property: this.property,
-        propertyValue: event.target.value
+        propertyValue: {
+          value: event.target.value
+        }
       });
     }, 500)
   }

@@ -7,7 +7,7 @@
     <option
       v-for="option in property.options"
       :value="option.value"
-      :selected="option.value === property.value">
+      :selected="option.value === property.value.value">
       {{ option.name }}
     </option>
   </select>
@@ -26,7 +26,9 @@ export default {
       this.$store.dispatch({
         type: 'setSourceProperty',
         property: this.property,
-        propertyValue: event.target.value
+        propertyValue: {
+          value: event.target.value
+        }
       });
     }
   }

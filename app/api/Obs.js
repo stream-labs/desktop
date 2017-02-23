@@ -80,37 +80,31 @@ class ObsApi {
   }
 
   getPropertyValue(sourceName, property) {
-    let value = nodeObs.OBS_content_getSourcePropertyCurrentValue(
+    let obj = nodeObs.OBS_content_getSourcePropertyCurrentValue(
       sourceName,
       property.name
     );
-
-    // If this is a simple value, there's no need to keep it
-    // as an object
-    if (value.value) {
-      value = value.value;
-    }
 
     // All of these values come back as strings for now, so
     // we need to do some basic type coersion.
 
     if (property.type === 'OBS_PROPERTY_BOOL') {
-      value = value === 'true';
+      obj.value = obj.value === 'true';
     }
 
     if (property.type === 'OBS_PROPERTY_FLOAT') {
-      value = parseFloat(value);
+      obj.value = parseFloat(obj.value);
     }
 
     if (property.type === 'OBS_PROPERTY_INT') {
-      value = parseInt(value);
+      obj.value = parseInt(obj.value);
     }
 
     if (property.type === 'OBS_PROPERTY_FRAME_RATE') {
-      value.numerator = parseInt(value.numerator);
-      value.denominator = parseInt(value.denominator);
+      obj.numerator = parseInt(obj.numerator);
+      obj.denominator = parseInt(obj.denominator);
 
-      _.each(value.ranges, range => {
+      _.each(obj.ranges, range => {
         range.max.numerator = parseInt(range.max.numerator);
         range.max.denominator = parseInt(range.max.denominator);
         range.min.numerator = parseInt(range.min.numerator);
@@ -119,25 +113,17 @@ class ObsApi {
     }
 
     if (property.type === 'OBS_PROPERTY_FONT') {
-      value.style = value.style || 'Regular';
+      obj.style = obj.style || 'Regular';
     }
 
-    return value;
+    return obj;
   }
 
   setProperty(sourceName, propertyName, value) {
-    let valueObj;
-
-    if (typeof(value) !== 'object') {
-      valueObj = {
-        value: value.toString()
-      };
-    }
-
     nodeObs.OBS_content_setProperty(
       sourceName,
       propertyName,
-      valueObj || value
+      value
     );
   }
 

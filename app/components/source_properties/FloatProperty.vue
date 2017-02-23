@@ -3,7 +3,7 @@
   <label>{{ property.description }}</label>
   <input
     type="text"
-    :value="property.value.toFixed(2)"
+    :value="property.value.value.toFixed(2)"
     :disabled="!property.enabled"
     @change="setValue"/>
 </div>
@@ -21,7 +21,9 @@ export default {
       this.$store.dispatch({
         type: 'setSourceProperty',
         property: this.property,
-        propertyValue: event.target.value
+        propertyValue: {
+          value: event.target.value
+        }
       });
     }
   }

@@ -2,7 +2,7 @@
 <div class="checkbox">
   <input
     type="checkbox"
-    :checked="property.value"
+    :checked="property.value.value"
     :disabled="!property.enabled"
     @change="setValue"/>
   <label>{{ property.description }}</label>
@@ -21,7 +21,9 @@ export default {
       this.$store.dispatch({
         type: 'setSourceProperty',
         property: this.property,
-        propertyValue: event.target.checked
+        propertyValue: {
+          value: event.target.checked.toString()
+        }
       });
     }
   }
