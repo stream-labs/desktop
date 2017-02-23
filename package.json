@@ -16,7 +16,7 @@
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
     "vue-color": "^2.0.6",
-    "vue-select": "^2.0.0",
+    "vue-multiselect": "^2.0.0-beta.13",
     "vuex": "^2.1.1"
   },
   "devDependencies": {

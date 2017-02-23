@@ -100,7 +100,7 @@ class WindowManager {
         // Eventually souceType will determine window size
         frame: false,
         width: 600,
-        height: 700
+        height: 800
       },
       inPlace
     });
