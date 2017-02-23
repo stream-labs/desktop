@@ -1,11 +1,11 @@
 <template>
-<div>
-  <label>{{ property.description }}</label>
+<div class="checkbox">
   <input
     type="checkbox"
     :checked="property.value"
     :disabled="!property.enabled"
     @change="setValue"/>
+  <label>{{ property.description }}</label>
 </div>
 </template>
 

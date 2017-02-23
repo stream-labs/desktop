@@ -118,6 +118,10 @@ class ObsApi {
       });
     }
 
+    if (property.type === 'OBS_PROPERTY_FONT') {
+      value.style = value.style || 'Regular';
+    }
+
     return value;
   }
 
