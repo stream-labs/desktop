@@ -7,6 +7,7 @@ import store from './store';
 import Obs from './api/Obs.js';
 import windowManager from './util/WindowManager.js';
 import URI from 'urijs';
+import contextMenuManager from './util/ContextMenuManager.js';
 
 require('./app.less');
 
@@ -24,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     store: store,
     render: h => h(windowManager.components[startupOptions.component])
   });
+
+  // Initialize the custom context menu system
+  contextMenuManager.init();
 
   window.reset = () => {
     vm.$forceUpdate();
