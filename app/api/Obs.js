@@ -116,7 +116,31 @@ class ObsApi {
       obj.style = obj.style || 'Regular';
     }
 
+    if (property.type === 'OBS_PROPERTY_PATH') {
+      obj.filter = this.parsePathFilters(obj.filter);
+    }
+
     return obj;
+  }
+
+  parsePathFilters(filterStr) {
+    let filters = _.compact(filterStr.split(';;'));
+
+    return _.map(filters, filter => {
+      let match = filter.match(/^(.*) \((.*)\)$/);
+      let desc = match[1];
+      let types = match[2].split(' ');
+
+      types = _.map(types, type => {
+        return type.match(/^\*\.(.+)$/)[1];
+      });
+
+      // This is the format that electron file dialogs use
+      return {
+        name: desc,
+        extensions: types
+      };
+    });
   }
 
   setProperty(sourceName, propertyName, value) {
