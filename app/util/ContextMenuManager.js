@@ -19,10 +19,19 @@ class ContextMenuManager {
 
   showMenu(layout, options) {
     this.menu.items = layout;
-    this.positionMenu(
-      options.position.x,
-      options.position.y
-    );
+
+    if (options.position) {
+      this.positionMenu(
+        options.position.x,
+        options.position.y
+      );
+    } else {
+      this.positionMenu(
+        options.mouseEvent.pageX,
+        options.mouseEvent.pageY
+      );
+    }
+
     this.menu.show();
   }
 

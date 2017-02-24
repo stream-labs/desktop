@@ -69,6 +69,7 @@ export default Vue.extend({
 
     itemClicked(item) {
       if (item.type === 'action') {
+        this.dismiss();
         item.handler();
       }
     }
