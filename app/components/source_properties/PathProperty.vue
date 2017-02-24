@@ -1,7 +1,17 @@
 <template>
 <div>
   <label>{{ property.description }}</label>
-  <button @click="showFileDialog">Browse</button>
+  <div class="PathProperty-fieldGroup">
+    <input
+      type="text"
+      :value="path"
+      class="PathProperty-path">
+    <button
+      @click="showFileDialog"
+      class="PathProperty-browse button">
+      Browse
+    </button>
+  </div>
 </div>
 </template>
 
@@ -17,23 +27,70 @@ export default {
 
   methods: {
     showFileDialog() {
-      console.log(_.cloneDeep(this.property.value.filter));
-      remote.dialog.showOpenDialog({
-        filters: this.property.value.filter,
-        properties: ['openFile']
-      });
+      let props = [];
+      let path;
+
+      if (this.property.value.type === 'OBS_PATH_FILE') {
+        props.push('openFile');
+      }
+
+      if (this.property.value.type === 'OBS_PATH_DIRECTORY') {
+        props.push('openDirectory');
+      }
+
+      if (this.property.value.type === 'OBS_PATH_FILE_SAVE') {
+        path = remote.dialog.showSaveDialog({
+          defaultPath: this.property.value.default_path,
+          filters: this.property.value.filter
+        });
+      } else {
+        path = remote.dialog.showOpenDialog({
+          defaultPath: this.property.value.default_path,
+          filters: this.property.value.filter,
+          properties: props
+        });
+      }
+
+      this.setPath(path);
     },
 
-    setValue(event) {
-      // this.$store.dispatch({
-      //   type: 'setSourceProperty',
-      //   property: this.property,
-      //   propertyValue: {
-      //     value: event.target.value
-      //   }
-      // });
+    setPath(path) {
+      this.$store.dispatch({
+        type: 'setSourceProperty',
+        property: this.property,
+        propertyValue: {
+          value: path
+        }
+      });
+    }
+  },
+
+  computed: {
+    path() {
+      return this.property.value.value;
     }
   }
 
 };
 </script>
+
+<style lang="less" scoped>
+.PathProperty-fieldGroup {
+  display: flex;
+  flex-direction: row;
+}
+
+.PathProperty-path {
+  flex-grow: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.PathProperty-browse {
+  flex-shrink: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+  background-color: #525e65;
+}
+</style>
