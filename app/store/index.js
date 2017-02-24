@@ -61,8 +61,8 @@ const actions = {
     dispatch({
       type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
-      sourceType: 'Media Source',
-      sourceName: 'Media 1',
+      sourceType: 'Image Slide Show',
+      sourceName: 'Slide Show 1',
       sourceId: ipcRenderer.sendSync('getUniqueId')
     });
   }

@@ -34,6 +34,7 @@ import FrameRateProperty from '../source_properties/FrameRateProperty.vue';
 import FontProperty from '../source_properties/FontProperty.vue';
 import TextProperty from '../source_properties/TextProperty.vue';
 import PathProperty from '../source_properties/PathProperty.vue';
+import EditableListProperty from '../source_properties/EditableListProperty.vue';
 
 export default {
 
@@ -58,7 +59,8 @@ export default {
     FrameRateProperty,
     FontProperty,
     TextProperty,
-    PathProperty
+    PathProperty,
+    EditableListProperty
   },
 
   methods: {
@@ -85,7 +87,8 @@ export default {
         OBS_PROPERTY_FRAME_RATE: FrameRateProperty,
         OBS_PROPERTY_FONT: FontProperty,
         OBS_PROPERTY_TEXT: TextProperty,
-        OBS_PROPERTY_PATH: PathProperty
+        OBS_PROPERTY_PATH: PathProperty,
+        OBS_PROPERTY_EDITABLE_LIST: EditableListProperty
       }[type];
     }
   },
