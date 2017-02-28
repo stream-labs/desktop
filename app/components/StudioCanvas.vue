@@ -1,5 +1,5 @@
 <template>
-<div class="studioCanvas">
+<div class="StudioCanvas">
 </div>
 </template>
 
@@ -8,7 +8,7 @@ export default {};
 </script>
 
 <style lang="less" scoped>
-.studioCanvas {
+.StudioCanvas {
   flex-grow: 1;
   background-color: black;
 }
