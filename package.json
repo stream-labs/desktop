@@ -4,7 +4,7 @@
   "main": "main.js",
   "scripts": {
     "compile": "webpack",
-    "watch": "webpack-dashboard -- webpack --watch",
+    "watch": "WEBPACK_DASHBOARD=true webpack-dashboard -- webpack --watch",
     "start": "electron .",
     "extract-libs": "bin/extract_libs.sh",
     "rebuild": "electron-rebuild && electron-rebuild -w node-obs"

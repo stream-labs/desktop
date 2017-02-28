@@ -1,5 +1,11 @@
 var DashboardPlugin = require('webpack-dashboard/plugin');
 
+var plugins = [];
+
+if (process.env.WEBPACK_DASHBOARD) {
+  plugins.push(new DashboardPlugin());
+}
+
 module.exports = {
   entry: './app/app.js',
   output: {
@@ -38,7 +44,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new DashboardPlugin()
-  ]
+  plugins: plugins
 }
