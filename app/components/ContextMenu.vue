@@ -10,6 +10,7 @@
         :class="classesForItem(item)"
         v-for="item in items">
         {{ item.label }}
+      </li>
     </ul>
   </div>
   <div
