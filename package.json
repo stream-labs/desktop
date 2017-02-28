@@ -4,7 +4,7 @@
   "main": "main.js",
   "scripts": {
     "compile": "webpack",
-    "watch": "webpack --watch",
+    "watch": "webpack-dashboard -- webpack --watch",
     "start": "electron .",
     "extract-libs": "bin/extract_libs.sh",
     "rebuild": "electron-rebuild && electron-rebuild -w node-obs"
@@ -33,6 +33,7 @@
     "style-loader": "^0.13.1",
     "vue-loader": "^10.2.0",
     "vue-template-compiler": "^2.1.10",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "webpack-dashboard": "^0.3.0"
   }
 }
