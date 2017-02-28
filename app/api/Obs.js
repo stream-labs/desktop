@@ -120,6 +120,10 @@ class ObsApi {
       obj.filter = this.parsePathFilters(obj.filter);
     }
 
+    if (property.type === 'OBS_PROPERTY_EDITABLE_LIST') {
+      obj.filter = this.parsePathFilters(obj.filter);
+    }
+
     return obj;
   }
 
