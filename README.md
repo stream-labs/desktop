@@ -1,10 +1,6 @@
 # slobs-client
 Electron client for the Streamlabs OBS streaming software.
 
-## Streaming
-Default config will stream to:
-https://www.twitch.tv/slobstest
-
 ## Dependencies
 
 ### Node OBS
@@ -58,3 +54,8 @@ You can run the app with:
 ```
 yarn start
 ```
+
+## Streaming
+
+The default config will stream to:
+https://www.twitch.tv/slobstest
