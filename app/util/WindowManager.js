@@ -36,6 +36,7 @@ class WindowManager {
         const win = remote.getCurrentWindow();
 
         win.setSize(data.windowOptions.width, data.windowOptions.height);
+        win.center();
       }
 
     } else {
