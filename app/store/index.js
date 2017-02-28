@@ -40,29 +40,13 @@ const actions = {
     dispatch({
       type: 'makeSceneActive',
       sceneName: 'Example Scene 1'
-    })
-
-    // dispatch({
-    //   type: 'createSourceAndAddToScene',
-    //   sceneName: 'Example Scene 1',
-    //   sourceType: 'Video Capture Device',
-    //   sourceName: 'Video Capture 1',
-    //   sourceId: ipcRenderer.sendSync('getUniqueId')
-    // });
-
-    // dispatch({
-    //   type: 'createSourceAndAddToScene',
-    //   sceneName: 'Example Scene 1',
-    //   sourceType: 'Text (FreeType 2)',
-    //   sourceName: 'Text 1',
-    //   sourceId: ipcRenderer.sendSync('getUniqueId')
-    // });
+    });
 
     dispatch({
       type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
-      sourceType: 'Game Capture (Syphon)',
-      sourceName: 'Capture 1',
+      sourceType: 'Video Capture Device',
+      sourceName: 'Video Capture 1',
       sourceId: ipcRenderer.sendSync('getUniqueId')
     });
   }
