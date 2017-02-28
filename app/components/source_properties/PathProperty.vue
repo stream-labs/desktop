@@ -51,7 +51,9 @@ export default {
         });
       }
 
-      this.setPath(path);
+      if (path) {
+        this.setPath(path);
+      }
     },
 
     setPath(path) {
