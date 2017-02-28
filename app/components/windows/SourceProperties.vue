@@ -35,6 +35,7 @@ import FontProperty from '../source_properties/FontProperty.vue';
 import TextProperty from '../source_properties/TextProperty.vue';
 import PathProperty from '../source_properties/PathProperty.vue';
 import EditableListProperty from '../source_properties/EditableListProperty.vue';
+import ButtonProperty from '../source_properties/ButtonProperty.vue';
 
 export default {
 
@@ -60,7 +61,8 @@ export default {
     FontProperty,
     TextProperty,
     PathProperty,
-    EditableListProperty
+    EditableListProperty,
+    ButtonProperty
   },
 
   methods: {
@@ -88,7 +90,8 @@ export default {
         OBS_PROPERTY_FONT: FontProperty,
         OBS_PROPERTY_TEXT: TextProperty,
         OBS_PROPERTY_PATH: PathProperty,
-        OBS_PROPERTY_EDITABLE_LIST: EditableListProperty
+        OBS_PROPERTY_EDITABLE_LIST: EditableListProperty,
+        OBS_PROPERTY_BUTTON: ButtonProperty
       }[type];
     }
   },
