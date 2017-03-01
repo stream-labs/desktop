@@ -20,6 +20,7 @@
 <script>
 const { getCurrentWindow } = window.require('electron').remote;
 const thisWindow = getCurrentWindow();
+import windowManager from '../util/WindowManager.js';
 
 let maximized = false;
 
@@ -41,7 +42,7 @@ export default {
     },
 
     handleClose() {
-      thisWindow.close();
+      windowManager.closeWindow();
     }
   },
 

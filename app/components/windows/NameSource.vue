@@ -37,19 +37,25 @@ export default {
       this.$store.dispatch({
         type: 'createSourceAndAddToScene',
         sceneName: this.$store.getters.activeSceneName,
-        sourceType: window.startupOptions.sourceType,
+        sourceType: this.sourceType,
         sourceName: this.name,
         sourceId: id
       });
 
-      windowManager.showSourceProperties(true, id);
+      windowManager.showSourceProperties(id);
     }
   },
 
   data() {
     return {
-      name: window.startupOptions.sourceType
+      name: this.$store.state.windowOptions.options.sourceType
     };
+  },
+
+  computed: {
+    sourceType() {
+      return this.$store.state.windowOptions.options.sourceType;
+    }
   }
 
 };

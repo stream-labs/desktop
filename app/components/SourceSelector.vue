@@ -52,8 +52,7 @@ export default {
 
     sourceProperties() {
       if (this.$store.getters.activeSourceId) {
-        windowManager.showSourceProperties(false,
-          this.$store.getters.activeSourceId);
+        windowManager.showSourceProperties(this.$store.getters.activeSourceId);
       }
     },
 

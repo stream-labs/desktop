@@ -1,9 +1,10 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const obs = require('node-obs');
 const _ = require('lodash');
-const URI = require('urijs');
 
 let mainWindow;
+let childWindow;
+
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 app.on('ready', () => {
@@ -15,9 +16,17 @@ app.on('ready', () => {
 
   mainWindow.webContents.openDevTools();
 
-  let mainUrl = URI(indexUrl).query({ component: 'Main' })
+  mainWindow.loadURL(indexUrl);
 
-  mainWindow.loadURL(mainUrl.toString());
+  // Pre-initialize the child window
+  childWindow = new BrowserWindow({
+    show: false,
+    frame: false
+  });
+
+  childWindow.webContents.openDevTools();
+
+  childWindow.loadURL(indexUrl + '?child=true');
 
   // TODO: NODE_ENV is not getting set yet
   if (process.env.NODE_ENV !== 'production') {
@@ -55,26 +64,14 @@ app.on('ready', () => {
 
 
 
-// Used for spawning child windows. Will automatically
-// replace any child window currently showing.
-let childWindow;
-
-ipcMain.on('window-spawnChildWindow', (event, data) => {
-  // Close the existing child window
-  if (childWindow && !childWindow.isDestroyed()) {
-    childWindow.close();
+ipcMain.on('window-showChildWindow', (event, data) => {
+  if (data.windowOptions.width && data.windowOptions.height) {
+    childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
+    childWindow.center();
   }
 
-  const options = Object.assign({}, data.windowOptions, {
-    parent: mainWindow
-  });
-
-  childWindow = new BrowserWindow(options);
-  childWindow.webContents.openDevTools();
-
-  let childUrl = URI(indexUrl).query(data.startupOptions);
-
-  childWindow.loadURL(childUrl.toString());
+  childWindow.send('window-setContents', data.startupOptions);
+  childWindow.show();
 });
 
 

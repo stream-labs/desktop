@@ -29,7 +29,7 @@ export default {
 
   methods: {
     selectSource(source) {
-      windowManager.showNameSource(true, source);
+      windowManager.showNameSource(source);
     }
   },
 

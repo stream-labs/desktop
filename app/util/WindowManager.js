@@ -8,6 +8,7 @@ import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
+import store from '../store';
 
 class WindowManager {
 
@@ -28,82 +29,76 @@ class WindowManager {
   // re-load and initialize all the assets. Most windowOptions
   // will be ignored.
   showWindow(data) {
-    if (data.inPlace) {
-      window.startupOptions = data.startupOptions;
-      window.reset();
-
-      if (data.windowOptions.width && data.windowOptions.height) {
-        const win = remote.getCurrentWindow();
-
-        win.setSize(data.windowOptions.width, data.windowOptions.height);
-        win.center();
-      }
-
-    } else {
-      ipcRenderer.send('window-spawnChildWindow', data);
-    }
+    ipcRenderer.send('window-showChildWindow', data);
   }
 
-  // Will close the current window
+  // Will close the current window.
+  // If this is the child window, it will be hidden instead.
   closeWindow() {
-    remote.getCurrentWindow().close();
+    if (store.state.windowOptions.isChild) {
+      remote.getCurrentWindow().hide();
+
+      // This prevents you from seeing the previous contents
+      // of the window for a split second after it is shown.
+      store.dispatch({
+        type: 'setWindowOptions',
+        options: {}
+      });
+    } else {
+      remote.getCurrentWindow().close();
+    }
   }
 
   // These methods are basically presets for showing
   // various dialog windows.
 
-  showSettings(inPlace = false) {
+  showSettings() {
     this.showWindow({
       startupOptions: {
         component: 'Settings'
       },
       windowOptions: {
-        frame: false
-      },
-      inPlace
+        width: 800,
+        height: 600
+      }
     });
   }
 
-  showAddSource(inPlace = false) {
+  showAddSource() {
     this.showWindow({
       startupOptions: {
         component: 'AddSource'
       },
       windowOptions: {
-        frame: false
-      },
-      inPlace
+        width: 800,
+        height: 600
+      }
     });
   }
 
-  showNameSource(inPlace = false, sourceType) {
+  showNameSource(sourceType) {
     this.showWindow({
       startupOptions: {
         component: 'NameSource',
         sourceType
       },
       windowOptions: {
-        frame: false,
         width: 400,
         height: 240
-      },
-      inPlace
+      }
     });
   }
 
-  showSourceProperties(inPlace = false, sourceId) {
+  showSourceProperties(sourceId) {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
         sourceId
       },
       windowOptions: {
-        // Eventually souceType will determine window size
-        frame: false,
         width: 600,
         height: 800
-      },
-      inPlace
+      }
     });
   }
 

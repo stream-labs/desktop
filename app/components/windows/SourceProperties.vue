@@ -41,8 +41,6 @@ export default {
 
   data() {
     return {
-      sourceId: window.startupOptions.sourceId,
-
       contentStyles: {
         padding: 0,
         'margin-top': '220px',
@@ -131,6 +129,10 @@ export default {
       } else {
         return [];
       }
+    },
+
+    sourceId() {
+      return this.$store.state.windowOptions.options.sourceId;
     }
   }
 

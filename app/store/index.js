@@ -4,6 +4,7 @@ import navigation from './modules/navigation.js';
 import scenes from './modules/scenes.js';
 import sources from './modules/sources.js';
 import streaming from './modules/streaming.js';
+import windowOptions from './modules/windowOptions.js';
 import _ from 'lodash';
 
 Vue.use(Vuex);
@@ -69,7 +70,7 @@ plugins.push(store => {
   // Only the main window should ever receive this
   ipcRenderer.on('vuex-sendState', (event, windowId) => {
     let win = remote.BrowserWindow.fromId(windowId);
-    win.webContents.send('vuex-loadState', store.state);
+    win.webContents.send('vuex-loadState', _.omit(store.state, ['windowOptions']));
   });
 
   // Only child windows should ever receive this
@@ -95,7 +96,8 @@ export default new Vuex.Store({
     navigation,
     scenes,
     sources,
-    streaming
+    streaming,
+    windowOptions
   },
   plugins,
   mutations,
