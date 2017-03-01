@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // This is purely for developer convencience.  Changing the URL
     // to match the current contents, as well as pulling the options
-    // from the URL allows child windows to be refreshed without
+    // from the URL, allows child windows to be refreshed without
     // losing their contents.
     let newOptions = Object.assign({ child: isChild }, options);
     let newURL = URI(window.location.href).query(newOptions).toString()
