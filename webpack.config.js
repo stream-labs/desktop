@@ -9,8 +9,8 @@ if (process.env.WEBPACK_DASHBOARD) {
 module.exports = {
   entry: './app/app.js',
   output: {
-    path: __dirname + '/dist',
-    filename: 'build.js'
+    path: __dirname + '/build',
+    filename: 'slobs.js'
   },
   module: {
     rules: [
