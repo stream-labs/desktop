@@ -39,8 +39,6 @@ export default {
     },
 
     removeSource() {
-      console.log('Click Remove Source');
-
       // We can only remove a source if one is selected
       if(this.$store.getters.activeSourceId) {
         this.$store.dispatch({

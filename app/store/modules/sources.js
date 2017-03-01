@@ -56,6 +56,11 @@ const actions = {
       sourceId: data.sourceId,
       sceneName: data.sceneName
     });
+
+    commit('MAKE_SOURCE_ACTIVE', {
+      sourceId: data.sourceId,
+      sceneName: data.sceneName
+    });
   },
 
   removeSource({ commit, state }, data) {
