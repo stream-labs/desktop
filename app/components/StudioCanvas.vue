@@ -1,10 +1,28 @@
 <template>
 <div class="StudioCanvas">
+  <source-preview :source="sources[0]"/>
 </div>
 </template>
 
 <script>
-export default {};
+import SourcePreview from './SourcePreview.vue';
+import _ from 'lodash';
+
+export default {
+
+  components: {
+    SourcePreview
+  },
+
+  computed: {
+    sources() {
+      return _.map(this.$store.getters.activeScene.sources, sourceId => {
+        return this.$store.state.sources.sources[sourceId];
+      });
+    }
+  }
+
+};
 </script>
 
 <style lang="less" scoped>

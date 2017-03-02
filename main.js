@@ -120,9 +120,14 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
 ipcMain.on('obs-apiCall', (event, data) => {
   console.log('OBS API CALL', data);
 
-  const retVal = obs[data.method].apply(obs, data.args);
+  let retVal = obs[data.method].apply(obs, data.args);
 
   console.log('OBS RETURN VALUE', retVal);
+
+  if (retVal instanceof ArrayBuffer) {
+    // Base64 is an efficient way of serializing this data
+    retVal = Buffer.from(retVal).toString('base64');
+  }
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.
@@ -134,5 +139,44 @@ ipcMain.on('obs-apiCall', (event, data) => {
 // Used for guaranteeing unique ids for objects in the vuex store
 ipcMain.on('getUniqueId', event => {
   event.returnValue = _.uniqueId();
+});
+
+
+
+const ipc = require('node-ipc');
+
+let streamingSource;
+
+let streamingTimeout;
+
+function setStreamingTimeout(socket) {
+  if (streamingSource) {
+    let buffer = obs.OBS_content_getSourceFrame(streamingSource);
+
+    ipc.server.emit(socket, buffer);
+  }
+
+ setTimeout(setStreamingTimeout.bind(this, socket), 100);
+}
+
+ipc.config.id = 'slobs';
+ipc.config.rawBuffer = true;
+ipc.config.retry = 1500;
+ipc.config.encoding = 'hex';
+
+ipc.serve(function() {
+  ipc.server.on('connect', function(socket) {
+    setStreamingTimeout(socket);
+  });
+});
+
+ipc.server.start();
+
+ipcMain.on('startStreamingSource', (event, data) => {
+  streamingSource = data.sourceName;
+});
+
+ipcMain.on('stopStreamingSource', (event, data) => {
+  streamingSource = null;
 });
 
