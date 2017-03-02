@@ -1,17 +1,26 @@
 <template>
 <div class="StudioCanvas">
-  <source-preview :source="sources[0]"/>
+  <!-- <source-preview :source="sources[0]"/> -->
+  <studio-canvas-overlay/>
 </div>
 </template>
 
 <script>
 import SourcePreview from './SourcePreview.vue';
+import StudioCanvasOverlay from './StudioCanvasOverlay.vue';
 import _ from 'lodash';
 
 export default {
 
   components: {
-    SourcePreview
+    SourcePreview,
+    StudioCanvasOverlay
+  },
+
+  data() {
+    return {
+
+    };
   },
 
   computed: {
@@ -19,6 +28,10 @@ export default {
       return _.map(this.$store.getters.activeScene.sources, sourceId => {
         return this.$store.state.sources.sources[sourceId];
       });
+    },
+
+    aspectRatio() {
+      return this.$store.getters.aspectRatio;
     }
   }
 
@@ -27,7 +40,8 @@ export default {
 
 <style lang="less" scoped>
 .StudioCanvas {
+  position: relative;
   flex-grow: 1;
-  background-color: black;
+  background-color: #222;
 }
 </style>

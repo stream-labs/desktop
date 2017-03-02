@@ -5,6 +5,7 @@ import scenes from './modules/scenes.js';
 import sources from './modules/sources.js';
 import streaming from './modules/streaming.js';
 import windowOptions from './modules/windowOptions.js';
+import video from './modules/video.js';
 import _ from 'lodash';
 
 Vue.use(Vuex);
@@ -97,7 +98,8 @@ export default new Vuex.Store({
     scenes,
     sources,
     streaming,
-    windowOptions
+    windowOptions,
+    video
   },
   plugins,
   mutations,

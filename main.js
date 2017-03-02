@@ -14,6 +14,8 @@ app.on('ready', () => {
     frame: false
   });
 
+  global.obs = obs;
+
   mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(indexUrl);
