@@ -14,7 +14,7 @@ app.on('ready', () => {
     frame: false
   });
 
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(indexUrl);
 
@@ -24,7 +24,7 @@ app.on('ready', () => {
     frame: false
   });
 
-  //childWindow.webContents.openDevTools();
+  childWindow.webContents.openDevTools();
 
   childWindow.loadURL(indexUrl + '?child=true');
 
@@ -143,6 +143,7 @@ ipcMain.on('getUniqueId', event => {
 
 
 // Handle source streaming
+let streamingSource;
 
 function sendFrame() {
   if (streamingSource) {
