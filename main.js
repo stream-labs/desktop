@@ -14,7 +14,7 @@ app.on('ready', () => {
     frame: false
   });
 
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   mainWindow.loadURL(indexUrl);
 
@@ -24,7 +24,7 @@ app.on('ready', () => {
     frame: false
   });
 
-  childWindow.webContents.openDevTools();
+  //childWindow.webContents.openDevTools();
 
   childWindow.loadURL(indexUrl + '?child=true');
 
@@ -142,35 +142,20 @@ ipcMain.on('getUniqueId', event => {
 });
 
 
+// Handle source streaming
 
-const ipc = require('node-ipc');
-
-let streamingSource;
-
-let streamingTimeout;
-
-function setStreamingTimeout(socket) {
+function sendFrame() {
   if (streamingSource) {
     let buffer = obs.OBS_content_getSourceFrame(streamingSource);
-
-    ipc.server.emit(socket, buffer);
+    let uint = new Uint8Array(buffer);
+   mainWindow.send('sourceFrame', uint);
   }
 
- setTimeout(setStreamingTimeout.bind(this, socket), 100);
+  setTimeout(sendFrame, 30);
 }
 
-ipc.config.id = 'slobs';
-ipc.config.rawBuffer = true;
-ipc.config.retry = 1500;
-ipc.config.encoding = 'hex';
+sendFrame();
 
-ipc.serve(function() {
-  ipc.server.on('connect', function(socket) {
-    setStreamingTimeout(socket);
-  });
-});
-
-ipc.server.start();
 
 ipcMain.on('startStreamingSource', (event, data) => {
   streamingSource = data.sourceName;
