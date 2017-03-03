@@ -15,7 +15,8 @@
 
 <script>
 import VideoStreaming from '../util/VideoStreaming.js';
-import renderer from 'webgl-video-renderer';
+import YUVBuffer from 'yuv-buffer';
+import YUVCanvas from 'yuv-canvas';
 
 export default {
 
@@ -28,7 +29,15 @@ export default {
     this.videoCanvas.width = 1280;
     this.videoCanvas.height = 720;
 
-    this.videoContext = renderer.setupCanvas(this.videoCanvas);
+    this.format = YUVBuffer.format({
+      width: 1280,
+      height: 720,
+
+      chromaWidth: 1280 / 2,
+      chromaHeight: 720 /2
+    });
+
+    this.yuv = YUVCanvas.attach(this.videoCanvas);
   },
 
   methods: {
@@ -36,16 +45,27 @@ export default {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let frame;
+        let drawFrame;
 
-        let drawFrame = () => {
-          this.videoContext.render(frame, 1280, 720, 1280*720, (1280*720) + (1280*720)/4 );
-          this.mainCanvas.drawImage(this.videoCanvas, 0, 0);
-        };
-
-        frame = VideoStreaming.startStreaming('Video Capture 1', function() {
+        let frame = VideoStreaming.startStreaming('Video Capture 1', function() {
           requestAnimationFrame(drawFrame);
         });
+
+        let y = YUVBuffer.lumaPlane(this.format);
+        y.bytes = frame.subarray(0, 1280*720);
+
+        let u = YUVBuffer.chromaPlane(this.format);
+        u.bytes = frame.subarray(1280*720, (1280*720) + (1280*720)/4);
+
+        let v = YUVBuffer.chromaPlane(this.format);
+        v.bytes = frame.subarray((1280*720) + (1280*720)/4);
+
+        let yuvFrame = YUVBuffer.frame(this.format, y, u, v);
+
+        drawFrame = () => {
+          this.yuv.drawFrame(yuvFrame);
+          this.mainCanvas.drawImage(this.videoCanvas, 0, 0);
+        };
       }
     }
   }

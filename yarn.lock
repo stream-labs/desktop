@@ -3705,10 +3705,6 @@ watchpack@^1.2.0:
     chokidar "^1.4.3"
     graceful-fs "^4.1.2"
 
-webgl-video-renderer@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/webgl-video-renderer/-/webgl-video-renderer-0.2.0.tgz#5c6516dc9e8ecf82d1fa56e824990fdb38bb778d"
-
 webpack-dashboard@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/webpack-dashboard/-/webpack-dashboard-0.3.0.tgz#d0fe182a0976a8ff0ea01b0507f29a034cd60a1c"

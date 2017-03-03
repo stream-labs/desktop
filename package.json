@@ -19,7 +19,6 @@
     "vue-multiselect": "2.0.0-beta.13",
     "vuedraggable": "^2.8.5",
     "vuex": "^2.1.1",
-    "webgl-video-renderer": "^0.2.0",
     "yuv-buffer": "^1.0.0",
     "yuv-canvas": "^1.0.0"
   },
