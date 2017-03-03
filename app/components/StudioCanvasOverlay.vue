@@ -36,12 +36,16 @@ export default {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let frame = VideoStreaming.startStreaming('Video Capture 1');
+        let frame;
 
-        setInterval(() => {
+        let drawFrame = () => {
           this.videoContext.render(frame, 1280, 720, 1280*720, (1280*720) + (1280*720)/4 );
           this.mainCanvas.drawImage(this.videoCanvas, 0, 0);
-        }, 33);
+        };
+
+        frame = VideoStreaming.startStreaming('Video Capture 1', function() {
+          requestAnimationFrame(drawFrame);
+        });
       }
     }
   }

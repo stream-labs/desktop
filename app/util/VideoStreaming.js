@@ -4,7 +4,7 @@ const net = window.require('net');
 
 export default {
 
-  startStreaming(sourceName) {
+  startStreaming(sourceName, sync) {
     let frameLength = 1382400
     let buffer = new Uint8Array(frameLength);
     let bufferOffset = 0;
@@ -12,11 +12,13 @@ export default {
     let client = new net.Socket();
 
     client.on('data', function(data) {
-      if ((data.length + bufferOffset) > frameLength) {
+      if ((data.length + bufferOffset) >= frameLength) {
         let end = data.subarray(0, frameLength - bufferOffset);
         let start = data.subarray(frameLength - bufferOffset);
         buffer.set(start, 0);
         buffer.set(end, bufferOffset);
+
+        sync();
       } else {
         buffer.set(data, bufferOffset);
       }
