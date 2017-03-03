@@ -12,7 +12,7 @@ export default {
     let client = new net.Socket();
 
     client.on('data', function(data) {
-      if ((data.length + bufferOffset) >= frameLength) {
+      if ((data.length + bufferOffset) > frameLength) {
         let end = data.subarray(0, frameLength - bufferOffset);
         let start = data.subarray(frameLength - bufferOffset);
         buffer.set(start, 0);
