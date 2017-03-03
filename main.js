@@ -144,27 +144,18 @@ ipcMain.on('getUniqueId', event => {
 });
 
 
-// Handle source streaming
-let streamingSource;
+// Handle streaming of video over TCP socket
+const net = require('net');
 
-function sendFrame() {
-  if (streamingSource) {
-    let buffer = obs.OBS_content_getSourceFrame(streamingSource);
-    let uint = new Uint8Array(buffer);
-   mainWindow.send('sourceFrame', uint);
+net.createServer(function(sock) {
+
+  function sendFrame() {
+    let frame = obs.OBS_content_getSourceFrame('Video Capture 1');
+
+    sock.write(Buffer.from(frame));
+
+    setTimeout(sendFrame, 30);
   }
 
-  setTimeout(sendFrame, 30);
-}
-
-sendFrame();
-
-
-ipcMain.on('startStreamingSource', (event, data) => {
-  streamingSource = data.sourceName;
-});
-
-ipcMain.on('stopStreamingSource', (event, data) => {
-  streamingSource = null;
-});
-
+  sendFrame();
+}).listen(8090, '127.0.0.1');
