@@ -14,7 +14,8 @@
 </template>
 
 <script>
-import VideoStreaming from '../util/VideoStreaming.js';
+import SourceFrameStream from '../util/SourceFrameStream.js';
+
 import YUVBuffer from 'yuv-buffer';
 import YUVCanvas from 'yuv-canvas';
 
@@ -24,7 +25,7 @@ export default {
     let canvas = this.$refs.canvas;
 
     this.mainCanvas = canvas.getContext('2d');
-    
+
     this.videoCanvas = document.createElement('canvas');
     this.videoCanvas.width = 1280;
     this.videoCanvas.height = 720;
@@ -45,9 +46,7 @@ export default {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let drawFrame;
-
-        let frame = VideoStreaming.startStreaming('Video Capture 1', function() {
+        let frame = SourceFrameStream.subscribeToSource('Video Capture 1', 1280 * 720 * 1.5, function() {
           requestAnimationFrame(drawFrame);
         });
 
@@ -62,10 +61,11 @@ export default {
 
         let yuvFrame = YUVBuffer.frame(this.format, y, u, v);
 
-        drawFrame = () => {
+        let drawFrame = () => {
           this.yuv.drawFrame(yuvFrame);
           this.mainCanvas.drawImage(this.videoCanvas, 0, 0);
         };
+
       }
     }
   }

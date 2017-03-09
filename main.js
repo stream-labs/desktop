@@ -147,15 +147,26 @@ ipcMain.on('getUniqueId', event => {
 // Handle streaming of video over TCP socket
 const net = require('net');
 
+let subscribedSources = [];
+
+ipcMain.on('subscribeToSource', (event, data) => {
+  subscribedSources.push(data);
+});
+
 net.createServer(function(sock) {
+  function sendFrames() {
+    _.each(subscribedSources, source => {
+      let frame = obs.OBS_content_getSourceFrame(source.name);
 
-  function sendFrame() {
-    let frame = obs.OBS_content_getSourceFrame('Video Capture 1');
+      // Write the id of the frame we are about to send
+      sock.write(Buffer.from(new Uint8Array([source.id])));
 
-    sock.write(Buffer.from(frame));
+      // Write the actual frame data
+      sock.write(Buffer.from(frame));
+    });
 
-    setTimeout(sendFrame, 30);
+    setTimeout(sendFrames, 33);
   }
 
-  sendFrame();
+  sendFrames();
 }).listen(8090, '127.0.0.1');
