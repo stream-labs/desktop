@@ -156,13 +156,13 @@ ipcMain.on('subscribeToSource', (event, data) => {
 net.createServer(function(sock) {
   function sendFrames() {
     _.each(subscribedSources, source => {
-      let frame = obs.OBS_content_getSourceFrame(source.name);
+      let frame = new Uint8Array(obs.OBS_content_getSourceFrame(source.name));
 
       // Write the id of the frame we are about to send
-      sock.write(Buffer.from(new Uint8Array([source.id])));
+      sock.write(Buffer([source.id]));
 
       // Write the actual frame data
-      sock.write(Buffer.from(frame));
+      sock.write(Buffer.from(frame.buffer));
     });
 
     setTimeout(sendFrames, 33);

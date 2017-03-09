@@ -42,8 +42,10 @@ class SourceFrameStream {
     } else {
       if ((chunk.length + this.currentOffset) >= this.currentSource.frameLength) {
         // Split the chunk at the frame boundary
-        let finalChunk = chunk.subarray(0, this.currentSource.frameLength - this.currentOffset);
-        let chunkRemainder = chunk.subarray(this.currentSource.frameLength - this.currentOffset);
+        let boundary = this.currentSource.frameLength - this.currentOffset;
+
+        let finalChunk = chunk.subarray(0, boundary);
+        let chunkRemainder = chunk.subarray(boundary);
 
         // Write the final chunk of this frame
         this.currentSource.frameBuffer.set(finalChunk, this.currentOffset);
@@ -53,7 +55,9 @@ class SourceFrameStream {
         // Prepare to receive another header
         this.currentSource = null;
 
-        this.handleChunk(chunkRemainder);
+        if (chunkRemainder.length > 0) {
+          this.handleChunk(chunkRemainder);
+        }
       } else {
         this.currentSource.frameBuffer.set(chunk, this.currentOffset);
         this.currentOffset += chunk.length;
