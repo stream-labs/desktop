@@ -48,7 +48,15 @@ const actions = {
       type: 'createSourceAndAddToScene',
       sceneName: 'Example Scene 1',
       sourceType: 'Video Capture Device',
-      sourceName: 'Video Capture 1',
+      sourceName: 'Video Capture Device',
+      sourceId: ipcRenderer.sendSync('getUniqueId')
+    });
+
+    dispatch({
+      type: 'createSourceAndAddToScene',
+      sceneName: 'Example Scene 1',
+      sourceType: 'Window Capture',
+      sourceName: 'Window Capture',
       sourceId: ipcRenderer.sendSync('getUniqueId')
     });
   }

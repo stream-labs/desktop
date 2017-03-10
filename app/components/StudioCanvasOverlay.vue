@@ -18,6 +18,11 @@ import SourceFrameStream from '../util/SourceFrameStream.js';
 
 import YUVBuffer from 'yuv-buffer';
 import YUVCanvas from 'yuv-canvas';
+import WebGLRenderer from '../util/WebGLRenderer.js';
+
+import _ from 'lodash';
+
+import Obs from '../api/Obs.js';
 
 export default {
 
@@ -25,20 +30,6 @@ export default {
     let canvas = this.$refs.canvas;
 
     this.mainCanvas = canvas.getContext('2d');
-
-    this.videoCanvas = document.createElement('canvas');
-    this.videoCanvas.width = 1280;
-    this.videoCanvas.height = 720;
-
-    this.format = YUVBuffer.format({
-      width: 1280,
-      height: 720,
-
-      chromaWidth: 1280 / 2,
-      chromaHeight: 720 /2
-    });
-
-    this.yuv = YUVCanvas.attach(this.videoCanvas);
   },
 
   methods: {
@@ -46,25 +37,80 @@ export default {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let frame = SourceFrameStream.subscribeToSource('Video Capture 1', 1280 * 720 * 1.5, function() {
-          requestAnimationFrame(drawFrame);
+        let sources = [
+          {
+            name: 'Video Capture Device',
+            x: 0,
+            y: 0
+          },
+          {
+            name: 'Window Capture',
+            x: 700,
+            y: 300
+          }
+        ];
+
+        _.each(sources, source => {
+          let settings = Obs.getSourceFrameSettings(source.name);
+
+          if (settings.format === 'VIDEO_FORMAT_UYVY') {
+            let frameLength = settings.width * settings.height * 1.5;
+
+            let frame = SourceFrameStream.subscribeToSource(source.name, frameLength, function() {});
+
+            let canvas = document.createElement('canvas');
+            canvas.width = settings.width;
+            canvas.height = settings.height;
+
+            let format = YUVBuffer.format({
+              width: settings.width,
+              height: settings.height,
+
+              chromaWidth: settings.width / 2,
+              chromaHeight: settings.height / 2
+            });
+
+            let y = YUVBuffer.lumaPlane(format);
+            y.bytes = frame.subarray(0, settings.width * settings.height);
+
+            let u = YUVBuffer.chromaPlane(format);
+            u.bytes = frame.subarray(settings.width * settings.height, (settings.width * settings.height) + (settings.width * settings.height) / 4);
+
+            let v = YUVBuffer.chromaPlane(format);
+            v.bytes = frame.subarray((settings.width * settings.height) + (settings.width * settings.height) / 4);
+
+            let yuvFrame = YUVBuffer.frame(format, y, u, v);
+
+            let yuv = YUVCanvas.attach(canvas);
+
+            source.canvas = canvas;
+
+            source.render = () => {
+              yuv.drawFrame(yuvFrame);
+            };
+          } else {
+            let frameLength = settings.width * settings.height * 4;
+
+            let frame = SourceFrameStream.subscribeToSource(source.name, frameLength, function() {});
+            let canvas = document.createElement('canvas');
+
+            let renderer = new WebGLRenderer(canvas, settings.width, settings.height);
+
+            source.canvas = canvas;
+
+            source.render = () => {
+              renderer.drawFrame(frame);
+            };
+          }
         });
 
-        let y = YUVBuffer.lumaPlane(this.format);
-        y.bytes = frame.subarray(0, 1280*720);
+        setInterval(() => {
+          _.each(sources, source => {
+            source.render();
+            this.mainCanvas.drawImage(source.canvas, source.x, source.y);
+          });
 
-        let u = YUVBuffer.chromaPlane(this.format);
-        u.bytes = frame.subarray(1280*720, (1280*720) + (1280*720)/4);
-
-        let v = YUVBuffer.chromaPlane(this.format);
-        v.bytes = frame.subarray((1280*720) + (1280*720)/4);
-
-        let yuvFrame = YUVBuffer.frame(this.format, y, u, v);
-
-        let drawFrame = () => {
-          this.yuv.drawFrame(yuvFrame);
-          this.mainCanvas.drawImage(this.videoCanvas, 0, 0);
-        };
+        }, 33);
 
       }
     }

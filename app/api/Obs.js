@@ -175,14 +175,14 @@ class ObsApi {
     nodeObs.OBS_service_stopRecording();
   }
 
-  getSourceFrame(sourceName) {
-    let start = performance.now();
-    let buffer =  new Buffer(nodeObs.OBS_content_getSourceFrame(sourceName), 'base64');
-    let end = performance.now();
+  getSourceFrameSettings(sourceName) {
+    let settings = nodeObs.OBS_content_getSourceFrameSettings(sourceName);
 
-    console.log('RUNTIME', end - start);
-
-    return buffer;
+    return {
+      format: settings.format,
+      width: parseInt(settings.width),
+      height: parseInt(settings.height)
+    };
   }
 
 }
