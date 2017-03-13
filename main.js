@@ -154,12 +154,6 @@ const SourceFrameHeader = require('./app/util/SourceFrameHeader.js').default;
 ipcMain.on('subscribeToSource', (event, data) => {
   let settings = obs.OBS_content_getSourceFrameSettings(data.name);
 
-  settings.frameLength = SourceFrameHeader.calcFrameSize(
-    parseInt(settings.width),
-    parseInt(settings.height),
-    settings.format
-  );
-
   subscribedSources.push(Object.assign({}, settings, data));
 });
 
@@ -173,7 +167,7 @@ net.createServer(function(sock) {
       header.id = source.id;
       header.width = source.width;
       header.height = source.height;
-      header.frameLength = source.frameLength;
+      header.frameLength = frame.byteLength;
 
       sock.write(Buffer.from(header.buffer.buffer));
 

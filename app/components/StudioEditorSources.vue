@@ -98,6 +98,8 @@ export default {
         });
 
         setInterval(() => {
+          this.mainCanvas.clearRect(0, 0, 1920, 1080);
+
           _.each(sources, source => {
             this.mainCanvas.drawImage(source.canvas, source.x, source.y);
           });

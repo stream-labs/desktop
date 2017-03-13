@@ -43,14 +43,6 @@ class SourceFrameHeader {
     }
   }
 
-  static calcFrameSize(width, height, format) {
-    if (format === 'VIDEO_FORMAT_UYVY') {
-      return width * height * 1.5;
-    } else {
-      return width * height * 4;
-    }
-  }
-
 }
 
 module.exports.default = SourceFrameHeader;
