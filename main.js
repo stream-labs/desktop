@@ -169,11 +169,10 @@ net.createServer(function(sock) {
       let frame = new Uint8Array(obs.OBS_content_getSourceFrame(source.name));
 
       let header = new SourceFrameHeader();
-      header.id = source.id;
 
+      header.id = source.id;
       header.width = source.width;
       header.height = source.height;
-
       header.frameLength = source.frameLength;
 
       sock.write(Buffer.from(header.buffer.buffer));

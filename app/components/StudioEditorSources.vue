@@ -99,7 +99,6 @@ export default {
 
         setInterval(() => {
           _.each(sources, source => {
-            console.log("DRAWING SOURCE");
             this.mainCanvas.drawImage(source.canvas, source.x, source.y);
           });
 
