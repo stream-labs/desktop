@@ -1,14 +1,14 @@
 <template>
 <div>
   <button
-    class="StudioCanvasOverlay-button button"
+    class="StudioEditorSources-button button"
     @click="startVideo">
     Start Video
   </button>
   <canvas
     width="1920"
     height="1080"
-    class="StudioCanvasOverlay"
+    class="StudioEditorSources"
     ref="canvas"/>
 </div>
 </template>
@@ -120,7 +120,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StudioCanvasOverlay {
+.StudioEditorSources {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -133,7 +133,7 @@ export default {
   background-color: black;
 }
 
-.StudioCanvasOverlay-button {
+.StudioEditorSources-button {
   position: absolute;
   top: 10px;
   left: 10px;
