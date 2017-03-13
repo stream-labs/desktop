@@ -149,8 +149,18 @@ const net = require('net');
 
 let subscribedSources = [];
 
+const SourceFrameHeader = require('./app/util/SourceFrameHeader.js').default;
+
 ipcMain.on('subscribeToSource', (event, data) => {
-  subscribedSources.push(data);
+  let settings = obs.OBS_content_getSourceFrameSettings(data.name);
+
+  settings.frameLength = SourceFrameHeader.calcFrameSize(
+    parseInt(settings.width),
+    parseInt(settings.height),
+    settings.format
+  );
+
+  subscribedSources.push(Object.assign({}, settings, data));
 });
 
 net.createServer(function(sock) {
@@ -158,8 +168,15 @@ net.createServer(function(sock) {
     _.each(subscribedSources, source => {
       let frame = new Uint8Array(obs.OBS_content_getSourceFrame(source.name));
 
-      // Write the id of the frame we are about to send
-      sock.write(Buffer([source.id]));
+      let header = new SourceFrameHeader();
+      header.id = source.id;
+
+      header.width = source.width;
+      header.height = source.height;
+
+      header.frameLength = source.frameLength;
+
+      sock.write(Buffer.from(header.buffer.buffer));
 
       // Write the actual frame data
       sock.write(Buffer.from(frame.buffer));

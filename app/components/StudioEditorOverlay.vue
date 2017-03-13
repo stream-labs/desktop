@@ -8,7 +8,7 @@
 
 <script>
 
-drawBox = (ctx, x, y, width, height) => {
+let drawBox = (ctx, x, y, width, height) => {
   ctx.stokeStyle = 'red';
   ctx.strokeRect(x, y, width, height);
 };
@@ -36,7 +36,5 @@ export default {
   max-height: 100%;
 
   z-index: 1000;
-
-  background-color: black;
 }
 </style>
