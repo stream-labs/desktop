@@ -1,17 +1,20 @@
 <template>
 <div class="StudioEditor">
-  <studio-editor-sources/>
+  <studio-editor-sources :sources="sources"/>
+  <studio-editor-overlay :sources="sources"/>
 </div>
 </template>
 
 <script>
 import StudioEditorSources from './StudioEditorSources.vue';
+import StudioEditorOverlay from './StudioEditorOverlay.vue';
 import _ from 'lodash';
 
 export default {
 
   components: {
-    StudioEditorSources
+    StudioEditorSources,
+    StudioEditorOverlay
   },
 
   data() {
