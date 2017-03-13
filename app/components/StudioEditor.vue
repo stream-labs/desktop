@@ -1,17 +1,17 @@
 <template>
-<div class="StudioCanvas">
-  <studio-canvas-overlay/>
+<div class="StudioEditor">
+  <studio-editor-sources/>
 </div>
 </template>
 
 <script>
-import StudioCanvasOverlay from './StudioCanvasOverlay.vue';
+import StudioEditorSources from './StudioEditorSources.vue';
 import _ from 'lodash';
 
 export default {
 
   components: {
-    StudioCanvasOverlay
+    StudioEditorSources
   },
 
   data() {
@@ -32,7 +32,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StudioCanvas {
+.StudioEditor {
   position: relative;
   flex-grow: 1;
   background-color: #222;

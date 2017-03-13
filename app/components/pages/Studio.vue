@@ -1,19 +1,19 @@
 <template>
 <div class="studioPage">
-  <studio-canvas />
+  <studio-editor />
   <studio-controls />
   <studio-footer />
 </div>
 </template>
 
 <script>
-import StudioCanvas from '../StudioCanvas.vue';
+import StudioEditor from '../StudioEditor.vue';
 import StudioControls from '../StudioControls.vue';
 import StudioFooter from '../StudioFooter.vue';
 
 export default {
   components: {
-    StudioCanvas,
+    StudioEditor,
     StudioControls,
     StudioFooter
   }
