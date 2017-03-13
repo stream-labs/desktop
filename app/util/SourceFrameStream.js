@@ -63,8 +63,6 @@ class SourceFrameStream {
   }
 
   handleChunk(chunk) {
-    // console.log("CHUNK", chunk.length);
-
     if ((chunk.length + this.currentOffset) >= this.currentBuffer.length) {
       let boundary = this.currentBuffer.length - this.currentOffset;
 
