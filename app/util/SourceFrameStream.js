@@ -1,13 +1,20 @@
 const net = window.require('net');
 const { ipcRenderer } = window.require('electron');
 
+const SourceFrameHeader = require('./SourceFrameHeader.js').default;
+
 class SourceFrameStream {
 
   constructor() {
     this.sources = {};
-    this.idCounter = 0;
+    this.idCounter = 1;
+    this.header = new SourceFrameHeader();
+
+    // This is the buffer we are currently trying to fill
+    // from the TCP socket.
+    this.currentBuffer = this.header.buffer;
+
     this.currentOffset = 0;
-    this.currentSource;
   }
 
   ensureConnected() {
@@ -24,56 +31,63 @@ class SourceFrameStream {
     }
   }
 
-  // Handles a single chunk in a continuous stream of
-  // interleaved source frames. Is responsible for making
-  // sure each incoming frame gets written to the correct
-  // buffer.
-  handleChunk(chunk) {
-    // We are expecting a header
-    if (!this.currentSource) {
-      // Prepare to read the incoming source frame specified
-      // by the source id in the 1 byte header
-      this.currentSource = this.sources[chunk[0]];
-      this.currentOffset = 0;
-
-      if (chunk.length > 1) {
-        this.handleChunk(chunk.subarray(1));
-      }
+  // Sets up the next target buffer for streaming.
+  setNextTarget() {
+    if (this.currentSourceId) {
+      this.currentSourceId = null;
+      this.currentBuffer = this.header.buffer;
     } else {
-      if ((chunk.length + this.currentOffset) >= this.currentSource.frameLength) {
-        // Split the chunk at the frame boundary
-        let boundary = this.currentSource.frameLength - this.currentOffset;
+      this.currentSourceId = this.header.id;
+      let source = this.sources[this.header.id];
 
-        let finalChunk = chunk.subarray(0, boundary);
-        let chunkRemainder = chunk.subarray(boundary);
-
-        // Write the final chunk of this frame
-        this.currentSource.frameBuffer.set(finalChunk, this.currentOffset);
-
-        this.currentSource.callback();
-
-        // Prepare to receive another header
-        this.currentSource = null;
-
-        if (chunkRemainder.length > 0) {
-          this.handleChunk(chunkRemainder);
-        }
-      } else {
-        this.currentSource.frameBuffer.set(chunk, this.currentOffset);
-        this.currentOffset += chunk.length;
+      if (!source.frameBuffer || (source.frameBuffer.length !== this.header.frameLength)) {
+        source.frameBuffer = new Uint8Array(this.header.frameLength);
       }
+
+      this.currentBuffer = source.frameBuffer;
+    }
+
+    this.currentOffset = 0;
+  }
+
+  processBuffer() {
+    if (this.currentSourceId) {
+      let source = this.sources[this.currentSourceId];
+
+      source.callback({
+        width: this.header.width,
+        height: this.header.height,
+        frameBuffer: source.frameBuffer
+      });
     }
   }
 
-  subscribeToSource(sourceName, frameLength, callback) {
-    this.ensureConnected();
+  handleChunk(chunk) {
+    // console.log("CHUNK", chunk.length);
 
-    let frameBuffer = new Uint8Array(frameLength);
+    if ((chunk.length + this.currentOffset) >= this.currentBuffer.length) {
+      let boundary = this.currentBuffer.length - this.currentOffset;
+
+      let finalChunk = chunk.subarray(0, boundary);
+      let overflow = chunk.subarray(boundary);
+
+      this.currentBuffer.set(finalChunk, this.currentOffset);
+
+      this.processBuffer();
+      this.setNextTarget();
+
+      this.handleChunk(overflow);
+    } else {
+      this.currentBuffer.set(chunk, this.currentOffset);
+      this.currentOffset += chunk.length;
+    }
+  }
+
+  subscribeToSource(sourceName, callback) {
+    this.ensureConnected();
 
     this.sources[this.idCounter] = {
       name: sourceName,
-      frameLength,
-      frameBuffer,
       callback
     };
 
@@ -83,8 +97,6 @@ class SourceFrameStream {
     });
 
     this.idCounter += 1;
-
-    return frameBuffer;
   }
 }
 

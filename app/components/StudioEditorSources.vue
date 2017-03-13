@@ -1,14 +1,14 @@
 <template>
 <div>
   <button
-    class="StudioCanvasOverlay-button button"
+    class="StudioEditorSources-button button"
     @click="startVideo">
     Start Video
   </button>
   <canvas
     width="1920"
     height="1080"
-    class="StudioCanvasOverlay"
+    class="StudioEditorSources"
     ref="canvas"/>
 </div>
 </template>
@@ -54,59 +54,53 @@ export default {
           let settings = Obs.getSourceFrameSettings(source.name);
 
           if (settings.format === 'VIDEO_FORMAT_UYVY') {
-            let frameLength = settings.width * settings.height * 1.5;
-
-            let frame = SourceFrameStream.subscribeToSource(source.name, frameLength, function() {});
-
             let canvas = document.createElement('canvas');
             canvas.width = settings.width;
             canvas.height = settings.height;
 
-            let format = YUVBuffer.format({
-              width: settings.width,
-              height: settings.height,
-
-              chromaWidth: settings.width / 2,
-              chromaHeight: settings.height / 2
-            });
-
-            let y = YUVBuffer.lumaPlane(format);
-            y.bytes = frame.subarray(0, settings.width * settings.height);
-
-            let u = YUVBuffer.chromaPlane(format);
-            u.bytes = frame.subarray(settings.width * settings.height, (settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-            let v = YUVBuffer.chromaPlane(format);
-            v.bytes = frame.subarray((settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-            let yuvFrame = YUVBuffer.frame(format, y, u, v);
+            source.canvas = canvas;
 
             let yuv = YUVCanvas.attach(canvas);
 
-            source.canvas = canvas;
+            SourceFrameStream.subscribeToSource(source.name, data => {
+              let format = YUVBuffer.format({
+                width: settings.width,
+                height: settings.height,
 
-            source.render = () => {
+                chromaWidth: settings.width / 2,
+                chromaHeight: settings.height / 2
+              });
+
+              let y = YUVBuffer.lumaPlane(format);
+              y.bytes = data.frameBuffer.subarray(0, data.width * data.height);
+
+              let u = YUVBuffer.chromaPlane(format);
+              u.bytes = data.frameBuffer.subarray(settings.width * settings.height, (settings.width * settings.height) + (settings.width * settings.height) / 4);
+
+              let v = YUVBuffer.chromaPlane(format);
+              v.bytes = data.frameBuffer.subarray((settings.width * settings.height) + (settings.width * settings.height) / 4);
+
+              let yuvFrame = YUVBuffer.frame(format, y, u, v);
+
               yuv.drawFrame(yuvFrame);
-            };
+            });
           } else {
-            let frameLength = settings.width * settings.height * 4;
-
-            let frame = SourceFrameStream.subscribeToSource(source.name, frameLength, function() {});
             let canvas = document.createElement('canvas');
 
-            let renderer = new WebGLRenderer(canvas, settings.width, settings.height);
+            let renderer = new WebGLRenderer(canvas);
 
             source.canvas = canvas;
 
-            source.render = () => {
-              renderer.drawFrame(frame);
-            };
+            SourceFrameStream.subscribeToSource(source.name, data => {
+              renderer.drawFrame(data.frameBuffer, data.width, data.height);
+            });
           }
         });
 
         setInterval(() => {
+          this.mainCanvas.clearRect(0, 0, 1920, 1080);
+
           _.each(sources, source => {
-            source.render();
             this.mainCanvas.drawImage(source.canvas, source.x, source.y);
           });
 
@@ -120,7 +114,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StudioCanvasOverlay {
+.StudioEditorSources {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -133,7 +127,7 @@ export default {
   background-color: black;
 }
 
-.StudioCanvasOverlay-button {
+.StudioEditorSources-button {
   position: absolute;
   top: 10px;
   left: 10px;

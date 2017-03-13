@@ -10,17 +10,12 @@
 class WebGLRenderer {
 
   // The HTML canvas element must be passed in
-  constructor(canvas, width, height) {
+  constructor(canvas) {
     this.canvas = canvas;
-    this.width = width;
-    this.height = height;
     this.setupCanvas();
   }
 
   setupCanvas() {
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-
     let gl = this.gl = this.canvas.getContext('webgl');
 
     this.texture = gl.createTexture();
@@ -77,8 +72,13 @@ class WebGLRenderer {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   }
 
-  drawFrame(frame) {
+  drawFrame(frame, width, height) {
     let gl = this.gl;
+
+    this.canvas.width = width;
+    this.canvas.height = height;
+
+    gl.viewport(0, 0, width, height);
 
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -86,8 +86,8 @@ class WebGLRenderer {
       gl.TEXTURE_2D,
       0,
       gl.RGBA,
-      this.width,
-      this.height,
+      width,
+      height,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
