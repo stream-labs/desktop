@@ -59,6 +59,10 @@ export default {
       return val * (this.$store.state.video.renderedWidth / this.$store.state.video.width);
     },
 
+    convertToVideoSpace(val) {
+      return val * (this.$store.state.video.width / this.$store.state.video.renderedWidth);
+    },
+
     startDragging(e) {
       console.log("STARTING DRAG");
       this.dragging = true;
@@ -66,15 +70,29 @@ export default {
       this.startY = e.pageY;
     },
 
-    move() {
+    move(e) {
       console.log("MOVING");
       if (this.dragging) {
+        let deltaX = e.pageX - this.startX;
+        let deltaY = e.pageY - this.startY;
 
+        if (deltaX || deltaY) {
+          this.$store.dispatch({
+            type: 'setSourcePosition',
+            sourceId: this.activeSource.id,
+            x: this.activeSource.x + this.convertToVideoSpace(deltaX),
+            y: this.activeSource.y + this.convertToVideoSpace(deltaY)
+          });
+
+          this.startX = e.pageX;
+          this.startY = e.pageY;
+        }
       }
     },
 
     stopDragging() {
       console.log("STOPPING DRAG");
+      this.dragging = false;
     }
   },
 

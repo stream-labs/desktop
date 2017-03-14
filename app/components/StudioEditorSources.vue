@@ -158,15 +158,15 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .StudioEditorSources {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 10px;
+  right: 10px;
   margin: auto;
-  max-width: 100%;
+  max-width: calc(100% - 20px);
   max-height: 100%;
 
   background-color: black;
