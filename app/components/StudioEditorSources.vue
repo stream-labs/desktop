@@ -33,6 +33,41 @@ export default {
   },
 
   methods: {
+    setupYUVCanvas(canvas) {
+      let yuv = YUVCanvas.attach(canvas);
+
+      return data => {
+        let format = YUVBuffer.format({
+          width: data.width,
+          height: data.height,
+
+          chromaWidth: data.width / 2,
+          chromaHeight: data.height / 2
+        });
+
+        let y = YUVBuffer.lumaPlane(format);
+        y.bytes = data.frameBuffer.subarray(0, data.width * data.height);
+
+        let u = YUVBuffer.chromaPlane(format);
+        u.bytes = data.frameBuffer.subarray(data.width * data.height, (data.width * data.height) + (data.width * data.height) / 4);
+
+        let v = YUVBuffer.chromaPlane(format);
+        v.bytes = data.frameBuffer.subarray((data.width * data.height) + (data.width * data.height) / 4);
+
+        let yuvFrame = YUVBuffer.frame(format, y, u, v);
+
+        yuv.drawFrame(yuvFrame);
+      };
+    },
+
+    setupRGBACanvas(canvas) {
+      let renderer = new WebGLRenderer(canvas);
+
+      return data => {
+        renderer.drawFrame(data.frameBuffer, data.width, data.height);
+      };
+    },
+
     startVideo() {
       if (!this.videoStarted) {
         this.videoStarted = true;
@@ -40,52 +75,11 @@ export default {
         let canvases = {};
 
         _.each(this.sources, source => {
-          let settings = Obs.getSourceFrameSettings(source.name);
+          let canvas = document.createElement('canvas');
+
+          canvases[source.id] = canvas;
+
           let renderMethod;
-
-          if (settings.format === 'VIDEO_FORMAT_UYVY') {
-            let canvas = document.createElement('canvas');
-            canvas.width = settings.width;
-            canvas.height = settings.height;
-
-            canvases[source.id] = canvas;
-
-            let yuv = YUVCanvas.attach(canvas);
-
-            renderMethod = data => {
-              let format = YUVBuffer.format({
-                width: settings.width,
-                height: settings.height,
-
-                chromaWidth: settings.width / 2,
-                chromaHeight: settings.height / 2
-              });
-
-              let y = YUVBuffer.lumaPlane(format);
-              y.bytes = data.frameBuffer.subarray(0, data.width * data.height);
-
-              let u = YUVBuffer.chromaPlane(format);
-              u.bytes = data.frameBuffer.subarray(settings.width * settings.height, (settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-              let v = YUVBuffer.chromaPlane(format);
-              v.bytes = data.frameBuffer.subarray((settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-              let yuvFrame = YUVBuffer.frame(format, y, u, v);
-
-              yuv.drawFrame(yuvFrame);
-            };
-          } else {
-            let canvas = document.createElement('canvas');
-
-            let renderer = new WebGLRenderer(canvas);
-
-            canvases[source.id] = canvas;
-
-            renderMethod = data => {
-              renderer.drawFrame(data.frameBuffer, data.width, data.height);
-            };
-          }
-
           let width;
           let height;
 
@@ -100,6 +94,14 @@ export default {
                 width,
                 height
               });
+            }
+
+            if (!renderMethod) {
+              if (data.format === 0) {
+                renderMethod = this.setupYUVCanvas(canvas);
+              } else {
+                renderMethod = this.setupRGBACanvas(canvas);
+              }
             }
 
             renderMethod(data);

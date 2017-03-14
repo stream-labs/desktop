@@ -18,6 +18,7 @@ class SourceFrameHeader {
   constructor(buffer) {
     this.fields = [
       'id',
+      'format',
       'width',
       'height',
       'frameLength'
