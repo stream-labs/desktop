@@ -1,38 +1,76 @@
 <template>
 <canvas
-  width="1920"
-  height="1080"
   class="StudioEditorOverlay"
   ref="canvas"
+  :width="width"
+  :height="height"
   @mousedown="startDragging"
+  @mousemove="move"
   @mouseup="stopDragging"/>
 </template>
 
 <script>
+
 export default {
+
+  data() {
+    return {
+      // This is how pany pixels larger the overlay is on each edge
+      // compared to the original source.  This is so that we can
+      // draw overlay elements that go a bit outside the video frame.
+      gutterSize: 10
+    }
+  },
 
   mounted() {
     this.ctx = this.$refs.canvas.getContext('2d');
     this.drawOverlay();
+
+    this.$store.watch((state, getters) => {
+      return {
+        x: getters.activeSource.x,
+        y: getters.activeSource.y,
+        width: getters.activeSource.width,
+        height: getters.activeSource.height,
+        renderedWidth: state.video.renderedWidth,
+        renderedHeight: state.video.renderedHeight
+      };
+    }, () => {
+      this.drawOverlay();
+    });
   },
 
   methods: {
     drawOverlay() {
-      console.log('DRAW');
-      this.ctx.clearRect(0, 0, 1920, 1080);
+      this.ctx.canvas.width = this.width;
+      this.ctx.canvas.height = this.height;
+      this.ctx.clearRect(0, 0, this.width, this.height);
       this.ctx.strokeStyle = 'red';
-      this.ctx.lineWidth = 4;
+      this.ctx.lineWidth = 2;
       this.ctx.strokeRect(
-        this.activeSource.x,
-        this.activeSource.y,
-        this.activeSource.width,
-        this.activeSource.height
+        this.convertToRenderedSpace(this.activeSource.x) + this.gutterSize,
+        this.convertToRenderedSpace(this.activeSource.y) + this.gutterSize,
+        this.convertToRenderedSpace(this.activeSource.width),
+        this.convertToRenderedSpace(this.activeSource.height)
       );
     },
 
-    startDragging() {
+    convertToRenderedSpace(val) {
+      return val * (this.$store.state.video.renderedWidth / this.$store.state.video.width);
+    },
+
+    startDragging(e) {
       console.log("STARTING DRAG");
-      debugger;
+      this.dragging = true;
+      this.startX = e.pageX;
+      this.startY = e.pageY;
+    },
+
+    move() {
+      console.log("MOVING");
+      if (this.dragging) {
+
+      }
     },
 
     stopDragging() {
@@ -40,15 +78,17 @@ export default {
     }
   },
 
-  watch: {
-    activeSource() {
-      this.drawOverlay();
-    }
-  },
-
   computed: {
     activeSource() {
       return this.$store.getters.activeSource;
+    },
+
+    width() {
+      return this.$store.state.video.renderedWidth + this.gutterSize * 2;
+    },
+
+    height() {
+      return this.$store.state.video.renderedHeight + this.gutterSize * 2;
     }
   }
 
@@ -63,8 +103,6 @@ export default {
   left: 0;
   right: 0;
   margin: auto;
-  max-width: 100%;
-  max-height: 100%;
 
   z-index: 1000;
 }

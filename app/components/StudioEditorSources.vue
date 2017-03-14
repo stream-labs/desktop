@@ -6,10 +6,11 @@
     Start Video
   </button>
   <canvas
-    width="1920"
-    height="1080"
     class="StudioEditorSources"
-    ref="canvas"/>
+    ref="canvas"
+    :width="width"
+    :height="height"
+    @resize="onResize"/>
 </div>
 </template>
 
@@ -30,9 +31,25 @@ export default {
     let canvas = this.$refs.canvas;
 
     this.mainCanvas = canvas.getContext('2d');
+
+    window.addEventListener('resize', this.onResize);
+
+    this.onResize();
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize);
   },
 
   methods: {
+    onResize() {
+      this.$store.dispatch({
+        type: 'setVideoRenderedSize',
+        width: this.$refs.canvas.offsetWidth,
+        height: this.$refs.canvas.offsetHeight
+      });
+    },
+
     setupYUVCanvas(canvas) {
       let yuv = YUVCanvas.attach(canvas);
 
@@ -110,7 +127,7 @@ export default {
 
 
         setInterval(() => {
-          this.mainCanvas.clearRect(0, 0, 1920, 1080);
+          this.mainCanvas.clearRect(0, 0, this.width, this.height);
 
           _.each(this.sources, source => {
             this.mainCanvas.drawImage(canvases[source.id], source.x, source.y);
@@ -127,6 +144,14 @@ export default {
       return _.map(this.$store.getters.activeScene.sources, sourceId => {
         return this.$store.state.sources.sources[sourceId];
       });
+    },
+
+    width() {
+      return this.$store.state.video.width;
+    },
+
+    height() {
+      return this.$store.state.video.height;
     }
   }
 
