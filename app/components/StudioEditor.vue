@@ -1,7 +1,7 @@
 <template>
 <div class="StudioEditor">
-  <studio-editor-sources :sources="sources"/>
-  <studio-editor-overlay :sources="sources"/>
+  <studio-editor-sources/>
+  <studio-editor-overlay/>
 </div>
 </template>
 
@@ -15,20 +15,6 @@ export default {
   components: {
     StudioEditorSources,
     StudioEditorOverlay
-  },
-
-  data() {
-    return {
-
-    };
-  },
-
-  computed: {
-    sources() {
-      return _.map(this.$store.getters.activeScene.sources, sourceId => {
-        return this.$store.state.sources.sources[sourceId];
-      });
-    }
   }
 
 };

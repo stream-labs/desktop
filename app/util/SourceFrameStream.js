@@ -57,6 +57,7 @@ class SourceFrameStream {
       source.callback({
         width: this.header.width,
         height: this.header.height,
+        format: this.header.format,
         frameBuffer: source.frameBuffer
       });
     }

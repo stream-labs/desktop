@@ -25,6 +25,20 @@ const mutations = {
     let source = state.sources[data.sourceId];
 
     source.restorePoint = _.cloneDeep(source.properties);
+  },
+
+  SET_SOURCE_SIZE(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.width = data.width;
+    source.height = data.height;
+  },
+
+  SET_SOURCE_POSITION(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.x = data.x;
+    source.y = data.y;
   }
 };
 
@@ -48,7 +62,11 @@ const actions = {
         name: data.sourceName,
         type: data.sourceType,
         properties,
-        restorePoint: null
+        restorePoint: null,
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
       }
     });
 
@@ -115,6 +133,22 @@ const actions = {
     dispatch({
       type: 'refreshProperties',
       sourceId: data.sourceId
+    });
+  },
+
+  setSourceSize({ commit }, data) {
+    commit('SET_SOURCE_SIZE', {
+      sourceId: data.sourceId,
+      width: data.width,
+      height: data.height
+    });
+  },
+
+  setSourcePosition({ commit }, data) {
+    commit('SET_SOURCE_POSITION', {
+      sourceId: data.sourceId,
+      x: data.x,
+      y: data.y
     });
   }
 };

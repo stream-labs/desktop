@@ -6,10 +6,11 @@
     Start Video
   </button>
   <canvas
-    width="1920"
-    height="1080"
     class="StudioEditorSources"
-    ref="canvas"/>
+    ref="canvas"
+    :width="width"
+    :height="height"
+    @resize="onResize"/>
 </div>
 </template>
 
@@ -30,98 +31,142 @@ export default {
     let canvas = this.$refs.canvas;
 
     this.mainCanvas = canvas.getContext('2d');
+
+    window.addEventListener('resize', this.onResize);
+
+    this.onResize();
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize);
   },
 
   methods: {
+    onResize() {
+      this.$store.dispatch({
+        type: 'setVideoRenderedSize',
+        width: this.$refs.canvas.offsetWidth,
+        height: this.$refs.canvas.offsetHeight
+      });
+    },
+
+    setupYUVCanvas(canvas) {
+      let yuv = YUVCanvas.attach(canvas);
+
+      return data => {
+        let format = YUVBuffer.format({
+          width: data.width,
+          height: data.height,
+
+          chromaWidth: data.width / 2,
+          chromaHeight: data.height / 2
+        });
+
+        let y = YUVBuffer.lumaPlane(format);
+        y.bytes = data.frameBuffer.subarray(0, data.width * data.height);
+
+        let u = YUVBuffer.chromaPlane(format);
+        u.bytes = data.frameBuffer.subarray(data.width * data.height, (data.width * data.height) + (data.width * data.height) / 4);
+
+        let v = YUVBuffer.chromaPlane(format);
+        v.bytes = data.frameBuffer.subarray((data.width * data.height) + (data.width * data.height) / 4);
+
+        let yuvFrame = YUVBuffer.frame(format, y, u, v);
+
+        yuv.drawFrame(yuvFrame);
+      };
+    },
+
+    setupRGBACanvas(canvas) {
+      let renderer = new WebGLRenderer(canvas);
+
+      return data => {
+        renderer.drawFrame(data.frameBuffer, data.width, data.height);
+      };
+    },
+
     startVideo() {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let sources = [
-          {
-            name: 'Video Capture Device',
-            x: 0,
-            y: 0
-          },
-          {
-            name: 'Window Capture',
-            x: 700,
-            y: 300
-          }
-        ];
+        let canvases = {};
 
-        _.each(sources, source => {
-          let settings = Obs.getSourceFrameSettings(source.name);
+        _.each(this.sources, source => {
+          let canvas = document.createElement('canvas');
 
-          if (settings.format === 'VIDEO_FORMAT_UYVY') {
-            let canvas = document.createElement('canvas');
-            canvas.width = settings.width;
-            canvas.height = settings.height;
+          canvases[source.id] = canvas;
 
-            source.canvas = canvas;
+          let renderMethod;
+          let width;
+          let height;
 
-            let yuv = YUVCanvas.attach(canvas);
+          SourceFrameStream.subscribeToSource(source.name, data => {
+            if ((width !== data.width) || (height !== data.height)) {
+              width = data.width;
+              height = data.height;
 
-            SourceFrameStream.subscribeToSource(source.name, data => {
-              let format = YUVBuffer.format({
-                width: settings.width,
-                height: settings.height,
-
-                chromaWidth: settings.width / 2,
-                chromaHeight: settings.height / 2
+              this.$store.dispatch({
+                type: 'setSourceSize',
+                sourceId: source.id,
+                width,
+                height
               });
+            }
 
-              let y = YUVBuffer.lumaPlane(format);
-              y.bytes = data.frameBuffer.subarray(0, data.width * data.height);
+            if (!renderMethod) {
+              if (data.format === 0) {
+                renderMethod = this.setupYUVCanvas(canvas);
+              } else {
+                renderMethod = this.setupRGBACanvas(canvas);
+              }
+            }
 
-              let u = YUVBuffer.chromaPlane(format);
-              u.bytes = data.frameBuffer.subarray(settings.width * settings.height, (settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-              let v = YUVBuffer.chromaPlane(format);
-              v.bytes = data.frameBuffer.subarray((settings.width * settings.height) + (settings.width * settings.height) / 4);
-
-              let yuvFrame = YUVBuffer.frame(format, y, u, v);
-
-              yuv.drawFrame(yuvFrame);
-            });
-          } else {
-            let canvas = document.createElement('canvas');
-
-            let renderer = new WebGLRenderer(canvas);
-
-            source.canvas = canvas;
-
-            SourceFrameStream.subscribeToSource(source.name, data => {
-              renderer.drawFrame(data.frameBuffer, data.width, data.height);
-            });
-          }
+            renderMethod(data);
+          });
         });
 
-        setInterval(() => {
-          this.mainCanvas.clearRect(0, 0, 1920, 1080);
 
-          _.each(sources, source => {
-            this.mainCanvas.drawImage(source.canvas, source.x, source.y);
+        setInterval(() => {
+          this.mainCanvas.clearRect(0, 0, this.width, this.height);
+
+          _.each(this.sources, source => {
+            this.mainCanvas.drawImage(canvases[source.id], source.x, source.y);
           });
 
         }, 33);
 
       }
     }
+  },
+
+  computed: {
+    sources() {
+      return _.map(this.$store.getters.activeScene.sources, sourceId => {
+        return this.$store.state.sources.sources[sourceId];
+      });
+    },
+
+    width() {
+      return this.$store.state.video.width;
+    },
+
+    height() {
+      return this.$store.state.video.height;
+    }
   }
 
 };
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 .StudioEditorSources {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 10px;
+  right: 10px;
   margin: auto;
-  max-width: 100%;
+  max-width: calc(100% - 20px);
   max-height: 100%;
 
   background-color: black;

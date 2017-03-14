@@ -152,22 +152,27 @@ let subscribedSources = [];
 const SourceFrameHeader = require('./app/util/SourceFrameHeader.js').default;
 
 ipcMain.on('subscribeToSource', (event, data) => {
-  let settings = obs.OBS_content_getSourceFrameSettings(data.name);
-
-  subscribedSources.push(Object.assign({}, settings, data));
+  subscribedSources.push(data);
 });
 
 net.createServer(function(sock) {
   function sendFrames() {
     _.each(subscribedSources, source => {
-      let frame = new Uint8Array(obs.OBS_content_getSourceFrame(source.name));
+      let frameInfo = obs.OBS_content_getSourceFrame(source.name);
 
+      let frame = new Uint8Array(frameInfo.frame);
       let header = new SourceFrameHeader();
 
       header.id = source.id;
-      header.width = source.width;
-      header.height = source.height;
-      header.frameLength = frame.byteLength;
+      header.width = parseInt(frameInfo.width);
+      header.height = parseInt(frameInfo.height);
+      header.frameLength = frame.length;
+
+      if (frameInfo.format === 'VIDEO_FORMAT_I420') {
+        header.format = 0;
+      } else {
+        header.format = 1;
+      }
 
       sock.write(Buffer.from(header.buffer.buffer));
 
