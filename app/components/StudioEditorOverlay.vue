@@ -6,7 +6,8 @@
   :height="height"
   @mousedown="startDragging"
   @mousemove="move"
-  @mouseup="stopDragging"/>
+  @mouseup="stopDragging"
+  @mouseleave="stopDragging"/>
 </template>
 
 <script>
@@ -64,14 +65,12 @@ export default {
     },
 
     startDragging(e) {
-      console.log("STARTING DRAG");
       this.dragging = true;
       this.startX = e.pageX;
       this.startY = e.pageY;
     },
 
     move(e) {
-      console.log("MOVING");
       if (this.dragging) {
         let deltaX = e.pageX - this.startX;
         let deltaY = e.pageY - this.startY;
@@ -91,7 +90,6 @@ export default {
     },
 
     stopDragging() {
-      console.log("STOPPING DRAG");
       this.dragging = false;
     }
   },
