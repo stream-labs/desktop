@@ -37,32 +37,22 @@ export default {
       if (!this.videoStarted) {
         this.videoStarted = true;
 
-        let sources = [
-          {
-            name: 'Video Capture Device',
-            x: 0,
-            y: 0
-          },
-          {
-            name: 'Window Capture',
-            x: 700,
-            y: 300
-          }
-        ];
+        let canvases = {};
 
-        _.each(sources, source => {
+        _.each(this.sources, source => {
           let settings = Obs.getSourceFrameSettings(source.name);
+          let renderMethod;
 
           if (settings.format === 'VIDEO_FORMAT_UYVY') {
             let canvas = document.createElement('canvas');
             canvas.width = settings.width;
             canvas.height = settings.height;
 
-            source.canvas = canvas;
+            canvases[source.id] = canvas;
 
             let yuv = YUVCanvas.attach(canvas);
 
-            SourceFrameStream.subscribeToSource(source.name, data => {
+            renderMethod = data => {
               let format = YUVBuffer.format({
                 width: settings.width,
                 height: settings.height,
@@ -83,30 +73,58 @@ export default {
               let yuvFrame = YUVBuffer.frame(format, y, u, v);
 
               yuv.drawFrame(yuvFrame);
-            });
+            };
           } else {
             let canvas = document.createElement('canvas');
 
             let renderer = new WebGLRenderer(canvas);
 
-            source.canvas = canvas;
+            canvases[source.id] = canvas;
 
-            SourceFrameStream.subscribeToSource(source.name, data => {
+            renderMethod = data => {
               renderer.drawFrame(data.frameBuffer, data.width, data.height);
-            });
+            };
           }
+
+          let width;
+          let height;
+
+          SourceFrameStream.subscribeToSource(source.name, data => {
+            if ((width !== data.width) || (height !== data.height)) {
+              width = data.width;
+              height = data.height;
+
+              this.$store.dispatch({
+                type: 'setSourceSize',
+                sourceId: source.id,
+                width,
+                height
+              });
+            }
+
+            renderMethod(data);
+          });
         });
+
 
         setInterval(() => {
           this.mainCanvas.clearRect(0, 0, 1920, 1080);
 
-          _.each(sources, source => {
-            this.mainCanvas.drawImage(source.canvas, source.x, source.y);
+          _.each(this.sources, source => {
+            this.mainCanvas.drawImage(canvases[source.id], source.x, source.y);
           });
 
         }, 33);
 
       }
+    }
+  },
+
+  computed: {
+    sources() {
+      return _.map(this.$store.getters.activeScene.sources, sourceId => {
+        return this.$store.state.sources.sources[sourceId];
+      });
     }
   }
 
