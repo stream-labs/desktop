@@ -47,14 +47,6 @@ export default {
       this.ctx.canvas.width = this.width;
       this.ctx.canvas.height = this.height;
       this.ctx.clearRect(0, 0, this.width, this.height);
-      // this.ctx.strokeStyle = 'red';
-      // this.ctx.lineWidth = 2;
-      // this.ctx.strokeRect(
-      //   this.convertToRenderedSpace(this.activeSource.x) + this.gutterSize,
-      //   this.convertToRenderedSpace(this.activeSource.y) + this.gutterSize,
-      //   this.convertToRenderedSpace(this.activeSource.width),
-      //   this.convertToRenderedSpace(this.activeSource.height)
-      // );
       this.drawPositionLines();
       this.drawSourceBorder();
     },
