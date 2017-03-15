@@ -4,10 +4,10 @@
   ref="canvas"
   :width="width"
   :height="height"
-  @mousedown="startDragging"
-  @mousemove="move"
-  @mouseup="stopDragging"
-  @mouseleave="stopDragging"/>
+  @mousedown="handleMousedown"
+  @mousemove="handleMousemove"
+  @mouseup="handleMouseup"
+  @mouseleave="handleMouseup"/>
 </template>
 
 <script>
@@ -174,8 +174,8 @@ export default {
     },
 
     // Determines if the given mouse event is over a resize
-    // region for the given source
-    isOverResize(event, source) {
+    // region for the active source
+    isOverResize(event) {
       return _.find(this.resizeRegions, region => {
         return this.isOverBox(
           event,
@@ -187,7 +187,7 @@ export default {
       });
     },
 
-    startDragging(e) {
+    handleMousedown(e) {
       /* Click Priority:
        * 1. If over a resize region, start resizing
        * 2. If over the active source, start dragging it
@@ -196,36 +196,54 @@ export default {
        *    it active, and start dragging it
        */
 
-      // If the click was not over the active source, we need to
-      // see if they are trying to select another source
-      if (!this.isOverSource(e, this.activeSource)) {
+      let overResize = this.isOverResize(e);
+
+      if (overResize) {
+        // Start resizing
+        this.resizeRegion = overResize;
+        this.startX = e.pageX;
+        this.startY = e.pageY;
+      } else if (this.isOverSource(e, this.activeSource)) {
+        // Start dragging the active source
+        this.dragging = true;
+        this.startX = e.pageX;
+        this.startY = e.pageY;
+      } else {
         let overSource = _.find(this.sources, source => {
           return this.isOverSource(e, source);
         });
 
         if (overSource) {
+          // Make this source active
           this.$store.dispatch({
             type: 'makeSourceActive',
             sceneName: this.$store.getters.activeSceneName,
             sourceId: overSource.id
           });
-        } else {
-          // TODO: deselect source (it's unclear whether slobs should allow this)
-          return;
+
+          // Start dragging it
+          this.dragging = true;
+          this.startX = e.pageX;
+          this.startY = e.pageY;
         }
       }
 
-      this.dragging = true;
-      this.startX = e.pageX;
-      this.startY = e.pageY;
-
+      // This might have changed the cursor
       this.updateCursor(e);
     },
 
-    move(e) {
-      if (this.dragging) {
-        let deltaX = e.pageX - this.startX;
-        let deltaY = e.pageY - this.startY;
+    handleMousemove(e) {
+      let deltaX = e.pageX - this.startX;
+      let deltaY = e.pageY - this.startY;
+
+      if (this.resizeRegion) {
+        if (deltaX || deltaY) {
+          let dxv = this.convertToVideoSpace(deltaX);
+          let dyv = this.convertToVideoSpace(deltaY);
+
+          console.log("RESIZING");
+        }
+      } else if (this.dragging) {
 
         if (deltaX || deltaY) {
           this.$store.dispatch({
@@ -238,13 +256,14 @@ export default {
           this.startX = e.pageX;
           this.startY = e.pageY;
         }
+      } else {
+        this.updateCursor(e);
       }
-
-      this.updateCursor(e);
     },
 
-    stopDragging(e) {
+    handleMouseup(e) {
       this.dragging = false;
+      this.resizeRegion = null;
 
       this.updateCursor(e);
     },
@@ -253,7 +272,7 @@ export default {
       if (this.dragging) {
         this.ctx.canvas.style.cursor = '-webkit-grabbing';
       } else {
-        let overResize = this.isOverResize(e, this.activeSource);
+        let overResize = this.isOverResize(e);
 
         if (overResize) {
           this.ctx.canvas.style.cursor = overResize.cursor;

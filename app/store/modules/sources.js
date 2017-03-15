@@ -84,8 +84,8 @@ const actions = {
         height: 0,
 
         // Scaling factor
-        scaleX: 1.0,
-        scaleY: 1.0,
+        scaleX: 0.5,
+        scaleY: 0.5,
 
         // These are a function of dimensions and scale
         scaledWidth: 0,
