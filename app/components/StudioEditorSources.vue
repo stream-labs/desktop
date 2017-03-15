@@ -129,7 +129,8 @@ export default {
         setInterval(() => {
           this.mainCanvas.clearRect(0, 0, this.width, this.height);
 
-          _.each(this.sources, source => {
+          // We render in reverse order, since the first source should be on top
+          _.each(this.reversedSources, source => {
             this.mainCanvas.drawImage(canvases[source.id], source.x, source.y);
           });
 
@@ -144,6 +145,10 @@ export default {
       return _.map(this.$store.getters.activeScene.sources, sourceId => {
         return this.$store.state.sources.sources[sourceId];
       });
+    },
+
+    reversedSources() {
+      return _.reverse(_.cloneDeep(this.sources));
     },
 
     width() {
