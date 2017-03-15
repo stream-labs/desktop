@@ -32,8 +32,8 @@ export default {
       return {
         x: getters.activeSource.x,
         y: getters.activeSource.y,
-        width: getters.activeSource.width,
-        height: getters.activeSource.height,
+        width: getters.activeSource.scaledWidth,
+        height: getters.activeSource.scaledHeight,
         renderedWidth: state.video.renderedWidth,
         renderedHeight: state.video.renderedHeight
       };
@@ -106,7 +106,7 @@ export default {
     },
 
     drawSourceBorder() {
-      this.ctx.strokeStyle = '#222222';
+      this.ctx.strokeStyle = '#333333';
       this.ctx.lineWidth = 1;
       this.ctx.strokeRect(
         this.convertToRenderedSpace(this.activeSource.x) + this.gutterSize,
@@ -187,6 +187,43 @@ export default {
       });
     },
 
+    // Performs an aspect-ratio-locked resize on the source.
+    // The move arguments determine whether the x and y position
+    // should be moved to compensate for the scaling.  This is
+    // useful for scaling relative to a certain origin point.
+    resize(pixelsX, pixelsY, moveX, moveY) {
+      let pixelsxv = this.convertToVideoSpace(pixelsX);
+      let pixelsyv = this.convertToVideoSpace(pixelsY);
+
+      let deltaScaleX = pixelsxv / this.activeSource.width;
+      let deltaScaleY = pixelsyv / this.activeSource.height;
+
+      // Take the bigger of the 2 scales, to preserve aspect ratio
+      if (Math.abs(deltaScaleX) > Math.abs(deltaScaleY)) {
+        deltaScaleY = deltaScaleX;
+        pixelsyv = pixelsxv * (this.activeSource.height / this.activeSource.width);
+      } else {
+        deltaScaleX = deltaScaleY;
+        pixelsxv = pixelsyv * (this.activeSource.width / this.activeSource.height);
+      }
+
+      this.$store.dispatch({
+        type: 'setSourceScale',
+        sourceId: this.activeSource.id,
+        scaleX: this.activeSource.scaleX + deltaScaleX,
+        scaleY: this.activeSource.scaleY + deltaScaleY
+      });
+
+      if (moveX || moveY) {
+        this.$store.dispatch({
+          type: 'setSourcePosition',
+          sourceId: this.activeSource.id,
+          x: this.activeSource.x - (moveX && pixelsxv || 0),
+          y: this.activeSource.y - (moveY && pixelsyv || 0)
+        });
+      }
+    },
+
     handleMousedown(e) {
       /* Click Priority:
        * 1. If over a resize region, start resizing
@@ -201,13 +238,13 @@ export default {
       if (overResize) {
         // Start resizing
         this.resizeRegion = overResize;
-        this.startX = e.pageX;
-        this.startY = e.pageY;
+        this.currentX = e.pageX;
+        this.currentY = e.pageY;
       } else if (this.isOverSource(e, this.activeSource)) {
         // Start dragging the active source
         this.dragging = true;
-        this.startX = e.pageX;
-        this.startY = e.pageY;
+        this.currentX = e.pageX;
+        this.currentY = e.pageY;
       } else {
         let overSource = _.find(this.sources, source => {
           return this.isOverSource(e, source);
@@ -223,8 +260,8 @@ export default {
 
           // Start dragging it
           this.dragging = true;
-          this.startX = e.pageX;
-          this.startY = e.pageY;
+          this.currentX = e.pageX;
+          this.currentY = e.pageY;
         }
       }
 
@@ -233,15 +270,33 @@ export default {
     },
 
     handleMousemove(e) {
-      let deltaX = e.pageX - this.startX;
-      let deltaY = e.pageY - this.startY;
+      let deltaX = e.pageX - this.currentX;
+      let deltaY = e.pageY - this.currentY;
 
       if (this.resizeRegion) {
         if (deltaX || deltaY) {
-          let dxv = this.convertToVideoSpace(deltaX);
-          let dyv = this.convertToVideoSpace(deltaY);
+          let name = this.resizeRegion.name;
 
-          console.log("RESIZING");
+          if (name === 'nw') {
+            this.resize(-1 * deltaX, -1 * deltaY, true, true);
+          } else if (name === 'sw') {
+            this.resize(-1 * deltaX, deltaY, true, false);
+          } else if (name === 'ne') {
+            this.resize(deltaX, -1 * deltaY, false, true);
+          } else if (name === 'se') {
+            this.resize(deltaX, deltaY, false, false);
+          } else if (name === 'n') {
+            this.resize(0, -1 * deltaY, false, true);
+          } else if (name === 's') {
+            this.resize(0, deltaY, false, false);
+          } else if (name === 'e') {
+            this.resize(deltaX, 0, false, false);
+          } else if (name === 'w') {
+            this.resize(-1 * deltaX, 0, true, false);
+          }
+
+          this.currentX = e.pageX;
+          this.currentY = e.pageY;
         }
       } else if (this.dragging) {
 
@@ -253,8 +308,8 @@ export default {
             y: this.activeSource.y + this.convertToVideoSpace(deltaY)
           });
 
-          this.startX = e.pageX;
-          this.startY = e.pageY;
+          this.currentX = e.pageX;
+          this.currentY = e.pageY;
         }
       } else {
         this.updateCursor(e);
@@ -327,36 +382,72 @@ export default {
       const height = regionRadius * 2;
 
       // Compass coordinates
-      return {
-        nw: {
+      return [
+        {
+          name: 'nw',
           x: this.convertToRenderedSpace(source.x) + this.gutterSize - regionRadius,
           y: this.convertToRenderedSpace(source.y) + this.gutterSize - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
-        sw: {
+        {
+          name: 'sw',
           x: this.convertToRenderedSpace(source.x) + this.gutterSize - regionRadius,
           y: this.convertToRenderedSpace(source.y + source.scaledHeight) + this.gutterSize - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
-        ne: {
+        {
+          name: 'ne',
           x: this.convertToRenderedSpace(source.x + source.scaledWidth) + this.gutterSize - regionRadius,
           y: this.convertToRenderedSpace(source.y) + this.gutterSize - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
-        se: {
+        {
+          name: 'se',
           x: this.convertToRenderedSpace(source.x + source.scaledWidth) + this.gutterSize - regionRadius,
           y: this.convertToRenderedSpace(source.y + source.scaledHeight) + this.gutterSize - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
+        },
+        {
+          name: 'n',
+          x: this.convertToRenderedSpace(source.x + source.scaledWidth / 2) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'ns-resize'
+        },
+        {
+          name: 's',
+          x: this.convertToRenderedSpace(source.x + source.scaledWidth / 2) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y + source.scaledHeight) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'ns-resize'
+        },
+        {
+          name: 'e',
+          x: this.convertToRenderedSpace(source.x + source.scaledWidth) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y + source.scaledHeight / 2) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'ew-resize'
+        },
+        {
+          name: 'w',
+          x: this.convertToRenderedSpace(source.x) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y + source.scaledHeight / 2) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'ew-resize'
         }
-      };
+      ];
     }
   }
 
