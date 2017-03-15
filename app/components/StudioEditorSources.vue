@@ -131,7 +131,13 @@ export default {
 
           // We render in reverse order, since the first source should be on top
           _.each(this.reversedSources, source => {
-            this.mainCanvas.drawImage(canvases[source.id], source.x, source.y);
+            this.mainCanvas.drawImage(
+              canvases[source.id],
+              source.x,
+              source.y,
+              source.scaledWidth,
+              source.scaledHeight
+            );
           });
 
         }, 33);

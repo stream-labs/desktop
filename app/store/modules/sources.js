@@ -32,6 +32,9 @@ const mutations = {
 
     source.width = data.width;
     source.height = data.height;
+
+    source.scaledWidth = source.width * source.scaleX;
+    source.scaledHeight = source.height * source.scaleY;
   },
 
   SET_SOURCE_POSITION(state, data) {
@@ -39,6 +42,16 @@ const mutations = {
 
     source.x = data.x;
     source.y = data.y;
+  },
+
+  SET_SOURCE_SCALE(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.scaleX = data.scaleX;
+    source.scaleY = data.scaleY;
+
+    source.scaledWidth = source.width * source.scaleX;
+    source.scaledHeight = source.height * source.scaleY;
   }
 };
 
@@ -65,8 +78,18 @@ const actions = {
         restorePoint: null,
         x: 0,
         y: 0,
+
+        // Original frame size
         width: 0,
-        height: 0
+        height: 0,
+
+        // Scaling factor
+        scaleX: 0.5,
+        scaleY: 0.5,
+
+        // These are a function of dimensions and scale
+        scaledWidth: 0,
+        scaledHeight: 0
       }
     });
 
@@ -149,6 +172,14 @@ const actions = {
       sourceId: data.sourceId,
       x: data.x,
       y: data.y
+    });
+  },
+
+  setSourceScale({ commit }, data) {
+    commit('SET_SOURCE_SCALE', {
+      sourceId: data.sourceId,
+      scaleX: data.scaleX,
+      scaleY: data.scaleY
     });
   }
 };
