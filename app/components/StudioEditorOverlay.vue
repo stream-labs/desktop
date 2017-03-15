@@ -175,6 +175,8 @@ export default {
       this.dragging = true;
       this.startX = e.pageX;
       this.startY = e.pageY;
+
+      this.updateCursor(e);
     },
 
     move(e) {
@@ -194,10 +196,30 @@ export default {
           this.startY = e.pageY;
         }
       }
+
+      this.updateCursor(e);
     },
 
-    stopDragging() {
+    stopDragging(e) {
       this.dragging = false;
+
+      this.updateCursor(e);
+    },
+
+    updateCursor(e) {
+      if (this.dragging) {
+        this.ctx.canvas.style.cursor = '-webkit-grabbing';
+      } else {
+        let overSource = _.find(this.sources, source => {
+          return this.isOverSource(e, source);
+        });
+
+        if (overSource) {
+          this.ctx.canvas.style.cursor = '-webkit-grab';
+        } else {
+          this.ctx.canvas.style.cursor = 'default';
+        }
+      }
     }
   },
 
