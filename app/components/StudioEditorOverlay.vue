@@ -49,6 +49,7 @@ export default {
       this.ctx.clearRect(0, 0, this.width, this.height);
       this.drawPositionLines();
       this.drawSourceBorder();
+      this.drawResizeBoxes();
     },
 
     drawPositionLines() {
@@ -115,6 +116,20 @@ export default {
       );
     },
 
+    drawResizeBoxes() {
+      this.ctx.strokeStyle = 'red';
+      this.ctx.lineWidth = 1;
+
+      _.each(this.resizeRegions, region => {
+        this.ctx.strokeRect(
+          region.x,
+          region.y,
+          region.width,
+          region.height
+        );
+      });
+    },
+
     convertToRenderedSpace(val) {
       return val * (this.$store.state.video.renderedWidth / this.videoWidth);
     },
@@ -133,26 +148,54 @@ export default {
       let srcwr = this.convertToRenderedSpace(source.scaledWidth);
       let srchr = this.convertToRenderedSpace(source.scaledHeight);
 
-      if (event.offsetX < srcxr) {
+      return this.isOverBox(event, srcxr, srcyr, srcwr, srchr);
+    },
+
+    // Determines if the given mouse event is over the
+    // given box in rendered space.
+    isOverBox(event, x, y, width, height) {
+      if (event.offsetX < x) {
         return false;
       }
 
-      if (event.offsetX > srcxr + srcwr) {
+      if (event.offsetX > x + width) {
         return false;
       }
 
-      if (event.offsetY < srcyr) {
+      if (event.offsetY < y) {
         return false;
       }
 
-      if (event.offsetY > srcyr + srchr) {
+      if (event.offsetY > y + height) {
         return false;
       }
 
       return true;
     },
 
+    // Determines if the given mouse event is over a resize
+    // region for the given source
+    isOverResize(event, source) {
+      return _.find(this.resizeRegions, region => {
+        return this.isOverBox(
+          event,
+          region.x,
+          region.y,
+          region.width,
+          region.height
+        );
+      });
+    },
+
     startDragging(e) {
+      /* Click Priority:
+       * 1. If over a resize region, start resizing
+       * 2. If over the active source, start dragging it
+       *    regardless of whether it is on top
+       * 3. If over another source, find the one on top, make
+       *    it active, and start dragging it
+       */
+
       // If the click was not over the active source, we need to
       // see if they are trying to select another source
       if (!this.isOverSource(e, this.activeSource)) {
@@ -210,14 +253,20 @@ export default {
       if (this.dragging) {
         this.ctx.canvas.style.cursor = '-webkit-grabbing';
       } else {
-        let overSource = _.find(this.sources, source => {
-          return this.isOverSource(e, source);
-        });
+        let overResize = this.isOverResize(e, this.activeSource);
 
-        if (overSource) {
-          this.ctx.canvas.style.cursor = '-webkit-grab';
+        if (overResize) {
+          this.ctx.canvas.style.cursor = overResize.cursor;
         } else {
-          this.ctx.canvas.style.cursor = 'default';
+          let overSource = _.find(this.sources, source => {
+            return this.isOverSource(e, source);
+          });
+
+          if (overSource) {
+            this.ctx.canvas.style.cursor = '-webkit-grab';
+          } else {
+            this.ctx.canvas.style.cursor = 'default';
+          }
         }
       }
     }
@@ -248,6 +297,47 @@ export default {
       return _.map(this.$store.getters.activeScene.sources, sourceId => {
         return this.$store.state.sources.sources[sourceId];
       });
+    },
+
+    resizeRegions() {
+      let source = this.activeSource;
+
+      const regionRadius = 5;
+
+      const width = regionRadius * 2;
+      const height = regionRadius * 2;
+
+      // Compass coordinates
+      return {
+        nw: {
+          x: this.convertToRenderedSpace(source.x) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'nwse-resize'
+        },
+        sw: {
+          x: this.convertToRenderedSpace(source.x) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y + source.scaledHeight) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'nesw-resize'
+        },
+        ne: {
+          x: this.convertToRenderedSpace(source.x + source.scaledWidth) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'nesw-resize'
+        },
+        se: {
+          x: this.convertToRenderedSpace(source.x + source.scaledWidth) + this.gutterSize - regionRadius,
+          y: this.convertToRenderedSpace(source.y + source.scaledHeight) + this.gutterSize - regionRadius,
+          width,
+          height,
+          cursor: 'nwse-resize'
+        }
+      };
     }
   }
 
