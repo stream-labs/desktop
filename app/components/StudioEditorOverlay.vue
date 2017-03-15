@@ -55,8 +55,8 @@ export default {
       // Midpoints in video space
       let source = this.activeSource;
 
-      let vMid = source.y + source.height / 2;
-      let hMid = source.x + source.width / 2;
+      let vMid = source.y + source.scaledHeight / 2;
+      let hMid = source.x + source.scaledWidth / 2;
 
       let length;
 
@@ -66,12 +66,12 @@ export default {
       this.drawLine(hMid, 0, hMid, source.y);
       this.drawMeasurement(source.y, hMid, source.y / 2, 20, 15);
 
-      this.drawLine(source.x + source.width, vMid, this.videoWidth, vMid);
-      length = this.videoWidth - (source.x + source.width);
+      this.drawLine(source.x + source.scaledWidth, vMid, this.videoWidth, vMid);
+      length = this.videoWidth - (source.x + source.scaledWidth);
       this.drawMeasurement(length, this.videoWidth - length / 2, vMid, 5, 0);
 
-      this.drawLine(hMid, source.y + source.height, hMid, this.videoHeight);
-      length = this.videoHeight - (source.y + source.height);
+      this.drawLine(hMid, source.y + source.scaledHeight, hMid, this.videoHeight);
+      length = this.videoHeight - (source.y + source.scaledHeight);
       this.drawMeasurement(length, hMid, this.videoHeight - length / 2, 20, 15);
     },
 
@@ -110,8 +110,8 @@ export default {
       this.ctx.strokeRect(
         this.convertToRenderedSpace(this.activeSource.x) + this.gutterSize,
         this.convertToRenderedSpace(this.activeSource.y) + this.gutterSize,
-        this.convertToRenderedSpace(this.activeSource.width),
-        this.convertToRenderedSpace(this.activeSource.height)
+        this.convertToRenderedSpace(this.activeSource.scaledWidth),
+        this.convertToRenderedSpace(this.activeSource.scaledHeight)
       );
     },
 
@@ -130,8 +130,8 @@ export default {
       let srcyr = this.convertToRenderedSpace(source.y) + this.gutterSize;
 
       // Source dimensions in rendered space
-      let srcwr = this.convertToRenderedSpace(source.width);
-      let srchr = this.convertToRenderedSpace(source.height);
+      let srcwr = this.convertToRenderedSpace(source.scaledWidth);
+      let srchr = this.convertToRenderedSpace(source.scaledHeight);
 
       if (event.offsetX < srcxr) {
         return false;
