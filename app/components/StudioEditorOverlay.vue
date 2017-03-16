@@ -29,14 +29,16 @@ export default {
     this.drawOverlay();
 
     this.$store.watch((state, getters) => {
-      return {
-        x: getters.activeSource.x,
-        y: getters.activeSource.y,
-        width: getters.activeSource.scaledWidth,
-        height: getters.activeSource.scaledHeight,
-        renderedWidth: state.video.renderedWidth,
-        renderedHeight: state.video.renderedHeight
-      };
+      if (this.activeSource) {
+        return {
+          x: getters.activeSource.x,
+          y: getters.activeSource.y,
+          width: getters.activeSource.scaledWidth,
+          height: getters.activeSource.scaledHeight,
+          renderedWidth: state.video.renderedWidth,
+          renderedHeight: state.video.renderedHeight
+        };
+      }
     }, () => {
       this.drawOverlay();
     });
@@ -47,9 +49,12 @@ export default {
       this.ctx.canvas.width = this.width;
       this.ctx.canvas.height = this.height;
       this.ctx.clearRect(0, 0, this.width, this.height);
-      this.drawPositionLines();
-      this.drawSourceBorder();
-      this.drawResizeBoxes();
+
+      if (this.activeSource) {
+        this.drawPositionLines();
+        this.drawSourceBorder();
+        this.drawResizeBoxes();
+      }
     },
 
     drawPositionLines() {
@@ -231,38 +236,52 @@ export default {
        *    regardless of whether it is on top
        * 3. If over another source, find the one on top, make
        *    it active, and start dragging it
+       * 4. Otherwise, deselect the currently active source
        */
 
-      let overResize = this.isOverResize(e);
+      if (this.activeSource) {
+        let overResize = this.isOverResize(e);
 
-      if (overResize) {
-        // Start resizing
-        this.resizeRegion = overResize;
-        this.currentX = e.pageX;
-        this.currentY = e.pageY;
-      } else if (this.isOverSource(e, this.activeSource)) {
-        // Start dragging the active source
+        if (overResize) {
+          // Start resizing
+          this.resizeRegion = overResize;
+          this.currentX = e.pageX;
+          this.currentY = e.pageY;
+
+          return;
+        } else if (this.isOverSource(e, this.activeSource)) {
+          // Start dragging the active source
+          this.dragging = true;
+          this.currentX = e.pageX;
+          this.currentY = e.pageY;
+
+          return;
+        }
+      }
+
+      let overSource = _.find(this.sources, source => {
+        return this.isOverSource(e, source);
+      });
+
+      if (overSource) {
+        // Make this source active
+        this.$store.dispatch({
+          type: 'makeSourceActive',
+          sceneName: this.$store.getters.activeSceneName,
+          sourceId: overSource.id
+        });
+
+        // Start dragging it
         this.dragging = true;
         this.currentX = e.pageX;
         this.currentY = e.pageY;
       } else {
-        let overSource = _.find(this.sources, source => {
-          return this.isOverSource(e, source);
+        this.$store.dispatch({
+          type: 'makeSourceActive',
+          sceneName: this.$store.getters.activeSceneName,
+          // null sourceId means no active source
+          sourceId: null
         });
-
-        if (overSource) {
-          // Make this source active
-          this.$store.dispatch({
-            type: 'makeSourceActive',
-            sceneName: this.$store.getters.activeSceneName,
-            sourceId: overSource.id
-          });
-
-          // Start dragging it
-          this.dragging = true;
-          this.currentX = e.pageX;
-          this.currentY = e.pageY;
-        }
       }
 
       // This might have changed the cursor
@@ -374,6 +393,10 @@ export default {
     },
 
     resizeRegions() {
+      if (!this.activeSource) {
+        return [];
+      }
+
       let source = this.activeSource;
 
       const regionRadius = 5;
