@@ -154,6 +154,10 @@ let socketPath = '';
 if (process.platform === 'win32') {
   socketPath = path.join('\\\\?', 'pipe', 'slobs', process.pid.toString(), 'sourceTransfer')
 } else {
+    var fs = require('fs');
+    if (!fs.existsSync(path.join('/tmp/slobs', process.pid.toString()))){
+      fs.mkdirSync(path.join('/tmp/slobs', process.pid.toString()));
+  }
   socketPath = path.join('/tmp/slobs', process.pid.toString(), 'sourceTransfer')
 }
 
