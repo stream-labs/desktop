@@ -27,7 +27,7 @@ class SourceFrameStream {
         this.handleChunk(chunk);
       });
 
-      socket.connect(8090, '127.0.0.1');
+      socket.connect(ipcRenderer.sendSync('getSocketPath'));
     }
   }
 
