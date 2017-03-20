@@ -6,3 +6,4 @@ lib/
 rtmp-services/
 text-freetype2/
 data/
+dist/
