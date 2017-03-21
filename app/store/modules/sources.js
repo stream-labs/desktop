@@ -167,7 +167,10 @@ const actions = {
     });
   },
 
-  setSourcePosition({ commit }, data) {
+  setSourcePosition({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.setSourcePosition(source.name, data.x, data.y);
+
     commit('SET_SOURCE_POSITION', {
       sourceId: data.sourceId,
       x: data.x,
@@ -175,7 +178,10 @@ const actions = {
     });
   },
 
-  setSourceScale({ commit }, data) {
+  setSourceScale({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.setSourceScale(source.name, data.scaleX, data.scaleY);
+
     commit('SET_SOURCE_SCALE', {
       sourceId: data.sourceId,
       scaleX: data.scaleX,
