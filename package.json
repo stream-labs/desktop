@@ -14,16 +14,7 @@
   },
   "dependencies": {
     "font-manager": "^0.2.2",
-    "lodash": "^4.17.4",
-    "moment": "^2.17.1",
-    "urijs": "^1.18.5",
-    "vue": "^2.1.10",
-    "vue-color": "^2.0.6",
-    "vue-multiselect": "2.0.0-beta.13",
-    "vuedraggable": "^2.8.5",
-    "vuex": "^2.1.1",
-    "yuv-buffer": "^1.0.0",
-    "yuv-canvas": "^1.0.0"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",
@@ -36,10 +27,19 @@
     "electron-rebuild": "^1.5.7",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
+    "moment": "^2.17.1",
     "style-loader": "^0.13.1",
+    "urijs": "^1.18.5",
+    "vue": "^2.1.10",
+    "vue-color": "^2.0.6",
     "vue-loader": "^10.2.0",
+    "vue-multiselect": "2.0.0-beta.13",
     "vue-template-compiler": "^2.1.10",
+    "vuedraggable": "^2.8.5",
+    "vuex": "^2.1.1",
     "webpack": "^2.2.1",
-    "webpack-dashboard": "^0.3.0"
+    "webpack-dashboard": "^0.3.0",
+    "yuv-buffer": "^1.0.0",
+    "yuv-canvas": "^1.0.0"
   }
 }

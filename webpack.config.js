@@ -7,10 +7,13 @@ if (process.env.WEBPACK_DASHBOARD) {
 }
 
 module.exports = {
-  entry: './app/app.js',
+  entry: {
+    renderer: './app/app.js',
+    main_helpers: './main_helpers.js'
+  },
   output: {
-    path: __dirname + '/build',
-    filename: 'slobs.js'
+    path: __dirname + '/bundles',
+    filename: '[name].js'
   },
   module: {
     rules: [

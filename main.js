@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const obs = require('node-obs');
+const obs = require('./node-obs');
 const _ = require('lodash');
 
 let mainWindow;
@@ -13,8 +13,6 @@ app.on('ready', () => {
     height: 1000,
     frame: false
   });
-
-  global.obs = obs;
 
   mainWindow.webContents.openDevTools();
 
@@ -31,11 +29,11 @@ app.on('ready', () => {
   childWindow.loadURL(indexUrl + '?child=true');
 
   // TODO: NODE_ENV is not getting set yet
-  if (process.env.NODE_ENV !== 'production') {
-    const devtoolsInstaller = require('electron-devtools-installer');
+  // if (process.env.NODE_ENV !== 'production') {
+  //   const devtoolsInstaller = require('electron-devtools-installer');
 
-    devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
-  }
+  //   devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+  // }
 
   // Initialize various OBS services
   obs.OBS_API_initOBS_API();
@@ -149,7 +147,7 @@ const net = require('net');
 
 let subscribedSources = [];
 
-const SourceFrameHeader = require('./app/util/SourceFrameHeader.js').default;
+const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
 
 ipcMain.on('subscribeToSource', (event, data) => {
   subscribedSources.push(data);

@@ -7,3 +7,5 @@ rtmp-services/
 text-freetype2/
 data/
 dist/
+bundles/
+node-obs/
