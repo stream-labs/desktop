@@ -187,24 +187,26 @@ net.createServer(function(sock) {
     _.each(subscribedSources, source => {
       let frameInfo = obs.OBS_content_getSourceFrame(source.name);
 
-      let frame = new Uint8Array(frameInfo.frame);
-      let header = new SourceFrameHeader();
+      if (frameInfo) {
+        let frame = new Uint8Array(frameInfo.frame);
+        let header = new SourceFrameHeader();
 
-      header.id = source.id;
-      header.width = parseInt(frameInfo.width);
-      header.height = parseInt(frameInfo.height);
-      header.frameLength = frame.length;
+        header.id = source.id;
+        header.width = parseInt(frameInfo.width);
+        header.height = parseInt(frameInfo.height);
+        header.frameLength = frame.length;
 
-      if (frameInfo.format === 'VIDEO_FORMAT_I420') {
-        header.format = 0;
-      } else {
-        header.format = 1;
+        if (frameInfo.format === 'VIDEO_FORMAT_I420') {
+          header.format = 0;
+        } else {
+          header.format = 1;
+        }
+
+        sock.write(Buffer.from(header.buffer.buffer));
+
+        // Write the actual frame data
+        sock.write(Buffer.from(frame.buffer));
       }
-
-      sock.write(Buffer.from(header.buffer.buffer));
-
-      // Write the actual frame data
-      sock.write(Buffer.from(frame.buffer));
     });
 
 
