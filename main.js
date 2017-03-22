@@ -160,8 +160,9 @@ const net = require('net');
 const path = require('path');
 const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
 
-let subscribedSources = [];
+let sockets = [];
 let socketPath = '';
+
 if (process.platform === 'win32') {
   socketPath = path.join('\\\\?', 'pipe', 'slobs', process.pid.toString(), 'sourceTransfer')
 } else {
@@ -177,16 +178,9 @@ ipcMain.on('getSocketPath', (event, data) => {
   event.returnValue = socketPath;
 });
 
-ipcMain.on('subscribeToSource', (event, data) => {
-  subscribedSources.push(data);
-});
-
-
-net.createServer(function(sock) {
-  function sendFrames() {
-    _.each(subscribedSources, source => {
-      let frameInfo = obs.OBS_content_getSourceFrame(source.name);
-
+ipcMain.on('subscribeToSource', (event, source) => {
+  obs.OBS_content_subscribeSourceFrames(source.name, frameInfo => {
+    _.each(sockets, sock => {
       if (frameInfo) {
         let frame = new Uint8Array(frameInfo.frame);
         let header = new SourceFrameHeader();
@@ -208,10 +202,10 @@ net.createServer(function(sock) {
         sock.write(Buffer.from(frame.buffer));
       }
     });
+  });
+});
 
 
-    setTimeout(sendFrames, 33);
-  }
-
-  sendFrames();
+net.createServer(function(sock) {
+  sockets.push(sock);  
 }).listen(socketPath);
