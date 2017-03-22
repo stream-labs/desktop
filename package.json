@@ -9,7 +9,7 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "extract-libs": "bin/extract_libs.sh",
-    "rebuild": "electron-rebuild && electron-rebuild -w node-obs",
+    "rebuild": "electron-rebuild",
     "package": "webpack && node bin/package.js"
   },
   "dependencies": {
