@@ -8,7 +8,7 @@ Electron client for the Streamlabs OBS streaming software.
 Due to OBS containing files named `package.json`, it is not
 currently possible to install `node-obs` via NPM. You will
 need to install and compile it manually, and then symlink it
-in your `node_modules` directory.
+in the root of this directory: `./node-obs`.
 
 Node OBS can be found here:
 https://github.com/twitchalerts/node-obs
