@@ -84,8 +84,8 @@ const actions = {
         height: 0,
 
         // Scaling factor
-        scaleX: 0.5,
-        scaleY: 0.5,
+        scaleX: 1.0,
+        scaleY: 1.0,
 
         // These are a function of dimensions and scale
         scaledWidth: 0,
@@ -167,7 +167,10 @@ const actions = {
     });
   },
 
-  setSourcePosition({ commit }, data) {
+  setSourcePosition({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.setSourcePosition(source.name, data.x, data.y);
+
     commit('SET_SOURCE_POSITION', {
       sourceId: data.sourceId,
       x: data.x,
@@ -175,7 +178,10 @@ const actions = {
     });
   },
 
-  setSourceScale({ commit }, data) {
+  setSourceScale({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.setSourceScale(source.name, data.scaleX, data.scaleY);
+
     commit('SET_SOURCE_SCALE', {
       sourceId: data.sourceId,
       scaleX: data.scaleX,
