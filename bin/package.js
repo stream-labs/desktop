@@ -7,16 +7,19 @@ builder.build({
   targets: Platform.WINDOWS.createTarget(),
   config: {
     appId: 'com.streamlabs.slobs',
+    productName: 'Streamlabs OBS',
     files: [
       'bundles',
-      'config',
       'node_modules',
       'public',
       'index.html',
       'main.js',
     ],
-    extraFiles: ['node-obs'],
-    asarUnpack: ['*.node']
+    extraFiles: ['node-obs', 'config'],
+    asarUnpack: ['**/*.node'],
+  },
+  extraMetadata: {
+    env: 'production'
   }
 }).then(() => {
   console.log('SUCCESS');
