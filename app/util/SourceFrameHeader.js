@@ -25,25 +25,24 @@ class SourceFrameHeader {
     ];
 
     this.length = this.fields.length * 4;
-
-    this.fields.forEach((field, index) => {
-      Object.defineProperty(this, field, {
-        get: () => {
-          return (new Uint32Array(this.buffer.buffer))[index];
-        },
-        set: val => {
-          (new Uint32Array(this.buffer.buffer))[index] = val;
-        }
-      });
-    });
-
     if (buffer) {
       this.buffer = buffer;
     } else {
       this.buffer = new Uint8Array(this.length);
     }
-  }
+    this.buffer32 = new Uint32Array(this.buffer.buffer);
 
+    this.fields.forEach((field, index) => {
+      Object.defineProperty(this, field, {
+        get: () => {
+          return this.buffer32[index];
+        },
+        set: val => {
+          this.buffer32[index] = val;
+        }
+      });
+    });
+  }
 }
 
 export default SourceFrameHeader;

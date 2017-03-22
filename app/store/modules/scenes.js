@@ -65,7 +65,7 @@ const actions = {
   },
 
   makeSceneActive({ commit }, data) {
-    // TODO: Make scene active in OBS
+    Obs.setCurrentScene(data.sceneName);
 
     commit('MAKE_SCENE_ACTIVE', {
       sceneName: data.sceneName

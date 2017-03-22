@@ -144,14 +144,31 @@ ipcMain.on('getUniqueId', event => {
 
 // Handle streaming of video over TCP socket
 const net = require('net');
+const path = require('path');
+const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
 
 let subscribedSources = [];
+let socketPath = '';
+if (process.platform === 'win32') {
+  socketPath = path.join('\\\\?', 'pipe', 'slobs', process.pid.toString(), 'sourceTransfer')
+} else {
+    var fs = require('fs');
+    if (!fs.existsSync(path.join('/tmp/slobs', process.pid.toString()))){
+      fs.mkdirSync(path.join('/tmp/slobs', process.pid.toString()));
+  }
+  socketPath = path.join('/tmp/slobs', process.pid.toString(), 'sourceTransfer')
+}
 
-const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
+//@desc getSocketPath
+// Call this synchronously (using IPC) from a Renderer to get the socket to connect to.
+ipcMain.on('getSocketPath', (event, data) => {
+  event.returnValue = socketPath;
+});
 
 ipcMain.on('subscribeToSource', (event, data) => {
   subscribedSources.push(data);
 });
+
 
 net.createServer(function(sock) {
   function sendFrames() {
@@ -178,8 +195,9 @@ net.createServer(function(sock) {
       sock.write(Buffer.from(frame.buffer));
     });
 
+
     setTimeout(sendFrames, 33);
   }
 
   sendFrames();
-}).listen(8090, '127.0.0.1');
+}).listen(socketPath);

@@ -32,6 +32,10 @@ class ObsApi {
     nodeObs.OBS_content_removeScene(name);
   }
 
+  setCurrentScene(name) {
+    nodeObs.OBS_content_setCurrentScene(name);
+  }
+
   getScenes() {
     return nodeObs.OBS_content_getListCurrentScenes();
   }
