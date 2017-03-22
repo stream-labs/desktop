@@ -155,6 +155,7 @@ ipcMain.on('getUniqueId', event => {
 
 
 // Handle streaming of video over TCP socket
+const fs = require('fs');
 const net = require('net');
 const path = require('path');
 const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
@@ -164,9 +165,8 @@ let socketPath = '';
 if (process.platform === 'win32') {
   socketPath = path.join('\\\\?', 'pipe', 'slobs', process.pid.toString(), 'sourceTransfer')
 } else {
-    var fs = require('fs');
-    if (!fs.existsSync(path.join('/tmp/slobs', process.pid.toString()))){
-      fs.mkdirSync(path.join('/tmp/slobs', process.pid.toString()));
+  if (!fs.existsSync(path.join('/tmp/slobs', process.pid.toString()))){
+    fs.mkdirSync(path.join('/tmp/slobs', process.pid.toString()));
   }
   socketPath = path.join('/tmp/slobs', process.pid.toString(), 'sourceTransfer')
 }
