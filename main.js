@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const obs = require('node-obs');
+const obs = require('./node-obs');
 const _ = require('lodash');
 
 let mainWindow;
