@@ -1,5 +1,5 @@
 {
-  "name": "slobs-client",
+  "name": "StreamlabsStreaming",
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "version": "0.0.1",
@@ -10,7 +10,7 @@
     "start": "electron .",
     "extract-libs": "bin/extract_libs.sh",
     "rebuild": "electron-rebuild && electron-rebuild -w node-obs",
-    "package": "node bin/package.js"
+    "package": "webpack && node bin/package.js"
   },
   "dependencies": {
     "font-manager": "^0.2.2",
