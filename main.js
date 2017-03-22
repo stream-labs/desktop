@@ -1,5 +1,19 @@
+const pjson = require('./package.json');
+
+if (pjson.env === 'production') {
+  process.env.NODE_ENV = 'production';
+}
+
+let obs;
+
+if (process.env.NODE_ENV === 'production') {
+  // OBS is loaded from outside the ASAR in production
+  obs = require('../../node-obs');
+} else {
+  obs = require('./node-obs');
+}
+
 const { app, BrowserWindow, ipcMain } = require('electron');
-const obs = require('./node-obs');
 const _ = require('lodash');
 
 let mainWindow;
@@ -14,10 +28,6 @@ app.on('ready', () => {
     frame: false
   });
 
-  global.obs = obs;
-
-  mainWindow.webContents.openDevTools();
-
   mainWindow.loadURL(indexUrl);
 
   // Pre-initialize the child window
@@ -26,12 +36,12 @@ app.on('ready', () => {
     frame: false
   });
 
-  childWindow.webContents.openDevTools();
-
   childWindow.loadURL(indexUrl + '?child=true');
 
-  // TODO: NODE_ENV is not getting set yet
   if (process.env.NODE_ENV !== 'production') {
+    childWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
+
     const devtoolsInstaller = require('electron-devtools-installer');
 
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
@@ -148,7 +158,7 @@ ipcMain.on('getUniqueId', event => {
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
-const SourceFrameHeader = require('./app/util/SourceFrameHeader.js').default;
+const SourceFrameHeader = require('./bundles/main_helpers.js').SourceFrameHeader;
 
 let subscribedSources = [];
 let socketPath = '';

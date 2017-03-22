@@ -45,4 +45,4 @@ class SourceFrameHeader {
   }
 }
 
-module.exports.default = SourceFrameHeader;
+export default SourceFrameHeader;
