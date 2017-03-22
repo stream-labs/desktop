@@ -163,6 +163,14 @@ class ObsApi {
     return nodeObs.OBS_content_getListInputSources();
   }
 
+  setSourcePosition(name, x, y) {
+    nodeObs.OBS_content_setSourcePosition(name, x.toString(), y.toString());
+  }
+
+  setSourceScale(name, x, y) {
+    nodeObs.OBS_content_setSourceScaling(name, x.toString(), y.toString());
+  }
+
   startStreaming() {
     nodeObs.OBS_service_startStreaming();
   }
