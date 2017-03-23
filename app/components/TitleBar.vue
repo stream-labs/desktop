@@ -1,17 +1,17 @@
 <template>
-<div class="titlebar">
-  <div class="titlebar-title">
+<div class="Titlebar">
+  <div class="Titlebar-title">
     {{ windowTitle }}
   </div>
   <div>
     <i
-      class="fa fa-window-minimize titlebar-action"
+      class="fa fa-window-minimize Titlebar-action"
       @click="handleMinimize" />
     <i
-      class="fa fa-window-maximize titlebar-action"
+      class="fa fa-window-maximize Titlebar-action"
       @click="handleMaximize" />
     <i
-      class="fa fa-window-close titlebar-action"
+      class="fa fa-window-close Titlebar-action"
       @click="handleClose" />
   </div>
 </div>
@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.titlebar {
+.Titlebar {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -64,18 +64,20 @@ export default {
   cursor: move;
 }
 
-.titlebar-title {
+.Titlebar-title {
   flex-grow: 1;
   padding-left: 30px;
 }
 
-.titlebar-action {
+.Titlebar-action {
   cursor: pointer;
   opacity: 0.6;
 
   font-size: 16px;
 
   margin: 0 8px;
+
+  -webkit-app-region: no-drag;
 
   &:hover {
     opacity: 1.0;
