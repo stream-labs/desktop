@@ -28,6 +28,9 @@ import Obs from '../api/Obs.js';
 export default {
 
   mounted() {
+    // Holds info about each source we are streaming
+    this.streamedSources = {};
+
     let canvas = this.$refs.canvas;
 
     this.mainCanvas = canvas.getContext('2d');
@@ -35,10 +38,20 @@ export default {
     window.addEventListener('resize', this.onResize);
 
     this.onResize();
+
+    if (window.videoStarted) {
+      this.startRendering();
+    }
   },
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
+
+    _.each(this.streamedSources, streamed => {
+      SourceFrameStream.unsubscribe(streamed.id, streamed.subId);
+    });
+
+    clearInterval(this.renderInterval);
   },
 
   methods: {
@@ -85,63 +98,61 @@ export default {
       };
     },
 
-    startVideo() {
-      if (!this.videoStarted) {
-        this.videoStarted = true;
+    setupSourceRendering(source) {
+      let canvas = document.createElement('canvas');
 
-        let canvases = {};
+      // For now, we need to lazy assign the render method,
+      // since we don't know the format until the first frame
+      // comes in.  This should change in the future.
+      let renderMethod;
 
-        _.each(this.sources, source => {
-          let canvas = document.createElement('canvas');
+      let subId = SourceFrameStream.subscribe(source.id, frameInfo => {
+        if (!renderMethod) {
+          if (frameInfo.format === 0) {
+            renderMethod = this.setupYUVCanvas(canvas);
+          } else {
+            renderMethod = this.setupRGBACanvas(canvas);
+          }
+        }
 
-          canvases[source.id] = canvas;
+        renderMethod(frameInfo);
+      });
 
-          let renderMethod;
-          let width;
-          let height;
+      this.streamedSources[source.id] = {
+        id: source.id,
+        canvas,
+        subId
+      };
+    },
 
-          SourceFrameStream.subscribeToSource(source.name, data => {
-            if ((width !== data.width) || (height !== data.height)) {
-              width = data.width;
-              height = data.height;
+    startRendering() {
+      _.each(this.reversedSources, source => {
+        this.setupSourceRendering(source);
+      });
 
-              this.$store.dispatch({
-                type: 'setSourceSize',
-                sourceId: source.id,
-                width,
-                height
-              });
-            }
+      this.renderInterval = setInterval(() => {
+        this.mainCanvas.clearRect(0, 0, this.width, this.height);
 
-            if (!renderMethod) {
-              if (data.format === 0) {
-                renderMethod = this.setupYUVCanvas(canvas);
-              } else {
-                renderMethod = this.setupRGBACanvas(canvas);
-              }
-            }
-
-            renderMethod(data);
-          });
+        // We render in reverse order, since the first source should be on top
+        _.each(this.reversedSources, source => {
+          this.mainCanvas.drawImage(
+            this.streamedSources[source.id].canvas,
+            source.x,
+            source.y,
+            source.scaledWidth,
+            source.scaledHeight
+          );
         });
 
+      }, 33);
+    },
 
-        setInterval(() => {
-          this.mainCanvas.clearRect(0, 0, this.width, this.height);
+    startVideo() {
+      // TODO: Don't use a global variable eventually
+      if (!window.videoStarted) {
+        window.videoStarted = true;
 
-          // We render in reverse order, since the first source should be on top
-          _.each(this.reversedSources, source => {
-            this.mainCanvas.drawImage(
-              canvases[source.id],
-              source.x,
-              source.y,
-              source.scaledWidth,
-              source.scaledHeight
-            );
-          });
-
-        }, 33);
-
+        this.startRendering();
       }
     }
   },
