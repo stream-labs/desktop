@@ -22,6 +22,17 @@ const mutations = {
     state.activeSceneName = data.sceneName;
   },
 
+  // Order is an array of names
+  SET_SCENE_ORDER(state, data) {
+    // TODO: This is a O(n^2) operation, probably not a big
+    // deal, but this should be handled better.
+    state.scenes = _.map(data.order, sceneName => {
+      return _.find(state.scenes, scene => {
+        return scene.name === sceneName;
+      });
+    });
+  },
+
   ADD_SOURCE_TO_SCENE(state, data) {
     state.scenes.find(scene => { 
       return scene.name === data.sceneName;
@@ -38,6 +49,12 @@ const mutations = {
     state.scenes.find(scene => {
       return scene.name === data.sceneName;
     }).activeSourceId = data.sourceId;
+  },
+
+  SET_SOURCE_ORDER(state, data) {
+    state.scenes.find(scene => {
+      return scene.name === data.sceneName;
+    }).sources = data.order;
   }
 };
 
@@ -72,10 +89,25 @@ const actions = {
     });
   },
 
+  setSceneOrder({ commit }, data) {
+    commit('SET_SCENE_ORDER', {
+      order: data.order
+    });
+  },
+
   makeSourceActive({ commit }, data) {
     commit('MAKE_SOURCE_ACTIVE', {
       sceneName: data.sceneName,
       sourceId: data.sourceId
+    });
+  },
+
+  setSourceOrder({ commit }, data) {
+    // TODO: Set order in OBS
+
+    commit('SET_SOURCE_ORDER', {
+      sceneName: data.sceneName,
+      order: data.order
     });
   }
 };

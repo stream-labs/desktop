@@ -18,7 +18,8 @@
     class="studioControls-selector"
     :items="sources"
     :activeItem="activeSourceId"
-    @select="makeActive"/>
+    @select="makeActive"
+    @sort="handleSort"/>
 </div>
 </template>
 
@@ -52,6 +53,14 @@ export default {
       if (this.$store.getters.activeSourceId) {
         windowManager.showSourceProperties(this.$store.getters.activeSourceId);
       }
+    },
+
+    handleSort(order) {
+      this.$store.dispatch({
+        type: 'setSourceOrder',
+        sceneName: this.$store.getters.activeSceneName,
+        order
+      });
     },
 
     makeActive(sourceId) {

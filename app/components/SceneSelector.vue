@@ -15,7 +15,8 @@
     class="studioControls-selector"
     :items="sceneNames"
     :activeItem="activeSceneName"
-    @select="makeActive"/>
+    @select="makeActive"
+    @sort="handleSort"/>
 </div>
 </template>
 
@@ -29,6 +30,13 @@ export default {
       this.$store.dispatch({
         type: 'makeSceneActive',
         sceneName: scene
+      });
+    },
+
+    handleSort(order) {
+      this.$store.dispatch({
+        type: 'setSceneOrder',
+        order
       });
     },
 
