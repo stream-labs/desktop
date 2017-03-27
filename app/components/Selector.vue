@@ -66,6 +66,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.sortable-ghost {
+  opacity: 0;
+}
+
+.sortable-drag {
+  border: 1px solid #ddd;
+  background-color: #eee;
+}
+
 .Selector-list {
   list-style-type: none;
   margin: 0;
