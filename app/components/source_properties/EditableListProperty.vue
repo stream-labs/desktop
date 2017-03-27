@@ -20,25 +20,6 @@
     :activeItem="activeItem"
     @select="handleSelect"
     @sort="handleSort"/>
-  <!--<ul class="EditableList-list">
-    <draggable
-      :list="list"
-      :options="draggableOptions"
-      @change="handleChange">
-      <li 
-        class="EditableList-item"
-        :class="{ 'EditableList-item__active': index === selectedIndex }"
-        v-for="(item, index) in list"
-        @click="handleSelect(index)">
-        <div class="EditableList-itemText">
-          {{item}}
-        </div>
-        <div class="EditableList-dragHandle">
-          <i class="fa fa-bars fa-rotate-90"/>
-        </div>
-      </li>
-    </draggable>
-  </ul>-->
 </div>
 </template>
 
