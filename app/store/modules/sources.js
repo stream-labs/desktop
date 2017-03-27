@@ -208,6 +208,15 @@ const getters = {
         return [];
       }
     };
+  },
+
+  // Returns a function for finding a source by name
+  sourceByName(state) {
+    return sourceName => {
+      return _.find(state.sources, source => {
+        return source.name === sourceName;
+      });
+    };
   }
 };
 

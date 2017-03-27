@@ -14,7 +14,13 @@
       @click="handleEdit"
       class="fa fa-cog EditableList-control"/>
   </div>
-  <ul class="EditableList-list">
+  <selector
+    class="EditableList-list"
+    :items="list"
+    :activeItem="activeItem"
+    @select="handleSelect"
+    @sort="handleSort"/>
+  <!--<ul class="EditableList-list">
     <draggable
       :list="list"
       :options="draggableOptions"
@@ -32,13 +38,13 @@
         </div>
       </li>
     </draggable>
-  </ul>
+  </ul>-->
 </div>
 </template>
 
 <script>
 import contextManager from '../../util/ContextMenuManager.js';
-import Draggable from 'vuedraggable';
+import Selector from '../Selector.vue';
 import _ from 'lodash';
 
 const { remote } = window.require('electron');
@@ -46,7 +52,7 @@ const { remote } = window.require('electron');
 export default {
 
   components: {
-    Draggable
+    Selector
   },
 
   props: [
@@ -55,40 +61,17 @@ export default {
 
   data() {
     return {
-      testList: [
-        '/Users/andycreeth/Downloads/foundation-6.3.0-complete/css/foundation.min.css',
-        '/Users/andycreeth/Downloads/foundation-6.3.0-complete/foundation-6.3.0-complete/css/foundation.min.css',
-        '/Users/andycreeth/Downloads/foundation-6.3.0-complete/foundation-6.3.0-complete/foundation-6.3.0-complete/foundation-6.3.0-complete/css/foundation.min.css'
-      ],
-
-      draggableOptions: {
-        handle: '.EditableList-dragHandle'
-      },
-
-      selectedIndex: 0
+      activeItem: null
     };
   },
 
   methods: {
-    handleChange(change) {
-      this.setList(this.list);
-      let oldI = change.moved.oldIndex;
-      let newI = change.moved.newIndex;
-
-      // Adjust the selected index based on what moved
-      if (change.moved) {
-        if (oldI === this.selectedIndex) {
-          this.selectedIndex = newI;
-        } else if ((oldI < this.selectedIndex) && (newI >= this.selectedIndex)) {
-          this.selectedIndex -= 1;
-        } else if ((oldI > this.selectedIndex) && (newI <= this.selectedIndex)) {
-          this.selectedIndex += 1;
-        }
-      }
+    handleSelect(item) {
+      this.activeItem = item;
     },
 
-    handleSelect(index) {
-      this.selectedIndex = index;
+    handleSort(list) {
+      this.setList(list);
     },
 
     handleAdd(event) {
@@ -112,8 +95,7 @@ export default {
     },
 
     handleRemove() {
-      this.list.splice(this.selectedIndex, 1);
-      this.setList(this.list);
+      this.setList(_.without(this.list, this.activeItem));
     },
 
     handleEdit() {
@@ -128,7 +110,12 @@ export default {
       });
 
       if (files) {
-        this.list[this.selectedIndex] = files[0];
+        let activeIndex = _.indexOf(this.list, this.activeItem);
+
+        this.list[activeIndex] = files[0];
+
+        // Preserve this item as active
+        this.activeItem = files[0];
         this.setList(this.list);
       }
     },
@@ -177,15 +164,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.sortable-ghost {
-  opacity: 0;
-}
-
-.sortable-drag {
-  border: 1px solid #ddd;
-  background-color: #eee;
-}
-
 .EditableList-topBar {
   display: flex;
   flex-direction: row;
@@ -197,13 +175,7 @@ export default {
 }
 
 .EditableList-list {
-  list-style-type: none;
-  margin: 0;
-  overflow: auto;
   height: 180px;
-  border: 1px solid #ddd;
-
-  background-color: #fcfcfc;
 }
 
 .EditableList-control {
@@ -217,42 +189,5 @@ export default {
   &:hover {
     opacity: 1;
   }
-}
-
-.EditableList-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid #ddd;
-
-  cursor: pointer;
-
-  &.EditableList-item__active {
-    background-color: #1ae6a8;
-    color: white;
-
-    .EditableList-dragHandle {
-      color: white;
-    }
-  }
-
-  &:hover {
-    .EditableList-dragHandle {
-      opacity: 1;
-    }
-  }
-}
-
-.EditableList-itemText {
-  flex-grow: 1;
-}
-
-.EditableList-dragHandle {
-  color: #ccc;
-  cursor: move;
-  font-size: 12px;
-  padding: 0 5px;
-  opacity: 0;
 }
 </style>
