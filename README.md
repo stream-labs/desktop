@@ -49,7 +49,10 @@ yarn run compile
 
 ## Starting
 
-You can run the app with:
+If you are using Visual Studio Code, you can start the app
+using the built in debugger.
+
+Otherwise, you can run the app with:
 
 ```
 yarn start
