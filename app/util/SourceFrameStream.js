@@ -1,23 +1,68 @@
 const net = window.require('net');
 const { ipcRenderer } = window.require('electron');
 
-const SourceFrameHeader = require('./SourceFrameHeader.js').default;
+import SourceFrameHeader from './SourceFrameHeader.js';
+import _ from 'lodash';
+import store from '../store';
 
 class SourceFrameStream {
 
   constructor() {
-    this.sources = {};
-    this.idCounter = 1;
+    // Object for keeping track of active streams.
+    // Keyed by source id
+    this.sourceStreams = {};
+
+    // All headers will be read into this buffer
     this.header = new SourceFrameHeader();
 
     // This is the buffer we are currently trying to fill
     // from the TCP socket.
     this.currentBuffer = this.header.buffer;
 
+    // This represents how far into the current buffer
+    // we are.
     this.currentOffset = 0;
   }
 
-  ensureConnected() {
+  /*                         *
+   * Public PubSub Interface *
+   *                         */
+
+  // Subscribe to frames for a particular source.
+  // A subscribed id will be returned, which can be
+  // used to unsubscribe.
+  subscribe(sourceId, callback) {
+    // Ensure we are connected to the main process
+    this.ensureSocketConnection();
+
+    // Ensure we are streaming the requested source
+    this.ensureSourceStream(sourceId);
+
+    let subscriberId = _.uniqueId();
+    let stream = this.sourceStreams[sourceId];
+
+    stream.subscribers[subscriberId] = callback;
+
+    return subscriberId;
+  }
+
+  // sourceId isn't technically required, but it makes
+  // it faster/easier to find their subscriber id
+  unsubscribe(sourceId, subscriberId) {
+    let stream = this.sourceStreams[sourceId];
+
+    delete stream.subscribers[subscriberId];
+
+    // TODO: We may want to unsubscribe from frames entirely
+    // once the last subscriber has unsubscribed.
+  }
+
+  /*         *
+   * PRIVATE *
+   *         */
+
+  // The socket is started lazily
+  ensureSocketConnection() {
     if (!this.connected) {
       this.connected = true;
 
@@ -31,36 +76,68 @@ class SourceFrameStream {
     }
   }
 
-  // Sets up the next target buffer for streaming.
-  setNextTarget() {
-    if (this.currentSourceId) {
-      this.currentSourceId = null;
-      this.currentBuffer = this.header.buffer;
-    } else {
-      this.currentSourceId = this.header.id;
-      let source = this.sources[this.header.id];
+  // Streams for each source are started lazily
+  ensureSourceStream(sourceId) {
+    if (!this.sourceStreams[sourceId]) {
+      this.sourceStreams[sourceId] = {
+        subscribers: {},
+        frameBuffer: null
+      };
 
-      if (!source.frameBuffer || (source.frameBuffer.length !== this.header.frameLength)) {
-        source.frameBuffer = new Uint8Array(this.header.frameLength);
-      }
+      let sourceName = store.state.sources.sources[sourceId].name;
 
-      this.currentBuffer = source.frameBuffer;
+      ipcRenderer.send('subscribeToSource', {
+        name: sourceName,
+        id: sourceId
+      });
     }
-
-    this.currentOffset = 0;
   }
 
   processBuffer() {
+    // If we just processed a source frame
     if (this.currentSourceId) {
-      let source = this.sources[this.currentSourceId];
+      let stream = this.sourceStreams[this.currentSourceId];
 
-      source.callback({
-        width: this.header.width,
-        height: this.header.height,
-        format: this.header.format,
-        frameBuffer: source.frameBuffer
+      _.each(stream.subscribers, callback => {
+        _.defer(callback, {
+          width: this.header.width,
+          height: this.header.height,
+          format: this.header.format,
+          frameBuffer: stream.frameBuffer
+        });
       });
+
+      this.currentSourceId = null;
+      this.currentBuffer = this.header.buffer;
+
+    // Otherwise we processed a header
+    } else {
+      this.currentSourceId = this.header.id.toString();
+      let stream = this.sourceStreams[this.currentSourceId];
+
+      // If the frame buffer does not exist yet, or is not correctly
+      // sized for the incoming frame, allocate a new framebuffer
+      if (!stream.frameBuffer || (stream.frameBuffer.length !== this.header.frameLength)) {
+        stream.frameBuffer = new Uint8Array(this.header.frameLength);
+      }
+
+      this.currentBuffer = stream.frameBuffer;
+
+      let source = store.state.sources.sources[this.currentSourceId];
+
+      // If the width of the incoming frame is different,
+      // let the vuex store know about the new source size.
+      if ((source.width !== this.header.width) || source.height !== this.header.height) {
+        store.dispatch({
+          type: 'setSourceSize',
+          sourceId: source.id,
+          width: this.header.width,
+          height: this.header.height
+        });
+      }
     }
+
+    this.currentOffset = 0;
   }
 
   handleChunk(chunk) {
@@ -73,29 +150,12 @@ class SourceFrameStream {
       this.currentBuffer.set(finalChunk, this.currentOffset);
 
       this.processBuffer();
-      this.setNextTarget();
 
       this.handleChunk(overflow);
     } else {
       this.currentBuffer.set(chunk, this.currentOffset);
       this.currentOffset += chunk.length;
     }
-  }
-
-  subscribeToSource(sourceName, callback) {
-    this.ensureConnected();
-
-    this.sources[this.idCounter] = {
-      name: sourceName,
-      callback
-    };
-
-    ipcRenderer.send('subscribeToSource', {
-      name: sourceName,
-      id: this.idCounter
-    });
-
-    this.idCounter += 1;
   }
 }
 
