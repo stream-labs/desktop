@@ -1,10 +1,5 @@
 <template>
 <div>
-  <button
-    class="StudioEditorSources-button button"
-    @click="startVideo">
-    Start Video
-  </button>
   <canvas
     class="StudioEditorSources"
     ref="canvas"
@@ -39,14 +34,13 @@ export default {
 
     this.onResize();
 
-    if (window.videoStarted) {
-      this.startRendering();
-    }
+    this.startRendering();
   },
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
+    // Unsubscribe from all sources
     _.each(this.streamedSources, streamed => {
       SourceFrameStream.unsubscribe(streamed.id, streamed.subId);
     });
@@ -98,37 +92,55 @@ export default {
       };
     },
 
-    setupSourceRendering(source) {
-      let canvas = document.createElement('canvas');
+    // Ensures that we are streaming and rendering the
+    // correct sources.
+    ensureSourceRendering() {
+      // Memoize currently active sources by id. Used for
+      // when we are looking for ones to remove.
+      let sourceMemo = {};
 
-      // For now, we need to lazy assign the render method,
-      // since we don't know the format until the first frame
-      // comes in.  This should change in the future.
-      let renderMethod;
+      // Add any new sources
+      _.each(this.reversedSources, source => {
+        sourceMemo[source.id] = true;
 
-      let subId = SourceFrameStream.subscribe(source.id, frameInfo => {
-        if (!renderMethod) {
-          if (frameInfo.format === 0) {
-            renderMethod = this.setupYUVCanvas(canvas);
-          } else {
-            renderMethod = this.setupRGBACanvas(canvas);
-          }
+        if (!this.streamedSources[source.id]) {
+          let canvas = document.createElement('canvas');
+
+          // For now, we need to lazy assign the render method,
+          // since we don't know the format until the first frame
+          // comes in.  This should change in the future.
+          let renderMethod;
+
+          let subId = SourceFrameStream.subscribe(source.id, frameInfo => {
+            if (!renderMethod) {
+              if (frameInfo.format === 0) {
+                renderMethod = this.setupYUVCanvas(canvas);
+              } else {
+                renderMethod = this.setupRGBACanvas(canvas);
+              }
+            }
+
+            renderMethod(frameInfo);
+          });
+
+          this.streamedSources[source.id] = {
+            id: source.id,
+            canvas,
+            subId
+          };
         }
-
-        renderMethod(frameInfo);
       });
 
-      this.streamedSources[source.id] = {
-        id: source.id,
-        canvas,
-        subId
-      };
+      // Remove any old sources
+      _.each(this.streamedSources, streamed => {
+        if (!sourceMemo[streamed.id]) {
+          SourceFrameStream.unsubscribe(streamed.id, streamed.subId);
+        }
+      });
     },
 
     startRendering() {
-      _.each(this.reversedSources, source => {
-        this.setupSourceRendering(source);
-      });
+      this.ensureSourceRendering();
 
       this.renderInterval = setInterval(() => {
         this.mainCanvas.clearRect(0, 0, this.width, this.height);
@@ -145,15 +157,12 @@ export default {
         });
 
       }, 33);
-    },
+    }
+  },
 
-    startVideo() {
-      // TODO: Don't use a global variable eventually
-      if (!window.videoStarted) {
-        window.videoStarted = true;
-
-        this.startRendering();
-      }
+  watch: {
+    reversedSources() {
+      this.ensureSourceRendering();
     }
   },
 
