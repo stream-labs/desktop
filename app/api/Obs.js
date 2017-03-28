@@ -59,7 +59,7 @@ class ObsApi {
   sourceProperties(sourceName, sourceId) {
     const properties = nodeObs.OBS_content_getSourceProperties(sourceName);
 
-    return _.map(properties, prop => {
+    const parsedProperties = _.map(properties, prop => {
       let propertyObj = {
         sourceId: sourceId,
         name: prop.name,
@@ -81,6 +81,10 @@ class ObsApi {
 
       return propertyObj;
     });
+
+    nodeObs.OBS_content_startDeferUpdateSourceProperties(sourceName);
+
+    return parsedProperties;
   }
 
   getPropertyValue(sourceName, property) {
