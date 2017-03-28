@@ -21,6 +21,7 @@
 <script>
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager.js';
+import namingHelpers from '../../util/NamingHelpers.js';
 const { ipcRenderer } = window.require('electron');
 
 export default {
@@ -43,29 +44,14 @@ export default {
       });
 
       windowManager.showSourceProperties(id);
-    },
-
-    // Given a name, if it is taken, suggests an alternate name
-    suggestName(name) {
-      if (this.$store.getters.sourceByName(name)) {
-        let match = name.match(/.*\(([0-9]+)\)$/);
-
-        if (match) {
-          let num = parseInt(match[1]);
-
-          return this.suggestName(name.replace(/(.*\()([0-9]+)(\))$/, '$1' + (num + 1) + '$3'));
-        } else {
-          return this.suggestName(name + ' (1)');
-        }
-      } else {
-        return name;
-      }
     }
   },
 
   data() {
     return {
-      name: this.suggestName(this.$store.state.windowOptions.options.sourceType)
+      name: namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, name => {
+        return this.$store.getters.sourceByName(name);
+      })
     };
   },
 

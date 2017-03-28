@@ -7,6 +7,7 @@ import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
 import NameSource from '../components/windows/NameSource.vue';
+import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import store from '../store';
 
@@ -20,6 +21,7 @@ class WindowManager {
       Settings,
       AddSource,
       NameSource,
+      NameScene,
       SourceProperties
     };
   }
@@ -81,6 +83,18 @@ class WindowManager {
       startupOptions: {
         component: 'NameSource',
         sourceType
+      },
+      windowOptions: {
+        width: 400,
+        height: 240
+      }
+    });
+  }
+
+  showNameScene() {
+    this.showWindow({
+      startupOptions: {
+        component: 'NameScene'
       },
       windowOptions: {
         width: 400,
