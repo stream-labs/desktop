@@ -8,7 +8,6 @@
     "compile": "webpack",
     "watch": "webpack --watch",
     "start": "electron .",
-    "extract-libs": "bin/extract_libs.sh",
     "rebuild": "electron-rebuild",
     "package": "webpack && node bin/package.js"
   },
