@@ -16,6 +16,12 @@ const mutations = {
     state.scenes = _.reject(state.scenes, scene => {
       return scene.name === data.sceneName;
     });
+
+    if (state.activeSceneName === data.sceneName) {
+      if (state.scenes[0]) {
+        state.activeSceneName = state.scenes[0].name;
+      }
+    }
   },
 
   MAKE_SCENE_ACTIVE(state, data) {
@@ -74,8 +80,6 @@ const actions = {
   removeScene({ commit }, data) {
     Obs.removeScene(data.sceneName);
 
-    // TODO: handle switching of active scene
-
     commit('REMOVE_SCENE', {
       sceneName: data.sceneName
     });
@@ -127,6 +131,14 @@ const getters = {
     if (getters.activeScene) {
       return getters.activeScene.activeSourceId;
     }
+  },
+
+  sceneByName(state) {
+    return sceneName => {
+      return _.find(state.scenes, scene => {
+        return scene.name === sceneName;
+      });
+    };
   }
 };
 
