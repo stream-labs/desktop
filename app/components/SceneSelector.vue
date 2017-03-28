@@ -22,6 +22,7 @@
 
 <script>
 import Selector from './Selector.vue';
+import windowManager from '../util/WindowManager.js';
 import _ from 'lodash';
 
 export default {
@@ -41,11 +42,14 @@ export default {
     },
 
     addScene() {
-      console.log('Click Add Scene');
+      windowManager.showNameScene();
     },
 
     removeScene() {
-      console.log('Click Remove Scene');
+      this.$store.dispatch({
+        type: 'removeScene',
+        sceneName: this.activeSceneName
+      });
     }
   },
 
