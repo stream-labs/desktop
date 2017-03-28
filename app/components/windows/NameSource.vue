@@ -7,8 +7,14 @@
     slot="content"
     @submit.prevent="submit">
     <p
+      v-if="!error"
       class="NameSource-label">
       Please enter the name of the source
+    </p>
+    <p
+      v-if="error"
+      class="NameSource-label NameSource-label__error">
+      {{ error }}
     </p>
     <input
       autofocus
@@ -32,26 +38,33 @@ export default {
 
   methods: {
     submit() {
-      // Choose a unique id for the source
-      const id = ipcRenderer.sendSync('getUniqueId');
+      if (this.isTaken(this.name)) {
+        this.error = 'That name is already taken';
+      } else {
+        // Choose a unique id for the source
+        const id = ipcRenderer.sendSync('getUniqueId');
 
-      this.$store.dispatch({
-        type: 'createSourceAndAddToScene',
-        sceneName: this.$store.getters.activeSceneName,
-        sourceType: this.sourceType,
-        sourceName: this.name,
-        sourceId: id
-      });
+        this.$store.dispatch({
+          type: 'createSourceAndAddToScene',
+          sceneName: this.$store.getters.activeSceneName,
+          sourceType: this.sourceType,
+          sourceName: this.name,
+          sourceId: id
+        });
 
-      windowManager.showSourceProperties(id);
+        windowManager.showSourceProperties(id);
+      }
+    },
+
+    isTaken(name) {
+      return this.$store.getters.sourceByName(name);
     }
   },
 
   data() {
     return {
-      name: namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, name => {
-        return this.$store.getters.sourceByName(name);
-      })
+      name: namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, this.isTaken),
+      error: null
     };
   },
 
@@ -67,5 +80,9 @@ export default {
 <style lang="less" scoped>
 .NameSource-label {
   margin-bottom: 10px;
+}
+
+.NameSource-label__error {
+  color: red;
 }
 </style>
