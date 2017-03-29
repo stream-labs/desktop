@@ -34,10 +34,10 @@ export default {
       });
     },
 
-    handleSort(order) {
+    handleSort(data) {
       this.$store.dispatch({
         type: 'setSceneOrder',
-        order
+        order: data.order
       });
     },
 

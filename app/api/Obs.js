@@ -56,6 +56,15 @@ class ObsApi {
     );
   }
 
+  // operation is one of:
+  // move_up
+  // move_down
+  // move_top
+  // move_bottom
+  moveSource(sourceName, operation) {
+    nodeObs.OBS_content_setSourceOrder(sourceName, operation);
+  }
+
   sourceProperties(sourceName, sourceId) {
     const properties = nodeObs.OBS_content_getSourceProperties(sourceName);
 

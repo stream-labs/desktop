@@ -31,12 +31,15 @@ export default {
   },
 
   methods: {
-    handleChange() {
+    handleChange(change) {
       let order = _.map(this.normalizedItems, item => {
         return item.value;
       });
 
-      this.$emit('sort', order);
+      this.$emit('sort', {
+        change,
+        order
+      });
     },
 
     handleSelect(index) {

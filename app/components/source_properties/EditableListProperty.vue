@@ -51,8 +51,8 @@ export default {
       this.activeItem = item;
     },
 
-    handleSort(list) {
-      this.setList(list);
+    handleSort(data) {
+      this.setList(data.order);
     },
 
     handleAdd(event) {

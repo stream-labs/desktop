@@ -55,11 +55,18 @@ export default {
       }
     },
 
-    handleSort(order) {
+    handleSort(data) {
+      let positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
+
       this.$store.dispatch({
         type: 'setSourceOrder',
         sceneName: this.$store.getters.activeSceneName,
-        order
+        order: data.order,
+        
+        // For now, we are passing this data since the OBS API
+        // uses a move-up move-down type interface.
+        sourceName: data.change.moved.element.name,
+        positionDelta
       });
     },
 

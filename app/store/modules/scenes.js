@@ -107,7 +107,17 @@ const actions = {
   },
 
   setSourceOrder({ commit }, data) {
-    // TODO: Set order in OBS
+    let operation;
+
+    if (data.positionDelta > 0) {
+      operation = 'move_down';
+    } else {
+      operation = 'move_up';
+    }
+
+    _.times(Math.abs(data.positionDelta), () => {
+      Obs.moveSource(data.sourceName, operation);
+    });
 
     commit('SET_SOURCE_ORDER', {
       sceneName: data.sceneName,
