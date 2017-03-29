@@ -4,6 +4,8 @@ if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
 
+process.env.SLOBS_VERSION = pjson.version;
+
 let obs;
 
 if (process.env.NODE_ENV === 'production') {
@@ -29,6 +31,10 @@ app.on('ready', () => {
   });
 
   mainWindow.loadURL(indexUrl);
+
+  mainWindow.on('closed', () => {
+    app.quit();
+  });
 
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
