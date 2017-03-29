@@ -62,3 +62,45 @@ yarn start
 
 The default config will stream to:
 https://www.twitch.tv/slobstest
+
+## Packaging / Distributing
+
+Currently only Windows x64 packaging is supported.
+
+### Prerequesites
+
+The packager will use whatever version of node-obs you have
+checked out in the slobs directory (at `./node-obs`).  You
+should make sure that node-obs is compiled for Windows 64-bit,
+and works properly with the currently checked out version of
+`slobs-client`.  If you're releasing, that should probably be
+the `master` branch.  You should probably try running the app
+from your dev environment to make sure everything is working
+before you start the release process.
+
+### Bumping the Version
+
+Before you release, you should bump the version.  This is done
+manually (for now) by changing the version number in the `pakcage.json`.
+Commit the changes to the `package.json`, tag the commit in the format
+of `v0.0.1`, and push the commit to the origin.
+
+### Running the Packager
+
+Make sure the app is not running in your dev environment
+before you start the packaging process.
+
+The packager can be run with the following command:
+
+```
+yarn run package
+```
+
+This will build a zipped distributable version to the `dist/`
+directory.  There is also an unzipped version in `dist/win-unpacked`.
+
+### Distributing
+
+Distributing is currently a manual process.  Take the zip
+file in `dist/` and give to whoever via Slack or some other
+file sharing service.
