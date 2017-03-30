@@ -19,8 +19,8 @@ class SourceFrame {
     return SourceFrame.getHeaderSize() + frameSize * 2; // Front + Back Buffer
   }
 
-  constructor(p_ArrayBuffer, p_frameSize) {
-    this.buffer = p_ArrayBuffer;
+  constructor(arrayBuffer, frameSize) {
+    this.buffer = arrayBuffer;
     this.fieldBuffer = new Uint32Array(this.buffer);
     this.length = this.buffer.byteLength;
 
@@ -35,8 +35,8 @@ class SourceFrame {
       });
     });
     
-    if (p_frameSize !== undefined) {
-      this.size = p_frameSize;
+    if (frameSize !== undefined) {
+      this.size = frameSize;
       this.frontOffset = SourceFrame.getHeaderSize();
       this.backOffset = SourceFrame.getHeaderSize() + this.size;
     }
