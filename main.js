@@ -33,6 +33,10 @@ app.on('ready', () => {
 
   mainWindow.loadURL(indexUrl);
 
+  mainWindow.on('closed', () => {
+    app.quit();
+  });
+
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,

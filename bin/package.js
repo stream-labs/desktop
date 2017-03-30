@@ -4,14 +4,14 @@ const builder = require("electron-builder");
 const Platform = builder.Platform;
 
 builder.build({
-  targets: Platform.WINDOWS.createTarget(),
+  targets: Platform.WINDOWS.createTarget('zip'),
   config: {
     appId: 'com.streamlabs.slobs',
     productName: 'Streamlabs OBS',
     files: [
       'bundles',
       'node_modules',
-      'public',
+      'vendor',
       'index.html',
       'main.js',
     ],

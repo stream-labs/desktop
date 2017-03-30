@@ -1,6 +1,7 @@
 <template>
 <div class="topLayout">
-  <title-bar></title-bar>
+  <title-bar
+    :windowTitle="title"/>
   <div class="topLayout-spacer bgColor-teal"></div>
   <top-nav></top-nav>
   <component class="pageContainer" :is="page">
@@ -11,6 +12,8 @@
 <script>
 import TitleBar from '../TitleBar.vue';
 import TopNav from '../TopNav.vue';
+
+const { remote } = window.require('electron');
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -26,12 +29,14 @@ export default {
     Dashboard
   },
 
+  data() {
+    return {
+      title: 'Streamlabs OBS - Version: ' + remote.process.env.SLOBS_VERSION
+    };
+  },
+
   created() {
-
-    console.log('STARTING MAIN WINDOW');
-
     this.$store.dispatch('initTestData');
-
   },
 
   computed: {
