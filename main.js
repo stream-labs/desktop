@@ -5,6 +5,7 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
+process.env.SLOBS_VERSION = pjson.version;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
@@ -229,7 +230,7 @@ function listenerFrameCallback(sourceName, frameInfo) {
   // Copy to backbuffer
   entry.data.width = frameInfo.width;
   entry.data.height = frameInfo.height;
-  entry.data.back_buffer().set(frameInfo.frame);
+  entry.data.backBuffer().set(frameInfo.frame);
   entry.data.flip();
 
   // Signal listeners
@@ -252,7 +253,7 @@ ipcMain.on('listenerRegister', (p_event, id, name) => {
     mapSourceNameToId.set(name, id);
     // Only register once.
     obs.OBS_content_subscribeSourceFrames(name, (frameInfo) => {
-      listenerFrameCallback(name, frameInfo)
+      listenerFrameCallback(name, frameInfo);
     });
   }
   mapSourceIdToSource.get(id).listeners.add(p_event.sender);
