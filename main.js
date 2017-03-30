@@ -236,7 +236,12 @@ function listenerFrameCallback(sourceName, frameInfo) {
 
   // Signal listeners
   entry.listeners.forEach((value, key, map) => {
-    value.send('listenerFlip', sourceId);
+    if (value.isDestroyed()) {
+      // Treat a destroyed window as if it unregistered
+      frameUnregister(value, sourceId);
+    } else {
+      value.send('listenerFlip', sourceId);
+    }
   });
 }
 
@@ -260,10 +265,9 @@ ipcMain.on('listenerRegister', (p_event, id, name) => {
   mapSourceIdToSource.get(id).listeners.add(p_event.sender);
 });
 
-ipcMain.on('listenerUnregister', (event, id) => {
-  // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
+function frameUnregister(listener, id) {
   if (mapSourceIdToSource.has(id)) {
-    mapSourceIdToSource.get(id).listeners.delete(event.sender);
+    mapSourceIdToSource.get(id).listeners.delete(listener);
     if (mapSourceIdToSource.get(id).listeners.size === 0) {
       // No listeners? Then we can safely remove it.
       mapSourceNameToId.delete(mapSourceIdToName.get(id));
@@ -271,4 +275,9 @@ ipcMain.on('listenerUnregister', (event, id) => {
       mapSourceIdToSource.delete(id);
     }
   }
+}
+
+ipcMain.on('listenerUnregister', (event, id) => {
+  // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
+  frameUnregister(event.sender, id);
 });
