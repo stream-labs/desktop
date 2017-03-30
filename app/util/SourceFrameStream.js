@@ -36,7 +36,8 @@ class SourceFrameStream {
         subscribers: new Map(),
         memory: null,
         region: null,
-        data: null
+        data: null,
+        localbuffer: null
       }
     }
 
@@ -79,43 +80,56 @@ class SourceFrameStream {
     let stream = this.sourceStreams[p_id];
 
     try {
-      stream.memory = new boost.interprocess.shared_memory(p_bufferName, 0, boost.interprocess.shared_memory_flags.Open);
-      stream.region = new boost.interprocess.mapped_region(stream.memory);
+      let newMemory = new boost.interprocess.shared_memory(p_bufferName, 0, boost.interprocess.shared_memory_flags.Open);
+      let newRegion = new boost.interprocess.mapped_region(newMemory);
+      let newData = new SourceFrame(newRegion.buffer());
+      if (newData.id !== p_id) {
+        console.error(`listenerReacquire: Id mismatch (${p_id}:${typeof (p_id)}) !== (${newData.id}:${typeof (newData.id)}).`, newData);
+        return;
+      }
+      console.debug(`listenerReacquire: (${p_id}:${typeof (p_id)}) reacquired '${p_bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
+
+      stream.localbuffer = new Uint8Array(newData.size);
+      store.dispatch({
+        type: 'setSourceSize',
+        sourceId: newData.id,
+        width: newData.width,
+        height: newData.height
+      });
+      stream.subscribers.forEach((p_value, p_key, p_map) => {
+        p_value({
+          width: newData.width,
+          height: newData.height,
+          format: newData.format,
+          frameBuffer: stream.localbuffer
+        });
+      });
+
+      stream.data = newData;
+      stream.region = newRegion;
+      stream.memory = newMemory;
     } catch (exc) {
       console.error(exc);
       return;
     }
-
-    stream.data = new SourceFrame(stream.region.buffer());
-    if (stream.data.id !== p_id) {
-      console.error(`listenerReacquire: Id mismatch (${p_id}:${typeof(p_id)}) !== (${stream.data.id}:${typeof(stream.data.id)}).`, stream.data);
-      return;
-    }
-    // console.log(`listenerReacquire: (${p_id}:${typeof(p_id)}) reacquired '${p_bufferName}': ${stream.data.width}x${stream.data.height}, ${stream.data.size} bytes, ${stream.data.format} format.`);
-
-    store.dispatch({
-      type: 'setSourceSize',
-      sourceId: stream.data.id,
-      width: stream.data.width,
-      height: stream.data.height
-    });
   }
 
   handleListenerFlip(p_event, p_id) {
     // console.log('listenerFlip', p_id)
     let stream = this.sourceStreams[p_id];
     if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
-      console.error(`'listenerFlip: (${p_id}:${typeof(p_id)}) received flip command with no valid stream or buffer.`);
+      console.error(`'listenerFlip: (${p_id}:${typeof (p_id)}) received flip command with no valid stream or buffer.`);
       return;
     }
+    stream.localbuffer.set(stream.data.front_buffer())
 
     stream.subscribers.forEach((p_value, p_key, p_map) => {
-      // p_value({
-      //   width: stream.data.width,
-      //   height: stream.data.height,
-      //   format: stream.data.format,
-      //   frameBuffer: stream.data.front_buffer()
-      // });
+      p_value({
+        width: stream.data.width,
+        height: stream.data.height,
+        format: stream.data.format,
+        frameBuffer: stream.localbuffer
+      });
     });
   }
 }
