@@ -42,7 +42,7 @@ const mutations = {
   ADD_SOURCE_TO_SCENE(state, data) {
     state.scenes.find(scene => { 
       return scene.name === data.sceneName;
-    }).sources.push(data.sourceId);
+    }).sources.unshift(data.sourceId);
   },
 
   REMOVE_SOURCE_FROM_ALL_SCENES(state, data) {
