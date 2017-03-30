@@ -163,9 +163,9 @@ const SourceFrame = require('./bundles/main_helpers.js').SourceFrame;
  *  "listeners" => [1,2,...]
  * }
  */
-let g_SourceMap = new Map();
-let g_IdToNameMap = new Map();
-let g_NameToIdMap = new Map();
+let mapSourceIdToSource = new Map();
+let mapSourceIdToName = new Map();
+let mapSourceNameToId = new Map();
 
 function generateUniqueSharedMemoryName(p_name) {
   // This has a very low chance of giving us the exact same string.
@@ -173,36 +173,36 @@ function generateUniqueSharedMemoryName(p_name) {
   return ("slobs" + process.pid.toString(16) + "-" + p_name + "-" + uuid);
 }
 
-function listenerMain(finfo) {
-  let sourceId = g_NameToIdMap.get(finfo.name);
+function listenerFrameCallback(frameInfo) {
+  let sourceId = mapSourceNameToId.get(frameInfo.name);
   if (sourceId === undefined) {
-    console.error("listenerMain: Source", finfo.name, "is not being listened to.");
+    console.error("listenerMain: Source", frameInfo.name, "is not being listened to.");
     return;
   }
 
-  let entry = g_SourceMap.get(sourceId);
+  let entry = mapSourceIdToSource.get(sourceId);
 
   // Test if we need to reacquire the buffer (too small)
   let shouldReacquire = false;
-  if ((entry.data == null) || (entry.data.size < finfo.frame.length)) {
+  if ((entry.data == null) || (entry.data.size < frameInfo.frame.length)) {
     shouldReacquire = true;
   }
 
   if (shouldReacquire) { // Reacquire buffer
     // Header + 2x Content (Front/Back Buffer)
-    let bufferName = generateUniqueSharedMemoryName(finfo.name);
-    let bufferSize = SourceFrame.getFullSize(finfo.frame.byteLength);
+    let bufferName = generateUniqueSharedMemoryName(frameInfo.name);
+    let bufferSize = SourceFrame.getFullSize(frameInfo.frame.byteLength);
 
     try {
       let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.Write + boost.interprocess.shared_memory_flags.Create);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
-      let newData = new SourceFrame(newRegion.buffer(), finfo.frame.byteLength);
+      let newData = new SourceFrame(newRegion.buffer(), frameInfo.frame.byteLength);
 
       // Initialize data
       newData.id = sourceId;
-      newData.width = finfo.width;
-      newData.height = finfo.height;
-      switch (finfo.format) {
+      newData.width = frameInfo.width;
+      newData.height = frameInfo.height;
+      switch (frameInfo.format) {
         case "VIDEO_FORMAT_RGBA":
           newData.format = 1;
           break;
@@ -226,9 +226,9 @@ function listenerMain(finfo) {
   }
 
   // Copy to backbuffer
-  entry.data.width = finfo.width;
-  entry.data.height = finfo.height;
-  entry.data.back_buffer().set(finfo.frame);
+  entry.data.width = frameInfo.width;
+  entry.data.height = frameInfo.height;
+  entry.data.back_buffer().set(frameInfo.frame);
   entry.data.flip();
 
   // Signal listeners
@@ -240,30 +240,32 @@ function listenerMain(finfo) {
 ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
   // console.log("listenerRegister:", p_id, p_name);
 
-  if (!g_SourceMap.has(p_id)) {
-    g_SourceMap.set(p_id, {
+  if (!mapSourceIdToSource.has(p_id)) {
+    mapSourceIdToSource.set(p_id, {
       memory: null,
       region: null,
       data: null,
       listeners: new Set()
     });
-    g_IdToNameMap.set(p_id, p_name);
-    g_NameToIdMap.set(p_name, p_id);
+    mapSourceIdToName.set(p_id, p_name);
+    mapSourceNameToId.set(p_name, p_id);
     // Only register once.
-    obs.OBS_content_subscribeSourceFrames(p_name, listenerMain);
+    obs.OBS_content_subscribeSourceFrames(p_name, (frameInfo) => {
+      listenerFrameCallback(p_name, frameInfo)
+    });
   }
-  g_SourceMap.get(p_id).listeners.add(p_event.sender);
+  mapSourceIdToSource.get(p_id).listeners.add(p_event.sender);
 });
 
 ipcMain.on('listenerUnregister', (p_event, p_id) => {
   // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
-  if (g_SourceMap.has(p_id)) {
-    g_SourceMap.get(p_id).listeners.delete(p_event.sender);
-    if (g_SourceMap.get(p_id).listeners.size === 0) {
+  if (mapSourceIdToSource.has(p_id)) {
+    mapSourceIdToSource.get(p_id).listeners.delete(p_event.sender);
+    if (mapSourceIdToSource.get(p_id).listeners.size === 0) {
       // No listeners? Then we can safely remove it.
-      g_NameToIdMap.delete(g_IdToNameMap.get(p_id));
-      g_IdToNameMap.delete(p_id);
-      g_SourceMap.delete(p_id);
+      mapSourceNameToId.delete(mapSourceIdToName.get(p_id));
+      mapSourceIdToName.delete(p_id);
+      mapSourceIdToSource.delete(p_id);
     }
   }
 });
