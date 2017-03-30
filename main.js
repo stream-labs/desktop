@@ -202,8 +202,8 @@ function listenerFrameCallback(sourceName, frameInfo) {
 
       // Initialize data
       newData.id = sourceId;
-      newData.width = frameInfo.width;
-      newData.height = frameInfo.height;
+      newData.width = parseInt(frameInfo.width);
+      newData.height = parseInt(frameInfo.height);
       switch (frameInfo.format) {
         case "VIDEO_FORMAT_RGBA":
           newData.format = 1;
@@ -228,8 +228,9 @@ function listenerFrameCallback(sourceName, frameInfo) {
   }
 
   // Copy to backbuffer
-  entry.data.width = frameInfo.width;
-  entry.data.height = frameInfo.height;
+  entry.data.width = parseInt(frameInfo.width);
+  entry.data.height = parseInt(frameInfo.height);
+  entry.data.size = frameInfo.frame.byteLength;
   entry.data.backBuffer().set(frameInfo.frame);
   entry.data.flip();
 
