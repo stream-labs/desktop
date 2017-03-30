@@ -6,8 +6,8 @@ class SourceFrame {
       'id',
       'width',
       'height',
-      'size',
       'format',
+      'size',
       'front_offset',    // Front Buffer (Renderer)
       'back_offset'      // Back Buffer (Main Process)
     ];
@@ -19,12 +19,10 @@ class SourceFrame {
     return SourceFrame.getHeaderSize() + frameSize * 2; // Front + Back Buffer
   }
 
-  constructor(p_ArrayBuffer) {
+  constructor(p_ArrayBuffer, p_frameSize) {
     this.buffer = p_ArrayBuffer;
-    this.viewBuffer = new Uint8Array(this.buffer);
     this.fieldBuffer = new Uint32Array(this.buffer);
-
-    this.length = this.buffer.length;
+    this.length = this.buffer.byteLength;
 
     SourceFrame.fields().forEach((field, index) => {
       Object.defineProperty(this, field, {
@@ -36,16 +34,22 @@ class SourceFrame {
         }
       });
     });
+    
+    if (p_frameSize !== undefined) {
+      this.size = p_frameSize;
+      this.front_offset = SourceFrame.getHeaderSize();
+      this.back_offset = SourceFrame.getHeaderSize() + this.size;
+    }
   }
 
   front_buffer() {
-    return this.viewBuffer.slice(this['front_offset'], this['size']);
+    return new Uint8Array(this.buffer, this.front_offset, this.size);
   }
   back_buffer() {
-    return this.viewBuffer.slice(this['back_offset'], this['size']);
+    return new Uint8Array(this.buffer, this.back_offset, this.size);
   }
   flip() {
-    this['front_offset'], this['back_offset'] = this['back_offset'], this['front_offset'];
+    this.front_offset, this.back_offset = this.back_offset, this.front_offset;
   }
 }
 
