@@ -21,8 +21,8 @@ class SourceFrame {
 
   constructor(arrayBuffer, frameSize) {
     this.buffer = arrayBuffer;
-    this.fieldBuffer = new Uint32Array(this.buffer);
     this.length = this.buffer.byteLength;
+    this.fieldBuffer = new Uint32Array(this.buffer);
 
     SourceFrame.fields().forEach((field, index) => {
       Object.defineProperty(this, field, {
@@ -42,10 +42,10 @@ class SourceFrame {
     }
   }
 
-  front_buffer() {
+  frontBuffer() {
     return new Uint8Array(this.buffer, this.frontOffset, this.size);
   }
-  back_buffer() {
+  backBuffer() {
     return new Uint8Array(this.buffer, this.backOffset, this.size);
   }
   flip() {
