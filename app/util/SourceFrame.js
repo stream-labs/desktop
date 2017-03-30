@@ -12,6 +12,12 @@ class SourceFrame {
       'back_offset'      // Back Buffer (Main Process)
     ];
   }
+  static getHeaderSize() {
+    return SourceFrame.fields().length * 4; // Uint32
+  }
+  static getFullSize(frameSize) {
+    return SourceFrame.getHeaderSize() + frameSize * 2; // Front + Back Buffer
+  }
 
   constructor(p_ArrayBuffer) {
     this.buffer = p_ArrayBuffer;
