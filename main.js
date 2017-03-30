@@ -175,17 +175,16 @@ function generateUniqueSharedMemoryName(p_name) {
 
 function listenerMain(finfo) {
   let sourceId = g_NameToIdMap.get(finfo.name);
-
   if (sourceId === undefined) {
     console.error("listenerMain: Source", finfo.name, "is not being listened to.");
     return;
   }
+
   let entry = g_SourceMap.get(sourceId);
 
   // Test if we need to reacquire the buffer (too small)
   let shouldReacquire = false;
-  if ((entry.data == null)
-    || (entry.data.size < finfo.frame.length)) {
+  if ((entry.data == null) || (entry.data.size < finfo.frame.length)) {
     shouldReacquire = true;
   }
 
@@ -193,17 +192,16 @@ function listenerMain(finfo) {
     // Header + 2x Content (Front/Back Buffer)
     let bufferName = generateUniqueSharedMemoryName(finfo.name);
     let bufferSize = SourceFrame.getFullSize(finfo.frame.byteLength);
-    
+
     try {
       let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.Write + boost.interprocess.shared_memory_flags.Create);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
-      let newData = new SourceFrame(newRegion.buffer());
+      let newData = new SourceFrame(newRegion.buffer(), finfo.frame.byteLength);
 
       // Initialize data
       newData.id = sourceId;
       newData.width = finfo.width;
       newData.height = finfo.height;
-      newData.size = finfo.frame.byteLength;
       switch (finfo.format) {
         case "VIDEO_FORMAT_RGBA":
           newData.format = 1;
@@ -212,14 +210,12 @@ function listenerMain(finfo) {
           newData.format = 0; // Should be using a FourCharacterCode (FourCC) for this.
           break;
       }
-      newData.front_offset = SourceFrame.getHeaderSize();
-      newData.back_offset = SourceFrame.getHeaderSize() + finfo.frame.byteLength;
 
       // Signal listeners
       entry.listeners.forEach((p_value, p_key, p_map) => {
         p_value.send('listenerReacquire', sourceId, bufferName);
       });
-      
+
       entry.data = newData;
       entry.region = newRegion;
       entry.memory = newMemory;
@@ -228,16 +224,17 @@ function listenerMain(finfo) {
       return;
     }
   }
-  
+
   // Copy to backbuffer
-  entry.data.size = finfo.frame.byteLength;
+  entry.data.width = finfo.width;
+  entry.data.height = finfo.height;
   entry.data.back_buffer().set(finfo.frame);
   entry.data.flip();
 
   // Signal listeners
   entry.listeners.forEach((p_value, p_key, p_map) => {
     p_value.send('listenerFlip', sourceId);
-  });  
+  });
 }
 
 ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
@@ -252,10 +249,10 @@ ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
     });
     g_IdToNameMap.set(p_id, p_name);
     g_NameToIdMap.set(p_name, p_id);
+    // Only register once.
+    obs.OBS_content_subscribeSourceFrames(p_name, listenerMain);
   }
   g_SourceMap.get(p_id).listeners.add(p_event.sender);
-
-  obs.OBS_content_subscribeSourceFrames(p_name, frame => { listenerMain(frame); });
 });
 
 ipcMain.on('listenerUnregister', (p_event, p_id) => {
