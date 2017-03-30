@@ -1,9 +1,20 @@
 const net = window.require('net');
 const { ipcRenderer } = window.require('electron');
+const boost = window.require('node-boost');
 
-import SourceFrameHeader from './SourceFrameHeader.js';
+import SourceFrame from './SourceFrame.js';
 import _ from 'lodash';
 import store from '../store';
+
+// ToDo: These two functions seem to fix the this object disappearing in a method call.
+function handleListenerReacquireWrapper(obj, event, id, bufferName) {
+  obj.handleListenerReacquire(event, parseInt(id), bufferName);
+}
+
+function handleListenerFlipWrapper(obj, event, id) {
+  obj.handleListenerFlip(event, parseInt(id));
+}
+
 
 class SourceFrameStream {
 
@@ -11,17 +22,6 @@ class SourceFrameStream {
     // Object for keeping track of active streams.
     // Keyed by source id
     this.sourceStreams = {};
-
-    // All headers will be read into this buffer
-    this.header = new SourceFrameHeader();
-
-    // This is the buffer we are currently trying to fill
-    // from the TCP socket.
-    this.currentBuffer = this.header.buffer;
-
-    // This represents how far into the current buffer
-    // we are.
-    this.currentOffset = 0;
   }
 
   /*                         *
@@ -32,130 +32,111 @@ class SourceFrameStream {
   // A subscribed id will be returned, which can be
   // used to unsubscribe.
   subscribe(sourceId, callback) {
-    // Ensure we are connected to the main process
-    this.ensureSocketConnection();
+    sourceId = parseInt(sourceId); // toDo: We get the sourceId as a string for an unknown reason.
 
-    // Ensure we are streaming the requested source
-    this.ensureSourceStream(sourceId);
+    if (!this.sourceStreams[sourceId]) {
+      this.sourceStreams[sourceId] = {
+        subscribers: new Map(),
+        memory: null,
+        region: null,
+        data: null,
+        localBuffer: null
+      }
+    }
 
     let subscriberId = _.uniqueId();
     let stream = this.sourceStreams[sourceId];
 
-    stream.subscribers[subscriberId] = callback;
+    // IPC Signal
+    ipcRenderer.send('listenerRegister', sourceId, store.state.sources.sources[sourceId].name);
+    ipcRenderer.on('listenerReacquire', (event, id, bufferName) => {
+      handleListenerReacquireWrapper(this, event, id, bufferName);
+    });
+    ipcRenderer.on('listenerFlip', (event, id) => {
+      handleListenerFlipWrapper(this, event, id);
+    });
 
+    stream.subscribers.set(subscriberId, callback);
     return subscriberId;
   }
 
   // sourceId isn't technically required, but it makes
   // it faster/easier to find their subscriber id
   unsubscribe(sourceId, subscriberId) {
+    sourceId = parseInt(sourceId); // toDo: We get the sourceId as a string for an unknown reason.
+
     let stream = this.sourceStreams[sourceId];
 
-    delete stream.subscribers[subscriberId];
+    // IPC Signal
+    ipcRenderer.send('listenerUnregister', sourceId);
 
-    // TODO: We may want to unsubscribe from frames entirely
-    // once the last subscriber has unsubscribed.
+    stream.subscribers.delete(subscriberId);
   }
 
   /*         *
    * PRIVATE *
    *         */
 
-  // The socket is started lazily
-  ensureSocketConnection() {
-    if (!this.connected) {
-      this.connected = true;
+  handleListenerReacquire(event, id, bufferName) {
+    // console.log('listenerReacquire', p_id)
+    let stream = this.sourceStreams[id];
 
-      let socket = new net.Socket();
+    try {
+      let newMemory = new boost.interprocess.shared_memory(bufferName, 0, boost.interprocess.shared_memory_flags.Open + boost.interprocess.shared_memory_flags.Write);
+      let newRegion = new boost.interprocess.mapped_region(newMemory);
+      let newData = new SourceFrame(newRegion.buffer());
+      if (newData.id !== id) {
+        console.error(`listenerReacquire: Id mismatch (${id}:${typeof (id)}) !== (${newData.id}:${typeof (newData.id)}).`, newData);
+        return;
+      }
+      console.debug(`listenerReacquire: (${id}:${typeof (id)}) reacquired '${bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
 
-      socket.on('data', chunk => {
-        this.handleChunk(chunk);
+      // Temporary Fix: WebGL crashes due to reading old buffer...
+      stream.localBuffer = new Uint8Array(newData.size);
+      // ToDo: Figure out how this even works.
+      store.dispatch({
+        type: 'setSourceSize',
+        sourceId: newData.id,
+        width: newData.width,
+        height: newData.height
       });
-
-      socket.connect(ipcRenderer.sendSync('getSocketPath'));
-    }
-  }
-
-  // Streams for each source are started lazily
-  ensureSourceStream(sourceId) {
-    if (!this.sourceStreams[sourceId]) {
-      this.sourceStreams[sourceId] = {
-        subscribers: {},
-        frameBuffer: null
-      };
-
-      let sourceName = store.state.sources.sources[sourceId].name;
-
-      ipcRenderer.send('subscribeToSource', {
-        name: sourceName,
-        id: sourceId
-      });
-    }
-  }
-
-  processBuffer() {
-    // If we just processed a source frame
-    if (this.currentSourceId) {
-      let stream = this.sourceStreams[this.currentSourceId];
-
-      _.each(stream.subscribers, callback => {
-        _.defer(callback, {
-          width: this.header.width,
-          height: this.header.height,
-          format: this.header.format,
-          frameBuffer: stream.frameBuffer
+      stream.subscribers.forEach((value, key, map) => {
+        value({
+          width: newData.width,
+          height: newData.height,
+          format: newData.format,
+          frameBuffer: stream.localBuffer
         });
       });
 
-      this.currentSourceId = null;
-      this.currentBuffer = this.header.buffer;
-
-    // Otherwise we processed a header
-    } else {
-      this.currentSourceId = this.header.id.toString();
-      let stream = this.sourceStreams[this.currentSourceId];
-
-      // If the frame buffer does not exist yet, or is not correctly
-      // sized for the incoming frame, allocate a new framebuffer
-      if (!stream.frameBuffer || (stream.frameBuffer.length !== this.header.frameLength)) {
-        stream.frameBuffer = new Uint8Array(this.header.frameLength);
-      }
-
-      this.currentBuffer = stream.frameBuffer;
-
-      let source = store.state.sources.sources[this.currentSourceId];
-
-      // If the width of the incoming frame is different,
-      // let the vuex store know about the new source size.
-      if ((source.width !== this.header.width) || source.height !== this.header.height) {
-        store.dispatch({
-          type: 'setSourceSize',
-          sourceId: source.id,
-          width: this.header.width,
-          height: this.header.height
-        });
-      }
+      stream.data = newData;
+      stream.region = newRegion;
+      stream.memory = newMemory;
+    } catch (exc) {
+      console.error(exc);
+      return;
     }
-
-    this.currentOffset = 0;
   }
 
-  handleChunk(chunk) {
-    if ((chunk.length + this.currentOffset) >= this.currentBuffer.length) {
-      let boundary = this.currentBuffer.length - this.currentOffset;
-
-      let finalChunk = chunk.subarray(0, boundary);
-      let overflow = chunk.subarray(boundary);
-
-      this.currentBuffer.set(finalChunk, this.currentOffset);
-
-      this.processBuffer();
-
-      this.handleChunk(overflow);
-    } else {
-      this.currentBuffer.set(chunk, this.currentOffset);
-      this.currentOffset += chunk.length;
+  handleListenerFlip(event, id) {
+    // console.log('listenerFlip', p_id)
+    let stream = this.sourceStreams[id];
+    if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
+      console.error(`'listenerFlip: (${id}:${typeof (id)}) received flip command with no valid stream or buffer.`);
+      return;
     }
+    // Temporary Fix: WebGL crashes due to reading old buffer...
+    stream.localBuffer.set(stream.data.frontBuffer())
+
+    // ToDo: Figure out how this even works.
+    stream.subscribers.forEach((p_value, p_key, p_map) => {
+      p_value({
+        width: stream.data.width,
+        height: stream.data.height,
+        format: stream.data.format,
+        frameBuffer: stream.localBuffer
+      });
+    });
   }
 }
 
