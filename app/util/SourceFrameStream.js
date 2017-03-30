@@ -7,11 +7,11 @@ import _ from 'lodash';
 import store from '../store';
 
 function handleListenerReacquire(p_obj, p_event, p_id, p_bufferName) {
-  p_obj.handleListenerReacquire(p_event, p_id, p_bufferName);
+  p_obj.handleListenerReacquire(p_event, parseInt(p_id), p_bufferName);
 }
 
 function handleListenerFlip(p_obj, p_event, p_id) {
-  p_obj.handleListenerFlip(p_event, p_id);
+  p_obj.handleListenerFlip(p_event, parseInt(p_id));
 }
 
 
@@ -60,7 +60,7 @@ class SourceFrameStream {
   // it faster/easier to find their subscriber id
   unsubscribe(sourceId, subscriberId) {
     // ToDo: sourceId is undefined?
-    console.log(sourceId);
+    // console.log(sourceId);
 
     let stream = this.sourceStreams[sourceId];
 
@@ -75,31 +75,47 @@ class SourceFrameStream {
    *         */
 
   handleListenerReacquire(p_event, p_id, p_bufferName) {
-    console.log('listenerReacquire', p_id)
+    // console.log('listenerReacquire', p_id)
     let stream = this.sourceStreams[p_id];
 
     try {
       stream.memory = new boost.interprocess.shared_memory(p_bufferName, 0, boost.interprocess.shared_memory_flags.Open);
       stream.region = new boost.interprocess.mapped_region(stream.memory);
-      stream.data = new SourceFrame(stream.region.buffer());
     } catch (exc) {
       console.error(exc);
       return;
     }
 
-    console.log(stream.data);
+    stream.data = new SourceFrame(stream.region.buffer());
+    if (stream.data.id !== p_id) {
+      console.error(`listenerReacquire: Id mismatch (${p_id}:${typeof(p_id)}) !== (${stream.data.id}:${typeof(stream.data.id)}).`, stream.data);
+      return;
+    }
+    // console.log(`listenerReacquire: (${p_id}:${typeof(p_id)}) reacquired '${p_bufferName}': ${stream.data.width}x${stream.data.height}, ${stream.data.size} bytes, ${stream.data.format} format.`);
+
+    store.dispatch({
+      type: 'setSourceSize',
+      sourceId: stream.data.id,
+      width: stream.data.width,
+      height: stream.data.height
+    });
   }
 
   handleListenerFlip(p_event, p_id) {
-    console.log('listenerFlip', p_id)
+    // console.log('listenerFlip', p_id)
     let stream = this.sourceStreams[p_id];
+    if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
+      console.error(`'listenerFlip: (${p_id}:${typeof(p_id)}) received flip command with no valid stream or buffer.`);
+      return;
+    }
+
     stream.subscribers.forEach((p_value, p_key, p_map) => {
-      p_value({
-        width: stream.data.width,
-        height: stream.data.height,
-        format: stream.data.format,
-        frameBuffer: stream.data.front_buffer()
-      });
+      // p_value({
+      //   width: stream.data.width,
+      //   height: stream.data.height,
+      //   format: stream.data.format,
+      //   frameBuffer: stream.data.front_buffer()
+      // });
     });
   }
 }
