@@ -6,12 +6,13 @@ import SourceFrame from './SourceFrame.js';
 import _ from 'lodash';
 import store from '../store';
 
-function handleListenerReacquire(p_obj, p_event, p_id, p_bufferName) {
-  p_obj.handleListenerReacquire(p_event, parseInt(p_id), p_bufferName);
+// ToDo: These two functions seem to fix the this object disappearing in a method call.
+function handleListenerReacquireWrapper(obj, event, id, bufferName) {
+  obj.handleListenerReacquire(event, parseInt(id), bufferName);
 }
 
-function handleListenerFlip(p_obj, p_event, p_id) {
-  p_obj.handleListenerFlip(p_event, parseInt(p_id));
+function handleListenerFlipWrapper(obj, event, id) {
+  obj.handleListenerFlip(event, parseInt(id));
 }
 
 
@@ -48,11 +49,11 @@ class SourceFrameStream {
 
     // IPC Signal
     ipcRenderer.send('listenerRegister', sourceId, store.state.sources.sources[sourceId].name);
-    ipcRenderer.on('listenerReacquire', (p_event, p_id, p_bufferName) => {
-      handleListenerReacquire(this, p_event, p_id, p_bufferName);
+    ipcRenderer.on('listenerReacquire', (event, id, bufferName) => {
+      handleListenerReacquireWrapper(this, event, id, bufferName);
     });
-    ipcRenderer.on('listenerFlip', (p_event, p_id) => {
-      handleListenerFlip(this, p_event, p_id);
+    ipcRenderer.on('listenerFlip', (event, id) => {
+      handleListenerFlipWrapper(this, event, id);
     });
 
     stream.subscribers.set(subscriberId, callback);
@@ -76,19 +77,19 @@ class SourceFrameStream {
    * PRIVATE *
    *         */
 
-  handleListenerReacquire(p_event, p_id, p_bufferName) {
+  handleListenerReacquire(event, id, bufferName) {
     // console.log('listenerReacquire', p_id)
-    let stream = this.sourceStreams[p_id];
+    let stream = this.sourceStreams[id];
 
     try {
-      let newMemory = new boost.interprocess.shared_memory(p_bufferName, 0, boost.interprocess.shared_memory_flags.Open);
+      let newMemory = new boost.interprocess.shared_memory(bufferName, 0, boost.interprocess.shared_memory_flags.Open);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
       let newData = new SourceFrame(newRegion.buffer());
-      if (newData.id !== p_id) {
-        console.error(`listenerReacquire: Id mismatch (${p_id}:${typeof (p_id)}) !== (${newData.id}:${typeof (newData.id)}).`, newData);
+      if (newData.id !== id) {
+        console.error(`listenerReacquire: Id mismatch (${id}:${typeof (id)}) !== (${newData.id}:${typeof (newData.id)}).`, newData);
         return;
       }
-      console.debug(`listenerReacquire: (${p_id}:${typeof (p_id)}) reacquired '${p_bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
+      console.debug(`listenerReacquire: (${id}:${typeof (id)}) reacquired '${bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
 
       // Temporary Fix: WebGL crashes due to reading old buffer...
       stream.localbuffer = new Uint8Array(newData.size);
@@ -100,8 +101,8 @@ class SourceFrameStream {
         width: newData.width,
         height: newData.height
       });
-      stream.subscribers.forEach((p_value, p_key, p_map) => {
-        p_value({
+      stream.subscribers.forEach((value, key, map) => {
+        value({
           width: newData.width,
           height: newData.height,
           format: newData.format,
@@ -118,16 +119,16 @@ class SourceFrameStream {
     }
   }
 
-  handleListenerFlip(p_event, p_id) {
+  handleListenerFlip(event, id) {
     // console.log('listenerFlip', p_id)
-    let stream = this.sourceStreams[p_id];
+    let stream = this.sourceStreams[id];
     if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
-      console.error(`'listenerFlip: (${p_id}:${typeof (p_id)}) received flip command with no valid stream or buffer.`);
+      console.error(`'listenerFlip: (${id}:${typeof (id)}) received flip command with no valid stream or buffer.`);
       return;
     }
     // Temporary Fix: WebGL crashes due to reading old buffer...
     stream.localBuffer.set(stream.data.front_buffer())
-    
+
     // ToDo: Figure out how this even works.
     stream.subscribers.forEach((p_value, p_key, p_map) => {
       p_value({

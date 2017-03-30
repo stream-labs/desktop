@@ -212,8 +212,8 @@ function listenerFrameCallback(frameInfo) {
       }
 
       // Signal listeners
-      entry.listeners.forEach((p_value, p_key, p_map) => {
-        p_value.send('listenerReacquire', sourceId, bufferName);
+      entry.listeners.forEach((value, key, map) => {
+        value.send('listenerReacquire', sourceId, bufferName);
       });
 
       entry.data = newData;
@@ -232,40 +232,40 @@ function listenerFrameCallback(frameInfo) {
   entry.data.flip();
 
   // Signal listeners
-  entry.listeners.forEach((p_value, p_key, p_map) => {
-    p_value.send('listenerFlip', sourceId);
+  entry.listeners.forEach((value, key, map) => {
+    value.send('listenerFlip', sourceId);
   });
 }
 
-ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
+ipcMain.on('listenerRegister', (p_event, id, name) => {
   // console.log("listenerRegister:", p_id, p_name);
 
-  if (!mapSourceIdToSource.has(p_id)) {
-    mapSourceIdToSource.set(p_id, {
+  if (!mapSourceIdToSource.has(id)) {
+    mapSourceIdToSource.set(id, {
       memory: null,
       region: null,
       data: null,
       listeners: new Set()
     });
-    mapSourceIdToName.set(p_id, p_name);
-    mapSourceNameToId.set(p_name, p_id);
+    mapSourceIdToName.set(id, name);
+    mapSourceNameToId.set(name, id);
     // Only register once.
-    obs.OBS_content_subscribeSourceFrames(p_name, (frameInfo) => {
-      listenerFrameCallback(p_name, frameInfo)
+    obs.OBS_content_subscribeSourceFrames(name, (frameInfo) => {
+      listenerFrameCallback(name, frameInfo)
     });
   }
-  mapSourceIdToSource.get(p_id).listeners.add(p_event.sender);
+  mapSourceIdToSource.get(id).listeners.add(p_event.sender);
 });
 
-ipcMain.on('listenerUnregister', (p_event, p_id) => {
+ipcMain.on('listenerUnregister', (event, id) => {
   // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
-  if (mapSourceIdToSource.has(p_id)) {
-    mapSourceIdToSource.get(p_id).listeners.delete(p_event.sender);
-    if (mapSourceIdToSource.get(p_id).listeners.size === 0) {
+  if (mapSourceIdToSource.has(id)) {
+    mapSourceIdToSource.get(id).listeners.delete(event.sender);
+    if (mapSourceIdToSource.get(id).listeners.size === 0) {
       // No listeners? Then we can safely remove it.
-      mapSourceNameToId.delete(mapSourceIdToName.get(p_id));
-      mapSourceIdToName.delete(p_id);
-      mapSourceIdToSource.delete(p_id);
+      mapSourceNameToId.delete(mapSourceIdToName.get(id));
+      mapSourceIdToName.delete(id);
+      mapSourceIdToSource.delete(id);
     }
   }
 });
