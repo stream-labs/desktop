@@ -92,8 +92,7 @@ class SourceFrameStream {
       console.debug(`listenerReacquire: (${id}:${typeof (id)}) reacquired '${bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
 
       // Temporary Fix: WebGL crashes due to reading old buffer...
-      stream.localbuffer = new Uint8Array(newData.size);
-
+      stream.localBuffer = new Uint8Array(newData.size);
       // ToDo: Figure out how this even works.
       store.dispatch({
         type: 'setSourceSize',
