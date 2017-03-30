@@ -192,20 +192,28 @@ function listenerMain(finfo) {
   if (shouldReacquire) { // Reacquire buffer
     // Header + 2x Content (Front/Back Buffer)
     let bufferName = generateUniqueSharedMemoryName(finfo.name);
-    let bufferSize = (finfo.frame.byteLength * 2) + (SourceFrame.fields().length * 4);
-
+    let bufferSize = SourceFrame.getFullSize(finfo.frame.byteLength);
+    
     try {
       let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.Write + boost.interprocess.shared_memory_flags.Create);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
       let newData = new SourceFrame(newRegion.buffer());
 
       // Initialize data
-      newData.id = entry.id;
+      newData.id = sourceId;
       newData.width = finfo.width;
       newData.height = finfo.height;
-      newData.size = finfo.frame.length;
-      newData.front_offset = (SourceFrame.fields.size * 4);
-      newData.back_offset = (SourceFrame.fields.size * 4) + finfo.frame.length;
+      newData.size = finfo.frame.byteLength;
+      switch (finfo.format) {
+        case "VIDEO_FORMAT_RGBA":
+          newData.format = 1;
+          break;
+        default:
+          newData.format = 0; // Should be using a FourCharacterCode (FourCC) for this.
+          break;
+      }
+      newData.front_offset = SourceFrame.getHeaderSize();
+      newData.back_offset = SourceFrame.getHeaderSize() + finfo.frame.byteLength;
 
       // Signal listeners
       entry.listeners.forEach((p_value, p_key, p_map) => {
@@ -222,6 +230,7 @@ function listenerMain(finfo) {
   }
   
   // Copy to backbuffer
+  entry.data.size = finfo.frame.byteLength;
   entry.data.back_buffer().set(finfo.frame);
   entry.data.flip();
 
@@ -232,7 +241,7 @@ function listenerMain(finfo) {
 }
 
 ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
-  console.log("listenerRegister:", p_id, p_name);
+  // console.log("listenerRegister:", p_id, p_name);
 
   if (!g_SourceMap.has(p_id)) {
     g_SourceMap.set(p_id, {
@@ -250,7 +259,7 @@ ipcMain.on('listenerRegister', (p_event, p_id, p_name) => {
 });
 
 ipcMain.on('listenerUnregister', (p_event, p_id) => {
-  console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
+  // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
   if (g_SourceMap.has(p_id)) {
     g_SourceMap.get(p_id).listeners.delete(p_event.sender);
     if (g_SourceMap.get(p_id).listeners.size === 0) {
