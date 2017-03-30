@@ -31,13 +31,15 @@ class SourceFrameStream {
   // A subscribed id will be returned, which can be
   // used to unsubscribe.
   subscribe(sourceId, callback) {
+    sourceId = parseInt(sourceId); // toDo: We get the sourceId as a string for an unknown reason.
+
     if (!this.sourceStreams[sourceId]) {
       this.sourceStreams[sourceId] = {
         subscribers: new Map(),
         memory: null,
         region: null,
         data: null,
-        localbuffer: null
+        localBuffer: null
       }
     }
 
@@ -60,8 +62,7 @@ class SourceFrameStream {
   // sourceId isn't technically required, but it makes
   // it faster/easier to find their subscriber id
   unsubscribe(sourceId, subscriberId) {
-    // ToDo: sourceId is undefined?
-    // console.log(sourceId);
+    sourceId = parseInt(sourceId); // toDo: We get the sourceId as a string for an unknown reason.
 
     let stream = this.sourceStreams[sourceId];
 
@@ -89,7 +90,10 @@ class SourceFrameStream {
       }
       console.debug(`listenerReacquire: (${p_id}:${typeof (p_id)}) reacquired '${p_bufferName}': ${newData.width}x${newData.height}, ${newData.size} bytes, ${newData.format} format.`);
 
+      // Temporary Fix: WebGL crashes due to reading old buffer...
       stream.localbuffer = new Uint8Array(newData.size);
+
+      // ToDo: Figure out how this even works.
       store.dispatch({
         type: 'setSourceSize',
         sourceId: newData.id,
@@ -101,7 +105,7 @@ class SourceFrameStream {
           width: newData.width,
           height: newData.height,
           format: newData.format,
-          frameBuffer: stream.localbuffer
+          frameBuffer: stream.localBuffer
         });
       });
 
@@ -121,14 +125,16 @@ class SourceFrameStream {
       console.error(`'listenerFlip: (${p_id}:${typeof (p_id)}) received flip command with no valid stream or buffer.`);
       return;
     }
-    stream.localbuffer.set(stream.data.front_buffer())
-
+    // Temporary Fix: WebGL crashes due to reading old buffer...
+    stream.localBuffer.set(stream.data.front_buffer())
+    
+    // ToDo: Figure out how this even works.
     stream.subscribers.forEach((p_value, p_key, p_map) => {
       p_value({
         width: stream.data.width,
         height: stream.data.height,
         format: stream.data.format,
-        frameBuffer: stream.localbuffer
+        frameBuffer: stream.localBuffer
       });
     });
   }
