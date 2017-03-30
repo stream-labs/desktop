@@ -8,8 +8,8 @@ class SourceFrame {
       'height',
       'format',
       'size',
-      'front_offset',    // Front Buffer (Renderer)
-      'back_offset'      // Back Buffer (Main Process)
+      'frontOffset',    // Front Buffer (Renderer)
+      'backOffset'      // Back Buffer (Main Process)
     ];
   }
   static getHeaderSize() {
@@ -37,19 +37,19 @@ class SourceFrame {
     
     if (p_frameSize !== undefined) {
       this.size = p_frameSize;
-      this.front_offset = SourceFrame.getHeaderSize();
-      this.back_offset = SourceFrame.getHeaderSize() + this.size;
+      this.frontOffset = SourceFrame.getHeaderSize();
+      this.backOffset = SourceFrame.getHeaderSize() + this.size;
     }
   }
 
   front_buffer() {
-    return new Uint8Array(this.buffer, this.front_offset, this.size);
+    return new Uint8Array(this.buffer, this.frontOffset, this.size);
   }
   back_buffer() {
-    return new Uint8Array(this.buffer, this.back_offset, this.size);
+    return new Uint8Array(this.buffer, this.backOffset, this.size);
   }
   flip() {
-    this.front_offset, this.back_offset = this.back_offset, this.front_offset;
+    this.frontOffset, this.backOffset = this.backOffset, this.frontOffset;
   }
 }
 
