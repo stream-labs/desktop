@@ -82,7 +82,7 @@ class SourceFrameStream {
     let stream = this.sourceStreams[id];
 
     try {
-      let newMemory = new boost.interprocess.shared_memory(bufferName, 0, boost.interprocess.shared_memory_flags.Open);
+      let newMemory = new boost.interprocess.shared_memory(bufferName, 0, boost.interprocess.shared_memory_flags.Open + boost.interprocess.shared_memory_flags.Write);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
       let newData = new SourceFrame(newRegion.buffer());
       if (newData.id !== id) {
@@ -126,7 +126,7 @@ class SourceFrameStream {
       return;
     }
     // Temporary Fix: WebGL crashes due to reading old buffer...
-    stream.localBuffer.set(stream.data.front_buffer())
+    stream.localBuffer.set(stream.data.frontBuffer())
 
     // ToDo: Figure out how this even works.
     stream.subscribers.forEach((p_value, p_key, p_map) => {
