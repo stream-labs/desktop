@@ -173,8 +173,9 @@ function generateUniqueSharedMemoryName(p_name) {
   return ("slobs" + process.pid.toString(16) + "-" + p_name + "-" + uuid);
 }
 
-function listenerFrameCallback(frameInfo) {
-  let sourceId = mapSourceNameToId.get(frameInfo.name);
+function listenerFrameCallback(sourceName, frameInfo) {
+  //let sourceId = mapSourceNameToId.get(frameInfo.name); // Requires https://github.com/twitchalerts/node-obs/pull/16
+  let sourceId = mapSourceNameToId.get(sourceName);
   if (sourceId === undefined) {
     console.error("listenerMain: Source", frameInfo.name, "is not being listened to.");
     return;
