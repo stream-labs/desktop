@@ -185,12 +185,7 @@ function listenerFrameCallback(sourceName, frameInfo) {
   let entry = mapSourceIdToSource.get(sourceId);
 
   // Test if we need to reacquire the buffer (too small)
-  let shouldReacquire = false;
-  if ((entry.data == null) || (entry.data.size < frameInfo.frame.byteLength)) {
-    shouldReacquire = true;
-  }
-
-  if (shouldReacquire) { // Reacquire buffer
+  if ((entry.data == null) || (entry.data.size < frameInfo.frame.byteLength)) { // Reacquire buffer
     // Header + 2x Content (Front/Back Buffer)
     let bufferName = generateUniqueSharedMemoryName(frameInfo.name);
     let bufferSize = SourceFrame.getFullSize(frameInfo.frame.byteLength);
@@ -225,6 +220,12 @@ function listenerFrameCallback(sourceName, frameInfo) {
       console.error(exc);
       return;
     }
+  }
+  if ((entry.data.width !== frameInfo.width) || (entry.data.height !== frameInfo.height)) {
+      // Signal listeners
+      entry.listeners.forEach((value, key, map) => {
+        value.send('listenerResize', sourceId);
+      });
   }
 
   // Copy to backbuffer
