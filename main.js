@@ -186,7 +186,7 @@ function listenerFrameCallback(sourceName, frameInfo) {
 
   // Test if we need to reacquire the buffer (too small)
   let shouldReacquire = false;
-  if ((entry.data == null) || (entry.data.size < frameInfo.frame.length)) {
+  if ((entry.data == null) || (entry.data.size < frameInfo.frame.byteLength)) {
     shouldReacquire = true;
   }
 
