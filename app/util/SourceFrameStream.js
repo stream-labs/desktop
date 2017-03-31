@@ -11,10 +11,13 @@ function handleListenerReacquireWrapper(obj, event, id, bufferName) {
   obj.handleListenerReacquire(event, parseInt(id), bufferName);
 }
 
+function handleListenerResize(obj, event, id) {
+  obj.handleListenerResize(event, parseInt(id));
+}
+
 function handleListenerFlipWrapper(obj, event, id) {
   obj.handleListenerFlip(event, parseInt(id));
 }
-
 
 class SourceFrameStream {
 
@@ -51,6 +54,9 @@ class SourceFrameStream {
     ipcRenderer.send('listenerRegister', sourceId, store.state.sources.sources[sourceId].name);
     ipcRenderer.on('listenerReacquire', (event, id, bufferName) => {
       handleListenerReacquireWrapper(this, event, id, bufferName);
+    });
+    ipcRenderer.on('listenerResize', (event, id) => {
+      handleListenerResize(this, event, id);
     });
     ipcRenderer.on('listenerFlip', (event, id) => {
       handleListenerFlipWrapper(this, event, id);
@@ -92,20 +98,11 @@ class SourceFrameStream {
 
       // Temporary Fix: WebGL crashes due to reading old buffer...
       stream.localBuffer = new Uint8Array(newData.size);
-      // ToDo: Figure out how this even works.
       store.dispatch({
         type: 'setSourceSize',
         sourceId: newData.id,
         width: newData.width,
         height: newData.height
-      });
-      stream.subscribers.forEach((value, key, map) => {
-        value({
-          width: newData.width,
-          height: newData.height,
-          format: newData.format,
-          frameBuffer: stream.localBuffer
-        });
       });
 
       stream.data = newData;
@@ -117,16 +114,26 @@ class SourceFrameStream {
     }
   }
 
+  handleListenerResize(event, id) {
+    let stream = this.sourceStreams[id];
+
+    store.dispatch({
+      type: 'setSourceSize',
+      sourceId: stream.data.id,
+      width: stream.data.width,
+      height: stream.data.height
+    });
+  }
+
   handleListenerFlip(event, id) {
     let stream = this.sourceStreams[id];
-    if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
+    if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null) || (stream.localBuffer === null)) {
       console.error(`'listenerFlip: (${id}:${typeof (id)}) received flip command with no valid stream or buffer.`);
       return;
     }
+    
     // Temporary Fix: WebGL crashes due to reading old buffer...
     stream.localBuffer.set(stream.data.frontBuffer())
-
-    // ToDo: Figure out how this even works.
     stream.subscribers.forEach((value, key, map) => {
       value({
         width: stream.data.width,
