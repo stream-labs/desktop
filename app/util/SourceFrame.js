@@ -49,7 +49,9 @@ class SourceFrame {
     return new Uint8Array(this.buffer, this.backOffset, this.size);
   }
   flip() {
-    this.frontOffset, this.backOffset = this.backOffset, this.frontOffset;
+    let backOffset = this.backOffset;
+    this.backOffset = this.frontOffset;
+    this.frontOffset = backOffset;
   }
 }
 
