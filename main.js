@@ -11,8 +11,8 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain } = require('electron');
-const boost = require('node-boost');
 const _ = require('lodash');
+const boost = require(process.env.NODE_ENV !== 'production' ? './node-boost' : '../../node-boost');
 const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../../node-obs');
 
 ////////////////////////////////////////////////////////////////////////////////

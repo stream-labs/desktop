@@ -15,7 +15,7 @@ builder.build({
       'index.html',
       'main.js',
     ],
-    extraFiles: ['node-obs', 'config'],
+    extraFiles: ['node-obs', 'node-boost', 'config'],
     asarUnpack: ['**/*.node'],
   },
   extraMetadata: {

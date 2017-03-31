@@ -1,6 +1,9 @@
 const net = window.require('net');
-const { ipcRenderer } = window.require('electron');
-const boost = window.require('node-boost');
+const { ipcRenderer, remote } = window.require('electron');
+
+const production = remote.process.env.NODE_ENV === 'production';
+
+const boost = window.require(production ? '../../node-boost' : './node-boost');
 
 import SourceFrame from './SourceFrame.js';
 import _ from 'lodash';
