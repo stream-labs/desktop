@@ -78,7 +78,6 @@ class SourceFrameStream {
    *         */
 
   handleListenerReacquire(event, id, bufferName) {
-    // console.log('listenerReacquire', p_id)
     let stream = this.sourceStreams[id];
 
     try {
@@ -119,7 +118,6 @@ class SourceFrameStream {
   }
 
   handleListenerFlip(event, id) {
-    // console.log('listenerFlip', p_id)
     let stream = this.sourceStreams[id];
     if ((stream === undefined) || (stream === null) || (stream.data === null) || (stream.memory === null)) {
       console.error(`'listenerFlip: (${id}:${typeof (id)}) received flip command with no valid stream or buffer.`);
@@ -129,8 +127,8 @@ class SourceFrameStream {
     stream.localBuffer.set(stream.data.frontBuffer())
 
     // ToDo: Figure out how this even works.
-    stream.subscribers.forEach((p_value, p_key, p_map) => {
-      p_value({
+    stream.subscribers.forEach((value, key, map) => {
+      value({
         width: stream.data.width,
         height: stream.data.height,
         format: stream.data.format,

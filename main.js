@@ -245,9 +245,7 @@ function listenerFrameCallback(sourceName, frameInfo) {
   });
 }
 
-ipcMain.on('listenerRegister', (p_event, id, name) => {
-  // console.log("listenerRegister:", p_id, p_name);
-
+ipcMain.on('listenerRegister', (event, id, name) => {
   if (!mapSourceIdToSource.has(id)) {
     mapSourceIdToSource.set(id, {
       memory: null,
@@ -262,7 +260,7 @@ ipcMain.on('listenerRegister', (p_event, id, name) => {
       listenerFrameCallback(name, frameInfo);
     });
   }
-  mapSourceIdToSource.get(id).listeners.add(p_event.sender);
+  mapSourceIdToSource.get(id).listeners.add(event.sender);
 });
 
 function frameUnregister(listener, id) {
@@ -278,6 +276,5 @@ function frameUnregister(listener, id) {
 }
 
 ipcMain.on('listenerUnregister', (event, id) => {
-  // console.log("listenerUnregister:", p_id, g_IdToNameMap.get(p_id));
   frameUnregister(event.sender, id);
 });
