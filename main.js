@@ -231,7 +231,7 @@ function listenerFrameCallback(sourceName, frameInfo) {
   entry.data.width = parseInt(frameInfo.width);
   entry.data.height = parseInt(frameInfo.height);
   entry.data.size = frameInfo.frame.byteLength;
-  entry.data.backBuffer().set(frameInfo.frame);
+  entry.data.backBuffer().set(new Uint8Array(frameInfo.frame));
   entry.data.flip();
 
   // Signal listeners
