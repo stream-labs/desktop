@@ -194,7 +194,7 @@ function listenerFrameCallback(frameInfo) {
     let bufferSize = SourceFrame.getFullSize(frameInfo.frame.byteLength);
 
     try {
-      let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.Write + boost.interprocess.shared_memory_flags.Create);
+      let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.write + boost.interprocess.shared_memory_flags.create);
       let newRegion = new boost.interprocess.mapped_region(newMemory);
       let newData = new SourceFrame(newRegion.buffer(), frameInfo.frame.byteLength);
 
