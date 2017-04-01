@@ -168,15 +168,16 @@ let mapSourceIdToSource = new Map();
 let mapSourceIdToName = new Map();
 let mapSourceNameToId = new Map();
 
+let frameSubscriptionInitialized = false;
+
 function generateUniqueSharedMemoryName(p_name) {
   // This has a very low chance of giving us the exact same string.
   let uuid = (Math.random() * 16777216).toString(16) + "-" + (Math.random() * 16777216).toString(16) + "-" + (Math.random() * 16777216).toString(16) + "-" + (Math.random() * 16777216).toString(16);
   return ("slobs" + process.pid.toString(16) + "-" + p_name + "-" + uuid);
 }
 
-function listenerFrameCallback(sourceName, frameInfo) {
-  //let sourceId = mapSourceNameToId.get(frameInfo.name); // Requires https://github.com/twitchalerts/node-obs/pull/16
-  let sourceId = mapSourceNameToId.get(sourceName);
+function listenerFrameCallback(frameInfo) {
+  let sourceId = mapSourceNameToId.get(frameInfo.name);
   if (sourceId === undefined) {
     console.error("listenerMain: Source", frameInfo.name, "is not being listened to.");
     return;
@@ -209,8 +210,8 @@ function listenerFrameCallback(sourceName, frameInfo) {
       }
 
       // Signal listeners
-      entry.listeners.forEach((value, key, map) => {
-        value.send('listenerReacquire', sourceId, bufferName);
+      entry.listeners.forEach(listener => {
+        listener.send('listenerReacquire', sourceId, bufferName);
       });
 
       entry.data = newData;
@@ -223,8 +224,8 @@ function listenerFrameCallback(sourceName, frameInfo) {
   }
   if ((entry.data.width !== frameInfo.width) || (entry.data.height !== frameInfo.height)) {
       // Signal listeners
-      entry.listeners.forEach((value, key, map) => {
-        value.send('listenerResize', sourceId);
+      entry.listeners.forEach(listener => {
+        listener.send('listenerResize', sourceId);
       });
   }
 
@@ -236,17 +237,23 @@ function listenerFrameCallback(sourceName, frameInfo) {
   entry.data.flip();
 
   // Signal listeners
-  entry.listeners.forEach((value, key, map) => {
-    if (value.isDestroyed()) {
+  entry.listeners.forEach(listener => {
+    if (listener.isDestroyed()) {
       // Treat a destroyed window as if it unregistered
-      frameUnregister(value, sourceId);
+      frameUnregister(listener, sourceId);
     } else {
-      value.send('listenerFlip', sourceId);
+      listener.send('listenerFlip', sourceId);
     }
   });
 }
 
 ipcMain.on('listenerRegister', (event, id, name) => {
+  if (!frameSubscriptionInitialized) {
+    // Register the callback before subscribing to any frames
+    obs.OBS_content_initializeSubscribing(listenerFrameCallback);
+    frameSubscriptionInitialized = true;
+  }
+
   if (!mapSourceIdToSource.has(id)) {
     mapSourceIdToSource.set(id, {
       memory: null,
@@ -257,9 +264,11 @@ ipcMain.on('listenerRegister', (event, id, name) => {
     mapSourceIdToName.set(id, name);
     mapSourceNameToId.set(name, id);
     // Only register once.
-    obs.OBS_content_subscribeSourceFrames(name, (frameInfo) => {
-      listenerFrameCallback(name, frameInfo);
-    });
+    obs.OBS_content_subscribeToSource(name);
+
+    // obs.OBS_content_subscribeSourceFrames(name, (frameInfo) => {
+    //   listenerFrameCallback(name, frameInfo);
+    // });
   }
   mapSourceIdToSource.get(id).listeners.add(event.sender);
 });
@@ -267,12 +276,9 @@ ipcMain.on('listenerRegister', (event, id, name) => {
 function frameUnregister(listener, id) {
   if (mapSourceIdToSource.has(id)) {
     mapSourceIdToSource.get(id).listeners.delete(listener);
-    if (mapSourceIdToSource.get(id).listeners.size === 0) {
-      // No listeners? Then we can safely remove it.
-      mapSourceNameToId.delete(mapSourceIdToName.get(id));
-      mapSourceIdToName.delete(id);
-      mapSourceIdToSource.delete(id);
-    }
+
+    // TODO: If there are no more listeners, stop subscribing to
+    // the source in node-obs.  Currently there is no way to do this.
   }
 }
 
