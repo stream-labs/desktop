@@ -177,6 +177,8 @@ function generateUniqueSharedMemoryName(p_name) {
 }
 
 function listenerFrameCallback(frameInfo) {
+  console.log("LISTENER CALLBACK", frameInfo);
+
   let sourceId = mapSourceNameToId.get(frameInfo.name);
   if (sourceId === undefined) {
     console.error("listenerMain: Source", frameInfo.name, "is not being listened to.");
