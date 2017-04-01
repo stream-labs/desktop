@@ -214,6 +214,7 @@ function listenerFrameCallback(frameInfo) {
       // Signal listeners
       entry.listeners.forEach(listener => {
         listener.send('listenerReacquire', sourceId, bufferName);
+        listener.send('listenerResize', sourceId);
       });
 
       entry.data = newData;
