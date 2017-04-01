@@ -52,6 +52,13 @@ const mutations = {
 
     source.scaledWidth = source.width * source.scaleX;
     source.scaledHeight = source.height * source.scaleY;
+  },
+
+  // Makes the source streamable
+  SET_SOURCE_STREAMABLE(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.streamable = true;
   }
 };
 
@@ -89,7 +96,11 @@ const actions = {
 
         // These are a function of dimensions and scale
         scaledWidth: 0,
-        scaledHeight: 0
+        scaledHeight: 0,
+
+        // We only want to start streaming the source after
+        // they have configured it for the first time.
+        streamable: false
       }
     });
 
@@ -186,6 +197,12 @@ const actions = {
       sourceId: data.sourceId,
       scaleX: data.scaleX,
       scaleY: data.scaleY
+    });
+  },
+
+  setSourceStreamable({ commit }, data) {
+    commit('SET_SOURCE_STREAMABLE', {
+      sourceId: data.sourceId
     });
   }
 };

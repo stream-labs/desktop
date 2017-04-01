@@ -65,6 +65,11 @@ export default {
 
   methods: {
     done() {
+      this.$store.dispatch({
+        type: 'setSourceStreamable',
+        sourceId: this.sourceId
+      });
+
       windowManager.closeWindow();
     },
 
