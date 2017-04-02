@@ -101,11 +101,6 @@ export default {
 
       // Add any new sources
       _.each(this.reversedSources, source => {
-        // Don't stream a source if it's not streamable yet
-        if (!source.streamable) {
-          return;
-        }
-
         sourceMemo[source.id] = true;
 
         if (!this.streamedSources[source.id]) {
