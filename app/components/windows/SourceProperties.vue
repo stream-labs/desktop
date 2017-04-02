@@ -6,8 +6,9 @@
   :cancel-handler="cancel"
   :content-styles="contentStyles">
   <div slot="content">
-    <div class="SourceProperties-preview">
-    </div>
+    <source-properties-preview
+      class="SourceProperties-preview"
+      :source-id="sourceId"/>
     <div class="SourceProperties-form">
     <component
       v-for="property in properties"
@@ -21,6 +22,7 @@
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
+import SourcePropertiesPreview from '../SourcePropertiesPreview.vue';
 import windowManager from '../../util/WindowManager.js';
 import Obs from '../../api/Obs.js';
 import _ from 'lodash';
@@ -50,6 +52,7 @@ export default {
 
   components: {
     ModalLayout,
+    SourcePropertiesPreview,
     ListProperty,
     BoolProperty,
     FloatProperty,
@@ -143,9 +146,12 @@ export default {
 .SourceProperties-preview {
   position: fixed;
   top: 30px;
+  left: 0;
+  right: 0;
+  margin: auto;
 
   height: 220px;
-  width: 100%;
+  // width: 100%;
   background-color: black;
 }
 

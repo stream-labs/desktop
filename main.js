@@ -167,6 +167,7 @@ const SourceFrame = require('./bundles/main_helpers.js').SourceFrame;
 let mapSourceIdToSource = new Map();
 let mapSourceIdToName = new Map();
 let mapSourceNameToId = new Map();
+let mapSourceIdToBufferName = new Map();
 
 let frameSubscriptionInitialized = false;
 
@@ -192,6 +193,8 @@ function listenerFrameCallback(frameInfo) {
     // Header + 2x Content (Front/Back Buffer)
     let bufferName = generateUniqueSharedMemoryName(frameInfo.name);
     let bufferSize = SourceFrame.getFullSize(frameInfo.frame.byteLength);
+
+    mapSourceIdToBufferName.set(sourceId, bufferName);
 
     try {
       let newMemory = new boost.interprocess.shared_memory(bufferName, bufferSize, boost.interprocess.shared_memory_flags.write + boost.interprocess.shared_memory_flags.create);
@@ -268,11 +271,13 @@ ipcMain.on('listenerRegister', (event, id, name) => {
     mapSourceNameToId.set(name, id);
     // Only register once.
     obs.OBS_content_subscribeToSource(name);
-
-    // obs.OBS_content_subscribeSourceFrames(name, (frameInfo) => {
-    //   listenerFrameCallback(name, frameInfo);
-    // });
+  } else {
+    // New subscribers need to be told where to find the source
+    let bufferName = mapSourceIdToBufferName.get(id);
+    event.sender.send('listenerReacquire', id, bufferName);
+    event.sender.send('listenerResize', id);
   }
+
   mapSourceIdToSource.get(id).listeners.add(event.sender);
 });
 
