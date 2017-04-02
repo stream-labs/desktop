@@ -210,6 +210,12 @@ class ObsApi {
     };
   }
 
+  // Needs to be called when the stream key changes
+  resetService() {
+    nodeObs.OBS_service_createService();
+    nodeObs.OBS_service_setServiceToTheStreamingOutput();
+  }
+
 }
 
 export default new ObsApi();
