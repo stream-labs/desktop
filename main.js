@@ -80,6 +80,11 @@ app.on('ready', () => {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+  
+  //Create a new child window and send the window handle to node-obs to create the display
+  let childWindowPreview = new BrowserWindow({parent: mainWindow});
+  var windowHandleBuffer = childWindowPreview.getNativeWindowHandle();
+  obs.OBS_content_createDisplay(windowHandleBuffer);
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
