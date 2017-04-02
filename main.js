@@ -284,9 +284,14 @@ ipcMain.on('listenerRegister', (event, id, name) => {
 function frameUnregister(listener, id) {
   if (mapSourceIdToSource.has(id)) {
     mapSourceIdToSource.get(id).listeners.delete(listener);
+    if (mapSourceIdToSource.get(id).listeners.size === 0) {
+      obs.OBS_content_unsubscribeFromSource(mapSourceIdToName.get(id));
 
-    // TODO: If there are no more listeners, stop subscribing to
-    // the source in node-obs.  Currently there is no way to do this.
+      // No listeners? Then we can safely remove it.
+      mapSourceNameToId.delete(mapSourceIdToName.get(id));
+      mapSourceIdToName.delete(id);
+      mapSourceIdToSource.delete(id);
+    }
   }
 }
 
