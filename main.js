@@ -29,8 +29,15 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
-    frame: false
+    frame: false,
+    show: false
   });
+
+  mainWindow.once('ready-to-show', () => {
+    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+    mainWindow.show();
+  });
+
 
   mainWindow.loadURL(indexUrl);
 
@@ -85,7 +92,6 @@ app.on('ready', () => {
   // let childWindowPreview = new BrowserWindow({parent: mainWindow});
   // var windowHandleBuffer = childWindowPreview.getNativeWindowHandle();
   // obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
-  obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
