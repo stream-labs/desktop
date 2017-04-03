@@ -82,9 +82,10 @@ app.on('ready', () => {
   obs.OBS_service_setServiceToTheStreamingOutput();
   
   //Create a new child window and send the window handle to node-obs to create the display
-  let childWindowPreview = new BrowserWindow({parent: mainWindow});
-  var windowHandleBuffer = childWindowPreview.getNativeWindowHandle();
-  obs.OBS_content_createDisplay(windowHandleBuffer);
+  // let childWindowPreview = new BrowserWindow({parent: mainWindow});
+  // var windowHandleBuffer = childWindowPreview.getNativeWindowHandle();
+  // obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+  obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
@@ -259,45 +260,45 @@ function listenerFrameCallback(frameInfo) {
 }
 
 ipcMain.on('listenerRegister', (event, id, name) => {
-  if (!frameSubscriptionInitialized) {
-    // Register the callback before subscribing to any frames
-    obs.OBS_content_initializeSubscribing(listenerFrameCallback);
-    frameSubscriptionInitialized = true;
-  }
+  // if (!frameSubscriptionInitialized) {
+  //   // Register the callback before subscribing to any frames
+  //   obs.OBS_content_initializeSubscribing(listenerFrameCallback);
+  //   frameSubscriptionInitialized = true;
+  // }
 
-  if (!mapSourceIdToSource.has(id)) {
-    mapSourceIdToSource.set(id, {
-      memory: null,
-      region: null,
-      data: null,
-      listeners: new Set()
-    });
-    mapSourceIdToName.set(id, name);
-    mapSourceNameToId.set(name, id);
-    // Only register once.
-    obs.OBS_content_subscribeToSource(name);
-  } else {
-    // New subscribers need to be told where to find the source
-    let bufferName = mapSourceIdToBufferName.get(id);
-    event.sender.send('listenerReacquire', id, bufferName);
-    event.sender.send('listenerResize', id);
-  }
+  // if (!mapSourceIdToSource.has(id)) {
+  //   mapSourceIdToSource.set(id, {
+  //     memory: null,
+  //     region: null,
+  //     data: null,
+  //     listeners: new Set()
+  //   });
+  //   mapSourceIdToName.set(id, name);
+  //   mapSourceNameToId.set(name, id);
+  //   // Only register once.
+  //   obs.OBS_content_subscribeToSource(name);
+  // } else {
+  //   // New subscribers need to be told where to find the source
+  //   let bufferName = mapSourceIdToBufferName.get(id);
+  //   event.sender.send('listenerReacquire', id, bufferName);
+  //   event.sender.send('listenerResize', id);
+  // }
 
-  mapSourceIdToSource.get(id).listeners.add(event.sender);
+  // mapSourceIdToSource.get(id).listeners.add(event.sender);
 });
 
 function frameUnregister(listener, id) {
-  if (mapSourceIdToSource.has(id)) {
-    mapSourceIdToSource.get(id).listeners.delete(listener);
-    if (mapSourceIdToSource.get(id).listeners.size === 0) {
-      obs.OBS_content_unsubscribeFromSource(mapSourceIdToName.get(id));
+  // if (mapSourceIdToSource.has(id)) {
+  //   mapSourceIdToSource.get(id).listeners.delete(listener);
+  //   if (mapSourceIdToSource.get(id).listeners.size === 0) {
+  //     obs.OBS_content_unsubscribeFromSource(mapSourceIdToName.get(id));
 
-      // No listeners? Then we can safely remove it.
-      mapSourceNameToId.delete(mapSourceIdToName.get(id));
-      mapSourceIdToName.delete(id);
-      mapSourceIdToSource.delete(id);
-    }
-  }
+  //     // No listeners? Then we can safely remove it.
+  //     mapSourceNameToId.delete(mapSourceIdToName.get(id));
+  //     mapSourceIdToName.delete(id);
+  //     mapSourceIdToSource.delete(id);
+  //   }
+  // }
 }
 
 ipcMain.on('listenerUnregister', (event, id) => {
