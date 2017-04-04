@@ -25,11 +25,11 @@ class ObsApi {
   }
 
   resizeDisplay(key, width, height) {
-    nodeObs.OBS_content_resizeDisplay(display, width, height);
+    nodeObs.OBS_content_resizeDisplay(key, width, height);
   }
 
   moveDisplay(key, x, y) {
-    nodeObs.OBS_content_moveDisplay(display, x, y);
+    nodeObs.OBS_content_moveDisplay(key, x, y);
   }
 
   createScene(name) {
