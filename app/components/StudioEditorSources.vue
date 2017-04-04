@@ -50,6 +50,12 @@ export default {
 
   methods: {
     onResize() {
+      Obs.resizeDisplay(
+        'Main Window',
+        this.$refs.canvas.offsetWidth,
+        this.$refs.canvas.offsetHeight
+      );
+      
       this.$store.dispatch({
         type: 'setVideoRenderedSize',
         width: this.$refs.canvas.offsetWidth,
@@ -178,10 +184,12 @@ export default {
     },
 
     width() {
+      console.log("Sources Width")
       return this.$store.state.video.width;
     },
 
     height() {
+      console.log("Sources Height")
       return this.$store.state.video.height;
     }
   }
