@@ -37,18 +37,18 @@ export default {
 
   methods: {
     onResize() {
+      var rect = this.$refs.canvas.getBoundingClientRect();
+
       Obs.resizeDisplay(
         'Main Window',
-        this.$refs.canvas.offsetWidth,
-        this.$refs.canvas.offsetHeight
+        rect.width,
+        rect.height
       );
-
-      var offsetParent = this.$refs.canvas.offsetParent;
 
       Obs.moveDisplay(
         'Main Window',
-        this.$refs.canvas.offsetLeft,
-        offsetParent.offsetTop + this.$refs.canvas.offsetTop
+        rect.left,
+        rect.top
       );
 
       this.$store.dispatch({
