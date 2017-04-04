@@ -56,10 +56,12 @@ export default {
         this.$refs.canvas.offsetHeight
       );
 
+      var offsetParent = this.$refs.canvas.offsetParent;
+
       Obs.moveDisplay(
         'Main Window',
         this.$refs.canvas.offsetLeft,
-        this.$refs.canvas.offsetTop
+        offsetParent.offsetTop
       );
 
       this.$store.dispatch({
