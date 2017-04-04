@@ -46,6 +46,7 @@ class WindowManager {
         type: 'setWindowOptions',
         options: {}
       });
+      ipcRenderer.send('window-hideChildWindow');
     } else {
       remote.getCurrentWindow().close();
     }
@@ -114,7 +115,9 @@ class WindowManager {
         height: 800
       }
     });
+    ipcRenderer.send('window-showChildPropertiesWindow', data);
   }
+
 
 }
 

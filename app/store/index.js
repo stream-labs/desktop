@@ -52,13 +52,13 @@ const actions = {
       sourceId: ipcRenderer.sendSync('getUniqueId')
     });
 
-    // dispatch({
-    //   type: 'createSourceAndAddToScene',
-    //   sceneName: 'Example Scene 1',
-    //   sourceType: 'Window Capture',
-    //   sourceName: 'Window Capture',
-    //   sourceId: ipcRenderer.sendSync('getUniqueId')
-    // });
+    dispatch({
+      type: 'createSourceAndAddToScene',
+      sceneName: 'Example Scene 1',
+      sourceType: 'Window Capture',
+      sourceName: 'Window Capture',
+      sourceId: ipcRenderer.sendSync('getUniqueId')
+    });
   }
 };
 
