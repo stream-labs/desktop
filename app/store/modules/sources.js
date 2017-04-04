@@ -213,7 +213,7 @@ const actions = {
 
   removeSourceDisplay({ commit, state }, data) {
     let source = state.sources[data.sourceId];
-    Obs.removeSourceDisplay(source.display);
+    Obs.removeSourceDisplay("Preview Window");
 
     commit('REMOVE_SOURCE_DISPLAY', {
       sourceId: data.sourceId,
