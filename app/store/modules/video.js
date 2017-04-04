@@ -6,7 +6,7 @@ const state = {
 
   // This is the actual size of the canvas on screen
   renderedWidth: 0,
-  renderedHeight: 0
+  renderedHeight: 0,
 };
 
 const mutations = {

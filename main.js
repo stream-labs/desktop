@@ -21,6 +21,7 @@ const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../.
 
 // Windows
 let mainWindow;
+
 let childWindow;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
@@ -34,10 +35,9 @@ app.on('ready', () => {
   });
 
   mainWindow.once('ready-to-show', () => {
-    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle(), "Main Window");
     mainWindow.show();
   });
-
 
   mainWindow.loadURL(indexUrl);
 
