@@ -205,7 +205,7 @@ class ObsApi {
   }
 
   removeSourceDisplay(key) {
-    nodeObs.OBS_content_removeSourcePreviewDisplay(key);
+    nodeObs.OBS_content_destroyDisplay(key);
   }
   
   startStreaming() {
