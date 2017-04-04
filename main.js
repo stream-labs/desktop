@@ -21,6 +21,8 @@ const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../.
 
 // Windows
 let mainWindow;
+let display;
+
 let childWindow;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
@@ -34,10 +36,16 @@ app.on('ready', () => {
   });
 
   mainWindow.once('ready-to-show', () => {
-    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+    display = obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+    console.log(display);
     mainWindow.show();
-  });
 
+    /* Let the main preview know its own display handle */
+    mainWindow.send('vuex-mutation', {
+      type: 'SET_VIDEO_DISPLAY',  
+      payload: { handle: display }
+    });
+  });
 
   mainWindow.loadURL(indexUrl);
 

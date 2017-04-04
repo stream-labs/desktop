@@ -24,6 +24,14 @@ class ObsApi {
     this.nodeObs = nodeObs;
   }
 
+  resizeDisplay(display, width, height) {
+    nodeObs.OBS_content_resizeDisplay(display, width, height);
+  }
+
+  moveDisplay(display, x, y) {
+    nodeObs.OBS_content_moveDisplay(display, x, y);
+  }
+
   createScene(name) {
     nodeObs.OBS_content_createScene(name);
   }
