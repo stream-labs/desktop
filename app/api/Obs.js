@@ -184,10 +184,14 @@ class ObsApi {
     nodeObs.OBS_content_setSourceScaling(name, x.toString(), y.toString());
   }
 
-  createSourceDisplay(windowHandle, name) {
-    return nodeObs.OBS_content_createSourcePreviewDisplay(windowHandle, name);
+  createSourceDisplay(windowHandle, name, key) {
+    return nodeObs.OBS_content_createSourcePreviewDisplay(windowHandle, name, key);
   }
 
+  removeSourceDisplay(key) {
+    nodeObs.OBS_content_removeSourcePreviewDisplay(key);
+  }
+  
   startStreaming() {
     nodeObs.OBS_service_startStreaming();
   }

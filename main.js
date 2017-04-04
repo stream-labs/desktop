@@ -97,7 +97,8 @@ ipcMain.on('window-showChildWindow', (event, data) => {
 
   //Create a display to render the preview for the source properties view
   if(data.startupOptions.component.localeCompare('SourceProperties') == 0) {
-    data.windowHandle = childWindow.getNativeWindowHandle();
+    data.startupOptions.windowHandle = childWindow.getNativeWindowHandle();
+    console.log("window handle in data : ", data.startupOptions.windowHandle);
   }
   childWindow.send('window-setContents', data.startupOptions);
   childWindow.show();

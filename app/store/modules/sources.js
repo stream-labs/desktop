@@ -52,16 +52,16 @@ const mutations = {
 
     source.scaledWidth = source.width * source.scaleX;
     source.scaledHeight = source.height * source.scaleY;
-  }
+  },
 
   CREATE_SOURCE_DISPLAY(state, data) {
-    let source = sate.sources[data.sourceId];
+    let source = state.sources[data.sourceId];
 
     source.display = data.display;
-  }
+  },
   
   REMOVE_SOURCE_DISPLAY(state, data) {
-    let source = sate.sources[data.sourceId];
+    let source = state.sources[data.sourceId];
 
     source.display = null;
   }
@@ -132,7 +132,6 @@ const actions = {
 
   refreshProperties({ commit, state }, data) {
     let source = state.sources[data.sourceId];
-
     commit('SET_SOURCE_PROPERTIES', {
       sourceId: data.sourceId,
       properties: Obs.sourceProperties(source.name, source.id)
@@ -202,8 +201,9 @@ const actions = {
   },
 
   createSourceDisplay({ commit, state }, data) {
+    console.log("CREATING DISPLAY");
     let source = state.sources[data.sourceId];
-    const display = Obs.createSourceDisplay(data.windowHandle, source.name);
+    const display = Obs.createSourceDisplay(data.windowHandle, source.name, "Preview Window");
 
     commit('CREATE_SOURCE_DISPLAY', {
       sourceId: data.sourceId,

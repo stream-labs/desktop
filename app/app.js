@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Used for replacing the contents of this window with
   // a new top level component
   ipcRenderer.on('window-setContents', (event, options) => {
+    console.log("dispatch setWindowOptions");
     store.dispatch({
       type: 'setWindowOptions',
       options

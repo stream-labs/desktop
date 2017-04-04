@@ -103,6 +103,11 @@ export default {
 
   created() {
     console.log(this.properties);
+    this.$store.dispatch({
+          type: 'createSourceDisplay',
+          sourceId: this.sourceId,
+          windowHandle: this.windowHandle
+    });
   },
 
   watch: {
@@ -112,11 +117,6 @@ export default {
         this.$store.dispatch({
           type: 'createPropertiesRestorePoint',
           sourceId: this.sourceId
-        });
-        this.$store.dispatch({
-          type: 'createSourceDisplay',
-          sourceId: this.sourceId,
-          windowHandle: this.windowHandle
         });
       }
     }
@@ -145,6 +145,10 @@ export default {
 
     sourceId() {
       return this.$store.state.windowOptions.options.sourceId;
+    },
+
+    windowHandle() {
+      return this.$store.state.windowOptions.options.windowHandle;
     }
   }
 

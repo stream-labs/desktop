@@ -103,7 +103,9 @@ class WindowManager {
     });
   }
 
-  showSourceProperties(sourceId) {
+  showSourceProperties(sourceId, windowHandle) {
+    console.log("window handle in showSourceProperties : ", windowHandle);
+    console.log("sourceId in showSourceProperties : ", sourceId);
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
