@@ -76,6 +76,10 @@ export default {
         type: 'restoreProperties',
         sourceId: this.sourceId
       });
+      this.$store.dispatch({
+        type: 'removeSourceDisplay',
+        sourceId: this.sourceId
+      });
 
       windowManager.closeWindow();
     },
@@ -108,6 +112,11 @@ export default {
         this.$store.dispatch({
           type: 'createPropertiesRestorePoint',
           sourceId: this.sourceId
+        });
+        this.$store.dispatch({
+          type: 'createSourceDisplay',
+          sourceId: this.sourceId,
+          windowHandle: this.windowHandle
         });
       }
     }

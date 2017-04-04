@@ -36,7 +36,7 @@ class WindowManager {
 
   // Will close the current window.
   // If this is the child window, it will be hidden instead.
-  closeWindow() {
+  closeWindow(data) {
     if (store.state.windowOptions.isChild) {
       remote.getCurrentWindow().hide();
 
@@ -46,7 +46,6 @@ class WindowManager {
         type: 'setWindowOptions',
         options: {}
       });
-      ipcRenderer.send('window-hideChildWindow');
     } else {
       remote.getCurrentWindow().close();
     }
@@ -108,14 +107,15 @@ class WindowManager {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
-        sourceId
+        sourceId,
+        windowHandle
       },
       windowOptions: {
         width: 600,
         height: 800
       }
     });
-    ipcRenderer.send('window-showChildPropertiesWindow', data);
+    
   }
 
 

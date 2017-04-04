@@ -53,6 +53,18 @@ const mutations = {
     source.scaledWidth = source.width * source.scaleX;
     source.scaledHeight = source.height * source.scaleY;
   }
+
+  CREATE_SOURCE_DISPLAY(state, data) {
+    let source = sate.sources[data.sourceId];
+
+    source.display = data.display;
+  }
+  
+  REMOVE_SOURCE_DISPLAY(state, data) {
+    let source = sate.sources[data.sourceId];
+
+    source.display = null;
+  }
 };
 
 const actions = {
@@ -187,7 +199,26 @@ const actions = {
       scaleX: data.scaleX,
       scaleY: data.scaleY
     });
-  }
+  },
+
+  createSourceDisplay({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    const display = Obs.createSourceDisplay(data.windowHandle, source.name);
+
+    commit('CREATE_SOURCE_DISPLAY', {
+      sourceId: data.sourceId,
+      display: display
+    });
+  },
+
+  removeSourceDisplay({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.removeSourceDisplay(source.display);
+
+    commit('REMOVE_SOURCE_DISPLAY', {
+      sourceId: data.sourceId,
+    });
+  },
 };
 
 const getters = {

@@ -87,11 +87,6 @@ app.on('ready', () => {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
-  
-  //Create a new child window and send the window handle to node-obs to create the display
-  // let childWindowPreview = new BrowserWindow({parent: mainWindow});
-  // var windowHandleBuffer = childWindowPreview.getNativeWindowHandle();
-  // obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
@@ -99,26 +94,13 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
     childWindow.center();
   }
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
-  console.log(data.startupOptions.component);
+
+  //Create a display to render the preview for the source properties view
   if(data.startupOptions.component.localeCompare('SourceProperties') == 0) {
-    console.log(data.sourceId);
-    console.log(mapSourceIdToName.get(data.sourceId));
-    obs.OBS_content_createSourcePreviewDisplay(childWindow.getNativeWindowHandle(), 'Video Capture Device');
+    data.windowHandle = childWindow.getNativeWindowHandle();
   }
   childWindow.send('window-setContents', data.startupOptions);
   childWindow.show();
-});
-
-ipcMain.on('window-hideChildWindow', (event) => {
-  console.log(data.sourceId);
-  console.log(mapSourceIdToName.get(data.sourceId));
-  obs.OBS_content_createSourcePreviewDisplay(childWindow.getNativeWindowHandle(), 'Video Capture Device');
 });
 
 // The main process acts as a hub for various windows
