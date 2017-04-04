@@ -55,7 +55,13 @@ export default {
         this.$refs.canvas.offsetWidth,
         this.$refs.canvas.offsetHeight
       );
-      
+
+      Obs.moveDisplay(
+        'Main Window',
+        this.$refs.canvas.offsetLeft,
+        this.$refs.canvas.offsetTop
+      );
+
       this.$store.dispatch({
         type: 'setVideoRenderedSize',
         width: this.$refs.canvas.offsetWidth,
