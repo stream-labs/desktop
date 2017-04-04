@@ -21,7 +21,6 @@ const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../.
 
 // Windows
 let mainWindow;
-let display;
 
 let childWindow;
 
@@ -37,7 +36,6 @@ app.on('ready', () => {
 
   mainWindow.once('ready-to-show', () => {
     obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle(), "Main Window");
-    console.log(display);
     mainWindow.show();
   });
 
