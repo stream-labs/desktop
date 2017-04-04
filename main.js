@@ -36,15 +36,9 @@ app.on('ready', () => {
   });
 
   mainWindow.once('ready-to-show', () => {
-    display = obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle());
+    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle(), "Main Window");
     console.log(display);
     mainWindow.show();
-
-    /* Let the main preview know its own display handle */
-    mainWindow.send('vuex-mutation', {
-      type: 'SET_VIDEO_DISPLAY',  
-      payload: { handle: display }
-    });
   });
 
   mainWindow.loadURL(indexUrl);
