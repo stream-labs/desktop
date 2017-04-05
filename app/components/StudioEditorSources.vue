@@ -36,9 +36,29 @@ export default {
   },
 
   methods: {
+    // http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+    getCoords(elem) { // crossbrowser version
+        var box = elem.getBoundingClientRect();
+
+        var body = document.body;
+        var docEl = document.documentElement;
+
+        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+        var clientTop = docEl.clientTop || body.clientTop || 0;
+        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+        var top  = box.top +  scrollTop - clientTop;
+        var left = box.left + scrollLeft - clientLeft;
+
+        return { top: Math.round(top), left: Math.round(left) };
+    },
+
     onResize() {
-      var doc = document.documentElement;
-      var rect = this.$refs.canvas.getBoundingClientRect();
+      var canvas = this.$refs.canvas;
+      var rect = canvas.getBoundingClientRect();
+      var pos = this.getCoords(canvas);
 
       Obs.resizeDisplay(
         'Main Window',
@@ -48,25 +68,13 @@ export default {
 
       Obs.moveDisplay(
         'Main Window',
-        rect.left + doc.scrollLeft - doc.clientLeft,
-        rect.top + doc.scrollTop - doc.clientTop
+        pos.left - window.scrollX,
+        pos.top - window.scrollY
       );
-
-      this.$store.dispatch({
-        type: 'setVideoRenderedSize',
-        width: this.$refs.canvas.offsetWidth,
-        height: this.$refs.canvas.offsetHeight
-      });
     },
   },
 
   computed: {
-    sources() {
-      return _.map(this.$store.getters.activeScene.sources, sourceId => {
-        return this.$store.state.sources.sources[sourceId];
-      });
-    },
-
     width() {
       return this.$store.state.video.width;
     },
@@ -90,7 +98,7 @@ export default {
   max-width: calc(100% - 20px);
   max-height: 100%;
 
-  background-color: black;
+  background-color: red;
 }
 
 .StudioEditorSources-button {
