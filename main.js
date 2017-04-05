@@ -33,6 +33,12 @@ app.on('ready', () => {
     frame: false,
     show: false
   });
+  
+
+  mainWindow.webContents.on('dom-ready', function (){
+    mainWindow.webContents.setZoomFactor(1.5);
+  });
+
 
   mainWindow.once('ready-to-show', () => {
     obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle(), "Main Window");
