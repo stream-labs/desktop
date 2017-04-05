@@ -37,6 +37,7 @@ export default {
 
   methods: {
     onResize() {
+      var doc = document.documentElement;
       var rect = this.$refs.canvas.getBoundingClientRect();
 
       Obs.resizeDisplay(
@@ -47,8 +48,8 @@ export default {
 
       Obs.moveDisplay(
         'Main Window',
-        rect.left,
-        rect.top
+        rect.left + doc.scrollLeft - doc.clientLeft,
+        rect.top + doc.scrollTop - doc.clientTop
       );
 
       this.$store.dispatch({
