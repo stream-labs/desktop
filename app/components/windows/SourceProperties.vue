@@ -60,7 +60,7 @@ export default {
     return {
       contentStyles: {
         padding: 0,
-        'margin-top': '220px',
+        'margin-top': '18%',
       }
     };
   },
@@ -223,12 +223,14 @@ export default {
   right: 0;
   margin: auto;
 
-  height: 220px;
+  height: 20%;
   width: 100%;
   background-color: black;
 }
 
 .SourceProperties-form {
-  padding: 30px;
+  padding-top: 10%;
+  padding-left: 2%;
+  padding-right: 2%;
 }
 </style>
