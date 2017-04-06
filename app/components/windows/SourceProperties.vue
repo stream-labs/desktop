@@ -61,7 +61,7 @@ export default {
     return {
       contentStyles: {
         padding: 0,
-        'margin-top': '18%',
+        'margin-top': '20%',
       }
     };
   },
@@ -215,7 +215,7 @@ export default {
 <style lang="less" scoped>
 .SourceProperties-preview {
   position: fixed;
-  top: 30px;
+  top: 40px;
   left: 0;
   right: 0;
   margin: auto;
