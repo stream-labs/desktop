@@ -13,7 +13,7 @@
 import SourceFrameStream from '../util/SourceFrameStream.js';
 import _ from 'lodash';
 import Obs from '../api/Obs.js';
-const { webFrame } = window.require('electron')
+const { webFrame, screen } = window.require('electron')
 
 export default {
 
@@ -55,7 +55,7 @@ export default {
       var canvas = this.$refs.canvas;
       var rect = canvas.getBoundingClientRect();
       var pos = this.getCoords(canvas);
-      var factor = webFrame.getZoomFactor();
+      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
       Obs.resizeDisplay(
         'Main Window',
