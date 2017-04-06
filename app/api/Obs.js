@@ -24,8 +24,8 @@ class ObsApi {
     this.nodeObs = nodeObs;
   }
 
-  createDisplay(key, window) {
-    nodeObs.OBS_content_createDisplay(key, window);
+  createDisplay(window, key) {
+    nodeObs.OBS_content_createDisplay(window, key);
   }
 
   destroyDisplay(key) {
