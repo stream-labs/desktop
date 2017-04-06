@@ -15,6 +15,7 @@ export default {
 
   mounted() {
     window.addEventListener('resize', this.onResize);
+    this.onResize();
   },
 
   beforeDestroy() {
@@ -31,20 +32,11 @@ export default {
         var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
         var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
-        console.log('scrollTop ', body.scrollTop);
-        console.log('scrollTop ', body.scrollLeft);
-
         var clientTop = docEl.clientTop || body.clientTop || 0;
         var clientLeft = docEl.clientLeft || body.clientLeft || 0;
 
-        console.log('clientTop ', clientTop);
-        console.log('clientLeft ', clientLeft);
-
         var top  = box.top +  scrollTop - clientTop;
         var left = box.left + scrollLeft - clientLeft;
-
-        console.log('top ', top);
-        console.log('left ', left);
 
         return { top: Math.round(top), left: Math.round(left) };
     },
@@ -53,6 +45,9 @@ export default {
       var canvas = this.$refs.canvas;
       var rect = canvas.getBoundingClientRect();
       var pos = this.getCoords(canvas);
+
+      console.log('resize to ', rect.width, 'x', rect.height);
+      console.log('move to ', pos.left - window.scrollX, ',', pos.top - window.scrollY);
 
       Obs.resizeDisplay(
         'Preview Window',

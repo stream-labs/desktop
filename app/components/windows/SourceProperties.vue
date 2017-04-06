@@ -8,6 +8,7 @@
   <div slot="content">
     <source-properties-preview
       class="SourceProperties-preview"
+      id="SourcePropertiesPreviewId"
       :source-id="sourceId"/>
     <div class="SourceProperties-form">
     <component
@@ -40,6 +41,13 @@ import EditableListProperty from '../source_properties/EditableListProperty.vue'
 import ButtonProperty from '../source_properties/ButtonProperty.vue';
 
 export default {
+
+  beforeDestroy() {
+    this.$store.dispatch({
+      type: 'removeSourceDisplay',
+      sourceId: this.sourceId
+    });
+  },
 
   data() {
     return {

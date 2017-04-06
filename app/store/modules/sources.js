@@ -62,8 +62,6 @@ const mutations = {
   
   REMOVE_SOURCE_DISPLAY(state, data) {
     let source = state.sources[data.sourceId];
-
-    source.display = null;
   }
 };
 

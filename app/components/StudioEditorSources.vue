@@ -27,11 +27,6 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
-    // Unsubscribe from all sources
-    _.each(this.streamedSources, streamed => {
-      SourceFrameStream.unsubscribe(streamed.id, streamed.subId);
-    });
-
     clearInterval(this.renderInterval);
   },
 
@@ -97,8 +92,6 @@ export default {
   margin: auto;
   max-width: calc(100% - 20px);
   max-height: 100%;
-
-  background-color: red;
 }
 
 .StudioEditorSources-button {
