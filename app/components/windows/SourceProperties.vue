@@ -8,7 +8,6 @@
   <div slot="content">
     <source-properties-preview
       class="SourceProperties-preview"
-      id="SourcePropertiesPreviewId"
       :source-id="sourceId"/>
     <div class="SourceProperties-form">
     <component
@@ -176,7 +175,7 @@ export default {
   margin: auto;
 
   height: 220px;
-  // width: 100%;
+  width: 100%;
   background-color: black;
 }
 
