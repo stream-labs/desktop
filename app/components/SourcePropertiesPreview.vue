@@ -42,24 +42,24 @@ export default {
     },
 
     onResize() {
-      var canvas = this.$refs.canvas;
-      var rect = canvas.getBoundingClientRect();
-      var pos = this.getCoords(canvas);
+      // var canvas = this.$refs.canvas;
+      // var rect = canvas.getBoundingClientRect();
+      // var pos = this.getCoords(canvas);
 
-      console.log('resize to ', rect.width, 'x', rect.height);
-      console.log('move to ', pos.left - window.scrollX, ',', pos.top - window.scrollY);
+      // console.log('resize to ', rect.width, 'x', rect.height);
+      // console.log('move to ', pos.left - window.scrollX, ',', pos.top - window.scrollY);
 
-      Obs.resizeDisplay(
-        'Preview Window',
-        rect.width,
-        rect.height
-      );
+      // Obs.resizeDisplay(
+      //   'Preview Window',
+      //   rect.width,
+      //   rect.height
+      // );
 
-      Obs.moveDisplay(
-        'Preview Window',
-        pos.left - window.scrollX,
-        pos.top - window.scrollY
-      );
+      // Obs.moveDisplay(
+      //   'Preview Window',
+      //   pos.left - window.scrollX,
+      //   pos.top - window.scrollY
+      // );
     },
   },
 

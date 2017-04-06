@@ -4,7 +4,8 @@
   :show-controls="true"
   :done-handler="done"
   :cancel-handler="cancel"
-  :content-styles="contentStyles">
+  :content-styles="contentStyles"
+  @resize="onResize">
   <div slot="content">
     <source-properties-preview
       class="SourceProperties-preview"
@@ -41,7 +42,14 @@ import ButtonProperty from '../source_properties/ButtonProperty.vue';
 
 export default {
 
+  mounted() {
+    window.addEventListener('resize', this.onResize);
+    this.onResize();
+  },
+
   beforeDestroy() {
+    window.removeEventListener('resize', this.onResize);
+
     this.$store.dispatch({
       type: 'removeSourceDisplay',
       sourceId: this.sourceId
@@ -74,6 +82,47 @@ export default {
   },
 
   methods: {
+
+    getCoords(elem) { // crossbrowser version
+        var box = elem.getBoundingClientRect();
+
+        var body = document.body;
+        var docEl = document.documentElement;
+
+        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+        var clientTop = docEl.clientTop || body.clientTop || 0;
+        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+        var top  = box.top +  scrollTop - clientTop;
+        var left = box.left + scrollLeft - clientLeft;
+
+        return { top: Math.round(top), left: Math.round(left) };
+    },
+
+    onResize() {
+      var canvas = document.getElementsByClassName("SourceProperties-preview");
+      // console.log(canvas["0"].scrollWidth);
+      // var rect = canvas.getBoundingClientRect();
+      var pos = this.getCoords(canvas["0"]);
+      console.log(canvas);
+      console.log('resize to ', canvas["0"].scrollWidth, 'x', canvas["0"].scrollHeight);
+      // console.log('move to ', pos.left - window.scrollX, ',', pos.top - window.scrollY);
+
+      Obs.resizeDisplay(
+        'Preview Window',
+        canvas["0"].scrollWidth,
+        canvas["0"].scrollHeight
+      );
+
+      Obs.moveDisplay(
+        'Preview Window',
+        pos.left - window.scrollX,
+        pos.top - window.scrollY
+      );
+    },
+
     done() {
       this.$store.dispatch({
         type: 'removeSourceDisplay',
