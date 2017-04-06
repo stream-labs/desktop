@@ -39,6 +39,7 @@ import TextProperty from '../source_properties/TextProperty.vue';
 import PathProperty from '../source_properties/PathProperty.vue';
 import EditableListProperty from '../source_properties/EditableListProperty.vue';
 import ButtonProperty from '../source_properties/ButtonProperty.vue';
+const { webFrame, screen } = window.require('electron')
 
 export default {
 
@@ -103,23 +104,19 @@ export default {
 
     onResize() {
       var canvas = document.getElementsByClassName("SourceProperties-preview");
-      // console.log(canvas["0"].scrollWidth);
-      // var rect = canvas.getBoundingClientRect();
       var pos = this.getCoords(canvas["0"]);
-      console.log(canvas);
-      console.log('resize to ', canvas["0"].scrollWidth, 'x', canvas["0"].scrollHeight);
-      // console.log('move to ', pos.left - window.scrollX, ',', pos.top - window.scrollY);
+      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
       Obs.resizeDisplay(
         'Preview Window',
-        canvas["0"].scrollWidth,
-        canvas["0"].scrollHeight
+        canvas["0"].scrollWidth * factor,
+        canvas["0"].scrollHeight * factor
       );
 
       Obs.moveDisplay(
         'Preview Window',
-        pos.left - window.scrollX,
-        pos.top - window.scrollY
+        pos.left - window.scrollX * factor,
+        pos.top - window.scrollY * factor
       );
     },
 
