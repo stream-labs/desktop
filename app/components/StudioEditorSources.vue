@@ -13,16 +13,19 @@
 import SourceFrameStream from '../util/SourceFrameStream.js';
 import _ from 'lodash';
 import Obs from '../api/Obs.js';
-const { webFrame, screen } = window.require('electron')
+const { webFrame, screen, remote } = window.require('electron')
 
 export default {
 
   mounted() {
     this.streamedSources = {};
-
-    window.addEventListener('resize', this.onResize);
-
+    var browser = remote.getCurrentWindow();
+    Obs.createDisplay(browser.getNativeWindowHandle(), 'Main Window');
     this.onResize();
+
+    browser.show();
+    
+    window.addEventListener('resize', this.onResize);
   },
 
   beforeDestroy() {
