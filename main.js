@@ -35,9 +35,9 @@ app.on('ready', () => {
   });
   
 
-  mainWindow.webContents.on('dom-ready', function (){
-    mainWindow.webContents.setZoomFactor(1.5);
-  });
+  // mainWindow.webContents.on('dom-ready', function (){
+  //   // mainWindow.webContents.setZoomFactor(0.665);
+  // });
 
 
   mainWindow.once('ready-to-show', () => {
@@ -56,6 +56,10 @@ app.on('ready', () => {
     show: false,
     frame: false
   });
+
+  // childWindow.webContents.on('dom-ready', function (){
+  //   childWindow.webContents.setZoomFactor(0.665);
+  // });
 
   childWindow.loadURL(indexUrl + '?child=true');
 
@@ -105,6 +109,8 @@ ipcMain.on('window-showChildWindow', (event, data) => {
   if(data.startupOptions.component.localeCompare('SourceProperties') == 0) {
     data.startupOptions.windowHandle = childWindow.getNativeWindowHandle();
     console.log("window handle in data : ", data.startupOptions.windowHandle);
+  } else {
+    data.startupOptions.windowHandle = null;
   }
   childWindow.send('window-setContents', data.startupOptions);
   childWindow.show();

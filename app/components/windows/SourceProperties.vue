@@ -68,6 +68,10 @@ export default {
 
   methods: {
     done() {
+      this.$store.dispatch({
+        type: 'removeSourceDisplay',
+        sourceId: this.sourceId
+      });
       windowManager.closeWindow();
     },
 

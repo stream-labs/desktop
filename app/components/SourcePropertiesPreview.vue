@@ -1,5 +1,7 @@
 <template>
 <canvas ref="canvas"
+        :width="width"
+        :height="height"
         @resize="onResize"/>
 </template>
 
@@ -12,31 +14,45 @@ export default {
   props: ['sourceId'],
 
   mounted() {
-    let canvas = this.$refs.canvas;
-
-    let renderer = new WebGLRenderer(canvas);
-
-    this.subId = SourceFrameStream.subscribe(this.sourceId, frameInfo => {
-      // Only support RGBA for now
-      if (frameInfo.format === 1) {
-        renderer.drawFrame(
-          frameInfo.frameBuffer,
-          frameInfo.width,
-          frameInfo.height
-        );
-      }
-    });
     window.addEventListener('resize', this.onResize);
   },
 
   beforeDestroy() {
-    SourceFrameStream.unsubscribe(this.sourceId, this.subId);
     window.removeEventListener('resize', this.onResize);
   },
 
   methods: {
+    getCoords(elem) { // crossbrowser version
+        var box = elem.getBoundingClientRect();
+
+        var body = document.body;
+        var docEl = document.documentElement;
+
+        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+        console.log('scrollTop ', body.scrollTop);
+        console.log('scrollTop ', body.scrollLeft);
+
+        var clientTop = docEl.clientTop || body.clientTop || 0;
+        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+        console.log('clientTop ', clientTop);
+        console.log('clientLeft ', clientLeft);
+
+        var top  = box.top +  scrollTop - clientTop;
+        var left = box.left + scrollLeft - clientLeft;
+
+        console.log('top ', top);
+        console.log('left ', left);
+
+        return { top: Math.round(top), left: Math.round(left) };
+    },
+
     onResize() {
-      var rect = this.$refs.canvas.getBoundingClientRect();
+      var canvas = this.$refs.canvas;
+      var rect = canvas.getBoundingClientRect();
+      var pos = this.getCoords(canvas);
 
       Obs.resizeDisplay(
         'Preview Window',
@@ -46,16 +62,20 @@ export default {
 
       Obs.moveDisplay(
         'Preview Window',
-        rect.left,
-        rect.top
+        pos.left - window.scrollX,
+        pos.top - window.scrollY
       );
-
-      this.$store.dispatch({
-        type: 'setVideoRenderedSize',
-        width: this.$refs.canvas.offsetWidth,
-        height: this.$refs.canvas.offsetHeight
-      });
     },
+  },
+
+  computed: {
+    width() {
+      return this.$store.state.video.width;
+    },
+
+    height() {
+      return this.$store.state.video.height;
+    }
   }
 };
 </script>
