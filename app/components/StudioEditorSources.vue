@@ -23,6 +23,80 @@ export default {
     window.addEventListener('resize', this.onResize);
 
     this.onResize();
+
+    // this.$refs.canvas.onclick = function(){console.log('mouse click event');};
+    // this.$refs.canvas.onmousemove = function(){console.log('mouse move event');};
+    let canvasToDrag = this.$refs.canvas;
+    let downFlag = false;
+    // canvasToDrag.onmousedown = function(){canvasToDrag.onmousemove = function(){console.log('drag event');};};
+
+    var position = {
+      X: 0,
+      Y: 0
+    };
+
+    canvasToDrag.onmousedown = function (down) {
+      downFlag = true;
+
+      // Record click position
+      position.X = down.clientX;
+      position.Y = down.clientY;
+
+    };
+
+    canvasToDrag.onmouseup = function (up) {
+      downFlag = false;
+
+      var box = canvasToDrag.getBoundingClientRect();
+
+      var body = document.body;
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+      var clientTop = docEl.clientTop || body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+      var top  = box.top +  scrollTop - clientTop;
+      var left = box.left + scrollLeft - clientLeft;
+
+      var pos = { 
+        top: Math.round(top), 
+        left: Math.round(left) 
+      };
+
+      console.log('click ! coordinates : ', up.clientX - pos.left - window.scrollX, ',', up.clientY - pos.top - window.scrollY);
+    };
+
+    canvasToDrag.onmousemove = function (move) {
+      var box = canvasToDrag.getBoundingClientRect();
+
+      var body = document.body;
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+      var clientTop = docEl.clientTop || body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+      var top  = box.top +  scrollTop - clientTop;
+      var left = box.left + scrollLeft - clientLeft;
+
+      var pos = { 
+        top: Math.round(top), 
+        left: Math.round(left) 
+      };
+
+      if (downFlag) {
+        if (position.X !== move.clientX || position.Y !== move.clientY) {
+          console.log('move while dragged event, coordinates : ', move.clientX - pos.left - window.scrollX, ',', move.clientY - pos.top - window.scrollY);
+        }
+      }
+    };
+
+
   },
 
   beforeDestroy() {
