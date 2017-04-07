@@ -207,6 +207,14 @@ class ObsApi {
   removeSourceDisplay(key) {
     nodeObs.OBS_content_destroyDisplay(key);
   }
+
+  selectSource(x, y) {
+    nodeObs.OBS_content_selectSource(x, y);
+  }
+
+  dragSelectedSource(x, y) {
+    nodeObs.OBS_content_dragSelectedSource(x, y);
+  }
   
   startStreaming() {
     nodeObs.OBS_service_startStreaming();

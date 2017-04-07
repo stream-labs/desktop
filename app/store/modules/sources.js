@@ -217,6 +217,15 @@ const actions = {
       sourceId: data.sourceId,
     });
   },
+
+  selectSource({ commit, state }, data) {
+    Obs.selectSource(data.x, data.y);
+  },
+
+  dragSelectedSource({ commit, state }, data) {
+    Obs.dragSelectedSource(data.x, data.y);
+  },
+
 };
 
 const getters = {

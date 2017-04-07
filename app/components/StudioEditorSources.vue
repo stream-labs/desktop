@@ -67,6 +67,7 @@ export default {
       };
 
       console.log('click ! coordinates : ', up.clientX - pos.left - window.scrollX, ',', up.clientY - pos.top - window.scrollY);
+      Obs.selectSource(up.clientX - pos.left - window.scrollX, up.clientY - pos.top - window.scrollY);
     };
 
     canvasToDrag.onmousemove = function (move) {
@@ -92,6 +93,7 @@ export default {
       if (downFlag) {
         if (position.X !== move.clientX || position.Y !== move.clientY) {
           console.log('move while dragged event, coordinates : ', move.clientX - pos.left - window.scrollX, ',', move.clientY - pos.top - window.scrollY);
+          Obs.dragSelectedSource(move.clientX - pos.left - window.scrollX, move.clientY - pos.top - window.scrollY);
         }
       }
     };
