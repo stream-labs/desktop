@@ -66,8 +66,15 @@ export default {
         left: Math.round(left) 
       };
 
-      console.log('click ! coordinates : ', up.clientX - pos.left - window.scrollX, ',', up.clientY - pos.top - window.scrollY);
-      Obs.selectSource(up.clientX - pos.left - window.scrollX, up.clientY - pos.top - window.scrollY);
+      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+
+      var scalingRatioWidth = 1280 / canvasToDrag.getBoundingClientRect().width * factor;
+      var scalingRatioHeight = 720 / canvasToDrag.getBoundingClientRect().height * factor;
+
+      var x = (up.clientX - pos.left - window.scrollX)*scalingRatioWidth;
+      var y = (up.clientY - pos.top - window.scrollY)*scalingRatioHeight;
+
+      Obs.selectSource(x, y);
     };
 
     canvasToDrag.onmousemove = function (move) {
