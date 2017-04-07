@@ -70,36 +70,10 @@ export default {
 
     canvasToDrag.onmouseup = function (up) {
       downFlag = false;
-
-      // var box = canvasToDrag.getBoundingClientRect();
-
-      // var body = document.body;
-      // var docEl = document.documentElement;
-
-      // var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      // var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      // var clientTop = docEl.clientTop || body.clientTop || 0;
-      // var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      // var top  = box.top +  scrollTop - clientTop;
-      // var left = box.left + scrollLeft - clientLeft;
-
-      // var pos = { 
-      //   top: Math.round(top), 
-      //   left: Math.round(left) 
-      // };
-
-      // var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-
-      // var scalingRatioWidth = 1280 / canvasToDrag.getBoundingClientRect().width * factor;
-      // var scalingRatioHeight = 720 / canvasToDrag.getBoundingClientRect().height * factor;
-
-      // var x = (up.clientX - pos.left - window.scrollX)*scalingRatioWidth;
-      // var y = (up.clientY - pos.top - window.scrollY)*scalingRatioHeight;
-
-      // Obs.selectSource(x, y);
     };
+    canvasToDrag.onmouseleave = function (move) {
+      downFlag = false;
+    }
 
     canvasToDrag.onmousemove = function (move) {
       var box = canvasToDrag.getBoundingClientRect();
@@ -131,6 +105,7 @@ export default {
           var x = (move.clientX - pos.left - window.scrollX)*scalingRatioWidth;
           var y = (move.clientY - pos.top - window.scrollY)*scalingRatioHeight;
 
+          console.log(x,y);
           Obs.dragSelectedSource(x, y);
         }
       }
