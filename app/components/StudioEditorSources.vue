@@ -13,22 +13,22 @@
 import SourceFrameStream from '../util/SourceFrameStream.js';
 import _ from 'lodash';
 import Obs from '../api/Obs.js';
-const { webFrame, screen } = window.require('electron')
+const { webFrame, screen, remote } = window.require('electron')
 
 export default {
 
   mounted() {
     this.streamedSources = {};
-
-    window.addEventListener('resize', this.onResize);
-
+    var browser = remote.getCurrentWindow();
+    Obs.createDisplay(browser.getNativeWindowHandle(), 'Main Window');
     this.onResize();
 
-    // this.$refs.canvas.onclick = function(){console.log('mouse click event');};
-    // this.$refs.canvas.onmousemove = function(){console.log('mouse move event');};
+    browser.show();
+    
+    window.addEventListener('resize', this.onResize);
+
     let canvasToDrag = this.$refs.canvas;
     let downFlag = false;
-    // canvasToDrag.onmousedown = function(){canvasToDrag.onmousemove = function(){console.log('drag event');};};
 
     var position = {
       X: 0,
@@ -111,8 +111,6 @@ export default {
         }
       }
     };
-
-
   },
 
   beforeDestroy() {

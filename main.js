@@ -39,12 +39,6 @@ app.on('ready', () => {
   //   // mainWindow.webContents.setZoomFactor(0.665);
   // });
 
-
-  mainWindow.once('ready-to-show', () => {
-    obs.OBS_content_createDisplay(mainWindow.getNativeWindowHandle(), "Main Window");
-    mainWindow.show();
-  });
-
   mainWindow.loadURL(indexUrl);
 
   mainWindow.on('closed', () => {
