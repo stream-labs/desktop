@@ -71,8 +71,9 @@ export default {
     canvasToDrag.onmouseup = function (up) {
       downFlag = false;
     };
-    canvasToDrag.onmouseleave = function (move) {
-      downFlag = false;
+    canvasToDrag.onmouseout = function (move) {
+      // downFlag = false;
+      // console.log('leave');
     }
 
     canvasToDrag.onmousemove = function (move) {
@@ -105,7 +106,7 @@ export default {
           var x = (move.clientX - pos.left - window.scrollX)*scalingRatioWidth;
           var y = (move.clientY - pos.top - window.scrollY)*scalingRatioHeight;
 
-          console.log(x,y);
+          // console.log(x,y);
           Obs.dragSelectedSource(x, y);
         }
       }
