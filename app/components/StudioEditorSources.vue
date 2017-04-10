@@ -8,7 +8,8 @@
     @mousedown="handleMouseDown"
     @mousemove="handleMouseMove"
     @mouseup="handleMouseUp"
-    @mouseleave="handleMouseLeave"/>
+    @mouseleave="handleMouseLeave"
+    @mouseenter="handleMouseEnter"/>
 </div>
 </template>
 
@@ -37,9 +38,8 @@ export default {
   },
 
   methods: {
-    handleMouseDown(event) {
-      this.downFlag = true;
-
+    // Gets properly scaled mouse coordinates within the preview
+    getLocalMouseCoordinates(event) {
       const preview = this.$refs.preview;
 
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
@@ -49,36 +49,42 @@ export default {
       const scalingRatioWidth = this.width / preview.offsetWidth * factor;
       const scalingRatioHeight = this.height / preview.offsetHeight * factor;
 
-      var x = (event.clientX - rect.left) * scalingRatioWidth;
-      var y = (event.clientY - rect.top)  * scalingRatioHeight;
+      const x = (event.clientX - rect.left) * scalingRatioWidth;
+      const y = (event.clientY - rect.top)  * scalingRatioHeight;
 
-      Obs.selectSource(x, y);
+      return {
+        x,
+        y
+      };
+    },
+
+    handleMouseDown(event) {
+      this.mouseDown = true;
+
+      const coords = this.getLocalMouseCoordinates(event);
+
+      Obs.selectSource(coords.x, coords.y);
     },
 
     handleMouseMove(event) {
-      if (this.downFlag) {
-        const preview = this.$refs.preview;
+      if (this.mouseDown && !this.mouseOut) {
+        const coords = this.getLocalMouseCoordinates(event);
 
-        const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-
-        const rect = preview.getBoundingClientRect();
-
-        const scalingRatioWidth = this.width / preview.offsetWidth * factor;
-        const scalingRatioHeight = this.height / preview.offsetHeight * factor;
-
-        var x = (event.clientX - rect.left) * scalingRatioWidth;
-        var y = (event.clientY - rect.top) * scalingRatioHeight;
-
-        Obs.dragSelectedSource(x, y);
+        Obs.dragSelectedSource(coords.x, coords.y);
       }
     },
 
     handleMouseUp() {
-      this.downFlag = false;
+      this.mouseDown = false;
     },
 
     handleMouseLeave() {
-      this.downFlag = false;
+      this.mouseOut = true;
+    },
+
+    handleMouseEnter(event) {
+      this.mouseOut = false;
+      this.mouseDown = event.buttons === 1;
     },
 
     onResize() {
@@ -94,8 +100,8 @@ export default {
 
       Obs.moveDisplay(
         'Main Window',
-        (rect.left - window.scrollX) * factor,
-        (rect.top - window.scrollY) * factor
+        rect.left * factor,
+        rect.top * factor
       );
     },
   },
