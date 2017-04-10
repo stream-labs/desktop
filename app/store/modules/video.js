@@ -1,8 +1,8 @@
 
 
 const state = {
-  width: 1920,
-  height: 1080,
+  width: 1280,
+  height: 720,
 
   // This is the actual size of the canvas on screen
   renderedWidth: 0,

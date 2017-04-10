@@ -30,35 +30,11 @@ const actions = {
       type: 'createNewScene',
       sceneName: 'Example Scene 1'
     });
-    // dispatch({
-    //   type: 'createNewScene',
-    //   sceneName: 'Example Scene 2'
-    // });
-    // dispatch({
-    //   type: 'createNewScene',
-    //   sceneName: 'Example Scene 3'
-    // });
 
     dispatch({
       type: 'makeSceneActive',
       sceneName: 'Example Scene 1'
     });
-
-    // dispatch({
-    //   type: 'createSourceAndAddToScene',
-    //   sceneName: 'Example Scene 1',
-    //   sourceType: 'Video Capture Device',
-    //   sourceName: 'Video Capture Device',
-    //   sourceId: ipcRenderer.sendSync('getUniqueId')
-    // });
-
-    // dispatch({
-    //   type: 'createSourceAndAddToScene',
-    //   sceneName: 'Example Scene 1',
-    //   sourceType: 'Window Capture',
-    //   sourceName: 'Window Capture',
-    //   sourceId: ipcRenderer.sendSync('getUniqueId')
-    // });
   }
 };
 

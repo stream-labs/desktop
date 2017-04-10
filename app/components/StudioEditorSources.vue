@@ -2,15 +2,17 @@
 <div>
   <canvas
     class="StudioEditorSources"
-    ref="canvas"
+    ref="preview"
     :width="width"
     :height="height"
-    @resize="onResize"/>
+    @mousedown="handleMouseDown"
+    @mousemove="handleMouseMove"
+    @mouseup="handleMouseUp"
+    @mouseleave="handleMouseLeave"/>
 </div>
 </template>
 
 <script>
-import SourceFrameStream from '../util/SourceFrameStream.js';
 import _ from 'lodash';
 import Obs from '../api/Obs.js';
 const { webFrame, screen, remote } = window.require('electron')
@@ -24,93 +26,8 @@ export default {
     this.onResize();
 
     browser.show();
-    
+
     window.addEventListener('resize', this.onResize);
-
-    let canvasToDrag = this.$refs.canvas;
-    let downFlag = false;
-
-    var position = {
-      X: 0,
-      Y: 0
-    };
-
-    canvasToDrag.onmousedown = function (down) {
-      downFlag = true;
-
-      var box = canvasToDrag.getBoundingClientRect();
-
-      var body = document.body;
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      var clientTop = docEl.clientTop || body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      var top  = box.top +  scrollTop - clientTop;
-      var left = box.left + scrollLeft - clientLeft;
-
-      var pos = { 
-        top: Math.round(top), 
-        left: Math.round(left) 
-      };
-
-      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-
-      var scalingRatioWidth = 1280 / canvasToDrag.getBoundingClientRect().width * factor;
-      var scalingRatioHeight = 720 / canvasToDrag.getBoundingClientRect().height * factor;
-
-      var x = (down.clientX - pos.left - window.scrollX)*scalingRatioWidth;
-      var y = (down.clientY - pos.top - window.scrollY)*scalingRatioHeight;
-
-      Obs.selectSource(x, y);
-    };
-
-    canvasToDrag.onmouseup = function (up) {
-      downFlag = false;
-    };
-    canvasToDrag.onmouseout = function (move) {
-      // downFlag = false;
-      // console.log('leave');
-    }
-
-    canvasToDrag.onmousemove = function (move) {
-      var box = canvasToDrag.getBoundingClientRect();
-
-      var body = document.body;
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      var clientTop = docEl.clientTop || body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      var top  = box.top +  scrollTop - clientTop;
-      var left = box.left + scrollLeft - clientLeft;
-
-      var pos = { 
-        top: Math.round(top), 
-        left: Math.round(left) 
-      };
-
-      if (downFlag) {
-        if (position.X !== move.clientX || position.Y !== move.clientY) {
-          var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-
-          var scalingRatioWidth = 1280 / canvasToDrag.getBoundingClientRect().width * factor;
-          var scalingRatioHeight = 720 / canvasToDrag.getBoundingClientRect().height * factor;
-
-          var x = (move.clientX - pos.left - window.scrollX)*scalingRatioWidth;
-          var y = (move.clientY - pos.top - window.scrollY)*scalingRatioHeight;
-
-          // console.log(x,y);
-          Obs.dragSelectedSource(x, y);
-        }
-      }
-    };
   },
 
   beforeDestroy() {
@@ -120,30 +37,54 @@ export default {
   },
 
   methods: {
-    // http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-    getCoords(elem) { // crossbrowser version
-        var box = elem.getBoundingClientRect();
+    handleMouseDown(event) {
+      this.downFlag = true;
 
-        var body = document.body;
-        var docEl = document.documentElement;
+      const preview = this.$refs.preview;
 
-        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+      const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
-        var clientTop = docEl.clientTop || body.clientTop || 0;
-        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+      const rect = preview.getBoundingClientRect();
 
-        var top  = box.top +  scrollTop - clientTop;
-        var left = box.left + scrollLeft - clientLeft;
+      const scalingRatioWidth = this.width / preview.offsetWidth * factor;
+      const scalingRatioHeight = this.height / preview.offsetHeight * factor;
 
-        return { top: Math.round(top), left: Math.round(left) };
+      var x = (event.clientX - rect.left) * scalingRatioWidth;
+      var y = (event.clientY - rect.top)  * scalingRatioHeight;
+
+      Obs.selectSource(x, y);
+    },
+
+    handleMouseMove(event) {
+      if (this.downFlag) {
+        const preview = this.$refs.preview;
+
+        const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+
+        const rect = preview.getBoundingClientRect();
+
+        const scalingRatioWidth = this.width / preview.offsetWidth * factor;
+        const scalingRatioHeight = this.height / preview.offsetHeight * factor;
+
+        var x = (event.clientX - rect.left) * scalingRatioWidth;
+        var y = (event.clientY - rect.top) * scalingRatioHeight;
+
+        Obs.dragSelectedSource(x, y);
+      }
+    },
+
+    handleMouseUp() {
+      this.downFlag = false;
+    },
+
+    handleMouseLeave() {
+      this.downFlag = false;
     },
 
     onResize() {
-      var canvas = this.$refs.canvas;
-      var rect = canvas.getBoundingClientRect();
-      var pos = this.getCoords(canvas);
-      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+      const preview = this.$refs.preview;
+      const rect = preview.getBoundingClientRect();
+      const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
       Obs.resizeDisplay(
         'Main Window',
@@ -153,8 +94,8 @@ export default {
 
       Obs.moveDisplay(
         'Main Window',
-        (pos.left - window.scrollX) * factor,
-        (pos.top - window.scrollY) * factor
+        (rect.left - window.scrollX) * factor,
+        (rect.top - window.scrollY) * factor
       );
     },
   },
