@@ -36,8 +36,6 @@
     "vue-template-compiler": "^2.1.10",
     "vuedraggable": "^2.8.5",
     "vuex": "^2.1.1",
-    "webpack": "^2.2.1",
-    "yuv-buffer": "^1.0.0",
-    "yuv-canvas": "^1.0.0"
+    "webpack": "^2.2.1"
   }
 }

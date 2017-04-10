@@ -21,8 +21,7 @@ const { webFrame, screen, remote } = window.require('electron')
 export default {
 
   mounted() {
-    this.streamedSources = {};
-    var browser = remote.getCurrentWindow();
+    const browser = remote.getCurrentWindow();
     Obs.createDisplay('Main Window');
     this.onResize();
 

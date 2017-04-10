@@ -38,13 +38,13 @@ yarn
 Then, rebuild native extensions for electron:
 
 ```
-yarn run rebuild
+yarn rebuild
 ```
 
 Finally, compile assets with webpack:
 
 ```
-yarn run compile
+yarn compile
 ```
 
 ## Starting
