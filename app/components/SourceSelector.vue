@@ -36,22 +36,24 @@ export default {
 
   methods: {
     addSource() {
-      windowManager.showAddSource();
+      if (this.$store.getters.activeScene) {
+        windowManager.showAddSource();
+      }
     },
 
     removeSource() {
       // We can only remove a source if one is selected
-      if(this.$store.getters.activeSourceId) {
+      if(this.activeSourceId) {
         this.$store.dispatch({
           type: 'removeSource',
-          sourceId: this.$store.getters.activeSourceId
+          sourceId: this.activeSourceId
         });
       }
     },
 
     sourceProperties() {
-      if (this.$store.getters.activeSourceId) {
-        windowManager.showSourceProperties(this.$store.getters.activeSourceId);
+      if (this.activeSourceId) {
+        windowManager.showSourceProperties(this.activeSourceId);
       }
     },
 
@@ -81,15 +83,19 @@ export default {
 
   computed: {
     sources() {
-      return _.map(this.$store.getters.activeScene.sources, sourceId => {
-        let source = this.$store.state.sources.sources[sourceId];
+      if (this.$store.getters.activeScene) {
+        return _.map(this.$store.getters.activeScene.sources, sourceId => {
+          let source = this.$store.state.sources.sources[sourceId];
 
-        // This is the format that the Selector component wants
-        return {
-          name: source.name,
-          value: source.id
-        }
-      });
+          // This is the format that the Selector component wants
+          return {
+            name: source.name,
+            value: source.id
+          }
+        });
+      } else {
+        return [];
+      }
     },
 
     activeSourceId() {
