@@ -32,7 +32,7 @@ class ObsApi {
   }
 
   destroyDisplay(key) {
-    nodeObs.OBS_content_destroy_display(key);
+    nodeObs.OBS_content_destroyDisplay(key);
   }
 
   resizeDisplay(key, width, height) {

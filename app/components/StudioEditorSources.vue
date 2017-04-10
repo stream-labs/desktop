@@ -33,7 +33,7 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
-    clearInterval(this.renderInterval);
+    Obs.destroyDisplay('Main Window');
   },
 
   methods: {
