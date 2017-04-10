@@ -103,21 +103,18 @@ class WindowManager {
     });
   }
 
-  showSourceProperties(sourceId, windowHandle) {
-    console.log("window handle in showSourceProperties : ", windowHandle);
-    console.log("sourceId in showSourceProperties : ", sourceId);
+  showSourceProperties(sourceId) {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
-        sourceId,
-        windowHandle
+        sourceId
       },
       windowOptions: {
         width: 600,
         height: 800
       }
     });
-    
+
   }
 
 

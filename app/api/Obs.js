@@ -1,7 +1,7 @@
 // This class provides the "glue" between the node-obs module
 // and the Vue app. This class is intended to be a singleton.
 
-const { ipcRenderer } = window.require('electron');
+const { ipcRenderer, remote } = window.require('electron');
 
 import _ from 'lodash';
 
@@ -24,12 +24,15 @@ class ObsApi {
     this.nodeObs = nodeObs;
   }
 
-  createDisplay(window, key) {
-    nodeObs.OBS_content_createDisplay(window, key);
+  createDisplay(key) {
+    nodeObs.OBS_content_createDisplay(
+      remote.getCurrentWindow().getNativeWindowHandle(),
+      key
+    );
   }
 
   destroyDisplay(key) {
-    nodeObs.OBS_content_destroy_display(key);
+    nodeObs.OBS_content_destroyDisplay(key);
   }
 
   resizeDisplay(key, width, height) {
@@ -200,8 +203,12 @@ class ObsApi {
     nodeObs.OBS_content_setSourceScaling(name, x.toString(), y.toString());
   }
 
-  createSourceDisplay(windowHandle, name, key) {
-    return nodeObs.OBS_content_createSourcePreviewDisplay(windowHandle, name, key);
+  createSourceDisplay(sourceName, key) {
+    return nodeObs.OBS_content_createSourcePreviewDisplay(
+      remote.getCurrentWindow().getNativeWindowHandle(),
+      sourceName,
+      key
+    );
   }
 
   removeSourceDisplay(key) {
