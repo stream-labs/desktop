@@ -25,33 +25,6 @@ const mutations = {
     let source = state.sources[data.sourceId];
 
     source.restorePoint = _.cloneDeep(source.properties);
-  },
-
-  SET_SOURCE_SIZE(state, data) {
-    let source = state.sources[data.sourceId];
-
-    source.width = data.width;
-    source.height = data.height;
-
-    source.scaledWidth = source.width * source.scaleX;
-    source.scaledHeight = source.height * source.scaleY;
-  },
-
-  SET_SOURCE_POSITION(state, data) {
-    let source = state.sources[data.sourceId];
-
-    source.x = data.x;
-    source.y = data.y;
-  },
-
-  SET_SOURCE_SCALE(state, data) {
-    let source = state.sources[data.sourceId];
-
-    source.scaleX = data.scaleX;
-    source.scaleY = data.scaleY;
-
-    source.scaledWidth = source.width * source.scaleX;
-    source.scaledHeight = source.height * source.scaleY;
   }
 };
 
@@ -75,21 +48,7 @@ const actions = {
         name: data.sourceName,
         type: data.sourceType,
         properties,
-        restorePoint: null,
-        x: 0,
-        y: 0,
-
-        // Original frame size
-        width: 0,
-        height: 0,
-
-        // Scaling factor
-        scaleX: 1.0,
-        scaleY: 1.0,
-
-        // These are a function of dimensions and scale
-        scaledWidth: 0,
-        scaledHeight: 0
+        restorePoint: null
       }
     });
 
@@ -155,36 +114,6 @@ const actions = {
     dispatch({
       type: 'refreshProperties',
       sourceId: data.sourceId
-    });
-  },
-
-  setSourceSize({ commit }, data) {
-    commit('SET_SOURCE_SIZE', {
-      sourceId: data.sourceId,
-      width: data.width,
-      height: data.height
-    });
-  },
-
-  setSourcePosition({ commit, state }, data) {
-    let source = state.sources[data.sourceId];
-    Obs.setSourcePosition(source.name, data.x, data.y);
-
-    commit('SET_SOURCE_POSITION', {
-      sourceId: data.sourceId,
-      x: data.x,
-      y: data.y
-    });
-  },
-
-  setSourceScale({ commit, state }, data) {
-    let source = state.sources[data.sourceId];
-    Obs.setSourceScale(source.name, data.scaleX, data.scaleY);
-
-    commit('SET_SOURCE_SCALE', {
-      sourceId: data.sourceId,
-      scaleX: data.scaleX,
-      scaleY: data.scaleY
     });
   }
 };

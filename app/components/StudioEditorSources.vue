@@ -22,7 +22,7 @@ export default {
   mounted() {
     this.streamedSources = {};
     var browser = remote.getCurrentWindow();
-    Obs.createDisplay(browser.getNativeWindowHandle(), 'Main Window');
+    Obs.createDisplay('Main Window');
     this.onResize();
 
     browser.show();

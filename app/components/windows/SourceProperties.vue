@@ -135,7 +135,6 @@ export default {
 
   created() {
     Obs.createSourceDisplay(
-      this.windowHandle,
       this.sourceName,
       'Preview Window'
     );
