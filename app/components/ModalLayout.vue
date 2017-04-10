@@ -1,5 +1,6 @@
 <template>
 <div class="ModalLayout">
+  <div class="ModalLayout-spacer"/>
   <title-bar :window-title="title" class="ModalLayout-titleBar"/>
   <div
     class="ModalLayout-content"
@@ -82,6 +83,10 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.ModalLayout-spacer {
+  height: 5px;
 }
 
 .ModalLayout-titleBar {
