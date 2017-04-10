@@ -65,7 +65,7 @@ const mutations = {
 };
 
 const actions = {
-  createNewScene({ commit }, data) {
+  createNewScene({ commit, dispatch }, data) {
     Obs.createScene(data.sceneName);
 
     commit('ADD_SCENE', {
@@ -74,6 +74,11 @@ const actions = {
         activeSourceId: null,
         sources: []
       }
+    });
+
+    dispatch({
+      type: 'makeSceneActive',
+      sceneName: data.sceneName
     });
   },
 

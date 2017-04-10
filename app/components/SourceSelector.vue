@@ -81,15 +81,19 @@ export default {
 
   computed: {
     sources() {
-      return _.map(this.$store.getters.activeScene.sources, sourceId => {
-        let source = this.$store.state.sources.sources[sourceId];
+      if (this.$store.getters.activeScene) {
+        return _.map(this.$store.getters.activeScene.sources, sourceId => {
+          let source = this.$store.state.sources.sources[sourceId];
 
-        // This is the format that the Selector component wants
-        return {
-          name: source.name,
-          value: source.id
-        }
-      });
+          // This is the format that the Selector component wants
+          return {
+            name: source.name,
+            value: source.id
+          }
+        });
+      } else {
+        return [];
+      }
     },
 
     activeSourceId() {
