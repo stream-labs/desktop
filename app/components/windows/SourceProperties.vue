@@ -7,9 +7,9 @@
   :content-styles="contentStyles"
   @resize="onResize">
   <div slot="content">
-    <source-properties-preview
+    <div
       class="SourceProperties-preview"
-      :source-id="sourceId"/>
+      ref="preview"/>
     <div class="SourceProperties-form">
     <component
       v-for="property in properties"
@@ -23,7 +23,6 @@
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import SourcePropertiesPreview from '../SourcePropertiesPreview.vue';
 import windowManager from '../../util/WindowManager.js';
 import Obs from '../../api/Obs.js';
 import _ from 'lodash';
@@ -51,10 +50,7 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
-    this.$store.dispatch({
-      type: 'removeSourceDisplay',
-      sourceId: this.sourceId
-    });
+    Obs.removeSourceDisplay('Preview Window');
   },
 
   data() {
@@ -68,7 +64,6 @@ export default {
 
   components: {
     ModalLayout,
-    SourcePropertiesPreview,
     ListProperty,
     BoolProperty,
     FloatProperty,
@@ -83,62 +78,42 @@ export default {
   },
 
   methods: {
-
-    getCoords(elem) { // crossbrowser version
-        var box = elem.getBoundingClientRect();
-
-        var body = document.body;
-        var docEl = document.documentElement;
-
-        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-        var clientTop = docEl.clientTop || body.clientTop || 0;
-        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-        var top  = box.top +  scrollTop - clientTop;
-        var left = box.left + scrollLeft - clientLeft;
-
-        return { top: Math.round(top), left: Math.round(left) };
-    },
-
     onResize() {
-      var canvas = document.getElementsByClassName("SourceProperties-preview");
-      var pos = this.getCoords(canvas["0"]);
-      var factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+      const preview = this.$refs.preview;
+      const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+      const rect = preview.getBoundingClientRect();
 
       Obs.resizeDisplay(
         'Preview Window',
-        canvas["0"].scrollWidth * factor,
-        canvas["0"].scrollHeight * factor
+        rect.width * factor,
+        rect.height * factor
       );
 
       Obs.moveDisplay(
         'Preview Window',
-        pos.left - window.scrollX * factor,
-        pos.top - window.scrollY * factor
+        rect.left * factor,
+        rect.top * factor
       );
     },
 
-    done() {
-      this.$store.dispatch({
-        type: 'removeSourceDisplay',
-        sourceId: this.sourceId
-      });
+    closeWindow() {
+      Obs.removeSourceDisplay('Preview Window');
       windowManager.closeWindow();
     },
 
-    cancel() {
-      this.$store.dispatch({
-        type: 'restoreProperties',
-        sourceId: this.sourceId
-      });
-      this.$store.dispatch({
-        type: 'removeSourceDisplay',
-        sourceId: this.sourceId
-      });
+    done() {
+      this.closeWindow();
+    },
 
-      windowManager.closeWindow();
+    cancel() {
+      // TODO: Get property restore working.
+      // For now, do the same as done.
+      // this.$store.dispatch({
+      //   type: 'restoreProperties',
+      //   sourceId: this.sourceId
+      // });
+
+      this.closeWindow();
     },
 
     propertyComponentForType(type) {
@@ -159,12 +134,11 @@ export default {
   },
 
   created() {
-    console.log(this.properties);
-    this.$store.dispatch({
-          type: 'createSourceDisplay',
-          sourceId: this.sourceId,
-          windowHandle: this.windowHandle
-    });
+    Obs.createSourceDisplay(
+      this.windowHandle,
+      this.sourceName,
+      'Preview Window'
+    );
   },
 
   watch: {
@@ -198,6 +172,10 @@ export default {
       } else {
         return [];
       }
+    },
+
+    sourceName() {
+      return this.$store.state.sources.sources[this.sourceId].name;
     },
 
     sourceId() {
