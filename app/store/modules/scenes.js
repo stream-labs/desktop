@@ -1,5 +1,6 @@
 import Obs from '../../api/Obs.js';
 import _ from 'lodash';
+import configFileManager from '../../util/ConfigFileManager.js';
 
 const state = {
   activeSceneName: null,
@@ -86,6 +87,8 @@ const actions = {
       type: 'makeSceneActive',
       sceneName: data.sceneName
     });
+
+    configFileManager.save();
   },
 
   removeScene({ commit }, data) {
@@ -94,6 +97,8 @@ const actions = {
     commit('REMOVE_SCENE', {
       sceneName: data.sceneName
     });
+
+    configFileManager.save();
   },
 
   makeSceneActive({ commit }, data) {
@@ -102,6 +107,8 @@ const actions = {
     commit('MAKE_SCENE_ACTIVE', {
       sceneName: data.sceneName
     });
+
+    configFileManager.save();
   },
 
   setSceneOrder({ commit }, data) {

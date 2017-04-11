@@ -12,6 +12,10 @@ class ConfigFileManager {
   constructor() {
     this.filename = 'config.json';
     this.path = path.join(remote.app.getPath('userData'), this.filename);
+
+    // Calling save is expensive, so only call it at most
+    // every 5 seconds.
+    this.save = _.throttle(this.rawSave, 5000);
   }
 
   load() {
@@ -19,7 +23,7 @@ class ConfigFileManager {
     store.dispatch('loadConfiguration');
   }
 
-  save() {
+  rawSave() {
     Obs.saveConfig(this.path);
   }
 
