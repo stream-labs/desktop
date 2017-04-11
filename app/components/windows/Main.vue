@@ -1,10 +1,11 @@
 <template>
-<div class="topLayout">
+<div class="Main">
+  <div class="Main-resizeSpacer"/>
   <title-bar
     :windowTitle="title"/>
-  <div class="topLayout-spacer bgColor-teal"></div>
+  <div class="Main-spacer bgColor-teal"></div>
   <top-nav></top-nav>
-  <component class="pageContainer" :is="page">
+  <component class="Main-pageContainer" :is="page">
   </component>
 </div>
 </template>
@@ -48,17 +49,21 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.topLayout {
+.Main {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.topLayout-spacer {
+.Main-resizeSpacer {
+  height: 5px;
+}
+
+.Main-spacer {
   height: 4px;
 }
 
-.pageContainer {
+.Main-pageContainer {
   /* Page always takes up remaining space */
   flex-grow: 1;
 }

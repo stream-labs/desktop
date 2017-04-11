@@ -4,19 +4,18 @@
   :show-controls="true"
   :done-handler="done"
   :cancel-handler="cancel"
-  :content-styles="contentStyles"
+  :fixedSectionHeight="200"
   @resize="onResize">
+  <div
+    class="SourceProperties-preview"
+    slot="fixed"
+    ref="preview"/>
   <div slot="content">
-    <div
-      class="SourceProperties-preview"
-      ref="preview"/>
-    <div class="SourceProperties-form">
     <component
       v-for="property in properties"
       v-if="property.visible"
       :is="propertyComponentForType(property.type)"
       :property="property"/>
-    </div>
   </div>
 </modal-layout>
 </template>
@@ -51,15 +50,6 @@ export default {
     window.removeEventListener('resize', this.onResize);
 
     Obs.removeSourceDisplay('Preview Window');
-  },
-
-  data() {
-    return {
-      contentStyles: {
-        padding: 0,
-        'margin-top': '20%',
-      }
-    };
   },
 
   components: {
@@ -165,7 +155,7 @@ export default {
 
     properties() {
       let source = this.$store.state.sources.sources[this.sourceId];
-      
+
       if (source) {
         return source.properties;
       } else {
@@ -191,20 +181,7 @@ export default {
 
 <style lang="less" scoped>
 .SourceProperties-preview {
-  position: fixed;
-  top: 40px;
-  left: 0;
-  right: 0;
-  margin: auto;
-
-  height: 20%;
-  width: 100%;
+  height: 100%;
   background-color: black;
-}
-
-.SourceProperties-form {
-  padding-top: 10%;
-  padding-left: 2%;
-  padding-right: 2%;
 }
 </style>
