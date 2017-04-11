@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // This is an autosave interval that saves every minute.
+  setInterval(() => {
+    configFileManager.save();
+  }, 60 * 1000);
+
   window.obs = Obs.nodeObs;
 
   let vm = new Vue({

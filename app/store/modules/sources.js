@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Obs from '../../api/Obs.js';
 import _ from 'lodash';
+import configFileManager from '../../util/ConfigFileManager.js';
 
 const state = {
   sources: {}
@@ -68,6 +69,8 @@ const actions = {
       sourceId: data.sourceId,
       sceneName: data.sceneName
     });
+
+    configFileManager.save();
   },
 
   removeSource({ commit, state }, data) {
@@ -82,6 +85,8 @@ const actions = {
     commit('REMOVE_SOURCE_FROM_ALL_SCENES', {
       sourceId: data.sourceId
     });
+
+    configFileManager.save();
   },
 
   refreshProperties({ commit, state }, data) {
@@ -105,6 +110,8 @@ const actions = {
       type: 'refreshProperties',
       sourceId: data.property.sourceId
     });
+
+    configFileManager.save();
   },
 
   createPropertiesRestorePoint({ commit }, data) {
