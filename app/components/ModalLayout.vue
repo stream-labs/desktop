@@ -3,6 +3,11 @@
   <div class="ModalLayout-spacer"/>
   <title-bar :window-title="title" class="ModalLayout-titleBar"/>
   <div
+    class="ModalLayout-fixed"
+    :style="fixedStyle">
+    <slot name="fixed"/>
+  </div>
+  <div
     class="ModalLayout-content"
     :style="contentStyle">
     <slot name="content"/>
@@ -36,8 +41,13 @@ export default {
 
     Object.assign(contentStyle, this.contentStyles);
 
+    let fixedStyle = {
+      height: (this.fixedSectionHeight || 0).toString() + 'px'
+    };
+
     return {
-      contentStyle
+      contentStyle,
+      fixedStyle
     };
   },
 
@@ -72,7 +82,10 @@ export default {
     'cancelHandler',
 
     // Additional CSS styles for the content section
-    'contentStyles'
+    'contentStyles',
+
+    // The height of the fixed section
+    'fixedSectionHeight'
   ]
 
 };
@@ -91,6 +104,10 @@ export default {
 
 .ModalLayout-titleBar {
   border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.ModalLayout-fixed {
   flex-shrink: 0;
 }
 
