@@ -7,8 +7,18 @@ const state = {
 };
 
 const mutations = {
+  RESET_SOURCES(state) {
+    state.sources = {};
+  },
+
   ADD_SOURCE(state, data) {
-    Vue.set(state.sources, data.source.id, data.source);
+    Vue.set(state.sources, data.id, {
+      id: data.id,
+      name: data.name,
+      type: data.type,
+      properties: data.properties,
+      restorePoint: null
+    });
   },
 
   REMOVE_SOURCE(state, data) {
@@ -43,13 +53,10 @@ const actions = {
     const properties = Obs.sourceProperties(data.sourceName, data.sourceId);
 
     commit('ADD_SOURCE', {
-      source: {
-        id: data.sourceId,
-        name: data.sourceName,
-        type: data.sourceType,
-        properties,
-        restorePoint: null
-      }
+      id: data.sourceId,
+      name: data.sourceName,
+      type: data.sourceType,
+      properties,
     });
 
     commit('ADD_SOURCE_TO_SCENE', {

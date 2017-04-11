@@ -8,6 +8,7 @@ import Obs from './api/Obs.js';
 import windowManager from './util/WindowManager.js';
 import URI from 'urijs';
 import contextMenuManager from './util/ContextMenuManager.js';
+import configFileManager from './util/ConfigFileManager.js';
 import _ from 'lodash';
 const { ipcRenderer } = window.require('electron');
 
@@ -24,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
       options: _.omit(query, ['child'])
     });
   } else {
+    configFileManager.load();
+
     store.dispatch({
       type: 'setWindowOptions',
       options: {

@@ -7,6 +7,7 @@ import streaming from './modules/streaming.js';
 import windowOptions from './modules/windowOptions.js';
 import video from './modules/video.js';
 import _ from 'lodash';
+import Obs from '../api/Obs.js';
 
 Vue.use(Vuex);
 
@@ -23,17 +24,35 @@ const mutations = {
 };
 
 const actions = {
+  loadConfiguration({ commit }, data) {
+    commit('RESET_SCENES');
+    commit('RESET_SOURCES');
 
-  // Create a bunch of test scenes and sources
-  initTestData({ dispatch }) {
-    dispatch({
-      type: 'createNewScene',
-      sceneName: 'Example Scene 1'
-    });
+    const scenes = Obs.getScenes();
 
-    dispatch({
-      type: 'makeSceneActive',
-      sceneName: 'Example Scene 1'
+    _.each(scenes, scene => {
+      commit('ADD_SCENE', {
+        name: scene
+      });
+
+      const sources = Obs.getSourcesInScene(scene);
+
+      _.each(sources, source => {
+        const id = ipcRenderer.sendSync('getUniqueId');
+        const properties = Obs.sourceProperties(source, id);
+
+        commit('ADD_SOURCE', {
+          id,
+          name: source,
+          type: null,
+          properties
+        });
+
+        commit('ADD_SOURCE_TO_SCENE', {
+          sceneName: scene,
+          sourceId: id
+        });
+      });
     });
   }
 };

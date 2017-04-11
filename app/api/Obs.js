@@ -59,6 +59,10 @@ class ObsApi {
     return nodeObs.OBS_content_getListCurrentScenes();
   }
 
+  getSourcesInScene(sceneName) {
+    return nodeObs.OBS_content_getListCurrentSourcesFromScene(sceneName);
+  }
+
   createSource(sceneName, sourceType, sourceName) {
     nodeObs.OBS_content_addSource(
       sourceType,
@@ -222,7 +226,7 @@ class ObsApi {
   dragSelectedSource(x, y) {
     nodeObs.OBS_content_dragSelectedSource(x, y);
   }
-  
+
   startStreaming() {
     nodeObs.OBS_service_startStreaming();
   }
@@ -253,6 +257,14 @@ class ObsApi {
   resetService() {
     nodeObs.OBS_service_createService();
     nodeObs.OBS_service_setServiceToTheStreamingOutput();
+  }
+
+  loadConfig(path) {
+    nodeObs.OBS_content_loadConfigFile(path);
+  }
+
+  saveConfig(path) {
+    nodeObs.OBS_content_saveIntoConfigFile(path);
   }
 
 }

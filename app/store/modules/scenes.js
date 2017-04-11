@@ -7,9 +7,19 @@ const state = {
 };
 
 const mutations = {
+  RESET_SCENES(state) {
+    state.activeSceneName = null;
+    state.scenes = [];
+  },
+
   ADD_SCENE(state, data) {
-    state.scenes.push(data.scene);
-    state.activeSceneName = state.activeSceneName || data.scene.name;
+    state.scenes.push({
+      name: data.name,
+      activeSourceId: null,
+      sources: []
+    });
+
+    state.activeSceneName = state.activeSceneName || data.name;
   },
 
   REMOVE_SCENE(state, data) {
@@ -40,7 +50,7 @@ const mutations = {
   },
 
   ADD_SOURCE_TO_SCENE(state, data) {
-    state.scenes.find(scene => { 
+    state.scenes.find(scene => {
       return scene.name === data.sceneName;
     }).sources.unshift(data.sourceId);
   },
@@ -69,11 +79,7 @@ const actions = {
     Obs.createScene(data.sceneName);
 
     commit('ADD_SCENE', {
-      scene: {
-        name: data.sceneName,
-        activeSourceId: null,
-        sources: []
-      }
+      name: data.sceneName
     });
 
     dispatch({
@@ -133,7 +139,7 @@ const actions = {
 
 const getters = {
   activeScene(state) {
-    return state.scenes.find(scene => { 
+    return state.scenes.find(scene => {
       return scene.name === state.activeSceneName;
     });
   },
