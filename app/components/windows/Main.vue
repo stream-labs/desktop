@@ -36,10 +36,6 @@ export default {
     };
   },
 
-  created() {
-    this.$store.dispatch('initTestData');
-  },
-
   computed: {
     page() {
       return this.$store.state.navigation.currentPage;

@@ -64,7 +64,7 @@ export default {
         type: 'setSourceOrder',
         sceneName: this.$store.getters.activeSceneName,
         order: data.order,
-        
+
         // For now, we are passing this data since the OBS API
         // uses a move-up move-down type interface.
         sourceName: data.change.moved.element.name,

@@ -10,6 +10,7 @@ import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import store from '../store';
+import configFileManager from'../util/ConfigFileManager.js';
 
 class WindowManager {
 
@@ -47,6 +48,8 @@ class WindowManager {
         options: {}
       });
     } else {
+      configFileManager.save();
+
       remote.getCurrentWindow().close();
     }
   }
