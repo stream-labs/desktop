@@ -169,10 +169,6 @@ export default {
 
     sourceId() {
       return this.$store.state.windowOptions.options.sourceId;
-    },
-
-    windowHandle() {
-      return this.$store.state.windowOptions.options.windowHandle;
     }
   }
 

@@ -1,8 +1,5 @@
 <template>
 <div class="Main">
-  <div class="Main-resizeSpacer"/>
-  <title-bar
-    :windowTitle="title"/>
   <div class="Main-spacer bgColor-teal"></div>
   <top-nav></top-nav>
   <component class="Main-pageContainer" :is="page">
@@ -11,7 +8,6 @@
 </template>
 
 <script>
-import TitleBar from '../TitleBar.vue';
 import TopNav from '../TopNav.vue';
 
 const { remote } = window.require('electron');
@@ -24,10 +20,13 @@ import Obs from '../../api/Obs.js';
 
 export default {
   components: {
-    TitleBar,
     TopNav,
     Studio,
     Dashboard
+  },
+
+  mounted() {
+    remote.getCurrentWindow().setTitle(this.title);
   },
 
   data() {
@@ -49,10 +48,6 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.Main-resizeSpacer {
-  height: 5px;
 }
 
 .Main-spacer {

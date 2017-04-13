@@ -1,7 +1,5 @@
 <template>
 <div class="ModalLayout">
-  <div class="ModalLayout-spacer"/>
-  <title-bar :window-title="title" class="ModalLayout-titleBar"/>
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -28,7 +26,6 @@
 </template>
 
 <script>
-import TitleBar from './TitleBar.vue';
 import windowManager from '../util/WindowManager.js';
 
 export default {
@@ -49,10 +46,6 @@ export default {
       contentStyle,
       fixedStyle
     };
-  },
-
-  components: {
-    TitleBar
   },
 
   methods: {
@@ -96,15 +89,6 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.ModalLayout-spacer {
-  height: 5px;
-}
-
-.ModalLayout-titleBar {
-  border-bottom: 1px solid #eee;
-  flex-shrink: 0;
 }
 
 .ModalLayout-fixed {
