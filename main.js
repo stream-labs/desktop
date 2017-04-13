@@ -40,8 +40,15 @@ app.on('ready', () => {
 
   mainWindow.loadURL(indexUrl);
 
+  mainWindow.on('close', e => {
+    if (!appExiting) {
+      mainWindow.send('shutdown');
+      appExiting = true;
+      e.preventDefault();
+    }
+  });
+
   mainWindow.on('closed', () => {
-    appExiting = true;
     app.quit();
   });
 

@@ -10,7 +10,7 @@ import URI from 'urijs';
 import contextMenuManager from './util/ContextMenuManager.js';
 import configFileManager from './util/ConfigFileManager.js';
 import _ from 'lodash';
-const { ipcRenderer } = window.require('electron');
+const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   } else {
     configFileManager.load();
+
+    ipcRenderer.on('shutdown', () => {
+      configFileManager.save();
+      remote.getCurrentWindow().close();
+    });
 
     store.dispatch({
       type: 'setWindowOptions',

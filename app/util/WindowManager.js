@@ -48,8 +48,6 @@ class WindowManager {
         options: {}
       });
     } else {
-      configFileManager.save();
-
       remote.getCurrentWindow().close();
     }
   }
