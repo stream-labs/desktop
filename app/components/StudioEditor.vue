@@ -1,17 +1,17 @@
 <template>
 <div class="StudioEditor">
-  <studio-editor-sources/>
+  <studio-editor-display/>
 </div>
 </template>
 
 <script>
-import StudioEditorSources from './StudioEditorSources.vue';
+import StudioEditorDisplay from './StudioEditorDisplay.vue';
 import _ from 'lodash';
 
 export default {
 
   components: {
-    StudioEditorSources
+    StudioEditorDisplay
   }
 
 };
