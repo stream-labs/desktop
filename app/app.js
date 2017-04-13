@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
       type: 'setWindowOptions',
       options: _.omit(query, ['child'])
     });
+
+    ipcRenderer.on('closeWindow', () => {
+      windowManager.closeWindow();
+    });
   } else {
     configFileManager.load();
 
