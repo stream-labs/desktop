@@ -42,8 +42,8 @@ app.on('ready', () => {
 
   mainWindow.on('close', e => {
     if (!appExiting) {
-      mainWindow.send('shutdown');
       appExiting = true;
+      mainWindow.send('shutdown');
       e.preventDefault();
     }
   });
