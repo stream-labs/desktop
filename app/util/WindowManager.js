@@ -89,7 +89,7 @@ class WindowManager {
       },
       windowOptions: {
         width: 400,
-        height: 240
+        height: 250
       }
     });
   }
@@ -101,7 +101,7 @@ class WindowManager {
       },
       windowOptions: {
         width: 400,
-        height: 240
+        height: 250
       }
     });
   }
