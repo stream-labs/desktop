@@ -27,6 +27,7 @@
 
 <script>
 import windowManager from '../util/WindowManager.js';
+const { remote } = window.require('electron');
 
 export default {
 
@@ -46,6 +47,10 @@ export default {
       contentStyle,
       fixedStyle
     };
+  },
+
+  mounted() {
+    remote.getCurrentWindow().setTitle(this.title);
   },
 
   methods: {
