@@ -1,16 +1,12 @@
 <template>
-<div>
-  <canvas
-    class="StudioEditorSources"
-    ref="preview"
-    :width="width"
-    :height="height"
-    @mousedown="handleMouseDown"
-    @mousemove="handleMouseMove"
-    @mouseup="handleMouseUp"
-    @mouseleave="handleMouseLeave"
-    @mouseenter="handleMouseEnter"/>
-</div>
+<div
+  class="StudioEditorSources"
+  ref="preview"
+  @mousedown="handleMouseDown"
+  @mousemove="handleMouseMove"
+  @mouseup="handleMouseUp"
+  @mouseleave="handleMouseLeave"
+  @mouseenter="handleMouseEnter"/>
 </template>
 
 <script>
@@ -121,13 +117,8 @@ export default {
 <style scoped>
 .StudioEditorSources {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 10px;
-  right: 10px;
-  margin: auto;
-  max-width: calc(100% - 20px);
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .StudioEditorSources-button {
