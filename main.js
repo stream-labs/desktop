@@ -20,8 +20,12 @@ const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../.
 
 // Windows
 let mainWindow;
-
 let childWindow;
+
+// Somewhat annoyingly, this is needed so that the child window
+// can differentiate between a user closing it vs the app
+// closing the windows before exit.
+let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
@@ -29,20 +33,34 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
-    frame: false,
     show: false
   });
+
+  mainWindow.setMenu(null);
 
   mainWindow.loadURL(indexUrl);
 
   mainWindow.on('closed', () => {
+    appExiting = true;
     app.quit();
   });
 
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
-    show: false,
-    frame: false
+    show: false
+  });
+
+  childWindow.setMenu(null);
+
+  // The child window is never closed, it just hides in the
+  // background until it is needed.
+  childWindow.on('close', e => {
+    if (!appExiting) {
+      childWindow.send('closeWindow');
+
+      // Prevent the window from actually closing
+      e.preventDefault();
+    }
   });
 
   childWindow.loadURL(indexUrl + '?child=true');
@@ -89,13 +107,6 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     childWindow.center();
   }
 
-  //Create a display to render the preview for the source properties view
-  if(data.startupOptions.component.localeCompare('SourceProperties') == 0) {
-    data.startupOptions.windowHandle = childWindow.getNativeWindowHandle();
-    console.log("window handle in data : ", data.startupOptions.windowHandle);
-  } else {
-    data.startupOptions.windowHandle = null;
-  }
   childWindow.send('window-setContents', data.startupOptions);
   childWindow.show();
 });
