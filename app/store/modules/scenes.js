@@ -120,7 +120,15 @@ const actions = {
     });
   },
 
-  makeSourceActive({ commit }, data) {
+  makeSourceActive({ commit, rootState }, data) {
+    // TODO: Properly handle multile active sources
+    if (data.sourceId) {
+      const source = rootState.sources.sources[data.sourceId];
+      Obs.setActiveSources([source.name]);
+    } else {
+      Obs.setActiveSources([]);
+    }
+
     commit('MAKE_SOURCE_ACTIVE', {
       sceneName: data.sceneName,
       sourceId: data.sourceId
