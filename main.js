@@ -167,20 +167,6 @@ ipcMain.on('obs-apiCall', (event, data) => {
   event.returnValue = retVal || null;
 });
 
-// We can't send functions over electron IPC, so this is special-cased
-ipcMain.on('obs-createDisplay', (event, data) => {
-  console.log("CREATING DISPLAY");
-
-  obs.OBS_content_createDisplay(data.handle, data.key, (name, width, height) => {
-    console.log("CALLBACK");
-    event.sender.send('obs-sourceResize', {
-      name,
-      width,
-      height
-    });
-  });
-});
-
 // Used for guaranteeing unique ids for objects in the vuex store
 ipcMain.on('getUniqueId', event => {
   event.returnValue = _.uniqueId();

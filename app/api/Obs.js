@@ -22,19 +22,13 @@ class ObsApi {
 
   constructor() {
     this.nodeObs = nodeObs;
-
-    ipcRenderer.on('obs-sourceResize', (event, data) => {
-      console.log("RESIZE", data.name, data.width, data.height);
-    });
   }
 
   createDisplay(key) {
-    const handle = remote.getCurrentWindow().getNativeWindowHandle();
-
-    ipcRenderer.send('obs-createDisplay', {
-      handle,
+    nodeObs.OBS_content_createDisplay(
+      remote.getCurrentWindow().getNativeWindowHandle(),
       key
-    });
+    );
   }
 
   destroyDisplay(key) {
