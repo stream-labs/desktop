@@ -207,6 +207,18 @@ class ObsApi {
     nodeObs.OBS_content_setSourceScaling(name, x.toString(), y.toString());
   }
 
+  getSourcePosition(name) {
+    return nodeObs.OBS_content_getSourcePosition(name);
+  }
+
+  getSourceScale(name) {
+    return nodeObs.OBS_content_getSourceScaling(name);
+  }
+
+  getSourceSize(name) {
+    return nodeObs.OBS_content_getSourceSize(name);
+  }
+
   createSourceDisplay(sourceName, key) {
     return nodeObs.OBS_content_createSourcePreviewDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),

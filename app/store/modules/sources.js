@@ -18,7 +18,18 @@ const mutations = {
       name: data.name,
       type: data.type,
       properties: data.properties,
-      restorePoint: null
+      restorePoint: null,
+
+      // Unscaled width and height
+      width: 0,
+      height: 0,
+
+      x: 0,
+      y: 0,
+
+      // Should be between 0 and 1
+      scaleX: 1.0,
+      scaleY: 1.0
     });
   },
 
@@ -36,6 +47,27 @@ const mutations = {
     let source = state.sources[data.sourceId];
 
     source.restorePoint = _.cloneDeep(source.properties);
+  },
+
+  SET_SOURCE_SIZE(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.width = data.width;
+    source.height = data.height;
+  },
+
+  SET_SOURCE_POSITION(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.x = data.x;
+    source.y = data.y;
+  },
+
+  SET_SOURCE_SCALE(state, data) {
+    let source = state.sources[data.sourceId];
+
+    source.scaleX = data.scaleX;
+    source.scaleY = data.scaleY;
   }
 };
 
@@ -128,6 +160,50 @@ const actions = {
     dispatch({
       type: 'refreshProperties',
       sourceId: data.sourceId
+    });
+  },
+
+  setSourceSize({ commit }, data) {
+    commit('SET_SOURCE_SIZE', {
+      sourceId: data.sourceId,
+      width: data.width,
+      height: data.height
+    });
+  },
+
+  setSourcePosition({ commit }, data) {
+    commit('SET_SOURCE_POSITION', {
+      sourceId: data.sourceId,
+      x: data.x,
+      y: data.y``
+    });
+  },
+
+  setSourceScale({ commit }, data) {
+    commit('SET_SOURCE_SCALE', {
+      sourceId: data.sourceId,
+      scaleX: data.scaleX,
+      scaleY: data.scaleY
+    });
+  },
+
+  // Loads source position and scale from OBS
+  loadSourcePositionAndScale({ commit, state }, data) {
+    const source = state.sources[data.sourceId];
+
+    const position = Obs.getSourcePosition(source.name);
+    const scale = Obs.getSourceScale(source.name);
+
+    commit('SET_SOURCE_POSITION', {
+      sourceId: data.sourceId,
+      x: position.x,
+      y: position.y
+    });
+
+    commit('SET_SOURCE_SCALE', {
+      sourceId: data.sourceId,
+      scaleX: scale.x,
+      scaleY: scale.y
     });
   }
 };
