@@ -126,7 +126,7 @@ class ObsApi {
       return propertyObj;
     });
 
-    nodeObs.OBS_content_startDeferUpdateSourceProperties(sourceName);
+    nodeObs.OBS_content_updateSourceProperties(sourceName);
 
     return parsedProperties;
   }
