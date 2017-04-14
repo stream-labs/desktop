@@ -81,6 +81,14 @@ export default {
     *****************/
 
     handleMouseDown(event) {
+      if (this.activeSource && this.isOverResize(event, this.activeSource)) {
+        this.resizing = true;
+        this.currentX = event.pageX;
+        this.currentY = event.pageY;
+
+        return;
+      }
+
       if (this.activeSource && this.isOverSource(event, this.activeSource)) {
         this.dragging = true;
         this.currentX = event.pageX;
@@ -117,25 +125,44 @@ export default {
 
     handleMouseUp(event) {
       this.dragging = false;
+      this.resizing = false;
 
       this.updateCursor(event);
     },
 
     handleMouseMove(event) {
-      console.log('X', event.offsetX);
-      console.log('Y', event.offsetY);
-
       const deltaX = event.pageX - this.currentX;
       const deltaY = event.pageY - this.currentY;
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+      const converted = this.convertScalarToBaseSpace(
+        deltaX * factor,
+        deltaY * factor
+      );
 
-      if (this.dragging) {
+      if (this.resizing) {
         if (deltaX || deltaY) {
-          const converted = this.convertScalarToBaseSpace(
-            deltaX * factor,
-            deltaY * factor
-          );
+          let deltaScaleX = converted.x / this.activeSource.width;
+          let deltaScaleY = converted.y / this.activeSource.height;
 
+          // Take the bigger of the 2 scales, to preserve aspect ratio
+          if (Math.abs(deltaScaleX) > Math.abs(deltaScaleY)) {
+            deltaScaleY = deltaScaleX;
+          } else {
+            deltaScaleX = deltaScaleY;
+          }
+
+          this.$store.dispatch({
+            type: 'setSourceScale',
+            sourceId: this.activeSource.id,
+            scaleX: this.activeSource.scaleX + deltaScaleX,
+            scaleY: this.activeSource.scaleY + deltaScaleY
+          });
+
+          this.currentX = event.pageX;
+          this.currentY = event.pageY;
+        }
+      } else if (this.dragging) {
+        if (deltaX || deltaY) {
           this.$store.dispatch({
             type: 'setSourcePosition',
             sourceId: this.activeSource.id,
@@ -154,15 +181,27 @@ export default {
     updateCursor(event) {
       if (this.dragging) {
         this.$refs.display.style.cursor = '-webkit-grabbing';
+      } else if (this.resizing) {
+        this.$refs.display.style.cursor = 'nwse-resize';
       } else {
-        const overSource = _.find(this.sources, source => {
-          return this.isOverSource(event, source);
-        });
+        let overResize;
 
-        if (overSource) {
-          this.$refs.display.style.cursor = '-webkit-grab';
+        if (this.activeSource) {
+          overResize = this.isOverResize(event, this.activeSource);
+        }
+
+        if (overResize) {
+          this.$refs.display.style.cursor = 'nwse-resize';
         } else {
-          this.$refs.display.style.cursor = 'default';
+          const overSource = _.find(this.sources, source => {
+            return this.isOverSource(event, source);
+          });
+
+          if (overSource) {
+            this.$refs.display.style.cursor = '-webkit-grab';
+          } else {
+            this.$refs.display.style.cursor = 'default';
+          }
         }
       }
     },
@@ -176,9 +215,6 @@ export default {
         event.offsetX * factor,
         event.offsetY * factor
       );
-
-      console.log('convertedX', mouse.x, x);
-      console.log('convertedY', mouse.y, y);
 
       if (mouse.x < x) {
         return false;
@@ -206,8 +242,23 @@ export default {
         event,
         source.x,
         source.y,
-        source.width,
-        source.height
+        source.width * source.scaleX,
+        source.height * source.scaleY
+      );
+    },
+
+    // Determines if the given mouse event is over the
+    // given source's SE resize corner
+    isOverResize(event, source) {
+      // 5px Resize radius in base space
+      const resizeRadius = this.convertScalarToBaseSpace(5, 5).x;
+
+      return this.isOverBox(
+        event,
+        source.x + (source.width * source.scaleX) - resizeRadius,
+        source.y + (source.height * source.scaleY) - resizeRadius,
+        resizeRadius * 2,
+        resizeRadius * 2
       );
     },
 
