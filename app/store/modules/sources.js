@@ -24,6 +24,7 @@ const mutations = {
       width: 0,
       height: 0,
 
+      // Position in video space
       x: 0,
       y: 0,
 
@@ -76,7 +77,7 @@ const actions = {
   // source to a scene. The state and mutations are set up
   // to support this in the future, but actions will match
   // the current capability of node-obs.
-  createSourceAndAddToScene({ commit }, data) {
+  createSourceAndAddToScene({ commit, dispatch }, data) {
     Obs.createSource(
       data.sceneName,
       data.sourceType,
@@ -97,7 +98,8 @@ const actions = {
       sceneName: data.sceneName
     });
 
-    commit('MAKE_SOURCE_ACTIVE', {
+    dispatch({
+      type: 'makeSourceActive',
       sourceId: data.sourceId,
       sceneName: data.sceneName
     });
@@ -171,11 +173,14 @@ const actions = {
     });
   },
 
-  setSourcePosition({ commit }, data) {
+  setSourcePosition({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+    Obs.setSourcePosition(source.name, data.x, data.y);
+
     commit('SET_SOURCE_POSITION', {
       sourceId: data.sourceId,
       x: data.x,
-      y: data.y``
+      y: data.y
     });
   },
 
