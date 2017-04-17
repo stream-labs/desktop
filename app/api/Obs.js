@@ -182,6 +182,16 @@ class ObsApi {
   parsePathFilters(filterStr) {
     let filters = _.compact(filterStr.split(';;'));
 
+    // Browser source uses *.*
+    if (filterStr === '*.*') {
+      return [
+        {
+          name: 'All Files',
+          extensions: ['*']
+        }
+      ];
+    }
+
     return _.map(filters, filter => {
       let match = filter.match(/^(.*) \((.*)\)$/);
       let desc = match[1];
