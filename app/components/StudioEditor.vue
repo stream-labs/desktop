@@ -221,20 +221,13 @@ export default {
       }
 
       this.$store.dispatch({
-        type: 'setSourceScale',
+        type: 'setSourcePositionAndScale',
         sourceId: source.id,
+        x: source.x - (moveX && pixelsX || 0),
+        y: source.y - (moveY && pixelsY || 0),
         scaleX: source.scaleX + deltaScaleX,
         scaleY: source.scaleY + deltaScaleY
       });
-
-      if (moveX || moveY) {
-        this.$store.dispatch({
-          type: 'setSourcePosition',
-          sourceId: source.id,
-          x: source.x - (moveX && pixelsX || 0),
-          y: source.y - (moveY && pixelsY || 0)
-        });
-      }
     },
 
     updateCursor(event) {

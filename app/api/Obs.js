@@ -219,6 +219,18 @@ class ObsApi {
     nodeObs.OBS_content_setSourceScaling(name, x.toString(), y.toString());
   }
 
+  // Uses a virtual node-obs function to set position and
+  // scale atomically.  This is required for smooth resizing.
+  setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
+    nodeObs.OBS_content_setSourcePositionAndScale(
+      name,
+      x.toString(),
+      y.toString(),
+      scaleX.toString(),
+      scaleY.toString()
+    );
+  }
+
   getSourcePosition(name) {
     return nodeObs.OBS_content_getSourcePosition(name);
   }
