@@ -236,8 +236,6 @@ class ObsApi {
       return { name: sourceName };
     });
 
-    console.log(sourceArr);
-
     nodeObs.OBS_content_selectSources(sourceArr);
   }
 
