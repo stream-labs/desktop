@@ -4,7 +4,8 @@
   ref="display"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
-  @mousemove="handleMouseMove"/>
+  @mousemove="handleMouseMove"
+  @mouseenter="handleMouseEnter"/>
 </template>
 
 <script>
@@ -138,6 +139,13 @@ export default {
       this.resizeRegion = null;
 
       this.updateCursor(event);
+    },
+
+    handleMouseEnter(event) {
+      if (!_.includes(event.buttons, 1)) {
+        this.dragging = false;
+        this.resizeRegion = null;
+      }
     },
 
     handleMouseMove(event) {
