@@ -142,7 +142,7 @@ export default {
     },
 
     handleMouseEnter(event) {
-      if (!_.includes(event.buttons, 1)) {
+      if (event.buttons !== 1) {
         this.dragging = false;
         this.resizeRegion = null;
       }
