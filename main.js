@@ -156,10 +156,35 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   });
 });
 
+// Virtual node OBS calls:
+//
+// These are methods that appear upstream to be OBS
+// API calls, but are actually Javascript functions.
+// These should be used sparingly, and are used to
+// ensure atomic operation of a handful of calls.
+const nodeObsVirtualMethods = {
+
+  // This needs to be done as a single IPC call, otherwise
+  // there is visible judder in the display output.
+  OBS_content_setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
+    obs.OBS_content_setSourcePosition(name, x, y);
+    obs.OBS_content_setSourceScaling(name, scaleX, scaleY);
+  }
+
+};
+
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
+  let retVal;
+
   console.log('OBS API CALL', data);
-  let retVal = obs[data.method].apply(obs, data.args);
+
+  if (nodeObsVirtualMethods[data.method]) {
+    retVal = nodeObsVirtualMethods[data.method].apply(null, data.args);
+  } else {
+    retVal = obs[data.method].apply(obs, data.args);
+  }
+
   console.log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
