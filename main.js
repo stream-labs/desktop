@@ -1,6 +1,8 @@
 'use strict';
 
-// Set up NODE_ENV
+////////////////////////////////////////////////////////////////////////////////
+// Set Up Environment Variables
+////////////////////////////////////////////////////////////////////////////////
 const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
@@ -10,9 +12,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
+const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain } = require('electron');
 const _ = require('lodash');
-const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../../node-obs');
+const obs = require(inAsar ? '../../node-obs' : './node-obs');
+const { autoUpdater } = require('electron-updater');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -29,7 +33,38 @@ let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
-app.on('ready', () => {
+// Returns a promise that is resolved if there was no update
+// to install.  If there was un update, the app will quit and
+// be updated.
+function runAutoUpdater() {
+  return new Promise(resolve => {
+    console.log("RUNNING AUTO UPDATE");
+
+    autoUpdater.on('checking-for-update', () => {
+      console.log('CHECKING FOR UPDATES...');
+    });
+
+    autoUpdater.on('update-available', (info) => {
+      console.log('FOUND UPDATE!', info);
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      console.log('NO UPDATE IS AVAILABLE!');
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+      console.log('DOWNLOADING... ', progress);
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+      console.log('SUCCESSFULLY DOWNLOADED NEW VERSION!');
+    });
+
+    autoUpdater.checkForUpdates();
+  });
+}
+
+function startApp() {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -106,6 +141,14 @@ app.on('ready', () => {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+}
+
+app.on('ready', () => {
+  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    runAutoUpdater().then(() => startApp());
+  } else {
+    startApp();
+  }
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {

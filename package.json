@@ -9,13 +9,38 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "package": "webpack && node bin/package.js"
+    "package": "webpack && build -w --x64 --em.env=production",
+    "deploy": "node bin/deploy.js"
+  },
+  "build": {
+    "appId": "com.streamlabs.slobs",
+    "productName": "Streamlabs OBS",
+    "files": [
+      "bundles",
+      "node_modules",
+      "vendor",
+      "index.html",
+      "main.js"
+    ],
+    "extraFiles": [
+      "node-obs",
+      "config"
+    ],
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "publish": {
+      "provider": "generic",
+      "url": "https://s3-us-west-2.amazonaws.com/streamlabs-obs"
+    }
   },
   "dependencies": {
+    "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "aws-sdk": "^2.43.0",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-preset-es2015": "^6.22.0",
@@ -24,9 +49,11 @@
     "electron-builder": "^15.6.2",
     "electron-devtools-installer": "^2.1.0",
     "electron-rebuild": "^1.5.7",
+    "js-yaml": "^3.8.3",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",
     "moment": "^2.17.1",
+    "progress": "^2.0.0",
     "style-loader": "^0.13.1",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
