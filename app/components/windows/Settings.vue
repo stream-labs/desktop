@@ -11,17 +11,7 @@
       <NavItem>Advanced</NavItem>
     </SideNav>
 
-    <div v-for="settingsGroup in settingsSubGroups">
-      <div>{{ settingsGroup.nameSubCategory }}</div>
-      <div v-for="property in settingsGroup.properties">
-        {{ property.type }}
-        <component
-          v-if="property.visible && property.type == 'OBS_PROPERTY_BOOL'"
-          :is="propertyComponentForType(property.type)"
-          :property="property"/>
-      </div>
-
-    </div>
+    <GenericForm :data="settingsData"></GenericForm>
 
   </div>
 </modal-layout>
@@ -29,32 +19,34 @@
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import Obs from '../../api/Obs.js';
-import windowManager from '../../util/WindowManager';
 import SideNav from '../shared/SideNav.vue';
 import NavItem from '../shared/NavItem.vue';
-import * as propertyComponents from '../shared/properties';
-import { propertyComponentForType } from '../shared/properties/helpers';
+import GenericForm from '../shared/forms/GenericForm.vue'
+import windowManager from '../../util/WindowManager';
+import SettingsService from '../../services/settings';
 
 
 export default {
 
-  components: Object.assign({
+  components: {
     ModalLayout,
     SideNav,
-    NavItem
-  }, propertyComponents),
+    NavItem,
+    GenericForm
+  },
 
   methods: {
     done() {
       //windowManager.closeWindow();
+      this.settingsService.setSettings('General', this.settingsService.getSettings('General'))
     }
   },
 
   data() {
-    console.log(Obs.getSettings('General'));
+    this.settingsService = SettingsService.instance;
+    console.log(this.settingsService.getSettings('General'));
     return {
-      settingsSubGroups: Obs.getSettings('General')
+      settingsData: this.settingsService.getSettings('General')
     };
   }
 

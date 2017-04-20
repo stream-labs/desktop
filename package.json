@@ -9,7 +9,8 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "package": "webpack && node bin/package.js"
+    "package": "webpack && node bin/package.js",
+    "update-node-obs": "cd ../node-obs/ && git pull && cmake-js clean && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && mv ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client"
   },
   "dependencies": {
     "font-manager": "^0.2.2",

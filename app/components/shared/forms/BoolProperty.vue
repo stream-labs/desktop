@@ -1,8 +1,9 @@
 <template>
 <div class="checkbox">
+  BOOLCOMP
   <input
     type="checkbox"
-    :checked="property.value.value"
+    :checked="property.currentValue"
     :disabled="!property.enabled"
     @change="setValue"/>
   <label>{{ property.description }}</label>
