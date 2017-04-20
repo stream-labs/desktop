@@ -28,8 +28,6 @@ export default {
 
   mounted() {
     ipcRenderer.on('autoUpdate-pushState', (event, data) => {
-      console.log('GOT STATE', data);
-
       if (data.version) {
         this.message = `Downloading version ${data.version}`
       }
