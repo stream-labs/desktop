@@ -301,6 +301,13 @@ class ObsApi {
     nodeObs.OBS_content_saveIntoConfigFile(path);
   }
 
+  getSettings(categoryName) {
+    return nodeObs.OBS_settings_getSettings(categoryName);
+  }
+
+  setSettings(categoryName) {
+    return nodeObs.OBS_settings_setSettings(categoryName);
+  }
 }
 
 export default new ObsApi();

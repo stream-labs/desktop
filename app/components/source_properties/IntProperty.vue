@@ -10,11 +10,9 @@
 </template>
 
 <script>
-export default {
+import Property from './Property.vue';
 
-  props: [
-    'property'
-  ],
+let IntProperty = Property.extend({
 
   methods: {
     setValue(event) {
@@ -28,5 +26,8 @@ export default {
     }
   }
 
-};
+});
+
+IntProperty.obsType = 'OBS_PROPERTY_INT';
+export default IntProperty;
 </script>

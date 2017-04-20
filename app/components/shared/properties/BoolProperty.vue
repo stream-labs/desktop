@@ -16,13 +16,14 @@ import Property from './Property.vue';
 let BoolProperty = Property.extend({
   methods: {
     setValue(event) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          value: event.target.checked.toString()
-        }
-      });
+
+//      this.$store.dispatch({
+//        type: 'setSourceProperty',
+//        property: this.property,
+//        propertyValue: {
+//          value: event.target.checked.toString()
+//        }
+//      });
     }
   }
 });

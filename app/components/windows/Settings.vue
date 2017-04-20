@@ -4,10 +4,25 @@
   :show-controls="true"
   :done-handler="done">
   <div slot="content">
-    <label>Stream Key</label>
-    <input
-      type="text"
-      v-model="streamKey"/>
+
+    <SideNav>
+      <NavItem>General</NavItem>
+      <NavItem>Stream</NavItem>
+      <NavItem>Advanced</NavItem>
+    </SideNav>
+
+    <div v-for="settingsGroup in settingsSubGroups">
+      <div>{{ settingsGroup.nameSubCategory }}</div>
+      <div v-for="property in settingsGroup.properties">
+        {{ property.type }}
+        <component
+          v-if="property.visible && property.type == 'OBS_PROPERTY_BOOL'"
+          :is="propertyComponentForType(property.type)"
+          :property="property"/>
+      </div>
+
+    </div>
+
   </div>
 </modal-layout>
 </template>
@@ -16,38 +31,30 @@
 import ModalLayout from '../ModalLayout.vue';
 import Obs from '../../api/Obs.js';
 import windowManager from '../../util/WindowManager';
-const fs = window.require('fs');
+import SideNav from '../shared/SideNav.vue';
+import NavItem from '../shared/NavItem.vue';
+import * as propertyComponents from '../shared/properties';
+import { propertyComponentForType } from '../shared/properties/helpers';
 
-const serviceConfigPath = './config/service.json';
 
 export default {
 
-  components: {
-    ModalLayout
-  },
+  components: Object.assign({
+    ModalLayout,
+    SideNav,
+    NavItem
+  }, propertyComponents),
 
   methods: {
     done() {
-      this.service.settings.key = this.streamKey;
-
-      const json = JSON.stringify(this.service, null, 4);
-
-      fs.writeFileSync(serviceConfigPath, json);
-
-      Obs.resetService();
-      windowManager.closeWindow();
+      //windowManager.closeWindow();
     }
   },
 
   data() {
-    // TODO: This should really be stored in memory rather than
-    // reading it from the file every time.  This is a temporary
-    // solution.
-    this.service = JSON.parse(fs.readFileSync(serviceConfigPath));
-    const streamKey = this.service.settings.key;
-
+    console.log(Obs.getSettings('General'));
     return {
-      streamKey
+      settingsSubGroups: Obs.getSettings('General')
     };
   }
 

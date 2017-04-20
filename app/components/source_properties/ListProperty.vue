@@ -15,11 +15,8 @@
 </template>
 
 <script>
-export default {
-
-  props: [
-    'property'
-  ],
+import Property from './Property.vue';
+let ListProperty = Property.extend({
 
   methods: {
     setValue(event) {
@@ -33,5 +30,8 @@ export default {
     }
   }
 
-};
+});
+ListProperty.obsType = 'OBS_PROPERTY_LIST';
+export default ListProperty;
+
 </script>

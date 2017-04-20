@@ -46,16 +46,13 @@
 <script>
 import Tabs from '../Tabs.vue';
 import fr from '../../util/FrameRate.js';
+import Property from './Property.vue';
 
-export default {
+let FrameRateProperty = Property.extend({
 
   components: {
     Tabs
   },
-
-  props: [
-    'property'
-  ],
 
   data() {
     return {
@@ -178,7 +175,11 @@ export default {
     }
   }
 
-};
+});
+
+FrameRateProperty.obsType = 'OBS_PROPERTY_FRAME_RATE';
+export default FrameRateProperty;
+
 </script>
 
 <style lang="less" scoped>
