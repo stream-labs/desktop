@@ -19,6 +19,7 @@
       "bundles",
       "node_modules",
       "vendor",
+      "updater",
       "index.html",
       "main.js"
     ],
