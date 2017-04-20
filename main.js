@@ -16,7 +16,7 @@ const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain } = require('electron');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
-const { autoUpdater } = require('electron-updater');
+const { Updater } = require('./updater/Updater.js');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -32,37 +32,6 @@ let childWindow;
 let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
-
-// Returns a promise that is resolved if there was no update
-// to install.  If there was un update, the app will quit and
-// be updated.
-function runAutoUpdater() {
-  return new Promise(resolve => {
-    console.log("RUNNING AUTO UPDATE");
-
-    autoUpdater.on('checking-for-update', () => {
-      console.log('CHECKING FOR UPDATES...');
-    });
-
-    autoUpdater.on('update-available', (info) => {
-      console.log('FOUND UPDATE!', info);
-    });
-
-    autoUpdater.on('update-not-available', () => {
-      console.log('NO UPDATE IS AVAILABLE!');
-    });
-
-    autoUpdater.on('download-progress', (progress) => {
-      console.log('DOWNLOADING... ', progress);
-    });
-
-    autoUpdater.on('update-downloaded', () => {
-      console.log('SUCCESSFULLY DOWNLOADED NEW VERSION!');
-    });
-
-    autoUpdater.checkForUpdates();
-  });
-}
 
 function startApp() {
   mainWindow = new BrowserWindow({
@@ -141,11 +110,13 @@ function startApp() {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+
+  console.log("DONE");
 }
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    runAutoUpdater().then(() => startApp());
+    (new Updater(startApp)).run();
   } else {
     startApp();
   }
