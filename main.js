@@ -110,8 +110,6 @@ function startApp() {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
-
-  console.log("DONE");
 }
 
 app.on('ready', () => {
