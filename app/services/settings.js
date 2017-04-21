@@ -13,17 +13,28 @@ export default class SettingsService extends Service {
     let settings = nodeObs.OBS_settings_getSettings(categoryName);
     console.log(settings);
     // set default values for lists
-    // for (let group of settings) {
-    //   for (let parameter of group.parameters) {
-    //     let needToSetDefaultValue = parameter.values && !parameter.values.includes(parameter.values);
-    //     if (needToSetDefaultValue) parameter.currentValue = parameter.values[0];
-    //   }
-    // }
+    settings.forEach(group => {
+      group.parameters.forEach(parameter => {
+        let needToSetDefaultValue = parameter.values && parameter.values.find(possibleValue => {
+            if (parameter.currentValue == this.getListItemName(possibleValue)) return true;
+        });
+        if (needToSetDefaultValue) parameter.currentValue = this.getListItemName(parameter.values[0]);
+      });
+    });
+
     return settings;
   }
 
   setSettings (categoryName, settingsData) {
     console.log(settingsData);
     return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+  }
+
+  getListItemDescription(possibleValue) {
+    return possibleValue[Object.keys(possibleValue)[0]]
+  }
+
+  getListItemName(possibleValue) {
+    return Object.keys(possibleValue)[0]
   }
 }

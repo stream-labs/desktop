@@ -6,8 +6,8 @@
       :disabled="!value.enabled"
       @input="$emit('input', value)"
     >
-      <option v-for="possibleValue in value.values">
-        {{ possibleValue }}
+      <option v-for="possibleValue in value.values" :value="getName(possibleValue)">
+        {{ getDescription(possibleValue) }}
       </option>
     </select>
   </div>
@@ -15,7 +15,20 @@
 
 <script>
   import Input from './Input.vue';
-  let ListInput = Input.extend({});
+
+  let ListInput = Input.extend({
+    methods: {
+
+      getDescription(possibleValue) {
+        return possibleValue[Object.keys(possibleValue)[0]]
+      },
+
+      getName(possibleValue) {
+        return Object.keys(possibleValue)[0]
+      }
+    }
+  });
   ListInput.obsType = 'OBS_PROPERTY_LIST';
+
   export default ListInput;
 </script>

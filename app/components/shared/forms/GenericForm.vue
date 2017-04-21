@@ -10,7 +10,7 @@
         </h4>
       </div>
 
-      <div v-show="expandedGroups[index] == true">
+      <div >
         <div v-for="(parameter, index) in formGroup.parameters">
           <component
             v-if="parameter.visible && propertyComponentForType(parameter.type)"
