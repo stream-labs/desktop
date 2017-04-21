@@ -5,7 +5,9 @@
             "name": "Launch",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/main.js",
+            "runtimeArgs": [
+                "${workspaceRoot}"
+            ],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
             "windows": {

@@ -4,6 +4,7 @@
     <input
       type="text"
       v-model="value.currentValue"
+      @input="$emit('input', value)"
     />
   </div>
 </template>

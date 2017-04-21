@@ -1,7 +1,7 @@
 module.exports = {
   entry: {
     renderer: './app/app.js',
-    main_helpers: './main_helpers.js'
+    updater: './updater/ui.js'
   },
   output: {
     path: __dirname + '/bundles',

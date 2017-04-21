@@ -195,6 +195,30 @@ const actions = {
     });
   },
 
+  // Used to atomically set position and scale together.
+  // This is required for smooth resizing.
+  setSourcePositionAndScale({ commit, state }, data) {
+    let source = state.sources[data.sourceId];
+
+    Obs.setSourcePositionAndScale(source.name, data.x, data.y, data.scaleX, data.scaleY);
+
+    if (data.x || data.y) {
+      commit('SET_SOURCE_POSITION', {
+        sourceId: data.sourceId,
+        x: data.x,
+        y: data.y
+      });
+    }
+
+    if (data.scaleX || data.scaleY) {
+      commit('SET_SOURCE_SCALE', {
+        sourceId: data.sourceId,
+        scaleX: data.scaleX,
+        scaleY: data.scaleY
+      });
+    }
+  },
+
   // Loads source position and scale from OBS
   loadSourcePositionAndScale({ commit, state }, data) {
     const source = state.sources[data.sourceId];

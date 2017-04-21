@@ -7,6 +7,7 @@
           v-if="parameter.visible && propertyComponentForType(parameter.type)"
           :is="propertyComponentForType(parameter.type)"
           v-model="formGroup.parameters[index]"
+          @input="$emit('input', value)"
         />
       </div>
     </div>

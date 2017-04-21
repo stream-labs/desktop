@@ -1,6 +1,8 @@
 'use strict';
 
-// Set up NODE_ENV
+////////////////////////////////////////////////////////////////////////////////
+// Set Up Environment Variables
+////////////////////////////////////////////////////////////////////////////////
 const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
@@ -10,9 +12,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
+const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain } = require('electron');
 const _ = require('lodash');
-const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../../node-obs');
+const obs = require(inAsar ? '../../node-obs' : './node-obs');
+const { Updater } = require('./updater/Updater.js');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -29,7 +33,7 @@ let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
-app.on('ready', () => {
+function startApp() {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -106,6 +110,14 @@ app.on('ready', () => {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+}
+
+app.on('ready', () => {
+  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    (new Updater(startApp)).run();
+  } else {
+    startApp();
+  }
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
@@ -156,10 +168,35 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   });
 });
 
+// Virtual node OBS calls:
+//
+// These are methods that appear upstream to be OBS
+// API calls, but are actually Javascript functions.
+// These should be used sparingly, and are used to
+// ensure atomic operation of a handful of calls.
+const nodeObsVirtualMethods = {
+
+  // This needs to be done as a single IPC call, otherwise
+  // there is visible judder in the display output.
+  OBS_content_setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
+    obs.OBS_content_setSourcePosition(name, x, y);
+    obs.OBS_content_setSourceScaling(name, scaleX, scaleY);
+  }
+
+};
+
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
+  let retVal;
+
   console.log('OBS API CALL', data);
-  let retVal = obs[data.method].apply(obs, data.args);
+
+  if (nodeObsVirtualMethods[data.method]) {
+    retVal = nodeObsVirtualMethods[data.method].apply(null, data.args);
+  } else {
+    retVal = obs[data.method].apply(obs, data.args);
+  }
+
   console.log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so

@@ -22,7 +22,7 @@ let IntInput = Input.extend({
         this.$refs.input.value = formattedValue
       }
       // Emit the number value through the input event
-      this.$emit('input', Number(formattedValue))
+      this.$emit('input', Object.assign(this.value, {currentValue: Number(formattedValue)}));
     }
   }
 });

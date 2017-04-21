@@ -3,7 +3,9 @@
     <label>{{ value.description }}</label>
     <select
       v-model="value.currentValue"
-      :disabled="!value.enabled">
+      :disabled="!value.enabled"
+      @input="$emit('input', value)"
+    >
       <option v-for="possibleValue in value.values">
         {{ possibleValue }}
       </option>

@@ -12,7 +12,7 @@
         </NavMenu>
       </div>
       <div class="columns small-9">
-        <GenericForm v-model="settingsData"></GenericForm>
+        <GenericForm v-model="settingsData" @input="save()"></GenericForm>
       </div>
     </div>
   </div>
@@ -54,6 +54,11 @@ export default {
   },
 
   methods: {
+
+    save() {
+      this.settingsService.setSettings(this.categoryName, this.settingsData);
+    },
+
     done () {
       this.settingsService.setSettings(this.categoryName, this.settingsData);
       windowManager.closeWindow();
