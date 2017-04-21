@@ -1,6 +1,8 @@
 'use strict';
 
-// Set up NODE_ENV
+////////////////////////////////////////////////////////////////////////////////
+// Set Up Environment Variables
+////////////////////////////////////////////////////////////////////////////////
 const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
@@ -10,9 +12,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
+const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain } = require('electron');
 const _ = require('lodash');
-const obs = require(process.env.NODE_ENV !== 'production' ? './node-obs' : '../../node-obs');
+const obs = require(inAsar ? '../../node-obs' : './node-obs');
+const { Updater } = require('./updater/Updater.js');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -29,7 +33,7 @@ let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
-app.on('ready', () => {
+function startApp() {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -106,6 +110,14 @@ app.on('ready', () => {
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+}
+
+app.on('ready', () => {
+  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    (new Updater(startApp)).run();
+  } else {
+    startApp();
+  }
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {

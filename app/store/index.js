@@ -11,9 +11,9 @@ import Obs from '../api/Obs.js';
 
 Vue.use(Vuex);
 
-const debug = process.env.NODE_ENV !== 'production';
-
 const { ipcRenderer, remote } = window.require('electron');
+
+const debug = remote.process.env.NODE_ENV !== 'production';
 
 const mutations = {
   BULK_LOAD_STATE(state, data) {
