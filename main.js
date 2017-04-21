@@ -85,7 +85,7 @@ function startApp() {
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
   }
 
-  // Initialize various OBS settings.js
+  // Initialize various OBS services
   obs.OBS_API_initOBS_API();
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
