@@ -1,6 +1,6 @@
 /**
  * simple singleton service implementation
- * original code from http://stackoverflow.com/a/26227662
+ * @see original code http://stackoverflow.com/a/26227662
  */
 
 const singleton = Symbol();

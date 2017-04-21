@@ -1,25 +1,28 @@
 <template>
   <div>
-    <div v-for="formGroup in data">
+    <div v-for="formGroup in value">
       <div>{{ formGroup.nameSubCategory }}</div>
-      <div v-for="parameter in formGroup.parameters">
+      <div v-for="(parameter, index) in formGroup.parameters">
         {{ parameter.type }}
         <component
-          v-if="parameter.visible && parameter.type == 'OBS_PROPERTY_BOOL'"
-          :is="'BoolProperty'"
-          :property="parameter"/>
+          v-if="parameter.visible && propertyComponentForType(parameter.type)"
+          :is="propertyComponentForType(parameter.type)"
+          v-model="formGroup.parameters[index]"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import * as propertyComponents from './index';
+  import * as inputComponents from './index';
   import { propertyComponentForType } from './helpers';
 
   export default {
-    props: ['data'],
-    components: {BoolProperty: propertyComponents.BoolProperty},
-    methods: {propertyComponentForType}
+    props: ['value'],
+    components: inputComponents,
+    methods: {
+      propertyComponentForType,
+    }
   }
 </script>

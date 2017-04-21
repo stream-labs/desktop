@@ -5,11 +5,15 @@ const nodeObs = Obs.nodeObs;
 
 export default class SettingsService extends Service {
 
-  getSettings(categoryName) {
+  getCategories () {
+    return nodeObs.OBS_settings_getListCategories();
+  }
+
+  getSettings (categoryName) {
     return nodeObs.OBS_settings_getSettings(categoryName);
   }
 
-  setSettings(categoryName, settingsData) {
+  setSettings (categoryName, settingsData) {
     return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
   }
 }

@@ -4,24 +4,19 @@
   :show-controls="true"
   :done-handler="done">
   <div slot="content">
-
-    <SideNav>
-      <NavItem>General</NavItem>
-      <NavItem>Stream</NavItem>
-      <NavItem>Advanced</NavItem>
-    </SideNav>
-
-    <GenericForm :data="settingsData"></GenericForm>
-
+    <NavMenu v-model="categoryName">
+      <NavItem v-for="category in categoriesNames" :to="category">{{ category }}</NavItem>
+    </NavMenu>
+    <GenericForm v-model="settingsData"></GenericForm>
   </div>
 </modal-layout>
 </template>
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import SideNav from '../shared/SideNav.vue';
+import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
-import GenericForm from '../shared/forms/GenericForm.vue'
+import GenericForm from '../shared/forms/GenericForm.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
 
@@ -30,24 +25,34 @@ export default {
 
   components: {
     ModalLayout,
-    SideNav,
+    NavMenu,
     NavItem,
     GenericForm
   },
 
+  beforeCreate() {
+    this.settingsService = SettingsService.instance;
+  },
+
   methods: {
-    done() {
-      //windowManager.closeWindow();
-      this.settingsService.setSettings('General', this.settingsService.getSettings('General'))
+    done () {
+      console.log(this.settingsData);
+      this.settingsService.setSettings(this.categoryName, this.settingsData)
     }
   },
 
-  data() {
-    this.settingsService = SettingsService.instance;
-    console.log(this.settingsService.getSettings('General'));
+  data () {
     return {
-      settingsData: this.settingsService.getSettings('General')
-    };
+      categoryName: 'General',
+      categoriesNames: this.settingsService.getCategories()
+    }
+  },
+
+  computed: {
+    settingsData() {
+      console.log(this.settingsService.getSettings(this.categoryName));
+      return this.settingsService.getSettings(this.categoryName)
+    }
   }
 
 };
