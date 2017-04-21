@@ -1,5 +1,5 @@
 <template>
-<ul class="nav-menu">
+<ul class="NavMenu">
   <slot></slot>
 </ul>
 </template>
@@ -17,6 +17,7 @@ export default {
 
 <style lang="less" scoped>
 
-  .nav-menu {
+  .NavMenu {
+    margin: 0;
   }
 </style>

@@ -16,5 +16,4 @@
   let ListInput = Input.extend({});
   ListInput.obsType = 'OBS_PROPERTY_LIST';
   export default ListInput;
-
 </script>

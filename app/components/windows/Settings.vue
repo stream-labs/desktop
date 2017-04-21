@@ -3,12 +3,20 @@
   title="Settings"
   :show-controls="true"
   :done-handler="done">
+
   <div slot="content">
-    <NavMenu v-model="categoryName">
-      <NavItem v-for="category in categoriesNames" :to="category">{{ category }}</NavItem>
-    </NavMenu>
-    <GenericForm v-model="settingsData"></GenericForm>
+    <div class="row">
+      <div class="columns small-3">
+        <NavMenu v-model="categoryName" class="side-menu">
+          <NavItem v-for="category in categoriesNames" :to="category">{{ category }}</NavItem>
+        </NavMenu>
+      </div>
+      <div class="columns small-9">
+        <GenericForm v-model="settingsData"></GenericForm>
+      </div>
+    </div>
   </div>
+
 </modal-layout>
 </template>
 
@@ -34,13 +42,6 @@ export default {
     this.settingsService = SettingsService.instance;
   },
 
-  methods: {
-    done () {
-      console.log(this.settingsData);
-      this.settingsService.setSettings(this.categoryName, this.settingsData)
-    }
-  },
-
   data () {
     return {
       categoryName: 'General',
@@ -49,11 +50,21 @@ export default {
   },
 
   computed: {
-    settingsData() {
-      console.log(this.settingsService.getSettings(this.categoryName));
-      return this.settingsService.getSettings(this.categoryName)
-    }
-  }
+    settingsData() {return this.settingsService.getSettings(this.categoryName)}
+  },
 
+  methods: {
+    done () {
+      this.settingsService.setSettings(this.categoryName, this.settingsData);
+      windowManager.closeWindow();
+    }
+  },
 };
 </script>
+
+<style lang="less" scoped>
+  .side-menu {
+    position: fixed;
+    left: 0;
+  }
+</style>

@@ -32,8 +32,11 @@ export default {
   .nav-item {
     cursor: default;
     list-style: none;
+    border-left: 3px solid transparent;
+    padding-left: 30px;
     &.active {
       font-weight: bold;
+      border-color: #ffcd47;
     }
   }
 
