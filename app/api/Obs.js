@@ -320,6 +320,7 @@ class ObsApi {
   saveConfig(path) {
     nodeObs.OBS_content_saveIntoConfigFile(path);
   }
+
 }
 
 export default new ObsApi();
