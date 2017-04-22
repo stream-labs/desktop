@@ -52,7 +52,7 @@ export default {
     let categoryName = 'Stream';
     return {
       categoryName: categoryName,
-      blackList: ['General', 'Advanced'],
+      blackList: ['Advanced'],
       categoriesNames: this.settingsService.getCategories(),
       settingsData: this.settingsService.getSettings(categoryName)
     }

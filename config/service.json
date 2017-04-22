@@ -2,7 +2,7 @@
     "settings": {
         "key": "",
         "server": "rtmp://live.twitch.tv/app",
-        "service": "Twitch",
+        "service": "YouTube / YouTube Gaming",
         "show_all": true,
         "streamType": "rtmp_common"
     },

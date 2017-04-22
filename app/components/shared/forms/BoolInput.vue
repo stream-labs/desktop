@@ -1,10 +1,11 @@
 <template>
-<div class="checkbox">
+<div class="input checkbox" :class="{disabled: !value.enabled}">
   <input
     type="checkbox"
     v-model="value.currentValue"
     :true-value="1"
     :false-value="0"
+    :disabled="!value.enabled"
     @change="$emit('input', value)"
   />
   <label>{{ value.description }}</label>

@@ -11,10 +11,13 @@ export default class SettingsService extends Service {
 
   getSettings (categoryName) {
     let settings = nodeObs.OBS_settings_getSettings(categoryName);
+    const BLACK_LIST_CATEGORIES = ['General'];
+    const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
 
     // set default values for lists
     settings.forEach(group => {
       group.parameters.forEach(parameter => {
+        if (groupIsBlacklisted) parameter.enabled = 0;
         let needToSetDefaultValue = parameter.values && !parameter.values.find(possibleValue => {
             if (parameter.currentValue == this.getListItemName(possibleValue)) return true;
         });
@@ -25,7 +28,6 @@ export default class SettingsService extends Service {
   }
 
   setSettings (categoryName, settingsData) {
-    console.log(JSON.stringify(settingsData));
     return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
   }
 
