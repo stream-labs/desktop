@@ -38,16 +38,25 @@ export default {
 <style lang="less" scoped>
 
   .nav-item {
-    cursor: default;
+    cursor: pointer;
     list-style: none;
-    border-left: 3px solid transparent;
-    padding-left: 30px;
+    border-left: 4px solid transparent;
+    padding-left: 50px;
+    opacity: 0.7;
+    font-size: 14px;
+    margin-bottom: 5px;
+
     &.active {
+      opacity: 1;
       font-weight: bold;
       border-color: #ffcd47;
     }
+    &:hover {
+      opacity: 1;
+    }
     &.disabled {
       opacity: 0.3;
+      cursor: default;
     }
   }
 

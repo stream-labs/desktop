@@ -64,5 +64,7 @@
   h4 {
     cursor: pointer;
   }
+
+  .fa-plus, .fa-minus {margin-right: 10px}
 }
 </style>
