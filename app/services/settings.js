@@ -11,7 +11,7 @@ export default class SettingsService extends Service {
 
   getSettings (categoryName) {
     let settings = nodeObs.OBS_settings_getSettings(categoryName);
-    console.log(settings);
+
     // set default values for lists
     settings.forEach(group => {
       group.parameters.forEach(parameter => {
@@ -21,12 +21,10 @@ export default class SettingsService extends Service {
         if (needToSetDefaultValue) parameter.currentValue = this.getListItemName(parameter.values[0]);
       });
     });
-
     return settings;
   }
 
   setSettings (categoryName, settingsData) {
-    console.log(settingsData);
     return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
   }
 

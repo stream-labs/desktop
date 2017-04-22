@@ -1,22 +1,22 @@
 <template>
   <div class="GenericForm">
-    <div v-for="(formGroup, index) in value" v-if="formGroup.parameters.length">
+    <div v-for="(formGroup, groupIndex) in value" v-if="formGroup.parameters.length">
 
       <div v-if="formGroup.nameSubCategory != 'Untitled'">
-        <h4  @click="toggleGroup(index)">
-          <i class="fa fa-plus"  v-show="!expandedGroups[index]"></i>
-          <i class="fa fa-minus" v-show="expandedGroups[index]"></i>
+        <h4  @click="toggleGroup(groupIndex)">
+          <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
+          <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
           {{ formGroup.nameSubCategory }}
         </h4>
       </div>
 
-      <div >
-        <div v-for="(parameter, index) in formGroup.parameters">
+      <div v-if="!collapsedGroups[groupIndex]">
+        <div v-for="(parameter, inputIndex) in formGroup.parameters">
           <component
             v-if="parameter.visible && propertyComponentForType(parameter.type)"
             :is="propertyComponentForType(parameter.type)"
-            v-model="formGroup.parameters[index]"
-            @input="$emit('input', value)"
+            v-model="formGroup.parameters[inputIndex]"
+            @input="onInputHandler"
           />
         </div>
       </div>
@@ -32,16 +32,12 @@
     props: ['value'],
     components: inputComponents,
     data() {
-      return {expandedGroups: {}}
+      return {collapsedGroups: {}}
     },
     methods: {
 
       toggleGroup(index) {
-        this.expandedGroups = Object.assign(this.expandedGroups, {[index]: !this.expandedGroups[index]});
-      },
-
-      collapseGroups() {
-        this.expandedGroups = {};
+        this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);
       },
 
       propertyComponentForType(type) {
@@ -49,6 +45,10 @@
           let component = inputComponents[componentName];
           if (component.obsType === type) return component;
         }
+      },
+
+      onInputHandler() {
+        this.$emit('input', this.value);
       }
     }
   }

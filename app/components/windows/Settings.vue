@@ -8,11 +8,17 @@
     <div class="row">
       <div class="columns small-3">
         <NavMenu v-model="categoryName" class="side-menu">
-          <NavItem v-for="category in categoriesNames" :to="category">{{ category }}</NavItem>
+          <NavItem
+            v-for="category in categoriesNames"
+            :to="category"
+            :enabled="!blackList.includes(category)"
+          >
+            {{ category }}
+          </NavItem>
         </NavMenu>
       </div>
       <div class="columns small-9">
-        <GenericForm v-model="settingsData" @input="save()"></GenericForm>
+        <GenericForm v-model="settingsData" @input="save"></GenericForm>
       </div>
     </div>
   </div>
@@ -43,27 +49,36 @@ export default {
   },
 
   data () {
+    let categoryName = 'Stream';
     return {
-      categoryName: 'General',
-      categoriesNames: this.settingsService.getCategories()
+      categoryName: categoryName,
+      blackList: ['General', 'Advanced'],
+      categoriesNames: this.settingsService.getCategories(),
+      settingsData: this.settingsService.getSettings(categoryName)
     }
   },
 
   computed: {
-    settingsData() {return this.settingsService.getSettings(this.categoryName)}
+
   },
 
   methods: {
 
-    save() {
-      this.settingsService.setSettings(this.categoryName, this.settingsData);
+    save(settingsData) {
+      this.settingsService.setSettings(this.categoryName, settingsData);
+      this.settingsData = this.settingsService.getSettings(this.categoryName);
     },
 
     done () {
-      this.settingsService.setSettings(this.categoryName, this.settingsData);
       windowManager.closeWindow();
     }
   },
+
+  watch: {
+    categoryName(categoryName) {
+      this.settingsData = this.settingsService.getSettings(categoryName);
+    }
+  }
 };
 </script>
 

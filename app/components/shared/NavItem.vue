@@ -1,5 +1,9 @@
 <template>
-    <li class="nav-item" :class="{ active: to === value }" @click="onClickHandler">
+    <li
+      class="nav-item"
+      :class="{ active: to === value, disabled: enabled == false }"
+      @click="onClickHandler"
+    >
       <slot></slot>
     </li>
 </template>
@@ -7,7 +11,10 @@
 <script>
 
 export default {
-  props: ['ico', 'to'],
+  props: {
+    to: {type: String},
+    enabled: {type: Boolean, default: true}
+  },
 
   computed: {
     value() {return this.$parent.value}
@@ -20,6 +27,7 @@ export default {
   methods: {
 
     onClickHandler() {
+      if (!this.enabled) return;
       this.$parent.setValue(this.to)
     },
 
@@ -37,6 +45,9 @@ export default {
     &.active {
       font-weight: bold;
       border-color: #ffcd47;
+    }
+    &.disabled {
+      opacity: 0.3;
     }
   }
 

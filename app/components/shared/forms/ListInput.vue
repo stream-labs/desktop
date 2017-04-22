@@ -4,7 +4,7 @@
     <select
       v-model="value.currentValue"
       :disabled="!value.enabled"
-      @input="$emit('input', value)"
+      @input="onInputHandler"
     >
       <option v-for="possibleValue in value.values" :value="getName(possibleValue)">
         {{ getDescription(possibleValue) }}
@@ -18,6 +18,10 @@
 
   let ListInput = Input.extend({
     methods: {
+
+      onInputHandler(event) {
+        this.$emit('input', Object.assign({}, this.value, {currentValue: event.target.value}))
+      },
 
       getDescription(possibleValue) {
         return Object.keys(possibleValue)[0]

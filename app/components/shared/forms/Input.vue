@@ -8,9 +8,10 @@
   import Vue from 'vue';
   export default Vue.extend({
 
-    props: [
-      'value'
-    ],
+    props: {
+      value: {},
+      enabled: {type: Boolean, default: true}
+    },
 
   });
 
