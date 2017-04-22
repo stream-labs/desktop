@@ -20,11 +20,11 @@
     methods: {
 
       getDescription(possibleValue) {
-        return possibleValue[Object.keys(possibleValue)[0]]
+        return Object.keys(possibleValue)[0]
       },
 
       getName(possibleValue) {
-        return Object.keys(possibleValue)[0]
+        return possibleValue[Object.keys(possibleValue)[0]]
       }
     }
   });
