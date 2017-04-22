@@ -25,6 +25,7 @@ export default class SettingsService extends Service {
   }
 
   setSettings (categoryName, settingsData) {
+    console.log(JSON.stringify(settingsData));
     return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
   }
 
