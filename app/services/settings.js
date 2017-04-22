@@ -11,7 +11,7 @@ export default class SettingsService extends Service {
 
   getSettings (categoryName) {
     let settings = nodeObs.OBS_settings_getSettings(categoryName);
-    const BLACK_LIST_CATEGORIES = ['General', 'Hotkeys'];
+    const BLACK_LIST_CATEGORIES = ['General'];
     const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
 
     // set default values for lists, and disable the blacklisted fields
