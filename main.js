@@ -99,7 +99,7 @@ function startApp() {
   obs.OBS_service_createAudioEncoder();
 
   obs.OBS_service_resetAudioContext();
-  obs.OBS_service_resetVideoContext();
+  obs.OBS_service_resetVideoContext(app.getPath('userData') + '\\');
 
   obs.OBS_service_associateAudioAndVideoToTheCurrentStreamingContext();
   obs.OBS_service_associateAudioAndVideoToTheCurrentRecordingContext();

@@ -1,6 +1,7 @@
 import Service from './service';
 import Obs from '../api/Obs';
 
+const { remote } = window.require('electron');
 const nodeObs = Obs.nodeObs;
 
 export default class SettingsService extends Service {
@@ -10,7 +11,7 @@ export default class SettingsService extends Service {
   }
 
   getSettings (categoryName) {
-    let settings = nodeObs.OBS_settings_getSettings(categoryName);
+    let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
     const BLACK_LIST_CATEGORIES = ['General'];
     const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
 
@@ -28,7 +29,7 @@ export default class SettingsService extends Service {
   }
 
   setSettings (categoryName, settingsData) {
-    return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+    return nodeObs.OBS_settings_saveSettings(categoryName, settingsData, remote.app.getPath('userData') + '\\');
   }
 
   getListItemDescription(possibleValue) {
