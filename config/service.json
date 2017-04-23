@@ -2,7 +2,7 @@
     "settings": {
         "key": "live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6",
         "server": "rtmp://live.twitch.tv/app",
-        "service": "YouTube / YouTube Gaming",
+        "service": "Twitch",
     },
     "type": "rtmp_common"
 }
