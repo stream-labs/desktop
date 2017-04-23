@@ -1,7 +1,7 @@
 <template>
 <div class="studioFooter">
   <div>
-    CPU STATS GO HERE
+    CPU: {{ cpuPercent }}%
   </div>
   <div class="studioFooter-buttons text-right">
     <button
@@ -21,14 +21,26 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
+import Obs from '../api/Obs.js';
 
 export default {
 
   data() {
     return {
       streamElapsed: '',
-      recordElapsed: ''
+      recordElapsed: '',
+      cpuPercent: 0
     };
+  },
+
+  mounted() {
+    this.cpuInterval = setInterval(() => {
+      this.cpuPercent = Obs.getPerformanceStatistics()[0].CPU;
+    }, 2000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.cpuInterval);
   },
 
   methods: {
