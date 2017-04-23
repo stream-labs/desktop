@@ -19,11 +19,8 @@
 const { remote } = window.require('electron');
 import _ from 'lodash';
 
-export default {
-
-  props: [
-    'property'
-  ],
+import Property from './Property.vue';
+let PathProperty = Property.extend({
 
   methods: {
     showFileDialog() {
@@ -73,7 +70,9 @@ export default {
     }
   }
 
-};
+});
+PathProperty.obsType = 'OBS_PROPERTY_PATH';
+export default PathProperty;
 </script>
 
 <style lang="less" scoped>

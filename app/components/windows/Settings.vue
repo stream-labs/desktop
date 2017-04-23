@@ -3,53 +3,88 @@
   title="Settings"
   :show-controls="true"
   :done-handler="done">
+
   <div slot="content">
-    <label>Stream Key</label>
-    <input
-      type="text"
-      v-model="streamKey"/>
+    <div class="row">
+      <div class="columns small-3">
+        <NavMenu v-model="categoryName" class="side-menu">
+          <NavItem
+            v-for="category in categoriesNames"
+            :to="category"
+            :enabled="!blackList.includes(category)"
+          >
+            {{ category }}
+          </NavItem>
+        </NavMenu>
+      </div>
+      <div class="columns small-9">
+        <GenericForm v-model="settingsData" @input="save"></GenericForm>
+      </div>
+    </div>
   </div>
+
 </modal-layout>
 </template>
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import Obs from '../../api/Obs.js';
+import NavMenu from '../shared/NavMenu.vue';
+import NavItem from '../shared/NavItem.vue';
+import GenericForm from '../shared/forms/GenericForm.vue';
 import windowManager from '../../util/WindowManager';
-const fs = window.require('fs');
+import SettingsService from '../../services/settings';
 
-const serviceConfigPath = './config/service.json';
 
 export default {
 
   components: {
-    ModalLayout
+    ModalLayout,
+    NavMenu,
+    NavItem,
+    GenericForm
+  },
+
+  beforeCreate() {
+    this.settingsService = SettingsService.instance;
+  },
+
+  data () {
+    let categoryName = 'Stream';
+    return {
+      categoryName: categoryName,
+      blackList: ['Advanced', 'Hotkeys'],
+      categoriesNames: this.settingsService.getCategories(),
+      settingsData: this.settingsService.getSettings(categoryName)
+    }
+  },
+
+  computed: {
+
   },
 
   methods: {
-    done() {
-      this.service.settings.key = this.streamKey;
 
-      const json = JSON.stringify(this.service, null, 4);
+    save(settingsData) {
+      this.settingsService.setSettings(this.categoryName, settingsData);
+      this.settingsData = this.settingsService.getSettings(this.categoryName);
+    },
 
-      fs.writeFileSync(serviceConfigPath, json);
-
-      Obs.resetService();
+    done () {
       windowManager.closeWindow();
     }
   },
 
-  data() {
-    // TODO: This should really be stored in memory rather than
-    // reading it from the file every time.  This is a temporary
-    // solution.
-    this.service = JSON.parse(fs.readFileSync(serviceConfigPath));
-    const streamKey = this.service.settings.key;
-
-    return {
-      streamKey
-    };
+  watch: {
+    categoryName(categoryName) {
+      this.settingsData = this.settingsService.getSettings(categoryName);
+    }
   }
-
 };
 </script>
+
+<style lang="less" scoped>
+  .side-menu {
+    position: fixed;
+    left: 0;
+  }
+</style>

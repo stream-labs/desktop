@@ -10,12 +10,11 @@
 </template>
 
 <script>
-export default {
 
-  props: [
-    'property'
-  ],
 
+import Property from './Property.vue';
+
+let FloatProperty = Property.extend({
   methods: {
     setValue(event) {
       this.$store.dispatch({
@@ -27,6 +26,8 @@ export default {
       });
     }
   }
+});
+FloatProperty.obsType = 'OBS_PROPERTY_FLOAT';
+export default FloatProperty;
 
-};
 </script>

@@ -66,15 +66,13 @@ import _ from 'lodash';
 
 import Multiselect from 'vue-multiselect';
 
-export default {
+import Property from './Property.vue';
+
+let FontProperty = Property.extend({
 
   components: {
     Multiselect
   },
-
-  props: [
-    'property'
-  ],
 
   data() {
     return {
@@ -240,8 +238,9 @@ export default {
       ];
     }
   }
-
-};
+});
+FontProperty.obsType = 'OBS_PROPERTY_FONT';
+export default FontProperty;
 </script>
 
 <style lang="less" scoped>

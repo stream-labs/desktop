@@ -1,0 +1,63 @@
+<template>
+    <li
+      class="nav-item"
+      :class="{ active: to === value, disabled: enabled == false }"
+      @click="onClickHandler"
+    >
+      <slot></slot>
+    </li>
+</template>
+
+<script>
+
+export default {
+  props: {
+    to: {type: String},
+    enabled: {type: Boolean, default: true}
+  },
+
+  computed: {
+    value() {return this.$parent.value}
+  },
+
+  updateValue() {
+    this.$set('value', this.$parent.value)
+  },
+
+  methods: {
+
+    onClickHandler() {
+      if (!this.enabled) return;
+      this.$parent.setValue(this.to)
+    },
+
+  }
+};
+</script>
+
+<style lang="less" scoped>
+
+  .nav-item {
+    cursor: pointer;
+    list-style: none;
+    border-left: 4px solid transparent;
+    padding-left: 50px;
+    opacity: 0.7;
+    font-size: 14px;
+    margin-bottom: 5px;
+
+    &.active {
+      opacity: 1;
+      font-weight: bold;
+      border-color: #ffcd47;
+    }
+    &:hover {
+      opacity: 1;
+    }
+    &.disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+
+</style>

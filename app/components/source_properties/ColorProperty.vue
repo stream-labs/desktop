@@ -34,8 +34,8 @@ import _ from 'lodash';
  * set the value in OBS, which will ripple back to this
  * component.
  */
-
-export default {
+import Property from './Property.vue';
+let ColorProperty = Property.extend({
 
   components: {
     ColorPicker: Sketch
@@ -51,10 +51,6 @@ export default {
       pickerVisible: false
     };
   },
-
-  props: [
-    'property'
-  ],
 
   methods: {
     onChange(color) {
@@ -129,8 +125,10 @@ export default {
       };
     }
   }
+});
+ColorProperty.obsType = 'OBS_PROPERTY_COLOR';
+export default ColorProperty;
 
-};
 </script>
 
 <style lang="less">

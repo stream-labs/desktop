@@ -30,15 +30,12 @@ import _ from 'lodash';
 
 const { remote } = window.require('electron');
 
-export default {
+import Property from './Property.vue';
+let EditableListProperty = Property.extend({
 
   components: {
     Selector
   },
-
-  props: [
-    'property'
-  ],
 
   data() {
     return {
@@ -141,7 +138,11 @@ export default {
     }
   }
 
-};
+});
+
+EditableListProperty.obsType = 'OBS_PROPERTY_EDITABLE_LIST';
+export default EditableListProperty;
+
 </script>
 
 <style lang="less" scoped>

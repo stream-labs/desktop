@@ -1,3 +1,11 @@
+h4 {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
 .button {
   &:focus {
     outline: 0;
@@ -7,6 +15,20 @@
 // TODO: eventuall use LESS variables from twitchalerts
 .bgColor-teal {
   background-color: #31c3a2;
+}
+
+// TODO: add "disable" and "enable" styles for form controls
+.input {
+  &.disabled {
+    opacity: 0.5;
+    &.checkbox input:checked~label, &.checkbox input~label {
+      &:before {
+        border-color: gray;
+        background: transparent;
+      }
+      &:after {color: gray}
+    }
+  }
 }
 
 // Make select boxes look similar to input boxes

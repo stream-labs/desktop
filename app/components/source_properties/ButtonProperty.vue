@@ -9,11 +9,8 @@
 </template>
 
 <script>
-export default {
-
-  props: [
-    'property'
-  ],
+import Property from './Property.vue';
+let ButtonProperty = Property.extend({
 
   methods: {
     handleClick() {
@@ -24,8 +21,11 @@ export default {
       });
     }
   }
+});
 
-};
+ButtonProperty.obsType = 'OBS_PROPERTY_BUTTON';
+
+export default ButtonProperty;
 </script>
 
 <style lang="less" scoped>

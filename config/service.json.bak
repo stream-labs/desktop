@@ -1,0 +1,10 @@
+{
+    "settings": {
+        "key": "",
+        "server": "rtmp://usmedia3.livecoding.tv/livecodingtv",
+        "service": "Twitch",
+        "show_all": true,
+        "streamType": "rtmp_common"
+    },
+    "type": "rtmp_common"
+}

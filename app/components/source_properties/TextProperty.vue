@@ -10,11 +10,8 @@
 </template>
 
 <script>
-export default {
-
-  props: [
-    'property'
-  ],
+import Property from './Property.vue';
+let TextProperty = Property.extend({
 
   methods: {
     setValue: _.debounce(function(event) {
@@ -28,5 +25,7 @@ export default {
     }, 500)
   }
 
-};
+});
+TextProperty.obsType = 'OBS_PROPERTY_TEXT';
+export default TextProperty;
 </script>

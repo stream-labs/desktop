@@ -10,12 +10,10 @@
 </template>
 
 <script>
-export default {
 
-  props: [
-    'property'
-  ],
+import Property from './Property.vue';
 
+let BoolProperty = Property.extend({
   methods: {
     setValue(event) {
       this.$store.dispatch({
@@ -27,6 +25,12 @@ export default {
       });
     }
   }
+});
 
-};
+BoolProperty.obsType = 'OBS_PROPERTY_BOOL';
+
+export default BoolProperty;
+
+
+
 </script>

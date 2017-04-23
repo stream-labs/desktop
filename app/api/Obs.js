@@ -321,6 +321,10 @@ class ObsApi {
     nodeObs.OBS_content_saveIntoConfigFile(path);
   }
 
+  getPerformanceStatistics() {
+    return nodeObs.OBS_API_getPerformanceStatistics();
+  }
+
 }
 
 export default new ObsApi();
