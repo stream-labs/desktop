@@ -17,6 +17,19 @@ h4 {
   background-color: #31c3a2;
 }
 
+// TODO: add "disable" and "enable" styles for form controls
+.input {
+  &.disabled {
+    opacity: 0.5;
+    &.checkbox input:checked~label, &.checkbox input~label {
+      &:before {
+        border-color: gray;
+        background: transparent;
+      }
+      &:after {color: gray}
+    }
+  }
+}
 
 // Make select boxes look similar to input boxes
 select {

@@ -1,8 +1,8 @@
 {
     "settings": {
         "key": "live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6",
-        "server": "rtmp://www.gameplank.tv/live",
-        "service": "YouTube / YouTube Gaming",
+        "server": "rtmp://a.rtmp.youtube.com/live2",
+        "service": "beam.pro",
         "show_all": true,
         "streamType": "rtmp_common"
     },

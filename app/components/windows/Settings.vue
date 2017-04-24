@@ -52,9 +52,9 @@ export default {
     let categoryName = 'Stream';
     return {
       categoryName: categoryName,
-      blackList: ['General', 'Advanced'],
+      blackList: ['Advanced', 'Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
-      settingsData: this.settingsService.getSettings(categoryName)
+      settingsData: this.settingsService.getSettingsFormData(categoryName)
     }
   },
 
@@ -66,7 +66,7 @@ export default {
 
     save(settingsData) {
       this.settingsService.setSettings(this.categoryName, settingsData);
-      this.settingsData = this.settingsService.getSettings(this.categoryName);
+      this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
     },
 
     done () {
@@ -76,7 +76,7 @@ export default {
 
   watch: {
     categoryName(categoryName) {
-      this.settingsData = this.settingsService.getSettings(categoryName);
+      this.settingsData = this.settingsService.getSettingsFormData(categoryName);
     }
   }
 };

@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="input">
   <label>{{ value.description }}</label>
   <div class="PathProperty-fieldGroup">
     <input

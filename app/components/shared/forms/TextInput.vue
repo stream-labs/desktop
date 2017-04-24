@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="input">
     <label>{{ value.description }}</label>
     <input
       type="text"
       v-model="value.currentValue"
-      @input="$emit('input', value)"
+      :disabled="!value.enabled"
+      @change="$emit('input', value)"
     />
   </div>
 </template>

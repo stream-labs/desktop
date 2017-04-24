@@ -1,10 +1,11 @@
 <template>
-<div>
+<div class="input">
   <label>{{ value.description }}</label>
   <input
     ref="input"
     type="text"
     :value="value.currentValue"
+    :disabled="!value.enabled"
     @input="updateValue($event.target.value)"
   />
 </div>
