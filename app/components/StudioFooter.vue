@@ -2,6 +2,7 @@
 <div class="studioFooter">
   <div>
     CPU: {{ cpuPercent }}%
+    {{ streamStatusMsg }}
   </div>
   <div class="studioFooter-buttons text-right">
     <button
@@ -29,7 +30,8 @@ export default {
     return {
       streamElapsed: '',
       recordElapsed: '',
-      cpuPercent: 0
+      cpuPercent: 0,
+      streamOk: null
     };
   },
 
@@ -61,11 +63,7 @@ export default {
         this.streamElapsed = '00:00:00';
 
         this.checkStreamInterval = setInterval(() => {
-          if (!Obs.checkStream()) {
-            this.$store.dispatch({
-              type: 'stopStreaming'
-            });
-          }
+          this.streamOk = Obs.checkStream();
         }, 10 * 1000);
 
         this.streamInterval = setInterval(() => {
@@ -107,6 +105,18 @@ export default {
   computed: {
     streaming() {
       return this.$store.getters.isStreaming;
+    },
+
+    streamStatusMsg() {
+      if (this.streaming && this.streamOk !== null) {
+        if (this.streamOk) {
+          return 'Stream OK';
+        } else {
+          return 'Stream Error';
+        }
+      } else {
+        return '';
+      }
     },
 
     streamStartTime() {
