@@ -16,10 +16,8 @@ function registerMethodAsVuexEntity (entityType, target, methodName, descriptor)
   let originalMethod = descriptor.value;
   target[entityType] = target[entityType] || {};
   target[entityType][methodName] = function (store, payload) {
-    let context = payload[0];
-    let args = payload.slice(1);
-    payload.shift();
-    return originalMethod.call(context, ...args);
+    let context = payload.shift();
+    return originalMethod.call(context, ...payload);
   };
   descriptor.value = function (...args) {
     args.unshift(this);
