@@ -1,10 +1,8 @@
 {
     "settings": {
         "key": "live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6",
-        "server": "rtmp://ingest-dal.beam.pro:1935/beam",
-        "service": "YouTube / YouTube Gaming",
-        "show_all": true,
-        "streamType": "rtmp_common"
+        "server": "rtmp://live.twitch.tv/app",
+        "service": "Twitch"
     },
     "type": "rtmp_common"
 }
