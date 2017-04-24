@@ -45,18 +45,28 @@ export default {
 
   methods: {
     toggleStreaming() {
+      // TODO: This really needs to be moved into a service
       if (this.streaming) {
         this.$store.dispatch({
           type: 'stopStreaming'
         });
 
         clearInterval(this.streamInterval);
+        clearInterval(this.checkStreamInterval);
       } else {
         this.$store.dispatch({
           type: 'startStreaming'
         });
 
         this.streamElapsed = '00:00:00';
+
+        this.checkStreamInterval = setInterval(() => {
+          if (!Obs.checkStream()) {
+            this.$store.dispatch({
+              type: 'stopStreaming'
+            });
+          }
+        }, 10 * 1000);
 
         this.streamInterval = setInterval(() => {
           this.streamElapsed = this.elapsedStreamTime;

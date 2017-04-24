@@ -289,6 +289,10 @@ class ObsApi {
     nodeObs.OBS_service_stopStreaming();
   }
 
+  checkStream() {
+    return nodeObs.OBS_service_isStreamingOutputActive() === '1';
+  }
+
   startRecording() {
     nodeObs.OBS_service_startRecording();
   }
