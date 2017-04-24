@@ -25,7 +25,11 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
+        options: {
+          plugins: ['transform-decorators-legacy'],
+          presets: ['stage-2']
+        }
       },
       {
         test: /\.less$/,

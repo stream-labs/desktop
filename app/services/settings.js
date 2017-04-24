@@ -1,9 +1,13 @@
-import Service from './service';
+import { StatefulService, action, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
 
-export default class SettingsService extends Service {
+
+
+export default class SettingsService extends StatefulService {
+
+  state = {};
 
   getCategories () {
     return nodeObs.OBS_settings_getListCategories();
@@ -24,15 +28,23 @@ export default class SettingsService extends Service {
     return settings;
   }
 
+  @action
   setSettings (categoryName, settingsData) {
-    return nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+    this.SET_SETTINGS(categoryName, settingsData);
   }
 
-  getListItemDescription(possibleValue) {
+  @mutation
+  SET_SETTINGS(categoryName, settingsData) {
+    nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+    this.state.categoryName = settingsData;
+  }
+
+
+  getListItemDescription (possibleValue) {
     return Object.keys(possibleValue)[0];
   }
 
-  getListItemName(possibleValue) {
+  getListItemName (possibleValue) {
     return possibleValue[Object.keys(possibleValue)[0]];
   }
 }
