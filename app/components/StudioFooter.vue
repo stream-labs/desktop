@@ -53,6 +53,8 @@ export default {
           type: 'stopStreaming'
         });
 
+        this.streamOk = null;
+
         clearInterval(this.streamInterval);
         clearInterval(this.checkStreamInterval);
       } else {
