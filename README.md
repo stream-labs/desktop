@@ -32,7 +32,7 @@ https://yarnpkg.com/en/docs/install
 First, install all node modules via yarn:
 
 ```
-yarn
+yarn install --pure-lockfile
 ```
 
 Then, rebuild native extensions for electron:
