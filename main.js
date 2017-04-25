@@ -93,18 +93,18 @@ function startApp() {
   obs.OBS_service_createStreamingOutput();
   obs.OBS_service_createRecordingOutput();
 
-  obs.OBS_service_createVideoStreamingEncoder();
-  obs.OBS_service_createVideoRecordingEncoder();
+  obs.OBS_service_createVideoStreamingEncoder(app.getPath('userData') + '\\');
+  obs.OBS_service_createVideoRecordingEncoder(app.getPath('userData') + '\\');
 
   obs.OBS_service_createAudioEncoder();
 
   obs.OBS_service_resetAudioContext();
-  obs.OBS_service_resetVideoContext();
+  obs.OBS_service_resetVideoContext(app.getPath('userData') + '\\');
 
   obs.OBS_service_associateAudioAndVideoToTheCurrentStreamingContext();
   obs.OBS_service_associateAudioAndVideoToTheCurrentRecordingContext();
 
-  obs.OBS_service_createService();
+  obs.OBS_service_createService(app.getPath('userData') + '\\');
 
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentStreamingOutput();
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
