@@ -1,10 +1,6 @@
 import Service from './service';
 import store from '../store';
-
-
-export function action (target, methodName, descriptor) {
-  return registerMethodAsVuexEntity('actions', target, methodName, descriptor)
-}
+import Vue from 'vue';
 
 
 export function mutation (target, methodName, descriptor) {
@@ -13,16 +9,16 @@ export function mutation (target, methodName, descriptor) {
 
 
 function registerMethodAsVuexEntity (entityType, target, methodName, descriptor) {
+  let entityName = target.constructor.name + '.' + methodName;
   let originalMethod = descriptor.value;
   target[entityType] = target[entityType] || {};
-  target[entityType][methodName] = function (store, payload) {
+  target[entityType][entityName] = function (store, payload) {
     let context = payload.shift();
     return originalMethod.call(context, ...payload);
   };
   descriptor.value = function (...args) {
     args.unshift(this);
-    if (entityType === 'actions') store.dispatch(methodName, args);
-    if (entityType === 'mutations') store.commit(methodName, args);
+    if (entityType === 'mutations') store.commit(entityName, args);
   };
   return descriptor;
 }
@@ -43,10 +39,14 @@ export class StatefulService extends Service {
   }
 
 
+  set state (newState) {
+    return Vue.set(this.store.state, this.moduleName, newState);
+  }
+
+
   constructor (...args) {
     super(...args);
     store.registerModule(this.moduleName, {
-      actions: this.actions,
       mutations: this.mutations,
       state: this.initialState
     });
@@ -56,5 +56,10 @@ export class StatefulService extends Service {
 
   init() {
 
+  }
+
+
+  patchState(patch) {
+    this.state = {...this.state, ...patch};
   }
 }

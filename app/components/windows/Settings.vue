@@ -69,10 +69,12 @@ export default {
       this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
     },
 
+
     done () {
       windowManager.closeWindow();
     }
   },
+
 
   watch: {
     categoryName(categoryName) {
@@ -83,8 +85,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .side-menu {
-    position: fixed;
-    left: 0;
-  }
+
+.side-menu {
+  position: fixed;
+  left: 0;
+}
+
 </style>

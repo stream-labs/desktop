@@ -1,8 +1,10 @@
 {
     "settings": {
         "key": "live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6",
-        "server": "rtmp://live.twitch.tv/app",
-        "service": "Twitch"
+        "server": "rtmp://live.hitbox.tv/push",
+        "service": "beam.pro",
+        "show_all": false,
+        "streamType": "rtmp_common"
     },
     "type": "rtmp_common"
 }

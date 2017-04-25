@@ -1,22 +1,24 @@
 import { StatefulService, mutation } from './stateful-service';
-import Vue from 'vue';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
-
 
 
 export default class SettingsService extends StatefulService {
 
   initialState = {};
 
-  static convertFormDataToState(settingsFormData) {
+  static convertFormDataToState (settingsFormData) {
     let settingsState = {};
-    settingsFormData.forEach(group => {
-      group.parameters.forEach(parameter => {
-        settingsState[parameter.name] = parameter.currentValue;
+    for (let groupName in settingsFormData) {
+      settingsFormData[groupName].forEach(subGroup => {
+        subGroup.parameters.forEach(parameter => {
+          settingsState[groupName] = settingsState[groupName] || {};
+          settingsState[groupName][parameter.name] = parameter.currentValue;
+        });
       });
-    });
+    }
+
     return settingsState;
   }
 
@@ -28,6 +30,15 @@ export default class SettingsService extends StatefulService {
 
   static getListItemName (possibleValue) {
     return possibleValue[Object.keys(possibleValue)[0]];
+  }
+
+  init() {
+    // load configuration from nodeObs to state
+    let settingsFormData = {};
+    this.getCategories().forEach(categoryName => {
+      settingsFormData[categoryName] = this.getSettingsFormData(categoryName);
+    });
+    this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
   }
 
 
@@ -54,10 +65,14 @@ export default class SettingsService extends StatefulService {
     return settings;
   }
 
-  @mutation
   setSettings (categoryName, settingsData) {
     nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
-    Vue.set(this.state, categoryName, SettingsService.convertFormDataToState(settingsData));
+    this.SET_SETTINGS(SettingsService.convertFormDataToState({[categoryName]: settingsData}));
+  }
+
+  @mutation
+  SET_SETTINGS (settingsData) {
+    this.patchState(settingsData);
   }
 
 }

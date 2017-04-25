@@ -1,9 +1,9 @@
 {
     "settings": {
         "key": "live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6",
-        "server": "rtmp://a.rtmp.youtube.com/live2",
-        "service": "beam.pro",
-        "show_all": true,
+        "server": "rtmp://rtmp-api.facebook.com:80/rtmp/",
+        "service": "hitbox.tv",
+        "show_all": false,
         "streamType": "rtmp_common"
     },
     "type": "rtmp_common"

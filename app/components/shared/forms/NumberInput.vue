@@ -12,9 +12,8 @@
 </template>
 
 <script>
-
-
 import Input from './Input.vue';
+
 let NumberInput = Input.extend({
   methods: {
     updateValue: function (value) {
@@ -29,7 +28,6 @@ let NumberInput = Input.extend({
   }
 });
 NumberInput.obsType = 'OBS_PROPERTY_DOUBLE';
+
 export default NumberInput;
-
-
 </script>
