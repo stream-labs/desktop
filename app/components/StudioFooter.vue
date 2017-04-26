@@ -22,7 +22,7 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
-import Obs from '../api/Obs.js';
+import Obs from '../api/Obs';
 
 export default {
 
@@ -100,7 +100,7 @@ export default {
       const minutes = _.padStart(duration.minutes(), 2, 0);
       const hours = _.padStart(duration.hours(), 2, 0);
 
-      return hours + ':' + minutes + ':' + seconds;
+      return `${hours}:${minutes}:${seconds}`;
     }
   },
 
@@ -113,12 +113,12 @@ export default {
       if (this.streaming && this.streamOk !== null) {
         if (this.streamOk) {
           return 'Stream OK';
-        } else {
-          return 'Stream Error';
         }
-      } else {
-        return '';
+
+        return 'Stream Error';
       }
+
+      return '';
     },
 
     streamStartTime() {
@@ -128,9 +128,9 @@ export default {
     streamButtonLabel() {
       if (this.streaming) {
         return this.streamElapsed;
-      } else {
-        return 'Start Streaming';
       }
+
+      return 'Start Streaming';
     },
 
     elapsedStreamTime: {
@@ -151,9 +151,9 @@ export default {
     recordButtonLabel() {
       if (this.recording) {
         return this.recordElapsed;
-      } else {
-        return 'Start Recording';
       }
+
+      return 'Start Recording';
     },
 
     elapsedRecordTime: {
