@@ -49,7 +49,6 @@ export class StatefulService extends Service {
 
   constructor (...args) {
     super(...args);
-    console.log(JSON.stringify(this.initialState));
     store.registerModule(this.moduleName, {
       mutations: this.mutations,
       state: this.initialState
