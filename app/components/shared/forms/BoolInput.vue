@@ -2,11 +2,9 @@
 <div class="input checkbox" :class="{disabled: !value.enabled}">
   <input
     type="checkbox"
-    :value="value.currentValue"
-    :true-value="1"
-    :false-value="0"
+    :checked="value.currentValue"
     :disabled="!value.enabled"
-    @change="$emit('input', value)"
+    @change="onChangeHandler"
   />
   <label>{{ value.description }}</label>
 </div>
@@ -15,7 +13,13 @@
 <script>
 
 import Input from './Input.vue';
-let BoolInput = Input.extend({});
+let BoolInput = Input.extend({
+  methods: {
+    onChangeHandler (event) {
+      this.$emit('input', Object.assign({}, this.value, {currentValue: Number(event.target.checked)}));
+    }
+  }
+});
 BoolInput.obsType = 'OBS_PROPERTY_BOOL';
 export default BoolInput;
 

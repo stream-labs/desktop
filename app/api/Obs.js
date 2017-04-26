@@ -282,11 +282,15 @@ class ObsApi {
   }
 
   startStreaming() {
-    nodeObs.OBS_service_startStreaming();
+    nodeObs.OBS_service_startStreaming(remote.app.getPath('userData') + '\\');
   }
 
   stopStreaming() {
     nodeObs.OBS_service_stopStreaming();
+  }
+
+  checkStream() {
+    return nodeObs.OBS_service_isStreamingOutputActive() === '1';
   }
 
   startRecording() {

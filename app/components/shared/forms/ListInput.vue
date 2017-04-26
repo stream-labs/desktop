@@ -15,21 +15,18 @@
 
 <script>
 import Input from './Input.vue';
+import SettingsService from '../../../services/settings'
 
 let ListInput = Input.extend({
+
   methods: {
 
     onInputHandler(event) {
       this.$emit('input', Object.assign({}, this.value, {currentValue: event.target.value}))
     },
 
-    getDescription(possibleValue) {
-      return Object.keys(possibleValue)[0]
-    },
-
-    getName(possibleValue) {
-      return possibleValue[Object.keys(possibleValue)[0]]
-    }
+    getDescription: SettingsService.getListItemDescription,
+    getName: SettingsService.getListItemName
   }
 });
 ListInput.obsType = 'OBS_PROPERTY_LIST';
