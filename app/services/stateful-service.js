@@ -31,7 +31,10 @@ function registerMethodAsVuexEntity (entityType, target, methodName, descriptor)
 export class StatefulService extends Service {
   store = store;
   moduleName = this.constructor.name;
-  initialState = {};
+
+  get initialState() {
+    return {};
+  }
 
 
   get state () {
@@ -46,6 +49,7 @@ export class StatefulService extends Service {
 
   constructor (...args) {
     super(...args);
+    console.log(JSON.stringify(this.initialState));
     store.registerModule(this.moduleName, {
       mutations: this.mutations,
       state: this.initialState

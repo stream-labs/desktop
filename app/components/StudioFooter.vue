@@ -23,6 +23,8 @@
 import moment from 'moment';
 import _ from 'lodash';
 import Obs from '../api/Obs';
+import SettingsService from '../services/settings';
+import StreamingService from '../services/streaming';
 
 export default {
 
@@ -30,9 +32,13 @@ export default {
     return {
       streamElapsed: '',
       recordElapsed: '',
-      cpuPercent: 0,
-      streamOk: null
+      cpuPercent: 0
     };
+  },
+
+  created() {
+    this.settingsService = SettingsService.instance;
+    this.streamingService = StreamingService.instance;
   },
 
   mounted() {
@@ -47,51 +53,51 @@ export default {
 
   methods: {
     toggleStreaming() {
-      // TODO: This really needs to be moved into a service
       if (this.streaming) {
-        this.$store.dispatch({
-          type: 'stopStreaming'
-        });
-
-        this.streamOk = null;
-
-        clearInterval(this.streamInterval);
-        clearInterval(this.checkStreamInterval);
+        this.stopStreaming();
       } else {
-        this.$store.dispatch({
-          type: 'startStreaming'
-        });
-
-        this.streamElapsed = '00:00:00';
-
-        this.checkStreamInterval = setInterval(() => {
-          this.streamOk = Obs.checkStream();
-        }, 10 * 1000);
-
-        this.streamInterval = setInterval(() => {
-          this.streamElapsed = this.elapsedStreamTime;
-        }, 100);
+        this.startStreaming();
       }
+    },
+
+    startStreaming() {
+      this.streamingService.startStreaming();
+
+      this.streamElapsed = '00:00:00';
+
+      this.streamInterval = setInterval(() => {
+        this.streamElapsed = this.elapsedStreamTime;
+      }, 100);
+    },
+
+    stopStreaming() {
+      this.streamingService.stopStreaming();
+
+      clearInterval(this.streamInterval);
     },
 
     toggleRecording() {
       if (this.recording) {
-        this.$store.dispatch({
-          type: 'stopRecording'
-        });
-
-        clearInterval(this.recordInterval);
+        this.stopRecording();
       } else {
-        this.$store.dispatch({
-          type: 'startRecording'
-        });
-
-        this.recordElapsed = '00:00:00';
-
-        this.recordInterval = setInterval(() => {
-          this.recordElapsed = this.elapsedRecordTime;
-        }, 100);
+        this.startRecording();
       }
+    },
+
+    startRecording() {
+      this.streamingService.startRecording();
+
+      this.recordElapsed = '00:00:00';
+
+      this.recordInterval = setInterval(() => {
+        this.recordElapsed = this.elapsedRecordTime;
+      }, 100);
+    },
+
+    stopRecording() {
+      this.streamingService.stopRecording();
+
+      clearInterval(this.recordInterval);
     },
 
     formattedDurationSince(timestamp) {
@@ -106,7 +112,7 @@ export default {
 
   computed: {
     streaming() {
-      return this.$store.getters.isStreaming;
+      return this.streamingService.state.isStreaming;
     },
 
     streamStatusMsg() {
@@ -122,7 +128,7 @@ export default {
     },
 
     streamStartTime() {
-      return this.$store.getters.streamStartTime;
+      return moment(this.streamingService.state.streamStartTime);
     },
 
     streamButtonLabel() {
@@ -133,6 +139,10 @@ export default {
       return 'Start Streaming';
     },
 
+    streamOk() {
+      return this.streamingService.state.streamOk;
+    },
+
     elapsedStreamTime: {
       cache: false,
       get() {
@@ -141,11 +151,11 @@ export default {
     },
 
     recording() {
-      return this.$store.getters.isRecording;
+      return this.streamingService.state.isRecording;
     },
 
     recordStartTime() {
-      return this.$store.getters.recordStartTime;
+      return moment(this.streamingService.state.recordStartTime);
     },
 
     recordButtonLabel() {
