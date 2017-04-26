@@ -52,6 +52,10 @@ const mutations = {
 
   REMOVE_SOURCE_FROM_ALL_SCENES(state, data) {
     _.each(state.scenes, scene => {
+      if (scene.activeSourceId === data.sourceId) {
+        scene.activeSourceId = null;
+      }
+
       scene.sources = _.without(scene.sources, data.sourceId);
     });
   },
