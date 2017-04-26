@@ -2,6 +2,7 @@ import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
+const { remote } = window.require('electron');
 
 
 export default class SettingsService extends StatefulService {
@@ -48,7 +49,7 @@ export default class SettingsService extends StatefulService {
 
 
   getSettingsFormData (categoryName) {
-    let settings = nodeObs.OBS_settings_getSettings(categoryName);
+    let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
     const BLACK_LIST_CATEGORIES = ['General'];
     const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
 
@@ -66,7 +67,7 @@ export default class SettingsService extends StatefulService {
   }
 
   setSettings (categoryName, settingsData) {
-    nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+    nodeObs.OBS_settings_saveSettings(categoryName, settingsData, remote.app.getPath('userData') + '\\');
     this.SET_SETTINGS(SettingsService.convertFormDataToState({[categoryName]: settingsData}));
   }
 
