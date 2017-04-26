@@ -1,38 +1,35 @@
 <template>
-  <div class="input">
-    <label>{{ value.description }}</label>
-    <select
-      v-model="value.currentValue"
-      :disabled="!value.enabled"
-      @input="onInputHandler"
-    >
-      <option v-for="possibleValue in value.values" :value="getName(possibleValue)">
-        {{ getDescription(possibleValue) }}
-      </option>
-    </select>
-  </div>
+<div class="input">
+  <label>{{ value.description }}</label>
+  <select
+    :value="value.currentValue"
+    :disabled="!value.enabled"
+    @input="onInputHandler"
+  >
+    <option v-for="possibleValue in value.values" :value="getName(possibleValue)">
+      {{ getDescription(possibleValue) }}
+    </option>
+  </select>
+</div>
 </template>
 
 <script>
-  import Input from './Input.vue';
+import Input from './Input.vue';
+import SettingsService from '../../../services/settings'
 
-  let ListInput = Input.extend({
-    methods: {
+let ListInput = Input.extend({
 
-      onInputHandler(event) {
-        this.$emit('input', Object.assign({}, this.value, {currentValue: event.target.value}))
-      },
+  methods: {
 
-      getDescription(possibleValue) {
-        return Object.keys(possibleValue)[0]
-      },
+    onInputHandler(event) {
+      this.$emit('input', Object.assign({}, this.value, {currentValue: event.target.value}))
+    },
 
-      getName(possibleValue) {
-        return possibleValue[Object.keys(possibleValue)[0]]
-      }
-    }
-  });
-  ListInput.obsType = 'OBS_PROPERTY_LIST';
+    getDescription: SettingsService.getListItemDescription,
+    getName: SettingsService.getListItemName
+  }
+});
+ListInput.obsType = 'OBS_PROPERTY_LIST';
 
-  export default ListInput;
+export default ListInput;
 </script>

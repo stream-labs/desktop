@@ -5,7 +5,7 @@
     <input
       type="text"
       ref="input"
-      v-model="value.currentValue"
+      :value="value.currentValue"
       class="PathProperty-path">
     <button
       @click="showFileDialog"
@@ -17,9 +17,9 @@
 </template>
 
 <script>
+import Input from './Input.vue';
 const { remote } = window.require('electron');
 
-import Input from './Input.vue';
 let PathInput = Input.extend({
 
   methods: {

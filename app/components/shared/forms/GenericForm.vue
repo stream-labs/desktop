@@ -26,39 +26,41 @@
 </template>
 
 <script>
-  import * as inputComponents from './index';
+import * as inputComponents from './index';
 
-  export default {
-    props: ['value'],
-    components: inputComponents,
-    data() {
-      return {collapsedGroups: {}}
+export default {
+  props: ['value'],
+  components: inputComponents,
+  data() {
+    return {collapsedGroups: {}}
+  },
+  methods: {
+
+    toggleGroup(index) {
+      this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);
     },
-    methods: {
 
-      toggleGroup(index) {
-        this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);
-      },
-
-      propertyComponentForType(type) {
-        for (let componentName in inputComponents) {
-          let component = inputComponents[componentName];
-          if (component.obsType === type) return component;
-        }
-      },
-
-      onInputHandler() {
-        this.$emit('input', this.value);
+    propertyComponentForType(type) {
+      for (let componentName in inputComponents) {
+        let component = inputComponents[componentName];
+        if (component.obsType === type) return component;
       }
+    },
+
+    onInputHandler() {
+      this.$emit('input', this.value);
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
+@import "../../../styles/index";
+
 .GenericForm > div {
   margin-bottom: 20px;
-  background-color: #fcfcfc;
-  border: 1px solid #ededed;
+  background-color: @panel-bg-color;
+  border: 1px solid @panel-border-color;
   padding: 20px 30px;
 
   h4 {

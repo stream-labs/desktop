@@ -6,6 +6,9 @@
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
 
+/**
+ * @abstract
+ */
 export default class Service {
 
   constructor(enforcer) {
