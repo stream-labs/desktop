@@ -1,3 +1,16 @@
 {
-  "extends": "airbnb"
+  "extends": "airbnb",
+  "plugins": [
+    "vue"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "class-methods-use-this": "off",
+    "arrow-parens": "off",
+    "comma-dangle": "off",
+    "prefer-rest-params": "off"
+  }
 }
