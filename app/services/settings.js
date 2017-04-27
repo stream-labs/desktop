@@ -33,7 +33,8 @@ export default class SettingsService extends StatefulService {
     return possibleValue[Object.keys(possibleValue)[0]];
   }
 
-  init() {
+
+  loadSettingsIntoStore() {
     // load configuration from nodeObs to state
     let settingsFormData = {};
     this.getCategories().forEach(categoryName => {

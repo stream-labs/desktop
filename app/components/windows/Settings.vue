@@ -46,6 +46,7 @@ export default {
 
   beforeCreate() {
     this.settingsService = SettingsService.instance;
+    this.settingsService.loadSettingsIntoStore();
   },
 
   data () {
