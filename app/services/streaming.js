@@ -4,15 +4,13 @@ import Obs from '../api/Obs';
 @stateful
 export default class StreamingService extends StatefulService {
 
-  get initialState() {
-    return {
+  static initialState = {
       isStreaming: false,
       streamStartTime: null,
       streamOk: null,
       isRecording: false,
       recordStartTime: null
-    };
-  }
+  };
 
   @mutation
   START_STREAMING(startTime) {
