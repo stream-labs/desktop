@@ -9,8 +9,9 @@
 </template>
 
 <script>
-import Obs from '../api/Obs.js';
 import _ from 'lodash';
+import Obs from '../api/Obs';
+
 const { webFrame, screen, remote } = window.require('electron');
 
 export default {
@@ -124,8 +125,8 @@ export default {
 
     startDragging(event) {
       this.dragging = true;
-      this.currentX = event.pageX,
-      this.currentY = event.pageY
+      this.currentX = event.pageX;
+      this.currentY = event.pageY;
     },
 
     startResizing(event, region) {
@@ -223,8 +224,8 @@ export default {
       this.$store.dispatch({
         type: 'setSourcePositionAndScale',
         sourceId: source.id,
-        x: source.x - (moveX && pixelsX || 0),
-        y: source.y - (moveY && pixelsY || 0),
+        x: source.x - ((moveX && pixelsX) || 0),
+        y: source.y - ((moveY && pixelsY) || 0),
         scaleX: source.scaleX + deltaScaleX,
         scaleY: source.scaleY + deltaScaleY
       });
@@ -303,6 +304,8 @@ export default {
           return this.isOverBox(event, region.x, region.y, region.width, region.height);
         });
       }
+
+      return null;
     },
 
     // Size (width & height) is a scalar value, and
@@ -310,8 +313,8 @@ export default {
     // spaces.
     convertScalarToBaseSpace(x, y) {
       return {
-        x: x * this.baseWidth / this.renderedWidth,
-        y: y * this.baseHeight / this.renderedHeight
+        x: (x * this.baseWidth) / this.renderedWidth,
+        y: (y * this.baseHeight) / this.renderedHeight
       };
     },
 
@@ -336,6 +339,8 @@ export default {
           return this.$store.state.sources.sources[sourceId];
         });
       }
+
+      return null;
     },
 
     baseWidth() {
@@ -365,7 +370,7 @@ export default {
     // Using a computed property since it is cached
     resizeRegions() {
       if (!this.activeSource) {
-        return;
+        return [];
       }
 
       const source = this.activeSource;
@@ -386,7 +391,7 @@ export default {
         },
         {
           name: 'n',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -394,7 +399,7 @@ export default {
         },
         {
           name: 'ne',
-          x: source.x + source.width * source.scaleX - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -402,24 +407,24 @@ export default {
         },
         {
           name: 'e',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
@@ -427,7 +432,7 @@ export default {
         {
           name: 'sw',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
@@ -435,7 +440,7 @@ export default {
         {
           name: 'w',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
