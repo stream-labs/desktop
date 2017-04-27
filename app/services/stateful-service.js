@@ -16,7 +16,12 @@ function registerMethodAsVuexEntity (entityType, target, methodName, descriptor)
   target[entityType][entityName] = function (store, payload) {
     let context = {
       moduleName: moduleName,
-      state: StatefulService.instance.store.state[moduleName],
+      get state() {
+        return StatefulService.instance.store.state[methodName];
+      },
+      set state(newState) {
+        Vue.set(StatefulService.instance.store.state, moduleName, newState);
+      },
       patchState: StatefulService.instance.patchState
     };
     return originalMethod.call(context, ...payload.args);
