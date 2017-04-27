@@ -23,6 +23,7 @@
 import moment from 'moment';
 import _ from 'lodash';
 import Obs from '../api/Obs.js';
+import SettingsService from '../services/settings';
 
 export default {
 
@@ -33,6 +34,11 @@ export default {
       cpuPercent: 0,
       streamOk: null
     };
+  },
+
+  beforeCreate() {
+    this.settingsService = SettingsService.instance;
+    this.settingsService.loadSettingsIntoStore();
   },
 
   mounted() {

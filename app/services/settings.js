@@ -51,7 +51,7 @@ export default class SettingsService extends StatefulService {
 
   getSettingsFormData (categoryName) {
     let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
-    const BLACK_LIST_CATEGORIES = ['General'];
+    const BLACK_LIST_CATEGORIES = [];
     const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
 
     // set default values for lists, and disable the blacklisted fields
