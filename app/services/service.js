@@ -17,7 +17,7 @@ export default class Service {
 
   static get instance() {
     if(!this[singleton]) {
-      this[singleton] = new this(singletonEnforcer);
+      return this[singleton] = new this(singletonEnforcer);
     }
     return this[singleton];
   }

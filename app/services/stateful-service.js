@@ -9,32 +9,41 @@ export function mutation (target, methodName, descriptor) {
 
 
 function registerMethodAsVuexEntity (entityType, target, methodName, descriptor) {
-  let entityName = target.constructor.name + '.' + methodName;
+  let moduleName = target.constructor.name;
+  let entityName = moduleName + '.' + methodName;
   let originalMethod = descriptor.value;
   target[entityType] = target[entityType] || {};
   target[entityType][entityName] = function (store, payload) {
-    let context = payload.shift();
-    return originalMethod.call(context, ...payload);
+    let context = {
+      moduleName: moduleName,
+      state: StatefulService.instance.store.state[moduleName],
+      patchState: StatefulService.instance.patchState
+    };
+    return originalMethod.call(context, ...payload.args);
   };
   descriptor.value = function (...args) {
-    args.unshift(this);
-    if (entityType === 'mutations') store.commit(entityName, args);
+    if (entityType === 'mutations') store.commit(entityName, {args});
   };
   return descriptor;
 }
 
+export function stateful (StatefulClass) {
+  let mutations = StatefulClass.prototype.mutations;
+  if (!StatefulClass.initialState && Object.keys(mutations).length === 0) return;
+  store.registerModule(StatefulClass.name, {
+    mutations: mutations,
+    state: StatefulClass.initialState || {}
+  });
+}
 
 /**
  * helps to integrate services with Vuex store
  * @abstract
  */
 export class StatefulService extends Service {
+  static initialState = {};
   store = store;
   moduleName = this.constructor.name;
-
-  get initialState() {
-    return {};
-  }
 
 
   get state () {
@@ -49,10 +58,6 @@ export class StatefulService extends Service {
 
   constructor (...args) {
     super(...args);
-    store.registerModule(this.moduleName, {
-      mutations: this.mutations,
-      state: this.initialState
-    });
     this.init();
   }
 

@@ -1,10 +1,10 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, stateful, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
 const { remote } = window.require('electron');
 
-
+@stateful
 export default class SettingsService extends StatefulService {
 
   static convertFormDataToState (settingsFormData) {
