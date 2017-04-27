@@ -4,7 +4,6 @@ import Vue from 'vue';
 
 
 export function mutation (target, methodName, descriptor) {
-  console.log('register mutation', methodName)
   return registerMethodAsVuexEntity('mutations', target, methodName, descriptor)
 }
 
