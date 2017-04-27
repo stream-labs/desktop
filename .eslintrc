@@ -17,6 +17,7 @@
       {
         "devDependencies": true
       }
-    ]
+    ],
+    "spaced-comment": "off"
   }
 }

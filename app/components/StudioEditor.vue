@@ -9,8 +9,9 @@
 </template>
 
 <script>
-import Obs from '../api/Obs.js';
 import _ from 'lodash';
+import Obs from '../api/Obs';
+
 const { webFrame, screen, remote } = window.require('electron');
 
 export default {
@@ -124,8 +125,8 @@ export default {
 
     startDragging(event) {
       this.dragging = true;
-      this.currentX = event.pageX,
-      this.currentY = event.pageY
+      this.currentX = event.pageX;
+      this.currentY = event.pageY;
     },
 
     startResizing(event, region) {
@@ -184,19 +185,78 @@ export default {
         }
       } else if (this.dragging) {
         if (deltaX || deltaY) {
-          this.$store.dispatch({
-            type: 'setSourcePosition',
-            sourceId: this.activeSource.id,
-            x: this.activeSource.x + converted.x,
-            y: this.activeSource.y + converted.y
-          });
-
-          this.currentX = event.pageX;
-          this.currentY = event.pageY;
+          this.drag(converted.x, converted.y);
         }
       }
 
       this.updateCursor(event);
+    },
+
+    // x & y are pixel distances in base space
+    drag(x, y) {
+      // Sensisivity is pixels in base space for now.
+      // Should eventually be rendered space.
+      const snapSensitivity = 20;
+
+      // Scaled width and height
+      const sourceWidth = this.activeSource.width * this.activeSource.scaleX;
+      const sourceHeight = this.activeSource.height * this.activeSource.scaleY;
+
+      // The new source location before applying snapping
+      let newX = this.activeSource.x + x;
+      let newY = this.activeSource.y + y;
+
+      // Whether or not we snapped on the X or Y coordinate
+      let snappedX = false;
+      let snappedY = false;
+
+      // Edge Snapping:
+      // Left Edge:
+      if ((newX < snapSensitivity) && (newX > snapSensitivity * -1)) {
+        newX = 0;
+        snappedX = true;
+      }
+
+      // Top Edge:
+      if ((newY < snapSensitivity) && (newY > snapSensitivity * -1)) {
+        newY = 0;
+        snappedY = true;
+      }
+
+      // Right Edge:
+      const rightEdgeX = newX + sourceWidth;
+      const snapRightMin = this.baseWidth - snapSensitivity;
+      const snapRightMax = this.baseWidth + snapSensitivity;
+
+      if ((rightEdgeX > snapRightMin) && (rightEdgeX < snapRightMax)) {
+        newX = this.baseWidth - sourceWidth;
+        snappedX = true;
+      }
+
+      // Bottom Edge:
+      const bottomEdgeY = newY + sourceHeight;
+      const snapBottomMin = this.baseHeight - snapSensitivity;
+      const snapBottomMax = this.baseHeight + snapSensitivity;
+
+      if ((bottomEdgeY > snapBottomMin) && (bottomEdgeY < snapBottomMax)) {
+        newY = this.baseHeight - sourceHeight;
+        snappedY = true;
+      }
+
+      this.$store.dispatch({
+        type: 'setSourcePosition',
+        sourceId: this.activeSource.id,
+        x: newX,
+        y: newY
+      });
+
+      if (!snappedX) {
+        this.currentX = event.pageX;
+      }
+
+      if (!snappedY) {
+        this.currentY = event.pageY;
+      }
     },
 
     // Performs an aspect ratio locked resize on the active source.
@@ -223,8 +283,8 @@ export default {
       this.$store.dispatch({
         type: 'setSourcePositionAndScale',
         sourceId: source.id,
-        x: source.x - (moveX && pixelsX || 0),
-        y: source.y - (moveY && pixelsY || 0),
+        x: source.x - ((moveX && pixelsX) || 0),
+        y: source.y - ((moveY && pixelsY) || 0),
         scaleX: source.scaleX + deltaScaleX,
         scaleY: source.scaleY + deltaScaleY
       });
@@ -303,6 +363,8 @@ export default {
           return this.isOverBox(event, region.x, region.y, region.width, region.height);
         });
       }
+
+      return null;
     },
 
     // Size (width & height) is a scalar value, and
@@ -310,8 +372,8 @@ export default {
     // spaces.
     convertScalarToBaseSpace(x, y) {
       return {
-        x: x * this.baseWidth / this.renderedWidth,
-        y: y * this.baseHeight / this.renderedHeight
+        x: (x * this.baseWidth) / this.renderedWidth,
+        y: (y * this.baseHeight) / this.renderedHeight
       };
     },
 
@@ -336,6 +398,8 @@ export default {
           return this.$store.state.sources.sources[sourceId];
         });
       }
+
+      return null;
     },
 
     baseWidth() {
@@ -365,7 +429,7 @@ export default {
     // Using a computed property since it is cached
     resizeRegions() {
       if (!this.activeSource) {
-        return;
+        return [];
       }
 
       const source = this.activeSource;
@@ -386,7 +450,7 @@ export default {
         },
         {
           name: 'n',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -394,7 +458,7 @@ export default {
         },
         {
           name: 'ne',
-          x: source.x + source.width * source.scaleX - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -402,24 +466,24 @@ export default {
         },
         {
           name: 'e',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
@@ -427,7 +491,7 @@ export default {
         {
           name: 'sw',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
@@ -435,7 +499,7 @@ export default {
         {
           name: 'w',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
