@@ -1,6 +1,5 @@
 {
   "extends": "airbnb",
-  "parser": "babel-eslint",
   "plugins": [
     "vue"
   ],
