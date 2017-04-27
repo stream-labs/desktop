@@ -23,7 +23,6 @@
 import moment from 'moment';
 import _ from 'lodash';
 import Obs from '../api/Obs';
-import SettingsService from '../services/settings';
 import StreamingService from '../services/streaming';
 
 export default {
@@ -37,7 +36,6 @@ export default {
   },
 
   beforeCreate() {
-    this.settingsService = SettingsService.instance;
     this.streamingService = StreamingService.instance;
   },
 

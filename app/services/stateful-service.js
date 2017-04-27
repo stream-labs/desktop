@@ -9,16 +9,18 @@ export function mutation (target, methodName, descriptor) {
 
 
 function registerMethodAsVuexEntity (entityType, target, methodName, descriptor) {
-  let entityName = target.constructor.name + '.' + methodName;
+  let moduleName = target.constructor.name;
+  let entityName = moduleName + '.' + methodName;
   let originalMethod = descriptor.value;
   target[entityType] = target[entityType] || {};
   target[entityType][entityName] = function (store, payload) {
-    let context = payload.shift();
-    return originalMethod.call(context, ...payload);
+    let context = payload.context;
+    delete payload.context;
+    context = context || Service.instancesContainer[moduleName];
+    return originalMethod.call(context, ...payload.args);
   };
   descriptor.value = function (...args) {
-    args.unshift(this);
-    if (entityType === 'mutations') store.commit(entityName, args);
+    if (entityType === 'mutations') store.commit(entityName, {context: this, args});
   };
   return descriptor;
 }

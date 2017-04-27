@@ -15,8 +15,6 @@ const { ipcRenderer, remote } = window.require('electron');
 // Import and initialize all services:
 // This is temporary until we can inject mutations at the
 // time that the class is loaded.
-import SettingsService from './services/settings';
-SettingsService.instance;
 import StreamingService from './services/streaming';
 StreamingService.instance;
 
