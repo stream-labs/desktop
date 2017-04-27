@@ -86,7 +86,6 @@ plugins.push(store => {
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event, mutation) => {
-    if (!store._mutations[mutation.type]) return;
     store.commit(mutation.type, Object.assign({}, mutation.payload, {
       __vuexSyncIgnore: true
     }));
