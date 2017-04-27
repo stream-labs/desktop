@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import navigation from './modules/navigation.js';
 import scenes from './modules/scenes.js';
 import sources from './modules/sources.js';
+import streaming from './modules/streaming.js';
 import windowOptions from './modules/windowOptions.js';
 import video from './modules/video.js';
 import _ from 'lodash';
@@ -99,6 +100,7 @@ export default new Vuex.Store({
     navigation,
     scenes,
     sources,
+    streaming,
     windowOptions,
     video
   },

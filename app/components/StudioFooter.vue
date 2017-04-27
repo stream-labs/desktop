@@ -22,8 +22,7 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
-import Obs from '../api/Obs';
-import StreamingService from '../services/streaming';
+import Obs from '../api/Obs.js';
 
 export default {
 
@@ -31,12 +30,9 @@ export default {
     return {
       streamElapsed: '',
       recordElapsed: '',
-      cpuPercent: 0
+      cpuPercent: 0,
+      streamOk: null
     };
-  },
-
-  beforeCreate() {
-    this.streamingService = StreamingService.instance;
   },
 
   mounted() {
@@ -51,51 +47,51 @@ export default {
 
   methods: {
     toggleStreaming() {
+      // TODO: This really needs to be moved into a service
       if (this.streaming) {
-        this.stopStreaming();
+        this.$store.dispatch({
+          type: 'stopStreaming'
+        });
+
+        this.streamOk = null;
+
+        clearInterval(this.streamInterval);
+        clearInterval(this.checkStreamInterval);
       } else {
-        this.startStreaming();
+        this.$store.dispatch({
+          type: 'startStreaming'
+        });
+
+        this.streamElapsed = '00:00:00';
+
+        this.checkStreamInterval = setInterval(() => {
+          this.streamOk = Obs.checkStream();
+        }, 10 * 1000);
+
+        this.streamInterval = setInterval(() => {
+          this.streamElapsed = this.elapsedStreamTime;
+        }, 100);
       }
-    },
-
-    startStreaming() {
-      this.streamingService.startStreaming();
-
-      this.streamElapsed = '00:00:00';
-
-      this.streamInterval = setInterval(() => {
-        this.streamElapsed = this.elapsedStreamTime;
-      }, 100);
-    },
-
-    stopStreaming() {
-      this.streamingService.stopStreaming();
-
-      clearInterval(this.streamInterval);
     },
 
     toggleRecording() {
       if (this.recording) {
-        this.stopRecording();
+        this.$store.dispatch({
+          type: 'stopRecording'
+        });
+
+        clearInterval(this.recordInterval);
       } else {
-        this.startRecording();
+        this.$store.dispatch({
+          type: 'startRecording'
+        });
+
+        this.recordElapsed = '00:00:00';
+
+        this.recordInterval = setInterval(() => {
+          this.recordElapsed = this.elapsedRecordTime;
+        }, 100);
       }
-    },
-
-    startRecording() {
-      this.streamingService.startRecording();
-
-      this.recordElapsed = '00:00:00';
-
-      this.recordInterval = setInterval(() => {
-        this.recordElapsed = this.elapsedRecordTime;
-      }, 100);
-    },
-
-    stopRecording() {
-      this.streamingService.stopRecording();
-
-      clearInterval(this.recordInterval);
     },
 
     formattedDurationSince(timestamp) {
@@ -104,41 +100,37 @@ export default {
       const minutes = _.padStart(duration.minutes(), 2, 0);
       const hours = _.padStart(duration.hours(), 2, 0);
 
-      return `${hours}:${minutes}:${seconds}`;
+      return hours + ':' + minutes + ':' + seconds;
     }
   },
 
   computed: {
     streaming() {
-      return this.streamingService.state.isStreaming;
+      return this.$store.getters.isStreaming;
     },
 
     streamStatusMsg() {
       if (this.streaming && this.streamOk !== null) {
         if (this.streamOk) {
           return 'Stream OK';
+        } else {
+          return 'Stream Error';
         }
-
-        return 'Stream Error';
+      } else {
+        return '';
       }
-
-      return '';
     },
 
     streamStartTime() {
-      return moment(this.streamingService.state.streamStartTime);
+      return this.$store.getters.streamStartTime;
     },
 
     streamButtonLabel() {
       if (this.streaming) {
         return this.streamElapsed;
+      } else {
+        return 'Start Streaming';
       }
-
-      return 'Start Streaming';
-    },
-
-    streamOk() {
-      return this.streamingService.state.streamOk;
     },
 
     elapsedStreamTime: {
@@ -149,19 +141,19 @@ export default {
     },
 
     recording() {
-      return this.streamingService.state.isRecording;
+      return this.$store.getters.isRecording;
     },
 
     recordStartTime() {
-      return moment(this.streamingService.state.recordStartTime);
+      return this.$store.getters.recordStartTime;
     },
 
     recordButtonLabel() {
       if (this.recording) {
         return this.recordElapsed;
+      } else {
+        return 'Start Recording';
       }
-
-      return 'Start Recording';
     },
 
     elapsedRecordTime: {

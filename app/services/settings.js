@@ -7,6 +7,8 @@ const { remote } = window.require('electron');
 @stateful
 export default class SettingsService extends StatefulService {
 
+  initialState = {};
+
   static convertFormDataToState (settingsFormData) {
     let settingsState = {};
     for (let groupName in settingsFormData) {

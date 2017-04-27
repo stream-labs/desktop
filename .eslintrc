@@ -1,6 +1,5 @@
 {
   "extends": "airbnb",
-  "parser": "babel-eslint",
   "plugins": [
     "vue"
   ],
@@ -12,12 +11,6 @@
     "class-methods-use-this": "off",
     "arrow-parens": "off",
     "comma-dangle": "off",
-    "prefer-rest-params": "off",
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": true
-      }
-    ]
+    "prefer-rest-params": "off"
   }
 }
