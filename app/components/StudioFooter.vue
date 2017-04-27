@@ -22,7 +22,7 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
-import Obs from '../api/Obs.js';
+import Obs from '../api/Obs';
 import SettingsService from '../services/settings';
 
 export default {
@@ -31,8 +31,7 @@ export default {
     return {
       streamElapsed: '',
       recordElapsed: '',
-      cpuPercent: 0,
-      streamOk: null
+      cpuPercent: 0
     };
   },
 
@@ -45,38 +44,45 @@ export default {
     this.cpuInterval = setInterval(() => {
       this.cpuPercent = Obs.getPerformanceStatistics()[0].CPU;
     }, 2000);
+
+    this.timersInterval = setInterval(() => {
+      if (this.streaming) {
+        this.streamElapsed = this.elapsedStreamTime;
+      }
+
+      if (this.recording) {
+        this.recordElapsed = this.elapsedRecordTime;
+      }
+    }, 100);
   },
 
   beforeDestroy() {
     clearInterval(this.cpuInterval);
+    clearInterval(this.timersInterval);
   },
 
   methods: {
     toggleStreaming() {
-      // TODO: This really needs to be moved into a service
       if (this.streaming) {
-        this.$store.dispatch({
-          type: 'stopStreaming'
-        });
+        const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+        const confirmText = 'Are you sure you want to stop streaming?';
 
-        this.streamOk = null;
-
-        clearInterval(this.streamInterval);
-        clearInterval(this.checkStreamInterval);
+        if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
+          this.$store.dispatch({
+            type: 'stopStreaming'
+          });
+        }
       } else {
-        this.$store.dispatch({
-          type: 'startStreaming'
-        });
+        const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+        const confirmText = 'Are you sure you want to start streaming?';
+
+        if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
+          this.$store.dispatch({
+            type: 'startStreaming'
+          });
+        }
 
         this.streamElapsed = '00:00:00';
-
-        this.checkStreamInterval = setInterval(() => {
-          this.streamOk = Obs.checkStream();
-        }, 10 * 1000);
-
-        this.streamInterval = setInterval(() => {
-          this.streamElapsed = this.elapsedStreamTime;
-        }, 100);
       }
     },
 
@@ -93,10 +99,6 @@ export default {
         });
 
         this.recordElapsed = '00:00:00';
-
-        this.recordInterval = setInterval(() => {
-          this.recordElapsed = this.elapsedRecordTime;
-        }, 100);
       }
     },
 
@@ -106,7 +108,7 @@ export default {
       const minutes = _.padStart(duration.minutes(), 2, 0);
       const hours = _.padStart(duration.hours(), 2, 0);
 
-      return hours + ':' + minutes + ':' + seconds;
+      return `${hours}:${minutes}:${seconds}`;
     }
   },
 
@@ -160,6 +162,10 @@ export default {
       } else {
         return 'Start Recording';
       }
+    },
+
+    streamOk() {
+      return this.$store.state.streaming.streamOk;
     },
 
     elapsedRecordTime: {
