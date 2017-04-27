@@ -12,12 +12,6 @@ import configFileManager from './util/ConfigFileManager.js';
 import _ from 'lodash';
 const { ipcRenderer, remote } = window.require('electron');
 
-// Import and initialize all services:
-// This is temporary until we can inject mutations at the
-// time that the class is loaded.
-import StreamingService from './services/streaming';
-StreamingService.instance;
-
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', function() {

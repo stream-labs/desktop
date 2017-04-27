@@ -1,6 +1,7 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation, stateful } from './stateful-service';
 import Obs from '../api/Obs';
 
+@stateful
 export default class StreamingService extends StatefulService {
 
   get initialState() {
