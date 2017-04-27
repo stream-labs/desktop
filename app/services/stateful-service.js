@@ -29,7 +29,7 @@ function registerMethodAsVuexEntity (entityType, target, methodName, descriptor)
 
 export function stateful (StatefulClass) {
   let mutations = StatefulClass.prototype.mutations;
-  if (!StatefulClass.initialState || Object.keys(mutations).length === 0) return;
+  if (!StatefulClass.initialState && Object.keys(mutations).length === 0) return;
   store.registerModule(StatefulClass.name, {
     mutations: mutations,
     state: StatefulClass.initialState || {}
