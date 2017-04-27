@@ -64,42 +64,70 @@ export default {
   methods: {
     toggleStreaming() {
       if (this.streaming) {
-        const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
-        const confirmText = 'Are you sure you want to stop streaming?';
+        this.stopStreaming();
 
-        if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-          this.$store.dispatch({
-            type: 'stopStreaming'
-          });
+        const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
+
+        if (!keepRecording && this.recording) {
+          this.stopRecording();
         }
       } else {
-        const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
-        const confirmText = 'Are you sure you want to start streaming?';
+        this.startStreaming();
 
-        if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-          this.$store.dispatch({
-            type: 'startStreaming'
-          });
+        const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+
+        if (recordWhenStreaming && !this.recording) {
+          this.startRecording();
         }
+      }
+    },
 
-        this.streamElapsed = '00:00:00';
+    startStreaming() {
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+      const confirmText = 'Are you sure you want to start streaming?';
+
+      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
+        this.$store.dispatch({
+          type: 'startStreaming'
+        });
+      }
+
+      this.streamElapsed = '00:00:00';
+    },
+
+    stopStreaming() {
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const confirmText = 'Are you sure you want to stop streaming?';
+
+      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
+        this.$store.dispatch({
+          type: 'stopStreaming'
+        });
       }
     },
 
     toggleRecording() {
       if (this.recording) {
-        this.$store.dispatch({
-          type: 'stopRecording'
-        });
-
-        clearInterval(this.recordInterval);
+        this.stopRecording();
       } else {
-        this.$store.dispatch({
-          type: 'startRecording'
-        });
-
-        this.recordElapsed = '00:00:00';
+        this.startRecording();
       }
+    },
+
+    startRecording() {
+      this.$store.dispatch({
+        type: 'startRecording'
+      });
+
+      this.recordElapsed = '00:00:00';
+    },
+
+    stopRecording() {
+      this.$store.dispatch({
+        type: 'stopRecording'
+      });
+
+      clearInterval(this.recordInterval);
     },
 
     formattedDurationSince(timestamp) {
