@@ -185,19 +185,78 @@ export default {
         }
       } else if (this.dragging) {
         if (deltaX || deltaY) {
-          this.$store.dispatch({
-            type: 'setSourcePosition',
-            sourceId: this.activeSource.id,
-            x: this.activeSource.x + converted.x,
-            y: this.activeSource.y + converted.y
-          });
-
-          this.currentX = event.pageX;
-          this.currentY = event.pageY;
+          this.drag(converted.x, converted.y);
         }
       }
 
       this.updateCursor(event);
+    },
+
+    // x & y are pixel distances in base space
+    drag(x, y) {
+      // Sensisivity is pixels in base space for now.
+      // Should eventually be rendered space.
+      const snapSensitivity = 20;
+
+      // Scaled width and height
+      const sourceWidth = this.activeSource.width * this.activeSource.scaleX;
+      const sourceHeight = this.activeSource.height * this.activeSource.scaleY;
+
+      // The new source location before applying snapping
+      let newX = this.activeSource.x + x;
+      let newY = this.activeSource.y + y;
+
+      // Whether or not we snapped on the X or Y coordinate
+      let snappedX = false;
+      let snappedY = false;
+
+      // Edge Snapping:
+      // Left Edge:
+      if ((newX < snapSensitivity) && (newX > snapSensitivity * -1)) {
+        newX = 0;
+        snappedX = true;
+      }
+
+      // Top Edge:
+      if ((newY < snapSensitivity) && (newY > snapSensitivity * -1)) {
+        newY = 0;
+        snappedY = true;
+      }
+
+      // Right Edge:
+      const rightEdgeX = newX + sourceWidth;
+      const snapRightMin = this.baseWidth - snapSensitivity;
+      const snapRightMax = this.baseWidth + snapSensitivity;
+
+      if ((rightEdgeX > snapRightMin) && (rightEdgeX < snapRightMax)) {
+        newX = this.baseWidth - sourceWidth;
+        snappedX = true;
+      }
+
+      // Bottom Edge:
+      const bottomEdgeY = newY + sourceHeight;
+      const snapBottomMin = this.baseHeight - snapSensitivity;
+      const snapBottomMax = this.baseHeight + snapSensitivity;
+
+      if ((bottomEdgeY > snapBottomMin) && (bottomEdgeY < snapBottomMax)) {
+        newY = this.baseHeight - sourceHeight;
+        snappedY = true;
+      }
+
+      this.$store.dispatch({
+        type: 'setSourcePosition',
+        sourceId: this.activeSource.id,
+        x: newX,
+        y: newY
+      });
+
+      if (!snappedX) {
+        this.currentX = event.pageX;
+      }
+
+      if (!snappedY) {
+        this.currentY = event.pageY;
+      }
     },
 
     // Performs an aspect ratio locked resize on the active source.
