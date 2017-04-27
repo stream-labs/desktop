@@ -51,13 +51,32 @@ export default class SettingsService extends StatefulService {
 
   getSettingsFormData (categoryName) {
     let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
-    const BLACK_LIST_CATEGORIES = [];
-    const groupIsBlacklisted = BLACK_LIST_CATEGORIES.includes(categoryName);
+
+    // Names of settings that are disabled because we
+    // have not implemented them yet.
+    const BLACK_LIST_NAMES = [
+      'ScreenSnapping',
+      'SysTrayMinimizeToTray',
+      'ReplayBufferWhileStreaming',
+      'KeepReplayBufferStreamStops',
+      'SnappingEnabled',
+      'SnapDistance',
+      'SysTrayEnabled',
+      'SourceSnapping',
+      'CenterSnapping',
+      'HideProjectorCursor',
+      'ProjectorAlwaysOnTop',
+      'SaveProjectors',
+      'SysTrayWhenStarted',
+    ];
 
     // set default values for lists, and disable the blacklisted fields
     settings.forEach(group => {
       group.parameters.forEach(parameter => {
-        if (groupIsBlacklisted) parameter.enabled = 0;
+        if (BLACK_LIST_NAMES.includes(parameter.name)) {
+          parameter.enabled = 0;
+        }
+
         let needToSetDefaultValue = parameter.values && !parameter.values.find(possibleValue => {
             if (parameter.currentValue == SettingsService.getListItemName(possibleValue)) return true;
           });
