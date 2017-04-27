@@ -36,7 +36,7 @@ export default {
     };
   },
 
-  created() {
+  beforeCreate() {
     this.settingsService = SettingsService.instance;
     this.streamingService = StreamingService.instance;
   },
