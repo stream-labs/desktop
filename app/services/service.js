@@ -11,17 +11,13 @@ const singletonEnforcer = Symbol();
  */
 export default class Service {
 
-  static instancesContainer = {};
-
   constructor(enforcer) {
     if(enforcer != singletonEnforcer) throw "Cannot construct singleton";
   }
 
   static get instance() {
     if(!this[singleton]) {
-      let instance = new this(singletonEnforcer);
-      Service.instancesContainer[instance.constructor.name] = instance;
-      return this[singleton] = instance;
+      return this[singleton] = new this(singletonEnforcer);
     }
     return this[singleton];
   }
