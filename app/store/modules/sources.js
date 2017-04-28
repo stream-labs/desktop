@@ -247,6 +247,17 @@ const getters = {
     }
   },
 
+  inactiveSources(state, getters) {
+    let sourceIds = getters.activeScene.sources.filter(source => {
+      return source.id !== getters.activeSourceId;
+    });
+
+    return sourceIds.map(id => {
+      return state.sources[id];
+    });
+  },
+
+
   // Returns a function for fetching source properties
   sourceProperties(state) {
     return sourceId => {

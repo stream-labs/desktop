@@ -55,12 +55,9 @@ export default class SettingsService extends StatefulService {
     // Names of settings that are disabled because we
     // have not implemented them yet.
     const BLACK_LIST_NAMES = [
-      'ScreenSnapping',
       'SysTrayMinimizeToTray',
       'ReplayBufferWhileStreaming',
       'KeepReplayBufferStreamStops',
-      'SnappingEnabled',
-      'SnapDistance',
       'SysTrayEnabled',
       'SourceSnapping',
       'CenterSnapping',
