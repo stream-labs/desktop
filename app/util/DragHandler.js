@@ -12,7 +12,7 @@ class DragHandler {
 
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
-    this.snapDistance = this.settingsService.state.General.SnapDistance;
+    this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
     this.edgeSnapping = this.settingsService.state.General.ScreenSnapping;
     this.sourceSnapping = this.settingsService.state.General.SourceSnapping;
     this.centerSnapping = this.settingsService.state.General.CenterSnapping;
@@ -22,6 +22,9 @@ class DragHandler {
     this.baseHeight = store.state.video.height;
     this.renderedWidth = store.state.video.displayOutputRegion.width;
     this.renderedHeight = store.state.video.displayOutputRegion.height;
+    this.scaleFactor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
+      this.renderedWidth;
 
     // Load some attributes about sources
     this.source = store.getters.activeSource;
@@ -105,11 +108,9 @@ class DragHandler {
     const deltaX = event.pageX - this.currentX;
     const deltaY = event.pageY - this.currentY;
 
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-
     return {
-      x: (deltaX * factor * this.baseWidth) / this.renderedWidth,
-      y: (deltaY * factor * this.baseHeight) / this.renderedHeight
+      x: (deltaX * this.scaleFactor * this.baseWidth) / this.renderedWidth,
+      y: (deltaY * this.scaleFactor * this.baseHeight) / this.renderedHeight
     };
   }
 
