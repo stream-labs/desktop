@@ -58,12 +58,18 @@ class DragHandler {
       _.each(sourceEdges, (sourceEdge, name) => {
         _.find(this.targetEdges[name], targetEdge => {
           if (this.shouldSnap(sourceEdge, targetEdge)) {
-            if (name === 'top' || name === 'bottom') {
-              snappedY = true;
-              newY += targetEdge.depth - sourceEdge.depth;
-            } else {
+            if (name === 'left') {
               snappedX = true;
-              newX += targetEdge.depth - sourceEdge.depth;
+              newX = targetEdge.depth;
+            } else if (name === 'top') {
+              snappedY = true;
+              newY = targetEdge.depth;
+            } else if (name === 'right') {
+              snappedX = true;
+              newX = targetEdge.depth - (this.draggedSource.width * this.draggedSource.scaleX);
+            } else {
+              snappedY = true;
+              newY = targetEdge.depth - (this.draggedSource.height * this.draggedSource.scaleY);
             }
           }
         });
