@@ -59,7 +59,6 @@ export default class SettingsService extends StatefulService {
       'ReplayBufferWhileStreaming',
       'KeepReplayBufferStreamStops',
       'SysTrayEnabled',
-      'SourceSnapping',
       'CenterSnapping',
       'HideProjectorCursor',
       'ProjectorAlwaysOnTop',

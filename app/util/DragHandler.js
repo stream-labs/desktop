@@ -28,7 +28,7 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    this.source = store.getters.activeSource;
+    this.draggedSource = store.getters.activeSource;
     this.otherSources = store.getters.inactiveSources;
 
     // Store the starting mouse event
@@ -45,15 +45,15 @@ class DragHandler {
     const delta = this.mouseDelta(event);
 
     // The new source location before applying snapping
-    let newX = this.source.x + delta.x;
-    let newY = this.source.y + delta.y;
+    let newX = this.draggedSource.x + delta.x;
+    let newY = this.draggedSource.y + delta.y;
 
     // Whether or not we snapped the X or Y coordinate
     let snappedX = false;
     let snappedY = false;
 
     if (this.snapEnabled) {
-      const sourceEdges = this.generateSourceEdges(newX, newY);
+      const sourceEdges = this.generateSourceEdges(this.draggedSource, newX, newY);
 
       _.each(sourceEdges, (sourceEdge, name) => {
         _.find(this.targetEdges[name], targetEdge => {
@@ -72,7 +72,7 @@ class DragHandler {
 
     store.dispatch({
       type: 'setSourcePosition',
-      sourceId: this.source.id,
+      sourceId: this.draggedSource.id,
       x: newX,
       y: newY
     });
@@ -186,20 +186,28 @@ class DragHandler {
 
     // Source edge snapping:
     if (this.sourceSnapping) {
-      // this.otherSources.forEach(source => {
+      this.otherSources.forEach(source => {
+        const edges = this.generateSourceEdges(source, source.x, source.y);
 
-      // });
+        // The dragged source snaps to the adjacent edge
+        // of other sources.  So the right edge snaps to
+        // the left edge of other sources, etc.
+        targetEdges.left.push(edges.right);
+        targetEdges.top.push(edges.bottom);
+        targetEdges.right.push(edges.left);
+        targetEdges.bottom.push(edges.top);
+      });
     }
 
     return targetEdges;
   }
 
-  // Generates edges for the currently dragged source
-  // based on a new x&y position
-  generateSourceEdges(x, y) {
+  // Generates edges for the given source at
+  // the given x & y coordinates
+  generateSourceEdges(source, x, y) {
     // The scaled width and height
-    const sourceWidth = this.source.width * this.source.scaleX;
-    const sourceHeight = this.source.height * this.source.scaleY;
+    const sourceWidth = source.width * source.scaleX;
+    const sourceHeight = source.height * source.scaleY;
 
     return {
       left: {
