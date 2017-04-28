@@ -221,7 +221,7 @@ export default {
     },
 
     updateCursor(event) {
-      if (this.dragging) {
+      if (this.dragHandler) {
         this.$refs.display.style.cursor = '-webkit-grabbing';
       } else if (this.resizeRegion) {
         this.$refs.display.style.cursor = this.resizeRegion.cursor;

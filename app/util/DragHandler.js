@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import SettingsService from '../services/settings';
 import store from '../store';
 
@@ -13,7 +14,7 @@ class DragHandler {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
-    this.edgeSnapping = this.settingsService.state.General.ScreenSnapping;
+    this.screenSnapping = this.settingsService.state.General.ScreenSnapping;
     this.sourceSnapping = this.settingsService.state.General.SourceSnapping;
     this.centerSnapping = this.settingsService.state.General.CenterSnapping;
 
@@ -33,16 +34,15 @@ class DragHandler {
     // Store the starting mouse event
     this.currentX = startEvent.pageX;
     this.currentY = startEvent.pageY;
+
+    // Generate the edges we should snap to
+    this.targetEdges = this.generateTargetEdges();
   }
 
   // event: The mousemove event
   // Should be called when the mouse moves
   move(event) {
     const delta = this.mouseDelta(event);
-
-    // The scaled width and height
-    const sourceWidth = this.source.width * this.source.scaleX;
-    const sourceHeight = this.source.height * this.source.scaleY;
 
     // The new source location before applying snapping
     let newX = this.source.x + delta.x;
@@ -52,38 +52,22 @@ class DragHandler {
     let snappedX = false;
     let snappedY = false;
 
-    if (this.snapEnabled && this.edgeSnapping) {
-      // Left Edge:
-      if ((newX < this.snapDistance) && (newX > 0 - this.snapDistance)) {
-        newX = 0;
-        snappedX = true;
-      }
+    if (this.snapEnabled) {
+      const sourceEdges = this.generateSourceEdges(newX, newY);
 
-      // Top Edge:
-      if ((newY < this.snapDistance) && (newY > 0 - this.snapDistance)) {
-        newY = 0;
-        snappedY = true;
-      }
-
-      // Right Edge:
-      const rightEdgeX = newX + sourceWidth;
-      const snapRightMin = this.baseWidth - this.snapDistance;
-      const snapRightMax = this.baseWidth + this.snapDistance;
-
-      if ((rightEdgeX > snapRightMin) && (rightEdgeX < snapRightMax)) {
-        newX = this.baseWidth - sourceWidth;
-        snappedX = true;
-      }
-
-      // Bottom Edge:
-      const bottomEdgeY = newY + sourceHeight;
-      const snapBottomMin = this.baseHeight - this.snapDistance;
-      const snapBottomMax = this.baseHeight + this.snapDistance;
-
-      if ((bottomEdgeY > snapBottomMin) && (bottomEdgeY < snapBottomMax)) {
-        newY = this.baseHeight - sourceHeight;
-        snappedY = true;
-      }
+      _.each(sourceEdges, (sourceEdge, name) => {
+        _.find(this.targetEdges[name], targetEdge => {
+          if (this.shouldSnap(sourceEdge, targetEdge)) {
+            if (name === 'top' || name === 'bottom') {
+              snappedY = true;
+              newY += targetEdge.depth - sourceEdge.depth;
+            } else {
+              snappedX = true;
+              newX += targetEdge.depth - sourceEdge.depth;
+            }
+          }
+        });
+      });
     }
 
     store.dispatch({
@@ -102,6 +86,8 @@ class DragHandler {
     }
   }
 
+  // Private:
+
   // Returns mouse deltas in base space
   mouseDelta(event) {
     // Deltas in rendered space
@@ -111,6 +97,134 @@ class DragHandler {
     return {
       x: (deltaX * this.scaleFactor * this.baseWidth) / this.renderedWidth,
       y: (deltaY * this.scaleFactor * this.baseHeight) / this.renderedHeight
+    };
+  }
+
+  /*
+   * An edge looks like:
+   * ________________________________
+   * |                ^
+   * |                |
+   * |      offset -> |
+   * |                |
+   * |                v
+   * |     depth      /\ ^
+   * |<-------------->|| |
+   * |                || |
+   * |        edge -> || | <- length
+   * |                || |
+   * |                || |
+   * |                \/ v
+   *
+   * An edge can be horizontal or vertical, but only alike
+   * types make sense to compare to each other.
+   */
+
+  // A and B are both edges, and this function returns true
+  // if they should snap together.  For best results, only
+  // compare horizontal edges to other horizontal edges, and
+  // vertical edges to other vertical edges.
+  shouldSnap(a, b) {
+    // First, check if the edges overlap
+    if (a.offset + a.length < b.offset) {
+      return false;
+    }
+
+    if (b.offset + b.length < a.offset) {
+      return false;
+    }
+
+    // Next, check if the edges are within snapping depth
+    if (Math.abs(a.depth - b.depth) > this.snapDistance) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Generates the target edges, which are edges that the
+  // currently dragged source can snap to.  They are separated
+  // by which edge of the source can snap to it.
+  generateTargetEdges() {
+    const targetEdges = {
+      left: [],
+      top: [],
+      right: [],
+      bottom: []
+    };
+
+    // Screen edge snapping:
+    if (this.screenSnapping) {
+      // Screen left
+      targetEdges.left.push({
+        depth: 0,
+        offset: 0,
+        length: this.baseHeight
+      });
+
+      // Screen top
+      targetEdges.top.push({
+        depth: 0,
+        offset: 0,
+        length: this.baseWidth
+      });
+
+      // Screen right
+      targetEdges.right.push({
+        depth: this.baseWidth - 1,
+        offset: 0,
+        length: this.baseHeight
+      });
+
+      // Screen bottom
+      targetEdges.bottom.push({
+        depth: this.baseHeight - 1,
+        offset: 0,
+        length: this.baseWidth
+      });
+    }
+
+    // Source edge snapping:
+    if (this.sourceSnapping) {
+      // this.otherSources.forEach(source => {
+
+      // });
+    }
+
+    return targetEdges;
+  }
+
+  // Generates edges for the currently dragged source
+  // based on a new x&y position
+  generateSourceEdges(x, y) {
+    // The scaled width and height
+    const sourceWidth = this.source.width * this.source.scaleX;
+    const sourceHeight = this.source.height * this.source.scaleY;
+
+    return {
+      left: {
+        depth: x,
+        offset: y,
+        length: sourceHeight
+      },
+
+      top: {
+        depth: y,
+        offset: x,
+        length: sourceWidth
+      },
+
+      right: {
+        depth: x + sourceWidth,
+        offset: y,
+        length: sourceHeight
+      },
+
+      bottom: {
+        depth: y + sourceHeight,
+        offset: x,
+        length: sourceWidth
+      }
     };
   }
 
