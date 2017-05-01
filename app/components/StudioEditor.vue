@@ -210,13 +210,27 @@ export default {
         pixelsX = pixelsY * (source.width / source.height);
       }
 
+      let clamped = false;
+      const newScaleX = source.scaleX + deltaScaleX;
+      const newScaleY = source.scaleY + deltaScaleY;
+
+      if (newScaleX < 0 ) {
+        newScaleX = 0;
+        clamped = true;
+      }
+
+      if (newScaleY < 0) {
+        newScaleY = 0;
+        clamped = true;
+      }
+
       this.$store.dispatch({
         type: 'setSourcePositionAndScale',
         sourceId: source.id,
-        x: source.x - ((moveX && pixelsX) || 0),
-        y: source.y - ((moveY && pixelsY) || 0),
-        scaleX: source.scaleX + deltaScaleX,
-        scaleY: source.scaleY + deltaScaleY
+        x: source.x - ((!clamped && moveX && pixelsX) || 0),
+        y: source.y - ((!clamped && moveY && pixelsY) || 0),
+        scaleX: newScaleX,
+        scaleY: newScaleY
       });
     },
 
