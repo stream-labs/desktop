@@ -20,6 +20,10 @@ const mutations = {
       properties: data.properties,
       restorePoint: null,
 
+      // Whether the source has audio and/or video
+      audio: data.audio,
+      video: data.video,
+
       // Unscaled width and height
       width: 0,
       height: 0,
@@ -86,10 +90,14 @@ const actions = {
 
     const properties = Obs.sourceProperties(data.sourceName, data.sourceId);
 
+    const flags = Obs.sourceProperties(data.sourceByName);
+
     commit('ADD_SOURCE', {
       id: data.sourceId,
       name: data.sourceName,
       type: data.sourceType,
+      audio: !!flags.audio,
+      video: !!flags.video,
       properties,
     });
 
