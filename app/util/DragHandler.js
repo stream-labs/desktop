@@ -29,7 +29,10 @@ class DragHandler {
 
     // Load some attributes about sources
     this.draggedSource = store.getters.activeSource;
-    this.otherSources = store.getters.inactiveSources;
+    this.otherSources = store.getters.inactiveSources.filter(source => {
+      // Only video targets are valid snap targets
+      return source.video;
+    });
 
     // Store the starting mouse event
     this.currentX = startEvent.pageX;

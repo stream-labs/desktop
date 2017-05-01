@@ -40,12 +40,15 @@ const actions = {
       _.each(sources, source => {
         const id = ipcRenderer.sendSync('getUniqueId');
         const properties = Obs.sourceProperties(source, id);
+        const flags = Obs.getSourceFlags(source);
 
         commit('ADD_SOURCE', {
           id,
           name: source,
           type: null,
-          properties
+          properties,
+          audio: !!flags.audio,
+          video: !!flags.video
         });
 
         commit('ADD_SOURCE_TO_SCENE', {

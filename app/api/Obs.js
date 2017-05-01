@@ -85,6 +85,10 @@ class ObsApi {
     );
   }
 
+  getSourceFlags(sourceName) {
+    return nodeObs.OBS_content_getSourceFlags(sourceName);
+  }
+
   removeSource(sourceName) {
     nodeObs.OBS_content_removeSource(
       sourceName

@@ -319,13 +319,22 @@ export default {
 
   computed: {
     activeSource() {
-      return this.$store.getters.activeSource;
+      const activeSource = this.$store.getters.activeSource;
+
+      if (activeSource && activeSource.video) {
+        return activeSource;
+      }
+
+      return null;
     },
 
     sources() {
       if (this.$store.getters.activeScene) {
         return _.map(this.$store.getters.activeScene.sources, sourceId => {
           return this.$store.state.sources.sources[sourceId];
+        }).filter(source => {
+          // We only care about sources with video
+          return source.video;
         });
       }
 
