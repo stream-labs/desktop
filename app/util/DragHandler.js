@@ -55,7 +55,8 @@ class DragHandler {
     let snappedX = false;
     let snappedY = false;
 
-    if (this.snapEnabled) {
+    // Holding Ctrl temporary disables snapping
+    if (this.snapEnabled && !event.ctrlKey) {
       const sourceEdges = this.generateSourceEdges(this.draggedSource, newX, newY);
 
       _.each(sourceEdges, (sourceEdge, name) => {
