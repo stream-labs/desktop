@@ -62,7 +62,7 @@ class WindowManager {
       },
       windowOptions: {
         width: 800,
-        height: 600
+        height: 800
       }
     });
   }
