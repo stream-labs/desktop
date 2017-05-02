@@ -9,7 +9,7 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js clean && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && mv ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client",
+    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client",
     "package": "webpack && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js"
   },
