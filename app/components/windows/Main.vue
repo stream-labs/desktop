@@ -13,7 +13,7 @@ import TopNav from '../TopNav.vue';
 // Pages
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
-import windowMixin from '../../mixins/window';
+import windowMixin from '../mixins/window';
 
 const { remote } = window.require('electron');
 
