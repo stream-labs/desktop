@@ -183,10 +183,10 @@ export default {
       }
 
       let clamped = false;
-      const newScaleX = source.scaleX + deltaScaleX;
-      const newScaleY = source.scaleY + deltaScaleY;
+      let newScaleX = source.scaleX + deltaScaleX;
+      let newScaleY = source.scaleY + deltaScaleY;
 
-      if (newScaleX < 0 ) {
+      if (newScaleX < 0) {
         newScaleX = 0;
         clamped = true;
       }
