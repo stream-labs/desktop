@@ -49,8 +49,9 @@ export default {
     this.settingsService.loadSettingsIntoStore();
   },
 
-  data () {
-    let categoryName = 'Stream';
+  data() {
+    const categoryName = 'General';
+
     return {
       categoryName: categoryName,
       blackList: ['Advanced', 'Hotkeys'],
