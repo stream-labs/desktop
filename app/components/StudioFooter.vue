@@ -1,8 +1,7 @@
 <template>
 <div class="studioFooter">
   <div>
-    CPU: {{ cpuPercent }}%
-    {{ streamStatusMsg }}
+    {{ statusLine }}
   </div>
   <div class="studioFooter-buttons text-right">
     <button
@@ -143,12 +142,13 @@ export default {
       if (this.streaming && this.streamOk !== null) {
         if (this.streamOk) {
           return 'Stream OK';
-        } else {
-          return 'Stream Error';
         }
-      } else {
-        return '';
+
+        return 'Stream Error';
+
       }
+
+      return null;
     },
 
     streamStartTime() {
@@ -197,8 +197,36 @@ export default {
       }
     },
 
+    statusLine() {
+      const line = [
+        `CPU: ${this.cpuPercent}%`,
+        `${this.frameRate} FPS`,
+        `Dropped Frames: ${this.droppedFrames} (${this.percentDropped}%)`,
+        `${this.bandwidth} kb/s`,
+        this.streamStatusMsg
+      ];
+
+      return _.compact(line).join(' | ');
+    },
+
     cpuPercent() {
       return this.$store.state.performance.CPU;
+    },
+
+    frameRate() {
+      return this.$store.state.performance.frameRate.toFixed(2);
+    },
+
+    droppedFrames() {
+      return this.$store.state.performance.numberDroppedFrames;
+    },
+
+    percentDropped() {
+      return (this.$store.state.performance.percentageDroppedFrames || 0).toFixed(1);
+    },
+
+    bandwidth() {
+      return this.$store.state.performance.bandwidth.toFixed(0);
     }
   }
 
