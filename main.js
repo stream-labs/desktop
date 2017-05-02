@@ -127,7 +127,7 @@ ipcMain.on('window-showChildWindow', (event, data) => {
   }
 
   childWindow.send('window-setContents', data.startupOptions);
-  childWindow.show();
+  // childWindow.show();
 });
 
 // The main process acts as a hub for various windows
