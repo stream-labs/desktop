@@ -10,15 +10,17 @@
 <script>
 import TopNav from '../TopNav.vue';
 
-const { remote } = window.require('electron');
-
 // Pages
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
+import windowMixin from '../mixins/window';
 
-import Obs from '../../api/Obs.js';
+const { remote } = window.require('electron');
 
 export default {
+
+  mixins: [windowMixin],
+
   components: {
     TopNav,
     Studio,

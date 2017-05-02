@@ -26,10 +26,13 @@
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager.js';
-import namingHelpers from '../../util/NamingHelpers.js';
+import windowManager from '../../util/WindowManager';
+import namingHelpers from '../../util/NamingHelpers';
+import windowMixin from '../mixins/window';
 
 export default {
+
+  mixins: [windowMixin],
 
   components: {
     ModalLayout

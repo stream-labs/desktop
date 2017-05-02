@@ -33,9 +33,11 @@ import NavItem from '../shared/NavItem.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
-
+import windowMixin from '../mixins/window';
 
 export default {
+
+  mixins: [windowMixin],
 
   components: {
     ModalLayout,
@@ -49,18 +51,15 @@ export default {
     this.settingsService.loadSettingsIntoStore();
   },
 
-  data () {
-    let categoryName = 'Stream';
+  data() {
+    const categoryName = 'General';
+
     return {
-      categoryName: categoryName,
+      categoryName,
       blackList: ['Advanced', 'Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
       settingsData: this.settingsService.getSettingsFormData(categoryName)
-    }
-  },
-
-  computed: {
-
+    };
   },
 
   methods: {
@@ -71,7 +70,7 @@ export default {
     },
 
 
-    done () {
+    done() {
       windowManager.closeWindow();
     }
   },

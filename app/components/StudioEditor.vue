@@ -21,8 +21,6 @@ export default {
     Obs.createDisplay('Main Window');
     this.onResize();
 
-    remote.getCurrentWindow().show();
-
     window.addEventListener('resize', this.onResize);
   },
 

@@ -22,16 +22,18 @@
 
 <script>
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager.js';
-import Obs from '../../api/Obs.js';
-import _ from 'lodash';
+import windowManager from '../../util/WindowManager';
+import Obs from '../../api/Obs';
+import windowMixin from '../mixins/window';
 
 import * as propertyComponents from '../source_properties';
 import { propertyComponentForType } from '../source_properties/helpers';
 
-const { webFrame, screen } = window.require('electron')
+const { webFrame, screen } = window.require('electron');
 
 export default {
+
+  mixins: [windowMixin],
 
   mounted() {
     window.addEventListener('resize', this.onResize);
@@ -44,7 +46,7 @@ export default {
     Obs.removeSourceDisplay('Preview Window');
   },
 
-  components: Object.assign({ModalLayout}, propertyComponents),
+  components: Object.assign({ ModalLayout }, propertyComponents),
 
   methods: {
     onResize() {
