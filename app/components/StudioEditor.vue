@@ -24,38 +24,12 @@ export default {
     remote.getCurrentWindow().show();
 
     window.addEventListener('resize', this.onResize);
-
-    // Ensure our positions and scales are up to date
-    _.each(this.sources, source => {
-      this.$store.dispatch({
-        type: 'loadSourcePositionAndScale',
-        sourceId: source.id
-      });
-    });
-
-    // Make sure we are listening for changes in size
-    this.sizeInterval = setInterval(() => {
-      _.each(this.sources, source => {
-        const size = Obs.getSourceSize(source.name);
-
-        if ((source.width !== size.width) || (source.height !== size.height)) {
-          this.$store.dispatch({
-            type: 'setSourceSize',
-            sourceId: source.id,
-            width: size.width,
-            height: size.height
-          });
-        }
-      });
-    }, 1000);
   },
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
     Obs.destroyDisplay('Main Window');
-
-    clearInterval(this.sizeInterval);
   },
 
   methods: {

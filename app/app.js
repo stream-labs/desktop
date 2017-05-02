@@ -42,12 +42,47 @@ document.addEventListener('DOMContentLoaded', function() {
         component: 'Main'
       }
     });
-  }
 
-  // This is an autosave interval that saves every minute.
-  setInterval(() => {
-    configFileManager.save();
-  }, 60 * 1000);
+    // TODO: Create a class that handles periodic "jobs" like this
+    // so we can stop polluting app.js.  This is a mess.  I take
+    // full responsibility.  :(
+
+    // This is an autosave interval that saves every minute.
+    setInterval(() => {
+      configFileManager.save();
+    }, 60 * 1000);
+
+    // This updates information about sources every second. Obs
+    // does not provide any mechanism to know when this changes,
+    // so we have no option but to poll.
+    setInterval(() => {
+      _.each(store.state.sources.sources, source => {
+        const size = Obs.getSourceSize(source.name);
+
+        if ((source.width !== size.width) || (source.height !== size.height)) {
+          store.dispatch({
+            type: 'setSourceSize',
+            sourceId: source.id,
+            width: size.width,
+            height: size.height
+          });
+        }
+
+        const flags = Obs.getSourceFlags(source.name);
+        const audio = !!flags.audio;
+        const video = !!flags.video;
+
+        if ((source.audio !== audio) || (source.video !== video)) {
+          store.dispatch({
+            type: 'setSourceFlags',
+            sourceId: source.id,
+            audio,
+            video
+          });
+        }
+      });
+    }, 1000);
+  }
 
   window.obs = Obs.nodeObs;
 
