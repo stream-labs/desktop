@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }, 1000);
+
+    // Update performance stats every 2 seconds
+    setInterval(() => {
+      store.dispatch('refreshPerformanceStats');
+    }, 2000);
   }
 
   window.obs = Obs.nodeObs;
