@@ -126,8 +126,8 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     childWindow.center();
   }
 
+  // The child window will show itself when rendered
   childWindow.send('window-setContents', data.startupOptions);
-  // childWindow.show();
 });
 
 // The main process acts as a hub for various windows
