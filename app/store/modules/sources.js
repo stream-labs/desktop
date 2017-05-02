@@ -21,8 +21,9 @@ const mutations = {
       restorePoint: null,
 
       // Whether the source has audio and/or video
-      audio: data.audio,
-      video: data.video,
+      // Will be updated periodically
+      audio: false,
+      video: false,
 
       // Unscaled width and height
       width: 0,
@@ -73,6 +74,13 @@ const mutations = {
 
     source.scaleX = data.scaleX;
     source.scaleY = data.scaleY;
+  },
+
+  SET_SOURCE_FLAGS(state, data) {
+    const source = state.sources[data.sourceId];
+
+    source.audio = data.audio;
+    source.video = data.video;
   }
 };
 
@@ -90,14 +98,10 @@ const actions = {
 
     const properties = Obs.sourceProperties(data.sourceName, data.sourceId);
 
-    const flags = Obs.sourceProperties(data.sourceByName);
-
     commit('ADD_SOURCE', {
       id: data.sourceId,
       name: data.sourceName,
       type: data.sourceType,
-      audio: !!flags.audio,
-      video: !!flags.video,
       properties,
     });
 
@@ -244,6 +248,14 @@ const actions = {
       sourceId: data.sourceId,
       scaleX: scale.x,
       scaleY: scale.y
+    });
+  },
+
+  setSourceFlags({ commit }, data) {
+    commit('SET_SOURCE_FLAGS', {
+      sourceId: data.sourceId,
+      audio: data.audio,
+      video: data.video
     });
   }
 };
