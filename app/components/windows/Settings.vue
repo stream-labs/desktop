@@ -33,7 +33,7 @@ import NavItem from '../shared/NavItem.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
-import windowMixin from '../../mixins/window';
+import windowMixin from '../mixins/window';
 
 export default {
 

@@ -24,7 +24,7 @@
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import Obs from '../../api/Obs';
-import windowMixin from '../../mixins/window';
+import windowMixin from '../mixins/window';
 
 import * as propertyComponents from '../source_properties';
 import { propertyComponentForType } from '../source_properties/helpers';

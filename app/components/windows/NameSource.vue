@@ -28,7 +28,7 @@
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
-import windowMixin from '../../mixins/window';
+import windowMixin from '../mixins/window';
 
 const { ipcRenderer } = window.require('electron');
 
