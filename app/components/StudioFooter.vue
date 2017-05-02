@@ -42,7 +42,7 @@ export default {
 
   mounted() {
     this.cpuInterval = setInterval(() => {
-      this.cpuPercent = Obs.getPerformanceStatistics()[0].CPU;
+      this.cpuPercent = Obs.getPerformanceStatistics().CPU;
     }, 2000);
 
     this.timersInterval = setInterval(() => {
