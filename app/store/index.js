@@ -24,7 +24,7 @@ const mutations = {
 };
 
 const actions = {
-  loadConfiguration({ commit }, data) {
+  loadConfiguration({ commit, dispatch }, data) {
     commit('RESET_SCENES');
     commit('RESET_SOURCES');
 
@@ -45,11 +45,16 @@ const actions = {
           id,
           name: source,
           type: null,
-          properties
+          properties,
         });
 
         commit('ADD_SOURCE_TO_SCENE', {
           sceneName: scene,
+          sourceId: id
+        });
+
+        dispatch({
+          type: 'loadSourcePositionAndScale',
           sourceId: id
         });
       });

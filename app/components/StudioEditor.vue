@@ -9,8 +9,10 @@
 </template>
 
 <script>
-import Obs from '../api/Obs.js';
 import _ from 'lodash';
+import Obs from '../api/Obs';
+import DragHandler from '../util/DragHandler';
+
 const { webFrame, screen, remote } = window.require('electron');
 
 export default {
@@ -22,38 +24,12 @@ export default {
     remote.getCurrentWindow().show();
 
     window.addEventListener('resize', this.onResize);
-
-    // Ensure our positions and scales are up to date
-    _.each(this.sources, source => {
-      this.$store.dispatch({
-        type: 'loadSourcePositionAndScale',
-        sourceId: source.id
-      });
-    });
-
-    // Make sure we are listening for changes in size
-    this.sizeInterval = setInterval(() => {
-      _.each(this.sources, source => {
-        const size = Obs.getSourceSize(source.name);
-
-        if ((source.width !== size.width) || (source.height !== size.height)) {
-          this.$store.dispatch({
-            type: 'setSourceSize',
-            sourceId: source.id,
-            width: size.width,
-            height: size.height
-          });
-        }
-      });
-    }, 1000);
   },
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
     Obs.destroyDisplay('Main Window');
-
-    clearInterval(this.sizeInterval);
   },
 
   methods: {
@@ -123,9 +99,7 @@ export default {
     },
 
     startDragging(event) {
-      this.dragging = true;
-      this.currentX = event.pageX,
-      this.currentY = event.pageY
+      this.dragHandler = new DragHandler(event);
     },
 
     startResizing(event, region) {
@@ -135,7 +109,7 @@ export default {
     },
 
     handleMouseUp(event) {
-      this.dragging = false;
+      this.dragHandler = null;
       this.resizeRegion = null;
 
       this.updateCursor(event);
@@ -143,7 +117,7 @@ export default {
 
     handleMouseEnter(event) {
       if (event.buttons !== 1) {
-        this.dragging = false;
+        this.dragHandler = null;
         this.resizeRegion = null;
       }
     },
@@ -182,18 +156,8 @@ export default {
           this.currentX = event.pageX;
           this.currentY = event.pageY;
         }
-      } else if (this.dragging) {
-        if (deltaX || deltaY) {
-          this.$store.dispatch({
-            type: 'setSourcePosition',
-            sourceId: this.activeSource.id,
-            x: this.activeSource.x + converted.x,
-            y: this.activeSource.y + converted.y
-          });
-
-          this.currentX = event.pageX;
-          this.currentY = event.pageY;
-        }
+      } else if (this.dragHandler) {
+        this.dragHandler.move(event);
       }
 
       this.updateCursor(event);
@@ -220,18 +184,32 @@ export default {
         pixelsX = pixelsY * (source.width / source.height);
       }
 
+      let clamped = false;
+      const newScaleX = source.scaleX + deltaScaleX;
+      const newScaleY = source.scaleY + deltaScaleY;
+
+      if (newScaleX < 0 ) {
+        newScaleX = 0;
+        clamped = true;
+      }
+
+      if (newScaleY < 0) {
+        newScaleY = 0;
+        clamped = true;
+      }
+
       this.$store.dispatch({
         type: 'setSourcePositionAndScale',
         sourceId: source.id,
-        x: source.x - (moveX && pixelsX || 0),
-        y: source.y - (moveY && pixelsY || 0),
-        scaleX: source.scaleX + deltaScaleX,
-        scaleY: source.scaleY + deltaScaleY
+        x: source.x - ((!clamped && moveX && pixelsX) || 0),
+        y: source.y - ((!clamped && moveY && pixelsY) || 0),
+        scaleX: newScaleX,
+        scaleY: newScaleY
       });
     },
 
     updateCursor(event) {
-      if (this.dragging) {
+      if (this.dragHandler) {
         this.$refs.display.style.cursor = '-webkit-grabbing';
       } else if (this.resizeRegion) {
         this.$refs.display.style.cursor = this.resizeRegion.cursor;
@@ -303,6 +281,8 @@ export default {
           return this.isOverBox(event, region.x, region.y, region.width, region.height);
         });
       }
+
+      return null;
     },
 
     // Size (width & height) is a scalar value, and
@@ -310,8 +290,8 @@ export default {
     // spaces.
     convertScalarToBaseSpace(x, y) {
       return {
-        x: x * this.baseWidth / this.renderedWidth,
-        y: y * this.baseHeight / this.renderedHeight
+        x: (x * this.baseWidth) / this.renderedWidth,
+        y: (y * this.baseHeight) / this.renderedHeight
       };
     },
 
@@ -327,15 +307,26 @@ export default {
 
   computed: {
     activeSource() {
-      return this.$store.getters.activeSource;
+      const activeSource = this.$store.getters.activeSource;
+
+      if (activeSource && activeSource.video) {
+        return activeSource;
+      }
+
+      return null;
     },
 
     sources() {
       if (this.$store.getters.activeScene) {
         return _.map(this.$store.getters.activeScene.sources, sourceId => {
           return this.$store.state.sources.sources[sourceId];
+        }).filter(source => {
+          // We only care about sources with video
+          return source.video;
         });
       }
+
+      return null;
     },
 
     baseWidth() {
@@ -365,7 +356,7 @@ export default {
     // Using a computed property since it is cached
     resizeRegions() {
       if (!this.activeSource) {
-        return;
+        return [];
       }
 
       const source = this.activeSource;
@@ -386,7 +377,7 @@ export default {
         },
         {
           name: 'n',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -394,7 +385,7 @@ export default {
         },
         {
           name: 'ne',
-          x: source.x + source.width * source.scaleX - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -402,24 +393,24 @@ export default {
         },
         {
           name: 'e',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: source.x + source.width * source.scaleX - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: source.x + source.width * source.scaleX / 2 - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
@@ -427,7 +418,7 @@ export default {
         {
           name: 'sw',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY - regionRadius,
+          y: (source.y + (source.height * source.scaleY)) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
@@ -435,7 +426,7 @@ export default {
         {
           name: 'w',
           x: source.x - regionRadius,
-          y: source.y + source.height * source.scaleY / 2 - regionRadius,
+          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'

@@ -9,7 +9,7 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "update-node-obs": "cd ../node-obs/ && git pull && cmake-js clean && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && mv ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client",
+    "rebuild-node-obs": "cd ../node-obs/ && cmake-js clean && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && mv ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client",
     "package": "webpack && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js"
   },
@@ -45,7 +45,9 @@
     "aws-sdk": "^2.43.0",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-2": "^6.24.1",
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",
     "electron-builder": "^15.6.2",

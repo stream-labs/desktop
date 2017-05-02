@@ -22,7 +22,8 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
-import Obs from '../api/Obs.js';
+import Obs from '../api/Obs';
+import SettingsService from '../services/settings';
 
 export default {
 
@@ -30,68 +31,103 @@ export default {
     return {
       streamElapsed: '',
       recordElapsed: '',
-      cpuPercent: 0,
-      streamOk: null
+      cpuPercent: 0
     };
+  },
+
+  beforeCreate() {
+    this.settingsService = SettingsService.instance;
+    this.settingsService.loadSettingsIntoStore();
   },
 
   mounted() {
     this.cpuInterval = setInterval(() => {
       this.cpuPercent = Obs.getPerformanceStatistics()[0].CPU;
     }, 2000);
+
+    this.timersInterval = setInterval(() => {
+      if (this.streaming) {
+        this.streamElapsed = this.elapsedStreamTime;
+      }
+
+      if (this.recording) {
+        this.recordElapsed = this.elapsedRecordTime;
+      }
+    }, 100);
   },
 
   beforeDestroy() {
     clearInterval(this.cpuInterval);
+    clearInterval(this.timersInterval);
   },
 
   methods: {
     toggleStreaming() {
-      // TODO: This really needs to be moved into a service
       if (this.streaming) {
-        this.$store.dispatch({
-          type: 'stopStreaming'
-        });
+        this.stopStreaming();
 
-        this.streamOk = null;
+        const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
 
-        clearInterval(this.streamInterval);
-        clearInterval(this.checkStreamInterval);
+        if (!keepRecording && this.recording) {
+          this.stopRecording();
+        }
       } else {
+        this.startStreaming();
+
+        const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+
+        if (recordWhenStreaming && !this.recording) {
+          this.startRecording();
+        }
+      }
+    },
+
+    startStreaming() {
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+      const confirmText = 'Are you sure you want to start streaming?';
+
+      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
         this.$store.dispatch({
           type: 'startStreaming'
         });
+      }
 
-        this.streamElapsed = '00:00:00';
+      this.streamElapsed = '00:00:00';
+    },
 
-        this.checkStreamInterval = setInterval(() => {
-          this.streamOk = Obs.checkStream();
-        }, 10 * 1000);
+    stopStreaming() {
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const confirmText = 'Are you sure you want to stop streaming?';
 
-        this.streamInterval = setInterval(() => {
-          this.streamElapsed = this.elapsedStreamTime;
-        }, 100);
+      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
+        this.$store.dispatch({
+          type: 'stopStreaming'
+        });
       }
     },
 
     toggleRecording() {
       if (this.recording) {
-        this.$store.dispatch({
-          type: 'stopRecording'
-        });
-
-        clearInterval(this.recordInterval);
+        this.stopRecording();
       } else {
-        this.$store.dispatch({
-          type: 'startRecording'
-        });
-
-        this.recordElapsed = '00:00:00';
-
-        this.recordInterval = setInterval(() => {
-          this.recordElapsed = this.elapsedRecordTime;
-        }, 100);
+        this.startRecording();
       }
+    },
+
+    startRecording() {
+      this.$store.dispatch({
+        type: 'startRecording'
+      });
+
+      this.recordElapsed = '00:00:00';
+    },
+
+    stopRecording() {
+      this.$store.dispatch({
+        type: 'stopRecording'
+      });
+
+      clearInterval(this.recordInterval);
     },
 
     formattedDurationSince(timestamp) {
@@ -100,7 +136,7 @@ export default {
       const minutes = _.padStart(duration.minutes(), 2, 0);
       const hours = _.padStart(duration.hours(), 2, 0);
 
-      return hours + ':' + minutes + ':' + seconds;
+      return `${hours}:${minutes}:${seconds}`;
     }
   },
 
@@ -154,6 +190,10 @@ export default {
       } else {
         return 'Start Recording';
       }
+    },
+
+    streamOk() {
+      return this.$store.state.streaming.streamOk;
     },
 
     elapsedRecordTime: {

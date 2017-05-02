@@ -46,6 +46,7 @@ export default {
 
   beforeCreate() {
     this.settingsService = SettingsService.instance;
+    this.settingsService.loadSettingsIntoStore();
   },
 
   data () {
@@ -54,7 +55,7 @@ export default {
       categoryName: categoryName,
       blackList: ['Advanced', 'Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
-      settingsData: this.settingsService.getSettings(categoryName)
+      settingsData: this.settingsService.getSettingsFormData(categoryName)
     }
   },
 
@@ -66,25 +67,29 @@ export default {
 
     save(settingsData) {
       this.settingsService.setSettings(this.categoryName, settingsData);
-      this.settingsData = this.settingsService.getSettings(this.categoryName);
+      this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
     },
+
 
     done () {
       windowManager.closeWindow();
     }
   },
 
+
   watch: {
     categoryName(categoryName) {
-      this.settingsData = this.settingsService.getSettings(categoryName);
+      this.settingsData = this.settingsService.getSettingsFormData(categoryName);
     }
   }
 };
 </script>
 
 <style lang="less" scoped>
-  .side-menu {
-    position: fixed;
-    left: 0;
-  }
+
+.side-menu {
+  position: fixed;
+  left: 0;
+}
+
 </style>

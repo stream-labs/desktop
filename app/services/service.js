@@ -6,6 +6,9 @@
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
 
+/**
+ * @abstract
+ */
 export default class Service {
 
   constructor(enforcer) {
@@ -14,7 +17,7 @@ export default class Service {
 
   static get instance() {
     if(!this[singleton]) {
-      this[singleton] = new this(singletonEnforcer);
+      return this[singleton] = new this(singletonEnforcer);
     }
     return this[singleton];
   }

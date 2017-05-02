@@ -20,6 +20,11 @@ const mutations = {
       properties: data.properties,
       restorePoint: null,
 
+      // Whether the source has audio and/or video
+      // Will be updated periodically
+      audio: false,
+      video: false,
+
       // Unscaled width and height
       width: 0,
       height: 0,
@@ -69,6 +74,13 @@ const mutations = {
 
     source.scaleX = data.scaleX;
     source.scaleY = data.scaleY;
+  },
+
+  SET_SOURCE_FLAGS(state, data) {
+    const source = state.sources[data.sourceId];
+
+    source.audio = data.audio;
+    source.video = data.video;
   }
 };
 
@@ -237,6 +249,14 @@ const actions = {
       scaleX: scale.x,
       scaleY: scale.y
     });
+  },
+
+  setSourceFlags({ commit }, data) {
+    commit('SET_SOURCE_FLAGS', {
+      sourceId: data.sourceId,
+      audio: data.audio,
+      video: data.video
+    });
   }
 };
 
@@ -246,6 +266,17 @@ const getters = {
       return state.sources[getters.activeSourceId];
     }
   },
+
+  inactiveSources(state, getters) {
+    let sourceIds = getters.activeScene.sources.filter(source => {
+      return source.id !== getters.activeSourceId;
+    });
+
+    return sourceIds.map(id => {
+      return state.sources[id];
+    });
+  },
+
 
   // Returns a function for fetching source properties
   sourceProperties(state) {
