@@ -1,13 +1,18 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import navigation from './modules/navigation.js';
-import scenes from './modules/scenes.js';
-import sources from './modules/sources.js';
-import streaming from './modules/streaming.js';
-import windowOptions from './modules/windowOptions.js';
-import video from './modules/video.js';
 import _ from 'lodash';
-import Obs from '../api/Obs.js';
+
+// Modules
+import navigation from './modules/navigation';
+import scenes from './modules/scenes';
+import sources from './modules/sources';
+import streaming from './modules/streaming';
+import windowOptions from './modules/windowOptions';
+import video from './modules/video';
+import performance from './modules/performance';
+
+
+import Obs from '../api/Obs';
 
 Vue.use(Vuex);
 
@@ -107,7 +112,8 @@ export default new Vuex.Store({
     sources,
     streaming,
     windowOptions,
-    video
+    video,
+    performance
   },
   plugins,
   mutations,

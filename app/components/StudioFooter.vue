@@ -30,8 +30,7 @@ export default {
   data() {
     return {
       streamElapsed: '',
-      recordElapsed: '',
-      cpuPercent: 0
+      recordElapsed: ''
     };
   },
 
@@ -41,10 +40,6 @@ export default {
   },
 
   mounted() {
-    this.cpuInterval = setInterval(() => {
-      this.cpuPercent = Obs.getPerformanceStatistics().CPU;
-    }, 2000);
-
     this.timersInterval = setInterval(() => {
       if (this.streaming) {
         this.streamElapsed = this.elapsedStreamTime;
@@ -57,7 +52,6 @@ export default {
   },
 
   beforeDestroy() {
-    clearInterval(this.cpuInterval);
     clearInterval(this.timersInterval);
   },
 
@@ -201,6 +195,10 @@ export default {
       get() {
         return this.formattedDurationSince(this.recordStartTime);
       }
+    },
+
+    cpuPercent() {
+      return this.$store.state.performance.CPU;
     }
   }
 
