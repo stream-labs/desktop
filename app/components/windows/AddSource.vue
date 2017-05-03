@@ -1,5 +1,7 @@
 <template>
-<modal-layout title="Add Source">
+<modal-layout
+  :show-controls="false"
+  title="Add Source">
   <div slot="content">
     <h4 class="AddSource-heading">
       Standard

@@ -1,7 +1,6 @@
 <template>
 <modal-layout
   :title="windowTitle"
-  :show-controls="true"
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200"
