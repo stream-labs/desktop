@@ -112,6 +112,22 @@ function startApp() {
   obs.OBS_service_setServiceToTheStreamingOutput();
 }
 
+// This ensures that only one copy of our app can run at once.
+const shouldQuit = app.makeSingleInstance(() => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+
+    mainWindow.focus();
+  }
+});
+
+if (shouldQuit) {
+  app.quit();
+}
+
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
     (new Updater(startApp)).run();
