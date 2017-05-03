@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   title="Settings"
-  :show-controls="true"
+  :show-cancel="false"
   :done-handler="done">
 
   <div slot="content">
