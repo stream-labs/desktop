@@ -3,20 +3,24 @@ window.eval = global.eval = function() {
 }
 
 import Vue from 'vue';
-import store from './store';
-import Obs from './api/Obs.js';
-import windowManager from './util/WindowManager.js';
-import URI from 'urijs';
-import contextMenuManager from './util/ContextMenuManager.js';
-import configFileManager from './util/ConfigFileManager.js';
 import _ from 'lodash';
+import URI from 'urijs';
+
+import store from './store';
+import Obs from './api/Obs';
+import windowManager from './util/WindowManager';
+import contextMenuManager from './util/ContextMenuManager';
+import configFileManager from './util/ConfigFileManager';
+import PeriodicRunner from './util/PeriodicRunner';
+
+
 const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
-document.addEventListener('DOMContentLoaded', function() {
-  let query = URI.parseQuery(URI.parse(window.location.href).query);
-  let isChild = query.child;
+document.addEventListener('DOMContentLoaded', () => {
+  const query = URI.parseQuery(URI.parse(window.location.href).query);
+  const isChild = query.child;
 
   if (isChild) {
     store.dispatch({ type: 'setWindowAsChild' });
@@ -43,59 +47,17 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // TODO: Create a class that handles periodic "jobs" like this
-    // so we can stop polluting app.js.  This is a mess.  I take
-    // full responsibility.  :(
-
-    // This is an autosave interval that saves every minute.
-    setInterval(() => {
-      configFileManager.save();
-    }, 60 * 1000);
-
-    // This updates information about sources every second. Obs
-    // does not provide any mechanism to know when this changes,
-    // so we have no option but to poll.
-    setInterval(() => {
-      _.each(store.state.sources.sources, source => {
-        const size = Obs.getSourceSize(source.name);
-
-        if ((source.width !== size.width) || (source.height !== size.height)) {
-          store.dispatch({
-            type: 'setSourceSize',
-            sourceId: source.id,
-            width: size.width,
-            height: size.height
-          });
-        }
-
-        const flags = Obs.getSourceFlags(source.name);
-        const audio = !!flags.audio;
-        const video = !!flags.video;
-
-        if ((source.audio !== audio) || (source.video !== video)) {
-          store.dispatch({
-            type: 'setSourceFlags',
-            sourceId: source.id,
-            audio,
-            video
-          });
-        }
-      });
-    }, 1000);
-
-    // Update performance stats every 2 seconds
-    setInterval(() => {
-      store.dispatch('refreshPerformanceStats');
-    }, 2000);
+    const periodicRunner = new PeriodicRunner();
+    periodicRunner.start();
   }
 
   window.obs = Obs.nodeObs;
 
-  let vm = new Vue({
+  const vm = new Vue({
     el: '#app',
-    store: store,
+    store,
     render: h => {
-      let componentName = store.state.windowOptions.options.component;
+      const componentName = store.state.windowOptions.options.component;
 
       return h(windowManager.components[componentName]);
     }
