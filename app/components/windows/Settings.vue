@@ -56,7 +56,7 @@ export default {
 
     return {
       categoryName,
-      blackList: ['Advanced', 'Hotkeys'],
+      blackList: ['Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
       settingsData: this.settingsService.getSettingsFormData(categoryName)
     };

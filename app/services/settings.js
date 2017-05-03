@@ -64,6 +64,21 @@ export default class SettingsService extends StatefulService {
       'ProjectorAlwaysOnTop',
       'SaveProjectors',
       'SysTrayWhenStarted',
+      'RecRBSuffix',
+      'LowLatencyEnable',
+      'BindIP',
+      'FilenameFormatting',
+      'DelayPreserve',
+      'DelaySec',
+      'DelayEnable',
+      'MaxRetries',
+      'MonitoringDeviceName',
+      'NewSocketLoopEnable',
+      'OverwriteIfExists',
+      'ProcessPriority',
+      'RecRBPrefix',
+      'Reconnect',
+      'RetryDelay'
     ];
 
     // set default values for lists, and disable the blacklisted fields
