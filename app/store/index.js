@@ -10,6 +10,7 @@ import streaming from './modules/streaming';
 import windowOptions from './modules/windowOptions';
 import video from './modules/video';
 import performance from './modules/performance';
+import sceneTransitions from './modules/sceneTransitions';
 
 
 import Obs from '../api/Obs';
@@ -50,7 +51,7 @@ const actions = {
           id,
           name: source,
           type: null,
-          properties,
+          properties
         });
 
         commit('ADD_SOURCE_TO_SCENE', {
@@ -64,6 +65,8 @@ const actions = {
         });
       });
     });
+
+    dispatch({ type: 'refreshSceneTransitions' });
   }
 };
 
@@ -113,6 +116,7 @@ export default new Vuex.Store({
     streaming,
     windowOptions,
     video,
+    sceneTransitions,
     performance
   },
   plugins,

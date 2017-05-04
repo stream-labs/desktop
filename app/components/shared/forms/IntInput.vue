@@ -5,7 +5,7 @@
     ref="input"
     type="text"
     :value="value.currentValue"
-    :disabled="!value.enabled"
+    :disabled="value.enabled === 0"
     @input="updateValue($event.target.value)"
   />
 </div>

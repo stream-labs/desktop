@@ -18,7 +18,7 @@
         </NavMenu>
       </div>
       <div class="columns small-9">
-        <GenericForm v-model="settingsData" @input="save"></GenericForm>
+        <GenericFormGroups v-model="settingsData" @input="save"></GenericFormGroups>
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
+import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
 import windowMixin from '../mixins/window';
@@ -43,7 +43,7 @@ export default {
     ModalLayout,
     NavMenu,
     NavItem,
-    GenericForm
+    GenericFormGroups
   },
 
   beforeCreate() {
@@ -53,7 +53,6 @@ export default {
 
   data() {
     const categoryName = 'General';
-
     return {
       categoryName,
       blackList: ['Hotkeys'],

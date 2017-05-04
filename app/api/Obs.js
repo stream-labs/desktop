@@ -333,6 +333,49 @@ class ObsApi {
     return nodeObs.OBS_API_getPerformanceStatistics();
   }
 
+  getSceneTransitionTypes() {
+    return nodeObs.OBS_content_getListTransitions();
+  }
+
+  getSceneTransitionNames() {
+    return nodeObs.OBS_content_getListCurrentTransitions();
+  }
+
+  getSceneTransitionName() {
+    return nodeObs.OBS_content_getCurrentTransition();
+  }
+
+  setSceneTransitionName(name) {
+    nodeObs.OBS_content_setTransition(name);
+  }
+
+  getSceneTransitionDuration() {
+    return nodeObs.OBS_content_getTransitionDuration();
+  }
+
+  setSceneTransitionDuration(duration) {
+    nodeObs.OBS_content_setTransitionDuration(duration);
+  }
+
+  setSceneTransitionProperty(transitionName, propName, value) {
+    nodeObs.OBS_content_setTransitionProperty(transitionName, propName, { value });
+  }
+
+  addSceneTransition(transitionType, transitionName) {
+    nodeObs.OBS_content_addTransition(transitionType, transitionName);
+  }
+
+  removeSceneTransition(transitionName) {
+    nodeObs.OBS_content_removeTransition(transitionName);
+  }
+
+  getSceneTransitionProperties(transitionName) {
+    return nodeObs.OBS_content_getTransitionProperties(transitionName);
+  }
+
+  getSceneTransitionPropertySubParameters(transitionName, propertyName) {
+    return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propertyName);
+  }
 }
 
 export default new ObsApi();

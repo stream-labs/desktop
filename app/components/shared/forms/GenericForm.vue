@@ -1,26 +1,12 @@
 <template>
   <div class="GenericForm">
-    <div v-for="(formGroup, groupIndex) in value" v-if="formGroup.parameters.length">
-
-      <div v-if="formGroup.nameSubCategory != 'Untitled'">
-        <h4  @click="toggleGroup(groupIndex)">
-          <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
-          <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
-          {{ formGroup.nameSubCategory }}
-        </h4>
-      </div>
-
-      <div v-if="!collapsedGroups[groupIndex]">
-        <div v-for="(parameter, inputIndex) in formGroup.parameters">
-          <component
-            v-if="parameter.visible && propertyComponentForType(parameter.type)"
-            :is="propertyComponentForType(parameter.type)"
-            v-model="formGroup.parameters[inputIndex]"
-            @input="onInputHandler"
-          />
-        </div>
-      </div>
-
+    <div v-for="(parameter, inputIndex) in value">
+      <component
+        v-if="parameter.visible && propertyComponentForType(parameter.type)"
+        :is="propertyComponentForType(parameter.type)"
+        :value="value[inputIndex]"
+        @input="value => onInputHandler(value, inputIndex)"
+      />
     </div>
   </div>
 </template>
@@ -31,42 +17,20 @@ import * as inputComponents from './index';
 export default {
   props: ['value'],
   components: inputComponents,
-  data() {
-    return {collapsedGroups: {}}
-  },
   methods: {
 
-    toggleGroup(index) {
-      this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);
-    },
-
     propertyComponentForType(type) {
-      for (let componentName in inputComponents) {
-        let component = inputComponents[componentName];
-        if (component.obsType === type) return component;
-      }
+      const componentName = Object.keys(inputComponents).find(name => {
+        return inputComponents[name].obsType === type;
+      });
+      return inputComponents[componentName];
     },
 
-    onInputHandler() {
-      this.$emit('input', this.value);
+    onInputHandler(value, index) {
+      const newValue = [].concat(this.value);
+      newValue.splice(index, 1, value);
+      this.$emit('input', newValue);
     }
   }
-}
+};
 </script>
-
-<style lang="less" scoped>
-@import "../../../styles/index";
-
-.GenericForm > div {
-  margin-bottom: 20px;
-  background-color: @panel-bg-color;
-  border: 1px solid @panel-border-color;
-  padding: 20px 30px;
-
-  h4 {
-    cursor: pointer;
-  }
-
-  .fa-plus, .fa-minus {margin-right: 10px}
-}
-</style>

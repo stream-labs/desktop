@@ -10,6 +10,9 @@
     <i
       class="fa fa-minus studioControls-button"
       @click="removeScene"/>
+    <i
+      class="fa fa-cog studioControls-button"
+      @click="showTransitions"/>
   </div>
   <selector
     class="studioControls-selector"
@@ -50,6 +53,10 @@ export default {
         type: 'removeScene',
         sceneName: this.activeSceneName
       });
+    },
+
+    showTransitions() {
+      windowManager.showSceneTransitions();
     }
   },
 

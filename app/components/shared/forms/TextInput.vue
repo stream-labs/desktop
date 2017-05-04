@@ -4,7 +4,7 @@
   <input
     type="text"
     :value="value.currentValue"
-    :disabled="!value.enabled"
+    :disabled="value.enabled === 0"
     @change="onInputHandler"
   />
 </div>

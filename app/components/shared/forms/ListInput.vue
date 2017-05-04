@@ -2,7 +2,7 @@
 <div class="input">
   <label>{{ value.description }}</label>
   <select
-    :disabled="!value.enabled"
+    :disabled="value.enabled === 0"
     @input="onInputHandler"
   >
     <option
