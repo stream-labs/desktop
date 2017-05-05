@@ -1,5 +1,5 @@
 <template>
-<div class="StartupSettings">
+<div class="StartupSettings" v-if="enabled">
   <bool-input
     :value="obsMode"
     @input="val => saveSetting(val, 'obsMode')"/>
@@ -36,49 +36,59 @@ export default {
   },
 
   data() {
-    const profileOptions = Obs.getObsProfiles().map(profile => {
-      return { [profile]: profile };
-    });
+    const obsInstalled = Obs.isObsInstalled();
 
-    const sceneCollectionOptions = Obs.getObsSceneCollections().map(coll => {
-      return { [coll]: coll };
-    });
+    if (obsInstalled) {
+      const profileOptions = Obs.getObsProfiles().map(profile => {
+        return { [profile]: profile };
+      });
 
-    this.settingsPath = path.join(remote.app.getPath('userData'), 'startup.json');
+      const sceneCollectionOptions = Obs.getObsSceneCollections().map(coll => {
+        return { [coll]: coll };
+      });
 
-    let settings;
+      this.settingsPath = path.join(remote.app.getPath('userData'), 'startup.json');
 
-    if (fs.existsSync(this.settingsPath)) {
-      settings = this.loadSettings();
-    } else {
-      // Ensure we have default settings
-      settings = {
-        obsMode: 0,
-        profile: Object.keys(profileOptions[0])[0],
-        sceneCollection: Object.keys(sceneCollectionOptions[0])[0]
+      let settings;
+
+      if (fs.existsSync(this.settingsPath)) {
+        settings = this.loadSettings();
+      } else {
+        // Ensure we have default settings
+        settings = {
+          obsMode: 0,
+          profile: Object.keys(profileOptions[0])[0],
+          sceneCollection: Object.keys(sceneCollectionOptions[0])[0]
+        };
+
+        fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
+      }
+
+      return {
+        enabled: true,
+
+        obsMode: {
+          description: 'Load configuration from OBS',
+          currentValue: settings.obsMode,
+          enabled: true
+        },
+
+        profile: {
+          values: profileOptions,
+          description: 'OBS Profile',
+          currentValue: settings.profile
+        },
+
+        sceneCollection: {
+          values: sceneCollectionOptions,
+          description: 'OBS Scene Collection',
+          currentValue: settings.sceneCollection
+        }
       };
-
-      fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
     }
 
     return {
-      obsMode: {
-        description: 'Load configuration from OBS',
-        currentValue: settings.obsMode,
-        enabled: true
-      },
-
-      profile: {
-        values: profileOptions,
-        description: 'OBS Profile',
-        currentValue: settings.profile
-      },
-
-      sceneCollection: {
-        values: sceneCollectionOptions,
-        description: 'OBS Scene Collection',
-        currentValue: settings.sceneCollection
-      }
+      enabled: false
     };
   },
 

@@ -24,6 +24,10 @@ class ObsApi {
     this.nodeObs = nodeObs;
   }
 
+  isObsInstalled() {
+    return nodeObs.OBS_API_isOBS_installed();
+  }
+
   createDisplay(key) {
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
