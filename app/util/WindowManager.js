@@ -6,6 +6,9 @@ const { ipcRenderer, remote } = window.require('electron');
 import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
+import SceneTransitions from '../components/windows/SceneTransitions.vue';
+import AddSceneTransition from '../components/windows/AddSceneTransition.vue';
+import SceneTransitionProperties from '../components/windows/SceneTransitionProperties.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
@@ -20,6 +23,9 @@ class WindowManager {
     this.components = {
       Main,
       Settings,
+      SceneTransitions,
+      AddSceneTransition,
+      SceneTransitionProperties,
       AddSource,
       NameSource,
       NameScene,
@@ -52,8 +58,49 @@ class WindowManager {
     }
   }
 
+  getOptions() {
+    return store.state.windowOptions.options;
+  }
+
   // These methods are basically presets for showing
   // various dialog windows.
+
+  showSceneTransitions() {
+    this.showWindow({
+      startupOptions: {
+        component: 'SceneTransitions'
+      },
+      windowOptions: {
+        width: 500,
+        height: 400
+      }
+    });
+  }
+
+  showAddSceneTransition() {
+    this.showWindow({
+      startupOptions: {
+        component: 'AddSceneTransition'
+      },
+      windowOptions: {
+        width: 800,
+        height: 600
+      }
+    });
+  }
+
+  showSceneTransitionProperties(transitionName = '') {
+    this.showWindow({
+      startupOptions: {
+        component: 'SceneTransitionProperties',
+        transitionName
+      },
+      windowOptions: {
+        width: 800,
+        height: 600
+      }
+    });
+  }
 
   showSettings() {
     this.showWindow({

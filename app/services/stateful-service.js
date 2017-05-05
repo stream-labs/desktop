@@ -2,7 +2,6 @@ import Service from './service';
 import store from '../store';
 import Vue from 'vue';
 
-
 export function mutation (target, methodName, descriptor) {
   return registerMethodAsVuexEntity('mutations', target, methodName, descriptor)
 }
@@ -13,17 +12,17 @@ function registerMethodAsVuexEntity (entityType, target, methodName, descriptor)
   let entityName = moduleName + '.' + methodName;
   let originalMethod = descriptor.value;
   target[entityType] = target[entityType] || {};
-  target[entityType][entityName] = function (store, payload) {
+  target[entityType][entityName] = function (localState, payload) {
     let context = {
       moduleName: moduleName,
-      get state() {
-        return target.constructor.instance.state;
+      get state () {
+        return store.state[moduleName];
       },
-      set state(newState) {
-        target.constructor.instance.state = newState;
-      },
-      patchState: target.constructor.instance.patchState
+      set state (newState) {
+        Vue.set(store.state, moduleName, newState);
+      }
     };
+    context.patchState = target.patchState.bind(context);
     return originalMethod.call(context, ...payload.args);
   };
   descriptor.value = function (...args) {

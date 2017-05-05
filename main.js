@@ -14,6 +14,8 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain } = require('electron');
+const fs = require('fs');
+const path = require('path');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
@@ -25,6 +27,18 @@ const { Updater } = require('./updater/Updater.js');
 // Windows
 let mainWindow;
 let childWindow;
+
+// This file determines whether we start up in SLOBS-mode or
+// OBS-mode, so we need to load it on app startup.
+function loadStartupConfig() {
+  const configLocation = path.join(app.getPath('userData'), 'startup.json');
+
+  if (fs.existsSync(configLocation)) {
+    return JSON.parse(fs.readFileSync(configLocation));
+  }
+
+  return null;
+}
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -87,29 +101,56 @@ function startApp() {
 
   // Initialize various OBS services
   obs.OBS_API_initOBS_API();
+
+  const startupConfig = loadStartupConfig();
+
+  if (startupConfig && startupConfig.obsMode) {
+    obs.OBS_API_setOBS_currentProfile(startupConfig.profile);
+    obs.OBS_API_setOBS_currentSceneCollection(startupConfig.sceneCollection);
+    obs.OBS_API_setPathConfigDirectory('');
+  } else {
+    obs.OBS_API_setPathConfigDirectory(app.getPath('userData'));
+  }
+
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
 
   obs.OBS_service_createStreamingOutput();
   obs.OBS_service_createRecordingOutput();
 
-  obs.OBS_service_createVideoStreamingEncoder(app.getPath('userData') + '\\');
-  obs.OBS_service_createVideoRecordingEncoder(app.getPath('userData') + '\\');
+  obs.OBS_service_createVideoStreamingEncoder();
+  obs.OBS_service_createVideoRecordingEncoder();
 
   obs.OBS_service_createAudioEncoder();
 
   obs.OBS_service_resetAudioContext();
-  obs.OBS_service_resetVideoContext(app.getPath('userData') + '\\');
+  obs.OBS_service_resetVideoContext();
 
   obs.OBS_service_associateAudioAndVideoToTheCurrentStreamingContext();
   obs.OBS_service_associateAudioAndVideoToTheCurrentRecordingContext();
 
-  obs.OBS_service_createService(app.getPath('userData') + '\\');
+  obs.OBS_service_createService();
 
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentStreamingOutput();
   obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
 
   obs.OBS_service_setServiceToTheStreamingOutput();
+}
+
+// This ensures that only one copy of our app can run at once.
+const shouldQuit = app.makeSingleInstance(() => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
+
+    mainWindow.focus();
+  }
+});
+
+if (shouldQuit) {
+  app.quit();
 }
 
 app.on('ready', () => {
@@ -207,4 +248,10 @@ ipcMain.on('obs-apiCall', (event, data) => {
 // Used for guaranteeing unique ids for objects in the vuex store
 ipcMain.on('getUniqueId', event => {
   event.returnValue = _.uniqueId();
+});
+
+ipcMain.on('restartApp', () => {
+  app.relaunch();
+  // Closing the main window starts the shut down sequence
+  mainWindow.close();
 });

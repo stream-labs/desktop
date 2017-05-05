@@ -13,16 +13,19 @@
 <script>
 
 import Input from './Input.vue';
-let BoolInput = Input.extend({
+
+const BoolInput = Input.extend({
   methods: {
-    onChangeHandler (event) {
-      this.$emit('input', Object.assign({}, this.value, {currentValue: Number(event.target.checked)}));
+    onChangeHandler(event) {
+      this.$emit('input', Object.assign({}, this.value, {
+        currentValue: Number(event.target.checked)
+      }));
     }
   }
 });
+
 BoolInput.obsType = 'OBS_PROPERTY_BOOL';
+
 export default BoolInput;
-
-
 
 </script>

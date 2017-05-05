@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   title="Settings"
-  :show-controls="true"
+  :show-cancel="false"
   :done-handler="done">
 
   <div slot="content">
@@ -18,7 +18,8 @@
         </NavMenu>
       </div>
       <div class="columns small-9">
-        <GenericForm v-model="settingsData" @input="save"></GenericForm>
+        <startup-settings v-if="categoryName === 'General'" />
+        <GenericFormGroups v-model="settingsData" @input="save"></GenericFormGroups>
       </div>
     </div>
   </div>
@@ -30,10 +31,11 @@
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
+import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
 import windowMixin from '../mixins/window';
+import StartupSettings from '../StartupSettings.vue';
 
 export default {
 
@@ -43,7 +45,8 @@ export default {
     ModalLayout,
     NavMenu,
     NavItem,
-    GenericForm
+    GenericFormGroups,
+    StartupSettings
   },
 
   beforeCreate() {
@@ -53,10 +56,9 @@ export default {
 
   data() {
     const categoryName = 'General';
-
     return {
       categoryName,
-      blackList: ['Advanced', 'Hotkeys'],
+      blackList: ['Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
       settingsData: this.settingsService.getSettingsFormData(categoryName)
     };

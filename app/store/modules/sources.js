@@ -177,14 +177,6 @@ const actions = {
     });
   },
 
-  setSourceSize({ commit }, data) {
-    commit('SET_SOURCE_SIZE', {
-      sourceId: data.sourceId,
-      width: data.width,
-      height: data.height
-    });
-  },
-
   setSourcePosition({ commit, state }, data) {
     let source = state.sources[data.sourceId];
     Obs.setSourcePosition(source.name, data.x, data.y);
@@ -251,11 +243,29 @@ const actions = {
     });
   },
 
-  setSourceFlags({ commit }, data) {
-    commit('SET_SOURCE_FLAGS', {
-      sourceId: data.sourceId,
-      audio: data.audio,
-      video: data.video
+  updateSourceAttributes({ commit, state }) {
+    _.each(state.sources, source => {
+      const size = Obs.getSourceSize(source.name);
+
+      if ((source.width !== size.width) || (source.height !== size.height)) {
+        commit('SET_SOURCE_SIZE', {
+          sourceId: source.id,
+          width: size.width,
+          height: size.height
+        });
+      }
+
+      const flags = Obs.getSourceFlags(source.name);
+      const audio = !!flags.audio;
+      const video = !!flags.video;
+
+      if ((source.audio !== audio) || (source.video !== video)) {
+        commit('SET_SOURCE_FLAGS', {
+          sourceId: source.id,
+          audio,
+          video
+        });
+      }
     });
   }
 };

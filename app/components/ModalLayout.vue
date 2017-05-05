@@ -12,6 +12,7 @@
   </div>
   <div v-if="showControls" class="ModalLayout-controls">
     <button
+      v-if="showCancel"
       class="button button--default"
       @click="cancel">
       Cancel
@@ -63,28 +64,48 @@ export default {
     }
   },
 
-  props: [
+  props: {
     // The title shown at the top of the window
-    'title',
+    title: {
+      type: String
+    },
 
     // Whether the "cancel" and "done" controls should be
     // shown at the bottom of the modal.
-    'showControls',
+    showControls: {
+      type: Boolean,
+      default: true
+    },
+
+    // If controls are shown, whether or not to show the
+    // cancel button.
+    showCancel: {
+      type: Boolean,
+      default: true
+    },
 
     // Will be called when "done" is clicked if controls
     // are enabled
-    'doneHandler',
+    doneHandler: {
+      type: Function
+    },
 
     // Will be called when "cancel" is clicked.  By default
     // this will just close the window.
-    'cancelHandler',
+    cancelHandler: {
+      type: Function
+    },
 
     // Additional CSS styles for the content section
-    'contentStyles',
+    contentStyles: {
+      type: String
+    },
 
     // The height of the fixed section
-    'fixedSectionHeight'
-  ]
+    fixedSectionHeight: {
+      type: Number
+    }
+  }
 
 };
 </script>

@@ -1,7 +1,6 @@
 <template>
 <modal-layout
   title="Name Scene"
-  :show-controls="true"
   :done-handler="submit">
   <form
     slot="content"

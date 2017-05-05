@@ -7,8 +7,6 @@ const { remote } = window.require('electron');
 @stateful
 export default class SettingsService extends StatefulService {
 
-  initialState = {};
-
   static convertFormDataToState (settingsFormData) {
     let settingsState = {};
     for (let groupName in settingsFormData) {
@@ -50,7 +48,7 @@ export default class SettingsService extends StatefulService {
 
 
   getSettingsFormData (categoryName) {
-    let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
+    let settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -64,6 +62,21 @@ export default class SettingsService extends StatefulService {
       'ProjectorAlwaysOnTop',
       'SaveProjectors',
       'SysTrayWhenStarted',
+      'RecRBSuffix',
+      'LowLatencyEnable',
+      'BindIP',
+      'FilenameFormatting',
+      'DelayPreserve',
+      'DelaySec',
+      'DelayEnable',
+      'MaxRetries',
+      'MonitoringDeviceName',
+      'NewSocketLoopEnable',
+      'OverwriteIfExists',
+      'ProcessPriority',
+      'RecRBPrefix',
+      'Reconnect',
+      'RetryDelay'
     ];
 
     // set default values for lists, and disable the blacklisted fields
@@ -83,7 +96,7 @@ export default class SettingsService extends StatefulService {
   }
 
   setSettings (categoryName, settingsData) {
-    nodeObs.OBS_settings_saveSettings(categoryName, settingsData, remote.app.getPath('userData') + '\\');
+    nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({[categoryName]: settingsData}));
   }
 

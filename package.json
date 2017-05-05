@@ -16,6 +16,7 @@
   "build": {
     "appId": "com.streamlabs.slobs",
     "productName": "Streamlabs OBS",
+    "icon": "images/icon.ico",
     "files": [
       "bundles",
       "node_modules",

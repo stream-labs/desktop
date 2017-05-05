@@ -24,6 +24,10 @@ class ObsApi {
     this.nodeObs = nodeObs;
   }
 
+  isObsInstalled() {
+    return nodeObs.OBS_API_isOBS_installed();
+  }
+
   createDisplay(key) {
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
@@ -286,7 +290,7 @@ class ObsApi {
   }
 
   startStreaming() {
-    nodeObs.OBS_service_startStreaming(remote.app.getPath('userData') + '\\');
+    nodeObs.OBS_service_startStreaming();
   }
 
   stopStreaming() {
@@ -333,6 +337,57 @@ class ObsApi {
     return nodeObs.OBS_API_getPerformanceStatistics();
   }
 
+  getSceneTransitionTypes() {
+    return nodeObs.OBS_content_getListTransitions();
+  }
+
+  getSceneTransitionNames() {
+    return nodeObs.OBS_content_getListCurrentTransitions();
+  }
+
+  getSceneTransitionName() {
+    return nodeObs.OBS_content_getCurrentTransition();
+  }
+
+  setSceneTransitionName(name) {
+    nodeObs.OBS_content_setTransition(name);
+  }
+
+  getSceneTransitionDuration() {
+    return nodeObs.OBS_content_getTransitionDuration();
+  }
+
+  setSceneTransitionDuration(duration) {
+    nodeObs.OBS_content_setTransitionDuration(duration);
+  }
+
+  setSceneTransitionProperty(transitionName, propName, value) {
+    nodeObs.OBS_content_setTransitionProperty(transitionName, propName, { value });
+  }
+
+  addSceneTransition(transitionType, transitionName) {
+    nodeObs.OBS_content_addTransition(transitionType, transitionName);
+  }
+
+  removeSceneTransition(transitionName) {
+    nodeObs.OBS_content_removeTransition(transitionName);
+  }
+
+  getSceneTransitionProperties(transitionName) {
+    return nodeObs.OBS_content_getTransitionProperties(transitionName);
+  }
+
+  getSceneTransitionPropertySubParameters(transitionName, propertyName) {
+    return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propertyName);
+  }
+
+  getObsProfiles() {
+    return nodeObs.OBS_API_getOBS_existingProfiles();
+  }
+
+  getObsSceneCollections() {
+    return nodeObs.OBS_API_getOBS_existingSceneCollections();
+  }
 }
 
 export default new ObsApi();
