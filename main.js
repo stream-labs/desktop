@@ -33,7 +33,11 @@ let childWindow;
 function loadStartupConfig() {
   const configLocation = path.join(app.getPath('userData'), 'startup.json');
 
-  return JSON.parse(fs.readFileSync(configLocation));
+  if (fs.existsSync(configLocation)) {
+    return JSON.parse(fs.readFileSync(configLocation));
+  }
+
+  return null;
 }
 
 // Somewhat annoyingly, this is needed so that the child window
@@ -100,7 +104,7 @@ function startApp() {
 
   const startupConfig = loadStartupConfig();
 
-  if (startupConfig.obsMode) {
+  if (startupConfig && startupConfig.obsMode) {
     obs.OBS_API_setOBS_currentProfile(startupConfig.profile);
     obs.OBS_API_setOBS_currentSceneCollection(startupConfig.sceneCollection);
     obs.OBS_API_setPathConfigDirectory('');

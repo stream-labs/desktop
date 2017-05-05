@@ -46,7 +46,20 @@ export default {
 
     this.settingsPath = path.join(remote.app.getPath('userData'), 'startup.json');
 
-    const settings = this.loadSettings();
+    let settings;
+
+    if (fs.existsSync(this.settingsPath)) {
+      settings = this.loadSettings();
+    } else {
+      // Ensure we have default settings
+      settings = {
+        obsMode: 0,
+        profile: Object.keys(profileOptions[0])[0],
+        sceneCollection: Object.keys(sceneCollectionOptions[0])[0]
+      };
+
+      fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
+    }
 
     return {
       obsMode: {
