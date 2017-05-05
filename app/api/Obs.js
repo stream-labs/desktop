@@ -286,7 +286,7 @@ class ObsApi {
   }
 
   startStreaming() {
-    nodeObs.OBS_service_startStreaming(remote.app.getPath('userData') + '\\');
+    nodeObs.OBS_service_startStreaming();
   }
 
   stopStreaming() {
@@ -375,6 +375,14 @@ class ObsApi {
 
   getSceneTransitionPropertySubParameters(transitionName, propertyName) {
     return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propertyName);
+  }
+
+  getObsProfiles() {
+    return nodeObs.OBS_API_getOBS_existingProfiles();
+  }
+
+  getObsSceneCollections() {
+    return nodeObs.OBS_API_getOBS_existingSceneCollections();
   }
 }
 

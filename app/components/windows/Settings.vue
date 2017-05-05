@@ -18,6 +18,7 @@
         </NavMenu>
       </div>
       <div class="columns small-9">
+        <startup-settings v-if="categoryName === 'General'" />
         <GenericFormGroups v-model="settingsData" @input="save"></GenericFormGroups>
       </div>
     </div>
@@ -34,6 +35,7 @@ import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
 import windowMixin from '../mixins/window';
+import StartupSettings from '../StartupSettings.vue';
 
 export default {
 
@@ -43,7 +45,8 @@ export default {
     ModalLayout,
     NavMenu,
     NavItem,
-    GenericFormGroups
+    GenericFormGroups,
+    StartupSettings
   },
 
   beforeCreate() {

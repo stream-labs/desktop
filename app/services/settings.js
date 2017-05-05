@@ -48,7 +48,7 @@ export default class SettingsService extends StatefulService {
 
 
   getSettingsFormData (categoryName) {
-    let settings = nodeObs.OBS_settings_getSettings(categoryName, remote.app.getPath('userData') + '\\');
+    let settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -96,7 +96,7 @@ export default class SettingsService extends StatefulService {
   }
 
   setSettings (categoryName, settingsData) {
-    nodeObs.OBS_settings_saveSettings(categoryName, settingsData, remote.app.getPath('userData') + '\\');
+    nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({[categoryName]: settingsData}));
   }
 
