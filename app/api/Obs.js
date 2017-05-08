@@ -5,17 +5,39 @@ const { ipcRenderer, remote } = window.require('electron');
 
 import _ from 'lodash';
 
+let idCounter = 0;
+const callbacks = {};
+
 // Behaves just like the node-obs library, but proxies
 // all methods via the main process
 const nodeObs = new Proxy({}, {
   get(target, key) {
-    return function() {
+    return (...args) => {
+      const mappedArgs = args.map(arg => {
+        if (typeof arg === 'function') {
+          idCounter += 1;
+
+          callbacks[idCounter] = arg;
+
+          return {
+            __obsCallback: true,
+            id: idCounter
+          };
+        }
+
+        return arg;
+      });
+
       return ipcRenderer.sendSync('obs-apiCall', {
         method: key,
-        args: Array.from(arguments)
+        args: mappedArgs,
       });
     };
   }
+});
+
+ipcRenderer.on('obs-apiCallback', (event, cbInfo) => {
+  callbacks[cbInfo.id](...cbInfo.args);
 });
 
 class ObsApi {

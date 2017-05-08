@@ -222,6 +222,12 @@ const nodeObsVirtualMethods = {
   OBS_content_setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
     obs.OBS_content_setSourcePosition(name, x, y);
     obs.OBS_content_setSourceScaling(name, scaleX, scaleY);
+  },
+
+  OBS_test_callbackProxy(num, cb) {
+    setTimeout(() => {
+      cb(num + 1);
+    }, 5000);
   }
 
 };
@@ -232,10 +238,25 @@ ipcMain.on('obs-apiCall', (event, data) => {
 
   console.log('OBS API CALL', data);
 
+  const mappedArgs = data.args.map(arg => {
+    const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
+
+    if (isCallbackPlaceholder) {
+      return (...args) => {
+        event.sender.send('obs-apiCallback', {
+          id: arg.id,
+          args
+        });
+      };
+    }
+
+    return arg;
+  });
+
   if (nodeObsVirtualMethods[data.method]) {
-    retVal = nodeObsVirtualMethods[data.method].apply(null, data.args);
+    retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
   } else {
-    retVal = obs[data.method].apply(obs, data.args);
+    retVal = obs[data.method].apply(obs, mappedArgs);
   }
 
   console.log('OBS RETURN VALUE', retVal);
