@@ -24,6 +24,7 @@ import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import Obs from '../../api/Obs';
 import windowMixin from '../mixins/window';
+import SourcesService from '../../services/sources';
 
 import * as propertyComponents from '../source_properties';
 import { propertyComponentForType } from '../source_properties/helpers';
@@ -76,13 +77,6 @@ export default {
     },
 
     cancel() {
-      // TODO: Get property restore working.
-      // For now, do the same as done.
-      // this.$store.dispatch({
-      //   type: 'restoreProperties',
-      //   sourceId: this.sourceId
-      // });
-
       this.closeWindow();
     },
 
@@ -96,21 +90,9 @@ export default {
     );
   },
 
-  watch: {
-    properties() {
-      if (this.properties && !this.restorePointSet) {
-        this.restorePointSet = true;
-        this.$store.dispatch({
-          type: 'createPropertiesRestorePoint',
-          sourceId: this.sourceId
-        });
-      }
-    }
-  },
-
   computed: {
     windowTitle() {
-      let source = this.$store.state.sources.sources[this.sourceId];
+      const source = SourcesService.instance.getSourceById(this.sourceId);
 
       if (source) {
         return "Properties for '" + source.name + "'";
@@ -120,7 +102,7 @@ export default {
     },
 
     properties() {
-      let source = this.$store.state.sources.sources[this.sourceId];
+      const source = SourcesService.instance.getSourceById(this.sourceId);
 
       if (source) {
         return source.properties;
@@ -130,7 +112,7 @@ export default {
     },
 
     sourceName() {
-      return this.$store.state.sources.sources[this.sourceId].name;
+      return SourcesService.instance.getSourceById(this.sourceId).name;
     },
 
     sourceId() {

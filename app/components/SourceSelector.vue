@@ -24,10 +24,12 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager.js';
+import ScenesService from '../services/scenes';
+import SourcesService from '../services/sources';
 
-import _ from 'lodash';
 
 export default {
   components: {
@@ -36,18 +38,15 @@ export default {
 
   methods: {
     addSource() {
-      if (this.$store.getters.activeScene) {
+      if (ScenesService.instance.activeScene) {
         windowManager.showAddSource();
       }
     },
 
     removeSource() {
       // We can only remove a source if one is selected
-      if(this.activeSourceId) {
-        this.$store.dispatch({
-          type: 'removeSource',
-          sourceId: this.activeSourceId
-        });
+      if (this.activeSourceId) {
+        SourcesService.instance.removeSource(this.activeSourceId);
       }
     },
 
@@ -58,48 +57,36 @@ export default {
     },
 
     handleSort(data) {
-      let positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
+      const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
 
-      this.$store.dispatch({
-        type: 'setSourceOrder',
-        sceneName: this.$store.getters.activeSceneName,
-        order: data.order,
-
-        // For now, we are passing this data since the OBS API
-        // uses a move-up move-down type interface.
-        sourceName: data.change.moved.element.name,
-        positionDelta
-      });
+      ScenesService.instance.setSourceOrder(
+        ScenesService.instance.activeScene.id,
+        data.change.moved.element.value,
+        positionDelta,
+        data.order
+      );
     },
 
     makeActive(sourceId) {
-      this.$store.dispatch({
-        type: 'makeSourceActive',
-        sceneName: this.$store.getters.activeSceneName,
+      ScenesService.instance.makeSourceActive(
+        ScenesService.instance.activeScene.id,
         sourceId
-      });
+      );
     }
   },
 
   computed: {
     sources() {
-      if (this.$store.getters.activeScene) {
-        return _.map(this.$store.getters.activeScene.sources, sourceId => {
-          let source = this.$store.state.sources.sources[sourceId];
-
-          // This is the format that the Selector component wants
-          return {
-            name: source.name,
-            value: source.id
-          }
-        });
-      } else {
-        return [];
-      }
+      return ScenesService.instance.sources.map(source => {
+        return {
+          name: source.name,
+          value: source.id
+        };
+      });
     },
 
     activeSourceId() {
-      return this.$store.getters.activeSourceId;
+      return ScenesService.instance.activeSourceId;
     }
   }
 };

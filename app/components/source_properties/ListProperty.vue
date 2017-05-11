@@ -16,17 +16,16 @@
 
 <script>
 import Property from './Property.vue';
-let ListProperty = Property.extend({
+import SourcesService from '../../services/sources';
+
+const ListProperty = Property.extend({
 
   methods: {
     setValue(event) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          value: event.target.value
-        }
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        { value: event.target.value }
+      );
     }
   }
 

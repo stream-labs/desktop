@@ -4,13 +4,13 @@ import _ from 'lodash';
 
 // Modules
 import navigation from './modules/navigation';
-import scenes from './modules/scenes';
-import sources from './modules/sources';
 import streaming from './modules/streaming';
 import windowOptions from './modules/windowOptions';
 import video from './modules/video';
 import performance from './modules/performance';
 import sceneTransitions from './modules/sceneTransitions';
+import SourcesService from '../services/sources';
+import ScenesService from '../services/scenes';
 
 
 import Obs from '../api/Obs';
@@ -111,8 +111,14 @@ plugins.push(store => {
 export default new Vuex.Store({
   modules: {
     navigation,
-    scenes,
-    sources,
+    ScenesService: {
+      state: ScenesService.initialState,
+      mutations: ScenesService.prototype.mutations
+    },
+    SourcesService: {
+      state: SourcesService.initialState,
+      mutations: SourcesService.prototype.mutations
+    },
     streaming,
     windowOptions,
     video,

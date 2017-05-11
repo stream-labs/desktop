@@ -7,6 +7,7 @@
 
 import configFileManager from './ConfigFileManager';
 import store from '../store';
+import SourcesService from '../services/sources';
 
 class PeriodicRunner {
 
@@ -44,7 +45,7 @@ class PeriodicRunner {
   }
 
   runSourceAttributesUpdate() {
-    store.dispatch('updateSourceAttributes');
+    SourcesService.instance.refreshSourceAttributes();
   }
 
   runPerformanceStatsUpdate() {

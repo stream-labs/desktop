@@ -45,10 +45,11 @@
 
 <script>
 import Tabs from '../Tabs.vue';
-import fr from '../../util/FrameRate.js';
+import fr from '../../util/FrameRate';
 import Property from './Property.vue';
+import SourcesService from '../../services/sources';
 
-let FrameRateProperty = Property.extend({
+const FrameRateProperty = Property.extend({
 
   components: {
     Tabs
@@ -74,32 +75,30 @@ let FrameRateProperty = Property.extend({
 
   methods: {
     setSimpleValue(event) {
-      let optionIndex = parseInt(event.target.value);
-      let option = this.simpleOptions[optionIndex];
+      const optionIndex = parseInt(event.target.value);
+      const option = this.simpleOptions[optionIndex];
 
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
+      SourcesService.instance.setProperty(
+        this.property,
+        {
           numerator: option.numerator.toString(),
           denominator: option.denominator.toString()
         }
-      });
+      );
     },
 
     setRationalValue(event) {
-      let numerator = this.$refs.numerator.value;
-      let denominator = this.$refs.denominator.value;
+      const numerator = this.$refs.numerator.value;
+      const denominator = this.$refs.denominator.value;
 
       if (numerator && denominator) {
-        this.$store.dispatch({
-          type: 'setSourceProperty',
-          property: this.property,
-          propertyValue: {
+        SourcesService.instance.setProperty(
+          this.property,
+          {
             numerator,
             denominator
           }
-        });
+        );
       }
     }
   },

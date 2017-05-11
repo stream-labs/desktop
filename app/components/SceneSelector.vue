@@ -16,32 +16,27 @@
   </div>
   <selector
     class="studioControls-selector"
-    :items="sceneNames"
-    :activeItem="activeSceneName"
+    :items="scenes"
+    :activeItem="activeSceneId"
     @select="makeActive"
     @sort="handleSort"/>
 </div>
 </template>
 
 <script>
-import Selector from './Selector.vue';
-import windowManager from '../util/WindowManager.js';
 import _ from 'lodash';
+import Selector from './Selector.vue';
+import windowManager from '../util/WindowManager';
+import ScenesService from '../services/scenes';
 
 export default {
   methods: {
-    makeActive(scene) {
-      this.$store.dispatch({
-        type: 'makeSceneActive',
-        sceneName: scene
-      });
+    makeActive(id) {
+      ScenesService.instance.makeSceneActive(id);
     },
 
     handleSort(data) {
-      this.$store.dispatch({
-        type: 'setSceneOrder',
-        order: data.order
-      });
+      ScenesService.instance.setSceneOrder(data.order);
     },
 
     addScene() {
@@ -49,10 +44,7 @@ export default {
     },
 
     removeScene() {
-      this.$store.dispatch({
-        type: 'removeScene',
-        sceneName: this.activeSceneName
-      });
+      ScenesService.instance.removeScene(this.activeSceneId);
     },
 
     showTransitions() {
@@ -61,12 +53,21 @@ export default {
   },
 
   computed: {
-    sceneNames() {
-      return _.map(this.$store.state.scenes.scenes, scene => scene.name);
+    scenes() {
+      return ScenesService.instance.scenes.map(scene => {
+        return {
+          name: scene.name,
+          value: scene.id
+        };
+      });
     },
 
-    activeSceneName() {
-      return this.$store.state.scenes.activeSceneName;
+    activeSceneId() {
+      if (ScenesService.instance.activeScene) {
+        return ScenesService.instance.activeScene.id;
+      }
+
+      return null;
     }
   },
 

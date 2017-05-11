@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import SettingsService from '../services/settings';
 import store from '../store';
+import ScenesService from '../services/scenes';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -28,8 +29,8 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    this.draggedSource = store.getters.activeSource;
-    this.otherSources = store.getters.inactiveSources.filter(source => {
+    this.draggedSource = ScenesService.instance.activeSource;
+    this.otherSources = ScenesService.instance.inactiveSources.filter(source => {
       // Only video targets are valid snap targets
       return source.video;
     });
@@ -70,22 +71,22 @@ class DragHandler {
               newY = targetEdge.depth;
             } else if (name === 'right') {
               snappedX = true;
-              newX = targetEdge.depth - (this.draggedSource.width * this.draggedSource.scaleX);
+              newX = targetEdge.depth - (this.draggedSource.scaledWidth);
             } else {
               snappedY = true;
-              newY = targetEdge.depth - (this.draggedSource.height * this.draggedSource.scaleY);
+              newY = targetEdge.depth - (this.draggedSource.scaledHeight);
             }
           }
         });
       });
     }
 
-    store.dispatch({
-      type: 'setSourcePosition',
-      sourceId: this.draggedSource.id,
-      x: newX,
-      y: newY
-    });
+    ScenesService.instance.setSourcePosition(
+      ScenesService.instance.activeSceneId,
+      this.draggedSource.id,
+      newX,
+      newY
+    );
 
     if (!snappedX) {
       this.currentX = event.pageX;
@@ -215,33 +216,29 @@ class DragHandler {
   // Generates edges for the given source at
   // the given x & y coordinates
   generateSourceEdges(source, x, y) {
-    // The scaled width and height
-    const sourceWidth = source.width * source.scaleX;
-    const sourceHeight = source.height * source.scaleY;
-
     return {
       left: {
         depth: x,
         offset: y,
-        length: sourceHeight
+        length: source.scaledHeight
       },
 
       top: {
         depth: y,
         offset: x,
-        length: sourceWidth
+        length: source.scaledWidth
       },
 
       right: {
-        depth: x + sourceWidth,
+        depth: x + source.scaledWidth,
         offset: y,
-        length: sourceHeight
+        length: source.scaledHeight
       },
 
       bottom: {
-        depth: y + sourceHeight,
+        depth: y + source.scaledHeight,
         offset: x,
-        length: sourceWidth
+        length: source.scaledWidth
       }
     };
   }

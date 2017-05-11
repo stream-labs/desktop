@@ -10,18 +10,18 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Property from './Property.vue';
-let TextProperty = Property.extend({
+import SourcesService from '../../services/sources';
+
+const TextProperty = Property.extend({
 
   methods: {
     setValue: _.debounce(function(event) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          value: event.target.value
-        }
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        { value: event.target.value }
+      );
     }, 500)
   }
 

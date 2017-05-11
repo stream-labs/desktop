@@ -12,17 +12,15 @@
 <script>
 
 import Property from './Property.vue';
+import SourcesService from '../../services/sources';
 
-let BoolProperty = Property.extend({
+const BoolProperty = Property.extend({
   methods: {
     setValue(event) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          value: event.target.checked.toString()
-        }
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        { value: event.target.checked.toString() }
+      );
     }
   }
 });

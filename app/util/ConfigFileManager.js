@@ -3,7 +3,7 @@
 
 import _ from 'lodash';
 import Obs from '../api/Obs';
-import store from '../store';
+import ScenesService from '../services/scenes';
 
 class ConfigFileManager {
 
@@ -15,7 +15,7 @@ class ConfigFileManager {
 
   load() {
     Obs.loadConfig();
-    store.dispatch('loadConfiguration');
+    ScenesService.instance.loadSceneConfig();
   }
 
   rawSave() {

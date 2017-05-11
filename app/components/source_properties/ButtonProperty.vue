@@ -10,15 +10,16 @@
 
 <script>
 import Property from './Property.vue';
-let ButtonProperty = Property.extend({
+import SourcesService from '../../services/sources';
+
+const ButtonProperty = Property.extend({
 
   methods: {
     handleClick() {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {}
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        {}
+      );
     }
   }
 });
