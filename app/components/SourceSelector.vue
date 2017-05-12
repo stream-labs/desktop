@@ -16,6 +16,7 @@
   </div>
   <selector
     class="studioControls-selector"
+    @contextmenu="showContextMenu"
     :items="sources"
     :activeItem="activeSourceId"
     @select="makeActive"
@@ -24,23 +25,47 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import Selector from './Selector.vue';
-import windowManager from '../util/WindowManager.js';
+import windowManager from '../util/WindowManager';
 import ScenesService from '../services/scenes';
 import SourcesService from '../services/sources';
 
+const { remote } = window.require('electron');
+const { Menu, MenuItem } = remote;
+
 
 export default {
+
   components: {
     Selector
   },
+
+  mounted() {
+    this.menu = new Menu();
+    this.menu.append(new MenuItem({
+      label: 'Filters',
+      click: () => {
+        windowManager.showSourceFilters(ScenesService.instance.activeSource.name);
+      }
+    }));
+    this.menu.append(new MenuItem({
+      label: 'Properties',
+      click: () => {
+        this.sourceProperties();
+      }
+    }));
+  },
+
 
   methods: {
     addSource() {
       if (ScenesService.instance.activeScene) {
         windowManager.showAddSource();
       }
+    },
+
+    showContextMenu() {
+      this.menu.popup(remote.getCurrentWindow());
     },
 
     removeSource() {

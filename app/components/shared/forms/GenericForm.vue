@@ -21,7 +21,10 @@ export default {
 
     propertyComponentForType(type) {
       const componentName = Object.keys(inputComponents).find(name => {
-        return inputComponents[name].obsType === type;
+        const componentObsType = inputComponents[name].obsType;
+        return Array.isArray(componentObsType) ?
+          componentObsType.includes(type) :
+          componentObsType === type;
       });
       return inputComponents[componentName];
     },

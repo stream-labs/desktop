@@ -209,6 +209,17 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   });
 });
 
+
+
+// Handle service initialization
+const servicesInitialized = new Set();
+
+ipcMain.on('services-shouldInit', (event, service) => {
+  event.returnValue = !servicesInitialized.has(service);
+  servicesInitialized.add(service);
+});
+
+
 // Virtual node OBS calls:
 //
 // These are methods that appear upstream to be OBS

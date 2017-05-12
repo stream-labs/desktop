@@ -1,43 +1,23 @@
-import Service from './service';
-import store from '../store';
 import Vue from 'vue';
+import { Service } from './service';
+import store from '../store';
 
-export function mutation (target, methodName, descriptor) {
-  return registerMethodAsVuexEntity('mutations', target, methodName, descriptor)
-}
+export function mutation(target, methodName, descriptor) {
+  const serviceName = target.constructor.name;
+  const mutationName = `${serviceName}.${methodName}`;
 
-
-function registerMethodAsVuexEntity (entityType, target, methodName, descriptor) {
-  let moduleName = target.constructor.name;
-  let entityName = moduleName + '.' + methodName;
-  let originalMethod = descriptor.value;
-  target[entityType] = target[entityType] || {};
-  target[entityType][entityName] = function (localState, payload) {
-    let context = {
-      moduleName: moduleName,
-      get state () {
-        return store.state[moduleName];
-      },
-      set state (newState) {
-        Vue.set(store.state, moduleName, newState);
-      }
-    };
-    context.patchState = target.patchState.bind(context);
-    return originalMethod.call(context, ...payload.args);
+  target.mutations = target.mutations || {};
+  target.mutations[mutationName] = function (localState, payload) {
+    descriptor.value.call(target.constructor.instance, ...payload.args);
   };
-  descriptor.value = function (...args) {
-    if (entityType === 'mutations') store.commit(entityName, {args});
-  };
-  return descriptor;
-}
 
-export function stateful (StatefulClass) {
-  let mutations = StatefulClass.prototype.mutations;
-  if (!StatefulClass.initialState && Object.keys(mutations).length === 0) return;
-  store.registerModule(StatefulClass.name, {
-    mutations: mutations,
-    state: StatefulClass.initialState || {}
-  });
+  return {
+    ...descriptor,
+
+    value(...args) {
+      store.commit(mutationName, { args });
+    }
+  };
 }
 
 /**
@@ -45,33 +25,32 @@ export function stateful (StatefulClass) {
  * @abstract
  */
 export class StatefulService extends Service {
+
   static initialState = {};
+
   store = store;
-  moduleName = this.constructor.name;
 
-
-  get state () {
-    return this.store.state[this.moduleName];
+  get state() {
+    return this.store.state[this.serviceName];
   }
 
 
-  set state (newState) {
-    return Vue.set(this.store.state, this.moduleName, newState);
+  set state(newState) {
+    return Vue.set(this.store.state, this.serviceName, newState);
   }
 
 
-  constructor (...args) {
-    super(...args);
-    this.init();
+  // Returns an injectable Vuex module
+  static getModule() {
+    return {
+      [this.name]: {
+        state: this.initialState,
+        mutations: this.prototype.mutations
+      }
+    };
   }
-
-
-  init() {
-
-  }
-
 
   patchState(patch) {
-    this.state = {...this.state, ...patch};
+    this.state = { ...this.state, ...patch };
   }
 }

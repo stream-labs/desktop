@@ -1,8 +1,6 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 
-const { ipcRenderer, remote } = window.require('electron');
-
 import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
@@ -12,8 +10,11 @@ import SceneTransitionProperties from '../components/windows/SceneTransitionProp
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
+import SourceFilters from '../components/windows/SourceFilters.vue';
+import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
 import store from '../store';
-import configFileManager from'../util/ConfigFileManager.js';
+
+const { ipcRenderer, remote } = window.require('electron');
 
 class WindowManager {
 
@@ -29,7 +30,9 @@ class WindowManager {
       AddSource,
       NameSource,
       NameScene,
-      SourceProperties
+      SourceProperties,
+      SourceFilters,
+      AddSourceFilter
     };
   }
 
@@ -163,6 +166,33 @@ class WindowManager {
       }
     });
 
+  }
+
+  showSourceFilters(sourceName = '', selectedFilterName = '') {
+    this.showWindow({
+      startupOptions: {
+        component: 'SourceFilters',
+        sourceName,
+        selectedFilterName
+      },
+      windowOptions: {
+        width: 800,
+        height: 800
+      }
+    });
+  }
+
+  showAddSourceFilter(sourceName = '') {
+    this.showWindow({
+      startupOptions: {
+        component: 'AddSourceFilter',
+        sourceName
+      },
+      windowOptions: {
+        width: 600,
+        height: 400
+      }
+    });
   }
 
 

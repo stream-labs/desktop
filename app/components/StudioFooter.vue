@@ -21,7 +21,6 @@
 <script>
 import moment from 'moment';
 import _ from 'lodash';
-import Obs from '../api/Obs';
 import SettingsService from '../services/settings';
 
 export default {
@@ -145,7 +144,6 @@ export default {
         }
 
         return 'Stream Error';
-
       }
 
       return null;

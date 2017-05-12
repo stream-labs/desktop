@@ -153,6 +153,9 @@ class ObsApi {
     return nodeObs.OBS_API_getPerformanceStatistics();
   }
 
+
+  // region SceneTransitions
+
   getSceneTransitionTypes() {
     return nodeObs.OBS_content_getListTransitions();
   }
@@ -196,6 +199,9 @@ class ObsApi {
   getSceneTransitionPropertySubParameters(transitionName, propertyName) {
     return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propertyName);
   }
+
+  // endregion
+
 
   getObsProfiles() {
     return nodeObs.OBS_API_getOBS_existingProfiles();

@@ -14,7 +14,7 @@ export default class SourcesService extends StatefulService {
 
   static initialState = {
     sources: {}
-  }
+  };
 
   @mutation
   RESET_SOURCES() {

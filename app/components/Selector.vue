@@ -8,6 +8,7 @@
       class="Selector-item"
       :class="{ 'Selector-item__active': item.value === activeItem }"
       v-for="(item, index) in normalizedItems"
+      @contextmenu="handleContextMenu(index)"
       @click="handleSelect(index)">
       <div class="Selector-itemText">
         {{item.name}}
@@ -46,6 +47,12 @@ export default {
       let value = this.normalizedItems[index].value;
 
       this.$emit('select', value);
+    },
+
+    handleContextMenu(index) {
+      const value = this.normalizedItems[index].value;
+      this.handleSelect(index);
+      this.$emit('contextmenu', value);
     }
   },
 

@@ -14,7 +14,7 @@ import Obs from '../api/Obs';
 import DragHandler from '../util/DragHandler';
 import ScenesService from '../services/scenes';
 
-const { webFrame, screen, remote } = window.require('electron');
+const { webFrame, screen } = window.require('electron');
 
 export default {
 

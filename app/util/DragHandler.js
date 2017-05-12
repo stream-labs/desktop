@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import SettingsService from '../services/settings';
-import store from '../store';
 import ScenesService from '../services/scenes';
+import store from '../store';
 
 const { webFrame, screen } = window.require('electron');
 

@@ -9,11 +9,22 @@ import windowOptions from './modules/windowOptions';
 import video from './modules/video';
 import performance from './modules/performance';
 import sceneTransitions from './modules/sceneTransitions';
-import SourcesService from '../services/sources';
-import ScenesService from '../services/scenes';
-
 
 import Obs from '../api/Obs';
+
+// Stateful Services
+import ScenesService from '../services/scenes';
+import SourcesService from '../services/sources';
+import SourceFiltersService from '../services/source-filters';
+import SettingsService from '../services/settings';
+
+const statefulServiceModules = {
+  ...ScenesService.getModule(),
+  ...SourcesService.getModule(),
+  ...SourceFiltersService.getModule(),
+  ...SettingsService.getModule()
+};
+
 
 Vue.use(Vuex);
 
@@ -93,7 +104,7 @@ plugins.push(store => {
   // Only child windows should ever receive this
   ipcRenderer.on('vuex-loadState', (event, state) => {
     store.commit('BULK_LOAD_STATE', {
-      state: state,
+      state,
       __vuexSyncIgnore: true
     });
   });
@@ -111,19 +122,12 @@ plugins.push(store => {
 export default new Vuex.Store({
   modules: {
     navigation,
-    ScenesService: {
-      state: ScenesService.initialState,
-      mutations: ScenesService.prototype.mutations
-    },
-    SourcesService: {
-      state: SourcesService.initialState,
-      mutations: SourcesService.prototype.mutations
-    },
     streaming,
     windowOptions,
     video,
     sceneTransitions,
-    performance
+    performance,
+    ...statefulServiceModules
   },
   plugins,
   mutations,

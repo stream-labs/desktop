@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
 import ScenesService from '../services/scenes';

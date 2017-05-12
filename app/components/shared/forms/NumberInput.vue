@@ -27,7 +27,7 @@ let NumberInput = Input.extend({
     }
   }
 });
-NumberInput.obsType = 'OBS_PROPERTY_DOUBLE';
+NumberInput.obsType = ['OBS_PROPERTY_DOUBLE', 'OBS_PROPERTY_FLOAT'];
 
 export default NumberInput;
 </script>

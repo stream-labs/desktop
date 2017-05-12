@@ -16,7 +16,7 @@ export default class ScenesService extends StatefulService {
     activeSceneId: null,
     displayOrder: [],
     scenes: {}
-  }
+  };
 
 
   @mutation
