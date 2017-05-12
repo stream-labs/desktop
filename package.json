@@ -9,7 +9,7 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild": "electron-rebuild",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client",
+    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-packaged-0.0.4.7z -onode-obs/",
     "package": "webpack && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js"
   },
@@ -43,6 +43,7 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
+    "7zip-bin": "^2.0.4",
     "aws-sdk": "^2.43.0",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
