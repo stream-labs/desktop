@@ -16,25 +16,38 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
-const { remote } = window.require('electron');
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType } from './Input';
 
-let PathInput = Input.extend({
+const { remote } = window['require']('electron');
 
-  methods: {
-    showFileDialog() {
-      let path = remote.dialog.showOpenDialog({
-        defaultPath: this.value.currentValue,
-        properties: ['openDirectory']
-      })[0];
+@Component
+class PathInput extends Vue {
 
-      this.$refs.input.value = path;
-      this.$emit('input', Object.assign(this.value, {currentValue: path}))
-    }
+  static obsType: TObsType;
+
+  @Prop()
+  value: IInputValue<string>;
+
+  $refs: {
+    input: HTMLInputElement
+  };
+
+
+  showFileDialog() {
+    const dialog = remote.dialog as any;
+    let path = remote.dialog.showOpenDialog({
+      defaultPath: this.value.currentValue,
+      properties: ['openDirectory']
+    })[0];
+
+    this.$refs.input.value = path;
+    this.$emit('input', Object.assign(this.value, {currentValue: path}))
   }
+}
 
-});
 PathInput.obsType = 'OBS_PROPERTY_PATH';
 export default PathInput;
 </script>

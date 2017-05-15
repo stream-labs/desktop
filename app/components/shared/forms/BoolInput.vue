@@ -10,19 +10,26 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 
-import Input from './Input.vue';
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType } from './Input';
 
-const BoolInput = Input.extend({
-  methods: {
-    onChangeHandler(event) {
-      this.$emit('input', Object.assign({}, this.value, {
-        currentValue: Number(event.target.checked)
-      }));
-    }
+@Component
+class BoolInput extends Vue {
+
+  static obsType: TObsType;
+
+  @Prop()
+  value: IInputValue<Boolean>;
+
+  onChangeHandler(event: Event) {
+    this.$emit('input', Object.assign({}, this.value, {
+      currentValue: Number(event.target['checked'])
+    }));
   }
-});
+}
 
 BoolInput.obsType = 'OBS_PROPERTY_BOOL';
 

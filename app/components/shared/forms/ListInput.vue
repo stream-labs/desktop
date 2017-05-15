@@ -15,24 +15,30 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
-import SettingsService from '../../../services/settings';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { TObsType, IListInputValue, getListItemDescription, getListItemName } from './Input';
 
-const ListInput = Input.extend({
 
-  methods: {
+@Component
+class ListInput extends Vue {
 
-    onInputHandler(event) {
-      this.$emit('input', Object.assign({}, this.value, {
-        currentValue: event.target.value
-      }));
-    },
+  static obsType: TObsType;
 
-    getDescription: SettingsService.getListItemDescription,
-    getName: SettingsService.getListItemName
+  @Prop()
+  value: IListInputValue<string>;
+
+  getDescription = getListItemDescription;
+  getName = getListItemName;
+
+  onInputHandler(event: Event) {
+    this.$emit('input', Object.assign({}, this.value, {
+      currentValue: event.target['value']
+    }));
   }
-});
+
+};
 
 ListInput.obsType = 'OBS_PROPERTY_LIST';
 

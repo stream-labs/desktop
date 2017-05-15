@@ -18,29 +18,33 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType } from './Input';
 
-let TextInput = Input.extend({
 
-  data() {
-    return {
-      textVisible: !this.value.masked
-    };
-  },
+@Component
+class TextInput extends Vue {
 
-  methods: {
-    toggleVisible() {
-      this.textVisible = !this.textVisible;
-    },
+  static obsType: TObsType;
 
-    onInputHandler(event) {
-      this.$emit('input', Object.assign({}, this.value, { currentValue: event.target.value }));
-    }
+  @Prop()
+  value: IInputValue<string>;
 
+  textVisible = !this.value.masked;
+
+
+  toggleVisible() {
+    this.textVisible = !this.textVisible;
   }
 
-});
+
+  onInputHandler(event: Event) {
+    this.$emit('input', Object.assign({}, this.value, { currentValue: event.target['value'] }));
+  }
+
+}
 TextInput.obsType = 'OBS_PROPERTY_EDIT_TEXT';
 export default TextInput;
 

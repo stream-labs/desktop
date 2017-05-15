@@ -11,22 +11,33 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType } from './Input';
 
-let NumberInput = Input.extend({
-  methods: {
-    updateValue: function (value) {
-      let formattedValue = value;
-      if (isNaN(Number(formattedValue))) formattedValue = 0;
-      if (formattedValue !== value) {
-        this.$refs.input.value = formattedValue
-      }
-      // Emit the number value through the input event
-      this.$emit('input', Object.assign(this.value, {currentValue: Number(formattedValue)}));
+@Component
+class NumberInput extends Vue {
+
+  static obsType: TObsType;
+
+  @Prop()
+  value: IInputValue<number>;
+
+  $refs: {
+    input: HTMLInputElement
+  };
+
+  updateValue(value: string) {
+    let formattedValue = value;
+    if (isNaN(Number(formattedValue))) formattedValue = '0';
+    if (formattedValue !== value) {
+      this.$refs.input.value = formattedValue;
     }
+    // Emit the number value through the input event
+    this.$emit('input', Object.assign(this.value, { currentValue: Number(formattedValue) }));
   }
-});
+}
 NumberInput.obsType = ['OBS_PROPERTY_DOUBLE', 'OBS_PROPERTY_FLOAT'];
 
 export default NumberInput;
