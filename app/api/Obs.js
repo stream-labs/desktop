@@ -105,26 +105,6 @@ class ObsApi {
     nodeObs.OBS_content_dragSelectedSource(x, y);
   }
 
-  startStreaming() {
-    nodeObs.OBS_service_startStreaming();
-  }
-
-  stopStreaming() {
-    nodeObs.OBS_service_stopStreaming();
-  }
-
-  checkStream() {
-    return nodeObs.OBS_service_isStreamingOutputActive() === '1';
-  }
-
-  startRecording() {
-    nodeObs.OBS_service_startRecording();
-  }
-
-  stopRecording() {
-    nodeObs.OBS_service_stopRecording();
-  }
-
   getSourceFrameSettings(sourceName) {
     let settings = nodeObs.OBS_content_getSourceFrameSettings(sourceName);
 
@@ -148,11 +128,6 @@ class ObsApi {
   saveConfig(path) {
     nodeObs.OBS_content_saveIntoConfigFile(path);
   }
-
-  getPerformanceStatistics() {
-    return nodeObs.OBS_API_getPerformanceStatistics();
-  }
-
 
   // region SceneTransitions
 

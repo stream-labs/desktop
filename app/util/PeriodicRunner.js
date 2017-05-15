@@ -9,6 +9,11 @@ import configFileManager from './ConfigFileManager';
 import store from '../store';
 import SourcesService from '../services/sources';
 
+
+// DEPRECATION NOTICE:
+// This class is now deprecated.  Instead, you should create
+// a service that calls `setInterval` in its init() hook.
+
 class PeriodicRunner {
 
   constructor() {
@@ -20,10 +25,6 @@ class PeriodicRunner {
       {
         method: this.runSourceAttributesUpdate,
         interval: 1000
-      },
-      {
-        method: this.runPerformanceStatsUpdate,
-        interval: 2 * 1000
       }
     ];
   }
@@ -46,10 +47,6 @@ class PeriodicRunner {
 
   runSourceAttributesUpdate() {
     SourcesService.instance.refreshSourceAttributes();
-  }
-
-  runPerformanceStatsUpdate() {
-    store.dispatch('refreshPerformanceStats');
   }
 
 };

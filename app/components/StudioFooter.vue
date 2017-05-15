@@ -22,6 +22,8 @@
 import moment from 'moment';
 import _ from 'lodash';
 import SettingsService from '../services/settings';
+import StreamingService from '../services/streaming';
+import PerformanceService from '../services/performance';
 
 export default {
 
@@ -35,6 +37,8 @@ export default {
   beforeCreate() {
     this.settingsService = SettingsService.instance;
     this.settingsService.loadSettingsIntoStore();
+    this.streamingService = StreamingService.instance;
+    this.performanceService = PerformanceService.instance;
   },
 
   mounted() {
@@ -79,12 +83,8 @@ export default {
       const confirmText = 'Are you sure you want to start streaming?';
 
       if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-        this.$store.dispatch({
-          type: 'startStreaming'
-        });
+        this.streamingService.startStreaming();
       }
-
-      this.streamElapsed = '00:00:00';
     },
 
     stopStreaming() {
@@ -92,34 +92,16 @@ export default {
       const confirmText = 'Are you sure you want to stop streaming?';
 
       if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-        this.$store.dispatch({
-          type: 'stopStreaming'
-        });
+        this.streamingService.stopStreaming();
       }
     },
 
     toggleRecording() {
       if (this.recording) {
-        this.stopRecording();
+        this.streamingService.stopRecording();
       } else {
-        this.startRecording();
+        this.streamingService.startRecording();
       }
-    },
-
-    startRecording() {
-      this.$store.dispatch({
-        type: 'startRecording'
-      });
-
-      this.recordElapsed = '00:00:00';
-    },
-
-    stopRecording() {
-      this.$store.dispatch({
-        type: 'stopRecording'
-      });
-
-      clearInterval(this.recordInterval);
     },
 
     formattedDurationSince(timestamp) {
@@ -134,7 +116,7 @@ export default {
 
   computed: {
     streaming() {
-      return this.$store.getters.isStreaming;
+      return this.streamingService.isStreaming;
     },
 
     streamStatusMsg() {
@@ -150,15 +132,15 @@ export default {
     },
 
     streamStartTime() {
-      return this.$store.getters.streamStartTime;
+      return this.streamingService.streamStartTime;
     },
 
     streamButtonLabel() {
       if (this.streaming) {
         return this.streamElapsed;
-      } else {
-        return 'Start Streaming';
       }
+
+      return 'Start Streaming';
     },
 
     elapsedStreamTime: {
@@ -169,23 +151,23 @@ export default {
     },
 
     recording() {
-      return this.$store.getters.isRecording;
+      return this.streamingService.isRecording;
     },
 
     recordStartTime() {
-      return this.$store.getters.recordStartTime;
+      return this.streamingService.recordStartTime;
     },
 
     recordButtonLabel() {
       if (this.recording) {
         return this.recordElapsed;
-      } else {
-        return 'Start Recording';
       }
+
+      return 'Start Recording';
     },
 
     streamOk() {
-      return this.$store.state.streaming.streamOk;
+      return this.streamingService.streamOk;
     },
 
     elapsedRecordTime: {
@@ -208,23 +190,23 @@ export default {
     },
 
     cpuPercent() {
-      return this.$store.state.performance.CPU;
+      return this.performanceService.state.CPU;
     },
 
     frameRate() {
-      return this.$store.state.performance.frameRate.toFixed(2);
+      return this.performanceService.state.frameRate.toFixed(2);
     },
 
     droppedFrames() {
-      return this.$store.state.performance.numberDroppedFrames;
+      return this.performanceService.state.numberDroppedFrames;
     },
 
     percentDropped() {
-      return (this.$store.state.performance.percentageDroppedFrames || 0).toFixed(1);
+      return (this.performanceService.state.percentageDroppedFrames || 0).toFixed(1);
     },
 
     bandwidth() {
-      return this.$store.state.performance.bandwidth.toFixed(0);
+      return this.performanceService.state.bandwidth.toFixed(0);
     }
   }
 
