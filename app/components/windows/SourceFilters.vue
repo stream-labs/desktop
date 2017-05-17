@@ -3,7 +3,7 @@
     :title="'Source filters (' + sourceName + ')'"
     :show-cancel="false"
     :done-handler="done"
-    :fixedSectionHeight="150"
+    :fixedSectionHeight="250"
   >
     <SourcePreview slot="fixed" :sourceName="sourceName"></SourcePreview>
 
