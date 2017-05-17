@@ -2,7 +2,7 @@
 <div class="input checkbox" :class="{disabled: !value.enabled}">
   <input
     type="checkbox"
-    :checked="value.currentValue"
+    :checked="value.value"
     :disabled="!value.enabled"
     @change="onChangeHandler"
   />
@@ -26,7 +26,7 @@ class BoolInput extends Vue {
 
   onChangeHandler(event: Event) {
     this.$emit('input', Object.assign({}, this.value, {
-      currentValue: Number(event.target['checked'])
+      value: Number(event.target['checked'])
     }));
   }
 }

@@ -26,11 +26,17 @@
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/7zip/-/7zip-0.0.6.tgz#9cafb171af82329490353b4816f03347aa150a30"
 
+"@types/electron@^1.4.37":
+  version "1.4.37"
+  resolved "https://registry.yarnpkg.com/@types/electron/-/electron-1.4.37.tgz#cfff6958f224842c1742a6e4873ed7135e5f2ff3"
+  dependencies:
+    "@types/node" "*"
+
 "@types/lodash@^4.14.64":
   version "4.14.64"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.64.tgz#979cf3a3d4a368670840bf9b3e448dc33ffe84ee"
 
-"@types/node@^7.0.18":
+"@types/node@*", "@types/node@^7.0.18":
   version "7.0.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.18.tgz#cd67f27d3dc0cfb746f0bdd5e086c4c5d55be173"
 

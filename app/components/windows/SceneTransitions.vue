@@ -54,7 +54,7 @@ export default {
   methods: {
 
     onInputHandler(value) {
-      this.$store.dispatch('setCurrentSceneTransition', { [value.name]: value.currentValue });
+      this.$store.dispatch('setCurrentSceneTransition', { [value.name]: value.value });
     },
 
     addTransition() {

@@ -4,7 +4,7 @@
   <div class="ButtonInput">
     <input
       :type="textVisible ? 'text' : 'password'"
-      :value="value.currentValue"
+      :value="value.value"
       :disabled="value.enabled === 0"
       @change="onInputHandler"
     />
@@ -41,7 +41,7 @@ class TextInput extends Vue {
 
 
   onInputHandler(event: Event) {
-    this.$emit('input', Object.assign({}, this.value, { currentValue: event.target['value'] }));
+    this.$emit('input', Object.assign({}, this.value, { value: event.target['value'] }));
   }
 
 }

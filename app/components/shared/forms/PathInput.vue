@@ -5,7 +5,7 @@
     <input
       type="text"
       ref="input"
-      :value="value.currentValue"
+      :value="value.value"
       class="PathProperty-path">
     <button
       @click="showFileDialog"
@@ -38,19 +38,18 @@ class PathInput extends Vue {
 
 
   showFileDialog() {
-
     const dialogProps: string[] = [];
 
-    if (this.value.type == 'OBS_PROPERTY_FILE') {
+    if (this.value.type === 'OBS_PROPERTY_FILE') {
       dialogProps.push('openFile');
     }
 
-    if (this.value.type == 'OBS_PROPERTY_PATH') {
+    if (this.value.type === 'OBS_PROPERTY_PATH') {
       dialogProps.push('openDirectory');
     }
 
     const paths = remote.dialog.showOpenDialog({
-      defaultPath: this.value.currentValue,
+      defaultPath: this.value.value,
       filters: this.value.filters,
       properties: dialogProps
     });
@@ -58,7 +57,7 @@ class PathInput extends Vue {
     const path = paths ? paths[0] : '';
 
     this.$refs.input.value = path;
-    this.$emit('input', Object.assign(this.value, { currentValue: path }));
+    this.$emit('input', { ...this.value, value: path });
   }
 }
 

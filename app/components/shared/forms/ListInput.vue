@@ -6,10 +6,10 @@
     @input="onInputHandler"
   >
     <option
-      v-for="possibleValue in value.values"
-      :value="getName(possibleValue)"
-      :selected="getName(possibleValue) === value.currentValue">
-      {{ getDescription(possibleValue) }}
+      v-for="possibleValue in value.options"
+      :value="possibleValue.value"
+      :selected="possibleValue.value === value.value">
+      {{ possibleValue.description }}
     </option>
   </select>
 </div>
@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IListInputValue, getListItemDescription, getListItemName } from './Input';
+import { TObsType, IListInputValue } from './Input';
 
 
 @Component
@@ -27,18 +27,15 @@ class ListInput extends Vue {
   static obsType: TObsType;
 
   @Prop()
-  value: IListInputValue<string>;
-
-  getDescription = getListItemDescription;
-  getName = getListItemName;
+  value: IListInputValue;
 
   onInputHandler(event: Event) {
     this.$emit('input', Object.assign({}, this.value, {
-      currentValue: event.target['value']
+      value: event.target['value']
     }));
   }
 
-};
+}
 
 ListInput.obsType = 'OBS_PROPERTY_LIST';
 

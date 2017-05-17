@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
+    "@types/electron": "^1.4.37",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
     "aws-sdk": "^2.43.0",

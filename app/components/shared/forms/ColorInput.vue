@@ -65,7 +65,7 @@ class ColorInput extends Vue {
   @debounce(500)
   setValue() {
     if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
-      this.$emit('input', Object.assign({}, this.value, { currentValue: this.hexRGBA }));
+      this.$emit('input', Object.assign({}, this.value, { value: this.hexRGBA }));
     }
   }
 
@@ -113,7 +113,7 @@ class ColorInput extends Vue {
 
   // This represents the actual value in the property in OBS
   get obsColor(): IColor {
-    let obsStr = this.value.currentValue;
+    let obsStr = this.value.value;
 
     return {
       hex: '#' + obsStr.substr(0, 6),

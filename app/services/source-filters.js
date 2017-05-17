@@ -1,5 +1,6 @@
 import { StatefulService } from './stateful-service';
-import SourcesService from './sources';
+import { obsValuesToInputValues, inputValuesToObsValues } from '../components/shared/forms/Input.ts';
+
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
@@ -23,14 +24,18 @@ export default class SourceFiltersService extends StatefulService {
 
 
   setProperties(sourceName, filterName, properties) {
-    for (const prop of properties) {
-      let value = prop.currentValue;
-      if (prop.type === 'OBS_PROPERTY_BOOL') {
-        value = value === 1 ? 'true' : 'false';
-      } else if (prop.type === 'OBS_PROPERTY_INT') {
-        value = String(value);
-      }
-      nodeObs.OBS_content_setSourceFilterProperty(sourceName, filterName, prop.name, { value });
+    const propertiesToSave = inputValuesToObsValues(properties, {
+      boolToString: true,
+      intToString: true
+    });
+
+    for (const prop of propertiesToSave) {
+      nodeObs.OBS_content_setSourceFilterProperty(
+        sourceName,
+        filterName,
+        prop.name,
+        { value: prop.value }
+      );
     }
   }
 
@@ -45,46 +50,39 @@ export default class SourceFiltersService extends StatefulService {
       type: {
         description: 'Filter type',
         name: 'type',
-        currentValue: this.state.availableTypes[0].type,
-        values: this.state.availableTypes.map(({ type, description }) => {
-          return { [description]: type };
+        value: this.state.availableTypes[0].type,
+        options: this.state.availableTypes.map(({ type, description }) => {
+          return { description, value: type };
         })
       },
       name: {
         description: 'Filter name',
         name: 'name',
-        currentValue: 'New filter'
+        value: 'New filter'
       }
     };
   }
 
 
   getPropertiesFormData(sourceName, filterName) {
-    const properties = nodeObs.OBS_content_getSourceFilterProperties(sourceName, filterName);
+    let properties = nodeObs.OBS_content_getSourceFilterProperties(sourceName, filterName);
     if (!properties) return [];
-    // patch currentValue for corresponding to common properties format
-    for (const property of properties) {
-      const valueObject = nodeObs.OBS_content_getSourceFilterPropertyCurrentValue(
-        sourceName, filterName, property.name
-      );
-      property.currentValue = valueObject.value;
 
-      if (property.type === 'OBS_PROPERTY_LIST') {
-        property.values = Obs.nodeObs.OBS_content_getSourceFilterPropertiesSubParameters(
-          sourceName, filterName, property.name
-        ).map(
-          ({ name, value }) => { return { [name]: value }; }
+    properties = obsValuesToInputValues(properties, {
+      valueIsObject: true,
+      boolIsString: true,
+      valueGetter: propName => {
+        return nodeObs.OBS_content_getSourceFilterPropertyCurrentValue(
+          sourceName, filterName, propName
         );
-      } else if (property.type === 'OBS_PROPERTY_BOOL') {
-        property.currentValue = property.currentValue === 'true' ? 1 : 0;
-      } else if (property.type === 'OBS_PROPERTY_PATH') {
-        if (valueObject.type === 'OBS_PATH_FILE') {
-          property.type = 'OBS_PROPERTY_FILE';
-          property.filters = SourcesService.parsePathFilters(valueObject.filter);
-        }
+      },
+      subParametersGetter: propName => {
+        return nodeObs.OBS_content_getSourceFilterPropertiesSubParameters(
+          sourceName, filterName, propName
+        );
       }
+    });
 
-    }
     return properties;
   }
 

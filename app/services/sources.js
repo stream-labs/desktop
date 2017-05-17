@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import _ from 'lodash';
+import { parsePathFilters } from '../components/shared/forms/Input.ts';
 
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
@@ -197,6 +198,12 @@ export default class SourcesService extends StatefulService {
     return parsedProperties;
   }
 
+  getPropertiesFormData(sourceId) {
+    const source = this.getSourceById(sourceId);
+    const properties = source ? source.properties : [];
+    return _.cloneDeep(properties);
+  }
+
   getPropertyValue(name, property) {
     const obj = nodeObs.OBS_content_getSourcePropertyCurrentValue(
       name,
@@ -235,47 +242,15 @@ export default class SourcesService extends StatefulService {
     }
 
     if (property.type === 'OBS_PROPERTY_PATH') {
-      obj.filter = SourcesService.parsePathFilters(obj.filter);
+      obj.filter = parsePathFilters(obj.filter);
     }
 
     if (property.type === 'OBS_PROPERTY_EDITABLE_LIST') {
-      obj.filter = SourcesService.parsePathFilters(obj.filter);
+      obj.filter = parsePathFilters(obj.filter);
     }
 
     return obj;
   }
-
-  // TODO: move this function outside the file
-  static parsePathFilters(filterStr) {
-    const filters = _.compact(filterStr.split(';;'));
-
-    // Browser source uses *.*
-    if (filterStr === '*.*') {
-      return [
-        {
-          name: 'All Files',
-          extensions: ['*']
-        }
-      ];
-    }
-
-    return filters.map(filter => {
-      const match = filter.match(/^(.*) \((.*)\)$/);
-      const desc = match[1];
-      let types = match[2].split(' ');
-
-      types = types.map(type => {
-        return type.match(/^\*\.(.+)$/)[1];
-      });
-
-      // This is the format that electron file dialogs use
-      return {
-        name: desc,
-        extensions: types
-      };
-    });
-  }
-
 
 }
 

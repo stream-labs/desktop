@@ -60,13 +60,13 @@ export default {
   methods: {
 
     done() {
-      const name = this.form.name.currentValue;
+      const name = this.form.name.value;
       this.error = this.validateName(name);
       if (this.error) return;
 
       this.sourceFiltersService.add(
         this.sourceName,
-        this.form.type.currentValue,
+        this.form.type.value,
         name
       );
 
@@ -89,8 +89,8 @@ export default {
 
 
     setTypeAsName(typeField) {
-      this.form.name.currentValue = this.state.availableTypes.find(({ type }) => {
-        return type === typeField.currentValue;
+      this.form.name.value = this.state.availableTypes.find(({ type }) => {
+        return type === typeField.value;
       }).description;
     }
   }

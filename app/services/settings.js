@@ -1,34 +1,24 @@
 import { StatefulService, mutation } from './stateful-service';
+import { obsValuesToInputValues, inputValuesToObsValues } from '../components/shared/forms/Input';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
 
 export default class SettingsService extends StatefulService {
 
-  static convertFormDataToState (settingsFormData) {
+  static convertFormDataToState(settingsFormData) {
     let settingsState = {};
     for (let groupName in settingsFormData) {
       settingsFormData[groupName].forEach(subGroup => {
         subGroup.parameters.forEach(parameter => {
           settingsState[groupName] = settingsState[groupName] || {};
-          settingsState[groupName][parameter.name] = parameter.currentValue;
+          settingsState[groupName][parameter.name] = parameter.value;
         });
       });
     }
 
     return settingsState;
   }
-
-
-  static getListItemDescription (possibleValue) {
-    return Object.keys(possibleValue)[0];
-  }
-
-
-  static getListItemName (possibleValue) {
-    return possibleValue[Object.keys(possibleValue)[0]];
-  }
-
 
   loadSettingsIntoStore() {
     // load configuration from nodeObs to state
@@ -40,13 +30,13 @@ export default class SettingsService extends StatefulService {
   }
 
 
-  getCategories () {
+  getCategories() {
     return nodeObs.OBS_settings_getListCategories();
   }
 
 
-  getSettingsFormData (categoryName) {
-    let settings = nodeObs.OBS_settings_getSettings(categoryName);
+  getSettingsFormData(categoryName) {
+    const settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
     // have not implemented them yet.
@@ -77,29 +67,26 @@ export default class SettingsService extends StatefulService {
       'RetryDelay'
     ];
 
-    // set default values for lists, and disable the blacklisted fields
-    settings.forEach(group => {
-      group.parameters.forEach(parameter => {
-        if (BLACK_LIST_NAMES.includes(parameter.name)) {
-          parameter.enabled = 0;
-        }
-
-        let needToSetDefaultValue = parameter.values && !parameter.values.find(possibleValue => {
-            if (parameter.currentValue == SettingsService.getListItemName(possibleValue)) return true;
-          });
-        if (needToSetDefaultValue) parameter.currentValue = SettingsService.getListItemName(parameter.values[0]);
+    for (const group of settings) {
+      group.parameters = obsValuesToInputValues(group.parameters, {
+        disabledFields: BLACK_LIST_NAMES,
+        transformListOptions: true
       });
-    });
+    }
+
     return settings;
   }
 
-  setSettings (categoryName, settingsData) {
+  setSettings(categoryName, settingsData) {
+    for (const subGroup of settingsData) {
+      subGroup.parameters = inputValuesToObsValues(subGroup.parameters);
+    }
     nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
-    this.SET_SETTINGS(SettingsService.convertFormDataToState({[categoryName]: settingsData}));
+    this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
   }
 
   @mutation
-  SET_SETTINGS (settingsData) {
+  SET_SETTINGS(settingsData) {
     this.patchState(settingsData);
   }
 

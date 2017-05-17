@@ -4,7 +4,7 @@
   <input
     ref="input"
     type="text"
-    :value="value.currentValue"
+    :value="value.value"
     :disabled="value.enabled === 0"
     @input="updateValue($event.target.value)"
   />
@@ -34,7 +34,7 @@ class IntInput extends Vue {
       this.$refs.input.value = formattedValue
     }
     // Emit the number value through the input event
-    this.$emit('input', Object.assign(this.value, { currentValue: Number(formattedValue) }));
+    this.$emit('input', Object.assign(this.value, { value: Number(formattedValue) }));
   }
 }
 IntInput.obsType = 'OBS_PROPERTY_INT';
