@@ -40,11 +40,17 @@ export default {
 
     if (obsInstalled) {
       const profileOptions = Obs.getObsProfiles().map(profile => {
-        return { [profile]: profile };
+        return {
+          value: profile,
+          description: profile
+        };
       });
 
       const sceneCollectionOptions = Obs.getObsSceneCollections().map(coll => {
-        return { [coll]: coll };
+        return {
+          value: coll,
+          description: coll
+        };
       });
 
       this.settingsPath = path.join(remote.app.getPath('userData'), 'startup.json');
@@ -53,12 +59,15 @@ export default {
 
       if (fs.existsSync(this.settingsPath)) {
         settings = this.loadSettings();
+
+        // Support legacy file format:
+        settings.obsMode = !!settings.obsMode;
       } else {
         // Ensure we have default settings
         settings = {
-          obsMode: 0,
-          profile: Object.keys(profileOptions[0])[0],
-          sceneCollection: Object.keys(sceneCollectionOptions[0])[0]
+          obsMode: false,
+          profile: profileOptions[0].name,
+          sceneCollection: sceneCollectionOptions[0].name
         };
 
         fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
@@ -69,20 +78,20 @@ export default {
 
         obsMode: {
           description: 'Load configuration from OBS',
-          currentValue: settings.obsMode,
+          value: settings.obsMode,
           enabled: true
         },
 
         profile: {
-          values: profileOptions,
+          options: profileOptions,
           description: 'OBS Profile',
-          currentValue: settings.profile
+          value: settings.profile
         },
 
         sceneCollection: {
-          values: sceneCollectionOptions,
+          options: sceneCollectionOptions,
           description: 'OBS Scene Collection',
-          currentValue: settings.sceneCollection
+          value: settings.sceneCollection
         }
       };
     }
@@ -99,7 +108,7 @@ export default {
 
     saveSetting(val, attr) {
       const settings = this.loadSettings();
-      settings[attr] = val.currentValue;
+      settings[attr] = val.value;
       fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
       this[attr].currentValue = val.currentValue;
     },
