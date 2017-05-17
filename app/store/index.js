@@ -5,10 +5,7 @@ import _ from 'lodash';
 // Modules
 import navigation from './modules/navigation';
 import windowOptions from './modules/windowOptions';
-import video from './modules/video';
 import sceneTransitions from './modules/sceneTransitions';
-
-import Obs from '../api/Obs';
 
 // Stateful Services
 import ScenesService from '../services/scenes';
@@ -87,7 +84,6 @@ export default new Vuex.Store({
   modules: {
     navigation,
     windowOptions,
-    video,
     sceneTransitions,
     ...statefulServiceModules
   },

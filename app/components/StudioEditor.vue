@@ -10,16 +10,24 @@
 
 <script>
 import _ from 'lodash';
-import Obs from '../api/Obs';
 import DragHandler from '../util/DragHandler';
 import ScenesService from '../services/scenes';
+import VideoService from '../services/video';
 
 const { webFrame, screen } = window.require('electron');
 
 export default {
 
   mounted() {
-    Obs.createDisplay('Main Window');
+    this.obsDisplay = VideoService.instance.createDisplay();
+
+    this.obsDisplay.onOutputResize(outputRegion => {
+      this.renderedWidth = outputRegion.width;
+      this.renderedHeight = outputRegion.height;
+      this.renderedOffsetX = outputRegion.x;
+      this.renderedOffsetY = outputRegion.y;
+    });
+
     this.onResize();
 
     window.addEventListener('resize', this.onResize);
@@ -28,7 +36,17 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
-    Obs.destroyDisplay('Main Window');
+    this.obsDisplay.destroy();
+  },
+
+  data() {
+    return {
+      renderedWidth: 0,
+      renderedHeight: 0,
+
+      renderedOffsetX: 0,
+      renderedOffsetY: 0
+    }
   },
 
   methods: {
@@ -37,19 +55,15 @@ export default {
       const rect = display.getBoundingClientRect();
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
-      Obs.resizeDisplay(
-        'Main Window',
+      this.obsDisplay.resize(
         rect.width * factor,
         rect.height * factor
       );
 
-      Obs.moveDisplay(
-        'Main Window',
+      this.obsDisplay.move(
         rect.left * factor,
         rect.top * factor
       );
-
-      this.$store.dispatch('updateDisplayOutputRegion');
     },
 
     /*****************
@@ -96,7 +110,7 @@ export default {
     },
 
     startDragging(event) {
-      this.dragHandler = new DragHandler(event);
+      this.dragHandler = new DragHandler(event, this.obsDisplay);
     },
 
     startResizing(event, region) {
@@ -319,27 +333,11 @@ export default {
     },
 
     baseWidth() {
-      return this.$store.state.video.width;
+      return VideoService.instance.baseWidth;
     },
 
     baseHeight() {
-      return this.$store.state.video.height;
-    },
-
-    renderedWidth() {
-      return this.$store.state.video.displayOutputRegion.width;
-    },
-
-    renderedHeight() {
-      return this.$store.state.video.displayOutputRegion.height;
-    },
-
-    renderedOffsetX() {
-      return this.$store.state.video.displayOutputRegion.x;
-    },
-
-    renderedOffsetY() {
-      return this.$store.state.video.displayOutputRegion.y;
+      return VideoService.instance.baseHeight;
     },
 
     // Using a computed property since it is cached

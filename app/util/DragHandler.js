@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import SettingsService from '../services/settings';
 import ScenesService from '../services/scenes';
-import store from '../store';
+import VideoService from '../services/video';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -9,7 +9,8 @@ const { webFrame, screen } = window.require('electron');
 class DragHandler {
 
   // startEvent: The mousedown event that started the drag
-  constructor(startEvent) {
+  // display: The OBS display object we are operating on
+  constructor(startEvent, display) {
     this.settingsService = SettingsService.instance;
 
     // Load some settings we care about
@@ -20,10 +21,10 @@ class DragHandler {
     this.centerSnapping = this.settingsService.state.General.CenterSnapping;
 
     // Load some attributes about the video canvas
-    this.baseWidth = store.state.video.width;
-    this.baseHeight = store.state.video.height;
-    this.renderedWidth = store.state.video.displayOutputRegion.width;
-    this.renderedHeight = store.state.video.displayOutputRegion.height;
+    this.baseWidth = VideoService.instance.baseWidth;
+    this.baseHeight = VideoService.instance.baseHeight;
+    this.renderedWidth = display.outputRegion.width;
+    this.renderedHeight = display.outputRegion.height;
     this.scaleFactor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
     this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
       this.renderedWidth;
