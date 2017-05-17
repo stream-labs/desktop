@@ -19,17 +19,18 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType } from './Input';
+import { IPathInputValue, TObsType } from './Input';
 
 const { remote } = window['require']('electron');
 
 @Component
 class PathInput extends Vue {
 
-  static obsType: TObsType;
+  static obsType: TObsType[];
 
   @Prop()
-  value: IInputValue<string>;
+  value: IPathInputValue;
+
 
   $refs: {
     input: HTMLInputElement
@@ -37,18 +38,32 @@ class PathInput extends Vue {
 
 
   showFileDialog() {
-    const dialog = remote.dialog as any;
-    let path = remote.dialog.showOpenDialog({
+
+    const dialogProps: string[] = [];
+
+    if (this.value.type == 'OBS_PROPERTY_FILE') {
+      dialogProps.push('openFile');
+    }
+
+    if (this.value.type == 'OBS_PROPERTY_PATH') {
+      dialogProps.push('openDirectory');
+    }
+
+    const paths = remote.dialog.showOpenDialog({
       defaultPath: this.value.currentValue,
-      properties: ['openDirectory']
-    })[0];
+      filters: this.value.filters,
+      properties: dialogProps
+    });
+
+    const path = paths ? paths[0] : '';
 
     this.$refs.input.value = path;
-    this.$emit('input', Object.assign(this.value, {currentValue: path}))
+    this.$emit('input', Object.assign(this.value, { currentValue: path }));
   }
 }
 
-PathInput.obsType = 'OBS_PROPERTY_PATH';
+PathInput.obsType = ['OBS_PROPERTY_PATH', 'OBS_PROPERTY_FILE'];
+
 export default PathInput;
 </script>
 

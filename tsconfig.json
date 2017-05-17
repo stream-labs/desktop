@@ -17,6 +17,7 @@
     "allowSyntheticDefaultImports": true,
 
     "outDir": "bundles/ts",
+    "sourceMap": true,
     "allowJs": true,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true

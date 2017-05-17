@@ -1,4 +1,5 @@
 import { StatefulService } from './stateful-service';
+import SourcesService from './sources';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
@@ -63,9 +64,11 @@ export default class SourceFiltersService extends StatefulService {
     if (!properties) return [];
     // patch currentValue for corresponding to common properties format
     for (const property of properties) {
-      property.currentValue = nodeObs.OBS_content_getSourceFilterPropertyCurrentValue(
+      const valueObject = nodeObs.OBS_content_getSourceFilterPropertyCurrentValue(
         sourceName, filterName, property.name
-      ).value;
+      );
+      property.currentValue = valueObject.value;
+
       if (property.type === 'OBS_PROPERTY_LIST') {
         property.values = Obs.nodeObs.OBS_content_getSourceFilterPropertiesSubParameters(
           sourceName, filterName, property.name
@@ -74,7 +77,13 @@ export default class SourceFiltersService extends StatefulService {
         );
       } else if (property.type === 'OBS_PROPERTY_BOOL') {
         property.currentValue = property.currentValue === 'true' ? 1 : 0;
+      } else if (property.type === 'OBS_PROPERTY_PATH') {
+        if (valueObject.type === 'OBS_PATH_FILE') {
+          property.type = 'OBS_PROPERTY_FILE';
+          property.filters = SourcesService.parsePathFilters(valueObject.filter);
+        }
       }
+
     }
     return properties;
   }

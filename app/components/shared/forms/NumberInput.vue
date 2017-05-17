@@ -19,7 +19,7 @@ import { IInputValue, TObsType } from './Input';
 @Component
 class NumberInput extends Vue {
 
-  static obsType: TObsType;
+  static obsType: TObsType[];
 
   @Prop()
   value: IInputValue<number>;

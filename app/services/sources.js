@@ -235,17 +235,18 @@ export default class SourcesService extends StatefulService {
     }
 
     if (property.type === 'OBS_PROPERTY_PATH') {
-      obj.filter = this.parsePathFilters(obj.filter);
+      obj.filter = SourcesService.parsePathFilters(obj.filter);
     }
 
     if (property.type === 'OBS_PROPERTY_EDITABLE_LIST') {
-      obj.filter = this.parsePathFilters(obj.filter);
+      obj.filter = SourcesService.parsePathFilters(obj.filter);
     }
 
     return obj;
   }
 
-  parsePathFilters(filterStr) {
+  // TODO: move this function outside the file
+  static parsePathFilters(filterStr) {
     const filters = _.compact(filterStr.split(';;'));
 
     // Browser source uses *.*
