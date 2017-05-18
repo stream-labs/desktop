@@ -11,11 +11,12 @@
         :interval="value.stepVal"
         :speed="0"
         :height="4"
-        :tooltipDir="['bottom','bottom']"
+        :tooltip="false"
       />
       <div class="slider-label slider-label-left">{{ value.minVal }}</div>
       <div class="slider-label slider-label-right">{{ value.maxVal }}</div>
     </div>
+    <input type="text" readonly :value="value.value"/>
   </div>
 </template>
 
@@ -53,7 +54,11 @@
   .SliderInput {
     position: relative;
 
-    .slider-container { height: 45px }
+    .slider-container {
+      height: 45px;
+      margin-right: 50px;
+      position: relative;
+    }
 
     .slider-label {
       position: absolute;
@@ -85,17 +90,16 @@
       }
     }
 
-    .vue-slider-tooltip {
-      font-size: 13px !important;
-      bottom: -3px !important;
-      background-color: white !important;
-      border: 1px solid @input-border-color !important;
-      padding: 0 5px !important;
-      border-radius: 2px !important;
-      color: inherit !important;
-      &:before {
-        display: none !important; // hide arrow
-      }
+    input {
+      position: absolute;
+      top: 23px;
+      right: 0;
+      width: 45px;
+      height: 20px;
+      padding: 0 4px;
+      border-radius: 2px;
+      text-align: right;
+      cursor: default;
     }
   }
 
