@@ -243,11 +243,21 @@ const nodeObsVirtualMethods = {
 
 };
 
+// These are called constantly and dirty up the logs.
+// They can be commented out of this list on the rare
+// occasional that they are useful in the log output.
+const filteredObsApiMethods = [
+  'OBS_content_getSourceSize',
+  'OBS_content_getSourceFlags',
+  'OBS_API_getPerformanceStatistics'
+];
+
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
   let retVal;
+  const shouldLog = !filteredObsApiMethods.includes(data.method);
 
-  console.log('OBS API CALL', data);
+  if (shouldLog) console.log('OBS API CALL', data);
 
   const mappedArgs = data.args.map(arg => {
     const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
@@ -270,7 +280,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
     retVal = obs[data.method].apply(obs, mappedArgs);
   }
 
-  console.log('OBS RETURN VALUE', retVal);
+  if (shouldLog) console.log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.
