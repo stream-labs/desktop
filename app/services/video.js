@@ -78,7 +78,6 @@ export default class VideoService extends Service {
   }
 
   get baseWidth() {
-    console.log("BASE WIDTH");
     return this.baseResolution.width;
   }
 
