@@ -4923,6 +4923,10 @@ vue-property-decorator@^5.0.1:
     reflect-metadata "^0.1.9"
     vue-class-component "^5.0.0"
 
+vue-slider-component@^2.2.7:
+  version "2.2.7"
+  resolved "https://registry.yarnpkg.com/vue-slider-component/-/vue-slider-component-2.2.7.tgz#2551696ad01f3246ba48e6cdbb4b4cb70bcc52d6"
+
 vue-style-loader@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/vue-style-loader/-/vue-style-loader-2.0.3.tgz#b464ffb6279702d4137a80ac81b5c12ac440f0a0"

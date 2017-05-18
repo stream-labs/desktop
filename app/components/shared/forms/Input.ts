@@ -1,4 +1,3 @@
-import { Dictionary } from 'lodash';
 import _ from 'lodash';
 
 export declare type TObsType =
@@ -11,7 +10,8 @@ export declare type TObsType =
   'OBS_PROPERTY_UINT' |
   'OBS_PROPERTY_COLOR' |
   'OBS_PROPERTY_DOUBLE' |
-  'OBS_PROPERTY_FLOAT';
+  'OBS_PROPERTY_FLOAT' |
+  'OBS_PROPERTY_SLIDER';
 
 export declare type TObsValue = number | string | boolean;
 
@@ -34,7 +34,13 @@ export interface IListInputValue extends IInputValue<string> {
 }
 
 export interface IPathInputValue extends IInputValue<string> {
-  filters: IElectronOpenDialogFilter[]
+  filters: IElectronOpenDialogFilter[];
+}
+
+export interface ISliderInputValue extends IInputValue<number> {
+  minVal: number;
+  maxVal: number;
+  stepVal: number;
 }
 
 export interface IElectronOpenDialogFilter {
@@ -82,7 +88,7 @@ interface IObsFetchOptions {
   boolIsString?: boolean;
   transformListOptions?: boolean;
   subParametersGetter?: (propName: string) => Dictionary<any>[];
-  valueGetter?: (propName: string) => any
+  valueGetter?: (propName: string) => any;
 }
 
 export function obsValuesToInputValues(
@@ -112,7 +118,7 @@ export function obsValuesToInputValues(
       prop.enabled = false;
     }
 
-    if (obsProp.type == 'OBS_PROPERTY_LIST') {
+    if (obsProp.type === 'OBS_PROPERTY_LIST') {
       const listOptions: any[] = [];
 
       if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
@@ -136,8 +142,20 @@ export function obsValuesToInputValues(
       (<any>prop).options = listOptions;
 
     } else if (obsProp.type === 'OBS_PROPERTY_BOOL') {
+
       if (options.boolIsString) prop.value = prop.value === 'true';
 
+    } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
+      if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
+        prop.type = 'OBS_PROPERTY_SLIDER';
+        prop = {
+          ...prop,
+          type: 'OBS_PROPERTY_SLIDER',
+          minVal: Number(obsProp.minVal),
+          maxVal: Number(obsProp.maxVal),
+          stepVal: Number(obsProp.stepVal)
+        } as ISliderInputValue
+      }
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
 
       if (valueObject && valueObject.type === 'OBS_PATH_FILE') {
