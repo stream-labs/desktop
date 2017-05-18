@@ -82,9 +82,16 @@ export default {
       const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
       const confirmText = 'Are you sure you want to start streaming?';
 
-      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-        this.streamingService.startStreaming();
+      if (shouldConfirm && !confirm(confirmText)) return;
+
+      const blankStreamKey = !this.settingsService.state.Stream.key;
+
+      if (blankStreamKey) {
+        alert('No stream key has been entered. Please check your settings and add a valid stream key.');
+        return;
       }
+
+      this.streamingService.startStreaming();
     },
 
     stopStreaming() {
