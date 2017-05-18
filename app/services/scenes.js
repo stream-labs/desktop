@@ -218,18 +218,21 @@ export default class ScenesService extends StatefulService {
   }
 
   setSourcePosition(sceneId, sourceId, x, y) {
+    const scene = this.getSceneById(sceneId);
     const source = this.getMergedSource(sceneId, sourceId);
 
-    nodeObs.OBS_content_setSourcePosition(source.name, x.toString(), y.toString());
+    nodeObs.OBS_content_setSourcePosition(scene.name, source.name, x.toString(), y.toString());
     this.SET_SOURCE_POSITION(sceneId, sourceId, x, y);
   }
 
   setSourcePositionAndScale(sceneId, sourceId, x, y, scaleX, scaleY) {
+    const scene = this.getSceneById(sceneId);
     const source = this.getMergedSource(sceneId, sourceId);
 
     // Uses a virtual node-obs function to set position and
     // scale atomically.  This is required for smooth resizing.
     nodeObs.OBS_content_setSourcePositionAndScale(
+      scene.name,
       source.name,
       x.toString(),
       y.toString(),
@@ -272,10 +275,11 @@ export default class ScenesService extends StatefulService {
   }
 
   loadSourcePositionAndScale(sceneId, sourceId) {
+    const scene = this.getSceneById(sceneId);
     const source = this.getMergedSource(sceneId, sourceId);
 
-    const position = nodeObs.OBS_content_getSourcePosition(source.name);
-    const scale = nodeObs.OBS_content_getSourceScaling(source.name);
+    const position = nodeObs.OBS_content_getSourcePosition(scene.name, source.name);
+    const scale = nodeObs.OBS_content_getSourceScaling(scene.name, source.name);
 
     this.SET_SOURCE_POSITION(sceneId, sourceId, position.x, position.y);
     this.SET_SOURCE_SCALE(sceneId, sourceId, scale.x, scale.y);

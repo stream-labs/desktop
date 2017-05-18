@@ -230,9 +230,9 @@ const nodeObsVirtualMethods = {
 
   // This needs to be done as a single IPC call, otherwise
   // there is visible judder in the display output.
-  OBS_content_setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
-    obs.OBS_content_setSourcePosition(name, x, y);
-    obs.OBS_content_setSourceScaling(name, scaleX, scaleY);
+  OBS_content_setSourcePositionAndScale(sceneName, sourceName, x, y, scaleX, scaleY) {
+    obs.OBS_content_setSourcePosition(sceneName, sourceName, x, y);
+    obs.OBS_content_setSourceScaling(sceneName, sourceName, scaleX, scaleY);
   },
 
   OBS_test_callbackProxy(num, cb) {
