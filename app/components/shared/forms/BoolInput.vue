@@ -11,23 +11,16 @@
 </template>
 
 <script lang="ts">
-
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType } from './Input';
+import { Component } from 'vue-property-decorator';
+import { Input, IInputValue, TObsType } from './Input';
 
 @Component
-class BoolInput extends Vue {
+class BoolInput extends Input<IInputValue<boolean>> {
 
   static obsType: TObsType;
 
-  @Prop()
-  value: IInputValue<Boolean>;
-
   onChangeHandler(event: Event) {
-    this.$emit('input', Object.assign({}, this.value, {
-      value: Number(event.target['checked'])
-    }));
+    this.emitInput({ ...this.value, value: !!event.target['checked'] });
   }
 }
 

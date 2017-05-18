@@ -21,11 +21,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType } from './Input';
+import { IInputValue, TObsType, Input } from './Input';
 
 
 @Component
-class TextInput extends Vue {
+class TextInput extends Input<IInputValue<string>> {
 
   static obsType: TObsType;
 
@@ -41,7 +41,7 @@ class TextInput extends Vue {
 
 
   onInputHandler(event: Event) {
-    this.$emit('input', Object.assign({}, this.value, { value: event.target['value'] }));
+    this.emitInput({ ...this.value, value: event.target['value'] });
   }
 
 }

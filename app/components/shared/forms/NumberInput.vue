@@ -12,12 +12,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType } from './Input';
+import { IInputValue, TObsType, Input } from './Input';
 
 @Component
-class NumberInput extends Vue {
+class NumberInput extends Input<IInputValue<number>> {
 
   static obsType: TObsType[];
 
@@ -35,7 +34,7 @@ class NumberInput extends Vue {
       this.$refs.input.value = formattedValue;
     }
     // Emit the number value through the input event
-    this.$emit('input', Object.assign(this.value, { value: Number(formattedValue) }));
+    this.emitInput({ ...this.value, value: Number(formattedValue) });
   }
 }
 NumberInput.obsType = ['OBS_PROPERTY_DOUBLE', 'OBS_PROPERTY_FLOAT'];

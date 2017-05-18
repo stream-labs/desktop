@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import Vue from 'vue';
+import { Prop } from "vue-property-decorator";
 
 export declare type TObsType =
   'OBS_PROPERTY_BOOL' |
@@ -200,4 +202,15 @@ export function inputValuesToObsValues(
     obsProp.value = obsProp.currentValue;
   }
   return obsProps;
+}
+
+export class Input<TValueType> extends Vue {
+
+  @Prop()
+  value: TValueType;
+
+  emitInput(eventData: TValueType) {
+    this.$emit('input', eventData);
+  }
+
 }

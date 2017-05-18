@@ -22,10 +22,9 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import Vue from 'vue';
 import { Component, Watch, Prop } from 'vue-property-decorator';
 import { debounce } from 'lodash-decorators';
-import { TObsType, IInputValue } from './Input';
+import { TObsType, IInputValue, Input } from './Input';
 const VueColor = require('vue-color');
 
 interface IColor {
@@ -37,7 +36,7 @@ interface IColor {
 @Component({
   components: { ColorPicker: VueColor.Sketch }
 })
-class ColorInput extends Vue {
+class ColorInput extends Input<IInputValue<string>> {
 
   static obsType: TObsType;
 
@@ -65,7 +64,7 @@ class ColorInput extends Vue {
   @debounce(500)
   setValue() {
     if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
-      this.$emit('input', Object.assign({}, this.value, { value: this.hexRGBA }));
+      this.emitInput({ ...this.value, value: this.hexRGBA });
     }
   }
 

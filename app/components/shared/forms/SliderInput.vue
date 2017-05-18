@@ -21,16 +21,15 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue';
   import vueSlider from 'vue-slider-component';
   import { throttle } from 'lodash-decorators';
   import { Component, Prop } from 'vue-property-decorator';
-  import { ISliderInputValue, TObsType } from './Input';
+  import { ISliderInputValue, TObsType, Input } from './Input';
 
   @Component({
     components: { vueSlider }
   })
-  class SliderInput extends Vue {
+  class SliderInput extends Input<ISliderInputValue> {
 
     static obsType: TObsType;
 
@@ -39,7 +38,7 @@
 
     @throttle(100)
     onInputHandler(value: number) {
-      this.$emit('input', { ...this.value, value });
+      this.emitInput({ ...this.value, value });
     }
   }
   SliderInput.obsType = 'OBS_PROPERTY_SLIDER';

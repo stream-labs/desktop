@@ -16,13 +16,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IListInputValue } from './Input';
+import { TObsType, IListInputValue, Input } from './Input';
 
 
 @Component
-class ListInput extends Vue {
+class ListInput extends Input<IListInputValue> {
 
   static obsType: TObsType;
 
@@ -30,9 +29,7 @@ class ListInput extends Vue {
   value: IListInputValue;
 
   onInputHandler(event: Event) {
-    this.$emit('input', Object.assign({}, this.value, {
-      value: event.target['value']
-    }));
+    this.emitInput({ ...this.value, value: event.target['value'] });
   }
 
 }
