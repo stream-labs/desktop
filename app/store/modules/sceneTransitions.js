@@ -122,7 +122,7 @@ const getters = {
     };
   },
 
-  sceneTransitionsPropertiesFormData(state) {
+  sceneTransitionsPropertiesFormData: (state) => () => {
     const transitionName = state.currentName;
     let properties = Obs.getSceneTransitionProperties(transitionName);
     if (!properties) return [];
