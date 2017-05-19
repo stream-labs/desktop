@@ -2,7 +2,7 @@
 <div class="input checkbox" :class="{disabled: !value.enabled}">
   <input
     type="checkbox"
-    :checked="value.currentValue"
+    :checked="value.value"
     :disabled="!value.enabled"
     @change="onChangeHandler"
   />
@@ -10,19 +10,19 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import { Component } from 'vue-property-decorator';
+import { Input, IInputValue, TObsType } from './Input';
 
-import Input from './Input.vue';
+@Component
+class BoolInput extends Input<IInputValue<boolean>> {
 
-const BoolInput = Input.extend({
-  methods: {
-    onChangeHandler(event) {
-      this.$emit('input', Object.assign({}, this.value, {
-        currentValue: Number(event.target.checked)
-      }));
-    }
+  static obsType: TObsType;
+
+  onChangeHandler(event: Event) {
+    this.emitInput({ ...this.value, value: !!event.target['checked'] });
   }
-});
+}
 
 BoolInput.obsType = 'OBS_PROPERTY_BOOL';
 

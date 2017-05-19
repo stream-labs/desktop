@@ -209,6 +209,17 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   });
 });
 
+
+
+// Handle service initialization
+const servicesInitialized = new Set();
+
+ipcMain.on('services-shouldInit', (event, service) => {
+  event.returnValue = !servicesInitialized.has(service);
+  servicesInitialized.add(service);
+});
+
+
 // Virtual node OBS calls:
 //
 // These are methods that appear upstream to be OBS
@@ -219,26 +230,57 @@ const nodeObsVirtualMethods = {
 
   // This needs to be done as a single IPC call, otherwise
   // there is visible judder in the display output.
-  OBS_content_setSourcePositionAndScale(name, x, y, scaleX, scaleY) {
-    obs.OBS_content_setSourcePosition(name, x, y);
-    obs.OBS_content_setSourceScaling(name, scaleX, scaleY);
+  OBS_content_setSourcePositionAndScale(sceneName, sourceName, x, y, scaleX, scaleY) {
+    obs.OBS_content_setSourcePosition(sceneName, sourceName, x, y);
+    obs.OBS_content_setSourceScaling(sceneName, sourceName, scaleX, scaleY);
+  },
+
+  OBS_test_callbackProxy(num, cb) {
+    setTimeout(() => {
+      cb(num + 1);
+    }, 5000);
   }
 
 };
 
+// These are called constantly and dirty up the logs.
+// They can be commented out of this list on the rare
+// occasional that they are useful in the log output.
+const filteredObsApiMethods = [
+  'OBS_content_getSourceSize',
+  'OBS_content_getSourceFlags',
+  'OBS_API_getPerformanceStatistics'
+];
+
 // Proxy node OBS calls
 ipcMain.on('obs-apiCall', (event, data) => {
   let retVal;
+  const shouldLog = !filteredObsApiMethods.includes(data.method);
 
-  console.log('OBS API CALL', data);
+  if (shouldLog) console.log('OBS API CALL', data);
+
+  const mappedArgs = data.args.map(arg => {
+    const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
+
+    if (isCallbackPlaceholder) {
+      return (...args) => {
+        event.sender.send('obs-apiCallback', {
+          id: arg.id,
+          args
+        });
+      };
+    }
+
+    return arg;
+  });
 
   if (nodeObsVirtualMethods[data.method]) {
-    retVal = nodeObsVirtualMethods[data.method].apply(null, data.args);
+    retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
   } else {
-    retVal = obs[data.method].apply(obs, data.args);
+    retVal = obs[data.method].apply(obs, mappedArgs);
   }
 
-  console.log('OBS RETURN VALUE', retVal);
+  if (shouldLog) console.log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.

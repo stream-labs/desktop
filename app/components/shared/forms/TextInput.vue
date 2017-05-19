@@ -4,7 +4,7 @@
   <div class="ButtonInput">
     <input
       :type="textVisible ? 'text' : 'password'"
-      :value="value.currentValue"
+      :value="value.value"
       :disabled="value.enabled === 0"
       @change="onInputHandler"
     />
@@ -18,29 +18,33 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType, Input } from './Input';
 
-let TextInput = Input.extend({
 
-  data() {
-    return {
-      textVisible: !this.value.masked
-    };
-  },
+@Component
+class TextInput extends Input<IInputValue<string>> {
 
-  methods: {
-    toggleVisible() {
-      this.textVisible = !this.textVisible;
-    },
+  static obsType: TObsType;
 
-    onInputHandler(event) {
-      this.$emit('input', Object.assign({}, this.value, { currentValue: event.target.value }));
-    }
+  @Prop()
+  value: IInputValue<string>;
 
+  textVisible = !this.value.masked;
+
+
+  toggleVisible() {
+    this.textVisible = !this.textVisible;
   }
 
-});
+
+  onInputHandler(event: Event) {
+    this.emitInput({ ...this.value, value: event.target['value'] });
+  }
+
+}
 TextInput.obsType = 'OBS_PROPERTY_EDIT_TEXT';
 export default TextInput;
 

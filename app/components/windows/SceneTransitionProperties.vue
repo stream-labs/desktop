@@ -31,7 +31,7 @@
 
     data() {
       return {
-        properties: this.$store.getters.sceneTransitionsPropertiesFormData
+        properties: this.$store.getters.sceneTransitionsPropertiesFormData()
       };
     },
 

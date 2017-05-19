@@ -10,15 +10,24 @@
 
 <script>
 import _ from 'lodash';
-import Obs from '../api/Obs';
 import DragHandler from '../util/DragHandler';
+import ScenesService from '../services/scenes';
+import VideoService from '../services/video';
 
-const { webFrame, screen, remote } = window.require('electron');
+const { webFrame, screen } = window.require('electron');
 
 export default {
 
   mounted() {
-    Obs.createDisplay('Main Window');
+    this.obsDisplay = VideoService.instance.createDisplay();
+
+    this.obsDisplay.onOutputResize(outputRegion => {
+      this.renderedWidth = outputRegion.width;
+      this.renderedHeight = outputRegion.height;
+      this.renderedOffsetX = outputRegion.x;
+      this.renderedOffsetY = outputRegion.y;
+    });
+
     this.onResize();
 
     window.addEventListener('resize', this.onResize);
@@ -27,7 +36,17 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
 
-    Obs.destroyDisplay('Main Window');
+    this.obsDisplay.destroy();
+  },
+
+  data() {
+    return {
+      renderedWidth: 0,
+      renderedHeight: 0,
+
+      renderedOffsetX: 0,
+      renderedOffsetY: 0
+    }
   },
 
   methods: {
@@ -36,19 +55,15 @@ export default {
       const rect = display.getBoundingClientRect();
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
 
-      Obs.resizeDisplay(
-        'Main Window',
+      this.obsDisplay.resize(
         rect.width * factor,
         rect.height * factor
       );
 
-      Obs.moveDisplay(
-        'Main Window',
+      this.obsDisplay.move(
         rect.left * factor,
         rect.top * factor
       );
-
-      this.$store.dispatch('updateDisplayOutputRegion');
     },
 
     /*****************
@@ -76,28 +91,26 @@ export default {
 
       if (overSource) {
         // Make this source active
-        this.$store.dispatch({
-          type: 'makeSourceActive',
-          sceneName: this.$store.getters.activeSceneName,
-          sourceId: overSource.id
-        });
+        ScenesService.instance.makeSourceActive(
+          ScenesService.instance.activeSceneId,
+          overSource.id
+        );
 
         // Start dragging it
         this.startDragging(event);
       } else {
         // Deselect all sources
-        this.$store.dispatch({
-          type: 'makeSourceActive',
-          sceneName: this.$store.getters.activeSceneName,
-          sourceId: null
-        });
+        ScenesService.instance.makeSourceActive(
+          ScenesService.instance.activeSceneId,
+          null
+        );
       }
 
       this.updateCursor(event);
     },
 
     startDragging(event) {
-      this.dragHandler = new DragHandler(event);
+      this.dragHandler = new DragHandler(event, this.obsDisplay);
     },
 
     startResizing(event, region) {
@@ -196,14 +209,14 @@ export default {
         clamped = true;
       }
 
-      this.$store.dispatch({
-        type: 'setSourcePositionAndScale',
-        sourceId: source.id,
-        x: source.x - ((!clamped && moveX && pixelsX) || 0),
-        y: source.y - ((!clamped && moveY && pixelsY) || 0),
-        scaleX: newScaleX,
-        scaleY: newScaleY
-      });
+      ScenesService.instance.setSourcePositionAndScale(
+        ScenesService.instance.activeSceneId,
+        source.id,
+        source.x - ((!clamped && moveX && pixelsX) || 0),
+        source.y - ((!clamped && moveY && pixelsY) || 0),
+        newScaleX,
+        newScaleY
+      );
     },
 
     updateCursor(event) {
@@ -266,8 +279,8 @@ export default {
         event,
         source.x,
         source.y,
-        source.width * source.scaleX,
-        source.height * source.scaleY
+        source.scaledWidth,
+        source.scaledHeight
       );
     },
 
@@ -305,50 +318,26 @@ export default {
 
   computed: {
     activeSource() {
-      const activeSource = this.$store.getters.activeSource;
-
-      if (activeSource && activeSource.video) {
-        return activeSource;
-      }
-
-      return null;
+      return ScenesService.instance.activeSource;
     },
 
     sources() {
-      if (this.$store.getters.activeScene) {
-        return _.map(this.$store.getters.activeScene.sources, sourceId => {
-          return this.$store.state.sources.sources[sourceId];
-        }).filter(source => {
+      if (ScenesService.instance.activeSceneId) {
+        return ScenesService.instance.sources.filter(source => {
           // We only care about sources with video
           return source.video;
         });
       }
 
-      return null;
+      return [];
     },
 
     baseWidth() {
-      return this.$store.state.video.width;
+      return VideoService.instance.baseWidth;
     },
 
     baseHeight() {
-      return this.$store.state.video.height;
-    },
-
-    renderedWidth() {
-      return this.$store.state.video.displayOutputRegion.width;
-    },
-
-    renderedHeight() {
-      return this.$store.state.video.displayOutputRegion.height;
-    },
-
-    renderedOffsetX() {
-      return this.$store.state.video.displayOutputRegion.x;
-    },
-
-    renderedOffsetY() {
-      return this.$store.state.video.displayOutputRegion.y;
+      return VideoService.instance.baseHeight;
     },
 
     // Using a computed property since it is cached
@@ -375,7 +364,7 @@ export default {
         },
         {
           name: 'n',
-          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
+          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -383,7 +372,7 @@ export default {
         },
         {
           name: 'ne',
-          x: (source.x + (source.width * source.scaleX)) - regionRadius,
+          x: (source.x + source.scaledWidth) - regionRadius,
           y: source.y - regionRadius,
           width,
           height,
@@ -391,24 +380,24 @@ export default {
         },
         {
           name: 'e',
-          x: (source.x + (source.width * source.scaleX)) - regionRadius,
-          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
+          x: (source.x + source.scaledWidth) - regionRadius,
+          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: (source.x + (source.width * source.scaleX)) - regionRadius,
-          y: (source.y + (source.height * source.scaleY)) - regionRadius,
+          x: (source.x + source.scaledWidth) - regionRadius,
+          y: (source.y + source.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: (source.x + ((source.width * source.scaleX) / 2)) - regionRadius,
-          y: (source.y + (source.height * source.scaleY)) - regionRadius,
+          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
+          y: (source.y + source.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
@@ -416,7 +405,7 @@ export default {
         {
           name: 'sw',
           x: source.x - regionRadius,
-          y: (source.y + (source.height * source.scaleY)) - regionRadius,
+          y: (source.y + source.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
@@ -424,7 +413,7 @@ export default {
         {
           name: 'w',
           x: source.x - regionRadius,
-          y: (source.y + ((source.height * source.scaleY) / 2)) - regionRadius,
+          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'

@@ -28,6 +28,7 @@ import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
+import ScenesService from '../../services/scenes';
 
 export default {
 
@@ -49,17 +50,13 @@ export default {
       if (this.isTaken(this.name)) {
         this.error = 'That name is already taken';
       } else {
-        this.$store.dispatch({
-          type: 'createNewScene',
-          sceneName: this.name
-        });
-
+        ScenesService.instance.createScene(this.name);
         windowManager.closeWindow();
       }
     },
 
     isTaken(name) {
-      return this.$store.getters.sceneByName(name);
+      return ScenesService.instance.getSceneByName(name);
     }
   }
 

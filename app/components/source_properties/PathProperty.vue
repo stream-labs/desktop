@@ -16,11 +16,12 @@
 </template>
 
 <script>
-const { remote } = window.require('electron');
-import _ from 'lodash';
-
 import Property from './Property.vue';
-let PathProperty = Property.extend({
+import SourcesService from '../../services/sources';
+
+const { remote } = window.require('electron');
+
+const PathProperty = Property.extend({
 
   methods: {
     showFileDialog() {
@@ -54,13 +55,10 @@ let PathProperty = Property.extend({
     },
 
     setPath(path) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          value: path
-        }
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        { value: path }
+      );
     }
   },
 

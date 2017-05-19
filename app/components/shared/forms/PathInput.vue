@@ -5,7 +5,7 @@
     <input
       type="text"
       ref="input"
-      :value="value.currentValue"
+      :value="value.value"
       class="PathProperty-path">
     <button
       @click="showFileDialog"
@@ -16,26 +16,53 @@
 </div>
 </template>
 
-<script>
-import Input from './Input.vue';
-const { remote } = window.require('electron');
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IPathInputValue, TObsType, Input } from './Input';
+import electron from '../../../vendor/electron';
+import OpenDialogOptions = Electron.OpenDialogOptions;
 
-let PathInput = Input.extend({
+@Component
+class PathInput extends Input<IPathInputValue> {
 
-  methods: {
-    showFileDialog() {
-      let path = remote.dialog.showOpenDialog({
-        defaultPath: this.value.currentValue,
-        properties: ['openDirectory']
-      })[0];
+  static obsType: TObsType[];
 
-      this.$refs.input.value = path;
-      this.$emit('input', Object.assign(this.value, {currentValue: path}))
+  @Prop()
+  value: IPathInputValue;
+
+
+  $refs: {
+    input: HTMLInputElement
+  };
+
+
+  showFileDialog() {
+
+    const options: OpenDialogOptions = {
+      defaultPath: this.value.value,
+      filters: this.value.filters,
+      properties: []
+    };
+
+    if (this.value.type === 'OBS_PROPERTY_FILE') {
+      options.properties.push('openFile');
     }
-  }
 
-});
-PathInput.obsType = 'OBS_PROPERTY_PATH';
+    if (this.value.type === 'OBS_PROPERTY_PATH') {
+      options.properties.push('openDirectory');
+    }
+
+    const paths = electron.remote.dialog.showOpenDialog(options);
+    const path = paths ? paths[0] : '';
+
+    this.$refs.input.value = path;
+    this.emitInput({ ...this.value, value: path });
+  }
+}
+
+PathInput.obsType = ['OBS_PROPERTY_PATH', 'OBS_PROPERTY_FILE'];
+
 export default PathInput;
 </script>
 

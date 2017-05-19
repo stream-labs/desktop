@@ -28,8 +28,8 @@ import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
-
-const { ipcRenderer } = window.require('electron');
+import ScenesService from '../../services/scenes';
+import SourcesService from '../../services/sources';
 
 export default {
 
@@ -44,23 +44,18 @@ export default {
       if (this.isTaken(this.name)) {
         this.error = 'That name is already taken';
       } else {
-        // Choose a unique id for the source
-        const id = ipcRenderer.sendSync('getUniqueId');
-
-        this.$store.dispatch({
-          type: 'createSourceAndAddToScene',
-          sceneName: this.$store.getters.activeSceneName,
-          sourceType: this.sourceType,
-          sourceName: this.name,
-          sourceId: id
-        });
+        const id = SourcesService.instance.createSourceAndAddToScene(
+          ScenesService.instance.activeSceneId,
+          this.name,
+          this.sourceType
+        );
 
         windowManager.showSourceProperties(id);
       }
     },
 
     isTaken(name) {
-      return this.$store.getters.sourceByName(name);
+      return SourcesService.instance.getSourceByName(name);
     }
   },
 

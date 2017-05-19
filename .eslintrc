@@ -1,5 +1,6 @@
 {
   "extends": "airbnb",
+  "parser": "babel-eslint",
   "plugins": [
     "vue"
   ],
@@ -9,6 +10,7 @@
   },
   "rules": {
     "class-methods-use-this": "off",
+    "no-prototype-builtins": "off",
     "arrow-parens": "off",
     "comma-dangle": "off",
     "prefer-rest-params": "off",

@@ -4,16 +4,26 @@ import _ from 'lodash';
 
 // Modules
 import navigation from './modules/navigation';
-import scenes from './modules/scenes';
-import sources from './modules/sources';
-import streaming from './modules/streaming';
 import windowOptions from './modules/windowOptions';
-import video from './modules/video';
-import performance from './modules/performance';
 import sceneTransitions from './modules/sceneTransitions';
 
+// Stateful Services
+import ScenesService from '../services/scenes';
+import SourcesService from '../services/sources';
+import SourceFiltersService from '../services/source-filters';
+import SettingsService from '../services/settings';
+import StreamingService from '../services/streaming';
+import PerformanceService from '../services/performance';
 
-import Obs from '../api/Obs';
+const statefulServiceModules = {
+  ...ScenesService.getModule(),
+  ...SourcesService.getModule(),
+  ...SourceFiltersService.getModule(),
+  ...SettingsService.getModule(),
+  ...StreamingService.getModule(),
+  ...PerformanceService.getModule()
+};
+
 
 Vue.use(Vuex);
 
@@ -30,44 +40,6 @@ const mutations = {
 };
 
 const actions = {
-  loadConfiguration({ commit, dispatch }, data) {
-    commit('RESET_SCENES');
-    commit('RESET_SOURCES');
-
-    const scenes = Obs.getScenes();
-
-    _.each(scenes, scene => {
-      commit('ADD_SCENE', {
-        name: scene
-      });
-
-      const sources = Obs.getSourcesInScene(scene);
-
-      _.each(sources, source => {
-        const id = ipcRenderer.sendSync('getUniqueId');
-        const properties = Obs.sourceProperties(source, id);
-
-        commit('ADD_SOURCE', {
-          id,
-          name: source,
-          type: null,
-          properties
-        });
-
-        commit('ADD_SOURCE_TO_SCENE', {
-          sceneName: scene,
-          sourceId: id
-        });
-
-        dispatch({
-          type: 'loadSourcePositionAndScale',
-          sourceId: id
-        });
-      });
-    });
-
-    dispatch({ type: 'refreshSceneTransitions' });
-  }
 };
 
 const plugins = [];
@@ -93,7 +65,7 @@ plugins.push(store => {
   // Only child windows should ever receive this
   ipcRenderer.on('vuex-loadState', (event, state) => {
     store.commit('BULK_LOAD_STATE', {
-      state: state,
+      state,
       __vuexSyncIgnore: true
     });
   });
@@ -111,13 +83,9 @@ plugins.push(store => {
 export default new Vuex.Store({
   modules: {
     navigation,
-    scenes,
-    sources,
-    streaming,
     windowOptions,
-    video,
     sceneTransitions,
-    performance
+    ...statefulServiceModules
   },
   plugins,
   mutations,

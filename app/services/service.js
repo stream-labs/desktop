@@ -6,19 +6,57 @@
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
 
+const { ipcRenderer } = window.require('electron');
+
+
 /**
  * @abstract
  */
-export default class Service {
+export class Service {
 
-  constructor(enforcer) {
-    if(enforcer != singletonEnforcer) throw "Cannot construct singleton";
-  }
+  serviceName = this.constructor.name;
 
   static get instance() {
-    if(!this[singleton]) {
-      return this[singleton] = new this(singletonEnforcer);
-    }
+    if (!this[singleton]) return Service.createInstance(this);
     return this[singleton];
   }
+
+
+  static createInstance(ServiceClass, options) {
+    if (ServiceClass[singleton]) {
+      throw `Unable to create more than one singleton service`;
+    }
+    ServiceClass.hasInstance = true;
+    return ServiceClass[singleton] = new ServiceClass(singletonEnforcer, options);
+  }
+
+
+  options = {};
+
+  constructor(enforcer, options) {
+    if (enforcer != singletonEnforcer) throw "Cannot construct singleton";
+    this.options = options || this.options;
+
+    const shouldInit = ipcRenderer.sendSync('services-shouldInit', this.serviceName);
+
+    if (shouldInit) this.init();
+
+    this.mount();
+  }
+
+
+  /**
+   * calls only once per application life
+   */
+  init() {
+  }
+
+
+  /**
+   * calls only once per window life
+   */
+  mount() {
+  }
+
+
 }

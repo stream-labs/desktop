@@ -60,15 +60,16 @@
 </template>
 
 <script>
-// This is a node native module for accessing OS fonts
-const fontManager = window.require('font-manager');
 import _ from 'lodash';
-
 import Multiselect from 'vue-multiselect';
 
 import Property from './Property.vue';
+import SourcesService from '../../services/sources';
 
-let FontProperty = Property.extend({
+// This is a node native module for accessing OS fonts
+const fontManager = window.require('font-manager');
+
+const FontProperty = Property.extend({
 
   components: {
     Multiselect
@@ -147,19 +148,18 @@ let FontProperty = Property.extend({
     // Values that are left blank will be filled with
     // the currently selected value.
     setFont(args) {
-      let defaults = {
+      const defaults = {
         face: this.$refs.font.value.family,
         style: this.$refs.font.value.style,
         size: this.$refs.size.value
       };
 
-      let fontObj = Object.assign(defaults, args);
+      const fontObj = Object.assign(defaults, args);
 
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: fontObj
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        fontObj
+      );
     },
 
     restyleSelects() {

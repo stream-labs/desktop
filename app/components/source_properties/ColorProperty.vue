@@ -24,6 +24,8 @@
 import { Sketch } from 'vue-color';
 import _ from 'lodash';
 
+import SourcesService from '../../services/sources';
+
 /* Notes:
  *
  * The color picker works a bit differently than most
@@ -63,13 +65,10 @@ let ColorProperty = Property.extend({
 
     setValue: _.debounce(function() {
       if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
-        this.$store.dispatch({
-          type: 'setSourceProperty',
-          property: this.property,
-          propertyValue: {
-            value: this.hexRGBA
-          }
-        });
+        SourcesService.instance.setProperty(
+          this.property,
+          { value: this.hexRGBA }
+        );
       }
     }, 500),
   },

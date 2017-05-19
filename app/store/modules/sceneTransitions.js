@@ -1,5 +1,5 @@
 import Obs from '../../api/Obs.js';
-
+import { obsValuesToInputValues, inputValuesToObsValues } from '../../components/shared/forms/Input.ts';
 
 const initialState = {
   availableTypes: [],
@@ -47,12 +47,11 @@ const actions = {
   },
 
   setSceneTransitionProperties({ state, dispatch }, { properties }) {
-    for (const prop of properties) {
-      let value = prop.currentValue;
-      if (prop.type === 'OBS_PROPERTY_BOOL') {
-        value = value === 1 ? 'true' : 'false';
-      }
-      Obs.setSceneTransitionProperty(state.currentName, prop.name, value);
+    const propertiesToSave = inputValuesToObsValues(properties, {
+      boolToString: true
+    });
+    for (const prop of propertiesToSave) {
+      Obs.setSceneTransitionProperty(state.currentName, prop.name, prop.value);
     }
     dispatch({ type: 'refreshSceneTransitions' });
   },
@@ -94,13 +93,13 @@ const getters = {
       currentName: {
         description: 'Transition',
         name: 'currentName',
-        currentValue: state.currentName,
-        values: state.availableNames.map(name => { return { [name]: name }; })
+        value: state.currentName,
+        options: state.availableNames.map(name => { return { description: name, value: name } })
       },
       duration: {
         description: 'Duration',
         name: 'duration',
-        currentValue: state.duration
+        value: state.duration
       }
     };
   },
@@ -110,36 +109,33 @@ const getters = {
       type: {
         description: 'Transition type',
         name: 'type',
-        currentValue: state.availableTypes[0].type,
-        values: state.availableTypes.map(({ type, description }) => {
-          return { [description]: type };
+        value: state.availableTypes[0].type,
+        options: state.availableTypes.map(({ type, description }) => {
+          return { description, value: type };
         })
       },
       name: {
         description: 'Transition name',
         name: 'name',
-        currentValue: 'New transition'
+        value: 'New transition'
       }
     };
   },
 
-  sceneTransitionsPropertiesFormData(state) {
+  sceneTransitionsPropertiesFormData: (state) => () => {
     const transitionName = state.currentName;
-    const properties = Obs.getSceneTransitionProperties(transitionName);
+    let properties = Obs.getSceneTransitionProperties(transitionName);
     if (!properties) return [];
+
     // patch currentValue for corresponding to common properties format
-    for (const property of properties) {
-      property.currentValue = property.currentValue.value;
-      if (property.type === 'OBS_PROPERTY_LIST') {
-        property.values = Obs.getSceneTransitionPropertySubParameters(
-          transitionName, property.name
-        ).map(
-          ({ name, value }) => { return { [name]: value }; }
-        );
-      } else if (property.type === 'OBS_PROPERTY_BOOL') {
-        property.currentValue = property.currentValue === 'true' ? 1 : 0; // TODO: fix node-obs bool values
+    properties = obsValuesToInputValues(properties, {
+      valueIsObject: true,
+      boolIsString: true,
+      subParametersGetter: propName => {
+        return Obs.getSceneTransitionPropertySubParameters(transitionName, propName);
       }
-    }
+    });
+
     return properties;
   }
 };

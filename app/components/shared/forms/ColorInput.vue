@@ -20,100 +20,109 @@
 </div>
 </template>
 
-<script>
-import { Sketch } from 'vue-color';
+<script lang="ts">
 import _ from 'lodash';
+import { Component, Watch, Prop } from 'vue-property-decorator';
+import { debounce } from 'lodash-decorators';
+import { TObsType, IInputValue, Input } from './Input';
+const VueColor = require('vue-color');
+
+interface IColor {
+  hex: string,
+  a: number
+}
 
 
-import Input from './Input.vue';
+@Component({
+  components: { ColorPicker: VueColor.Sketch }
+})
+class ColorInput extends Input<IInputValue<string>> {
 
-const ColorProperty = Input.extend({
+  static obsType: TObsType;
 
-  components: {
-    ColorPicker: Sketch
-  },
+  @Prop()
+  value: IInputValue<string>;
 
-  data() {
-    return {
-      color: {
-        hex: '#ffffff',
-        a: 1
-      },
+  color: IColor = {
+    hex: '#ffffff',
+    a: 1
+  };
 
-      pickerVisible: false
-    };
-  },
+  pickerVisible = false;
 
-  methods: {
-    onChange(color) {
-      this.color = color;
-    },
 
-    togglePicker() {
-      this.pickerVisible = !this.pickerVisible;
-    },
+  onChange(color: IColor) {
+    this.color = color;
+  }
 
-    setValue: _.debounce(function () {
-      if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
-        this.$emit('input', Object.assign({}, this.value, { currentValue: this.hexRGBA }));
-      }
-    }, 500),
-  },
 
-  watch: {
-    color() {
-      this.setValue();
-    },
+  togglePicker() {
+    this.pickerVisible = !this.pickerVisible;
+  }
 
-    obsColor() {
-      this.color = this.obsColor;
+
+  @debounce(500)
+  setValue() {
+    if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
+      this.emitInput({ ...this.value, value: this.hexRGBA });
     }
-  },
+  }
+
+
+  @Watch('color')
+  onColorChangeHandler() {
+    this.setValue();
+  }
+
+
+  @Watch('obsColor')
+  onObsColorChangeHandler() {
+    this.color = this.obsColor;
+  }
 
   created() {
     this.color = this.obsColor;
-  },
-
-  computed: {
-    hexAlpha() {
-      let alpha = this.color.a;
-      return _.padStart(Math.floor(alpha * 255).toString(16), 2, '0');
-    },
-
-    hexColor() {
-      return this.color.hex.substr(1);
-    },
-
-    // This is what node-obs uses
-    hexRGBA() {
-      return (this.hexColor + this.hexAlpha).toLowerCase();
-    },
-
-    // This is displayed to the user
-    hexARGB() {
-      return ('#' + this.hexAlpha + this.hexColor).toLowerCase();
-    },
-
-    swatchStyle() {
-      return {
-        backgroundColor: this.color.hex,
-        opacity: this.color.a || 1
-      };
-    },
-
-    // This represents the actual value in the property in OBS
-    obsColor() {
-      let obsStr = this.value.currentValue;
-
-      return {
-        hex: '#' + obsStr.substr(0, 6),
-        a: parseInt(obsStr.substr(6), 16) / 255
-      };
-    }
   }
-});
-ColorProperty.obsType = 'OBS_PROPERTY_COLOR';
-export default ColorProperty;
+
+  get hexAlpha() {
+    let alpha = this.color.a;
+    return _.padStart(Math.floor(alpha * 255).toString(16), 2, '0');
+  }
+
+  get hexColor() {
+    return this.color.hex.substr(1);
+  }
+
+  // This is what node-obs uses
+  get hexRGBA() {
+    return (this.hexColor + this.hexAlpha).toLowerCase();
+  }
+
+  // This is displayed to the user
+  get hexARGB() {
+    return ('#' + this.hexAlpha + this.hexColor).toLowerCase();
+  }
+
+  get swatchStyle() {
+    return {
+      backgroundColor: this.color.hex,
+      opacity: this.color.a || 1
+    };
+  }
+
+  // This represents the actual value in the property in OBS
+  get obsColor(): IColor {
+    let obsStr = this.value.value;
+
+    return {
+      hex: '#' + obsStr.substr(0, 6),
+      a: parseInt(obsStr.substr(6), 16) / 255
+    };
+  }
+
+}
+ColorInput.obsType = 'OBS_PROPERTY_COLOR';
+export default ColorInput;
 
 </script>
 

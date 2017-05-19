@@ -11,26 +11,41 @@
   </div>
 </template>
 
-<script>
-import * as inputComponents from './index';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { IInputValue, TObsType } from "./Input";
+import NumberInput from './NumberInput.vue';
+import * as comps from './index';
 
-export default {
-  props: ['value'],
-  components: inputComponents,
-  methods: {
+// modules with "export default" lose types when we use re-exports
+const inputComponents = comps as any as { [key: string]: typeof Vue };
 
-    propertyComponentForType(type) {
-      const componentName = Object.keys(inputComponents).find(name => {
-        return inputComponents[name].obsType === type;
-      });
-      return inputComponents[componentName];
-    },
 
-    onInputHandler(value, index) {
-      const newValue = [].concat(this.value);
-      newValue.splice(index, 1, value);
-      this.$emit('input', newValue);
-    }
+@Component({
+  components: inputComponents
+})
+export default class GenericForm extends Vue {
+
+  @Prop()
+  value: IInputValue<any>[];
+
+
+  propertyComponentForType(type: TObsType): typeof Vue {
+    const componentName = Object.keys(inputComponents).find(name => {
+      const componentObsType = inputComponents[name]['obsType'];
+      return Array.isArray(componentObsType) ?
+        componentObsType.includes(type) :
+        componentObsType === type;
+    });
+    return inputComponents[componentName];
+  }
+
+
+  onInputHandler(value: IInputValue<any>, index: number) {
+    const newValue = [].concat(this.value);
+    newValue.splice(index, 1, value);
+    this.$emit('input', newValue);
   }
 };
 </script>

@@ -24,14 +24,16 @@
 </template>
 
 <script>
-import contextManager from '../../util/ContextMenuManager.js';
-import Selector from '../Selector.vue';
 import _ from 'lodash';
+import contextManager from '../../util/ContextMenuManager';
+import Selector from '../Selector.vue';
+import Property from './Property.vue';
+import SourcesService from '../../services/sources';
 
 const { remote } = window.require('electron');
 
-import Property from './Property.vue';
-let EditableListProperty = Property.extend({
+
+const EditableListProperty = Property.extend({
 
   components: {
     Selector
@@ -122,13 +124,10 @@ let EditableListProperty = Property.extend({
     },
 
     setList(list) {
-      this.$store.dispatch({
-        type: 'setSourceProperty',
-        property: this.property,
-        propertyValue: {
-          valuesArray: list
-        }
-      });
+      SourcesService.instance.setProperty(
+        this.property,
+        { valuesArray: list }
+      );
     }
   },
 

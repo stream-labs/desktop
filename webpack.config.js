@@ -1,6 +1,6 @@
 module.exports = {
   entry: {
-    renderer: './app/app.js',
+    renderer: './app/app-entry.ts',
     updater: './updater/ui.js'
   },
   output: {
@@ -10,12 +10,17 @@ module.exports = {
 
   devtool: 'sourcemap',
 
+  resolve: {
+    extensions: ['.js', '.ts']
+  },
+
   module: {
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
+          esModule: true,
           loaders: {
             'scss': 'vue-style-loader!css-loader!sass-loader',
             'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
@@ -23,13 +28,19 @@ module.exports = {
         }
       },
       {
+        test: /\.ts$/,
+        // TODO: use recommended by MS awesome-typescript-loader when the issue will be resoled
+        // https://github.com/s-panferov/awesome-typescript-loader/issues/356
+        loader: 'ts-loader',
+        exclude: /node_modules|vue\/src/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
-        options: {
-          plugins: ['transform-decorators-legacy'],
-          presets: ['stage-2']
-        }
       },
       {
         test: /\.less$/,

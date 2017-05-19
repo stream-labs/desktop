@@ -34,14 +34,14 @@ export default {
   methods: {
 
     done() {
-      const name = this.form.name.currentValue;
+      const name = this.form.name.value;
       this.error = this.validateName(name);
       if (this.error) return;
 
       this.$store.dispatch({
         type: 'addSceneTransition',
         transitionName: name,
-        transitionType: this.form.type.currentValue
+        transitionType: this.form.type.value
       });
 
       if (this.state.properties.length) {
