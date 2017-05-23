@@ -1,11 +1,11 @@
 <template>
-<div :class="{disabled: !value.enabled}">
+<div :class="{disabled: value.enabled == false}">
   <label>{{ value.description }}</label>
   <input
     ref="input"
     type="text"
     :value="value.value"
-    :disabled="value.enabled === 0"
+    :disabled="value.enabled == false"
     @input="updateValue($event.target.value)"
   />
 </div>

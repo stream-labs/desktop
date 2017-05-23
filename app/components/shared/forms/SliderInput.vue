@@ -5,7 +5,7 @@
       <vue-slider
         @input="value => onInputHandler(value)"
         :value="value.value"
-        :disabled="!value.enabled"
+        :disabled="value.enabled == false"
         :max="value.maxVal"
         :min="value.minVal"
         :interval="value.stepVal"

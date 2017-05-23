@@ -7,3 +7,6 @@ export { default as UintInput } from './UintInput.vue';
 export { default as PathInput } from './PathInput.vue';
 export { default as ListInput } from './ListInput.vue';
 export { default as SliderInput } from './SliderInput.vue';
+export { default as FontInput } from './FontInput.vue';
+export { default as EditableListInput } from './EditableListInput.vue';
+export { default as ButtonInput } from './ButtonInput.vue';
