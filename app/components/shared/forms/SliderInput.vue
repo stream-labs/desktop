@@ -3,7 +3,7 @@
     <label>{{ value.description }}</label>
     <div class="slider-container">
       <vue-slider
-        @input="value => onInputHandler(value)"
+        @input="value => updateValue(value)"
         :value="value.value"
         :disabled="value.enabled == false"
         :max="value.maxVal"
@@ -37,7 +37,7 @@
     value: ISliderInputValue;
 
     @throttle(100)
-    onInputHandler(value: number) {
+    updateValue(value: number) {
       this.emitInput({ ...this.value, value });
     }
   }

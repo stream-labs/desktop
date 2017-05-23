@@ -4,6 +4,7 @@
   :class="{ active: to === value, disabled: enabled == false }"
   @click="onClickHandler"
 >
+  <i v-if="ico" :class="'fa fa-' + ico"></i>
   <slot></slot>
 </li>
 </template>
@@ -12,12 +13,13 @@
 
 export default {
   props: {
-    to: {type: String},
-    enabled: {type: Boolean, default: true}
+    to: { type: String },
+    ico: { type: String },
+    enabled: { type: Boolean, default: true }
   },
 
   computed: {
-    value() {return this.$parent.value}
+    value() { return this.$parent.value }
   },
 
   updateValue() {
@@ -51,6 +53,9 @@ export default {
     opacity: 1;
     font-weight: bold;
     border-color: @yellow;
+    .fa {
+      color: @yellow;
+    }
   }
   &:hover {
     opacity: 1;
@@ -58,6 +63,13 @@ export default {
   &.disabled {
     opacity: 0.3;
     cursor: default;
+  }
+
+  .fa {
+    color: #999;
+    position: relative;
+    margin-right: -15px;
+    left: -25px;
   }
 }
 

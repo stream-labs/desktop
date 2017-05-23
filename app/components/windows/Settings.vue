@@ -11,6 +11,7 @@
           <NavItem
             v-for="category in categoriesNames"
             :to="category"
+            :ico="icons[category]"
           >
             {{ category }}
           </NavItem>
@@ -64,7 +65,16 @@ export default {
     return {
       categoryName,
       categoriesNames: this.settingsService.getCategories(),
-      settingsData: this.settingsService.getSettingsFormData(categoryName)
+      settingsData: this.settingsService.getSettingsFormData(categoryName),
+      icons: {
+        General: 'th-large',
+        Stream: 'globe',
+        Output: 'microchip',
+        Video: 'film',
+        Audio: 'volume-up',
+        Hotkeys: 'keyboard-o',
+        Advanced: 'cogs'
+      }
     };
   },
 
