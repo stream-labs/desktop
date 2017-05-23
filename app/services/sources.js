@@ -37,7 +37,9 @@ export default class SourcesService extends StatefulService {
 
       // Unscaled width and height
       width: 0,
-      height: 0
+      height: 0,
+
+      muted: false
     });
   }
 
@@ -61,6 +63,11 @@ export default class SourcesService extends StatefulService {
   SET_SOURCE_FLAGS(id, audio, video) {
     this.state.sources[id].audio = audio;
     this.state.sources[id].video = video;
+  }
+
+  @mutation
+  SET_MUTED(id, muted) {
+    this.state.sources[id].muted = muted;
   }
 
   // This is currently a single function because node-obs
@@ -96,6 +103,9 @@ export default class SourcesService extends StatefulService {
 
     this.ADD_SOURCE(id, name, type, properties);
 
+    const muted = nodeObs.OBS_content_isSourceMuted(name);
+    this.SET_MUTED(id, muted);
+
     return id;
   }
 
@@ -126,6 +136,13 @@ export default class SourcesService extends StatefulService {
 
     this.refreshProperties(property.sourceId);
     configFileManager.save();
+  }
+
+  setMuted(id, muted) {
+    const source = this.state.sources[id];
+
+    nodeObs.OBS_content_sourceSetMuted(source.name, muted);
+    this.SET_MUTED(id, muted);
   }
 
   refreshSourceAttributes() {
@@ -162,6 +179,10 @@ export default class SourcesService extends StatefulService {
     return Object.values(this.state.sources).find(source => {
       return source.name === name;
     });
+  }
+
+  get sources() {
+    return Object.values(this.state.sources);
   }
 
 

@@ -71,7 +71,9 @@ export default class ScenesService extends StatefulService {
 
       // Scale between 0 and 1
       scaleX: 1.0,
-      scaleY: 1.0
+      scaleY: 1.0,
+
+      visible: true
     });
   }
 
@@ -125,6 +127,14 @@ export default class ScenesService extends StatefulService {
     source.scaleY = scaleY;
   }
 
+  @mutation
+  SET_SOURCE_VISIBILITY(sceneId, sourceId, visible) {
+    const source = this.state.scenes[sceneId].sources.find(source => {
+      return source.id === sourceId;
+    });
+
+    source.visible = visible;
+  }
 
   // Adds the existing source to the current scene
   addSourceToScene(sceneId, sourceId) {
@@ -266,7 +276,7 @@ export default class ScenesService extends StatefulService {
 
         this.ADD_SOURCE_TO_SCENE(id, sourceId);
 
-        this.loadSourcePositionAndScale(id, sourceId);
+        this.loadSourceAttributes(id, sourceId);
       });
     });
 
@@ -274,7 +284,7 @@ export default class ScenesService extends StatefulService {
     store.dispatch({ type: 'refreshSceneTransitions' });
   }
 
-  loadSourcePositionAndScale(sceneId, sourceId) {
+  loadSourceAttributes(sceneId, sourceId) {
     const scene = this.getSceneById(sceneId);
     const source = this.getMergedSource(sceneId, sourceId);
 
@@ -283,8 +293,18 @@ export default class ScenesService extends StatefulService {
 
     this.SET_SOURCE_POSITION(sceneId, sourceId, position.x, position.y);
     this.SET_SOURCE_SCALE(sceneId, sourceId, scale.x, scale.y);
+
+    const visible = nodeObs.OBS_content_getSourceVisibility(scene.name, source.name);
+    this.SET_SOURCE_VISIBILITY(sceneId, sourceId, visible);
   }
 
+  setSourceVisibility(sceneId, sourceId, visible) {
+    const scene = this.getSceneById(sceneId);
+    const source = this.getMergedSource(sceneId, sourceId);
+
+    nodeObs.OBS_content_setSourceVisibility(scene.name, source.name, visible);
+    this.SET_SOURCE_VISIBILITY(sceneId, sourceId, visible);
+  }
 
   // Utility functions / getters
 
