@@ -292,7 +292,7 @@ export default class HotkeysService extends Service {
             this.hotkeysFromAction(
               actionName,
               action,
-              null,
+              undefined,
               source.name
             )
           );

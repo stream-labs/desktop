@@ -51,6 +51,8 @@ export default class Hotkey extends Vue {
   }
 
   handleKeydown(event, index) {
+    event.preventDefault();
+
     if (this.isModifierPress(event)) return;
 
     const keys = [];
@@ -92,10 +94,10 @@ export default class Hotkey extends Vue {
     // empty binding instead.
     if (this.bindings.length === 1) {
       this.bindings[0].binding = '';
-      return;
+    } else {
+      this.bindings.splice(index, 1);
     }
 
-    this.bindings.splice(index, 1);
     this.setBindings();
   }
 
