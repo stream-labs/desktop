@@ -14,7 +14,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType, TObsValue } from "./Input";
+import { IInputValue, TObsType } from "./Input";
 import NumberInput from './NumberInput.vue';
 import * as comps from './index';
 
@@ -28,7 +28,7 @@ const inputComponents = comps as any as { [key: string]: typeof Vue };
 export default class GenericForm extends Vue {
 
   @Prop()
-  value: IInputValue<TObsValue>[];
+  value: IInputValue<any>[];
 
 
   propertyComponentForType(type: TObsType): typeof Vue {
@@ -38,12 +38,11 @@ export default class GenericForm extends Vue {
         componentObsType.includes(type) :
         componentObsType === type;
     });
-    if (!componentName) console.log('Component not found. Type:', type);
     return inputComponents[componentName];
   }
 
 
-  onInputHandler(value: IInputValue<TObsValue>, index: number) {
+  onInputHandler(value: IInputValue<any>, index: number) {
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
     this.$emit('input', newValue);

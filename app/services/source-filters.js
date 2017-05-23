@@ -26,9 +26,7 @@ export default class SourceFiltersService extends StatefulService {
   setProperties(sourceName, filterName, properties) {
     const propertiesToSave = inputValuesToObsValues(properties, {
       boolToString: true,
-      intToString: true,
-      valueToCurrentValue: true,
-      valueToObject: true
+      intToString: true
     });
 
     for (const prop of propertiesToSave) {
@@ -36,7 +34,7 @@ export default class SourceFiltersService extends StatefulService {
         sourceName,
         filterName,
         prop.name,
-        prop.value
+        { value: prop.value }
       );
     }
   }

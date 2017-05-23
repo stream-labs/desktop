@@ -4,6 +4,7 @@ interface Dictionary<TItemType> {
   [key: string]: TItemType
 }
 
-// allow TS to import components without type definitions
-// webpack still check the module existence
-declare module '*';
+declare module "vue-slider-component" {
+  // currently we don't use any methods from vue-slider-component
+  export = {};
+}

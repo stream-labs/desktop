@@ -1,8 +1,6 @@
 import Vue from 'vue';
-import {
-  inputValuesToObsValues,
-  obsValuesToInputValues
-} from '../components/shared/forms/Input.ts';
+import _ from 'lodash';
+import { parsePathFilters } from '../components/shared/forms/Input.ts';
 
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
@@ -94,7 +92,7 @@ export default class SourcesService extends StatefulService {
   initSource(name, type) {
     // Get an id to identify the source on the frontend
     const id = ipcRenderer.sendSync('getUniqueId');
-    const properties = this.getPropertiesFormData(id);
+    const properties = this.fetchPropertiesForSource(name, id);
 
     this.ADD_SOURCE(id, name, type, properties);
 
@@ -111,9 +109,23 @@ export default class SourcesService extends StatefulService {
   }
 
   refreshProperties(id) {
-    const properties = this.getPropertiesFormData(id);
+    const source = this.state.sources[id];
+    const properties = this.fetchPropertiesForSource(source.name, id);
 
     this.SET_SOURCE_PROPERTIES(id, properties);
+  }
+
+  setProperty(property, value) {
+    const source = this.state.sources[property.sourceId];
+
+    nodeObs.OBS_content_setProperty(
+      source.name,
+      property.name,
+      value
+    );
+
+    this.refreshProperties(property.sourceId);
+    configFileManager.save();
   }
 
   refreshSourceAttributes() {
@@ -136,26 +148,6 @@ export default class SourcesService extends StatefulService {
     });
   }
 
-  setProperties(sourceId, properties) {
-    const source = this.state.sources[sourceId];
-    const propertiesToSave = inputValuesToObsValues(properties, {
-      boolToString: true,
-      intToString: true,
-      valueToObject: true
-    });
-
-    for (const prop of propertiesToSave) {
-      nodeObs.OBS_content_setProperty(
-        source.name,
-        prop.name,
-        prop.value
-      );
-    }
-
-    this.refreshProperties(sourceId);
-    configFileManager.save();
-  }
-
   reset() {
     this.RESET_SOURCES();
   }
@@ -172,29 +164,92 @@ export default class SourcesService extends StatefulService {
     });
   }
 
-  getPropertiesFormData(sourceId) {
-    const source = this.getSourceById(sourceId);
-    if (!source) return [];
 
-    const obsProps = nodeObs.OBS_content_getSourceProperties(source.name);
-    const props = obsValuesToInputValues(obsProps, {
-      boolIsString: true,
-      valueIsObject: true,
-      valueGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertyCurrentValue(
-          source.name,
-          propName
-        );
-      },
-      subParametersGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertiesSubParameters(source.name, propName);
+  // Dealing with OBS API Junk
+
+  fetchPropertiesForSource(name, id) {
+    const properties = nodeObs.OBS_content_getSourceProperties(name);
+
+    const parsedProperties = properties.map(prop => {
+      const propertyObj = {
+        sourceId: id,
+        name: prop.name,
+        description: prop.description,
+        longDescription: prop.long_description,
+        type: prop.type,
+        visible: (prop.visible === 'true'),
+        enabled: (prop.enabled === 'true')
+      };
+
+      // For list types, we must separately fetch the
+      // list options.
+      if (propertyObj.type === 'OBS_PROPERTY_LIST') {
+        propertyObj.options = _.compact(nodeObs
+          .OBS_content_getSourcePropertiesSubParameters(name, propertyObj.name));
       }
+
+      propertyObj.value = this.getPropertyValue(name, propertyObj);
+
+      return propertyObj;
     });
 
-    // some magic required by node-obs
-    nodeObs.OBS_content_updateSourceProperties(source.name);
+    nodeObs.OBS_content_updateSourceProperties(name);
 
-    return props;
+    return parsedProperties;
+  }
+
+  getPropertiesFormData(sourceId) {
+    const source = this.getSourceById(sourceId);
+    const properties = source ? source.properties : [];
+    return _.cloneDeep(properties);
+  }
+
+  getPropertyValue(name, property) {
+    const obj = nodeObs.OBS_content_getSourcePropertyCurrentValue(
+      name,
+      property.name
+    );
+
+    // All of these values come back as strings for now, so
+    // we need to do some basic type coersion.
+
+    if (property.type === 'OBS_PROPERTY_BOOL') {
+      obj.value = obj.value === 'true';
+    }
+
+    if (property.type === 'OBS_PROPERTY_FLOAT') {
+      obj.value = parseFloat(obj.value);
+    }
+
+    if (property.type === 'OBS_PROPERTY_INT') {
+      obj.value = parseInt(obj.value);
+    }
+
+    if (property.type === 'OBS_PROPERTY_FRAME_RATE') {
+      obj.numerator = parseInt(obj.numerator);
+      obj.denominator = parseInt(obj.denominator);
+
+      obj.ranges.forEach(range => {
+        range.max.numerator = parseInt(range.max.numerator);
+        range.max.denominator = parseInt(range.max.denominator);
+        range.min.numerator = parseInt(range.min.numerator);
+        range.min.denominator = parseInt(range.min.denominator);
+      });
+    }
+
+    if (property.type === 'OBS_PROPERTY_FONT') {
+      obj.style = obj.style || 'Regular';
+    }
+
+    if (property.type === 'OBS_PROPERTY_PATH') {
+      obj.filter = parsePathFilters(obj.filter);
+    }
+
+    if (property.type === 'OBS_PROPERTY_EDITABLE_LIST') {
+      obj.filter = parsePathFilters(obj.filter);
+    }
+
+    return obj;
   }
 
 }

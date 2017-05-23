@@ -19,6 +19,7 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IInputValue, TObsType, Input } from './Input';
 
@@ -26,7 +27,7 @@ import { IInputValue, TObsType, Input } from './Input';
 @Component
 class TextInput extends Input<IInputValue<string>> {
 
-  static obsType: TObsType[];
+  static obsType: TObsType;
 
   @Prop()
   value: IInputValue<string>;
@@ -44,7 +45,7 @@ class TextInput extends Input<IInputValue<string>> {
   }
 
 }
-TextInput.obsType = ['OBS_PROPERTY_EDIT_TEXT', 'OBS_PROPERTY_TEXT'];
+TextInput.obsType = 'OBS_PROPERTY_EDIT_TEXT';
 export default TextInput;
 
 </script>

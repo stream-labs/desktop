@@ -2,9 +2,6 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from "vue-property-decorator";
 
-/**
- * all possible OBS properties types
- */
 export declare type TObsType =
   'OBS_PROPERTY_BOOL' |
   'OBS_PROPERTY_INT' |
@@ -12,40 +9,30 @@ export declare type TObsType =
   'OBS_PROPERTY_PATH' |
   'OBS_PROPERTY_FILE' |
   'OBS_PROPERTY_EDIT_TEXT' |
-  'OBS_PROPERTY_TEXT' |
   'OBS_PROPERTY_UINT' |
   'OBS_PROPERTY_COLOR' |
   'OBS_PROPERTY_DOUBLE' |
   'OBS_PROPERTY_FLOAT' |
-  'OBS_PROPERTY_SLIDER' |
-  'OBS_PROPERTY_FONT' |
-  'OBS_PROPERTY_EDITABLE_LIST';
+  'OBS_PROPERTY_SLIDER';
 
-/**
- * OBS values that frontend application can change
- */
-export declare type TObsValue = number | string | boolean | IFont | IStringList;
+export declare type TObsValue = number | string | boolean;
 
-/**
- * common interface for OBS objects properties
- */
 export interface IInputValue<TValueType> {
   value: TValueType;
   name: string;
   description: string;
   type: TObsType;
   enabled: boolean;
-  visible: boolean;
   masked: boolean;
-}
-
-export interface IListInputValue extends IInputValue<string> {
-  options: IListOption[];
 }
 
 export interface IListOption {
   description: string;
   value: string;
+}
+
+export interface IListInputValue extends IInputValue<string> {
+  options: IListOption[];
 }
 
 export interface IPathInputValue extends IInputValue<string> {
@@ -58,27 +45,13 @@ export interface ISliderInputValue extends IInputValue<number> {
   stepVal: number;
 }
 
-export interface IFont {
-  face?: string;
-  style?: string;
-  size?: string;
-}
-
-export interface IStringList {
-  valuesArray: string[];
-}
-
-export interface IEditableListInputValue extends IInputValue<IStringList> {
-  defaultPath?: string;
-  filters?: IElectronOpenDialogFilter[];
-}
-
 export interface IElectronOpenDialogFilter {
   name: string;
   extensions: string[];
 }
 
-function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
+// TODO: do not export this function after source filters will use GenericForm
+export function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
   const filters = _.compact(filterStr.split(';;'));
 
   // Browser source uses *.*
@@ -143,12 +116,6 @@ export function obsValuesToInputValues(
 
     prop.value = obsValue;
 
-    if (options.boolIsString) {
-      prop.masked = obsProp.masked === 'true';
-      prop.enabled = obsProp.enabled === 'true';
-      prop.visible = obsProp.visible === 'true';
-    }
-
     if (options.disabledFields && options.disabledFields.includes(prop.name)) {
       prop.enabled = false;
     }
@@ -181,9 +148,6 @@ export function obsValuesToInputValues(
       if (options.boolIsString) prop.value = prop.value === 'true';
 
     } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
-
-      prop.value = Number(prop.value);
-
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
         prop.type = 'OBS_PROPERTY_SLIDER';
         prop = {
@@ -203,17 +167,6 @@ export function obsValuesToInputValues(
           filters: parsePathFilters(valueObject.filter)
         } as IPathInputValue
       }
-    } else if (obsProp.type === 'OBS_PROPERTY_FONT') {
-      prop.value = valueObject;
-      prop.value.style = prop.value.style || 'Regular';
-
-    } else if (obsProp.type === 'OBS_PROPERTY_EDITABLE_LIST') {
-      prop = {
-        ...prop,
-        value: valueObject,
-        filters: parsePathFilters(valueObject.filter),
-        defaultPath: valueObject.default_path
-      } as IEditableListInputValue;
     }
 
     resultProps.push(prop);
@@ -228,8 +181,6 @@ export function obsValuesToInputValues(
 interface IObsSaveOptions {
   boolToString?: boolean;
   intToString?: boolean;
-  valueToObject?: boolean;
-  valueToCurrentValue?: boolean;
 }
 
 export function inputValuesToObsValues(
@@ -240,6 +191,7 @@ export function inputValuesToObsValues(
 
   for (const prop of props) {
     const obsProp = {...prop} as Dictionary<any>;
+    obsProp.currentValue = prop.value;
     obsProps.push(obsProp);
 
     if (prop.type === 'OBS_PROPERTY_BOOL' ) {
@@ -247,14 +199,7 @@ export function inputValuesToObsValues(
     } else if (prop.type === 'OBS_PROPERTY_INT') {
       if (options.intToString) obsProp.currentValue = String(obsProp.currentValue);
     }
-
-    if (options.valueToObject && !['OBS_PROPERTY_FONT', 'OBS_PROPERTY_EDITABLE_LIST'].includes(prop.type)) {
-      obsProp.value = { value: obsProp.value };
-    }
-
-    if (options.valueToCurrentValue) {
-      obsProp.currentValue = obsProp.value;
-    }
+    obsProp.value = obsProp.currentValue;
   }
   return obsProps;
 }

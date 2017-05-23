@@ -79,10 +79,7 @@ export default class SettingsService extends StatefulService {
 
   setSettings(categoryName, settingsData) {
     for (const subGroup of settingsData) {
-      subGroup.parameters = inputValuesToObsValues(
-        subGroup.parameters,
-        { valueToCurrentValue: true }
-      );
+      subGroup.parameters = inputValuesToObsValues(subGroup.parameters);
     }
     nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
