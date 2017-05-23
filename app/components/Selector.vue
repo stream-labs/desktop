@@ -21,56 +21,67 @@
 </ul>
 </template>
 
-<script>
-import Draggable from 'vuedraggable';
+<script lang="ts">
+import Vue from 'vue';
+import _ from 'lodash';
+import { Component, Prop } from 'vue-property-decorator';
+import draggable from 'vuedraggable';
 
-export default {
-  props: ['items', 'activeItem'],
+interface ISelectorItem {
+  name: string;
+  value: string;
+}
 
-  components: {
-    Draggable
-  },
 
-  methods: {
-    handleChange(change) {
-      let order = _.map(this.normalizedItems, item => {
-        return item.value;
-      });
+@Component({
+  components: { draggable }
+})
+export default class Selector extends Vue {
 
-      this.$emit('sort', {
-        change,
-        order
-      });
-    },
+  @Prop()
+  items: ISelectorItem[];
 
-    handleSelect(index) {
-      let value = this.normalizedItems[index].value;
+  @Prop()
+  activeItem: string;
 
-      this.$emit('select', value);
-    },
 
-    handleContextMenu(index) {
-      const value = this.normalizedItems[index].value;
-      this.handleSelect(index);
-      this.$emit('contextmenu', value);
-    }
-  },
+  handleChange(change: any) {
+    let order = _.map(this.normalizedItems, item => {
+      return item.value;
+    });
 
-  computed: {
-    // Items can be either an array of strings, or an
-    // array of objects, so we normalize those here.
-    normalizedItems() {
-      return _.map(this.items, item => {
-        if (typeof(item) === 'string') {
-          return {
-            name: item,
-            value: item
-          };
-        } else {
-          return item;
-        }
-      });
-    }
+    this.$emit('sort', {
+      change,
+      order
+    });
+  }
+
+  handleSelect(index: number) {
+    let value = this.normalizedItems[index].value;
+    this.$emit('select', value);
+  }
+
+  handleContextMenu(index: number) {
+    const value = this.normalizedItems[index].value;
+    this.handleSelect(index);
+    this.$emit('contextmenu', value);
+  }
+
+  /**
+   * Items can be either an array of strings, or an
+   * array of objects, so we normalize those here.
+   */
+  get normalizedItems(): ISelectorItem[] {
+    return _.map(this.items, item => {
+      if (typeof(item) === 'string') {
+        return {
+          name: item,
+          value: item
+        };
+      } else {
+        return item;
+      }
+    });
   }
 }
 </script>
