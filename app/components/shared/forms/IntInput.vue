@@ -63,6 +63,7 @@ class IntInput extends Input<IInputValue<number>> {
     );
     if (!canChange) return;
     if (event.deltaY > 0) this.decrement(); else this.increment();
+    event.preventDefault();
   }
 }
 IntInput.obsType = ['OBS_PROPERTY_INT', 'OBS_PROPERTY_UINT'];
