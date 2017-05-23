@@ -46,7 +46,7 @@ export default {
 
       renderedOffsetX: 0,
       renderedOffsetY: 0
-    }
+    };
   },
 
   methods: {
@@ -78,32 +78,6 @@ export default {
           this.startResizing(event, overResize);
           return;
         }
-
-        if (this.isOverSource(event, this.activeSource)) {
-          this.startDragging(event);
-          return;
-        }
-      }
-
-      const overSource = _.find(this.sources, source => {
-        return this.isOverSource(event, source);
-      });
-
-      if (overSource) {
-        // Make this source active
-        ScenesService.instance.makeSourceActive(
-          ScenesService.instance.activeSceneId,
-          overSource.id
-        );
-
-        // Start dragging it
-        this.startDragging(event);
-      } else {
-        // Deselect all sources
-        ScenesService.instance.makeSourceActive(
-          ScenesService.instance.activeSceneId,
-          null
-        );
       }
 
       this.updateCursor(event);
@@ -120,6 +94,20 @@ export default {
     },
 
     handleMouseUp(event) {
+      // If neither a drag or resize was initiated, it must have been
+      // an attempted selection.
+      if (!this.dragHandler && !this.resizeRegion) {
+        const overSource = this.sources.find(source => {
+          return this.isOverSource(event, source);
+        });
+
+        // Either select a new source, or deselect all sources (null)
+        ScenesService.instance.makeSourceActive(
+          ScenesService.instance.activeSceneId,
+          overSource ? overSource.id : null
+        );
+      }
+
       this.dragHandler = null;
       this.resizeRegion = null;
 
@@ -169,6 +157,24 @@ export default {
         }
       } else if (this.dragHandler) {
         this.dragHandler.move(event);
+      } else if (event.buttons === 1) {
+        // We might need to start dragging
+        const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sources));
+
+        const overSource = sourcesInPriorityOrder.find(source => {
+          return this.isOverSource(event, source);
+        });
+
+        if (overSource) {
+          // Make this source active
+          ScenesService.instance.makeSourceActive(
+            ScenesService.instance.activeSceneId,
+            overSource.id
+          );
+
+          // Start dragging it
+          this.startDragging(event);
+        }
       }
 
       this.updateCursor(event);
