@@ -201,25 +201,16 @@ export default {
         pixelsX = pixelsY * (source.width / source.height);
       }
 
-      let clamped = false;
-      let newScaleX = source.scaleX + deltaScaleX;
-      let newScaleY = source.scaleY + deltaScaleY;
-
-      if (newScaleX < 0) {
-        newScaleX = 0;
-        clamped = true;
-      }
-
-      if (newScaleY < 0) {
-        newScaleY = 0;
-        clamped = true;
-      }
+      const newX = source.x - ((moveX && pixelsX) || 0);
+      const newY = source.y - ((moveY && pixelsY) || 0);
+      const newScaleX = source.scaleX + deltaScaleX;
+      const newScaleY = source.scaleY + deltaScaleY;
 
       ScenesService.instance.setSourcePositionAndScale(
         ScenesService.instance.activeSceneId,
         source.id,
-        source.x - ((!clamped && moveX && pixelsX) || 0),
-        source.y - ((!clamped && moveY && pixelsY) || 0),
+        newX,
+        newY,
         newScaleX,
         newScaleY
       );
@@ -259,19 +250,32 @@ export default {
         event.offsetY * factor
       );
 
-      if (mouse.x < x) {
+      const box = { x, y, width, height };
+
+      // Normalize to account for negative width and/or height
+      if (box.width < 0) {
+        box.width *= -1;
+        box.x -= box.width;
+      }
+
+      if (box.height < 0) {
+        box.height *= -1;
+        box.y -= box.height;
+      }
+
+      if (mouse.x < box.x) {
         return false;
       }
 
-      if (mouse.y < y) {
+      if (mouse.y < box.y) {
         return false;
       }
 
-      if (mouse.x > x + width) {
+      if (mouse.x > box.x + box.width) {
         return false;
       }
 
-      if (mouse.y > y + height) {
+      if (mouse.y > box.y + box.height) {
         return false;
       }
 
