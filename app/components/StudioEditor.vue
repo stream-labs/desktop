@@ -13,6 +13,7 @@ import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
+import { SourceMenu } from '../util/menus/SourceMenu.ts';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -95,7 +96,7 @@ export default {
 
     handleMouseUp(event) {
       // If neither a drag or resize was initiated, it must have been
-      // an attempted selection.
+      // an attempted selection or right click.
       if (!this.dragHandler && !this.resizeRegion) {
         const overSource = this.sources.find(source => {
           return this.isOverSource(event, source);
@@ -106,6 +107,11 @@ export default {
           ScenesService.instance.activeSceneId,
           overSource ? overSource.id : null
         );
+
+        if ((event.button === 2) && overSource) {
+          const menu = new SourceMenu(overSource.id);
+          menu.popup();
+        }
       }
 
       this.dragHandler = null;
