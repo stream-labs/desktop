@@ -1,4 +1,4 @@
-import { Menu, menuItem } from './Menu.ts';
+import { Menu, menuItem } from './Menu';
 import windowManager from '../WindowManager';
 import SourcesService from '../../services/sources';
 
