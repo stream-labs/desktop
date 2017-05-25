@@ -64,18 +64,12 @@ class DragHandler {
       _.each(sourceEdges, (sourceEdge, name) => {
         _.find(this.targetEdges[name], targetEdge => {
           if (this.shouldSnap(sourceEdge, targetEdge)) {
-            if (name === 'left') {
+            if ((name === 'left') || (name === 'right')) {
               snappedX = true;
-              newX = targetEdge.depth;
-            } else if (name === 'top') {
-              snappedY = true;
-              newY = targetEdge.depth;
-            } else if (name === 'right') {
-              snappedX = true;
-              newX = targetEdge.depth - (this.draggedSource.scaledWidth);
+              newX -= sourceEdge.depth - targetEdge.depth;
             } else {
               snappedY = true;
-              newY = targetEdge.depth - (this.draggedSource.scaledHeight);
+              newY -= sourceEdge.depth - targetEdge.depth;
             }
           }
         });
@@ -217,29 +211,47 @@ class DragHandler {
   // Generates edges for the given source at
   // the given x & y coordinates
   generateSourceEdges(source, x, y) {
+    const box = {
+      x,
+      y,
+      width: source.scaledWidth,
+      height: source.scaledHeight
+    };
+
+    // Normalize the box for negative scales
+    if (box.width < 0) {
+      box.width *= -1;
+      box.x -= box.width;
+    }
+
+    if (box.height < 0) {
+      box.height *= -1;
+      box.y -= box.height;
+    }
+
     return {
       left: {
-        depth: x,
-        offset: y,
-        length: source.scaledHeight
+        depth: box.x,
+        offset: box.y,
+        length: box.height
       },
 
       top: {
-        depth: y,
-        offset: x,
-        length: source.scaledWidth
+        depth: box.y,
+        offset: box.x,
+        length: box.width
       },
 
       right: {
-        depth: x + source.scaledWidth,
-        offset: y,
-        length: source.scaledHeight
+        depth: box.x + box.width,
+        offset: box.y,
+        length: box.height
       },
 
       bottom: {
-        depth: y + source.scaledHeight,
-        offset: x,
-        length: source.scaledWidth
+        depth: box.y + box.height,
+        offset: box.x,
+        length: box.width
       }
     };
   }
