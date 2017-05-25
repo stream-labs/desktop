@@ -1,19 +1,44 @@
-import { Menu, menuItem } from './Menu';
+import { Menu } from './Menu';
+import { SourceTransformMenu } from './SourceTransformMenu';
 import windowManager from '../WindowManager';
 import SourcesService from '../../services/sources';
 
 export class SourceMenu extends Menu {
 
-  sourceId: string;
-
-  constructor(sourceId: string) {
+  constructor(private sceneId: string, private sourceId: string) {
     super();
 
-    this.sourceId = sourceId;
+    this.appendMenuItems();
   }
 
 
-  @menuItem({ label: 'Filters' })
+  appendMenuItems() {
+    this.append({
+      label: 'Transform',
+      submenu: this.transformSubmenu().menu
+    });
+
+    this.append({
+      label: 'Filters',
+      click: () => {
+        this.showFilters();
+      }
+    });
+
+    this.append({
+      label: 'Properties',
+      click: () => {
+        this.showProperties();
+      }
+    });
+  }
+
+
+  transformSubmenu() {
+    return new SourceTransformMenu(this.sceneId, this.sourceId);
+  }
+
+
   showFilters() {
     const name = SourcesService.instance.getSourceById(this.sourceId).name;
 
@@ -22,7 +47,6 @@ export class SourceMenu extends Menu {
   }
 
 
-  @menuItem({ label: 'Properties' })
   showProperties() {
     windowManager.showSourceProperties(this.sourceId);
   }

@@ -109,7 +109,10 @@ export default {
         );
 
         if ((event.button === 2) && overSource) {
-          const menu = new SourceMenu(overSource.id);
+          const menu = new SourceMenu(
+            ScenesService.instance.activeSceneId,
+            overSource.id
+          );
           menu.popup();
         }
       }

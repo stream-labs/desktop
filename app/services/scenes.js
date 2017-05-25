@@ -254,6 +254,17 @@ export default class ScenesService extends StatefulService {
     this.SET_SOURCE_SCALE(sceneId, sourceId, scaleX, scaleY);
   }
 
+  resetSourceTransform(sceneId, sourceId) {
+    this.setSourcePositionAndScale(
+      sceneId,
+      sourceId,
+      0,
+      0,
+      1.0,
+      1.0
+    );
+  }
+
   loadSceneConfig() {
     SourcesService.instance.reset();
     this.RESET_SCENES();

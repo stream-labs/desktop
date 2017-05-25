@@ -46,7 +46,10 @@ export default {
     },
 
     showContextMenu(sourceId) {
-      const menu = new SourceMenu(sourceId);
+      const menu = new SourceMenu(
+        ScenesService.instance.activeSceneId,
+        sourceId
+      );
       menu.popup();
     },
 
