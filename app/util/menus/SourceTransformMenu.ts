@@ -17,11 +17,35 @@ export class SourceTransformMenu extends Menu {
         this.resetTransform();
       }
     });
+
+    this.append({
+      label: 'Flip Vertical',
+      click: () => {
+        this.flipVertical();
+      }
+    });
+
+    this.append({
+      label: 'Flip Horizontal',
+      click: () => {
+        this.flipHorizontal();
+      }
+    });
   }
 
 
   resetTransform() {
     ScenesService.instance.resetSourceTransform(this.sceneId, this.sourceId);
+  }
+
+
+  flipVertical() {
+    ScenesService.instance.flipSourceVertical(this.sceneId, this.sourceId);
+  }
+
+
+  flipHorizontal() {
+    ScenesService.instance.flipSourceHorizontal(this.sceneId, this.sourceId);
   }
 
 }

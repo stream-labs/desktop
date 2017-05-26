@@ -6,6 +6,7 @@ import Obs from '../api/Obs';
 import configFileManager from '../util/ConfigFileManager';
 import SourcesService from './sources';
 import store from '../store';
+import { ScalableRectangle } from '../util/ScalableRectangle.ts';
 
 const nodeObs = Obs.nodeObs;
 const { ipcRenderer } = window.require('electron');
@@ -262,6 +263,38 @@ export default class ScenesService extends StatefulService {
       0,
       1.0,
       1.0
+    );
+  }
+
+  flipSourceVertical(sceneId, sourceId) {
+    const source = this.getMergedSource(sceneId, sourceId);
+    const rect = new ScalableRectangle(source);
+
+    rect.flipY();
+
+    this.setSourcePositionAndScale(
+      sceneId,
+      sourceId,
+      rect.x,
+      rect.y,
+      rect.scaleX,
+      rect.scaleY
+    );
+  }
+
+  flipSourceHorizontal(sceneId, sourceId) {
+    const source = this.getMergedSource(sceneId, sourceId);
+    const rect = new ScalableRectangle(source);
+
+    rect.flipX();
+
+    this.setSourcePositionAndScale(
+      sceneId,
+      sourceId,
+      rect.x,
+      rect.y,
+      rect.scaleX,
+      rect.scaleY
     );
   }
 

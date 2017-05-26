@@ -2,6 +2,7 @@ import _ from 'lodash';
 import SettingsService from '../services/settings';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
+import { ScalableRectangle } from '../util/ScalableRectangle.ts';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -211,47 +212,40 @@ class DragHandler {
   // Generates edges for the given source at
   // the given x & y coordinates
   generateSourceEdges(source, x, y) {
-    const box = {
+    const rect = new ScalableRectangle({
       x,
       y,
-      width: source.scaledWidth,
-      height: source.scaledHeight
-    };
+      width: source.width,
+      height: source.height,
+      scaleX: source.scaleX,
+      scaleY: source.scaleY
+    });
 
-    // Normalize the box for negative scales
-    if (box.width < 0) {
-      box.width *= -1;
-      box.x -= box.width;
-    }
-
-    if (box.height < 0) {
-      box.height *= -1;
-      box.y -= box.height;
-    }
+    rect.normalize();
 
     return {
       left: {
-        depth: box.x,
-        offset: box.y,
-        length: box.height
+        depth: rect.x,
+        offset: rect.y,
+        length: rect.scaledHeight
       },
 
       top: {
-        depth: box.y,
-        offset: box.x,
-        length: box.width
+        depth: rect.y,
+        offset: rect.x,
+        length: rect.scaledWidth
       },
 
       right: {
-        depth: box.x + box.width,
-        offset: box.y,
-        length: box.height
+        depth: rect.x + rect.scaledWidth,
+        offset: rect.y,
+        length: rect.scaledHeight
       },
 
       bottom: {
-        depth: box.y + box.height,
-        offset: box.x,
-        length: box.width
+        depth: rect.y + rect.scaledHeight,
+        offset: rect.x,
+        length: rect.scaledWidth
       }
     };
   }

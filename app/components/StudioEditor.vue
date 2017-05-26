@@ -14,6 +14,7 @@ import DragHandler from '../util/DragHandler';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
 import { SourceMenu } from '../util/menus/SourceMenu.ts';
+import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle.ts';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -131,39 +132,32 @@ export default {
     },
 
     handleMouseMove(event) {
-      const deltaX = event.pageX - this.currentX;
-      const deltaY = event.pageY - this.currentY;
+      const mousePosX = event.offsetX - this.renderedOffsetX;
+      const mousePosY = event.offsetY - this.renderedOffsetY;
+
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
       const converted = this.convertScalarToBaseSpace(
-        deltaX * factor,
-        deltaY * factor
+        mousePosX * factor,
+        mousePosY * factor
       );
 
       if (this.resizeRegion) {
-        if (deltaX || deltaY) {
-          const name = this.resizeRegion.name;
+        const name = this.resizeRegion.name;
 
-          if (name === 'nw') {
-            this.resize(-1 * converted.x, -1 * converted.y, true, true);
-          } else if (name === 'sw') {
-            this.resize(-1 * converted.x, converted.y, true, false);
-          } else if (name === 'ne') {
-            this.resize(converted.x, -1 * converted.y, false, true);
-          } else if (name === 'se') {
-            this.resize(converted.x, converted.y, false, false);
-          } else if (name === 'n') {
-            this.resize(0, -1 * converted.y, false, true);
-          } else if (name === 's') {
-            this.resize(0, converted.y, false, false);
-          } else if (name === 'e') {
-            this.resize(converted.x, 0, false, false);
-          } else if (name === 'w') {
-            this.resize(-1 * converted.x, 0, true, false);
-          }
+        // We choose an anchor point opposite the resize region
+        const anchorMap = {
+          nw: AnchorPoint.SouthEast,
+          sw: AnchorPoint.NorthEast,
+          ne: AnchorPoint.SouthWest,
+          se: AnchorPoint.NorthWest,
+          n: AnchorPoint.South,
+          s: AnchorPoint.North,
+          e: AnchorPoint.West,
+          w: AnchorPoint.East
+        };
 
-          this.currentX = event.pageX;
-          this.currentY = event.pageY;
-        }
+        this.resize(converted.x, converted.y, anchorMap[name]);
+
       } else if (this.dragHandler) {
         this.dragHandler.move(event);
       } else if (event.buttons === 1) {
@@ -190,38 +184,40 @@ export default {
     },
 
     // Performs an aspect ratio locked resize on the active source.
-    // The move arguments determine whether the x and y position
-    // should be moved to compensate for the scaling. This is
-    // useful for scaling relative to a certain origin point.
-    resize(x, y, moveX, moveY) {
+    // x & y are a mouse position in video space.  The anchor is
+    // an AnchorPoint enum that will resizing will be done around.
+    resize(x, y, anchor) {
       const source = this.activeSource;
+      const rect = new ScalableRectangle(source);
 
-      let pixelsX = x;
-      let pixelsY = y;
-      let deltaScaleX = pixelsX / source.width;
-      let deltaScaleY = pixelsY / source.height;
+      rect.normalized(() => {
+        rect.withAnchor(anchor, () => {
+          const distanceX = x ? Math.abs(x - rect.x) : 0;
+          const distanceY = y ? Math.abs(y - rect.y) : 0;
 
-      // Take the bigger of the 2 scales, to preserve aspect ratio
-      if (Math.abs(deltaScaleX) > Math.abs(deltaScaleY)) {
-        deltaScaleY = deltaScaleX;
-        pixelsY = pixelsX * (source.height / source.width);
-      } else {
-        deltaScaleX = deltaScaleY;
-        pixelsX = pixelsY * (source.width / source.height);
-      }
+          let newScaleX = distanceX / rect.width;
+          let newScaleY = distanceY / rect.height;
 
-      const newX = source.x - ((moveX && pixelsX) || 0);
-      const newY = source.y - ((moveY && pixelsY) || 0);
-      const newScaleX = source.scaleX + deltaScaleX;
-      const newScaleY = source.scaleY + deltaScaleY;
+          // To preserve aspect ratio, take the bigger of the
+          // two new scales.
+          if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
+            newScaleY = newScaleX;
+          } else {
+            newScaleX = newScaleY;
+          }
+
+          rect.scaleX = newScaleX;
+          rect.scaleY = newScaleY;
+        });
+      });
 
       ScenesService.instance.setSourcePositionAndScale(
         ScenesService.instance.activeSceneId,
         source.id,
-        newX,
-        newY,
-        newScaleX,
-        newScaleY
+        rect.x,
+        rect.y,
+        rect.scaleX,
+        rect.scaleY
       );
     },
 
@@ -261,17 +257,6 @@ export default {
 
       const box = { x, y, width, height };
 
-      // Normalize to account for negative width and/or height
-      if (box.width < 0) {
-        box.width *= -1;
-        box.x -= box.width;
-      }
-
-      if (box.height < 0) {
-        box.height *= -1;
-        box.y -= box.height;
-      }
-
       if (mouse.x < box.x) {
         return false;
       }
@@ -294,12 +279,15 @@ export default {
     // Determines if the given mouse event is over the
     // given source
     isOverSource(event, source) {
+      const rect = new ScalableRectangle(source);
+      rect.normalize();
+
       return this.isOverBox(
         event,
-        source.x,
-        source.y,
-        source.scaledWidth,
-        source.scaledHeight
+        rect.x,
+        rect.y,
+        rect.scaledWidth,
+        rect.scaledHeight
       );
     },
 
@@ -372,67 +360,70 @@ export default {
       const width = regionRadius * 2;
       const height = regionRadius * 2;
 
+      const rect = new ScalableRectangle(source);
+      rect.normalize();
+
       return [
         {
           name: 'nw',
-          x: source.x - regionRadius,
-          y: source.y - regionRadius,
+          x: rect.x - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 'n',
-          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
-          y: source.y - regionRadius,
+          x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
         },
         {
           name: 'ne',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: source.y - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
         {
           name: 'e',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
         },
         {
           name: 'sw',
-          x: source.x - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: rect.x - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
         {
           name: 'w',
-          x: source.x - regionRadius,
-          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
+          x: rect.x - regionRadius,
+          y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
