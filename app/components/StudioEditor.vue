@@ -145,19 +145,23 @@ export default {
         const name = this.resizeRegion.name;
 
         // We choose an anchor point opposite the resize region
-        const anchorMap = {
-          nw: AnchorPoint.SouthEast,
-          sw: AnchorPoint.NorthEast,
-          ne: AnchorPoint.SouthWest,
-          se: AnchorPoint.NorthWest,
-          n: AnchorPoint.South,
-          s: AnchorPoint.North,
-          e: AnchorPoint.West,
-          w: AnchorPoint.East
+        const optionsMap = {
+          nw: { anchor: AnchorPoint.SouthEast },
+          sw: { anchor: AnchorPoint.NorthEast },
+          ne: { anchor: AnchorPoint.SouthWest },
+          se: { anchor: AnchorPoint.NorthWest },
+          n: { anchor: AnchorPoint.South, lockX: true },
+          s: { anchor: AnchorPoint.North, lockX: true },
+          e: { anchor: AnchorPoint.West, lockY: true },
+          w: { anchor: AnchorPoint.East, lockY: true }
         };
 
-        this.resize(converted.x, converted.y, anchorMap[name]);
+        const options = {
+          ...optionsMap[name],
+          lockRatio: !event.shiftKey
+        };
 
+        this.resize(converted.x, converted.y, options);
       } else if (this.dragHandler) {
         this.dragHandler.move(event);
       } else if (event.buttons === 1) {
@@ -183,31 +187,45 @@ export default {
       this.updateCursor(event);
     },
 
-    // Performs an aspect ratio locked resize on the active source.
-    // x & y are a mouse position in video space.  The anchor is
-    // an AnchorPoint enum that will resizing will be done around.
-    resize(x, y, anchor) {
+    // x & y are mouse positions in video space
+    // options:
+    //  - anchor: an AnchorPoint enum to resize around
+    //  - lockRatio: preserve the aspect ratio (default: true)
+    //  - lockX: prevent changes to the X scale (default: false)
+    //  - lockY: prevent changes to the Y scale (default: false)
+    resize(x, y, options) {
+      // Set defaults
+      const opts = {
+        lockRatio: true,
+        lockX: false,
+        lockY: false,
+        ...options
+      };
+
       const source = this.activeSource;
       const rect = new ScalableRectangle(source);
 
       rect.normalized(() => {
-        rect.withAnchor(anchor, () => {
-          const distanceX = x ? Math.abs(x - rect.x) : 0;
-          const distanceY = y ? Math.abs(y - rect.y) : 0;
+        rect.withAnchor(opts.anchor, () => {
+          const distanceX = Math.abs(x - rect.x);
+          const distanceY = Math.abs(y - rect.y);
 
           let newScaleX = distanceX / rect.width;
           let newScaleY = distanceY / rect.height;
 
           // To preserve aspect ratio, take the bigger of the
           // two new scales.
-          if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
-            newScaleY = newScaleX;
-          } else {
-            newScaleX = newScaleY;
+          if (opts.lockRatio) {
+            if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
+              newScaleY = newScaleX;
+            } else {
+              newScaleX = newScaleY;
+            }
           }
 
-          rect.scaleX = newScaleX;
-          rect.scaleY = newScaleY;
+          // Aspect ratio preservation overrides lockX and lockY
+          if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
+          if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
         });
       });
 
