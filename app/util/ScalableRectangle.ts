@@ -20,7 +20,8 @@ export enum AnchorPoint {
   South,
   SouthWest,
   West,
-  NorthWest
+  NorthWest,
+  Center
 }
 
 
@@ -33,7 +34,8 @@ const AnchorPositions = {
   [AnchorPoint.South]: { x: 0.5, y: 1 },
   [AnchorPoint.SouthWest]: { x: 0, y: 1 },
   [AnchorPoint.West]: { x: 0, y: 0.5 },
-  [AnchorPoint.NorthWest]: { x: 0, y: 0 }
+  [AnchorPoint.NorthWest]: { x: 0, y: 0 },
+  [AnchorPoint.Center]: { x: 0.5, y: 0.5 }
 };
 
 
@@ -67,6 +69,16 @@ export class ScalableRectangle {
 
   get scaledHeight() {
     return this.scaleY * this.height;
+  }
+
+
+  get aspectRatio() {
+    return this.width / this.height;
+  }
+
+
+  get scaledAspectRatio() {
+    return this.scaledWidth / this.scaledHeight;
   }
 
 
@@ -135,6 +147,50 @@ export class ScalableRectangle {
   flipY() {
     this.scaleY *= -1;
     this.y -= this.scaledHeight;
+  }
+
+
+  // Stretches this rectangle across the provided
+  // rectangle.  Aspect ratio may not be preserved.
+  stretchAcross(rect: ScalableRectangle) {
+    // Normalize both rectangles for this operation
+    this.normalized(() => { rect.normalized(() => {
+      this.x = rect.x;
+      this.y = rect.y;
+      this.scaleX = rect.scaledWidth / this.width;
+      this.scaleY = rect.scaledHeight / this.height;
+    })});
+  }
+
+
+  // Fits this rectangle inside the provided rectangle
+  // while preserving the aspect ratio of this rectangle.
+  fitTo(rect: ScalableRectangle) {
+    // Normalize both rectangles for this operation
+    this.normalized(() => { rect.normalized(() => {
+      if (this.aspectRatio > rect.scaledAspectRatio) {
+        this.scaleX = rect.scaledWidth / this.width;
+        this.scaleY = this.scaleX;
+      } else {
+        this.scaleY = rect.scaledHeight / this.height;
+        this.scaleX = this.scaleY;
+      }
+
+      this.centerOn(rect);
+    })});
+  }
+
+
+  // Centers this rectangle on the provided rectangle
+  // without changing the scale.
+  centerOn(rect: ScalableRectangle) {
+    // Anchor both rectangles in the center
+    this.withAnchor(AnchorPoint.Center, () => {
+      rect.withAnchor(AnchorPoint.Center, () => {
+        this.x = rect.x;
+        this.y = rect.y;
+      });
+    });
   }
 
 }

@@ -1,5 +1,7 @@
 import { Menu } from './Menu';
 import ScenesService from '../../services/scenes';
+import VideoService from '../../services/video';
+import { ScalableRectangle } from '../../util/ScalableRectangle';
 
 export class SourceTransformMenu extends Menu {
 
@@ -31,21 +33,109 @@ export class SourceTransformMenu extends Menu {
         this.flipHorizontal();
       }
     });
+
+    this.append({
+      label: 'Stretch to Screen',
+      click: () => {
+        this.stretchToScreen();
+      }
+    });
+
+    this.append({
+      label: 'Fit to Screen',
+      click: () => {
+        this.fitToScreen();
+      }
+    });
+
+    this.append({
+      label: 'Center on Screen',
+      click: () => {
+        this.centerOnScreen();
+      }
+    });
+
   }
 
 
   resetTransform() {
-    ScenesService.instance.resetSourceTransform(this.sceneId, this.sourceId);
+    ScenesService.instance.setSourcePositionAndScale(
+      this.sceneId,
+      this.sourceId,
+      0,
+      0,
+      1.0,
+      1.0
+    );
+  }
+
+
+  setRectangle(rect: ScalableRectangle) {
+    ScenesService.instance.setSourcePositionAndScale(
+      this.sceneId,
+      this.sourceId,
+      rect.x,
+      rect.y,
+      rect.scaleX,
+      rect.scaleY
+    );
+  }
+
+
+  getMergedSource() {
+    return ScenesService.instance.getMergedSource(this.sceneId, this.sourceId);
+  }
+
+
+  // A rectangle representing this source
+  getSourceRectangle() {
+    return new ScalableRectangle(this.getMergedSource());
+  }
+
+
+  // A rectangle representing the video output screen
+  getScreenRectangle() {
+    return new ScalableRectangle({
+      x: 0,
+      y: 0,
+      width: VideoService.instance.baseWidth,
+      height: VideoService.instance.baseHeight
+    });
   }
 
 
   flipVertical() {
-    ScenesService.instance.flipSourceVertical(this.sceneId, this.sourceId);
+    const source = this.getSourceRectangle();
+    source.flipY();
+    this.setRectangle(source);
   }
 
 
   flipHorizontal() {
-    ScenesService.instance.flipSourceHorizontal(this.sceneId, this.sourceId);
+    const source = this.getSourceRectangle();
+    source.flipX();
+    this.setRectangle(source);
+  }
+
+
+  stretchToScreen() {
+    const source = this.getSourceRectangle();
+    source.stretchAcross(this.getScreenRectangle());
+    this.setRectangle(source);
+  }
+
+
+  fitToScreen() {
+    const source = this.getSourceRectangle();
+    source.fitTo(this.getScreenRectangle());
+    this.setRectangle(source);
+  }
+
+
+  centerOnScreen() {
+    const source = this.getSourceRectangle();
+    source.centerOn(this.getScreenRectangle());
+    this.setRectangle(source);
   }
 
 }
