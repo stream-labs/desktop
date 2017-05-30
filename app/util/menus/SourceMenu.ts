@@ -2,6 +2,7 @@ import { Menu } from './Menu';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import windowManager from '../WindowManager';
 import SourcesService from '../../services/sources';
+import ScenesService from '../../services/scenes';
 
 export class SourceMenu extends Menu {
 
@@ -18,6 +19,15 @@ export class SourceMenu extends Menu {
       submenu: this.transformSubmenu().menu
     });
 
+    const visibilityLabel = this.mergedSource.visible ? 'Hide' : 'Show';
+
+    this.append({
+      label: visibilityLabel,
+      click: () => {
+        this.toggleVisibility();
+      }
+    });
+
     this.append({
       label: 'Filters',
       click: () => {
@@ -31,6 +41,20 @@ export class SourceMenu extends Menu {
         this.showProperties();
       }
     });
+  }
+
+
+  get mergedSource() {
+    return ScenesService.instance.getMergedSource(this.sceneId, this.sourceId);
+  }
+
+
+  toggleVisibility() {
+    ScenesService.instance.setSourceVisibility(
+      this.sceneId,
+      this.sourceId,
+      !this.mergedSource.visible
+    );
   }
 
 
