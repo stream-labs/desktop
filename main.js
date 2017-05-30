@@ -284,7 +284,11 @@ ipcMain.on('obs-apiCall', (event, data) => {
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.
-  event.returnValue = retVal || null;
+  if (retVal == null) {
+    retVal = null;
+  }
+
+  event.returnValue = retVal;
 });
 
 // Used for guaranteeing unique ids for objects in the vuex store

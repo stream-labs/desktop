@@ -13,7 +13,7 @@
 
           <div class="side-menu">
             <NavMenu v-model="selectedFilterName">
-              <NavItem v-for="filter in filters" :to="filter">
+              <NavItem v-for="filter in filters" :to="filter" ico="eye">
                 {{ filter }}
               </NavItem>
             </NavMenu>

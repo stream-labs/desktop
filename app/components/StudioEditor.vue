@@ -13,6 +13,8 @@ import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
+import { SourceMenu } from '../util/menus/SourceMenu.ts';
+import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle.ts';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -46,7 +48,7 @@ export default {
 
       renderedOffsetX: 0,
       renderedOffsetY: 0
-    }
+    };
   },
 
   methods: {
@@ -78,32 +80,6 @@ export default {
           this.startResizing(event, overResize);
           return;
         }
-
-        if (this.isOverSource(event, this.activeSource)) {
-          this.startDragging(event);
-          return;
-        }
-      }
-
-      const overSource = _.find(this.sources, source => {
-        return this.isOverSource(event, source);
-      });
-
-      if (overSource) {
-        // Make this source active
-        ScenesService.instance.makeSourceActive(
-          ScenesService.instance.activeSceneId,
-          overSource.id
-        );
-
-        // Start dragging it
-        this.startDragging(event);
-      } else {
-        // Deselect all sources
-        ScenesService.instance.makeSourceActive(
-          ScenesService.instance.activeSceneId,
-          null
-        );
       }
 
       this.updateCursor(event);
@@ -120,6 +96,28 @@ export default {
     },
 
     handleMouseUp(event) {
+      // If neither a drag or resize was initiated, it must have been
+      // an attempted selection or right click.
+      if (!this.dragHandler && !this.resizeRegion) {
+        const overSource = this.sources.find(source => {
+          return this.isOverSource(event, source);
+        });
+
+        // Either select a new source, or deselect all sources (null)
+        ScenesService.instance.makeSourceActive(
+          ScenesService.instance.activeSceneId,
+          overSource ? overSource.id : null
+        );
+
+        if ((event.button === 2) && overSource) {
+          const menu = new SourceMenu(
+            ScenesService.instance.activeSceneId,
+            overSource.id
+          );
+          menu.popup();
+        }
+      }
+
       this.dragHandler = null;
       this.resizeRegion = null;
 
@@ -134,88 +132,110 @@ export default {
     },
 
     handleMouseMove(event) {
-      const deltaX = event.pageX - this.currentX;
-      const deltaY = event.pageY - this.currentY;
+      const mousePosX = event.offsetX - this.renderedOffsetX;
+      const mousePosY = event.offsetY - this.renderedOffsetY;
+
       const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
       const converted = this.convertScalarToBaseSpace(
-        deltaX * factor,
-        deltaY * factor
+        mousePosX * factor,
+        mousePosY * factor
       );
 
       if (this.resizeRegion) {
-        if (deltaX || deltaY) {
-          const name = this.resizeRegion.name;
+        const name = this.resizeRegion.name;
 
-          if (name === 'nw') {
-            this.resize(-1 * converted.x, -1 * converted.y, true, true);
-          } else if (name === 'sw') {
-            this.resize(-1 * converted.x, converted.y, true, false);
-          } else if (name === 'ne') {
-            this.resize(converted.x, -1 * converted.y, false, true);
-          } else if (name === 'se') {
-            this.resize(converted.x, converted.y, false, false);
-          } else if (name === 'n') {
-            this.resize(0, -1 * converted.y, false, true);
-          } else if (name === 's') {
-            this.resize(0, converted.y, false, false);
-          } else if (name === 'e') {
-            this.resize(converted.x, 0, false, false);
-          } else if (name === 'w') {
-            this.resize(-1 * converted.x, 0, true, false);
-          }
+        // We choose an anchor point opposite the resize region
+        const optionsMap = {
+          nw: { anchor: AnchorPoint.SouthEast },
+          sw: { anchor: AnchorPoint.NorthEast },
+          ne: { anchor: AnchorPoint.SouthWest },
+          se: { anchor: AnchorPoint.NorthWest },
+          n: { anchor: AnchorPoint.South, lockX: true },
+          s: { anchor: AnchorPoint.North, lockX: true },
+          e: { anchor: AnchorPoint.West, lockY: true },
+          w: { anchor: AnchorPoint.East, lockY: true }
+        };
 
-          this.currentX = event.pageX;
-          this.currentY = event.pageY;
-        }
+        const options = {
+          ...optionsMap[name],
+          lockRatio: !event.shiftKey
+        };
+
+        this.resize(converted.x, converted.y, options);
       } else if (this.dragHandler) {
         this.dragHandler.move(event);
+      } else if (event.buttons === 1) {
+        // We might need to start dragging
+        const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sources));
+
+        const overSource = sourcesInPriorityOrder.find(source => {
+          return this.isOverSource(event, source);
+        });
+
+        if (overSource) {
+          // Make this source active
+          ScenesService.instance.makeSourceActive(
+            ScenesService.instance.activeSceneId,
+            overSource.id
+          );
+
+          // Start dragging it
+          this.startDragging(event);
+        }
       }
 
       this.updateCursor(event);
     },
 
-    // Performs an aspect ratio locked resize on the active source.
-    // The move arguments determine whether the x and y position
-    // should be moved to compensate for the scaling. This is
-    // useful for scaling relative to a certain origin point.
-    resize(x, y, moveX, moveY) {
+    // x & y are mouse positions in video space
+    // options:
+    //  - anchor: an AnchorPoint enum to resize around
+    //  - lockRatio: preserve the aspect ratio (default: true)
+    //  - lockX: prevent changes to the X scale (default: false)
+    //  - lockY: prevent changes to the Y scale (default: false)
+    resize(x, y, options) {
+      // Set defaults
+      const opts = {
+        lockRatio: true,
+        lockX: false,
+        lockY: false,
+        ...options
+      };
+
       const source = this.activeSource;
+      const rect = new ScalableRectangle(source);
 
-      let pixelsX = x;
-      let pixelsY = y;
-      let deltaScaleX = pixelsX / source.width;
-      let deltaScaleY = pixelsY / source.height;
+      rect.normalized(() => {
+        rect.withAnchor(opts.anchor, () => {
+          const distanceX = Math.abs(x - rect.x);
+          const distanceY = Math.abs(y - rect.y);
 
-      // Take the bigger of the 2 scales, to preserve aspect ratio
-      if (Math.abs(deltaScaleX) > Math.abs(deltaScaleY)) {
-        deltaScaleY = deltaScaleX;
-        pixelsY = pixelsX * (source.height / source.width);
-      } else {
-        deltaScaleX = deltaScaleY;
-        pixelsX = pixelsY * (source.width / source.height);
-      }
+          let newScaleX = distanceX / rect.width;
+          let newScaleY = distanceY / rect.height;
 
-      let clamped = false;
-      let newScaleX = source.scaleX + deltaScaleX;
-      let newScaleY = source.scaleY + deltaScaleY;
+          // To preserve aspect ratio, take the bigger of the
+          // two new scales.
+          if (opts.lockRatio) {
+            if (Math.abs(newScaleX) > Math.abs(newScaleY)) {
+              newScaleY = newScaleX;
+            } else {
+              newScaleX = newScaleY;
+            }
+          }
 
-      if (newScaleX < 0) {
-        newScaleX = 0;
-        clamped = true;
-      }
-
-      if (newScaleY < 0) {
-        newScaleY = 0;
-        clamped = true;
-      }
+          // Aspect ratio preservation overrides lockX and lockY
+          if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
+          if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
+        });
+      });
 
       ScenesService.instance.setSourcePositionAndScale(
         ScenesService.instance.activeSceneId,
         source.id,
-        source.x - ((!clamped && moveX && pixelsX) || 0),
-        source.y - ((!clamped && moveY && pixelsY) || 0),
-        newScaleX,
-        newScaleY
+        rect.x,
+        rect.y,
+        rect.scaleX,
+        rect.scaleY
       );
     },
 
@@ -253,19 +273,21 @@ export default {
         event.offsetY * factor
       );
 
-      if (mouse.x < x) {
+      const box = { x, y, width, height };
+
+      if (mouse.x < box.x) {
         return false;
       }
 
-      if (mouse.y < y) {
+      if (mouse.y < box.y) {
         return false;
       }
 
-      if (mouse.x > x + width) {
+      if (mouse.x > box.x + box.width) {
         return false;
       }
 
-      if (mouse.y > y + height) {
+      if (mouse.y > box.y + box.height) {
         return false;
       }
 
@@ -275,12 +297,15 @@ export default {
     // Determines if the given mouse event is over the
     // given source
     isOverSource(event, source) {
+      const rect = new ScalableRectangle(source);
+      rect.normalize();
+
       return this.isOverBox(
         event,
-        source.x,
-        source.y,
-        source.scaledWidth,
-        source.scaledHeight
+        rect.x,
+        rect.y,
+        rect.scaledWidth,
+        rect.scaledHeight
       );
     },
 
@@ -353,67 +378,70 @@ export default {
       const width = regionRadius * 2;
       const height = regionRadius * 2;
 
+      const rect = new ScalableRectangle(source);
+      rect.normalize();
+
       return [
         {
           name: 'nw',
-          x: source.x - regionRadius,
-          y: source.y - regionRadius,
+          x: rect.x - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 'n',
-          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
-          y: source.y - regionRadius,
+          x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
         },
         {
           name: 'ne',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: source.y - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: rect.y - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
         {
           name: 'e',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'
         },
         {
           name: 'se',
-          x: (source.x + source.scaledWidth) - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: (rect.x + rect.scaledWidth) - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nwse-resize'
         },
         {
           name: 's',
-          x: (source.x + (source.scaledWidth / 2)) - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: (rect.x + (rect.scaledWidth / 2)) - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'ns-resize'
         },
         {
           name: 'sw',
-          x: source.x - regionRadius,
-          y: (source.y + source.scaledHeight) - regionRadius,
+          x: rect.x - regionRadius,
+          y: (rect.y + rect.scaledHeight) - regionRadius,
           width,
           height,
           cursor: 'nesw-resize'
         },
         {
           name: 'w',
-          x: source.x - regionRadius,
-          y: (source.y + (source.scaledHeight / 2)) - regionRadius,
+          x: rect.x - regionRadius,
+          y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
           width,
           height,
           cursor: 'ew-resize'

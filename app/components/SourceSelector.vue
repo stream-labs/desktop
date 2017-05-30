@@ -29,9 +29,7 @@ import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
 import ScenesService from '../services/scenes';
 import SourcesService from '../services/sources';
-
-const { remote } = window.require('electron');
-const { Menu, MenuItem } = remote;
+import { SourceMenu } from '../util/menus/SourceMenu.ts';
 
 
 export default {
@@ -40,23 +38,6 @@ export default {
     Selector
   },
 
-  mounted() {
-    this.menu = new Menu();
-    this.menu.append(new MenuItem({
-      label: 'Filters',
-      click: () => {
-        windowManager.showSourceFilters(ScenesService.instance.activeSource.name);
-      }
-    }));
-    this.menu.append(new MenuItem({
-      label: 'Properties',
-      click: () => {
-        this.sourceProperties();
-      }
-    }));
-  },
-
-
   methods: {
     addSource() {
       if (ScenesService.instance.activeScene) {
@@ -64,8 +45,12 @@ export default {
       }
     },
 
-    showContextMenu() {
-      this.menu.popup(remote.getCurrentWindow());
+    showContextMenu(sourceId) {
+      const menu = new SourceMenu(
+        ScenesService.instance.activeSceneId,
+        sourceId
+      );
+      menu.popup();
     },
 
     removeSource() {

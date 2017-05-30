@@ -6,11 +6,7 @@
   :fixedSectionHeight="200">
   <SourcePreview slot="fixed" :sourceName="sourceName"></SourcePreview>
   <div slot="content">
-    <component
-      v-for="property in properties"
-      v-if="property.visible"
-      :is="propertyComponentForType(property.type)"
-      :property="property"/>
+    <GenericForm v-model="properties" @input="onInputHandler"/>
   </div>
 </modal-layout>
 </template>
@@ -18,21 +14,37 @@
 <script>
 import windowManager from '../../util/WindowManager';
 import windowMixin from '../mixins/window';
-import { propertyComponentForType } from '../source_properties/helpers';
 import SourcesService from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import SourcePreview from '../shared/SourcePreview.vue';
-import * as propertyComponents from '../source_properties';
+import GenericForm from '../shared/forms/GenericForm.vue';
 
 
 export default {
 
   mixins: [windowMixin],
 
-  components: Object.assign({ ModalLayout, SourcePreview }, propertyComponents),
+  components: { ModalLayout, SourcePreview, GenericForm },
+
+  data() {
+    const sourceId = this.$store.state.windowOptions.options.sourceId;
+    const properties = SourcesService.instance.getPropertiesFormData(sourceId);
+    return {
+      sourceId,
+      properties
+    };
+  },
 
   methods: {
+
+    onInputHandler(properties, changedIndex) {
+      SourcesService.instance.setProperties(
+        this.sourceId,
+        [properties[changedIndex]]
+      );
+      this.properties = SourcesService.instance.getPropertiesFormData(this.sourceId);
+    },
 
     closeWindow() {
       windowManager.closeWindow();
@@ -44,9 +56,7 @@ export default {
 
     cancel() {
       this.closeWindow();
-    },
-
-    propertyComponentForType
+    }
   },
 
 
@@ -58,20 +68,10 @@ export default {
       return '';
     },
 
-    properties() {
-      const source = SourcesService.instance.getSourceById(this.sourceId);
-
-      if (source) return source.properties;
-      return [];
-    },
-
     sourceName() {
       return SourcesService.instance.getSourceById(this.sourceId).name;
     },
 
-    sourceId() {
-      return this.$store.state.windowOptions.options.sourceId;
-    }
   }
 
 };

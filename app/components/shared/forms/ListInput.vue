@@ -1,8 +1,8 @@
 <template>
-<div class="input">
+<div class="input" :class="{disabled: value.enabled === false}">
   <label>{{ value.description }}</label>
   <select
-    :disabled="value.enabled === 0"
+    :disabled="value.enabled === false"
     @input="onInputHandler"
   >
     <option

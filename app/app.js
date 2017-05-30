@@ -12,7 +12,7 @@ import windowManager from './util/WindowManager';
 import contextMenuManager from './util/ContextMenuManager';
 import configFileManager from './util/ConfigFileManager';
 import PeriodicRunner from './util/PeriodicRunner';
-
+import HotkeysService from './services/hotkeys';
 
 const { ipcRenderer, remote } = window.require('electron');
 
@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const periodicRunner = new PeriodicRunner();
     periodicRunner.start();
+
+    HotkeysService.instance.bindAllHotkeys();
   }
 
   window.obs = Obs.nodeObs;

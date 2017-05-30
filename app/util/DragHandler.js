@@ -2,6 +2,7 @@ import _ from 'lodash';
 import SettingsService from '../services/settings';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
+import { ScalableRectangle } from '../util/ScalableRectangle.ts';
 
 const { webFrame, screen } = window.require('electron');
 
@@ -64,18 +65,12 @@ class DragHandler {
       _.each(sourceEdges, (sourceEdge, name) => {
         _.find(this.targetEdges[name], targetEdge => {
           if (this.shouldSnap(sourceEdge, targetEdge)) {
-            if (name === 'left') {
+            if ((name === 'left') || (name === 'right')) {
               snappedX = true;
-              newX = targetEdge.depth;
-            } else if (name === 'top') {
-              snappedY = true;
-              newY = targetEdge.depth;
-            } else if (name === 'right') {
-              snappedX = true;
-              newX = targetEdge.depth - (this.draggedSource.scaledWidth);
+              newX -= sourceEdge.depth - targetEdge.depth;
             } else {
               snappedY = true;
-              newY = targetEdge.depth - (this.draggedSource.scaledHeight);
+              newY -= sourceEdge.depth - targetEdge.depth;
             }
           }
         });
@@ -217,29 +212,40 @@ class DragHandler {
   // Generates edges for the given source at
   // the given x & y coordinates
   generateSourceEdges(source, x, y) {
+    const rect = new ScalableRectangle({
+      x,
+      y,
+      width: source.width,
+      height: source.height,
+      scaleX: source.scaleX,
+      scaleY: source.scaleY
+    });
+
+    rect.normalize();
+
     return {
       left: {
-        depth: x,
-        offset: y,
-        length: source.scaledHeight
+        depth: rect.x,
+        offset: rect.y,
+        length: rect.scaledHeight
       },
 
       top: {
-        depth: y,
-        offset: x,
-        length: source.scaledWidth
+        depth: rect.y,
+        offset: rect.x,
+        length: rect.scaledWidth
       },
 
       right: {
-        depth: x + source.scaledWidth,
-        offset: y,
-        length: source.scaledHeight
+        depth: rect.x + rect.scaledWidth,
+        offset: rect.y,
+        length: rect.scaledHeight
       },
 
       bottom: {
-        depth: y + source.scaledHeight,
-        offset: x,
-        length: source.scaledWidth
+        depth: rect.y + rect.scaledHeight,
+        offset: rect.x,
+        length: rect.scaledWidth
       }
     };
   }

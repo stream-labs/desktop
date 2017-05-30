@@ -11,7 +11,7 @@
           <NavItem
             v-for="category in categoriesNames"
             :to="category"
-            :enabled="!blackList.includes(category)"
+            :ico="icons[category]"
           >
             {{ category }}
           </NavItem>
@@ -19,7 +19,11 @@
       </div>
       <div class="columns small-9">
         <startup-settings v-if="categoryName === 'General'" />
-        <GenericFormGroups v-model="settingsData" @input="save"></GenericFormGroups>
+        <hotkeys v-if="categoryName === 'Hotkeys'" />
+        <GenericFormGroups
+          v-if="categoryName !== 'Hotkeys'"
+          v-model="settingsData"
+          @input="save" />
       </div>
     </div>
   </div>
@@ -36,6 +40,7 @@ import windowManager from '../../util/WindowManager';
 import SettingsService from '../../services/settings';
 import windowMixin from '../mixins/window';
 import StartupSettings from '../StartupSettings.vue';
+import Hotkeys from '../Hotkeys.vue';
 
 export default {
 
@@ -46,7 +51,8 @@ export default {
     NavMenu,
     NavItem,
     GenericFormGroups,
-    StartupSettings
+    StartupSettings,
+    Hotkeys
   },
 
   beforeCreate() {
@@ -58,9 +64,17 @@ export default {
     const categoryName = 'General';
     return {
       categoryName,
-      blackList: ['Hotkeys'],
       categoriesNames: this.settingsService.getCategories(),
-      settingsData: this.settingsService.getSettingsFormData(categoryName)
+      settingsData: this.settingsService.getSettingsFormData(categoryName),
+      icons: {
+        General: 'th-large',
+        Stream: 'globe',
+        Output: 'microchip',
+        Video: 'film',
+        Audio: 'volume-up',
+        Hotkeys: 'keyboard-o',
+        Advanced: 'cogs'
+      }
     };
   },
 
