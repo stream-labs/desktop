@@ -56,18 +56,6 @@ export default {
   margin-bottom: 15px;
 }
 
-.studioControls-button {
-  margin-left: 15px;
-  font-size: 16px !important;
-  cursor: pointer;
-  color: #999;
-  opacity: 0.6;
-
-  &:hover {
-    opacity: 1.0;
-  }
-}
-
 .studioControls-selector {
   border: 1px solid gray;
   flex-grow: 1;

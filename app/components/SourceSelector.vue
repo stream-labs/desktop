@@ -5,13 +5,13 @@
       Sources
     </h4>
     <i
-      class="fa fa-plus studioControls-button"
+      class="fa fa-plus ico-btn"
       @click="addSource"/>
     <i
-      class="fa fa-minus studioControls-button"
+      class="fa fa-minus ico-btn"
       @click="removeSource"/>
     <i
-      class="fa fa-cog studioControls-button"
+      class="fa fa-cog ico-btn"
       @click="sourceProperties"/>
   </div>
   <selector

@@ -5,13 +5,13 @@
       Scenes
     </h4>
     <i
-      class="fa fa-plus studioControls-button"
+      class="fa fa-plus ico-btn"
       @click="addScene"/>
     <i
-      class="fa fa-minus studioControls-button"
+      class="fa fa-minus ico-btn"
       @click="removeScene"/>
     <i
-      class="fa fa-cog studioControls-button"
+      class="fa fa-cog ico-btn"
       @click="showTransitions"/>
   </div>
   <selector

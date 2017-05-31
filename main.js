@@ -48,6 +48,7 @@ let appExiting = false;
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 function startApp() {
+  const isDevMode = process.env.NODE_ENV !== 'production';
   // We use a special cache directory for running tests
   if (process.env.SLOBS_CACHE_DIR) {
     app.setPath('userData', process.env.SLOBS_CACHE_DIR);
@@ -61,7 +62,13 @@ function startApp() {
 
   mainWindow.setMenu(null);
 
-  mainWindow.loadURL(indexUrl);
+  // wait until devtools will be opened and load app into window
+  // it allows to start application with clean cache
+  // and handle breakpoints on startup
+  const LOAD_DELAY = 2000;
+  setTimeout(() => {
+    mainWindow.loadURL(indexUrl);
+  }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
     if (!appExiting) {
@@ -95,7 +102,7 @@ function startApp() {
 
   childWindow.loadURL(indexUrl + '?child=true');
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (isDevMode) {
     childWindow.webContents.openDevTools();
     mainWindow.webContents.openDevTools();
 
@@ -269,10 +276,12 @@ ipcMain.on('obs-apiCall', (event, data) => {
 
     if (isCallbackPlaceholder) {
       return (...args) => {
-        event.sender.send('obs-apiCallback', {
-          id: arg.id,
-          args
-        });
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('obs-apiCallback', {
+            id: arg.id,
+            args
+          });
+        }
       };
     }
 

@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { Subject } from 'rxjs/Subject';
 import {
   inputValuesToObsValues,
   obsValuesToInputValues
@@ -13,11 +14,17 @@ const nodeObs = Obs.nodeObs;
 
 const { ipcRenderer } = window.require('electron');
 
+
 export default class SourcesService extends StatefulService {
 
   static initialState = {
     sources: {}
   };
+
+  // TODO: in TS replace to "new Subject<ISource>()";
+  sourceAdded = new Subject();
+  sourceUpdated = new Subject();
+  sourceRemoved = new Subject();
 
   @mutation
   RESET_SOURCES() {
@@ -92,7 +99,6 @@ export default class SourcesService extends StatefulService {
     ScenesService.instance.addSourceToScene(sceneId, id);
 
     configFileManager.save();
-
     return id;
   }
 
@@ -104,10 +110,12 @@ export default class SourcesService extends StatefulService {
     const properties = this.getPropertiesFormData(id);
 
     this.ADD_SOURCE(id, name, type, properties);
+    const source = this.state.sources[id];
 
     const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.SET_MUTED(id, muted);
-
+    this.refreshSourceFlags(source, id)
+    this.sourceAdded.next(source);
     return id;
   }
 
@@ -119,6 +127,7 @@ export default class SourcesService extends StatefulService {
 
     this.REMOVE_SOURCE(id);
     ScenesService.instance.removeSourceFromAllScenes(id);
+    this.sourceRemoved.next(source);
   }
 
 
@@ -139,14 +148,20 @@ export default class SourcesService extends StatefulService {
         this.SET_SOURCE_SIZE(id, size.width, size.height);
       }
 
-      const flags = nodeObs.OBS_content_getSourceFlags(source.name);
-      const audio = !!flags.audio;
-      const video = !!flags.video;
-
-      if ((source.audio !== audio) || (source.video !== video)) {
-        this.SET_SOURCE_FLAGS(id, audio, video);
-      }
+      this.refreshSourceFlags(source, id);
     });
+  }
+
+
+  refreshSourceFlags(source, id) {
+    const flags = nodeObs.OBS_content_getSourceFlags(source.name);
+    const audio = !!flags.audio;
+    const video = !!flags.video;
+
+    if ((source.audio !== audio) || (source.video !== video)) {
+      this.SET_SOURCE_FLAGS(id, audio, video);
+      this.sourceUpdated.next(source);
+    }
   }
 
 
@@ -176,6 +191,7 @@ export default class SourcesService extends StatefulService {
 
     nodeObs.OBS_content_sourceSetMuted(source.name, muted);
     this.SET_MUTED(id, muted);
+    this.sourceUpdated.next(source);
   }
 
 

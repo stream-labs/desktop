@@ -14,6 +14,7 @@ import SourceFiltersService from '../services/source-filters';
 import SettingsService from '../services/settings';
 import StreamingService from '../services/streaming';
 import PerformanceService from '../services/performance';
+import { AudioService } from '../services/audio.ts';
 
 const statefulServiceModules = {
   ...ScenesService.getModule(),
@@ -21,7 +22,8 @@ const statefulServiceModules = {
   ...SourceFiltersService.getModule(),
   ...SettingsService.getModule(),
   ...StreamingService.getModule(),
-  ...PerformanceService.getModule()
+  ...PerformanceService.getModule(),
+  ...AudioService.getModule()
 };
 
 
