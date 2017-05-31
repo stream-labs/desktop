@@ -11,7 +11,8 @@
     "rebuild": "electron-rebuild",
     "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-packaged-0.0.4.7z -onode-obs/",
     "package": "webpack && build -w --x64 --em.env=production",
-    "deploy": "node bin/deploy.js"
+    "deploy": "node bin/deploy.js",
+    "test": "ava"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -37,6 +38,12 @@
       "url": "https://s3-us-west-2.amazonaws.com/streamlabs-obs"
     }
   },
+  "ava": {
+    "files": [
+      "test/*.js"
+    ],
+    "serial": true
+  },
   "dependencies": {
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
@@ -47,6 +54,7 @@
     "@types/electron": "^1.4.37",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
+    "ava": "^0.19.1",
     "aws-sdk": "^2.43.0",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
@@ -72,6 +80,8 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "progress": "^2.0.0",
+    "rimraf": "^2.6.1",
+    "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.3",
     "typescript": "^2.3.2",

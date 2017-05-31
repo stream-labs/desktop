@@ -48,6 +48,11 @@ let appExiting = false;
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 function startApp() {
+  // We use a special cache directory for running tests
+  if (process.env.SLOBS_CACHE_DIR) {
+    app.setPath('userData', process.env.SLOBS_CACHE_DIR);
+  }
+
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
