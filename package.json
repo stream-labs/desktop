@@ -47,7 +47,8 @@
   "dependencies": {
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "tslint": "^5.4.2"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
@@ -80,11 +81,14 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "progress": "^2.0.0",
-    "rxjs": "^5.4.0",
     "rimraf": "^2.6.1",
+    "rxjs": "^5.4.0",
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.3",
+    "tslint": "^5.4.2",
+    "tslint-config-airbnb": "^5.0.1",
+    "tslint-loader": "^3.5.3",
     "typescript": "^2.3.2",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",

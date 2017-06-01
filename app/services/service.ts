@@ -13,9 +13,9 @@ const singletonEnforcer = Symbol();
  * In this case observer-service is like a "plugin" for observable service.
  */
 export function InitAfter(...observableServices: typeof Service[]): ClassDecorator {
-  return function(target: typeof Service) {
+  return function (target: typeof Service) {
     Service.observeList.push({ ObserverService: target, observableServices });
-  }
+  };
 }
 
 /**
@@ -26,7 +26,7 @@ export function Inject() {
   return function (target: Object, key: string) {
     const ServiceClass = Reflect.getMetadata('design:type', target, key);
     Object.defineProperty(target, key, {
-      get() { return ServiceClass.instance }
+      get() { return ServiceClass.instance; }
     });
   };
 }
@@ -62,14 +62,14 @@ export abstract class Service {
 
   static initObservers(observableServiceName: string): Service[] {
     const observers = this.observeList.filter(item => {
-      return item.observableServices.find(service => service.name == observableServiceName);
+      return item.observableServices.find(service => service.name === observableServiceName);
     });
     return observers.map(observer => observer.ObserverService.instance);
   }
 
 
   constructor(enforcer: Symbol, options: Dictionary<any>) {
-    if (enforcer != singletonEnforcer) throw "Cannot construct singleton";
+    if (enforcer !== singletonEnforcer) throw 'Cannot construct singleton';
     this.options = options || this.options;
 
     const shouldInit = electron.ipcRenderer.sendSync('services-shouldInit', this.serviceName);

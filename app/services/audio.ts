@@ -79,17 +79,17 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     });
 
     sourceRemovedEvent.subscribe(source => {
-      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.name)
+      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.name);
     });
 
   }
 
 
   getSourcesForCurrentScene(): IAudioSource[] {
-    let sceneSources = this.scenesService.sources;
+    const sceneSources = this.scenesService.sources;
     return this.state.audioSources.filter(audioSource => {
       return sceneSources.find((source: ISource) => source.name === audioSource.name);
-    })
+    });
   }
 
 
@@ -131,7 +131,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       name: source.name,
       muted: source.muted,
       fader
-    }
+    };
   }
 
 
@@ -143,13 +143,13 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   @mutation
   private UPDATE_AUDIO_SOURCE(sourceName: string, patch: Partial<IAudioSource>) {
-    const source = this.state.audioSources.find(source => sourceName == source.name);
+    const source = this.state.audioSources.find(source => sourceName === source.name);
     Object.assign(source, patch);
   }
 
 
   @mutation
   private REMOVE_AUDIO_SOURCE(sourceName: string) {
-    this.state.audioSources = this.state.audioSources.filter(source => source.name != sourceName);
+    this.state.audioSources = this.state.audioSources.filter(source => source.name !== sourceName);
   }
 }
