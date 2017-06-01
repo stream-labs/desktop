@@ -93,9 +93,6 @@
     watch: {
       selectedFilterName() {
         this.save();
-        this.properties = this.sourceFiltersService.getPropertiesFormData(
-          this.sourceName, this.selectedFilterName
-        );
       }
     },
 
@@ -107,6 +104,9 @@
           this.sourceName,
           this.selectedFilterName,
           this.properties
+        );
+        this.properties = this.sourceFiltersService.getPropertiesFormData(
+          this.sourceName, this.selectedFilterName
         );
       },
 
