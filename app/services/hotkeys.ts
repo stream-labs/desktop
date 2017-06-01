@@ -1,13 +1,65 @@
-import _ from 'lodash';
+import { flatten } from 'lodash';
 
-import { Service } from './service';
+import { Service, Inject } from './service';
 import StreamingService from './streaming';
 import ScenesService from './scenes';
 import SourcesService from './sources';
+import electron from '../vendor/electron';
 
-const { globalShortcut, app } = window.require('electron').remote;
-const path = window.require('path');
-const fs = window.require('fs');
+const { globalShortcut, app } = electron.remote;
+
+const path = window['require']('path');
+const fs = window['require']('fs');
+
+// TODO: Convert scenes/sources service to Typescript
+// This represents the attributes we use on a source
+interface ISource {
+  id: string;
+  name: string;
+  audio: boolean;
+}
+
+interface IScene {
+  id: string;
+  name: string;
+  sources: ISource[];
+}
+
+interface IHotkeyBaseAction {
+  perSource?: boolean;
+  shouldApply?: (source: ISource) => boolean;
+  actsAsToggle?: boolean;
+  momentaryPress?: boolean;
+}
+
+interface IHotkeySimpleAction extends IHotkeyBaseAction {
+  description(sceneName: string, sourceName: string): string;
+  handler(sceneName: string, sourceName: string): void;
+}
+
+interface IHotkeyToggleAction extends IHotkeyBaseAction {
+  actsAsToggle: true;
+  description: {
+    on(sceneName: string, sourceName: string): string;
+    off(sceneName: string, sourceName: string): string;
+  };
+  getCurrentState(sceneName: string, sourceName: string): boolean;
+  on(sceneName: string, sourceName: string): void;
+  off(sceneName: string, sourceName: string): void;
+}
+
+interface IHotkeyMomentaryAction extends IHotkeyBaseAction {
+  momentaryPress: true;
+  description(sceneName: string, sourceName: string): string;
+  down(sceneName: string, sourceName: string): void;
+  up(sceneName: string, sourceName: string): void;
+}
+
+type THotkeyAction =
+  IHotkeySimpleAction |
+  IHotkeyToggleAction |
+  IHotkeyMomentaryAction;
+
 
 // All possible hotkeys should be defined in this object.
 // All information about the hotkey and its behavior is
@@ -18,7 +70,7 @@ const fs = window.require('fs');
 // name shouldn't really change after it is added.
 const HOTKEY_ACTIONS = {
   GENERAL: {
-    TOGGLE_STREAMING: {
+    TOGGLE_STREAMING: <IHotkeyToggleAction>{
       actsAsToggle: true,
       description: {
         on() {
@@ -39,7 +91,7 @@ const HOTKEY_ACTIONS = {
       }
     },
 
-    TOGGLE_RECORDING: {
+    TOGGLE_RECORDING: <IHotkeyToggleAction>{
       actsAsToggle: true,
       description: {
         on() {
@@ -62,7 +114,7 @@ const HOTKEY_ACTIONS = {
   },
 
   SCENE: {
-    TOGGLE_SOURCE_VISIBILITY: {
+    TOGGLE_SOURCE_VISIBILITY: <IHotkeyToggleAction>{
       actsAsToggle: true,
       perSource: true,
       description: {
@@ -94,7 +146,7 @@ const HOTKEY_ACTIONS = {
       }
     },
 
-    SWITCH_TO_SCENE: {
+    SWITCH_TO_SCENE: <IHotkeySimpleAction>{
       description() {
         return 'Switch to scene';
       },
@@ -106,7 +158,7 @@ const HOTKEY_ACTIONS = {
   },
 
   SOURCE: {
-    TOGGLE_MUTE: {
+    TOGGLE_MUTE: <IHotkeyToggleAction>{
       actsAsToggle: true,
       description: {
         on() {
@@ -138,14 +190,31 @@ const HOTKEY_ACTIONS = {
   }
 };
 
-// Represents a single bindable hotkey
-class Hotkey {
 
-  // In this case, the object is a plain JS object
-  // that uniquely represents this Hotkey.  This is
-  // needed so we can store it as JSON and identify
-  // it later.
-  static fromObject(obj) {
+// Represents a serialized Hotkey
+interface HotkeyObject {
+  action: string;
+  toggle: string;
+  scene: string;
+  source: string;
+  accelerators: string[];
+}
+
+
+// Represents a single bindable hotkey
+export class Hotkey {
+
+  action: string;
+  toggle: string;
+  scene: string;
+  source: string;
+  accelerators: Set<string>;
+
+  // These are injected dynamically
+  handler: (accelerator: string) => void;
+  description: string;
+
+  static fromObject(obj: HotkeyObject) {
     const hotkey = new this();
 
     hotkey.action = obj.action;
@@ -158,7 +227,7 @@ class Hotkey {
   }
 
   toObject() {
-    const obj = {
+    const obj = <HotkeyObject>{
       action: this.action,
       accelerators: Array.from(this.accelerators.values())
     };
@@ -171,7 +240,7 @@ class Hotkey {
   }
 
   // Determines if they are the same hotkey
-  isSameHotkey(other) {
+  isSameHotkey(other: Hotkey) {
     return (this.action === other.action) &&
       (this.toggle === other.toggle) &&
       (this.scene === other.scene) &&
@@ -186,7 +255,11 @@ class Hotkey {
 
 // Represents the full set of bindable hotkeys.  Can
 // be queried for various hotkey types.
-class HotkeySet {
+export class HotkeySet {
+
+  generalHotkeys: Hotkey[];
+  sceneHotkeys: Map<string, Hotkey[]>;
+  sourceHotkeys: Map<string, Hotkey[]>;
 
   constructor() {
     this.generalHotkeys = [];
@@ -194,16 +267,16 @@ class HotkeySet {
     this.sourceHotkeys = new Map();
   }
 
-  addGeneralHotkeys(hotkeys) {
+  addGeneralHotkeys(hotkeys: Hotkey[]) {
     this.generalHotkeys = this.generalHotkeys.concat(hotkeys);
   }
 
-  addSceneHotkeys(scene, hotkeys) {
+  addSceneHotkeys(scene: string, hotkeys: Hotkey[]) {
     const sceneHotkeys = this.sceneHotkeys.get(scene) || [];
     this.sceneHotkeys.set(scene, sceneHotkeys.concat(hotkeys));
   }
 
-  addSourceHotkeys(source, hotkeys) {
+  addSourceHotkeys(source: string, hotkeys: Hotkey[]) {
     const sourceHotkeys = this.sourceHotkeys.get(source) || [];
     this.sourceHotkeys.set(source, sourceHotkeys.concat(hotkeys));
   }
@@ -212,11 +285,11 @@ class HotkeySet {
     return this.generalHotkeys;
   }
 
-  getSceneHotkeys(scene) {
+  getSceneHotkeys(scene: string) {
     return this.sceneHotkeys.get(scene) || [];
   }
 
-  getSourceHotkeys(source) {
+  getSourceHotkeys(source: string) {
     return this.sourceHotkeys.get(source) || [];
   }
 
@@ -224,16 +297,22 @@ class HotkeySet {
   getAllHotkeys() {
     const hotkeys = [
       this.generalHotkeys,
-      Array.from(this.sceneHotkeys.values()),
-      Array.from(this.sourceHotkeys.values())
+      flatten(Array.from(this.sceneHotkeys.values())),
+      flatten(Array.from(this.sourceHotkeys.values()))
     ];
 
-    return _.flattenDeep(hotkeys);
+    return flatten(hotkeys);
   }
 
 }
 
-export default class HotkeysService extends Service {
+export class HotkeysService extends Service {
+
+  @Inject()
+  scenesService: ScenesService;
+
+  @Inject()
+  sourcesService: SourcesService;
 
   // Loads the config from disk, and binds all current hotkeys
   bindAllHotkeys() {
@@ -251,17 +330,17 @@ export default class HotkeysService extends Service {
     const hotkeySet = new HotkeySet();
 
     Object.keys(HOTKEY_ACTIONS.GENERAL).forEach(actionName => {
-      const action = HOTKEY_ACTIONS.GENERAL[actionName];
+      const action = HOTKEY_ACTIONS.GENERAL[actionName] as THotkeyAction;
       hotkeySet.addGeneralHotkeys(this.hotkeysFromAction(actionName, action));
     });
 
-    ScenesService.instance.scenes.forEach(scene => {
+    this.scenesService.scenes.forEach((scene: IScene) => {
       Object.keys(HOTKEY_ACTIONS.SCENE).forEach(actionName => {
-        const action = HOTKEY_ACTIONS.SCENE[actionName];
+        const action = HOTKEY_ACTIONS.SCENE[actionName] as THotkeyAction;
 
         if (action.perSource) {
           scene.sources.forEach(source => {
-            const name = SourcesService.instance.getSourceById(source.id).name;
+            const name: string = this.sourcesService.getSourceById(source.id).name;
 
             hotkeySet.addSceneHotkeys(
               scene.name,
@@ -282,9 +361,9 @@ export default class HotkeysService extends Service {
       });
     });
 
-    SourcesService.instance.sources.forEach(source => {
+    this.sourcesService.sources.forEach((source: ISource) => {
       Object.keys(HOTKEY_ACTIONS.SOURCE).forEach(actionName => {
-        const action = HOTKEY_ACTIONS.SOURCE[actionName];
+        const action = HOTKEY_ACTIONS.SOURCE[actionName] as THotkeyAction;
 
         if (action.shouldApply(source)) {
           hotkeySet.addSourceHotkeys(
@@ -307,14 +386,14 @@ export default class HotkeysService extends Service {
 
   // Takes the given hotkey set, starts listening for
   // keypresses, and saves the configuration
-  applyHotkeySet(hotkeySet) {
+  applyHotkeySet(hotkeySet: HotkeySet) {
     this.saveHotkeySet(hotkeySet);
     this.bindHotkeySet(hotkeySet);
   }
 
   // Saves the hotkey set to the configuration file
-  saveHotkeySet(hotkeySet) {
-    const bindings = [];
+  saveHotkeySet(hotkeySet: HotkeySet) {
+    const bindings: HotkeyObject[] = [];
 
     hotkeySet.getAllHotkeys().forEach(hotkey => {
       if (hotkey.isBound()) {
@@ -326,10 +405,10 @@ export default class HotkeysService extends Service {
     fs.writeFileSync(this.bindingsFilePath, JSON.stringify({ bindings }));
   }
 
-  bindHotkeySet(hotkeySet) {
+  bindHotkeySet(hotkeySet: HotkeySet) {
     globalShortcut.unregisterAll();
 
-    const acceleratorMap = new Map();
+    const acceleratorMap = new Map<string, Function[]>();
 
     // We need to group all hotkeys by accelerator, since electron
     // does not support binding multiple callbacks to the same
@@ -344,18 +423,18 @@ export default class HotkeysService extends Service {
       }
     });
 
-    for (const [accelerator, handlers] of acceleratorMap.entries()) {
+    acceleratorMap.forEach((handlers, accelerator) => {
       globalShortcut.register(accelerator, () => {
         handlers.forEach(handler => {
           handler(accelerator);
         });
       });
-    }
+    });
   }
 
   // This is a slow O(n^2) process, and may need to
   // be optimized later.
-  loadBindingsIntoHotkeys(hotkeys) {
+  loadBindingsIntoHotkeys(hotkeys: Hotkey[]) {
     const bindings = this.loadBindings();
 
     hotkeys.forEach(hotkey => {
@@ -367,9 +446,9 @@ export default class HotkeysService extends Service {
     });
   }
 
-  loadBindings() {
+  loadBindings(): Hotkey[] {
     if (fs.existsSync(this.bindingsFilePath)) {
-      const parsed = JSON.parse(fs.readFileSync(this.bindingsFilePath)).bindings;
+      const parsed: HotkeyObject[] = JSON.parse(fs.readFileSync(this.bindingsFilePath)).bindings;
 
       return parsed.map(binding => {
         return Hotkey.fromObject(binding);
@@ -379,10 +458,10 @@ export default class HotkeysService extends Service {
     return [];
   }
 
-  hotkeysFromAction(name, action, scene, source) {
-    const hotkeys = [];
+  hotkeysFromAction(name: string, action: THotkeyAction, scene?: string, source?: string) {
+    const hotkeys: Hotkey[] = [];
 
-    const hotkeyObj = {
+    const hotkeyObj = <HotkeyObject>{
       action: name,
       scene,
       source
@@ -390,25 +469,27 @@ export default class HotkeysService extends Service {
 
     // Toggles result in 2 hotkeys per action
     if (action.actsAsToggle) {
+      const toggleAction = action as IHotkeyToggleAction;
+
       const onHotkey = Hotkey.fromObject(hotkeyObj);
       const offHotkey = Hotkey.fromObject(hotkeyObj);
 
       onHotkey.toggle = 'on';
       offHotkey.toggle = 'off';
 
-      onHotkey.description = action.description.on(scene, source);
-      offHotkey.description = action.description.off(scene, source);
+      onHotkey.description = toggleAction.description.on(scene, source);
+      offHotkey.description = toggleAction.description.off(scene, source);
 
       onHotkey.handler = accelerator => {
         // Act as a toggle
         if (offHotkey.accelerators.has(accelerator)) {
-          if (action.getCurrentState(scene, source)) {
-            action.off(scene, source);
+          if (toggleAction.getCurrentState(scene, source)) {
+            toggleAction.off(scene, source);
           } else {
-            action.on(scene, source);
+            toggleAction.on(scene, source);
           }
-        } else if (!action.getCurrentState(scene, source)) {
-          action.on(scene, source);
+        } else if (!toggleAction.getCurrentState(scene, source)) {
+          toggleAction.on(scene, source);
         }
       };
 
@@ -416,19 +497,21 @@ export default class HotkeysService extends Service {
         if (onHotkey.accelerators.has(accelerator)) {
           // We do nothing.  The on hotkey is responsible
           // for handling toggles
-        } else if (action.getCurrentState(scene, source)) {
-          action.off(scene, source);
+        } else if (toggleAction.getCurrentState(scene, source)) {
+          toggleAction.off(scene, source);
         }
       };
 
       hotkeys.push(onHotkey);
       hotkeys.push(offHotkey);
     } else {
+      const simpleAction = action as IHotkeySimpleAction;
+
       const hotkey = Hotkey.fromObject(hotkeyObj);
-      hotkey.description = action.description(scene, source);
+      hotkey.description = simpleAction.description(scene, source);
 
       hotkey.handler = () => {
-        action.handler(scene, source);
+        simpleAction.handler(scene, source);
       };
 
       hotkeys.push(hotkey);

@@ -44,11 +44,14 @@
     ],
     "serial": true
   },
+  "cmake-js": {
+    "runtime": "electron",
+    "runtimeVersion": "1.6.1"
+  },
   "dependencies": {
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
-    "lodash": "^4.17.4",
-    "tslint": "^5.4.2"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
