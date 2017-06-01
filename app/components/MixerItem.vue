@@ -9,9 +9,9 @@
     </div>
   </div>
 
-  <div class="volmeter" v-if="volmeter">
-    <div class="volmeter-progress" :style="{ right: 100 - (volmeter.level * 100) + '%' }"></div>
-    <div class="volmeter-peak" :style="{ left: 100 * volmeter.peak + '%' }"></div>
+  <div class="volmeter">
+    <div class="volmeter-progress" :style="volmeter && { right: 100 - (volmeter.level * 100) + '%' }"></div>
+    <div class="volmeter-peak" :style="volmeter && { left: 100 * volmeter.peak + '%' }"></div>
   </div>
 
   <div class="flex">
@@ -76,7 +76,7 @@ export default class Mixer extends Vue {
   setMuted(muted: boolean) {
     this.audioService.setMuted(this.audioSource.id, muted);
     if (muted) {
-      this.volmeterSubscription.unsubscribe();
+      this.unsubscribeVolmeter();
       this.volmeter = { ...this.volmeter, peak: 0, level: 0 };
     } else {
       this.subscribeVolmeter();
