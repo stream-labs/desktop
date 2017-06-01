@@ -70,6 +70,10 @@ These variables can be used in development to force certain behavior.
 `SLOBS_FORCE_AUTO_UPDATE`: Force the auto-updater to run in development. Normally
 this would only run in production.
 
+`SLOBS_CACHE_DIR`: Force a different location for the user data cache directory.
+
+`SLOBS_DISABLE_MAIN_LOGGING`: Disable javascript logging in the main process.
+
 ## Packaging / Distributing
 
 Currently only Windows x64 packaging is supported.

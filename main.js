@@ -24,6 +24,12 @@ const { Updater } = require('./updater/Updater.js');
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////
 
+function log(...args) {
+  if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
+    console.log(...args);
+  }
+}
+
 // Windows
 let mainWindow;
 let childWindow;
@@ -195,12 +201,12 @@ ipcMain.on('vuex-register', event => {
   // refreshed.  We only want to register it once.
   if (!registeredStores[windowId]) {
     registeredStores[windowId] = win;
-    console.log('Registered vuex stores: ', _.keys(registeredStores));
+    log('Registered vuex stores: ', _.keys(registeredStores));
 
     // Make sure we unregister is when it is closed
     win.on('closed', () => {
       delete registeredStores[windowId];
-      console.log('Registered vuex stores: ', _.keys(registeredStores));
+      log('Registered vuex stores: ', _.keys(registeredStores));
     });
   }
 
@@ -269,7 +275,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
   let retVal;
   const shouldLog = !filteredObsApiMethods.includes(data.method);
 
-  if (shouldLog) console.log('OBS API CALL', data);
+  if (shouldLog) log('OBS API CALL', data);
 
   const mappedArgs = data.args.map(arg => {
     const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
@@ -294,7 +300,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
     retVal = obs[data.method].apply(obs, mappedArgs);
   }
 
-  if (shouldLog) console.log('OBS RETURN VALUE', retVal);
+  if (shouldLog) log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.
