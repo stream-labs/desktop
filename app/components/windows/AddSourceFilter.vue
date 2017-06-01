@@ -21,6 +21,7 @@
 import windowManager from '../../util/WindowManager';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
+import namingHelpers from '../../util/NamingHelpers';
 
 import * as inputComponents from '../shared/forms';
 import ModalLayout from '../ModalLayout.vue';
@@ -88,10 +89,13 @@ export default {
     },
 
 
-    setTypeAsName(typeField) {
-      this.form.name.value = this.state.availableTypes.find(({ type }) => {
-        return type === typeField.value;
+    setTypeAsName() {
+      const name = this.state.availableTypes.find(({ type }) => {
+        return type === this.form.type.value;
       }).description;
+      this.form.name.value = namingHelpers.suggestName(
+        name, suggestedName => this.validateName(suggestedName)
+      );
     }
   }
 
