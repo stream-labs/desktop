@@ -32,16 +32,10 @@ https://yarnpkg.com/en/docs/install
 First, install all node modules via yarn:
 
 ```
-yarn install --pure-lockfile
+yarn install
 ```
 
-Then, rebuild native extensions for electron:
-
-```
-yarn rebuild
-```
-
-Finally, compile assets with webpack:
+Then, compile assets with webpack:
 
 ```
 yarn compile
