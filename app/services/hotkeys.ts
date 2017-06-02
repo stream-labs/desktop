@@ -25,20 +25,33 @@ interface IScene {
   sources: ISource[];
 }
 
+enum HotkeyActionKind {
+  Simple,
+  Toggle,
+  Momentary
+}
+
 interface IHotkeyBaseAction {
+  // Only valid for hotkey actions on a scene.
+  // If true, applies to each source in a scene.
   perSource?: boolean;
+
+  // Only valid for hotkey actions a source.
+  // Takes a source a determines whether it
+  // is a valid action for the passed source.
   shouldApply?: (source: ISource) => boolean;
-  actsAsToggle?: boolean;
-  momentaryPress?: boolean;
+
+  kind: HotkeyActionKind;
 }
 
 interface IHotkeySimpleAction extends IHotkeyBaseAction {
+  kind: HotkeyActionKind.Simple;
   description(sceneName: string, sourceName: string): string;
   handler(sceneName: string, sourceName: string): void;
 }
 
 interface IHotkeyToggleAction extends IHotkeyBaseAction {
-  actsAsToggle: true;
+  kind: HotkeyActionKind.Toggle;
   description: {
     on(sceneName: string, sourceName: string): string;
     off(sceneName: string, sourceName: string): string;
@@ -48,8 +61,9 @@ interface IHotkeyToggleAction extends IHotkeyBaseAction {
   off(sceneName: string, sourceName: string): void;
 }
 
+// TODO: These need to be implemented
 interface IHotkeyMomentaryAction extends IHotkeyBaseAction {
-  momentaryPress: true;
+  kind: HotkeyActionKind.Momentary;
   description(sceneName: string, sourceName: string): string;
   down(sceneName: string, sourceName: string): void;
   up(sceneName: string, sourceName: string): void;
@@ -71,7 +85,7 @@ type THotkeyAction =
 const HOTKEY_ACTIONS = {
   GENERAL: {
     TOGGLE_STREAMING: <IHotkeyToggleAction>{
-      actsAsToggle: true,
+      kind: HotkeyActionKind.Toggle,
       description: {
         on() {
           return 'Start Streaming';
@@ -92,7 +106,7 @@ const HOTKEY_ACTIONS = {
     },
 
     TOGGLE_RECORDING: <IHotkeyToggleAction>{
-      actsAsToggle: true,
+      kind: HotkeyActionKind.Toggle,
       description: {
         on() {
           return 'Start Recording';
@@ -115,7 +129,7 @@ const HOTKEY_ACTIONS = {
 
   SCENE: {
     TOGGLE_SOURCE_VISIBILITY: <IHotkeyToggleAction>{
-      actsAsToggle: true,
+      kind: HotkeyActionKind.Toggle,
       perSource: true,
       description: {
         on(scene, source) {
@@ -147,6 +161,7 @@ const HOTKEY_ACTIONS = {
     },
 
     SWITCH_TO_SCENE: <IHotkeySimpleAction>{
+      kind: HotkeyActionKind.Simple,
       description() {
         return 'Switch to scene';
       },
@@ -159,7 +174,7 @@ const HOTKEY_ACTIONS = {
 
   SOURCE: {
     TOGGLE_MUTE: <IHotkeyToggleAction>{
-      actsAsToggle: true,
+      kind: HotkeyActionKind.Toggle,
       description: {
         on() {
           return 'Mute';
@@ -468,28 +483,26 @@ export class HotkeysService extends Service {
     };
 
     // Toggles result in 2 hotkeys per action
-    if (action.actsAsToggle) {
-      const toggleAction = action as IHotkeyToggleAction;
-
+    if (action.kind === HotkeyActionKind.Toggle) {
       const onHotkey = Hotkey.fromObject(hotkeyObj);
       const offHotkey = Hotkey.fromObject(hotkeyObj);
 
       onHotkey.toggle = 'on';
       offHotkey.toggle = 'off';
 
-      onHotkey.description = toggleAction.description.on(scene, source);
-      offHotkey.description = toggleAction.description.off(scene, source);
+      onHotkey.description = action.description.on(scene, source);
+      offHotkey.description = action.description.off(scene, source);
 
       onHotkey.handler = accelerator => {
         // Act as a toggle
         if (offHotkey.accelerators.has(accelerator)) {
-          if (toggleAction.getCurrentState(scene, source)) {
-            toggleAction.off(scene, source);
+          if (action.getCurrentState(scene, source)) {
+            action.off(scene, source);
           } else {
-            toggleAction.on(scene, source);
+            action.on(scene, source);
           }
-        } else if (!toggleAction.getCurrentState(scene, source)) {
-          toggleAction.on(scene, source);
+        } else if (!action.getCurrentState(scene, source)) {
+          action.on(scene, source);
         }
       };
 
@@ -497,21 +510,19 @@ export class HotkeysService extends Service {
         if (onHotkey.accelerators.has(accelerator)) {
           // We do nothing.  The on hotkey is responsible
           // for handling toggles
-        } else if (toggleAction.getCurrentState(scene, source)) {
-          toggleAction.off(scene, source);
+        } else if (action.getCurrentState(scene, source)) {
+          action.off(scene, source);
         }
       };
 
       hotkeys.push(onHotkey);
       hotkeys.push(offHotkey);
-    } else {
-      const simpleAction = action as IHotkeySimpleAction;
-
+    } else if (action.kind === HotkeyActionKind.Simple) {
       const hotkey = Hotkey.fromObject(hotkeyObj);
-      hotkey.description = simpleAction.description(scene, source);
+      hotkey.description = action.description(scene, source);
 
       hotkey.handler = () => {
-        simpleAction.handler(scene, source);
+        action.handler(scene, source);
       };
 
       hotkeys.push(hotkey);
