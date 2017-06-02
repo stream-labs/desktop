@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 import configFileManager from '../util/ConfigFileManager';
-import SourcesService from './sources';
+import { SourcesService } from './sources.ts';
 import store from '../store';
 
 const nodeObs = Obs.nodeObs;

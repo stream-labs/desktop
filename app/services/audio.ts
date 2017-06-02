@@ -1,8 +1,8 @@
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { mutation, StatefulService, InitAfter, Inject } from './stateful-service';
+import { SourcesService, ISource } from './sources';
 import ScenesService from './scenes';
-import SourcesService from './sources';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
@@ -34,14 +34,6 @@ interface INodeObsId {
   id: number;
 }
 
-// TODO: declare this interface in SourcesService
-interface ISource {
-  id: string;
-  name: string;
-  audio: boolean;
-  muted: boolean;
-}
-
 
 @InitAfter(SourcesService)
 export class AudioService extends StatefulService<IAudioSourcesState> {
@@ -55,16 +47,13 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
 
   protected mounted() {
-    const sourceAddedEvent = this.sourcesService.sourceAdded as Subject<ISource>;
-    const sourceUpdatedEvent = this.sourcesService.sourceUpdated as Subject<ISource>;
-    const sourceRemovedEvent = this.sourcesService.sourceRemoved as Subject<ISource>;
 
-    sourceAddedEvent.subscribe(source => {
+    this.sourcesService.sourceAdded.subscribe(source => {
       if (!source.audio) return;
       this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
     });
 
-    sourceUpdatedEvent.subscribe(source => {
+    this.sourcesService.sourceUpdated.subscribe(source => {
       const audioSource = this.state.audioSources.find(audioSource => audioSource.id === source.id);
       if (!audioSource) return;
 
@@ -78,7 +67,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       }
     });
 
-    sourceRemovedEvent.subscribe(source => {
+    this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.audio) this.REMOVE_AUDIO_SOURCE(source.name);
     });
 

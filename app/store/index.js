@@ -9,7 +9,7 @@ import sceneTransitions from './modules/sceneTransitions';
 
 // Stateful Services
 import ScenesService from '../services/scenes';
-import SourcesService from '../services/sources';
+import { SourcesService } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';
 import SettingsService from '../services/settings';
 import StreamingService from '../services/streaming';

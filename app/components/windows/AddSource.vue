@@ -18,33 +18,28 @@
 </modal-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import Obs from '../../api/Obs';
 import windowMixin from '../mixins/window';
 
-export default {
-
+@Component({
+  components: { ModalLayout },
   mixins: [windowMixin],
+})
+export default class AddSource extends Vue {
 
-  components: {
-    ModalLayout
-  },
+  availableSources = Obs.availableSources();
 
-  methods: {
-    selectSource(source) {
-      windowManager.showNameSource(source);
-    }
-  },
-
-  data() {
-    return {
-      availableSources: Obs.availableSources()
-    };
+  selectSource(sourceName: string) {
+    windowManager.showNameSource(sourceName);
   }
 
-};
+}
 </script>
 
 <style lang="less" scoped>

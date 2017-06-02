@@ -40,6 +40,8 @@ export interface IInputValue<TValueType> {
   masked: boolean;
 }
 
+export declare type TFormData = IInputValue<TObsValue>[];
+
 export interface IListInputValue extends IInputValue<string> {
   options: IListOption[];
 }
@@ -124,9 +126,9 @@ interface IObsFetchOptions {
 export function obsValuesToInputValues(
   obsProps: Dictionary<any>[],
   options: IObsFetchOptions = {}
-): IInputValue<TObsValue>[] {
+): TFormData {
 
-  const resultProps: IInputValue<TObsValue>[] = [];
+  const resultProps: TFormData = [];
 
   for (const obsProp of obsProps) {
     let prop = { ...obsProp } as IInputValue<TObsValue>;
@@ -234,7 +236,7 @@ interface IObsSaveOptions {
 }
 
 export function inputValuesToObsValues(
-  props: IInputValue<TObsValue>[],
+  props: TFormData,
   options: IObsSaveOptions = {}
 ): Dictionary<any>[] {
   const obsProps: Dictionary<any>[] = [];

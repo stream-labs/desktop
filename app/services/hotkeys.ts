@@ -3,21 +3,13 @@ import { flatten } from 'lodash';
 import { Service, Inject } from './service';
 import StreamingService from './streaming';
 import ScenesService from './scenes';
-import SourcesService from './sources';
+import { SourcesService, ISource } from './sources';
 import electron from '../vendor/electron';
 
 const { globalShortcut, app } = electron.remote;
 
 const path = window['require']('path');
 const fs = window['require']('fs');
-
-// TODO: Convert scenes/sources service to Typescript
-// This represents the attributes we use on a source
-interface ISource {
-  id: string;
-  name: string;
-  audio: boolean;
-}
 
 interface IScene {
   id: string;

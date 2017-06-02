@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import {
+  TFormData,
   inputValuesToObsValues,
   obsValuesToInputValues
 } from '../components/shared/forms/Input.ts';
@@ -9,30 +10,44 @@ import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 import ScenesService from './scenes';
 import configFileManager from '../util/ConfigFileManager';
+import electron from '../vendor/electron';
 
-const nodeObs = Obs.nodeObs;
+const nodeObs = Obs.nodeObs as Dictionary<Function>;
+const { ipcRenderer } = electron;
 
-const { ipcRenderer } = window.require('electron');
+export interface ISource {
+  id: string;
+  name: string;
+  audio: boolean;
+  video: boolean;
+  muted: boolean;
+  width: number;
+  height: number;
+  properties: TFormData;
+}
+
+interface ISourcesState {
+  sources: Dictionary<ISource>;
+}
 
 
-export default class SourcesService extends StatefulService {
+export class SourcesService extends StatefulService<ISourcesState> {
 
   static initialState = {
     sources: {}
-  };
+  } as ISourcesState;
 
-  // TODO: in TS replace to "new Subject<ISource>()";
-  sourceAdded = new Subject();
-  sourceUpdated = new Subject();
-  sourceRemoved = new Subject();
+  sourceAdded = new Subject<ISource>();
+  sourceUpdated = new Subject<ISource>();
+  sourceRemoved = new Subject<ISource>();
 
   @mutation
-  RESET_SOURCES() {
+  private RESET_SOURCES() {
     this.state.sources = {};
   }
 
   @mutation
-  ADD_SOURCE(id, name, type, properties) {
+  private ADD_SOURCE(id: string, name: string, type: string, properties: TFormData) {
     Vue.set(this.state.sources, id, {
       id,
       name,
@@ -53,29 +68,29 @@ export default class SourcesService extends StatefulService {
   }
 
   @mutation
-  REMOVE_SOURCE(id) {
+  private REMOVE_SOURCE(id: string) {
     Vue.delete(this.state.sources, id);
   }
 
   @mutation
-  SET_SOURCE_PROPERTIES(id, properties) {
+  private SET_SOURCE_PROPERTIES(id: string, properties: TFormData) {
     this.state.sources[id].properties = properties;
   }
 
   @mutation
-  SET_SOURCE_SIZE(id, width, height) {
+  private SET_SOURCE_SIZE(id: string, width: number, height: number) {
     this.state.sources[id].width = width;
     this.state.sources[id].height = height;
   }
 
   @mutation
-  SET_SOURCE_FLAGS(id, audio, video) {
+  private SET_SOURCE_FLAGS(id: string, audio: boolean, video: boolean) {
     this.state.sources[id].audio = audio;
     this.state.sources[id].video = video;
   }
 
   @mutation
-  SET_MUTED(id, muted) {
+  private SET_MUTED(id: string, muted: boolean) {
     this.state.sources[id].muted = muted;
   }
 
@@ -83,7 +98,7 @@ export default class SourcesService extends StatefulService {
   // does not support adding the same source to multiple
   // scenes.  This will be split into multiple functions
   // in the future.
-  createSourceAndAddToScene(sceneId, name, type) {
+  createSourceAndAddToScene(sceneId: string, name: string, type: string) {
     const sceneName = ScenesService.instance.getSceneById(sceneId).name;
 
     nodeObs.OBS_content_addSource(
@@ -104,7 +119,7 @@ export default class SourcesService extends StatefulService {
 
   // Initializes a source and assigns it an id.
   // The id is returned.
-  initSource(name, type) {
+  initSource(name: string, type: string) {
     // Get an id to identify the source on the frontend
     const id = ipcRenderer.sendSync('getUniqueId');
     const properties = this.getPropertiesFormData(id);
@@ -114,13 +129,13 @@ export default class SourcesService extends StatefulService {
 
     const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.SET_MUTED(id, muted);
-    this.refreshSourceFlags(source, id)
+    this.refreshSourceFlags(source, id);
     this.sourceAdded.next(source);
     return id;
   }
 
 
-  removeSource(id) {
+  removeSource(id: string) {
     const source = this.state.sources[id];
 
     nodeObs.OBS_content_removeSource(source.name);
@@ -131,7 +146,7 @@ export default class SourcesService extends StatefulService {
   }
 
 
-  refreshProperties(id) {
+  private refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
 
     this.SET_SOURCE_PROPERTIES(id, properties);
@@ -153,7 +168,7 @@ export default class SourcesService extends StatefulService {
   }
 
 
-  refreshSourceFlags(source, id) {
+  private refreshSourceFlags(source: ISource, id: string) {
     const flags = nodeObs.OBS_content_getSourceFlags(source.name);
     const audio = !!flags.audio;
     const video = !!flags.video;
@@ -165,7 +180,7 @@ export default class SourcesService extends StatefulService {
   }
 
 
-  setProperties(sourceId, properties) {
+  setProperties(sourceId: string, properties: TFormData) {
     const source = this.state.sources[sourceId];
     const propertiesToSave = inputValuesToObsValues(properties, {
       boolToString: true,
@@ -186,7 +201,7 @@ export default class SourcesService extends StatefulService {
   }
 
 
-  setMuted(id, muted) {
+  setMuted(id: string, muted: boolean) {
     const source = this.state.sources[id];
 
     nodeObs.OBS_content_sourceSetMuted(source.name, muted);
@@ -201,12 +216,12 @@ export default class SourcesService extends StatefulService {
 
   // Utility functions / getters
 
-  getSourceById(id) {
+  getSourceById(id: string) {
     return this.state.sources[id];
   }
 
 
-  getSourceByName(name) {
+  getSourceByName(name: string) {
     return Object.values(this.state.sources).find(source => {
       return source.name === name;
     });
@@ -218,7 +233,7 @@ export default class SourcesService extends StatefulService {
   }
 
 
-  getPropertiesFormData(sourceId) {
+  getPropertiesFormData(sourceId: string) {
     const source = this.getSourceById(sourceId);
     if (!source) return [];
 

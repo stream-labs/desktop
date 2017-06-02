@@ -7,7 +7,7 @@
 
 import configFileManager from './ConfigFileManager';
 import store from '../store';
-import SourcesService from '../services/sources';
+import { SourcesService } from '../services/sources.ts';
 
 
 // DEPRECATION NOTICE:

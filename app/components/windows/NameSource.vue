@@ -23,56 +23,52 @@
 </modal-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import ScenesService from '../../services/scenes';
-import SourcesService from '../../services/sources';
+import { SourcesService } from '../../services/sources';
 
-export default {
+@Component({
+  components: { ModalLayout },
+  mixins: [windowMixin]
+})
+export default class NameSource extends Vue {
 
-  mixins: [windowMixin],
+  @Inject()
+  sourcesService: SourcesService;
 
-  components: {
-    ModalLayout
-  },
+  name = namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, this.isTaken);
+  error = '';
 
-  methods: {
-    submit() {
-      if (this.isTaken(this.name)) {
-        this.error = 'That name is already taken';
-      } else {
-        const id = SourcesService.instance.createSourceAndAddToScene(
-          ScenesService.instance.activeSceneId,
-          this.name,
-          this.sourceType
-        );
+  submit() {
+    if (this.isTaken(this.name)) {
+      this.error = 'That name is already taken';
+    } else {
+      const id = this.sourcesService.createSourceAndAddToScene(
+        ScenesService.instance.activeSceneId,
+        this.name,
+        this.sourceType
+      );
 
-        windowManager.showSourceProperties(id);
-      }
-    },
-
-    isTaken(name) {
-      return SourcesService.instance.getSourceByName(name);
-    }
-  },
-
-  data() {
-    return {
-      name: namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, this.isTaken),
-      error: null
-    };
-  },
-
-  computed: {
-    sourceType() {
-      return this.$store.state.windowOptions.options.sourceType;
+      windowManager.showSourceProperties(id);
     }
   }
 
-};
+  isTaken(name: string) {
+    return this.sourcesService.getSourceByName(name);
+  }
+
+  get sourceType() {
+    return this.$store.state.windowOptions.options.sourceType;
+  }
+
+}
 </script>
 
 <style lang="less" scoped>

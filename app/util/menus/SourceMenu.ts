@@ -1,10 +1,14 @@
+import { Inject } from '../../services/service';
 import { Menu } from './Menu';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import windowManager from '../WindowManager';
-import SourcesService from '../../services/sources';
+import { SourcesService } from '../../services/sources';
 import ScenesService from '../../services/scenes';
 
 export class SourceMenu extends Menu {
+
+  @Inject()
+  private sourcesService: SourcesService;
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
@@ -64,7 +68,7 @@ export class SourceMenu extends Menu {
 
 
   showFilters() {
-    const name = SourcesService.instance.getSourceById(this.sourceId).name;
+    const name = this.sourcesService.getSourceById(this.sourceId).name;
 
     // TODO: This should take an id
     windowManager.showSourceFilters(name);
