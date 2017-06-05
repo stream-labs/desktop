@@ -10,7 +10,7 @@ export function useSpectron() {
   test.beforeEach(async t => {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     t.context.app = new Application({
-      path: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+      path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: ['.'],
       env: {
         NODE_ENV: 'test',
@@ -47,5 +47,5 @@ export async function focusMain(t) {
 
 // Focuses the child window
 export async function focusChild(t) {
-  await focusWindow(t, /child=true$/);
+  await focusWindow(t, /child=true/);
 }
