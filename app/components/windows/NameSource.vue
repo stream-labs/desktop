@@ -43,8 +43,15 @@ export default class NameSource extends Vue {
   @Inject()
   sourcesService: SourcesService;
 
-  name = namingHelpers.suggestName(this.$store.state.windowOptions.options.sourceType, this.isTaken);
+  name = '';
   error = '';
+
+  mounted() {
+    this.name = namingHelpers.suggestName(
+      this.$store.state.windowOptions.options.sourceType,
+      (name: string) => this.isTaken(name)
+    );
+  }
 
   submit() {
     if (this.isTaken(this.name)) {

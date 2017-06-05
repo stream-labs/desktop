@@ -30,7 +30,9 @@ export abstract class StatefulService<TState extends object> extends Service {
 
   static initialState = {};
 
-  store: Store<any> = store;
+  get store(): Store<any> {
+    return store;
+  }
 
   get state(): TState {
     return this.store.state[this.serviceName];
