@@ -92,25 +92,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   @mutation
-  private SET_SOURCE_PROPERTIES(id: string, properties: TFormData) {
-    this.state.sources[id].properties = properties;
-  }
-
-  @mutation
-  private SET_SOURCE_SIZE(id: string, width: number, height: number) {
-    this.state.sources[id].width = width;
-    this.state.sources[id].height = height;
-  }
-
-  @mutation
-  private SET_SOURCE_FLAGS(id: string, audio: boolean, video: boolean) {
-    this.state.sources[id].audio = audio;
-    this.state.sources[id].video = video;
-  }
-
-  @mutation
-  private SET_MUTED(id: string, muted: boolean) {
-    this.state.sources[id].muted = muted;
+  private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
+    Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
   }
 
   // This is currently a single function because node-obs
@@ -148,7 +131,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.state.sources[id];
 
     const muted = nodeObs.OBS_content_isSourceMuted(name);
-    this.SET_MUTED(id, muted);
+    this.UPDATE_SOURCE({ id, muted });
     this.refreshSourceFlags(source, id);
     this.sourceAdded.next(source);
     return id;
@@ -169,7 +152,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   private refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
 
-    this.SET_SOURCE_PROPERTIES(id, properties);
+    this.UPDATE_SOURCE({ id, properties });
   }
 
 
@@ -177,10 +160,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
     Object.keys(this.state.sources).forEach(id => {
       const source = this.state.sources[id];
 
-      const size = nodeObs.OBS_content_getSourceSize(source.name);
+      const size: {width: number, height: number } = nodeObs.OBS_content_getSourceSize(source.name);
 
       if ((source.width !== size.width) || (source.height !== size.height)) {
-        this.SET_SOURCE_SIZE(id, size.width, size.height);
+        const { width, height } = size;
+        this.UPDATE_SOURCE({ id, width, height });
       }
 
       this.refreshSourceFlags(source, id);
@@ -194,7 +178,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const video = !!flags.video;
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.SET_SOURCE_FLAGS(id, audio, video);
+      this.UPDATE_SOURCE({ id, audio, video });
       this.sourceUpdated.next(source);
     }
   }
@@ -225,7 +209,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const source = this.state.sources[id];
 
     nodeObs.OBS_content_sourceSetMuted(source.name, muted);
-    this.SET_MUTED(id, muted);
+    this.UPDATE_SOURCE({ id, muted });
     this.sourceUpdated.next(source);
   }
 
