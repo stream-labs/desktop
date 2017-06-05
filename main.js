@@ -20,6 +20,9 @@ const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 
+// Initialize the keylistener
+require('node-libuiohook').startHook();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////

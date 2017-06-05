@@ -50,7 +50,8 @@
   "dependencies": {
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "node-libuiohook": "git+ssh://git@github.com/twitchalerts/node-libuiohook.git#ce7512ce8916fb89be67da3e6d5127775ce039ce"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
