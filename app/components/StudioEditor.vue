@@ -99,7 +99,7 @@ export default {
       // If neither a drag or resize was initiated, it must have been
       // an attempted selection or right click.
       if (!this.dragHandler && !this.resizeRegion) {
-        const overSource = this.sources.find(source => {
+        const overSource = this.getSources().find(source => {
           return this.isOverSource(event, source);
         });
 
@@ -348,7 +348,7 @@ export default {
 
     sources() {
       if (ScenesService.instance.activeSceneId) {
-        return ScenesService.instance.sources.filter(source => {
+        return ScenesService.instance.getSources().filter(source => {
           // We only care about sources with video
           return source.video;
         });

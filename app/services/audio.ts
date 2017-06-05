@@ -10,6 +10,7 @@ const nodeObs = Obs.nodeObs as Dictionary<Function>;
 export interface IAudioSource {
   id: string;
   name: string;
+  displayName: string;
   fader: IFader;
   muted: boolean;
 }
@@ -75,7 +76,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
 
   getSourcesForCurrentScene(): IAudioSource[] {
-    const sceneSources = this.scenesService.sources;
+    const sceneSources = this.scenesService.getSources({ showHidden: true });
     return this.state.audioSources.filter(audioSource => {
       return sceneSources.find((source: ISource) => source.name === audioSource.name);
     });
@@ -118,6 +119,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     return {
       id: source.id,
       name: source.name,
+      displayName: SourcesService.getDisplayName(source),
       muted: source.muted,
       fader
     };

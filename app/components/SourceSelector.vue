@@ -98,7 +98,7 @@ export default class SourceSelector extends Vue {
 
 
   get sources() {
-    return this.scenesService.sources.map((source: ISource) => {
+    return this.scenesService.getSources().map((source: ISource) => {
       return {
         name: source.name,
         value: source.id

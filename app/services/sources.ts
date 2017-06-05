@@ -18,6 +18,8 @@ const { ipcRenderer } = electron;
 export interface ISource {
   id: string;
   name: string;
+  type: TSourceType;
+  isHidden: boolean;
   audio: boolean;
   video: boolean;
   muted: boolean;
@@ -25,6 +27,11 @@ export interface ISource {
   height: number;
   properties: TFormData;
 }
+
+// TODO: add more types
+export type TSourceType =
+  'Audio Output Capture' |
+  'Audio Input Capture';
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -41,13 +48,25 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
+
+  static getHidden(source: ISource) {
+    return source.name.match(/\[HIDDEN_\d+\].+/);
+  }
+
+
+  static getDisplayName(source: ISource) {
+    return this.getHidden(source) ?
+      source.name.replace(/\[HIDDEN_\d+\]/, '') :
+      source.name;
+  }
+
   @mutation
   private RESET_SOURCES() {
     this.state.sources = {};
   }
 
   @mutation
-  private ADD_SOURCE(id: string, name: string, type: string, properties: TFormData) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData) {
     Vue.set(this.state.sources, id, {
       id,
       name,
@@ -98,18 +117,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
   // does not support adding the same source to multiple
   // scenes.  This will be split into multiple functions
   // in the future.
-  createSourceAndAddToScene(sceneId: string, name: string, type: string) {
+  createSourceAndAddToScene(sceneId: string, name: string, type: TSourceType, isHidden = false) {
     const sceneName = ScenesService.instance.getSceneById(sceneId).name;
+    const sourceName = isHidden ? `[HIDDEN_${sceneId}]${name}` : name;
 
     nodeObs.OBS_content_addSource(
       type,
-      name,
+      sourceName,
       {},
       {},
       sceneName
     );
 
-    const id = this.initSource(name, type);
+    const id = this.initSource(sourceName, type);
 
     ScenesService.instance.addSourceToScene(sceneId, id);
 
@@ -119,7 +139,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   // Initializes a source and assigns it an id.
   // The id is returned.
-  initSource(name: string, type: string) {
+  initSource(name: string, type: TSourceType) {
     // Get an id to identify the source on the frontend
     const id = ipcRenderer.sendSync('getUniqueId');
     const properties = this.getPropertiesFormData(id);

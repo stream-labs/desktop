@@ -161,6 +161,7 @@ export default class ScenesService extends StatefulService {
 
     this.ADD_SCENE(id, name);
     this.makeSceneActive(id);
+    this.addDefaultSources(id);
 
     configFileManager.save();
   }
@@ -365,6 +366,10 @@ export default class ScenesService extends StatefulService {
           return source.height * sceneSource.scaleY;
         }
 
+        if (key === 'isHidden') {
+          return SourcesService.getHidden(source);
+        }
+
         return undefined;
       }
     });
@@ -378,11 +383,13 @@ export default class ScenesService extends StatefulService {
     return this.state.scenes[this.state.activeSceneId];
   }
 
-  get sources() {
+  getSources(options = { showHidden: false }) {
     if (this.activeScene) {
-      return this.activeScene.sources.map(source => {
+      const sources = this.activeScene.sources.map(source => {
         return this.getMergedSource(this.activeScene.id, source.id);
       });
+
+      return options.showHidden ? sources : sources.filter(source => !source.isHidden);
     }
 
     return [];
@@ -424,6 +431,8 @@ export default class ScenesService extends StatefulService {
     return [];
   }
 
-
-
+  addDefaultSources(sceneId) {
+    SourcesService.instance.createSourceAndAddToScene(sceneId, 'Mic/Aux', 'Audio Input Capture', true);
+    SourcesService.instance.createSourceAndAddToScene(sceneId, 'Desktop Audio', 'Audio Output Capture', true);
+  }
 }

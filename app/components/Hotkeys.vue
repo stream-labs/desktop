@@ -45,7 +45,7 @@ export default class Hotkeys extends Vue {
   }
 
   get sourceNames() {
-    return SourcesService.instance.sources.map(source => {
+    return SourcesService.instance.getSources().map(source => {
       return source.name;
     });
   }
