@@ -40,13 +40,18 @@ export class KeyListenerService extends Service {
   private normalizeAccelerator(accelerator: string) {
     let [modifier, key] = accelerator.split('+');
 
+    if (!key) {
+      key = modifier;
+      modifier = null;
+    }
+
     if (modifier === 'Ctrl' || modifier === 'Control' || modifier === 'Command') {
       modifier = 'CommandOrControl';
     }
 
     key = capitalize(key);
 
-    return `${modifier}+${key}`;
+    return [modifier, key].join('+');
   }
 
 }
