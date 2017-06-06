@@ -6,7 +6,7 @@ useSpectron();
 
 test('Adding and removing a source', async t => {
   const app = t.context.app;
-  const sourceName = 'Example Video Capture';
+  const sourceName = 'Example Window Capture';
   const sourceSelector = `li=${sourceName}`;
 
   await addSource(t, 'Video Capture Device', sourceName);

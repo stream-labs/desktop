@@ -45,7 +45,8 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "1.6.1"
+    "runtimeVersion": "1.6.1",
+    "arch": "x64"
   },
   "dependencies": {
     "electron-updater": "^1.14.0",

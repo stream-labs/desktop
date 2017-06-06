@@ -1,0 +1,12 @@
+build: off
+
+cache:
+  - node_modules
+
+install:
+  - git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs
+  - yarn install
+  - yarn compile
+
+test_script:
+  - yarn test -- -v
