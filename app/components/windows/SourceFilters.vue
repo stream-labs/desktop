@@ -13,8 +13,12 @@
 
           <div class="side-menu">
             <NavMenu v-model="selectedFilterName">
-              <NavItem v-for="filter in filters" :to="filter" ico="eye">
-                {{ filter }}
+              <NavItem
+                v-for="filter in filters"
+                :to="filter.name"
+                :ico="filter.visible ? 'eye' : 'eye-slash'"
+                @iconClick="toggleVisibility">
+                {{ filter.name }}
               </NavItem>
             </NavMenu>
             <div class="controls">
@@ -43,91 +47,82 @@
   </modal-layout>
 </template>
 
-<script>
-  import windowManager from '../../util/WindowManager';
-  import windowMixin from '../mixins/window';
-  import SourceFiltersService from '../../services/source-filters';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Watch } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
+import windowManager from '../../util/WindowManager';
+import windowMixin from '../mixins/window';
+import SourceFiltersService from '../../services/source-filters';
 
-  import ModalLayout from '../ModalLayout.vue';
-  import NavMenu from '../shared/NavMenu.vue';
-  import NavItem from '../shared/NavItem.vue';
-  import SourcePreview from '../shared/SourcePreview.vue';
-  import GenericForm from '../shared/forms/GenericForm.vue';
+import ModalLayout from '../ModalLayout.vue';
+import NavMenu from '../shared/NavMenu.vue';
+import NavItem from '../shared/NavItem.vue';
+import SourcePreview from '../shared/SourcePreview.vue';
+import GenericForm from '../shared/forms/GenericForm.vue';
 
-  export default {
+@Component({
+  components: {
+    ModalLayout,
+    NavMenu,
+    NavItem,
+    GenericForm,
+    SourcePreview,
+  },
+  mixins: [windowMixin]
+})
+export default class SourceFilters extends Vue {
 
-    mixins: [windowMixin],
+  @Inject()
+  filtersService: SourceFiltersService;
 
-    components: {
-      ModalLayout,
-      NavMenu,
-      NavItem,
-      GenericForm,
-      SourcePreview
-    },
+  windowOptions: { sourceName: string, selectedFilterName: string } = windowManager.getOptions();
+  sourceName = this.windowOptions.sourceName;
+  filters = this.filtersService.getFilters(this.sourceName);
+  selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
+  properties = this.filtersService.getPropertiesFormData(
+    this.sourceName, this.selectedFilterName
+  );
 
+  @Watch('selectedFilterName')
+  onSelectedFilterChanged() {
+    this.save();
+  }
 
-    beforeCreate() {
-      /**
-       * @type {SourceFilterService}
-       */
-      this.sourceFiltersService = SourceFiltersService.instance;
-    },
-
-
-    data() {
-      const { sourceName, selectedFilterName } = windowManager.getOptions();
-      const filters = this.sourceFiltersService.getFiltersNames(sourceName);
-      const filterName = selectedFilterName || filters[0];
-      return {
-        sourceName,
-        filters,
-        selectedFilterName: filterName,
-        properties: this.sourceFiltersService.getPropertiesFormData(
-          sourceName, filterName
-        ),
-      };
-    },
-
-
-    watch: {
-      selectedFilterName() {
-        this.save();
-      }
-    },
-
-
-    methods: {
-
-      save() {
-        this.sourceFiltersService.setProperties(
-          this.sourceName,
-          this.selectedFilterName,
-          this.properties
-        );
-        this.properties = this.sourceFiltersService.getPropertiesFormData(
-          this.sourceName, this.selectedFilterName
-        );
-      },
+  save() {
+    this.filtersService.setProperties(
+      this.sourceName,
+      this.selectedFilterName,
+      this.properties
+    );
+    this.properties = this.filtersService.getPropertiesFormData(
+      this.sourceName, this.selectedFilterName
+    );
+  }
 
 
-      done() {
-        windowManager.closeWindow();
-      },
+  done() {
+    windowManager.closeWindow();
+  }
 
 
-      addFilter() {
-        windowManager.showAddSourceFilter(this.sourceName);
-      },
+  addFilter() {
+    windowManager.showAddSourceFilter(this.sourceName);
+  }
 
 
-      removeFilter() {
-        this.sourceFiltersService.remove(this.sourceName, this.selectedFilterName);
-        this.filters = this.sourceFiltersService.getFiltersNames(this.sourceName);
-        this.selectedFilterName = this.filters[0];
-      }
-    }
-  };
+  removeFilter() {
+    this.filtersService.remove(this.sourceName, this.selectedFilterName);
+    this.filters = this.filtersService.getFilters(this.sourceName);
+    this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
+  }
+
+  toggleVisibility(filterName: string) {
+    const sourceFilter = this.filters.find(filter => filter.name === filterName);
+    this.filtersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
+    this.filters = this.filtersService.getFilters(this.sourceName);
+  }
+}
 </script>
 
 <style lang="less" scoped>

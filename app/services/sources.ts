@@ -4,7 +4,7 @@ import {
   TFormData,
   inputValuesToObsValues,
   obsValuesToInputValues
-} from '../components/shared/forms/Input.ts';
+} from '../components/shared/forms/Input';
 
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
@@ -49,12 +49,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceRemoved = new Subject<ISource>();
 
 
-  static getHidden(source: ISource) {
-    return source.name.match(/\[HIDDEN_\d+\].+/);
+  static getHidden(source: ISource): boolean {
+    return !!source.name.match(/\[HIDDEN_\d+\].+/);
   }
 
 
-  static getDisplayName(source: ISource) {
+  static getDisplayName(source: ISource): string {
     return this.getHidden(source) ?
       source.name.replace(/\[HIDDEN_\d+\]/, '') :
       source.name;
