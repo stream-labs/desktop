@@ -18,19 +18,21 @@ export class SourceMenu extends Menu {
 
 
   appendMenuItems() {
-    this.append({
-      label: 'Transform',
-      submenu: this.transformSubmenu().menu
-    });
+    if (this.mergedSource.video) {
+      this.append({
+        label: 'Transform',
+        submenu: this.transformSubmenu().menu
+      });
 
-    const visibilityLabel = this.mergedSource.visible ? 'Hide' : 'Show';
+      const visibilityLabel = this.mergedSource.visible ? 'Hide' : 'Show';
 
-    this.append({
-      label: visibilityLabel,
-      click: () => {
-        this.toggleVisibility();
-      }
-    });
+      this.append({
+        label: visibilityLabel,
+        click: () => {
+          this.toggleVisibility();
+        }
+      });
+    }
 
     this.append({
       label: 'Filters',

@@ -36,6 +36,11 @@
         @click="setMuted(false)"
       >
       </i>
+      <i
+        class="ico-btn fa fa-cog"
+        @click="showSourceMenu(audioSource.id)"
+      >
+      </i>
     </div>
   </div>
 
@@ -46,7 +51,9 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
+import { SourceMenu } from '../util/menus/SourceMenu';
 import { AudioService, IAudioSource, IVolmeter } from '../services/audio';
+import ScenesService from '../services/scenes';
 import { Inject } from '../services/service';
 import Slider from  './shared/Slider.vue';
 
@@ -60,6 +67,8 @@ export default class Mixer extends Vue {
 
   @Inject()
   audioService: AudioService;
+
+  scenesService = ScenesService.instance;
 
   volmeter: IVolmeter = null;
   volmeterSubscription: Subscription;
@@ -97,6 +106,14 @@ export default class Mixer extends Vue {
 
   onSliderChangeHandler(newVal: number) {
     this.audioService.setDeflection(this.audioSource.name, newVal);
+  }
+
+  showSourceMenu(sourceId: string) {
+    const menu = new SourceMenu(
+      this.scenesService.activeSceneId,
+      sourceId
+    );
+    menu.popup();
   }
 }
 </script>
@@ -146,8 +163,8 @@ export default class Mixer extends Vue {
   }
 
   .controls {
-    width: 30px;
-    text-align: center;
+    width: 55px;
+    text-align: right;
     font-size: 16px;
     margin-top: -2px;
     .fa-volume-off { color: @red }
