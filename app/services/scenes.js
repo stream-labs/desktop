@@ -282,6 +282,11 @@ export default class ScenesService extends StatefulService {
       });
     });
 
+    const needToCreateDefaultScene = Object.keys(this.state.scenes).length === 0;
+    if (needToCreateDefaultScene) {
+      this.createScene('Scene');
+    }
+
     // TODO: LOAD EXISTING SCENE TRANSITIONS
     store.dispatch({ type: 'refreshSceneTransitions' });
   }
