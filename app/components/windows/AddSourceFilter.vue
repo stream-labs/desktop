@@ -39,7 +39,7 @@ export default class AddSourceFilter extends Vue {
   @Inject()
   filtersService: SourceFiltersService;
   sourceName: string = windowManager.getOptions().sourceName;
-  form = this.filtersService.getAddNewFormData();
+  form = this.filtersService.getAddNewFormData(this.sourceName);
   error = '';
 
   mounted() {

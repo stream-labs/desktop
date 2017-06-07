@@ -2,8 +2,18 @@ import { StatefulService } from './stateful-service';
 import { obsValuesToInputValues, inputValuesToObsValues, TFormData } from '../components/shared/forms/Input';
 
 import Obs from '../api/Obs';
+import { Inject } from './service';
+import { SourcesService } from './sources';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
+
+interface ISourceFilterType {
+  type: string;
+  description: string;
+  video: boolean;
+  audio: boolean;
+  async: boolean;
+}
 
 export interface ISourceFilter {
   name: string;
@@ -11,7 +21,7 @@ export interface ISourceFilter {
 }
 
 interface ISourceFiltersState {
-  availableTypes: { type: string, description: string }[];
+  availableTypes: ISourceFilterType[];
 }
 
 export default class SourceFiltersService extends StatefulService<ISourceFiltersState> {
@@ -20,6 +30,9 @@ export default class SourceFiltersService extends StatefulService<ISourceFilters
   static initialState: ISourceFiltersState = {
     availableTypes: nodeObs.OBS_content_getListFilters()
   };
+
+  @Inject()
+  sourcesService: SourcesService;
 
 
   add(sourceName: string, filterType: string, filterName: string) {
@@ -67,15 +80,20 @@ export default class SourceFiltersService extends StatefulService<ISourceFilters
   }
 
 
-  getAddNewFormData() {
+  getAddNewFormData(sourceName: string) {
+    const source = this.sourcesService.getSourceByName(sourceName);
+    const availableTypes = this.state.availableTypes.filter(filterType => {
+      return (filterType.audio && source.audio) || (filterType.video && source.video);
+    }).map(filterType => {
+      return { description: filterType.description, value: filterType.type };
+    });
+
     return {
       type: {
         description: 'Filter type',
         name: 'type',
         value: this.state.availableTypes[0].type,
-        options: this.state.availableTypes.map((item: { type: string, description: string }) => {
-          return { description: item.description, value: item.type };
-        })
+        options: availableTypes
       },
       name: {
         description: 'Filter name',
