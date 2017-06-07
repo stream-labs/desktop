@@ -124,6 +124,9 @@ const HOTKEY_ACTIONS = {
     TOGGLE_SOURCE_VISIBILITY: <IHotkeyToggleAction>{
       kind: HotkeyActionKind.Toggle,
       perSource: true,
+      shouldApply(source) {
+        return source.video;
+      },
       description: {
         on(scene, source) {
           return `Show '${source}'`;
@@ -387,18 +390,20 @@ export class HotkeysService extends Service {
         const action = HOTKEY_ACTIONS.SCENE[actionName] as THotkeyAction;
 
         if (action.perSource) {
-          scene.sources.forEach(source => {
-            const name: string = this.sourcesService.getSourceById(source.id).name;
+          scene.sources.forEach(sceneSource => {
+            const source = this.sourcesService.getSourceById(sceneSource.id);
 
-            hotkeySet.addSceneHotkeys(
-              scene.name,
-              this.hotkeysFromAction(
-                actionName,
-                action,
+            if (!action.shouldApply || action.shouldApply(source)) {
+              hotkeySet.addSceneHotkeys(
                 scene.name,
-                name
-              )
-            );
+                this.hotkeysFromAction(
+                  actionName,
+                  action,
+                  scene.name,
+                  source.name
+                )
+              );
+            }
           });
         } else {
           hotkeySet.addSceneHotkeys(
@@ -413,7 +418,7 @@ export class HotkeysService extends Service {
       Object.keys(HOTKEY_ACTIONS.SOURCE).forEach(actionName => {
         const action = HOTKEY_ACTIONS.SOURCE[actionName] as THotkeyAction;
 
-        if (action.shouldApply && action.shouldApply(source)) {
+        if (!action.shouldApply || action.shouldApply(source)) {
           hotkeySet.addSourceHotkeys(
             source.name,
             this.hotkeysFromAction(
