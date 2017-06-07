@@ -14,10 +14,11 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { HotkeysService } from '../services/hotkeys.ts';
+import { Inject } from '../services/service';
+import { HotkeySet, HotkeysService } from '../services/hotkeys';
 import ScenesService from '../services/scenes';
 import { SourcesService } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup.vue';
@@ -27,25 +28,34 @@ import HotkeyGroup from './HotkeyGroup.vue';
 })
 export default class Hotkeys extends Vue {
 
-  beforeCreate() {
+  @Inject()
+  sourcesService: SourcesService;
+
+  @Inject()
+  hotkeysService: HotkeysService;
+
+  hotkeySet: HotkeySet;
+
+  created() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
     HotkeysService.instance.unregisterAll();
-    this.hotkeySet = HotkeysService.instance.getHotkeySet();
+    this.hotkeySet = this.hotkeysService.getHotkeySet();
   }
 
   destroyed() {
-    HotkeysService.instance.applyHotkeySet(this.hotkeySet);
+    this.hotkeysService.applyHotkeySet(this.hotkeySet);
   }
 
   get sceneNames() {
-    return ScenesService.instance.scenes.map(scene => {
+    // TODO: move ScenesService to TypeScript
+    return ScenesService.instance.scenes.map((scene: any) => {
       return scene.name;
     });
   }
 
   get sourceNames() {
-    return SourcesService.instance.getSources().map(source => {
+    return this.sourcesService.sources.map(source => {
       return source.name;
     });
   }
