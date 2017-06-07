@@ -5,13 +5,21 @@ import { addScene, clickRemoveScene, selectScene } from './helpers/spectron/scen
 
 useSpectron();
 
+// Checks for the default audio sources
+async function checkDefaultSources(t) {
+  const app = t.context.app;
+  await focusMain(t);
+
+  t.true(await app.client.isExisting('div=Mic/Aux'));
+  t.true(await app.client.isExisting('div=Desktop Audio'));
+}
+
 test('The default scene', async t => {
   const app = t.context.app;
   await focusMain(t);
   t.true(await app.client.isExisting('div=Scene'));
+  await checkDefaultSources(t);
 });
-
-test.todo('Default audio sources in the default scene');
 
 test('Adding and removing a scene', async t => {
   const app = t.context.app;
@@ -23,6 +31,7 @@ test('Adding and removing a scene', async t => {
   t.true(await app.client.isExisting(`div=${sceneName}`));
 
   await selectScene(t, sceneName);
+  await checkDefaultSources(t);
   await clickRemoveScene(t);
 
   t.false(await app.client.isExisting(`div=${sceneName}`));
