@@ -1,9 +1,14 @@
+import { Inject } from '../../services/service';
 import { Menu } from './Menu';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import windowManager from '../WindowManager';
-import SourcesService from '../../services/sources';
+import { SourcesService } from '../../services/sources';
+import ScenesService from '../../services/scenes';
 
 export class SourceMenu extends Menu {
+
+  @Inject()
+  private sourcesService: SourcesService;
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
@@ -13,10 +18,21 @@ export class SourceMenu extends Menu {
 
 
   appendMenuItems() {
-    this.append({
-      label: 'Transform',
-      submenu: this.transformSubmenu().menu
-    });
+    if (this.mergedSource.video) {
+      this.append({
+        label: 'Transform',
+        submenu: this.transformSubmenu().menu
+      });
+
+      const visibilityLabel = this.mergedSource.visible ? 'Hide' : 'Show';
+
+      this.append({
+        label: visibilityLabel,
+        click: () => {
+          this.toggleVisibility();
+        }
+      });
+    }
 
     this.append({
       label: 'Filters',
@@ -34,13 +50,27 @@ export class SourceMenu extends Menu {
   }
 
 
+  get mergedSource() {
+    return ScenesService.instance.getMergedSource(this.sceneId, this.sourceId);
+  }
+
+
+  toggleVisibility() {
+    ScenesService.instance.setSourceVisibility(
+      this.sceneId,
+      this.sourceId,
+      !this.mergedSource.visible
+    );
+  }
+
+
   transformSubmenu() {
     return new SourceTransformMenu(this.sceneId, this.sourceId);
   }
 
 
   showFilters() {
-    const name = SourcesService.instance.getSourceById(this.sourceId).name;
+    const name = this.sourcesService.getSourceById(this.sourceId).name;
 
     // TODO: This should take an id
     windowManager.showSourceFilters(name);

@@ -12,7 +12,7 @@ import windowManager from './util/WindowManager';
 import contextMenuManager from './util/ContextMenuManager';
 import configFileManager from './util/ConfigFileManager';
 import PeriodicRunner from './util/PeriodicRunner';
-import HotkeysService from './services/hotkeys';
+import { HotkeysService } from './services/hotkeys.ts';
 
 const { ipcRenderer, remote } = window.require('electron');
 

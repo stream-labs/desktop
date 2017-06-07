@@ -154,12 +154,12 @@ export class ScalableRectangle {
   // rectangle.  Aspect ratio may not be preserved.
   stretchAcross(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => { rect.normalized(() => {
+    this.normalized(() => rect.normalized(() => {
       this.x = rect.x;
       this.y = rect.y;
       this.scaleX = rect.scaledWidth / this.width;
       this.scaleY = rect.scaledHeight / this.height;
-    })});
+    }));
   }
 
 
@@ -167,7 +167,7 @@ export class ScalableRectangle {
   // while preserving the aspect ratio of this rectangle.
   fitTo(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
-    this.normalized(() => { rect.normalized(() => {
+    this.normalized(() => rect.normalized(() => {
       if (this.aspectRatio > rect.scaledAspectRatio) {
         this.scaleX = rect.scaledWidth / this.width;
         this.scaleY = this.scaleX;
@@ -177,7 +177,7 @@ export class ScalableRectangle {
       }
 
       this.centerOn(rect);
-    })});
+    }));
   }
 
 

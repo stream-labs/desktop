@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Vue from 'vue';
-import { Prop } from "vue-property-decorator";
+import { Prop } from 'vue-property-decorator';
 
 /**
  * all possible OBS properties types
@@ -39,6 +39,8 @@ export interface IInputValue<TValueType> {
   visible: boolean;
   masked: boolean;
 }
+
+export declare type TFormData = IInputValue<TObsValue>[];
 
 export interface IListInputValue extends IInputValue<string> {
   options: IListOption[];
@@ -124,12 +126,12 @@ interface IObsFetchOptions {
 export function obsValuesToInputValues(
   obsProps: Dictionary<any>[],
   options: IObsFetchOptions = {}
-): IInputValue<TObsValue>[] {
+): TFormData {
 
-  const resultProps: IInputValue<TObsValue>[] = [];
+  const resultProps: TFormData = [];
 
   for (const obsProp of obsProps) {
-    let prop = {...obsProp} as IInputValue<TObsValue>;
+    let prop = { ...obsProp } as IInputValue<TObsValue>;
     let valueObject: Dictionary<any>;
     let obsValue = obsProp.currentValue;
 
@@ -139,7 +141,7 @@ export function obsValuesToInputValues(
     }
 
     if (options.valueIsObject) {
-      obsValue = obsValue.value
+      obsValue = obsValue.value;
     }
 
     prop.value = obsValue;
@@ -161,7 +163,7 @@ export function obsValuesToInputValues(
         listOptions.push({
           value: listOption[Object.keys(listOption)[0]],
           description: Object.keys(listOption)[0]
-        })
+        });
       }
 
       if (options.subParametersGetter) {
@@ -169,10 +171,10 @@ export function obsValuesToInputValues(
       }
 
       for (const listOption of listOptions) {
-        if (listOption.description == void 0) listOption.description = listOption['name'];
+        if (listOption.description === void 0) listOption.description = listOption['name'];
       }
 
-      const needToSetDefaultValue = listOptions.length && prop.value == void 0;
+      const needToSetDefaultValue = listOptions.length && prop.value === void 0;
       if (needToSetDefaultValue) prop.value = listOptions[0].value;
 
       (<any>prop).options = listOptions;
@@ -193,7 +195,7 @@ export function obsValuesToInputValues(
           minVal: Number(obsProp.minVal),
           maxVal: Number(obsProp.maxVal),
           stepVal: Number(obsProp.stepVal)
-        } as ISliderInputValue
+        } as ISliderInputValue;
       }
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
 
@@ -202,7 +204,7 @@ export function obsValuesToInputValues(
           ...prop,
           type: 'OBS_PROPERTY_FILE',
           filters: parsePathFilters(valueObject.filter)
-        } as IPathInputValue
+        } as IPathInputValue;
       }
     } else if (obsProp.type === 'OBS_PROPERTY_FONT') {
       prop.value = valueObject;
@@ -234,16 +236,16 @@ interface IObsSaveOptions {
 }
 
 export function inputValuesToObsValues(
-  props: IInputValue<TObsValue>[],
+  props: TFormData,
   options: IObsSaveOptions = {}
 ): Dictionary<any>[] {
   const obsProps: Dictionary<any>[] = [];
 
   for (const prop of props) {
-    const obsProp = {...prop} as Dictionary<any>;
+    const obsProp = { ...prop } as Dictionary<any>;
     obsProps.push(obsProp);
 
-    if (prop.type === 'OBS_PROPERTY_BOOL' ) {
+    if (prop.type === 'OBS_PROPERTY_BOOL') {
       if (options.boolToString) obsProp.currentValue = obsProp.currentValue ? 'true' : 'false';
     } else if (prop.type === 'OBS_PROPERTY_INT') {
       if (options.intToString) obsProp.currentValue = String(obsProp.currentValue);

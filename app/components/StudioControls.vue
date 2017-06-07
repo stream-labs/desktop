@@ -1,21 +1,18 @@
 <template>
 <div class="studioControls row expanded">
-  <theme-selector class="studioControls-panel small-3 columns" />
-  <scene-selector class="studioControls-panel small-3 columns" />
-  <source-selector class="studioControls-panel small-3 columns" />
-  <mixer class="studioControls-panel small-3 columns" />
+  <scene-selector class="studioControls-panel small-4 columns" />
+  <source-selector class="studioControls-panel small-4 columns" />
+  <mixer class="studioControls-panel small-4 columns" />
 </div>
 </template>
 
 <script>
-import ThemeSelector from './ThemeSelector.vue';
 import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
 import Mixer from './Mixer.vue';
 
 export default {
   components: {
-    ThemeSelector,
     SceneSelector,
     SourceSelector,
     Mixer
@@ -57,18 +54,6 @@ export default {
   align-items: center;
 
   margin-bottom: 15px;
-}
-
-.studioControls-button {
-  margin-left: 15px;
-  font-size: 16px !important;
-  cursor: pointer;
-  color: #999;
-  opacity: 0.6;
-
-  &:hover {
-    opacity: 1.0;
-  }
 }
 
 .studioControls-selector {

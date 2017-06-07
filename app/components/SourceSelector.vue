@@ -5,13 +5,13 @@
       Sources
     </h4>
     <i
-      class="fa fa-plus studioControls-button"
+      class="fa fa-plus ico-btn"
       @click="addSource"/>
     <i
-      class="fa fa-minus studioControls-button"
+      class="fa fa-minus ico-btn"
       @click="removeSource"/>
     <i
-      class="fa fa-cog studioControls-button"
+      class="fa fa-cog ico-btn"
       @click="sourceProperties"/>
   </div>
   <selector
@@ -24,80 +24,91 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
 import ScenesService from '../services/scenes';
-import SourcesService from '../services/sources';
-import { SourceMenu } from '../util/menus/SourceMenu.ts';
+import { ISource, SourcesService } from '../services/sources';
+import { SourceMenu } from '../util/menus/SourceMenu';
+
+@Component({
+  components: { Selector }
+})
+export default class SourceSelector extends Vue {
+
+  @Inject()
+  sourcesService: SourcesService;
+
+  @Inject()
+  scenesService: ScenesService;
 
 
-export default {
-
-  components: {
-    Selector
-  },
-
-  methods: {
-    addSource() {
-      if (ScenesService.instance.activeScene) {
-        windowManager.showAddSource();
-      }
-    },
-
-    showContextMenu(sourceId) {
-      const menu = new SourceMenu(
-        ScenesService.instance.activeSceneId,
-        sourceId
-      );
-      menu.popup();
-    },
-
-    removeSource() {
-      // We can only remove a source if one is selected
-      if (this.activeSourceId) {
-        SourcesService.instance.removeSource(this.activeSourceId);
-      }
-    },
-
-    sourceProperties() {
-      if (this.activeSourceId) {
-        windowManager.showSourceProperties(this.activeSourceId);
-      }
-    },
-
-    handleSort(data) {
-      const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
-
-      ScenesService.instance.setSourceOrder(
-        ScenesService.instance.activeScene.id,
-        data.change.moved.element.value,
-        positionDelta,
-        data.order
-      );
-    },
-
-    makeActive(sourceId) {
-      ScenesService.instance.makeSourceActive(
-        ScenesService.instance.activeScene.id,
-        sourceId
-      );
-    }
-  },
-
-  computed: {
-    sources() {
-      return ScenesService.instance.sources.map(source => {
-        return {
-          name: source.name,
-          value: source.id
-        };
-      });
-    },
-
-    activeSourceId() {
-      return ScenesService.instance.activeSourceId;
+  addSource() {
+    if (this.scenesService.activeScene) {
+      windowManager.showAddSource();
     }
   }
-};
+
+
+  showContextMenu(sourceId: string) {
+    const menu = new SourceMenu(
+      this.scenesService.activeSceneId,
+      sourceId
+    );
+    menu.popup();
+  }
+
+
+  removeSource() {
+    // We can only remove a source if one is selected
+    if (this.activeSourceId) {
+      this.sourcesService.removeSource(this.activeSourceId);
+    }
+  }
+
+
+  sourceProperties() {
+    if (this.activeSourceId) {
+      windowManager.showSourceProperties(this.activeSourceId);
+    }
+  }
+
+
+  handleSort(data: any) {
+    const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
+
+    this.scenesService.setSourceOrder(
+      this.scenesService.activeScene.id,
+      data.change.moved.element.value,
+      positionDelta,
+      data.order
+    );
+  }
+
+
+  makeActive(sourceId: string) {
+    this.scenesService.makeSourceActive(
+      this.scenesService.activeScene.id,
+      sourceId
+    );
+  }
+
+
+  get sources() {
+    return this.scenesService.getSources().map((source: ISource) => {
+      return {
+        name: source.name,
+        value: source.id
+      };
+    });
+  }
+
+
+  get activeSourceId(): string {
+    return this.scenesService.activeSourceId;
+  }
+}
 </script>

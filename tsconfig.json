@@ -4,7 +4,8 @@
     "target": "es5",
     "lib": [
       "dom",
-      "es7"
+      "es7",
+      "ES2017"
     ],
     "module": "es2015",
     "moduleResolution": "node",

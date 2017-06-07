@@ -20,9 +20,18 @@ const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 
+// Initialize the keylistener
+require('node-libuiohook').startHook();
+
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
 ////////////////////////////////////////////////////////////////////////////////
+
+function log(...args) {
+  if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
+    console.log(...args);
+  }
+}
 
 // Windows
 let mainWindow;
@@ -48,6 +57,12 @@ let appExiting = false;
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 function startApp() {
+  const isDevMode = process.env.NODE_ENV !== 'production';
+  // We use a special cache directory for running tests
+  if (process.env.SLOBS_CACHE_DIR) {
+    app.setPath('userData', process.env.SLOBS_CACHE_DIR);
+  }
+
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -56,7 +71,13 @@ function startApp() {
 
   mainWindow.setMenu(null);
 
-  mainWindow.loadURL(indexUrl);
+  // wait until devtools will be opened and load app into window
+  // it allows to start application with clean cache
+  // and handle breakpoints on startup
+  const LOAD_DELAY = 2000;
+  setTimeout(() => {
+    mainWindow.loadURL(indexUrl);
+  }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
     if (!appExiting) {
@@ -90,7 +111,7 @@ function startApp() {
 
   childWindow.loadURL(indexUrl + '?child=true');
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (isDevMode) {
     childWindow.webContents.openDevTools();
     mainWindow.webContents.openDevTools();
 
@@ -183,12 +204,12 @@ ipcMain.on('vuex-register', event => {
   // refreshed.  We only want to register it once.
   if (!registeredStores[windowId]) {
     registeredStores[windowId] = win;
-    console.log('Registered vuex stores: ', _.keys(registeredStores));
+    log('Registered vuex stores: ', _.keys(registeredStores));
 
     // Make sure we unregister is when it is closed
     win.on('closed', () => {
       delete registeredStores[windowId];
-      console.log('Registered vuex stores: ', _.keys(registeredStores));
+      log('Registered vuex stores: ', _.keys(registeredStores));
     });
   }
 
@@ -257,17 +278,19 @@ ipcMain.on('obs-apiCall', (event, data) => {
   let retVal;
   const shouldLog = !filteredObsApiMethods.includes(data.method);
 
-  if (shouldLog) console.log('OBS API CALL', data);
+  if (shouldLog) log('OBS API CALL', data);
 
   const mappedArgs = data.args.map(arg => {
     const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__obsCallback;
 
     if (isCallbackPlaceholder) {
       return (...args) => {
-        event.sender.send('obs-apiCallback', {
-          id: arg.id,
-          args
-        });
+        if (!event.sender.isDestroyed()) {
+          event.sender.send('obs-apiCallback', {
+            id: arg.id,
+            args
+          });
+        }
       };
     }
 
@@ -280,7 +303,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
     retVal = obs[data.method].apply(obs, mappedArgs);
   }
 
-  if (shouldLog) console.log('OBS RETURN VALUE', retVal);
+  if (shouldLog) log('OBS RETURN VALUE', retVal);
 
   // electron ipc doesn't like returning undefined, so
   // we return null instead.

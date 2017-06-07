@@ -47,7 +47,7 @@
 import Tabs from '../Tabs.vue';
 import fr from '../../util/FrameRate';
 import Property from './Property.vue';
-import SourcesService from '../../services/sources';
+import { SourcesService } from '../../services/sources.ts';
 
 const FrameRateProperty = Property.extend({
 

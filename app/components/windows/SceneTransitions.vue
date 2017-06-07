@@ -9,12 +9,12 @@
         <ListInput :value="form.currentName" @input="onInputHandler"></ListInput>
       </div>
       <div class="columns small-4 controls">
-        <div class="fa fa-plus studioControls-button" @click="addTransition"></div>
+        <div class="fa fa-plus ico-btn" @click="addTransition"></div>
         <div
-          class="fa fa-minus studioControls-button"
+          class="fa fa-minus ico-btn"
           @click="removeTransition" v-if="state.availableNames.length > 1">
         </div>
-        <div class="fa fa-cog studioControls-button" @click="setupTransition" v-if="state.properties.length"></div>
+        <div class="fa fa-cog ico-btn" @click="setupTransition" v-if="state.properties.length"></div>
       </div>
     </div>
     <div class="row">

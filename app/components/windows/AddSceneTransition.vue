@@ -6,8 +6,8 @@
   >
 
     <div slot="content">
+      <ListInput v-model="form.type" @input="setTypeAsName"></ListInput>
       <TextInput v-model="form.name"></TextInput>
-      <ListInput v-model="form.type"></ListInput>
       <p v-if="error" style="color: red">
         {{ error }}
       </p>
@@ -22,6 +22,7 @@ import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager.js';
 import windowMixin from '../mixins/window';
 import * as inputComponents from '../shared/forms';
+import namingHelpers from '../../util/NamingHelpers';
 
 export default {
 
@@ -30,6 +31,10 @@ export default {
   components: Object.assign({
     ModalLayout
   }, inputComponents),
+
+  mounted() {
+    this.setTypeAsName();
+  },
 
   methods: {
 
@@ -59,6 +64,15 @@ export default {
       if (!name) return 'Name is required';
       if (this.state.availableNames.includes(name)) return 'That name is already taken';
       return '';
+    },
+
+    setTypeAsName() {
+      const name = this.state.availableTypes.find(({ type }) => {
+        return type === this.form.type.value;
+      }).description;
+      this.form.name.value = namingHelpers.suggestName(
+        name, suggestedName => this.validateName(suggestedName)
+      );
     }
   },
 

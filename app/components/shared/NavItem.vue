@@ -4,7 +4,7 @@
   :class="{ active: to === value, disabled: enabled == false }"
   @click="onClickHandler"
 >
-  <i v-if="ico" :class="'fa fa-' + ico"></i>
+  <i v-if="ico" :class="'fa fa-' + ico" @click="onIconClickHandler"></i>
   <slot></slot>
 </li>
 </template>
@@ -30,7 +30,13 @@ export default {
 
     onClickHandler() {
       if (!this.enabled) return;
-      this.$parent.setValue(this.to)
+      this.$parent.setValue(this.to);
+    },
+
+    onIconClickHandler(event) {
+      if (!this.enabled) return;
+      this.$emit('iconClick', this.to);
+      event.stopPropagation();
     },
 
   }

@@ -348,7 +348,7 @@ export default {
 
     sources() {
       if (ScenesService.instance.activeSceneId) {
-        return ScenesService.instance.sources.filter(source => {
+        return ScenesService.instance.getSources().filter(source => {
           // We only care about sources with video
           return source.video;
         });

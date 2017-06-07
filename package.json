@@ -8,10 +8,10 @@
     "compile": "webpack",
     "watch": "webpack --watch",
     "start": "electron .",
-    "rebuild": "electron-rebuild",
     "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-packaged-0.0.4.7z -onode-obs/",
     "package": "webpack && build -w --x64 --em.env=production",
-    "deploy": "node bin/deploy.js"
+    "deploy": "node bin/deploy.js",
+    "test": "ava"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -37,16 +37,29 @@
       "url": "https://s3-us-west-2.amazonaws.com/streamlabs-obs"
     }
   },
+  "ava": {
+    "files": [
+      "test/*.js"
+    ],
+    "serial": true
+  },
+  "cmake-js": {
+    "runtime": "electron",
+    "runtimeVersion": "1.6.1",
+    "arch": "x64"
+  },
   "dependencies": {
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "node-libuiohook": "git+ssh://git@github.com/twitchalerts/node-libuiohook.git#ce7512ce8916fb89be67da3e6d5127775ce039ce"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
     "@types/electron": "^1.4.37",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
+    "ava": "^0.19.1",
     "aws-sdk": "^2.43.0",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
@@ -59,7 +72,6 @@
     "electron": "^1.4.15",
     "electron-builder": "^15.6.2",
     "electron-devtools-installer": "^2.1.0",
-    "electron-rebuild": "^1.5.7",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
@@ -72,8 +84,14 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "progress": "^2.0.0",
+    "rimraf": "^2.6.1",
+    "rxjs": "^5.4.0",
+    "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "ts-loader": "^2.0.3",
+    "tslint": "^5.4.2",
+    "tslint-config-airbnb": "^5.0.1",
+    "tslint-loader": "^3.5.3",
     "typescript": "^2.3.2",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",

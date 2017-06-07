@@ -32,16 +32,10 @@ https://yarnpkg.com/en/docs/install
 First, install all node modules via yarn:
 
 ```
-yarn install --pure-lockfile
+yarn install
 ```
 
-Then, rebuild native extensions for electron:
-
-```
-yarn rebuild
-```
-
-Finally, compile assets with webpack:
+Then, compile assets with webpack:
 
 ```
 yarn compile
@@ -69,6 +63,10 @@ These variables can be used in development to force certain behavior.
 
 `SLOBS_FORCE_AUTO_UPDATE`: Force the auto-updater to run in development. Normally
 this would only run in production.
+
+`SLOBS_CACHE_DIR`: Force a different location for the user data cache directory.
+
+`SLOBS_DISABLE_MAIN_LOGGING`: Disable javascript logging in the main process.
 
 ## Packaging / Distributing
 
