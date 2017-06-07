@@ -66,8 +66,8 @@ export default {
         // Ensure we have default settings
         settings = {
           obsMode: false,
-          profile: profileOptions[0].name,
-          sceneCollection: sceneCollectionOptions[0].name
+          profile: profileOptions[0].value,
+          sceneCollection: sceneCollectionOptions[0].value
         };
 
         fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
