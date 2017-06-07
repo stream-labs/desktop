@@ -88,6 +88,7 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
+    obs.OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -121,7 +122,7 @@ function startApp() {
   }
 
   // Initialize various OBS services
-  obs.OBS_API_initOBS_API();
+  obs.OBS_API_initOBS_API(app.getPath('userData'));
 
   const startupConfig = loadStartupConfig();
 
