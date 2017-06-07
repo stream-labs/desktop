@@ -88,6 +88,7 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
+    require('node-libuiohook').stopHook();
     obs.OBS_API_destroyOBS_API();
     app.quit();
   });
