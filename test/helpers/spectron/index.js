@@ -28,7 +28,9 @@ export function useSpectron() {
 
   test.afterEach.always(async t => {
     await t.context.app.stop();
-    rimraf.sync(t.context.cacheDir);
+    setTimeout(() => {
+      rimraf.sync(t.context.cacheDir);
+    }, 1000);
   });
 }
 
