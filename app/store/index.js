@@ -5,10 +5,10 @@ import _ from 'lodash';
 // Modules
 import navigation from './modules/navigation';
 import windowOptions from './modules/windowOptions';
-import sceneTransitions from './modules/sceneTransitions';
 
 // Stateful Services
 import ScenesService from '../services/scenes';
+import ScenesTransitions from  '../services/scenes-transitions.ts';
 import { SourcesService } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';
 import SettingsService from '../services/settings';
@@ -18,6 +18,7 @@ import { AudioService } from '../services/audio.ts';
 
 const statefulServiceModules = {
   ...ScenesService.getModule(),
+  ...ScenesTransitions.getModule(),
   ...SourcesService.getModule(),
   ...SourceFiltersService.getModule(),
   ...SettingsService.getModule(),
@@ -86,7 +87,6 @@ export default new Vuex.Store({
   modules: {
     navigation,
     windowOptions,
-    sceneTransitions,
     ...statefulServiceModules
   },
   plugins,

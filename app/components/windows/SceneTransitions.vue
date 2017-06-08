@@ -27,53 +27,55 @@
 </modal-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
+import { IInputValue } from "../shared/forms/Input";
+import ScenesTransitionsService from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
 import * as inputComponents from '../shared/forms';
 import windowManager from '../../util/WindowManager';
 import windowMixin from '../mixins/window';
 
+@Component({
+  components: { ModalLayout, ...inputComponents },
+  mixins: [windowMixin]
+})
+export default class SceneTransitions extends Vue {
 
-export default {
+  @Inject()
+  transitionsService: ScenesTransitionsService;
+  form = this.transitionsService.getFormData();
 
-  mixins: [windowMixin],
+  get state() { return this.transitionsService.state; }
 
-  components: Object.assign({
-    ModalLayout
-  }, inputComponents),
 
-  computed: {
-    form() {
-      return this.$store.getters.sceneTransitionsFormData;
-    },
-    state() {
-      return this.$store.state.sceneTransitions;
-    }
-  },
-
-  methods: {
-
-    onInputHandler(value) {
-      this.$store.dispatch('setCurrentSceneTransition', { [value.name]: value.value });
-    },
-
-    addTransition() {
-      windowManager.showAddSceneTransition();
-    },
-
-    setupTransition() {
-      windowManager.showSceneTransitionProperties(this.state.currentName);
-    },
-
-    removeTransition() {
-      this.$store.dispatch('removeSceneTransition', { name: this.state.currentName });
-    },
-
-    done() {
-      windowManager.closeWindow();
-    }
+  onInputHandler(value: IInputValue<string>) {
+    this.transitionsService.setCurrent({ [value.name]: value.value });
   }
-};
+
+
+  addTransition() {
+    windowManager.showAddSceneTransition();
+  }
+
+
+  setupTransition() {
+    windowManager.showSceneTransitionProperties(this.state.currentName);
+  }
+
+
+  removeTransition() {
+    this.transitionsService.remove(this.state.currentName);
+  }
+
+
+  done() {
+    windowManager.closeWindow();
+  }
+}
+
 </script>
 
 <style lang="less" scoped>

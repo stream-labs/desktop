@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import _ from 'lodash';
 
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from './stateful-service.ts';
 import Obs from '../api/Obs';
 import configFileManager from '../util/ConfigFileManager';
 import { SourcesService } from './sources.ts';
@@ -287,8 +287,6 @@ export default class ScenesService extends StatefulService {
       this.createScene('Scene');
     }
 
-    // TODO: LOAD EXISTING SCENE TRANSITIONS
-    store.dispatch({ type: 'refreshSceneTransitions' });
   }
 
   loadSourceAttributes(sceneId, sourceId) {

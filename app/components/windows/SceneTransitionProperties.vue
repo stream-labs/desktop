@@ -12,46 +12,38 @@
   </modal-layout>
 </template>
 
-<script>
-  import ModalLayout from '../ModalLayout.vue';
-  import * as inputComponents from '../shared/forms';
-  import GenericForm from '../shared/forms/GenericForm.vue';
-  import windowManager from '../../util/WindowManager';
-  import windowMixin from '../mixins/window';
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
+import ScenesTransitionsService from '../../services/scenes-transitions';
+import ModalLayout from '../ModalLayout.vue';
+import GenericForm from '../shared/forms/GenericForm.vue';
+import windowManager from '../../util/WindowManager';
+import windowMixin from '../mixins/window';
 
-  export default {
+@Component({
+  components: { ModalLayout, GenericForm },
+  mixins: [windowMixin]
+})
+export default class SceneTransitionProperties extends Vue {
 
-    mixins: [windowMixin],
+  @Inject()
+  transitionsService: ScenesTransitionsService;
 
-    components: Object.assign({
-      ModalLayout,
-      GenericForm
-    }, inputComponents),
-
-
-    data() {
-      return {
-        properties: this.$store.getters.sceneTransitionsPropertiesFormData()
-      };
-    },
+  properties = this.transitionsService.getPropertiesFormData();
 
 
-    methods: {
+  done() {
+    this.transitionsService.setProperties(this.properties);
+    windowManager.showSceneTransitions();
+  }
 
-      done() {
-        this.$store.dispatch({
-          type: 'setSceneTransitionProperties',
-          properties: this.properties
-        });
 
-        windowManager.showSceneTransitions();
-      },
-
-      cancel() {
-        windowManager.showSceneTransitions();
-      }
-    }
-  };
+  cancel() {
+    windowManager.showSceneTransitions();
+  }
+}
 </script>
 
 <style lang="less" scoped>
