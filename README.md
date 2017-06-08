@@ -29,7 +29,13 @@ https://yarnpkg.com/en/docs/install
 
 ## Installation
 
-First, install all node modules via yarn:
+First, make sure you have initialized git submodules:
+
+```
+git submodule update --init --recursive
+```
+
+Install all node modules via yarn:
 
 ```
 yarn install
