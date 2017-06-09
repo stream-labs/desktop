@@ -41,11 +41,6 @@ const mutations = {
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
-  },
-
-  // Used by PersistentStatefulService
-  LOAD_PERSISTED_STATE(state, data) {
-    state[data.serviceName] = data.state;
   }
 };
 
