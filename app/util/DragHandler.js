@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import SettingsService from '../services/settings';
+import { SettingsService } from '../services/settings';
 import ScenesService from '../services/scenes';
 import VideoService from '../services/video';
 import { ScalableRectangle } from '../util/ScalableRectangle.ts';

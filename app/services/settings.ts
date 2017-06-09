@@ -1,14 +1,39 @@
 import { StatefulService, mutation } from './stateful-service';
-import { obsValuesToInputValues, inputValuesToObsValues } from '../components/shared/forms/Input';
+import { obsValuesToInputValues, inputValuesToObsValues, TObsValue, TFormData } from '../components/shared/forms/Input';
 import Obs from '../api/Obs';
 
-const nodeObs = Obs.nodeObs;
+const nodeObs: Dictionary<Function> = Obs.nodeObs;
 
-export default class SettingsService extends StatefulService {
+export interface ISettingsSubCategory {
+  nameSubCategory: string;
+  parameters: TFormData;
+}
 
-  static convertFormDataToState(settingsFormData) {
-    let settingsState = {};
-    for (let groupName in settingsFormData) {
+export interface ISettingsState {
+  General: {
+    KeepRecordingWhenStreamStops: boolean;
+    RecordWhenStreaming: boolean;
+    WarnBeforeStartingStream: boolean;
+    WarnBeforeStoppingStream: boolean;
+  };
+  Stream: {
+    key: string;
+  };
+  Output: Dictionary<TObsValue>;
+  Video: Dictionary<TObsValue>;
+  Audio: Dictionary<TObsValue>;
+  Hotkeys: Dictionary<TObsValue>;
+  Advanced: Dictionary<TObsValue>;
+}
+
+declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
+
+
+export class SettingsService extends StatefulService<ISettingsState> {
+
+  static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
+    const settingsState: Partial<ISettingsState> = {};
+    for (const groupName in settingsFormData) {
       settingsFormData[groupName].forEach(subGroup => {
         subGroup.parameters.forEach(parameter => {
           settingsState[groupName] = settingsState[groupName] || {};
@@ -17,12 +42,18 @@ export default class SettingsService extends StatefulService {
       });
     }
 
-    return settingsState;
+    return settingsState as ISettingsState;
   }
+
+
+  init() {
+    this.loadSettingsIntoStore();
+  }
+
 
   loadSettingsIntoStore() {
     // load configuration from nodeObs to state
-    let settingsFormData = {};
+    const settingsFormData = {};
     this.getCategories().forEach(categoryName => {
       settingsFormData[categoryName] = this.getSettingsFormData(categoryName);
     });
@@ -30,12 +61,12 @@ export default class SettingsService extends StatefulService {
   }
 
 
-  getCategories() {
+  getCategories(): string[] {
     return nodeObs.OBS_settings_getListCategories();
   }
 
 
-  getSettingsFormData(categoryName) {
+  getSettingsFormData(categoryName: string): TSettingsFormData {
     const settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
@@ -77,19 +108,21 @@ export default class SettingsService extends StatefulService {
     return settings;
   }
 
-  setSettings(categoryName, settingsData) {
+  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
+    const dataToSave = [];
+
     for (const subGroup of settingsData) {
-      subGroup.parameters = inputValuesToObsValues(
+      dataToSave.push({ ...subGroup, parameters: inputValuesToObsValues(
         subGroup.parameters,
         { valueToCurrentValue: true }
-      );
+      )});
     }
-    nodeObs.OBS_settings_saveSettings(categoryName, settingsData);
+    nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
   }
 
   @mutation
-  SET_SETTINGS(settingsData) {
+  SET_SETTINGS(settingsData: ISettingsState) {
     this.patchState(settingsData);
   }
 

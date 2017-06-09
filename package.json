@@ -52,7 +52,8 @@
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
-    "node-libuiohook": "file:./node-libuiohook"
+    "node-libuiohook": "file:./node-libuiohook",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",

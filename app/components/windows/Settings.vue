@@ -31,73 +31,65 @@
 </modal-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Watch } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import windowManager from '../../util/WindowManager';
-import SettingsService from '../../services/settings';
+import { SettingsService, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import StartupSettings from '../StartupSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 
-export default {
-
-  mixins: [windowMixin],
-
+@Component({
   components: {
     ModalLayout,
+    GenericFormGroups,
     NavMenu,
     NavItem,
-    GenericFormGroups,
     StartupSettings,
     Hotkeys
   },
+  mixins: [windowMixin]
+})
+export default class SceneTransitions extends Vue {
 
-  beforeCreate() {
-    this.settingsService = SettingsService.instance;
-    this.settingsService.loadSettingsIntoStore();
-  },
+  @Inject()
+  settingsService: SettingsService;
 
-  data() {
-    const categoryName = 'General';
-    return {
-      categoryName,
-      categoriesNames: this.settingsService.getCategories(),
-      settingsData: this.settingsService.getSettingsFormData(categoryName),
-      icons: {
-        General: 'th-large',
-        Stream: 'globe',
-        Output: 'microchip',
-        Video: 'film',
-        Audio: 'volume-up',
-        Hotkeys: 'keyboard-o',
-        Advanced: 'cogs'
-      }
-    };
-  },
+  categoryName = 'General';
+  categoriesNames = this.settingsService.getCategories();
+  settingsData = this.settingsService.getSettingsFormData(this.categoryName);
+  icons: {[key in keyof ISettingsState]: string} = {
+    General: 'th-large',
+    Stream: 'globe',
+    Output: 'microchip',
+    Video: 'film',
+    Audio: 'volume-up',
+    Hotkeys: 'keyboard-o',
+    Advanced: 'cogs'
+  };
 
-  methods: {
-
-    save(settingsData) {
-      this.settingsService.setSettings(this.categoryName, settingsData);
-      this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
-    },
-
-
-    done() {
-      windowManager.closeWindow();
-    }
-  },
-
-
-  watch: {
-    categoryName(categoryName) {
-      this.settingsData = this.settingsService.getSettingsFormData(categoryName);
-    }
+  save(settingsData: ISettingsSubCategory[]) {
+    this.settingsService.setSettings(this.categoryName, settingsData);
+    this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
-};
+
+
+  done() {
+    windowManager.closeWindow();
+  }
+
+  @Watch('categoryName')
+  onCategoryNameChangedHandler(categoryName: string) {
+    this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+  }
+
+}
 </script>
 
 <style lang="less" scoped>

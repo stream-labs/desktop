@@ -50,13 +50,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
 
   static getHidden(source: ISource): boolean {
-    return !!source.name.match(/\[HIDDEN_\d+\].+/);
+    return !!source.name.match(/\[HIDDEN_[\d\w-]+\].+/);
   }
 
 
   static getDisplayName(source: ISource): string {
     return this.getHidden(source) ?
-      source.name.replace(/\[HIDDEN_\d+\]/, '') :
+      source.name.replace(/\[HIDDEN_[\d\w-]+\]/, '') :
       source.name;
   }
 

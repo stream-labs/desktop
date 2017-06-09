@@ -11,7 +11,7 @@ import ScenesService from '../services/scenes';
 import ScenesTransitions from  '../services/scenes-transitions.ts';
 import { SourcesService } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';
-import SettingsService from '../services/settings';
+import { SettingsService } from '../services/settings';
 import StreamingService from '../services/streaming';
 import PerformanceService from '../services/performance';
 import { AudioService } from '../services/audio.ts';

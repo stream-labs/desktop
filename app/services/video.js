@@ -1,5 +1,5 @@
 import { Service } from './service';
-import SettingsService from './settings';
+import { SettingsService } from './settings';
 import Obs from '../api/Obs';
 
 const nodeObs = Obs.nodeObs;
