@@ -15,6 +15,7 @@ import SettingsService from '../services/settings';
 import StreamingService from '../services/streaming';
 import PerformanceService from '../services/performance';
 import { AudioService } from '../services/audio.ts';
+import { CustomizationService } from '../services/customization.ts';
 
 const statefulServiceModules = {
   ...ScenesService.getModule(),
@@ -24,7 +25,8 @@ const statefulServiceModules = {
   ...SettingsService.getModule(),
   ...StreamingService.getModule(),
   ...PerformanceService.getModule(),
-  ...AudioService.getModule()
+  ...AudioService.getModule(),
+  ...CustomizationService.getModule()
 };
 
 
