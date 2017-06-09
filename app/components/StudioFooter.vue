@@ -9,44 +9,34 @@
       @click="toggleRecording">
       {{ recordButtonLabel }}
     </button>
-    <button
-      class="button button--default button--md studioFooter-button studioFooter-button--startStreaming"
-      @click="toggleStreaming">
-      {{ streamButtonLabel }}
-    </button>
+    <start-streaming-button class="studioFooter-button studioFooter-button--startStreaming"/>
   </div>
 </div>
 </template>
 
 <script>
-import moment from 'moment';
 import _ from 'lodash';
-import SettingsService from '../services/settings';
-import StreamingService from '../services/streaming';
+import StreamingService from '../services/streaming.ts';
 import PerformanceService from '../services/performance';
+import StartStreamingButton from './StartStreamingButton.vue';
 
 export default {
 
+  components: { StartStreamingButton },
+
   data() {
     return {
-      streamElapsed: '',
       recordElapsed: ''
     };
   },
 
   beforeCreate() {
-    this.settingsService = SettingsService.instance;
-    this.settingsService.loadSettingsIntoStore();
     this.streamingService = StreamingService.instance;
     this.performanceService = PerformanceService.instance;
   },
 
   mounted() {
     this.timersInterval = setInterval(() => {
-      if (this.streaming) {
-        this.streamElapsed = this.elapsedStreamTime;
-      }
-
       if (this.recording) {
         this.recordElapsed = this.elapsedRecordTime;
       }
@@ -58,76 +48,18 @@ export default {
   },
 
   methods: {
-    toggleStreaming() {
-      if (this.streaming) {
-        this.stopStreaming();
-
-        const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
-
-        if (!keepRecording && this.recording) {
-          this.stopRecording();
-        }
-      } else {
-        this.startStreaming();
-
-        const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
-
-        if (recordWhenStreaming && !this.recording) {
-          this.startRecording();
-        }
-      }
-    },
-
-    startStreaming() {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
-      const confirmText = 'Are you sure you want to start streaming?';
-
-      if (shouldConfirm && !confirm(confirmText)) return;
-
-      const blankStreamKey = !this.settingsService.state.Stream.key;
-
-      if (blankStreamKey) {
-        alert('No stream key has been entered. Please check your settings and add a valid stream key.');
-        return;
-      }
-
-      this.streamingService.startStreaming();
-    },
-
-    stopStreaming() {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
-      const confirmText = 'Are you sure you want to stop streaming?';
-
-      if ((shouldConfirm && confirm(confirmText)) || !shouldConfirm) {
-        this.streamingService.stopStreaming();
-      }
-    },
-
     toggleRecording() {
       if (this.recording) {
         this.streamingService.stopRecording();
       } else {
         this.streamingService.startRecording();
       }
-    },
-
-    formattedDurationSince(timestamp) {
-      const duration = moment.duration(moment() - timestamp);
-      const seconds = _.padStart(duration.seconds(), 2, 0);
-      const minutes = _.padStart(duration.minutes(), 2, 0);
-      const hours = _.padStart(duration.hours(), 2, 0);
-
-      return `${hours}:${minutes}:${seconds}`;
     }
   },
 
   computed: {
-    streaming() {
-      return this.streamingService.isStreaming;
-    },
-
     streamStatusMsg() {
-      if (this.streaming && this.streamOk !== null) {
+      if (this.streamingService.isStreaming && this.streamOk !== null) {
         if (this.streamOk) {
           return 'Stream OK';
         }
@@ -136,25 +68,6 @@ export default {
       }
 
       return null;
-    },
-
-    streamStartTime() {
-      return this.streamingService.streamStartTime;
-    },
-
-    streamButtonLabel() {
-      if (this.streaming) {
-        return this.streamElapsed;
-      }
-
-      return 'Start Streaming';
-    },
-
-    elapsedStreamTime: {
-      cache: false,
-      get() {
-        return this.formattedDurationSince(this.streamStartTime);
-      }
     },
 
     recording() {
@@ -180,7 +93,7 @@ export default {
     elapsedRecordTime: {
       cache: false,
       get() {
-        return this.formattedDurationSince(this.recordStartTime);
+        return this.streamingService.formattedElapsedRecordTime;
       }
     },
 
