@@ -1,6 +1,6 @@
 <template>
   <modal-layout
-    :title="'Source filters (' + sourceName + ')'"
+    :title="'Source filters (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"
@@ -54,6 +54,7 @@ import { Inject } from '../../services/service';
 import windowManager from '../../util/WindowManager';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
+import { SourcesService } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
@@ -108,6 +109,13 @@ export default class SourceFilters extends Vue {
 
   addFilter() {
     windowManager.showAddSourceFilter(this.sourceName);
+  }
+
+
+  get sourceDisplayName() {
+    return SourcesService.getDisplayName(
+      SourcesService.instance.getSourceByName(this.sourceName)
+    );
   }
 
 
