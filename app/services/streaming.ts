@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Inject } from './service';
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
-import SettingsService from './settings';
+import { SettingsService } from './settings';
 import { padStart } from 'lodash';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
@@ -60,7 +60,6 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
 
   // Only runs once per app lifecycle
   init() {
-    this.settingsService.loadSettingsIntoStore();
 
     // Initialize the stream check interval
     setInterval(
