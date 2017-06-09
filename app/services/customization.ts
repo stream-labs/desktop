@@ -1,12 +1,12 @@
-import { StatefulService, mutation } from './stateful-service';
+import { PersistentStatefulService } from './persistent-stateful-service';
+import { mutation } from './stateful-service';
 
 interface ICustomizationServiceState {
   nightMode: boolean;
 }
 
-export class CustomizationService extends StatefulService<ICustomizationServiceState> {
+export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
 
-  // TODO: Saving and laoding of state
   static initialState = {
     nightMode: false
   } as ICustomizationServiceState;
