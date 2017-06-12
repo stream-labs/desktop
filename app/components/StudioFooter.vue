@@ -14,7 +14,6 @@
 
 <script>
 import StreamingService from '../services/streaming.ts';
-import PerformanceService from '../services/performance';
 import StartStreamingButton from './StartStreamingButton.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 
@@ -30,7 +29,6 @@ export default {
 
   beforeCreate() {
     this.streamingService = StreamingService.instance;
-    this.performanceService = PerformanceService.instance;
   },
 
   mounted() {
