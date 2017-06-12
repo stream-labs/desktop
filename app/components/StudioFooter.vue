@@ -1,8 +1,6 @@
 <template>
 <div class="studioFooter">
-  <div>
-    {{ statusLine }}
-  </div>
+  <performance-metrics/>
   <div class="studioFooter-buttons text-right">
     <button
       class="button button--default button--md studioFooter-button studioFooter-button--startRecording"
@@ -15,14 +13,14 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import StreamingService from '../services/streaming.ts';
 import PerformanceService from '../services/performance';
 import StartStreamingButton from './StartStreamingButton.vue';
+import PerformanceMetrics from './PerformanceMetrics.vue';
 
 export default {
 
-  components: { StartStreamingButton },
+  components: { StartStreamingButton, PerformanceMetrics },
 
   data() {
     return {
@@ -58,18 +56,6 @@ export default {
   },
 
   computed: {
-    streamStatusMsg() {
-      if (this.streamingService.isStreaming && this.streamOk !== null) {
-        if (this.streamOk) {
-          return 'Stream OK';
-        }
-
-        return 'Stream Error';
-      }
-
-      return null;
-    },
-
     recording() {
       return this.streamingService.isRecording;
     },
@@ -86,47 +72,11 @@ export default {
       return 'Start Recording';
     },
 
-    streamOk() {
-      return this.streamingService.streamOk;
-    },
-
     elapsedRecordTime: {
       cache: false,
       get() {
         return this.streamingService.formattedElapsedRecordTime;
       }
-    },
-
-    statusLine() {
-      const line = [
-        `CPU: ${this.cpuPercent}%`,
-        `${this.frameRate} FPS`,
-        `Dropped Frames: ${this.droppedFrames} (${this.percentDropped}%)`,
-        `${this.bandwidth} kb/s`,
-        this.streamStatusMsg
-      ];
-
-      return _.compact(line).join(' | ');
-    },
-
-    cpuPercent() {
-      return this.performanceService.state.CPU;
-    },
-
-    frameRate() {
-      return this.performanceService.state.frameRate.toFixed(2);
-    },
-
-    droppedFrames() {
-      return this.performanceService.state.numberDroppedFrames;
-    },
-
-    percentDropped() {
-      return (this.performanceService.state.percentageDroppedFrames || 0).toFixed(1);
-    },
-
-    bandwidth() {
-      return this.performanceService.state.bandwidth.toFixed(0);
     }
   }
 
