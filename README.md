@@ -139,7 +139,7 @@ This is a checklist to run through every time you deploy.
 - [ ] Change the version in `package.json`
 - [ ] Commit and push
 - [ ] Tag the repo `git tag 'v0.0.11'` and `git push --tags`
-- [ ] Also tag the `node-obs` commit you are releasing with
+- [ ] Tag the `node-obs` in the same way with the same version
 - [ ] Remove the dist directory `rm -rf dist`
 - [ ] Package the app `yarn package`
 - [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
