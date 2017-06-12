@@ -14,7 +14,11 @@ test('Streaming to Twitch', async t => {
   await app.client.click('li=Stream');
 
   // This is the twitch.tv/slobstest stream key
-  await setFormInput(t, 'Stream key', 'live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6');
+  await setFormInput(
+    t,
+    'Stream key',
+    process.env.SLOBS_STREAM_KEY || 'live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6'
+  );
   await app.client.click('button=Done');
 
   await focusMain(t);
