@@ -57,3 +57,19 @@ test('Scene switching with sources', async t => {
   await selectScene(t, 'Scene');
   t.true(await app.client.isExisting(`li=${sourceName}`));
 });
+
+test.failing('Restarting the app preserves the default sources', async t => {
+  const app = t.context.app;
+  const sceneName = 'Coolest Scene Ever';
+
+  await addScene(t, sceneName);
+
+  await focusMain(t);
+  t.true(await app.client.isExisting(`div=${sceneName}`));
+
+  await t.context.app.restart();
+
+  await focusMain(t);
+  await selectScene(t, sceneName);
+  await checkDefaultSources(t);
+});
