@@ -1,5 +1,5 @@
 <template>
-<div class="StartupSettings" v-if="enabled">
+<div class="section" v-if="enabled">
   <bool-input
     :value="obsMode"
     @input="val => saveSetting(val, 'obsMode')"/>
@@ -121,14 +121,3 @@ export default {
 };
 
 </script>
-
-<style lang="less" scoped>
-@import "../styles/index";
-
-.StartupSettings {
-  margin-bottom: 20px;
-  background-color: @panel-bg-color;
-  border: 1px solid @panel-border-color;
-  padding: 20px 30px;
-}
-</style>

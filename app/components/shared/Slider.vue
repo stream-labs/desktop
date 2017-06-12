@@ -57,7 +57,7 @@ export default class SliderInput extends Vue {
     background-color: @slider-progress-color !important;
   }
 
-  .vue-slider-dot{
+  .vue-slider-dot {
     &:after {
       content: '';
       display: block;
@@ -68,6 +68,11 @@ export default class SliderInput extends Vue {
       height: 5px;
       border-radius: 50%;
       background-color: @slider-progress-color;
+    }
+  }
+  .night-theme {
+    .vue-slider {
+      background-color: @night-slider-bg!important;
     }
   }
 

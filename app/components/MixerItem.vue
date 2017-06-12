@@ -170,4 +170,9 @@ export default class Mixer extends Vue {
     .fa-volume-off { color: @red }
   }
 }
+.night-theme {
+  .volmeter {
+    background-color: @night-slider-bg;
+  }
+}
 </style>

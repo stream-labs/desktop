@@ -1,16 +1,16 @@
 <template>
-  <div class="GenericFormGroups">
-    <div v-for="(formGroup, groupIndex) in value" v-if="formGroup.parameters.length">
+  <div class="form-groups">
+    <div class="section" v-for="(formGroup, groupIndex) in value" v-if="formGroup.parameters.length">
 
-      <div v-if="formGroup.nameSubCategory != 'Untitled'">
-        <h4  @click="toggleGroup(groupIndex)">
+      <div class="section-title--dropdown" v-if="formGroup.nameSubCategory != 'Untitled'">
+        <h4 class="section-title" @click="toggleGroup(groupIndex)">
           <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
           <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
           {{ formGroup.nameSubCategory }}
         </h4>
       </div>
 
-      <div v-if="!collapsedGroups[groupIndex]">
+      <div class="section-content section-content--dropdown" v-if="!collapsedGroups[groupIndex]">
         <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
       </div>
 
@@ -43,20 +43,3 @@ export default {
   }
 };
 </script>
-
-<style lang="less" scoped>
-@import "../../../styles/index";
-
-.GenericFormGroups > div {
-  margin-bottom: 20px;
-  background-color: @panel-bg-color;
-  border: 1px solid @panel-border-color;
-  padding: 20px 30px;
-
-  h4 {
-    cursor: pointer;
-  }
-
-  .fa-plus, .fa-minus {margin-right: 10px}
-}
-</style>

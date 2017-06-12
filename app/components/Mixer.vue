@@ -1,11 +1,11 @@
 <template>
 <div>
-  <div class="studioControls-top">
-    <h4 class="studioControls-label">
+  <div class="studio-controls-top">
+    <h4 class="studio-controls__label">
       Mixer
     </h4>
   </div>
-  <div class="studioControls-selector mixerPanel">
+  <div class="studio-controls-selector mixerPanel">
     <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="audioSource.name"/>
   </div>
 </div>

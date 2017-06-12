@@ -1,31 +1,111 @@
 @import "./styles/index";
 
+.main {
+  background: @white;
+}
+/* Layout */
+.page-container {
+  padding: 20px;
+  max-width: 1000px;
+}
+
+/* Type */
 h4 {
   text-transform: uppercase;
   font-size: 12px;
-  letter-spacing: 1px;
-  font-weight: 500;
+  letter-spacing: .7px;
+  .semibold;
   margin-bottom: 20px;
 }
 
-.button {
-  &:focus {
-    outline: 0;
+.checkbox {
+  label {
+    &:before {
+      background: transparent;
+      border-color: @day-border;
+    }
   }
 }
 
-.ico-btn {
-  font-size: 16px;
-  cursor: pointer;
-  color: #999;
-  opacity: 0.6;
-  margin-left: 10px;
-  &:first-child { margin-left: inherit }
-  &:hover { opacity: 1.0}
+/* Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown' */
+/* On 'dropdown__toggle' use @click="showDropdown = !showDropdown" */
+/* On 'dropdown__menu' use v-if="showDropdown" */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown__toggle, .slide-open__open {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .7px;
+  color: @grey;
+  .fa {
+    font-size: 8px;
+    vertical-align: middle;
+    margin-bottom: 2px;
+  }
+}
+.dropdown__menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: white;
+  padding: 8px;
+  min-width: 100px;
+  text-align: left;
+  border-radius: 3px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
 
-
-
+.slide-open__menu {
+  position: absolute;
+  background: @white;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 0 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.slide-open__close {
+  position: absolute;
+  left: 25px;
+  color: @grey;
+  transition: all 275ms;
+  &:hover {
+    .fa {
+      color: @navy;
+    }
+  }
+}
+.tabs {
+  background: transparent;
+  padding: 0;
+}
+.tab-button {
+  border-bottom: 3px solid transparent;
+  padding: 20px 0;
+  margin-right: 10px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .7px;
+  color: @grey;
+  .fa {
+    margin-right: 4px;
+  }
+  &.active {
+    border-color: @yellow;
+    color: @navy;
+    .fa {
+      color: @yellow;
+    }
+  }
+}
 // TODO: eventuall use LESS variables from twitchalerts
 .bgColor-teal {
   background-color: @teal;
@@ -47,6 +127,86 @@ h4 {
 
 // Make select boxes look similar to input boxes
 select {
-  border-radius: 3px;
+  .radius;
   height: 36px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: @day-border;
+  border-radius: 0 3px 3px 0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: @white;
+  border: 2px solid @day-border;
+  border-right: 1px solid @day-border;
+  border-radius: 10px;
+}
+
+/* Vue transitions */
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all .3s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+/* Night theme rules */
+.night-theme {
+  &.main {
+    background: @night-primary;
+    color: @night-text;
+  }
+  .border {
+    border: 1px solid transparent;
+  }
+  .checkbox {
+    input:checked~label {
+      color: @white;
+    }
+    label {
+      &:before {
+        background: transparent;
+        border-color: @teal-light-opac;
+      }
+    }
+  }
+  .dropdown__menu {
+    background-color: @night-accent-light;
+  }
+  .slide-open__menu {
+    background-color: @night-primary;
+  }
+  .slide-open__close {
+    &:hover {
+      .fa {
+        color: @white;
+      }
+    }
+  }
+  .studio-controls-selector {
+    background: @navy-secondary;
+    border-color: @navy-secondary;
+  }
+  .selector-item {
+    &.selector-item--active {
+      background-color: @night-hover;
+      border-color: transparent;
+    }
+  }
+  .tab-button{
+    &.active {
+      color: @white;
+    }
+  }
+  ::-webkit-scrollbar-track {
+    background: @night-accent-dark;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: @night-accent-light;
+    border-color: @night-accent-dark;
+  }
 }

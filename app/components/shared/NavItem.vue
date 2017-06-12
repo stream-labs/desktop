@@ -49,7 +49,7 @@ export default {
 .nav-item {
   cursor: pointer;
   list-style: none;
-  border-left: 4px solid transparent;
+  border-left: 3px solid transparent;
   padding-left: 50px;
   opacity: 0.7;
   font-size: 14px;
@@ -57,8 +57,9 @@ export default {
 
   &.active {
     opacity: 1;
-    font-weight: bold;
+    .semibold;
     border-color: @yellow;
+    color: @navy;
     .fa {
       color: @yellow;
     }
@@ -76,6 +77,13 @@ export default {
     position: relative;
     margin-right: -15px;
     left: -25px;
+  }
+}
+.night-theme {
+  .nav-item {
+    &.active {
+      color: @white;
+    }
   }
 }
 

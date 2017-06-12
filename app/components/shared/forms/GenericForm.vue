@@ -1,5 +1,5 @@
 <template>
-  <div class="GenericForm">
+  <div>
     <div v-for="(parameter, inputIndex) in value">
       <component
         v-if="parameter.visible && propertyComponentForType(parameter.type)"

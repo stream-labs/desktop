@@ -1,21 +1,23 @@
 <template>
 <div>
-  <div class="studioControls-top">
-    <h4 class="studioControls-label">
+  <div class="studio-controls-top">
+    <h4 class="studio-controls__label">
       Scenes
     </h4>
-    <i
-      class="fa fa-plus ico-btn"
-      @click="addScene"/>
-    <i
-      class="fa fa-minus ico-btn"
-      @click="removeScene"/>
-    <i
-      class="fa fa-cog ico-btn"
-      @click="showTransitions"/>
+    <div>
+      <i
+        class="fa fa-plus ico-btn"
+        @click="addScene"/>
+      <i
+        class="fa fa-minus ico-btn"
+        @click="removeScene"/>
+      <i
+        class="fa fa-cog ico-btn"
+        @click="showTransitions"/>
+      </div>
   </div>
   <selector
-    class="studioControls-selector"
+    class="studio-controls-selector"
     :items="scenes"
     :activeItem="activeSceneId"
     @select="makeActive"

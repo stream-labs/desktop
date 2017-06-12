@@ -1,8 +1,8 @@
 <template>
-<div class="Main">
-  <div class="Main-spacer bgColor-teal"></div>
+<div class="main" :class="{'night-theme': nightTheme}">
+  <div class="main-spacer bgColor-teal"></div>
   <top-nav></top-nav>
-  <component class="Main-pageContainer" :is="page">
+  <component class="main-page-container" :is="page">
   </component>
 </div>
 </template>
@@ -13,7 +13,9 @@ import TopNav from '../TopNav.vue';
 // Pages
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
+import Live from '../pages/Live.vue';
 import windowMixin from '../mixins/window';
+import { CustomizationService } from '../../services/customization';
 
 const { remote } = window.require('electron');
 
@@ -24,7 +26,8 @@ export default {
   components: {
     TopNav,
     Studio,
-    Dashboard
+    Dashboard,
+    Live
   },
 
   mounted() {
@@ -40,23 +43,28 @@ export default {
   computed: {
     page() {
       return this.$store.state.navigation.currentPage;
+    },
+    nightTheme() {
+      return CustomizationService.instance.nightMode;
     }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>
-.Main {
+@import "../../styles/index";
+
+.main {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.Main-spacer {
+.main-spacer {
   height: 4px;
 }
 
-.Main-pageContainer {
+.main-page-container {
   /* Page always takes up remaining space */
   flex-grow: 1;
 }

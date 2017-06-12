@@ -8,7 +8,7 @@ test('Streaming to Twitch', async t => {
   const app = t.context.app;
 
   await focusMain(t);
-  await app.client.click('button=Settings');
+  await app.client.click('.top-nav .fa-cog');
 
   await focusChild(t);
   await app.client.click('li=Stream');
@@ -22,7 +22,7 @@ test('Streaming to Twitch', async t => {
   await app.client.click('button=Done');
 
   await focusMain(t);
-  await app.client.click('button=Start Streaming');
+  await app.client.click('button=Go Live');
 
   // Wait up to 10 seconds for the "Stream OK" message to appear
   await app.client.waitForExist('div*=Stream OK', 10 * 1000);

@@ -1,6 +1,6 @@
 <template>
 <button
-  class="button button--default button--md"
+  class="button button--action button--md button--go-live"
   @click="toggleStreaming">
   {{ streamButtonLabel }}
 </button>
@@ -49,7 +49,7 @@ export default class StartStreamingButton extends Vue {
       return this.streamElapsed;
     }
 
-    return 'Start Streaming';
+    return 'Go Live';
   }
 
   getElapsedStreamTime() {
@@ -58,3 +58,9 @@ export default class StartStreamingButton extends Vue {
 
 }
 </script>
+
+<style lang="less" scoped>
+  .button--go-live {
+    width: 100px;
+  }
+</style>

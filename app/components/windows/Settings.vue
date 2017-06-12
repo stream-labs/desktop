@@ -17,7 +17,7 @@
           </NavItem>
         </NavMenu>
       </div>
-      <div class="columns small-9">
+      <div class="columns small-9 no-padding-right">
         <startup-settings v-if="categoryName === 'General'" />
         <hotkeys v-if="categoryName === 'Hotkeys'" />
         <GenericFormGroups

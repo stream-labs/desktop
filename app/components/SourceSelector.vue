@@ -1,21 +1,23 @@
 <template>
 <div>
-  <div class="studioControls-top">
-    <h4 class="studioControls-label">
+  <div class="studio-controls-top">
+    <h4 class="studio-controls__label">
       Sources
     </h4>
-    <i
-      class="fa fa-plus ico-btn"
-      @click="addSource"/>
-    <i
-      class="fa fa-minus ico-btn"
-      @click="removeSource"/>
-    <i
-      class="fa fa-cog ico-btn"
-      @click="sourceProperties"/>
+    <div>
+      <i
+        class="fa fa-plus ico-btn"
+        @click="addSource"/>
+      <i
+        class="fa fa-minus ico-btn"
+        @click="removeSource"/>
+      <i
+        class="fa fa-cog ico-btn"
+        @click="sourceProperties"/>
+    </div>
   </div>
   <selector
-    class="studioControls-selector"
+    class="studio-controls-selector"
     @contextmenu="showContextMenu"
     :items="sources"
     :activeItem="activeSourceId"

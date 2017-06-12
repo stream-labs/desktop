@@ -7,7 +7,6 @@
       @click="toggleRecording">
       {{ recordButtonLabel }}
     </button>
-    <start-streaming-button class="studioFooter-button studioFooter-button--startStreaming"/>
   </div>
 </div>
 </template>

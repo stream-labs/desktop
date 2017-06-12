@@ -1,6 +1,6 @@
 <template>
 <div
-  class="StudioEditor-display"
+  class="studio-editor-display"
   ref="display"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
@@ -454,9 +454,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StudioEditor-display {
+@import "../styles/index";
+.studio-editor-display {
   position: relative;
   flex-grow: 1;
-  background-color: #222;
+  background-color: @navy-secondary;
 }
 </style>
