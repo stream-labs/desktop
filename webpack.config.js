@@ -59,6 +59,15 @@ module.exports = {
           },
           'less-loader'
         ]
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'images/',
+          publicPath: 'bundles/'
+        }
       }
     ]
   }
