@@ -25,55 +25,63 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 
-export default {
-  methods: {
-    makeActive(id) {
-      ScenesService.instance.makeSceneActive(id);
-    },
+@Component({
+  components: { Selector }
+})
+export default class SceneSelector extends Vue {
 
-    handleSort(data) {
-      ScenesService.instance.setSceneOrder(data.order);
-    },
+  @Inject()
+  scenesService: ScenesService;
 
-    addScene() {
-      windowManager.showNameScene();
-    },
 
-    removeScene() {
-      ScenesService.instance.removeScene(this.activeSceneId);
-    },
-
-    showTransitions() {
-      windowManager.showSceneTransitions();
-    }
-  },
-
-  computed: {
-    scenes() {
-      return ScenesService.instance.scenes.map(scene => {
-        return {
-          name: scene.name,
-          value: scene.id
-        };
-      });
-    },
-
-    activeSceneId() {
-      if (ScenesService.instance.activeScene) {
-        return ScenesService.instance.activeScene.id;
-      }
-
-      return null;
-    }
-  },
-
-  components: {
-    Selector
+  makeActive(id: string) {
+    this.scenesService.makeSceneActive(id);
   }
-};
+
+
+  handleSort(data: any) {
+    this.scenesService.setSceneOrder(data.order);
+  }
+
+
+  addScene() {
+    windowManager.showNameScene();
+  }
+
+  removeScene() {
+    this.scenesService.removeScene(this.activeSceneId);
+  }
+
+
+  showTransitions() {
+    windowManager.showSceneTransitions();
+  }
+
+
+  get scenes() {
+    return this.scenesService.scenes.map(scene => {
+      return {
+        name: scene.name,
+        value: scene.id
+      };
+    });
+  }
+
+
+  get activeSceneId() {
+    if (this.scenesService.activeScene) {
+      return this.scenesService.activeScene.id;
+    }
+
+    return null;
+  }
+}
 </script>

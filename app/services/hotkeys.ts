@@ -2,7 +2,7 @@ import { flatten } from 'lodash';
 
 import { Service, Inject } from './service';
 import StreamingService from './streaming';
-import ScenesService from './scenes';
+import { ScenesService } from './scenes';
 import { SourcesService, ISource } from './sources';
 import electron from '../vendor/electron';
 import { KeyListenerService, TKeyEventType } from './key-listener';
@@ -138,7 +138,7 @@ const HOTKEY_ACTIONS = {
       getCurrentState(sceneName, sourceName) {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
-        const mergedSource = ScenesService.instance.getMergedSource(scene.id, source.id);
+        const mergedSource = ScenesService.instance.getSource(scene.id, source.id);
 
         return mergedSource.visible;
       },
@@ -385,7 +385,7 @@ export class HotkeysService extends Service {
       hotkeySet.addGeneralHotkeys(this.hotkeysFromAction(actionName, action));
     });
 
-    this.scenesService.scenes.forEach((scene: IScene) => {
+    this.scenesService.scenes.forEach(scene => {
       Object.keys(HOTKEY_ACTIONS.SCENE).forEach(actionName => {
         const action = HOTKEY_ACTIONS.SCENE[actionName] as THotkeyAction;
 

@@ -7,7 +7,7 @@ import navigation from './modules/navigation';
 import windowOptions from './modules/windowOptions';
 
 // Stateful Services
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 import ScenesTransitions from  '../services/scenes-transitions.ts';
 import { SourcesService } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';

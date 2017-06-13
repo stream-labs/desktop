@@ -52,8 +52,8 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
 import { SourceMenu } from '../util/menus/SourceMenu';
-import { AudioService, IAudioSource, IVolmeter } from '../services/audio';
-import ScenesService from '../services/scenes';
+import { AudioService, AudioSource, IVolmeter } from '../services/audio';
+import { ScenesService } from '../services/scenes';
 import { Inject } from '../services/service';
 import Slider from  './shared/Slider.vue';
 
@@ -63,12 +63,13 @@ import Slider from  './shared/Slider.vue';
 export default class Mixer extends Vue {
 
   @Prop()
-  audioSource: IAudioSource;
+  audioSource: AudioSource;
 
   @Inject()
   audioService: AudioService;
 
-  scenesService = ScenesService.instance;
+  @Inject()
+  scenesService: ScenesService;
 
   volmeter: IVolmeter = null;
   volmeterSubscription: Subscription;
@@ -105,7 +106,7 @@ export default class Mixer extends Vue {
 
 
   onSliderChangeHandler(newVal: number) {
-    this.audioService.setDeflection(this.audioSource.name, newVal);
+    this.audioService.setDeflection(this.audioSource.id, newVal);
   }
 
   showSourceMenu(sourceId: string) {

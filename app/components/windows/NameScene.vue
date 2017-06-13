@@ -23,44 +23,49 @@
 </modal-layout>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
-import ScenesService from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 
-export default {
+@Component({
+  components: { ModalLayout },
+  mixins: [windowMixin]
+})
+export default class NameScene extends Vue {
 
-  mixins: [windowMixin],
+  name = '';
+  error = '';
 
-  components: {
-    ModalLayout
-  },
+  @Inject()
+  scenesService: ScenesService;
 
-  data() {
-    return {
-      name: namingHelpers.suggestName('New Scene', this.isTaken),
-      error: null
-    };
-  },
+  mounted() {
+    this.name = namingHelpers.suggestName(
+      'New Scene',
+      (name: string) => this.isTaken(name)
+    );
+  }
 
-  methods: {
-    submit() {
-      if (this.isTaken(this.name)) {
-        this.error = 'That name is already taken';
-      } else {
-        ScenesService.instance.createScene(this.name);
-        windowManager.closeWindow();
-      }
-    },
-
-    isTaken(name) {
-      return ScenesService.instance.getSceneByName(name);
+  submit() {
+    if (this.isTaken(this.name)) {
+      this.error = 'That name is already taken';
+    } else {
+      this.scenesService.createScene(this.name);
+      windowManager.closeWindow();
     }
   }
 
-};
+  isTaken(name: string) {
+    return this.scenesService.getSceneByName(name);
+  }
+
+}
 </script>
 
 <style lang="less" scoped>

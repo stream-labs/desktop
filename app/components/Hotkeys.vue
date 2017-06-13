@@ -9,7 +9,7 @@
   <hotkey-group
     v-for="source in sources"
     v-if="hotkeySet.getSourceHotkeys(source.name).length > 0"
-    :title="getDisplayName(source)"
+    :title="source.displayName"
     :hotkeys="hotkeySet.getSourceHotkeys(source.name)"/>
 </div>
 </template>
@@ -19,7 +19,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import { HotkeySet, HotkeysService } from '../services/hotkeys';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 import { SourcesService, ISource } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup.vue';
 
@@ -30,6 +30,9 @@ export default class Hotkeys extends Vue {
 
   @Inject()
   sourcesService: SourcesService;
+
+  @Inject()
+  scenesService: ScenesService;
 
   @Inject()
   hotkeysService: HotkeysService;
@@ -47,13 +50,8 @@ export default class Hotkeys extends Vue {
     this.hotkeysService.applyHotkeySet(this.hotkeySet);
   }
 
-  getDisplayName(source: ISource) {
-    return SourcesService.getDisplayName(source);
-  }
-
   get sceneNames() {
-    // TODO: move ScenesService to TypeScript
-    return ScenesService.instance.scenes.map((scene: any) => {
+    return this.scenesService.scenes.map((scene: any) => {
       return scene.name;
     });
   }

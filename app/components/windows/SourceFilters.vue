@@ -77,6 +77,9 @@ export default class SourceFilters extends Vue {
   @Inject()
   filtersService: SourceFiltersService;
 
+  @Inject()
+  sourcesService: SourcesService;
+
   windowOptions: { sourceName: string, selectedFilterName: string } = windowManager.getOptions();
   sourceName = this.windowOptions.sourceName;
   filters = this.filtersService.getFilters(this.sourceName);
@@ -113,9 +116,7 @@ export default class SourceFilters extends Vue {
 
 
   get sourceDisplayName() {
-    return SourcesService.getDisplayName(
-      SourcesService.instance.getSourceByName(this.sourceName)
-    );
+    return this.sourcesService.getSourceByName(this.sourceName).displayName;
   }
 
 

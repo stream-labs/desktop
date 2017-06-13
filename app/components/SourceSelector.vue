@@ -32,7 +32,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 import { ISource, SourcesService } from '../services/sources';
 import { SourceMenu } from '../util/menus/SourceMenu';
 

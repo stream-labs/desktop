@@ -63,7 +63,6 @@ export abstract class Service {
     const shouldInit = electron.ipcRenderer.sendSync('services-shouldInit', ServiceClass.name);
     if (shouldInit) instance.init();
     instance.mounted();
-
     Service.initObservers(ServiceClass.name);
 
     return instance;
