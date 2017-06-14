@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { SettingsService } from '../services/settings';
 import { Inject } from '../services/service';
 import { ScenesService, SceneSource } from '../services/scenes';
