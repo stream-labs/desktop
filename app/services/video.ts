@@ -19,7 +19,6 @@ export class Display {
   outputRegion: IOutputRegion;
 
   constructor(public name: string) {
-    this.name = name;
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
       name
