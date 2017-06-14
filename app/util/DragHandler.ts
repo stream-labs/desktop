@@ -130,8 +130,6 @@ class DragHandler {
 
         this.targetEdges[edgeName].find((targetEdge: IEdge) => {
           if (this.shouldSnap(sourceEdge, targetEdge)) {
-            console.log('Snapping To: ', edgeName);
-
             if ((edgeName === 'left') && !snappedX) {
               snappedX = true;
               newX = targetEdge.depth;
