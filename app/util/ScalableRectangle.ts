@@ -2,16 +2,6 @@
 // with rectangles that can be scaled, including
 // negative scales.
 
-interface ScalableRectangleOptions {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  scaleX?: number;
-  scaleY?: number;
-}
-
-
 export enum AnchorPoint {
   North,
   NorthEast,
@@ -39,7 +29,7 @@ const AnchorPositions = {
 };
 
 
-export class ScalableRectangle {
+export class ScalableRectangle implements IScalableRectangle {
 
   x: number;
   y: number;
@@ -51,7 +41,7 @@ export class ScalableRectangle {
   private anchor: AnchorPoint;
 
 
-  constructor(options: ScalableRectangleOptions) {
+  constructor(options: IScalableRectangle) {
     this.x = options.x;
     this.y = options.y;
     this.width = options.width;

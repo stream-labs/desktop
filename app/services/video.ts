@@ -6,17 +6,13 @@ import electron from '../vendor/electron';
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { remote } = electron;
 
-export interface IOutputRegion {
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-}
-
 export class Display {
 
+  @Inject()
+  settingsService: SettingsService;
+
   outputRegionCallbacks: Function[];
-  outputRegion: IOutputRegion;
+  outputRegion: IRectangle;
 
   constructor(public name: string) {
     nodeObs.OBS_content_createDisplay(
@@ -27,7 +23,7 @@ export class Display {
 
     // Watch for changes to the base resolution.
     // This seems super freaking hacky.
-    SettingsService.instance.store.watch((state: any) => {
+    this.settingsService.store.watch(state => {
       return state.SettingsService.Video.Base;
     }, () => {
       // This gives the setting time to propagate
