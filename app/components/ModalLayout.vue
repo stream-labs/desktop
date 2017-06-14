@@ -1,5 +1,5 @@
 <template>
-<div class="ModalLayout">
+<div class="modal-layout" :class="{'night-theme': nightTheme}">
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -10,7 +10,7 @@
     :style="contentStyle">
     <slot name="content"/>
   </div>
-  <div v-if="showControls" class="ModalLayout-controls">
+  <div v-if="showControls" class="modal-layout-controls">
     <button
       v-if="showCancel"
       class="button button--default"
@@ -18,7 +18,7 @@
       Cancel
     </button>
     <button
-      class="button button--action ModalLayout-button"
+      class="button button--action"
       @click="doneHandler">
       Done
     </button>
@@ -28,13 +28,15 @@
 
 <script>
 import windowManager from '../util/WindowManager.js';
+import { CustomizationService } from '../services/customization';
+
 const { remote } = window.require('electron');
 
 export default {
 
   data() {
     let contentStyle  = {
-      padding: '30px',
+      padding: '20px',
       overflow: 'auto'
     };
 
@@ -52,6 +54,12 @@ export default {
 
   mounted() {
     remote.getCurrentWindow().setTitle(this.title);
+  },
+
+  computed: {
+    nightTheme() {
+      return CustomizationService.instance.nightMode;
+    }
   },
 
   methods: {
@@ -111,10 +119,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.ModalLayout {
+@import "../styles/index";
+.modal-layout {
   height: 100%;
   display: flex;
   flex-direction: column;
+  color: @grey;
+  border-top: 1px solid @day-border;
 }
 
 .ModalLayout-fixed {
@@ -125,15 +136,23 @@ export default {
   flex-grow: 1;
 }
 
-.ModalLayout-controls {
-  background-color: #fcfcfc;
-  border-top: 1px solid #ededed;
+.modal-layout-controls {
+  background-color: @day-secondary;
+  border-top: 1px solid @day-border;
   padding: 15px 30px;
   text-align: right;
   flex-shrink: 0;
+  z-index: 10;
 }
 
-.ModalLayout-button {
-  margin-left: 15px;
+.night-theme {
+  &.modal-layout {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
+  .modal-layout-controls {
+    border-top-color: @night-border;
+    background-color: @night-primary;
+  }
 }
 </style>

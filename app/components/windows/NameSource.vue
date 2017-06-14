@@ -31,7 +31,7 @@ import ModalLayout from '../ModalLayout.vue';
 import windowManager from '../../util/WindowManager';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
-import ScenesService from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 import { SourcesService } from '../../services/sources';
 
 @Component({
@@ -42,6 +42,9 @@ export default class NameSource extends Vue {
 
   @Inject()
   sourcesService: SourcesService;
+
+  @Inject()
+  scenesService: ScenesService;
 
   name = '';
   error = '';
@@ -57,8 +60,8 @@ export default class NameSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      const id = this.sourcesService.createSourceAndAddToScene(
-        ScenesService.instance.activeSceneId,
+      const id = this.scenesService.createSourceAndAddToScene(
+        this.scenesService.activeSceneId,
         this.name,
         this.sourceType
       );

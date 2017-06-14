@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configFileManager.load();
 
     ipcRenderer.on('shutdown', () => {
-      configFileManager.save();
+      configFileManager.rawSave();
       remote.getCurrentWindow().close();
     });
 

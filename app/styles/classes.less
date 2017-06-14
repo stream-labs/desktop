@@ -1,1 +1,47 @@
-.flex { display: flex;}
+.flex { 
+  display: flex;
+}
+.section {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: @day-secondary;
+  border: 1px solid @day-border;
+  .radius;
+}
+.section-title--dropdown {
+  h4 {
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+}
+.section-content--dropdown {
+  margin-top: 20px;
+  > div {
+    div {
+      &:last-child {
+        .input {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+.text--sm {
+  font-size: 11px;
+}
+
+/* Backgrounds */
+.gradient--teal {
+  background: #31c3a2; /* Old browsers */
+  background: -moz-linear-gradient(-45deg, #31c3a2 1%, #20e5be 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg, #31c3a2 1%,#20e5be 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg, #31c3a2 1%,#20e5be 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#31c3a2', endColorstr='#20e5be',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.night-theme {
+  .section {
+    background: @night-secondary;
+    border-color: @night-secondary;
+  }
+}

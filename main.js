@@ -19,6 +19,7 @@ const path = require('path');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
+const uuid = require('uuid/v1');
 
 // Initialize the keylistener
 require('node-libuiohook').startHook();
@@ -88,6 +89,8 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
+    require('node-libuiohook').stopHook();
+    obs.OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -121,7 +124,7 @@ function startApp() {
   }
 
   // Initialize various OBS services
-  obs.OBS_API_initOBS_API();
+  obs.OBS_API_initOBS_API(app.getPath('userData'));
 
   const startupConfig = loadStartupConfig();
 
@@ -316,7 +319,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
 
 // Used for guaranteeing unique ids for objects in the vuex store
 ipcMain.on('getUniqueId', event => {
-  event.returnValue = _.uniqueId();
+  event.returnValue = uuid();
 });
 
 ipcMain.on('restartApp', () => {

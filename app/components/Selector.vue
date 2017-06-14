@@ -1,19 +1,19 @@
 <template>
-<ul class="Selector-list">
+<ul class="selector-list">
   <draggable
     :list="normalizedItems"
     :options="{}"
     @change="handleChange">
     <li
-      class="Selector-item"
-      :class="{ 'Selector-item__active': item.value === activeItem }"
+      class="selector-item"
+      :class="{ 'selector-item--active': item.value === activeItem }"
       v-for="(item, index) in normalizedItems"
       @contextmenu="handleContextMenu(index)"
       @click="handleSelect(index)">
-      <div class="Selector-itemText">
+      <div class="selector-item-text">
         {{item.name}}
       </div>
-      <div class="Selector-dragHandle">
+      <div class="selector-drag-handle">
         <i class="fa fa-bars fa-rotate-90"/>
       </div>
     </li>
@@ -87,6 +87,7 @@ export default class Selector extends Vue {
 </script>
 
 <style lang="less" scoped>
+@import "../styles/index";
 .sortable-ghost {
   opacity: 0;
 }
@@ -96,35 +97,38 @@ export default class Selector extends Vue {
   background-color: #eee;
 }
 
-.Selector-list {
+.selector-list {
   list-style-type: none;
   margin: 0;
   overflow: auto;
   border: 1px solid #ddd;
-
   background-color: #fcfcfc;
+  .selector-item {
+    &:first-child {
+      border-top-color: transparent;
+    }
+  }
 }
 
-.Selector-item {
+.selector-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid #ddd;
-
+  padding: 4px 12px;
   cursor: pointer;
-
-  &.Selector-item__active {
-    background-color: #1ae6a8;
-    color: white;
-
-    .Selector-dragHandle {
-      color: white;
+  justify-content: space-between;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  &.selector-item--active {
+    background-color: @white;
+    border-color: @day-border;
+    .selector-drag-handle {
+      opacity: 1;
     }
   }
 
   &:hover {
-    .Selector-dragHandle {
+    .selector-drag-handle {
       opacity: 1;
     }
   }
@@ -134,11 +138,11 @@ export default class Selector extends Vue {
   flex-grow: 1;
 }
 
-.Selector-dragHandle {
-  color: #ccc;
+.selector-drag-handle {
+  color: @grey;
   cursor: move;
   font-size: 12px;
-  padding: 0 5px;
+  padding: 0 0px 0 6px;
   opacity: 0;
 }
 </style>

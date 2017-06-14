@@ -1,8 +1,8 @@
 <template>
-<div class="studioControls row expanded">
-  <scene-selector class="studioControls-panel small-4 columns" />
-  <source-selector class="studioControls-panel small-4 columns" />
-  <mixer class="studioControls-panel small-4 columns" />
+<div class="studio-controls row expanded">
+  <scene-selector class="studio-controls-panel small-4 columns" />
+  <source-selector class="studio-controls-panel small-4 columns" />
+  <mixer class="studio-controls-panel small-4 columns" />
 </div>
 </template>
 
@@ -21,14 +21,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.studioControls {
+@import "../styles/index";
+.studio-controls {
   height: 280px;
   width: 100%;
-
-  padding: 30px 25px;
+  padding: 20px 15px;
 }
 
-.studioControls-panel {
+.studio-controls-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -37,27 +37,22 @@ export default {
 </style>
 
 <style lang="less">
-.studioControls-label {
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 1px;
-  font-weight: 500;
-
-  flex-grow: 1;
-
-  margin: 0;
-}
-
-.studioControls-top {
+@import "../styles/index";
+.studio-controls-top {
   display: flex;
   flex-direction: row;
   align-items: center;
-
   margin-bottom: 15px;
+  justify-content: space-between;
 }
-
-.studioControls-selector {
-  border: 1px solid gray;
+.studio-controls__label {
+  margin-bottom: 0;
+  .semibold;
+}
+.studio-controls-selector {
+  background: @day-secondary;
+  border: 1px solid @day-border;
+  .radius;
   flex-grow: 1;
 }
 </style>

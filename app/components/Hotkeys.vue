@@ -7,19 +7,20 @@
     :title="scene"
     :hotkeys="hotkeySet.getSceneHotkeys(scene)"/>
   <hotkey-group
-    v-for="source in sourceNames"
-    v-if="hotkeySet.getSourceHotkeys(source).length > 0"
-    :title="source"
-    :hotkeys="hotkeySet.getSourceHotkeys(source)"/>
+    v-for="source in sources"
+    v-if="hotkeySet.getSourceHotkeys(source.name).length > 0"
+    :title="source.displayName"
+    :hotkeys="hotkeySet.getSourceHotkeys(source.name)"/>
 </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { HotkeysService } from '../services/hotkeys.ts';
-import ScenesService from '../services/scenes';
-import { SourcesService } from '../services/sources';
+import { Inject } from '../services/service';
+import { HotkeySet, HotkeysService } from '../services/hotkeys';
+import { ScenesService } from '../services/scenes';
+import { SourcesService, ISource } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup.vue';
 
 @Component({
@@ -27,25 +28,40 @@ import HotkeyGroup from './HotkeyGroup.vue';
 })
 export default class Hotkeys extends Vue {
 
-  beforeCreate() {
+  @Inject()
+  sourcesService: SourcesService;
+
+  @Inject()
+  scenesService: ScenesService;
+
+  @Inject()
+  hotkeysService: HotkeysService;
+
+  hotkeySet: HotkeySet;
+
+  created() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
     HotkeysService.instance.unregisterAll();
-    this.hotkeySet = HotkeysService.instance.getHotkeySet();
+    this.hotkeySet = this.hotkeysService.getHotkeySet();
   }
 
   destroyed() {
-    HotkeysService.instance.applyHotkeySet(this.hotkeySet);
+    this.hotkeysService.applyHotkeySet(this.hotkeySet);
   }
 
   get sceneNames() {
-    return ScenesService.instance.scenes.map(scene => {
+    return this.scenesService.scenes.map((scene: any) => {
       return scene.name;
     });
   }
 
+  get sources() {
+    return this.sourcesService.sources;
+  }
+
   get sourceNames() {
-    return SourcesService.instance.getSources().map(source => {
+    return this.sources.map(source => {
       return source.name;
     });
   }

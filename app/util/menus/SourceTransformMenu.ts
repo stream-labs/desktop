@@ -1,9 +1,13 @@
 import { Menu } from './Menu';
-import ScenesService from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 import VideoService from '../../services/video';
 import { ScalableRectangle } from '../../util/ScalableRectangle';
+import { Inject } from '../../services/service';
 
 export class SourceTransformMenu extends Menu {
+  
+  @Inject()
+  scenesService: ScenesService;
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
@@ -59,7 +63,7 @@ export class SourceTransformMenu extends Menu {
 
 
   resetTransform() {
-    ScenesService.instance.setSourcePositionAndScale(
+    this.scenesService.setSourcePositionAndScale(
       this.sceneId,
       this.sourceId,
       0,
@@ -71,7 +75,7 @@ export class SourceTransformMenu extends Menu {
 
 
   setRectangle(rect: ScalableRectangle) {
-    ScenesService.instance.setSourcePositionAndScale(
+    this.scenesService.setSourcePositionAndScale(
       this.sceneId,
       this.sourceId,
       rect.x,
@@ -83,7 +87,7 @@ export class SourceTransformMenu extends Menu {
 
 
   getMergedSource() {
-    return ScenesService.instance.getMergedSource(this.sceneId, this.sourceId);
+    return this.scenesService.getSource(this.sceneId, this.sourceId);
   }
 
 

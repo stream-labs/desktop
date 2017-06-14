@@ -41,7 +41,6 @@ export default {
 .Tabs-tabContainer {
   display: flex;
   flex-direction: row;
-
   list-style-type: none;
   margin: 0;
 }
@@ -52,10 +51,8 @@ export default {
   padding: 10px 0;
   cursor: pointer;
   box-sizing: border-box;
-
   border: 1px solid rgba(0,0,0,0);
   border-bottom: 1px solid #ccc;
-
   &.Tabs-tab__active {
     border: 1px solid #ccc;
     border-bottom: 1px solid rgba(0,0,0,0);

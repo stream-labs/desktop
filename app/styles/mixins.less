@@ -1,3 +1,4 @@
+/* Positioning */
 .absolute (@top: auto, @right: auto, @bottom: auto, @left: auto) {
   display: block;
   position: absolute;
@@ -5,4 +6,38 @@
   right: @right;
   bottom: @bottom;
   left: @left;
+}
+
+/* Box shadows */
+.shadow {
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+}
+
+/* Border radius */
+.radius {
+  border-radius: 3px;
+}
+
+/* Borders */
+.border {
+  border: 1px solid @day-border;
+}
+
+/* Typography */
+.normal {
+  font-weight: 400;
+}
+.semibold {
+  font-weight: 500;
+}
+.bold {
+  font-weight: 700;
+}
+
+/* Paddings */
+.no-padding-left {
+  padding-left: 0;
+}
+.no-padding-right {
+  padding-right: 0;
 }

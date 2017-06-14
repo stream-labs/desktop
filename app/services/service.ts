@@ -49,14 +49,23 @@ export abstract class Service {
   }
 
 
+  /**
+   * all services must be created via factory method
+   */
   static createInstance(ServiceClass: any, options?: Dictionary<any>) {
     if (ServiceClass.hasInstance) {
       throw `Unable to create more than one singleton service`;
     }
     ServiceClass.hasInstance = true;
-    ServiceClass[singleton] = new ServiceClass(singletonEnforcer, options);
+    const instance = new ServiceClass(singletonEnforcer, options);
+    ServiceClass[singleton] = instance;
+
+    const shouldInit = electron.ipcRenderer.sendSync('services-shouldInit', ServiceClass.name);
+    if (shouldInit) instance.init();
+    instance.mounted();
     Service.initObservers(ServiceClass.name);
-    return ServiceClass[singleton];
+
+    return instance;
   }
 
 
@@ -71,12 +80,6 @@ export abstract class Service {
   constructor(enforcer: Symbol, options: Dictionary<any>) {
     if (enforcer !== singletonEnforcer) throw 'Cannot construct singleton';
     this.options = options || this.options;
-
-    const shouldInit = electron.ipcRenderer.sendSync('services-shouldInit', this.serviceName);
-
-    if (shouldInit) this.init();
-
-    this.mounted();
   }
 
 

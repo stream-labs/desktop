@@ -1,6 +1,6 @@
 <template>
 <div
-  class="StudioEditor-display"
+  class="studio-editor-display"
   ref="display"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
@@ -11,7 +11,7 @@
 <script>
 import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 import VideoService from '../services/video';
 import { SourceMenu } from '../util/menus/SourceMenu.ts';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle.ts';
@@ -454,9 +454,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StudioEditor-display {
+@import "../styles/index";
+.studio-editor-display {
   position: relative;
   flex-grow: 1;
-  background-color: #222;
+  background-color: @navy-secondary;
 }
 </style>

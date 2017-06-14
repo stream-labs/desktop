@@ -1,18 +1,16 @@
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { mutation, StatefulService, InitAfter, Inject } from './stateful-service';
-import { SourcesService, ISource } from './sources';
-import ScenesService from './scenes';
+import { SourcesService, ISource, Source } from './sources';
+import { ScenesService } from './scenes';
 import Obs from '../api/Obs';
+import Utils from './utils';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 
 export interface IAudioSource {
   id: string;
-  name: string;
-  displayName: string;
   fader: IFader;
-  muted: boolean;
 }
 
 export interface IVolmeter {
@@ -28,7 +26,7 @@ interface IFader {
 }
 
 interface IAudioSourcesState {
-  audioSources: IAudioSource[];
+  audioSources: Dictionary<IAudioSource>;
 }
 
 interface INodeObsId {
@@ -36,11 +34,12 @@ interface INodeObsId {
 }
 
 
+
 @InitAfter(SourcesService)
 export class AudioService extends StatefulService<IAudioSourcesState> {
 
   static initialState: IAudioSourcesState = {
-    audioSources: []
+    audioSources: {}
   };
 
   @Inject() private sourcesService: SourcesService;
@@ -55,31 +54,33 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     });
 
     this.sourcesService.sourceUpdated.subscribe(source => {
-      const audioSource = this.state.audioSources.find(audioSource => audioSource.id === source.id);
+      const audioSource = this.getSource(source.id);
       if (!audioSource) return;
 
       if (!source.audio) {
-        this.REMOVE_AUDIO_SOURCE(source.name);
+        this.REMOVE_AUDIO_SOURCE(source.id);
         return;
       }
 
-      if (audioSource.muted !== source.muted) {
-        this.UPDATE_AUDIO_SOURCE(source.name, { muted: source.muted });
-      }
     });
 
     this.sourcesService.sourceRemoved.subscribe(source => {
-      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.name);
+      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.id);
     });
 
   }
 
+  getSource(sourceId: string): AudioSource {
+    return this.state.audioSources[sourceId] ? new AudioSource(sourceId) : void 0;
+  }
 
-  getSourcesForCurrentScene(): IAudioSource[] {
-    const sceneSources = this.scenesService.getSources({ showHidden: true });
-    return this.state.audioSources.filter(audioSource => {
-      return sceneSources.find((source: ISource) => source.name === audioSource.name);
-    });
+  getSources(): AudioSource[] {
+    return Object.values(this.state.audioSources).map(source => this.getSource(source.id));
+  }
+
+  getSourcesForCurrentScene(): AudioSource[] {
+    const sceneSources = this.scenesService.getSources({ showHidden: true }).filter((source: any) => source.audio);
+    return sceneSources.map((sceneSource: ISource) => this.getSource(sceneSource.id));
   }
 
 
@@ -100,10 +101,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
 
-  setDeflection(sourceName: string, deflection: number) {
-    const fader = nodeObs.OBS_content_getSourceFader(sourceName);
+  setDeflection(sourceId: string, deflection: number) {
+    const source = this.getSource(sourceId);
+    const fader = nodeObs.OBS_content_getSourceFader(source.name);
     nodeObs.OBS_audio_faderSetDeflection(fader, deflection);
-    this.UPDATE_AUDIO_SOURCE(sourceName, this.fetchAudioSource(sourceName));
+    this.UPDATE_AUDIO_SOURCE(source.id, this.fetchAudioSource(source.name));
   }
 
 
@@ -118,9 +120,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     fader.db = fader.db || 0;
     return {
       id: source.id,
-      name: source.name,
-      displayName: SourcesService.getDisplayName(source),
-      muted: source.muted,
       fader
     };
   }
@@ -128,19 +127,31 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   @mutation
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
-    this.state.audioSources.push(source);
+    this.state.audioSources[source.id] = source;
   }
 
 
   @mutation
-  private UPDATE_AUDIO_SOURCE(sourceName: string, patch: Partial<IAudioSource>) {
-    const source = this.state.audioSources.find(source => sourceName === source.name);
-    Object.assign(source, patch);
+  private UPDATE_AUDIO_SOURCE(sourceId: string, patch: Partial<IAudioSource>) {
+    Object.assign(this.state.audioSources[sourceId], patch);
   }
 
 
   @mutation
-  private REMOVE_AUDIO_SOURCE(sourceName: string) {
-    this.state.audioSources = this.state.audioSources.filter(source => source.name !== sourceName);
+  private REMOVE_AUDIO_SOURCE(sourceId: string) {
+    delete this.state.audioSources[sourceId];
   }
+}
+
+export class AudioSource extends Source implements IAudioSource {
+  fader: IFader;
+
+  @Inject()
+  audioService: AudioService;
+
+  constructor(sourceId: string) {
+    super(sourceId);
+    Utils.applyProxy(this, this.audioService.state.audioSources[sourceId]);
+  }
+
 }

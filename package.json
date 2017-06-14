@@ -9,7 +9,7 @@
     "watch": "webpack --watch",
     "start": "electron .",
     "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-packaged-0.0.4.7z -onode-obs/",
-    "package": "webpack && build -w --x64 --em.env=production",
+    "package": "rm -rf dist && rm -rf bundles && webpack && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js",
     "test": "ava"
   },
@@ -52,7 +52,8 @@
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
-    "node-libuiohook": "git+ssh://git@github.com/twitchalerts/node-libuiohook.git#ce7512ce8916fb89be67da3e6d5127775ce039ce"
+    "node-libuiohook": "file:./node-libuiohook",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
@@ -78,6 +79,7 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "eslint-plugin-vue": "^2.0.1",
+    "file-loader": "^0.11.2",
     "js-yaml": "^3.8.3",
     "less": "^2.7.2",
     "less-loader": "^2.2.3",

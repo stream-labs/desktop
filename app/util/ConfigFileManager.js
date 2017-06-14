@@ -3,7 +3,7 @@
 
 import _ from 'lodash';
 import Obs from '../api/Obs';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 
 class ConfigFileManager {
 

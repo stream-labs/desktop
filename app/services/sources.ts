@@ -6,11 +6,11 @@ import {
   obsValuesToInputValues
 } from '../components/shared/forms/Input';
 
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation, Inject } from './stateful-service';
 import Obs from '../api/Obs';
-import ScenesService from './scenes';
 import configFileManager from '../util/ConfigFileManager';
 import electron from '../vendor/electron';
+import Utils from './utils';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;
@@ -19,7 +19,6 @@ export interface ISource {
   id: string;
   name: string;
   type: TSourceType;
-  isHidden: boolean;
   audio: boolean;
   video: boolean;
   muted: boolean;
@@ -47,18 +46,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
-
-
-  static getHidden(source: ISource): boolean {
-    return !!source.name.match(/\[HIDDEN_\d+\].+/);
-  }
-
-
-  static getDisplayName(source: ISource): string {
-    return this.getHidden(source) ?
-      source.name.replace(/\[HIDDEN_\d+\]/, '') :
-      source.name;
-  }
 
   @mutation
   private RESET_SOURCES() {
@@ -100,8 +87,15 @@ export class SourcesService extends StatefulService<ISourcesState> {
   // does not support adding the same source to multiple
   // scenes.  This will be split into multiple functions
   // in the future.
-  createSourceAndAddToScene(sceneId: string, name: string, type: TSourceType, isHidden = false) {
-    const sceneName = ScenesService.instance.getSceneById(sceneId).name;
+  // TODO: When node-obs supports associating and existing
+  // source with a scene, we should rid of sceneName and sceneId here.
+  createSceneSource(
+    sceneId: string,
+    sceneName: string,
+    name: string,
+    type: TSourceType,
+    isHidden = false
+  ) {
     const sourceName = isHidden ? `[HIDDEN_${sceneId}]${name}` : name;
 
     nodeObs.OBS_content_addSource(
@@ -113,10 +107,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     );
 
     const id = this.initSource(sourceName, type);
-
-    ScenesService.instance.addSourceToScene(sceneId, id);
-
-    configFileManager.save();
     return id;
   }
 
@@ -144,7 +134,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     nodeObs.OBS_content_removeSource(source.name);
 
     this.REMOVE_SOURCE(id);
-    ScenesService.instance.removeSourceFromAllScenes(id);
     this.sourceRemoved.next(source);
   }
 
@@ -220,20 +209,25 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   // Utility functions / getters
 
-  getSourceById(id: string) {
-    return this.state.sources[id];
+  getSourceById(id: string): Source {
+    return this.getSource(id);
   }
 
 
-  getSourceByName(name: string) {
-    return Object.values(this.state.sources).find(source => {
+  getSourceByName(name: string): Source {
+    const sourceModel = Object.values(this.state.sources).find(source => {
       return source.name === name;
     });
+    return sourceModel ? this.getSource(sourceModel.id) : void 0;
   }
 
 
-  get sources() {
-    return Object.values(this.state.sources);
+  get sources(): Source[] {
+    return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.id));
+  }
+
+  getSource(id: string): Source {
+    return this.state.sources[id] ? new Source(id) : void 0;
   }
 
 
@@ -261,6 +255,39 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     return props;
   }
+}
 
+
+export class Source implements ISource {
+  id: string;
+  name: string;
+  type: TSourceType;
+  audio: boolean;
+  video: boolean;
+  muted: boolean;
+  width: number;
+  height: number;
+  properties: TFormData;
+
+  get displayName() {
+    return this.isHidden ?
+      this.name.replace(/\[HIDDEN_[\d\w-]+\]/, '') :
+      this.name;
+  }
+
+  get isHidden() {
+    return !!this.name.match(/\[HIDDEN_[\d\w-]+\].+/);
+  }
+
+  @Inject()
+  protected sourcesService: SourcesService;
+
+  constructor(sourceId: string) {
+    // Using a proxy will ensure that this object
+    // is always up-to-date, and essentially acts
+    // as a view into the store.  It also enforces
+    // the read-only nature of this data
+    Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+  }
 }
 

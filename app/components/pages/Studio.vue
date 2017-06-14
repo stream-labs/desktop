@@ -1,5 +1,5 @@
 <template>
-<div class="studioPage">
+<div class="studio-page">
   <studio-editor />
   <studio-controls />
   <studio-footer />
@@ -21,7 +21,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.studioPage {
+.studio-page {
   display: flex;
   flex-direction: column;
 }

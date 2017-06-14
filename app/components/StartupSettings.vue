@@ -1,5 +1,5 @@
 <template>
-<div class="StartupSettings" v-if="enabled">
+<div class="section" v-if="enabled">
   <bool-input
     :value="obsMode"
     @input="val => saveSetting(val, 'obsMode')"/>
@@ -66,8 +66,8 @@ export default {
         // Ensure we have default settings
         settings = {
           obsMode: false,
-          profile: profileOptions[0].name,
-          sceneCollection: sceneCollectionOptions[0].name
+          profile: profileOptions[0].value,
+          sceneCollection: sceneCollectionOptions[0].value
         };
 
         fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
@@ -121,14 +121,3 @@ export default {
 };
 
 </script>
-
-<style lang="less" scoped>
-@import "../styles/index";
-
-.StartupSettings {
-  margin-bottom: 20px;
-  background-color: @panel-bg-color;
-  border: 1px solid @panel-border-color;
-  padding: 20px 30px;
-}
-</style>

@@ -1,21 +1,23 @@
 <template>
 <div>
-  <div class="studioControls-top">
-    <h4 class="studioControls-label">
+  <div class="studio-controls-top">
+    <h4 class="studio-controls__label">
       Sources
     </h4>
-    <i
-      class="fa fa-plus ico-btn"
-      @click="addSource"/>
-    <i
-      class="fa fa-minus ico-btn"
-      @click="removeSource"/>
-    <i
-      class="fa fa-cog ico-btn"
-      @click="sourceProperties"/>
+    <div>
+      <i
+        class="fa fa-plus ico-btn"
+        @click="addSource"/>
+      <i
+        class="fa fa-minus ico-btn"
+        @click="removeSource"/>
+      <i
+        class="fa fa-cog ico-btn"
+        @click="sourceProperties"/>
+    </div>
   </div>
   <selector
-    class="studioControls-selector"
+    class="studio-controls-selector"
     @contextmenu="showContextMenu"
     :items="sources"
     :activeItem="activeSourceId"
@@ -30,7 +32,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import windowManager from '../util/WindowManager';
-import ScenesService from '../services/scenes';
+import { ScenesService } from '../services/scenes';
 import { ISource, SourcesService } from '../services/sources';
 import { SourceMenu } from '../util/menus/SourceMenu';
 

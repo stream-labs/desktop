@@ -29,7 +29,13 @@ https://yarnpkg.com/en/docs/install
 
 ## Installation
 
-First, install all node modules via yarn:
+First, make sure you have initialized git submodules:
+
+```
+git submodule update --init --recursive
+```
+
+Install all node modules via yarn:
 
 ```
 yarn install
@@ -119,3 +125,22 @@ In order for this to work, you will need to have `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY` set in your environment. These values
 are secret. If you need to set up your machine, ask someone on the
 team who has them, or someone with admin access on our AWS account.
+
+### Deploy Checklist
+
+This is a checklist to run through every time you deploy.
+
+- [ ] Merge staging into master on `slobs-client` and `node-obs`
+- [ ] Check out `master` on `slobs-client`
+- [ ] Check out `master` on `node-obs`
+- [ ] Rebuild node-obs `yarn rebuild-node-obs`
+- [ ] Compile assets `yarn compile`
+- [ ] Run the test suite `yarn test`
+- [ ] Change the version in `package.json`
+- [ ] Commit and push
+- [ ] Tag the repo `git tag 'v0.0.11'` and `git push --tags`
+- [ ] Tag `node-obs` in the same way with the same version
+- [ ] Remove the dist directory `rm -rf dist`
+- [ ] Package the app `yarn package`
+- [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
+- [ ] Deploy the new version `yarn deploy`

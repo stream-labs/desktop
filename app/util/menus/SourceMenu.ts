@@ -3,12 +3,15 @@ import { Menu } from './Menu';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import windowManager from '../WindowManager';
 import { SourcesService } from '../../services/sources';
-import ScenesService from '../../services/scenes';
+import { ScenesService } from '../../services/scenes';
 
 export class SourceMenu extends Menu {
 
   @Inject()
   private sourcesService: SourcesService;
+
+  @Inject()
+  private scenesService: ScenesService;
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
@@ -51,12 +54,12 @@ export class SourceMenu extends Menu {
 
 
   get mergedSource() {
-    return ScenesService.instance.getMergedSource(this.sceneId, this.sourceId);
+    return this.scenesService.getSource(this.sceneId, this.sourceId);
   }
 
 
   toggleVisibility() {
-    ScenesService.instance.setSourceVisibility(
+    this.scenesService.setSourceVisibility(
       this.sceneId,
       this.sourceId,
       !this.mergedSource.visible

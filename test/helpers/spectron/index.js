@@ -19,11 +19,18 @@ export function useSpectron() {
     });
 
     await t.context.app.start();
+
+    // Wait up to 2 seconds before giving up looking for an element.
+    // This will slightly slow down negative assertions, but makes
+    // the tests much more stable, especially on slow systems.
+    t.context.app.client.timeouts('implicit', 2000);
   });
 
   test.afterEach.always(async t => {
     await t.context.app.stop();
-    rimraf.sync(t.context.cacheDir);
+    setTimeout(() => {
+      rimraf.sync(t.context.cacheDir);
+    }, 1000);
   });
 }
 
