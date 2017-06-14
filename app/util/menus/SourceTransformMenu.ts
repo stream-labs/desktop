@@ -1,13 +1,16 @@
 import { Menu } from './Menu';
 import { ScenesService } from '../../services/scenes';
-import VideoService from '../../services/video';
+import { VideoService } from '../../services/video';
 import { ScalableRectangle } from '../../util/ScalableRectangle';
 import { Inject } from '../../services/service';
 
 export class SourceTransformMenu extends Menu {
-  
+
   @Inject()
   scenesService: ScenesService;
+
+  @Inject()
+  videoService: VideoService;
 
   constructor(private sceneId: string, private sourceId: string) {
     super();
@@ -102,8 +105,8 @@ export class SourceTransformMenu extends Menu {
     return new ScalableRectangle({
       x: 0,
       y: 0,
-      width: VideoService.instance.baseWidth,
-      height: VideoService.instance.baseHeight
+      width: this.videoService.baseWidth,
+      height: this.videoService.baseHeight
     });
   }
 
