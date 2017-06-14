@@ -189,6 +189,7 @@ ipcMain.on('window-showChildWindow', (event, data) => {
   if (data.windowOptions.width && data.windowOptions.height) {
     childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
     childWindow.center();
+    childWindow.focus();
   }
 
   // The child window will show itself when rendered

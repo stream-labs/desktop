@@ -12,7 +12,7 @@
 import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
 import { ScenesService } from '../services/scenes';
-import VideoService from '../services/video';
+import { VideoService } from '../services/video';
 import { SourceMenu } from '../util/menus/SourceMenu.ts';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle.ts';
 

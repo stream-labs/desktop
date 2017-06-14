@@ -1,19 +1,82 @@
-import _ from 'lodash';
 import { SettingsService } from '../services/settings';
-import { ScenesService } from '../services/scenes';
-import VideoService from '../services/video';
+import { Inject } from '../services/service';
+import { ScenesService, SceneSource } from '../services/scenes';
+import { VideoService, Display } from '../services/video';
 import { ScalableRectangle } from '../util/ScalableRectangle.ts';
+import electron from '../vendor/electron';
 
-const { webFrame, screen } = window.require('electron');
+const { webFrame, screen } = electron;
+
+/*
+  * An edge looks like:
+  * ________________________________
+  * |                ^
+  * |                |
+  * |      offset -> |
+  * |                |
+  * |                v
+  * |     depth      /\ ^
+  * |<-------------->|| |
+  * |                || |
+  * |        edge -> || | <- length
+  * |                || |
+  * |                || |
+  * |                \/ v
+  *
+  * An edge can be horizontal or vertical, but only alike
+  * types make sense to compare to each other.
+  */
+interface IEdge {
+  depth: number;
+  offset: number;
+  length: number;
+}
+
+// A set of edged separated by location
+interface IEdgeCollection {
+  top: IEdge[];
+  bottom: IEdge[];
+  left: IEdge[];
+  right: IEdge[];
+}
 
 // Encapsulates logic for dragging sources in the overlay editor
 class DragHandler {
 
+  @Inject()
+  settingsService: SettingsService;
+
+  @Inject()
+  scenesService: ScenesService;
+
+  // Settings
+  snapEnabled: boolean;
+  renderedSnapDistance: number;
+  screenSnapping: boolean;
+  sourceSnapping: boolean;
+  centerSnapping: boolean;
+
+  // Video Canvas
+  baseWidth: number;
+  baseHeight: number;
+  renderedWidth: number;
+  renderedHeight: number;
+  scaleFactor: number;
+  snapDistance: number;
+
+  // Sources
+  draggedSource: SceneSource;
+  otherSources: SceneSource[];
+
+  // Mouse properties
+  currentX: number;
+  currentY: number;
+
+  targetEdges: IEdgeCollection;
+
   // startEvent: The mousedown event that started the drag
   // display: The OBS display object we are operating on
-  constructor(startEvent, display) {
-    this.settingsService = SettingsService.instance;
-
+  constructor(startEvent: MouseEvent, display: Display) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
@@ -31,8 +94,8 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    this.draggedSource = ScenesService.instance.activeSource;
-    this.otherSources = ScenesService.instance.inactiveSources.filter(source => {
+    this.draggedSource = this.scenesService.activeSource;
+    this.otherSources = this.scenesService.inactiveSources.filter(source => {
       // Only video targets are valid snap targets
       return source.video;
     });
@@ -45,9 +108,8 @@ class DragHandler {
     this.targetEdges = this.generateTargetEdges();
   }
 
-  // event: The mousemove event
   // Should be called when the mouse moves
-  move(event) {
+  move(event: MouseEvent) {
     const delta = this.mouseDelta(event);
 
     // The new source location before applying snapping
@@ -62,16 +124,33 @@ class DragHandler {
     if (this.snapEnabled && !event.ctrlKey) {
       const sourceEdges = this.generateSourceEdges(this.draggedSource, newX, newY);
 
-      _.each(sourceEdges, (sourceEdge, name) => {
-        _.find(this.targetEdges[name], targetEdge => {
+      Object.keys(sourceEdges).forEach(edgeName => {
+        const sourceEdge = sourceEdges[edgeName] as IEdge;
+
+        this.targetEdges[edgeName].find((targetEdge: IEdge) => {
           if (this.shouldSnap(sourceEdge, targetEdge)) {
-            if ((name === 'left') || (name === 'right')) {
+            if ((edgeName === 'left') && !snappedX) {
               snappedX = true;
-              newX -= sourceEdge.depth - targetEdge.depth;
-            } else {
-              snappedY = true;
-              newY -= sourceEdge.depth - targetEdge.depth;
+              newX = targetEdge.depth;
             }
+
+            if ((edgeName === 'right') && !snappedX) {
+              snappedX = true;
+              newX = targetEdge.depth - this.draggedSource.scaledWidth;
+            }
+
+            if ((edgeName === 'top') && !snappedY) {
+              snappedY = true;
+              newY = targetEdge.depth;
+            }
+
+            if ((edgeName === 'bottom') && !snappedY) {
+              snappedY = true;
+              newY = targetEdge.depth - this.draggedSource.scaledHeight;
+            }
+
+            // Leave the loop early if we snapped X & Y
+            return snappedX && snappedY;
           }
         });
       });
@@ -96,7 +175,7 @@ class DragHandler {
   // Private:
 
   // Returns mouse deltas in base space
-  mouseDelta(event) {
+  mouseDelta(event: MouseEvent) {
     // Deltas in rendered space
     const deltaX = event.pageX - this.currentX;
     const deltaY = event.pageY - this.currentY;
@@ -107,31 +186,11 @@ class DragHandler {
     };
   }
 
-  /*
-   * An edge looks like:
-   * ________________________________
-   * |                ^
-   * |                |
-   * |      offset -> |
-   * |                |
-   * |                v
-   * |     depth      /\ ^
-   * |<-------------->|| |
-   * |                || |
-   * |        edge -> || | <- length
-   * |                || |
-   * |                || |
-   * |                \/ v
-   *
-   * An edge can be horizontal or vertical, but only alike
-   * types make sense to compare to each other.
-   */
-
   // A and B are both edges, and this function returns true
   // if they should snap together.  For best results, only
   // compare horizontal edges to other horizontal edges, and
   // vertical edges to other vertical edges.
-  shouldSnap(a, b) {
+  shouldSnap(a: IEdge, b: IEdge) {
     // First, check if the edges overlap
     if (a.offset + a.length < b.offset) {
       return false;
@@ -153,7 +212,7 @@ class DragHandler {
   // currently dragged source can snap to.  They are separated
   // by which edge of the source can snap to it.
   generateTargetEdges() {
-    const targetEdges = {
+    const targetEdges: IEdgeCollection = {
       left: [],
       top: [],
       right: [],
@@ -211,7 +270,7 @@ class DragHandler {
 
   // Generates edges for the given source at
   // the given x & y coordinates
-  generateSourceEdges(source, x, y) {
+  generateSourceEdges(source: SceneSource, x: number, y: number) {
     const rect = new ScalableRectangle({
       x,
       y,
