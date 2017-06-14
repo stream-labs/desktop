@@ -8,7 +8,8 @@
     "import-name": false,
     "max-line-length": {
       "options": [120]
-    }
+    },
+    "align": [true, "parameters", "statements"]
   },
   "jsRules": {
   }

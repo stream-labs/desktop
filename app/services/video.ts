@@ -1,13 +1,24 @@
-import { Service } from './service';
+import { Service, Inject } from './service';
 import { SettingsService } from './settings';
 import Obs from '../api/Obs';
+import electron from '../vendor/electron';
 
-const nodeObs = Obs.nodeObs;
-const { remote } = window.require('electron');
+const nodeObs = Obs.nodeObs as Dictionary<Function>;
+const { remote } = electron;
 
-class Display {
+export interface IOutputRegion {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+}
 
-  constructor(name) {
+export class Display {
+
+  outputRegionCallbacks: Function[];
+  outputRegion: IOutputRegion;
+
+  constructor(public name: string) {
     this.name = name;
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
@@ -17,7 +28,7 @@ class Display {
 
     // Watch for changes to the base resolution.
     // This seems super freaking hacky.
-    SettingsService.instance.store.watch((state) => {
+    SettingsService.instance.store.watch((state: any) => {
       return state.SettingsService.Video.Base;
     }, () => {
       // This gives the setting time to propagate
@@ -27,11 +38,11 @@ class Display {
     });
   }
 
-  move(x, y) {
+  move(x: number, y: number) {
     nodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
-  resize(width, height) {
+  resize(width: number, height: number) {
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
     this.refreshOutputRegion();
   }
@@ -40,7 +51,7 @@ class Display {
     nodeObs.OBS_content_destroyDisplay(this.name);
   }
 
-  onOutputResize(cb) {
+  onOutputResize(cb: Function) {
     this.outputRegionCallbacks.push(cb);
   }
 
@@ -60,10 +71,13 @@ class Display {
 
 }
 
-export default class VideoService extends Service {
+export class VideoService extends Service {
+
+  @Inject()
+  settingsService: SettingsService;
 
   init() {
-    SettingsService.instance.loadSettingsIntoStore();
+    this.settingsService.loadSettingsIntoStore();
   }
 
   createDisplay() {
@@ -86,9 +100,9 @@ export default class VideoService extends Service {
   }
 
   get baseResolution() {
-    const [widthStr, heightStr] = SettingsService.instance.state.Video.Base.split('x');
-    const width = parseInt(widthStr);
-    const height = parseInt(heightStr);
+    const [widthStr, heightStr] = this.settingsService.state.Video.Base.split('x');
+    const width = parseInt(widthStr, 10);
+    const height = parseInt(heightStr, 10);
 
     return {
       width,

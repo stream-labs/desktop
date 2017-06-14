@@ -15,12 +15,19 @@ export interface ISettingsState {
     RecordWhenStreaming: boolean;
     WarnBeforeStartingStream: boolean;
     WarnBeforeStoppingStream: boolean;
+    SnappingEnabled: boolean;
+    SnapDistance: number;
+    ScreenSnapping: boolean;
+    SourceSnapping: boolean;
+    CenterSnapping: boolean;
   };
   Stream: {
     key: string;
   };
   Output: Dictionary<TObsValue>;
-  Video: Dictionary<TObsValue>;
+  Video: {
+    Base: string;
+  };
   Audio: Dictionary<TObsValue>;
   Hotkeys: Dictionary<TObsValue>;
   Advanced: Dictionary<TObsValue>;
