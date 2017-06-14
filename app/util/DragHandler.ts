@@ -212,12 +212,12 @@ class DragHandler {
   // currently dragged source can snap to.  They are separated
   // by which edge of the source can snap to it.
   generateTargetEdges() {
-    const targetEdges = {
+    const targetEdges: IEdgeCollection = {
       left: [],
       top: [],
       right: [],
       bottom: []
-    } as IEdgeCollection;
+    };
 
     // Screen edge snapping:
     if (this.screenSnapping) {
