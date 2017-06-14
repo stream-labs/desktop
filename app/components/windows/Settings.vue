@@ -9,7 +9,7 @@
       <div class="columns small-3">
         <NavMenu v-model="categoryName" class="side-menu">
           <NavItem
-            v-for="category in categoriesNames"
+            v-for="category in categoryNames"
             :to="category"
             :ico="icons[category]"
           >
@@ -62,7 +62,6 @@ export default class SceneTransitions extends Vue {
   settingsService: SettingsService;
 
   categoryName = 'General';
-  categoriesNames = this.settingsService.getCategories();
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: {[key in keyof ISettingsState]: string} = {
     General: 'th-large',
@@ -73,6 +72,14 @@ export default class SceneTransitions extends Vue {
     Hotkeys: 'keyboard-o',
     Advanced: 'cogs'
   };
+
+
+  get categoryNames() {
+    return this.settingsService.getCategories().filter(name => {
+      return name !== 'Audio';
+    });
+  }
+
 
   save(settingsData: ISettingsSubCategory[]) {
     this.settingsService.setSettings(this.categoryName, settingsData);
