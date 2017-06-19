@@ -112,9 +112,12 @@ class DragHandler {
   move(event: MouseEvent) {
     const delta = this.mouseDelta(event);
 
+    const rect = new ScalableRectangle(this.draggedSource);
+    const denormalize = rect.normalize();
+
     // The new source location before applying snapping
-    let newX = this.draggedSource.x + delta.x;
-    let newY = this.draggedSource.y + delta.y;
+    let newX = rect.x + delta.x;
+    let newY = rect.y + delta.y;
 
     // Whether or not we snapped the X or Y coordinate
     let snappedX = false;
@@ -122,7 +125,7 @@ class DragHandler {
 
     // Holding Ctrl temporary disables snapping
     if (this.snapEnabled && !event.ctrlKey) {
-      const sourceEdges = this.generateSourceEdges(this.draggedSource, newX, newY);
+      const sourceEdges = this.generateSourceEdges(rect, newX, newY);
 
       Object.keys(sourceEdges).forEach(edgeName => {
         const sourceEdge = sourceEdges[edgeName] as IEdge;
@@ -136,7 +139,7 @@ class DragHandler {
 
             if ((edgeName === 'right') && !snappedX) {
               snappedX = true;
-              newX = targetEdge.depth - this.draggedSource.scaledWidth;
+              newX = targetEdge.depth - rect.scaledWidth;
             }
 
             if ((edgeName === 'top') && !snappedY) {
@@ -146,7 +149,7 @@ class DragHandler {
 
             if ((edgeName === 'bottom') && !snappedY) {
               snappedY = true;
-              newY = targetEdge.depth - this.draggedSource.scaledHeight;
+              newY = targetEdge.depth - rect.scaledHeight;
             }
 
             // Leave the loop early if we snapped X & Y
@@ -156,11 +159,16 @@ class DragHandler {
       });
     }
 
+    rect.x = newX;
+    rect.y = newY;
+
+    denormalize();
+
     ScenesService.instance.setSourcePosition(
       ScenesService.instance.activeSceneId,
       this.draggedSource.id,
-      newX,
-      newY
+      rect.x,
+      rect.y
     );
 
     if (!snappedX) {
@@ -270,7 +278,7 @@ class DragHandler {
 
   // Generates edges for the given source at
   // the given x & y coordinates
-  generateSourceEdges(source: SceneSource, x: number, y: number) {
+  generateSourceEdges(source: IScalableRectangle, x: number, y: number) {
     const rect = new ScalableRectangle({
       x,
       y,
