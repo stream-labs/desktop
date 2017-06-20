@@ -19,6 +19,7 @@
   <selector
     class="studio-controls-selector"
     @contextmenu="showContextMenu"
+    @dblclick="sourceProperties"
     :items="sources"
     :activeItem="activeSourceId"
     @select="makeActive"
