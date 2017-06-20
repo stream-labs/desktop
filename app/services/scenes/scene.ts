@@ -134,6 +134,12 @@ export class Scene implements IScene {
       nodeObs.OBS_content_setSourceOrder(source.name, operation);
     });
 
+    const hiddenSourcesOrder = this.getSources({ showHidden: true })
+      .filter(source => source.isHidden)
+      .map(source => source.id);
+
+    order.unshift(...hiddenSourcesOrder);
+
     this.SET_SOURCE_ORDER(order);
   }
 
