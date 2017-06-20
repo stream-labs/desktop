@@ -8,6 +8,8 @@ import Utils from './utils';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 
+const VOLMETER_UPDATE_INTERVAL = 40;
+
 export interface IAudioSource {
   id: string;
   fader: IFader;
@@ -88,14 +90,24 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     const volmeterStream = new Subject<IVolmeter>();
     const volmeterId = nodeObs.OBS_content_getSourceVolmeter(sourceName) as INodeObsId;
 
-    // uncomment to slow down the volmeter updating
-    // nodeObs.OBS_audio_volmeterSetUpdateInterval(volmeterId, 1000);
+    nodeObs.OBS_audio_volmeterSetUpdateInterval(volmeterId, VOLMETER_UPDATE_INTERVAL);
 
+    let lastVolmeterEventTime: number;
+    let lastVolmeterValue: IVolmeter;
     const obsSubscription = nodeObs.OBS_audio_volmeterAddCallback(volmeterId, (volmeter: IVolmeter) => {
       volmeterStream.next(volmeter);
+      lastVolmeterValue = volmeter;
+      lastVolmeterEventTime = Date.now();
     }) as INodeObsId;
 
+    // reset volmeter if for a long time we don't have any updates from backend
+    const volmeterCheckIntervalId = setInterval(() => {
+      if (Date.now() - lastVolmeterEventTime < VOLMETER_UPDATE_INTERVAL * 2) return;
+      volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
+    }, VOLMETER_UPDATE_INTERVAL * 2);
+
     return volmeterStream.subscribe(cb).add(() => {
+      clearInterval(volmeterCheckIntervalId);
       nodeObs.OBS_audio_volmeterRemoveCallback(volmeterId, obsSubscription);
     });
   }
