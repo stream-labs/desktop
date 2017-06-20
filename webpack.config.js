@@ -61,11 +61,11 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: 'images/',
+          outputPath: 'media/',
           publicPath: 'bundles/'
         }
       }

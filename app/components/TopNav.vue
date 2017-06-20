@@ -1,5 +1,12 @@
 <template>
 <div class="top-nav">
+  <!--<button
+      @click="navigateOnboarding"
+      class="button button--action"
+      :class="{ active: page === 'Onboarding' }">
+      Onboarding
+  </button>-->
+
   <div class="tabs">
     <button
       @click="navigateDashboard"
@@ -14,7 +21,6 @@
       :class="{ active: page === 'Studio' }">
       <i class="fa fa-video-camera"/> Editor
     </button>
-    
     <button
       @click="navigateLive"
       class="tab-button"
@@ -107,6 +113,13 @@ export default {
       });
     },
 
+    navigateOnboarding() {
+      this.$store.dispatch({
+        type: 'navigate',
+        pageName: 'Onboarding'
+      });
+    },
+
     openSettingsWindow() {
       windowManager.showSettings();
     },
@@ -119,8 +132,8 @@ export default {
   computed: {
     page() {
       return this.$store.state.navigation.currentPage;
-    },
-   }
+    }
+  }
 };
 </script>
 

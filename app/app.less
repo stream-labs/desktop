@@ -50,14 +50,60 @@ h4 {
   position: absolute;
   top: 30px;
   right: 0;
-  background: white;
+  background: @white;
   padding: 8px;
   min-width: 100px;
   text-align: left;
   border-radius: 3px;
   box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
-
+.select {
+  position: relative;
+  .select {
+    font-size: 13px;
+    margin: 0;
+    padding: 0 32px 0 8px;
+  }
+}
+.select-carot {
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  font-size: 11px;
+  color: @white;
+}
+.select--semi-opac {
+  select {
+    background: rgba(255,255,255,.1);
+    border-color: transparent;
+    color: white;
+    &:focus {
+      background: rgba(255,255,255,.14);
+      outline: none;
+    }
+  }
+}
+.search-input {
+  position: relative;
+  input[type=text] {
+    background: transparent;
+    border: none;
+    padding: 0 32px 0 8px;
+    color: @grey;
+    .radius;
+     &:focus {
+      background: rgba(255,255,255,.14);
+      outline: none;
+      box-shadow: none;
+    }
+  }
+  .fa-search {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 16px;
+  }
+}
 .slide-open__menu {
   position: absolute;
   background: @white;

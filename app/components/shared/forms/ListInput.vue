@@ -1,5 +1,5 @@
 <template>
-<div class="input" :class="{disabled: value.enabled === false}">
+<div class="input select" :class="{disabled: value.enabled === false}">
   <label>{{ value.description }}</label>
   <select
     :disabled="value.enabled === false"
@@ -12,6 +12,7 @@
       {{ possibleValue.description }}
     </option>
   </select>
+  <div class="select-carot"><i class="fa fa-chevron-down" /></div>
 </div>
 </template>
 
