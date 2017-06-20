@@ -10,15 +10,25 @@ export function mutation(target: any, methodName: string, descriptor: PropertyDe
   const mutationName = `${serviceName}.${methodName}`;
 
   target.mutations = target.mutations || {};
-  target.mutations[mutationName] = function (localState: any, payload: {args: any}) {
-    descriptor.value.call(target.constructor.instance, ...payload.args);
+  target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
+    const targetIsSingleton = !!target.constructor.instance;
+    let context = null;
+
+    if (targetIsSingleton) {
+      context = target.constructor.instance;
+    } else {
+      context = new target.constructor(...payload.constructorArgs);
+    }
+
+    descriptor.value.call(context, ...payload.args);
   };
 
   return {
     ...descriptor,
 
     value(...args: any[]) {
-      store.commit(mutationName, { args });
+      const constructorArgs = this['constructorArgs'];
+      store.commit(mutationName, { args, constructorArgs });
     }
   };
 }
@@ -43,20 +53,49 @@ export abstract class StatefulService<TState extends object> extends Service {
     Vue.set(this.store.state, this.serviceName, newState);
   }
 
-  // Returns an injectable Vuex module
-  static getModule(): Module<any, any> {
-    return {
-      [this.name]: {
-        state: this.initialState,
-        mutations: (<any>this.prototype).mutations
-      }
+
+}
+
+/**
+ * Returns an injectable Vuex module
+ */
+export function getModule(ModuleContainer: any): Module<any, any> {
+  return {
+    [ModuleContainer.name]: {
+      state: ModuleContainer.initialState,
+      mutations: (<any>ModuleContainer.prototype).mutations
+    }
+  };
+}
+
+/**
+ * Classes with Mutator decorator saves constructor's
+ * arguments to send them with each called mutation.
+ * We need to save constructor arguments to create the same
+ * class instance in another window.
+ * Caveats:
+ * - constructor arguments must be able to be serialized
+ * - constructor must not have side effects
+ */
+export function Mutator(): ClassDecorator {
+  return function (target: any) {
+    const original = target;
+
+    // create new constructor that will save arguments in instance
+    const f:any = function (this: any, ...args: any[]) {
+      original.apply(this, args);
+      this.constructorArgs = args;
+      return this;
     };
-  }
 
-  patchState(patch: Partial<TState>) {
-    // spread operator is not supported on generic types yet
-    // https://github.com/Microsoft/TypeScript/issues/12756#issuecomment-265812676
-    this.state = { ...(this.state as object), ...(patch as object) } as TState;
-  }
+    // copy prototype so intanceof operator still works
+    f.prototype = original.prototype;
 
+    // vuex modules names related to constructor name
+    // so we need to save the name
+    Object.defineProperty(f, 'name', { value: target.name });
+
+    // return new constructor (will override original)
+    return f;
+  };
 }

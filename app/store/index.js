@@ -6,27 +6,32 @@ import _ from 'lodash';
 import navigation from './modules/navigation';
 import windowOptions from './modules/windowOptions';
 
-// Stateful Services
-import { ScenesService } from '../services/scenes';
+// Stateful Services and Classes
+import { getModule } from '../services/stateful-service';
+import { ScenesService, Scene, SceneSource } from '../services/scenes';
 import ScenesTransitions from  '../services/scenes-transitions.ts';
-import { SourcesService } from '../services/sources.ts';
+import { SourcesService, Source } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';
 import { SettingsService } from '../services/settings';
 import StreamingService from '../services/streaming';
 import PerformanceService from '../services/performance';
-import { AudioService } from '../services/audio.ts';
+import { AudioService, AudioSource } from '../services/audio.ts';
 import { CustomizationService } from '../services/customization.ts';
 
 const statefulServiceModules = {
-  ...ScenesService.getModule(),
-  ...ScenesTransitions.getModule(),
-  ...SourcesService.getModule(),
-  ...SourceFiltersService.getModule(),
-  ...SettingsService.getModule(),
-  ...StreamingService.getModule(),
-  ...PerformanceService.getModule(),
-  ...AudioService.getModule(),
-  ...CustomizationService.getModule()
+  ...getModule(ScenesService),
+  ...getModule(Scene),
+  ...getModule(SceneSource),
+  ...getModule(ScenesTransitions),
+  ...getModule(SourcesService),
+  ...getModule(Source),
+  ...getModule(SourceFiltersService),
+  ...getModule(SettingsService),
+  ...getModule(StreamingService),
+  ...getModule(PerformanceService),
+  ...getModule(AudioService),
+  ...getModule(AudioSource),
+  ...getModule(CustomizationService)
 };
 
 

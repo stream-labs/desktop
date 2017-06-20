@@ -2,7 +2,7 @@ import { SettingsService } from '../services/settings';
 import { Inject } from '../services/service';
 import { ScenesService, SceneSource } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
-import { ScalableRectangle } from '../util/ScalableRectangle.ts';
+import { ScalableRectangle } from '../util/ScalableRectangle';
 import electron from '../vendor/electron';
 
 const { webFrame, screen } = electron;
@@ -94,8 +94,9 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    this.draggedSource = this.scenesService.activeSource;
-    this.otherSources = this.scenesService.inactiveSources.filter(source => {
+    const scene = this.scenesService.activeScene;
+    this.draggedSource = scene.activeSource;
+    this.otherSources = scene.inactiveSources.filter(source => {
       // Only video targets are valid snap targets
       return source.video;
     });
@@ -164,12 +165,9 @@ class DragHandler {
 
     denormalize();
 
-    ScenesService.instance.setSourcePosition(
-      ScenesService.instance.activeSceneId,
-      this.draggedSource.id,
-      rect.x,
-      rect.y
-    );
+    this.scenesService.activeScene.getSource(
+      this.draggedSource.id
+    ).setPosition(rect);
 
     if (!snappedX) {
       this.currentX = event.pageX;
