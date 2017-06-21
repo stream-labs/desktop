@@ -1,5 +1,12 @@
 <template>
 <div class="top-nav">
+  <!--<button
+      @click="navigateOnboarding"
+      class="button button--action"
+      :class="{ active: page === 'Onboarding' }">
+      Onboarding
+  </button>-->
+
   <div class="tabs">
     <button
       @click="navigateDashboard"
@@ -14,7 +21,6 @@
       :class="{ active: page === 'Studio' }">
       <i class="fa fa-video-camera"/> Editor
     </button>
-    
     <button
       @click="navigateLive"
       class="tab-button"
@@ -26,14 +32,17 @@
 
   <div class="top-nav-right">
     <div class="top-nav-item">
-      <button 
-        class="slide-open__open" 
+      <a @click="bugReport">Bug Report</a>
+    </div>
+    <div class="top-nav-item">
+      <button
+        class="slide-open__open"
         @click="slideOpen = !slideOpen">
         <i class="fa fa-long-arrow-left" aria-hidden="true"></i> Test
       </button>
       <transition name="slide-fade">
-        <div 
-          v-if="slideOpen" 
+        <div
+          v-if="slideOpen"
           class="slide-open__menu">
           <a class="slide-open__close"
               @click="slideOpen = !slideOpen">
@@ -73,6 +82,7 @@
 import windowManager from '../util/WindowManager.js';
 import StartStreamingButton from './StartStreamingButton.vue';
 import { CustomizationService } from '../services/customization';
+import electron from '../vendor/electron';
 
 export default {
   components: {
@@ -107,20 +117,31 @@ export default {
       });
     },
 
+    navigateOnboarding() {
+      this.$store.dispatch({
+        type: 'navigate',
+        pageName: 'Onboarding'
+      });
+    },
+
     openSettingsWindow() {
       windowManager.showSettings();
     },
 
     toggleNightTheme() {
       CustomizationService.instance.nightMode = !CustomizationService.instance.nightMode;
+    },
+
+    bugReport() {
+      electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
     }
   },
 
   computed: {
     page() {
       return this.$store.state.navigation.currentPage;
-    },
-   }
+    }
+  }
 };
 </script>
 

@@ -9,7 +9,8 @@
       :class="{ 'selector-item--active': item.value === activeItem }"
       v-for="(item, index) in normalizedItems"
       @contextmenu="handleContextMenu(index)"
-      @click="handleSelect(index)">
+      @click="handleSelect(index)"
+      @dblclick="handleDoubleClick(index)">
       <div class="selector-item-text">
         {{item.name}}
       </div>
@@ -65,6 +66,12 @@ export default class Selector extends Vue {
     const value = this.normalizedItems[index].value;
     this.handleSelect(index);
     this.$emit('contextmenu', value);
+  }
+
+  handleDoubleClick(index: number) {
+    const value = this.normalizedItems[index].value;
+    this.handleSelect(index);
+    this.$emit('dblclick', value);
   }
 
   /**

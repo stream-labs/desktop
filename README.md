@@ -121,6 +121,10 @@ You should thoroughly test the packaged app before running this, since
 all users will be forced to upgrade to this verion the next time they
 start the app.
 
+You should also make sure that the packager signed the executables.
+This will only happen if you have `CSC_LINK` and `CSC_KEY_PASSWORD`
+set in your environment.  Someone on the team can give these to you.
+
 In order for this to work, you will need to have `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY` set in your environment. These values
 are secret. If you need to set up your machine, ask someone on the

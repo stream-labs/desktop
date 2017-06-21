@@ -18,6 +18,11 @@ interface IScalableRectangle extends IRectangle {
 
 declare type TPatch<TEntity> = { id: string } & Partial<TEntity>;
 
+interface IVec2 {
+  x: number;
+  y: number;
+}
+
 // allow TS to import components without type definitions
 // webpack still check the module existence
 declare module '*';

@@ -12,6 +12,8 @@ export class SourceTransformMenu extends Menu {
   @Inject()
   videoService: VideoService;
 
+  source = this.scenesService.getScene(this.sceneId).getSource(this.sourceId);
+
   constructor(private sceneId: string, private sourceId: string) {
     super();
 
@@ -66,21 +68,12 @@ export class SourceTransformMenu extends Menu {
 
 
   resetTransform() {
-    this.scenesService.setSourcePositionAndScale(
-      this.sceneId,
-      this.sourceId,
-      0,
-      0,
-      1.0,
-      1.0
-    );
+    this.source.setPositionAndScale(0, 0, 1.0, 1.0);
   }
 
 
   setRectangle(rect: ScalableRectangle) {
-    this.scenesService.setSourcePositionAndScale(
-      this.sceneId,
-      this.sourceId,
+    this.source.setPositionAndScale(
       rect.x,
       rect.y,
       rect.scaleX,
@@ -89,14 +82,9 @@ export class SourceTransformMenu extends Menu {
   }
 
 
-  getMergedSource() {
-    return this.scenesService.getSource(this.sceneId, this.sourceId);
-  }
-
-
   // A rectangle representing this source
   getSourceRectangle() {
-    return new ScalableRectangle(this.getMergedSource());
+    return new ScalableRectangle(this.source);
   }
 
 

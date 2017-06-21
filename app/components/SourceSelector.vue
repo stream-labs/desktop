@@ -19,8 +19,9 @@
   <selector
     class="studio-controls-selector"
     @contextmenu="showContextMenu"
+    @dblclick="sourceProperties"
     :items="sources"
-    :activeItem="activeSourceId"
+    :activeItem="scene.activeSourceId"
     @select="makeActive"
     @sort="handleSort"/>
 </div>
@@ -66,15 +67,15 @@ export default class SourceSelector extends Vue {
 
   removeSource() {
     // We can only remove a source if one is selected
-    if (this.activeSourceId) {
-      this.sourcesService.removeSource(this.activeSourceId);
+    if (this.scene.activeSourceId) {
+      this.sourcesService.removeSource(this.scene.activeSourceId);
     }
   }
 
 
   sourceProperties() {
-    if (this.activeSourceId) {
-      windowManager.showSourceProperties(this.activeSourceId);
+    if (this.scene.activeSourceId) {
+      windowManager.showSourceProperties(this.scene.activeSourceId);
     }
   }
 
@@ -82,8 +83,7 @@ export default class SourceSelector extends Vue {
   handleSort(data: any) {
     const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
 
-    this.scenesService.setSourceOrder(
-      this.scenesService.activeScene.id,
+    this.scenesService.activeScene.setSourceOrder(
       data.change.moved.element.value,
       positionDelta,
       data.order
@@ -92,15 +92,15 @@ export default class SourceSelector extends Vue {
 
 
   makeActive(sourceId: string) {
-    this.scenesService.makeSourceActive(
-      this.scenesService.activeScene.id,
-      sourceId
-    );
+    this.scene.makeSourceActive(sourceId);
   }
 
+  get scene() {
+    return this.scenesService.activeScene;
+  }
 
   get sources() {
-    return this.scenesService.getSources().map((source: ISource) => {
+    return this.scene.getSources().map((source: ISource) => {
       return {
         name: source.name,
         value: source.id
@@ -108,9 +108,5 @@ export default class SourceSelector extends Vue {
     });
   }
 
-
-  get activeSourceId(): string {
-    return this.scenesService.activeSourceId;
-  }
 }
 </script>

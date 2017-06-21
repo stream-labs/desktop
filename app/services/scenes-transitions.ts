@@ -1,5 +1,5 @@
 import Obs from '../api/Obs';
-import { mutation, StatefulService, InitAfter, Inject } from './stateful-service';
+import { mutation, StatefulService } from './stateful-service';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,

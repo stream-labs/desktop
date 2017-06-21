@@ -5,29 +5,31 @@
   "version": "0.1.2",
   "main": "main.js",
   "scripts": {
-    "compile": "webpack",
-    "watch": "webpack --watch",
+    "compile": "yarn clear && webpack",
+    "watch": "yarn clear && webpack --watch",
     "start": "electron .",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-packaged-0.0.4.7z -onode-obs/",
+    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.6.1 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser.7z -onode-obs/",
+    "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser.7z -onode-obs/",
     "package": "rm -rf dist && rm -rf bundles && webpack && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js",
-    "test": "ava"
+    "test": "ava",
+    "clear": "rm -rf bundles/media"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
     "productName": "Streamlabs OBS",
-    "icon": "images/icon.ico",
+    "icon": "media/images/icon.ico",
     "files": [
       "bundles",
       "node_modules",
       "vendor",
-      "updater",
+      "updater/index.html",
+      "updater/Updater.js",
       "index.html",
       "main.js"
     ],
     "extraFiles": [
-      "node-obs",
-      "config"
+      "node-obs"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -35,10 +37,6 @@
     "publish": {
       "provider": "generic",
       "url": "https://s3-us-west-2.amazonaws.com/streamlabs-obs"
-    },
-    "win": {
-      "certificateFile": "C:/Users/acree/streamlabsp12.pfx",
-      "certificatePassword": "ultimat3str3aming3xp3ri3nc3"
     }
   },
   "ava": {

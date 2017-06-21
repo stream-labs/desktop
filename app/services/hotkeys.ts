@@ -146,13 +146,13 @@ const HOTKEY_ACTIONS = {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
 
-        ScenesService.instance.setSourceVisibility(scene.id, source.id, true);
+        ScenesService.instance.getSource(scene.id, source.id).setVisibility(true);
       },
       off(sceneName, sourceName) {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
 
-        ScenesService.instance.setSourceVisibility(scene.id, source.id, false);
+        ScenesService.instance.getSource(scene.id, source.id).setVisibility(false);
       }
     },
 

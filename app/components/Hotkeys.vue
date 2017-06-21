@@ -20,7 +20,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import { HotkeySet, HotkeysService } from '../services/hotkeys';
 import { ScenesService } from '../services/scenes';
-import { SourcesService, ISource } from '../services/sources';
+import { SourcesService } from '../services/sources';
 import HotkeyGroup from './HotkeyGroup.vue';
 
 @Component({
@@ -51,9 +51,7 @@ export default class Hotkeys extends Vue {
   }
 
   get sceneNames() {
-    return this.scenesService.scenes.map((scene: any) => {
-      return scene.name;
-    });
+    return this.scenesService.scenes.map(scene => scene.name);
   }
 
   get sources() {

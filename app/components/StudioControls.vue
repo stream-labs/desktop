@@ -17,7 +17,7 @@ export default {
     SourceSelector,
     Mixer
   }
-}
+};
 </script>
 
 <style lang="less" scoped>

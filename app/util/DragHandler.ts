@@ -2,7 +2,7 @@ import { SettingsService } from '../services/settings';
 import { Inject } from '../services/service';
 import { ScenesService, SceneSource } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
-import { ScalableRectangle } from '../util/ScalableRectangle.ts';
+import { ScalableRectangle } from '../util/ScalableRectangle';
 import electron from '../vendor/electron';
 
 const { webFrame, screen } = electron;
@@ -94,8 +94,9 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    this.draggedSource = this.scenesService.activeSource;
-    this.otherSources = this.scenesService.inactiveSources.filter(source => {
+    const scene = this.scenesService.activeScene;
+    this.draggedSource = scene.activeSource;
+    this.otherSources = scene.inactiveSources.filter(source => {
       // Only video targets are valid snap targets
       return source.video;
     });
@@ -112,9 +113,12 @@ class DragHandler {
   move(event: MouseEvent) {
     const delta = this.mouseDelta(event);
 
+    const rect = new ScalableRectangle(this.draggedSource);
+    const denormalize = rect.normalize();
+
     // The new source location before applying snapping
-    let newX = this.draggedSource.x + delta.x;
-    let newY = this.draggedSource.y + delta.y;
+    let newX = rect.x + delta.x;
+    let newY = rect.y + delta.y;
 
     // Whether or not we snapped the X or Y coordinate
     let snappedX = false;
@@ -122,7 +126,7 @@ class DragHandler {
 
     // Holding Ctrl temporary disables snapping
     if (this.snapEnabled && !event.ctrlKey) {
-      const sourceEdges = this.generateSourceEdges(this.draggedSource, newX, newY);
+      const sourceEdges = this.generateSourceEdges(rect, newX, newY);
 
       Object.keys(sourceEdges).forEach(edgeName => {
         const sourceEdge = sourceEdges[edgeName] as IEdge;
@@ -136,7 +140,7 @@ class DragHandler {
 
             if ((edgeName === 'right') && !snappedX) {
               snappedX = true;
-              newX = targetEdge.depth - this.draggedSource.scaledWidth;
+              newX = targetEdge.depth - rect.scaledWidth;
             }
 
             if ((edgeName === 'top') && !snappedY) {
@@ -146,7 +150,7 @@ class DragHandler {
 
             if ((edgeName === 'bottom') && !snappedY) {
               snappedY = true;
-              newY = targetEdge.depth - this.draggedSource.scaledHeight;
+              newY = targetEdge.depth - rect.scaledHeight;
             }
 
             // Leave the loop early if we snapped X & Y
@@ -156,12 +160,14 @@ class DragHandler {
       });
     }
 
-    ScenesService.instance.setSourcePosition(
-      ScenesService.instance.activeSceneId,
-      this.draggedSource.id,
-      newX,
-      newY
-    );
+    rect.x = newX;
+    rect.y = newY;
+
+    denormalize();
+
+    this.scenesService.activeScene.getSource(
+      this.draggedSource.id
+    ).setPosition(rect);
 
     if (!snappedX) {
       this.currentX = event.pageX;
@@ -270,7 +276,7 @@ class DragHandler {
 
   // Generates edges for the given source at
   // the given x & y coordinates
-  generateSourceEdges(source: SceneSource, x: number, y: number) {
+  generateSourceEdges(source: IScalableRectangle, x: number, y: number) {
     const rect = new ScalableRectangle({
       x,
       y,

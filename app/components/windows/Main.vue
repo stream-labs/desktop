@@ -14,6 +14,7 @@ import TopNav from '../TopNav.vue';
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
 import Live from '../pages/Live.vue';
+import Onboarding from '../pages/Onboarding.vue';
 import windowMixin from '../mixins/window';
 import { CustomizationService } from '../../services/customization';
 
@@ -27,7 +28,8 @@ export default {
     TopNav,
     Studio,
     Dashboard,
-    Live
+    Live,
+    Onboarding
   },
 
   mounted() {

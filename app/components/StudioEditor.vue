@@ -20,6 +20,10 @@ const { webFrame, screen } = window.require('electron');
 
 export default {
 
+  created() {
+    this.scenesService = ScenesService.instance;
+  },
+
   mounted() {
     this.obsDisplay = VideoService.instance.createDisplay();
 
@@ -104,14 +108,11 @@ export default {
         });
 
         // Either select a new source, or deselect all sources (null)
-        ScenesService.instance.makeSourceActive(
-          ScenesService.instance.activeSceneId,
-          overSource ? overSource.id : null
-        );
+        this.scene.makeSourceActive(overSource ? overSource.id : null);
 
         if ((event.button === 2) && overSource) {
           const menu = new SourceMenu(
-            ScenesService.instance.activeSceneId,
+            this.scene.id,
             overSource.id
           );
           menu.popup();
@@ -174,10 +175,7 @@ export default {
 
         if (overSource) {
           // Make this source active
-          ScenesService.instance.makeSourceActive(
-            ScenesService.instance.activeSceneId,
-            overSource.id
-          );
+          this.scene.makeSourceActive(overSource.id);
 
           // Start dragging it
           this.startDragging(event);
@@ -229,9 +227,7 @@ export default {
         });
       });
 
-      ScenesService.instance.setSourcePositionAndScale(
-        ScenesService.instance.activeSceneId,
-        source.id,
+      this.scene.getSource(source.id).setPositionAndScale(
         rect.x,
         rect.y,
         rect.scaleX,
@@ -343,18 +339,23 @@ export default {
 
   computed: {
     activeSource() {
-      return ScenesService.instance.activeSource;
+      return this.scenesService.activeScene.activeSource;
     },
 
     sources() {
-      if (ScenesService.instance.activeSceneId) {
-        return ScenesService.instance.getSources().filter(source => {
+      const scene = this.scenesService.activeScene;
+      if (scene) {
+        return scene.getSources().filter(source => {
           // We only care about sources with video
           return source.video;
         });
       }
 
       return [];
+    },
+
+    scene() {
+      return this.scenesService.activeScene;
     },
 
     baseWidth() {

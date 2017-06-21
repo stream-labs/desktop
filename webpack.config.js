@@ -21,9 +21,9 @@ module.exports = {
         loader: 'vue-loader',
         options: {
           esModule: true,
-          loaders: {
-            'scss': 'vue-style-loader!css-loader!sass-loader',
-            'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax'
+          transformToRequire: {
+            video: 'src',
+            source: 'src'
           }
         }
       },
@@ -61,11 +61,11 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: 'images/',
+          outputPath: 'media/',
           publicPath: 'bundles/'
         }
       }

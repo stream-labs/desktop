@@ -60,8 +60,7 @@ export default class NameSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      const id = this.scenesService.createSourceAndAddToScene(
-        this.scenesService.activeSceneId,
+      const id = this.scenesService.activeScene.addSource(
         this.name,
         this.sourceType
       );

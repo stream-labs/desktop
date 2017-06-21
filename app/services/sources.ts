@@ -5,8 +5,7 @@ import {
   inputValuesToObsValues,
   obsValuesToInputValues
 } from '../components/shared/forms/Input';
-
-import { StatefulService, mutation, Inject } from './stateful-service';
+import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
 import Obs from '../api/Obs';
 import configFileManager from '../util/ConfigFileManager';
 import electron from '../vendor/electron';
@@ -257,7 +256,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 }
 
-
+@Mutator()
 export class Source implements ISource {
   id: string;
   name: string;
