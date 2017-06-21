@@ -137,7 +137,10 @@ export class AudioSource extends Source implements IAudioSource {
     const volmeterStream = new Subject<IVolmeter>();
     const volmeterId = nodeObs.OBS_content_getSourceVolmeter(this.name) as INodeObsId;
 
-    nodeObs.OBS_audio_volmeterSetUpdateInterval(volmeterId, VOLMETER_UPDATE_INTERVAL);
+    // TODO: calling this function causes a crash in ava tests
+    // https://github.com/twitchalerts/node-obs/issues/156
+    // the default interval is 40ms
+    // nodeObs.OBS_audio_volmeterSetUpdateInterval(volmeterId, VOLMETER_UPDATE_INTERVAL);
 
     let lastVolmeterEventTime: number;
     let lastVolmeterValue: IVolmeter;
