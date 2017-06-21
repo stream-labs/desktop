@@ -1,20 +1,30 @@
 <template>
-<div class="section" v-if="enabled">
-  <bool-input
-    :value="obsMode"
-    @input="val => saveSetting(val, 'obsMode')"/>
-  <list-input
-    :value="profile"
-    @input="val => saveSetting(val, 'profile')"/>
-  <list-input
-    :value="sceneCollection"
-    @input="val => saveSetting(val, 'sceneCollection')"/>
-  <p>
-    These settings will take effect when the application is relaunched.
-  </p>
-  <button class="button button--action" @click="restartApp">
-    Relaunch Now
-  </button>
+<div>
+  <div class="section" v-if="enabled">
+    <bool-input
+      :value="obsMode"
+      @input="val => saveSetting(val, 'obsMode')"/>
+    <list-input
+      :value="profile"
+      @input="val => saveSetting(val, 'profile')"/>
+    <list-input
+      :value="sceneCollection"
+      @input="val => saveSetting(val, 'sceneCollection')"/>
+    <p>
+      These settings will take effect when the application is relaunched.
+    </p>
+    <button class="button button--action" @click="restartApp">
+      Relaunch Now
+    </button>
+  </div>
+  <div class="section" v-if="enabled">
+    <p>
+      If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.  The application can not be running when you delete your cache directory.
+    </p>
+    <button class="button button--action" @click="showCacheDir">
+      Show Cache Directory
+    </button>
+  </div>
 </div>
 </template>
 
@@ -115,6 +125,10 @@ export default {
 
     restartApp() {
       ipcRenderer.send('restartApp');
+    },
+
+    showCacheDir() {
+      remote.shell.showItemInFolder(remote.app.getPath('userData'));
     }
   }
 
