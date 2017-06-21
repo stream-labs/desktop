@@ -17,6 +17,7 @@ import StreamingService from '../services/streaming';
 import PerformanceService from '../services/performance';
 import { AudioService, AudioSource } from '../services/audio.ts';
 import { CustomizationService } from '../services/customization.ts';
+import { UserService } from '../services/user.ts';
 
 const statefulServiceModules = {
   ...getModule(ScenesService),
@@ -31,7 +32,8 @@ const statefulServiceModules = {
   ...getModule(PerformanceService),
   ...getModule(AudioService),
   ...getModule(AudioSource),
-  ...getModule(CustomizationService)
+  ...getModule(CustomizationService),
+  ...getModule(UserService)
 };
 
 
@@ -46,11 +48,6 @@ const mutations = {
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
-  },
-
-  // Used by PersistentStatefulService
-  LOAD_PERSISTED_STATE(state, data) {
-    state[data.serviceName] = data.state;
   }
 };
 

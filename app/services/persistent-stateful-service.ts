@@ -5,27 +5,30 @@ import { StatefulService } from './stateful-service';
 
 export abstract class PersistentStatefulService<TState extends object> extends StatefulService<TState> {
 
-  get localStorageKey() {
-    return `PersistentStatefulService-${this.serviceName}`;
+  // This is the default state if the state is not found
+  // in local storage.
+  static defaultState = {};
+
+  static get initialState() {
+    const persisted = JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
+
+    return {
+      ...this.defaultState,
+      ...persisted
+    };
+  }
+
+  static get localStorageKey() {
+    return `PersistentStatefulService-${this.name}`;
   }
 
   init() {
-    const persisted = JSON.parse(localStorage.getItem(this.localStorageKey)) as Partial<TState> || {};
-
-    this.store.commit('LOAD_PERSISTED_STATE', {
-      serviceName: this.serviceName,
-      state: {
-        ...(this.state as object),
-        ...(persisted as object)
-      }
-    });
-
     this.store.watch(
       () => {
         return JSON.stringify(this.state);
       },
       val => {
-        localStorage.setItem(this.localStorageKey, val);
+        localStorage.setItem((this.constructor as typeof PersistentStatefulService).localStorageKey, val);
       }
     );
   }
