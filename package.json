@@ -18,18 +18,18 @@
   "build": {
     "appId": "com.streamlabs.slobs",
     "productName": "Streamlabs OBS",
-    "icon": "images/icon.ico",
+    "icon": "media/images/icon.ico",
     "files": [
       "bundles",
       "node_modules",
       "vendor",
-      "updater",
+      "updater/index.html",
+      "updater/Updater.js",
       "index.html",
       "main.js"
     ],
     "extraFiles": [
-      "node-obs",
-      "config"
+      "node-obs"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -37,10 +37,6 @@
     "publish": {
       "provider": "generic",
       "url": "https://s3-us-west-2.amazonaws.com/streamlabs-obs"
-    },
-    "win": {
-      "certificateFile": "C:/Users/acree/streamlabsp12.pfx",
-      "certificatePassword": "ultimat3str3aming3xp3ri3nc3"
     }
   },
   "ava": {
