@@ -19,7 +19,7 @@ import { Inject } from '../../services/service';
 import ScenesTransitionsService from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 
 @Component({
@@ -31,17 +31,19 @@ export default class SceneTransitionProperties extends Vue {
   @Inject()
   transitionsService: ScenesTransitionsService;
 
+  windowService = WindowService.instance;
+
   properties = this.transitionsService.getPropertiesFormData();
 
 
   done() {
     this.transitionsService.setProperties(this.properties);
-    windowManager.showSceneTransitions();
+    this.windowService.showSceneTransitions();
   }
 
 
   cancel() {
-    windowManager.showSceneTransitions();
+    this.windowService.showSceneTransitions();
   }
 }
 </script>

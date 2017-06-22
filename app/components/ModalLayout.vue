@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import windowManager from '../util/WindowManager.js';
+import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 
 const { remote } = window.require('electron');
@@ -48,7 +48,8 @@ export default {
 
     return {
       contentStyle,
-      fixedStyle
+      fixedStyle,
+      windowService: WindowService.instance
     };
   },
 
@@ -67,7 +68,7 @@ export default {
       if (this.cancelHandler) {
         this.cancelHandler();
       } else {
-        windowManager.closeWindow();
+        this.windowService.closeWindow();
       }
     }
   },

@@ -8,7 +8,7 @@ import URI from 'urijs';
 
 import store from './store';
 import Obs from './api/Obs';
-import windowManager from './util/WindowManager';
+import { WindowService } from './services/window';
 import contextMenuManager from './util/ContextMenuManager';
 import configFileManager from './util/ConfigFileManager';
 import PeriodicRunner from './util/PeriodicRunner';
@@ -19,6 +19,7 @@ const { ipcRenderer, remote } = window.require('electron');
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
+  const windowService = WindowService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
 
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ipcRenderer.on('closeWindow', () => {
-      windowManager.closeWindow();
+      windowService.closeWindow();
     });
   } else {
     configFileManager.load();
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     render: h => {
       const componentName = store.state.windowOptions.options.component;
 
-      return h(windowManager.components[componentName]);
+      return h(windowService.components[componentName]);
     }
   });
 

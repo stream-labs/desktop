@@ -23,7 +23,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import Obs from '../../api/Obs';
 import windowMixin from '../mixins/window';
 
@@ -35,8 +35,10 @@ export default class AddSource extends Vue {
 
   availableSources = Obs.availableSources();
 
+  windowService = WindowService.instance;
+
   selectSource(sourceName: string) {
-    windowManager.showNameSource(sourceName);
+    this.windowService.showNameSource(sourceName);
   }
 
 }

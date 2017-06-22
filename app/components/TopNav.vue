@@ -79,7 +79,7 @@
 </template>
 
 <script>
-import windowManager from '../util/WindowManager.js';
+import { WindowService } from '../services/window';
 import StartStreamingButton from './StartStreamingButton.vue';
 import { CustomizationService } from '../services/customization';
 import electron from '../vendor/electron';
@@ -91,7 +91,8 @@ export default {
 
   data() {
     return {
-      slideOpen: false
+      slideOpen: false,
+      windowService: WindowService.instance
     };
   },
 
@@ -125,7 +126,7 @@ export default {
     },
 
     openSettingsWindow() {
-      windowManager.showSettings();
+      this.windowService.showSettings();
     },
 
     toggleNightTheme() {
