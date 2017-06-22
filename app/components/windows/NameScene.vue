@@ -28,7 +28,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import { ScenesService } from '../../services/scenes';
@@ -45,6 +45,8 @@ export default class NameScene extends Vue {
   @Inject()
   scenesService: ScenesService;
 
+  windowService = WindowService.instance;
+
   mounted() {
     this.name = namingHelpers.suggestName(
       'New Scene',
@@ -57,7 +59,7 @@ export default class NameScene extends Vue {
       this.error = 'That name is already taken';
     } else {
       this.scenesService.createScene(this.name);
-      windowManager.closeWindow();
+      this.windowService.closeWindow();
     }
   }
 

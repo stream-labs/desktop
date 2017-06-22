@@ -10,6 +10,7 @@ import Obs from '../api/Obs';
 import configFileManager from '../util/ConfigFileManager';
 import electron from '../vendor/electron';
 import Utils from './utils';
+import { WindowService } from './window';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;

@@ -1,13 +1,15 @@
 import { Inject } from '../../services/service';
 import { Menu } from './Menu';
 import { SourceTransformMenu } from './SourceTransformMenu';
-import windowManager from '../WindowManager';
+import { WindowService } from '../../services/window';
 import { ScenesService } from '../../services/scenes';
 
 export class SourceMenu extends Menu {
 
   @Inject()
   private scenesService: ScenesService;
+
+  private windowService = WindowService.instance;
 
   private source = this.scenesService.getScene(this.sceneId).getSource(this.sourceId);
 
@@ -57,12 +59,12 @@ export class SourceMenu extends Menu {
 
   showFilters() {
     // TODO: This should take an id
-    windowManager.showSourceFilters(this.source.name);
+    this.windowService.showSourceFilters(this.source.name);
   }
 
 
   showProperties() {
-    windowManager.showSourceProperties(this.sourceId);
+    this.windowService.showSourceProperties(this.sourceId);
   }
 
 }

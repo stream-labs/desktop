@@ -30,7 +30,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import Selector from './Selector.vue';
-import windowManager from '../util/WindowManager';
+import { WindowService } from '../services/window';
 import { ScenesService } from '../services/scenes';
 
 @Component({
@@ -41,6 +41,7 @@ export default class SceneSelector extends Vue {
   @Inject()
   scenesService: ScenesService;
 
+  windowService = WindowService.instance;
 
   makeActive(id: string) {
     this.scenesService.makeSceneActive(id);
@@ -53,7 +54,7 @@ export default class SceneSelector extends Vue {
 
 
   addScene() {
-    windowManager.showNameScene();
+    this.windowService.showNameScene();
   }
 
   removeScene() {
@@ -62,7 +63,7 @@ export default class SceneSelector extends Vue {
 
 
   showTransitions() {
-    windowManager.showSceneTransitions();
+    this.windowService.showSceneTransitions();
   }
 
 

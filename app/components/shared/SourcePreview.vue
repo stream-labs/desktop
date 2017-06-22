@@ -4,7 +4,6 @@
 
 <script>
 
-  import windowManager from '../../util/WindowManager';
   import Obs from '../../api/Obs';
 
   const { webFrame, screen } = window.require('electron');

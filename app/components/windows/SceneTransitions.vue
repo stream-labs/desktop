@@ -35,7 +35,7 @@ import { IInputValue } from "../shared/forms/Input";
 import ScenesTransitionsService from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
 import * as inputComponents from '../shared/forms';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 
 @Component({
@@ -46,6 +46,8 @@ export default class SceneTransitions extends Vue {
 
   @Inject()
   transitionsService: ScenesTransitionsService;
+
+  windowService = WindowService.instance;
   form = this.transitionsService.getFormData();
 
   get state() { return this.transitionsService.state; }
@@ -57,12 +59,12 @@ export default class SceneTransitions extends Vue {
 
 
   addTransition() {
-    windowManager.showAddSceneTransition();
+    this.windowService.showAddSceneTransition();
   }
 
 
   setupTransition() {
-    windowManager.showSceneTransitionProperties(this.state.currentName);
+    this.windowService.showSceneTransitionProperties(this.state.currentName);
   }
 
 
@@ -72,7 +74,7 @@ export default class SceneTransitions extends Vue {
 
 
   done() {
-    windowManager.closeWindow();
+    this.windowService.closeWindow();
   }
 }
 

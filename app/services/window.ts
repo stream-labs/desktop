@@ -12,41 +12,53 @@ import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
+import { Service } from './service';
 import store from '../store';
+import electron from '../vendor/electron';
+import { TSourceType } from './sources';
 
-const { ipcRenderer, remote } = window.require('electron');
+const { ipcRenderer, remote } = electron;
 
-class WindowManager {
+export interface IWindowOptions {
+  startupOptions: {
+    component: string
+    [key: string]: string
+  };
+  windowOptions: {
+    width: number,
+    height: number
+  };
+}
 
-  constructor() {
-    // This is a list of components that are registered to be
-    // top level components in new child windows.
-    this.components = {
-      Main,
-      Settings,
-      SceneTransitions,
-      AddSceneTransition,
-      SceneTransitionProperties,
-      AddSource,
-      NameSource,
-      NameScene,
-      SourceProperties,
-      SourceFilters,
-      AddSourceFilter
-    };
-  }
+export class WindowService extends Service {
+
+  // This is a list of components that are registered to be
+  // top level components in new child windows.
+  components = {
+    Main,
+    Settings,
+    SceneTransitions,
+    AddSceneTransition,
+    SceneTransitionProperties,
+    AddSource,
+    NameSource,
+    NameScene,
+    SourceProperties,
+    SourceFilters,
+    AddSourceFilter
+  };
 
   // inPlace will replace the contents of the current window
   // with the new window.  This is faster since it doesn't
   // re-load and initialize all the assets. Most windowOptions
   // will be ignored.
-  showWindow(data) {
-    ipcRenderer.send('window-showChildWindow', data);
+  showWindow(options: IWindowOptions) {
+    ipcRenderer.send('window-showChildWindow', options);
   }
 
   // Will close the current window.
   // If this is the child window, it will be hidden instead.
-  closeWindow(data) {
+  closeWindow() {
     if (store.state.windowOptions.isChild) {
       remote.getCurrentWindow().hide();
 
@@ -129,7 +141,7 @@ class WindowManager {
     });
   }
 
-  showNameSource(sourceType) {
+  showNameSource(sourceType: TSourceType) {
     this.showWindow({
       startupOptions: {
         component: 'NameSource',
@@ -154,7 +166,7 @@ class WindowManager {
     });
   }
 
-  showSourceProperties(sourceId) {
+  showSourceProperties(sourceId: string) {
     this.showWindow({
       startupOptions: {
         component: 'SourceProperties',
@@ -197,5 +209,3 @@ class WindowManager {
 
 
 }
-
-export default new WindowManager();

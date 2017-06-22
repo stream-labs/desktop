@@ -16,7 +16,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import { TFormData } from '../shared/forms/Input';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import { SourcesService } from '../../services/sources';
 
@@ -33,6 +33,7 @@ export default class SourceProperties extends Vue {
   @Inject()
   sourcesService: SourcesService;
 
+  windowService = WindowService.instance;
   sourceId = this.$store.state.windowOptions.options.sourceId;
   properties = this.sourcesService.getPropertiesFormData(this.sourceId);
 
@@ -46,7 +47,7 @@ export default class SourceProperties extends Vue {
   }
 
   closeWindow() {
-    windowManager.closeWindow();
+    this.windowService.closeWindow();
   }
 
   done() {
