@@ -5,7 +5,7 @@
 // shouldn't be too many of these, and store modules should do most of
 /// the heavy lifting.
 
-import configFileManager from './ConfigFileManager';
+import { ConfigFileService } from '../services/config-file';
 import store from '../store';
 import { SourcesService } from '../services/sources.ts';
 
@@ -15,6 +15,8 @@ import { SourcesService } from '../services/sources.ts';
 // a service that calls `setInterval` in its init() hook.
 
 class PeriodicRunner {
+
+  configFileService = ConfigFileService.instance;
 
   constructor() {
     this.jobs = [
@@ -42,7 +44,7 @@ class PeriodicRunner {
   }
 
   runConfigSave() {
-    configFileManager.save();
+    this.configFileService.save();
   }
 
   runSourceAttributesUpdate() {
