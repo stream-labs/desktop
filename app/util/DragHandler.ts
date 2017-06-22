@@ -97,8 +97,7 @@ class DragHandler {
     const scene = this.scenesService.activeScene;
     this.draggedSource = scene.activeSource;
     this.otherSources = scene.inactiveSources.filter(source => {
-      // Only video targets are valid snap targets
-      return source.video;
+      return source.isOverlaySource;
     });
 
     // Store the starting mouse event

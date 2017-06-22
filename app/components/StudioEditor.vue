@@ -339,15 +339,16 @@ export default {
 
   computed: {
     activeSource() {
-      return this.scenesService.activeScene.activeSource;
+      const activeSource = this.scenesService.activeScene.activeSource;
+
+      if (activeSource && activeSource.isOverlaySource) return activeSource;
     },
 
     sources() {
       const scene = this.scenesService.activeScene;
       if (scene) {
         return scene.getSources().filter(source => {
-          // We only care about sources with video
-          return source.video;
+          return source.isOverlaySource;
         });
       }
 
