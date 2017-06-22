@@ -5,7 +5,7 @@
       {{ value.description }}
     </label>
     <i
-      @click="handleAdd"
+      @click="menu.popup()"
       class="fa fa-plus EditableList-control"/>
     <i
       @click="handleRemove"
@@ -26,10 +26,10 @@
 <script lang="ts">
 import _ from 'lodash';
 import electron from '../../../vendor/electron';
-import contextManager from '../../../util/ContextMenuManager';
 import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import  { IEditableListInputValue, Input, TObsType } from './Input';
+import { Menu } from '../../../util/menus/Menu';
 
 
 interface ISelectorSortEventData {
@@ -48,6 +48,23 @@ class EditableListProperty extends Input<IEditableListInputValue> {
   value: IEditableListInputValue;
 
   activeItem = '';
+  menu = new Menu();
+
+  created() {
+    this.menu.append({
+      label: 'Add Files',
+      click: () => {
+        this.showFileDialog();
+      }
+    });
+
+    this.menu.append({
+      label: 'Add Directory',
+      click: () => {
+        this.showDirDialog();
+      }
+    });
+  }
 
   handleSelect(item: string) {
     this.activeItem = item;
@@ -55,26 +72,6 @@ class EditableListProperty extends Input<IEditableListInputValue> {
 
   handleSort(data: ISelectorSortEventData) {
     this.setList(data.order);
-  }
-
-  handleAdd(event: MouseEvent) {
-    contextManager.showMenu(
-      [
-        {
-          type: 'action',
-          label: 'Add Files',
-          handler: this.showFileDialog
-        },
-        {
-          type: 'action',
-          label: 'Add Directory',
-          handler: this.showDirDialog
-        }
-      ],
-      {
-        mouseEvent: event
-      }
-    );
   }
 
   handleRemove() {
