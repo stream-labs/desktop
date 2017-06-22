@@ -9,7 +9,6 @@ import URI from 'urijs';
 import store from './store';
 import Obs from './api/Obs';
 import { WindowService } from './services/window';
-import contextMenuManager from './util/ContextMenuManager';
 import configFileManager from './util/ConfigFileManager';
 import PeriodicRunner from './util/PeriodicRunner';
 import { HotkeysService } from './services/hotkeys.ts';
@@ -65,9 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return h(windowService.components[componentName]);
     }
   });
-
-  // Initialize the custom context menu system
-  contextMenuManager.init();
 
   // Used for replacing the contents of this window with
   // a new top level component

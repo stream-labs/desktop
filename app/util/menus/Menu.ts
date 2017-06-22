@@ -3,7 +3,7 @@
 import electron from '../../vendor/electron';
 const { remote } = electron;
 
-export abstract class Menu {
+export class Menu {
 
   menu: Electron.Menu;
 
