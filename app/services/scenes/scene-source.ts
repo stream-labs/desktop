@@ -39,6 +39,11 @@ export class SceneSource extends Source implements ISceneSource {
     return this.height * this.scaleY;
   }
 
+  // An overlay source is visible in the overlay editor
+  get isOverlaySource() {
+    return (this.video && (this.width > 0) && (this.height > 0));
+  }
+
   private sceneSourceState: ISceneSource;
   private scenesService: ScenesService = ScenesService.instance;
 
