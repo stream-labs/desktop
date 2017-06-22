@@ -7,10 +7,9 @@ import {
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
 import Obs from '../api/Obs';
-import configFileManager from '../util/ConfigFileManager';
+import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
-import { WindowService } from './window';
 
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;
@@ -46,6 +45,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
+
+  @Inject()
+  private configFileService: ConfigFileService;
 
   @mutation
   private RESET_SOURCES() {
@@ -190,7 +192,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     }
 
     this.refreshProperties(sourceId);
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 

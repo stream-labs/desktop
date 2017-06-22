@@ -2,11 +2,10 @@ import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation, Inject } from '../stateful-service';
 import Obs from '../../api/Obs';
-import configFileManager from '../../util/ConfigFileManager';
-import { SourcesService, TSourceType } from '../sources';
+import { ConfigFileService } from '../config-file';
+import { SourcesService } from '../sources';
 import { IScene, Scene } from './scene';
 import electron from '../../vendor/electron';
-import { SceneSource } from './scene-source';
 
 const nodeObs: Dictionary<Function> = Obs.nodeObs;
 const { ipcRenderer } = electron;
@@ -27,6 +26,9 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   @Inject()
   private sourcesService: SourcesService;
+
+  @Inject()
+  private configFileService: ConfigFileService;
 
   mounted() {
     this.sourcesService.sourceRemoved.subscribe(source => {
@@ -87,7 +89,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.addDefaultSources(id);
     this.makeSceneActive(id);
 
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 
@@ -105,7 +107,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       }
     }
 
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 

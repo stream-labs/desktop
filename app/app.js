@@ -9,7 +9,7 @@ import URI from 'urijs';
 import store from './store';
 import Obs from './api/Obs';
 import { WindowService } from './services/window';
-import configFileManager from './util/ConfigFileManager';
+import { ConfigFileService } from './services/config-file';
 import PeriodicRunner from './util/PeriodicRunner';
 import { HotkeysService } from './services/hotkeys.ts';
 
@@ -19,6 +19,7 @@ require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
   const windowService = WindowService.instance;
+  const configFileService = ConfigFileService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
 
@@ -33,10 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
       windowService.closeWindow();
     });
   } else {
-    configFileManager.load();
+    configFileService.load();
 
     ipcRenderer.on('shutdown', () => {
-      configFileManager.rawSave();
+      configFileService.rawSave();
       remote.getCurrentWindow().close();
     });
 
