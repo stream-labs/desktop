@@ -123,8 +123,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/alertbox.mp4"></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/alertbox.mp4"></video>
           </div>
         </div>
       </div>
@@ -154,8 +153,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/eventlist.mp4" autoplay></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/eventlist.mp4" autoplay></video>
           </div>
         </div>
       </div>
@@ -185,8 +183,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/jar.mp4"></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/jar.mp4"></video>
           </div>
         </div>
       </div>
@@ -216,8 +213,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/jar.mp4"></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/chatbox.mp4"></video>
           </div>
         </div>
       </div>
@@ -247,8 +243,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/jar.mp4"></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/donation-ticker.mp4"></video>
           </div>
         </div>
       </div>
@@ -278,8 +273,7 @@
             </div>
           </div>
           <div class="widget-detail__body">
-            <!--<video src="../../../../media/mp4/jar.mp4"></video>-->
-            <img src="../../../../media/images/battlefield.jpg">
+            <video autoplay loop muted src="../../../../media/mp4/donation-goal.mp4"></video>
           </div>
         </div>
       </div>
@@ -374,6 +368,7 @@ export default class SelectWidgets extends Vue {
   background: @night-select-bg;
   overflow: hidden;
   width: 80%;
+  min-width: 550px;
   max-width: 750px;
 }
 .widget-detail-close {
@@ -389,5 +384,13 @@ export default class SelectWidgets extends Vue {
   padding: 20px;
   display: flex;
   justify-content: space-between;
+}
+.widget-detail__body {
+  overflow: hidden;
+  video {
+    width: 102%;
+    display: flex;
+    margin: -3px -1% -1px -1%;
+  }
 }
 </style>

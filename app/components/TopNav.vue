@@ -181,7 +181,6 @@ export default {
   }
   .fa-sun-o {
     color: @yellow;
-    // margin-right: 10px;
   }
   .fa-moon-o {
     display: none;

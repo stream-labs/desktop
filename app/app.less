@@ -59,17 +59,20 @@ h4 {
 }
 .select {
   position: relative;
-  .select {
+  select {
     font-size: 13px;
     margin: 0;
     padding: 0 32px 0 8px;
+    option {
+      color: @navy;
+    }
   }
 }
 .select-carot {
   position: absolute;
   right: 8px;
-  top: 4px;
-  font-size: 11px;
+  top: 10px;
+  font-size: 10px;
   color: @white;
 }
 .select--semi-opac {
@@ -85,13 +88,15 @@ h4 {
 }
 .search-input {
   position: relative;
+  .transition;
   input[type=text] {
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
     color: @grey;
+    .transition;
     .radius;
-     &:focus {
+    &:focus {
       background: rgba(255,255,255,.14);
       outline: none;
       box-shadow: none;
@@ -102,6 +107,17 @@ h4 {
     top: 8px;
     right: 8px;
     font-size: 16px;
+  }
+}
+.search-input--trans {
+  input[type=text] {
+    &:focus, &:active {
+      background: transparent;
+      color: @white;
+    }
+  }
+  &:focus, &:active, &:hover {
+    color: @white;
   }
 }
 .slide-open__menu {
@@ -177,6 +193,7 @@ select {
   height: 36px;
 }
 
+/* Scrolls */
 ::-webkit-scrollbar {
   width: 6px;
 }
