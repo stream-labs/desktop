@@ -31,7 +31,8 @@ export interface ISource {
 // TODO: add more types
 export type TSourceType =
   'Audio Output Capture' |
-  'Audio Input Capture';
+  'Audio Input Capture' |
+  'BrowserSource';
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
