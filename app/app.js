@@ -11,15 +11,10 @@ import Obs from './api/Obs';
 import { WindowService } from './services/window';
 import { ConfigFileService } from './services/config-file';
 import { HotkeysService } from './services/hotkeys.ts';
-import { UserService } from './services/user.ts';
-import { WidgetsService } from './services/widgets.ts';
 
 const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
-
-window.user = UserService.instance;
-window.widgets = WidgetsService.instance;
 
 document.addEventListener('DOMContentLoaded', () => {
   const windowService = WindowService.instance;
