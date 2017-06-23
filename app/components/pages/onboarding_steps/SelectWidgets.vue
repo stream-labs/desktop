@@ -116,10 +116,14 @@ export default class SelectWidgets extends Vue {
     WidgetType.TheJar
   ];
 
+  // SelectableWidget components with inspect=true will
+  // pop up a full screen modal.  This function can be
+  // used to pop up a single inspect modal at a time.
   inspectWidget(widget: WidgetType) {
     this.inspectedWidget = widget;
   }
 
+  // Ensures no inspection modals are popped up.
   closeInspection() {
     this.inspectedWidget = null;
   }
