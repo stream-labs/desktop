@@ -5,18 +5,12 @@ import StreamingService from './streaming';
 import { ScenesService } from './scenes';
 import { SourcesService, ISource } from './sources';
 import electron from '../vendor/electron';
-import { KeyListenerService, TKeyEventType } from './key-listener';
+import { KeyListenerService } from './key-listener';
 
 const { app } = electron.remote;
 
 const path = window['require']('path');
 const fs = window['require']('fs');
-
-interface IScene {
-  id: string;
-  name: string;
-  sources: ISource[];
-}
 
 enum HotkeyActionKind {
   Simple,
@@ -239,7 +233,7 @@ const HOTKEY_ACTIONS = {
 
 
 // Represents a serialized Hotkey
-interface HotkeyObject {
+export interface HotkeyObject {
   action: string;
   toggle: string;
   scene: string;

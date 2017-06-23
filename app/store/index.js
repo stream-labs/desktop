@@ -14,7 +14,7 @@ import { SourcesService, Source } from '../services/sources.ts';
 import SourceFiltersService from '../services/source-filters';
 import { SettingsService } from '../services/settings';
 import StreamingService from '../services/streaming';
-import PerformanceService from '../services/performance';
+import { PerformanceService } from '../services/performance';
 import { AudioService, AudioSource } from '../services/audio.ts';
 import { CustomizationService } from '../services/customization.ts';
 import { UserService } from '../services/user.ts';

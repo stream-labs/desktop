@@ -4,15 +4,19 @@
   </ul>
 </template>
 
-<script>
-export default {
-  props: ['value'],
-  methods: {
-    setValue(value) {
-      this.$emit('input', value)
-    }
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+
+@Component({})
+export default class NavMenu extends Vue {
+  @Prop()
+  value: string;
+
+  setValue(value: string) {
+    this.$emit('input', value);
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
