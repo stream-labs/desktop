@@ -22,7 +22,7 @@
       <div class="widget-detail__header">
         <div class="flex flex--center">
           <div class="widget__icon">
-            <img src="../../../../media/images/icons/alertbox.png">
+            <slot name="icon"></slot>
           </div>
           <div class="widget__info">
             <div class="widget__name">{{ name }}</div>
