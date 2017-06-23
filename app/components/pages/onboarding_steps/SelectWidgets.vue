@@ -8,293 +8,136 @@
       <div class="select-widgets">
         <div class="select-widgets__column">
           <div class="select-widgets__column-title">Essentials</div>
-          <div 
-            class="widget selected"
-            :class="{ active : details =='alertbox' }"
-            @click="openDetails('alertbox')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/alertbox.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">Alertbox</div>
-              <div class="widget__desc">
-                Thanks viewers with notification popups
-              </div>
-            </div>
-          </div>
-          <div 
-            class="widget selected"
-            :class="{ active : details =='eventlist' }"
-            @click="openDetails('eventlist')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/event-list.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">Event List</div>
-              <div class="widget__desc">
-                Most recent events into your stream
-              </div>
-            </div>
-          </div>
-          <div 
-            class="widget selected"
-            :class="{ active : details =='jar' }"
-            @click="openDetails('jar')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/jar.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">The Jar</div>
-              <div class="widget__desc">
-                A jar that catches bits, tips, and more
-              </div>
-            </div>
-          </div>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.AlertBox)"
+            :inspected="inspectedWidget === widgetTypes.AlertBox"
+            name="Alertbox"
+            description="Thanks viewers with notification popups"
+            @toggle="toggleWidget(widgetTypes.AlertBox)"
+            @inspect="inspectWidget(widgetTypes.AlertBox)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/alertbox.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/alertbox.mp4"></video>
+          </selectable-widget>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.EventList)"
+            :inspected="inspectedWidget === widgetTypes.EventList"
+            name="Event List"
+            description="Most recent events into your stream"
+            @toggle="toggleWidget(widgetTypes.EventList)"
+            @inspect="inspectWidget(widgetTypes.EventList)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/event-list.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/eventlist.mp4"></video>
+          </selectable-widget>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.TheJar)"
+            :inspected="inspectedWidget === widgetTypes.TheJar"
+            name="The Jar"
+            description="A jar that catches bits, tips, and more"
+            @toggle="toggleWidget(widgetTypes.TheJar)"
+            @inspect="inspectWidget(widgetTypes.TheJar)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/jar.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/jar.mp4"></video>
+          </selectable-widget>
         </div>
         <div class="select-widgets__column">
           <div class="select-widgets__column-title">Additional</div>
-          <div class="widget"
-            :class="{ active : details =='chatbox' }"
-            @click="openDetails('chatbox')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/chatbox.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">Chatbox</div>
-              <div class="widget__desc">
-                Your channel's chat in your stream
-              </div>
-            </div>
-          </div>
-          <div class="widget"
-            :class="{ active : details =='donationTicker' }"
-            @click="openDetails('donationTicker')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/donation-ticker.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">Donation Ticker</div>
-              <div class="widget__desc">
-                Show off most recent donations to viewers
-              </div>
-            </div>
-          </div>
-          <div class="widget"
-            :class="{ active : details =='donationGoal' }"
-            @click="openDetails('donationGoal')">
-            <div class="widget__icon">
-              <img src="../../../../media/images/icons/donation-goal.png">
-            </div>
-            <div class="widget__info">
-              <div class="widget__name">Donation Goal</div>
-              <div class="widget__desc">
-                Give your viewers a target to help you reach
-              </div>
-            </div>
-          </div>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.ChatBox)"
+            :inspected="inspectedWidget === widgetTypes.ChatBox"
+            name="Chatbox"
+            description="Your channel's chat in your stream"
+            @toggle="toggleWidget(widgetTypes.ChatBox)"
+            @inspect="inspectWidget(widgetTypes.ChatBox)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/chatbox.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/chatbox.mp4"></video>
+          </selectable-widget>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.DonationTicker)"
+            :inspected="inspectedWidget === widgetTypes.DonationTicker"
+            name="Donation Ticker"
+            description="Show off most recent donations to viewers"
+            @toggle="toggleWidget(widgetTypes.DonationTicker)"
+            @inspect="inspectWidget(widgetTypes.DonationTicker)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/donation-ticker.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/donation-ticker.mp4"></video>
+          </selectable-widget>
+          <selectable-widget
+            :selected="selectedWidgets.includes(widgetTypes.DonationGoal)"
+            :inspected="inspectedWidget === widgetTypes.DonationGoal"
+            name="Donation Goal"
+            description="Give your viewers a target to help you reach"
+            @toggle="toggleWidget(widgetTypes.DonationGoal)"
+            @inspect="inspectWidget(widgetTypes.DonationGoal)"
+            @close="closeInspection">
+            <img slot="icon" src="../../../../media/images/icons/donation-goal.png">
+            <video slot="body" autoplay loop muted src="../../../../media/mp4/donation-goal.mp4"></video>
+          </selectable-widget>
         </div>
       </div>
-      <button class="button button--lg button--action">Next</button>
-
-      <!-- Detail modals -->
-      <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'alertbox'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/alertbox.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Alertbox</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('alertbox')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/alertbox.mp4"></video>
-          </div>
-        </div>
-      </div>
-      <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'eventlist'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/event-list.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Eventlist</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('eventlist')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/eventlist.mp4" autoplay></video>
-          </div>
-        </div>
-      </div>
-      <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'jar'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/jar.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Jar</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>  
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('jar')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/jar.mp4"></video>
-          </div>
-        </div>
-      </div>
-      <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'chatbox'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/chatbox.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Chatbox</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('chatbox')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/chatbox.mp4"></video>
-          </div>
-        </div>
-      </div>
-       <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'donationTicker'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/donation-ticker.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Donation Ticker</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('donationTicker')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/donation-ticker.mp4"></video>
-          </div>
-        </div>
-      </div>
-       <div 
-        class="widget-detail-wrapper"
-        v-if="details == 'donationGoal'">
-        <div class="widget-detail">
-          <div class="widget-detail__header">
-            <div class="flex flex--center">
-              <div class="widget__icon">
-                <img src="../../../../media/images/icons/donation-goal.png">
-              </div>
-              <div class="widget__info">
-                <div class="widget__name">Donation Goal</div>
-                <div class="widget__desc">
-                  Thanks viewers with notification popups
-                </div>
-              </div>
-            </div>
-            <div class="flex flex--center">
-              <button class="button button--semi-opac">Remove Widget</button>
-              <div 
-                class="widget-detail-close"
-                @click="closeDetails('donationGoal')">
-                <i class="fa fa-times" />
-              </div>
-            </div>
-          </div>
-          <div class="widget-detail__body">
-            <video autoplay loop muted src="../../../../media/mp4/donation-goal.mp4"></video>
-          </div>
-        </div>
-      </div>
+      <button
+        class="button button--lg button--action"
+        @click="next">
+        Next
+      </button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import { without } from 'lodash';
 import { Component } from 'vue-property-decorator';
+import { WidgetsService, WidgetType } from '../../../services/widgets';
+import { Inject } from '../../../services/service';
+import SelectableWidget from './SelectableWidget.vue';
 
-@Component({})
+@Component({
+  components: { SelectableWidget }
+})
 export default class SelectWidgets extends Vue {
 
-  details: string = '';
- 
-  openDetails(details: string) {
-    this.details = details;
+  @Inject()
+  widgetsService: WidgetsService;
+
+  // We can't access TypeScript enums in the Vue template, so
+  // accessing them through the Vue instance is a workaround.
+  widgetTypes = WidgetType;
+
+  inspectedWidget: WidgetType = null;
+
+  selectedWidgets: WidgetType[] = [
+    WidgetType.AlertBox,
+    WidgetType.EventList,
+    WidgetType.TheJar
+  ];
+
+  inspectWidget(widget: WidgetType) {
+    this.inspectedWidget = widget;
   }
-  closeDetails() {
-    this.details = '';
+
+  closeInspection() {
+    this.inspectedWidget = null;
+  }
+
+  toggleWidget(widget: WidgetType) {
+    if (this.selectedWidgets.includes(widget)) {
+      this.selectedWidgets = without(this.selectedWidgets, widget);
+    } else {
+      this.selectedWidgets.push(widget);
+    }
+  }
+
+  next() {
+    // TODO: Onboarding navigation
+    this.selectedWidgets.forEach(widget => {
+      this.widgetsService.createWidget(widget);
+    });
+
   }
 
 }
@@ -314,83 +157,5 @@ export default class SelectWidgets extends Vue {
   .semibold;
   color: @white;
   font-size: 14px;
-}
-.widget {
-  margin-top: 20px;
-  border: 2px solid transparent;
-  .radius;
-  background: @night-select-bg;
-  padding: 20px;
-  width: 200px;
-  text-align: left;
-  display: flex;
-  cursor: pointer;
-  width: 360px;
-  .transition;
-  &:hover {
-    border-color: @teal-light-opac;
-  }
-  &.selected {
-    border-color: @teal-bright;
-  }
-}
-.widget__icon {
-  width: 40px;
-  margin-right: 20px;
-}
-.widget__info {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: left;
-}
-.widget__name {
-  .semibold;
-  color: @white;
-  font-size: 14px;
-}
-.widget__desc {
-  color: @grey;
-}
-.widget-detail-wrapper {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  background: rgba(43,56,63, .85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.widget-detail {
-  .radius;
-  background: @night-select-bg;
-  overflow: hidden;
-  width: 80%;
-  min-width: 550px;
-  max-width: 750px;
-}
-.widget-detail-close {
-  color: @grey;
-  .transition;
-  margin-left: 20px;
-  cursor: pointer;
-  &:hover {
-    color: @white;
-  }
-}
-.widget-detail__header {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-.widget-detail__body {
-  overflow: hidden;
-  video {
-    width: 102%;
-    display: flex;
-    margin: -3px -1% -1px -1%;
-  }
 }
 </style>

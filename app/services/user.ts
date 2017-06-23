@@ -142,3 +142,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 }
+
+// You can use this decorator to ensure the user is logged in
+// before proceeding
+export function requiresLogin() {
+  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+
+    return {
+      ...descriptor,
+      value(...args: any[]) {
+        // TODO: Redirect to login if not logged in?
+        if (UserService.instance.isLoggedIn()) original.apply(target, args);
+      }
+    };
+  };
+}

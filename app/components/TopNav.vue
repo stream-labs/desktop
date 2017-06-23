@@ -1,11 +1,11 @@
 <template>
 <div class="top-nav">
-  <!--<button
+  <button
       @click="navigateOnboarding"
       class="button button--action"
       :class="{ active: page === 'Onboarding' }">
       Onboarding
-  </button>-->
+  </button>
 
   <div class="tabs">
     <button
