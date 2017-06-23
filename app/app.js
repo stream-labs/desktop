@@ -10,7 +10,6 @@ import store from './store';
 import Obs from './api/Obs';
 import { WindowService } from './services/window';
 import { ConfigFileService } from './services/config-file';
-import PeriodicRunner from './util/PeriodicRunner';
 import { HotkeysService } from './services/hotkeys.ts';
 
 const { ipcRenderer, remote } = window.require('electron');
@@ -47,9 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         component: 'Main'
       }
     });
-
-    const periodicRunner = new PeriodicRunner();
-    periodicRunner.start();
 
     HotkeysService.instance.bindAllHotkeys();
   }
