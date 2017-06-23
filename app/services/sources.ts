@@ -14,6 +14,8 @@ import Utils from './utils';
 const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;
 
+const SOURCES_UPDATE_INTERVAL = 1000;
+
 export interface ISource {
   id: string;
   name: string;
@@ -48,6 +50,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
   @Inject()
   private configFileService: ConfigFileService;
+
+
+  init() {
+    setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
+  }
 
   @mutation
   private RESET_SOURCES() {
