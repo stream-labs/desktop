@@ -23,34 +23,39 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { compact } from 'lodash';
+import { Hotkey } from '../../services/hotkeys';
+
+interface IBinding {
+  binding: string;
+  key: string;
+}
 
 @Component({
   props: ['hotkey']
 })
-export default class Hotkey extends Vue {
+export default class HotkeyComponent extends Vue {
 
-  data() {
-    let bindings;
+  @Prop()
+  hotkey: Hotkey;
 
+  description = this.hotkey.description;
+  bindings: IBinding[] = [];
+
+  created() {
     if (this.hotkey.accelerators.size === 0) {
-      bindings = [this.createBindingWithKey('')];
+      this.bindings = [this.createBindingWithKey('')];
     } else {
-      bindings = Array.from(this.hotkey.accelerators.values()).map(binding => {
+      this.bindings = Array.from(this.hotkey.accelerators.values()).map(binding => {
         return this.createBindingWithKey(binding);
       });
     }
-
-    return {
-      description: this.hotkey.description,
-      bindings
-    };
   }
 
-  handleKeydown(event, index) {
+  handleKeydown(event: KeyboardEvent, index: number) {
     event.preventDefault();
 
     if (this.isModifierPress(event)) return;
@@ -68,7 +73,7 @@ export default class Hotkey extends Vue {
     this.setBindings();
   }
 
-  getModifier(event) {
+  getModifier(event: KeyboardEvent) {
     if (event.altKey) return 'Alt';
     if (event.ctrlKey) return 'Ctrl';
     if (event.metaKey) return 'Super';
@@ -77,7 +82,7 @@ export default class Hotkey extends Vue {
     return '';
   }
 
-  isModifierPress(event) {
+  isModifierPress(event: KeyboardEvent) {
     return (event.key === 'Control') ||
       (event.key === 'Alt') ||
       (event.key === 'Meta') ||
@@ -85,11 +90,11 @@ export default class Hotkey extends Vue {
   }
 
   // Adds a new blank binding
-  addBinding(index) {
+  addBinding(index: number) {
     this.bindings.splice(index + 1, 0, this.createBindingWithKey(''));
   }
 
-  removeBinding(index) {
+  removeBinding(index: number) {
     // If this is the last binding, replace it with an
     // empty binding instead.
     if (this.bindings.length === 1) {
@@ -104,7 +109,7 @@ export default class Hotkey extends Vue {
   // This is kind of weird, but the key attribute allows
   // us to uniquely identify that binding in the DOM,
   // which allows CSS animations to work properly.
-  createBindingWithKey(binding) {
+  createBindingWithKey(binding: string): IBinding {
     return {
       binding,
       key: Math.random().toString(36).substring(2, 15)

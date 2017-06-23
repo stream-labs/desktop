@@ -3,21 +3,29 @@ import Vue from 'vue';
 import { StatefulService, mutation } from './stateful-service';
 import Obs from '../api/Obs';
 
-const nodeObs = Obs.nodeObs;
+const nodeObs: Dictionary<Function> = Obs.nodeObs;
+
+interface IPerformanceState {
+  CPU: number;
+  numberDroppedFrames: number;
+  percentageDroppedFrames: number;
+  bandwidth: number;
+  frameRate: number;
+}
 
 // Keeps a store of up-to-date performance metrics
-export default class PerformanceService extends StatefulService {
+export class PerformanceService extends StatefulService<IPerformanceState> {
 
-  static initialState = {
+  static initialState: IPerformanceState = {
     CPU: 0,
     numberDroppedFrames: 0,
     percentageDroppedFrames: 0,
     bandwidth: 0,
     frameRate: 0
-  }
+  };
 
   @mutation
-  SET_PERFORMANCE_STATS(stats) {
+  SET_PERFORMANCE_STATS(stats: IPerformanceState) {
     Object.keys(stats).forEach(stat => {
       Vue.set(this.state, stat, stats[stat]);
     });

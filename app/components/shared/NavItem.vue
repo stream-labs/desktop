@@ -9,38 +9,38 @@
 </li>
 </template>
 
-<script>
+<script lang="ts">
 
-export default {
-  props: {
-    to: { type: String },
-    ico: { type: String },
-    enabled: { type: Boolean, default: true }
-  },
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-  computed: {
-    value() { return this.$parent.value }
-  },
+@Component({})
+export default class NavItem extends Vue {
 
-  updateValue() {
-    this.$set('value', this.$parent.value)
-  },
+  @Prop()
+  to: string;
 
-  methods: {
+  @Prop()
+  ico: string;
 
-    onClickHandler() {
-      if (!this.enabled) return;
-      this.$parent.setValue(this.to);
-    },
+  @Prop({ default: true })
+  enabled: boolean;
 
-    onIconClickHandler(event) {
-      if (!this.enabled) return;
-      this.$emit('iconClick', this.to);
-      event.stopPropagation();
-    },
+  navMenu = this.$parent as any as { value: string; setValue: (value: string) => void };
 
+  get value() { return this.navMenu.value; }
+
+  onClickHandler() {
+    if (!this.enabled) return;
+    this.navMenu.setValue(this.to);
   }
-};
+
+  onIconClickHandler(event: MouseEvent) {
+    if (!this.enabled) return;
+    this.$emit('iconClick', this.to);
+    event.stopPropagation();
+  }
+}
 </script>
 
 <style lang="less" scoped>
