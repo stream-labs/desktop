@@ -33,7 +33,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   init() {
     super.init();
 
-    // TODO: Verify that the user is still logged in (token is still valid)
+    this.validateLogin();
+  }
+
+
+  // Makes sure the user's login is still good
+  validateLogin() {
+    if (!this.isLoggedIn()) return;
+
+    const host = this.hostsService.streamlabs;
+    const token = this.widgetToken;
+    const url = `https://${host}/api/v5/slobs/validate/${token}`;
+    const request = new Request(url);
+
+    fetch(request).then(res => {
+      return res.text();
+    }).then(valid => {
+      if (valid.match(/false/)) this.LOGOUT();
+    });
   }
 
 
