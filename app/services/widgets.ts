@@ -1,5 +1,5 @@
 import { Service, Inject } from './service';
-import { UserService, requiresLogin } from './user';
+import { UserService, requiresLogin, TPlatform } from './user';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { IInputValue } from '../components/shared/forms/input';
@@ -13,51 +13,128 @@ export enum WidgetType {
   TheJar
 }
 
+type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
+
+
+export interface IWidgetTester {
+  name: string;
+  url: TUrlGenerator;
+
+  // Which platforms this tester can be used on
+  platforms: TPlatform[];
+}
+
+const WidgetTesters: IWidgetTester[] = [
+  {
+    name: 'Follow',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    },
+    platforms: ['twitch', 'youtube']
+  },
+  {
+    name: 'Subscription',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    },
+    platforms: ['twitch']
+  },
+  {
+    name: 'Sponsor',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    },
+    platforms: ['youtube']
+  },
+  {
+    name: 'Donation',
+    url(host, token) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/donation/${token}`;
+    },
+    platforms: ['twitch', 'youtube']
+  },
+  {
+    name: 'Bits',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${token}`;
+    },
+    platforms: ['twitch']
+  },
+  {
+    name: 'Host',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${token}`;
+    },
+    platforms: ['twitch']
+  },
+  {
+    name: 'Super Chat',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${token}`;
+    },
+    platforms: ['youtube']
+  }
+];
+
+
+export class WidgetTester {
+
+  constructor(public name: string, private url: string) {
+
+  }
+
+  test() {
+    fetch(new Request(this.url));
+  }
+
+}
+
+
 // TODO: Default width, height, and position
 interface IWidget {
   name: string;
-  urlGenerator: (host: string, token: string) => string;
+  url: TUrlGenerator;
 }
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.AlertBox]: {
     name: 'Alert Box',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/alert-box/v3/${token}`;
     }
   },
 
   [WidgetType.DonationGoal]: {
     name: 'Donation Goal',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/widgets/donation-goal?token=${token}`;
     }
   },
 
   [WidgetType.DonationTicker]: {
     name: 'Donation Ticker',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/widgets/donation-ticker?token=${token}`;
     }
   },
 
   [WidgetType.ChatBox]: {
     name: 'Chat Box',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/widgets/chat-box/v1/${token}`;
     }
   },
 
   [WidgetType.EventList]: {
     name: 'Event List',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/widgets/event-list/v1/${token}`;
     }
   },
 
   [WidgetType.TheJar]: {
     name: 'The Jar',
-    urlGenerator(host, token) {
+    url(host, token) {
       return `https://${host}/widgets/tip-jar/v1/${token}`;
     }
   }
@@ -89,11 +166,28 @@ export class WidgetsService extends Service {
     // Find the URL property and set it
     properties.forEach(prop => {
       if (prop.name === 'url') {
-        prop.value = widget.urlGenerator('streamlabs.com', this.userService.widgetToken);
+        prop.value = widget.url(
+          'streamlabs.com',
+          this.userService.widgetToken,
+          this.userService.platform.type
+        );
       }
     });
 
     this.sourcesService.setProperties(sourceId, properties);
+  }
+
+  @requiresLogin()
+  getTesters() {
+    return WidgetTesters.filter(tester => {
+      return tester.platforms.includes(this.userService.platform.type);
+    }).map(tester => {
+      return new WidgetTester(tester.name, tester.url(
+        'streamlabs.com',
+        this.userService.widgetToken,
+        this.userService.platform.type
+      ));
+    });
   }
 
 }

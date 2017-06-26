@@ -56,6 +56,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
+  get platform() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform;
+    }
+  }
+
+
   get username() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.username;
@@ -153,7 +160,7 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn()) original.apply(target, args);
+        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
       }
     };
   };
