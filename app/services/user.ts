@@ -5,23 +5,13 @@ import { Inject } from './service';
 import { mutation } from './stateful-service';
 import electron from '../vendor/electron';
 import { HostsService } from './hosts';
+import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
-interface IPlatformAuth {
-  widgetToken: string;
-  platform: {
-    type: TPlatform;
-    username: string;
-    token: string;
-    id: string;
-  };
-}
-
-export type TPlatform = 'twitch' | 'youtube';
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
 
@@ -84,8 +74,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   // is actually successful.
   startAuth(platform: TPlatform) {
     return new Promise((resolve, reject) => {
+      const service = getPlatformService(platform);
+
       const authWindow = new electron.remote.BrowserWindow({
-        ...this.windowSizeForPlatform(platform),
+        ...service.authWindowOptions,
         alwaysOnTop: true,
         show: false,
         webPreferences: {
@@ -99,6 +91,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         if (parsed) {
           authWindow.close();
           this.LOGIN(parsed);
+          service.setupStreamSettings(parsed);
         }
       });
 
@@ -108,28 +101,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       });
 
       authWindow.setMenu(null);
-      authWindow.loadURL(this.authUrl(platform));
+      console.log(service.authUrl);
+      authWindow.loadURL(service.authUrl);
     });
-  }
-
-
-  private windowSizeForPlatform(platform: TPlatform) {
-    return {
-      twitch: {
-        width: 600,
-        height: 800
-      },
-      youtube: {
-        width: 1000,
-        height: 600
-      }
-    }[platform];
-  }
-
-
-  private authUrl(platform: TPlatform) {
-    const host = this.hostsService.streamlabs;
-    return `https://${host}/login?_=${Date.now()}&skip_splash=true&external=electron&${platform}&force_verify`;
   }
 
 
