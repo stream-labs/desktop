@@ -1,5 +1,6 @@
 import { Service, Inject } from './service';
-import { UserService, requiresLogin, TPlatform } from './user';
+import { UserService, requiresLogin } from './user';
+import { TPlatform } from './platforms';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { IInputValue } from '../components/shared/forms/input';

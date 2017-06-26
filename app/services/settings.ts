@@ -73,7 +73,7 @@ export class SettingsService extends StatefulService<ISettingsState> {
   }
 
 
-  getSettingsFormData(categoryName: string): TSettingsFormData {
+  getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     const settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we
