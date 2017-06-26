@@ -32,7 +32,7 @@
 // This component is temporary and will be removed before release
 
 import { BoolInput, ListInput } from './shared/forms';
-import Obs from '../api/Obs';
+import { ObsApiService } from '../services/obs-api';
 
 const { remote, ipcRenderer } = window.require('electron');
 const path = window.require('path');
@@ -46,17 +46,18 @@ export default {
   },
 
   data() {
-    const obsInstalled = Obs.isObsInstalled();
+    const obsApiService = ObsApiService.instance;
+    const obsInstalled = obsApiService.isObsInstalled();
 
     if (obsInstalled) {
-      const profileOptions = Obs.getObsProfiles().map(profile => {
+      const profileOptions = obsApiService.getObsProfiles().map(profile => {
         return {
           value: profile,
           description: profile
         };
       });
 
-      const sceneCollectionOptions = Obs.getObsSceneCollections().map(coll => {
+      const sceneCollectionOptions = obsApiService.getObsSceneCollections().map(coll => {
         return {
           value: coll,
           description: coll

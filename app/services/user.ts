@@ -3,7 +3,6 @@ import URI from 'urijs';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from './service';
 import { mutation } from './stateful-service';
-import windowManager from '../util/WindowManager';
 import electron from '../vendor/electron';
 import { HostsService } from './hosts';
 import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';

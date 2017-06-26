@@ -1,13 +1,12 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation, Inject } from '../stateful-service';
-import Obs from '../../api/Obs';
+import { nodeObs } from '../obs-api';
 import { ConfigFileService } from '../config-file';
 import { SourcesService } from '../sources';
 import { IScene, Scene } from './scene';
 import electron from '../../vendor/electron';
 
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
 const { ipcRenderer } = electron;
 
 interface IScenesState {
