@@ -253,7 +253,7 @@ export class WidgetsService extends Service {
 
     this.sourcesService.setProperties(sourceId, properties);
 
-    // Give a couple reconds for the resize to propagate
+    // Give a couple seconds for the resize to propagate
     setTimeout(() => {
       const source = scene.getSource(sourceId);
 
