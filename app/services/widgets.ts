@@ -232,8 +232,6 @@ export class WidgetsService extends Service {
     const sourceId = scene.addSource(widget.name, 'BrowserSource');
     const properties = this.sourcesService.getPropertiesFormData(sourceId);
 
-    console.log(properties);
-
     // Find the URL property and set it
     properties.forEach(prop => {
       if (prop.name === 'url') {
