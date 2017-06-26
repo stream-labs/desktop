@@ -1,9 +1,11 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import { PersistentStatefulService } from './persistent-stateful-service';
+import { Inject } from './service';
 import { mutation } from './stateful-service';
 import windowManager from '../util/WindowManager';
 import electron from '../vendor/electron';
+import { HostsService } from './hosts';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -24,6 +26,8 @@ export type TPlatform = 'twitch' | 'youtube';
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
 
+  @Inject()
+  hostsService: HostsService;
 
   @mutation
   LOGIN(auth: IPlatformAuth) {
@@ -52,6 +56,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get widgetToken() {
     if (this.isLoggedIn()) {
       return this.state.auth.widgetToken;
+    }
+  }
+
+
+  get platform() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform;
     }
   }
 
@@ -118,7 +129,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
 
   private authUrl(platform: TPlatform) {
-    return `https://streamlabs.com/login?_=${Date.now()}&skip_splash=true&external=electron&${platform}&force_verify`;
+    const host = this.hostsService.streamlabs;
+    return `https://${host}/login?_=${Date.now()}&skip_splash=true&external=electron&${platform}&force_verify`;
   }
 
 
@@ -153,7 +165,7 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn()) original.apply(target, args);
+        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
       }
     };
   };
