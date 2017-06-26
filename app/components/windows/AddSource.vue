@@ -24,8 +24,8 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
-import Obs from '../../api/Obs';
 import windowMixin from '../mixins/window';
+import { SourcesService, TSourceType } from '../../services/sources';
 
 @Component({
   components: { ModalLayout },
@@ -33,11 +33,13 @@ import windowMixin from '../mixins/window';
 })
 export default class AddSource extends Vue {
 
-  availableSources = Obs.availableSources();
+  @Inject()
+  sourcesService: SourcesService;
 
-  windowService = WindowService.instance;
+  availableSources = this.sourcesService.getAvailableSourcesTypes();
+  windowService: WindowService = WindowService.instance;
 
-  selectSource(sourceName: string) {
+  selectSource(sourceName: TSourceType) {
     this.windowService.showNameSource(sourceName);
   }
 

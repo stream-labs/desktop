@@ -1,11 +1,9 @@
 import { StatefulService } from './stateful-service';
 import { obsValuesToInputValues, inputValuesToObsValues, TFormData } from '../components/shared/forms/Input';
 
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import { Inject } from './service';
 import { SourcesService } from './sources';
-
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 
 interface ISourceFilterType {
   type: string;

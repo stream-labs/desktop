@@ -5,9 +5,7 @@ import { SourcesService, TSourceType } from '../sources';
 import { ISceneSource, SceneSource } from './scene-source';
 import { ConfigFileService } from '../config-file';
 import Utils from '../utils';
-import Obs from '../../api/Obs';
-
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
+import { nodeObs } from '../obs-api';
 
 export interface IScene {
   id: string;

@@ -6,12 +6,11 @@ import {
   obsValuesToInputValues
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
 
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -147,6 +146,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.sourceRemoved.next(source);
   }
 
+  getAvailableSourcesTypes(): TSourceType[] {
+    return nodeObs.OBS_content_getListInputSources();
+  }
 
   private refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);

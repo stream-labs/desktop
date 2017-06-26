@@ -2,11 +2,9 @@ import moment from 'moment';
 
 import { Inject } from './service';
 import { StatefulService, mutation } from './stateful-service';
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import { SettingsService } from './settings';
 import { padStart } from 'lodash';
-
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 
 interface IStreamingServiceState {
   isStreaming: boolean;

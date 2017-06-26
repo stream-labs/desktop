@@ -5,13 +5,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import Obs from '../../api/Obs';
+import { ObsApiService } from '../../services/obs-api';
 import electron from '../../vendor/electron';
+import { Inject } from '../../services/service';
 
 const { webFrame, screen } = electron;
 
 @Component({})
 export default class SourcePreview extends Vue {
+
+  @Inject()
+  obsApiService: ObsApiService;
 
   @Prop()
   sourceName: string;
@@ -26,7 +30,7 @@ export default class SourcePreview extends Vue {
   }
 
   created() {
-    Obs.createSourceDisplay(
+    this.obsApiService.createSourceDisplay(
       this.sourceName,
       'Preview Window'
     );
@@ -34,7 +38,7 @@ export default class SourcePreview extends Vue {
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
-    Obs.removeSourceDisplay('Preview Window');
+    this.obsApiService.removeSourceDisplay('Preview Window');
   }
 
   onResize() {
@@ -42,13 +46,13 @@ export default class SourcePreview extends Vue {
     const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
     const rect = preview.getBoundingClientRect();
 
-    Obs.resizeDisplay(
+    this.obsApiService.resizeDisplay(
       'Preview Window',
       rect.width * factor,
       rect.height * factor
     );
 
-    Obs.moveDisplay(
+    this.obsApiService.moveDisplay(
       'Preview Window',
       rect.left * factor,
       rect.top * factor

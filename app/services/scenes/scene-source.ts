@@ -2,9 +2,7 @@ import { ScenesService } from './scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
 import { Source } from '../sources';
-import Obs from '../../api/Obs';
-
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
+import { nodeObs } from '../obs-api';
 
 export interface ISceneSource {
   id: string;
