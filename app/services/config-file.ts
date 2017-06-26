@@ -1,4 +1,4 @@
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import { ScenesService } from './scenes';
 import { Service } from './service';
 import { throttle } from 'lodash-decorators';
@@ -11,14 +11,17 @@ const CONFIG_SAVE_INTERVAL = 60 * 1000;
  */
 export class ConfigFileService extends Service {
 
+  private scenesService: ScenesService = ScenesService.instance;
+
+
   init() {
     setInterval(() => this.save(), CONFIG_SAVE_INTERVAL);
   }
 
 
   load() {
-    Obs.loadConfig();
-    ScenesService.instance.loadSceneConfig();
+    nodeObs.OBS_content_loadConfigFile();
+    this.scenesService.loadSceneConfig();
   }
 
   // Calling save is expensive, so only call it at most
@@ -29,6 +32,6 @@ export class ConfigFileService extends Service {
   }
 
   rawSave() {
-    Obs.saveConfig();
+    nodeObs.OBS_content_saveIntoConfigFile();
   }
 }

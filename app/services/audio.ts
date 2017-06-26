@@ -3,10 +3,9 @@ import { Subscription } from 'rxjs/Subscription';
 import { mutation, StatefulService, InitAfter, Inject, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import Utils from './utils';
 
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 
 const VOLMETER_UPDATE_INTERVAL = 40;
 
