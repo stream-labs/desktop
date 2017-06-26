@@ -28,7 +28,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { UserService, TPlatform } from '../../../services/user';
+import { UserService } from '../../../services/user';
+import { TPlatform } from '../../../services/platforms';
 import { Inject } from '../../../services/service';
 
 @Component({})
