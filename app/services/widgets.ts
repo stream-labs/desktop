@@ -3,6 +3,7 @@ import { UserService, requiresLogin, TPlatform } from './user';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { IInputValue } from '../components/shared/forms/input';
+import { HostsService } from './hosts';
 
 export enum WidgetType {
   AlertBox,
@@ -153,6 +154,9 @@ export class WidgetsService extends Service {
   @Inject()
   sourcesService: SourcesService;
 
+  @Inject()
+  hostsService: HostsService;
+
   // For now, we don't let you rename it
   @requiresLogin()
   createWidget(type: WidgetType) {
@@ -167,7 +171,7 @@ export class WidgetsService extends Service {
     properties.forEach(prop => {
       if (prop.name === 'url') {
         prop.value = widget.url(
-          'streamlabs.com',
+          this.hostsService.streamlabs,
           this.userService.widgetToken,
           this.userService.platform.type
         );
@@ -183,7 +187,7 @@ export class WidgetsService extends Service {
       return tester.platforms.includes(this.userService.platform.type);
     }).map(tester => {
       return new WidgetTester(tester.name, tester.url(
-        'streamlabs.com',
+        this.hostsService.streamlabs,
         this.userService.widgetToken,
         this.userService.platform.type
       ));
