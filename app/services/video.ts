@@ -45,7 +45,7 @@ export class Display {
     nodeObs.OBS_content_destroyDisplay(this.name);
   }
 
-  onOutputResize(cb: Function) {
+  onOutputResize(cb: (region: IRectangle) => void) {
     this.outputRegionCallbacks.push(cb);
   }
 

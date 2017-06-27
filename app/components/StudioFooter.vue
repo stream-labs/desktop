@@ -11,24 +11,27 @@
 </div>
 </template>
 
-<script>
-import StreamingService from '../services/streaming.ts';
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../services/service';
+import StreamingService from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 
-export default {
+@Component({
+  components: {
+    StartStreamingButton,
+    PerformanceMetrics
+  }
+})
+export default class StudioFooterComponent extends Vue {
 
-  components: { StartStreamingButton, PerformanceMetrics },
+  @Inject()
+  streamingService: StreamingService;
 
-  data() {
-    return {
-      recordElapsed: ''
-    };
-  },
-
-  beforeCreate() {
-    this.streamingService = StreamingService.instance;
-  },
+  recordElapsed = '';
+  timersInterval: number;
 
   mounted() {
     this.timersInterval = setInterval(() => {
@@ -36,48 +39,41 @@ export default {
         this.recordElapsed = this.elapsedRecordTime;
       }
     }, 100);
-  },
+  }
 
   beforeDestroy() {
     clearInterval(this.timersInterval);
-  },
+  }
 
-  methods: {
-    toggleRecording() {
-      if (this.recording) {
-        this.streamingService.stopRecording();
-      } else {
-        this.streamingService.startRecording();
-      }
-    }
-  },
-
-  computed: {
-    recording() {
-      return this.streamingService.isRecording;
-    },
-
-    recordStartTime() {
-      return this.streamingService.recordStartTime;
-    },
-
-    recordButtonLabel() {
-      if (this.recording) {
-        return this.recordElapsed;
-      }
-
-      return 'Start Recording';
-    },
-
-    elapsedRecordTime: {
-      cache: false,
-      get() {
-        return this.streamingService.formattedElapsedRecordTime;
-      }
+  toggleRecording() {
+    if (this.recording) {
+      this.streamingService.stopRecording();
+    } else {
+      this.streamingService.startRecording();
     }
   }
 
-};
+  get recording() {
+    return this.streamingService.isRecording;
+  }
+
+  get recordStartTime() {
+    return this.streamingService.recordStartTime;
+  }
+
+  get recordButtonLabel() {
+    if (this.recording) {
+      return this.recordElapsed;
+    }
+
+    return 'Start Recording';
+  }
+
+  get elapsedRecordTime() {
+    return this.streamingService.formattedElapsedRecordTime;
+  }
+
+}
 </script>
 
 <style lang="less" scoped>

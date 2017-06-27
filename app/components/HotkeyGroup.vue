@@ -18,7 +18,7 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import Hotkey from './shared/Hotkey.vue';
@@ -32,11 +32,7 @@ import Hotkey from './shared/Hotkey.vue';
 })
 export default class HotkeyGroup extends Vue {
 
-  data() {
-    return {
-      collapsed: false
-    };
-  }
+  collapsed = false;
 
 }
 </script>
