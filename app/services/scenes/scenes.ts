@@ -93,6 +93,11 @@ export class ScenesService extends StatefulService<IScenesState> {
 
 
   removeScene(id: string) {
+    if (Object.keys(this.state.scenes).length < 2) {
+      alert('There needs to be at least one scene.');
+      return;
+    }
+
     const name = this.state.scenes[id].name;
 
     nodeObs.OBS_content_removeScene(name);
