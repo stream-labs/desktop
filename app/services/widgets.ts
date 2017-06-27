@@ -7,6 +7,7 @@ import { VideoService } from './video';
 import { IInputValue } from '../components/shared/forms/input';
 import { HostsService } from './hosts';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
+import namingHelpers from '../util/NamingHelpers';
 
 export enum WidgetType {
   AlertBox,
@@ -229,8 +230,11 @@ export class WidgetsService extends Service {
     const scene = this.scenesService.scenes[0];
     const widget = WidgetDefinitions[type];
 
-    // TODO: Avoid name conflicts
-    const sourceId = scene.addSource(widget.name, 'BrowserSource');
+    const name = namingHelpers.suggestName(widget.name, (name: string) => {
+      return this.sourcesService.getSourceByName(name);
+    });
+
+    const sourceId = scene.addSource(name, 'BrowserSource');
     const properties = this.sourcesService.getPropertiesFormData(sourceId);
 
     // Find the URL property and set it
