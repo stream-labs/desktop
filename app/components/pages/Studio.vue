@@ -6,18 +6,22 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import StudioEditor from '../StudioEditor.vue';
 import StudioControls from '../StudioControls.vue';
 import StudioFooter from '../StudioFooter.vue';
 
-export default {
+@Component({
   components: {
     StudioEditor,
     StudioControls,
     StudioFooter
   }
-};
+})
+export default class Studio extends Vue {
+}
 </script>
 
 <style lang="less" scoped>

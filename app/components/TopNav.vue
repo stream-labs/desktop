@@ -78,70 +78,67 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import { WindowService } from '../services/window';
 import StartStreamingButton from './StartStreamingButton.vue';
+import { Inject } from '../services/service';
 import { CustomizationService } from '../services/customization';
 import electron from '../vendor/electron';
 
-export default {
-  components: {
-    StartStreamingButton
-  },
+@Component({
+  components: { StartStreamingButton }
+})
+export default class TopNav extends Vue {
 
-  data() {
-    return {
-      slideOpen: false,
-      windowService: WindowService.instance
-    };
-  },
+  windowService: WindowService = WindowService.instance;
+  customizationService: CustomizationService = CustomizationService.instance;
 
-  methods: {
-    navigateStudio() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Studio'
-      });
-    },
+  slideOpen = false;
 
-    navigateDashboard() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Dashboard'
-      });
-    },
+  navigateStudio() {
+    this.$store.dispatch({
+      type: 'navigate',
+      pageName: 'Studio'
+    });
+  }
 
-    navigateLive() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Live'
-      });
-    },
+  navigateDashboard() {
+    this.$store.dispatch({
+      type: 'navigate',
+      pageName: 'Dashboard'
+    });
+  }
 
-    navigateOnboarding() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Onboarding'
-      });
-    },
+  navigateLive() {
+    this.$store.dispatch({
+      type: 'navigate',
+      pageName: 'Live'
+    });
+  }
 
-    openSettingsWindow() {
-      this.windowService.showSettings();
-    },
+  navigateOnboarding() {
+    this.$store.dispatch({
+      type: 'navigate',
+      pageName: 'Onboarding'
+    });
+  }
 
-    toggleNightTheme() {
-      CustomizationService.instance.nightMode = !CustomizationService.instance.nightMode;
-    },
+  openSettingsWindow() {
+    this.windowService.showSettings();
+  }
 
-    bugReport() {
-      electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
-    }
-  },
+  toggleNightTheme() {
+    this.customizationService.nightMode = !this.customizationService.nightMode;
+  }
 
-  computed: {
-    page() {
-      return this.$store.state.navigation.currentPage;
-    }
+  bugReport() {
+    electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
+  }
+
+  get page() {
+    return this.$store.state.navigation.currentPage;
   }
 };
 </script>

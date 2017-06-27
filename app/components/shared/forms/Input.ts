@@ -34,10 +34,10 @@ export interface IInputValue<TValueType> {
   value: TValueType;
   name: string;
   description: string;
-  type: TObsType;
-  enabled: boolean;
-  visible: boolean;
-  masked: boolean;
+  enabled?: boolean;
+  visible?: boolean;
+  masked?: boolean;
+  type?: TObsType;
 }
 
 export declare type TFormData = IInputValue<TObsValue>[];

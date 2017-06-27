@@ -17,24 +17,29 @@
 </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 
-  props: ['tabs'],
+interface ITab {
+  name: string;
+  value: string;
+  selected: boolean;
+}
 
-  data() {
-    return {
-      selected: this.tabs[0].value
-    }
-  },
+@Component({})
+export default class Tabs extends Vue {
 
-  methods: {
-    showTab(tab) {
-      this.selected = tab;
-    }
+  @Prop()
+  tabs: ITab[];
+
+  selected: string = this.tabs[0].value || '';
+
+  showTab(tab: string) {
+    this.selected = tab;
   }
 
-};
+}
 </script>
 
 <style lang="less" scoped>

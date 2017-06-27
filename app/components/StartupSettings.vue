@@ -28,36 +28,51 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
 // This component is temporary and will be removed before release
 
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import { BoolInput, ListInput } from './shared/forms';
 import { ObsApiService } from '../services/obs-api';
+import { Inject } from '../services/service';
+import electron from '../vendor/electron';
+import { IInputValue, IListInputValue, TObsValue } from "./shared/forms/Input";
 
-const { remote, ipcRenderer } = window.require('electron');
-const path = window.require('path');
-const fs = window.require('fs');
+const { remote, ipcRenderer } = electron;
+const path = window['require']('path');
+const fs = window['require']('fs');
 
-export default {
-
+@Component({
   components: {
     BoolInput,
     ListInput
-  },
+  }
+})
+export default class StartupSettings extends Vue {
 
-  data() {
-    const obsApiService = ObsApiService.instance;
-    const obsInstalled = obsApiService.isObsInstalled();
+  obsApiService: ObsApiService = ObsApiService.instance;
+
+  settingsPath: string;
+  enabled = false;
+
+  obsMode: IInputValue<boolean> = null;
+  profile: IListInputValue = null;
+  sceneCollection: IListInputValue = null;
+
+
+  created() {
+    const obsInstalled = this.obsApiService.isObsInstalled();
 
     if (obsInstalled) {
-      const profileOptions = obsApiService.getObsProfiles().map(profile => {
+      const profileOptions = this.obsApiService.getObsProfiles().map(profile => {
         return {
           value: profile,
           description: profile
         };
       });
 
-      const sceneCollectionOptions = obsApiService.getObsSceneCollections().map(coll => {
+      const sceneCollectionOptions = this.obsApiService.getObsSceneCollections().map(coll => {
         return {
           value: coll,
           description: coll
@@ -84,55 +99,53 @@ export default {
         fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
       }
 
-      return {
-        enabled: true,
+      this.enabled = true;
 
-        obsMode: {
-          description: 'Load configuration from OBS',
-          value: settings.obsMode,
-          enabled: true
-        },
-
-        profile: {
-          options: profileOptions,
-          description: 'OBS Profile',
-          value: settings.profile
-        },
-
-        sceneCollection: {
-          options: sceneCollectionOptions,
-          description: 'OBS Scene Collection',
-          value: settings.sceneCollection
-        }
+      this.obsMode = {
+        name: '',
+        description: 'Load configuration from OBS',
+        value: settings.obsMode,
+        enabled: true
       };
+
+      this.profile = {
+        name: '',
+        options: profileOptions,
+        description: 'OBS Profile',
+        value: settings.profile
+      };
+
+      this.sceneCollection = {
+        name: '',
+        options: sceneCollectionOptions,
+        description: 'OBS Scene Collection',
+        value: settings.sceneCollection
+      };
+      return;
     }
 
-    return {
-      enabled: false
-    };
-  },
-
-  methods: {
-    loadSettings() {
-      return JSON.parse(fs.readFileSync(this.settingsPath));
-    },
-
-    saveSetting(val, attr) {
-      const settings = this.loadSettings();
-      settings[attr] = val.value;
-      fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
-      this[attr].currentValue = val.currentValue;
-    },
-
-    restartApp() {
-      ipcRenderer.send('restartApp');
-    },
-
-    showCacheDir() {
-      remote.shell.showItemInFolder(remote.app.getPath('userData'));
-    }
+    this.enabled = false;
   }
 
-};
+  loadSettings() {
+    return JSON.parse(fs.readFileSync(this.settingsPath));
+  }
+
+  saveSetting(val: any, attr: string) {
+    const settings = this.loadSettings();
+    settings[attr] = val.value;
+    fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
+    this[attr].currentValue = val.currentValue;
+  }
+
+  restartApp() {
+    ipcRenderer.send('restartApp');
+  }
+
+  showCacheDir() {
+    remote.shell.showItemInFolder(remote.app.getPath('userData'));
+  }
+
+}
 
 </script>

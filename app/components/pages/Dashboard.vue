@@ -6,14 +6,18 @@
 </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import SceneSelector from '../SceneSelector.vue';
 import SourceSelector from '../SourceSelector.vue';
 
-export default {
+@Component({
   components: {
     SceneSelector,
     SourceSelector,
   }
+})
+export default class Dashboard extends Vue {
 }
 </script>

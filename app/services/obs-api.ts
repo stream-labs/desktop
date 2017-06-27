@@ -12,7 +12,6 @@ const callbacks = {};
 // all methods via the main process
 export const nodeObs: Dictionary<Function> = new Proxy({}, {
   get(target, key) {
-    console.log(key);
     return (...args: any[]) => {
       const mappedArgs = args.map(arg => {
         if (typeof arg === 'function') {
@@ -80,11 +79,11 @@ export class ObsApiService extends Service {
     nodeObs.OBS_content_selectSource(x, y);
   }
 
-  getObsProfiles() {
+  getObsProfiles(): string[] {
     return nodeObs.OBS_API_getOBS_existingProfiles();
   }
 
-  getObsSceneCollections() {
+  getObsSceneCollections(): string[] {
     return nodeObs.OBS_API_getOBS_existingSceneCollections();
   }
 }
