@@ -78,7 +78,7 @@ export default class ModalLayout extends Vue {
 
   // The height of the fixed section
   @Prop()
-  fixedSectionHeight: string;
+  fixedSectionHeight: number;
 
 
   created() {
