@@ -20,6 +20,7 @@ import Onboarding from '../pages/Onboarding.vue';
 import windowMixin from '../mixins/window';
 import { Inject } from '../../services/service';
 import { CustomizationService } from '../../services/customization';
+import { NavigationService } from '../../services/navigation';
 import electron from '../../vendor/electron';
 
 const { remote } = electron;
@@ -41,12 +42,15 @@ export default class Main extends Vue {
   @Inject()
   customizationService: CustomizationService;
 
+  @Inject()
+  navigationService: NavigationService;
+
   mounted() {
     remote.getCurrentWindow().setTitle(this.title);
   }
 
   get page() {
-    return this.$store.state.navigation.currentPage;
+    return this.navigationService.state.currentPage;
   }
 
   get nightTheme() {

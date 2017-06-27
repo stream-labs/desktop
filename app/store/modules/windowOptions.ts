@@ -10,25 +10,25 @@ const state = {
 };
 
 const mutations = {
-  SET_WINDOW_OPTIONS(state, data) {
+  SET_WINDOW_OPTIONS(state: any, data: any) {
     state.options = data.options;
   },
 
-  SET_WINDOW_AS_CHILD(state) {
+  SET_WINDOW_AS_CHILD(state: any) {
     state.isChild = true;
   }
 };
 
 const actions = {
-  setWindowOptions({ commit }, data) {
-    commit('SET_WINDOW_OPTIONS', {
+  setWindowOptions(vuex: { commit: Function }, data: any) {
+    vuex.commit('SET_WINDOW_OPTIONS', {
       options: data.options,
       __vuexSyncIgnore: true
     });
   },
 
-  setWindowAsChild({ commit }) {
-    commit('SET_WINDOW_AS_CHILD', {
+  setWindowAsChild(vuex: { commit: Function }) {
+    vuex.commit('SET_WINDOW_AS_CHILD', {
       __vuexSyncIgnore: true
     });
   }

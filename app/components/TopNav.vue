@@ -81,10 +81,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { WindowService } from '../services/window';
-import StartStreamingButton from './StartStreamingButton.vue';
 import { Inject } from '../services/service';
+import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
+import { NavigationService } from "../services/navigation";
+import StartStreamingButton from './StartStreamingButton.vue';
 import electron from '../vendor/electron';
 
 @Component({
@@ -94,35 +95,24 @@ export default class TopNav extends Vue {
 
   windowService: WindowService = WindowService.instance;
   customizationService: CustomizationService = CustomizationService.instance;
+  navigationService: NavigationService = NavigationService.instance;
 
   slideOpen = false;
 
   navigateStudio() {
-    this.$store.dispatch({
-      type: 'navigate',
-      pageName: 'Studio'
-    });
+    this.navigationService.navigate('Studio');
   }
 
   navigateDashboard() {
-    this.$store.dispatch({
-      type: 'navigate',
-      pageName: 'Dashboard'
-    });
+    this.navigationService.navigate('Dashboard');
   }
 
   navigateLive() {
-    this.$store.dispatch({
-      type: 'navigate',
-      pageName: 'Live'
-    });
+    this.navigationService.navigate('Live');
   }
 
   navigateOnboarding() {
-    this.$store.dispatch({
-      type: 'navigate',
-      pageName: 'Onboarding'
-    });
+    this.navigationService.navigate('Onboarding');
   }
 
   openSettingsWindow() {
@@ -138,9 +128,9 @@ export default class TopNav extends Vue {
   }
 
   get page() {
-    return this.$store.state.navigation.currentPage;
+    return this.navigationService.state.currentPage;
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

@@ -1,6 +1,7 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 import _ from 'lodash';
+import electron from '../vendor/electron';
 
 // Modules
 import navigation from './modules/navigation';
@@ -10,14 +11,15 @@ import windowOptions from './modules/windowOptions';
 import { getModule } from '../services/stateful-service';
 import { ScenesService, Scene, SceneSource } from '../services/scenes';
 import ScenesTransitions from  '../services/scenes-transitions.ts';
-import { SourcesService, Source } from '../services/sources.ts';
+import { SourcesService, Source } from '../services/sources';
 import SourceFiltersService from '../services/source-filters';
 import { SettingsService } from '../services/settings';
 import StreamingService from '../services/streaming';
 import { PerformanceService } from '../services/performance';
-import { AudioService, AudioSource } from '../services/audio.ts';
-import { CustomizationService } from '../services/customization.ts';
-import { UserService } from '../services/user.ts';
+import { AudioService, AudioSource } from '../services/audio';
+import { CustomizationService } from '../services/customization';
+import { UserService } from '../services/user';
+import { NavigationService } from '../services/navigation';
 
 const statefulServiceModules = {
   ...getModule(ScenesService),
@@ -33,18 +35,19 @@ const statefulServiceModules = {
   ...getModule(AudioService),
   ...getModule(AudioSource),
   ...getModule(CustomizationService),
-  ...getModule(UserService)
+  ...getModule(UserService),
+  ...getModule(NavigationService)
 };
 
 
 Vue.use(Vuex);
 
-const { ipcRenderer, remote } = window.require('electron');
+const { ipcRenderer, remote } = electron;
 
 const debug = remote.process.env.NODE_ENV !== 'production';
 
 const mutations = {
-  BULK_LOAD_STATE(state, data) {
+  BULK_LOAD_STATE(state: any, data: any) {
     _.each(data.state, (value, key) => {
       state[key] = value;
     });
@@ -58,8 +61,8 @@ const plugins = [];
 
 // This plugin will keep all vuex stores in sync via
 // IPC with the main process.
-plugins.push(store => {
-  store.subscribe(mutation => {
+plugins.push((store: Store<any>) => {
+  store.subscribe((mutation: Dictionary<any>) => {
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
       ipcRenderer.send('vuex-mutation', {
         type: mutation.type,
@@ -70,7 +73,7 @@ plugins.push(store => {
 
   // Only the main window should ever receive this
   ipcRenderer.on('vuex-sendState', (event, windowId) => {
-    let win = remote.BrowserWindow.fromId(windowId);
+    const win = remote.BrowserWindow.fromId(windowId);
     win.webContents.send('vuex-loadState', _.omit(store.state, ['windowOptions']));
   });
 
@@ -94,7 +97,6 @@ plugins.push(store => {
 
 export default new Vuex.Store({
   modules: {
-    navigation,
     windowOptions,
     ...statefulServiceModules
   },

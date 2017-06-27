@@ -6,7 +6,7 @@ import Vue from 'vue';
 import _ from 'lodash';
 import URI from 'urijs';
 
-import store from './store';
+import store from './store/index';
 import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
 import { ConfigFileService } from './services/config-file';
