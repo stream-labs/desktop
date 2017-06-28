@@ -6,7 +6,6 @@
     class="add-source">
     <!-- Standard sources -->
     <add-source-info
-      :inspected="inspectedSource === 'Image'"
       v-if="inspectedSource === 'Image'"
       @clickAdd="selectSource('Image')"
       name="Image"
@@ -22,7 +21,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Image Slide Show'"
       v-if="inspectedSource === 'Image Slide Show'"
       @clickAdd="selectSource('Image Slide Show')"
       name="Image Slide Show"
@@ -38,7 +36,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Media Source'"
       v-if="inspectedSource === 'Media Source'"
       @clickAdd="selectSource('Media Source')"
       name="Media Source"
@@ -60,7 +57,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Text (FreeType 2)'"
       v-if="inspectedSource === 'Text (FreeType 2)'"
       @clickAdd="selectSource('Text (FreeType 2)')"
       name="Text (FreeType 2)"
@@ -70,7 +66,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Window Capture'"
       v-if="inspectedSource === 'Window Capture'"
       @clickAdd="selectSource('Window Capture')"
       name="Window Capture"
@@ -80,7 +75,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Video Capture Device'"
       v-if="inspectedSource === 'Video Capture Device'"
       @clickAdd="selectSource('Video Capture Device')"
       name="Video Capture Device"
@@ -90,7 +84,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Audio Output Capture'"
       v-if="inspectedSource === 'Audio Output Capture'"
       @clickAdd="selectSource('Audio Output Capture')"
       name="Audio Output Capture"
@@ -106,7 +99,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Color Source'"
       v-if="inspectedSource === 'Color Source'"
       @clickAdd="selectSource('Color Source')"
       name="Color Source"
@@ -119,7 +111,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'BrowserSource'"
       v-if="inspectedSource === 'BrowserSource'"
       @clickAdd="selectSource('BrowserSource')"
       name="BrowserSource"
@@ -132,7 +123,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Text (GDI+)'"
       v-if="inspectedSource === 'Text (GDI+)'"
       @clickAdd="selectSource('Text (GDI+)')"
       name="Text (GDI+)"
@@ -145,7 +135,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Display Capture'"
       v-if="inspectedSource === 'Display Capture'"
       @clickAdd="selectSource('Display Capture')"
       name="Display Capture"
@@ -155,7 +144,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Game Capture'"
       v-if="inspectedSource === 'Game Capture'"
       @clickAdd="selectSource('Game Capture')"
       name="Game Capture"
@@ -165,7 +153,6 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'Audio Input Capture'"
       v-if="inspectedSource === 'Audio Input Capture'"
       @clickAdd="selectSource('Audio Input Capture')"
       name="Audio Input Capture"
@@ -182,8 +169,8 @@
     </add-source-info>
     <!-- Widget Sources -->
     <add-source-info
-      :inspected="inspectedSource === 'alertbox'"
-      v-if="inspectedSource === 'alertbox'"
+      v-if="inspectedSource === widgetTypes.AlertBox"
+      @clickAdd="selectWidget(widgetTypes.AlertBox)"
       name="Alertbox"
       description="Thanks viewers with notification popups.">
       <video slot="media" autoplay loop muted src="../../../media/source-demos/source-alertbox.mp4"></video>
@@ -196,8 +183,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'donationTicker'"
-      v-if="inspectedSource === 'donationTicker'"
+      v-if="inspectedSource === widgetTypes.DonationTicker"
+      @clickAdd="selectWidget(widgetTypes.DonationTicker)"
       name="Donation Ticker"
       description="Show off your most recent donations to your viewers.">
       <video slot="media" autoplay loop muted src="../../../media/source-demos/source-donation-ticker.mp4"></video>
@@ -206,8 +193,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'eventList'"
-      v-if="inspectedSource === 'eventList'"
+      v-if="inspectedSource === widgetTypes.EventList"
+      @clickAdd="selectWidget(widgetTypes.EventList)"
       name="Event List"
       description="Include your channel's most recent events into your stream.">
       <video slot="media" autoplay loop muted src="../../../media/source-demos/source-eventlist.mp4"></video>
@@ -221,8 +208,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'donationGoal'"
-      v-if="inspectedSource === 'donationGoal'"
+      v-if="inspectedSource === widgetTypes.DonationGoal"
+      @clickAdd="selectWidget(widgetTypes.DonationGoal)"
       name="Donation Goal"
       description="Set a goal for your viewers to help you reach below.">
       <img slot="media" src="../../../media/source-demos/source-donation-goal.png"/>
@@ -231,8 +218,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'chatbox'"
-      v-if="inspectedSource === 'chatbox'"
+      v-if="inspectedSource === widgetTypes.ChatBox"
+      @clickAdd="selectWidget(widgetTypes.ChatBox)"
       name="Chatbox"
       description="Include your channel's chat into your stream.">
       <video slot="media" autoplay loop muted src="../../../media/source-demos/source-chatbox.mp4"></video>
@@ -242,8 +229,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      :inspected="inspectedSource === 'jar'"
-      v-if="inspectedSource === 'jar'"
+      v-if="inspectedSource === widgetTypes.TheJar"
+      @clickAdd="selectWidget(widgetTypes.TheJar)"
       name="The Jar"
       description="The jar that catches bits, tips, and more.">
       <video slot="media" autoplay loop muted src="../../../media/source-demos/source-jar.mp4"></video>
@@ -257,7 +244,7 @@
     </add-source-info>
     <div
       class="source-info"
-      v-if="inspectedSource === ''">
+      v-if="inspectedSource === null">
       <h3>Welcome to sources!</h3>
       <ol>
         <li>Browse through our Standard and Widget sources</li>
@@ -283,7 +270,7 @@
         <div class="source-list--widgets">
           <div
             class="source source--widget"
-            @click="inspectSource('alertbox')">
+            @click="inspectSource(widgetTypes.AlertBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/alertbox-no-bg.png">
             </div>
@@ -291,7 +278,7 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource('donationGoal')">
+            @click="inspectSource(widgetTypes.DonationGoal)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-goal-no-bg.png">
             </div>
@@ -299,7 +286,7 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource('donationTicker')">
+            @click="inspectSource(widgetTypes.DonationTicker)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-ticker-no-bg.png">
             </div>
@@ -307,7 +294,7 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource('chatbox')">
+            @click="inspectSource(widgetTypes.ChatBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/chatbox-no-bg.png">
             </div>
@@ -315,7 +302,7 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource('eventList')">
+            @click="inspectSource(widgetTypes.EventList)">
             <div class="source__icon">
               <img src="../../../media/images/icons/event-list-no-bg.png">
             </div>
@@ -323,7 +310,7 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource('jar')">
+            @click="inspectSource(widgetTypes.TheJar)">
             <div class="source__icon">
               <img src="../../../media/images/icons/the-jar-no-bg.png">
             </div>
@@ -346,9 +333,12 @@ import windowMixin from '../mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType } from '../../services/sources';
 import { UserService } from '../../services/user';
+import { WidgetsService, WidgetType } from '../../services/widgets';
+
+type TInspectableSource = TSourceType | WidgetType;
 
 @Component({
-  components: { 
+  components: {
     ModalLayout,
     AddSourceInfo
   },
@@ -362,6 +352,11 @@ export default class AddSource extends Vue {
   @Inject()
   userService: UserService;
 
+  @Inject()
+  widgetsService:WidgetsService;
+
+  widgetTypes = WidgetType;
+
   availableSources = this.sourcesService.getAvailableSourcesTypes();
   windowService: WindowService = WindowService.instance;
 
@@ -369,9 +364,13 @@ export default class AddSource extends Vue {
     this.windowService.showNameSource(sourceName);
   }
 
-  inspectedSource = '';
+  selectWidget(type: WidgetType) {
+    this.windowService.showNameWidget(type);
+  }
 
-  inspectSource(inspectedSource: string) {
+  inspectedSource: TInspectableSource = null;
+
+  inspectSource(inspectedSource: TInspectableSource) {
     this.inspectedSource = inspectedSource;
   }
 
