@@ -2,6 +2,7 @@ button, .button {
   .transition;
   &:focus, &:visited {
     outline: none;
+    background: inherit;
   }
 }
 .button--action {
@@ -15,7 +16,7 @@ button, .button {
     color: @grey;
     .transition;
   }
-  &:hover {
+  &:hover, &:focus {
     color: @navy;
     background: transparent;
     .fa {
