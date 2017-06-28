@@ -1,11 +1,11 @@
 <template>
   <div>
-    <label>{{ value.description }}</label>
-    <div class="FontProperty-container">
-      <label>Family</label>
+    <!--<label>{{ value.description }}</label>-->
+    <div class="input-container">
+      <label>Font Family</label>
       <multiselect
         ref="family"
-        class="FontProperty-multiselect"
+        class="multiselect--font"
         :value="selectedFamily"
         :options="fontFamilies"
         :allow-empty="false"
@@ -18,11 +18,12 @@
         </span>
         </template>
       </multiselect>
-
-      <label>Style</label>
+    </div>
+    <div class="input-container">
+      <label>Font Style</label>
       <multiselect
         ref="font"
-        class="FontProperty-multiselect"
+        class="multiselect--font"
         :value="selectedFont"
         :options="selectedFamily.fonts"
         :allow-empty="false"
@@ -36,9 +37,10 @@
         </span>
         </template>
       </multiselect>
-
-      <label>Size</label>
-      <div class="FontProperty-sizeContainer">
+    </div>
+    <div class="input-container">
+      <label>Font Size</label>
+      <div class="">
         <input
           ref="size"
           type="text"
@@ -256,18 +258,9 @@ export default FontProperty;
 </script>
 
 <style lang="less" scoped>
-  .FontProperty-container {
-    border-left: 2px solid #ccc;
-    padding: 15px 0 15px 15px;
-    margin-bottom: 20px;
-  }
-
-  .FontProperty-multiselect {
-    margin-bottom: 20px;
-  }
-
-  .FontProperty-sizeContainer {
-    position: relative;
+@import "../../../styles/index";
+  .multiselect--font {
+    margin-bottom: 0px;
   }
 
   .FontProperty-presets {

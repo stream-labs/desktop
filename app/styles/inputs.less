@@ -1,0 +1,40 @@
+.input-container {
+  margin-bottom: 20px;
+}
+input[type=text] {
+  border: 1px solid @day-input-border;
+  background: @day-input-bg;
+  &:focus {
+    box-shadow: none;
+  }
+}
+.multiselect {
+
+}
+.multiselect__select {
+  z-index: 10;
+  padding: 0;
+  width: auto;
+  height: auto;
+  right: 8px;
+  top: 10px;
+  &:before {
+    font-family: FontAwesome;
+    content: '\f078';
+    border: none;
+    font-size: 9px;
+  }
+}
+.multiselect__tags {
+  padding: 0;
+  border: none;
+  .radius;
+}
+
+.night-theme {
+  input[type="text"] {
+    background: @night-secondary;
+    color: @white;
+    border-color: transparent;
+  }
+}

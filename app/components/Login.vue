@@ -3,7 +3,7 @@
     <div
       v-if="loggedIn"
       class="user--logged-in">
-      <div class="user__icon"><img src="../../media/images/icons/alertbox.png"></div>
+      <!--<div class="user__icon"><img src="../../media/images/icons/alertbox.png"></div>-->
       <div class="user__name">{{ username }}</div>
       <a class="logout link" @click="logout">
         <i class="fa fa-sign-out"/>
