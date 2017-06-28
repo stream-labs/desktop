@@ -16,13 +16,14 @@ import { Service } from './service';
 import store from '../store';
 import electron from '../vendor/electron';
 import { TSourceType } from './sources';
+import { WidgetType } from './widgets';
 
 const { ipcRenderer, remote } = electron;
 
 export interface IWindowOptions {
   startupOptions: {
     component: string
-    [key: string]: string
+    [key: string]: string | number
   };
   windowOptions: {
     width: number,
@@ -146,6 +147,19 @@ export class WindowService extends Service {
       startupOptions: {
         component: 'NameSource',
         sourceType
+      },
+      windowOptions: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+  showNameWidget(widgetType: WidgetType) {
+    this.showWindow({
+      startupOptions: {
+        component: 'NameSource',
+        widgetType
       },
       windowOptions: {
         width: 400,

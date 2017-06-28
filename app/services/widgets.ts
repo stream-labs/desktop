@@ -224,17 +224,16 @@ export class WidgetsService extends Service {
   @Inject()
   videoService: VideoService;
 
-  // For now, we don't let you rename it
   @requiresLogin()
-  createWidget(type: WidgetType) {
+  createWidget(type: WidgetType, name?: string) {
     const scene = this.scenesService.scenes[0];
     const widget = WidgetDefinitions[type];
 
-    const name = namingHelpers.suggestName(widget.name, (name: string) => {
+    const suggestedName = namingHelpers.suggestName(name || widget.name, (name: string) => {
       return this.sourcesService.getSourceByName(name);
     });
 
-    const sourceId = scene.addSource(name, 'BrowserSource');
+    const sourceId = scene.addSource(suggestedName, 'BrowserSource');
     const properties = this.sourcesService.getPropertiesFormData(sourceId);
 
     // Find the URL property and set it
@@ -275,6 +274,8 @@ export class WidgetsService extends Service {
         y: rect.y
       });
     }, 1500);
+
+    return sourceId;
   }
 
   @requiresLogin()
