@@ -278,10 +278,10 @@
           </li>
         </ul>
       </div>
-      <div class="source-group">
+      <div class="source-group" v-if="loggedIn">
         <h4>Widgets</h4>
         <div class="source-list--widgets">
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('alertbox')">
             <div class="source__icon">
@@ -289,7 +289,7 @@
             </div>
             <div>Alertbox</div>
           </div>
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('donationGoal')">
             <div class="source__icon">
@@ -297,7 +297,7 @@
             </div>
             <div>Donation Goal</div>
           </div>
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('donationTicker')">
             <div class="source__icon">
@@ -305,7 +305,7 @@
             </div>
             <div>Donation Ticker</div>
           </div>
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('chatbox')">
             <div class="source__icon">
@@ -313,7 +313,7 @@
             </div>
             <div>Chatbox</div>
           </div>
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('eventList')">
             <div class="source__icon">
@@ -321,7 +321,7 @@
             </div>
             <div>Event List</div>
           </div>
-          <div 
+          <div
             class="source source--widget"
             @click="inspectSource('jar')">
             <div class="source__icon">
@@ -345,6 +345,7 @@ import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType } from '../../services/sources';
+import { UserService } from '../../services/user';
 
 @Component({
   components: { 
@@ -358,6 +359,9 @@ export default class AddSource extends Vue {
   @Inject()
   sourcesService: SourcesService;
 
+  @Inject()
+  userService: UserService;
+
   availableSources = this.sourcesService.getAvailableSourcesTypes();
   windowService: WindowService = WindowService.instance;
 
@@ -370,6 +374,11 @@ export default class AddSource extends Vue {
   inspectSource(inspectedSource: string) {
     this.inspectedSource = inspectedSource;
   }
+
+  get loggedIn() {
+    return this.userService.isLoggedIn();
+  }
+
 }
 </script>
 
