@@ -1,7 +1,7 @@
 <template>
 <div class="main" :class="{'night-theme': nightTheme}">
   <div class="main-spacer bgColor-teal"></div>
-  <top-nav></top-nav>
+  <top-nav v-if="page !== 'Onboarding'"></top-nav>
   <component class="main-page-container" :is="page">
   </component>
 </div>
