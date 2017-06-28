@@ -6,34 +6,6 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
-export function useSpectron() {
-  test.beforeEach(async t => {
-    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
-    t.context.app = new Application({
-      path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: ['.'],
-      env: {
-        NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir
-      }
-    });
-
-    await t.context.app.start();
-
-    // Wait up to 2 seconds before giving up looking for an element.
-    // This will slightly slow down negative assertions, but makes
-    // the tests much more stable, especially on slow systems.
-    t.context.app.client.timeouts('implicit', 2000);
-  });
-
-  test.afterEach.always(async t => {
-    await t.context.app.stop();
-    setTimeout(() => {
-      rimraf.sync(t.context.cacheDir);
-    }, 1000);
-  });
-}
-
 
 async function focusWindow(t, regex) {
   const handles = await t.context.app.client.windowHandles();
@@ -55,4 +27,40 @@ export async function focusMain(t) {
 // Focuses the child window
 export async function focusChild(t) {
   await focusWindow(t, /child=true/);
+}
+
+
+export function useSpectron(skipOnboarding = true) {
+  test.beforeEach(async t => {
+    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    t.context.app = new Application({
+      path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
+      args: ['.'],
+      env: {
+        NODE_ENV: 'test',
+        SLOBS_CACHE_DIR: t.context.cacheDir
+      }
+    });
+
+    await t.context.app.start();
+
+    // Wait up to 2 seconds before giving up looking for an element.
+    // This will slightly slow down negative assertions, but makes
+    // the tests much more stable, especially on slow systems.
+    t.context.app.client.timeouts('implicit', 2000);
+
+    // Pretty much all tests except for onboarding-specific
+    // tests will want to skip this flow, so we do it automatically.
+    if (skipOnboarding) {
+      await focusMain(t);
+      await t.context.app.client.click('a=Setup later');
+    }
+  });
+
+  test.afterEach.always(async t => {
+    await t.context.app.stop();
+    setTimeout(() => {
+      rimraf.sync(t.context.cacheDir);
+    }, 1000);
+  });
 }

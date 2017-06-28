@@ -23,9 +23,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
 
   init() {
-    // TODO: Uncomment this line when we are ready to
-    // release the onboarding flow.  (Will break tests)
-    // this.startOnboardingIfRequired();
+    this.startOnboardingIfRequired();
   }
 
 
