@@ -35,44 +35,20 @@
       <a @click="bugReport">Bug Report</a>
     </div>
     <div class="top-nav-item">
-      <button
-        class="slide-open__open"
-        @click="slideOpen = !slideOpen">
-        <i class="fa fa-long-arrow-left" aria-hidden="true"></i> Test
-      </button>
-      <transition name="slide-fade">
-        <div
-          v-if="slideOpen"
-          class="slide-open__menu">
-          <a class="slide-open__close"
-              @click="slideOpen = !slideOpen">
-              <i class="fa fa-times" aria-hidden="true"></i>
-          </a>
-          <div class="button-container">
-            <button class="button button--trans">Follow</button>
-            <button class="button button--trans">Subscription</button>
-            <button class="button button--trans">Donation</button>
-            <button class="button button--trans">Hosting</button>
-            <button class="button button--trans">Bit</button>
-            <button class="button button--trans">Redemption</button>
-          </div>
-        </div>
-      </transition>
-    </div>
-    <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
           <i class="fa fa-sun-o"/>
           <i class="fa fa-moon-o"/>
       </button>
     </div>
     <div class="top-nav-item">
-      <button
-        @click="openSettingsWindow">
-        <i class="fa fa-cog"/>
-      </button>
+      <a
+        @click="openSettingsWindow"
+        class="link link--uppercase">
+        <i class="fa fa-cog"/> Settings
+      </a>
     </div>
     <div class="top-nav-item">
-      <start-streaming-button />
+      <login/>
     </div>
   </div>
 </div>
@@ -85,11 +61,12 @@ import { Inject } from '../services/service';
 import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";
-import StartStreamingButton from './StartStreamingButton.vue';
 import electron from '../vendor/electron';
+import Login from './Login.vue';
+
 
 @Component({
-  components: { StartStreamingButton }
+  components: { Login }
 })
 export default class TopNav extends Vue {
 
@@ -153,12 +130,9 @@ export default class TopNav extends Vue {
 }
 
 .top-nav-item {
-  margin-left: 10px;
+  margin-left: 20px;
   display: flex;
   align-items: center;
-  .fa {
-    color: @grey;
-  }
 }
 
 .theme-toggle {
@@ -183,6 +157,11 @@ export default class TopNav extends Vue {
       color: @white;
       opacity: 1;
       display: block;
+    }
+  }
+  .user__name {
+    &:hover {
+      color: @white;
     }
   }
 }

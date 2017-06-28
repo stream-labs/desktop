@@ -1,12 +1,20 @@
 <template>
-<div class="studioFooter">
+<div class="footer">
   <performance-metrics/>
-  <div class="studioFooter-buttons text-right">
-    <button
-      class="button button--default button--md studioFooter-button studioFooter-button--startRecording"
-      @click="toggleRecording">
-      {{ recordButtonLabel }}
-    </button>
+  <div class="nav-right">
+    <div class="nav-item">
+      <test-widgets/>
+    </div>
+    <div class="nav-item">
+      <button
+        class="record-button"
+        @click="toggleRecording">
+        <i class="fa fa-circle"/>
+      </button>
+    </div>
+    <div class="nav-item">
+      <start-streaming-button />
+    </div>
   </div>
 </div>
 </template>
@@ -17,11 +25,13 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import StreamingService from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
+import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 
 @Component({
   components: {
     StartStreamingButton,
+    TestWidgets,
     PerformanceMetrics
   }
 })
@@ -29,21 +39,6 @@ export default class StudioFooterComponent extends Vue {
 
   @Inject()
   streamingService: StreamingService;
-
-  recordElapsed = '';
-  timersInterval: number;
-
-  mounted() {
-    this.timersInterval = setInterval(() => {
-      if (this.recording) {
-        this.recordElapsed = this.elapsedRecordTime;
-      }
-    }, 100);
-  }
-
-  beforeDestroy() {
-    clearInterval(this.timersInterval);
-  }
 
   toggleRecording() {
     if (this.recording) {
@@ -57,52 +52,50 @@ export default class StudioFooterComponent extends Vue {
     return this.streamingService.isRecording;
   }
 
-  get recordStartTime() {
-    return this.streamingService.recordStartTime;
-  }
-
-  get recordButtonLabel() {
-    if (this.recording) {
-      return this.recordElapsed;
-    }
-
-    return 'Start Recording';
-  }
-
-  get elapsedRecordTime() {
-    return this.streamingService.formattedElapsedRecordTime;
-  }
-
 }
 </script>
 
 <style lang="less" scoped>
-.studioFooter {
+@import "../styles/index";
+.footer {
   display: flex;
+  justify-content: space-between;
   flex-direction: row;
   align-items: center;
-
-  padding: 0 40px;
-
-  background-color: #fafafa;
-  border-top: 1px solid #ddd;
+  position: relative;
+  padding: 10px 30px;
+  background-color: @day-secondary;
+  border-top: 1px solid @day-border;
+  max-width: none;
 }
-
-.studioFooter-buttons {
-  flex-grow: 1;
+.nav-right {
+  display: flex;
+  align-items: center;
 }
-
-.studioFooter-button {
-  width: 170px;
-  margin: 10px 5px;
+.nav-item {
+  margin-left: 20px;
 }
-
-/* Button styles have to be overridden with !important */
-.studioFooter-button--startRecording {
-  color: #ff4141 !important;
+.record-button {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  color: @red;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid @red;
+  border-radius: 100%;
+  .fa-circle {
+    top: 4px;
+    left: 4px;
+    font-size: 20px;
+  }
 }
-
-.studioFooter-button--startStreaming {
-  color: #644899 !important;
+.night-theme {
+  .footer {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
 }
 </style>

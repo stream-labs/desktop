@@ -136,7 +136,7 @@ export class WindowService extends Service {
       },
       windowOptions: {
         width: 800,
-        height: 600
+        height: 520
       }
     });
   }

@@ -32,6 +32,7 @@ export async function addSource(t, type, name) {
 
   await focusChild(t);
   await app.client.click(`li=${type}`);
+  await app.client.click('button=Add Source');
   await app.client.setValue('input', name);
   await app.client.click('button=Done');
 

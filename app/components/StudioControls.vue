@@ -52,6 +52,7 @@ export default class StudioControls extends Vue {
 .studio-controls__label {
   margin-bottom: 0;
   .semibold;
+  color: @grey;
 }
 .studio-controls-selector {
   background: @day-secondary;

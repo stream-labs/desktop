@@ -2,18 +2,336 @@
 <modal-layout
   :show-controls="false"
   title="Add Source">
-  <div slot="content">
-    <h4 class="AddSource-heading">
-      Standard
-    </h4>
-    <ul class="AddSource-sourceList">
-      <li
-        v-for="source in availableSources"
-        class="AddSource-source"
-        @click="selectSource(source)">
-        {{ source }}
-      </li>
-    </ul>
+  <div slot="content"
+    class="add-source">
+    <!-- Standard sources -->
+    <add-source-info
+      :inspected="inspectedSource === 'Image'"
+      v-if="inspectedSource === 'Image'"
+      @clickAdd="selectSource('Image')"
+      name="Image"
+      description="Add images to your scene.">
+      <img slot="media" src="../../../media/source-demos/source-image.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>png</li>
+        <li>jpg</li>
+        <li>jpeg</li>
+        <li>gif</li>
+        <li>tga</li>
+        <li>bmp</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Image Slide Show'"
+      v-if="inspectedSource === 'Image Slide Show'"
+      @clickAdd="selectSource('Image Slide Show')"
+      name="Image Slide Show"
+      description="Add a slideshow of images to your scene.">
+      <img slot="media" src="../../../media/source-demos/source-slide-show.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>png</li>
+        <li>jpg</li>
+        <li>jpeg</li>
+        <li>gif</li>
+        <li>tga</li>
+        <li>bmp</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Media Source'"
+      v-if="inspectedSource === 'Media Source'"
+      @clickAdd="selectSource('Media Source')"
+      name="Media Source"
+      description="Add videos to your scene.">
+      <img slot="media" src="../../../media/source-demos/source-media.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>mp4</li>
+        <li>ts</li>
+        <li>mov</li>
+        <li>flv</li>
+        <li>mkv</li>
+        <li>avi</li>
+        <li>mp3</li>
+        <li>ogg</li>
+        <li>aac</li>
+        <li>wav</li>
+        <li>gif</li>
+        <li>webm</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Text (FreeType 2)'"
+      v-if="inspectedSource === 'Text (FreeType 2)'"
+      @clickAdd="selectSource('Text (FreeType 2)')"
+      name="Text (FreeType 2)"
+      description="Add text and choose from tons of fonts and colors.">
+      <img slot="media" src="../../../media/source-demos/source-text.png"/>
+      <ul slot="support-list" class="source-support__list">
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Window Capture'"
+      v-if="inspectedSource === 'Window Capture'"
+      @clickAdd="selectSource('Window Capture')"
+      name="Window Capture"
+      description="Capture a specific window you select.">
+      <img slot="media" src="../../../media/source-demos/source-capture.png"/>
+      <ul slot="support-list" class="source-support__list">
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Video Capture Device'"
+      v-if="inspectedSource === 'Video Capture Device'"
+      @clickAdd="selectSource('Video Capture Device')"
+      name="Video Capture Device"
+      description="Select from your build in USB webcam or an external.">
+      <img slot="media" src="../../../media/source-demos/source-video.png"/>
+      <ul slot="support-list" class="source-support__list">
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Audio Output Capture'"
+      v-if="inspectedSource === 'Audio Output Capture'"
+      @clickAdd="selectSource('Audio Output Capture')"
+      name="Audio Output Capture"
+      description="Add images to your scene.">
+      <img slot="media" src="../../../media/source-demos/source-output.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>png</li>
+        <li>jpg</li>
+        <li>jpeg</li>
+        <li>gif</li>
+        <li>tga</li>
+        <li>bmp</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Color Source'"
+      v-if="inspectedSource === 'Color Source'"
+      @clickAdd="selectSource('Color Source')"
+      name="Color Source"
+      description="Add a color to the background of your whole scene or just a part.">
+      <img slot="media" src="../../../media/source-demos/source-color.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Hex</li>
+        <li>RGBA</li>
+        <li>HSV</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'BrowserSource'"
+      v-if="inspectedSource === 'BrowserSource'"
+      @clickAdd="selectSource('BrowserSource')"
+      name="BrowserSource"
+      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
+      <img slot="media" src="../../../media/source-demos/source-browser.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Hex</li>
+        <li>RGBA</li>
+        <li>HSV</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Text (GDI+)'"
+      v-if="inspectedSource === 'Text (GDI+)'"
+      @clickAdd="selectSource('Text (GDI+)')"
+      name="Text (GDI+)"
+      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
+      <img slot="media" src="../../../media/source-demos/source-text.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Hex</li>
+        <li>RGBA</li>
+        <li>HSV</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Display Capture'"
+      v-if="inspectedSource === 'Display Capture'"
+      @clickAdd="selectSource('Display Capture')"
+      name="Display Capture"
+      description="Capture your entire computer monitor.">
+      <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
+      <ul slot="support-list" class="source-support__list">
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Game Capture'"
+      v-if="inspectedSource === 'Game Capture'"
+      @clickAdd="selectSource('Game Capture')"
+      name="Game Capture"
+      description="Capture your entire computer monitor.">
+      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
+      <ul slot="support-list" class="source-support__list">
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'Audio Input Capture'"
+      v-if="inspectedSource === 'Audio Input Capture'"
+      @clickAdd="selectSource('Audio Input Capture')"
+      name="Audio Input Capture"
+      description="Add images to your scene.">
+      <img slot="media" src="../../../media/source-demos/source-input.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>png</li>
+        <li>jpg</li>
+        <li>jpeg</li>
+        <li>gif</li>
+        <li>tga</li>
+        <li>bmp</li>
+      </ul>
+    </add-source-info>
+    <!-- Widget Sources -->
+    <add-source-info
+      :inspected="inspectedSource === 'alertbox'"
+      v-if="inspectedSource === 'alertbox'"
+      name="Alertbox"
+      description="Thanks viewers with notification popups.">
+      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-alertbox.mp4"></video>
+      <ul slot="support-list" class="source-support__list">
+        <li>Donations</li>
+        <li>Subscriptions</li>
+        <li>Follows</li>
+        <li>Bits</li>
+        <li>Hosts</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'donationTicker'"
+      v-if="inspectedSource === 'donationTicker'"
+      name="Donation Ticker"
+      description="Show off your most recent donations to your viewers.">
+      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-donation-ticker.mp4"></video>
+      <ul slot="support-list" class="source-support__list">
+        <li>Donations</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'eventList'"
+      v-if="inspectedSource === 'eventList'"
+      name="Event List"
+      description="Include your channel's most recent events into your stream.">
+      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-eventlist.mp4"></video>
+      <ul slot="support-list" class="source-support__list">
+        <li>Donations</li>
+        <li>Subscriptions</li>
+        <li>Follows</li>
+        <li>Bits</li>
+        <li>Hosts</li>
+        <li>Redemptions</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'donationGoal'"
+      v-if="inspectedSource === 'donationGoal'"
+      name="Donation Goal"
+      description="Set a goal for your viewers to help you reach below.">
+      <img slot="media" src="../../../media/source-demos/source-donation-goal.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Donations</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'chatbox'"
+      v-if="inspectedSource === 'chatbox'"
+      name="Chatbox"
+      description="Include your channel's chat into your stream.">
+      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-chatbox.mp4"></video>
+      <ul slot="support-list" class="source-support__list">
+        <li>Twitch chat</li>
+        <li>Youtube chat</li>
+      </ul>
+    </add-source-info>
+    <add-source-info
+      :inspected="inspectedSource === 'jar'"
+      v-if="inspectedSource === 'jar'"
+      name="The Jar"
+      description="The jar that catches bits, tips, and more.">
+      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-jar.mp4"></video>
+      <ul slot="support-list" class="source-support__list">
+        <li>Donations</li>
+        <li>Subscriptions</li>
+        <li>Follows</li>
+        <li>Bits</li>
+        <li>Hosts</li>
+      </ul>
+    </add-source-info>
+    <div
+      class="source-info"
+      v-if="inspectedSource === ''">
+      <h3>Welcome to sources!</h3>
+      <ol>
+        <li>Browse through our Standard and Widget sources</li>
+        <li>Click a source to get more details about it</li>
+        <li>Click 'Add Source' when you're ready to add it to your scene</li>
+      </ol>
+    </div>
+
+    <div class="sources">
+      <div class="source-group">
+        <h4>Standard</h4>
+        <ul class="source-list">
+          <li
+            v-for="source in availableSources"
+            class="source source--standard"
+            @click="inspectSource(source)">
+            {{ source }}
+          </li>
+        </ul>
+      </div>
+      <div class="source-group">
+        <h4>Widgets</h4>
+        <div class="source-list--widgets">
+          <div 
+            class="source source--widget"
+            @click="inspectSource('alertbox')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/alertbox-no-bg.png">
+            </div>
+            <div>Alertbox</div>
+          </div>
+          <div 
+            class="source source--widget"
+            @click="inspectSource('donationGoal')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/donation-goal-no-bg.png">
+            </div>
+            <div>Donation Goal</div>
+          </div>
+          <div 
+            class="source source--widget"
+            @click="inspectSource('donationTicker')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/donation-ticker-no-bg.png">
+            </div>
+            <div>Donation Ticker</div>
+          </div>
+          <div 
+            class="source source--widget"
+            @click="inspectSource('chatbox')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/chatbox-no-bg.png">
+            </div>
+            <div>Chatbox</div>
+          </div>
+          <div 
+            class="source source--widget"
+            @click="inspectSource('eventList')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/event-list-no-bg.png">
+            </div>
+            <div>Event List</div>
+          </div>
+          <div 
+            class="source source--widget"
+            @click="inspectSource('jar')">
+            <div class="source__icon">
+              <img src="../../../media/images/icons/the-jar-no-bg.png">
+            </div>
+            <div>The Jar</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </modal-layout>
 </template>
@@ -25,10 +343,14 @@ import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
+import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType } from '../../services/sources';
 
 @Component({
-  components: { ModalLayout },
+  components: { 
+    ModalLayout,
+    AddSourceInfo
+  },
   mixins: [windowMixin],
 })
 export default class AddSource extends Vue {
@@ -43,36 +365,133 @@ export default class AddSource extends Vue {
     this.windowService.showNameSource(sourceName);
   }
 
+  inspectedSource = '';
+
+  inspectSource(inspectedSource: string) {
+    this.inspectedSource = inspectedSource;
+  }
 }
 </script>
 
+<style lang="less">
+@import "../../styles/index";
+.source-info {
+  padding: 20px;
+  border-bottom: 1px solid @day-border;
+  display: flex;
+  flex-direction: column;
+  background: @day-secondary;
+  flex: 0 0 220px;
+  height: 220px;
+  .button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+}
+.night-theme {
+  .source-info {
+    border-color: @night-border;
+    background-color: @night-primary;
+  }
+}
+</style>
 <style lang="less" scoped>
-.AddSource-titleBar {
-  border-bottom: 1px solid #eee;
+@import "../../styles/index";
+h4 {
+  color: @grey;
 }
-
-.AddSource-content {
-  padding: 30px;
-  background-color: #fcfcfc;
+.add-source {
+  color: @navy;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
 }
-
-.AddSource-heading {
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 1px;
-  color: #777;
+.sources {
+  padding: 20px;
+  display: flex;
+  flex: 1 0 auto;
+  .source-group {
+    &:last-child {
+      padding: 20px 0 20px 20px;
+      border-right: none;
+    }
+  }
 }
-
-.AddSource-sourceList {
+.source-group {
+  border-right: 1px solid @day-border;
+  margin: -20px 0px -20px 0px;
+  padding: 20px 20px 20px 0;
+  flex: 0 0 50%;
+}
+.source-list {
   list-style-type: none;
   margin: 0;
 }
-
-.AddSource-source {
+.source-list--widgets {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.source {
+  color: @navy;
   cursor: pointer;
-
+  .transition;
   &:hover {
-    background-color: #eee;
+    color: @navy-secondary;
+    .semibold;
+  }
+}
+.source--standard {
+  display: inline-block;
+  width: 49%;
+  padding-right: 1%;
+  margin-bottom: 4px;
+}
+.source--widget {
+  border: 1px solid @day-border;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: 49%;
+  margin-bottom: 10px;
+  .radius;
+  .transition;
+  &:hover {
+    background: @day-secondary;
+  }
+  &:nth-child(5), &:nth-child(6) {
+    margin-bottom: 0;
+  }
+}
+.source__icon {
+  margin-right: 10px;
+  width: 30px;
+}
+
+.night-theme {
+  .add-source {
+    color: @grey;
+  }
+  .source {
+    color: @grey;
+    &:hover {
+      color: @white;
+    }
+  }
+  .source--widget {
+    border-color: @night-border;
+    &:hover {
+      background: @night-hover;
+      border-color: @night-hover;
+    }
+  }
+  .source-group {
+    border-color: @night-border;
   }
 }
 </style>
