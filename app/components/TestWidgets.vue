@@ -14,12 +14,13 @@
           <i class="fa fa-times" aria-hidden="true"></i>
         </a>
         <div class="button-container">
-          <button class="button button--trans">Follow</button>
-          <button class="button button--trans">Subscription</button>
-          <button class="button button--trans">Donation</button>
-          <button class="button button--trans">Hosting</button>
-          <button class="button button--trans">Bit</button>
-          <button class="button button--trans">Redemption</button>
+          <button
+            class="button button--trans"
+            v-for="tester in widgetTesters"
+            :key="tester.name"
+            @click="tester.test()">
+            {{ tester.name }}
+          </button>
         </div>
       </div>
     </transition>
@@ -29,10 +30,21 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
+import { WidgetsService } from '../services/widgets';
+import { Inject } from '../services/service';
 
 @Component({})
 export default class TestWidgets extends Vue {
+
+  @Inject()
+  widgetsService:WidgetsService;
+
   slideOpen = false;
+
+  get widgetTesters() {
+    return this.widgetsService.getTesters();
+  }
+
 }
 </script>
 
