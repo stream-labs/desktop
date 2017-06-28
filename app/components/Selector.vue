@@ -96,9 +96,13 @@ export default class Selector extends Vue {
 <style lang="less" scoped>
 @import "../styles/index";
 .sortable-ghost {
-  opacity: 0;
+  opacity: .6;
+  background-image: none;
 }
-
+.sortable-chosen {
+  opacity: .6;
+  background-image: none;
+}
 .sortable-drag {
   border: 1px solid #ddd;
   background-color: #eee;
@@ -151,5 +155,10 @@ export default class Selector extends Vue {
   font-size: 12px;
   padding: 0 0px 0 6px;
   opacity: 0;
+}
+.night-theme {
+  .sortable-ghost, .sortable-chosen {
+    background: @night-accent-light;
+  }
 }
 </style>

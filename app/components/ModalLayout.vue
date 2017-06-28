@@ -141,6 +141,9 @@ export default class ModalLayout extends Vue {
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
+  .button {
+    margin-left: 8px;
+  }
 }
 
 .night-theme {

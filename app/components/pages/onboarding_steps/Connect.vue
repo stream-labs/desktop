@@ -6,18 +6,15 @@
       <div class="onboarding-desc">Sign in with your Twitch, Youtube, Facebook, Twitter, or Mixer account to get started with Streamlabs</div>
       <div class="signup-buttons">
         <button
-          class="square-button square-button--twitch"
+          class="button button--twitch"
           @click="authPlatform('twitch')">
-          <i class="fa" :class="iconForPlatform('twitch')" />
+          <i class="fa" :class="iconForPlatform('twitch')" /> Twitch
         </button>
         <button
-          class="square-button square-button--yt"
+          class="button button--yt"
           @click="authPlatform('youtube')">
-          <i class="fa" :class="iconForPlatform('youtube')" />
+          <i class="fa" :class="iconForPlatform('youtube')" /> Youtube
         </button>
-        <button class="square-button square-button--fb"><i class="fa fa-facebook-official" /></button>
-        <button class="square-button square-button--twitter"><i class="fa fa-twitter" /></button>
-        <button class="square-button square-button--mixer"><i class="fa fa-gamepad" /></button>
       </div>
       <div class="setup-later">
         <a @click="skipOnboarding">Setup later</a>

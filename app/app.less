@@ -10,14 +10,38 @@
 }
 
 /* Type */
+h3 {
+  font-family: 'Roboto';
+  font-size: 14px;
+  .semibold;
+}
 h4 {
+  font-family: 'Roboto';
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: .7px;
   .semibold;
   margin-bottom: 20px;
 }
+.link {
+  .semibold;
+  color: @grey;
+  .transition;
+  &:hover {
+    color: @navy;
+  }
+}
+.link--uppercase {
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
 
+/* Inputs */
+input[type="text"] {
+  &:focus {
+    box-shadow: none;
+  }
+}
 .checkbox {
   label {
     &:before {
@@ -35,11 +59,10 @@ h4 {
   display: inline-block;
 }
 .dropdown__toggle, .slide-open__open {
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .7px;
+  .semibold;
   color: @grey;
+  text-transform: uppercase;
+  letter-spacing: .7px;
   .fa {
     font-size: 8px;
     vertical-align: middle;
@@ -154,7 +177,7 @@ h4 {
   margin-right: 10px;
   text-transform: uppercase;
   font-size: 12px;
-  font-weight: 500;
+  .semibold;
   letter-spacing: .7px;
   color: @grey;
   .fa {
@@ -226,6 +249,9 @@ select {
   .border {
     border: 1px solid transparent;
   }
+  h3 {
+    color: @grey;
+  }
   .checkbox {
     input:checked~label {
       color: @white;
@@ -236,6 +262,16 @@ select {
         border-color: @teal-light-opac;
       }
     }
+  }
+  .link {
+    &:hover {
+      color: @white;
+    }
+  }
+  input[type="text"] {
+    background: @night-secondary;
+    color: @white;
+    border-color: transparent;
   }
   .dropdown__menu {
     background-color: @night-accent-light;
