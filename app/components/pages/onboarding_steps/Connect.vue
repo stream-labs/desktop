@@ -3,7 +3,7 @@
     <div class="onboarding-step">
       <div class="onboarding-image"><img src="../../../../media/images/connect.png"></div>
       <div class="onboarding-title">Connect</div>
-      <div class="onboarding-desc">Sign in with your Twitch, Youtube, Facebook, Twitter, or Mixer account to get started with Streamlabs</div>
+      <div class="onboarding-desc">Sign in with your Twitch or Youtube account to get started with Streamlabs</div>
       <div class="signup-buttons">
         <button
           class="button button--twitch"

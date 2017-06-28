@@ -50,3 +50,6 @@ export default class GenericForm extends Vue {
   }
 };
 </script>
+<style lang="less" scoped>
+@import "../../../styles/index";
+</style>

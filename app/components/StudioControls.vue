@@ -46,8 +46,9 @@ export default class StudioControls extends Vue {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   justify-content: space-between;
+  flex: 0 0 20px;
 }
 .studio-controls__label {
   margin-bottom: 0;

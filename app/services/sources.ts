@@ -31,6 +31,7 @@ export interface ISource {
 export type TSourceType =
   'Audio Output Capture' |
   'Audio Input Capture' |
+  'Text (FreeType 2)' |
   'BrowserSource';
 
 interface ISourcesState {

@@ -39,7 +39,7 @@
       v-if="inspectedSource === 'Media Source'"
       @clickAdd="selectSource('Media Source')"
       name="Media Source"
-      description="Add videos to your scene.">
+      description="Add videos or sound clips to your scene.">
       <img slot="media" src="../../../media/source-demos/source-media.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>mp4</li>
@@ -57,21 +57,13 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Text (FreeType 2)'"
-      @clickAdd="selectSource('Text (FreeType 2)')"
-      name="Text (FreeType 2)"
-      description="Add text and choose from tons of fonts and colors.">
-      <img slot="media" src="../../../media/source-demos/source-text.png"/>
-      <ul slot="support-list" class="source-support__list">
-      </ul>
-    </add-source-info>
-    <add-source-info
       v-if="inspectedSource === 'Window Capture'"
       @clickAdd="selectSource('Window Capture')"
       name="Window Capture"
-      description="Capture a specific window you select.">
+      description="Capture a specific window that's open on your computer.">
       <img slot="media" src="../../../media/source-demos/source-capture.png"/>
       <ul slot="support-list" class="source-support__list">
+        <li>Compatible with most modern browsers and programs</li>
       </ul>
     </add-source-info>
     <add-source-info
@@ -81,21 +73,19 @@
       description="Select from your build in USB webcam or an external.">
       <img slot="media" src="../../../media/source-demos/source-video.png"/>
       <ul slot="support-list" class="source-support__list">
+        <li>Built in webcam</li>
+        <li>Logitech webcam</li>
+        <li>Capture cards (Elgato, Avermedia, BlackMagic)</li>
       </ul>
     </add-source-info>
     <add-source-info
       v-if="inspectedSource === 'Audio Output Capture'"
       @clickAdd="selectSource('Audio Output Capture')"
       name="Audio Output Capture"
-      description="Add images to your scene.">
+      description="Captures your desktop audio for the purpose of playing sound, such as music or speech.">
       <img slot="media" src="../../../media/source-demos/source-output.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>png</li>
-        <li>jpg</li>
-        <li>jpeg</li>
-        <li>gif</li>
-        <li>tga</li>
-        <li>bmp</li>
+        <li>Desktop audio</li>
       </ul>
     </add-source-info>
     <add-source-info
@@ -117,21 +107,23 @@
       description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Hex</li>
-        <li>RGBA</li>
-        <li>HSV</li>
+        <li>Websites</li>
+        <li>Third party widgets</li>
+        <li>HTML</li>
       </ul>
     </add-source-info>
     <add-source-info
       v-if="inspectedSource === 'Text (GDI+)'"
       @clickAdd="selectSource('Text (GDI+)')"
       name="Text (GDI+)"
-      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
+      description="Add text to your scene and adjust its style.">
       <img slot="media" src="../../../media/source-demos/source-text.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Hex</li>
         <li>RGBA</li>
         <li>HSV</li>
+        <li>System Fonts</li>
+        <li>System Sizes</li>
       </ul>
     </add-source-info>
     <add-source-info
@@ -141,30 +133,30 @@
       description="Capture your entire computer monitor.">
       <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
       <ul slot="support-list" class="source-support__list">
+        <li>Primary monitor</li>
+        <li>Secondary monitor</li>
       </ul>
     </add-source-info>
     <add-source-info
       v-if="inspectedSource === 'Game Capture'"
       @clickAdd="selectSource('Game Capture')"
       name="Game Capture"
-      description="Capture your entire computer monitor.">
+      description="Capture a game you're playing on your computer.">
       <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
       <ul slot="support-list" class="source-support__list">
+        <li>Built in works with most modern computer games</li>
       </ul>
     </add-source-info>
     <add-source-info
       v-if="inspectedSource === 'Audio Input Capture'"
       @clickAdd="selectSource('Audio Input Capture')"
       name="Audio Input Capture"
-      description="Add images to your scene.">
+      description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.">
       <img slot="media" src="../../../media/source-demos/source-input.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>png</li>
-        <li>jpg</li>
-        <li>jpeg</li>
-        <li>gif</li>
-        <li>tga</li>
-        <li>bmp</li>
+        <li>Built in microphones</li>
+        <li>USB microphones</li>
+        <li>Other USB devices</li>
       </ul>
     </add-source-info>
     <!-- Widget Sources -->
@@ -246,11 +238,18 @@
       class="source-info"
       v-if="inspectedSource === null">
       <h3>Welcome to sources!</h3>
-      <ol>
-        <li>Browse through our Standard and Widget sources</li>
-        <li>Click a source to get more details about it</li>
-        <li>Click 'Add Source' when you're ready to add it to your scene</li>
-      </ol>
+      <div class="source-welcome">
+        <div class="source-welcome__text">
+          <ol>
+            <li>Browse through our Standard and Widget sources</li>
+            <li>Click a source to get more details about it</li>
+            <li>Click 'Add Source' when you're ready to add it to your scene</li>
+          </ol>
+        </div>
+        <div class="source-welcome__img">
+          <img slot="media" src="../../../media/source-demos/source-welcome.png"/>
+        </div>
+      </div>
     </div>
 
     <div class="sources">
@@ -357,7 +356,6 @@ export default class AddSource extends Vue {
 
   widgetTypes = WidgetType;
 
-  availableSources = this.sourcesService.getAvailableSourcesTypes();
   windowService: WindowService = WindowService.instance;
 
   selectSource(sourceName: TSourceType) {
@@ -376,6 +374,12 @@ export default class AddSource extends Vue {
 
   get loggedIn() {
     return this.userService.isLoggedIn();
+  }
+
+  get availableSources() {
+    return this.sourcesService.getAvailableSourcesTypes().filter(type => {
+      return type !== 'Text (FreeType 2)';
+    });
   }
 
 }
@@ -418,6 +422,15 @@ h4 {
   bottom: 0;
   right: 0;
   left: 0;
+}
+.source-welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.source-welcome__img {
+  padding: 0 20px 0 40px;
+  flex: 0 0 50%;
 }
 .sources {
   padding: 20px;
