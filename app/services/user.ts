@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import URI from 'urijs';
+import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from './service';
 import { mutation } from './stateful-service';
@@ -85,42 +86,38 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
-  // Starts the authentication process.  Returns a promise
-  // that is resolved when the window was successfully popped
-  // up.  Note that the promise is not resolved when the auth
-  // is actually successful.
-  startAuth(platform: TPlatform) {
-    return new Promise((resolve, reject) => {
-      const service = getPlatformService(platform);
+  // Starts the authentication process.  Multiple callbacks
+  // can be passed for various events.
+  startAuth(platform: TPlatform, onWindowShow: Function, onAuthFinish: Function) {
+    const service = getPlatformService(platform);
 
-      const authWindow = new electron.remote.BrowserWindow({
-        ...service.authWindowOptions,
-        alwaysOnTop: true,
-        show: false,
-        webPreferences: {
-          nodeIntegration: false
-        }
-      });
-
-      authWindow.webContents.on('did-navigate', (e, url) => {
-        const parsed = this.parseAuthFromUrl(url);
-
-        if (parsed) {
-          authWindow.close();
-          this.LOGIN(parsed);
-          service.setupStreamSettings(parsed);
-        }
-      });
-
-      authWindow.once('ready-to-show', () => {
-        authWindow.show();
-        resolve();
-      });
-
-      authWindow.setMenu(null);
-      console.log(service.authUrl);
-      authWindow.loadURL(service.authUrl);
+    const authWindow = new electron.remote.BrowserWindow({
+      ...service.authWindowOptions,
+      alwaysOnTop: true,
+      show: false,
+      webPreferences: {
+        nodeIntegration: false
+      }
     });
+
+    authWindow.webContents.on('did-navigate', (e, url) => {
+      const parsed = this.parseAuthFromUrl(url);
+
+      if (parsed) {
+        authWindow.close();
+        this.LOGIN(parsed);
+        service.setupStreamSettings(parsed);
+        defer(onAuthFinish);
+      }
+    });
+
+    authWindow.once('ready-to-show', () => {
+      authWindow.show();
+      defer(onWindowShow);
+    });
+
+    authWindow.setMenu(null);
+    authWindow.loadURL(service.authUrl);
   }
 
 

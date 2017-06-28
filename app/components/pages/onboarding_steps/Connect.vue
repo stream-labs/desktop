@@ -20,7 +20,7 @@
         <button class="square-button square-button--mixer"><i class="fa fa-gamepad" /></button>
       </div>
       <div class="setup-later">
-        <a>Setup later</a>
+        <a @click="skipOnboarding">Setup later</a>
       </div>
     </div>
   </div>
@@ -31,6 +31,7 @@ import { Component } from 'vue-property-decorator';
 import { UserService } from '../../../services/user';
 import { TPlatform } from '../../../services/platforms';
 import { Inject } from '../../../services/service';
+import { OnboardingService } from '../../../services/onboarding';
 
 @Component({})
 export default class Connect extends Vue {
@@ -38,13 +39,22 @@ export default class Connect extends Vue {
   @Inject()
   userService: UserService;
 
+  @Inject()
+  onboardingService: OnboardingService;
+
   loadingState: Dictionary<boolean> = {};
 
   authPlatform(platform: TPlatform) {
     Vue.set(this.loadingState, platform, true);
-    this.userService.startAuth(platform).then(() => {
-      this.loadingState[platform] = false;
-    });
+    this.userService.startAuth(
+      platform,
+      () => {
+        this.loadingState[platform] = false;
+      },
+      () => {
+        this.onboardingService.next();
+      }
+    );
   }
 
   iconForPlatform(platform: TPlatform) {
@@ -54,6 +64,10 @@ export default class Connect extends Vue {
       twitch: 'fa-twitch',
       youtube: 'fa-youtube-play'
     }[platform];
+  }
+
+  skipOnboarding() {
+    this.onboardingService.finish();
   }
 
 }

@@ -80,6 +80,7 @@
         </div>
       </div>
       <button
+        :disabled="busy"
         class="button button--lg button--action"
         @click="next">
         Next
@@ -90,10 +91,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { without } from 'lodash';
+import { without, defer } from 'lodash';
 import { Component } from 'vue-property-decorator';
 import { WidgetsService, WidgetType } from '../../../services/widgets';
 import { Inject } from '../../../services/service';
+import { OnboardingService } from '../../../services/onboarding';
 import SelectableWidget from './SelectableWidget.vue';
 
 @Component({
@@ -104,11 +106,16 @@ export default class SelectWidgets extends Vue {
   @Inject()
   widgetsService: WidgetsService;
 
+  @Inject()
+  onboardingService: OnboardingService;
+
   // We can't access TypeScript enums in the Vue template, so
   // accessing them through the Vue instance is a workaround.
   widgetTypes = WidgetType;
 
   inspectedWidget: WidgetType = null;
+
+  busy = false;
 
   selectedWidgets: WidgetType[] = [
     WidgetType.AlertBox,
@@ -137,11 +144,18 @@ export default class SelectWidgets extends Vue {
   }
 
   next() {
-    // TODO: Onboarding navigation
-    this.selectedWidgets.forEach(widget => {
-      this.widgetsService.createWidget(widget);
-    });
+    if (!this.busy) {
+      this.busy = true;
 
+      defer(() => {
+        // This operation can be a little slow
+        this.selectedWidgets.forEach(widget => {
+          this.widgetsService.createWidget(widget);
+        });
+
+        this.onboardingService.finish();
+      });
+    }
   }
 
 }

@@ -15,6 +15,8 @@ import OptimizeC from './onboarding_steps/OptimizeC.vue';
 import SuccessfullyImported from './onboarding_steps/SuccessfullyImported.vue';
 import BrowseOverlays from './onboarding_steps/BrowseOverlays.vue';
 import SelectWidgets from './onboarding_steps/SelectWidgets.vue';
+import { OnboardingService } from '../../services/onboarding';
+import { Inject } from '../../services/service';
 
 @Component({
   components: {
@@ -29,7 +31,13 @@ import SelectWidgets from './onboarding_steps/SelectWidgets.vue';
   }
 })
 export default class Onboarding extends Vue {
-  currentView = 'SelectWidgets';
+
+  @Inject()
+  onboardingService: OnboardingService;
+
+  get currentView() {
+    return this.onboardingService.currentStep;
+  }
 }
 </script>
 

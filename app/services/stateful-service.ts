@@ -38,8 +38,6 @@ export function mutation(target: any, methodName: string, descriptor: PropertyDe
  */
 export abstract class StatefulService<TState extends object> extends Service {
 
-  static initialState = {};
-
   get store(): Store<any> {
     return store;
   }
@@ -62,7 +60,7 @@ export abstract class StatefulService<TState extends object> extends Service {
 export function getModule(ModuleContainer: any): Module<any, any> {
   return {
     [ModuleContainer.name]: {
-      state: ModuleContainer.initialState,
+      state: ModuleContainer.initialState || {},
       mutations: (<any>ModuleContainer.prototype).mutations
     }
   };

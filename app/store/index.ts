@@ -20,6 +20,7 @@ import { AudioService, AudioSource } from '../services/audio';
 import { CustomizationService } from '../services/customization';
 import { UserService } from '../services/user';
 import { NavigationService } from '../services/navigation';
+import { OnboardingService } from '../services/onboarding';
 
 const statefulServiceModules = {
   ...getModule(ScenesService),
@@ -36,7 +37,8 @@ const statefulServiceModules = {
   ...getModule(AudioSource),
   ...getModule(CustomizationService),
   ...getModule(UserService),
-  ...getModule(NavigationService)
+  ...getModule(NavigationService),
+  ...getModule(OnboardingService)
 };
 
 
