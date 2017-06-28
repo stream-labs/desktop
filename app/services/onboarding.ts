@@ -51,6 +51,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
+  start() {
+    this.SET_CURRENT_STEP('Connect');
+    this.navigationService.navigate('Onboarding');
+  }
+
+
   // Ends the onboarding process
   finish() {
     this.navigationService.navigate('Studio');
@@ -61,9 +67,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     if (localStorage.getItem(this.localStorageKey)) return;
 
     localStorage.setItem(this.localStorageKey, 'true');
-
-    this.SET_CURRENT_STEP('Connect');
-    this.navigationService.navigate('Onboarding');
+    this.start();
   }
 
 }
