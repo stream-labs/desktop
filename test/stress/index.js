@@ -1,10 +1,10 @@
 // The stress test will not be run when normally running tests.
 
 import test from 'ava';
-import { uniqueId, random, sample } from 'lodash';
+import { uniqueId, sample } from 'lodash';
 import { useSpectron, focusMain } from '../helpers/spectron';
-import { addScene, selectScene, clickRemoveScene } from '../helpers/spectron/scenes';
-import { addSource, selectSource, clickRemoveSource } from '../helpers/spectron/sources';
+import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
+import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
 
 useSpectron();
 
@@ -15,7 +15,6 @@ const SOURCE_TYPES = [
   'BrowserSource',
   'Media Source',
   'Text (GDI+)',
-  'Text (FreeType 2)',
   'Display Capture',
   'Window Capture',
   'Game Capture',
