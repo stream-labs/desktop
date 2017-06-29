@@ -23,7 +23,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import { IInputValue } from "../shared/forms/Input";
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager.js';
+import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import * as inputComponents from '../shared/forms';
 import namingHelpers from '../../util/NamingHelpers';
@@ -38,6 +38,7 @@ export default class AddSceneTransition extends Vue {
   @Inject()
   transitionsService: ScenesTransitionsService;
 
+  windowService = WindowService.instance;
   form = this.transitionsService.getAddNewFormData();
   error = '';
 
@@ -53,14 +54,14 @@ export default class AddSceneTransition extends Vue {
     this.transitionsService.add(name, this.form.type.value);
 
     if (this.state.properties.length) {
-      windowManager.showSceneTransitionProperties(name);
+      this.windowService.showSceneTransitionProperties(name);
     } else {
-      windowManager.showSceneTransitions();
+      this.windowService.showSceneTransitions();
     }
   }
 
   cancel() {
-    windowManager.showSceneTransitions();
+    this.windowService.showSceneTransitions();
   }
 
   validateName(name: string) {

@@ -1,9 +1,8 @@
 import { Service, Inject } from './service';
 import { SettingsService } from './settings';
-import Obs from '../api/Obs';
+import { nodeObs } from './obs-api';
 import electron from '../vendor/electron';
 
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { remote } = electron;
 
 export class Display {
@@ -46,7 +45,7 @@ export class Display {
     nodeObs.OBS_content_destroyDisplay(this.name);
   }
 
-  onOutputResize(cb: Function) {
+  onOutputResize(cb: (region: IRectangle) => void) {
     this.outputRegionCallbacks.push(cb);
   }
 

@@ -1,14 +1,12 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation, Inject } from '../stateful-service';
-import Obs from '../../api/Obs';
-import configFileManager from '../../util/ConfigFileManager';
-import { SourcesService, TSourceType } from '../sources';
+import { nodeObs } from '../obs-api';
+import { ConfigFileService } from '../config-file';
+import { SourcesService } from '../sources';
 import { IScene, Scene } from './scene';
 import electron from '../../vendor/electron';
-import { SceneSource } from './scene-source';
 
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
 const { ipcRenderer } = electron;
 
 interface IScenesState {
@@ -27,6 +25,9 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   @Inject()
   private sourcesService: SourcesService;
+
+  @Inject()
+  private configFileService: ConfigFileService;
 
   mounted() {
     this.sourcesService.sourceRemoved.subscribe(source => {
@@ -87,11 +88,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.addDefaultSources(id);
     this.makeSceneActive(id);
 
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 
   removeScene(id: string) {
+    if (Object.keys(this.state.scenes).length < 2) {
+      alert('There needs to be at least one scene.');
+      return;
+    }
+
     const name = this.state.scenes[id].name;
 
     nodeObs.OBS_content_removeScene(name);
@@ -105,7 +111,7 @@ export class ScenesService extends StatefulService<IScenesState> {
       }
     }
 
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 

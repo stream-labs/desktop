@@ -1,8 +1,6 @@
 import { StatefulService, mutation } from './stateful-service';
 import { obsValuesToInputValues, inputValuesToObsValues, TObsValue, TFormData } from '../components/shared/forms/Input';
-import Obs from '../api/Obs';
-
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
+import { nodeObs } from './obs-api';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -73,7 +71,7 @@ export class SettingsService extends StatefulService<ISettingsState> {
   }
 
 
-  getSettingsFormData(categoryName: string): TSettingsFormData {
+  getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     const settings = nodeObs.OBS_settings_getSettings(categoryName);
 
     // Names of settings that are disabled because we

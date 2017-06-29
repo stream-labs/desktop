@@ -6,13 +6,14 @@ import {
   obsValuesToInputValues
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import Obs from '../api/Obs';
-import configFileManager from '../util/ConfigFileManager';
+import { nodeObs } from './obs-api';
+import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
 
-const nodeObs = Obs.nodeObs as Dictionary<Function>;
 const { ipcRenderer } = electron;
+
+const SOURCES_UPDATE_INTERVAL = 1000;
 
 export interface ISource {
   id: string;
@@ -29,7 +30,9 @@ export interface ISource {
 // TODO: add more types
 export type TSourceType =
   'Audio Output Capture' |
-  'Audio Input Capture';
+  'Audio Input Capture' |
+  'Text (FreeType 2)' |
+  'BrowserSource';
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -45,6 +48,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceAdded = new Subject<ISource>();
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
+
+  @Inject()
+  private configFileService: ConfigFileService;
+
+
+  init() {
+    setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
+  }
 
   @mutation
   private RESET_SOURCES() {
@@ -136,6 +147,9 @@ export class SourcesService extends StatefulService<ISourcesState> {
     this.sourceRemoved.next(source);
   }
 
+  getAvailableSourcesTypes(): TSourceType[] {
+    return nodeObs.OBS_content_getListInputSources();
+  }
 
   private refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
@@ -189,7 +203,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
     }
 
     this.refreshProperties(sourceId);
-    configFileManager.save();
+    this.configFileService.save();
   }
 
 

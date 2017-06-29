@@ -35,114 +35,79 @@
       <a @click="bugReport">Bug Report</a>
     </div>
     <div class="top-nav-item">
-      <button
-        class="slide-open__open"
-        @click="slideOpen = !slideOpen">
-        <i class="fa fa-long-arrow-left" aria-hidden="true"></i> Test
-      </button>
-      <transition name="slide-fade">
-        <div
-          v-if="slideOpen"
-          class="slide-open__menu">
-          <a class="slide-open__close"
-              @click="slideOpen = !slideOpen">
-              <i class="fa fa-times" aria-hidden="true"></i>
-          </a>
-          <div class="button-container">
-            <button class="button button--trans">Follow</button>
-            <button class="button button--trans">Subscription</button>
-            <button class="button button--trans">Donation</button>
-            <button class="button button--trans">Hosting</button>
-            <button class="button button--trans">Bit</button>
-            <button class="button button--trans">Redemption</button>
-          </div>
-        </div>
-      </transition>
-    </div>
-    <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
           <i class="fa fa-sun-o"/>
           <i class="fa fa-moon-o"/>
       </button>
     </div>
     <div class="top-nav-item">
-      <button
-        @click="openSettingsWindow">
-        <i class="fa fa-cog"/>
-      </button>
+      <a
+        @click="openSettingsWindow"
+        class="link link--uppercase">
+        <i class="fa fa-cog"/> Settings
+      </a>
     </div>
     <div class="top-nav-item">
-      <start-streaming-button />
+      <login/>
     </div>
   </div>
 </div>
 </template>
 
-<script>
-import windowManager from '../util/WindowManager.js';
-import StartStreamingButton from './StartStreamingButton.vue';
+<script lang="ts">
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
+import { Inject } from '../services/service';
+import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
+import { NavigationService } from "../services/navigation";
 import electron from '../vendor/electron';
+import Login from './Login.vue';
 
-export default {
-  components: {
-    StartStreamingButton
-  },
 
-  data() {
-    return {
-      slideOpen: false
-    };
-  },
+@Component({
+  components: { Login }
+})
+export default class TopNav extends Vue {
 
-  methods: {
-    navigateStudio() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Studio'
-      });
-    },
+  windowService: WindowService = WindowService.instance;
+  customizationService: CustomizationService = CustomizationService.instance;
+  navigationService: NavigationService = NavigationService.instance;
 
-    navigateDashboard() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Dashboard'
-      });
-    },
+  slideOpen = false;
 
-    navigateLive() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Live'
-      });
-    },
-
-    navigateOnboarding() {
-      this.$store.dispatch({
-        type: 'navigate',
-        pageName: 'Onboarding'
-      });
-    },
-
-    openSettingsWindow() {
-      windowManager.showSettings();
-    },
-
-    toggleNightTheme() {
-      CustomizationService.instance.nightMode = !CustomizationService.instance.nightMode;
-    },
-
-    bugReport() {
-      electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
-    }
-  },
-
-  computed: {
-    page() {
-      return this.$store.state.navigation.currentPage;
-    }
+  navigateStudio() {
+    this.navigationService.navigate('Studio');
   }
-};
+
+  navigateDashboard() {
+    this.navigationService.navigate('Dashboard');
+  }
+
+  navigateLive() {
+    this.navigationService.navigate('Live');
+  }
+
+  navigateOnboarding() {
+    this.navigationService.navigate('Onboarding');
+  }
+
+  openSettingsWindow() {
+    this.windowService.showSettings();
+  }
+
+  toggleNightTheme() {
+    this.customizationService.nightMode = !this.customizationService.nightMode;
+  }
+
+  bugReport() {
+    electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
+  }
+
+  get page() {
+    return this.navigationService.state.currentPage;
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -165,12 +130,9 @@ export default {
 }
 
 .top-nav-item {
-  margin-left: 10px;
+  margin-left: 20px;
   display: flex;
   align-items: center;
-  .fa {
-    color: @grey;
-  }
 }
 
 .theme-toggle {
@@ -180,7 +142,6 @@ export default {
   }
   .fa-sun-o {
     color: @yellow;
-    // margin-right: 10px;
   }
   .fa-moon-o {
     display: none;
@@ -196,6 +157,11 @@ export default {
       color: @white;
       opacity: 1;
       display: block;
+    }
+  }
+  .user__name {
+    &:hover {
+      color: @white;
     }
   }
 }

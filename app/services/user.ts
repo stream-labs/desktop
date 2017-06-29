@@ -1,29 +1,23 @@
 import Vue from 'vue';
 import URI from 'urijs';
+import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
+import { Inject } from './service';
 import { mutation } from './stateful-service';
-import windowManager from '../util/WindowManager';
 import electron from '../vendor/electron';
+import { HostsService } from './hosts';
+import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
-interface IPlatformAuth {
-  widgetToken: string;
-  platform: {
-    type: TPlatform;
-    username: string;
-    token: string;
-    id: string;
-  };
-}
-
-export type TPlatform = 'twitch' | 'youtube';
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
 
+  @Inject()
+  hostsService: HostsService;
 
   @mutation
   LOGIN(auth: IPlatformAuth) {
@@ -40,7 +34,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   init() {
     super.init();
 
-    // TODO: Verify that the user is still logged in (token is still valid)
+    this.validateLogin();
+  }
+
+
+  // Makes sure the user's login is still good
+  validateLogin() {
+    if (!this.isLoggedIn()) return;
+
+    const host = this.hostsService.streamlabs;
+    const token = this.widgetToken;
+    const url = `https://${host}/api/v5/slobs/validate/${token}`;
+    const request = new Request(url);
+
+    fetch(request).then(res => {
+      return res.text();
+    }).then(valid => {
+      if (valid.match(/false/)) this.LOGOUT();
+    });
   }
 
 
@@ -52,6 +63,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get widgetToken() {
     if (this.isLoggedIn()) {
       return this.state.auth.widgetToken;
+    }
+  }
+
+
+  get platform() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform;
     }
   }
 
@@ -68,57 +86,38 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
-  // Starts the authentication process.  Returns a promise
-  // that is resolved when the window was successfully popped
-  // up.  Note that the promise is not resolved when the auth
-  // is actually successful.
-  startAuth(platform: TPlatform) {
-    return new Promise((resolve, reject) => {
-      const authWindow = new electron.remote.BrowserWindow({
-        ...this.windowSizeForPlatform(platform),
-        alwaysOnTop: true,
-        show: false,
-        webPreferences: {
-          nodeIntegration: false
-        }
-      });
+  // Starts the authentication process.  Multiple callbacks
+  // can be passed for various events.
+  startAuth(platform: TPlatform, onWindowShow: Function, onAuthFinish: Function) {
+    const service = getPlatformService(platform);
 
-      authWindow.webContents.on('did-navigate', (e, url) => {
-        const parsed = this.parseAuthFromUrl(url);
-
-        if (parsed) {
-          authWindow.close();
-          this.LOGIN(parsed);
-        }
-      });
-
-      authWindow.once('ready-to-show', () => {
-        authWindow.show();
-        resolve();
-      });
-
-      authWindow.setMenu(null);
-      authWindow.loadURL(this.authUrl(platform));
-    });
-  }
-
-
-  private windowSizeForPlatform(platform: TPlatform) {
-    return {
-      twitch: {
-        width: 600,
-        height: 800
-      },
-      youtube: {
-        width: 1000,
-        height: 600
+    const authWindow = new electron.remote.BrowserWindow({
+      ...service.authWindowOptions,
+      alwaysOnTop: true,
+      show: false,
+      webPreferences: {
+        nodeIntegration: false
       }
-    }[platform];
-  }
+    });
 
+    authWindow.webContents.on('did-navigate', (e, url) => {
+      const parsed = this.parseAuthFromUrl(url);
 
-  private authUrl(platform: TPlatform) {
-    return `https://streamlabs.com/login?_=${Date.now()}&skip_splash=true&external=electron&${platform}&force_verify`;
+      if (parsed) {
+        authWindow.close();
+        this.LOGIN(parsed);
+        service.setupStreamSettings(parsed);
+        defer(onAuthFinish);
+      }
+    });
+
+    authWindow.once('ready-to-show', () => {
+      authWindow.show();
+      defer(onWindowShow);
+    });
+
+    authWindow.setMenu(null);
+    authWindow.loadURL(service.authUrl);
   }
 
 
@@ -141,4 +140,20 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return false;
   }
 
+}
+
+// You can use this decorator to ensure the user is logged in
+// before proceeding
+export function requiresLogin() {
+  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+
+    return {
+      ...descriptor,
+      value(...args: any[]) {
+        // TODO: Redirect to login if not logged in?
+        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
+      }
+    };
+  };
 }

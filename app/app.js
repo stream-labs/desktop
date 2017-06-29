@@ -6,19 +6,21 @@ import Vue from 'vue';
 import _ from 'lodash';
 import URI from 'urijs';
 
-import store from './store';
-import Obs from './api/Obs';
-import windowManager from './util/WindowManager';
-import contextMenuManager from './util/ContextMenuManager';
-import configFileManager from './util/ConfigFileManager';
-import PeriodicRunner from './util/PeriodicRunner';
+import store from './store/index';
+import { ObsApiService } from './services/obs-api';
+import { WindowService } from './services/window';
+import { ConfigFileService } from './services/config-file';
 import { HotkeysService } from './services/hotkeys.ts';
+import { OnboardingService } from './services/onboarding.ts';
 
 const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
+  const windowService = WindowService.instance;
+  const obsApiService = ObsApiService.instance;
+  const configFileService = ConfigFileService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
 
@@ -30,13 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ipcRenderer.on('closeWindow', () => {
-      windowManager.closeWindow();
+      windowService.closeWindow();
     });
   } else {
-    configFileManager.load();
+    configFileService.load();
 
     ipcRenderer.on('shutdown', () => {
-      configFileManager.rawSave();
+      configFileService.rawSave();
       remote.getCurrentWindow().close();
     });
 
@@ -47,13 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    const periodicRunner = new PeriodicRunner();
-    periodicRunner.start();
-
     HotkeysService.instance.bindAllHotkeys();
+    OnboardingService.instance;
   }
 
-  window.obs = Obs.nodeObs;
+  window.obs = obsApiService.nodeObs;
 
   const vm = new Vue({
     el: '#app',
@@ -61,12 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
     render: h => {
       const componentName = store.state.windowOptions.options.component;
 
-      return h(windowManager.components[componentName]);
+      return h(windowService.components[componentName]);
     }
   });
-
-  // Initialize the custom context menu system
-  contextMenuManager.init();
 
   // Used for replacing the contents of this window with
   // a new top level component

@@ -1,5 +1,5 @@
-import Obs from '../api/Obs';
 import { mutation, StatefulService } from './stateful-service';
+import { nodeObs } from './obs-api';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
@@ -56,16 +56,18 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
   }
 
   private refresh() {
-    const currentName = Obs.getSceneTransitionName();
+    const currentName = nodeObs.OBS_content_getCurrentTransition();
     this.SET_NAME(currentName);
-    this.SET_DURATION(Obs.getSceneTransitionDuration());
-    this.SET_AVAILABLE_TYPES(Obs.getSceneTransitionTypes().map((item: { description: string, type: string }) => {
-      return { description: item.description, value: item.type };
-    }));
-    this.SET_AVAILABLE_NAMES(Obs.getSceneTransitionNames().map((name: string) => {
+    this.SET_DURATION(nodeObs.OBS_content_getTransitionDuration());
+    this.SET_AVAILABLE_TYPES(nodeObs.OBS_content_getListTransitions()
+      .map((item: { description: string, type: string }) => {
+        return { description: item.description, value: item.type };
+      })
+    );
+    this.SET_AVAILABLE_NAMES(nodeObs.OBS_content_getListCurrentTransitions().map((name: string) => {
       return { description: name, value: name };
     }));
-    this.SET_PROPERTIES(Obs.getSceneTransitionProperties(currentName));
+    this.SET_PROPERTIES(nodeObs.OBS_content_setTransitionProperty(currentName));
   }
 
 
@@ -74,28 +76,28 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
       boolToString: true
     });
     for (const prop of propertiesToSave) {
-      Obs.setSceneTransitionProperty(this.state.currentName, prop.name, prop.value);
+      nodeObs.OBS_content_setTransitionProperty(this.state.currentName, prop.name, prop.value);
     }
     this.refresh();
   }
 
 
   setCurrent(transition: { currentName?: string, duration?: number }) {
-    if (transition.currentName) Obs.setSceneTransitionName(transition.currentName);
-    if (transition.duration) Obs.setSceneTransitionDuration(transition.duration);
+    if (transition.currentName) nodeObs.OBS_content_setTransition(transition.currentName);
+    if (transition.duration) nodeObs.OBS_content_setTransitionDuration(transition.duration);
     this.refresh();
   }
 
 
   add(transitionName: string, transitionType: string) {
-    Obs.addSceneTransition(transitionType, transitionName);
-    Obs.setSceneTransitionName(transitionName);
+    nodeObs.OBS_content_addTransition(transitionType, transitionName);
+    nodeObs.OBS_content_setTransition(transitionName);
     this.refresh();
   }
 
 
   remove(name: string) {
-    Obs.removeSceneTransition(name);
+    nodeObs.OBS_content_removeTransition(name);
     if (name === this.state.currentName) {
       this.setCurrent({currentName: this.state.availableNames.find(transition => {
         return transition.value !== name;
@@ -139,7 +141,7 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
 
   getPropertiesFormData() {
     const transitionName = this.state.currentName;
-    let properties = Obs.getSceneTransitionProperties(transitionName);
+    let properties = nodeObs.OBS_content_getTransitionProperties(transitionName);
     if (!properties) return [];
 
     // patch currentValue for corresponding to common properties format
@@ -147,7 +149,7 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
       valueIsObject: true,
       boolIsString: true,
       subParametersGetter: propName => {
-        return Obs.getSceneTransitionPropertySubParameters(transitionName, propName);
+        return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propName);
       }
     });
 

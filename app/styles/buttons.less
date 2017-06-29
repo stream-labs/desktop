@@ -2,17 +2,32 @@ button, .button {
   .transition;
   &:focus, &:visited {
     outline: none;
+    background: inherit;
   }
 }
 .button--action {
   background-color: @teal-bright;
   color: @white;
+  &:hover {
+    background-color: lighten(@teal-bright, 4%);
+  }
+  &:focus {
+    background-color: @teal-bright;
+  }
 }
 .button--trans {
   background: transparent;
   color: @grey;
-  &:hover {
+  .fa {
+    color: @grey;
+    .transition;
+  }
+  &:hover, &:focus {
     color: @navy;
+    background: transparent;
+    .fa {
+      color: @navy;
+    }
   }
 }
 .button--semi-opac {
@@ -20,6 +35,12 @@ button, .button {
   &:hover {
     background: rgba(255, 255, 255, .14);
   }
+  &:focus {
+    background: rgba(255, 255, 255, .1);
+  }
+}
+.button--100 {
+  width: 100%;
 }
 .ico-btn {
   font-size: 13px;
@@ -46,6 +67,9 @@ button, .button {
   justify-content: center;
   align-content: center;
 }
+.button--twitch, .button--yt {
+  width: 48%;
+}
 .square-button {
   .radius;
   .transition;
@@ -57,22 +81,28 @@ button, .button {
   color: @white;
   font-size: 16px;
 }
-.square-button--twitch {
+.square-button--twitch, .button--twitch {
   background: #6441A4;
   &:hover {
-    background: lighten(#6441A4,4%)
+    background: lighten(#6441A4,4%);
+  }
+  &:focus {
+    background: #6441A4;
   }
 }
-.square-button--yt {
+.square-button--yt, .button--yt {
   background: #D22222;
   &:hover {
-    background: lighten(#D22222,4%)
+    background: lighten(#D22222,4%);
+  }
+  &:focus {
+    background: #D22222;
   }
 }
 .square-button--fb {
   background: #3B5998;
   &:hover {
-    background: lighten(#3B5998,4%)
+    background: lighten(#3B5998,4%);
   }
 }
 .square-button--twitter {
@@ -93,5 +123,10 @@ button, .button {
     &:hover {
       color: @white;
     }
+  }
+  .button--default {
+    background: rgba(255, 255, 255, .1);
+    border-color: transparent;
+    color: @white;
   }
 }

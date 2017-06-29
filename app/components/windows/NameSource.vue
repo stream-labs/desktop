@@ -28,11 +28,12 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
 import ModalLayout from '../ModalLayout.vue';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import { ScenesService } from '../../services/scenes';
 import { SourcesService } from '../../services/sources';
+import { WidgetsService, WidgetDefinitions } from '../../services/widgets';
 
 @Component({
   components: { ModalLayout },
@@ -46,12 +47,16 @@ export default class NameSource extends Vue {
   @Inject()
   scenesService: ScenesService;
 
+  @Inject()
+  widgetsService:WidgetsService;
+
+  windowService = WindowService.instance;
   name = '';
   error = '';
 
   mounted() {
     this.name = namingHelpers.suggestName(
-      this.$store.state.windowOptions.options.sourceType,
+      this.sourceType || WidgetDefinitions[this.widgetType].name,
       (name: string) => this.isTaken(name)
     );
   }
@@ -60,12 +65,21 @@ export default class NameSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      const id = this.scenesService.activeScene.addSource(
-        this.name,
-        this.sourceType
-      );
+      let id;
 
-      windowManager.showSourceProperties(id);
+      if (this.sourceType) {
+        id = this.scenesService.activeScene.addSource(
+          this.name,
+          this.sourceType
+        );
+      } else if (this.widgetType) {
+        id = this.widgetsService.createWidget(
+          this.widgetType,
+          this.name
+        );
+      }
+
+      this.windowService.showSourceProperties(id);
     }
   }
 
@@ -75,6 +89,10 @@ export default class NameSource extends Vue {
 
   get sourceType() {
     return this.$store.state.windowOptions.options.sourceType;
+  }
+
+  get widgetType() {
+    return this.$store.state.windowOptions.options.widgetType;
   }
 
 }

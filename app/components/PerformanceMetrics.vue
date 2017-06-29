@@ -5,7 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import StreamingService from '../services/streaming';
-import PerformanceService from '../services/performance';
+import { PerformanceService } from '../services/performance';
 import { Inject } from '../services/service';
 import { Component } from 'vue-property-decorator';
 import { compact } from 'lodash';

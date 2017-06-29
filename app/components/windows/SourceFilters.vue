@@ -51,7 +51,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
-import windowManager from '../../util/WindowManager';
+import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
 import { SourcesService } from '../../services/sources';
@@ -80,7 +80,9 @@ export default class SourceFilters extends Vue {
   @Inject()
   sourcesService: SourcesService;
 
-  windowOptions: { sourceName: string, selectedFilterName: string } = windowManager.getOptions();
+  windowService = WindowService.instance;
+
+  windowOptions: { sourceName: string, selectedFilterName: string } = this.windowService.getOptions();
   sourceName = this.windowOptions.sourceName;
   filters = this.filtersService.getFilters(this.sourceName);
   selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
@@ -106,12 +108,12 @@ export default class SourceFilters extends Vue {
 
 
   done() {
-    windowManager.closeWindow();
+    this.windowService.closeWindow();
   }
 
 
   addFilter() {
-    windowManager.showAddSourceFilter(this.sourceName);
+    this.windowService.showAddSourceFilter(this.sourceName);
   }
 
 

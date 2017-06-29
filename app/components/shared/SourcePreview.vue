@@ -2,55 +2,63 @@
   <div class="SourcePreview" ref="preview"></div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { ObsApiService } from '../../services/obs-api';
+import electron from '../../vendor/electron';
+import { Inject } from '../../services/service';
 
-  import windowManager from '../../util/WindowManager';
-  import Obs from '../../api/Obs';
+const { webFrame, screen } = electron;
 
-  const { webFrame, screen } = window.require('electron');
+@Component({})
+export default class SourcePreview extends Vue {
 
-  export default {
+  @Inject()
+  obsApiService: ObsApiService;
 
-    props: ['sourceName'],
+  @Prop()
+  sourceName: string;
 
-    mounted() {
-      window.addEventListener('resize', this.onResize);
-      this.onResize();
-    },
-
-    created() {
-      Obs.createSourceDisplay(
-        this.sourceName,
-        'Preview Window'
-      );
-    },
-
-    beforeDestroy() {
-      window.removeEventListener('resize', this.onResize);
-      Obs.removeSourceDisplay('Preview Window');
-    },
-
-    methods: {
-
-      onResize() {
-        const preview = this.$refs.preview;
-        const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
-        const rect = preview.getBoundingClientRect();
-
-        Obs.resizeDisplay(
-          'Preview Window',
-          rect.width * factor,
-          rect.height * factor
-        );
-
-        Obs.moveDisplay(
-          'Preview Window',
-          rect.left * factor,
-          rect.top * factor
-        );
-      }
-    }
+  $refs: {
+    preview: HTMLElement
   };
+
+  mounted() {
+    window.addEventListener('resize', this.onResize);
+    this.onResize();
+  }
+
+  created() {
+    this.obsApiService.createSourceDisplay(
+      this.sourceName,
+      'Preview Window'
+    );
+  }
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.onResize);
+    this.obsApiService.removeSourceDisplay('Preview Window');
+  }
+
+  onResize() {
+    const preview = this.$refs.preview;
+    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const rect = preview.getBoundingClientRect();
+
+    this.obsApiService.resizeDisplay(
+      'Preview Window',
+      rect.width * factor,
+      rect.height * factor
+    );
+
+    this.obsApiService.moveDisplay(
+      'Preview Window',
+      rect.left * factor,
+      rect.top * factor
+    );
+  }
+}
 </script>
 
 <style lang="less" scoped>

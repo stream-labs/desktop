@@ -26,96 +26,94 @@
 </div>
 </template>
 
-<script>
-import windowManager from '../util/WindowManager.js';
+<script lang="ts">
+import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
+import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
+import electron from '../vendor/electron';
+import { Inject } from '../services/service';
 
-const { remote } = window.require('electron');
+const { remote } = electron;
 
-export default {
+@Component({})
+export default class ModalLayout extends Vue {
 
-  data() {
-    let contentStyle  = {
+  contentStyle: Object = {};
+  fixedStyle: Object = {};
+
+  @Inject()
+  windowService: WindowService;
+
+  @Inject()
+  customizationService: CustomizationService;
+
+  // The title shown at the top of the window
+  @Prop()
+  title: string;
+
+  // Whether the "cancel" and "done" controls should be
+  // shown at the bottom of the modal.
+  @Prop({ default: true })
+  showControls: boolean;
+
+  // If controls are shown, whether or not to show the
+  // cancel button.
+  @Prop({ default: true })
+  showCancel: boolean;
+
+  // Will be called when "done" is clicked if controls
+  // are enabled
+  @Prop()
+  doneHandler: Function;
+
+  // Will be called when "cancel" is clicked.  By default
+  // this will just close the window.
+  @Prop()
+  cancelHandler: Function;
+
+  // Additional CSS styles for the content section
+  @Prop()
+  contentStyles: string;
+
+  // The height of the fixed section
+  @Prop()
+  fixedSectionHeight: number;
+
+
+  created() {
+    const contentStyle = {
       padding: '20px',
       overflow: 'auto'
     };
 
     Object.assign(contentStyle, this.contentStyles);
 
-    let fixedStyle = {
+    const fixedStyle = {
       height: (this.fixedSectionHeight || 0).toString() + 'px'
     };
 
-    return {
-      contentStyle,
-      fixedStyle
-    };
-  },
+    this.contentStyle = contentStyle;
+    this.fixedStyle = fixedStyle;
+  }
 
   mounted() {
     remote.getCurrentWindow().setTitle(this.title);
-  },
+  }
 
-  computed: {
-    nightTheme() {
-      return CustomizationService.instance.nightMode;
-    }
-  },
+  get nightTheme() {
+    return this.customizationService.nightMode;
+  }
 
-  methods: {
-    cancel() {
-      if (this.cancelHandler) {
-        this.cancelHandler();
-      } else {
-        windowManager.closeWindow();
-      }
-    }
-  },
-
-  props: {
-    // The title shown at the top of the window
-    title: {
-      type: String
-    },
-
-    // Whether the "cancel" and "done" controls should be
-    // shown at the bottom of the modal.
-    showControls: {
-      type: Boolean,
-      default: true
-    },
-
-    // If controls are shown, whether or not to show the
-    // cancel button.
-    showCancel: {
-      type: Boolean,
-      default: true
-    },
-
-    // Will be called when "done" is clicked if controls
-    // are enabled
-    doneHandler: {
-      type: Function
-    },
-
-    // Will be called when "cancel" is clicked.  By default
-    // this will just close the window.
-    cancelHandler: {
-      type: Function
-    },
-
-    // Additional CSS styles for the content section
-    contentStyles: {
-      type: String
-    },
-
-    // The height of the fixed section
-    fixedSectionHeight: {
-      type: Number
+  cancel() {
+    if (this.cancelHandler) {
+      this.cancelHandler();
+    } else {
+      this.windowService.closeWindow();
     }
   }
 
-};
+}
 </script>
 
 <style lang="less" scoped>
@@ -143,6 +141,9 @@ export default {
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
+  .button {
+    margin-left: 8px;
+  }
 }
 
 .night-theme {

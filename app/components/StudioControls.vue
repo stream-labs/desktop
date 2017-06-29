@@ -7,17 +7,21 @@
 </template>
 
 <script>
+import Vue from 'vue';
+import { Component } from 'vue-property-decorator';
 import SceneSelector from './SceneSelector.vue';
 import SourceSelector from './SourceSelector.vue';
 import Mixer from './Mixer.vue';
 
-export default {
+@Component({
   components: {
     SceneSelector,
     SourceSelector,
     Mixer
   }
-};
+})
+export default class StudioControls extends Vue {
+}
 </script>
 
 <style lang="less" scoped>
@@ -42,12 +46,14 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   justify-content: space-between;
+  flex: 0 0 20px;
 }
 .studio-controls__label {
   margin-bottom: 0;
   .semibold;
+  color: @grey;
 }
 .studio-controls-selector {
   background: @day-secondary;

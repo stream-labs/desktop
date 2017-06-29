@@ -3,11 +3,9 @@ import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService, TSourceType } from '../sources';
 import { ISceneSource, SceneSource } from './scene-source';
+import { ConfigFileService } from '../config-file';
 import Utils from '../utils';
-import configFileManager from '../../util/ConfigFileManager';
-import Obs from '../../api/Obs';
-
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
+import { nodeObs } from '../obs-api';
 
 export interface IScene {
   id: string;
@@ -26,6 +24,7 @@ export class Scene implements IScene {
 
   private scenesService: ScenesService = ScenesService.instance;
   private sourcesService: SourcesService = SourcesService.instance;
+  private configFileService: ConfigFileService = ConfigFileService.instance;
   private sceneState: IScene;
 
   constructor(sceneId: string) {
@@ -93,7 +92,7 @@ export class Scene implements IScene {
     // Newly added sources are immediately active
     this.makeSourceActive(sourceId);
 
-    configFileManager.save();
+    this.configFileService.save();
     return sourceId;
   }
 

@@ -10,14 +10,38 @@
 }
 
 /* Type */
+h3 {
+  font-family: 'Roboto';
+  font-size: 14px;
+  .semibold;
+}
 h4 {
+  font-family: 'Roboto';
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: .7px;
   .semibold;
   margin-bottom: 20px;
 }
+.link {
+  .semibold;
+  color: @grey;
+  .transition;
+  &:hover {
+    color: @navy;
+  }
+}
+.link--uppercase {
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
 
+/* Inputs */
+input[type="text"] {
+  &:focus {
+    box-shadow: none;
+  }
+}
 .checkbox {
   label {
     &:before {
@@ -35,11 +59,10 @@ h4 {
   display: inline-block;
 }
 .dropdown__toggle, .slide-open__open {
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .7px;
+  .semibold;
   color: @grey;
+  text-transform: uppercase;
+  letter-spacing: .7px;
   .fa {
     font-size: 8px;
     vertical-align: middle;
@@ -59,17 +82,20 @@ h4 {
 }
 .select {
   position: relative;
-  .select {
+  select {
     font-size: 13px;
     margin: 0;
     padding: 0 32px 0 8px;
+    option {
+      color: @navy;
+    }
   }
 }
 .select-carot {
   position: absolute;
   right: 8px;
-  top: 4px;
-  font-size: 11px;
+  top: 10px;
+  font-size: 10px;
   color: @white;
 }
 .select--semi-opac {
@@ -85,13 +111,15 @@ h4 {
 }
 .search-input {
   position: relative;
+  .transition;
   input[type=text] {
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
     color: @grey;
+    .transition;
     .radius;
-     &:focus {
+    &:focus {
       background: rgba(255,255,255,.14);
       outline: none;
       box-shadow: none;
@@ -102,6 +130,17 @@ h4 {
     top: 8px;
     right: 8px;
     font-size: 16px;
+  }
+}
+.search-input--trans {
+  input[type=text] {
+    &:focus, &:active {
+      background: transparent;
+      color: @white;
+    }
+  }
+  &:focus, &:active, &:hover {
+    color: @white;
   }
 }
 .slide-open__menu {
@@ -138,7 +177,7 @@ h4 {
   margin-right: 10px;
   text-transform: uppercase;
   font-size: 12px;
-  font-weight: 500;
+  .semibold;
   letter-spacing: .7px;
   color: @grey;
   .fa {
@@ -177,6 +216,7 @@ select {
   height: 36px;
 }
 
+/* Scrolls */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -209,6 +249,9 @@ select {
   .border {
     border: 1px solid transparent;
   }
+  h3 {
+    color: @grey;
+  }
   .checkbox {
     input:checked~label {
       color: @white;
@@ -220,6 +263,12 @@ select {
       }
     }
   }
+  .link {
+    &:hover {
+      color: @white;
+    }
+  }
+  
   .dropdown__menu {
     background-color: @night-accent-light;
   }
@@ -236,12 +285,6 @@ select {
   .studio-controls-selector {
     background: @navy-secondary;
     border-color: @navy-secondary;
-  }
-  .selector-item {
-    &.selector-item--active {
-      background-color: @night-hover;
-      border-color: transparent;
-    }
   }
   .tab-button{
     &.active {

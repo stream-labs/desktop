@@ -32,7 +32,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import Selector from './Selector.vue';
-import windowManager from '../util/WindowManager';
+import { WindowService } from '../services/window';
 import { ScenesService } from '../services/scenes';
 import { ISource, SourcesService } from '../services/sources';
 import { SourceMenu } from '../util/menus/SourceMenu';
@@ -48,10 +48,11 @@ export default class SourceSelector extends Vue {
   @Inject()
   scenesService: ScenesService;
 
+  windowService = WindowService.instance;
 
   addSource() {
     if (this.scenesService.activeScene) {
-      windowManager.showAddSource();
+      this.windowService.showAddSource();
     }
   }
 
@@ -75,7 +76,7 @@ export default class SourceSelector extends Vue {
 
   sourceProperties() {
     if (this.scene.activeSourceId) {
-      windowManager.showSourceProperties(this.scene.activeSourceId);
+      this.windowService.showSourceProperties(this.scene.activeSourceId);
     }
   }
 

@@ -2,9 +2,7 @@ import { ScenesService } from './scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
 import { Source } from '../sources';
-import Obs from '../../api/Obs';
-
-const nodeObs: Dictionary<Function> = Obs.nodeObs;
+import { nodeObs } from '../obs-api';
 
 export interface ISceneSource {
   id: string;
@@ -37,6 +35,11 @@ export class SceneSource extends Source implements ISceneSource {
 
   get scaledHeight(): number {
     return this.height * this.scaleY;
+  }
+
+  // An overlay source is visible in the overlay editor
+  get isOverlaySource() {
+    return (this.video && (this.width > 0) && (this.height > 0));
   }
 
   private sceneSourceState: ISceneSource;
