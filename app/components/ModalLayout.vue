@@ -43,10 +43,9 @@ export default class ModalLayout extends Vue {
   fixedStyle: Object = {};
 
   @Inject()
-  windowService: WindowService;
-
-  @Inject()
   customizationService: CustomizationService;
+
+  windowService: WindowService = WindowService.instance;
 
   // The title shown at the top of the window
   @Prop()

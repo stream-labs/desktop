@@ -8,25 +8,41 @@ import {
 } from '../components/shared/forms/Input';
 
 interface ISceneTransitionsState {
-  availableTypes: IListOption[];
-  availableNames: IListOption[];
+  availableTransitions: IListOption[];
   duration: number;
   properties: TFormData;
   currentName: string;
 }
 
+const TRANSITION_TYPES: IListOption[] = [
+  { description: 'Cut', value: 'cut_transition' },
+  { description: 'Fade', value: 'fade_transition' },
+  { description: 'Swipe', value: 'swipe_transition' },
+  { description: 'Slide', value: 'slide_transition' },
+  { description: 'Fade to Color', value: 'fade_to_color_transition' },
+  { description: 'Luma Wipe', value: 'wipe_transition' }
+];
 
 export default class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
 
   static initialState = {
-    availableTypes: [],
-    availableNames: [],
+    availableTransitions: [],
     duration: 0,
     properties: [],
     currentName: '',
   } as ISceneTransitionsState;
 
+
   init() {
+    this.refresh();
+
+    // create transitions for each type if not exist
+    TRANSITION_TYPES.forEach(type => {
+      const transition = this.state.availableTransitions.find(transition => transition.value === type.description);
+      if (transition) return;
+      this.add(type.description, type.value);
+    });
+
     this.refresh();
   }
 
@@ -41,33 +57,18 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
   }
 
   @mutation
-  private SET_AVAILABLE_TYPES(availableTypes: IListOption[]) {
-    this.state.availableTypes = availableTypes;
+  private SET_AVAILABLE_TRANSITIONS(transitions: IListOption[]) {
+    this.state.availableTransitions = transitions;
   }
 
-  @mutation
-  private SET_AVAILABLE_NAMES(availableNames: IListOption[]) {
-    this.state.availableNames = availableNames;
-  }
-
-  @mutation
-  private SET_PROPERTIES(props: TFormData) {
-    this.state.properties = props;
-  }
 
   private refresh() {
     const currentName = nodeObs.OBS_content_getCurrentTransition();
     this.SET_NAME(currentName);
     this.SET_DURATION(nodeObs.OBS_content_getTransitionDuration());
-    this.SET_AVAILABLE_TYPES(nodeObs.OBS_content_getListTransitions()
-      .map((item: { description: string, type: string }) => {
-        return { description: item.description, value: item.type };
-      })
-    );
-    this.SET_AVAILABLE_NAMES(nodeObs.OBS_content_getListCurrentTransitions().map((name: string) => {
+    this.SET_AVAILABLE_TRANSITIONS(nodeObs.OBS_content_getListCurrentTransitions().map((name: string) => {
       return { description: name, value: name };
     }));
-    this.SET_PROPERTIES(nodeObs.OBS_content_setTransitionProperty(currentName));
   }
 
 
@@ -76,7 +77,7 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
       boolToString: true
     });
     for (const prop of propertiesToSave) {
-      nodeObs.OBS_content_setTransitionProperty(this.state.currentName, prop.name, prop.value);
+      nodeObs.OBS_content_setTransitionProperty(this.state.currentName, prop.name, prop);
     }
     this.refresh();
   }
@@ -89,22 +90,8 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
   }
 
 
-  add(transitionName: string, transitionType: string) {
+  private add(transitionName: string, transitionType: string) {
     nodeObs.OBS_content_addTransition(transitionType, transitionName);
-    nodeObs.OBS_content_setTransition(transitionName);
-    this.refresh();
-  }
-
-
-  remove(name: string) {
-    nodeObs.OBS_content_removeTransition(name);
-    if (name === this.state.currentName) {
-      this.setCurrent({currentName: this.state.availableNames.find(transition => {
-        return transition.value !== name;
-      }).value});
-      return;
-    }
-    this.refresh();
   }
 
   getFormData() {
@@ -113,28 +100,12 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
         description: 'Transition',
         name: 'currentName',
         value: this.state.currentName,
-        options: this.state.availableNames
+        options: this.state.availableTransitions
       },
       duration: {
         description: 'Duration',
         name: 'duration',
         value: this.state.duration
-      }
-    };
-  }
-
-  getAddNewFormData() {
-    return {
-      type: {
-        description: 'Transition type',
-        name: 'type',
-        value: this.state.availableTypes[0].value,
-        options: this.state.availableTypes
-      },
-      name: {
-        description: 'Transition name',
-        name: 'name',
-        value: ''
       }
     };
   }

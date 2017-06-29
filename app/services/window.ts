@@ -5,8 +5,6 @@ import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
 import SceneTransitions from '../components/windows/SceneTransitions.vue';
-import AddSceneTransition from '../components/windows/AddSceneTransition.vue';
-import SceneTransitionProperties from '../components/windows/SceneTransitionProperties.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
@@ -39,8 +37,6 @@ export class WindowService extends Service {
     Main,
     Settings,
     SceneTransitions,
-    AddSceneTransition,
-    SceneTransitionProperties,
     AddSource,
     NameSource,
     NameScene,
@@ -88,31 +84,6 @@ export class WindowService extends Service {
       },
       windowOptions: {
         width: 500,
-        height: 400
-      }
-    });
-  }
-
-  showAddSceneTransition() {
-    this.showWindow({
-      startupOptions: {
-        component: 'AddSceneTransition'
-      },
-      windowOptions: {
-        width: 800,
-        height: 600
-      }
-    });
-  }
-
-  showSceneTransitionProperties(transitionName = '') {
-    this.showWindow({
-      startupOptions: {
-        component: 'SceneTransitionProperties',
-        transitionName
-      },
-      windowOptions: {
-        width: 800,
         height: 600
       }
     });
