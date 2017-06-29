@@ -5,21 +5,14 @@
 
   <div slot="content">
     <div class="row">
-      <div class="columns small-8">
-        <ListInput :value="form.currentName" @input="onInputHandler"></ListInput>
-      </div>
-      <div class="columns small-4 controls">
-        <div class="fa fa-plus ico-btn" @click="addTransition"></div>
-        <div
-          class="fa fa-minus ico-btn"
-          @click="removeTransition" v-if="state.availableNames.length > 1">
-        </div>
-        <div class="fa fa-cog ico-btn" @click="setupTransition" v-if="state.properties.length"></div>
-      </div>
-    </div>
-    <div class="row">
       <div class="columns small-12">
-        <IntInput :value="form.duration" @input="onInputHandler"></IntInput>
+        <ListInput v-model="form.currentName" @input="onTransitionChangeHandler"></ListInput>
+      </div>
+      <div class="columns small-12">
+        <IntInput v-model="form.duration"></IntInput>
+      </div>
+      <div class="columns small-12">
+        <GenericForm v-model="properties"></GenericForm>
       </div>
     </div>
   </div>
@@ -31,16 +24,21 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
-import { IInputValue } from "../shared/forms/Input";
+import { IInputValue, TFormData } from '../shared/forms/Input';
 import ScenesTransitionsService from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
+import GenericForm from '../shared/forms/GenericForm.vue';
 import * as inputComponents from '../shared/forms';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 
 @Component({
-  components: { ModalLayout, ...inputComponents },
-  mixins: [windowMixin]
+  mixins: [windowMixin],
+  components: {
+    ModalLayout,
+    GenericForm,
+    ...inputComponents
+  }
 })
 export default class SceneTransitions extends Vue {
 
@@ -49,31 +47,21 @@ export default class SceneTransitions extends Vue {
 
   windowService = WindowService.instance;
   form = this.transitionsService.getFormData();
+  properties = this.transitionsService.getPropertiesFormData();
 
-  get state() { return this.transitionsService.state; }
 
-
-  onInputHandler(value: IInputValue<string>) {
+  onTransitionChangeHandler(value: IInputValue<string>) {
     this.transitionsService.setCurrent({ [value.name]: value.value });
-  }
-
-
-  addTransition() {
-    this.windowService.showAddSceneTransition();
-  }
-
-
-  setupTransition() {
-    this.windowService.showSceneTransitionProperties(this.state.currentName);
-  }
-
-
-  removeTransition() {
-    this.transitionsService.remove(this.state.currentName);
+    this.properties = this.transitionsService.getPropertiesFormData();
   }
 
 
   done() {
+    this.transitionsService.setCurrent({
+      currentName: this.form.currentName.value,
+      duration: this.form.duration.value
+    });
+    this.transitionsService.setProperties(this.properties);
     this.windowService.closeWindow();
   }
 }
