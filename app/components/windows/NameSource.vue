@@ -88,11 +88,11 @@ export default class NameSource extends Vue {
   }
 
   get sourceType() {
-    return this.$store.state.windowOptions.options.sourceType;
+    return this.windowService.getOptions().sourceType;
   }
 
   get widgetType() {
-    return this.$store.state.windowOptions.options.widgetType;
+    return this.windowService.getOptions().widgetType;
   }
 
 }

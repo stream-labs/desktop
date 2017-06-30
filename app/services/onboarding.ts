@@ -27,7 +27,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
-  @mutation
+  @mutation()
   SET_CURRENT_STEP(step: TOnboardingStep) {
     this.state.currentStep = step;
   }

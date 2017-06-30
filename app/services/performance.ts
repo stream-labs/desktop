@@ -22,7 +22,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
     frameRate: 0
   };
 
-  @mutation
+  @mutation()
   SET_PERFORMANCE_STATS(stats: IPerformanceState) {
     Object.keys(stats).forEach(stat => {
       Vue.set(this.state, stat, stats[stat]);

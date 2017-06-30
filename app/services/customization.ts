@@ -11,7 +11,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     nightMode: false
   };
 
-  @mutation
+  @mutation()
   SET_NIGHT_MODE(nightMode: boolean) {
     this.state.nightMode = nightMode;
   }

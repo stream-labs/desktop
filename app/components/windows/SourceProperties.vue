@@ -34,7 +34,7 @@ export default class SourceProperties extends Vue {
   sourcesService: SourcesService;
 
   windowService = WindowService.instance;
-  sourceId = this.$store.state.windowOptions.options.sourceId;
+  sourceId = this.windowService.getOptions().sourceId;
   properties = this.sourcesService.getPropertiesFormData(this.sourceId);
 
 

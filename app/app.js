@@ -25,11 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const isChild = query.child;
 
   if (isChild) {
-    store.dispatch({ type: 'setWindowAsChild' });
-    store.dispatch({
-      type: 'setWindowOptions',
-      options: _.omit(query, ['child'])
-    });
+    windowService.setWindowAsChild();
+    windowService.setWindowOptions(_.omit(query, ['child']));
 
     ipcRenderer.on('closeWindow', () => {
       windowService.closeWindow();
@@ -42,12 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       remote.getCurrentWindow().close();
     });
 
-    store.dispatch({
-      type: 'setWindowOptions',
-      options: {
-        component: 'Main'
-      }
-    });
+    windowService.setWindowOptions({ component: 'Main' });
 
     HotkeysService.instance.bindAllHotkeys();
     OnboardingService.instance;
@@ -59,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     el: '#app',
     store,
     render: h => {
-      const componentName = store.state.windowOptions.options.component;
+      const componentName = windowService.state.options.component;
 
       return h(windowService.components[componentName]);
     }
@@ -68,10 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Used for replacing the contents of this window with
   // a new top level component
   ipcRenderer.on('window-setContents', (event, options) => {
-    store.dispatch({
-      type: 'setWindowOptions',
-      options
-    });
+    windowService.setWindowOptions(options);
 
     // This is purely for developer convencience.  Changing the URL
     // to match the current contents, as well as pulling the options

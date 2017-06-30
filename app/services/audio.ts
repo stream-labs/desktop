@@ -93,13 +93,13 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
 
-  @mutation
+  @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     this.state.audioSources[source.id] = source;
   }
 
 
-  @mutation
+  @mutation()
   private REMOVE_AUDIO_SOURCE(sourceId: string) {
     delete this.state.audioSources[sourceId];
   }
@@ -162,7 +162,7 @@ export class AudioSource extends Source implements IAudioSource {
   }
 
 
-  @mutation
+  @mutation()
   private UPDATE(patch: TPatch<IAudioSource>) {
     Object.assign(this.audioSourceState, patch);
   }
