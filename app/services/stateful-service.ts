@@ -5,38 +5,47 @@ import store from '../store';
 
 export * from './service';
 
-export function mutation(target: any, methodName: string, descriptor: PropertyDescriptor) {
-  const serviceName = target.constructor.name;
-  const mutationName = `${serviceName}.${methodName}`;
+export function mutation(options = { vuexSyncIgnore: false }) {
+  return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
+    const serviceName = target.constructor.name;
+    const mutationName = `${serviceName}.${methodName}`;
 
-  target.mutations = target.mutations || {};
-  target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
-    const targetIsSingleton = !!target.constructor.instance;
-    let context = null;
+    target.mutations = target.mutations || {};
+    target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
+      const targetIsSingleton = !!target.constructor.instance;
+      let context = null;
 
-    if (targetIsSingleton) {
-      context = target.constructor.instance;
-    } else {
-      context = new target.constructor(...payload.constructorArgs);
-    }
+      if (targetIsSingleton) {
+        context = target.constructor.instance;
+      } else {
+        context = new target.constructor(...payload.constructorArgs);
+      }
 
-    descriptor.value.call(context, ...payload.args);
+      descriptor.value.call(context, ...payload.args);
+    };
+
+    return {
+      ...descriptor,
+
+      value(...args: any[]) {
+        const constructorArgs = this['constructorArgs'];
+        store.commit(
+          mutationName, {
+            args,
+            constructorArgs,
+            __vuexSyncIgnore: options.vuexSyncIgnore
+          });
+      }
+    };
   };
 
-  return {
-    ...descriptor,
-
-    value(...args: any[]) {
-      const constructorArgs = this['constructorArgs'];
-      store.commit(mutationName, { args, constructorArgs });
-    }
-  };
 }
 
 /**
  * helps to integrate services with Vuex store
  */
 export abstract class StatefulService<TState extends object> extends Service {
+
 
   get store(): Store<any> {
     return store;

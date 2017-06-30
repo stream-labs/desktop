@@ -3,10 +3,6 @@ import Vuex, { Store } from 'vuex';
 import _ from 'lodash';
 import electron from '../vendor/electron';
 
-// Modules
-import navigation from './modules/navigation';
-import windowOptions from './modules/windowOptions';
-
 // Stateful Services and Classes
 import { getModule } from '../services/stateful-service';
 import { ScenesService, Scene, SceneSource } from '../services/scenes';
@@ -19,6 +15,7 @@ import { PerformanceService } from '../services/performance';
 import { AudioService, AudioSource } from '../services/audio';
 import { CustomizationService } from '../services/customization';
 import { UserService } from '../services/user';
+import { WindowService } from '../services/window';
 import { NavigationService } from '../services/navigation';
 import { OnboardingService } from '../services/onboarding';
 
@@ -37,6 +34,7 @@ const statefulServiceModules = {
   ...getModule(AudioSource),
   ...getModule(CustomizationService),
   ...getModule(UserService),
+  ...getModule(WindowService),
   ...getModule(NavigationService),
   ...getModule(OnboardingService)
 };
@@ -76,7 +74,7 @@ plugins.push((store: Store<any>) => {
   // Only the main window should ever receive this
   ipcRenderer.on('vuex-sendState', (event, windowId) => {
     const win = remote.BrowserWindow.fromId(windowId);
-    win.webContents.send('vuex-loadState', _.omit(store.state, ['windowOptions']));
+    win.webContents.send('vuex-loadState', _.omit(store.state, ['WindowService']));
   });
 
   // Only child windows should ever receive this
@@ -99,7 +97,6 @@ plugins.push((store: Store<any>) => {
 
 export default new Vuex.Store({
   modules: {
-    windowOptions,
     ...statefulServiceModules
   },
   plugins,

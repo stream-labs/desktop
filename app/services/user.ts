@@ -19,13 +19,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject()
   hostsService: HostsService;
 
-  @mutation
+  @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
   }
 
 
-  @mutation
+  @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
   }

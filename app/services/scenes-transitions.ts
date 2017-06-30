@@ -46,21 +46,20 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
     this.refresh();
   }
 
-  @mutation
+  @mutation()
   private SET_NAME(name: string) {
     this.state.currentName = name;
   }
 
-  @mutation
+  @mutation()
   SET_DURATION(duration: number) {
     this.state.duration = duration;
   }
 
-  @mutation
+  @mutation()
   private SET_AVAILABLE_TRANSITIONS(transitions: IListOption[]) {
     this.state.availableTransitions = transitions;
   }
-
 
   private refresh() {
     const currentName = nodeObs.OBS_content_getCurrentTransition();

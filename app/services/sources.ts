@@ -57,12 +57,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
     setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
   }
 
-  @mutation
+  @mutation()
   private RESET_SOURCES() {
     this.state.sources = {};
   }
 
-  @mutation
+  @mutation()
   private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData) {
     Vue.set(this.state.sources, id, {
       id,
@@ -83,12 +83,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
   }
 
-  @mutation
+  @mutation()
   private REMOVE_SOURCE(id: string) {
     Vue.delete(this.state.sources, id);
   }
 
-  @mutation
+  @mutation()
   private UPDATE_SOURCE(sourcePatch: TPatch<ISource>) {
     Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
   }

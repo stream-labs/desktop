@@ -104,7 +104,7 @@ export class SceneSource extends Source implements ISceneSource {
     });
   }
 
-  @mutation
+  @mutation()
   private UPDATE(patch: TPatch<ISceneSource>) {
     Object.assign(this.sceneSourceState, patch);
   }
