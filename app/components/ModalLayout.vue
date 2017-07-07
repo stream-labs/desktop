@@ -77,7 +77,7 @@ export default class ModalLayout extends Vue {
 
   // Additional CSS styles for the content section
   @Prop()
-  contentStyles: string;
+  contentStyles: Dictionary<string>;
 
   // The height of the fixed section
   @Prop()
