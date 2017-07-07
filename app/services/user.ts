@@ -38,6 +38,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
+  mounted() {
+    // This is used for faking authentication in tests.  We have
+    // to do this because Twitch adds a captcha when we try to
+    // actually log in from integration tests.
+    electron.ipcRenderer.on('testing-fakeAuth', (e, auth) => {
+      this.LOGIN(auth);
+    });
+  }
+
+
   // Makes sure the user's login is still good
   validateLogin() {
     if (!this.isLoggedIn()) return;

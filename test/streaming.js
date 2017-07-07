@@ -17,7 +17,7 @@ test('Streaming to Twitch', async t => {
   await setFormInput(
     t,
     'Stream key',
-    process.env.SLOBS_STREAM_KEY || 'live_147956788_EzVP5LjgcNbYwexq2lZrM4qFRb5BX6'
+    process.env.SLOBS_STREAM_KEY || 'live_147956788_GvRHQnjQL64F1MqDlw5roLcroaRULT'
   );
   await app.client.click('button=Done');
 
