@@ -4,6 +4,13 @@ import { selectSource, clickSourceProperties } from './helpers/spectron/sources'
 
 useSpectron(false);
 
+async function clickCloseInspect(t, widgetName) {
+  const app = t.context.app;
+
+  await app.client.$(`div=${widgetName}`).$('..').$('..').$('..')
+    .click('.fa-times');
+}
+
 test('Addding some starter widgets', async t => {
   const app = t.context.app;
   await focusMain(t);
@@ -25,15 +32,15 @@ test('Addding some starter widgets', async t => {
 
   await app.client.click('div=Event List');
   await app.client.click('button=Remove Widget');
-  await app.client.click('.fa-times');
+  await clickCloseInspect(t, 'Event List');
 
   await app.client.click('div=Chatbox');
   await app.client.click('button=Add Widget');
-  await app.client.click('.fa-times');
+  await clickCloseInspect(t, 'Chatbox');
 
   await app.client.click('div=Donation Goal');
   await app.client.click('button=Add Widget');
-  await app.client.click('.fa-times');
+  await clickCloseInspect(t, 'Donation Goal');
 
   await app.client.click('button=Next');
 
