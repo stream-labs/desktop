@@ -12,6 +12,7 @@ import { WindowService } from './services/window';
 import { ConfigFileService } from './services/config-file';
 import { HotkeysService } from './services/hotkeys.ts';
 import { OnboardingService } from './services/onboarding.ts';
+import { UserService } from './services/user.ts';
 
 const { ipcRenderer, remote } = window.require('electron');
 
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     HotkeysService.instance.bindAllHotkeys();
     OnboardingService.instance;
+    UserService.instance;
   }
 
   window.obs = obsApiService.nodeObs;

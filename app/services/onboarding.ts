@@ -1,6 +1,7 @@
 import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { Inject } from './service';
+import electron from '../vendor/electron';
 
 type TOnboardingStep = 'Connect' | 'SelectWidgets';
 
@@ -24,6 +25,16 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   init() {
     this.startOnboardingIfRequired();
+  }
+
+
+  mounted() {
+    // This is used for faking authentication in tests.  We have
+    // to do this because Twitch adds a captcha when we try to
+    // actually log in from integration tests.
+    electron.ipcRenderer.on('testing-fakeAuth', () => {
+      this.next();
+    });
   }
 
 
