@@ -1,5 +1,6 @@
 <template>
 <div class="main" :class="{'night-theme': nightTheme}">
+  <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
   <top-nav v-if="page !== 'Onboarding'"></top-nav>
   <component class="main-page-container" :is="page">
@@ -17,6 +18,7 @@ import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
+import TitleBar from '../TitleBar.vue';
 import windowMixin from '../mixins/window';
 import { Inject } from '../../services/service';
 import { CustomizationService } from '../../services/customization';
@@ -28,6 +30,7 @@ const { remote } = electron;
 @Component({
   mixins: [windowMixin],
   components: {
+    TitleBar,
     TopNav,
     Studio,
     Dashboard,
@@ -44,10 +47,6 @@ export default class Main extends Vue {
 
   @Inject()
   navigationService: NavigationService;
-
-  mounted() {
-    remote.getCurrentWindow().setTitle(this.title);
-  }
 
   get page() {
     return this.navigationService.state.currentPage;

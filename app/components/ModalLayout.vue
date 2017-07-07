@@ -1,5 +1,6 @@
 <template>
 <div class="modal-layout" :class="{'night-theme': nightTheme}">
+  <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -33,10 +34,13 @@ import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import electron from '../vendor/electron';
 import { Inject } from '../services/service';
+import TitleBar from './TitleBar.vue';
 
 const { remote } = electron;
 
-@Component({})
+@Component({
+  components: { TitleBar }
+})
 export default class ModalLayout extends Vue {
 
   contentStyle: Object = {};
@@ -96,10 +100,6 @@ export default class ModalLayout extends Vue {
     this.fixedStyle = fixedStyle;
   }
 
-  mounted() {
-    remote.getCurrentWindow().setTitle(this.title);
-  }
-
   get nightTheme() {
     return this.customizationService.nightMode;
   }
@@ -123,6 +123,10 @@ export default class ModalLayout extends Vue {
   flex-direction: column;
   color: @grey;
   border-top: 1px solid @day-border;
+}
+
+.modal-layout-titlebar {
+  flex-shrink: 0;
 }
 
 .ModalLayout-fixed {
