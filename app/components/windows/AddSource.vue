@@ -1,6 +1,7 @@
 <template>
 <modal-layout
   :show-controls="false"
+  :content-styles="{ padding: 0 }"
   title="Add Source">
   <div slot="content"
     class="add-source">
@@ -417,11 +418,7 @@ h4 {
   color: @navy;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  position: relative;
 }
 .source-welcome {
   display: flex;
