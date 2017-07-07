@@ -67,7 +67,8 @@ function startApp() {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
-    show: false
+    show: false,
+    frame: false
   });
 
   mainWindow.setMenu(null);
@@ -96,7 +97,8 @@ function startApp() {
 
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
-    show: false
+    show: false,
+    frame: false
   });
 
   childWindow.setMenu(null);
