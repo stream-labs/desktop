@@ -226,7 +226,7 @@ export class WidgetsService extends Service {
 
   @requiresLogin()
   createWidget(type: WidgetType, name?: string) {
-    const scene = this.scenesService.scenes[0];
+    const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
     const suggestedName = namingHelpers.suggestName(name || widget.name, (name: string) => {
