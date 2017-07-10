@@ -37,6 +37,17 @@ brew install yarn
 For other platforms, check the yarn docs:
 https://yarnpkg.com/en/docs/install
 
+### Visual C++ Compiler
+
+Yarn will install and compile a number of native extensions from
+source.  For yarn to do this, it needs a Visual C++ compiler.  The
+most reliable way to get this is to install:
+
+Visual Studio Community 2015 with Update 3
+
+Make sure you do a custom installation and select Visual C++ from
+the languages section.
+
 ## Installation
 
 First, make sure you have initialized git submodules:
