@@ -71,18 +71,13 @@ yarn compile
 ## Starting
 
 If you are using Visual Studio Code, you can start the app
-using the built in debugger.
+using the built in debugger (default F5).
 
 Otherwise, you can run the app with:
 
 ```
 yarn start
 ```
-
-## Streaming
-
-The default config will stream to:
-https://www.twitch.tv/slobstest
 
 ## Environment Variables
 
