@@ -153,7 +153,7 @@ export default class SelectWidgets extends Vue {
           this.widgetsService.createWidget(widget);
         });
 
-        this.onboardingService.finish();
+        this.onboardingService.next();
       });
     }
   }
