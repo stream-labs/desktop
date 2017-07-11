@@ -55,6 +55,7 @@ export default class Main extends Vue {
   get nightTheme() {
     return this.customizationService.nightMode;
   }
+
 }
 </script>
 

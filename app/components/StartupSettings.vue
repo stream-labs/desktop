@@ -147,5 +147,4 @@ export default class StartupSettings extends Vue {
   }
 
 }
-
 </script>

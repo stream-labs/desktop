@@ -56,7 +56,6 @@ export default class SourceSelector extends Vue {
     }
   }
 
-
   showContextMenu(sourceId: string) {
     const menu = new SourceMenu(
       this.scenesService.activeSceneId,
@@ -65,7 +64,6 @@ export default class SourceSelector extends Vue {
     menu.popup();
   }
 
-
   removeSource() {
     // We can only remove a source if one is selected
     if (this.scene.activeSourceId) {
@@ -73,13 +71,11 @@ export default class SourceSelector extends Vue {
     }
   }
 
-
   sourceProperties() {
     if (this.scene.activeSourceId) {
       this.windowService.showSourceProperties(this.scene.activeSourceId);
     }
   }
-
 
   handleSort(data: any) {
     const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
@@ -90,7 +86,6 @@ export default class SourceSelector extends Vue {
       data.order
     );
   }
-
 
   makeActive(sourceId: string) {
     this.scene.makeSourceActive(sourceId);

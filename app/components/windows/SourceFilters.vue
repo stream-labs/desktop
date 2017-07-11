@@ -106,21 +106,17 @@ export default class SourceFilters extends Vue {
     );
   }
 
-
   done() {
     this.windowService.closeWindow();
   }
-
 
   addFilter() {
     this.windowService.showAddSourceFilter(this.sourceName);
   }
 
-
   get sourceDisplayName() {
     return this.sourcesService.getSourceByName(this.sourceName).displayName;
   }
-
 
   removeFilter() {
     this.filtersService.remove(this.sourceName, this.selectedFilterName);
@@ -133,19 +129,18 @@ export default class SourceFilters extends Vue {
     this.filtersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
     this.filters = this.filtersService.getFilters(this.sourceName);
   }
+
 }
 </script>
 
 <style lang="less" scoped>
+.side-menu {
+  position: fixed;
+  left: 0;
+}
 
-  .side-menu {
-    position: fixed;
-    left: 0;
-  }
-
-  .controls {
-    margin-left: 15px;
-    margin-top: 15px;
-  }
-
+.controls {
+  margin-left: 15px;
+  margin-top: 15px;
+}
 </style>

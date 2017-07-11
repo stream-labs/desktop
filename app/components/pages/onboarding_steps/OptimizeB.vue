@@ -50,7 +50,3 @@ export default class OptimizeB extends Vue {
 
 }
 </script>
-
-<style lang="less" scoped>
-  
-</style>

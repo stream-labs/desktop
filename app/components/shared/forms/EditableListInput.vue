@@ -1,25 +1,29 @@
 <template>
-<div>
-  <div class="EditableList-topBar">
-    <label class="EditableList-label">
+<div class="input-container">
+  <div class="input-label">
+    <label>
       {{ value.description }}
     </label>
-    <i
-      @click="menu.popup()"
-      class="fa fa-plus EditableList-control"/>
-    <i
-      @click="handleRemove"
-      class="fa fa-minus EditableList-control"/>
-    <i
-      @click="handleEdit"
-      class="fa fa-cog EditableList-control"/>
   </div>
-  <selector
-    class="EditableList-list"
-    :items="list"
-    :activeItem="activeItem"
-    @select="handleSelect"
-    @sort="handleSort"/>
+  <div class="input-wrapper editable-list">
+    <div class="editable-list__bar">
+      <i
+        @click="menu.popup()"
+        class="fa fa-plus ico-btn editable-list__control"/>
+      <i
+        @click="handleRemove"
+        class="fa fa-minus ico-btn editable-list__control"/>
+      <i
+        @click="handleEdit"
+        class="fa fa-cog ico-btn editable-list__control"/>
+    </div>
+    <selector
+      class="editable-list__list"
+      :items="list"
+      :activeItem="activeItem"
+      @select="handleSelect"
+      @sort="handleSort"/>
+  </div>
 </div>
 </template>
 
@@ -30,7 +34,6 @@ import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import  { IEditableListInputValue, Input, TObsType } from './Input';
 import { Menu } from '../../../util/menus/Menu';
-
 
 interface ISelectorSortEventData {
   change: any;
@@ -127,7 +130,6 @@ class EditableListProperty extends Input<IEditableListInputValue> {
     this.emitInput({ ...this.value, value: { valuesArray: list } });
   }
 
-
   get list(): string[] {
     return _.cloneDeep(this.value.value.valuesArray);
   }
@@ -135,35 +137,28 @@ class EditableListProperty extends Input<IEditableListInputValue> {
 }
 
 EditableListProperty.obsType = 'OBS_PROPERTY_EDITABLE_LIST';
-export default EditableListProperty;
 
+export default EditableListProperty;
 </script>
 
 <style lang="less" scoped>
-.EditableList-topBar {
+@import "../../../styles/index";
+
+.editable-list__list {
+  background: @day-input-bg;
+  border: 1px solid @day-input-border;
+}
+
+.editable-list__bar {
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
 }
 
-.EditableList-label {
-  flex-grow: 1;
-}
-
-.EditableList-list {
-  height: 180px;
-}
-
-.EditableList-control {
-  color: #999;
-  opacity: 0.6;
-  cursor: pointer;
-
-  font-size: 16px;
-  margin-left: 15px;
-
-  &:hover {
-    opacity: 1;
+.night-theme {
+  .editable-list__list {
+    border-color: @night-secondary;
+    background: @night-secondary;
   }
 }
 </style>

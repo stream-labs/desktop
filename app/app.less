@@ -1,5 +1,7 @@
 @import "./styles/index";
-
+body {
+  color: @navy;
+}
 .main {
   background: @white;
 }
@@ -22,6 +24,7 @@ h4 {
   letter-spacing: .7px;
   .semibold;
   margin-bottom: 20px;
+  color: @grey;
 }
 .link {
   .semibold;
@@ -34,21 +37,6 @@ h4 {
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
-}
-
-/* Inputs */
-input[type="text"] {
-  &:focus {
-    box-shadow: none;
-  }
-}
-.checkbox {
-  label {
-    &:before {
-      background: transparent;
-      border-color: @day-border;
-    }
-  }
 }
 
 /* Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown' */
@@ -173,7 +161,7 @@ input[type="text"] {
 }
 .tab-button {
   border-bottom: 3px solid transparent;
-  padding: 20px 0;
+  padding: 16px 0;
   margin-right: 10px;
   text-transform: uppercase;
   font-size: 12px;

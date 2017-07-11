@@ -5,7 +5,7 @@
       <div class="onboarding-title">Optimize</div>
       <div class="onboarding-desc">Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.</div>
       <button class="button button--action button--lg">Start</button>
-      
+
       <div class="setup-later">
         <span>Rather do this manually?</span>
         <a>Setup later</a>
@@ -23,7 +23,3 @@ export default class OptimizeA extends Vue {
 
 }
 </script>
-
-<style lang="less" scoped>
-  
-</style>

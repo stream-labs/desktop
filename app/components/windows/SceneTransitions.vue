@@ -64,12 +64,12 @@ export default class SceneTransitions extends Vue {
     this.transitionsService.setProperties(this.properties);
     this.windowService.closeWindow();
   }
-}
 
+}
 </script>
 
 <style lang="less" scoped>
-  .controls {
-    padding-top: 30px;
-  }
+.controls {
+  padding-top: 30px;
+}
 </style>

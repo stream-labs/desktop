@@ -7,7 +7,7 @@
     <slot name="fixed"/>
   </div>
   <div
-    class="ModalLayout-content"
+    class="modal-layout-content"
     :style="contentStyle">
     <slot name="content"/>
   </div>
@@ -117,6 +117,7 @@ export default class ModalLayout extends Vue {
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .modal-layout {
   height: 100%;
   display: flex;
@@ -133,8 +134,9 @@ export default class ModalLayout extends Vue {
   flex-shrink: 0;
 }
 
-.ModalLayout-content {
+.modal-layout-content {
   flex-grow: 1;
+  height: 100%;
 }
 
 .modal-layout-controls {

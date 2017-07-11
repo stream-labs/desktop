@@ -58,9 +58,7 @@ export default class TitleBar extends Vue {
   display: flex;
   flex-direction: row;
   align-items: center;
-
   height: 30px;
-
   -webkit-app-region: drag;
 }
 
@@ -82,7 +80,6 @@ export default class TitleBar extends Vue {
   cursor: pointer;
   opacity: 0.6;
   font-size: 16px;
-
   margin: 0 8px;
 
   &:hover {

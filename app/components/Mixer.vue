@@ -5,7 +5,7 @@
       Mixer
     </h4>
   </div>
-  <div class="studio-controls-selector mixerPanel">
+  <div class="studio-controls-selector mixer-panel">
     <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="audioSource.name"/>
   </div>
 </div>
@@ -30,14 +30,6 @@ export default class Mixer extends Vue {
     return this.audioService.getSourcesForCurrentScene();
   }
 
-
 }
 </script>
 
-<style lang="less" scoped>
-.mixerPanel {
-  border: 1px solid #ddd;
-  background-color: #fcfcfc;
-  overflow-y: auto;
-}
-</style>

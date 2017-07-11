@@ -1,20 +1,26 @@
 <template>
-<div class="IntInput" :class="{disabled: value.enabled == false}">
-  <label>{{ value.description }}</label>
-  <input
-    ref="input"
-    type="text"
-    :value="value.value"
-    @mousewheel="onMouseWheelHandler"
-    :disabled="value.enabled == false"
-    @input="updateValue($event.target.value)"
-  />
-  <div class="arrows" @mousewheel="onMouseWheelHandler">
-    <div class="arrow arrow-up" @click="increment">
-      <i class="fa fa-sort-up"></i>
-    </div>
-    <div class="arrow arrow-down" @click="decrement">
-      <i class="fa fa-sort-down"></i>
+<div class="input-container IntInput" :class="{disabled: value.enabled == false}">
+  <div class="input-label">
+    <label>{{ value.description }}</label>
+  </div>
+  <div class="input-wrapper">
+    <div class="int-input">
+      <input
+        ref="input"
+        type="text"
+        :value="value.value"
+        @mousewheel="onMouseWheelHandler"
+        :disabled="value.enabled == false"
+        @input="updateValue($event.target.value)"
+      />
+      <div class="arrows" @mousewheel="onMouseWheelHandler">
+        <div class="arrow arrow-up" @click="increment">
+          <i class="fa fa-chevron-up"></i>
+        </div>
+        <div class="arrow arrow-down" @click="decrement">
+          <i class="fa fa-chevron-down"></i>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -65,58 +71,51 @@ class IntInput extends Input<IInputValue<number>> {
     if (event.deltaY > 0) this.decrement(); else this.increment();
     event.preventDefault();
   }
+
 }
+
 IntInput.obsType = ['OBS_PROPERTY_INT', 'OBS_PROPERTY_UINT'];
 
 export default IntInput;
-
 </script>
 
 <style lang="less">
 @import "../../../styles/index";
 
-.IntInput {
+.int-input {
   position: relative;
 
   .arrows {
-    .absolute(0, 0, 0);
+    .absolute(0, 8px, 0, auto);
     width: 30px;
-    color: @input-border-color;
+    color: @grey;
+    opacity: .7;
+    cursor: pointer;
+    .transition;
+
+    &:hover {
+      opacity: 1;
+    }
 
     .arrow {
-      border: 1px solid @input-border-color;
-      width: 13px;
-      height: 11px;
+      display: flex !important;
 
-      &:hover {
-        color: fade(black, 60%);
-        border-color: fade(black, 60%)
+      .fa {
+        position: relative;
+        font-size: 9px;
       }
 
       &:active {
         color: black;
-        border-color: black;
       }
 
       &.arrow-up {
-        .absolute(auto, 4px, 20px);
-        .fa {
-          position: relative;
-          top: -2px;
-          left: 2px;
-        }
+        .absolute(6px, 0px, auto, auto);
       }
 
       &.arrow-down {
-        .absolute(auto, 4px, 4px);
-        .fa {
-          position: relative;
-          top: -7px;
-          left: 2px;
-        }
-
+        .absolute(auto, 0px, 6px, auto);
       }
-
     }
   }
 }
