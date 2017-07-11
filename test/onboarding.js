@@ -11,7 +11,7 @@ async function clickCloseInspect(t, widgetName) {
     .click('.fa-times');
 }
 
-test('Addding some starter widgets', async t => {
+test('Adding some starter widgets', async t => {
   const app = t.context.app;
   await focusMain(t);
 
@@ -55,6 +55,6 @@ test('Addding some starter widgets', async t => {
   await clickSourceProperties(t);
   await focusChild(t);
 
-  const url = await app.client.$('label=URL').$('..').getValue('input');
+  const url = await app.client.$('label=URL').$('../..').getValue('input');
   t.regex(url, /SomeWidgetToken/);
 });

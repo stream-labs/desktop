@@ -76,13 +76,16 @@ export default class StudioFooterComponent extends Vue {
   border-top: 1px solid @day-border;
   max-width: none;
 }
+
 .nav-right {
   display: flex;
   align-items: center;
 }
+
 .nav-item {
   margin-left: 20px;
 }
+
 .record-button {
   position: relative;
   width: 30px;
@@ -94,12 +97,39 @@ export default class StudioFooterComponent extends Vue {
   justify-content: center;
   border: 3px solid @red;
   border-radius: 100%;
+  opacity: .4;
+  .transition;
+
   .fa-circle {
     top: 4px;
     left: 4px;
     font-size: 20px;
   }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.active {
+    opacity: 1;
+    .fa-circle {
+      animation: pulse 2.5s infinite;
+    }
+  }
 }
+
+@keyframes pulse {
+  0% {
+    transform: scale(.7);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(.7);
+  }
+}
+
 .night-theme {
   .footer {
     background-color: @night-primary;

@@ -60,7 +60,7 @@ export default class StartStreamingButton extends Vue {
 </script>
 
 <style lang="less" scoped>
-  .button--go-live {
-    width: 100px;
-  }
+.button--go-live {
+  width: 100px;
+}
 </style>

@@ -15,20 +15,20 @@
   flex-direction: column;
 }
 .section {
-  margin-bottom: 20px;
-  padding: 20px;
-  background: @day-secondary;
-  border: 1px solid @day-border;
-  .radius;
+  padding: 20px 20px 0;
+  background: @day-primary;
+  border-bottom: 1px solid @day-border;
+  .button {
+    margin-bottom: 20px;
+  }
 }
 .section-title--dropdown {
   h4 {
+    margin-bottom: 20px;
     cursor: pointer;
-    margin-bottom: 0;
   }
 }
 .section-content--dropdown {
-  margin-top: 20px;
   > div {
     div {
       &:last-child {
@@ -54,7 +54,7 @@
 
 .night-theme {
   .section {
-    background: @night-secondary;
-    border-color: @night-secondary;
+    background: @night-primary;
+    border-color: @night-border;
   }
 }

@@ -129,6 +129,7 @@ import { ListInput } from '../../shared/forms';
   }
 })
 export default class BrowseOverlays extends Vue {
+
   view = 'browseOverlays';
 
   listInputValue = {
@@ -143,14 +144,17 @@ export default class BrowseOverlays extends Vue {
   viewDetails() {
     this.view = 'overlayDetails';
   };
+
   viewOverlays() {
     this.view = 'browseOverlays';
   };
+
 }
 </script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";
+
 .overlays-container   {
   display: flex;
   justify-content: flex-start;
@@ -158,19 +162,23 @@ export default class BrowseOverlays extends Vue {
   height: 100%;
   color: @grey;
   padding-bottom: 56px;
+
   ::-webkit-scrollbar {
     width: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent!important;
   }
+
   ::-webkit-scrollbar-thumb {
     background-color: rgba(255,255,255,.08);
     border: none;
     border-radius: 3px;
   }
 }
-.overlays-header { 
+
+.overlays-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -179,6 +187,7 @@ export default class BrowseOverlays extends Vue {
   padding: 8px;
   flex: 0 0 56px;
 }
+
 .overlays-footer {
   position: absolute;
   left: 0;
@@ -188,12 +197,14 @@ export default class BrowseOverlays extends Vue {
   padding: 10px 20px;
   text-align: right;
 }
+
 .overlays-filters, .overlays-body {
   display: flex;
   padding: 20px;
   flex-direction: column;
   height: 100%;
 }
+
 .overlays-filters {
   flex-grow: 0;
   flex-shrink: 0;
@@ -201,9 +212,11 @@ export default class BrowseOverlays extends Vue {
   background: darken(@onboarding-bg, 3%);
   text-align: left;
 }
+
 .overlays-body {
   flex: 1;
 }
+
 .overlays {
   display: flex;
   flex-wrap: wrap;
@@ -213,12 +226,14 @@ export default class BrowseOverlays extends Vue {
   overflow-x: hidden;
   padding: 0 8px;
   margin-bottom: 8px;
+
   .overlay {
     &:nth-child(1), &:nth-child(2) {
       margin-top: 0;
     }
   }
 }
+
 .overlay {
   .aspect-ratio(16, 9);
   .radius;
@@ -231,49 +246,60 @@ export default class BrowseOverlays extends Vue {
   background-size: contain;
   cursor: pointer;
 }
+
 .overlay__name {
   position: absolute;
   left: 20px;
   bottom: 20px;
 }
+
 .filters {
   padding: 0 8px 8px;
   overflow-y: auto;
+
   .filter-group {
     &:last-child {
       margin-bottom: 0;
     }
   }
 }
+
 .filter-group {
   margin-bottom: 20px;
+
   .filter-option {
     &:last-child {
       margin-bottom: 0;
     }
   }
 }
+
 .filter-title {
   .semibold;
   font-size: 14px;
   margin-bottom: 8px;
 }
+
 .filter-option {
   .transition;
   margin-bottom: 4px;
   cursor: pointer;
+
   &:hover {
     color: @white;
   }
+
   &.selected {
     color: @teal-bright;
   }
 }
+
 .overlay-details {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
+
 .overlay-details-images {
   padding: 0 8px 8px;
   display: flex;
@@ -284,6 +310,7 @@ export default class BrowseOverlays extends Vue {
   min-height: 0px;
   height: 100%;
 }
+
 .overlay-details__main {
   background: darken(@onboarding-bg, 3%);
   .radius;
@@ -291,10 +318,12 @@ export default class BrowseOverlays extends Vue {
   justify-content: center;
   display: flex;
   flex: 0 0 80%;
+
   img {
     max-height: 100%;
   }
 }
+
 .overlay-details__thumbnails {
   display: flex;
   flex-wrap: nowrap;
@@ -305,6 +334,7 @@ export default class BrowseOverlays extends Vue {
   padding: 0 50px;
   margin: 0 auto;
 }
+
 .overlay-details__thumbnail {
   .radius;
   cursor: pointer;
@@ -312,12 +342,15 @@ export default class BrowseOverlays extends Vue {
   border: 2px solid transparent;
   max-width: 17%;
   max-height: 100%;
+
   &:hover {
     border-color: @teal-light-opac;
   }
+
   &.selected {
     border-color: @teal-bright;
   }
+
   img {
     max-height: 100%;
     width: auto;

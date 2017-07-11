@@ -482,6 +482,7 @@ export default class StudioEditor extends Vue {
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .studio-editor-display {
   position: relative;
   flex-grow: 1;

@@ -10,11 +10,11 @@
 </template>
 
 <script lang="ts">
-
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component({})
+
 export default class NavItem extends Vue {
 
   @Prop()
@@ -40,6 +40,7 @@ export default class NavItem extends Vue {
     this.$emit('iconClick', this.to);
     event.stopPropagation();
   }
+
 }
 </script>
 
@@ -60,13 +61,16 @@ export default class NavItem extends Vue {
     .semibold;
     border-color: @yellow;
     color: @navy;
+
     .fa {
       color: @yellow;
     }
   }
+
   &:hover {
     opacity: 1;
   }
+
   &.disabled {
     opacity: 0.3;
     cursor: default;

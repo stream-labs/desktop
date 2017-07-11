@@ -1,17 +1,21 @@
 <template>
-<div class="input">
-  <label>{{ value.description }}</label>
-  <div class="PathProperty-fieldGroup">
-    <input
-      type="text"
-      ref="input"
-      :value="value.value"
-      class="PathProperty-path">
-    <button
-      @click="showFileDialog"
-      class="PathProperty-browse button">
-      Browse
-    </button>
+<div class="input-container">
+  <div class="input-label">
+    <label>{{ value.description }}</label>
+  </div>
+  <div class="input-wrapper">
+    <div class="PathProperty-fieldGroup">
+      <input
+        type="text"
+        ref="input"
+        :value="value.value"
+        class="PathProperty-path">
+      <button
+        @click="showFileDialog"
+        class="PathProperty-browse button">
+        Browse
+      </button>
+    </div>
   </div>
 </div>
 </template>
@@ -59,6 +63,7 @@ class PathInput extends Input<IPathInputValue> {
     this.$refs.input.value = path;
     this.emitInput({ ...this.value, value: path });
   }
+
 }
 
 PathInput.obsType = ['OBS_PROPERTY_PATH', 'OBS_PROPERTY_FILE'];

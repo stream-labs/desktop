@@ -1,7 +1,9 @@
 <template>
-<div class="input">
-  <label>{{ value.description }}</label>
-  <div class="ButtonInput">
+<div class="input-container">
+  <div class="input-label">
+    <label>{{ value.description }}</label>
+  </div>
+  <div class="input-wrapper">
     <input
       :type="textVisible ? 'text' : 'password'"
       :value="value.value"
@@ -22,7 +24,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IInputValue, TObsType, Input } from './Input';
 
-
 @Component
 class TextInput extends Input<IInputValue<string>> {
 
@@ -38,15 +39,15 @@ class TextInput extends Input<IInputValue<string>> {
     this.textVisible = !this.textVisible;
   }
 
-
   onInputHandler(event: Event) {
     this.emitInput({ ...this.value, value: event.target['value'] });
   }
 
 }
-TextInput.obsType = ['OBS_PROPERTY_EDIT_TEXT', 'OBS_PROPERTY_TEXT'];
-export default TextInput;
 
+TextInput.obsType = ['OBS_PROPERTY_EDIT_TEXT', 'OBS_PROPERTY_TEXT'];
+
+export default TextInput;
 </script>
 
 <style lang="less" scoped>

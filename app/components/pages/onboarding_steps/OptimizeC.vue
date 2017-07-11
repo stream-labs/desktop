@@ -44,6 +44,3 @@ export default class OptimizeC extends Vue {
 
 }
 </script>
-<style lang="less" scoped>
-  
-</style>

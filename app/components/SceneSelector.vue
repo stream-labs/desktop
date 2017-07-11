@@ -47,11 +47,9 @@ export default class SceneSelector extends Vue {
     this.scenesService.makeSceneActive(id);
   }
 
-
   handleSort(data: any) {
     this.scenesService.setSceneOrder(data.order);
   }
-
 
   addScene() {
     this.windowService.showNameScene();
@@ -61,11 +59,9 @@ export default class SceneSelector extends Vue {
     this.scenesService.removeScene(this.activeSceneId);
   }
 
-
   showTransitions() {
     this.windowService.showSceneTransitions();
   }
-
 
   get scenes() {
     return this.scenesService.scenes.map(scene => {
@@ -76,7 +72,6 @@ export default class SceneSelector extends Vue {
     });
   }
 
-
   get activeSceneId() {
     if (this.scenesService.activeScene) {
       return this.scenesService.activeScene.id;
@@ -84,5 +79,6 @@ export default class SceneSelector extends Vue {
 
     return null;
   }
+
 }
 </script>

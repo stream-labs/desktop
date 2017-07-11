@@ -1,19 +1,21 @@
 <template>
-  <div class="input SliderInput">
-    <label>{{ value.description }}</label>
-    <div class="slider-container">
-      <Slider
-        @input="value => updateValue(value)"
-        :value="value.value"
-        :disabled="value.enabled == false"
-        :max="value.maxVal"
-        :min="value.minVal"
-        :interval="value.stepVal"
-      />
-      <div class="slider-label slider-label-left">{{ value.minVal }}</div>
-      <div class="slider-label slider-label-right">{{ value.maxVal }}</div>
+  <div class="input-container">
+    <div class="input-label">
+      <label>{{ value.description }}</label>
     </div>
-    <input type="text" readonly :value="value.value"/>
+    <div class="input-wrapper">
+      <div class="slider-container">
+        <Slider
+          @input="value => updateValue(value)"
+          :value="value.value"
+          :disabled="value.enabled == false"
+          :max="value.maxVal"
+          :min="value.minVal"
+          :interval="value.stepVal"
+          tooltip="always"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,44 +39,40 @@
     updateValue(value: number) {
       this.emitInput({ ...this.value, value });
     }
+
   }
+
   SliderInput.obsType = 'OBS_PROPERTY_SLIDER';
 
   export default SliderInput;
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+@import "../../../styles/index";
 
-  @import "../../../styles/index";
+.slider-container {
+  height: 45px;
+  position: relative;
+}
 
-  .SliderInput {
-    position: relative;
+.slider-label {
+  position: absolute;
+  bottom: 4px;
+  color: @input-label-color;
+  &.slider-label--left { left: 0 }
+  &.slider-label--right { right: 0 }
+}
 
-    .slider-container {
-      height: 45px;
-      margin-right: 50px;
-      position: relative;
-    }
-
-    .slider-label {
-      position: absolute;
-      bottom: 4px;
-      color: @input-label-color;
-      &.slider-label-left { left: 0 }
-      &.slider-label-right { right: 0 }
-    }
-
-    input {
-      position: absolute;
-      top: 23px;
-      right: 0;
-      width: 45px;
-      height: 20px;
-      padding: 0 4px;
-      border-radius: 2px;
-      text-align: right;
-      cursor: default;
-    }
-  }
-
+.slider-value {
+  position: absolute;
+  top: 23px;
+  right: 0;
+  width: 45px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 2px;
+  text-align: right;
+  cursor: default;
+  border: none;
+}
 </style>

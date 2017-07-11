@@ -1,5 +1,5 @@
 <template>
-<div class="Hotkey">
+<div class="hotkey">
   <div class="Hotkey-description">
     {{ description }}
   </div>
@@ -131,9 +131,10 @@ export default class HotkeyComponent extends Vue {
 </script>
 
 <style lang="less" scoped>
-.Hotkey {
+.hotkey {
   display: flex;
   flex-direction: row;
+  margin-bottom: 20px;
 }
 
 .Hotkey-description {

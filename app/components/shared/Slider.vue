@@ -1,5 +1,5 @@
 <template>
-  <vue-slider class="Slider"
+  <vue-slider class="slider"
     @input="value => updateValue(value)"
     :value="value"
     :disabled="disabled"
@@ -8,7 +8,7 @@
     :interval="interval"
     :speed="0"
     :height="4"
-    :tooltip="false"
+    :tooltip="tooltip"
   />
 </template>
 
@@ -38,42 +38,78 @@ export default class SliderInput extends Vue {
   @Prop()
   disabled: boolean;
 
+   @Prop()
+  tooltip: string;
+
   @throttle(100)
   updateValue(value: number) {
     this.$emit('input', value);
   }
+
 }
 </script>
 
 <style lang="less">
+@import "../../styles/index";
 
-  @import "../../styles/index";
+.slider {
+  background: transparent;
+  padding:8px 0 !important;
+  margin: 0;
 
+  &:hover {
+    .vue-slider-tooltip {
+      color: @navy !important;
+    }
+  }
+}
+
+.vue-slider {
+  background-color: @slider-background-color !important;
+}
+
+.vue-slider-process {
+  background-color: @slider-progress-color !important;
+}
+
+.vue-slider-dot {
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: @slider-progress-color;
+  }
+}
+
+.vue-slider-tooltip {
+  background-color: transparent !important;
+  border: none !important;
+  color: @grey !important;
+  font-size: 13px !important;
+  top: 40px !important;
+  .transition;
+
+  &:before {
+    display: none;
+  }
+}
+
+.night-theme {
   .vue-slider {
-    background-color: @slider-background-color !important;
+    background-color: @night-slider-bg!important;
   }
 
-  .vue-slider-process {
-    background-color: @slider-progress-color !important;
-  }
-
-  .vue-slider-dot {
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      left: 5px;
-      top: 5px;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background-color: @slider-progress-color;
+  .slider {
+    &:hover {
+      .vue-slider-tooltip {
+        color: @white !important;
+      }
     }
   }
-  .night-theme {
-    .vue-slider {
-      background-color: @night-slider-bg!important;
-    }
-  }
-
+}
 </style>

@@ -168,9 +168,11 @@ export default class SelectWidgets extends Vue {
   display: flex;
   margin: 20px 0;
 }
+
 .select-widgets__column {
   padding: 0 15px;
 }
+
 .select-widgets__column-title {
   .semibold;
   color: @white;
