@@ -43,6 +43,7 @@ test('Adding some starter widgets', async t => {
   await clickCloseInspect(t, 'Donation Goal');
 
   await app.client.click('button=Next');
+  await app.client.click('a=Setup later');
 
   t.true(await app.client.isExisting('li=Alert Box'));
   t.false(await app.client.isExisting('li=Event List'));

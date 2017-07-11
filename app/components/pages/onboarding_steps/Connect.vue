@@ -64,7 +64,7 @@ export default class Connect extends Vue {
   }
 
   skipOnboarding() {
-    this.onboardingService.finish();
+    this.onboardingService.skip();
   }
 
 }
