@@ -260,7 +260,8 @@
           <li
             v-for="source in availableSources"
             class="source source--standard"
-            @click="inspectSource(source)">
+            @click="inspectSource(source)"
+            @dblclick="selectSource(source)">
             {{ source }}
           </li>
         </ul>
@@ -270,7 +271,8 @@
         <div class="source-list--widgets">
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.AlertBox)">
+            @click="inspectSource(widgetTypes.AlertBox)"
+            @dblclick="selectWidget(widgetTypes.AlertBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/alertbox-no-bg.png">
             </div>
@@ -278,7 +280,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationGoal)">
+            @click="inspectSource(widgetTypes.DonationGoal)"
+            @dblclick="selectWidget(widgetTypes.DonationGoal)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-goal-no-bg.png">
             </div>
@@ -286,7 +289,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationTicker)">
+            @click="inspectSource(widgetTypes.DonationTicker)"
+            @dblclick="selectWidget(widgetTypes.DonationTicker)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-ticker-no-bg.png">
             </div>
@@ -294,7 +298,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.ChatBox)">
+            @click="inspectSource(widgetTypes.ChatBox)"
+            @dblclick="selectWidget(widgetTypes.ChatBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/chatbox-no-bg.png">
             </div>
@@ -302,7 +307,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.EventList)">
+            @click="inspectSource(widgetTypes.EventList)"
+            @dblclick="selectWidget(widgetTypes.EventList)">
             <div class="source__icon">
               <img src="../../../media/images/icons/event-list-no-bg.png">
             </div>
@@ -310,7 +316,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.TheJar)">
+            @click="inspectSource(widgetTypes.TheJar)"
+            @dblclick="selectWidget(widgetTypes.TheJar)">
             <div class="source__icon">
               <img src="../../../media/images/icons/the-jar-no-bg.png">
             </div>
