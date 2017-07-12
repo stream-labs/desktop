@@ -6,19 +6,19 @@
 
       <div class="running-setup-container optimizing">
         <div class="running-setup__deco running-setup__deco--right">
-          <img src="../../../../media/images/decorations/right-running.png" />
+          <img src="../../../../media/images/decorations/right.gif" />
         </div>
         <div class="running-setup__deco running-setup__deco--left">
-          <img src="../../../../media/images/decorations/left-running.png" />
+          <img src="../../../../media/images/decorations/left.gif" />
         </div>
         <div
           class="running-setup-row"
           v-for="step in stepInfo"
           :key="step.step">
-          <div class="running-setup-title">{{ step.description }}</div>
+          <div class="running-setup-title typing">{{ step.description }}</div>
           <div
             v-if="step.percentage != null"
-            class="running-setup-percent">
+            class="running-setup-percent delay">
             {{ step.percentage }}%
           </div>
         </div>
@@ -106,3 +106,27 @@ export default class OptimizeB extends Vue {
 
 }
 </script>
+
+<style lang="less">
+.typing {
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  animation: typing 3s steps(30, end),
+}
+
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+.delay {
+  animation: 3s 0s delay;
+}
+
+@keyframes delay {
+  0% { opacity:0; }
+  100% { opacity:0; }
+}
+</style>

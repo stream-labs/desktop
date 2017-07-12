@@ -8,7 +8,8 @@
     <div class="nav-item">
       <button
         class="record-button"
-        @click="toggleRecording">
+        @click="toggleRecording"
+        :class="{ active: streamingService.isRecording }">
         <i class="fa fa-circle"/>
       </button>
     </div>
@@ -65,6 +66,7 @@ export default class StudioFooterComponent extends Vue {
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .footer {
   display: flex;
   justify-content: space-between;
@@ -95,7 +97,6 @@ export default class StudioFooterComponent extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid @red;
   border-radius: 100%;
   opacity: .4;
   .transition;
@@ -112,9 +113,7 @@ export default class StudioFooterComponent extends Vue {
 
   &.active {
     opacity: 1;
-    .fa-circle {
-      animation: pulse 2.5s infinite;
-    }
+    animation: pulse 2.5s infinite;
   }
 }
 
