@@ -10,6 +10,7 @@
       :options="value.options"
       track-by="value"
       :close-on-select="true"
+      :allow-empty="false"
       label="description"
       @input="onInputHandler">
       <template slot="option" scope="props">
