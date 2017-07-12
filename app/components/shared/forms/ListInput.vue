@@ -44,9 +44,11 @@ class ListInput extends Input<IListInputValue> {
   }
 
   get currentValue() {
-    return this.value.options.find((opt: IListOption) => {
+    const option = this.value.options.find((opt: IListOption) => {
       return this.value.value === opt.value;
     });
+
+    return option || this.value.options[0];
   }
 
 }
