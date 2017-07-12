@@ -1,6 +1,7 @@
 <template>
 <modal-layout
   :show-controls="false"
+  :content-styles="{ padding: 0 }"
   title="Add Source">
   <div slot="content"
     class="add-source">
@@ -259,7 +260,8 @@
           <li
             v-for="source in availableSources"
             class="source source--standard"
-            @click="inspectSource(source)">
+            @click="inspectSource(source)"
+            @dblclick="selectSource(source)">
             {{ source }}
           </li>
         </ul>
@@ -269,7 +271,8 @@
         <div class="source-list--widgets">
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.AlertBox)">
+            @click="inspectSource(widgetTypes.AlertBox)"
+            @dblclick="selectWidget(widgetTypes.AlertBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/alertbox-no-bg.png">
             </div>
@@ -277,7 +280,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationGoal)">
+            @click="inspectSource(widgetTypes.DonationGoal)"
+            @dblclick="selectWidget(widgetTypes.DonationGoal)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-goal-no-bg.png">
             </div>
@@ -285,7 +289,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationTicker)">
+            @click="inspectSource(widgetTypes.DonationTicker)"
+            @dblclick="selectWidget(widgetTypes.DonationTicker)">
             <div class="source__icon">
               <img src="../../../media/images/icons/donation-ticker-no-bg.png">
             </div>
@@ -293,7 +298,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.ChatBox)">
+            @click="inspectSource(widgetTypes.ChatBox)"
+            @dblclick="selectWidget(widgetTypes.ChatBox)">
             <div class="source__icon">
               <img src="../../../media/images/icons/chatbox-no-bg.png">
             </div>
@@ -301,7 +307,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.EventList)">
+            @click="inspectSource(widgetTypes.EventList)"
+            @dblclick="selectWidget(widgetTypes.EventList)">
             <div class="source__icon">
               <img src="../../../media/images/icons/event-list-no-bg.png">
             </div>
@@ -309,7 +316,8 @@
           </div>
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.TheJar)">
+            @click="inspectSource(widgetTypes.TheJar)"
+            @dblclick="selectWidget(widgetTypes.TheJar)">
             <div class="source__icon">
               <img src="../../../media/images/icons/the-jar-no-bg.png">
             </div>
@@ -387,6 +395,7 @@ export default class AddSource extends Vue {
 
 <style lang="less">
 @import "../../styles/index";
+
 .source-info {
   padding: 20px;
   border-bottom: 1px solid @day-border;
@@ -395,12 +404,14 @@ export default class AddSource extends Vue {
   background: @day-secondary;
   flex: 0 0 220px;
   height: 220px;
+
   .button {
     position: absolute;
     right: 20px;
     top: 20px;
   }
 }
+
 .night-theme {
   .source-info {
     border-color: @night-border;
@@ -408,34 +419,37 @@ export default class AddSource extends Vue {
   }
 }
 </style>
+
 <style lang="less" scoped>
 @import "../../styles/index";
+
 h4 {
   color: @grey;
 }
+
 .add-source {
   color: @navy;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  position: relative;
 }
+
 .source-welcome {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
 }
+
 .source-welcome__img {
   padding: 0 20px 0 40px;
   flex: 0 0 50%;
 }
+
 .sources {
   padding: 20px;
   display: flex;
   flex: 1 0 auto;
+
   .source-group {
     &:last-child {
       padding: 20px 0 20px 20px;
@@ -443,36 +457,43 @@ h4 {
     }
   }
 }
+
 .source-group {
   border-right: 1px solid @day-border;
   margin: -20px 0px -20px 0px;
   padding: 20px 20px 20px 0;
   flex: 0 0 50%;
 }
+
 .source-list {
   list-style-type: none;
   margin: 0;
 }
+
 .source-list--widgets {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
 .source {
   color: @navy;
   cursor: pointer;
   .transition;
+
   &:hover {
     color: @navy-secondary;
     .semibold;
   }
 }
+
 .source--standard {
   display: inline-block;
   width: 49%;
   padding-right: 1%;
   margin-bottom: 4px;
 }
+
 .source--widget {
   border: 1px solid @day-border;
   display: flex;
@@ -482,13 +503,16 @@ h4 {
   margin-bottom: 10px;
   .radius;
   .transition;
+
   &:hover {
     background: @day-secondary;
   }
+
   &:nth-child(5), &:nth-child(6) {
     margin-bottom: 0;
   }
 }
+
 .source__icon {
   margin-right: 10px;
   width: 30px;
@@ -498,19 +522,24 @@ h4 {
   .add-source {
     color: @grey;
   }
+
   .source {
     color: @grey;
+
     &:hover {
       color: @white;
     }
   }
+
   .source--widget {
     border-color: @night-border;
+
     &:hover {
       background: @night-hover;
       border-color: @night-hover;
     }
   }
+
   .source-group {
     border-color: @night-border;
   }

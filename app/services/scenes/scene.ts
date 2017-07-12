@@ -142,12 +142,12 @@ export class Scene implements IScene {
     this.SET_SOURCE_ORDER(order);
   }
 
-  @mutation
+  @mutation()
   private MAKE_SOURCE_ACTIVE(sourceId: string) {
     this.sceneState.activeSourceId = sourceId;
   }
 
-  @mutation
+  @mutation()
   private ADD_SOURCE_TO_SCENE(sourceId: string) {
     this.sceneState.sources.unshift({
       // This is information that belongs to a scene/source pair
@@ -167,7 +167,7 @@ export class Scene implements IScene {
     });
   }
 
-  @mutation
+  @mutation()
   private REMOVE_SOURCE_FROM_SCENE(sourceId: string) {
 
     if (this.sceneState.activeSourceId === sourceId) {
@@ -179,7 +179,7 @@ export class Scene implements IScene {
     });
   }
 
-  @mutation
+  @mutation()
   private SET_SOURCE_ORDER(order: string[]) {
 
     // TODO: This is O(n^2)

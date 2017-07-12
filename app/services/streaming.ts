@@ -27,31 +27,31 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     streamOk: null
   } as IStreamingServiceState;
 
-  @mutation
+  @mutation()
   START_STREAMING(startTime: string) {
     this.state.isStreaming = true;
     this.state.streamStartTime = startTime;
   }
 
-  @mutation
+  @mutation()
   STOP_STREAMING() {
     this.state.isStreaming = false;
     this.state.streamStartTime = null;
   }
 
-  @mutation
+  @mutation()
   START_RECORDING(startTime: string) {
     this.state.isRecording = true;
     this.state.recordStartTime = startTime;
   }
 
-  @mutation
+  @mutation()
   STOP_RECORDING() {
     this.state.isRecording = false;
     this.state.recordStartTime = null;
   }
 
-  @mutation
+  @mutation()
   SET_STREAM_STATUS(streamOk: boolean) {
     this.state.streamOk = streamOk;
   }

@@ -93,31 +93,38 @@ export default class SelectableWidget extends Vue {
   cursor: pointer;
   width: 360px;
   .transition;
+
   &:hover {
     border-color: @teal-light-opac;
   }
+
   &.selected {
     border-color: @teal-bright;
   }
 }
+
 .widget__icon {
   width: 40px;
   margin-right: 20px;
 }
+
 .widget__info {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   text-align: left;
 }
+
 .widget__name {
   .semibold;
   color: @white;
   font-size: 14px;
 }
+
 .widget__desc {
   color: @grey;
 }
+
 .widget-detail-wrapper {
   position: absolute;
   top: 0;
@@ -129,6 +136,7 @@ export default class SelectableWidget extends Vue {
   justify-content: center;
   align-items: center;
 }
+
 .widget-detail {
   .radius;
   background: @night-select-bg;
@@ -137,22 +145,27 @@ export default class SelectableWidget extends Vue {
   min-width: 550px;
   max-width: 750px;
 }
+
 .widget-detail-close {
   color: @grey;
   .transition;
   margin-left: 20px;
   cursor: pointer;
+
   &:hover {
     color: @white;
   }
 }
+
 .widget-detail__header {
   padding: 20px;
   display: flex;
   justify-content: space-between;
 }
+
 .widget-detail__body {
   overflow: hidden;
+
   video {
     width: 102%;
     display: flex;

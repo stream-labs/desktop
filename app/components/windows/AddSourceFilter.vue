@@ -64,11 +64,9 @@ export default class AddSourceFilter extends Vue {
     this.windowService.showSourceFilters(this.sourceName, name);
   }
 
-
   cancel() {
     this.windowService.showSourceFilters(this.sourceName);
   }
-
 
   validateName(name: string) {
     if (!name) return 'Name is required';
@@ -78,7 +76,6 @@ export default class AddSourceFilter extends Vue {
     return '';
   }
 
-
   setTypeAsName() {
     const name = this.state.availableTypes.find(({ type }) => {
       return type === this.form.type.value;
@@ -87,5 +84,6 @@ export default class AddSourceFilter extends Vue {
       name, (suggestedName: string) => this.validateName(suggestedName)
     );
   }
+
 }
 </script>

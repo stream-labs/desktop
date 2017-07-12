@@ -58,14 +58,13 @@ export default class SourcePreview extends Vue {
       rect.top * factor
     );
   }
+
 }
 </script>
 
 <style lang="less" scoped>
-
-  .SourcePreview {
-    height: 100%;
-    background-color: black;
-  }
-
+.SourcePreview {
+  height: 100%;
+  background-color: black;
+}
 </style>

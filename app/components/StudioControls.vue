@@ -27,9 +27,9 @@ export default class StudioControls extends Vue {
 <style lang="less" scoped>
 @import "../styles/index";
 .studio-controls {
-  height: 280px;
+  height: 240px;
   width: 100%;
-  padding: 20px 15px;
+  padding: 16px 15px;
 }
 
 .studio-controls-panel {
@@ -42,6 +42,7 @@ export default class StudioControls extends Vue {
 
 <style lang="less">
 @import "../styles/index";
+
 .studio-controls-top {
   display: flex;
   flex-direction: row;
@@ -50,15 +51,18 @@ export default class StudioControls extends Vue {
   justify-content: space-between;
   flex: 0 0 20px;
 }
+
 .studio-controls__label {
   margin-bottom: 0;
   .semibold;
   color: @grey;
 }
+
 .studio-controls-selector {
   background: @day-secondary;
   border: 1px solid @day-border;
   .radius;
   flex-grow: 1;
+  overflow-y: auto;
 }
 </style>

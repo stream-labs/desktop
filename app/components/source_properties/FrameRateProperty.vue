@@ -148,7 +148,6 @@ const FrameRateProperty = Property.extend({
         denominator: 0
       }];
 
-
       if (this.property.value.ranges[0]) {
         options = options.concat(fr.simpleFPSValuesForRanges(this.property.value.ranges));
       }
@@ -177,8 +176,8 @@ const FrameRateProperty = Property.extend({
 });
 
 FrameRateProperty.obsType = 'OBS_PROPERTY_FRAME_RATE';
-export default FrameRateProperty;
 
+export default FrameRateProperty;
 </script>
 
 <style lang="less" scoped>

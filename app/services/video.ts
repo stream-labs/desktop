@@ -30,6 +30,8 @@ export class Display {
         this.refreshOutputRegion();
       }, 1000);
     });
+
+    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
   }
 
   move(x: number, y: number) {

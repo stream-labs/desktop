@@ -45,7 +45,3 @@ export default class SetupOptions extends Vue {
 
 }
 </script>
-
-<style lang="less" scoped>
-  
-</style>

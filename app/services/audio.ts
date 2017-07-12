@@ -93,13 +93,13 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
 
-  @mutation
+  @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     this.state.audioSources[source.id] = source;
   }
 
 
-  @mutation
+  @mutation()
   private REMOVE_AUDIO_SOURCE(sourceId: string) {
     delete this.state.audioSources[sourceId];
   }
@@ -141,28 +141,34 @@ export class AudioSource extends Source implements IAudioSource {
     // the default interval is 40ms
     // nodeObs.OBS_audio_volmeterSetUpdateInterval(volmeterId, VOLMETER_UPDATE_INTERVAL);
 
-    let lastVolmeterEventTime: number;
+    let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
+    let volmeterCheckTimeoutId: number;
     const obsSubscription: INodeObsId = nodeObs.OBS_audio_volmeterAddCallback(volmeterId, (volmeter: IVolmeter) => {
       volmeterStream.next(volmeter);
       lastVolmeterValue = volmeter;
-      lastVolmeterEventTime = Date.now();
+      gotEvent = true;
     });
 
-    // reset volmeter if for a long time we don't have any updates from backend
-    const volmeterCheckIntervalId = setInterval(() => {
-      if (Date.now() - lastVolmeterEventTime < VOLMETER_UPDATE_INTERVAL * 2) return;
-      volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
-    }, VOLMETER_UPDATE_INTERVAL * 2);
+    function volmeterCheck() {
+      if (!gotEvent) {
+        volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
+      }
+
+      gotEvent = false;
+      volmeterCheckTimeoutId = setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+    }
+
+    volmeterCheck();
 
     return volmeterStream.subscribe(cb).add(() => {
-      clearInterval(volmeterCheckIntervalId);
+      clearTimeout(volmeterCheckTimeoutId);
       nodeObs.OBS_audio_volmeterRemoveCallback(volmeterId, obsSubscription);
     });
   }
 
 
-  @mutation
+  @mutation()
   private UPDATE(patch: TPatch<IAudioSource>) {
     Object.assign(this.audioSourceState, patch);
   }

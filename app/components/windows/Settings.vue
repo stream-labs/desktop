@@ -4,30 +4,25 @@
   :show-cancel="false"
   :done-handler="done">
 
-  <div slot="content">
-    <div class="row">
-      <div class="columns small-3">
-        <NavMenu v-model="categoryName" class="side-menu">
-          <NavItem
-            v-for="category in categoryNames"
-            :to="category"
-            :ico="icons[category]"
-          >
-            {{ category }}
-          </NavItem>
-        </NavMenu>
-      </div>
-      <div class="columns small-9 no-padding-right">
-        <startup-settings v-if="categoryName === 'General'" />
-        <hotkeys v-if="categoryName === 'Hotkeys'" />
-        <GenericFormGroups
-          v-if="categoryName !== 'Hotkeys'"
-          v-model="settingsData"
-          @input="save" />
-      </div>
+  <div slot="content" class="settings">
+    <NavMenu v-model="categoryName" class="side-menu">
+      <NavItem
+        v-for="category in categoryNames"
+        :to="category"
+        :ico="icons[category]"
+      >
+        {{ category }}
+      </NavItem>
+    </NavMenu>
+    <div class="settings-container">
+      <startup-settings v-if="categoryName === 'General'" />
+      <hotkeys v-if="categoryName === 'Hotkeys'" />
+      <GenericFormGroups
+        v-if="categoryName !== 'Hotkeys'"
+        v-model="settingsData"
+        @input="save" />
     </div>
   </div>
-
 </modal-layout>
 </template>
 
@@ -75,19 +70,16 @@ export default class SceneTransitions extends Vue {
     Advanced: 'cogs'
   };
 
-
   get categoryNames() {
     return this.settingsService.getCategories().filter(name => {
       return name !== 'Audio';
     });
   }
 
-
   save(settingsData: ISettingsSubCategory[]) {
     this.settingsService.setSettings(this.categoryName, settingsData);
     this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
-
 
   done() {
     this.windowService.closeWindow();
@@ -102,10 +94,34 @@ export default class SceneTransitions extends Vue {
 </script>
 
 <style lang="less" scoped>
-
-.side-menu {
-  position: fixed;
-  left: 0;
+.settings {
+  display: flex;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
 }
 
+.settings-container {
+  flex-grow: 1;
+  margin: -20px -20px -20px 0;
+  overflow: auto;
+}
+</style>
+
+<style lang="less">
+.settings-container {
+  .input-container {
+    flex-direction: column;
+
+    .input-label, .input-wrapper {
+      width: 100%;
+    }
+
+    .input-label {
+      label {
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
 </style>

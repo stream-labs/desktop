@@ -8,10 +8,10 @@ interface ICustomizationServiceState {
 export class CustomizationService extends PersistentStatefulService<ICustomizationServiceState> {
 
   static defaultState: ICustomizationServiceState = {
-    nightMode: false
+    nightMode: true
   };
 
-  @mutation
+  @mutation()
   SET_NIGHT_MODE(nightMode: boolean) {
     this.state.nightMode = nightMode;
   }

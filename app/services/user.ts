@@ -19,13 +19,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject()
   hostsService: HostsService;
 
-  @mutation
+  @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
   }
 
 
-  @mutation
+  @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
   }
@@ -35,6 +35,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
 
     this.validateLogin();
+  }
+
+
+  mounted() {
+    // This is used for faking authentication in tests.  We have
+    // to do this because Twitch adds a captcha when we try to
+    // actually log in from integration tests.
+    electron.ipcRenderer.on('testing-fakeAuth', (e, auth) => {
+      this.LOGIN(auth);
+    });
   }
 
 

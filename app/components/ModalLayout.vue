@@ -1,12 +1,13 @@
 <template>
 <div class="modal-layout" :class="{'night-theme': nightTheme}">
+  <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
     <slot name="fixed"/>
   </div>
   <div
-    class="ModalLayout-content"
+    class="modal-layout-content"
     :style="contentStyle">
     <slot name="content"/>
   </div>
@@ -33,20 +34,22 @@ import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import electron from '../vendor/electron';
 import { Inject } from '../services/service';
+import TitleBar from './TitleBar.vue';
 
 const { remote } = electron;
 
-@Component({})
+@Component({
+  components: { TitleBar }
+})
 export default class ModalLayout extends Vue {
 
   contentStyle: Object = {};
   fixedStyle: Object = {};
 
   @Inject()
-  windowService: WindowService;
-
-  @Inject()
   customizationService: CustomizationService;
+
+  windowService: WindowService = WindowService.instance;
 
   // The title shown at the top of the window
   @Prop()
@@ -74,7 +77,7 @@ export default class ModalLayout extends Vue {
 
   // Additional CSS styles for the content section
   @Prop()
-  contentStyles: string;
+  contentStyles: Dictionary<string>;
 
   // The height of the fixed section
   @Prop()
@@ -97,10 +100,6 @@ export default class ModalLayout extends Vue {
     this.fixedStyle = fixedStyle;
   }
 
-  mounted() {
-    remote.getCurrentWindow().setTitle(this.title);
-  }
-
   get nightTheme() {
     return this.customizationService.nightMode;
   }
@@ -118,6 +117,7 @@ export default class ModalLayout extends Vue {
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .modal-layout {
   height: 100%;
   display: flex;
@@ -126,12 +126,17 @@ export default class ModalLayout extends Vue {
   border-top: 1px solid @day-border;
 }
 
+.modal-layout-titlebar {
+  flex-shrink: 0;
+}
+
 .ModalLayout-fixed {
   flex-shrink: 0;
 }
 
-.ModalLayout-content {
+.modal-layout-content {
   flex-grow: 1;
+  height: 100%;
 }
 
 .modal-layout-controls {

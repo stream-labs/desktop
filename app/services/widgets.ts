@@ -1,3 +1,4 @@
+import { throttle } from 'lodash-decorators';
 import { Service, Inject } from './service';
 import { UserService, requiresLogin } from './user';
 import { TPlatform } from './platforms';
@@ -88,6 +89,7 @@ export class WidgetTester {
 
   }
 
+  @throttle(1000)
   test() {
     fetch(new Request(this.url));
   }
@@ -226,7 +228,7 @@ export class WidgetsService extends Service {
 
   @requiresLogin()
   createWidget(type: WidgetType, name?: string) {
-    const scene = this.scenesService.scenes[0];
+    const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
     const suggestedName = namingHelpers.suggestName(name || widget.name, (name: string) => {

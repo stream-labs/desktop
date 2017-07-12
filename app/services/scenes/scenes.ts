@@ -36,14 +36,14 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
 
-  @mutation
+  @mutation()
   private RESET_SCENES() {
     this.state.activeSceneId = null;
     this.state.displayOrder = [];
     this.state.scenes = {};
   }
 
-  @mutation
+  @mutation()
   private ADD_SCENE(id: string, name: string) {
     Vue.set(this.state.scenes, id, {
       id,
@@ -55,19 +55,19 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.state.activeSceneId = this.state.activeSceneId || id;
   }
 
-  @mutation
+  @mutation()
   private REMOVE_SCENE(id: string) {
     Vue.delete(this.state.scenes, id);
 
     this.state.displayOrder = without(this.state.displayOrder, id);
   }
 
-  @mutation
+  @mutation()
   private MAKE_SCENE_ACTIVE(id: string) {
     this.state.activeSceneId = id;
   }
 
-  @mutation
+  @mutation()
   private SET_SCENE_ORDER(order: string[]) {
     this.state.displayOrder = order;
   }

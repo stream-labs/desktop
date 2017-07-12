@@ -67,12 +67,12 @@ export default class NameSource extends Vue {
     } else {
       let id;
 
-      if (this.sourceType) {
+      if (this.sourceType != null) {
         id = this.scenesService.activeScene.addSource(
           this.name,
           this.sourceType
         );
-      } else if (this.widgetType) {
+      } else if (this.widgetType != null) {
         id = this.widgetsService.createWidget(
           this.widgetType,
           this.name
@@ -88,11 +88,11 @@ export default class NameSource extends Vue {
   }
 
   get sourceType() {
-    return this.$store.state.windowOptions.options.sourceType;
+    return this.windowService.getOptions().sourceType;
   }
 
   get widgetType() {
-    return this.$store.state.windowOptions.options.widgetType;
+    return this.windowService.getOptions().widgetType;
   }
 
 }

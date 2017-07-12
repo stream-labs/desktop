@@ -1,5 +1,5 @@
 <template>
-<div class="MixerItem" :class="{ muted: audioSource.muted}">
+<div class="mixer-item" :class="{ muted: audioSource.muted}">
 
   <div class="flex">
     <div class="source-name">{{ audioSource.displayName }}</div>
@@ -21,6 +21,7 @@
       :max="1"
       :interval="0.01"
       @input="onSliderChangeHandler"
+      tooltip="false"
     />
     <div class="controls">
       <i class="ico-btn fa fa-volume-up"
@@ -113,18 +114,20 @@ export default class Mixer extends Vue {
     );
     menu.popup();
   }
+
 }
 </script>
 
 <style lang="less" scoped>
 @import "../styles/index";
 
-.MixerItem {
+.mixer-item {
   position: relative;
   padding: 10px;
 
-
-  .source-name { flex: 1}
+  .source-name {
+    flex: 1
+  }
 
   .db-value {
     width: 60px;
@@ -151,23 +154,30 @@ export default class Mixer extends Vue {
     }
   }
 
-  .Slider {
+  .slider {
     flex: 1;
-    margin-left: -8px;
   }
 
-  &.muted .Slider {
+  &.muted .slider {
     opacity: 0.4;
   }
 
   .controls {
-    width: 55px;
+    width: 60px;
     text-align: right;
     font-size: 16px;
     margin-top: -2px;
-    .fa-volume-off { color: @red }
+
+    .fa {
+      font-size: 14;
+    }
+
+    .fa-volume-off {
+      color: @red;
+    }
   }
 }
+
 .night-theme {
   .volmeter {
     background-color: @night-slider-bg;

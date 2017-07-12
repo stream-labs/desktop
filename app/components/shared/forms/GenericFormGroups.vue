@@ -41,5 +41,16 @@ export default {
       this.$emit('input', this.value);
     }
   }
+
 };
 </script>
+
+<style lang="less">
+.form-groups {
+  .section{
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+</style>

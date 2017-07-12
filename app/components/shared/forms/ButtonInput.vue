@@ -1,10 +1,14 @@
 <template>
-  <div>
-    <button
-      class="button button--action ButtonProperty-button"
-      @click="handleClick">
-      {{ value.description }}
-    </button>
+  <div class="input-container">
+    <div class="input-label">
+    </div>
+    <div class="input-wrapper">
+      <button
+        class="button button--action button-property-button"
+        @click="handleClick">
+        {{ value.description }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -23,14 +27,10 @@ class ButtonInput extends Input<IInputValue<{}>> {
   handleClick() {
     this.emitInput({ ...this.value, value: {} });
   }
+
 }
 
 ButtonInput.obsType = 'OBS_PROPERTY_BUTTON';
+
 export default ButtonInput;
 </script>
-
-<style lang="less" scoped>
-  .ButtonProperty-button {
-    margin: 15px 0;
-  }
-</style>

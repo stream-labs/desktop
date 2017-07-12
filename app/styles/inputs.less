@@ -1,23 +1,45 @@
 .input-container {
   margin-bottom: 20px;
+  position: relative;
+  display: flex;
 }
-input[type=text] {
+.input-label {
+  width: 30%;
+  padding-right: 15px;
+}
+.input-wrapper {
+  width: 70%;
+}
+input[type=text], input[type="password"] {
   border: 1px solid @day-input-border;
   background: @day-input-bg;
+  margin-bottom: 0;
   &:focus {
     box-shadow: none;
+    background: @day-input-bg;
+    border-color: @day-focus-border;
   }
 }
-.multiselect {
 
+.checkbox {
+  margin-bottom: 0;
+  label {
+    line-height: 20px;
+    &:before {
+      background: transparent;
+      border-color: @day-input-border;
+    }
+  }
 }
+
 .multiselect__select {
   z-index: 10;
   padding: 0;
   width: auto;
   height: auto;
   right: 8px;
-  top: 10px;
+  top: 0px;
+  line-height: 32px;
   &:before {
     font-family: FontAwesome;
     content: '\f078';
@@ -28,13 +50,79 @@ input[type=text] {
 .multiselect__tags {
   padding: 0;
   border: none;
+  height: 0;
+  min-height: 0;
   .radius;
+  input[type="text"] {
+    cursor: pointer;
+  }
+}
+.multiselect__input, .multiselect__single {
+  &:hover, &:focus {
+    background: @day-input-bg;
+    border-color: @day-focus-border;
+  }
+}
+.multiselect__content {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-color: @day-border;
+  top: 36px;
+  background: @day-input-bg;
+}
+.multiselect__element {
+  font-size: 13px;
+}
+.multiselect__option {
+  padding: 0px 8px;
+  height: 36px;
+  min-height: 0;
+  line-height: 36px;
+  .transition;
+  &:after {
+    padding-right: 8px;
+    line-height: 36px;
+    color: @grey;
+    font-family: 'Roboto';
+    font-weight: normal;
+    font-size: 12px;
+  }
+}
+.multiselect__option--highlight {
+  background: @day-hover;
+  color: @navy;
+  &:after {
+    background: transparent;
+  }
+}
+.multiselect__option--selected {
+  background: @teal-bright;
+  color: @white;
+  &.multiselect__option--highlight {
+    background: @teal-bright;
+    &:after {
+      background: transparent;
+      color: @red;
+    }
+  }
+  &:after {
+    color: @grey;
+  }
 }
 
 .night-theme {
-  input[type="text"] {
+  input[type="text"], input[type="password"] {
     background: @night-secondary;
     color: @white;
     border-color: transparent;
+  }
+  .multiselect__content {
+    background: @night-secondary;
+    border-color: @night-secondary;
+    color: @white;
+  }
+  .multiselect__option--highlight {
+    background: @night-hover;
+    color: @white;
   }
 }

@@ -64,7 +64,6 @@ import { NavigationService } from "../services/navigation";
 import electron from '../vendor/electron';
 import Login from './Login.vue';
 
-
 @Component({
   components: { Login }
 })
@@ -107,11 +106,13 @@ export default class TopNav extends Vue {
   get page() {
     return this.navigationService.state.currentPage;
   }
+
 }
 </script>
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .top-nav {
   display: flex;
   flex-direction: row;
@@ -140,9 +141,11 @@ export default class TopNav extends Vue {
     overflow: hidden;
     position: relative;
   }
+
   .fa-sun-o {
     color: @yellow;
   }
+
   .fa-moon-o {
     display: none;
   }
@@ -153,12 +156,14 @@ export default class TopNav extends Vue {
     .fa-sun-o {
       display: none;
     }
+
     .fa-moon-o {
       color: @white;
       opacity: 1;
       display: block;
     }
   }
+
   .user__name {
     &:hover {
       color: @white;

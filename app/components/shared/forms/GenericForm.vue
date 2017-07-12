@@ -21,7 +21,6 @@ import * as comps from './index';
 // modules with "export default" lose types when we use re-exports
 const inputComponents = comps as any as { [key: string]: typeof Vue };
 
-
 @Component({
   components: inputComponents
 })
@@ -29,7 +28,6 @@ export default class GenericForm extends Vue {
 
   @Prop()
   value: IInputValue<TObsValue>[];
-
 
   propertyComponentForType(type: TObsType): typeof Vue {
     const componentName = Object.keys(inputComponents).find(name => {
@@ -42,14 +40,11 @@ export default class GenericForm extends Vue {
     return inputComponents[componentName];
   }
 
-
   onInputHandler(value: IInputValue<TObsValue>, index: number) {
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
     this.$emit('input', newValue, index);
   }
+
 };
 </script>
-<style lang="less" scoped>
-@import "../../../styles/index";
-</style>

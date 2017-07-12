@@ -126,7 +126,7 @@ export class SettingsService extends StatefulService<ISettingsState> {
     this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
   }
 
-  @mutation
+  @mutation()
   SET_SETTINGS(settingsData: ISettingsState) {
     Object.assign(this.state, settingsData);
   }

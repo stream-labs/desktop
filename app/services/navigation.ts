@@ -16,7 +16,7 @@ export class NavigationService extends StatefulService<INavigationState> {
     this.NAVINGATE(page);
   }
 
-  @mutation
+  @mutation()
   private NAVINGATE(page: TAppPage) {
     this.state.currentPage = page;
   }

@@ -5,12 +5,22 @@ Electron client for the Streamlabs OBS streaming software.
 
 ### Node OBS
 
-Due to OBS containing files named `package.json`, it is not
-currently possible to install `node-obs` via NPM. You will
-need to install and compile it manually, and then symlink it
-in the root of this directory: `./node-obs`.
+Node OBS is our C++ Node module that provides a javascript
+interface to OBS.  For SLOBS to start properly, it needs to
+find a built version of node OBS at `./node-obs`.  There are
+currently a number of different ways to acquire this.
 
-Node OBS can be found here:
+The simplest is to clone the prebuild repo into slobs:
+
+```
+git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs
+```
+
+This repo is updated frequently from the `staging` branch on
+the node-obs repo.  If you need more bleeding edge access, or
+need a specific branch, you will have to do the compilation
+yourself.  Instructions can be found here:
+
 https://github.com/twitchalerts/node-obs
 
 ### Yarn
@@ -26,6 +36,17 @@ brew install yarn
 
 For other platforms, check the yarn docs:
 https://yarnpkg.com/en/docs/install
+
+### Visual C++ Compiler
+
+Yarn will install and compile a number of native extensions from
+source.  For yarn to do this, it needs a Visual C++ compiler.  The
+most reliable way to get this is to install:
+
+Visual Studio Community 2015 with Update 3
+
+Make sure you do a custom installation and select Visual C++ from
+the languages section.
 
 ## Installation
 
@@ -50,18 +71,13 @@ yarn compile
 ## Starting
 
 If you are using Visual Studio Code, you can start the app
-using the built in debugger.
+using the built in debugger (default F5).
 
 Otherwise, you can run the app with:
 
 ```
 yarn start
 ```
-
-## Streaming
-
-The default config will stream to:
-https://www.twitch.tv/slobstest
 
 ## Environment Variables
 

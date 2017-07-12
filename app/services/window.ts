@@ -5,33 +5,43 @@ import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
 import AddSource from '../components/windows/AddSource.vue';
 import SceneTransitions from '../components/windows/SceneTransitions.vue';
-import AddSceneTransition from '../components/windows/AddSceneTransition.vue';
-import SceneTransitionProperties from '../components/windows/SceneTransitionProperties.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
-import { Service } from './service';
-import store from '../store';
+import { mutation, StatefulService } from './stateful-service';
 import electron from '../vendor/electron';
 import { TSourceType } from './sources';
 import { WidgetType } from './widgets';
 
 const { ipcRenderer, remote } = electron;
 
+interface IWindowStartupOptions {
+  component?: string;
+  [key: string]: string | number;
+}
+
 export interface IWindowOptions {
-  startupOptions: {
-    component: string
-    [key: string]: string | number
-  };
+  startupOptions: IWindowStartupOptions;
   windowOptions: {
     width: number,
     height: number
   };
 }
 
-export class WindowService extends Service {
+interface IWindowState {
+  options: IWindowStartupOptions;
+  isChild: boolean;
+}
+
+
+export class WindowService extends StatefulService<IWindowState> {
+
+  static initialState: IWindowState = {
+    options: {},
+    isChild: false
+  };
 
   // This is a list of components that are registered to be
   // top level components in new child windows.
@@ -39,8 +49,6 @@ export class WindowService extends Service {
     Main,
     Settings,
     SceneTransitions,
-    AddSceneTransition,
-    SceneTransitionProperties,
     AddSource,
     NameSource,
     NameScene,
@@ -60,22 +68,30 @@ export class WindowService extends Service {
   // Will close the current window.
   // If this is the child window, it will be hidden instead.
   closeWindow() {
-    if (store.state.windowOptions.isChild) {
+    if (this.state.isChild) {
       remote.getCurrentWindow().hide();
 
       // This prevents you from seeing the previous contents
       // of the window for a split second after it is shown.
-      store.dispatch({
-        type: 'setWindowOptions',
-        options: {}
-      });
+      this.setWindowOptions({});
     } else {
       remote.getCurrentWindow().close();
     }
   }
 
+
   getOptions() {
-    return store.state.windowOptions.options;
+    return this.state.options;
+  }
+
+
+  setWindowOptions(options: IWindowStartupOptions) {
+    this.SET_WINDOW_OPTIONS(options);
+  }
+
+
+  setWindowAsChild() {
+    this.SET_WINDOW_AS_CHILD();
   }
 
   // These methods are basically presets for showing
@@ -88,31 +104,6 @@ export class WindowService extends Service {
       },
       windowOptions: {
         width: 500,
-        height: 400
-      }
-    });
-  }
-
-  showAddSceneTransition() {
-    this.showWindow({
-      startupOptions: {
-        component: 'AddSceneTransition'
-      },
-      windowOptions: {
-        width: 800,
-        height: 600
-      }
-    });
-  }
-
-  showSceneTransitionProperties(transitionName = '') {
-    this.showWindow({
-      startupOptions: {
-        component: 'SceneTransitionProperties',
-        transitionName
-      },
-      windowOptions: {
-        width: 800,
         height: 600
       }
     });
@@ -221,5 +212,22 @@ export class WindowService extends Service {
     });
   }
 
+  // This module handles windowOptions.  This is the only
+  // piece of the vuex store that is not synchronized
+  // between various windows.  These are unique to the
+  // current window, and tell the window what it should
+  // be displaying currently.
+
+
+  @mutation({ vuexSyncIgnore: true })
+  SET_WINDOW_OPTIONS(options: IWindowStartupOptions) {
+    this.state.options = options;
+  }
+
+
+  @mutation({ vuexSyncIgnore: true })
+  SET_WINDOW_AS_CHILD() {
+    this.state.isChild = true;
+  }
 
 }
