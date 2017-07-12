@@ -1,3 +1,4 @@
+import { throttle } from 'lodash-decorators';
 import { Service, Inject } from './service';
 import { UserService, requiresLogin } from './user';
 import { TPlatform } from './platforms';
@@ -88,6 +89,7 @@ export class WidgetTester {
 
   }
 
+  @throttle(1000)
   test() {
     fetch(new Request(this.url));
   }
