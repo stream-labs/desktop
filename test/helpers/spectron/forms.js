@@ -6,3 +6,15 @@ export async function setFormInput(t, label, value) {
     .$('../..')
     .setValue('input', value);
 }
+
+export async function setFormDropdown(t, label, value) {
+  await t.context.app.client
+    .$(`label=${label}`)
+    .$('../..')
+    .click('.multiselect');
+
+  await t.context.app.client
+    .$(`label=${label}`)
+    .$('../..')
+    .click(`li=${value}`);
+}
