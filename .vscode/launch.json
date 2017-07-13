@@ -5,14 +5,12 @@
             "name": "Launch",
             "type": "node",
             "request": "launch",
+            "protocol": "legacy",
             "runtimeArgs": [
                 "${workspaceRoot}"
             ],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-            "windows": {
-                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-            },
             "envFile": "${workspaceRoot}/.env"
         }
     ]
