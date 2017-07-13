@@ -24,6 +24,10 @@ export async function selectSource(t, name) {
   await t.context.app.client.click(`li=${name}`);
 }
 
+export async function rightClickSource(t, name) {
+  await t.context.app.client.rightClick(`li=${name}`);
+}
+
 export async function addSource(t, type, name) {
   const app = t.context.app;
 

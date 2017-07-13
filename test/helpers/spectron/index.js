@@ -6,7 +6,6 @@ const fs = require('fs');
 const os = require('os');
 const rimraf = require('rimraf');
 
-
 async function focusWindow(t, regex) {
   const handles = await t.context.app.client.windowHandles();
 
@@ -35,7 +34,7 @@ export function useSpectron(skipOnboarding = true) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: ['.'],
+      args: ['--require', path.join(__dirname, 'context-menu-injected.js'), '.'],
       env: {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir
