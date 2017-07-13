@@ -133,10 +133,9 @@ function startApp() {
   if (startupConfig && startupConfig.obsMode) {
     obs.OBS_API_setOBS_currentProfile(startupConfig.profile);
     obs.OBS_API_setOBS_currentSceneCollection(startupConfig.sceneCollection);
-    obs.OBS_API_setPathConfigDirectory('');
-  } else {
-    obs.OBS_API_setPathConfigDirectory(app.getPath('userData'));
-  }
+  } 
+
+  obs.OBS_API_setPathConfigDirectory(app.getPath('userData'));
 
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
