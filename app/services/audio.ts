@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
+import Vue from 'vue';
 import { mutation, StatefulService, InitAfter, Inject, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
@@ -95,13 +96,13 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
-    this.state.audioSources[source.id] = source;
+    Vue.set(this.state.audioSources, source.id, source);
   }
 
 
   @mutation()
   private REMOVE_AUDIO_SOURCE(sourceId: string) {
-    delete this.state.audioSources[sourceId];
+    Vue.delete(this.state.audioSources, sourceId);
   }
 }
 
