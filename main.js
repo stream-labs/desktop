@@ -133,10 +133,9 @@ function startApp() {
   if (startupConfig && startupConfig.obsMode) {
     obs.OBS_API_setOBS_currentProfile(startupConfig.profile);
     obs.OBS_API_setOBS_currentSceneCollection(startupConfig.sceneCollection);
-    obs.OBS_API_setPathConfigDirectory('');
-  } else {
-    obs.OBS_API_setPathConfigDirectory(app.getPath('userData'));
-  }
+  } 
+
+  obs.OBS_API_setPathConfigDirectory(app.getPath('userData'));
 
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();
@@ -189,8 +188,18 @@ app.on('ready', () => {
 
 ipcMain.on('window-showChildWindow', (event, data) => {
   if (data.windowOptions.width && data.windowOptions.height) {
-    childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
-    childWindow.center();
+    // Center the child window on the main window
+    const bounds = mainWindow.getBounds();
+    const childX = (bounds.x + (bounds.width / 2)) - (data.windowOptions.width / 2);
+    const childY = (bounds.y + (bounds.height / 2)) - (data.windowOptions.height / 2);
+
+    childWindow.setBounds({
+      x: childX,
+      y: childY,
+      width: data.windowOptions.width,
+      height: data.windowOptions.height
+    });
+
     childWindow.focus();
   }
 

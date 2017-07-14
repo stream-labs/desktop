@@ -9,10 +9,11 @@
     </div>
   </div>
 
-  <div class="volmeter">
-    <div class="volmeter-progress" :style="volmeter && { right: 100 - (volmeter.level * 100) + '%' }"></div>
-    <div class="volmeter-peak" :style="volmeter && { left: 100 * volmeter.peak + '%' }"></div>
-  </div>
+   <canvas
+    class="volmeter"
+    ref="volmeter"
+    :width="volmeterResolution"
+    height="1"/>
 
   <div class="flex">
     <Slider
@@ -69,8 +70,9 @@ export default class Mixer extends Vue {
   @Inject()
   scenesService: ScenesService;
 
-  volmeter: IVolmeter = null;
   volmeterSubscription: Subscription;
+
+  volmeterResolution = 500;
 
   mounted() {
     if (!this.audioSource.muted) this.subscribeVolmeter();
@@ -85,7 +87,7 @@ export default class Mixer extends Vue {
     this.audioSource.setMuted(muted);
     if (muted) {
       this.unsubscribeVolmeter();
-      this.volmeter = { ...this.volmeter, peak: 0, level: 0 };
+      this.drawVolmeter(0, 0);
     } else {
       this.subscribeVolmeter();
     }
@@ -93,9 +95,24 @@ export default class Mixer extends Vue {
 
 
   subscribeVolmeter() {
-    this.volmeterSubscription = this.audioSource.subscribeVolmeter(
-      volmeter => this.volmeter = volmeter
-    );
+    this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
+      this.drawVolmeter(volmeter.level, volmeter.peak);
+    });
+  }
+
+  drawVolmeter(level: number, peak: number) {
+    const ctx = (this.$refs.volmeter as HTMLCanvasElement).getContext('2d');
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, this.volmeterResolution, 1);
+
+    // Draw the level
+    ctx.fillStyle = '#31c3a2'; // Streamlabs Teal
+    ctx.fillRect(0, 0, level * this.volmeterResolution, 1);
+
+    // Draw the peak
+    ctx.fillStyle = 'white';
+    ctx.fillRect(peak * this.volmeterResolution - 2, 0, 2, 1);
   }
 
   unsubscribeVolmeter() {
@@ -137,6 +154,7 @@ export default class Mixer extends Vue {
   .volmeter {
     position: relative;
     overflow: hidden;
+    width: 100%;
     margin: 10px 0;
     height: 4px;
     border-radius: 4px;
