@@ -128,7 +128,7 @@ export class SettingsService extends StatefulService<ISettingsState> {
 
   @mutation()
   SET_SETTINGS(settingsData: ISettingsState) {
-    Object.assign(this.state, settingsData);
+    this.state = Object.assign({}, this.state, settingsData);
   }
 
 }
