@@ -189,16 +189,28 @@ app.on('ready', () => {
 ipcMain.on('window-showChildWindow', (event, data) => {
   if (data.windowOptions.width && data.windowOptions.height) {
     // Center the child window on the main window
-    const bounds = mainWindow.getBounds();
-    const childX = (bounds.x + (bounds.width / 2)) - (data.windowOptions.width / 2);
-    const childY = (bounds.y + (bounds.height / 2)) - (data.windowOptions.height / 2);
 
-    childWindow.setBounds({
-      x: childX,
-      y: childY,
-      width: data.windowOptions.width,
-      height: data.windowOptions.height
-    });
+    // For some unknown reason, electron sometimes gets into a
+    // weird state where this will always fail.  Instead, we
+    // should recover by simply setting the size and forgetting
+    // about the bounds.
+    try {
+      const bounds = mainWindow.getBounds();
+      const childX = (bounds.x + (bounds.width / 2)) - (data.windowOptions.width / 2);
+      const childY = (bounds.y + (bounds.height / 2)) - (data.windowOptions.height / 2);
+
+      childWindow.setBounds({
+        x: childX,
+        y: childY,
+        width: data.windowOptions.width,
+        height: data.windowOptions.height
+      });
+    } catch (err) {
+      log('Recovering from error:', err);
+
+      childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
+      childWindow.center();
+    }
 
     childWindow.focus();
   }
