@@ -9,7 +9,8 @@
         type="text"
         ref="input"
         :value="value.value"
-        class="PathProperty-path">
+        class="PathProperty-path"
+        @change="handleChange">
       <button
         @click="showFileDialog"
         class="PathProperty-browse button">
@@ -42,7 +43,6 @@ class PathInput extends Input<IPathInputValue> {
 
 
   showFileDialog() {
-
     const options: OpenDialogOptions = {
       defaultPath: this.value.value,
       filters: this.value.filters,
@@ -61,7 +61,12 @@ class PathInput extends Input<IPathInputValue> {
     const path = paths ? paths[0] : '';
 
     this.$refs.input.value = path;
-    this.emitInput({ ...this.value, value: path });
+    this.handleChange();
+  }
+
+
+  handleChange() {
+    this.emitInput({ ...this.value, value: this.$refs.input.value });
   }
 
 }
