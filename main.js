@@ -199,6 +199,7 @@ ipcMain.on('window-showChildWindow', (event, data) => {
       const childX = (bounds.x + (bounds.width / 2)) - (data.windowOptions.width / 2);
       const childY = (bounds.y + (bounds.height / 2)) - (data.windowOptions.height / 2);
 
+      childWindow.restore();
       childWindow.setBounds({
         x: childX,
         y: childY,
