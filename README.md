@@ -150,17 +150,15 @@ team who has them, or someone with admin access on our AWS account.
 
 This is a checklist to run through every time you deploy.
 
-- [ ] Merge staging into master on `slobs-client` and `node-obs`
+- [ ] Merge staging into master on `slobs-client`
 - [ ] Check out `master` on `slobs-client`
-- [ ] Check out `master` on `node-obs`
-- [ ] Rebuild node-obs `yarn rebuild-node-obs`
+- [ ] Download the latest signed build of `node-obs` from Github
+- [ ] Copy `node-obs` into the root of `slobs-client`
 - [ ] Compile assets `yarn compile`
 - [ ] Run the test suite `yarn test`
 - [ ] Change the version in `package.json`
 - [ ] Commit and push
 - [ ] Tag the repo `git tag 'v0.0.11'` and `git push --tags`
-- [ ] Tag `node-obs` in the same way with the same version
-- [ ] Remove the dist directory `rm -rf dist`
 - [ ] Package the app `yarn package`
 - [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
 - [ ] Deploy the new version `yarn deploy`
