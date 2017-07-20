@@ -153,6 +153,7 @@ This is a checklist to run through every time you deploy.
 - [ ] Merge staging into master on `slobs-client`
 - [ ] Check out `master` on `slobs-client`
 - [ ] Download the latest signed build of `node-obs` from Github
+- [ ] Install OBS plugins `yarn install-plugins`
 - [ ] Copy `node-obs` into the root of `slobs-client`
 - [ ] Compile assets `yarn compile`
 - [ ] Run the test suite `yarn test`
