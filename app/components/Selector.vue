@@ -14,8 +14,9 @@
       <div class="selector-item-text">
         {{item.name}}
       </div>
-      <div class="selector-drag-handle">
-        <i class="fa fa-bars fa-rotate-90"/>
+      <div class="selector-actions">
+        <slot name="actions" :item="item"/>
+        <i class="fa fa-bars fa-rotate-90 selector-drag-handle"/>
       </div>
     </li>
   </draggable>
@@ -144,13 +145,13 @@ export default class Selector extends Vue {
     border-color: @day-border;
     color: @navy-secondary;
 
-    .selector-drag-handle {
+    .selector-actions {
       opacity: 1;
     }
   }
 
   &:hover {
-    .selector-drag-handle {
+    .selector-actions {
       opacity: 1;
     }
   }
@@ -165,12 +166,21 @@ export default class Selector extends Vue {
   justify-content: flex-end;
 }
 
-.selector-drag-handle {
+.selector-actions {
+  display: flex;
+  flex-direction: row;
   color: @grey;
-  cursor: move;
   font-size: 12px;
   padding: 0 0px 0 6px;
   opacity: 0;
+
+  >i {
+    margin-left: 5px;
+  }
+}
+
+.selector-drag-handle {
+  cursor: move;
 }
 
 .night-theme {

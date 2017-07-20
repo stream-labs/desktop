@@ -23,7 +23,15 @@
     :items="sources"
     :activeItem="scene.activeSourceId"
     @select="makeActive"
-    @sort="handleSort"/>
+    @sort="handleSort">
+    <template slot="actions" scope="props">
+      <i
+        class="fa fa-eye source-selector-visibility"
+        :class="visibilityClassesForSource(props.item.value)"
+        @click.stop="toggleVisibility(props.item.value)"
+        @dblclick.stop="() => {}" />
+    </template>
+  </selector>
 </div>
 </template>
 
@@ -91,6 +99,22 @@ export default class SourceSelector extends Vue {
     this.scene.makeSourceActive(sourceId);
   }
 
+  toggleVisibility(sourceId: string) {
+    const source = this.scene.getSource(sourceId);
+
+    source.setVisibility(!source.visible);
+  }
+
+  visibilityClassesForSource(sourceId: string) {
+    console.log(sourceId);
+    const visible = this.scene.getSource(sourceId).visible;
+
+    return {
+      'fa-eye': visible,
+      'fa-eye-slash': !visible
+    };
+  }
+
   get scene() {
     return this.scenesService.activeScene;
   }
@@ -106,3 +130,14 @@ export default class SourceSelector extends Vue {
 
 }
 </script>
+
+<style lang="less" scoped>
+.source-selector-visibility {
+  font-size: 18px;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+</style>
