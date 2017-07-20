@@ -12,7 +12,7 @@ const SOURCE_TYPES = [
   'Image',
   'Color Source',
   'Image Slide Show',
-  'BrowserSource',
+  'Browser Source',
   'Media Source',
   'Text (GDI+)',
   'Display Capture',

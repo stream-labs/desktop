@@ -61,6 +61,10 @@
     ansi-styles "^2.2.1"
     esutils "^2.0.2"
 
+"@tweenjs/tween.js@^16.8.0":
+  version "16.8.0"
+  resolved "https://registry.yarnpkg.com/@tweenjs/tween.js/-/tween.js-16.8.0.tgz#5c43965901fd9554b270e21251f4d18ee49069d3"
+
 "@types/electron@^1.4.37":
   version "1.4.37"
   resolved "https://registry.yarnpkg.com/@types/electron/-/electron-1.4.37.tgz#cfff6958f224842c1742a6e4873ed7135e5f2ff3"

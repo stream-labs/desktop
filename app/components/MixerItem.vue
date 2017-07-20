@@ -9,11 +9,10 @@
     </div>
   </div>
 
-   <canvas
-    class="volmeter"
-    ref="volmeter"
-    :width="volmeterResolution"
-    height="1"/>
+  <div class="volmeter">
+    <div class="volmeter-level" ref="level"></div>
+    <div class="volmeter-peak" ref="peak"></div>
+  </div>
 
   <div class="flex">
     <Slider
@@ -51,18 +50,60 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import Tween from '@tweenjs/tween.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
 import { SourceMenu } from '../util/menus/SourceMenu';
-import { AudioSource, IVolmeter } from '../services/audio';
+import { AudioSource } from '../services/audio';
 import { ScenesService } from '../services/scenes';
 import { Inject } from '../services/service';
 import Slider from  './shared/Slider.vue';
 
+// This class manages animating the volmeter.  If this needs to
+// be used elsewhere in the future it can be extracted to
+// another file.
+class MixerVolmeter {
+
+  data: {
+    level: number;
+    peak: number;
+  };
+
+  shouldContinue = true;
+
+  constructor(
+    private levelElement: HTMLElement,
+    private peakElement: HTMLElement,
+    private interval: number) {
+
+    this.data = { level: 0, peak: 0 };
+  }
+
+  setData(level: number, peak: number) {
+    (new Tween.Tween(this.data)).to({ level, peak }, this.interval).start();
+  }
+
+  animate() {
+    if (this.shouldContinue) window.requestAnimationFrame(() => this.animate());
+    Tween.update();
+    this.draw();
+  }
+
+  stop() {
+    this.shouldContinue = false;
+  }
+
+  draw() {
+    this.levelElement.style.right = `${100 - (this.data.level * 100)}%`;
+    this.peakElement.style.left = `${100 * this.data.peak}%`;
+  }
+
+}
+
 @Component({
   components: { Slider }
 })
-export default class Mixer extends Vue {
+export default class MixerItem extends Vue {
 
   @Prop()
   audioSource: AudioSource;
@@ -72,14 +113,18 @@ export default class Mixer extends Vue {
 
   volmeterSubscription: Subscription;
 
-  volmeterResolution = 500;
+  volmeter: MixerVolmeter;
 
   mounted() {
     if (!this.audioSource.muted) this.subscribeVolmeter();
+    this.volmeter = new MixerVolmeter(this.$refs.level as HTMLElement, this.$refs.peak as HTMLElement, 50);
+    this.volmeter.animate();
   }
+
 
   destroyed() {
     this.unsubscribeVolmeter();
+    this.volmeter.stop();
   }
 
 
@@ -87,7 +132,7 @@ export default class Mixer extends Vue {
     this.audioSource.setMuted(muted);
     if (muted) {
       this.unsubscribeVolmeter();
-      this.drawVolmeter(0, 0);
+      this.volmeter.setData(0, 0);
     } else {
       this.subscribeVolmeter();
     }
@@ -96,24 +141,10 @@ export default class Mixer extends Vue {
 
   subscribeVolmeter() {
     this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
-      this.drawVolmeter(volmeter.level, volmeter.peak);
+      this.volmeter.setData(volmeter.level, volmeter.peak);
     });
   }
 
-  drawVolmeter(level: number, peak: number) {
-    const ctx = (this.$refs.volmeter as HTMLCanvasElement).getContext('2d');
-
-    // Clear the canvas
-    ctx.clearRect(0, 0, this.volmeterResolution, 1);
-
-    // Draw the level
-    ctx.fillStyle = '#31c3a2'; // Streamlabs Teal
-    ctx.fillRect(0, 0, level * this.volmeterResolution, 1);
-
-    // Draw the peak
-    ctx.fillStyle = 'white';
-    ctx.fillRect(peak * this.volmeterResolution - 2, 0, 2, 1);
-  }
 
   unsubscribeVolmeter() {
     this.volmeterSubscription && this.volmeterSubscription.unsubscribe();
@@ -154,13 +185,12 @@ export default class Mixer extends Vue {
   .volmeter {
     position: relative;
     overflow: hidden;
-    width: 100%;
     margin: 10px 0;
     height: 4px;
     border-radius: 4px;
     background-color: @slider-background-color;
 
-    .volmeter-progress {
+    .volmeter-level {
       .absolute(0, 100%, 0, 0);
       background-color: @teal;
     }
