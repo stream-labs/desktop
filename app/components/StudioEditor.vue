@@ -57,6 +57,7 @@ export default class StudioEditor extends Vue {
   resizeRegion: IResizeRegion;
   currentX: number;
   currentY: number;
+  isCropping: boolean;
 
   $refs: {
     display: HTMLElement
@@ -123,6 +124,8 @@ export default class StudioEditor extends Vue {
     this.resizeRegion = region;
     this.currentX = event.pageX;
     this.currentY = event.pageY;
+
+    if (event.altKey) this.isCropping = true;
   }
 
   handleMouseUp(event: MouseEvent) {
@@ -147,6 +150,7 @@ export default class StudioEditor extends Vue {
 
     this.dragHandler = null;
     this.resizeRegion = null;
+    this.isCropping = false;
 
     this.updateCursor(event);
   }
@@ -188,7 +192,11 @@ export default class StudioEditor extends Vue {
         lockRatio: !event.shiftKey
       };
 
-      this.resize(converted.x, converted.y, options);
+      if (this.isCropping) {
+        this.crop(converted.x, converted.y, options);
+      } else {
+        this.resize(converted.x, converted.y, options);
+      }
     } else if (this.dragHandler) {
       this.dragHandler.move(event);
     } else if (event.buttons === 1) {
@@ -211,6 +219,35 @@ export default class StudioEditor extends Vue {
     this.updateCursor(event);
   }
 
+  crop(x: number, y: number, options: IResizeOptions) {
+    const source = this.activeSource;
+    const rect = new ScalableRectangle(source);
+
+    rect.normalized(() => {
+      rect.withAnchor(options.anchor, () => {
+        // There's probably a more generic way to do this math
+        if (options.anchor === AnchorPoint.East) {
+          const croppableWidth = rect.width - rect.crop.right;
+          const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
+          rect.crop.left = _.clamp(distance / rect.scaleX, 0, croppableWidth);
+        } else if (options.anchor === AnchorPoint.West) {
+          const croppableWidth = rect.width - rect.crop.left;
+          const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
+          rect.crop.right = _.clamp(distance / rect.scaleX, 0, croppableWidth);
+        } else if (options.anchor === AnchorPoint.South) {
+          const croppableHeight = rect.height - rect.crop.bottom;
+          const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
+          rect.crop.top = _.clamp(distance / rect.scaleY, 0, croppableHeight);
+        } else if (options.anchor === AnchorPoint.North) {
+          const croppableHeight = rect.height - rect.crop.top;
+          const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
+          rect.crop.bottom = _.clamp(distance / rect.scaleY, 0, croppableHeight);
+        }
+      });
+    });
+
+    this.scene.getSource(source.id).setPositionAndCrop(rect.x, rect.y, rect.crop);
+  }
 
   resize(
     // x & y are mouse positions in video space
@@ -234,8 +271,8 @@ export default class StudioEditor extends Vue {
         const distanceX = Math.abs(x - rect.x);
         const distanceY = Math.abs(y - rect.y);
 
-        let newScaleX = distanceX / rect.width;
-        let newScaleY = distanceY / rect.height;
+        let newScaleX = distanceX / rect.croppedWidth;
+        let newScaleY = distanceY / rect.croppedHeight;
 
         // To preserve aspect ratio, take the bigger of the
         // two new scales.

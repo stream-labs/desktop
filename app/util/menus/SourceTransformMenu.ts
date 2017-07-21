@@ -69,6 +69,12 @@ export class SourceTransformMenu extends Menu {
 
   resetTransform() {
     this.source.setPositionAndScale(0, 0, 1.0, 1.0);
+    this.source.setCrop({
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    });
   }
 
 

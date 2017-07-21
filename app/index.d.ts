@@ -14,6 +14,7 @@ interface IRectangle {
 interface IScalableRectangle extends IRectangle {
   scaleX?: number;
   scaleY?: number;
+  crop?: ICrop;
 }
 
 declare type TPatch<TEntity> = { id: string } & Partial<TEntity>;
@@ -21,6 +22,13 @@ declare type TPatch<TEntity> = { id: string } & Partial<TEntity>;
 interface IVec2 {
   x: number;
   y: number;
+}
+
+interface ICrop {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
 }
 
 // allow TS to import components without type definitions
