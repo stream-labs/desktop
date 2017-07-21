@@ -284,6 +284,11 @@ const nodeObsVirtualMethods = {
     obs.OBS_content_setSourceScaling(sceneName, sourceName, scaleX, scaleY);
   },
 
+  OBS_content_setSourcePositionAndCrop(sceneName, sourceName, x, y, crop) {
+    obs.OBS_content_setSourcePosition(sceneName, sourceName, x, y);
+    obs.OBS_content_setSceneItemCrop(sceneName, sourceName, crop);
+  },
+
   OBS_test_callbackProxy(num, cb) {
     setTimeout(() => {
       cb(num + 1);

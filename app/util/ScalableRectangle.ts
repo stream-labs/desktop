@@ -37,6 +37,7 @@ export class ScalableRectangle implements IScalableRectangle {
   scaleY: number;
   width: number;
   height: number;
+  crop: ICrop;
 
   private anchor: AnchorPoint;
 
@@ -48,17 +49,36 @@ export class ScalableRectangle implements IScalableRectangle {
     this.height = options.height;
     this.scaleX = options.scaleX || 1.0;
     this.scaleY = options.scaleY || 1.0;
+
+    this.crop = {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      ...options.crop
+    };
+
     this.anchor = AnchorPoint.NorthWest;
   }
 
 
+  get croppedWidth() {
+    return this.width - this.crop.left - this.crop.right;
+  }
+
+
+  get croppedHeight() {
+    return this.height - this.crop.top - this.crop.bottom;
+  }
+
+
   get scaledWidth() {
-    return this.scaleX * this.width;
+    return this.scaleX * this.croppedWidth;
   }
 
 
   get scaledHeight() {
-    return this.scaleY * this.height;
+    return this.scaleY * this.croppedHeight;
   }
 
 
@@ -131,12 +151,20 @@ export class ScalableRectangle implements IScalableRectangle {
   flipX() {
     this.scaleX *= -1;
     this.x -= this.scaledWidth;
+
+    const leftCrop = this.crop.left;
+    this.crop.left = this.crop.right;
+    this.crop.right = leftCrop;
   }
 
 
   flipY() {
     this.scaleY *= -1;
     this.y -= this.scaledHeight;
+
+    const topCrop = this.crop.top;
+    this.crop.top = this.crop.bottom;
+    this.crop.bottom = topCrop;
   }
 
 
