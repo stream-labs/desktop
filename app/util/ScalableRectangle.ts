@@ -175,8 +175,8 @@ export class ScalableRectangle implements IScalableRectangle {
     this.normalized(() => rect.normalized(() => {
       this.x = rect.x;
       this.y = rect.y;
-      this.scaleX = rect.scaledWidth / this.width;
-      this.scaleY = rect.scaledHeight / this.height;
+      this.scaleX = rect.scaledWidth / this.croppedWidth;
+      this.scaleY = rect.scaledHeight / this.croppedHeight;
     }));
   }
 
@@ -187,10 +187,10 @@ export class ScalableRectangle implements IScalableRectangle {
     // Normalize both rectangles for this operation
     this.normalized(() => rect.normalized(() => {
       if (this.aspectRatio > rect.scaledAspectRatio) {
-        this.scaleX = rect.scaledWidth / this.width;
+        this.scaleX = rect.scaledWidth / this.croppedWidth;
         this.scaleY = this.scaleX;
       } else {
-        this.scaleY = rect.scaledHeight / this.height;
+        this.scaleY = rect.scaledHeight / this.croppedHeight;
         this.scaleX = this.scaleY;
       }
 
