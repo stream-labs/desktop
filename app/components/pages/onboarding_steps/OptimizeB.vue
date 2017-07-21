@@ -14,8 +14,8 @@
         <div
           class="running-setup-row"
           v-for="step in stepInfo"
-          :key="step.step">
-          <div class="running-setup-title typing">{{ step.description }}</div>
+          :key="step.description">
+          <div class="running-setup-title typing">{{ step.summary }}</div>
           <div
             v-if="step.percentage != null"
             class="running-setup-percent delay">
@@ -42,11 +42,11 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../../services/service';
 import { OnboardingService } from '../../../services/onboarding';
-import { AutoConfigService, TConfigStep, IConfigProgress } from '../../../services/auto-config';
+import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
 
 interface IConfigStepPresentation {
-  step: TConfigStep;
   description: string;
+  summary: string;
   percentage?: number;
 }
 
@@ -74,15 +74,15 @@ export default class OptimizeB extends Vue {
         || (progress.event === 'stopping_step')) {
 
         const step = this.stepInfo.find(step => {
-          return step.step === progress.step;
+          return step.description === progress.description;
         });
 
         if (step) {
           step.percentage = progress.percentage;
         } else {
           this.stepInfo.push({
-            step: progress.step,
-            description: this.descriptionForStep(progress),
+            description: progress.description,
+            summary: this.summaryForStep(progress),
             percentage: progress.percentage
           });
         }
@@ -92,16 +92,18 @@ export default class OptimizeB extends Vue {
     });
   }
 
-  descriptionForStep(progress: IConfigProgress) {
+  summaryForStep(progress: IConfigProgress) {
     return {
       detecting_location: 'Detecting your location ...',
       location_found: `Detected ${progress.continent}`,
-      bandwidth_test: 'Finding the best server ...',
+      bandwidth_test: 'Performing bandwidth test ...',
       streamingEncoder_test: 'Testing streaming encoder ...',
       recordingEncoder_test: 'Testing recording encoder ...',
+      checking_settings: 'Attempting stream ...',
+      setting_default_settings: 'Reverting to defaults ...',
       saving_service: 'Applying stream settings ...',
       saving_settings: 'Applying general settings ...'
-    }[progress.step];
+    }[progress.description];
   }
 
 }
