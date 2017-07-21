@@ -163,7 +163,14 @@ export class Scene implements IScene {
       scaleX: 1.0,
       scaleY: 1.0,
 
-      visible: true
+      visible: true,
+
+      crop: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
     });
   }
 

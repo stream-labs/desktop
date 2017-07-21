@@ -11,6 +11,7 @@ export interface ISceneSource {
   scaleX: number;
   scaleY: number;
   visible: boolean;
+  crop: ICrop;
 }
 
 /**
@@ -26,6 +27,7 @@ export class SceneSource extends Source implements ISceneSource {
   scaleX: number;
   scaleY: number;
   visible: boolean;
+  crop: ICrop;
 
   // Some computed attributes
 
@@ -88,19 +90,35 @@ export class SceneSource extends Source implements ISceneSource {
   }
 
 
+  setCrop(crop: ICrop) {
+    const scene = this.scenesService.getSceneById(this.sceneId);
+    nodeObs.OBS_content_setSceneItemCrop(scene.name, this.name, crop);
+    this.UPDATE({ id: this.id, crop: { ...crop } });
+  }
+
+
+  setPositionAndCrop(x: number, y: number, crop: ICrop) {
+    const scene = this.scenesService.getSceneById(this.sceneId);
+    nodeObs.OBS_content_setSourcePositionAndCrop(scene.name, this.name, x.toString(), y.toString(), crop);
+    this.UPDATE({ id: this.id, x, y, crop: { ...crop } });
+  }
+
+
   loadAttributes() {
     const scene = this.scenesService.getSceneById(this.sceneId);
 
     const position: IVec2 = nodeObs.OBS_content_getSourcePosition(scene.name, this.name);
     const scale: IVec2 = nodeObs.OBS_content_getSourceScaling(scene.name, this.name);
     const visible: boolean = nodeObs.OBS_content_getSourceVisibility(scene.name, this.name);
+    const crop: ICrop = nodeObs.OBS_content_getSceneItemCrop(scene.name, this.name);
 
     this.UPDATE({
       id: this.id,
       scaleX: scale.x,
       scaleY: scale.y,
       visible,
-      ...position
+      ...position,
+      crop
     });
   }
 
