@@ -66,7 +66,9 @@ async function selectRandomScene(t) {
 
 async function addRandomSource(t) {
   const type = sample(SOURCE_TYPES);
-  const name = uniqueId('source_');
+  const name = `${type} ${uniqueId()}`;
+
+  console.log('  Source:', name);
 
   await focusMain(t);
   await addSource(t, type, name);
@@ -78,6 +80,10 @@ async function removeRandomSource(t) {
 
   if (sources.length > 0) {
     const source = sample(sources);
+    const text = await t.context.app.client.elementIdText(source.value.ELEMENT);
+
+    console.log('  Source:', text.value);
+
     await t.context.app.client.elementIdClick(source.value.ELEMENT);
     await clickRemoveSource(t);
   }
@@ -105,9 +111,6 @@ const ACTION_FUNCTIONS = [
 test('Stress test', async t => {
   let quit = false;
 
-  // We shouldn't need to wait long for this test
-  t.context.app.client.timeouts('implicit', 500);
-
   // Quit after 1 hour
   setTimeout(() => {
     t.pass();
@@ -115,6 +118,8 @@ test('Stress test', async t => {
   }, 60 * 60 * 1000);
 
   while(!quit) {
-    await sample(ACTION_FUNCTIONS)(t);
+    const action = sample(ACTION_FUNCTIONS);
+    console.log(action.name);
+    await action(t);
   }
 });
