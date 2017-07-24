@@ -1,11 +1,11 @@
 import { times } from 'lodash';
 import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { SourcesService, TSourceType } from '../sources';
+import { ISourceCreateOptions, SourcesService, TSourceType } from '../sources';
 import { ISceneSource, SceneSource } from './scene-source';
 import { ConfigFileService } from '../config-file';
 import Utils from '../utils';
-import { nodeObs } from '../obs-api';
+import { nodeObs, ObsScene } from '../obs-api';
 
 export interface IScene {
   id: string;
@@ -30,6 +30,11 @@ export class Scene implements IScene {
   constructor(sceneId: string) {
     this.sceneState = this.scenesService.state.scenes[sceneId];
     Utils.applyProxy(this, this.sceneState);
+  }
+
+
+  getObsScene(): ObsScene {
+    return ObsScene.fromName(this.name);
   }
 
 
@@ -64,40 +69,44 @@ export class Scene implements IScene {
 
 
   loadConfig() {
-    const sourceNames: string[] = nodeObs.OBS_content_getListCurrentSourcesFromScene(this.name);
-
-    sourceNames.forEach(sourceName => {
-      // Node-obs does not currently provide us with the
-      // type at this point.  Luckily, we don't really
-      // care about type on the frontend yet.
-      const sourceId = SourcesService.instance.initSource(sourceName);
-
-      this.ADD_SOURCE_TO_SCENE(sourceId);
-
-      this.getSource(sourceId).loadAttributes();
+    this.getObsScene().getItems().forEach(sceneItem => {
+      const obsSource = sceneItem.source;
+      this.addSceneSource(obsSource.name, obsSource.id as TSourceType, { obsSourceIsAlreadyExist: true });
     });
   }
 
   /**
    * Create and add the source to the current scene
    */
-  addSource(
+  addSceneSource(
     sourceName: string,
     type: TSourceType,
-    isHidden = false
-  ): string {
-    const sourceId = this.sourcesService.createSceneSource(this.id, this.name, sourceName, type, isHidden);
-    this.ADD_SOURCE_TO_SCENE(sourceId);
+    options: ISourceCreateOptions = {}
+  ): SceneSource {
+    const source = this.sourcesService.createSource(sourceName, type, options);
+    const obsScene = this.getObsScene();
+    if (!options.obsSourceIsAlreadyExist) {
+      obsScene.add(source.getObsInput());
+    }
+
+    this.ADD_SOURCE_TO_SCENE(source.id);
+    const sceneSource = this.getSource(source.id);
 
     // Newly added sources are immediately active
-    this.makeSourceActive(sourceId);
+    this.makeSourceActive(sceneSource.id);
+
+    sceneSource.loadAttributes();
 
     this.configFileService.save();
-    return sourceId;
+    this.scenesService.sourceAdded.next(sceneSource.sceneSourceState);
+    return sceneSource;
   }
 
   removeSource(sourceId: string) {
+    const sceneSource = this.getSource(sourceId);
+    this.getObsScene().findItem(sceneSource.name).remove();
     this.REMOVE_SOURCE_FROM_SCENE(sourceId);
+    this.scenesService.sourceRemoved.next(sceneSource.sceneSourceState);
   }
 
 

@@ -235,7 +235,7 @@ export class WidgetsService extends Service {
       return this.sourcesService.getSourceByName(name);
     });
 
-    const sourceId = scene.addSource(suggestedName, 'BrowserSource');
+    const sourceId = scene.addSceneSource(suggestedName, 'browser_source').id;
     const properties = this.sourcesService.getPropertiesFormData(sourceId);
 
     // Find the URL property and set it

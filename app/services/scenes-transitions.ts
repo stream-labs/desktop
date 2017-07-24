@@ -8,13 +8,13 @@ import {
 } from '../components/shared/forms/Input';
 
 interface ISceneTransitionsState {
-  availableTransitions: IListOption[];
+  availableTransitions: IListOption<string>[];
   duration: number;
   properties: TFormData;
   currentName: string;
 }
 
-const TRANSITION_TYPES: IListOption[] = [
+const TRANSITION_TYPES: IListOption<string>[] = [
   { description: 'Cut', value: 'cut_transition' },
   { description: 'Fade', value: 'fade_transition' },
   { description: 'Swipe', value: 'swipe_transition' },
@@ -57,7 +57,7 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
   }
 
   @mutation()
-  private SET_AVAILABLE_TRANSITIONS(transitions: IListOption[]) {
+  private SET_AVAILABLE_TRANSITIONS(transitions: IListOption<string>[]) {
     this.state.availableTransitions = transitions;
   }
 

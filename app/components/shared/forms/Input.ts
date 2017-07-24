@@ -43,12 +43,12 @@ export interface IInputValue<TValueType> {
 export declare type TFormData = IInputValue<TObsValue>[];
 
 export interface IListInputValue extends IInputValue<string> {
-  options: IListOption[];
+  options: IListOption<string>[];
 }
 
-export interface IListOption {
+export interface IListOption<TValue> {
   description: string;
-  value: string;
+  value: TValue;
 }
 
 export interface IPathInputValue extends IInputValue<string> {

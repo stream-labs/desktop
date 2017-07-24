@@ -75,7 +75,7 @@ export default class SourceSelector extends Vue {
   removeSource() {
     // We can only remove a source if one is selected
     if (this.scene.activeSourceId) {
-      this.sourcesService.removeSource(this.scene.activeSourceId);
+      this.scene.removeSource(this.scene.activeSourceId);
     }
   }
 
