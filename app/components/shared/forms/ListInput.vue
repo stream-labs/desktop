@@ -39,12 +39,12 @@ class ListInput extends Input<IListInputValue> {
   @Prop()
   value: IListInputValue;
 
-  onInputHandler(option: IListOption) {
+  onInputHandler(option: IListOption<string>) {
     this.emitInput({ ...this.value, value: option.value });
   }
 
   get currentValue() {
-    const option = this.value.options.find((opt: IListOption) => {
+    const option = this.value.options.find((opt: IListOption<string>) => {
       return this.value.value === opt.value;
     });
 

@@ -3,12 +3,13 @@
   :show-controls="false"
   :content-styles="{ padding: 0 }"
   title="Add Source">
+
   <div slot="content"
     class="add-source">
     <!-- Standard sources -->
     <add-source-info
-      v-if="inspectedSource === 'Image'"
-      @clickAdd="selectSource('Image')"
+      v-if="inspectedSource === 'image_source'"
+      @clickAdd="selectSource('image_source')"
       name="Image"
       description="Add images to your scene.">
       <img slot="media" src="../../../media/source-demos/source-image.png"/>
@@ -22,8 +23,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Image Slide Show'"
-      @clickAdd="selectSource('Image Slide Show')"
+      v-if="inspectedSource === 'slideshow'"
+      @clickAdd="selectSource('slideshow')"
       name="Image Slide Show"
       description="Add a slideshow of images to your scene.">
       <img slot="media" src="../../../media/source-demos/source-slide-show.png"/>
@@ -37,8 +38,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Media Source'"
-      @clickAdd="selectSource('Media Source')"
+      v-if="inspectedSource === 'ffmpeg_source'"
+      @clickAdd="selectSource('ffmpeg_source')"
       name="Media Source"
       description="Add videos or sound clips to your scene.">
       <img slot="media" src="../../../media/source-demos/source-media.png"/>
@@ -58,8 +59,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Window Capture'"
-      @clickAdd="selectSource('Window Capture')"
+      v-if="inspectedSource === 'window_capture'"
+      @clickAdd="selectSource('window_capture')"
       name="Window Capture"
       description="Capture a specific window that's open on your computer.">
       <img slot="media" src="../../../media/source-demos/source-capture.png"/>
@@ -68,8 +69,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Video Capture Device'"
-      @clickAdd="selectSource('Video Capture Device')"
+      v-if="inspectedSource === 'dshow_input'"
+      @clickAdd="selectSource('dshow_input')"
       name="Video Capture Device"
       description="Select from your build in USB webcam or an external.">
       <img slot="media" src="../../../media/source-demos/source-video.png"/>
@@ -80,8 +81,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Audio Output Capture'"
-      @clickAdd="selectSource('Audio Output Capture')"
+      v-if="inspectedSource === 'wasapi_output_capture'"
+      @clickAdd="selectSource('wasapi_output_capture')"
       name="Audio Output Capture"
       description="Captures your desktop audio for the purpose of playing sound, such as music or speech.">
       <img slot="media" src="../../../media/source-demos/source-output.png"/>
@@ -90,8 +91,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Color Source'"
-      @clickAdd="selectSource('Color Source')"
+      v-if="inspectedSource === 'color_source'"
+      @clickAdd="selectSource('color_source')"
       name="Color Source"
       description="Add a color to the background of your whole scene or just a part.">
       <img slot="media" src="../../../media/source-demos/source-color.png"/>
@@ -102,8 +103,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'BrowserSource'"
-      @clickAdd="selectSource('BrowserSource')"
+      v-if="inspectedSource === 'browser_source'"
+      @clickAdd="selectSource('browser_source')"
       name="BrowserSource"
       description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
@@ -114,8 +115,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Text (GDI+)'"
-      @clickAdd="selectSource('Text (GDI+)')"
+      v-if="inspectedSource === 'text_gdiplus'"
+      @clickAdd="selectSource('text_gdiplus')"
       name="Text (GDI+)"
       description="Add text to your scene and adjust its style.">
       <img slot="media" src="../../../media/source-demos/source-text.png"/>
@@ -128,8 +129,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Display Capture'"
-      @clickAdd="selectSource('Display Capture')"
+      v-if="inspectedSource === 'monitor_capture'"
+      @clickAdd="selectSource('monitor_capture')"
       name="Display Capture"
       description="Capture your entire computer monitor.">
       <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
@@ -139,8 +140,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Game Capture'"
-      @clickAdd="selectSource('Game Capture')"
+      v-if="inspectedSource === 'game_capture'"
+      @clickAdd="selectSource('game_capture')"
       name="Game Capture"
       description="Capture a game you're playing on your computer.">
       <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
@@ -149,8 +150,8 @@
       </ul>
     </add-source-info>
     <add-source-info
-      v-if="inspectedSource === 'Audio Input Capture'"
-      @clickAdd="selectSource('Audio Input Capture')"
+      v-if="inspectedSource === 'wasapi_input_capture'"
+      @clickAdd="selectSource('wasapi_input_capture')"
       name="Audio Input Capture"
       description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.">
       <img slot="media" src="../../../media/source-demos/source-input.png"/>
@@ -260,9 +261,9 @@
           <li
             v-for="source in availableSources"
             class="source source--standard"
-            @click="inspectSource(source)"
-            @dblclick="selectSource(source)">
-            {{ source }}
+            @click="inspectSource(source.value)"
+            @dblclick="selectSource(source.value)">
+            {{ source.description }}
           </li>
         </ul>
       </div>
@@ -366,8 +367,8 @@ export default class AddSource extends Vue {
 
   windowService: WindowService = WindowService.instance;
 
-  selectSource(sourceName: TSourceType) {
-    this.windowService.showNameSource(sourceName);
+  selectSource(sourceType: TSourceType) {
+    this.windowService.showNameSource(sourceType);
   }
 
   selectWidget(type: WidgetType) {
@@ -386,7 +387,7 @@ export default class AddSource extends Vue {
 
   get availableSources() {
     return this.sourcesService.getAvailableSourcesTypes().filter(type => {
-      return type !== 'Text (FreeType 2)';
+      return type.value !== 'text_ft2_source';
     });
   }
 

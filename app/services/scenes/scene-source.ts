@@ -44,7 +44,7 @@ export class SceneSource extends Source implements ISceneSource {
     return (this.video && (this.width > 0) && (this.height > 0));
   }
 
-  private sceneSourceState: ISceneSource;
+  sceneSourceState: ISceneSource;
   private scenesService: ScenesService = ScenesService.instance;
 
 

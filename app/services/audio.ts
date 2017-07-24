@@ -1,6 +1,6 @@
+import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import Vue from 'vue';
 import { mutation, StatefulService, InitAfter, Inject, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
@@ -50,9 +50,10 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   protected mounted() {
 
-    this.sourcesService.sourceAdded.subscribe(source => {
+    this.scenesService.sourceAdded.subscribe(sceneSourceModel => {
+      const source = this.sourcesService.getSource(sceneSourceModel.id);
       if (!source.audio) return;
-      this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
+      this.createAudioSource(source);
     });
 
     this.sourcesService.sourceUpdated.subscribe(source => {
@@ -79,7 +80,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   getSourcesForCurrentScene(): AudioSource[] {
     const scene = this.scenesService.activeScene;
     const sceneSources = scene.getSources({ showHidden: true }).filter(source => source.audio);
-    return sceneSources.map((sceneSource: ISource) => this.getSource(sceneSource.id));
+    return sceneSources.map((sceneSource: ISource) => this.getSource(sceneSource.id)).filter(item => item);
   }
 
 
@@ -91,6 +92,17 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
       id: source.id,
       fader
     };
+  }
+
+
+  private createAudioSource(source: Source) {
+    const volmeter = nodeObs.OBS_audio_createVolmeter(2);
+    const fader = nodeObs.OBS_audio_createFader(0);
+
+    nodeObs.OBS_audio_volmeterAttachSource(volmeter, source.name);
+    nodeObs.OBS_audio_faderAttachSource(fader, source.name);
+
+    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
   }
 
 

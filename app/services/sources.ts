@@ -3,13 +3,14 @@ import { Subject } from 'rxjs/Subject';
 import {
   TFormData,
   inputValuesToObsValues,
-  obsValuesToInputValues
+  obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import { nodeObs } from './obs-api';
+import { nodeObs, ObsInput } from './obs-api';
 import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
+import { ScenesService, ISceneSource } from './scenes';
 
 const { ipcRenderer } = electron;
 
@@ -27,12 +28,25 @@ export interface ISource {
   properties: TFormData;
 }
 
-// TODO: add more types
+export interface ISourceCreateOptions {
+  isHidden?: boolean;
+  obsSourceIsAlreadyExist?: boolean; // rid of this option when frontend will load the config file
+}
+
 export type TSourceType =
-  'Audio Output Capture' |
-  'Audio Input Capture' |
-  'Text (FreeType 2)' |
-  'BrowserSource';
+  'image_source' |
+  'color_source' |
+  'browser_source' |
+  'slideshow' |
+  'ffmpeg_source' |
+  'text_gdiplus' |
+  'text_ft2_source' |
+  'monitor_capture' |
+  'window_capture' |
+  'game_capture' |
+  'dshow_input' |
+  'wasapi_input_capture' |
+  'wasapi_output_capture';
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -52,9 +66,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @Inject()
   private configFileService: ConfigFileService;
 
+  private scenesService: ScenesService = ScenesService.instance;
+
 
   init() {
     setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
+    this.scenesService.sourceRemoved.subscribe(
+      (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
+    );
   }
 
   @mutation()
@@ -93,63 +112,64 @@ export class SourcesService extends StatefulService<ISourcesState> {
     Object.assign(this.state.sources[sourcePatch.id], sourcePatch);
   }
 
-  // This is currently a single function because node-obs
-  // does not support adding the same source to multiple
-  // scenes.  This will be split into multiple functions
-  // in the future.
-  // TODO: When node-obs supports associating and existing
-  // source with a scene, we should rid of sceneName and sceneId here.
-  createSceneSource(
-    sceneId: string,
-    sceneName: string,
+
+  createSource(
     name: string,
     type: TSourceType,
-    isHidden = false
-  ) {
-    const sourceName = isHidden ? `[HIDDEN_${sceneId}]${name}` : name;
+    options: ISourceCreateOptions = {}
+  ): Source {
+    const id: string = ipcRenderer.sendSync('getUniqueId');
+    const sourceName = options.isHidden ? `[HIDDEN_${id}]${name}` : name;
 
-    nodeObs.OBS_content_addSource(
-      type,
-      sourceName,
-      {},
-      {},
-      sceneName
-    );
+    if (!options.obsSourceIsAlreadyExist) {
+      ObsInput.create(type, sourceName);
+    }
 
-    const id = this.initSource(sourceName, type);
-    return id;
-  }
-
-  // Initializes a source and assigns it an id.
-  // The id is returned.
-  initSource(name: string, type: TSourceType) {
-    // Get an id to identify the source on the frontend
-    const id = ipcRenderer.sendSync('getUniqueId');
     const properties = this.getPropertiesFormData(id);
 
-    this.ADD_SOURCE(id, name, type, properties);
+    this.ADD_SOURCE(id, sourceName, type, properties);
     const source = this.state.sources[id];
-
-    const muted = nodeObs.OBS_content_isSourceMuted(name);
+    const muted = nodeObs.OBS_content_isSourceMuted(sourceName);
     this.UPDATE_SOURCE({ id, muted });
     this.refreshSourceFlags(source, id);
     this.sourceAdded.next(source);
-    return id;
+    return this.getSource(id);
   }
 
 
-  removeSource(id: string) {
-    const source = this.state.sources[id];
+  private onSceneSourceRemovedHandler(sceneSourceState: ISceneSource) {
+    // remove source if it has been removed from the all scenes
+    if (this.scenesService.getSourceScenes(sceneSourceState.id).length > 0) return;
+    this.removeSource(sceneSourceState.id);
+  }
 
-    nodeObs.OBS_content_removeSource(source.name);
 
+  private removeSource(id: string) {
+    const source = this.getSource(id);
+    source.getObsInput().release();
     this.REMOVE_SOURCE(id);
-    this.sourceRemoved.next(source);
+    this.sourceRemoved.next(source.sourceState);
   }
 
-  getAvailableSourcesTypes(): TSourceType[] {
-    return nodeObs.OBS_content_getListInputSources();
+
+  getAvailableSourcesTypes(): IListOption<TSourceType>[] {
+    return [
+      { description: 'Image', value: 'image_source' },
+      { description: 'Color Source', value: 'color_source' },
+      { description: 'Browser Source', value: 'browser_source' },
+      { description: 'Media Source', value: 'ffmpeg_source' },
+      { description: 'Image Slide Show', value: 'slideshow' },
+      { description: 'Text (GDI+)', value: 'text_gdiplus' },
+      { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
+      { description: 'Display Capture', value: 'monitor_capture' },
+      { description: 'Window Capture', value: 'window_capture' },
+      { description: 'Game Capture', value: 'game_capture' },
+      { description: 'Video Capture Device', value: 'dshow_input' },
+      { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
+      { description: 'Audio Output Capture', value: 'wasapi_output_capture' }
+    ];
   }
+
 
   private refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
@@ -282,6 +302,8 @@ export class Source implements ISource {
   height: number;
   properties: TFormData;
 
+  sourceState: ISource;
+
   get displayName() {
     return this.isHidden ?
       this.name.replace(/\[HIDDEN_[\d\w-]+\]/, '') :
@@ -292,6 +314,10 @@ export class Source implements ISource {
     return !!this.name.match(/\[HIDDEN_[\d\w-]+\].+/);
   }
 
+  getObsInput(): ObsInput {
+    return ObsInput.fromName(this.name);
+  }
+
   @Inject()
   protected sourcesService: SourcesService;
 
@@ -300,6 +326,7 @@ export class Source implements ISource {
     // is always up-to-date, and essentially acts
     // as a view into the store.  It also enforces
     // the read-only nature of this data
+    this.sourceState = this.sourcesService.state.sources[sourceId];
     Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
   }
 }
