@@ -21,7 +21,9 @@
     :items="scenes"
     :activeItem="activeSceneId"
     @select="makeActive"
-    @sort="handleSort"/>
+    @sort="handleSort"
+    @contextmenu="menu.popup()"
+  />
 </div>
 </template>
 
@@ -32,6 +34,7 @@ import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import { WindowService } from '../services/window';
 import { ScenesService } from '../services/scenes';
+import { Menu } from '../util/menus/Menu';
 
 @Component({
   components: { Selector }
@@ -42,6 +45,15 @@ export default class SceneSelector extends Vue {
   scenesService: ScenesService;
 
   windowService = WindowService.instance;
+
+  menu = new Menu();
+
+  created() {
+    this.menu.append({
+      label: 'Duplicate',
+      click: () => this.windowService.showDuplicateScene(this.scenesService.activeScene.name)
+    });
+  }
 
   makeActive(id: string) {
     this.scenesService.makeSceneActive(id);

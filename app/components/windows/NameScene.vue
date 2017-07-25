@@ -47,10 +47,12 @@ export default class NameScene extends Vue {
 
   windowService = WindowService.instance;
 
+  options: { sceneToDuplicate?: string } = this.windowService.getOptions();
+
   mounted() {
+    const suggestedName = this.options.sceneToDuplicate || 'NewScene';
     this.name = namingHelpers.suggestName(
-      'New Scene',
-      (name: string) => this.isTaken(name)
+      suggestedName, (name: string) => this.isTaken(name)
     );
   }
 
@@ -58,7 +60,10 @@ export default class NameScene extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      this.scenesService.createScene(this.name);
+      this.scenesService.createScene(
+        this.name,
+        { duplicateSourcesFromScene: this.options.sceneToDuplicate }
+      );
       this.windowService.closeWindow();
     }
   }
