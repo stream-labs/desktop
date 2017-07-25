@@ -2,16 +2,26 @@ import { times } from 'lodash';
 import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { ISourceCreateOptions, SourcesService, TSourceType } from '../sources';
-import { ISceneSource, SceneSource } from './scene-source';
+import { ISceneItem, SceneItem } from './scene-item';
 import { ConfigFileService } from '../config-file';
 import Utils from '../utils';
-import { nodeObs, ObsScene } from '../obs-api';
+import { nodeObs, ObsScene, ObsSceneItem } from '../obs-api';
+import electron from '../../vendor/electron';
+
+const { ipcRenderer } = electron;
+
 
 export interface IScene {
   id: string;
   name: string;
-  activeSourceId: string;
-  sources: ISceneSource[];
+  activeItemId: string;
+  items: ISceneItem[];
+}
+
+// TODO: delete these options after we will handle the config loading on the frontend side
+export interface ISceneItemAddOptions {
+  obsSceneItemIsAlreadyExist: boolean;
+  obsSceneItemId: number;
 }
 
 
@@ -19,8 +29,8 @@ export interface IScene {
 export class Scene implements IScene {
   id: string;
   name: string;
-  activeSourceId: string;
-  sources: ISceneSource[];
+  activeItemId: string;
+  items: ISceneItem[];
 
   private scenesService: ScenesService = ScenesService.instance;
   private sourcesService: SourcesService = SourcesService.instance;
@@ -38,81 +48,103 @@ export class Scene implements IScene {
   }
 
 
-  getSource(sourceId: string): SceneSource {
-    return this.sceneState.sources.find(source => source.id === sourceId) ?
-      new SceneSource(this.id, sourceId) :
+  getItem(sceneItemId: string): SceneItem {
+    const sceneItemModel = this.sceneState.items.find(sceneItemModel => sceneItemModel.sceneItemId === sceneItemId);
+    return sceneItemModel ?
+      new SceneItem(this.id, sceneItemModel.sceneItemId, sceneItemModel.sourceId) :
       null;
   }
 
 
-  getSources(options = { showHidden: false }): SceneSource[] {
-    const sources = this.sceneState.sources.map(sourceModel => {
-      return this.getSource(sourceModel.id);
+  getItems(options = { showHidden: false }): SceneItem[] {
+    const sources = this.sceneState.items.map(sourceModel => {
+      return this.getItem(sourceModel.sceneItemId);
     });
 
     return options.showHidden ? sources : sources.filter(source => !source.isHidden);
   }
 
 
-  get inactiveSources(): SceneSource[] {
-    return this.sceneState.sources.filter(sourceModel => {
-      return sourceModel.id !== this.activeSourceId;
+  get inactiveSources(): SceneItem[] {
+    return this.sceneState.items.filter(sourceModel => {
+      return sourceModel.sceneItemId !== this.activeItemId;
     }).map(source => {
-      return this.getSource(source.id);
+      return this.getItem(source.sceneItemId);
     });
   }
 
 
-  get activeSource(): SceneSource {
-    return this.getSource(this.activeSourceId);
+  get activeItem(): SceneItem {
+    return this.getItem(this.activeItemId);
   }
 
 
   loadConfig() {
-    this.getObsScene().getItems().forEach(sceneItem => {
-      const obsSource = sceneItem.source;
-      this.addSceneSource(obsSource.name, obsSource.id as TSourceType, { obsSourceIsAlreadyExist: true });
+    this.getObsScene().getItems().forEach(obsSceneItem => {
+      const obsSource = obsSceneItem.source;
+
+      // some sources could be already added from another .loadConfig call
+      // because several scenes can reference to one source
+      let source = this.sourcesService.getSourceByName(obsSource.name);
+      if (!source) {
+        source = this.sourcesService.createSource(
+          obsSource.name,
+          obsSource.id as TSourceType,
+          { obsSourceIsAlreadyExist: true, }
+        );
+      }
+
+      this.addSource(
+        source.sourceId,
+        { obsSceneItemIsAlreadyExist: true, obsSceneItemId: obsSceneItem.id }
+      );
+
     });
   }
 
-  /**
-   * Create and add the source to the current scene
-   */
-  addSceneSource(
-    sourceName: string,
-    type: TSourceType,
-    options: ISourceCreateOptions = {}
-  ): SceneSource {
-    const source = this.sourcesService.createSource(sourceName, type, options);
-    const obsScene = this.getObsScene();
-    if (!options.obsSourceIsAlreadyExist) {
-      obsScene.add(source.getObsInput());
-    }
 
-    this.ADD_SOURCE_TO_SCENE(source.id);
-    const sceneSource = this.getSource(source.id);
-
-    // Newly added sources are immediately active
-    this.makeSourceActive(sceneSource.id);
-
-    sceneSource.loadAttributes();
-
-    this.configFileService.save();
-    this.scenesService.sourceAdded.next(sceneSource.sceneSourceState);
-    return sceneSource;
+  createAndAddSource(sourceName: string, type: TSourceType): SceneItem {
+    const source = this.sourcesService.createSource(sourceName, type);
+    return this.addSource(source.sourceId);
   }
 
-  removeSource(sourceId: string) {
-    const sceneSource = this.getSource(sourceId);
-    this.getObsScene().findItem(sceneSource.name).remove();
-    this.REMOVE_SOURCE_FROM_SCENE(sourceId);
-    this.scenesService.sourceRemoved.next(sceneSource.sceneSourceState);
+
+  addSource(sourceId: string, options?: ISceneItemAddOptions): SceneItem {
+    const source = this.sourcesService.getSource(sourceId);
+    const sceneItemId = ipcRenderer.sendSync('getUniqueId');
+
+    let obsSceneItem: ObsSceneItem;
+    if (options && options.obsSceneItemIsAlreadyExist) {
+      obsSceneItem = this.getObsScene().findItem(options.obsSceneItemId);
+    } else {
+      obsSceneItem = this.getObsScene().add(source.getObsInput());
+    }
+
+    this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
+    const sceneItem = this.getItem(sceneItemId);
+
+    // Newly added sources are immediately active
+    this.makeSourceActive(sceneItemId);
+
+    sceneItem.loadAttributes();
+
+    this.configFileService.save();
+    this.scenesService.sourceAdded.next(sceneItem.sceneItemState);
+    return sceneItem;
+  }
+
+
+  removeItem(sceneItemId: string) {
+    const sceneItem = this.getItem(sceneItemId);
+    sceneItem.getObsSceneItem().remove();
+    this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);
+    this.scenesService.sourceRemoved.next(sceneItem.sceneItemState);
   }
 
 
   makeSourceActive(sourceId: string) {
     if (sourceId) {
-      const source = this.getSource(sourceId);
+      const source = this.getItem(sourceId);
 
       // This should really operate on a scene too, rather than
       // just the currently active scene
@@ -134,7 +166,7 @@ export class Scene implements IScene {
       operation = 'move_up';
     }
 
-    const source = this.getSource(sourceId);
+    const source = this.getItem(sourceId);
 
     times(Math.abs(positionDelta), () => {
       // This should operate on a specific scene rather
@@ -142,9 +174,9 @@ export class Scene implements IScene {
       nodeObs.OBS_content_setSourceOrder(source.name, operation);
     });
 
-    const hiddenSourcesOrder = this.getSources({ showHidden: true })
-      .filter(source => source.isHidden)
-      .map(source => source.id);
+    const hiddenSourcesOrder = this.getItems({ showHidden: true })
+      .filter(item => item.isHidden)
+      .map(item => item.sceneItemId);
 
     order.unshift(...hiddenSourcesOrder);
 
@@ -152,17 +184,19 @@ export class Scene implements IScene {
   }
 
   @mutation()
-  private MAKE_SOURCE_ACTIVE(sourceId: string) {
-    this.sceneState.activeSourceId = sourceId;
+  private MAKE_SOURCE_ACTIVE(sceneItemId: string) {
+    this.sceneState.activeItemId = sceneItemId;
   }
 
   @mutation()
-  private ADD_SOURCE_TO_SCENE(sourceId: string) {
-    this.sceneState.sources.unshift({
+  private ADD_SOURCE_TO_SCENE(sceneItemId: string, sourceId: string, obsSceneItemId: number) {
+    this.sceneState.items.unshift({
       // This is information that belongs to a scene/source pair
 
       // The id of the source
-      id: sourceId,
+      sceneItemId,
+      sourceId,
+      obsSceneItemId,
 
       // Position in video space
       x: 0,
@@ -184,14 +218,14 @@ export class Scene implements IScene {
   }
 
   @mutation()
-  private REMOVE_SOURCE_FROM_SCENE(sourceId: string) {
+  private REMOVE_SOURCE_FROM_SCENE(sceneItemId: string) {
 
-    if (this.sceneState.activeSourceId === sourceId) {
-      this.sceneState.activeSourceId = null;
+    if (this.sceneState.activeItemId === sceneItemId) {
+      this.sceneState.activeItemId = null;
     }
 
-    this.sceneState.sources = this.sceneState.sources.filter(source => {
-      return source.id !== sourceId;
+    this.sceneState.items = this.sceneState.items.filter(source => {
+      return source.sceneItemId !== sceneItemId;
     });
   }
 
@@ -199,9 +233,9 @@ export class Scene implements IScene {
   private SET_SOURCE_ORDER(order: string[]) {
 
     // TODO: This is O(n^2)
-    this.sceneState.sources = order.map(id => {
-      return this.sceneState.sources.find(source => {
-        return source.id === id;
+    this.sceneState.items = order.map(id => {
+      return this.sceneState.items.find(source => {
+        return source.sceneItemId === id;
       });
     });
   }

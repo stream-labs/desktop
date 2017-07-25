@@ -70,21 +70,21 @@ export default class NameSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      let id: string;
+      let sourceId: string;
 
       if (this.sourceType != null) {
-        id = this.scenesService.activeScene.addSceneSource(
+        sourceId = this.scenesService.activeScene.createAndAddSource(
           this.name,
           this.sourceType
-        ).id;
+        ).sourceId;
       } else if (this.widgetType != null) {
-        id = this.widgetsService.createWidget(
+        sourceId = this.widgetsService.createWidget(
           this.widgetType,
           this.name
-        );
+        ).sourceId;
       }
 
-      this.windowService.showSourceProperties(id);
+      this.windowService.showSourceProperties(sourceId);
     }
   }
 

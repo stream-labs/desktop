@@ -10,7 +10,7 @@
         @click="addSource"/>
       <i
         class="fa fa-minus ico-btn"
-        @click="removeSource"/>
+        @click="removeItem"/>
       <i
         class="fa fa-cog ico-btn"
         @click="sourceProperties"/>
@@ -21,7 +21,7 @@
     @contextmenu="showContextMenu"
     @dblclick="sourceProperties"
     :items="sources"
-    :activeItem="scene.activeSourceId"
+    :activeItem="scene.activeItemId"
     @select="makeActive"
     @sort="handleSort">
     <template slot="actions" scope="props">
@@ -41,17 +41,13 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import { WindowService } from '../services/window';
-import { ScenesService } from '../services/scenes';
-import { ISource, SourcesService } from '../services/sources';
-import { SourceMenu } from '../util/menus/SourceMenu';
+import { ScenesService, SceneItem } from '../services/scenes';
+import { SceneItemMenu } from '../util/menus/SceneItemMenu';
 
 @Component({
   components: { Selector }
 })
 export default class SourceSelector extends Vue {
-
-  @Inject()
-  sourcesService: SourcesService;
 
   @Inject()
   scenesService: ScenesService;
@@ -64,24 +60,26 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sourceId: string) {
-    const menu = new SourceMenu(
+  showContextMenu(sceneItemId: string) {
+    const sceneItem = this.scene.getItem(sceneItemId);
+    const menu = new SceneItemMenu(
       this.scenesService.activeSceneId,
-      sourceId
+      sceneItemId,
+      sceneItem.sourceId
     );
     menu.popup();
   }
 
-  removeSource() {
+  removeItem() {
     // We can only remove a source if one is selected
-    if (this.scene.activeSourceId) {
-      this.scene.removeSource(this.scene.activeSourceId);
+    if (this.scene.activeItemId) {
+      this.scene.removeItem(this.scene.activeItemId);
     }
   }
 
   sourceProperties() {
-    if (this.scene.activeSourceId) {
-      this.windowService.showSourceProperties(this.scene.activeSourceId);
+    if (this.scene.activeItemId) {
+      this.windowService.showSourceProperties(this.scene.activeItem.sourceId);
     }
   }
 
@@ -95,19 +93,18 @@ export default class SourceSelector extends Vue {
     );
   }
 
-  makeActive(sourceId: string) {
-    this.scene.makeSourceActive(sourceId);
+  makeActive(sceneItemId: string) {
+    this.scene.makeSourceActive(sceneItemId);
   }
 
-  toggleVisibility(sourceId: string) {
-    const source = this.scene.getSource(sourceId);
+  toggleVisibility(sceneItemId: string) {
+    const source = this.scene.getItem(sceneItemId);
 
     source.setVisibility(!source.visible);
   }
 
-  visibilityClassesForSource(sourceId: string) {
-    console.log(sourceId);
-    const visible = this.scene.getSource(sourceId).visible;
+  visibilityClassesForSource(sceneItemId: string) {
+    const visible = this.scene.getItem(sceneItemId).visible;
 
     return {
       'fa-eye': visible,
@@ -120,10 +117,10 @@ export default class SourceSelector extends Vue {
   }
 
   get sources() {
-    return this.scene.getSources().map((source: ISource) => {
+    return this.scene.getItems().map((sceneItem: SceneItem) => {
       return {
-        name: source.name,
-        value: source.id
+        name: sceneItem.name,
+        value: sceneItem.sceneItemId
       };
     });
   }

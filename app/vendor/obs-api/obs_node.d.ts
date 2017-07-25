@@ -1,23 +1,38 @@
+/** 
+ * Namespace representing the global libobs functionality 
+ * @namespace ObsGlobal
+ * */
 export namespace ObsGlobal {
     /**
      * Initializes libobs global context
-     * @param locale The locale used globally
-     * @param path Path to libobs data files
+     * @method
+     * @memberof ObsGlobal
+     * @name startup
+     * @param {string} locale - The locale used globally
+     * @param {string} [path] - Path to libobs data files
      */
     function startup(locale: string, path?: string): void;
 
     /**
      * Uninitializes libobs global context
+     * @method
+     * @memberof ObsGlobal 
+     * @name shutdown
      */
     function shutdown(): void;
 
     /**
      * Current status of the global libobs context
+     * @member {boolean} initialized
+     * @memberof ObsGlobal
+     * 
      */
     const initialized: boolean;
 
     /**
      * Current locale of current libobs context
+     * @member {string} locale
+     * @memberof ObsGlobal
      */
     const locale: string;
 
@@ -27,12 +42,15 @@ export namespace ObsGlobal {
      * First 2 bytes are major.
      * Second 2 bytes are minor.
      * Last 4 bytes are patch.
+     * @member {number} version
+     * @memberof ObsGlobal
      */
     const version: number;
 }
 
 /**
  * Used for various 2-dimensional functions
+ * @interface IVec2
  * @property {number} x
  * @property {number} y
  */
@@ -42,20 +60,66 @@ export interface IVec2 {
 }
 
 /**
- * Base class for Filter, Transition, Scene, and Input.
- * Should not be created directly.
- * 
- * @property {number} status The validitty of the source
- * @property {string} id The corresponding id of the source
- * @property {boolean} configurable Whether the source has properties or not
- * @property {number} width width of the source. 0 if audio only
- * @property {number} height height of the source. 0 if audio only
- * @property {string} name Name of the source when referencing it
- * @property {number} flags Unsigned bit-field concerning various flags.
- * @method release Release the underlying reference
- * @method remove Send remove signal to other holders of the current reference.
+ * Base class for Filter, Transition, Scene, and Input
+ * @interface ObsSource
+ * @property {object} settings - Object holding current settings of the source
+ * @property {ObsProperties} properties - Returns properties structure associated with the source.
+ * @property {number} status - The validity of the source
+ * @property {string} id - The corresponding id of the source
+ * @property {boolean} configurable - Whether the source has properties or not
+ * @property {number} width - width of the source. 0 if audio only
+ * @property {number} height - height of the source. 0 if audio only
+ * @property {string} name - Name of the source when referencing it
+ * @property {number} flags - Unsigned bit-field concerning various flags
  */
+export interface ObsSource {
+    /**
+     * Release the underlying reference
+     * @method release
+     * @memberof ObsSource#
+     */
+    release(): void;
 
+    /**
+     * Send remove signal to other holders of the current reference.
+     * @method remove
+     * @memberof ObsSource#
+     */
+    remove(): void;
+
+    /**
+     * Update the settings of the source instance
+     * correlating to the values held within the
+     * object passed. 
+     * @method update
+     * @memberof ObsSource#
+     * @param {object} settings - Object holding settings values
+     */
+    update(settings: object): void;
+
+    readonly settings: object;
+    readonly properties: ObsProperties;
+    readonly status: number;
+    readonly type: ESourceType;
+    readonly id: string;
+    readonly configurable: boolean;
+    readonly width: number;
+    readonly height: number;
+
+    name: string;
+    flags: number;
+}
+
+/**
+ * Describes the type of source.
+ * @readonly
+ * @enum
+ * @name ESourceType
+ * @property Input
+ * @property Filter
+ * @property Transition
+ * @property Scene
+ */
 export const enum ESourceType {
     Input,
     Filter,
@@ -63,25 +127,59 @@ export const enum ESourceType {
     Scene,
 }
 
+/**
+ * Describes algorithm type to use for volume representation.
+ * @readonly
+ * @enum 
+ * @name EFaderType
+ * @property Cubic
+ * @property IEC
+ * @property Log
+ */
 export const enum EFaderType {
     Cubic,
     IEC,
     Log
 }
 
+/**
+ * This is simply used to type check
+ * objects passed back that hold internal
+ * information when dealing with callbacks.
+ * @interface ObsCallbackData
+ */
 export class ObsCallbackData {
-
+    private constructor();
 }
 
+/**
+ * @classdesc Object representation of a fader control. 
+ * @class ObsFader
+ * @hideconstructor
+ * @property {number} db - Volume level of the control
+ * @property {number} deflection - deflection representation of volume level
+ * @property {number} mul - Multiplier represention of volume level
+ */
 export class ObsFader {
     private constructor();
 
+    /**
+     * Create an instance of a fader object
+     * @param {EFaderType} type - What algorithm to use for new fader
+     * @memberof ObsFader
+     * @return {ObsFader} The created instance
+     */
     static create(type: EFaderType): ObsFader;
 
     db: number;
     deflection: number;
     mul: number;
 
+    /**
+     * Attach to a source to monitor the volume of
+     * @method attach
+     * @param source Input source to attach to
+     */
     attach(source: ObsInput): void;
     detach(): void;
 
@@ -110,23 +208,6 @@ export class ObsVolmeter {
     removeCallback(cbData: ObsCallbackData): void;
 }
 
-export interface ObsSource {
-    release(): void;
-    remove(): void;
-
-    readonly settings: object;
-    readonly properties: ObsProperties;
-    readonly status: number;
-    readonly type: ESourceType;
-    readonly id: string;
-    readonly configurable: boolean;
-    readonly width: number;
-    readonly height: number;
-
-    name: string;
-    flags: number;
-}
-
 /**
  * Object representing a filter.
  * 
@@ -140,6 +221,7 @@ export class ObsFilter implements ObsSource {
     //Source
     release(): void;
     remove(): void;
+    update(settings: object): void;
 
     readonly settings: object;
     readonly properties: ObsProperties;
@@ -173,6 +255,7 @@ export class ObsTransition implements ObsSource {
     //Source
     release(): void;
     remove(): void;
+    update(settings: object): void;
 
     readonly settings: object;
     readonly properties: ObsProperties;
@@ -201,7 +284,7 @@ export class ObsTransition implements ObsSource {
 export class ObsInput implements ObsSource {
     private constructor();
     static types(): string[];
-    static create(id: string, name: string, hotkeys?: object, settings?: object): ObsInput;
+    static create(id: string, name: string, settings?: object, hotkeys?: object): ObsInput;
     static createPrivate(id: string, name: string, settings?: object): ObsInput;
     static fromName(name: string): ObsInput;
     static getPublicSources(): ObsInput[];
@@ -210,7 +293,8 @@ export class ObsInput implements ObsSource {
     showing: boolean;
     audioMixers: number;
 
-    duplicate(name: string, is_private: boolean): ObsInput;
+
+    duplicate(name?: string, is_private?: boolean): ObsInput;
     findFilter(name: string): ObsFilter;
     addFilter(filter: ObsFilter): void;
     removeFilter(filter: ObsFilter): void;
@@ -219,6 +303,7 @@ export class ObsInput implements ObsSource {
     //Source
     release(): void;
     remove(): void;
+    update(settings: object): void;
 
     readonly settings: object;
     readonly properties: ObsProperties;
@@ -259,12 +344,13 @@ export class ObsScene implements ObsSource {
     
     readonly source: ObsInput;
 
-    findItem(name: string): ObsSceneItem;
+    findItem(id: string | number): ObsSceneItem;
     getItems(): ObsSceneItem[];
 
     //Source
     release(): void;
     remove(): void;
+    update(settings: object): void;
 
     readonly settings: object;
     readonly properties: ObsProperties;
@@ -284,6 +370,35 @@ export const enum EOrderMovement {
     MoveDown,
     MoveTop,
     MoveBottom
+}
+
+export interface ITransformInfo {
+    readonly pos: IVec2;
+    readonly rot: number;
+    readonly scale: IVec2;
+    readonly alignment: number;
+    readonly boundsType: EBoundsType;
+    readonly boundsAlignment: number;
+    readonly bounds: IVec2;
+}
+
+export interface ICropInfo {
+    readonly left: number;
+    readonly right: number;
+    readonly top: number;
+    readonly bottom: number;
+}
+
+export const enum EAlignment {
+    Center,
+    Left = (1 << 0),
+    Right = (1 << 1),
+    Top = (1 << 2),
+    Bottom = (1 << 3),
+    TopLeft = (Top | Left),
+    TopRight = (Top | Right),
+    BottomLeft = (Bottom | Left),
+    BottomRight = (Bottom | Right)
 }
 
 /**
@@ -316,11 +431,14 @@ export class ObsSceneItem {
     boundsType: EBoundsType;
     scaleFilter: EScaleType;
     visible: boolean;
-    // transform_info: TTransformInfo;
-    // crop: TCropInfo;
+    readonly transformInfo: ITransformInfo;
+    readonly crop: ICropInfo;
 
-    order(movement: EOrderMovement): void;
-    orderPosition(pos: number): void;
+    moveUp(): void;
+    moveDown(): void;
+    moveTop(): void;
+    moveBottom(): void;
+    move(position: number): void;
 
     remove(): void;
 
@@ -403,19 +521,19 @@ export interface INumberProperty {
  */
 export class ObsProperty {
     private constructor();
-    status: number;
-    name: string;
-    description: string;
-    longDescription: string;
-    enabled: boolean;
-    visible: boolean;
-    type: EPropertyType;
-    details: 
+    readonly status: number;
+    readonly name: string;
+    readonly description: string;
+    readonly longDescription: string;
+    readonly enabled: boolean;
+    readonly visible: boolean;
+    readonly type: EPropertyType;
+    readonly details: 
         IListProperty | IEditableListProperty | 
         IPathProperty | ITextProperty | 
         INumberProperty | {};
-    value: ObsProperty;
-    done: boolean;
+    readonly value: ObsProperty;
+    readonly done: boolean;
 
     /**
      * Uses the current object to obtain the next
@@ -469,17 +587,6 @@ export class ObsModule {
     status(): number;
 }
 
-/**
- * @namespace module 
- * A namespace meant for functions interacting with global context 
- * conerning modules. 
- */
-export namespace module {
-    function add_path(bin_path: string, data_path: string): void;
-    function load_all(): void;
-    function log_loaded(): void;
-}
-
 export const enum EScaleType {
     Default,
     Point,
@@ -525,19 +632,19 @@ export const enum EFormat {
 }
 
 interface IVideoInfo {
-    graphics_module: string;
-    fps_num: number;
-    fps_den: number;
-    base_width: number;
-    base_height: number;
-    output_width: number;
-    output_height: number;
-    output_format: EFormat;
-    adapter: number;
-    gpu_conversion: boolean;
-    colorspace: EColorSpace;
-    range: ERangeType;
-    scale_type: EScaleType;
+    readonly graphics_module: string;
+    readonly fps_num: number;
+    readonly fps_den: number;
+    readonly base_width: number;
+    readonly base_height: number;
+    readonly output_width: number;
+    readonly output_height: number;
+    readonly output_format: EFormat;
+    readonly adapter: number;
+    readonly gpu_conversion: boolean;
+    readonly colorspace: EColorSpace;
+    readonly range: ERangeType;
+    readonly scale_type: EScaleType;
 }
 
 export class ObsVideo {

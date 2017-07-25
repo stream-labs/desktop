@@ -39,7 +39,7 @@
       </i>
       <i
         class="ico-btn fa fa-cog"
-        @click="showSourceMenu(audioSource.id)"
+        @click="showSourceMenu(audioSource.sourceId)"
       >
       </i>
     </div>
@@ -156,10 +156,7 @@ export default class MixerItem extends Vue {
   }
 
   showSourceMenu(sourceId: string) {
-    const menu = new SourceMenu(
-      this.scenesService.activeSceneId,
-      sourceId
-    );
+    const menu = new SourceMenu(sourceId);
     menu.popup();
   }
 

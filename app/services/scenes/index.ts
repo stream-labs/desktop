@@ -1,3 +1,3 @@
 export * from './scenes';
 export * from './scene';
-export * from './scene-source';
+export * from './scene-item';

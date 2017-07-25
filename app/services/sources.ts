@@ -10,14 +10,14 @@ import { nodeObs, ObsInput } from './obs-api';
 import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
-import { ScenesService, ISceneSource } from './scenes';
+import { ScenesService, ISceneItem } from './scenes';
 
 const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
 
 export interface ISource {
-  id: string;
+  sourceId: string;
   name: string;
   type: TSourceType;
   audio: boolean;
@@ -30,7 +30,7 @@ export interface ISource {
 
 export interface ISourceCreateOptions {
   isHidden?: boolean;
-  obsSourceIsAlreadyExist?: boolean; // rid of this option when frontend will load the config file
+  obsSourceIsAlreadyExist?: boolean; // TODO: rid of this option when frontend will load the config file
 }
 
 export type TSourceType =
@@ -84,7 +84,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   @mutation()
   private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData) {
     Vue.set(this.state.sources, id, {
-      id,
+      sourceId: id,
       name,
       type,
       properties,
@@ -137,10 +137,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
 
-  private onSceneSourceRemovedHandler(sceneSourceState: ISceneSource) {
+  private onSceneSourceRemovedHandler(sceneSourceState: ISceneItem) {
     // remove source if it has been removed from the all scenes
-    if (this.scenesService.getSourceScenes(sceneSourceState.id).length > 0) return;
-    this.removeSource(sceneSourceState.id);
+    if (this.scenesService.getSourceScenes(sceneSourceState.sourceId).length > 0) return;
+    this.removeSource(sceneSourceState.sourceId);
   }
 
 
@@ -251,12 +251,12 @@ export class SourcesService extends StatefulService<ISourcesState> {
     const sourceModel = Object.values(this.state.sources).find(source => {
       return source.name === name;
     });
-    return sourceModel ? this.getSource(sourceModel.id) : void 0;
+    return sourceModel ? this.getSource(sourceModel.sourceId) : void 0;
   }
 
 
   get sources(): Source[] {
-    return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.id));
+    return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
   getSource(id: string): Source {
@@ -292,7 +292,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
 @Mutator()
 export class Source implements ISource {
-  id: string;
+  sourceId: string;
   name: string;
   type: TSourceType;
   audio: boolean;

@@ -1,11 +1,13 @@
-import { ScenesService } from './scenes';
+import { ScenesService, Scene } from '../scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
 import { Source } from '../sources';
-import { nodeObs } from '../obs-api';
+import { nodeObs, ObsSceneItem } from '../obs-api';
 
-export interface ISceneSource {
-  id: string;
+export interface ISceneItem {
+  sceneItemId: string;
+  sourceId: string;
+  obsSceneItemId: number;
   x: number;
   y: number;
   scaleX: number;
@@ -15,13 +17,14 @@ export interface ISceneSource {
 }
 
 /**
- * A SceneSource is a source that contains
+ * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @Mutator()
-export class SceneSource extends Source implements ISceneSource {
-  id: string;
+export class SceneItem extends Source implements ISceneItem {
+  sceneItemId: string;
+  obsSceneItemId: number;
   x: number;
   y: number;
   scaleX: number;
@@ -44,31 +47,42 @@ export class SceneSource extends Source implements ISceneSource {
     return (this.video && (this.width > 0) && (this.height > 0));
   }
 
-  sceneSourceState: ISceneSource;
+  sceneItemState: ISceneItem;
   private scenesService: ScenesService = ScenesService.instance;
 
 
-  constructor(private sceneId: string, sourceId: string) {
+  constructor(private sceneId: string, sceneItemId: string, sourceId: string) {
     super(sourceId);
-    this.sceneSourceState = this.scenesService.state.scenes[sceneId].sources.find(source => {
-      return source.id === sourceId;
+    const sceneSourceState = this.scenesService.state.scenes[sceneId].items.find(source => {
+      return source.sceneItemId === sceneItemId;
     });
+    this.sceneItemState = sceneSourceState;
     this.sceneId = sceneId;
-    Utils.applyProxy(this, this.sceneSourceState);
+    Utils.applyProxy(this, this.sceneItemState);
+  }
+
+
+  getScene(): Scene {
+    return this.scenesService.getScene(this.sceneId);
+  }
+
+
+  getObsSceneItem(): ObsSceneItem {
+    return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }
 
 
   setPosition(vec: IVec2) {
     const scene = this.scenesService.getSceneById(this.sceneId);
     nodeObs.OBS_content_setSourcePosition(scene.name, this.name, vec.x.toString(), vec.y.toString());
-    this.UPDATE({ id: this.id, x: vec.x, y: vec.y });
+    this.UPDATE({ id: this.sceneItemId, x: vec.x, y: vec.y });
   }
 
 
   setVisibility(visible: boolean) {
     const scene = this.scenesService.getSceneById(this.sceneId);
     nodeObs.OBS_content_setSourceVisibility(scene.name, this.name, visible);
-    this.UPDATE({ id: this.id, visible });
+    this.UPDATE({ id: this.sceneItemId, visible });
   }
 
 
@@ -86,21 +100,21 @@ export class SceneSource extends Source implements ISceneSource {
       scaleY.toString()
     );
 
-    this.UPDATE({ id: this.id, x, y, scaleX, scaleY });
+    this.UPDATE({ id: this.sceneItemId, x, y, scaleX, scaleY });
   }
 
 
   setCrop(crop: ICrop) {
     const scene = this.scenesService.getSceneById(this.sceneId);
     nodeObs.OBS_content_setSceneItemCrop(scene.name, this.name, crop);
-    this.UPDATE({ id: this.id, crop: { ...crop } });
+    this.UPDATE({ id: this.sceneItemId, crop: { ...crop } });
   }
 
 
   setPositionAndCrop(x: number, y: number, crop: ICrop) {
     const scene = this.scenesService.getSceneById(this.sceneId);
     nodeObs.OBS_content_setSourcePositionAndCrop(scene.name, this.name, x.toString(), y.toString(), crop);
-    this.UPDATE({ id: this.id, x, y, crop: { ...crop } });
+    this.UPDATE({ id: this.sceneItemId, x, y, crop: { ...crop } });
   }
 
 
@@ -113,7 +127,7 @@ export class SceneSource extends Source implements ISceneSource {
     const crop: ICrop = nodeObs.OBS_content_getSceneItemCrop(scene.name, this.name);
 
     this.UPDATE({
-      id: this.id,
+      id: this.sceneItemId,
       scaleX: scale.x,
       scaleY: scale.y,
       visible,
@@ -123,7 +137,7 @@ export class SceneSource extends Source implements ISceneSource {
   }
 
   @mutation()
-  private UPDATE(patch: TPatch<ISceneSource>) {
-    Object.assign(this.sceneSourceState, patch);
+  private UPDATE(patch: TPatch<ISceneItem>) {
+    Object.assign(this.sceneItemState, patch);
   }
 }

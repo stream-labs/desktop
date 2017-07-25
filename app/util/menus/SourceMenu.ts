@@ -1,41 +1,25 @@
 import { Inject } from '../../services/service';
 import { Menu } from './Menu';
-import { SourceTransformMenu } from './SourceTransformMenu';
 import { WindowService } from '../../services/window';
-import { ScenesService } from '../../services/scenes';
+import { SourcesService } from '../../services/sources';
 
 export class SourceMenu extends Menu {
 
   @Inject()
-  private scenesService: ScenesService;
+  private sourcesService: SourcesService;
 
   private windowService = WindowService.instance;
 
-  private source = this.scenesService.getScene(this.sceneId).getSource(this.sourceId);
+  private source = this.sourcesService.getSource(this.sourceId);
 
-  constructor(private sceneId: string, private sourceId: string) {
+  constructor(private sourceId: string) {
     super();
 
-    this.appendMenuItems();
+    this.appendSourceMenuItems();
   }
 
 
-  appendMenuItems() {
-    if (this.source.video) {
-      this.append({
-        label: 'Transform',
-        submenu: this.transformSubmenu().menu
-      });
-
-      const visibilityLabel = this.source.visible ? 'Hide' : 'Show';
-
-      this.append({
-        label: visibilityLabel,
-        click: () => {
-          this.source.setVisibility(!this.source.visible);
-        }
-      });
-    }
+  private appendSourceMenuItems() {
 
     this.append({
       label: 'Filters',
@@ -52,18 +36,13 @@ export class SourceMenu extends Menu {
     });
   }
 
-  transformSubmenu() {
-    return new SourceTransformMenu(this.sceneId, this.sourceId);
-  }
-
-
-  showFilters() {
+  private showFilters() {
     // TODO: This should take an id
     this.windowService.showSourceFilters(this.source.name);
   }
 
 
-  showProperties() {
+  private showProperties() {
     this.windowService.showSourceProperties(this.sourceId);
   }
 
