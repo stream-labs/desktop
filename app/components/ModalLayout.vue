@@ -123,7 +123,6 @@ export default class ModalLayout extends Vue {
   display: flex;
   flex-direction: column;
   color: @grey;
-  border-top: 1px solid @day-border;
 }
 
 .modal-layout-titlebar {
@@ -146,6 +145,7 @@ export default class ModalLayout extends Vue {
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
+
   .button {
     margin-left: 8px;
   }
@@ -154,8 +154,8 @@ export default class ModalLayout extends Vue {
 .night-theme {
   &.modal-layout {
     background-color: @night-primary;
-    border-color: @night-border;
   }
+
   .modal-layout-controls {
     border-top-color: @night-border;
     background-color: @night-primary;

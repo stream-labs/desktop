@@ -26,6 +26,7 @@ export default class StudioControls extends Vue {
 
 <style lang="less" scoped>
 @import "../styles/index";
+
 .studio-controls {
   height: 240px;
   width: 100%;

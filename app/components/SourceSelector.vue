@@ -129,12 +129,10 @@ export default class SourceSelector extends Vue {
 </script>
 
 <style lang="less" scoped>
-.source-selector-visibility {
-  font-size: 18px;
-  opacity: 0.6;
+@import "../styles/index";
 
-  &:hover {
-    opacity: 1;
-  }
+.source-selector-visibility {
+  font-size: 17px;
+  .icon-hover;
 }
 </style>

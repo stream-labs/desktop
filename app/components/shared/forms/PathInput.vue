@@ -4,16 +4,16 @@
     <label>{{ value.description }}</label>
   </div>
   <div class="input-wrapper">
-    <div class="PathProperty-fieldGroup">
+    <div class="flex">
       <input
         type="text"
         ref="input"
         :value="value.value"
-        class="PathProperty-path"
+        class="path__input"
         @change="handleChange">
       <button
         @click="showFileDialog"
-        class="PathProperty-browse button">
+        class="path__browse-button button button--dark">
         Browse
       </button>
     </div>
@@ -77,22 +77,16 @@ export default PathInput;
 </script>
 
 <style lang="less" scoped>
-.PathProperty-fieldGroup {
-  display: flex;
-  flex-direction: row;
-}
-
-.PathProperty-path {
+.path__input {
   flex-grow: 1;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.PathProperty-browse {
+.path__browse-button {
   flex-shrink: 0;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -1px;
-  background-color: #525e65;
 }
 </style>
