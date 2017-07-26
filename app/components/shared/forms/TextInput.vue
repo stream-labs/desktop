@@ -11,7 +11,7 @@
       @change="onInputHandler"
     />
     <button
-      class="button button--default"
+      class="button button--default button--input"
       v-if="value.masked"
       @click="toggleVisible">
       {{ textVisible ? 'Hide' : 'Show' }}
@@ -51,17 +51,13 @@ export default TextInput;
 </script>
 
 <style lang="less" scoped>
-.ButtonInput {
+.input-wrapper {
   display: flex;
-  flex-direction: row;
+}
 
-  >input {
-    flex-grow: 1;
-  }
-
-  >button {
-    margin-left: 10px;
-    width: 80px;
-  }
+.button--input {
+  flex: 0 0 auto;
+  width: 80px;
+  margin-left: 12px;
 }
 </style>

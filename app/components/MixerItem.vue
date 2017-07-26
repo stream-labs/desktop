@@ -210,12 +210,6 @@ export default class MixerItem extends Vue {
   .controls {
     width: 60px;
     text-align: right;
-    font-size: 16px;
-    margin-top: -2px;
-
-    .fa {
-      font-size: 14;
-    }
 
     .fa-volume-off {
       color: @red;

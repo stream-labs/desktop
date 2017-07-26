@@ -1,75 +1,94 @@
 button, .button {
   .transition;
+
   &:focus, &:visited {
     outline: none;
-    background: inherit;
   }
 }
+
 .button--action {
   background-color: @teal-bright;
   color: @white;
+
   &:hover {
     background-color: lighten(@teal-bright, 4%);
   }
+
   &:focus {
     background-color: @teal-bright;
   }
 }
+
 .button--trans {
   background: transparent;
   color: @grey;
+
   .fa {
     color: @grey;
     .transition;
   }
+
   &:hover, &:focus {
     color: @navy;
     background: transparent;
+
     .fa {
       color: @navy;
     }
   }
 }
+
 .button--semi-opac {
   background: rgba(255, 255, 255, .1);
+
   &:hover {
     background: rgba(255, 255, 255, .14);
   }
+
   &:focus {
     background: rgba(255, 255, 255, .1);
   }
 }
+
 .button--100 {
   width: 100%;
 }
+
 .ico-btn {
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
-  color: @grey;
-  opacity: 0.7;
   margin-left: 10px;
-  &:first-child { margin-left: inherit }
-  &:hover { opacity: 1.0}
+  .icon-hover;
+
+  &:first-child {
+    margin-left: inherit;
+  }
 }
+
 .back-arrow {
   font-size: 16px;
   margin-right: 20px;
   .transition;
 }
+
 .back-arrow--light {
   color: @grey;
+
   &:hover {
     color: @white;
   }
 }
+
 .button-container {
   display: flex;
   justify-content: center;
   align-content: center;
 }
+
 .button--twitch, .button--yt {
   width: 48%;
 }
+
 .square-button {
   .radius;
   .transition;
@@ -81,49 +100,63 @@ button, .button {
   color: @white;
   font-size: 16px;
 }
+
 .square-button--twitch, .button--twitch {
   background: #6441A4;
+
   &:hover {
-    background: lighten(#6441A4,4%);
+    background: lighten(#6441A4, 4%);
   }
+
   &:focus {
     background: #6441A4;
   }
 }
+
 .square-button--yt, .button--yt {
   background: #D22222;
+
   &:hover {
-    background: lighten(#D22222,4%);
+    background: lighten(#D22222, 4%);
   }
+
   &:focus {
     background: #D22222;
   }
 }
+
 .square-button--fb {
   background: #3B5998;
+
   &:hover {
-    background: lighten(#3B5998,4%);
+    background: lighten(#3B5998, 4%);
   }
 }
 .square-button--twitter {
   background: #1DA1F2;
+
   &:hover {
-    background: lighten(#1DA1F2,4%)
+    background: lighten(#1DA1F2, 4%)
   }
 }
+
 .square-button--mixer {
   background: #00BBF2;
+
   &:hover {
     background: lighten(#00BBF2,4%)
   }
 }
+
 .night-theme {
   .button--trans {
     color: @night-link;
+
     &:hover {
       color: @white;
     }
   }
+
   .button--default {
     background: rgba(255, 255, 255, .1);
     border-color: transparent;

@@ -53,13 +53,16 @@ export default class TitleBar extends Vue {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+@import "../styles/index";
+
 .titlebar {
   display: flex;
   flex-direction: row;
   align-items: center;
   height: 30px;
   -webkit-app-region: drag;
+  border-bottom: 1px solid @day-border;
 }
 
 .titlebar-icon {
@@ -84,6 +87,12 @@ export default class TitleBar extends Vue {
 
   &:hover {
     opacity: 1.0;
+  }
+}
+
+.night-theme {
+  .titlebar {
+    border-color: @night-border;
   }
 }
 </style>

@@ -169,18 +169,18 @@ export default class Selector extends Vue {
 .selector-actions {
   display: flex;
   flex-direction: row;
-  color: @grey;
   font-size: 12px;
-  padding: 0 0px 0 6px;
   opacity: 0;
+  .transition;
 
   >i {
-    margin-left: 5px;
+    margin-left: 10px;
   }
 }
 
 .selector-drag-handle {
   cursor: move;
+  .icon-hover;
 }
 
 .night-theme {
