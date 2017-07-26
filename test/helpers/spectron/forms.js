@@ -12,6 +12,14 @@ export async function setFormInput(t, label, value, index = 0) {
     .setValue('input', value);
 }
 
+export async function clickFormInput(t, label, index = 0) {
+  const id = await getNthLabelId(t, label, index);
+
+  await t.context.app.client
+    .elementIdElement(id, '../..')
+    .click('input');
+}
+
 export async function setFormDropdown(t, label, value, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
