@@ -1,6 +1,6 @@
-import electron from '../electron';
+const electron = window['require']('electron');
 const { remote } = electron;
-const obs = remote.require('./app/vendor/obs-api/obs_node.node');
+const obs = remote.require('./obs-api/obs_node.node');
 
 export const ObsGlobal = obs.Global;
 export const ObsInput = obs.Input;

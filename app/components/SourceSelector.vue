@@ -42,7 +42,7 @@ import { Inject } from '../services/service';
 import Selector from './Selector.vue';
 import { WindowService } from '../services/window';
 import { ScenesService, SceneItem } from '../services/scenes';
-import { SceneItemMenu } from '../util/menus/SceneItemMenu';
+import { EditMenu } from '../util/menus/EditMenu';
 
 @Component({
   components: { Selector }
@@ -60,13 +60,17 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sceneItemId: string) {
+  showContextMenu(sceneItemId?: string) {
     const sceneItem = this.scene.getItem(sceneItemId);
-    const menu = new SceneItemMenu(
-      this.scenesService.activeSceneId,
-      sceneItemId,
-      sceneItem.sourceId
-    );
+    const menuOptions = sceneItem ?
+      ({
+        selectedSceneId: this.scene.id,
+        selectedSceneItemId: sceneItemId,
+        selectedSourceId: sceneItem.sourceId
+      }) :
+      ({ selectedSceneId: this.scene.id });
+
+    const menu = new EditMenu(menuOptions);
     menu.popup();
   }
 
@@ -94,7 +98,7 @@ export default class SourceSelector extends Vue {
   }
 
   makeActive(sceneItemId: string) {
-    this.scene.makeSourceActive(sceneItemId);
+    this.scene.makeItemActive(sceneItemId);
   }
 
   toggleVisibility(sceneItemId: string) {

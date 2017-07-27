@@ -1,7 +1,6 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
-
 const plugins = [];
 
 plugins.push(new ProgressBarPlugin());

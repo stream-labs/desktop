@@ -1,5 +1,5 @@
 <template>
-<ul class="selector-list">
+<ul class="selector-list" @contextmenu="handleContextMenu()">
   <draggable
     :list="normalizedItems"
     :options="{}"
@@ -8,7 +8,7 @@
       class="selector-item"
       :class="{ 'selector-item--active': item.value === activeItem }"
       v-for="(item, index) in normalizedItems"
-      @contextmenu="handleContextMenu(index)"
+      @contextmenu.stop="handleContextMenu(index)"
       @click="handleSelect(index)"
       @dblclick="handleDoubleClick(index)">
       <div class="selector-item-text">
@@ -63,10 +63,14 @@ export default class Selector extends Vue {
     this.$emit('select', value);
   }
 
-  handleContextMenu(index: number) {
-    const value = this.normalizedItems[index].value;
-    this.handleSelect(index);
-    this.$emit('contextmenu', value);
+  handleContextMenu(index?: number) {
+    if (index !== void 0) {
+      const value = this.normalizedItems[index].value;
+      this.handleSelect(index);
+      this.$emit('contextmenu', value);
+      return;
+    }
+    this.$emit('contextmenu');
   }
 
   handleDoubleClick(index: number) {

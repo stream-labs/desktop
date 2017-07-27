@@ -4,8 +4,7 @@
 import { Service } from './service';
 import electron from '../vendor/electron';
 const { ipcRenderer, remote } = electron;
-export * from '../vendor/obs-api';
-
+export * from '../../obs-api';
 
 let idCounter = 0;
 const callbacks = {};

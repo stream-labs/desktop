@@ -1,0 +1,103 @@
+import { Inject } from '../../services/service';
+import { Menu } from './Menu';
+import { WindowService } from '../../services/window';
+import { SourcesService } from '../../services/sources';
+import { ScenesService } from '../../services/scenes';
+import { ClipboardService } from '../../services/clipboard';
+import { SourceTransformMenu } from './SourceTransformMenu';
+
+interface IEditMenuOptions {
+  selectedSourceId?: string;
+  selectedSceneItemId?: string;
+  selectedSceneId?: string;
+}
+
+export class EditMenu extends Menu {
+
+  @Inject()
+  private sourcesService: SourcesService;
+
+  @Inject()
+  private scenesService: ScenesService;
+
+  @Inject()
+  private clipboardService: ClipboardService;
+
+  private windowService = WindowService.instance;
+
+  private source = this.sourcesService.getSource(this.options.selectedSourceId);
+  private scene = this.scenesService.getScene(this.options.selectedSceneId);
+  private sceneItem = this.scene.getItem(this.options.selectedSceneItemId);
+
+  constructor(private options: IEditMenuOptions) {
+    super();
+
+    this.appendEditMenuItems();
+  }
+
+
+  private appendEditMenuItems() {
+
+    if (this.scene) {
+      this.append({
+        label: 'Paste',
+        enabled: this.clipboardService.hasItems(),
+        click: () => this.clipboardService.paste()
+      });
+    }
+
+    if (this.sceneItem) {
+
+      this.append({
+        label: 'Copy',
+        click: () => this.clipboardService.copy()
+      });
+
+      this.append({
+        label: 'Transform',
+        submenu: this.transformSubmenu().menu
+      });
+
+      const visibilityLabel = this.sceneItem.visible ? 'Hide' : 'Show';
+
+      this.append({
+        label: visibilityLabel,
+        click: () => {
+          this.sceneItem.setVisibility(!this.sceneItem.visible);
+        }
+      });
+    }
+
+    if (this.source) {
+      this.append({
+        label: 'Filters',
+        click: () => {
+          this.showFilters();
+        }
+      });
+
+      this.append({
+        label: 'Properties',
+        click: () => {
+          this.showProperties();
+        }
+      });
+    }
+
+  }
+
+  private showFilters() {
+    // TODO: This should take an id
+    this.windowService.showSourceFilters(this.source.name);
+  }
+
+
+  private showProperties() {
+    this.windowService.showSourceProperties(this.source.sourceId);
+  }
+
+
+  private transformSubmenu() {
+    return new SourceTransformMenu(this.scene.id, this.sceneItem.sceneItemId);
+  }
+}

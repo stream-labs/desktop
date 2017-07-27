@@ -18,6 +18,7 @@ import { UserService } from '../services/user';
 import { WindowService } from '../services/window';
 import { NavigationService } from '../services/navigation';
 import { OnboardingService } from '../services/onboarding';
+import { ClipboardService } from '../services/clipboard';
 
 const statefulServiceModules = {
   ...getModule(ScenesService),
@@ -36,7 +37,8 @@ const statefulServiceModules = {
   ...getModule(UserService),
   ...getModule(WindowService),
   ...getModule(NavigationService),
-  ...getModule(OnboardingService)
+  ...getModule(OnboardingService),
+  ...getModule(ClipboardService)
 };
 
 
