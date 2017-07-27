@@ -16,7 +16,7 @@ import DragHandler from '../util/DragHandler';
 import { Inject } from '../services/service';
 import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
-import { SceneItemMenu } from '../util/menus/SceneItemMenu';
+import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import electron from '../vendor/electron';
 
@@ -132,19 +132,24 @@ export default class StudioEditor extends Vue {
     // If neither a drag or resize was initiated, it must have been
     // an attempted selection or right click.
     if (!this.dragHandler && !this.resizeRegion) {
-      const overSource = this.sources.find(source => {
+      const overSource = this.sceneItems.find(source => {
         return this.isOverSource(event, source);
       });
 
       // Either select a new source, or deselect all sources (null)
-      this.scene.makeSourceActive(overSource ? overSource.sceneItemId : null);
+      this.scene.makeItemActive(overSource ? overSource.sceneItemId : null);
 
-      if ((event.button === 2) && overSource) {
-        const menu = new SceneItemMenu(
-          this.scene.id,
-          overSource.sceneItemId,
-          overSource.sourceId
-        );
+      if ((event.button === 2)) {
+        let menu: EditMenu;
+        if (overSource) {
+          menu = new EditMenu({
+            selectedSceneId: this.scene.id,
+            selectedSceneItemId: overSource.sceneItemId,
+            selectedSourceId: overSource.sourceId
+          });
+        } else {
+          menu = new EditMenu({ selectedSceneId: this.scene.id });
+        }
         menu.popup();
       }
     }
@@ -202,7 +207,7 @@ export default class StudioEditor extends Vue {
       this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
-      const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sources));
+      const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sceneItems));
 
       const overSource = sourcesInPriorityOrder.find(source => {
         return this.isOverSource(event, source);
@@ -210,7 +215,7 @@ export default class StudioEditor extends Vue {
 
       if (overSource) {
         // Make this source active
-        this.scene.makeSourceActive(overSource.sceneItemId);
+        this.scene.makeItemActive(overSource.sceneItemId);
 
         // Start dragging it
         this.startDragging(event);
@@ -310,7 +315,7 @@ export default class StudioEditor extends Vue {
       if (overResize) {
         this.$refs.display.style.cursor = overResize.cursor;
       } else {
-        const overSource = _.find(this.sources, source => {
+        const overSource = _.find(this.sceneItems, source => {
           return this.isOverSource(event, source);
         });
 
@@ -408,7 +413,7 @@ export default class StudioEditor extends Vue {
     if (activeSource && activeSource.isOverlaySource) return activeSource;
   }
 
-  get sources(): SceneItem[] {
+  get sceneItems(): SceneItem[] {
     const scene = this.scenesService.activeScene;
     if (scene) {
       return scene.getItems().filter(source => {

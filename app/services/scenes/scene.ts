@@ -124,7 +124,7 @@ export class Scene implements IScene {
     const sceneItem = this.getItem(sceneItemId);
 
     // Newly added sources are immediately active
-    this.makeSourceActive(sceneItemId);
+    this.makeItemActive(sceneItemId);
 
     sceneItem.loadAttributes();
 
@@ -142,18 +142,17 @@ export class Scene implements IScene {
   }
 
 
-  makeSourceActive(sourceId: string) {
-    if (sourceId) {
-      const source = this.getItem(sourceId);
+  makeItemActive(sceneItemId: string) {
+    const selectedItem = this.getItem(sceneItemId);
+    this.getObsScene().getItems().forEach(obsSceneItem => {
+      if (!selectedItem || selectedItem.obsSceneItemId !== obsSceneItem.id) {
+        obsSceneItem.selected = false;
+        return;
+      }
+      obsSceneItem.selected = true;
+    });
 
-      // This should really operate on a scene too, rather than
-      // just the currently active scene
-      nodeObs.OBS_content_selectSources([{ name: source.name }]);
-    } else {
-      nodeObs.OBS_content_selectSources([]);
-    }
-
-    this.MAKE_SOURCE_ACTIVE(sourceId);
+    this.MAKE_SOURCE_ACTIVE(sceneItemId);
   }
 
 

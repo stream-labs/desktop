@@ -53,7 +53,7 @@ import Vue from 'vue';
 import Tween from '@tweenjs/tween.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
-import { SourceMenu } from '../util/menus/SourceMenu';
+import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
 import { ScenesService } from '../services/scenes';
 import { Inject } from '../services/service';
@@ -156,7 +156,7 @@ export default class MixerItem extends Vue {
   }
 
   showSourceMenu(sourceId: string) {
-    const menu = new SourceMenu(sourceId);
+    const menu = new EditMenu({ selectedSourceId: sourceId});
     menu.popup();
   }
 
