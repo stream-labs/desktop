@@ -12,9 +12,9 @@ export class SourceTransformMenu extends Menu {
   @Inject()
   videoService: VideoService;
 
-  source = this.scenesService.getScene(this.sceneId).getSource(this.sourceId);
+  source = this.scenesService.getScene(this.sceneId).getItem(this.sceneItemId);
 
-  constructor(private sceneId: string, private sourceId: string) {
+  constructor(private sceneId: string, private sceneItemId: string) {
     super();
 
     this.appendMenuItems();

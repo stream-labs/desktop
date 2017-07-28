@@ -22,4 +22,9 @@ export class YoutubeService extends Service implements IPlatformService {
     // TODO: Not currently implemented
   }
 
+  fetchLiveStreamInfo(youtubeId: string) {
+    // TODO: Harsha
+    return {};
+  }
+
 }

@@ -132,7 +132,7 @@ const HOTKEY_ACTIONS = {
       getCurrentState(sceneName, sourceName) {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
-        const mergedSource = ScenesService.instance.getSource(scene.id, source.id);
+        const mergedSource = ScenesService.instance.getItem(scene.id, source.id);
 
         return mergedSource.visible;
       },
@@ -140,13 +140,13 @@ const HOTKEY_ACTIONS = {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
 
-        ScenesService.instance.getSource(scene.id, source.id).setVisibility(true);
+        ScenesService.instance.getItem(scene.id, source.id).setVisibility(true);
       },
       off(sceneName, sourceName) {
         const scene = ScenesService.instance.getSceneByName(sceneName);
         const source = SourcesService.instance.getSourceByName(sourceName);
 
-        ScenesService.instance.getSource(scene.id, source.id).setVisibility(false);
+        ScenesService.instance.getItem(scene.id, source.id).setVisibility(false);
       }
     },
 
@@ -384,8 +384,8 @@ export class HotkeysService extends Service {
         const action = HOTKEY_ACTIONS.SCENE[actionName] as THotkeyAction;
 
         if (action.perSource) {
-          scene.sources.forEach(sceneSource => {
-            const source = this.sourcesService.getSourceById(sceneSource.id);
+          scene.items.forEach(sceneSource => {
+            const source = this.sourcesService.getSourceById(sceneSource.sourceId);
 
             if (!action.shouldApply || action.shouldApply(source)) {
               hotkeySet.addSceneHotkeys(

@@ -2,10 +2,9 @@ import { throttle } from 'lodash-decorators';
 import { Service, Inject } from './service';
 import { UserService, requiresLogin } from './user';
 import { TPlatform } from './platforms';
-import { ScenesService } from './scenes';
+import { ScenesService, SceneItem } from './scenes';
 import { SourcesService } from './sources';
 import { VideoService } from './video';
-import { IInputValue } from '../components/shared/forms/input';
 import { HostsService } from './hosts';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import namingHelpers from '../util/NamingHelpers';
@@ -227,7 +226,7 @@ export class WidgetsService extends Service {
   videoService: VideoService;
 
   @requiresLogin()
-  createWidget(type: WidgetType, name?: string) {
+  createWidget(type: WidgetType, name?: string): SceneItem {
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
@@ -235,8 +234,8 @@ export class WidgetsService extends Service {
       return this.sourcesService.getSourceByName(name);
     });
 
-    const sourceId = scene.addSource(suggestedName, 'BrowserSource');
-    const properties = this.sourcesService.getPropertiesFormData(sourceId);
+    const sceneItem = scene.createAndAddSource(suggestedName, 'browser_source');
+    const properties = this.sourcesService.getPropertiesFormData(sceneItem.sourceId);
 
     // Find the URL property and set it
     properties.forEach(prop => {
@@ -257,11 +256,11 @@ export class WidgetsService extends Service {
       }
     });
 
-    this.sourcesService.setProperties(sourceId, properties);
+    this.sourcesService.setProperties(sceneItem.sourceId, properties);
 
     // Give a couple seconds for the resize to propagate
     setTimeout(() => {
-      const source = scene.getSource(sourceId);
+      const source = scene.getItem(sceneItem.sceneItemId);
 
       // Set the default transform
       const rect = new ScalableRectangle(source);
@@ -277,7 +276,7 @@ export class WidgetsService extends Service {
       });
     }, 1500);
 
-    return sourceId;
+    return sceneItem;
   }
 
   @requiresLogin()

@@ -62,4 +62,17 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
+  fetchLiveStreamInfo(twitchId: string) {
+    const headers = new Headers();
+
+    headers.append('Client-Id', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+
+    const request = new Request(`https://api.twitch.tv/kraken/streams/${twitchId}`, { headers });
+
+    return fetch(request).then(response => {
+      return response.json();
+    });
+  }
+
 }

@@ -72,9 +72,13 @@
 <script lang="ts">
 import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
-import { debounce } from 'lodash-decorators';
 import { TObsType, IInputValue, Input, IFont } from './Input';
 const Multiselect = require('vue-multiselect').Multiselect;
+
+
+const OBS_FONT_BOLD = 1 << 0;
+const OBS_FONT_ITALIC = 1 << 1;
+
 
 /**
  * @tutorial https://github.com/devongovett/font-manager
@@ -158,19 +162,25 @@ class FontProperty extends Input<IInputValue<IFont>>{
 
     this.setFont({
       face: family.family,
-      style
+      flags: this.styleToFlags(style)
     });
+  }
+
+  styleToFlags(style: string) {
+    // These are specific to the GDI+ Text property
+    let flags = 0;
+    if (style.match(/Italic/)) flags |= OBS_FONT_ITALIC;
+    if (style.match(/Bold/)) flags |= OBS_FONT_BOLD;
+
+    return flags;
   }
 
   setStyle(font: IFontDescriptor) {
-    this.setFont({
-      style: font.style
-    });
+    this.setFont({ flags: this.styleToFlags(font.style) });
   }
 
-  setFontSizePreset(event: Event) {
-    this.$refs.size.value = event.target['value'];
-    this.setFont({});
+  setFontSizePreset(size: string) {
+    this.setFont({ size });
   }
 
   // Generic function for setting the current font.
@@ -179,8 +189,8 @@ class FontProperty extends Input<IInputValue<IFont>>{
   setFont(args: IFont) {
     const defaults = {
       face: this.$refs.font.value.family,
-      style: this.$refs.font.value.style,
-      size: this.$refs.size.value
+      size: this.$refs.size.value,
+      flags: this.styleToFlags(this.$refs.font.value.style)
     };
 
     const fontObj = Object.assign(defaults, args);
@@ -222,7 +232,10 @@ class FontProperty extends Input<IInputValue<IFont>>{
 
   get selectedFont() {
     return _.find(this.selectedFamily.fonts, font => {
-      return font.style === this.value.value.style;
+      if ((this.value.value.flags & OBS_FONT_BOLD) && (!font.style.match(/Bold/))) return false;
+      if ((this.value.value.flags & OBS_FONT_ITALIC) && (!font.style.match(/Italic/))) return false;
+
+      return true;
     });
   }
 

@@ -14,9 +14,9 @@ import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
 import { Inject } from '../services/service';
-import { ScenesService, SceneSource, Scene } from '../services/scenes';
+import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
-import { SourceMenu } from '../util/menus/SourceMenu';
+import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import electron from '../vendor/electron';
 
@@ -132,18 +132,24 @@ export default class StudioEditor extends Vue {
     // If neither a drag or resize was initiated, it must have been
     // an attempted selection or right click.
     if (!this.dragHandler && !this.resizeRegion) {
-      const overSource = this.sources.find(source => {
+      const overSource = this.sceneItems.find(source => {
         return this.isOverSource(event, source);
       });
 
       // Either select a new source, or deselect all sources (null)
-      this.scene.makeSourceActive(overSource ? overSource.id : null);
+      this.scene.makeItemActive(overSource ? overSource.sceneItemId : null);
 
-      if ((event.button === 2) && overSource) {
-        const menu = new SourceMenu(
-          this.scene.id,
-          overSource.id
-        );
+      if ((event.button === 2)) {
+        let menu: EditMenu;
+        if (overSource) {
+          menu = new EditMenu({
+            selectedSceneId: this.scene.id,
+            selectedSceneItemId: overSource.sceneItemId,
+            selectedSourceId: overSource.sourceId
+          });
+        } else {
+          menu = new EditMenu({ selectedSceneId: this.scene.id });
+        }
         menu.popup();
       }
     }
@@ -201,7 +207,7 @@ export default class StudioEditor extends Vue {
       this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
-      const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sources));
+      const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sceneItems));
 
       const overSource = sourcesInPriorityOrder.find(source => {
         return this.isOverSource(event, source);
@@ -209,7 +215,7 @@ export default class StudioEditor extends Vue {
 
       if (overSource) {
         // Make this source active
-        this.scene.makeSourceActive(overSource.id);
+        this.scene.makeItemActive(overSource.sceneItemId);
 
         // Start dragging it
         this.startDragging(event);
@@ -246,7 +252,7 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getSource(source.id).setPositionAndCrop(rect.x, rect.y, rect.crop);
+    this.scene.getItem(source.sceneItemId).setPositionAndCrop(rect.x, rect.y, rect.crop);
   }
 
   resize(
@@ -290,7 +296,7 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getSource(source.id).setPositionAndScale(
+    this.scene.getItem(source.sceneItemId).setPositionAndScale(
       rect.x,
       rect.y,
       rect.scaleX,
@@ -309,7 +315,7 @@ export default class StudioEditor extends Vue {
       if (overResize) {
         this.$refs.display.style.cursor = overResize.cursor;
       } else {
-        const overSource = _.find(this.sources, source => {
+        const overSource = _.find(this.sceneItems, source => {
           return this.isOverSource(event, source);
         });
 
@@ -355,7 +361,7 @@ export default class StudioEditor extends Vue {
 
   // Determines if the given mouse event is over the
   // given source
-  isOverSource(event: MouseEvent, source: SceneSource) {
+  isOverSource(event: MouseEvent, source: SceneItem) {
     const rect = new ScalableRectangle(source);
     rect.normalize();
 
@@ -401,16 +407,16 @@ export default class StudioEditor extends Vue {
 
   // getters
 
-  get activeSource(): SceneSource {
-    const activeSource = this.scenesService.activeScene.activeSource;
+  get activeSource(): SceneItem {
+    const activeSource = this.scenesService.activeScene.activeItem;
 
     if (activeSource && activeSource.isOverlaySource) return activeSource;
   }
 
-  get sources(): SceneSource[] {
+  get sceneItems(): SceneItem[] {
     const scene = this.scenesService.activeScene;
     if (scene) {
-      return scene.getSources().filter(source => {
+      return scene.getItems().filter(source => {
         return source.isOverlaySource;
       });
     }

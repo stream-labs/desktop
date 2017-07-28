@@ -4,6 +4,7 @@
 import { Service } from './service';
 import electron from '../vendor/electron';
 const { ipcRenderer, remote } = electron;
+export * from '../../obs-api';
 
 let idCounter = 0;
 const callbacks = {};
@@ -43,6 +44,7 @@ ipcRenderer.on('obs-apiCallback', (event, cbInfo) => {
 export class ObsApiService extends Service {
 
   nodeObs = nodeObs;
+
 
   isObsInstalled() {
     return nodeObs.OBS_API_isOBS_installed();

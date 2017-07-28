@@ -43,12 +43,12 @@ export interface IInputValue<TValueType> {
 export declare type TFormData = IInputValue<TObsValue>[];
 
 export interface IListInputValue extends IInputValue<string> {
-  options: IListOption[];
+  options: IListOption<string>[];
 }
 
-export interface IListOption {
+export interface IListOption<TValue> {
   description: string;
-  value: string;
+  value: TValue;
 }
 
 export interface IPathInputValue extends IInputValue<string> {
@@ -63,7 +63,7 @@ export interface ISliderInputValue extends IInputValue<number> {
 
 export interface IFont {
   face?: string;
-  style?: string;
+  flags?: number;
   size?: string;
 }
 
@@ -208,8 +208,6 @@ export function obsValuesToInputValues(
       }
     } else if (obsProp.type === 'OBS_PROPERTY_FONT') {
       prop.value = valueObject;
-      prop.value.style = prop.value.style || 'Regular';
-
     } else if (obsProp.type === 'OBS_PROPERTY_EDITABLE_LIST') {
       prop = {
         ...prop,

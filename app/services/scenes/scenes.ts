@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation, Inject } from '../stateful-service';
-import { nodeObs } from '../obs-api';
+import { nodeObs, ObsScene, ESceneDupType } from '../obs-api';
 import { ConfigFileService } from '../config-file';
 import { SourcesService } from '../sources';
-import { IScene, Scene } from './scene';
+import { IScene, Scene, ISceneItem } from '../scenes';
 import electron from '../../vendor/electron';
+import { Subject } from 'rxjs/Subject';
 
 const { ipcRenderer } = electron;
 
@@ -13,6 +14,11 @@ interface IScenesState {
   activeSceneId: string;
   displayOrder: string[];
   scenes: Dictionary<IScene>;
+}
+
+interface ISceneCreateOptions {
+  duplicateSourcesFromScene?: string;
+  obsSceneIsAlreadyExist?: boolean; // TODO: rid of this option when frontend will load the config file
 }
 
 export class ScenesService extends StatefulService<IScenesState> {
@@ -23,17 +29,14 @@ export class ScenesService extends StatefulService<IScenesState> {
     scenes: {}
   };
 
+  sourceAdded = new Subject<ISceneItem>();
+  sourceRemoved = new Subject<ISceneItem>();
+
   @Inject()
   private sourcesService: SourcesService;
 
   @Inject()
   private configFileService: ConfigFileService;
-
-  mounted() {
-    this.sourcesService.sourceRemoved.subscribe(source => {
-      this.removeSourceFromAllScenes(source.id);
-    });
-  }
 
 
   @mutation()
@@ -45,11 +48,11 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
-    Vue.set(this.state.scenes, id, {
+    Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      activeSourceId: null,
-      sources: []
+      activeItemId: null,
+      items: []
     });
     this.state.displayOrder.push(id);
     this.state.activeSceneId = this.state.activeSceneId || id;
@@ -73,20 +76,30 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
 
-  removeSourceFromAllScenes(sourceId: string) {
-    this.scenes.forEach(scene => scene.removeSource(sourceId));
-  }
-
-
-  createScene(name: string) {
+  createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
     const id = ipcRenderer.sendSync('getUniqueId');
-
-    nodeObs.OBS_content_createScene(name);
-
     this.ADD_SCENE(id, name);
-    this.addDefaultSources(id);
+
+    if (!options.obsSceneIsAlreadyExist) {
+      if (!options.duplicateSourcesFromScene) {
+        ObsScene.create(name);
+        this.addDefaultSources(id);
+      } else {
+        this.getSceneByName(options.duplicateSourcesFromScene)
+          .getObsScene()
+          .duplicate(name, ESceneDupType.Refs);
+        this.getScene(id).loadConfig();
+      }
+    } else {
+      this.getScene(id).loadConfig();
+    }
+
     this.makeSceneActive(id);
+
+    // API for now can't save the scenes order
+    const scenesNames = this.scenes.map(scene => scene.name);
+    nodeObs.OBS_content_fillTabScenes(scenesNames);
 
     this.configFileService.save();
   }
@@ -98,10 +111,19 @@ export class ScenesService extends StatefulService<IScenesState> {
       return;
     }
 
-    const name = this.state.scenes[id].name;
+    const scene = this.getScene(id);
 
-    nodeObs.OBS_content_removeScene(name);
+    // remove all sources from scene
+    scene.getItems({ showHidden: true }).forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
+
+    scene.getObsScene().release();
+
     this.REMOVE_SCENE(id);
+
+    // OBS_content_getListCurrentScenes relies on OBS_content_fillTabScenes
+    // so we have to delete the scene from this list
+    const scenesNames = this.scenes.map(scene => scene.name);
+    nodeObs.OBS_content_fillTabScenes(scenesNames);
 
     if (this.state.activeSceneId === id) {
       const sceneIds = Object.keys(this.state.scenes);
@@ -112,6 +134,16 @@ export class ScenesService extends StatefulService<IScenesState> {
     }
 
     this.configFileService.save();
+  }
+
+
+  getSourceScenes(sourceId: string): Scene[] {
+    const resultScenes: Scene[] = [];
+    this.scenes.forEach(scene => {
+      const items = scene.getItems({ showHidden: true }).filter(sceneItem => sceneItem.sourceId === sourceId);
+      if (items.length > 0) resultScenes.push(scene);
+    });
+    return resultScenes;
   }
 
 
@@ -134,12 +166,8 @@ export class ScenesService extends StatefulService<IScenesState> {
 
     const sceneNames: string[] = nodeObs.OBS_content_getListCurrentScenes();
 
-    sceneNames.forEach(sceneName => {
-      // Get an id to identify the scene on the frontend
-      const id = ipcRenderer.sendSync('getUniqueId');
-
-      this.ADD_SCENE(id, sceneName);
-      this.getScene(id).loadConfig();
+    sceneNames.forEach(sceneNames => {
+      this.createScene(sceneNames, { obsSceneIsAlreadyExist: true });
     });
 
     const needToCreateDefaultScene = Object.keys(this.state.scenes).length === 0;
@@ -157,7 +185,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   }
 
 
-  getSceneByName(name: string): IScene {
+  getSceneByName(name: string): Scene {
     let foundScene: IScene;
 
     Object.keys(this.state.scenes).forEach(id => {
@@ -196,8 +224,17 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   private addDefaultSources(sceneId: string) {
     const scene = this.getScene(sceneId);
-    scene.addSource('Mic/Aux', 'Audio Input Capture', true);
-    scene.addSource('Desktop Audio', 'Audio Output Capture', true);
+
+    const audioInputSource = this.sourcesService.createSource(
+      'Mic/Aux', 'wasapi_input_capture', { isHidden: true }
+    );
+
+    const audioOutputSource = this.sourcesService.createSource(
+      'Desktop Audio', 'wasapi_output_capture', { isHidden: true }
+    );
+
+    scene.addSource(audioInputSource.sourceId);
+    scene.addSource(audioOutputSource.sourceId);
   }
 
 }

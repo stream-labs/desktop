@@ -19,7 +19,7 @@ const path = require('path');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
-const uuid = require('uuid/v1');
+const uuid = require('uuid/v4');
 
 // Initialize the keylistener
 require('node-libuiohook').startHook();
@@ -276,18 +276,6 @@ ipcMain.on('services-shouldInit', (event, service) => {
 // These should be used sparingly, and are used to
 // ensure atomic operation of a handful of calls.
 const nodeObsVirtualMethods = {
-
-  // This needs to be done as a single IPC call, otherwise
-  // there is visible judder in the display output.
-  OBS_content_setSourcePositionAndScale(sceneName, sourceName, x, y, scaleX, scaleY) {
-    obs.OBS_content_setSourcePosition(sceneName, sourceName, x, y);
-    obs.OBS_content_setSourceScaling(sceneName, sourceName, scaleX, scaleY);
-  },
-
-  OBS_content_setSourcePositionAndCrop(sceneName, sourceName, x, y, crop) {
-    obs.OBS_content_setSourcePosition(sceneName, sourceName, x, y);
-    obs.OBS_content_setSceneItemCrop(sceneName, sourceName, crop);
-  },
 
   OBS_test_callbackProxy(num, cb) {
     setTimeout(() => {

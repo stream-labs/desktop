@@ -1,6 +1,6 @@
+import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import Vue from 'vue';
 import { mutation, StatefulService, InitAfter, Inject, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
@@ -11,7 +11,7 @@ import Utils from './utils';
 const VOLMETER_UPDATE_INTERVAL = 40;
 
 export interface IAudioSource {
-  id: string;
+  sourceId: string;
   fader: IFader;
 }
 
@@ -50,24 +50,25 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   protected mounted() {
 
-    this.sourcesService.sourceAdded.subscribe(source => {
+    this.scenesService.sourceAdded.subscribe(sceneSourceModel => {
+      const source = this.sourcesService.getSource(sceneSourceModel.sourceId);
       if (!source.audio) return;
-      this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
+      this.createAudioSource(source);
     });
 
     this.sourcesService.sourceUpdated.subscribe(source => {
-      const audioSource = this.getSource(source.id);
+      const audioSource = this.getSource(source.sourceId);
       if (!audioSource) return;
 
       if (!source.audio) {
-        this.REMOVE_AUDIO_SOURCE(source.id);
+        this.REMOVE_AUDIO_SOURCE(source.sourceId);
         return;
       }
 
     });
 
     this.sourcesService.sourceRemoved.subscribe(source => {
-      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.id);
+      if (source.audio) this.REMOVE_AUDIO_SOURCE(source.sourceId);
     });
 
   }
@@ -78,8 +79,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   getSourcesForCurrentScene(): AudioSource[] {
     const scene = this.scenesService.activeScene;
-    const sceneSources = scene.getSources({ showHidden: true }).filter(source => source.audio);
-    return sceneSources.map((sceneSource: ISource) => this.getSource(sceneSource.id));
+    const sceneSources = scene.getItems({ showHidden: true }).filter(source => source.audio);
+    return sceneSources.map((sceneSource: ISource) => this.getSource(sceneSource.sourceId)).filter(item => item);
   }
 
 
@@ -88,15 +89,26 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     const fader = nodeObs.OBS_content_getSourceFader(sourceName);
     fader.db = fader.db || 0;
     return {
-      id: source.id,
+      sourceId: source.sourceId,
       fader
     };
   }
 
 
+  private createAudioSource(source: Source) {
+    const volmeter = nodeObs.OBS_audio_createVolmeter(2);
+    const fader = nodeObs.OBS_audio_createFader(0);
+
+    nodeObs.OBS_audio_volmeterAttachSource(volmeter, source.name);
+    nodeObs.OBS_audio_faderAttachSource(fader, source.name);
+
+    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
+  }
+
+
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
-    Vue.set(this.state.audioSources, source.id, source);
+    Vue.set(this.state.audioSources, source.sourceId, source);
   }
 
 
@@ -129,7 +141,7 @@ export class AudioSource extends Source implements IAudioSource {
   }
 
   setMuted(muted: boolean) {
-    this.sourcesService.setMuted(this.id, muted);
+    this.sourcesService.setMuted(this.sourceId, muted);
   }
 
 
@@ -170,7 +182,7 @@ export class AudioSource extends Source implements IAudioSource {
 
 
   @mutation()
-  private UPDATE(patch: TPatch<IAudioSource>) {
+  private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
     Object.assign(this.audioSourceState, patch);
   }
 

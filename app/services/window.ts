@@ -171,6 +171,19 @@ export class WindowService extends StatefulService<IWindowState> {
     });
   }
 
+  showDuplicateScene(sceneName: string) {
+    this.showWindow({
+      startupOptions: {
+        component: 'NameScene',
+        sceneToDuplicate: sceneName
+      },
+      windowOptions: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
   showSourceProperties(sourceId: string) {
     this.showWindow({
       startupOptions: {

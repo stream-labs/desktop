@@ -13,6 +13,8 @@ export interface IPlatformService {
   // settings for this platform, given an auth.
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
+  fetchLiveStreamInfo: (platformId: string) => any;
+
 }
 
 export interface IPlatformAuth {

@@ -26,7 +26,8 @@
       "updater/index.html",
       "updater/Updater.js",
       "index.html",
-      "main.js"
+      "main.js",
+      "obs-api"
     ],
     "extraFiles": [
       "node-obs"

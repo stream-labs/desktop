@@ -55,8 +55,13 @@ export default class NameSource extends Vue {
   error = '';
 
   mounted() {
+    const sourceType =
+      this.sourceType &&
+      this.sourcesService.getAvailableSourcesTypes()
+        .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
+
     this.name = namingHelpers.suggestName(
-      this.sourceType || WidgetDefinitions[this.widgetType].name,
+      (this.sourceType && sourceType.description) || WidgetDefinitions[this.widgetType].name,
       (name: string) => this.isTaken(name)
     );
   }
@@ -65,21 +70,21 @@ export default class NameSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      let id;
+      let sourceId: string;
 
       if (this.sourceType != null) {
-        id = this.scenesService.activeScene.addSource(
+        sourceId = this.scenesService.activeScene.createAndAddSource(
           this.name,
           this.sourceType
-        );
+        ).sourceId;
       } else if (this.widgetType != null) {
-        id = this.widgetsService.createWidget(
+        sourceId = this.widgetsService.createWidget(
           this.widgetType,
           this.name
-        );
+        ).sourceId;
       }
 
-      this.windowService.showSourceProperties(id);
+      this.windowService.showSourceProperties(sourceId);
     }
   }
 

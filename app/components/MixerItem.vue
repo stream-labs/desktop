@@ -39,7 +39,7 @@
       </i>
       <i
         class="ico-btn fa fa-cog"
-        @click="showSourceMenu(audioSource.id)"
+        @click="showSourceMenu(audioSource.sourceId)"
       >
       </i>
     </div>
@@ -53,7 +53,7 @@ import Vue from 'vue';
 import Tween from '@tweenjs/tween.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
-import { SourceMenu } from '../util/menus/SourceMenu';
+import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
 import { ScenesService } from '../services/scenes';
 import { Inject } from '../services/service';
@@ -156,10 +156,7 @@ export default class MixerItem extends Vue {
   }
 
   showSourceMenu(sourceId: string) {
-    const menu = new SourceMenu(
-      this.scenesService.activeSceneId,
-      sourceId
-    );
+    const menu = new EditMenu({ selectedSourceId: sourceId});
     menu.popup();
   }
 
@@ -171,7 +168,7 @@ export default class MixerItem extends Vue {
 
 .mixer-item {
   position: relative;
-  padding: 10px;
+  padding: 10px 12px;
 
   .source-name {
     flex: 1
@@ -213,12 +210,6 @@ export default class MixerItem extends Vue {
   .controls {
     width: 60px;
     text-align: right;
-    font-size: 16px;
-    margin-top: -2px;
-
-    .fa {
-      font-size: 14;
-    }
 
     .fa-volume-off {
       color: @red;

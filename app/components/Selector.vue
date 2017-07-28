@@ -1,5 +1,5 @@
 <template>
-<ul class="selector-list">
+<ul class="selector-list" @contextmenu="handleContextMenu()">
   <draggable
     :list="normalizedItems"
     :options="{}"
@@ -8,7 +8,7 @@
       class="selector-item"
       :class="{ 'selector-item--active': item.value === activeItem }"
       v-for="(item, index) in normalizedItems"
-      @contextmenu="handleContextMenu(index)"
+      @contextmenu.stop="handleContextMenu(index)"
       @click="handleSelect(index)"
       @dblclick="handleDoubleClick(index)">
       <div class="selector-item-text">
@@ -63,10 +63,14 @@ export default class Selector extends Vue {
     this.$emit('select', value);
   }
 
-  handleContextMenu(index: number) {
-    const value = this.normalizedItems[index].value;
-    this.handleSelect(index);
-    this.$emit('contextmenu', value);
+  handleContextMenu(index?: number) {
+    if (index !== void 0) {
+      const value = this.normalizedItems[index].value;
+      this.handleSelect(index);
+      this.$emit('contextmenu', value);
+      return;
+    }
+    this.$emit('contextmenu');
   }
 
   handleDoubleClick(index: number) {
@@ -117,9 +121,6 @@ export default class Selector extends Vue {
   list-style-type: none;
   margin: 0;
   overflow: auto;
-  border: 1px solid @day-border;
-  background-color: @day-secondary;
-  .radius;
 
   .selector-item {
     &:first-child {
@@ -169,28 +170,23 @@ export default class Selector extends Vue {
 .selector-actions {
   display: flex;
   flex-direction: row;
-  color: @grey;
   font-size: 12px;
-  padding: 0 0px 0 6px;
   opacity: 0;
+  .transition;
 
   >i {
-    margin-left: 5px;
+    margin-left: 10px;
   }
 }
 
 .selector-drag-handle {
   cursor: move;
+  .icon-hover;
 }
 
 .night-theme {
   .sortable-ghost, .sortable-chosen {
     background: @night-accent-light;
-  }
-
-  .selector-item {
-    background: @night-secondary;
-    border-color: transparent;
   }
 
   .selector-item {

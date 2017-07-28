@@ -1,6 +1,6 @@
 import { SettingsService } from '../services/settings';
 import { Inject } from '../services/service';
-import { ScenesService, SceneSource } from '../services/scenes';
+import { ScenesService, SceneItem } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
 import { ScalableRectangle } from '../util/ScalableRectangle';
 import electron from '../vendor/electron';
@@ -65,8 +65,8 @@ class DragHandler {
   snapDistance: number;
 
   // Sources
-  draggedSource: SceneSource;
-  otherSources: SceneSource[];
+  draggedSource: SceneItem;
+  otherSources: SceneItem[];
 
   // Mouse properties
   currentX: number;
@@ -95,7 +95,7 @@ class DragHandler {
 
     // Load some attributes about sources
     const scene = this.scenesService.activeScene;
-    this.draggedSource = scene.activeSource;
+    this.draggedSource = scene.activeItem;
     this.otherSources = scene.inactiveSources.filter(source => {
       return source.isOverlaySource;
     });
@@ -164,8 +164,8 @@ class DragHandler {
 
     denormalize();
 
-    this.scenesService.activeScene.getSource(
-      this.draggedSource.id
+    this.scenesService.activeScene.getItem(
+      this.draggedSource.sceneItemId
     ).setPosition(rect);
 
     if (!snappedX) {
