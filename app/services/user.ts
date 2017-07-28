@@ -7,6 +7,7 @@ import { mutation } from './stateful-service';
 import electron from '../vendor/electron';
 import { HostsService } from './hosts';
 import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
+import { CustomizationService } from './customization';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -18,6 +19,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   @Inject()
   hostsService: HostsService;
+
+  @Inject()
+  customizationService: CustomizationService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -88,6 +92,32 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.username;
     }
+  }
+
+  get platformId() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.id;
+    }
+  }
+
+
+  widgetUrl(type: string) {
+    if (this.isLoggedIn()) {
+      const host = this.hostsService.streamlabs;
+      const token = this.widgetToken;
+      const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+      if (type === 'recent-events') {
+        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}`;
+      } else if (type === 'dashboard') {
+        return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&show_recent_events=0`;
+      }
+    }
+  }
+
+  get chatUrl() {
+    const username = this.username;
+    const nightMode = this.customizationService.nightMode ? 'darkpopout' : 'popout';
+    return `https://twitch.tv/${username}/chat?${nightMode}`;
   }
 
 

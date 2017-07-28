@@ -30,8 +30,12 @@ export default class StudioControls extends Vue {
 .studio-controls {
   height: 240px;
   width: 100%;
-  padding: 16px 15px;
+  padding: 20px 5px;
 }
+</style>
+
+<style lang="less">
+@import "../styles/index";
 
 .studio-controls-panel {
   display: flex;
@@ -39,10 +43,6 @@ export default class StudioControls extends Vue {
   height: 100%;
   padding: 0 15px;
 }
-</style>
-
-<style lang="less">
-@import "../styles/index";
 
 .studio-controls-top {
   display: flex;
@@ -61,9 +61,16 @@ export default class StudioControls extends Vue {
 
 .studio-controls-selector {
   background: @day-secondary;
-  border: 1px solid @day-border;
+  .border;
   .radius;
   flex-grow: 1;
   overflow-y: auto;
+}
+
+.night-theme {
+  .studio-controls-selector {
+    background: @navy-secondary;
+    border-color: @navy-secondary;
+  }
 }
 </style>

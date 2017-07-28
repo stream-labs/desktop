@@ -121,9 +121,6 @@ export default class Selector extends Vue {
   list-style-type: none;
   margin: 0;
   overflow: auto;
-  border: 1px solid @day-border;
-  background-color: @day-secondary;
-  .radius;
 
   .selector-item {
     &:first-child {
@@ -190,11 +187,6 @@ export default class Selector extends Vue {
 .night-theme {
   .sortable-ghost, .sortable-chosen {
     background: @night-accent-light;
-  }
-
-  .selector-item {
-    background: @night-secondary;
-    border-color: transparent;
   }
 
   .selector-item {
