@@ -72,7 +72,6 @@
 <script lang="ts">
 import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
-import { debounce } from 'lodash-decorators';
 import { TObsType, IInputValue, Input, IFont } from './Input';
 const Multiselect = require('vue-multiselect').Multiselect;
 
@@ -168,9 +167,8 @@ class FontProperty extends Input<IInputValue<IFont>>{
     });
   }
 
-  setFontSizePreset(event: Event) {
-    this.$refs.size.value = event.target['value'];
-    this.setFont({});
+  setFontSizePreset(size: string) {
+    this.setFont({ size });
   }
 
   // Generic function for setting the current font.
