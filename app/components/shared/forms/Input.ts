@@ -63,7 +63,7 @@ export interface ISliderInputValue extends IInputValue<number> {
 
 export interface IFont {
   face?: string;
-  style?: string;
+  flags?: number;
   size?: string;
 }
 
@@ -208,8 +208,6 @@ export function obsValuesToInputValues(
       }
     } else if (obsProp.type === 'OBS_PROPERTY_FONT') {
       prop.value = valueObject;
-      prop.value.style = prop.value.style || 'Regular';
-
     } else if (obsProp.type === 'OBS_PROPERTY_EDITABLE_LIST') {
       prop = {
         ...prop,
