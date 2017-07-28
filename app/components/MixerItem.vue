@@ -168,7 +168,7 @@ export default class MixerItem extends Vue {
 
 .mixer-item {
   position: relative;
-  padding: 10px;
+  padding: 10px 12px;
 
   .source-name {
     flex: 1

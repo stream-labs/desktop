@@ -2,21 +2,27 @@
 body {
   color: @navy;
 }
+
 .main {
   background: @white;
 }
-/* Layout */
+
+// Layout
 .page-container {
-  padding: 20px;
-  max-width: 1000px;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-/* Type */
+// Type
 h3 {
   font-family: 'Roboto';
   font-size: 14px;
   .semibold;
 }
+
 h4 {
   font-family: 'Roboto';
   text-transform: uppercase;
@@ -26,37 +32,43 @@ h4 {
   margin-bottom: 20px;
   color: @grey;
 }
+
 .link {
   .semibold;
   color: @grey;
   .transition;
+
   &:hover {
     color: @navy;
   }
 }
+
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
 }
 
-/* Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown' */
-/* On 'dropdown__toggle' use @click="showDropdown = !showDropdown" */
-/* On 'dropdown__menu' use v-if="showDropdown" */
+// Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown'
+// On 'dropdown__toggle' use @click="showDropdown = !showDropdown"
+// On 'dropdown__menu' use v-if="showDropdown"
 .dropdown {
   position: relative;
   display: inline-block;
 }
+
 .dropdown__toggle, .slide-open__open {
   .semibold;
   color: @grey;
   text-transform: uppercase;
   letter-spacing: .7px;
+
   .fa {
     font-size: 8px;
     vertical-align: middle;
     margin-bottom: 2px;
   }
 }
+
 .dropdown__menu {
   position: absolute;
   top: 30px;
@@ -68,17 +80,21 @@ h4 {
   border-radius: 3px;
   box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
+
 .select {
   position: relative;
+
   select {
     font-size: 13px;
     margin: 0;
     padding: 0 32px 0 8px;
+
     option {
       color: @navy;
     }
   }
 }
+
 .select-carot {
   position: absolute;
   right: 8px;
@@ -86,20 +102,24 @@ h4 {
   font-size: 10px;
   color: @white;
 }
+
 .select--semi-opac {
   select {
     background: rgba(255,255,255,.1);
     border-color: transparent;
     color: white;
+
     &:focus {
       background: rgba(255,255,255,.14);
       outline: none;
     }
   }
 }
+
 .search-input {
   position: relative;
   .transition;
+
   input[type=text] {
     background: transparent;
     border: none;
@@ -107,6 +127,7 @@ h4 {
     color: @grey;
     .transition;
     .radius;
+
     &:focus {
       background: rgba(255,255,255,.14);
       outline: none;
@@ -120,6 +141,7 @@ h4 {
     font-size: 16px;
   }
 }
+
 .search-input--trans {
   input[type=text] {
     &:focus, &:active {
@@ -127,10 +149,12 @@ h4 {
       color: @white;
     }
   }
+
   &:focus, &:active, &:hover {
     color: @white;
   }
 }
+
 .slide-open__menu {
   position: absolute;
   background: @white;
@@ -144,11 +168,13 @@ h4 {
   justify-content: center;
   z-index: 10;
 }
+
 .slide-open__close {
   position: absolute;
   left: 25px;
   color: @grey;
   transition: all 275ms;
+
   &:hover {
     .fa {
       color: @navy;
@@ -159,6 +185,7 @@ h4 {
   background: transparent;
   padding: 0;
 }
+
 .tab-button {
   border-bottom: 3px solid transparent;
   padding: 16px 0;
@@ -168,17 +195,21 @@ h4 {
   .semibold;
   letter-spacing: .7px;
   color: @grey;
+
   .fa {
     margin-right: 4px;
   }
+
   &.active {
     border-color: @yellow;
     color: @navy;
+
     .fa {
       color: @yellow;
     }
   }
 }
+
 // TODO: eventuall use LESS variables from twitchalerts
 .bgColor-teal {
   background-color: @teal;
@@ -188,11 +219,13 @@ h4 {
 .input {
   &.disabled {
     opacity: 0.5;
+
     &.checkbox input:checked~label, &.checkbox input~label {
       &:before {
         border-color: gray;
         background: transparent;
       }
+
       &:after {color: gray}
     }
   }
@@ -204,14 +237,16 @@ select {
   height: 36px;
 }
 
-/* Scrolls */
+// Scrolls
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: @day-border;
   border-radius: 0 3px 3px 0;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: @white;
   border: 2px solid @day-border;
@@ -219,31 +254,36 @@ select {
   border-radius: 10px;
 }
 
-/* Vue transitions */
+// Vue transitions
 .slide-fade-enter-active, .slide-fade-leave-active {
   transition: all .3s ease;
 }
+
 .slide-fade-enter, .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
 }
 
-/* Night theme rules */
+// Night theme rules
 .night-theme {
   &.main {
     background: @night-primary;
     color: @night-text;
   }
+
   .border {
     border: 1px solid transparent;
   }
+
   h3 {
     color: @grey;
   }
+
   .checkbox {
     input:checked~label {
       color: @white;
     }
+
     label {
       &:before {
         background: transparent;
@@ -251,18 +291,21 @@ select {
       }
     }
   }
+
   .link {
     &:hover {
       color: @white;
     }
   }
-  
+
   .dropdown__menu {
     background-color: @night-accent-light;
   }
+
   .slide-open__menu {
     background-color: @night-primary;
   }
+
   .slide-open__close {
     &:hover {
       .fa {
@@ -270,18 +313,17 @@ select {
       }
     }
   }
-  .studio-controls-selector {
-    background: @navy-secondary;
-    border-color: @navy-secondary;
-  }
+
   .tab-button{
     &.active {
       color: @white;
     }
   }
+
   ::-webkit-scrollbar-track {
     background: @night-accent-dark;
   }
+
   ::-webkit-scrollbar-thumb {
     background-color: @night-accent-light;
     border-color: @night-accent-dark;

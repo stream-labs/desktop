@@ -114,7 +114,7 @@ export default class OptimizeB extends Vue {
   white-space: nowrap;
   overflow: hidden;
   text-align: left;
-  animation: typing 3s steps(30, end),
+  // animation: typing 3s steps(30, end),
 }
 
 /* The typing effect */
@@ -123,9 +123,9 @@ export default class OptimizeB extends Vue {
   to { width: 100% }
 }
 
-.delay {
-  animation: 3s 0s delay;
-}
+// .delay {
+//   animation: 3s 0s delay;
+// }
 
 @keyframes delay {
   0% { opacity:0; }

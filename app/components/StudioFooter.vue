@@ -29,6 +29,7 @@ import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 import { UserService } from '../services/user';
+import { NavigationService } from "../services/navigation";
 
 @Component({
   components: {
@@ -73,7 +74,7 @@ export default class StudioFooterComponent extends Vue {
   flex-direction: row;
   align-items: center;
   position: relative;
-  padding: 10px 30px;
+  padding: 10px 20px;
   background-color: @day-secondary;
   border-top: 1px solid @day-border;
   max-width: none;

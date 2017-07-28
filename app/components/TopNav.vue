@@ -11,8 +11,7 @@
     <button
       @click="navigateDashboard"
       class="tab-button"
-      :class="{ active: page === 'Dashboard' }"
-      disabled>
+      :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn">
       <i class="fa fa-tachometer"/> Dashboard
     </button>
     <button
@@ -24,8 +23,7 @@
     <button
       @click="navigateLive"
       class="tab-button"
-      :class="{ active: page === 'Live' }"
-      disabled>
+      :class="{ active: page === 'Live' }" :disabled="!isUserLoggedIn">
       <i class="fa fa-list"/> Live
     </button>
   </div>
@@ -61,6 +59,7 @@ import { Inject } from '../services/service';
 import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";
+import { UserService } from '../services/user';
 import electron from '../vendor/electron';
 import Login from './Login.vue';
 
@@ -72,6 +71,9 @@ export default class TopNav extends Vue {
   windowService: WindowService = WindowService.instance;
   customizationService: CustomizationService = CustomizationService.instance;
   navigationService: NavigationService = NavigationService.instance;
+
+  @Inject()
+  userService: UserService;
 
   slideOpen = false;
 
@@ -107,6 +109,10 @@ export default class TopNav extends Vue {
     return this.navigationService.state.currentPage;
   }
 
+  get isUserLoggedIn() {
+    return this.userService.isLoggedIn();
+  }
+
 }
 </script>
 
@@ -117,9 +123,11 @@ export default class TopNav extends Vue {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 30px;
+  padding: 0 20px;
   position: relative;
   max-width:  none;
+  background-color: @day-secondary;
+  border-bottom: 1px solid @day-border;
 }
 
 .top-nav-right {
@@ -152,6 +160,11 @@ export default class TopNav extends Vue {
 }
 
 .night-theme {
+  .top-nav {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
+
   .theme-toggle {
     .fa-sun-o {
       display: none;

@@ -3,8 +3,13 @@
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
   <top-nav v-if="page !== 'Onboarding'"></top-nav>
-  <component class="main-page-container" :is="page">
-  </component>
+  <component
+    class="main-page-container"
+    :is="page"
+    v-if="page !== 'Dashboard'"/>
+  <dashboard
+    class="main-page-container"
+    v-show="page === 'Dashboard'"/>
 </div>
 </template>
 
@@ -75,5 +80,7 @@ export default class Main extends Vue {
 .main-page-container {
   /* Page always takes up remaining space */
   flex-grow: 1;
+  display: flex;
+  position: relative;
 }
 </style>
