@@ -27,7 +27,7 @@ export class EditMenu extends Menu {
 
   private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
-  private sceneItem = this.scene.getItem(this.options.selectedSceneItemId);
+  private sceneItem = this.scene ? this.scene.getItem(this.options.selectedSceneItemId) : null;
 
   constructor(private options: IEditMenuOptions) {
     super();
