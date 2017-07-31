@@ -308,11 +308,24 @@ export class ObsTransition implements ObsSource {
 
     /**
      * Create a new instance of an ObsTransition
-     * @param id - The type of transition to create, possibly from `types()`
-     * @param name - Name of the created transition
-     * @param settings - Settings to create transition with
+     * @param id - The type of transition source to create, possibly from {@link types}
+     * @param name - Name of the created transition source
+     * @param settings - Optional, settings to create transition source with
+     * @param hotkeys - Optional, hotkey data associated with transition
+     * @returns - Returns instance or null if failure
      */
-    static create(id: string, name: string, settings?: object): ObsTransition;
+    static create(id: string, name: string, settings?: object, hotkeys?: object): ObsTransition;
+
+    /**
+     * Create a new instance of an ObsTransition that's private
+     * Private in this context means any function that returns an 
+     * ObsTransition will not return this source
+     * @param id - The type of transition source to create, possibly from {@link types}
+     * @param name - Name of the created inptransitionut source
+     * @param settings - Optional, settings to create transition source with
+     * @returns - Returns instance or null if failure
+     */
+    static createPrivate(id: string, name: string, settings?: object): ObsTransition;
 
     /**
      * Obtain currently set input source.
@@ -478,6 +491,13 @@ export class ObsScene implements ObsSource {
      * @returns - Returns the instance or null on failure
      */
     static create(name: string): ObsScene;
+
+    /**
+     * Create a new scene instance that's private
+     * @param name - Name of the scene to create
+     * @returns - Returns the instance or null on failure
+     */
+    static createPrivate(name: string): ObsScene;
 
     /**
      * Create a new scene instance by fetching it by name
