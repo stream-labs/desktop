@@ -76,7 +76,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",
-    "electron-builder": "^15.6.2",
+    "electron-builder": "^19.10.0",
     "electron-devtools-installer": "^2.1.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
