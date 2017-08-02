@@ -1,11 +1,10 @@
-import { times } from 'lodash';
 import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { ISourceCreateOptions, SourcesService, TSourceType } from '../sources';
+import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, SceneItem } from './scene-item';
 import { ConfigFileService } from '../config-file';
 import Utils from '../utils';
-import { nodeObs, ObsScene, ObsSceneItem } from '../obs-api';
+import { ObsScene, ObsSceneItem } from '../obs-api';
 import electron from '../../vendor/electron';
 
 const { ipcRenderer } = electron;
@@ -156,31 +155,23 @@ export class Scene implements IScene {
   }
 
 
-  setSourceOrder(sourceId: string, positionDelta: number, order: string[]) {
-    let operation: 'move_down' | 'move_up';
-
-    if (positionDelta > 0) {
-      operation = 'move_down';
-    } else {
-      operation = 'move_up';
-    }
-
-    const source = this.getItem(sourceId);
-
-    times(Math.abs(positionDelta), () => {
-      // This should operate on a specific scene rather
-      // than just the active scene.
-      nodeObs.OBS_content_setSourceOrder(source.name, operation);
-    });
-
+  setSourceOrder(sceneItemId: string, positionDelta: number, order: string[]) {
+    const itemIndex = this.getItemIndex(sceneItemId);
     const hiddenSourcesOrder = this.getItems({ showHidden: true })
       .filter(item => item.isHidden)
       .map(item => item.sceneItemId);
 
     order.unshift(...hiddenSourcesOrder);
 
+    this.getObsScene().moveItem(itemIndex, itemIndex + positionDelta);
     this.SET_SOURCE_ORDER(order);
   }
+
+
+  getItemIndex(sceneItemId: string): number {
+    return this.sceneState.items.findIndex(sceneItemModel => sceneItemModel.sceneItemId === sceneItemId);
+  }
+
 
   @mutation()
   private MAKE_SOURCE_ACTIVE(sceneItemId: string) {
