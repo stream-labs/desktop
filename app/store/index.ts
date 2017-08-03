@@ -6,7 +6,7 @@ import electron from '../vendor/electron';
 // Stateful Services and Classes
 import { getModule } from '../services/stateful-service';
 import { ScenesService, Scene, SceneItem } from '../services/scenes';
-import ScenesTransitions from  '../services/scenes-transitions.ts';
+import { ScenesTransitionsService } from  '../services/scenes-transitions.ts';
 import { SourcesService, Source } from '../services/sources';
 import SourceFiltersService from '../services/source-filters';
 import { SettingsService } from '../services/settings';
@@ -24,7 +24,7 @@ const statefulServiceModules = {
   ...getModule(ScenesService),
   ...getModule(Scene),
   ...getModule(SceneItem),
-  ...getModule(ScenesTransitions),
+  ...getModule(ScenesTransitionsService),
   ...getModule(SourcesService),
   ...getModule(Source),
   ...getModule(SourceFiltersService),

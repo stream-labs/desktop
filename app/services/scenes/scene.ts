@@ -2,7 +2,7 @@ import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, SceneItem } from './scene-item';
-import { ConfigFileService } from '../config-file';
+import { ConfigPersistenceService } from '../config-persistence';
 import Utils from '../utils';
 import { ObsScene, ObsSceneItem } from '../obs-api';
 import electron from '../../vendor/electron';
@@ -19,8 +19,7 @@ export interface IScene {
 
 // TODO: delete these options after we will handle the config loading on the frontend side
 export interface ISceneItemAddOptions {
-  obsSceneItemIsAlreadyExist: boolean;
-  obsSceneItemId: number;
+  sceneItemId?: string; // A new ID will be assigned if one is not provided
 }
 
 
@@ -33,7 +32,7 @@ export class Scene implements IScene {
 
   private scenesService: ScenesService = ScenesService.instance;
   private sourcesService: SourcesService = SourcesService.instance;
-  private configFileService: ConfigFileService = ConfigFileService.instance;
+  private configPersistenceService: ConfigPersistenceService = ConfigPersistenceService.instance;
   private sceneState: IScene;
 
   constructor(sceneId: string) {
@@ -78,46 +77,18 @@ export class Scene implements IScene {
   }
 
 
-  loadConfig() {
-    this.getObsScene().getItems().forEach(obsSceneItem => {
-      const obsSource = obsSceneItem.source;
-
-      // some sources could be already added from another .loadConfig call
-      // because several scenes can reference to one source
-      let source = this.sourcesService.getSourceByName(obsSource.name);
-      if (!source) {
-        source = this.sourcesService.createSource(
-          obsSource.name,
-          obsSource.id as TSourceType,
-          { obsSourceIsAlreadyExist: true, }
-        );
-      }
-
-      this.addSource(
-        source.sourceId,
-        { obsSceneItemIsAlreadyExist: true, obsSceneItemId: obsSceneItem.id }
-      );
-
-    });
-  }
-
-
   createAndAddSource(sourceName: string, type: TSourceType): SceneItem {
     const source = this.sourcesService.createSource(sourceName, type);
     return this.addSource(source.sourceId);
   }
 
 
-  addSource(sourceId: string, options?: ISceneItemAddOptions): SceneItem {
+  addSource(sourceId: string, options: ISceneItemAddOptions = {}): SceneItem {
     const source = this.sourcesService.getSource(sourceId);
-    const sceneItemId = ipcRenderer.sendSync('getUniqueId');
+    const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
     let obsSceneItem: ObsSceneItem;
-    if (options && options.obsSceneItemIsAlreadyExist) {
-      obsSceneItem = this.getObsScene().findItem(options.obsSceneItemId);
-    } else {
-      obsSceneItem = this.getObsScene().add(source.getObsInput());
-    }
+    obsSceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
@@ -127,7 +98,7 @@ export class Scene implements IScene {
 
     sceneItem.loadAttributes();
 
-    this.configFileService.save();
+    this.configPersistenceService.save();
     this.scenesService.sourceAdded.next(sceneItem.sceneItemState);
     return sceneItem;
   }

@@ -38,18 +38,6 @@ function log(...args) {
 let mainWindow;
 let childWindow;
 
-// This file determines whether we start up in SLOBS-mode or
-// OBS-mode, so we need to load it on app startup.
-function loadStartupConfig() {
-  const configLocation = path.join(app.getPath('userData'), 'startup.json');
-
-  if (fs.existsSync(configLocation)) {
-    return JSON.parse(fs.readFileSync(configLocation));
-  }
-
-  return null;
-}
-
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
 // closing the windows before exit.
@@ -127,12 +115,6 @@ function startApp() {
 
   // Initialize various OBS services
   obs.OBS_API_initOBS_API(app.getPath('userData'));
-
-  const startupConfig = loadStartupConfig();
-
-  if (startupConfig && startupConfig.obsMode) {
-    obs.OBS_API_useOBS_config(startupConfig.profile, startupConfig.sceneCollection);
-  } 
 
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();

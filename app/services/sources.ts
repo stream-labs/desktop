@@ -7,7 +7,6 @@ import {
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
 import { nodeObs, ObsInput } from './obs-api';
-import { ConfigFileService } from './config-file';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
@@ -30,7 +29,7 @@ export interface ISource {
 
 export interface ISourceCreateOptions {
   isHidden?: boolean;
-  obsSourceIsAlreadyExist?: boolean; // TODO: rid of this option when frontend will load the config file
+  sourceId?: string; // A new ID will be generated if one is not specified
 }
 
 export type TSourceType =
@@ -63,8 +62,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-  @Inject()
-  private configFileService: ConfigFileService;
 
   private scenesService: ScenesService = ScenesService.instance;
 
@@ -118,12 +115,10 @@ export class SourcesService extends StatefulService<ISourcesState> {
     type: TSourceType,
     options: ISourceCreateOptions = {}
   ): Source {
-    const id: string = ipcRenderer.sendSync('getUniqueId');
+    const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
     const sourceName = options.isHidden ? `[HIDDEN_${id}]${name}` : name;
 
-    if (!options.obsSourceIsAlreadyExist) {
-      ObsInput.create(type, sourceName);
-    }
+    ObsInput.create(type, sourceName);
 
     const properties = this.getPropertiesFormData(id);
 
@@ -171,7 +166,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
 
-  private refreshProperties(id: string) {
+  refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
 
     this.UPDATE_SOURCE({ id, properties });
@@ -223,7 +218,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     }
 
     this.refreshProperties(sourceId);
-    this.configFileService.save();
   }
 
 

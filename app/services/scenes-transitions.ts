@@ -1,5 +1,5 @@
 import { mutation, StatefulService } from './stateful-service';
-import { nodeObs } from './obs-api';
+import { nodeObs, ObsGlobal, ObsTransition, ObsScene } from './obs-api';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
@@ -11,7 +11,7 @@ interface ISceneTransitionsState {
   availableTransitions: IListOption<string>[];
   duration: number;
   properties: TFormData;
-  currentName: string;
+  type: string;
 }
 
 const TRANSITION_TYPES: IListOption<string>[] = [
@@ -23,83 +23,70 @@ const TRANSITION_TYPES: IListOption<string>[] = [
   { description: 'Luma Wipe', value: 'wipe_transition' }
 ];
 
-export default class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
+export class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
 
   static initialState = {
-    availableTransitions: [],
-    duration: 0,
-    properties: [],
-    currentName: '',
+    duration: 300,
+    type: '',
   } as ISceneTransitionsState;
 
 
   init() {
-    this.refresh();
-
-    // create transitions for each type if not exist
-    TRANSITION_TYPES.forEach(type => {
-      const transition = this.state.availableTransitions.find(transition => transition.value === type.description);
-      if (transition) return;
-      this.add(type.description, type.value);
-    });
-
-    this.refresh();
+    // Set the default transition type
+    this.setType('cut_transition');
   }
+
 
   @mutation()
-  private SET_NAME(name: string) {
-    this.state.currentName = name;
+  private SET_TYPE(type: string) {
+    this.state.type = type;
   }
+
 
   @mutation()
   SET_DURATION(duration: number) {
     this.state.duration = duration;
   }
 
-  @mutation()
-  private SET_AVAILABLE_TRANSITIONS(transitions: IListOption<string>[]) {
-    this.state.availableTransitions = transitions;
-  }
 
-  private refresh() {
-    const currentName = nodeObs.OBS_content_getCurrentTransition();
-    this.SET_NAME(currentName);
-    this.SET_DURATION(nodeObs.OBS_content_getTransitionDuration());
-    this.SET_AVAILABLE_TRANSITIONS(nodeObs.OBS_content_getListCurrentTransitions().map((name: string) => {
-      return { description: name, value: name };
-    }));
+  transitionTo(scene: ObsScene) {
+    const transition = this.getCurrentTransition();
+    transition.start(this.state.duration, scene);
   }
 
 
-  setProperties(properties: TFormData) {
-    const propertiesToSave = inputValuesToObsValues(properties, {
-      boolToString: true
-    });
-    for (const prop of propertiesToSave) {
-      nodeObs.OBS_content_setTransitionProperty(this.state.currentName, prop.name, prop);
+  private getCurrentTransition() {
+    return ObsGlobal.getOutputSource(0) as ObsTransition;
+  }
+
+
+  setType(type: string) {
+    const oldTransition = this.getCurrentTransition() as ObsTransition;
+    const newTransition = ObsTransition.create(type, 'Global Transition');
+
+    ObsGlobal.setOutputSource(0, newTransition);
+
+    if (oldTransition && oldTransition.getActiveSource) {
+      newTransition.set(oldTransition.getActiveSource());
+      oldTransition.release();
     }
-    this.refresh();
+
+    this.SET_TYPE(type);
   }
 
 
-  setCurrent(transition: { currentName?: string, duration?: number }) {
-    if (transition.currentName) nodeObs.OBS_content_setTransition(transition.currentName);
-    if (transition.duration) nodeObs.OBS_content_setTransitionDuration(transition.duration);
-    this.refresh();
+  setDuration(duration: number) {
+    this.SET_DURATION(duration);
   }
 
-
-  private add(transitionName: string, transitionType: string) {
-    nodeObs.OBS_content_addTransition(transitionType, transitionName);
-  }
 
   getFormData() {
     return {
-      currentName: {
+      type: {
         description: 'Transition',
-        name: 'currentName',
-        value: this.state.currentName,
-        options: this.state.availableTransitions
+        name: 'type',
+        value: this.state.type,
+        options: TRANSITION_TYPES
       },
       duration: {
         description: 'Duration',
@@ -109,20 +96,4 @@ export default class ScenesTransitionsService extends StatefulService<ISceneTran
     };
   }
 
-  getPropertiesFormData() {
-    const transitionName = this.state.currentName;
-    let properties = nodeObs.OBS_content_getTransitionProperties(transitionName);
-    if (!properties) return [];
-
-    // patch currentValue for corresponding to common properties format
-    properties = obsValuesToInputValues(properties, {
-      valueIsObject: true,
-      boolIsString: true,
-      subParametersGetter: propName => {
-        return nodeObs.OBS_content_getTransitionPropertiesSubParameters(transitionName, propName);
-      }
-    });
-
-    return properties;
-  }
 }
