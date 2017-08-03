@@ -6,13 +6,14 @@
   <div slot="content">
     <div class="row">
       <div class="columns small-12">
-        <ListInput v-model="form.currentName" @input="onTransitionChangeHandler"></ListInput>
+        <ListInput
+          v-model="form.type"
+          @input="setTransitionType"/>
       </div>
       <div class="columns small-12">
-        <IntInput v-model="form.duration"></IntInput>
-      </div>
-      <div class="columns small-12">
-        <GenericForm v-model="properties"></GenericForm>
+        <IntInput
+          v-model="form.duration"
+          @input="setTransitionDuration"/>
       </div>
     </div>
   </div>
@@ -24,10 +25,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../services/service';
-import { IInputValue, TFormData } from '../shared/forms/Input';
-import ScenesTransitionsService from '../../services/scenes-transitions';
+import { ScenesTransitionsService } from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
 import * as inputComponents from '../shared/forms';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
@@ -36,7 +35,6 @@ import windowMixin from '../mixins/window';
   mixins: [windowMixin],
   components: {
     ModalLayout,
-    GenericForm,
     ...inputComponents
   }
 })
@@ -47,21 +45,19 @@ export default class SceneTransitions extends Vue {
 
   windowService = WindowService.instance;
   form = this.transitionsService.getFormData();
-  properties = this.transitionsService.getPropertiesFormData();
 
 
-  onTransitionChangeHandler(value: IInputValue<string>) {
-    this.transitionsService.setCurrent({ [value.name]: value.value });
-    this.properties = this.transitionsService.getPropertiesFormData();
+  setTransitionType() {
+    this.transitionsService.setType(this.form.type.value);
+  }
+
+
+  setTransitionDuration() {
+    this.transitionsService.setDuration(this.form.duration.value);
   }
 
 
   done() {
-    this.transitionsService.setCurrent({
-      currentName: this.form.currentName.value,
-      duration: this.form.duration.value
-    });
-    this.transitionsService.setProperties(this.properties);
     this.windowService.closeWindow();
   }
 

@@ -9,10 +9,10 @@ import URI from 'urijs';
 import store from './store/index';
 import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
-import { ConfigFileService } from './services/config-file';
 import { HotkeysService } from './services/hotkeys.ts';
 import { OnboardingService } from './services/onboarding.ts';
 import { UserService } from './services/user.ts';
+import { ConfigPersistenceService } from './services/config-persistence';
 
 const { ipcRenderer, remote } = window.require('electron');
 
@@ -21,7 +21,6 @@ require('./app.less');
 document.addEventListener('DOMContentLoaded', () => {
   const windowService = WindowService.instance;
   const obsApiService = ObsApiService.instance;
-  const configFileService = ConfigFileService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
 
@@ -33,10 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
       windowService.closeWindow();
     });
   } else {
-    configFileService.load();
+    ConfigPersistenceService.instance.load();
+
+    // Set up auto save
+    const autoSave = setInterval(() => {
+      ConfigPersistenceService.instance.save();
+    }, 60 * 1000);
+
 
     ipcRenderer.on('shutdown', () => {
-      configFileService.rawSave();
+      clearInterval(autoSave);
+      ConfigPersistenceService.instance.rawSave();
       remote.getCurrentWindow().close();
     });
 
