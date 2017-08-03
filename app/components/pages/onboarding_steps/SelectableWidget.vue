@@ -167,7 +167,7 @@ export default class SelectableWidget extends Vue {
   overflow: hidden;
 
   video {
-    width: 102%;
+    height: 430px;
     display: flex;
     margin: -3px -1% -1px -1%;
   }
