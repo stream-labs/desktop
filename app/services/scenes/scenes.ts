@@ -84,9 +84,9 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.ADD_SCENE(id, name);
     ObsScene.create(name);
 
-    if (!options.duplicateSourcesFromScene) {
-      if (options.addDefaultSources) this.addDefaultSources(id);
-    } else {
+    if (options.addDefaultSources) this.addDefaultSources(id);
+
+    if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
       const newScene = this.getScene(id);
 
