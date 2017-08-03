@@ -5,11 +5,7 @@
   <top-nav v-if="page !== 'Onboarding'"></top-nav>
   <component
     class="main-page-container"
-    :is="page"
-    v-if="page !== 'Dashboard'"/>
-  <dashboard
-    class="main-page-container"
-    v-show="page === 'Dashboard'"/>
+    :is="page"/>
 </div>
 </template>
 
