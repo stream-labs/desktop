@@ -46,7 +46,7 @@ let appExiting = false;
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 function startApp() {
-  const isDevMode = process.env.NODE_ENV !== 'production';
+  const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
   // We use a special cache directory for running tests
   if (process.env.SLOBS_CACHE_DIR) {
     app.setPath('userData', process.env.SLOBS_CACHE_DIR);
