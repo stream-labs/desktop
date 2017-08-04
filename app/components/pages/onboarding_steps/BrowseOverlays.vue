@@ -44,7 +44,7 @@
                 <div>Filter by name or category and choose an overlay for your stream</div>
               </div>
               <list-input
-                class="select--semi-opac"
+                class="select--onboarding"
                 :value="listInputValue" />
             </div>
             <div class="overlays">
@@ -198,7 +198,8 @@ export default class BrowseOverlays extends Vue {
   text-align: right;
 }
 
-.overlays-filters, .overlays-body {
+.overlays-filters,
+.overlays-body {
   display: flex;
   padding: 20px;
   flex-direction: column;
@@ -256,6 +257,7 @@ export default class BrowseOverlays extends Vue {
 .filters {
   padding: 0 8px 8px;
   overflow-y: auto;
+  margin-top: 20px;
 
   .filter-group {
     &:last-child {
@@ -276,8 +278,9 @@ export default class BrowseOverlays extends Vue {
 
 .filter-title {
   .semibold;
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 8px;
+  color: @grey;
 }
 
 .filter-option {
