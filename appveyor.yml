@@ -1,7 +1,7 @@
 build: off
 
 cache:
-  - node_modules -> package.json
+  #- node_modules -> package.json
 
 install:
   - git submodule update --init --recursive
