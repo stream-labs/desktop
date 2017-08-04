@@ -1,8 +1,5 @@
 build: off
 
-cache:
-  #- node_modules -> package.json
-
 install:
   - git submodule update --init --recursive
   - git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs
