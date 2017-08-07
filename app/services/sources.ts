@@ -6,7 +6,7 @@ import {
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import { nodeObs, ObsInput } from './obs-api';
+import { nodeObs, ObsInput, ObsGlobal } from './obs-api';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
@@ -25,10 +25,11 @@ export interface ISource {
   width: number;
   height: number;
   properties: TFormData;
+  isGlobal: boolean;
 }
 
 export interface ISourceCreateOptions {
-  isHidden?: boolean;
+  isGlobal?: boolean;
   sourceId?: string; // A new ID will be generated if one is not specified
 }
 
@@ -66,7 +67,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   private scenesService: ScenesService = ScenesService.instance;
 
 
-  init() {
+  protected init() {
     setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
     this.scenesService.sourceRemoved.subscribe(
       (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
@@ -79,8 +80,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData) {
-    Vue.set(this.state.sources, id, {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, isGlobal = false) {
+    const sourceModel: ISource = {
       sourceId: id,
       name,
       type,
@@ -95,8 +96,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
       width: 0,
       height: 0,
 
-      muted: false
-    });
+      muted: false,
+      isGlobal
+    };
+
+    Vue.set(this.state.sources, id, sourceModel);
   }
 
   @mutation()
@@ -116,15 +120,16 @@ export class SourcesService extends StatefulService<ISourcesState> {
     options: ISourceCreateOptions = {}
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
-    const sourceName = options.isHidden ? `[HIDDEN_${id}]${name}` : name;
 
-    ObsInput.create(type, sourceName);
+    const obsInput = ObsInput.create(type, name);
+
+    if (options.isGlobal) ObsGlobal.setOutputSource(1, obsInput);
 
     const properties = this.getPropertiesFormData(id);
 
-    this.ADD_SOURCE(id, sourceName, type, properties);
+    this.ADD_SOURCE(id, name, type, properties, options.isGlobal);
     const source = this.state.sources[id];
-    const muted = nodeObs.OBS_content_isSourceMuted(sourceName);
+    const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.UPDATE_SOURCE({ id, muted });
     this.refreshSourceFlags(source, id);
     this.sourceAdded.next(source);
@@ -253,8 +258,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
+
   getSource(id: string): Source {
     return this.state.sources[id] ? new Source(id) : void 0;
+  }
+
+
+  getSources() {
+    return this.sources;
   }
 
 
@@ -295,17 +306,17 @@ export class Source implements ISource {
   width: number;
   height: number;
   properties: TFormData;
+  isGlobal: boolean;
 
   sourceState: ISource;
 
+  /**
+   * displayName can be localized in future releases
+   */
   get displayName() {
-    return this.isHidden ?
-      this.name.replace(/\[HIDDEN_[\d\w-]+\]/, '') :
-      this.name;
-  }
-
-  get isHidden() {
-    return !!this.name.match(/\[HIDDEN_[\d\w-]+\].+/);
+    if (this.name === 'DefaultAudioInput') return 'Mic/Aux';
+    if (this.name === 'DefaultAudioOutput') return 'Desktop Audio';
+    return this.name;
   }
 
   getObsInput(): ObsInput {

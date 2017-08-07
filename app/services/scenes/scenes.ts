@@ -19,7 +19,6 @@ interface IScenesState {
 interface ISceneCreateOptions {
   duplicateSourcesFromScene?: string;
   sceneId?: string; // A new ID will be generated if one is not provided
-  addDefaultSources?: boolean;
   makeActive?: boolean;
 }
 
@@ -84,8 +83,6 @@ export class ScenesService extends StatefulService<IScenesState> {
     this.ADD_SCENE(id, name);
     ObsScene.create(name);
 
-    if (options.addDefaultSources) this.addDefaultSources(id);
-
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
       const newScene = this.getScene(id);
@@ -122,7 +119,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     const scene = this.getScene(id);
 
     // remove all sources from scene
-    scene.getItems({ showHidden: true }).forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
+    scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
 
     scene.getObsScene().release();
 
@@ -146,7 +143,7 @@ export class ScenesService extends StatefulService<IScenesState> {
   getSourceScenes(sourceId: string): Scene[] {
     const resultScenes: Scene[] = [];
     this.scenes.forEach(scene => {
-      const items = scene.getItems({ showHidden: true }).filter(sceneItem => sceneItem.sourceId === sourceId);
+      const items = scene.getItems().filter(sceneItem => sceneItem.sourceId === sourceId);
       if (items.length > 0) resultScenes.push(scene);
     });
     return resultScenes;
@@ -207,22 +204,6 @@ export class ScenesService extends StatefulService<IScenesState> {
 
   get activeScene(): Scene {
     return this.getScene(this.state.activeSceneId);
-  }
-
-
-  private addDefaultSources(sceneId: string) {
-    const scene = this.getScene(sceneId);
-
-    const audioInputSource = this.sourcesService.createSource(
-      'Mic/Aux', 'wasapi_input_capture', { isHidden: true }
-    );
-
-    const audioOutputSource = this.sourcesService.createSource(
-      'Desktop Audio', 'wasapi_output_capture', { isHidden: true }
-    );
-
-    scene.addSource(audioInputSource.sourceId);
-    scene.addSource(audioOutputSource.sourceId);
   }
 
 }

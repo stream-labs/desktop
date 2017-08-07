@@ -7,6 +7,7 @@ import { TransitionNode } from './nodes/transition';
 import { FiltersNode } from './nodes/filters';
 import electron from '../../vendor/electron';
 import { ScenesService } from '../scenes';
+import { SourcesService } from '../sources';
 import { throttle } from 'lodash-decorators';
 
 const NODE_TYPES = {
@@ -30,6 +31,7 @@ const path = window['require']('path');
 export class ConfigPersistenceService extends Service {
 
   scenesService: ScenesService = ScenesService.instance;
+  sourcesService: SourcesService = SourcesService.instance;
 
   @throttle(5000)
   save() {
@@ -76,10 +78,9 @@ export class ConfigPersistenceService extends Service {
   // updating every time we change the schema, we simply put the
   // application into the desired state and save.
   setUpDefaults() {
-    this.scenesService.createScene('Scene', {
-      addDefaultSources: true,
-      makeActive: true
-    });
+    this.scenesService.createScene('Scene', { makeActive: true });
+    this.sourcesService.createSource('DefaultAudioInput', 'wasapi_input_capture', { isGlobal: true });
+    this.sourcesService.createSource('DefaultAudioOutput', 'wasapi_output_capture', { isGlobal: true });
   }
 
 

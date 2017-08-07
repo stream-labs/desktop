@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
-import store from '../store';
+import { store } from '../store';
 
 export * from './service';
 
@@ -68,10 +68,8 @@ export abstract class StatefulService<TState extends object> extends Service {
  */
 export function getModule(ModuleContainer: any): Module<any, any> {
   return {
-    [ModuleContainer.name]: {
-      state: ModuleContainer.initialState || {},
-      mutations: (<any>ModuleContainer.prototype).mutations
-    }
+    state: ModuleContainer.initialState || {},
+    mutations: (<any>ModuleContainer.prototype).mutations
   };
 }
 
@@ -92,6 +90,8 @@ export function Mutator(): ClassDecorator {
     const f:any = function (this: any, ...args: any[]) {
       original.apply(this, args);
       this.constructorArgs = args;
+      this.isMutator = true;
+      this.mutatorName = target.name;
       return this;
     };
 

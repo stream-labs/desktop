@@ -22,7 +22,7 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   schemaVersion = 1;
 
   getItems(context: IContext) {
-    return context.scene.getItems({ showHidden: true }).slice().reverse();
+    return context.scene.getItems().slice().reverse();
   }
 
   saveItem(sceneItem: SceneItem): ISchema {

@@ -1,6 +1,7 @@
 import { ArrayNode } from './array-node';
 import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
+import { AudioService } from '../../audio';
 
 interface ISchema {
   id: string;
@@ -9,6 +10,7 @@ interface ISchema {
   settings: object;
   volume: number;
   filters: FiltersNode;
+  isGlobal: boolean;
 }
 
 export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
@@ -16,6 +18,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
   schemaVersion = 1;
 
   sourcesService: SourcesService = SourcesService.instance;
+  audioService: AudioService = AudioService.instance;
 
   getItems() {
     return this.sourcesService.sources;
@@ -31,6 +34,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
       type: source.type,
       settings: source.getObsInput().settings,
       volume: source.getObsInput().volume,
+      isGlobal: source.isGlobal,
       filters
     };
   }
@@ -39,7 +43,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     const source = this.sourcesService.createSource(
       obj.name,
       obj.type,
-      { sourceId: obj.id }
+      { sourceId: obj.id, isGlobal: obj.isGlobal }
     );
 
     const input = source.getObsInput();
@@ -47,7 +51,9 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     input.update(obj.settings);
     this.sourcesService.refreshProperties(source.sourceId);
 
-    input.volume = obj.volume;
+    if (source.audio) {
+      this.audioService.getSource(source.sourceId).setMul(obj.volume);
+    }
 
     obj.filters.load({ source });
   }
