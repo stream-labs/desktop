@@ -2,7 +2,6 @@
  * simple singleton service implementation
  * @see original code http://stackoverflow.com/a/26227662
  */
-import electron from '../vendor/electron';
 
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
@@ -39,13 +38,36 @@ export abstract class Service {
   }[] = [];
 
   static hasInstance = false;
+  static isSingleton = true;
+
+
+  private static proxyFn: (service: Service) => Service;
+
+  /**
+   * returns true if service has been successfully initialized
+   */
+  private static initFn: (service: Service) => boolean;
 
   serviceName = this.constructor.name;
   options = {};
 
   static get instance() {
-    if (!this.hasInstance) return Service.createInstance(this);
-    return this[singleton];
+    const instance = !this.hasInstance ? Service.createInstance(this) : this[singleton];
+    return this.proxyFn ? this.proxyFn(instance) : instance;
+  }
+
+  /**
+   * proxy function will be applied for all services instances
+   */
+  static setupProxy(fn: (service: Service) => Service) {
+    this.proxyFn = fn;
+  }
+
+  /**
+   * replace init function
+   */
+  static setupInitFunction(fn: (service: Service) => boolean) {
+    this.initFn = fn;
   }
 
 
@@ -57,14 +79,16 @@ export abstract class Service {
       throw `Unable to create more than one singleton service`;
     }
     ServiceClass.hasInstance = true;
+    ServiceClass.isSingleton = true;
     const instance = new ServiceClass(singletonEnforcer, options);
     ServiceClass[singleton] = instance;
 
-    const shouldInit = electron.ipcRenderer.sendSync('services-shouldInit', ServiceClass.name);
-    if (shouldInit) instance.init();
+    const mustInit = this.initFn ? !this.initFn(instance) : true;
+
+    if (mustInit) instance.init();
     instance.mounted();
     Service.initObservers(ServiceClass.name);
-
+    if (mustInit) instance.afterInit();
     return instance;
   }
 
@@ -96,4 +120,11 @@ export abstract class Service {
   protected mounted() {
   }
 
+
+  /**
+   * calls only once per application life
+   * all observers are ready to listen service's events
+   */
+  protected afterInit() {
+  }
 }

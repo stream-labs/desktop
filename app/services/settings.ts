@@ -36,6 +36,8 @@ declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
 export class SettingsService extends StatefulService<ISettingsState> {
 
+  static initialState = {};
+
   static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
     const settingsState: Partial<ISettingsState> = {};
     for (const groupName in settingsFormData) {

@@ -102,7 +102,27 @@ function startApp() {
     }
   });
 
-  childWindow.loadURL(indexUrl + '?child=true');
+
+  // simple messaging system for services between windows
+  // WARNING! the child window use synchronous requests and will be frozen
+  // until main window asynchronous response
+  const requests = { };
+
+  ipcMain.on('services-ready', () => {
+    childWindow.loadURL(indexUrl + '?child=true');
+  });
+
+  ipcMain.on('services-request', (event, payload) => {
+    const request = { id: uuid(), payload };
+    mainWindow.webContents.send('services-request', request);
+    requests[request.id] = Object.assign({}, request, { event });
+  });
+
+  ipcMain.on('services-response', (event, response) => {
+    requests[response.id].event.returnValue = response;
+    delete requests[response.id];
+  });
+
 
   if (isDevMode) {
     childWindow.webContents.openDevTools();

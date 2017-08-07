@@ -64,7 +64,6 @@ export default class NameScene extends Vue {
         this.name,
         {
           duplicateSourcesFromScene: this.options.sceneToDuplicate,
-          addDefaultSources: true,
           makeActive: true
         }
       );

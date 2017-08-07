@@ -54,12 +54,10 @@ export class Scene implements IScene {
   }
 
 
-  getItems(options = { showHidden: false }): SceneItem[] {
-    const sources = this.sceneState.items.map(sourceModel => {
+  getItems(): SceneItem[] {
+    return this.sceneState.items.map(sourceModel => {
       return this.getItem(sourceModel.sceneItemId);
     });
-
-    return options.showHidden ? sources : sources.filter(source => !source.isHidden);
   }
 
 
@@ -128,12 +126,6 @@ export class Scene implements IScene {
 
   setSourceOrder(sceneItemId: string, positionDelta: number, order: string[]) {
     const itemIndex = this.getItemIndex(sceneItemId);
-    const hiddenSourcesOrder = this.getItems({ showHidden: true })
-      .filter(item => item.isHidden)
-      .map(item => item.sceneItemId);
-
-    order.unshift(...hiddenSourcesOrder);
-
     this.getObsScene().moveItem(itemIndex, itemIndex + positionDelta);
     this.SET_SOURCE_ORDER(order);
   }
