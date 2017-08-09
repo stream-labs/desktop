@@ -10,7 +10,7 @@ interface ISchema {
   settings: object;
   volume: number;
   filters: FiltersNode;
-  isGlobal: boolean;
+  channel?: number;
 }
 
 export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
@@ -24,7 +24,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     return this.sourcesService.sources;
   }
 
-  saveItem(source: Source) {
+  saveItem(source: Source): ISchema {
     const filters = new FiltersNode();
     filters.save({ source });
 
@@ -34,7 +34,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
       type: source.type,
       settings: source.getObsInput().settings,
       volume: source.getObsInput().volume,
-      isGlobal: source.isGlobal,
+      channel: source.channel,
       filters
     };
   }
@@ -43,7 +43,7 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     const source = this.sourcesService.createSource(
       obj.name,
       obj.type,
-      { sourceId: obj.id, isGlobal: obj.isGlobal }
+      { sourceId: obj.id, channel: obj.channel }
     );
 
     const input = source.getObsInput();

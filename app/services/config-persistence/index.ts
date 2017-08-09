@@ -7,7 +7,7 @@ import { TransitionNode } from './nodes/transition';
 import { FiltersNode } from './nodes/filters';
 import electron from '../../vendor/electron';
 import { ScenesService } from '../scenes';
-import { SourcesService } from '../sources';
+import { SourcesService, E_AUDIO_CHANNELS } from '../sources';
 import { throttle } from 'lodash-decorators';
 
 const NODE_TYPES = {
@@ -79,8 +79,17 @@ export class ConfigPersistenceService extends Service {
   // application into the desired state and save.
   setUpDefaults() {
     this.scenesService.createScene('Scene', { makeActive: true });
-    this.sourcesService.createSource('DefaultAudioInput', 'wasapi_input_capture', { isGlobal: true });
-    this.sourcesService.createSource('DefaultAudioOutput', 'wasapi_output_capture', { isGlobal: true });
+    this.sourcesService.createSource(
+      'DesktopAudioDevice1',
+      'wasapi_output_capture',
+      { channel: E_AUDIO_CHANNELS.OUTPUT_1 }
+    );
+
+    this.sourcesService.createSource(
+      'AuxAudioDevice1',
+      'wasapi_input_capture',
+      { channel: E_AUDIO_CHANNELS.INPUT_1 }
+    );
   }
 
 
