@@ -31,7 +31,6 @@ export class Scene implements IScene {
 
   private scenesService: ScenesService = ScenesService.instance;
   private sourcesService: SourcesService = SourcesService.instance;
-  private configPersistenceService: ConfigPersistenceService = ConfigPersistenceService.instance;
   private sceneState: IScene;
 
   constructor(sceneId: string) {
