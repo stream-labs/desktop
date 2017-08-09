@@ -2,7 +2,6 @@ import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, SceneItem } from './scene-item';
-import { ConfigPersistenceService } from '../config-persistence';
 import Utils from '../utils';
 import { ObsScene, ObsSceneItem } from '../obs-api';
 import electron from '../../vendor/electron';
@@ -96,7 +95,6 @@ export class Scene implements IScene {
 
     sceneItem.loadAttributes();
 
-    this.configPersistenceService.save();
     this.scenesService.sourceAdded.next(sceneItem.sceneItemState);
     return sceneItem;
   }
