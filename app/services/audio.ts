@@ -6,7 +6,6 @@ import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
 import { ObsFader, EFaderType, ObsVolmeter } from './obs-api';
 import Utils from './utils';
-
 const VOLMETER_UPDATE_INTERVAL = 40;
 
 export interface IAudioSource {
@@ -79,7 +78,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   getSourcesForCurrentScene(): AudioSource[] {
     const scene = this.scenesService.activeScene;
     const sceneSources = scene.getItems().filter(source => source.audio);
-    const globalSources = this.sourcesService.getSources().filter(source => source.isGlobal);
+    const globalSources = this.sourcesService.getSources().filter(source => source.channel !== void 0);
     return globalSources
       .concat(sceneSources)
       .map((sceneSource: ISource) => this.getSource(sceneSource.sourceId))

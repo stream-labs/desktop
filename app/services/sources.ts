@@ -15,6 +15,14 @@ const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
 
+export enum E_AUDIO_CHANNELS {
+  OUTPUT_1 = 1,
+  OUTPUT_2 = 2,
+  INPUT_1 = 3,
+  INPUT_2 = 4,
+  INPUT_3 = 5,
+}
+
 export interface ISource {
   sourceId: string;
   name: string;
@@ -25,11 +33,11 @@ export interface ISource {
   width: number;
   height: number;
   properties: TFormData;
-  isGlobal: boolean;
+  channel?: number;
 }
 
 export interface ISourceCreateOptions {
-  isGlobal?: boolean;
+  channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
 }
 
@@ -80,7 +88,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, isGlobal = false) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, channel?: number) {
     const sourceModel: ISource = {
       sourceId: id,
       name,
@@ -97,7 +105,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
       height: 0,
 
       muted: false,
-      isGlobal
+      channel
     };
 
     Vue.set(this.state.sources, id, sourceModel);
@@ -123,11 +131,13 @@ export class SourcesService extends StatefulService<ISourcesState> {
 
     const obsInput = ObsInput.create(type, name);
 
-    if (options.isGlobal) ObsGlobal.setOutputSource(1, obsInput);
+    if (options.channel !== void 0) {
+      ObsGlobal.setOutputSource(options.channel, obsInput);
+    }
 
     const properties = this.getPropertiesFormData(id);
 
-    this.ADD_SOURCE(id, name, type, properties, options.isGlobal);
+    this.ADD_SOURCE(id, name, type, properties, options.channel);
     const source = this.state.sources[id];
     const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.UPDATE_SOURCE({ id, muted });
@@ -306,7 +316,7 @@ export class Source implements ISource {
   width: number;
   height: number;
   properties: TFormData;
-  isGlobal: boolean;
+  channel?: number;
 
   sourceState: ISource;
 
@@ -314,8 +324,8 @@ export class Source implements ISource {
    * displayName can be localized in future releases
    */
   get displayName() {
-    if (this.name === 'DefaultAudioInput') return 'Mic/Aux';
-    if (this.name === 'DefaultAudioOutput') return 'Desktop Audio';
+    if (this.name === 'AuxAudioDevice1') return 'Mic/Aux';
+    if (this.name === 'DesktopAudioDevice1') return 'Desktop Audio';
     return this.name;
   }
 
