@@ -91,7 +91,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
     const obsFader = this.obsFaders[source.sourceId];
 
     const fader: IFader = {
-      db: obsFader.db | 0,
+      db: obsFader.db || 0,
       deflection: obsFader.deflection,
       mul: obsFader.mul
     };
