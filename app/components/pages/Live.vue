@@ -111,6 +111,8 @@ export default class Live extends Vue {
 
     this.obsDisplay = this.videoService.createDisplay();
 
+    this.obsDisplay.setShoulddrawUI(false);
+
     this.scenesService.activeScene.makeItemActive(null);
 
     this.onResize();

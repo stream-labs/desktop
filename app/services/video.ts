@@ -65,6 +65,10 @@ export class Display {
     });
   }
 
+  setShoulddrawUI(drawUI: boolean) {
+    nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
+  }
+
 }
 
 export class VideoService extends Service {
