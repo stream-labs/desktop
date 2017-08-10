@@ -16,6 +16,7 @@ import { OnboardingService } from './services/onboarding.ts';
 import { UserService } from './services/user.ts';
 import Utils from './services/utils.ts';
 import { ConfigPersistenceService } from './services/config-persistence';
+import { OverlaysPersistenceService } from './services/config-persistence';
 
 
 const { ipcRenderer, remote } = window.require('electron');
@@ -38,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   } else {
     ConfigPersistenceService.instance.load();
+
+    // Uncomment to start up from an overlay file
+    // OverlaysPersistenceService.instance.loadOverlay('C:\\Users\\acree\\Downloads\\testing.overlay');
 
     // Set up auto save
     const autoSave = setInterval(() => {

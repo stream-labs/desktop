@@ -1,4 +1,5 @@
 import { Node } from './node';
+import { compact } from 'lodash';
 
 interface IArraySchema<TSchema> {
   items: TSchema[];
@@ -14,9 +15,9 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
 
   save(context: TContext) {
     this.data = {
-      items: this.getItems(context).map(item => {
+      items: compact(this.getItems(context).map(item => {
         return this.saveItem(item, context);
-      })
+      }))
     };
   }
 
