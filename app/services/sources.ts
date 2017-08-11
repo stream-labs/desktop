@@ -6,8 +6,7 @@ import {
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import { nodeObs, ObsInput } from './obs-api';
-import { ConfigFileService } from './config-file';
+import { nodeObs, ObsInput, ObsGlobal } from './obs-api';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
@@ -15,6 +14,14 @@ import { ScenesService, ISceneItem } from './scenes';
 const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
+
+export enum E_AUDIO_CHANNELS {
+  OUTPUT_1 = 1,
+  OUTPUT_2 = 2,
+  INPUT_1 = 3,
+  INPUT_2 = 4,
+  INPUT_3 = 5,
+}
 
 export interface ISource {
   sourceId: string;
@@ -26,11 +33,12 @@ export interface ISource {
   width: number;
   height: number;
   properties: TFormData;
+  channel?: number;
 }
 
 export interface ISourceCreateOptions {
-  isHidden?: boolean;
-  obsSourceIsAlreadyExist?: boolean; // TODO: rid of this option when frontend will load the config file
+  channel?: number;
+  sourceId?: string; // A new ID will be generated if one is not specified
 }
 
 export type TSourceType =
@@ -63,13 +71,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-  @Inject()
-  private configFileService: ConfigFileService;
 
   private scenesService: ScenesService = ScenesService.instance;
 
 
-  init() {
+  protected init() {
     setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
     this.scenesService.sourceRemoved.subscribe(
       (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
@@ -82,8 +88,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData) {
-    Vue.set(this.state.sources, id, {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, channel?: number) {
+    const sourceModel: ISource = {
       sourceId: id,
       name,
       type,
@@ -98,8 +104,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
       width: 0,
       height: 0,
 
-      muted: false
-    });
+      muted: false,
+      channel
+    };
+
+    Vue.set(this.state.sources, id, sourceModel);
   }
 
   @mutation()
@@ -118,18 +127,19 @@ export class SourcesService extends StatefulService<ISourcesState> {
     type: TSourceType,
     options: ISourceCreateOptions = {}
   ): Source {
-    const id: string = ipcRenderer.sendSync('getUniqueId');
-    const sourceName = options.isHidden ? `[HIDDEN_${id}]${name}` : name;
+    const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
-    if (!options.obsSourceIsAlreadyExist) {
-      ObsInput.create(type, sourceName);
+    const obsInput = ObsInput.create(type, name);
+
+    if (options.channel !== void 0) {
+      ObsGlobal.setOutputSource(options.channel, obsInput);
     }
 
     const properties = this.getPropertiesFormData(id);
 
-    this.ADD_SOURCE(id, sourceName, type, properties);
+    this.ADD_SOURCE(id, name, type, properties, options.channel);
     const source = this.state.sources[id];
-    const muted = nodeObs.OBS_content_isSourceMuted(sourceName);
+    const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.UPDATE_SOURCE({ id, muted });
     this.refreshSourceFlags(source, id);
     this.sourceAdded.next(source);
@@ -171,7 +181,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
   }
 
 
-  private refreshProperties(id: string) {
+  refreshProperties(id: string) {
     const properties = this.getPropertiesFormData(id);
 
     this.UPDATE_SOURCE({ id, properties });
@@ -223,7 +233,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
     }
 
     this.refreshProperties(sourceId);
-    this.configFileService.save();
   }
 
 
@@ -259,8 +268,14 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return Object.values(this.state.sources).map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
+
   getSource(id: string): Source {
     return this.state.sources[id] ? new Source(id) : void 0;
+  }
+
+
+  getSources() {
+    return this.sources;
   }
 
 
@@ -301,17 +316,17 @@ export class Source implements ISource {
   width: number;
   height: number;
   properties: TFormData;
+  channel?: number;
 
   sourceState: ISource;
 
+  /**
+   * displayName can be localized in future releases
+   */
   get displayName() {
-    return this.isHidden ?
-      this.name.replace(/\[HIDDEN_[\d\w-]+\]/, '') :
-      this.name;
-  }
-
-  get isHidden() {
-    return !!this.name.match(/\[HIDDEN_[\d\w-]+\].+/);
+    if (this.name === 'AuxAudioDevice1') return 'Mic/Aux';
+    if (this.name === 'DesktopAudioDevice1') return 'Desktop Audio';
+    return this.name;
   }
 
   getObsInput(): ObsInput {

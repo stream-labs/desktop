@@ -5,41 +5,16 @@ import electron from '../vendor/electron';
 
 // Stateful Services and Classes
 import { getModule } from '../services/stateful-service';
-import { ScenesService, Scene, SceneItem } from '../services/scenes';
-import ScenesTransitions from  '../services/scenes-transitions.ts';
-import { SourcesService, Source } from '../services/sources';
-import SourceFiltersService from '../services/source-filters';
-import { SettingsService } from '../services/settings';
-import StreamingService from '../services/streaming';
-import { PerformanceService } from '../services/performance';
-import { AudioService, AudioSource } from '../services/audio';
-import { CustomizationService } from '../services/customization';
-import { UserService } from '../services/user';
 import { WindowService } from '../services/window';
-import { NavigationService } from '../services/navigation';
-import { OnboardingService } from '../services/onboarding';
-import { ClipboardService } from '../services/clipboard';
+import { ServicesManager, IMutation } from '../services-manager';
 
-const statefulServiceModules = {
-  ...getModule(ScenesService),
-  ...getModule(Scene),
-  ...getModule(SceneItem),
-  ...getModule(ScenesTransitions),
-  ...getModule(SourcesService),
-  ...getModule(Source),
-  ...getModule(SourceFiltersService),
-  ...getModule(SettingsService),
-  ...getModule(StreamingService),
-  ...getModule(PerformanceService),
-  ...getModule(AudioService),
-  ...getModule(AudioSource),
-  ...getModule(CustomizationService),
-  ...getModule(UserService),
-  ...getModule(WindowService),
-  ...getModule(NavigationService),
-  ...getModule(OnboardingService),
-  ...getModule(ClipboardService)
-};
+
+const statefulServiceModules = {};
+const servicesManager: ServicesManager = ServicesManager.instance;
+const statefulServices = servicesManager.getStatefulServices();
+Object.keys(statefulServices).forEach(serviceName => {
+  statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);
+});
 
 
 Vue.use(Vuex);
@@ -66,10 +41,17 @@ const plugins = [];
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
-      ipcRenderer.send('vuex-mutation', {
+
+      const mutationToSend: IMutation = {
         type: mutation.type,
         payload: mutation.payload
-      });
+      };
+
+      if (servicesManager.isMutationBufferingEnabled()) {
+        servicesManager.addMutationToBuffer(mutationToSend);
+      } else {
+        ipcRenderer.send('vuex-mutation', mutationToSend);
+      }
     }
   });
 
@@ -89,15 +71,14 @@ plugins.push((store: Store<any>) => {
 
   // All windows can receive this
   ipcRenderer.on('vuex-mutation', (event, mutation) => {
-    store.commit(mutation.type, Object.assign({}, mutation.payload, {
-      __vuexSyncIgnore: true
-    }));
+    commitMutation(mutation);
   });
 
   ipcRenderer.send('vuex-register');
 });
 
-export default new Vuex.Store({
+
+export const store = new Vuex.Store({
   modules: {
     ...statefulServiceModules
   },
@@ -106,3 +87,10 @@ export default new Vuex.Store({
   actions,
   strict: debug
 });
+
+
+export function commitMutation(mutation: IMutation) {
+  store.commit(mutation.type, Object.assign({}, mutation.payload, {
+    __vuexSyncIgnore: true
+  }));
+}

@@ -58,8 +58,8 @@ export function useSpectron(skipOnboarding = true) {
 
   test.afterEach.always(async t => {
     await t.context.app.stop();
-    setTimeout(() => {
-      rimraf.sync(t.context.cacheDir);
-    }, 1000);
+    await new Promise((resolve) => {
+      rimraf(t.context.cacheDir, resolve);
+    });
   });
 }

@@ -38,18 +38,6 @@ function log(...args) {
 let mainWindow;
 let childWindow;
 
-// This file determines whether we start up in SLOBS-mode or
-// OBS-mode, so we need to load it on app startup.
-function loadStartupConfig() {
-  const configLocation = path.join(app.getPath('userData'), 'startup.json');
-
-  if (fs.existsSync(configLocation)) {
-    return JSON.parse(fs.readFileSync(configLocation));
-  }
-
-  return null;
-}
-
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
 // closing the windows before exit.
@@ -58,7 +46,7 @@ let appExiting = false;
 const indexUrl = 'file://' + __dirname + '/index.html';
 
 function startApp() {
-  const isDevMode = process.env.NODE_ENV !== 'production';
+  const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
   // We use a special cache directory for running tests
   if (process.env.SLOBS_CACHE_DIR) {
     app.setPath('userData', process.env.SLOBS_CACHE_DIR);
@@ -114,7 +102,27 @@ function startApp() {
     }
   });
 
-  childWindow.loadURL(indexUrl + '?child=true');
+
+  // simple messaging system for services between windows
+  // WARNING! the child window use synchronous requests and will be frozen
+  // until main window asynchronous response
+  const requests = { };
+
+  ipcMain.on('services-ready', () => {
+    childWindow.loadURL(indexUrl + '?child=true');
+  });
+
+  ipcMain.on('services-request', (event, payload) => {
+    const request = { id: uuid(), payload };
+    mainWindow.webContents.send('services-request', request);
+    requests[request.id] = Object.assign({}, request, { event });
+  });
+
+  ipcMain.on('services-response', (event, response) => {
+    requests[response.id].event.returnValue = response;
+    delete requests[response.id];
+  });
+
 
   if (isDevMode) {
     childWindow.webContents.openDevTools();
@@ -127,12 +135,6 @@ function startApp() {
 
   // Initialize various OBS services
   obs.OBS_API_initOBS_API(app.getPath('userData'));
-
-  const startupConfig = loadStartupConfig();
-
-  if (startupConfig && startupConfig.obsMode) {
-    obs.OBS_API_useOBS_config(startupConfig.profile, startupConfig.sceneCollection);
-  } 
 
   obs.OBS_API_openAllModules();
   obs.OBS_API_initAllModules();

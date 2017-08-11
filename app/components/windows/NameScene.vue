@@ -62,7 +62,10 @@ export default class NameScene extends Vue {
     } else {
       this.scenesService.createScene(
         this.name,
-        { duplicateSourcesFromScene: this.options.sceneToDuplicate }
+        {
+          duplicateSourcesFromScene: this.options.sceneToDuplicate,
+          makeActive: true
+        }
       );
       this.windowService.closeWindow();
     }

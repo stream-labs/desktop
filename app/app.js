@@ -2,26 +2,31 @@ window.eval = global.eval = function() {
   throw new Error("window.eval() is disabled for security");
 }
 
+import 'reflect-metadata';
 import Vue from 'vue';
 import _ from 'lodash';
 import URI from 'urijs';
 
-import store from './store/index';
+import { store } from './store';
+import { ServicesManager } from './services-manager';
 import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
-import { ConfigFileService } from './services/config-file';
 import { HotkeysService } from './services/hotkeys.ts';
 import { OnboardingService } from './services/onboarding.ts';
 import { UserService } from './services/user.ts';
+import Utils from './services/utils.ts';
+import { ConfigPersistenceService } from './services/config-persistence';
+import { OverlaysPersistenceService } from './services/config-persistence';
+
 
 const { ipcRenderer, remote } = window.require('electron');
 
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
+  const servicesManager = ServicesManager.instance;
   const windowService = WindowService.instance;
   const obsApiService = ObsApiService.instance;
-  const configFileService = ConfigFileService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
 
@@ -33,10 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
       windowService.closeWindow();
     });
   } else {
-    configFileService.load();
+    ConfigPersistenceService.instance.load();
+
+    // Uncomment to start up from an overlay file
+    // OverlaysPersistenceService.instance.loadOverlay('C:\\Users\\acree\\Downloads\\testing.overlay');
+
+    // Set up auto save
+    const autoSave = setInterval(() => {
+      ConfigPersistenceService.instance.save();
+    }, 60 * 1000);
+
 
     ipcRenderer.on('shutdown', () => {
-      configFileService.rawSave();
+      clearInterval(autoSave);
+      ConfigPersistenceService.instance.rawSave();
       remote.getCurrentWindow().close();
     });
 
@@ -58,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return h(windowService.components[componentName]);
     }
   });
+
+  if (!Utils.isChildWindow()) servicesManager.listenApiCalls();
 
   // Used for replacing the contents of this window with
   // a new top level component

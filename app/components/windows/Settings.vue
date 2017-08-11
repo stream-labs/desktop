@@ -15,7 +15,7 @@
       </NavItem>
     </NavMenu>
     <div class="settings-container">
-      <startup-settings v-if="categoryName === 'General'" />
+      <extra-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
       <GenericFormGroups
         v-if="categoryName !== 'Hotkeys'"
@@ -37,7 +37,7 @@ import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowService } from '../../services/window';
 import { SettingsService, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
-import StartupSettings from '../StartupSettings.vue';
+import ExtraSettings from '../ExtraSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 
 @Component({
@@ -46,7 +46,7 @@ import Hotkeys from '../Hotkeys.vue';
     GenericFormGroups,
     NavMenu,
     NavItem,
-    StartupSettings,
+    ExtraSettings,
     Hotkeys
   },
   mixins: [windowMixin]

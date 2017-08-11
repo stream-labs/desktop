@@ -4,8 +4,7 @@ import { HostsService } from '../hosts';
 
 export class YoutubeService extends Service implements IPlatformService {
 
-  @Inject()
-  hostsService: HostsService;
+  hostsService: HostsService = HostsService.instance;
 
   authWindowOptions: Electron.BrowserWindowOptions = {
     width: 1000,

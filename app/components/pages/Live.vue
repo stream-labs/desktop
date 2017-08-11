@@ -13,10 +13,14 @@
           </div>
         </div>
       </div>
+
       <div class="live-right">
         <div class="flex__column">
           <div class="output-container">
-            <div class="flex__item output studio-editor-display" ref=display>
+            <div class="output-wrapper">
+              <div class="content">
+                <div class="output" ref=display></div>
+              </div>
             </div>
             <!-- status and viewer counts here-->
             <div class="stream-stats">
@@ -30,6 +34,7 @@
         </div>
       </div>
     </div>
+
     <div class="stream-footer">
       <studio-footer />
     </div>
@@ -106,6 +111,8 @@ export default class Live extends Vue {
 
     this.obsDisplay = this.videoService.createDisplay();
 
+    this.obsDisplay.setShoulddrawUI(false);
+
     this.scenesService.activeScene.makeItemActive(null);
 
     this.onResize();
@@ -163,7 +170,8 @@ export default class Live extends Vue {
   box-sizing: border-box;
 }
 
-.live-left, .live-right {
+.live-left,
+.live-right {
   display: flex;
 }
 
@@ -181,7 +189,6 @@ export default class Live extends Vue {
   margin-bottom: 20px;
   .radius;
   overflow: hidden;
-  .border;
 }
 
 .mission-control {
@@ -200,8 +207,13 @@ export default class Live extends Vue {
   overflow: hidden;
 }
 
+.output-wrapper {
+  .aspect-ratio(16,9);
+}
+
 .output {
-  height: 240px;
+  width: 100%;
+  height: 100%;
 }
 
 .stream-stats {
@@ -220,10 +232,6 @@ export default class Live extends Vue {
 
 .chat-wrapper {
   height: 100%;
-}
-
-.studio-editor-display {
-  position: relative;
 }
 
 .night-theme {

@@ -1,5 +1,41 @@
 <template>
-<div>{{ statusLine }}</div>
+<div class="performance-metrics flex flex--center">
+  <span class="performance-metric-wrapper">
+    <span
+      class="performance-metric">
+      CPU: {{ cpuPercent }}
+    </span>
+  </span>
+
+  <span class="performance-metric-wrapper">
+    <span
+      class="performance-metric">
+      {{ frameRate }} FPS
+    </span>
+  </span>
+
+  <span class="performance-metric-wrapper">
+    <span class="performance-metric">
+      Dropped Frames: {{ droppedFrames }} ({{ percentDropped }}%)
+    </span>
+  </span>
+
+  <span class="performance-metric-wrapper">
+    <span
+      class="performance-metric">
+      {{ bandwidth }} kb/s
+    </span>
+  </span>
+
+  <span class="performance-metric-wrapper">
+    <span
+      v-if="this.streamingService.isStreaming && this.streamOk !== null"
+      class="performance-metric">
+      {{ streamStatusMsg }}
+    </span>
+    <span v-else></span>
+  </span>
+</div>
 </template>
 
 <script lang="ts">
@@ -18,18 +54,6 @@ export default class PerformanceMetrics extends Vue {
 
   @Inject()
   performanceService: PerformanceService;
-
-  get statusLine() {
-    const line = [
-      `CPU: ${this.cpuPercent}%`,
-      `${this.frameRate} FPS`,
-      `Dropped Frames: ${this.droppedFrames} (${this.percentDropped}%)`,
-      `${this.bandwidth} kb/s`,
-      this.streamStatusMsg
-    ];
-
-    return compact(line).join(' | ');
-  }
 
   get cpuPercent() {
     return this.performanceService.state.CPU;
@@ -69,3 +93,26 @@ export default class PerformanceMetrics extends Vue {
 
 }
 </script>
+<style lang="less">
+.performance-metric-wrapper {
+  &:first-child {
+    .performance-metric {
+      padding-left: 0;
+
+      &:before {
+        content: '';
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+.performance-metric {
+  padding-left: 10px;
+
+  &:before {
+    content: '|';
+    padding-right: 10px;
+  }
+}
+</style>
