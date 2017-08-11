@@ -52,7 +52,6 @@
     "arch": "x64"
   },
   "dependencies": {
-    "asar": "^0.13.0",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
