@@ -22,7 +22,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from '../services/user';
 import { OnboardingService } from '../services/onboarding';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 
 @Component({})
 export default class Login extends Vue {

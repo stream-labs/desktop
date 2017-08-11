@@ -4,17 +4,12 @@ import _ from 'lodash';
 import electron from '../vendor/electron';
 
 // Stateful Services and Classes
-import { getModule } from '../services/stateful-service';
+import { getModule, StatefulService } from '../services/stateful-service';
 import { WindowService } from '../services/window';
 import { ServicesManager, IMutation } from '../services-manager';
 
 
-const statefulServiceModules = {};
-const servicesManager: ServicesManager = ServicesManager.instance;
-const statefulServices = servicesManager.getStatefulServices();
-Object.keys(statefulServices).forEach(serviceName => {
-  statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);
-});
+
 
 
 Vue.use(Vuex);
@@ -34,12 +29,13 @@ const mutations = {
 const actions = {
 };
 
-const plugins = [];
+const plugins: any[] = [];
 
 // This plugin will keep all vuex stores in sync via
 // IPC with the main process.
 plugins.push((store: Store<any>) => {
   store.subscribe((mutation: Dictionary<any>) => {
+    const servicesManager: ServicesManager = ServicesManager.instance;
     if (mutation.payload && !mutation.payload.__vuexSyncIgnore) {
 
       const mutationToSend: IMutation = {
@@ -78,16 +74,30 @@ plugins.push((store: Store<any>) => {
 });
 
 
-export const store = new Vuex.Store({
-  modules: {
-    ...statefulServiceModules
-  },
-  plugins,
-  mutations,
-  actions,
-  strict: debug
-});
+let store: Vuex.Store<any> = null;
 
+export function createStore() {
+
+  const statefulServiceModules = {};
+  const servicesManager: ServicesManager = ServicesManager.instance;
+  const statefulServices = servicesManager.getStatefulServices();
+  Object.keys(statefulServices).forEach(serviceName => {
+    statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);
+  });
+
+  store = new Vuex.Store({
+    modules: {
+      ...statefulServiceModules
+    },
+    plugins,
+    mutations,
+    actions,
+    strict: debug
+  });
+
+  StatefulService.setupVuexStore(store);
+  return store;
+}
 
 export function commitMutation(mutation: IMutation) {
   store.commit(mutation.type, Object.assign({}, mutation.payload, {

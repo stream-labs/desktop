@@ -40,7 +40,7 @@ export interface IInputValue<TValueType> {
   type?: TObsType;
 }
 
-export declare type TFormData = IInputValue<TObsValue>[];
+export declare type TFormData = (IInputValue<TObsValue> | IListInputValue)[];
 
 export interface IListInputValue extends IInputValue<string> {
   options: IListOption<string>[];

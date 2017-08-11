@@ -49,7 +49,7 @@ import SceneSelector from '../SceneSelector.vue';
 import Mixer from '../Mixer.vue';
 import Chat from '../Chat.vue';
 import { UserService } from '../../services/user';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import StreamingService from '../../services/streaming';
 import { getPlatformService } from '../../services/platforms';
 import StudioFooter from '../StudioFooter.vue';

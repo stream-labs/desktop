@@ -16,7 +16,7 @@ import SuccessfullyImported from './onboarding_steps/SuccessfullyImported.vue';
 import BrowseOverlays from './onboarding_steps/BrowseOverlays.vue';
 import SelectWidgets from './onboarding_steps/SelectWidgets.vue';
 import { OnboardingService } from '../../services/onboarding';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 
 @Component({
   components: {

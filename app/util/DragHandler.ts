@@ -1,5 +1,5 @@
 import { SettingsService } from '../services/settings';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { ScenesService, SceneItem } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
 import { ScalableRectangle } from '../util/ScalableRectangle';

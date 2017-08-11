@@ -94,7 +94,7 @@ import Vue from 'vue';
 import { without, defer } from 'lodash';
 import { Component } from 'vue-property-decorator';
 import { WidgetsService, WidgetType } from '../../../services/widgets';
-import { Inject } from '../../../services/service';
+import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 import SelectableWidget from './SelectableWidget.vue';
 

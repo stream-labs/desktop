@@ -2,7 +2,7 @@ import Vue from 'vue';
 import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
-import { Inject } from './service';
+import { Inject } from '../util/injector';
 import { mutation } from './stateful-service';
 import electron from '../vendor/electron';
 import { HostsService } from './hosts';

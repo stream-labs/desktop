@@ -7,7 +7,8 @@ import { TransitionNode } from './nodes/transition';
 import { FiltersNode } from './nodes/filters';
 import electron from '../../vendor/electron';
 import { ScenesService } from '../scenes';
-import { SourcesService, E_AUDIO_CHANNELS } from '../sources';
+import { SourcesService } from '../sources';
+import { E_AUDIO_CHANNELS } from '../audio';
 import { throttle } from 'lodash-decorators';
 import { parse } from '.';
 

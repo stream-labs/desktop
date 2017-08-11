@@ -2,7 +2,7 @@ import { StatefulService } from './stateful-service';
 import { obsValuesToInputValues, inputValuesToObsValues, TFormData } from '../components/shared/forms/Input';
 
 import { nodeObs } from './obs-api';
-import { Inject } from './service';
+import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 
 interface ISourceFilterType {

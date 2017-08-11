@@ -55,7 +55,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";

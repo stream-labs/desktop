@@ -334,7 +334,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';

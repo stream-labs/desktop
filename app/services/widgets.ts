@@ -1,5 +1,6 @@
 import { throttle } from 'lodash-decorators';
-import { Service, Inject } from './service';
+import { Service } from './service';
+import { Inject } from '../util/injector';
 import { UserService, requiresLogin } from './user';
 import { TPlatform } from './platforms';
 import { ScenesService, SceneItem } from './scenes';

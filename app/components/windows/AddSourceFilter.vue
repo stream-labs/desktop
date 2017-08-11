@@ -20,7 +20,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';

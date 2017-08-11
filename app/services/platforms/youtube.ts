@@ -1,6 +1,7 @@
-import { Service, Inject } from '../service';
+import { Service } from '../service';
 import { IPlatformService } from '.';
 import { HostsService } from '../hosts';
+import { Inject } from '../util/injector';
 
 export class YoutubeService extends Service implements IPlatformService {
 

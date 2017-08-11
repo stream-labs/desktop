@@ -1,11 +1,12 @@
 import { flatten } from 'lodash';
 
-import { Service, Inject } from './service';
+import { Service } from './service';
 import StreamingService from './streaming';
 import { ScenesService } from './scenes';
 import { SourcesService, ISource } from './sources';
 import electron from '../vendor/electron';
 import { KeyListenerService } from './key-listener';
+import { Inject } from '../util/injector';
 
 const { app } = electron.remote;
 

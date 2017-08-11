@@ -13,7 +13,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
 import DragHandler from '../util/DragHandler';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
 import { EditMenu } from '../util/menus/EditMenu';

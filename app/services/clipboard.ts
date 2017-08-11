@@ -1,6 +1,7 @@
-import { mutation, StatefulService, Inject } from './stateful-service';
+import { mutation, StatefulService } from './stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
+import { Inject } from '../util/injector';
 
 // TODO: add Filter type
 enum EClipboardItemType { Source }

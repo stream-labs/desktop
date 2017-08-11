@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import { without } from 'lodash';
-import { StatefulService, mutation, Inject } from '../stateful-service';
+import { StatefulService, mutation } from '../stateful-service';
 import { nodeObs, ObsScene, ESceneDupType } from '../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';
 import { IScene, Scene, ISceneItem } from '../scenes';
 import electron from '../../vendor/electron';
 import { Subject } from 'rxjs/Subject';
+import { Inject } from '../../util/injector';
 
 const { ipcRenderer } = electron;
 
@@ -36,7 +37,8 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject()
   private sourcesService: SourcesService;
 
-  @Inject()
+
+  @Inject('ScenesTransitionsService')
   private transitionsService: ScenesTransitionsService;
 
 

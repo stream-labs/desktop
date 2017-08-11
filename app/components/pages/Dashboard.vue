@@ -13,7 +13,7 @@ import { Component } from 'vue-property-decorator';
 import SceneSelector from '../SceneSelector.vue';
 import SourceSelector from '../SourceSelector.vue';
 import { UserService } from '../../services/user';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 
 @Component({
   components: {
