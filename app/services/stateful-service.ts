@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Store, Module } from 'vuex';
 import { Service } from './service';
-import { store } from '../store';
 
 export * from './service';
 
@@ -29,6 +28,7 @@ export function mutation(options = { vuexSyncIgnore: false }) {
 
       value(...args: any[]) {
         const constructorArgs = this['constructorArgs'];
+        const store = StatefulService.getStore();
         store.commit(
           mutationName, {
             args,
@@ -46,9 +46,19 @@ export function mutation(options = { vuexSyncIgnore: false }) {
  */
 export abstract class StatefulService<TState extends object> extends Service {
 
+  private static store: Store<any>;
+
+  static setupVuexStore(store: Store<any>) {
+    this.store = store;
+  }
+
+  static getStore() {
+    if (!this.store) throw 'vuex store is not set';
+    return this.store;
+  }
 
   get store(): Store<any> {
-    return store;
+    return StatefulService.store;
   }
 
   get state(): TState {

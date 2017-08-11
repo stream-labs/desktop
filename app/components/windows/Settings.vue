@@ -29,7 +29,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
@@ -71,9 +71,7 @@ export default class SceneTransitions extends Vue {
   };
 
   get categoryNames() {
-    return this.settingsService.getCategories().filter(name => {
-      return name !== 'Audio';
-    });
+    return this.settingsService.getCategories();
   }
 
   save(settingsData: ISettingsSubCategory[]) {

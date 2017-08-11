@@ -38,7 +38,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
 import { WindowService } from '../services/window';
 import { ScenesService, SceneItem } from '../services/scenes';

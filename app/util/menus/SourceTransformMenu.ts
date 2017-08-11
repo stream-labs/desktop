@@ -2,7 +2,7 @@ import { Menu } from './Menu';
 import { ScenesService } from '../../services/scenes';
 import { VideoService } from '../../services/video';
 import { ScalableRectangle } from '../../util/ScalableRectangle';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 
 export class SourceTransformMenu extends Menu {
 

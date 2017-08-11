@@ -5,6 +5,7 @@ import { ISceneItem, SceneItem } from './scene-item';
 import Utils from '../utils';
 import { ObsScene, ObsSceneItem } from '../obs-api';
 import electron from '../../vendor/electron';
+import { Inject } from '../../util/injector';
 
 const { ipcRenderer } = electron;
 
@@ -29,8 +30,12 @@ export class Scene implements IScene {
   activeItemId: string;
   items: ISceneItem[];
 
-  private scenesService: ScenesService = ScenesService.instance;
-  private sourcesService: SourcesService = SourcesService.instance;
+  @Inject()
+  private scenesService: ScenesService;
+
+  @Inject()
+  private sourcesService: SourcesService;
+
   private sceneState: IScene;
 
   constructor(sceneId: string) {

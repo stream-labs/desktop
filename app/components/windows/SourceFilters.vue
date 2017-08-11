@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
@@ -75,7 +75,7 @@ import GenericForm from '../shared/forms/GenericForm.vue';
 export default class SourceFilters extends Vue {
 
   @Inject()
-  filtersService: SourceFiltersService;
+  SourceFiltersService: SourceFiltersService;
 
   @Inject()
   sourcesService: SourcesService;
@@ -84,9 +84,9 @@ export default class SourceFilters extends Vue {
 
   windowOptions: { sourceName: string, selectedFilterName: string } = this.windowService.getOptions();
   sourceName = this.windowOptions.sourceName;
-  filters = this.filtersService.getFilters(this.sourceName);
+  filters = this.SourceFiltersService.getFilters(this.sourceName);
   selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
-  properties = this.filtersService.getPropertiesFormData(
+  properties = this.SourceFiltersService.getPropertiesFormData(
     this.sourceName, this.selectedFilterName
   );
 
@@ -96,12 +96,12 @@ export default class SourceFilters extends Vue {
   }
 
   save() {
-    this.filtersService.setProperties(
+    this.SourceFiltersService.setProperties(
       this.sourceName,
       this.selectedFilterName,
       this.properties
     );
-    this.properties = this.filtersService.getPropertiesFormData(
+    this.properties = this.SourceFiltersService.getPropertiesFormData(
       this.sourceName, this.selectedFilterName
     );
   }
@@ -119,15 +119,15 @@ export default class SourceFilters extends Vue {
   }
 
   removeFilter() {
-    this.filtersService.remove(this.sourceName, this.selectedFilterName);
-    this.filters = this.filtersService.getFilters(this.sourceName);
+    this.SourceFiltersService.remove(this.sourceName, this.selectedFilterName);
+    this.filters = this.SourceFiltersService.getFilters(this.sourceName);
     this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
   }
 
   toggleVisibility(filterName: string) {
     const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.filtersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
-    this.filters = this.filtersService.getFilters(this.sourceName);
+    this.SourceFiltersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
+    this.filters = this.SourceFiltersService.getFilters(this.sourceName);
   }
 
 }

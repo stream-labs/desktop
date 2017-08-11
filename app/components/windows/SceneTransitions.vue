@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { ScenesTransitionsService } from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
 import * as inputComponents from '../shared/forms';

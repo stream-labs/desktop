@@ -1,6 +1,6 @@
 import { Node } from './node';
 import { ScenesTransitionsService } from '../../scenes-transitions';
-import { Inject } from '../../service';
+import { Inject } from '../../../util/injector';
 
 interface ISchema {
   type: string;
@@ -11,7 +11,7 @@ export class TransitionNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
 
-  @Inject()
+  @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
   save() {

@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { Inject } from './service';
+import { Inject } from '../util/injector';
 import { StatefulService, mutation } from './stateful-service';
 import { nodeObs } from './obs-api';
 import { SettingsService } from './settings';

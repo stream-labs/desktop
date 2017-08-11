@@ -6,6 +6,7 @@
     "variable-name": false,
     "trailing-comma": false,
     "import-name": false,
+    "no-increment-decrement": false,
     "max-line-length": {
       "options": [120]
     },

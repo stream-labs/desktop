@@ -5,23 +5,16 @@ import {
   inputValuesToObsValues,
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
-import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
+import { StatefulService, mutation, Mutator } from './stateful-service';
 import { nodeObs, ObsInput, ObsGlobal } from './obs-api';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
+import { Inject } from '../util/injector';
 
 const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
-
-export enum E_AUDIO_CHANNELS {
-  OUTPUT_1 = 1,
-  OUTPUT_2 = 2,
-  INPUT_1 = 3,
-  INPUT_2 = 4,
-  INPUT_3 = 5,
-}
 
 export interface ISource {
   sourceId: string;
@@ -72,7 +65,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceRemoved = new Subject<ISource>();
 
 
-  private scenesService: ScenesService = ScenesService.instance;
+  @Inject()
+  private scenesService: ScenesService;
 
 
   protected init() {
@@ -146,19 +140,18 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return this.getSource(id);
   }
 
+  removeSource(id: string) {
+    const source = this.getSource(id);
+    source.getObsInput().release();
+    this.REMOVE_SOURCE(id);
+    this.sourceRemoved.next(source.sourceState);
+  }
+
 
   private onSceneSourceRemovedHandler(sceneSourceState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     if (this.scenesService.getSourceScenes(sceneSourceState.sourceId).length > 0) return;
     this.removeSource(sceneSourceState.sourceId);
-  }
-
-
-  private removeSource(id: string) {
-    const source = this.getSource(id);
-    source.getObsInput().release();
-    this.REMOVE_SOURCE(id);
-    this.sourceRemoved.next(source.sourceState);
   }
 
 
@@ -326,11 +319,28 @@ export class Source implements ISource {
   get displayName() {
     if (this.name === 'AuxAudioDevice1') return 'Mic/Aux';
     if (this.name === 'DesktopAudioDevice1') return 'Desktop Audio';
+    const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(this.name);
+    const auxDeviceMatch = /^AuxAudioDevice(\d)$/.exec(this.name);
+
+    if (desktopDeviceMatch) {
+      const index = parseInt(desktopDeviceMatch[1], 10);
+      return 'Desktop Audio' + (index > 1 ? ' ' + index : '');
+    }
+
+    if (auxDeviceMatch) {
+      const index = parseInt(auxDeviceMatch[1], 10);
+      return 'Mic/Aux' + (index > 1 ? ' ' + index : '');
+    }
+
     return this.name;
   }
 
   getObsInput(): ObsInput {
     return ObsInput.fromName(this.name);
+  }
+
+  updateSettings(settings: Dictionary<any>) {
+    this.getObsInput().update(settings);
   }
 
   @Inject()

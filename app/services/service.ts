@@ -11,22 +11,9 @@ const singletonEnforcer = Symbol();
  * service initialization. This allows observable service to know nothing about observer.
  * In this case observer-service is like a "plugin" for observable service.
  */
-export function InitAfter(...observableServices: typeof Service[]): ClassDecorator {
+export function InitAfter(...observableServices: typeof Service[]) {
   return function (target: typeof Service) {
     Service.observeList.push({ ObserverService: target, observableServices });
-  };
-}
-
-/**
- * DI decorator
- * @see http://source.coveo.com/2016/02/04/typescript-injection-decorator/
- */
-export function Inject() {
-  return function (target: Object, key: string) {
-    const ServiceClass = Reflect.getMetadata('design:type', target, key);
-    Object.defineProperty(target, key, {
-      get() { return ServiceClass.instance; }
-    });
   };
 }
 

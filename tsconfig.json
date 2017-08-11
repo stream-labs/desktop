@@ -19,7 +19,7 @@
 
     "outDir": "bundles/ts",
     "sourceMap": true,
-    "allowJs": true,
+    "allowJs": false,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true
   },

@@ -1,7 +1,8 @@
-import { Service, Inject } from '../service';
+import { Service } from '../service';
 import { IPlatformService, IPlatformAuth } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
+import { Inject } from '../../util/injector';
 
 export class TwitchService extends Service implements IPlatformService {
 

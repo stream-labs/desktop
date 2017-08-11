@@ -56,7 +56,7 @@ import { Subscription } from 'rxjs/subscription';
 import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
 import { ScenesService } from '../services/scenes';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import Slider from  './shared/Slider.vue';
 
 // This class manages animating the volmeter.  If this needs to

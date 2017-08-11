@@ -28,6 +28,7 @@ import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
+import traverse from 'traverse';
 
 const { ipcRenderer } = electron;
 
@@ -103,6 +104,11 @@ export class ServicesManager extends Service {
       });
     }
 
+  }
+
+
+  getService(serviceName: string) {
+    return this.services[serviceName];
   }
 
 
@@ -235,6 +241,8 @@ export class ServicesManager extends Service {
     return new Proxy(service, {
       get: (target, property, receiver) => {
 
+        if (!target[property]) return target[property];
+
         if (target[property].isMutator) {
           return this.applyIpcProxy(target[property]);
         }
@@ -264,8 +272,18 @@ export class ServicesManager extends Service {
             const mutator = this.getMutator(payload.mutatorName, payload.constructorArgs);
             return this.applyIpcProxy(mutator);
           } else {
+            // payload can contain mutators-objects
+            // we have to wrap them in IpcProxy too
+            traverse(payload).forEach((item: any) => {
+              if (item && item.isMutator) {
+                const mutator = this.getMutator(item.mutatorName, item.constructorArgs);
+                return this.applyIpcProxy(mutator);
+              }
+            });
             return payload;
           }
+
+
 
         };
       }
