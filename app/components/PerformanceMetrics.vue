@@ -16,7 +16,7 @@
 
   <span class="performance-metric-wrapper">
     <span class="performance-metric">
-      Dropped Frames: {{ droppedFrames }} {{ percentDropped }}
+      Dropped Frames: {{ droppedFrames }} ({{ percentDropped }}%)
     </span>
   </span>
 
