@@ -41,6 +41,8 @@ export default class ExtraSettings extends Vue {
       filters: [{ name: 'Overlay File', extensions: ['overlay'] }]
     });
 
+    if (!path) return;
+
     this.overlaySaving = true;
 
     this.overlaysService.saveOverlay(path).then(() => {
