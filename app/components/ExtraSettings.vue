@@ -8,14 +8,15 @@
       Show Cache Directory
     </button>
   </div>
-  <div class="section">
+  <!-- TODO: Uncomment when we want to expose this feature -->
+  <!-- <div class="section">
     <p>
       This will export your current scene configuration as a reusable overlay that can be used as a base scene config by other people.  This is an experimental feature.
     </p>
     <button class="button button--action" @click="exportOverlay" :disabled="overlaySaving">
       Export as Overlay
     </button>
-  </div>
+  </div> -->
 </div>
 </template>
 
