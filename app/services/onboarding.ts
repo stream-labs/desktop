@@ -12,6 +12,7 @@ type TOnboardingStep =
   'OptimizeC';
 
 interface IOnboardingServiceState {
+  isLogin: boolean;
   currentStep: TOnboardingStep;
   completedSteps: TOnboardingStep[];
 }
@@ -35,6 +36,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   SelectWidgets: {
     isEligible: service => {
+      if (service.state.isLogin) return false;
       return service.userService.isLoggedIn();
     },
     next: 'OptimizeA'
@@ -42,6 +44,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeA: {
     isEligible: service => {
+      if (service.state.isLogin) return false;
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB'
@@ -57,6 +60,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 export class OnboardingService extends StatefulService<IOnboardingServiceState> {
 
   static initialState: IOnboardingServiceState = {
+    isLogin: false,
     currentStep: null,
     completedSteps: []
   };
@@ -95,6 +99,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
 
   @mutation()
+  RESET_COMPLETED_STEPS() {
+    this.state.completedSteps = [];
+  }
+
+
+  @mutation()
+  SET_LOGIN(login: boolean) {
+    this.state.isLogin = login;
+  }
+
+
+  @mutation()
   COMPLETE_STEP(step: TOnboardingStep) {
     this.state.completedSteps.push(step);
   }
@@ -119,7 +135,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
-  start() {
+  // A login attempt is an abbreviated version of the onboarding process,
+  // and some steps should be skipped.
+  start(isLogin = false) {
+    this.RESET_COMPLETED_STEPS();
+    this.SET_LOGIN(isLogin);
     this.SET_CURRENT_STEP('Connect');
     this.navigationService.navigate('Onboarding');
   }
