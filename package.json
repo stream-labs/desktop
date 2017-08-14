@@ -52,6 +52,7 @@
     "arch": "x64"
   },
   "dependencies": {
+    "asar": "^0.13.0",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
@@ -76,7 +77,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.26.1",
     "electron": "^1.4.15",
-    "electron-builder": "^19.10.0",
+    "electron-builder": "^19.22.1",
     "electron-devtools-installer": "^2.1.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
