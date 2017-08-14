@@ -1,5 +1,5 @@
 import { Service } from '../service';
-import { IPlatformService, IPlatformAuth } from '.';
+import { IPlatformService, IPlatformAuth, IStreamInfo } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
@@ -63,7 +63,7 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
-  fetchLiveStreamInfo(twitchId: string) {
+  fetchLiveStreamInfo(twitchId: string): Promise<IStreamInfo> {
     const headers = new Headers();
 
     headers.append('Client-Id', this.clientId);
@@ -73,6 +73,11 @@ export class TwitchService extends Service implements IPlatformService {
 
     return fetch(request).then(response => {
       return response.json();
+    }).then(json => {
+      return {
+        status: json.stream.channel.status,
+        viewers: json.stream.viewers
+      };
     });
   }
 

@@ -1,5 +1,13 @@
 <template>
-  <webview class="chat" id="recentEventsWebview" :src="chatUrl"></webview>
+  <webview
+    v-if="isTwitch"
+    class="chat"
+    id="recentEventsWebview"
+    :src="chatUrl">
+  </webview>
+  <div v-else>
+    Youtube chat is coming soon!
+  </div>
 </template>
 
 <script lang="ts">
@@ -17,6 +25,10 @@ export default class Chat extends Vue {
 
   get chatUrl() {
     return this.userService.chatUrl;
+  }
+
+  get isTwitch() {
+    return this.userService.platform.type === 'twitch';
   }
 }
 </script>

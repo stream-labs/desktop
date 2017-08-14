@@ -1,5 +1,5 @@
 import { Service } from '../service';
-import { IPlatformService } from '.';
+import { IPlatformService, IStreamInfo } from '.';
 import { HostsService } from '../hosts';
 import { Inject } from '../util/injector';
 
@@ -22,9 +22,9 @@ export class YoutubeService extends Service implements IPlatformService {
     // TODO: Not currently implemented
   }
 
-  fetchLiveStreamInfo(youtubeId: string) {
+  fetchLiveStreamInfo(youtubeId: string): Promise<IStreamInfo> {
     // TODO: Harsha
-    return {};
+    return Promise.resolve({ status: '', viewers: 0 });
   }
 
 }
