@@ -48,10 +48,7 @@ export default class Login extends Vue {
   }
 
   login() {
-    // For now, we start the onboarding flow again.  We should
-    // improve this UX to have a dedicated standalone login
-    // page, but that hasn't been built yet.
-    this.onboardingService.start();
+    this.onboardingService.start(true);
   }
 
 }
