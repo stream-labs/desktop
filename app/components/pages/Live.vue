@@ -51,7 +51,7 @@ import Chat from '../Chat.vue';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import StreamingService from '../../services/streaming';
-import { getPlatformService } from '../../services/platforms';
+import { getPlatformService, IStreamInfo } from '../../services/platforms';
 import StudioFooter from '../StudioFooter.vue';
 import { ScenesService } from '../../services/scenes';
 import { Display, VideoService } from '../../services/video';
@@ -80,7 +80,7 @@ export default class Live extends Vue {
   @Inject()
   videoService: VideoService;
 
-  streamInfo = {status: '', viewers:0};
+  streamInfo: IStreamInfo = { status: '', viewers: 0 };
   streamInfoInterval: number;
 
   obsDisplay: Display;
@@ -98,11 +98,8 @@ export default class Live extends Vue {
           const platformId = this.userService.platformId;
           const service = getPlatformService(platform);
 
-          service.fetchLiveStreamInfo(platformId).then((streamInfo: any) => {
-            if (streamInfo && streamInfo.stream) {
-              this.streamInfo.status = streamInfo.stream.channel.status;
-              this.streamInfo.viewers = streamInfo.stream.viewers;
-            }
+          service.fetchLiveStreamInfo(platformId).then(streamInfo => {
+            this.streamInfo = streamInfo;
           });
         }
       },

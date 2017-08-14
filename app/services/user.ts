@@ -114,6 +114,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+
+  // TODO: This is platform specific and should be moved into the Twitch
+  // platform service.
   get chatUrl() {
     const username = this.username;
     const nightMode = this.customizationService.nightMode ? 'darkpopout' : 'popout';
