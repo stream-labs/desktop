@@ -20,9 +20,7 @@ const NODE_TYPES = {
 const fs = window['require']('fs');
 const os = window['require']('os');
 const path = window['require']('path');
-
-// TODO: Actually require asar when electron-builder will package it properly
-const asar: any = {};
+const asar = window['require']('asar');
 
 export class OverlaysPersistenceService extends Service {
 
