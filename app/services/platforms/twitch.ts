@@ -78,6 +78,8 @@ export class TwitchService extends Service implements IPlatformService {
         status: json.stream.channel.status,
         viewers: json.stream.viewers
       };
+    }).catch(() => {
+      return { status: '', viewers: 0 };
     });
   }
 
