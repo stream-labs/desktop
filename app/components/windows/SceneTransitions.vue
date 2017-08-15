@@ -40,7 +40,7 @@ import windowMixin from '../mixins/window';
 })
 export default class SceneTransitions extends Vue {
 
-  @Inject()
+  @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
   windowService = WindowService.instance;
