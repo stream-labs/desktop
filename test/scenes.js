@@ -10,7 +10,6 @@ useSpectron();
 async function checkDefaultSources(t) {
   const app = t.context.app;
   await focusMain(t);
-
   t.true(await app.client.isExisting('div=Mic/Aux'));
   t.true(await app.client.isExisting('div=Desktop Audio'));
 }

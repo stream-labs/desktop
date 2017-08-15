@@ -75,7 +75,7 @@ import GenericForm from '../shared/forms/GenericForm.vue';
 export default class SourceFilters extends Vue {
 
   @Inject()
-  SourceFiltersService: SourceFiltersService;
+  sourceFiltersService: SourceFiltersService;
 
   @Inject()
   sourcesService: SourcesService;
@@ -84,9 +84,9 @@ export default class SourceFilters extends Vue {
 
   windowOptions: { sourceName: string, selectedFilterName: string } = this.windowService.getOptions();
   sourceName = this.windowOptions.sourceName;
-  filters = this.SourceFiltersService.getFilters(this.sourceName);
+  filters = this.sourceFiltersService.getFilters(this.sourceName);
   selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
-  properties = this.SourceFiltersService.getPropertiesFormData(
+  properties = this.sourceFiltersService.getPropertiesFormData(
     this.sourceName, this.selectedFilterName
   );
 
@@ -96,12 +96,12 @@ export default class SourceFilters extends Vue {
   }
 
   save() {
-    this.SourceFiltersService.setProperties(
+    this.sourceFiltersService.setProperties(
       this.sourceName,
       this.selectedFilterName,
       this.properties
     );
-    this.properties = this.SourceFiltersService.getPropertiesFormData(
+    this.properties = this.sourceFiltersService.getPropertiesFormData(
       this.sourceName, this.selectedFilterName
     );
   }
@@ -119,15 +119,15 @@ export default class SourceFilters extends Vue {
   }
 
   removeFilter() {
-    this.SourceFiltersService.remove(this.sourceName, this.selectedFilterName);
-    this.filters = this.SourceFiltersService.getFilters(this.sourceName);
+    this.sourceFiltersService.remove(this.sourceName, this.selectedFilterName);
+    this.filters = this.sourceFiltersService.getFilters(this.sourceName);
     this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
   }
 
   toggleVisibility(filterName: string) {
     const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.SourceFiltersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
-    this.filters = this.SourceFiltersService.getFilters(this.sourceName);
+    this.sourceFiltersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
+    this.filters = this.sourceFiltersService.getFilters(this.sourceName);
   }
 
 }

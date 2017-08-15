@@ -12,6 +12,14 @@ export async function setFormInput(t, label, value, index = 0) {
     .setValue('input', value);
 }
 
+export async function getFormInput(t, label, index = 0) {
+  const id = await getNthLabelId(t, label, index);
+
+  return t.context.app.client
+    .elementIdElement(id, '../..')
+    .getValue('input');
+}
+
 export async function clickFormInput(t, label, index = 0) {
   const id = await getNthLabelId(t, label, index);
 

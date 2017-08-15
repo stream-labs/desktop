@@ -25,7 +25,9 @@ export async function addFilter(t, sourceName, filterType, filterName) {
   await openFiltersWindow(t, sourceName);
   await t.context.app.client.click('.fa-plus');
   await setFormDropdown(t, 'Filter type', filterType);
-  await setFormInput(t, 'Filter name', filterName);
+  if (filterType !== filterName) {
+    await setFormInput(t, 'Filter name', filterName);
+  }
   await t.context.app.client.click('button=Done');
   await t.context.app.client.click('button=Done');
 }
