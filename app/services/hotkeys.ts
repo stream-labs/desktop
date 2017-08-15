@@ -7,11 +7,10 @@ import { SourcesService, ISource } from './sources';
 import electron from '../vendor/electron';
 import { KeyListenerService } from './key-listener';
 import { Inject } from '../util/injector';
+import path from 'path';
+import fs from 'fs';
 
 const { app } = electron.remote;
-
-const path = window['require']('path');
-const fs = window['require']('fs');
 
 enum HotkeyActionKind {
   Simple,
@@ -518,7 +517,7 @@ export class HotkeysService extends Service {
 
   loadBindings(): Hotkey[] {
     if (fs.existsSync(this.bindingsFilePath)) {
-      const parsed: HotkeyObject[] = JSON.parse(fs.readFileSync(this.bindingsFilePath)).bindings;
+      const parsed: HotkeyObject[] = JSON.parse(fs.readFileSync(this.bindingsFilePath).toString()).bindings;
 
       return parsed.map(binding => {
         return Hotkey.fromObject(binding);

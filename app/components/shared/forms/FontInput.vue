@@ -73,8 +73,7 @@
 import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
 import { TObsType, IInputValue, Input, IFont } from './Input';
-const Multiselect = require('vue-multiselect').Multiselect;
-
+import { Multiselect } from 'vue-multiselect';
 
 const OBS_FONT_BOLD = 1 << 0;
 const OBS_FONT_ITALIC = 1 << 1;
