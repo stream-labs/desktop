@@ -1,9 +1,8 @@
 import { Node } from '../node';
 import { SceneItem } from '../../../scenes';
 import { uniqueId } from 'lodash';
-
-const path = window['require']('path');
-const fs = window['require']('fs');
+import path from 'path';
+import fs from 'fs';
 
 interface ISchema {
   filename: string;

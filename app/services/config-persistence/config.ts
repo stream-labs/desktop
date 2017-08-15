@@ -11,6 +11,8 @@ import { SourcesService } from '../sources';
 import { E_AUDIO_CHANNELS } from '../audio';
 import { throttle } from 'lodash-decorators';
 import { parse } from '.';
+import fs from 'fs';
+import path from 'path';
 
 const NODE_TYPES = {
   RootNode,
@@ -20,9 +22,6 @@ const NODE_TYPES = {
   TransitionNode,
   FiltersNode
 };
-
-const fs = window['require']('fs');
-const path = window['require']('path');
 
 // This class exposes the public API for saving and loading
 // the scene configuration.  This service and its supporting
@@ -51,7 +50,7 @@ export class ConfigPersistenceService extends Service {
 
   load() {
     if (fs.existsSync(this.configFilePath)) {
-      const data = fs.readFileSync(this.configFilePath);
+      const data = fs.readFileSync(this.configFilePath).toString();
       const root = parse(data, NODE_TYPES);
       root.load();
     } else {

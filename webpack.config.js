@@ -28,6 +28,8 @@ module.exports = {
 
   devtool: 'sourcemap',
 
+  target: 'electron-renderer',
+
   resolve: {
     extensions: ['.js', '.ts']
   },
