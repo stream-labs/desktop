@@ -291,9 +291,6 @@ export class SourcesService extends StatefulService<ISourcesState> {
       }
     });
 
-    // some magic required by node-obs
-    nodeObs.OBS_content_updateSourceProperties(source.name);
-
     return props;
   }
 }
