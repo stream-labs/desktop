@@ -35,7 +35,7 @@ import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowService } from '../../services/window';
-import { SettingsService, ISettingsState, ISettingsSubCategory } from '../../services/settings';
+import { ISettingsServiceApi, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
@@ -54,7 +54,7 @@ import Hotkeys from '../Hotkeys.vue';
 export default class SceneTransitions extends Vue {
 
   @Inject()
-  settingsService: SettingsService;
+  settingsService: ISettingsServiceApi;
 
   windowService = WindowService.instance;
 

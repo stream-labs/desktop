@@ -4,7 +4,7 @@ import { StatefulService, mutation } from '../stateful-service';
 import { nodeObs, ObsScene, ESceneDupType } from '../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';
-import { IScene, Scene, ISceneItem } from '../scenes';
+import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
 import electron from '../../vendor/electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
@@ -23,7 +23,17 @@ interface ISceneCreateOptions {
   makeActive?: boolean;
 }
 
-export class ScenesService extends StatefulService<IScenesState> {
+
+export interface IScenesServiceApi {
+  createScene(name: string, options: ISceneCreateOptions): ISceneApi;
+  scenes: ISceneApi[];
+  activeScene: ISceneApi;
+  activeSceneId: string;
+  getSceneByName(name: string): ISceneApi;
+}
+
+
+export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
   static initialState: IScenesState = {
     activeSceneId: '',

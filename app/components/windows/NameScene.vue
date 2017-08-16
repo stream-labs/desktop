@@ -31,7 +31,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
-import { ScenesService } from '../../services/scenes';
+import { IScenesServiceApi } from '../../services/scenes';
 
 @Component({
   components: { ModalLayout },
@@ -43,7 +43,7 @@ export default class NameScene extends Vue {
   error = '';
 
   @Inject()
-  scenesService: ScenesService;
+  scenesService: IScenesServiceApi;
 
   windowService = WindowService.instance;
 

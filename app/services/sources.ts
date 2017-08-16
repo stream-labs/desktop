@@ -29,6 +29,24 @@ export interface ISource {
   channel?: number;
 }
 
+
+export interface ISourceApi extends ISource {
+  displayName: string;
+  updateSettings(settings: Dictionary<any>): void;
+}
+
+
+export interface ISourcesServiceApi {
+  createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
+  getAvailableSourcesTypes(): IListOption<TSourceType>[];
+  getPropertiesFormData(sourceId: string): TFormData;
+  setProperties(sourceId: string, properties: TFormData): void;
+  getSources(): ISourceApi[];
+  getSource(sourceId: string): ISourceApi;
+  getSourceByName(name: string): ISourceApi;
+}
+
+
 export interface ISourceCreateOptions {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
@@ -54,7 +72,7 @@ interface ISourcesState {
 }
 
 
-export class SourcesService extends StatefulService<ISourcesState> {
+export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
 
   static initialState = {
     sources: {}
@@ -296,7 +314,7 @@ export class SourcesService extends StatefulService<ISourcesState> {
 }
 
 @Mutator()
-export class Source implements ISource {
+export class Source implements ISourceApi {
   sourceId: string;
   name: string;
   type: TSourceType;
