@@ -26,6 +26,15 @@ export interface IAudioSource {
   fader: IFader;
 }
 
+
+export interface IAudioSourceApi extends IAudioSource {
+  setDeflection(deflection: number): void;
+  setMul(mul: number): void;
+  setMuted(muted: boolean): void;
+  subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
+}
+
+
 export interface IVolmeter {
   level: number;
   magnitude: number;
@@ -50,9 +59,14 @@ interface IAudioSourcesState {
   audioSources: Dictionary<IAudioSource>;
 }
 
+export interface IAudioServiceApi {
+  getDevices(): IAudioDevice[];
+  getSource(sourceId: string): IAudioSourceApi;
+}
+
 
 @InitAfter(SourcesService)
-export class AudioService extends StatefulService<IAudioSourcesState> {
+export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 
   static initialState: IAudioSourcesState = {
     audioSources: {}
@@ -184,7 +198,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 }
 
 @Mutator()
-export class AudioSource extends Source implements IAudioSource {
+export class AudioSource extends Source implements IAudioSourceApi {
   fader: IFader;
 
   @Inject()

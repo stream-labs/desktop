@@ -54,7 +54,7 @@ import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
-import { SourcesService } from '../../services/sources';
+import { ISourcesServiceApi } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
@@ -78,7 +78,7 @@ export default class SourceFilters extends Vue {
   sourceFiltersService: SourceFiltersService;
 
   @Inject()
-  sourcesService: SourcesService;
+  sourcesService: ISourcesServiceApi;
 
   windowService = WindowService.instance;
 

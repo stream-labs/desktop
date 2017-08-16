@@ -38,8 +38,13 @@ export interface ISettingsState {
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
+export interface ISettingsServiceApi {
+  getCategories(): string[];
+  getSettingsFormData(categoryName: string): ISettingsSubCategory[];
+  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
+}
 
-export class SettingsService extends StatefulService<ISettingsState> {
+export class SettingsService extends StatefulService<ISettingsState> implements ISettingsServiceApi {
 
   static initialState = {};
 
@@ -58,10 +63,10 @@ export class SettingsService extends StatefulService<ISettingsState> {
   }
 
   @Inject()
-  sourcesService: SourcesService;
+  private sourcesService: SourcesService;
 
   @Inject()
-  audioService: AudioService;
+  private audioService: AudioService;
 
 
   init() {

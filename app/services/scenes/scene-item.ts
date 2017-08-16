@@ -1,4 +1,4 @@
-import { ScenesService, Scene } from '../scenes';
+import { ScenesService, Scene, ISceneApi } from '../scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
 import { Source, SourcesService, TSourceType } from '../sources';
@@ -18,13 +18,24 @@ export interface ISceneItem {
   crop: ICrop;
 }
 
+
+export interface ISceneItemApi extends ISceneItem {
+  getScene(): ISceneApi;
+  setPosition(vec: IVec2): void;
+  setVisibility(visible: boolean): void;
+  setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
+  setCrop(crop: ICrop): ICrop;
+  setPositionAndCrop(x: number, y: number, crop: ICrop): void;
+}
+
+
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @Mutator()
-export class SceneItem implements ISceneItem {
+export class SceneItem implements ISceneItemApi {
 
   sourceId: string;
   name: string;

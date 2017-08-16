@@ -31,8 +31,8 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
-import { ScenesService } from '../../services/scenes';
-import { SourcesService } from '../../services/sources';
+import { IScenesServiceApi } from '../../services/scenes';
+import { ISourcesServiceApi } from '../../services/sources';
 import { WidgetsService, WidgetDefinitions } from '../../services/widgets';
 
 @Component({
@@ -42,10 +42,10 @@ import { WidgetsService, WidgetDefinitions } from '../../services/widgets';
 export default class NameSource extends Vue {
 
   @Inject()
-  sourcesService: SourcesService;
+  sourcesService: ISourcesServiceApi;
 
   @Inject()
-  scenesService: ScenesService;
+  scenesService: IScenesServiceApi;
 
   @Inject()
   widgetsService:WidgetsService;
