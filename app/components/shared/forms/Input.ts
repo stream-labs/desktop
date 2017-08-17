@@ -101,8 +101,8 @@ function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
   }
 
   return filters.map(filter => {
-    const match = filter.match(/^(.*) \((.*)\)$/);
-    const desc = match[1];
+    const match = filter.match(/^(.*)\((.*)\)$/);
+    const desc = _.trim(match[1]);
     let types = match[2].split(' ');
 
     types = types.map(type => {
