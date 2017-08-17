@@ -65,6 +65,12 @@ export interface IFont {
   face?: string;
   flags?: number;
   size?: string;
+  path?: string;
+}
+
+export interface IGoogleFont {
+  path?: string;
+  size?: string;
 }
 
 export interface IStringList {

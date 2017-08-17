@@ -236,6 +236,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
 
     for (const prop of propertiesToSave) {
+      // TODO: This is a temporary hack
+      if (prop.name === 'font') {
+        this.getSource(sourceId).getObsInput().update({ custom_font: prop.value.path });
+      }
+
       nodeObs.OBS_content_setProperty(
         source.name,
         prop.name,
@@ -299,10 +304,17 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       boolIsString: true,
       valueIsObject: true,
       valueGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertyCurrentValue(
+        const val = nodeObs.OBS_content_getSourcePropertyCurrentValue(
           source.name,
           propName
         );
+
+        // TODO: This is a temporary hack
+        if (propName === 'font') {
+          val.path = source.getObsInput().settings['custom_font'];
+        }
+
+        return val;
       },
       subParametersGetter: (propName) => {
         return nodeObs.OBS_content_getSourcePropertiesSubParameters(source.name, propName);

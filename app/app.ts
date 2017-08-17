@@ -16,6 +16,7 @@ import { OnboardingService } from './services/onboarding';
 import { UserService } from './services/user';
 import Utils from './services/utils.ts';
 import { ConfigPersistenceService } from './services/config-persistence';
+import { FontLibraryService } from './services/font-library';
 import electron from './vendor/electron';
 
 const { ipcRenderer, remote } = electron;
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window['obs'] = obsApiService.nodeObs;
+  window['fontlibrary'] = FontLibraryService.instance;
 
   const vm = new Vue({
     el: '#app',

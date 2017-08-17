@@ -45,6 +45,13 @@ let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
+
+function openDevTools() {
+  childWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+}
+
+
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
   // We use a special cache directory for running tests
@@ -125,12 +132,9 @@ function startApp() {
 
 
   if (isDevMode) {
-    childWindow.webContents.openDevTools();
-    mainWindow.webContents.openDevTools();
-
     const devtoolsInstaller = require('electron-devtools-installer');
-
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+    openDevTools();
   }
 
   // Initialize various OBS services
@@ -183,6 +187,10 @@ app.on('ready', () => {
   } else {
     startApp();
   }
+});
+
+ipcMain.on('openDevTools', () => {
+  openDevTools();
 });
 
 ipcMain.on('window-showChildWindow', (event, data) => {
