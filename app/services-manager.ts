@@ -24,6 +24,7 @@ import { WidgetsService } from  './services/widgets';
 import { WindowService } from  './services/window';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
+import { FontLibraryService } from './services/font-library';
 import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
@@ -80,7 +81,8 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
-    WindowService
+    WindowService,
+    FontLibraryService
   };
 
   private instances: Dictionary<Service> = {};
