@@ -63,6 +63,7 @@ plugins.push((store: Store<any>) => {
       state,
       __vuexSyncIgnore: true
     });
+    ipcRenderer.send('window-childWindowIsReadyToShow');
   });
 
   // All windows can receive this
