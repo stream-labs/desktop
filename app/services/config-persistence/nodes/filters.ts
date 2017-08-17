@@ -1,5 +1,5 @@
 import { ArrayNode } from './array-node';
-import { ObsFilter } from '../../obs-api';
+import * as obs from '../../obs-api';
 import { Source } from '../../sources';
 
 interface ISchema {
@@ -16,7 +16,7 @@ interface IContext {
 // TODO: This class should not use the OBS API directly.  Instead,
 // it should interact with the filters service.  This should be
 // changed when filters are moved over to the new OBS bindings.
-export class FiltersNode extends ArrayNode<ISchema, IContext, ObsFilter> {
+export class FiltersNode extends ArrayNode<ISchema, IContext, obs.IFilter> {
 
   schemaVersion = 1;
 
@@ -26,7 +26,7 @@ export class FiltersNode extends ArrayNode<ISchema, IContext, ObsFilter> {
   }
 
 
-  saveItem(filter: ObsFilter) {
+  saveItem(filter: obs.IFilter) {
     return {
       type: filter.id,
       name: filter.name,
@@ -36,7 +36,7 @@ export class FiltersNode extends ArrayNode<ISchema, IContext, ObsFilter> {
 
 
   loadItem(obj: ISchema, context: IContext) {
-    const filter = ObsFilter.create(obj.type, obj.name, obj.settings);
+    const filter = obs.FilterFactory.create(obj.type, obj.name, obj.settings);
     context.source.getObsInput().addFilter(filter);
   }
 

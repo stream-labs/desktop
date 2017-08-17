@@ -3,7 +3,7 @@ import { ScenesService } from './scenes';
 import { ISourceApi, SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
-import { ObsScene, ObsSceneItem } from '../obs-api';
+import * as obs from '../obs-api';
 import electron from '../../vendor/electron';
 import { Inject } from '../../util/injector';
 
@@ -53,8 +53,8 @@ export class Scene implements ISceneApi {
   }
 
 
-  getObsScene(): ObsScene {
-    return ObsScene.fromName(this.name);
+  getObsScene(): obs.IScene {
+    return obs.SceneFactory.fromName(this.name);
   }
 
 
@@ -97,7 +97,7 @@ export class Scene implements ISceneApi {
     const source = this.sourcesService.getSource(sourceId);
     const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
-    let obsSceneItem: ObsSceneItem;
+    let obsSceneItem: obs.ISceneItem;
     obsSceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);

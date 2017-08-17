@@ -2,9 +2,9 @@ import { ScenesService, Scene, ISceneApi } from '../scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
 import { Source, SourcesService, TSourceType } from '../sources';
-import { ObsSceneItem } from '../obs-api';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
+import * as obs from '../obs-api';
 
 export interface ISceneItem {
   sceneItemId: string;
@@ -104,7 +104,7 @@ export class SceneItem implements ISceneItemApi {
     return this.source.getObsInput();
   }
 
-  getObsSceneItem(): ObsSceneItem {
+  getObsSceneItem(): obs.ISceneItem {
     return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }
 

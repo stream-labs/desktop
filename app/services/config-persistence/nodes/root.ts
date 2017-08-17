@@ -2,7 +2,6 @@ import { Node } from './node';
 import { SourcesNode } from './sources';
 import { ScenesNode } from './scenes';
 import { TransitionNode } from './transition';
-import { ObsTransition, ObsGlobal } from '../../obs-api';
 
 interface ISchema {
   sources: SourcesNode;

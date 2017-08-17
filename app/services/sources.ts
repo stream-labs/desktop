@@ -6,7 +6,8 @@ import {
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, Mutator } from './stateful-service';
-import { nodeObs, ObsInput, ObsGlobal } from './obs-api';
+import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
@@ -141,10 +142,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
-    const obsInput = ObsInput.create(type, name);
+    const obsInput = obs.InputFactory.create(type, name);
 
     if (options.channel !== void 0) {
-      ObsGlobal.setOutputSource(options.channel, obsInput);
+      obs.Global.setOutputSource(options.channel, obsInput);
     }
 
     const properties = this.getPropertiesFormData(id);
@@ -362,8 +363,8 @@ export class Source implements ISourceApi {
     return this.name;
   }
 
-  getObsInput(): ObsInput {
-    return ObsInput.fromName(this.name);
+  getObsInput(): obs.IInput {
+    return obs.InputFactory.fromName(this.name);
   }
 
   updateSettings(settings: Dictionary<any>) {
