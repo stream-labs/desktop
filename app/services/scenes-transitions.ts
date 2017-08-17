@@ -1,5 +1,6 @@
 import { mutation, StatefulService } from './stateful-service';
-import { nodeObs, ObsGlobal, ObsTransition, ObsScene } from './obs-api';
+import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
@@ -49,22 +50,22 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   }
 
 
-  transitionTo(scene: ObsScene) {
+  transitionTo(scene: obs.IScene) {
     const transition = this.getCurrentTransition();
     transition.start(this.state.duration, scene);
   }
 
 
   private getCurrentTransition() {
-    return ObsGlobal.getOutputSource(0) as ObsTransition;
+    return obs.Global.getOutputSource(0) as obs.ITransition;
   }
 
 
   setType(type: string) {
-    const oldTransition = this.getCurrentTransition() as ObsTransition;
-    const newTransition = ObsTransition.create(type, 'Global Transition');
+    const oldTransition = this.getCurrentTransition() as obs.ITransition;
+    const newTransition = obs.TransitionFactory.create(type, 'Global Transition');
 
-    ObsGlobal.setOutputSource(0, newTransition);
+    obs.Global.setOutputSource(0, newTransition);
 
     if (oldTransition && oldTransition.getActiveSource) {
       newTransition.set(oldTransition.getActiveSource());

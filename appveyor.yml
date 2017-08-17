@@ -1,5 +1,8 @@
 build: off
 
+environment:
+  nodejs_version: "7.4.0"
+
 install:
   - git submodule update --init --recursive
   - git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs

@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { mutation, StatefulService, InitAfter, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
-import { ObsFader, EFaderType, ObsVolmeter, ObsInput } from './obs-api';
+import * as obs from '../../obs-api';
 import Utils from './utils';
 import electron from '../vendor/electron';
 import { Inject } from '../util/injector';
@@ -72,8 +72,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     audioSources: {}
   };
 
-  obsFaders: Dictionary<ObsFader> = {};
-  obsVolmeters: Dictionary<ObsVolmeter> = {};
+  obsFaders: Dictionary<obs.IFader> = {};
+  obsVolmeters: Dictionary<obs.IVolmeter> = {};
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
@@ -139,8 +139,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   getDevices(): IAudioDevice[] {
     const devices: IAudioDevice[] = [];
-    const obsAudioInput = ObsInput.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
-    const obsAudioOutput = ObsInput.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
+    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
+    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
 
     (obsAudioInput.properties.get('device_id').details as any).items
       .forEach((item: { name: string, value: string}) => {
@@ -167,11 +167,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
 
   private createAudioSource(source: Source) {
-    const obsVolmeter = ObsVolmeter.create(EFaderType.IEC);
+    const obsVolmeter = obs.VolmeterFactory.create(obs.EFaderType.IEC);
     obsVolmeter.attach(source.getObsInput());
     this.obsVolmeters[source.sourceId] = obsVolmeter;
 
-    const obsFader = ObsFader.create(EFaderType.IEC);
+    const obsFader = obs.FaderFactory.create(obs.EFaderType.IEC);
     obsFader.attach(source.getObsInput());
     this.obsFaders[source.sourceId] = obsFader;
 
