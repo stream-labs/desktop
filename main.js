@@ -37,6 +37,7 @@ function log(...args) {
 // Windows
 let mainWindow;
 let childWindow;
+let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -117,6 +118,10 @@ function startApp() {
 
   ipcMain.on('services-ready', () => {
     childWindow.loadURL(indexUrl + '?child=true');
+  });
+
+  ipcMain.on('window-childWindowIsReadyToShow', () => {
+    childWindowIsReadyToShow = true;
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -223,8 +228,19 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     childWindow.focus();
   }
 
-  // The child window will show itself when rendered
-  childWindow.send('window-setContents', data.startupOptions);
+
+  // show the child window when it will be ready
+  new Promise(resolve => {
+    if (childWindowIsReadyToShow) {
+      resolve();
+      return;
+    }
+    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
+  }).then(() => {
+    // The child window will show itself when rendered
+    childWindow.send('window-setContents', data.startupOptions);
+  });
+
 });
 
 // The main process acts as a hub for various windows
