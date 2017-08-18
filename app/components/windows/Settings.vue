@@ -71,7 +71,9 @@ export default class SceneTransitions extends Vue {
   };
 
   get categoryNames() {
-    return this.settingsService.getCategories();
+    return this.settingsService.getCategories().filter(name => {
+      return name !== 'Hotkeys';
+    });
   }
 
   save(settingsData: ISettingsSubCategory[]) {
