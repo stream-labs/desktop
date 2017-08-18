@@ -219,6 +219,7 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
         source = this.sourcesService.createSource(
           deviceForm.name,
           isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
+          {},
           { channel }
         );
       }
