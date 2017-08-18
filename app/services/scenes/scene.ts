@@ -1,10 +1,11 @@
 import { Mutator, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { SourcesService, TSourceType } from '../sources';
-import { ISceneItem, SceneItem } from './scene-item';
+import { ISourceApi, SourcesService, TSourceType } from '../sources';
+import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
-import { ObsScene, ObsSceneItem } from '../obs-api';
+import * as obs from '../obs-api';
 import electron from '../../vendor/electron';
+import { Inject } from '../../util/injector';
 
 const { ipcRenderer } = electron;
 
@@ -16,21 +17,34 @@ export interface IScene {
   items: ISceneItem[];
 }
 
-// TODO: delete these options after we will handle the config loading on the frontend side
+
 export interface ISceneItemAddOptions {
   sceneItemId?: string; // A new ID will be assigned if one is not provided
 }
 
 
+export interface ISceneApi extends IScene {
+  getItem(sceneItemId: string): ISceneItemApi;
+  getItems(): ISceneItemApi[];
+  addSource(sourceId: string, options: ISceneItemAddOptions): ISceneItemApi;
+  createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
+  makeItemActive(sceneItemId: string): void;
+}
+
+
 @Mutator()
-export class Scene implements IScene {
+export class Scene implements ISceneApi {
   id: string;
   name: string;
   activeItemId: string;
   items: ISceneItem[];
 
-  private scenesService: ScenesService = ScenesService.instance;
-  private sourcesService: SourcesService = SourcesService.instance;
+  @Inject()
+  private scenesService: ScenesService;
+
+  @Inject()
+  private sourcesService: SourcesService;
+
   private sceneState: IScene;
 
   constructor(sceneId: string) {
@@ -39,8 +53,8 @@ export class Scene implements IScene {
   }
 
 
-  getObsScene(): ObsScene {
-    return ObsScene.fromName(this.name);
+  getObsScene(): obs.IScene {
+    return obs.SceneFactory.fromName(this.name);
   }
 
 
@@ -73,8 +87,8 @@ export class Scene implements IScene {
   }
 
 
-  createAndAddSource(sourceName: string, type: TSourceType): SceneItem {
-    const source = this.sourcesService.createSource(sourceName, type);
+  createAndAddSource(sourceName: string, type: TSourceType, settings?: Dictionary<any>): SceneItem {
+    const source = this.sourcesService.createSource(sourceName, type, settings);
     return this.addSource(source.sourceId);
   }
 
@@ -83,7 +97,7 @@ export class Scene implements IScene {
     const source = this.sourcesService.getSource(sourceId);
     const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
-    let obsSceneItem: ObsSceneItem;
+    let obsSceneItem: obs.ISceneItem;
     obsSceneItem = this.getObsScene().add(source.getObsInput());
 
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);

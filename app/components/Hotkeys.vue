@@ -17,7 +17,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { HotkeySet, HotkeysService } from '../services/hotkeys';
 import { ScenesService } from '../services/scenes';
 import { SourcesService } from '../services/sources';

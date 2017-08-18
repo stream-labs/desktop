@@ -22,7 +22,7 @@ const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 
 // Initialize the keylistener
-require('node-libuiohook').startHook();
+// require('node-libuiohook').startHook();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -37,6 +37,7 @@ function log(...args) {
 // Windows
 let mainWindow;
 let childWindow;
+let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -44,6 +45,13 @@ let childWindow;
 let appExiting = false;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
+
+
+function openDevTools() {
+  childWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+}
+
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
@@ -78,7 +86,7 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
-    require('node-libuiohook').stopHook();
+    // require('node-libuiohook').stopHook();
     obs.OBS_API_destroyOBS_API();
     app.quit();
   });
@@ -112,6 +120,10 @@ function startApp() {
     childWindow.loadURL(indexUrl + '?child=true');
   });
 
+  ipcMain.on('window-childWindowIsReadyToShow', () => {
+    childWindowIsReadyToShow = true;
+  });
+
   ipcMain.on('services-request', (event, payload) => {
     const request = { id: uuid(), payload };
     mainWindow.webContents.send('services-request', request);
@@ -125,12 +137,9 @@ function startApp() {
 
 
   if (isDevMode) {
-    childWindow.webContents.openDevTools();
-    mainWindow.webContents.openDevTools();
-
     const devtoolsInstaller = require('electron-devtools-installer');
-
     devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+    openDevTools();
   }
 
   // Initialize various OBS services
@@ -185,6 +194,10 @@ app.on('ready', () => {
   }
 });
 
+ipcMain.on('openDevTools', () => {
+  openDevTools();
+});
+
 ipcMain.on('window-showChildWindow', (event, data) => {
   if (data.windowOptions.width && data.windowOptions.height) {
     // Center the child window on the main window
@@ -215,8 +228,19 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     childWindow.focus();
   }
 
-  // The child window will show itself when rendered
-  childWindow.send('window-setContents', data.startupOptions);
+
+  // show the child window when it will be ready
+  new Promise(resolve => {
+    if (childWindowIsReadyToShow) {
+      resolve();
+      return;
+    }
+    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
+  }).then(() => {
+    // The child window will show itself when rendered
+    childWindow.send('window-setContents', data.startupOptions);
+  });
+
 });
 
 // The main process acts as a hub for various windows

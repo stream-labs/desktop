@@ -23,7 +23,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import StreamingService from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';

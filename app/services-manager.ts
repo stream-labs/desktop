@@ -2,6 +2,7 @@ import electron from './vendor/electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ConfigPersistenceService } from './services/config-persistence';
+import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
 import { ScenesService, SceneItem, Scene } from './services/scenes';
@@ -24,10 +25,12 @@ import { WidgetsService } from  './services/widgets';
 import { WindowService } from  './services/window';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
+import { FontLibraryService } from './services/font-library';
 import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
+import traverse from 'traverse';
 
 const { ipcRenderer } = electron;
 
@@ -79,7 +82,10 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
-    WindowService
+    WindowService,
+    FontLibraryService,
+    ObsImporterService,
+    ConfigPersistenceService
   };
 
   private instances: Dictionary<Service> = {};
@@ -103,6 +109,11 @@ export class ServicesManager extends Service {
       });
     }
 
+  }
+
+
+  getService(serviceName: string) {
+    return this.services[serviceName];
   }
 
 
@@ -235,6 +246,8 @@ export class ServicesManager extends Service {
     return new Proxy(service, {
       get: (target, property, receiver) => {
 
+        if (!target[property]) return target[property];
+
         if (target[property].isMutator) {
           return this.applyIpcProxy(target[property]);
         }
@@ -264,8 +277,18 @@ export class ServicesManager extends Service {
             const mutator = this.getMutator(payload.mutatorName, payload.constructorArgs);
             return this.applyIpcProxy(mutator);
           } else {
+            // payload can contain mutators-objects
+            // we have to wrap them in IpcProxy too
+            traverse(payload).forEach((item: any) => {
+              if (item && item.isMutator) {
+                const mutator = this.getMutator(item.mutatorName, item.constructorArgs);
+                return this.applyIpcProxy(mutator);
+              }
+            });
             return payload;
           }
+
+
 
         };
       }

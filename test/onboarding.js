@@ -28,6 +28,11 @@ test('Adding some starter widgets', async t => {
     platform
   });
 
+  // This will only show up if OBS is installed
+  if (await t.context.app.client.isExisting('button=Start Fresh')) {
+    await t.context.app.client.click('button=Start Fresh');
+  }
+
   // Select and deselect some widgets
 
   await app.client.click('div=Event List');

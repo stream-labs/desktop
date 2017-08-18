@@ -7,7 +7,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ObsApiService } from '../../services/obs-api';
 import electron from '../../vendor/electron';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 
 const { webFrame, screen } = electron;
 

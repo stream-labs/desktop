@@ -1,7 +1,7 @@
 import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
-import { Inject } from './service';
+import { Inject } from '../util/injector';
 import electron from '../vendor/electron';
 
 type TOnboardingStep =
@@ -9,9 +9,11 @@ type TOnboardingStep =
   'SelectWidgets' |
   'OptimizeA' |
   'OptimizeB' |
-  'OptimizeC';
+  'OptimizeC' |
+  'ObsImport';
 
 interface IOnboardingServiceState {
+  isLogin: boolean;
   currentStep: TOnboardingStep;
   completedSteps: TOnboardingStep[];
 }
@@ -30,11 +32,20 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
+    next: 'ObsImport'
+  },
+
+  ObsImport: {
+    isEligible: service => {
+      if (service.state.isLogin) return false;
+      return true;
+    },
     next: 'SelectWidgets'
   },
 
   SelectWidgets: {
     isEligible: service => {
+      if (service.state.isLogin) return false;
       return service.userService.isLoggedIn();
     },
     next: 'OptimizeA'
@@ -42,6 +53,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeA: {
     isEligible: service => {
+      if (service.state.isLogin) return false;
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB'
@@ -57,6 +69,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 export class OnboardingService extends StatefulService<IOnboardingServiceState> {
 
   static initialState: IOnboardingServiceState = {
+    isLogin: false,
     currentStep: null,
     completedSteps: []
   };
@@ -72,18 +85,13 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   userService: UserService;
 
 
-  init() {
-    this.startOnboardingIfRequired();
-  }
-
-
   mounted() {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.
     electron.ipcRenderer.on('testing-fakeAuth', () => {
       this.COMPLETE_STEP('Connect');
-      this.SET_CURRENT_STEP('SelectWidgets');
+      this.SET_CURRENT_STEP('ObsImport');
     });
   }
 
@@ -91,6 +99,18 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   @mutation()
   SET_CURRENT_STEP(step: TOnboardingStep) {
     this.state.currentStep = step;
+  }
+
+
+  @mutation()
+  RESET_COMPLETED_STEPS() {
+    this.state.completedSteps = [];
+  }
+
+
+  @mutation()
+  SET_LOGIN(login: boolean) {
+    this.state.isLogin = login;
   }
 
 
@@ -119,7 +139,11 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
-  start() {
+  // A login attempt is an abbreviated version of the onboarding process,
+  // and some steps should be skipped.
+  start(isLogin = false) {
+    this.RESET_COMPLETED_STEPS();
+    this.SET_LOGIN(isLogin);
     this.SET_CURRENT_STEP('Connect');
     this.navigationService.navigate('Onboarding');
   }
@@ -153,11 +177,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
-  private startOnboardingIfRequired() {
-    if (localStorage.getItem(this.localStorageKey)) return;
+  startOnboardingIfRequired() {
+    if (localStorage.getItem(this.localStorageKey)) return false;
 
     localStorage.setItem(this.localStorageKey, 'true');
     this.start();
+    return true;
   }
 
 }

@@ -1,7 +1,8 @@
-import { Service, Inject } from '../service';
-import { IPlatformService, IPlatformAuth } from '.';
+import { Service } from '../service';
+import { IPlatformService, IPlatformAuth, IStreamInfo } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
+import { Inject } from '../../util/injector';
 
 export class TwitchService extends Service implements IPlatformService {
 
@@ -21,7 +22,8 @@ export class TwitchService extends Service implements IPlatformService {
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&scope=channel_read`;
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&scope=channel_read,
+      channel_editor`;
     return `https://${host}/login?${query}`;
   }
 
@@ -62,7 +64,7 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
-  fetchLiveStreamInfo(twitchId: string) {
+  fetchLiveStreamInfo(twitchId: string): Promise<IStreamInfo> {
     const headers = new Headers();
 
     headers.append('Client-Id', this.clientId);
@@ -72,6 +74,38 @@ export class TwitchService extends Service implements IPlatformService {
 
     return fetch(request).then(response => {
       return response.json();
+    }).then(json => {
+      return {
+        status: json.stream.channel.status,
+        viewers: json.stream.viewers
+      };
+    }).catch(() => {
+      return { status: '', viewers: 0 };
+    });
+  }
+
+  putLiveStreamTitle(streamTitle: string, twitchId:string, oauthToken: string) {
+    const headers = new Headers();
+
+    headers.append('Client-Id', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+    headers.append('Authorization', `OAuth ${oauthToken}`);
+    headers.append('Content-Type', 'application/json');
+
+    const data = { channel: { status : streamTitle } };
+
+    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request).then(response => {
+      return response.json();
+    }).then(json => {
+      return true;
+    }).catch(() => {
+      return false;
     });
   }
 

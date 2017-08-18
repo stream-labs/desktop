@@ -14,11 +14,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { TFormData } from '../shared/forms/Input';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
-import { SourcesService } from '../../services/sources';
+import { ISourcesServiceApi } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import SourcePreview from '../shared/SourcePreview.vue';
@@ -31,7 +31,7 @@ import GenericForm from '../shared/forms/GenericForm.vue';
 export default class SourceProperties extends Vue {
 
   @Inject()
-  sourcesService: SourcesService;
+  sourcesService: ISourcesServiceApi;
 
   windowService = WindowService.instance;
   sourceId = this.windowService.getOptions().sourceId;
@@ -60,12 +60,12 @@ export default class SourceProperties extends Vue {
 
 
   get windowTitle() {
-    const source = this.sourcesService.getSourceById(this.sourceId);
+    const source = this.sourcesService.getSource(this.sourceId);
     return source ? `Properties for '${source.displayName}'` : '';
   }
 
   get sourceName() {
-    return this.sourcesService.getSourceById(this.sourceId).name;
+    return this.sourcesService.getSource(this.sourceId).name;
   }
 
 }

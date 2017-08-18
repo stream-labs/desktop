@@ -27,7 +27,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from '../../../services/user';
 import { TPlatform } from '../../../services/platforms';
-import { Inject } from '../../../services/service';
+import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 
 @Component({})

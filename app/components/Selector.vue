@@ -16,7 +16,7 @@
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
-        <i class="fa fa-bars fa-rotate-90 selector-drag-handle"/>
+        <i class="icon-btn fa fa-bars fa-rotate-90 selector-drag-handle"/>
       </div>
     </li>
   </draggable>
@@ -103,12 +103,12 @@ export default class Selector extends Vue {
 @import "../styles/index";
 
 .sortable-ghost {
-  opacity: .6;
+  opacity: .7;
   background-image: none;
 }
 
 .sortable-chosen {
-  opacity: .6;
+  opacity: .7;
   background-image: none;
 }
 
@@ -170,13 +170,8 @@ export default class Selector extends Vue {
 .selector-actions {
   display: flex;
   flex-direction: row;
-  font-size: 12px;
+  font-size: 13px;
   opacity: 0;
-  .transition;
-
-  >i {
-    margin-left: 10px;
-  }
 }
 
 .selector-drag-handle {

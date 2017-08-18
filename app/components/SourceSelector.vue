@@ -6,13 +6,13 @@
     </h4>
     <div>
       <i
-        class="fa fa-plus ico-btn"
+        class="fa fa-plus icon-btn icon-btn--lg"
         @click="addSource"/>
       <i
-        class="fa fa-minus ico-btn"
+        class="fa fa-minus icon-btn icon-btn--lg"
         @click="removeItem"/>
       <i
-        class="fa fa-cog ico-btn"
+        class="fa fa-cog icon-btn"
         @click="sourceProperties"/>
     </div>
   </div>
@@ -26,7 +26,7 @@
     @sort="handleSort">
     <template slot="actions" scope="props">
       <i
-        class="fa fa-eye source-selector-visibility"
+        class="fa fa-eye icon-btn source-selector-visibility"
         :class="visibilityClassesForSource(props.item.value)"
         @click.stop="toggleVisibility(props.item.value)"
         @dblclick.stop="() => {}" />
@@ -38,7 +38,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
 import { WindowService } from '../services/window';
 import { ScenesService, SceneItem } from '../services/scenes';
@@ -136,7 +136,6 @@ export default class SourceSelector extends Vue {
 @import "../styles/index";
 
 .source-selector-visibility {
-  font-size: 17px;
-  .icon-hover;
+  font-size: 16px;
 }
 </style>

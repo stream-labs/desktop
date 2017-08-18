@@ -1,8 +1,10 @@
-import { ScenesService, Scene } from '../scenes';
+import { ScenesService, Scene, ISceneApi } from '../scenes';
 import { mutation, Mutator } from '../stateful-service';
 import Utils from '../utils';
-import { Source } from '../sources';
-import { ObsSceneItem } from '../obs-api';
+import { Source, SourcesService, TSourceType } from '../sources';
+import { Inject } from '../../util/injector';
+import { TFormData } from '../../components/shared/forms/Input';
+import * as obs from '../obs-api';
 
 export interface ISceneItem {
   sceneItemId: string;
@@ -16,13 +18,36 @@ export interface ISceneItem {
   crop: ICrop;
 }
 
+
+export interface ISceneItemApi extends ISceneItem {
+  getScene(): ISceneApi;
+  setPosition(vec: IVec2): void;
+  setVisibility(visible: boolean): void;
+  setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
+  setCrop(crop: ICrop): ICrop;
+  setPositionAndCrop(x: number, y: number, crop: ICrop): void;
+}
+
+
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @Mutator()
-export class SceneItem extends Source implements ISceneItem {
+export class SceneItem implements ISceneItemApi {
+
+  sourceId: string;
+  name: string;
+  type: TSourceType;
+  audio: boolean;
+  video: boolean;
+  muted: boolean;
+  width: number;
+  height: number;
+  properties: TFormData;
+  channel?: number;
+
   sceneItemId: string;
   obsSceneItemId: number;
   x: number;
@@ -48,16 +73,25 @@ export class SceneItem extends Source implements ISceneItem {
   }
 
   sceneItemState: ISceneItem;
-  private scenesService: ScenesService = ScenesService.instance;
 
+  @Inject()
+  private scenesService: ScenesService;
+
+  @Inject()
+  private sourcesService: SourcesService;
+
+
+  source: Source = null;
 
   constructor(private sceneId: string, sceneItemId: string, sourceId: string) {
-    super(sourceId);
+
     const sceneSourceState = this.scenesService.state.scenes[sceneId].items.find(source => {
       return source.sceneItemId === sceneItemId;
     });
+    this.source = this.sourcesService.getSource(sourceId);
     this.sceneItemState = sceneSourceState;
     this.sceneId = sceneId;
+    Utils.applyProxy(this, this.source.sourceState);
     Utils.applyProxy(this, this.sceneItemState);
   }
 
@@ -66,8 +100,11 @@ export class SceneItem extends Source implements ISceneItem {
     return this.scenesService.getScene(this.sceneId);
   }
 
+  getObsInput() {
+    return this.source.getObsInput();
+  }
 
-  getObsSceneItem(): ObsSceneItem {
+  getObsSceneItem(): obs.ISceneItem {
     return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }
 

@@ -5,23 +5,18 @@ import {
   inputValuesToObsValues,
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
-import { StatefulService, mutation, Inject, Mutator } from './stateful-service';
-import { nodeObs, ObsInput, ObsGlobal } from './obs-api';
+import { StatefulService, mutation, Mutator } from './stateful-service';
+import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
+import { Inject } from '../util/injector';
+import namingHelpers from '../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
-
-export enum E_AUDIO_CHANNELS {
-  OUTPUT_1 = 1,
-  OUTPUT_2 = 2,
-  INPUT_1 = 3,
-  INPUT_2 = 4,
-  INPUT_3 = 5,
-}
 
 export interface ISource {
   sourceId: string;
@@ -35,6 +30,26 @@ export interface ISource {
   properties: TFormData;
   channel?: number;
 }
+
+
+export interface ISourceApi extends ISource {
+  displayName: string;
+  updateSettings(settings: Dictionary<any>): void;
+  getSettings(): Dictionary<any>;
+}
+
+
+export interface ISourcesServiceApi {
+  createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
+  getAvailableSourcesTypes(): IListOption<TSourceType>[];
+  getPropertiesFormData(sourceId: string): TFormData;
+  setProperties(sourceId: string, properties: TFormData): void;
+  getSources(): ISourceApi[];
+  getSource(sourceId: string): ISourceApi;
+  getSourceByName(name: string): ISourceApi;
+  suggestName(name: string): string;
+}
+
 
 export interface ISourceCreateOptions {
   channel?: number;
@@ -61,7 +76,7 @@ interface ISourcesState {
 }
 
 
-export class SourcesService extends StatefulService<ISourcesState> {
+export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
 
   static initialState = {
     sources: {}
@@ -72,7 +87,8 @@ export class SourcesService extends StatefulService<ISourcesState> {
   sourceRemoved = new Subject<ISource>();
 
 
-  private scenesService: ScenesService = ScenesService.instance;
+  @Inject()
+  private scenesService: ScenesService;
 
 
   protected init() {
@@ -125,15 +141,18 @@ export class SourcesService extends StatefulService<ISourcesState> {
   createSource(
     name: string,
     type: TSourceType,
+    settings: Dictionary<any> = {},
     options: ISourceCreateOptions = {}
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
-    const obsInput = ObsInput.create(type, name);
+    const obsInput = obs.InputFactory.create(type, name);
 
     if (options.channel !== void 0) {
-      ObsGlobal.setOutputSource(options.channel, obsInput);
+      obs.Global.setOutputSource(options.channel, obsInput);
     }
+
+    obsInput.update(settings);
 
     const properties = this.getPropertiesFormData(id);
 
@@ -146,19 +165,23 @@ export class SourcesService extends StatefulService<ISourcesState> {
     return this.getSource(id);
   }
 
+  removeSource(id: string) {
+    const source = this.getSource(id);
+    source.getObsInput().release();
+    this.REMOVE_SOURCE(id);
+    this.sourceRemoved.next(source.sourceState);
+  }
+
+
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name) => this.getSourceByName(name));
+  }
+
 
   private onSceneSourceRemovedHandler(sceneSourceState: ISceneItem) {
     // remove source if it has been removed from the all scenes
     if (this.scenesService.getSourceScenes(sceneSourceState.sourceId).length > 0) return;
     this.removeSource(sceneSourceState.sourceId);
-  }
-
-
-  private removeSource(id: string) {
-    const source = this.getSource(id);
-    source.getObsInput().release();
-    this.REMOVE_SOURCE(id);
-    this.sourceRemoved.next(source.sourceState);
   }
 
 
@@ -225,6 +248,11 @@ export class SourcesService extends StatefulService<ISourcesState> {
     });
 
     for (const prop of propertiesToSave) {
+      // TODO: This is a temporary hack
+      if (prop.name === 'font') {
+        this.getSource(sourceId).getObsInput().update({ custom_font: prop.value.path });
+      }
+
       nodeObs.OBS_content_setProperty(
         source.name,
         prop.name,
@@ -288,25 +316,29 @@ export class SourcesService extends StatefulService<ISourcesState> {
       boolIsString: true,
       valueIsObject: true,
       valueGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertyCurrentValue(
+        const val = nodeObs.OBS_content_getSourcePropertyCurrentValue(
           source.name,
           propName
         );
+
+        // TODO: This is a temporary hack
+        if (propName === 'font') {
+          val.path = source.getObsInput().settings['custom_font'];
+        }
+
+        return val;
       },
       subParametersGetter: (propName) => {
         return nodeObs.OBS_content_getSourcePropertiesSubParameters(source.name, propName);
       }
     });
 
-    // some magic required by node-obs
-    nodeObs.OBS_content_updateSourceProperties(source.name);
-
     return props;
   }
 }
 
 @Mutator()
-export class Source implements ISource {
+export class Source implements ISourceApi {
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -326,12 +358,46 @@ export class Source implements ISource {
   get displayName() {
     if (this.name === 'AuxAudioDevice1') return 'Mic/Aux';
     if (this.name === 'DesktopAudioDevice1') return 'Desktop Audio';
+    const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(this.name);
+    const auxDeviceMatch = /^AuxAudioDevice(\d)$/.exec(this.name);
+
+    if (desktopDeviceMatch) {
+      const index = parseInt(desktopDeviceMatch[1], 10);
+      return 'Desktop Audio' + (index > 1 ? ' ' + index : '');
+    }
+
+    if (auxDeviceMatch) {
+      const index = parseInt(auxDeviceMatch[1], 10);
+      return 'Mic/Aux' + (index > 1 ? ' ' + index : '');
+    }
+
     return this.name;
   }
 
-  getObsInput(): ObsInput {
-    return ObsInput.fromName(this.name);
+
+  getObsInput(): obs.IInput {
+    return obs.InputFactory.fromName(this.name);
   }
+
+
+  updateSettings(settings: Dictionary<any>) {
+    this.getObsInput().update(settings);
+  }
+
+
+  getSettings(): Dictionary<any> {
+    return this.getObsInput().settings;
+  }
+
+
+  duplicate(): Source {
+    return this.sourcesService.createSource(
+      this.sourcesService.suggestName(this.name),
+      this.type,
+      this.getSettings()
+    );
+  }
+
 
   @Inject()
   protected sourcesService: SourcesService;

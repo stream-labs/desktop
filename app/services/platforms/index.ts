@@ -1,6 +1,13 @@
 import { TwitchService } from './twitch';
 import { YoutubeService } from './youtube';
 
+
+export interface IStreamInfo {
+  status: string;
+  viewers: number;
+}
+
+
 // All platform services should implement
 // this interface.
 export interface IPlatformService {
@@ -13,8 +20,9 @@ export interface IPlatformService {
   // settings for this platform, given an auth.
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
-  fetchLiveStreamInfo: (platformId: string) => any;
+  fetchLiveStreamInfo: (platformId: string) => Promise<IStreamInfo>;
 
+  putLiveStreamTitle: (streamTitle: string, platformId: string, oauthToken: string) => Promise<boolean>;
 }
 
 export interface IPlatformAuth {

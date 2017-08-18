@@ -1,11 +1,24 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, InitAfter, Inject, Mutator } from './stateful-service';
+import { mutation, StatefulService, InitAfter, Mutator } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
-import { ObsFader, EFaderType, ObsVolmeter } from './obs-api';
+import * as obs from '../../obs-api';
 import Utils from './utils';
+import electron from '../vendor/electron';
+import { Inject } from '../util/injector';
+
+const { ipcRenderer } = electron;
+
+export enum E_AUDIO_CHANNELS {
+  OUTPUT_1 = 1,
+  OUTPUT_2 = 2,
+  INPUT_1 = 3,
+  INPUT_2 = 4,
+  INPUT_3 = 5,
+}
+
 const VOLMETER_UPDATE_INTERVAL = 40;
 
 export interface IAudioSource {
@@ -13,12 +26,28 @@ export interface IAudioSource {
   fader: IFader;
 }
 
+
+export interface IAudioSourceApi extends IAudioSource {
+  setDeflection(deflection: number): void;
+  setMul(mul: number): void;
+  setMuted(muted: boolean): void;
+  subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
+}
+
+
 export interface IVolmeter {
   level: number;
   magnitude: number;
   peak: number;
   muted: boolean;
 }
+
+export interface IAudioDevice {
+  id: string;
+  description: string;
+  type: 'input' | 'output';
+}
+
 
 interface IFader {
   db: number;
@@ -30,16 +59,21 @@ interface IAudioSourcesState {
   audioSources: Dictionary<IAudioSource>;
 }
 
+export interface IAudioServiceApi {
+  getDevices(): IAudioDevice[];
+  getSource(sourceId: string): IAudioSourceApi;
+}
+
 
 @InitAfter(SourcesService)
-export class AudioService extends StatefulService<IAudioSourcesState> {
+export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 
   static initialState: IAudioSourcesState = {
     audioSources: {}
   };
 
-  obsFaders: Dictionary<ObsFader> = {};
-  obsVolmeters: Dictionary<ObsVolmeter> = {};
+  obsFaders: Dictionary<obs.IFader> = {};
+  obsVolmeters: Dictionary<obs.IVolmeter> = {};
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
@@ -77,7 +111,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 
   getSourcesForCurrentScene(): AudioSource[] {
     const scene = this.scenesService.activeScene;
-    const sceneSources = scene.getItems().filter(source => source.audio);
+    const sceneSources = scene.getItems().filter(sceneItem => sceneItem.audio).map(sceneItem => sceneItem.source);
     const globalSources = this.sourcesService.getSources().filter(source => source.channel !== void 0);
     return globalSources
       .concat(sceneSources)
@@ -103,12 +137,41 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
   }
 
 
+  getDevices(): IAudioDevice[] {
+    const devices: IAudioDevice[] = [];
+    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
+    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
+
+    (obsAudioInput.properties.get('device_id').details as any).items
+      .forEach((item: { name: string, value: string}) => {
+        devices.push({
+          id: item.value,
+          description: item.name,
+          type: 'input'
+        });
+      });
+
+    (obsAudioOutput.properties.get('device_id').details as any).items
+      .forEach((item: { name: string, value: string}) => {
+        devices.push({
+          id: item.value,
+          description: item.name,
+          type: 'output'
+        });
+      });
+
+    obsAudioInput.release();
+    obsAudioOutput.release();
+    return devices;
+  }
+
+
   private createAudioSource(source: Source) {
-    const obsVolmeter = ObsVolmeter.create(EFaderType.IEC);
+    const obsVolmeter = obs.VolmeterFactory.create(obs.EFaderType.IEC);
     obsVolmeter.attach(source.getObsInput());
     this.obsVolmeters[source.sourceId] = obsVolmeter;
 
-    const obsFader = ObsFader.create(EFaderType.IEC);
+    const obsFader = obs.FaderFactory.create(obs.EFaderType.IEC);
     obsFader.attach(source.getObsInput());
     this.obsFaders[source.sourceId] = obsFader;
 
@@ -135,7 +198,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> {
 }
 
 @Mutator()
-export class AudioSource extends Source implements IAudioSource {
+export class AudioSource extends Source implements IAudioSourceApi {
   fader: IFader;
 
   @Inject()

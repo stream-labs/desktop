@@ -1,15 +1,13 @@
 <template>
 <div class="performance-metrics flex flex--center">
   <span class="performance-metric-wrapper">
-    <span
-      class="performance-metric">
-      CPU: {{ cpuPercent }}
+    <span class="performance-metric">
+      CPU: {{ cpuPercent }}%
     </span>
   </span>
 
   <span class="performance-metric-wrapper">
-    <span
-      class="performance-metric">
+    <span class="performance-metric">
       {{ frameRate }} FPS
     </span>
   </span>
@@ -21,8 +19,7 @@
   </span>
 
   <span class="performance-metric-wrapper">
-    <span
-      class="performance-metric">
+    <span class="performance-metric">
       {{ bandwidth }} kb/s
     </span>
   </span>
@@ -42,7 +39,7 @@
 import Vue from 'vue';
 import StreamingService from '../services/streaming';
 import { PerformanceService } from '../services/performance';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { Component } from 'vue-property-decorator';
 import { compact } from 'lodash';
 
@@ -108,7 +105,7 @@ export default class PerformanceMetrics extends Vue {
 }
 
 .performance-metric {
-  padding-left: 10px;
+  padding-left: 12px;
 
   &:before {
     content: '|';

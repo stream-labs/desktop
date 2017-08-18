@@ -29,6 +29,9 @@
   </div>
 
   <div class="top-nav-right">
+    <div class="top-nav-item" v-if="isDevMode">
+      <a @click="openDevTools">Dev Tools</a>
+    </div>
     <div class="top-nav-item">
       <a @click="bugReport">Bug Report</a>
     </div>
@@ -55,7 +58,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";
@@ -103,6 +106,14 @@ export default class TopNav extends Vue {
 
   bugReport() {
     electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
+  }
+
+  get isDevMode() {
+    return electron.remote.process.env.NODE_ENV !== 'production';
+  }
+
+  openDevTools() {
+    electron.ipcRenderer.send('openDevTools');
   }
 
   get page() {

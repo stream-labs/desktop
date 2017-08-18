@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import { without } from 'lodash';
-import { StatefulService, mutation, Inject } from '../stateful-service';
-import { nodeObs, ObsScene, ESceneDupType } from '../obs-api';
+import { StatefulService, mutation } from '../stateful-service';
+import { nodeObs } from '../obs-api';
+import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';
-import { IScene, Scene, ISceneItem } from '../scenes';
+import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
 import electron from '../../vendor/electron';
 import { Subject } from 'rxjs/Subject';
+import { Inject } from '../../util/injector';
 
 const { ipcRenderer } = electron;
 
@@ -22,7 +24,17 @@ interface ISceneCreateOptions {
   makeActive?: boolean;
 }
 
-export class ScenesService extends StatefulService<IScenesState> {
+
+export interface IScenesServiceApi {
+  createScene(name: string, options: ISceneCreateOptions): ISceneApi;
+  scenes: ISceneApi[];
+  activeScene: ISceneApi;
+  activeSceneId: string;
+  getSceneByName(name: string): ISceneApi;
+}
+
+
+export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
   static initialState: IScenesState = {
     activeSceneId: '',
@@ -36,7 +48,8 @@ export class ScenesService extends StatefulService<IScenesState> {
   @Inject()
   private sourcesService: SourcesService;
 
-  @Inject()
+
+  @Inject('ScenesTransitionsService')
   private transitionsService: ScenesTransitionsService;
 
 
@@ -81,7 +94,7 @@ export class ScenesService extends StatefulService<IScenesState> {
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
     this.ADD_SCENE(id, name);
-    ObsScene.create(name);
+    obs.SceneFactory.create(name);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);

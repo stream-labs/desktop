@@ -51,18 +51,28 @@
 .normal {
   font-weight: 400;
 }
+
 .semibold {
   font-weight: 500;
   src: local('Roboto Medium');
 }
+
 .bold {
   font-weight: 700;
+}
+
+.teal {
+  color: @teal;
+}
+
+.warning {
+  color: @red;
 }
 
 // Hovers
 .icon-hover {
   color: @grey;
-  opacity: .6;
+  opacity: .7;
   transition: all 275ms;
 
   &:hover {
@@ -96,4 +106,10 @@
 
 .bold {
   font-weight: 700;
+}
+
+.night-theme {
+  .teal {
+    color: @teal-bright;
+  }
 }

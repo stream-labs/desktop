@@ -20,7 +20,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
@@ -38,8 +38,9 @@ export default class AddSourceFilter extends Vue {
 
   windowService = WindowService.instance;
 
-  @Inject()
+  @Inject('SourceFiltersService')
   filtersService: SourceFiltersService;
+
   sourceName: string = this.windowService.getOptions().sourceName;
   form = this.filtersService.getAddNewFormData(this.sourceName);
   error = '';

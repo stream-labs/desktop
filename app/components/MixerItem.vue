@@ -24,21 +24,21 @@
       tooltip="false"
     />
     <div class="controls">
-      <i class="ico-btn fa fa-volume-up"
+      <i class="icon-btn fa fa-volume-up"
          title="click to switch off"
          v-if="!audioSource.muted"
          @click="setMuted(true)"
       >
       </i>
       <i
-        class="ico-btn fa fa-volume-off"
+        class="icon-btn fa fa-volume-off"
         title="click to switch on"
         v-if="audioSource.muted"
         @click="setMuted(false)"
       >
       </i>
       <i
-        class="ico-btn fa fa-cog"
+        class="icon-btn fa fa-cog"
         @click="showSourceMenu(audioSource.sourceId)"
       >
       </i>
@@ -56,7 +56,7 @@ import { Subscription } from 'rxjs/subscription';
 import { EditMenu } from '../util/menus/EditMenu';
 import { AudioSource } from '../services/audio';
 import { ScenesService } from '../services/scenes';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 import Slider from  './shared/Slider.vue';
 
 // This class manages animating the volmeter.  If this needs to

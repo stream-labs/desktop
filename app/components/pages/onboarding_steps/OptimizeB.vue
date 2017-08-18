@@ -40,7 +40,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../../services/service';
+import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
 

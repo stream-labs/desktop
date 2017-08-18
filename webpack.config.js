@@ -18,7 +18,7 @@ plugins.push(new ProgressBarPlugin());
 
 module.exports = {
   entry: {
-    renderer: './app/app-entry.ts',
+    renderer: './app/app.ts',
     updater: './updater/ui.js'
   },
   output: {
@@ -27,6 +27,8 @@ module.exports = {
   },
 
   devtool: 'sourcemap',
+
+  target: 'electron-renderer',
 
   resolve: {
     extensions: ['.js', '.ts']

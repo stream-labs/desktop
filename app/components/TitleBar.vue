@@ -17,7 +17,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import electron from '../vendor/electron';
 import { CustomizationService } from '../services/customization';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 
 @Component({})
 export default class TitleBar extends Vue {

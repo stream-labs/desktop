@@ -7,6 +7,9 @@ import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { parse } from '.';
 import electron from '../../vendor/electron';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 const NODE_TYPES = {
   RootNode,
@@ -17,12 +20,7 @@ const NODE_TYPES = {
   WebcamNode
 };
 
-const fs = window['require']('fs');
-const os = window['require']('os');
-const path = window['require']('path');
-
-// TODO: Actually require asar when electron-builder will package it properly
-const asar: any = {};
+const asar = window['require']('asar');
 
 export class OverlaysPersistenceService extends Service {
 
@@ -34,7 +32,7 @@ export class OverlaysPersistenceService extends Service {
     asar.extractAll(overlayFilePath, assetsPath);
 
     const configPath = path.join(assetsPath, 'config.json');
-    const data = fs.readFileSync(configPath);
+    const data = fs.readFileSync(configPath).toString();
     const root = parse(data, NODE_TYPES);
     root.load({ assetsPath });
   }

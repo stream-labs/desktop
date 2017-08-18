@@ -29,13 +29,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowService } from '../../services/window';
-import { SettingsService, ISettingsState, ISettingsSubCategory } from '../../services/settings';
+import { ISettingsServiceApi, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
@@ -54,7 +54,7 @@ import Hotkeys from '../Hotkeys.vue';
 export default class SceneTransitions extends Vue {
 
   @Inject()
-  settingsService: SettingsService;
+  settingsService: ISettingsServiceApi;
 
   windowService = WindowService.instance;
 
@@ -72,7 +72,7 @@ export default class SceneTransitions extends Vue {
 
   get categoryNames() {
     return this.settingsService.getCategories().filter(name => {
-      return name !== 'Audio';
+      return name !== 'Hotkeys';
     });
   }
 

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
-import { Inject } from './service';
+import { Inject } from '../util/injector';
 import { mutation } from './stateful-service';
 import electron from '../vendor/electron';
 import { HostsService } from './hosts';
@@ -107,13 +107,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
       if (type === 'recent-events') {
-        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}`;
+        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
       } else if (type === 'dashboard') {
         return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&show_recent_events=0`;
       }
     }
   }
 
+
+  // TODO: This is platform specific and should be moved into the Twitch
+  // platform service.
   get chatUrl() {
     const username = this.username;
     const nightMode = this.customizationService.nightMode ? 'darkpopout' : 'popout';

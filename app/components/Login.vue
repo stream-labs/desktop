@@ -22,7 +22,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { UserService } from '../services/user';
 import { OnboardingService } from '../services/onboarding';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 
 @Component({})
 export default class Login extends Vue {
@@ -48,10 +48,7 @@ export default class Login extends Vue {
   }
 
   login() {
-    // For now, we start the onboarding flow again.  We should
-    // improve this UX to have a dedicated standalone login
-    // page, but that hasn't been built yet.
-    this.onboardingService.start();
+    this.onboardingService.start(true);
   }
 
 }

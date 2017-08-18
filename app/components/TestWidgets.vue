@@ -31,7 +31,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { WidgetsService } from '../services/widgets';
-import { Inject } from '../services/service';
+import { Inject } from '../util/injector';
 
 @Component({})
 export default class TestWidgets extends Vue {

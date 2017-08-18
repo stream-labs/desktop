@@ -22,9 +22,9 @@
               </NavItem>
             </NavMenu>
             <div class="controls">
-              <div class="fa fa-plus ico-btn" @click="addFilter"></div>
+              <div class="fa fa-plus icon-btn" @click="addFilter"></div>
               <div
-                class="fa fa-minus ico-btn"
+                class="fa fa-minus icon-btn"
                 v-if="selectedFilterName"
                 @click="removeFilter"
               >
@@ -50,11 +50,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../services/service';
+import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import SourceFiltersService from '../../services/source-filters';
-import { SourcesService } from '../../services/sources';
+import { ISourcesServiceApi } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
@@ -75,18 +75,18 @@ import GenericForm from '../shared/forms/GenericForm.vue';
 export default class SourceFilters extends Vue {
 
   @Inject()
-  filtersService: SourceFiltersService;
+  sourceFiltersService: SourceFiltersService;
 
   @Inject()
-  sourcesService: SourcesService;
+  sourcesService: ISourcesServiceApi;
 
   windowService = WindowService.instance;
 
   windowOptions: { sourceName: string, selectedFilterName: string } = this.windowService.getOptions();
   sourceName = this.windowOptions.sourceName;
-  filters = this.filtersService.getFilters(this.sourceName);
+  filters = this.sourceFiltersService.getFilters(this.sourceName);
   selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
-  properties = this.filtersService.getPropertiesFormData(
+  properties = this.sourceFiltersService.getPropertiesFormData(
     this.sourceName, this.selectedFilterName
   );
 
@@ -96,12 +96,12 @@ export default class SourceFilters extends Vue {
   }
 
   save() {
-    this.filtersService.setProperties(
+    this.sourceFiltersService.setProperties(
       this.sourceName,
       this.selectedFilterName,
       this.properties
     );
-    this.properties = this.filtersService.getPropertiesFormData(
+    this.properties = this.sourceFiltersService.getPropertiesFormData(
       this.sourceName, this.selectedFilterName
     );
   }
@@ -119,15 +119,15 @@ export default class SourceFilters extends Vue {
   }
 
   removeFilter() {
-    this.filtersService.remove(this.sourceName, this.selectedFilterName);
-    this.filters = this.filtersService.getFilters(this.sourceName);
+    this.sourceFiltersService.remove(this.sourceName, this.selectedFilterName);
+    this.filters = this.sourceFiltersService.getFilters(this.sourceName);
     this.selectedFilterName = (this.filters[0] && this.filters[0].name) || null;
   }
 
   toggleVisibility(filterName: string) {
     const sourceFilter = this.filters.find(filter => filter.name === filterName);
-    this.filtersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
-    this.filters = this.filtersService.getFilters(this.sourceName);
+    this.sourceFiltersService.setVisibility(this.sourceName, sourceFilter.name, !sourceFilter.visible);
+    this.filters = this.sourceFiltersService.getFilters(this.sourceName);
   }
 
 }

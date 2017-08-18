@@ -40,7 +40,7 @@ export interface IInputValue<TValueType> {
   type?: TObsType;
 }
 
-export declare type TFormData = IInputValue<TObsValue>[];
+export declare type TFormData = (IInputValue<TObsValue> | IListInputValue)[];
 
 export interface IListInputValue extends IInputValue<string> {
   options: IListOption<string>[];
@@ -64,6 +64,12 @@ export interface ISliderInputValue extends IInputValue<number> {
 export interface IFont {
   face?: string;
   flags?: number;
+  size?: string;
+  path?: string;
+}
+
+export interface IGoogleFont {
+  path?: string;
   size?: string;
 }
 
@@ -95,8 +101,8 @@ function parsePathFilters(filterStr: string): IElectronOpenDialogFilter[] {
   }
 
   return filters.map(filter => {
-    const match = filter.match(/^(.*) \((.*)\)$/);
-    const desc = match[1];
+    const match = filter.match(/^(.*)\((.*)\)$/);
+    const desc = _.trim(match[1]);
     let types = match[2].split(' ');
 
     types = types.map(type => {
