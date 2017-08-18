@@ -27,4 +27,9 @@ export class YoutubeService extends Service implements IPlatformService {
     return Promise.resolve({ status: '', viewers: 0 });
   }
 
+  putLiveStreamTitle(streamTitle: string, youtubeId: string, oauthToken: string) {
+    // TODO: Harsha
+    return Promise.resolve(true);
+  }
+
 }

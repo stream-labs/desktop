@@ -6,13 +6,13 @@
     </h4>
     <div>
       <i
-        class="fa fa-plus ico-btn"
+        class="fa fa-plus icon-btn icon-btn--lg"
         @click="addScene"/>
       <i
-        class="fa fa-minus ico-btn"
+        class="fa fa-minus icon-btn icon-btn--lg"
         @click="removeScene"/>
       <i
-        class="fa fa-cog ico-btn"
+        class="fa fa-cog icon-btn icon-btn--lg"
         @click="showTransitions"/>
       </div>
   </div>

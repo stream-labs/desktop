@@ -21,6 +21,8 @@ export interface IPlatformService {
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
   fetchLiveStreamInfo: (platformId: string) => Promise<IStreamInfo>;
+
+  putLiveStreamTitle: (streamTitle: string, platformId: string, oauthToken: string) => Promise<boolean>;
 }
 
 export interface IPlatformAuth {
