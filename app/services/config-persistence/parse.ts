@@ -4,7 +4,6 @@ export function parse(config: string, nodeTypes: Dictionary<any>) {
       const instance = new nodeTypes[value.nodeType]();
 
       instance.fromJSON(value);
-
       return instance;
     } else {
       return value;

@@ -2,6 +2,7 @@ import electron from './vendor/electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ConfigPersistenceService } from './services/config-persistence';
+import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
 import { ScenesService, SceneItem, Scene } from './services/scenes';
@@ -82,7 +83,9 @@ export class ServicesManager extends Service {
     VideoService,
     WidgetsService,
     WindowService,
-    FontLibraryService
+    FontLibraryService,
+    ObsImporterService,
+    ConfigPersistenceService
   };
 
   private instances: Dictionary<Service> = {};
