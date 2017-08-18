@@ -84,9 +84,9 @@ export class ObsImporterService extends Service {
           const source = this.sourcesService.createSource(
             sourceJSON.name,
             sourceJSON.id,
+            sourceJSON.settings,
             { sourceId: sourceJSON.id, channel: sourceJSON.channel }
           );
-          source.updateSettings(sourceJSON.settings);
 
           // Adding the filters
           const filtersJSON = sourceJSON.filters;
@@ -166,6 +166,7 @@ export class ObsImporterService extends Service {
         this.sourcesService.createSource(
           mixerSource.name,
           mixerSource.id,
+          {},
           { channel: i + 1 }
         );
       }
