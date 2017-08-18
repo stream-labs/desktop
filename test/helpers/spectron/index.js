@@ -53,6 +53,11 @@ export function useSpectron(skipOnboarding = true) {
     if (skipOnboarding) {
       await focusMain(t);
       await t.context.app.client.click('a=Setup later');
+
+      // This will only show up if OBS is installed
+      if (await t.context.app.client.isExisting('button=Start Fresh')) {
+        await t.context.app.client.click('button=Start Fresh');
+      }
     }
   });
 
