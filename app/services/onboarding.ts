@@ -91,7 +91,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     // actually log in from integration tests.
     electron.ipcRenderer.on('testing-fakeAuth', () => {
       this.COMPLETE_STEP('Connect');
-      this.SET_CURRENT_STEP('SelectWidgets');
+      this.SET_CURRENT_STEP('ObsImport');
     });
   }
 
