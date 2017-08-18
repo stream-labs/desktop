@@ -10,7 +10,7 @@ import { Component } from 'vue-property-decorator';
 import Connect from './onboarding_steps/Connect.vue';
 import OptimizeA from './onboarding_steps/OptimizeA.vue';
 import OptimizeB from './onboarding_steps/OptimizeB.vue';
-import SetupOptions from './onboarding_steps/SetupOptions.vue';
+import ObsImport from './onboarding_steps/ObsImport.vue';
 import OptimizeC from './onboarding_steps/OptimizeC.vue';
 import SuccessfullyImported from './onboarding_steps/SuccessfullyImported.vue';
 import BrowseOverlays from './onboarding_steps/BrowseOverlays.vue';
@@ -23,7 +23,7 @@ import { Inject } from '../../util/injector';
     Connect,
     OptimizeA,
     OptimizeB,
-    SetupOptions,
+    ObsImport,
     OptimizeC,
     SuccessfullyImported,
     BrowseOverlays,

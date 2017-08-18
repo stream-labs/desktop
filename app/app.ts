@@ -16,6 +16,7 @@ import { OnboardingService } from './services/onboarding';
 import { UserService } from './services/user';
 import Utils from './services/utils.ts';
 import { ConfigPersistenceService } from './services/config-persistence';
+import { ObsImporterService } from './services/obs-importer';
 import { FontLibraryService } from './services/font-library';
 import electron from './vendor/electron';
 
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const obsApiService = ObsApiService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
+  const onboardingService = OnboardingService.instance;
 
   if (isChild) {
     windowService.setWindowAsChild();
@@ -39,7 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
       windowService.closeWindow();
     });
   } else {
-    ConfigPersistenceService.instance.load();
+    // If we're not showing the onboarding steps, we should load
+    // the config file.  Otherwise the onboarding process will
+    // handle it based on what the user wants.
+    if (!onboardingService.startOnboardingIfRequired()) {
+      ConfigPersistenceService.instance.load();
+    }
 
     // Uncomment to start up from an overlay file
     // OverlaysPersistenceService.instance.loadOverlay('C:\\Users\\acree\\Downloads\\testing.overlay');
@@ -59,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     windowService.setWindowOptions({ component: 'Main' });
 
     HotkeysService.instance.bindAllHotkeys();
-    OnboardingService.instance;
     UserService.instance;
   }
 

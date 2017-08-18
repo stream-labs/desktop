@@ -9,7 +9,8 @@ type TOnboardingStep =
   'SelectWidgets' |
   'OptimizeA' |
   'OptimizeB' |
-  'OptimizeC';
+  'OptimizeC' |
+  'ObsImport';
 
 interface IOnboardingServiceState {
   isLogin: boolean;
@@ -30,6 +31,11 @@ interface IOnboardingStep {
 
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
+    isEligible: () => true,
+    next: 'ObsImport'
+  },
+
+  ObsImport: {
     isEligible: () => true,
     next: 'SelectWidgets'
   },
@@ -74,11 +80,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   @Inject()
   userService: UserService;
-
-
-  init() {
-    this.startOnboardingIfRequired();
-  }
 
 
   mounted() {
@@ -173,11 +174,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   }
 
 
-  private startOnboardingIfRequired() {
-    if (localStorage.getItem(this.localStorageKey)) return;
+  startOnboardingIfRequired() {
+    if (localStorage.getItem(this.localStorageKey)) return false;
 
     localStorage.setItem(this.localStorageKey, 'true');
     this.start();
+    return true;
   }
 
 }
