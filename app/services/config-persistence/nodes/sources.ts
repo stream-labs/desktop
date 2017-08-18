@@ -43,12 +43,10 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     const source = this.sourcesService.createSource(
       obj.name,
       obj.type,
+      obj.settings,
       { sourceId: obj.id, channel: obj.channel }
     );
 
-    const input = source.getObsInput();
-
-    input.update(obj.settings);
     this.sourcesService.refreshProperties(source.sourceId);
 
     if (source.audio) {

@@ -12,6 +12,7 @@ import electron from '../vendor/electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
 import { Inject } from '../util/injector';
+import namingHelpers from '../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
 
@@ -34,6 +35,7 @@ export interface ISource {
 export interface ISourceApi extends ISource {
   displayName: string;
   updateSettings(settings: Dictionary<any>): void;
+  getSettings(): Dictionary<any>;
 }
 
 
@@ -45,6 +47,7 @@ export interface ISourcesServiceApi {
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
+  suggestName(name: string): string;
 }
 
 
@@ -138,6 +141,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   createSource(
     name: string,
     type: TSourceType,
+    settings: Dictionary<any> = {},
     options: ISourceCreateOptions = {}
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
@@ -147,6 +151,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
+
+    obsInput.update(settings);
 
     const properties = this.getPropertiesFormData(id);
 
@@ -164,6 +170,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     source.getObsInput().release();
     this.REMOVE_SOURCE(id);
     this.sourceRemoved.next(source.sourceState);
+  }
+
+
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name) => this.getSourceByName(name));
   }
 
 
@@ -363,13 +374,30 @@ export class Source implements ISourceApi {
     return this.name;
   }
 
+
   getObsInput(): obs.IInput {
     return obs.InputFactory.fromName(this.name);
   }
 
+
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);
   }
+
+
+  getSettings(): Dictionary<any> {
+    return this.getObsInput().settings;
+  }
+
+
+  duplicate(): Source {
+    return this.sourcesService.createSource(
+      this.sourcesService.suggestName(this.name),
+      this.type,
+      this.getSettings()
+    );
+  }
+
 
   @Inject()
   protected sourcesService: SourcesService;
