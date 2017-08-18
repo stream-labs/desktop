@@ -9,13 +9,13 @@
     <div class="editable-list__bar">
       <i
         @click="menu.popup()"
-        class="fa fa-plus ico-btn editable-list__control"/>
+        class="fa fa-plus icon-btn editable-list__control"/>
       <i
         @click="handleRemove"
-        class="fa fa-minus ico-btn editable-list__control"/>
+        class="fa fa-minus icon-btn editable-list__control"/>
       <i
         @click="handleEdit"
-        class="fa fa-cog ico-btn editable-list__control"/>
+        class="fa fa-cog icon-btn editable-list__control"/>
     </div>
     <selector
       class="editable-list__list"

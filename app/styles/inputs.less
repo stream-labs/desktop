@@ -3,28 +3,43 @@
   position: relative;
   display: flex;
 }
+
 .input-label {
   width: 30%;
   padding-right: 15px;
 }
+
 .input-wrapper {
   width: 70%;
 }
-input[type=text], input[type="password"] {
+
+input[type=text],
+input[type="password"] {
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
+
   &:focus {
     box-shadow: none;
     background: @day-input-bg;
     border-color: @day-focus-border;
   }
+
+  &.input--transparent {
+    border: 0;
+    border-bottom: 1px dashed @grey;
+    padding: 0;
+    height: 26px;
+    background: transparent;
+  }
 }
 
 .checkbox {
   margin-bottom: 0;
+
   label {
     line-height: 20px;
+
     &:before {
       background: transparent;
       border-color: @day-input-border;
@@ -111,16 +126,23 @@ input[type=text], input[type="password"] {
 }
 
 .night-theme {
-  input[type="text"], input[type="password"] {
+  input[type="text"],
+  input[type="password"] {
     background: @night-secondary;
     color: @white;
     border-color: transparent;
+
+    &.input--transparent {
+      border-bottom: 1px dashed @grey;
+    }
   }
+
   .multiselect__content {
     background: @night-secondary;
     border-color: @night-secondary;
     color: @white;
   }
+
   .multiselect__option--highlight {
     background: @night-hover;
     color: @white;

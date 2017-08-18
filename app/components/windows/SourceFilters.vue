@@ -22,9 +22,9 @@
               </NavItem>
             </NavMenu>
             <div class="controls">
-              <div class="fa fa-plus ico-btn" @click="addFilter"></div>
+              <div class="fa fa-plus icon-btn" @click="addFilter"></div>
               <div
-                class="fa fa-minus ico-btn"
+                class="fa fa-minus icon-btn"
                 v-if="selectedFilterName"
                 @click="removeFilter"
               >
