@@ -22,6 +22,7 @@
     "files": [
       "bundles",
       "node_modules",
+      "!node_modules/obs-studio-node/obs-build/**/*",
       "vendor",
       "updater/index.html",
       "updater/Updater.js",
