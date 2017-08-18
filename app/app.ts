@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     windowService.setWindowOptions({ component: 'Main' });
 
-    HotkeysService.instance.bindAllHotkeys();
+    // HotkeysService.instance.bindAllHotkeys();
     UserService.instance;
   }
 
