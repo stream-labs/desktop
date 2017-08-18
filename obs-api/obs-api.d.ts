@@ -54,6 +54,18 @@ export declare const enum EAlignment {
     BottomLeft = 9,
     BottomRight = 10,
 }
+export declare const enum EOutputFlags {
+    Video = 1,
+    Audio = 2,
+    Async = 4,
+    AsyncVideo = 5,
+    CustomDraw = 8,
+    Interaction = 32,
+    Composite = 64,
+    DoNotDuplicate = 128,
+    Deprecated = 256,
+    DoNotSelfMonitor = 512,
+}
 export declare const enum ESceneDupType {
     Refs = 0,
     Copy = 1,
@@ -137,6 +149,19 @@ export declare const enum EColorSpace {
     CS601 = 1,
     CS709 = 2,
 }
+export declare const enum ESpeakerLayout {
+    Unknown = 0,
+    Mono = 1,
+    Stereo = 2,
+    TwoOne = 3,
+    Quad = 4,
+    FourOne = 5,
+    FiveOne = 6,
+    FiveOneSurround = 7,
+    SevenOne = 8,
+    SevenOneSurround = 9,
+    Surround = 10,
+}
 export declare const Global: IGlobal;
 export declare const InputFactory: IInputFactory;
 export declare const SceneFactory: ISceneFactory;
@@ -145,6 +170,7 @@ export declare const TransitionFactory: ITransitionFactory;
 export declare const DisplayFactory: IDisplayFactory;
 export declare const VolmeterFactory: IVolmeterFactory;
 export declare const FaderFactory: IFaderFactory;
+export declare const Audio: IAudio;
 export declare const Video: IVideo;
 export declare const ModuleFactory: IModuleFactory;
 export interface ISettings {
@@ -184,6 +210,10 @@ export interface IVideoInfo {
     readonly range: ERangeType;
     readonly scaleType: EScaleType;
 }
+export interface IAudioInfo {
+    readonly samplesPerSec: number;
+    readonly speakerLayout: ESpeakerLayout;
+}
 export interface IDisplayInit {
     width: number;
     height: number;
@@ -219,6 +249,9 @@ export interface ITextProperty {
 }
 export interface INumberProperty {
     readonly type: ENumberType;
+    readonly min: number;
+    readonly max: number;
+    readonly step: number;
 }
 export interface IProperty {
     readonly status: number;
@@ -229,8 +262,7 @@ export interface IProperty {
     readonly visible: boolean;
     readonly type: EPropertyType;
     readonly details: IListProperty | IEditableListProperty | IPathProperty | ITextProperty | INumberProperty | {};
-    readonly done: boolean;
-    next(): void;
+    next(): IProperty;
 }
 export interface IProperties {
     readonly status: number;
@@ -324,6 +356,7 @@ export interface ISource {
     readonly type: ESourceType;
     readonly id: string;
     readonly configurable: boolean;
+    readonly outputFlags: number;
     name: string;
     flags: number;
 }
@@ -371,6 +404,9 @@ export interface IDisplay {
 }
 export interface IVideo {
     reset(info: IVideoInfo): void;
+}
+export interface IAudio {
+    reset(info: IAudioInfo): void;
 }
 export interface IModuleFactory {
     create(binPath: string, dataPath: string): IModule;
