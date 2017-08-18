@@ -109,7 +109,7 @@ export default class TopNav extends Vue {
   }
 
   get isDevMode() {
-    return electron.remote.process.env !== 'production';
+    return electron.remote.process.env.NODE_ENV !== 'production';
   }
 
   openDevTools() {

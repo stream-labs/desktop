@@ -36,7 +36,10 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   },
 
   ObsImport: {
-    isEligible: () => true,
+    isEligible: service => {
+      if (service.state.isLogin) return false;
+      return true;
+    },
     next: 'SelectWidgets'
   },
 
