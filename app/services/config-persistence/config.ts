@@ -68,12 +68,14 @@ export class ConfigPersistenceService extends Service {
     this.sourcesService.createSource(
       'DesktopAudioDevice1',
       'wasapi_output_capture',
+      {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 }
     );
 
     this.sourcesService.createSource(
       'AuxAudioDevice1',
       'wasapi_input_capture',
+      {},
       { channel: E_AUDIO_CHANNELS.INPUT_1 }
     );
   }
