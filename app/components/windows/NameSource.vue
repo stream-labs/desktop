@@ -29,7 +29,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowService } from '../../services/window';
-import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
@@ -60,9 +59,8 @@ export default class NameSource extends Vue {
       this.sourcesService.getAvailableSourcesTypes()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-    this.name = namingHelpers.suggestName(
-      (this.sourceType && sourceType.description) || WidgetDefinitions[this.widgetType].name,
-      (name: string) => this.isTaken(name)
+    this.name = this.sourcesService.suggestName(
+      (this.sourceType && sourceType.description) || WidgetDefinitions[this.widgetType].name
     );
   }
 

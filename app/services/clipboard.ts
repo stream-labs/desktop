@@ -35,11 +35,21 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   }
 
 
-  paste() {
+  pasteReference() {
     this.state.items.forEach(clipboardItem => {
       const source = this.sourcesService.getSource(clipboardItem.id);
       if (!source) return;
       this.scenesService.activeScene.addSource(source.sourceId);
+    });
+  }
+
+
+  pasteDuplicate() {
+    this.state.items.forEach(clipboardItem => {
+      const source = this.sourcesService.getSource(clipboardItem.id);
+      if (!source) return;
+      const duplicatedSource = source.duplicate();
+      this.scenesService.activeScene.addSource(duplicatedSource.sourceId);
     });
   }
 

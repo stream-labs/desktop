@@ -87,8 +87,8 @@ export class Scene implements ISceneApi {
   }
 
 
-  createAndAddSource(sourceName: string, type: TSourceType): SceneItem {
-    const source = this.sourcesService.createSource(sourceName, type);
+  createAndAddSource(sourceName: string, type: TSourceType, settings?: Dictionary<any>): SceneItem {
+    const source = this.sourcesService.createSource(sourceName, type, settings);
     return this.addSource(source.sourceId);
   }
 
