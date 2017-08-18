@@ -38,7 +38,7 @@ export default class Dashboard extends Vue {
 <style lang="less" scoped>
 .dashboard-container {
   position: absolute;
-  top: 0px;
+  top: -1px;
   right: 0;
   bottom: 0;
   left: 0;
