@@ -85,7 +85,7 @@ export class ObsImporterService extends Service {
             sourceJSON.name,
             sourceJSON.id,
             sourceJSON.settings,
-            { sourceId: sourceJSON.id, channel: sourceJSON.channel }
+            { channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0 }
           );
 
           // Adding the filters
@@ -114,7 +114,7 @@ export class ObsImporterService extends Service {
                 return source.name === item.name;
               });
               if (sourceToAdd) {
-                const sceneItem = scene.addSource(sourceToAdd.sourceId, { sceneItemId: sourceToAdd.sourceId });
+                const sceneItem = scene.addSource(sourceToAdd.sourceId);
 
                 const crop = {
                   bottom: item.crop_bottom,
@@ -137,7 +137,7 @@ export class ObsImporterService extends Service {
   }
 
   importSceneOrder(configJSON :any) {
-    const sceneNames = Array();
+    const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
     const listScene = this.scenesService.scenes;
 
