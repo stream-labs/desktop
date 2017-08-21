@@ -159,8 +159,6 @@ export default class Live extends Vue {
 
     this.obsDisplay.setShoulddrawUI(false);
 
-    this.scenesService.activeScene.makeItemActive(null);
-
     this.onResize();
 
     window.addEventListener('resize', this.onResize);
