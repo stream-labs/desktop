@@ -17,7 +17,7 @@ import { UserService } from './services/user';
 import Utils from './services/utils.ts';
 import { ConfigPersistenceService } from './services/config-persistence';
 import { ObsImporterService } from './services/obs-importer';
-import { FontLibraryService } from './services/font-library';
+import { ShortcutsService } from './services/shortcuts';
 import electron from './vendor/electron';
 
 const { ipcRenderer, remote } = electron;
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // HotkeysService.instance.bindAllHotkeys();
     UserService.instance;
+    ShortcutsService.instance;
   }
 
   window['obs'] = obsApiService.nodeObs;
-  window['fontlibrary'] = FontLibraryService.instance;
 
   const vm = new Vue({
     el: '#app',

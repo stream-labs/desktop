@@ -74,6 +74,9 @@ export class WindowService extends StatefulService<IWindowState> {
       // This prevents you from seeing the previous contents
       // of the window for a split second after it is shown.
       this.setWindowOptions({});
+
+      // Refocus the main window
+      ipcRenderer.send('window-focusMain');
     } else {
       remote.getCurrentWindow().close();
     }

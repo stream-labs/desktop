@@ -243,6 +243,10 @@ ipcMain.on('window-showChildWindow', (event, data) => {
 
 });
 
+ipcMain.on('window-focusMain', () => {
+  mainWindow.focus();
+});
+
 // The main process acts as a hub for various windows
 // syncing their vuex stores.
 let registeredStores = {};

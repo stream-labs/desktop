@@ -9,6 +9,7 @@ import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
 import electron from '../../vendor/electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
+import { shortcut } from '../shortcuts';
 
 const { ipcRenderer } = electron;
 
@@ -200,6 +201,46 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   getScene(id: string) {
     return !this.state.scenes[id] ? null : new Scene(id);
+  }
+
+
+  @shortcut('ArrowLeft')
+  nudgeActiveItemLeft() {
+    if (this.activeScene.activeItem) {
+      this.activeScene.activeItem.nudgeLeft();
+    }
+  }
+
+
+  @shortcut('ArrowRight')
+  nudgeActiveItemRight() {
+    if (this.activeScene.activeItem) {
+      this.activeScene.activeItem.nudgeRight();
+    }
+  }
+
+
+  @shortcut('ArrowUp')
+  nudgeActiveItemUp() {
+    if (this.activeScene.activeItem) {
+      this.activeScene.activeItem.nudgeUp();
+    }
+  }
+
+
+  @shortcut('ArrowDown')
+  nudgeActiveItemDown() {
+    if (this.activeScene.activeItem) {
+      this.activeScene.activeItem.nudgeDown();
+    }
+  }
+
+
+  @shortcut('Delete')
+  removeActiveItem() {
+    if (this.activeScene.activeItem) {
+      this.activeScene.removeItem(this.activeScene.activeItem.sceneItemId);
+    }
   }
 
 
