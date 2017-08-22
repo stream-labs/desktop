@@ -27,9 +27,9 @@ var receivedTestData = {
 function parseTestData(d) {
 
   // remove filter test
-  if (d.includes("stopping thread"))
+  if (d.includes("stopping threads"))
     receivedTestData.removeFilterTestCount += 1;
-  if (d.includes("thread stopped"))
+  if (d.includes("threads stopped"))
     receivedTestData.removeFilterTestCount += 1;
   if (d.includes("filter destroyed"))
     receivedTestData.removeFilterTestCount += 1;
@@ -101,17 +101,13 @@ function getFacemaskDataDir() {
 
 // ---------------------------------------------------------------------------
 // addMediaSource : Create a Media Source and set it to play a video
-const MEDIA_GEEK1 = 1;
-const MEDIA_GEEK2 = 2;
-async function addMediaSource(t, sourceName, which = MEDIA_GEEK1) {
+async function addMediaSource(t, sourceName) {
   // create a media source
   await addSource(t, 'Media Source', sourceName, false);
 
   // what media
-  var mediaFile = 'geek1.mp4';
-  if (which == MEDIA_GEEK2)
-    mediaFile = 'geek2.mp4';
-
+  var mediaFile = 'vidyo4_720p_60fps.webm';
+  
   // set the source to an archive video
   await focusChild(t);
   var f = getFacemaskDataDir() + mediaFile;
@@ -193,6 +189,18 @@ async function setMaskImage(t, sourceName, filterName, color) {
 }
 
 // ---------------------------------------------------------------------------
+// setMaskJson
+async function setMaskJson(t, sourceName, filterName, color) {
+  // set some params
+  await openFilterProperties(t, sourceName, filterName);
+  var f = getFacemaskDataDir() + color + "sphere.json";
+  await focusChild(t);
+  await setFormInput(t, 'Mask', f);
+  await focusChild(t);
+  await closeFilterProperties(t);
+}
+
+// ---------------------------------------------------------------------------
 // setMaskImage
 async function setGlassesImage(t, sourceName, filterName, color) {
   // set some params
@@ -269,15 +277,16 @@ async function updatePerformanceStats(t) {
   // get the full status string
   await focusMain(t);
   const texts = await t.context.app.client.getText('div*=FPS');
+
   var text = texts[texts.length - 1];
 
   // parse out cpu usage
-  var cputext = text.split(' | ')[0];
+  var cputext = text.split('\n')[0];
   cputext = cputext.split(':')[1];
   cputext = cputext.split('%')[0];
 
   // parse out fps
-  var fpstext = text.split(' | ')[1];
+  var fpstext = text.split('\n')[1];
   fpstext = fpstext.split(' ')[0];
 
   // convert and save
@@ -301,18 +310,18 @@ async function drawingModeTest(t, drawMode) {
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
 
-  // 2D Mask drawing
+  // set draw mode
   await setDrawMode(t, sourceName, filterName, drawMode);
 
   // tests
   var testColors = ["red", "green", "blue"];
   var testValues = [[255,0,0,255], [0,255,0,255], [0,0,255,255]];
   for(var i = 0; i < testColors.length; i++) {
-    // set to color dot image
-    if (drawMode == 'Glasses')
-      await setGlassesImage(t, sourceName, filterName, testColors[i]);
-    else
+    // set to color dot
+    if (drawMode == '2D Face Mask')
       await setMaskImage(t, sourceName, filterName, testColors[i]);
+    else
+      await setMaskJson(t, sourceName, filterName, testColors[i]);
     await sleep(100);
     // check color at detected pixel
     const startTime = Date.now();
@@ -366,8 +375,10 @@ test('Remove Filter', async t => {
   // we should have got 3 of these
   if (receivedTestData.removeFilterTestCount == 3)
     t.pass();
-  else
+  else {
+    console.log("Only received ", receivedTestData.removeFilterTestCount);
     t.fail();
+  }
 });
 
 
@@ -390,6 +401,7 @@ test('Face Detection - Basic', async t => {
   // run for a second (ish), check the face positions
   const startTime = Date.now();
   while((Date.now() - startTime) < 1000) {
+
     // be a little lax on the exact position
     if (receivedTestData.lastFaceX < 690)
       t.fail();
@@ -420,27 +432,14 @@ test('Face Detection - Basic', async t => {
   startTestPipeServer();
 
   // media source
-  await addMediaSource(t, sourceName, MEDIA_GEEK1);
+  await addMediaSource(t, sourceName);
 
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
   await setDetectionFull(t, sourceName, filterName);
 
   // wait for a few seconds
-  await sleep(30 * 1000);
-
-  // kill the source
-  await killSource(t, sourceName);
-
-  // media source
-  await addMediaSource(t, sourceName, MEDIA_GEEK2);
-
-  // facemask filter
-  await addFacemaskFilter(t, sourceName, filterName);
-  await setDetectionFull(t, sourceName, filterName);
-
-  // wait for a few seconds
-  await sleep(30 * 1000);
+  await sleep(60 * 1000);
 
   console.log("frames with faces:    ",  receivedTestData.faceDetectedCount);
   console.log("frames with no faces: ",  receivedTestData.faceNotDetectedCount);
@@ -453,7 +452,7 @@ test('Face Detection - Basic', async t => {
   console.log("We detected faces ", percent.toString(), "% of the time.");
 
   // for these videos, this is currently a pass
-  if (percent > 30)
+  if (percent > 95)
     t.pass();
   else
     t.fail();
@@ -478,6 +477,13 @@ test('Performance', async t => {
 
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
+
+  // set draw mode to 2D
+  await setDrawMode(t, sourceName, filterName, "2D Face Mask");
+
+  // wait for the cpu to settle down. Setting params in the UI
+  // lowers the FPS
+  await sleep(3000);
 
   // run for a while, check the fps
   const startTime = Date.now();
@@ -507,24 +513,12 @@ test('Drawing : 2D Mask', async t => {
 
 
 // ---------------------------------------------------------------------------
-// TEST : Drawing : 3D Mask
+// TEST : Drawing : JSON Mask
 // ---------------------------------------------------------------------------
-test('Drawing : 3D Mask', async t => {
+test('Drawing : Mask Json', async t => {
 
   // draw mode test
-  await drawingModeTest(t, '3D Face Mask');
-
-  t.pass();
-});
-
-
-// ---------------------------------------------------------------------------
-// TEST : Drawing : Glasses
-// ---------------------------------------------------------------------------
-test('Drawing : Glasses', async t => {
-
-  // draw mode test
-  await drawingModeTest(t, 'Glasses');
+  await drawingModeTest(t, 'Mask Json');
 
   t.pass();
 });
