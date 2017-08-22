@@ -9,6 +9,7 @@ import { SourcesService } from './sources';
 import  SourceFiltersService from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
+import { ConfigPersistenceService } from './config-persistence/config';
 
 interface Source {
   name?: string;
@@ -34,11 +35,18 @@ export class ObsImporterService extends Service {
   @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
+  @Inject('ConfigPersistenceService')
+  configPersistenceService: ConfigPersistenceService;
+
   load(sceneCollectionSelected: ISceneCollection) {
     if (this.isOBSinstalled()) {
       const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, sceneCollectionSelected.filename);
       const data = fs.readFileSync(sceneCollectionPath).toString();
       const root = this.parseOBSconfig(data);
+
+      if (this.scenesService.scenes.length === 0) {
+        this.configPersistenceService.setUpDefaults();
+      }
     }
   }
 
