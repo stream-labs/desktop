@@ -11,6 +11,7 @@ interface ISchema {
   scaleY: number;
   visible: boolean;
   crop: ICrop;
+  locked?: boolean;
 }
 
 interface IContext {
@@ -34,7 +35,8 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       scaleX: sceneItem.scaleX,
       scaleY: sceneItem.scaleY,
       visible: sceneItem.visible,
-      crop: sceneItem.crop
+      crop: sceneItem.crop,
+      locked: sceneItem.locked
     };
   }
 
@@ -52,6 +54,7 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
     );
     item.setVisibility(obj.visible);
     item.setCrop(obj.crop);
+    item.setLocked(obj.locked || false);
   }
 
 }
