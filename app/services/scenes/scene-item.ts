@@ -115,6 +115,26 @@ export class SceneItem implements ISceneItemApi {
   }
 
 
+  nudgeLeft() {
+    this.setPosition({ x: this.x - 1, y: this.y });
+  }
+
+
+  nudgeRight() {
+    this.setPosition({ x: this.x + 1, y: this.y });
+  }
+
+
+  nudgeUp() {
+    this.setPosition({ x: this.x, y: this.y - 1 });
+  }
+
+
+  nudgeDown() {
+    this.setPosition({ x: this.x, y: this.y + 1 });
+  }
+
+
   setVisibility(visible: boolean) {
     this.getObsSceneItem().visible = visible;
     this.UPDATE({ sceneItemId: this.sceneItemId, visible });

@@ -9,6 +9,7 @@ import { SourcesService } from './sources';
 import  SourceFiltersService from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
+import { ConfigPersistenceService } from './config-persistence/config';
 
 interface Source {
   name?: string;
@@ -34,11 +35,18 @@ export class ObsImporterService extends Service {
   @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
+  @Inject('ConfigPersistenceService')
+  configPersistenceService: ConfigPersistenceService;
+
   load(sceneCollectionSelected: ISceneCollection) {
     if (this.isOBSinstalled()) {
       const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, sceneCollectionSelected.filename);
       const data = fs.readFileSync(sceneCollectionPath).toString();
       const root = this.parseOBSconfig(data);
+
+      if (this.scenesService.scenes.length === 0) {
+        this.configPersistenceService.setUpDefaults();
+      }
     }
   }
 
@@ -85,7 +93,7 @@ export class ObsImporterService extends Service {
             sourceJSON.name,
             sourceJSON.id,
             sourceJSON.settings,
-            { sourceId: sourceJSON.id, channel: sourceJSON.channel }
+            { channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0 }
           );
 
           // Adding the filters
@@ -114,7 +122,7 @@ export class ObsImporterService extends Service {
                 return source.name === item.name;
               });
               if (sourceToAdd) {
-                const sceneItem = scene.addSource(sourceToAdd.sourceId, { sceneItemId: sourceToAdd.sourceId });
+                const sceneItem = scene.addSource(sourceToAdd.sourceId);
 
                 const crop = {
                   bottom: item.crop_bottom,
@@ -137,7 +145,7 @@ export class ObsImporterService extends Service {
   }
 
   importSceneOrder(configJSON :any) {
-    const sceneNames = Array();
+    const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
     const listScene = this.scenesService.scenes;
 
