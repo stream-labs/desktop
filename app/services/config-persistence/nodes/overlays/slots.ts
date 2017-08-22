@@ -6,6 +6,7 @@ import { Inject } from '../../../../util/injector';
 import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
+import { VideoNode } from './video';
 
 interface ISchema {
   name: string;
@@ -17,7 +18,7 @@ interface ISchema {
   scaleX: number;
   scaleY: number;
 
-  content: ImageNode | TextNode | WebcamNode;
+  content: ImageNode | TextNode | WebcamNode | VideoNode;
 }
 
 interface IContext {
@@ -64,6 +65,11 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       content.save({ sceneItem, assetsPath: context.assetsPath });
 
       return { ...details, content };
+    } else if (sceneItem.type === 'ffmpeg_source') {
+      const content = new VideoNode();
+      content.save({ sceneItem, assetsPath: context.assetsPath });
+
+      return { ...details, content };
     }
 
     return null;
@@ -99,6 +105,8 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       sceneItem = context.scene.createAndAddSource(obj.name, 'image_source');
     } else if (obj.content instanceof TextNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus');
+    } else if (obj.content instanceof VideoNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source');
     }
 
     this.adjustPositionAndScale(sceneItem, obj);

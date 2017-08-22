@@ -5,7 +5,9 @@ import { SlotsNode } from './nodes/overlays/slots';
 import { ImageNode } from './nodes/overlays/image';
 import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
-import { parse } from '.';
+import { VideoNode } from './nodes/overlays/video';
+import { ConfigPersistenceService, parse } from '.';
+import { Inject } from '../../util/injector';
 import electron from '../../vendor/electron';
 import fs from 'fs';
 import os from 'os';
@@ -17,12 +19,17 @@ const NODE_TYPES = {
   SlotsNode,
   ImageNode,
   TextNode,
-  WebcamNode
+  WebcamNode,
+  VideoNode
 };
 
 const asar = window['require']('asar');
 
 export class OverlaysPersistenceService extends Service {
+
+  @Inject()
+  configPersistenceService: ConfigPersistenceService;
+
 
   loadOverlay(overlayFilePath: string) {
     const overlayName = path.parse(overlayFilePath).name;
@@ -35,6 +42,8 @@ export class OverlaysPersistenceService extends Service {
     const data = fs.readFileSync(configPath).toString();
     const root = parse(data, NODE_TYPES);
     root.load({ assetsPath });
+
+    this.configPersistenceService.setUpDefaultAudio();
   }
 
 
