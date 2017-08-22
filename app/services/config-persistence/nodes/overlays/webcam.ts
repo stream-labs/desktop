@@ -14,6 +14,9 @@ interface ISchema {
 interface IContext {
   sceneItem: SceneItem;
   assetsPath: string;
+
+  // Whether this is an existing webcam
+  existing?: boolean;
 }
 
 interface IResolution {
@@ -45,6 +48,47 @@ export class WebcamNode extends Node<ISchema, IContext> {
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
     const input = context.sceneItem.getObsInput();
+    let resolution: IResolution;
+
+    if (context.existing) {
+      resolution = this.resStringToResolution(input.settings['resolution']);
+    } else {
+      resolution = this.performInitialSetup(context.sceneItem);
+    }
+
+    // Figure out how far we have to scale it
+    const scale = targetHeight / resolution.height;
+
+    // Crop the width down to size
+    const crop: ICrop = {
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    };
+
+    if ((resolution.width * scale) > targetWidth) {
+      const delta = ((resolution.width * scale) - targetWidth) / scale;
+
+      crop.left = delta / 2;
+      crop.right = delta / 2;
+    }
+
+    this.applyScaleAndCrop(
+      context.sceneItem,
+      scale,
+      crop
+    );
+  }
+
+
+  // This selects the video device and picks the best resolution.
+  // It should not be performed if context.existing is true
+  performInitialSetup(item: SceneItem) {
+    const targetWidth = this.data.width * this.videoService.baseWidth;
+    const targetHeight = this.data.height * this.videoService.baseHeight;
+    const targetAspect = targetWidth / targetHeight;
+    const input = item.getObsInput();
 
     // Select the first video device
     // TODO: Maybe do some string matching to figure out which
@@ -62,9 +106,9 @@ export class WebcamNode extends Node<ISchema, IContext> {
     input.update(settings);
 
     // Figure out which resolutions this device can run at
-    const resolutionDetails = context.sceneItem.getObsInput().properties.get('resolution').details as IListProperty;
+    const resolutionDetails = input.properties.get('resolution').details as IListProperty;
     const resolutionOptions = (resolutionDetails.items as any[]).map(item => {
-      return this.resStringtoResolution(item.value);
+      return this.resStringToResolution(item.value);
     });
 
     // Group resolutions by aspect ratio
@@ -104,34 +148,13 @@ export class WebcamNode extends Node<ISchema, IContext> {
     // Otherwise, pick the biggest width
     if (!bestResolution) bestResolution = sorted.reverse()[0];
 
-    // Figure out how far we have to scale it
-    const scale = targetHeight / bestResolution.height;
+    this.applyResolution(item, bestResolution.value);
 
-    // Crop the width down to size
-    const crop: ICrop = {
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    };
-
-    if ((bestResolution.width * scale) > targetWidth) {
-      const delta = ((bestResolution.width * scale) - targetWidth) / scale;
-
-      crop.left = delta / 2;
-      crop.right = delta / 2;
-    }
-
-    this.applyResolution(
-      context.sceneItem,
-      bestResolution.value,
-      scale,
-      crop
-    );
+    return bestResolution;
   }
 
 
-  applyResolution(sceneItem: SceneItem, resolution: string, scale: number, crop: ICrop) {
+  applyResolution(sceneItem: SceneItem, resolution: string) {
     const input = sceneItem.getObsInput();
     const settings = { ...input.settings };
 
@@ -140,19 +163,22 @@ export class WebcamNode extends Node<ISchema, IContext> {
     settings['resolution'] = resolution;
 
     input.update(settings);
+  }
 
-    sceneItem.setPositionAndScale(
-      sceneItem.x,
-      sceneItem.y,
+
+  applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {
+    item.setPositionAndScale(
+      item.x,
+      item.y,
       scale,
       scale
     );
 
-    sceneItem.setCrop(crop);
+    item.setCrop(crop);
   }
 
 
-  resStringtoResolution(resString: string): IResolution {
+  resStringToResolution(resString: string): IResolution {
     const parts = resString.split('x');
     return {
       value: resString,

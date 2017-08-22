@@ -26,7 +26,12 @@
     @sort="handleSort">
     <template slot="actions" scope="props">
       <i
-        class="fa fa-eye icon-btn source-selector-visibility"
+        class="fa fa-lock icon-btn source-selector-action"
+        :class="lockClassesForSource(props.item.value)"
+        @click.stop="toggleLock(props.item.value)"
+        @dblclick.stop="() => {}" />
+      <i
+        class="fa fa-eye icon-btn source-selector-action"
         :class="visibilityClassesForSource(props.item.value)"
         @click.stop="toggleVisibility(props.item.value)"
         @dblclick.stop="() => {}" />
@@ -116,6 +121,20 @@ export default class SourceSelector extends Vue {
     };
   }
 
+  lockClassesForSource(sceneItemId: string) {
+    const locked = this.scene.getItem(sceneItemId).locked;
+
+    return {
+      'fa-lock': locked,
+      'fa-unlock': !locked
+    };
+  }
+
+  toggleLock(sceneItemId: string) {
+    const item = this.scene.getItem(sceneItemId);
+    item.setLocked(!item.locked);
+  }
+
   get scene() {
     return this.scenesService.activeScene;
   }
@@ -135,7 +154,7 @@ export default class SourceSelector extends Vue {
 <style lang="less" scoped>
 @import "../styles/index";
 
-.source-selector-visibility {
+.source-selector-action {
   font-size: 16px;
 }
 </style>

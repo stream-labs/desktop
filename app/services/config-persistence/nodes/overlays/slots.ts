@@ -1,9 +1,12 @@
 import { ArrayNode } from '../array-node';
 import { SceneItem, Scene } from '../../../scenes';
 import { VideoService } from '../../../video';
+import { SourcesService } from '../../../sources';
+import { Inject } from '../../../../util/injector';
 import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
+import { VideoNode } from './video';
 
 interface ISchema {
   name: string;
@@ -15,7 +18,7 @@ interface ISchema {
   scaleX: number;
   scaleY: number;
 
-  content: ImageNode | TextNode | WebcamNode;
+  content: ImageNode | TextNode | WebcamNode | VideoNode;
 }
 
 interface IContext {
@@ -27,8 +30,11 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
 
   schemaVersion = 1;
 
-  videoService: VideoService = VideoService.instance;
+  @Inject()
+  videoService: VideoService;
 
+  @Inject()
+  sourcesService: SourcesService;
 
   getItems(context: IContext) {
     return context.scene.getItems().slice().reverse();
@@ -59,6 +65,11 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       content.save({ sceneItem, assetsPath: context.assetsPath });
 
       return { ...details, content };
+    } else if (sceneItem.type === 'ffmpeg_source') {
+      const content = new VideoNode();
+      content.save({ sceneItem, assetsPath: context.assetsPath });
+
+      return { ...details, content };
     }
 
     return null;
@@ -68,22 +79,48 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   loadItem(obj: ISchema, context: IContext) {
     let sceneItem: SceneItem;
 
+    if (obj.content instanceof WebcamNode) {
+      const existingWebcam = this.sourcesService.sources.find(source => {
+        return source.type === 'dshow_input';
+      });
+
+      if (existingWebcam) {
+        sceneItem = context.scene.addSource(existingWebcam.sourceId);
+      } else {
+        sceneItem = context.scene.createAndAddSource(obj.name, 'dshow_input');
+      }
+
+      this.adjustPositionAndScale(sceneItem, obj);
+
+      obj.content.load({
+        sceneItem,
+        assetsPath: context.assetsPath,
+        existing: existingWebcam !== void 0
+      });
+
+      return;
+    }
+
     if (obj.content instanceof ImageNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'image_source');
     } else if (obj.content instanceof TextNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus');
-    } else if (obj.content instanceof WebcamNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'dshow_input');
+    } else if (obj.content instanceof VideoNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source');
     }
 
-    sceneItem.setPositionAndScale(
+    this.adjustPositionAndScale(sceneItem, obj);
+    obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+  }
+
+
+  adjustPositionAndScale(item: SceneItem, obj: ISchema) {
+    item.setPositionAndScale(
       obj.x * this.videoService.baseWidth,
       obj.y * this.videoService.baseHeight,
       obj.scaleX * this.videoService.baseWidth,
       obj.scaleY * this.videoService.baseHeight
     );
-
-    obj.content.load({ sceneItem, assetsPath: context.assetsPath });
   }
 
 

@@ -57,8 +57,8 @@
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
-    "obs-studio-node": "file:./obs-studio-nan",
     "node-libuiohook": "file:./node-libuiohook",
+    "obs-studio-node": "file:./obs-studio-nan",
     "uuid": "^3.0.1"
   },
   "devDependencies": {

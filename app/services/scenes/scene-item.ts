@@ -16,6 +16,7 @@ export interface ISceneItem {
   scaleY: number;
   visible: boolean;
   crop: ICrop;
+  locked: boolean;
 }
 
 
@@ -26,6 +27,7 @@ export interface ISceneItemApi extends ISceneItem {
   setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
   setCrop(crop: ICrop): ICrop;
   setPositionAndCrop(x: number, y: number, crop: ICrop): void;
+  setLocked(locked: boolean): void;
 }
 
 
@@ -56,6 +58,7 @@ export class SceneItem implements ISceneItemApi {
   scaleY: number;
   visible: boolean;
   crop: ICrop;
+  locked: boolean;
 
   // Some computed attributes
 
@@ -67,9 +70,9 @@ export class SceneItem implements ISceneItemApi {
     return this.height * this.scaleY;
   }
 
-  // An overlay source is visible in the overlay editor
+  // An overlay source is visible in the overlay editor and not locked
   get isOverlaySource() {
-    return (this.video && (this.width > 0) && (this.height > 0));
+    return (this.video && (this.width > 0) && (this.height > 0)) && !this.locked;
   }
 
   sceneItemState: ISceneItem;
@@ -167,6 +170,16 @@ export class SceneItem implements ISceneItemApi {
     this.setCrop(crop);
     obsSceneItem.position = { x, y };
     this.UPDATE({ sceneItemId: this.sceneItemId, x, y });
+  }
+
+
+  setLocked(locked: boolean) {
+    const scene = this.getScene();
+    if (locked && (scene.activeItemId === this.sceneItemId)) {
+      scene.makeItemActive(null);
+    }
+
+    this.UPDATE({ sceneItemId: this.sceneItemId, locked });
   }
 
 
