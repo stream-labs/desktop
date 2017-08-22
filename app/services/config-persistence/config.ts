@@ -65,6 +65,11 @@ export class ConfigPersistenceService extends Service {
   // application into the desired state and save.
   setUpDefaults() {
     this.scenesService.createScene('Scene', { makeActive: true });
+    this.setUpDefaultAudio();
+  }
+
+
+  setUpDefaultAudio() {
     this.sourcesService.createSource(
       'DesktopAudioDevice1',
       'wasapi_output_capture',
