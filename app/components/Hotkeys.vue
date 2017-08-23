@@ -42,7 +42,7 @@ export default class Hotkeys extends Vue {
   created() {
     // We don't want hotkeys registering while trying to bind.
     // We may change our minds on this in the future.
-    HotkeysService.instance.unregisterAll();
+    this.hotkeysService.unregisterAll();
     this.hotkeySet = this.hotkeysService.getHotkeySet();
   }
 

@@ -240,6 +240,10 @@ export class AudioSource extends Source implements IAudioSourceApi {
     let volmeterCheckTimeoutId: number;
     const obsVolmeter = this.audioService.obsVolmeters[this.sourceId];
     const obsSubscription = obsVolmeter.addCallback((volmeter: IVolmeter) => {
+      if (volmeter.muted) {
+        volmeter.level = 0;
+        volmeter.peak = 0;
+      }
       volmeterStream.next(volmeter);
       lastVolmeterValue = volmeter;
       gotEvent = true;

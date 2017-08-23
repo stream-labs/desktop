@@ -130,12 +130,6 @@ export default class MixerItem extends Vue {
 
   setMuted(muted: boolean) {
     this.audioSource.setMuted(muted);
-    if (muted) {
-      this.unsubscribeVolmeter();
-      this.volmeter.setData(0, 0);
-    } else {
-      this.subscribeVolmeter();
-    }
   }
 
 

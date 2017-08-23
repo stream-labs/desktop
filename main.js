@@ -22,7 +22,7 @@ const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 
 // Initialize the keylistener
-// require('node-libuiohook').startHook();
+require('node-libuiohook').startHook();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -86,7 +86,7 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
-    // require('node-libuiohook').stopHook();
+    require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
     app.quit();
