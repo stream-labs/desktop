@@ -13,7 +13,7 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -87,6 +87,7 @@ function startApp() {
 
   mainWindow.on('closed', () => {
     // require('node-libuiohook').stopHook();
+    session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
     app.quit();
   });
