@@ -2,10 +2,13 @@
 <div>
   <div class="section">
     <p>
-      If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.  The application can not be running when you delete your cache directory.
+      If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.
     </p>
     <button class="button button--action" @click="showCacheDir">
       Show Cache Directory
+    </button>
+    <button class="button button--action" @click="deleteCacheDir">
+      Delete Cache and Restart
     </button>
   </div>
   <!-- TODO: Uncomment when we want to expose this feature -->
@@ -35,6 +38,13 @@ export default class ExtraSettings extends Vue {
 
   showCacheDir() {
     electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
+  }
+
+  deleteCacheDir() {
+    if (confirm('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!')) {
+      electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
+      electron.remote.app.quit();
+    }
   }
 
   exportOverlay() {
