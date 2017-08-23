@@ -150,7 +150,7 @@ team who has them, or someone with admin access on our AWS account.
 
 This is a checklist to run through every time you deploy.
 
-- [ ] Merge `staging` into `master`
+- [ ] Merge `staging` into `master` - DO NOT "Squash & Merge", just do a regular merge
 - [ ] Check out `master`
 - [ ] Download the latest signed build of `node-obs` from Github
 - [ ] Copy `node-obs` into the root of `slobs-client`
@@ -163,3 +163,4 @@ This is a checklist to run through every time you deploy.
 - [ ] Package the app `yarn package`
 - [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
 - [ ] Deploy the new version `yarn deploy`
+- [ ] Merge master back into staging
