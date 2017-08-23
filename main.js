@@ -20,6 +20,11 @@ const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
+
+if (process.argv.includes('--clearCacheDir')) {
+  rimraf.sync(app.getPath('userData'));
+}
 
 // Initialize the keylistener
 require('node-libuiohook').startHook();
