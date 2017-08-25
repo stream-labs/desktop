@@ -139,21 +139,8 @@ export default class Live extends Vue {
   };
 
   mounted() {
-    this.streamInfoInterval = setInterval(
-      () => {
-        //Avoid hitting Twitch API if user is not streaming
-        if (this.streamingService.isStreaming) {
-          const platform = this.userService.platform.type;
-          const platformId = this.userService.platformId;
-          const service = getPlatformService(platform);
-
-          service.fetchLiveStreamInfo(platformId).then(streamInfo => {
-            this.streamInfo = streamInfo;
-          });
-        }
-      },
-      30 * 1000
-    );
+    this.fetchLiveStreamInfo();
+    this.streamInfoInterval = setInterval(this.fetchLiveStreamInfo, 30 * 1000);
 
     this.obsDisplay = this.videoService.createDisplay();
 
@@ -224,6 +211,21 @@ export default class Live extends Vue {
     });
   }
 
+  fetchLiveStreamInfo() {
+    {
+      //Avoid hitting Twitch API if user is not streaming
+      if (this.streamingService.isStreaming) {
+        const platform = this.userService.platform.type;
+        const platformId = this.userService.platformId;
+        const service = getPlatformService(platform);
+
+        service.fetchLiveStreamInfo(platformId).then(streamInfo => {
+          this.streamInfo = streamInfo;
+        });
+      }
+    }
+  }
+
   //getters
 
   get recenteventsUrl() {
@@ -231,7 +233,7 @@ export default class Live extends Vue {
   }
 
   get streamStatus() {
-    return this.streamInfo.status || 'Stream Title';
+    return this.streamInfo.status || 'Stream Offline';
   }
 
   get streamCCU() {

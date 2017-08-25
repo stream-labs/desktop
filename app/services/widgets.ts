@@ -36,7 +36,14 @@ const WidgetTesters: IWidgetTester[] = [
     url(host, token, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
     },
-    platforms: ['twitch', 'youtube']
+    platforms: ['twitch']
+  },
+  {
+    name: 'Subscriber',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    },
+    platforms: ['youtube']
   },
   {
     name: 'Subscription',
