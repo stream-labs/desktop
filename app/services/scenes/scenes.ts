@@ -204,6 +204,14 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
+  getSceneItem(sceneItemId: string) {
+    for (const scene of this.scenes) {
+      const sceneItem = scene.getItem(sceneItemId);
+      if (sceneItem) return sceneItem;
+    }
+    return null;
+  }
+
   @shortcut('ArrowLeft')
   nudgeActiveItemLeft() {
     if (this.activeScene.activeItem) {

@@ -59,6 +59,7 @@
     "lodash": "^4.17.4",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "file:./obs-studio-nan",
+    "rimraf": "^2.6.1",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
@@ -95,7 +96,6 @@
     "moment": "^2.17.1",
     "progress": "^2.0.0",
     "progress-bar-webpack-plugin": "^1.10.0",
-    "rimraf": "^2.6.1",
     "rxjs": "^5.4.3",
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",

@@ -13,16 +13,21 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, session } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
+
+if (process.argv.includes('--clearCacheDir')) {
+  rimraf.sync(app.getPath('userData'));
+}
 
 // Initialize the keylistener
-// require('node-libuiohook').startHook();
+//require('node-libuiohook').startHook();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -86,7 +91,8 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
-    // require('node-libuiohook').stopHook();
+    require('node-libuiohook').stopHook();
+    session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
     app.quit();
   });
