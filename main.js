@@ -27,7 +27,7 @@ if (process.argv.includes('--clearCacheDir')) {
 }
 
 // Initialize the keylistener
-require('node-libuiohook').startHook();
+//require('node-libuiohook').startHook();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
