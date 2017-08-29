@@ -116,10 +116,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
     if (options.makeActive) this.makeSceneActive(id);
 
-    // API for now can't save the scenes order
-    const scenesNames = this.scenes.map(scene => scene.name);
-    nodeObs.OBS_content_fillTabScenes(scenesNames);
-
     return this.getSceneByName(name);
   }
 
@@ -138,11 +134,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     scene.getObsScene().release();
 
     this.REMOVE_SCENE(id);
-
-    // OBS_content_getListCurrentScenes relies on OBS_content_fillTabScenes
-    // so we have to delete the scene from this list
-    const scenesNames = this.scenes.map(scene => scene.name);
-    nodeObs.OBS_content_fillTabScenes(scenesNames);
 
     if (this.state.activeSceneId === id) {
       const sceneIds = Object.keys(this.state.scenes);
