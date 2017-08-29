@@ -5,7 +5,7 @@ import {
   inputValuesToObsValues,
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
-import { StatefulService, mutation, Mutator } from './stateful-service';
+import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
 import electron from '../vendor/electron';
@@ -265,11 +265,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   setMuted(id: string, muted: boolean) {
-    const source = this.state.sources[id];
-
-    nodeObs.OBS_content_sourceSetMuted(source.name, muted);
+    const source = this.getSource(id);
+    source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.sourceUpdated.next(source);
+    this.sourceUpdated.next(source.sourceState);
   }
 
 
@@ -337,7 +336,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 }
 
-@Mutator()
+@ServiceHelper()
 export class Source implements ISourceApi {
   sourceId: string;
   name: string;
