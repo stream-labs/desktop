@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, InitAfter, Mutator } from './stateful-service';
+import { mutation, StatefulService, InitAfter, ServiceHelper } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
 import * as obs from '../../obs-api';
@@ -197,7 +197,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 }
 
-@Mutator()
+@ServiceHelper()
 export class AudioSource extends Source implements IAudioSourceApi {
   fader: IFader;
 

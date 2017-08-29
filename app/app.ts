@@ -16,7 +16,6 @@ import { OnboardingService } from './services/onboarding';
 import { UserService } from './services/user';
 import Utils from './services/utils.ts';
 import { ConfigPersistenceService } from './services/config-persistence';
-import { ObsImporterService } from './services/obs-importer';
 import { ShortcutsService } from './services/shortcuts';
 import electron from './vendor/electron';
 
@@ -65,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     windowService.setWindowOptions({ component: 'Main' });
 
-    HotkeysService.instance.bindAllHotkeys();
+    HotkeysService.instance.registerAndBindHotkeys();
     UserService.instance;
     ShortcutsService.instance;
   }

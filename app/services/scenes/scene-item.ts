@@ -1,5 +1,5 @@
 import { ScenesService, Scene, ISceneApi } from '../scenes';
-import { mutation, Mutator } from '../stateful-service';
+import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { Source, SourcesService, TSourceType } from '../sources';
 import { Inject } from '../../util/injector';
@@ -36,7 +36,7 @@ export interface ISceneItemApi extends ISceneItem {
  * all of the information about that source, and
  * how it fits in to the given scene
  */
-@Mutator()
+@ServiceHelper()
 export class SceneItem implements ISceneItemApi {
 
   sourceId: string;

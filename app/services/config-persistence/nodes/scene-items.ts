@@ -1,6 +1,7 @@
 import { ArrayNode } from './array-node';
 import { SceneItem } from '../../scenes/scene-item';
 import { Scene } from '../../scenes/scene';
+import { HotkeysNode } from './hotkeys';
 
 interface ISchema {
   id: string;
@@ -11,6 +12,7 @@ interface ISchema {
   scaleY: number;
   visible: boolean;
   crop: ICrop;
+  hotkeys?: HotkeysNode;
   locked?: boolean;
 }
 
@@ -27,6 +29,9 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   }
 
   saveItem(sceneItem: SceneItem): ISchema {
+    const hotkeys = new HotkeysNode();
+    hotkeys.save({ sceneItemId: sceneItem.sceneItemId });
+
     return {
       id: sceneItem.sceneItemId,
       sourceId: sceneItem.sourceId,
@@ -36,7 +41,8 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       scaleY: sceneItem.scaleY,
       visible: sceneItem.visible,
       crop: sceneItem.crop,
-      locked: sceneItem.locked
+      locked: sceneItem.locked,
+      hotkeys
     };
   }
 
@@ -55,6 +61,8 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
     item.setVisibility(obj.visible);
     item.setCrop(obj.crop);
     item.setLocked(obj.locked || false);
+
+    if (obj.hotkeys) obj.hotkeys.load({ sceneItemId: obj.id });
   }
 
 }

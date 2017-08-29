@@ -84,7 +84,7 @@ export function getModule(ModuleContainer: any): Module<any, any> {
 }
 
 /**
- * Classes with Mutator decorator saves constructor's
+ * Classes with ServiceHelper decorator saves constructor's
  * arguments to send them with each called mutation.
  * We need to save constructor arguments to create the same
  * class instance in another window.
@@ -92,7 +92,7 @@ export function getModule(ModuleContainer: any): Module<any, any> {
  * - constructor arguments must be able to be serialized
  * - constructor must not have side effects
  */
-export function Mutator(): ClassDecorator {
+export function ServiceHelper(): ClassDecorator {
   return function (target: any) {
     const original = target;
 
@@ -100,8 +100,8 @@ export function Mutator(): ClassDecorator {
     const f:any = function (this: any, ...args: any[]) {
       original.apply(this, args);
       this.constructorArgs = args;
-      this.isMutator = true;
-      this.mutatorName = target.name;
+      this.isHelper = true;
+      this.helperName = target.name;
       return this;
     };
 
