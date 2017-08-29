@@ -63,22 +63,31 @@ export class ObsImporterService extends Service {
   importFilters(filtersJSON :any, source :Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
 
-        // Setting properties
-        const properties = this.filtersService.getPropertiesFormData(source.name, filterJSON.name) ;
+        const isFilterAvailable = this.filtersService.state.availableTypes.find((availableFilter) => {
+          return availableFilter.type === filterJSON.id;
+        });
 
-        if (properties) {
-          if (Array.isArray(properties)) {
-            properties.forEach(property => {
-              if (filterJSON.settings[property.name]) {
-                property.value = filterJSON.settings[property.name];
-              }
-            });
+        if (isFilterAvailable) {
+          this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
+
+          // Setting properties
+          const properties = this.filtersService.getPropertiesFormData(source.name, filterJSON.name) ;
+
+          if (properties) {
+            if (Array.isArray(properties)) {
+              properties.forEach(property => {
+                if (filterJSON.settings[property.name]) {
+                  property.value = filterJSON.settings[property.name];
+                }
+              });
+            }
           }
-        }
 
-        this.filtersService.setProperties(source.name, filterJSON.name, properties);
+          this.filtersService.setProperties(source.name, filterJSON.name, properties);
+        } else {
+           // TODO Report to the user that slobs does not support the filter
+        }
       });
     }
   }
@@ -88,17 +97,25 @@ export class ObsImporterService extends Service {
 
     if (Array.isArray(sourcesJSON)) {
       sourcesJSON.forEach(sourceJSON => {
-        if (sourceJSON.id !== 'scene') {
-          const source = this.sourcesService.createSource(
-            sourceJSON.name,
-            sourceJSON.id,
-            sourceJSON.settings,
-            { channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0 }
-          );
+        const isSourceAvailable = this.sourcesService.getAvailableSourcesTypes().find((availableSource) => {
+          return availableSource.value === sourceJSON.id;
+        });
 
-          // Adding the filters
-          const filtersJSON = sourceJSON.filters;
-          this.importFilters(filtersJSON, source);
+        if (isSourceAvailable) {
+          if (sourceJSON.id !== 'scene') {
+            const source = this.sourcesService.createSource(
+              sourceJSON.name,
+              sourceJSON.id,
+              sourceJSON.settings,
+              { channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0 }
+            );
+
+            // Adding the filters
+            const filtersJSON = sourceJSON.filters;
+            this.importFilters(filtersJSON, source);
+          }
+        } else {
+          // TODO Report to the user that slobs does not support the source
         }
       });
     }
