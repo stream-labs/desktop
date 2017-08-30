@@ -55,6 +55,10 @@ export class ConfigPersistenceService extends Service {
       const data = fs.readFileSync(this.configFilePath).toString();
       const root = parse(data, NODE_TYPES);
       root.load();
+
+      // Make sure we actually loaded at least one scene, otherwise
+      // create the default one
+      if (this.scenesService.scenes.length === 0) this.setUpDefaults();
     } else {
       this.setUpDefaults();
       this.save();
