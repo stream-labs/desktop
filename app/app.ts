@@ -8,15 +8,9 @@ import _ from 'lodash';
 import URI from 'urijs';
 
 import { createStore } from './store';
-import { ServicesManager } from './services-manager';
 import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
-import { HotkeysService } from './services/hotkeys';
-import { OnboardingService } from './services/onboarding';
-import { UserService } from './services/user';
-import Utils from './services/utils.ts';
-import { ConfigPersistenceService } from './services/config-persistence';
-import { ShortcutsService } from './services/shortcuts';
+import { StartupService } from './services/startup';
 import electron from './vendor/electron';
 
 const { ipcRenderer, remote } = electron;
@@ -25,12 +19,10 @@ require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
   const store = createStore();
-  const servicesManager = ServicesManager.instance;
   const windowService = WindowService.instance;
   const obsApiService = ObsApiService.instance;
   const query = URI.parseQuery(URI.parse(window.location.href).query);
   const isChild = query.child;
-  const onboardingService = OnboardingService.instance;
 
   if (isChild) {
     windowService.setWindowAsChild();
@@ -40,33 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
       windowService.closeWindow();
     });
   } else {
-    // If we're not showing the onboarding steps, we should load
-    // the config file.  Otherwise the onboarding process will
-    // handle it based on what the user wants.
-    if (!onboardingService.startOnboardingIfRequired()) {
-      ConfigPersistenceService.instance.load();
-    }
-
-    // Uncomment to start up from an overlay file
-    // OverlaysPersistenceService.instance.loadOverlay('C:\\Users\\acree\\Downloads\\testing.overlay');
-
-    // Set up auto save
-    const autoSave = setInterval(() => {
-      ConfigPersistenceService.instance.save();
-    }, 60 * 1000);
-
-
-    ipcRenderer.on('shutdown', () => {
-      clearInterval(autoSave);
-      ConfigPersistenceService.instance.rawSave();
-      remote.getCurrentWindow().close();
-    });
-
     windowService.setWindowOptions({ component: 'Main' });
-
-    HotkeysService.instance.registerAndBindHotkeys();
-    UserService.instance;
-    ShortcutsService.instance;
+    StartupService.instance.load();
   }
 
   window['obs'] = obsApiService.nodeObs;
@@ -80,8 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return h(windowService.components[componentName]);
     }
   });
-
-  if (!Utils.isChildWindow()) servicesManager.listenApiCalls();
 
   // Used for replacing the contents of this window with
   // a new top level component

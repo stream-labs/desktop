@@ -26,6 +26,8 @@ import { WindowService } from  './services/window';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
+import { StartupService } from './services/startup';
+import { ShortcutsService } from './services/shortcuts';
 import { CacheUploaderService } from './services/cache-uploader';
 import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
@@ -87,6 +89,8 @@ export class ServicesManager extends Service {
     FontLibraryService,
     ObsImporterService,
     ConfigPersistenceService,
+    StartupService,
+    ShortcutsService,
     CacheUploaderService
   };
 
