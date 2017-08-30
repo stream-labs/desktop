@@ -97,18 +97,17 @@ export class WebcamNode extends Node<ISchema, IContext> {
     const deviceProperty = input.properties.get('video_device_id');
 
     // Stop loading if there aren't any devices
-    if ((deviceProperty.details as IListProperty).items.length === 0) return;
+    if ((deviceProperty as IListProperty).details.items.length === 0) return;
 
-    const device = (deviceProperty.details as IListProperty).items[0]['value'];
+    const device = (deviceProperty as IListProperty).details.items[0]['value'];
     const settings = { ...input.settings };
 
     settings['video_device_id'] = device;
     input.update(settings);
 
     // Figure out which resolutions this device can run at
-    const resolutionDetails = input.properties.get('resolution').details as IListProperty;
-    const resolutionOptions = (resolutionDetails.items as any[]).map(item => {
-      return this.resStringToResolution(item.value);
+    const resolutionOptions = (input.properties.get('resolution') as IListProperty).details.items.map(item => {
+      return this.resStringToResolution(item.value as string);
     });
 
     // Group resolutions by aspect ratio
