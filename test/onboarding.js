@@ -23,6 +23,9 @@ test('Adding some starter widgets', async t => {
     id: 'SomeId'
   };
 
+  // Wait for the auth screen to appear
+  await app.client.isExisting('button=Twitch');
+
   await app.webContents.send('testing-fakeAuth', {
     widgetToken,
     platform
