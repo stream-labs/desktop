@@ -61,7 +61,7 @@ export class StartupService extends StatefulService<IStartupState> {
         electron.remote.getCurrentWindow().close();
       });
 
-      this.hotkeysService.registerAndBindHotkeys();
+      this.hotkeysService.bindHotkeys();
       this.userService;
       this.shortcutsService;
 

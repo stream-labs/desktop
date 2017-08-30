@@ -162,7 +162,7 @@ export interface IHotkey {
  * Represents the full set of bindable hotkeys
  * for convenient render inside a component
  */
-interface IHotkeysSet {
+export interface IHotkeysSet {
   general: IHotkey[];
   sources: Dictionary<IHotkey[]>;
   scenes: Dictionary<IHotkey[]>;
@@ -170,7 +170,7 @@ interface IHotkeysSet {
 
 
 interface IHotkeysServiceState {
-  hotkeys: IHotkey[];
+  hotkeys: IHotkey[]; // only hotkeys with binded accelerators here
 }
 
 
@@ -190,23 +190,18 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   @Inject()
   private keyListenerService: KeyListenerService;
 
-  private hotkeysFromConfig: IHotkey[] = []; // here will be loaded hotkeys from config
+  private registeredHotkeys: Hotkey[] = [];
 
 
   addHotkey(hotkeyModel: IHotkey) {
-    this.hotkeysFromConfig.push(hotkeyModel);
+    this.ADD_HOTKEY(hotkeyModel);
   }
 
-  registerAndBindHotkeys() {
-    this.registerHotkeys();
-    this.bindHotkeys();
-  }
-
-  private registerHotkeys() {
-    this.CLEAR_HOTKEYS();
+  private updateRegisteredHotkeys() {
+    const hotkeys: IHotkey[] = [];
 
     HOTKEY_ACTIONS.GENERAL.forEach(action => {
-      this.ADD_HOTKEY({
+      hotkeys.push({
         actionName: action.name,
         accelerators: []
       });
@@ -216,7 +211,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     this.scenesService.scenes.forEach(scene => {
       scene.getItems().forEach(sceneItem => {
         HOTKEY_ACTIONS.SCENE_ITEM.forEach(action => {
-          this.ADD_HOTKEY({
+          hotkeys.push({
             actionName: action.name,
             accelerators: [],
             sceneItemId: sceneItem.sceneItemId
@@ -225,7 +220,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
 
       HOTKEY_ACTIONS.SCENE.forEach(action => {
-        this.ADD_HOTKEY({
+        hotkeys.push({
           actionName: action.name,
           accelerators: [],
           sceneId: scene.id
@@ -236,7 +231,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
     this.sourcesService.getSources().forEach(source => {
       HOTKEY_ACTIONS.SOURCE.forEach(action => {
-        this.ADD_HOTKEY({
+        hotkeys.push({
           actionName: action.name,
           accelerators: [],
           sourceId: source.sourceId
@@ -244,19 +239,33 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
       });
     });
 
-    this.setAccelerators(this.hotkeysFromConfig);
+    // setup accelerators from saved hotkeys
+    // This is a slow O(n^2) process, and may need to
+    // be optimized later.
+    this.state.hotkeys.forEach(savedHotkey => {
+      const hotkey = hotkeys.find(blankHotkey => {
+        return this.getHotkey(blankHotkey).isSameHotkey(savedHotkey);
+      });
+      if (hotkey) hotkey.accelerators = [].concat(savedHotkey.accelerators);
+    });
+
+    this.registeredHotkeys = hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel));
   }
+
 
   getHotkey(obj: IHotkey): Hotkey {
     return new Hotkey(obj);
   }
 
+
   getHotkeys(): Hotkey[] {
-    return this.state.hotkeys.map(hotkeyModel => this.getHotkey(hotkeyModel)).filter(hotkey => hotkey.shouldApply);
+    if (!this.registeredHotkeys) this.updateRegisteredHotkeys();
+    return this.registeredHotkeys.filter(hotkey => hotkey.shouldApply);
   }
 
+
   getHotkeysSet(): IHotkeysSet {
-    this.registerHotkeys();
+    this.updateRegisteredHotkeys();
 
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
@@ -284,7 +293,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     hotkeys.push(...hotkeySet.general);
     Object.keys(hotkeySet.scenes).forEach(sceneId => hotkeys.push(...hotkeySet.scenes[sceneId]));
     Object.keys(hotkeySet.sources).forEach(sourceId => hotkeys.push(...hotkeySet.sources[sourceId]));
-    this.setAccelerators(hotkeys);
+    this.setHotkeys(hotkeys);
     this.bindHotkeys();
   }
 
@@ -297,7 +306,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   getSourceHotkeys(sourceId: string): Hotkey[] {
     return this.getHotkeys().filter(hotkey => hotkey.sourceId === sourceId);
   }
-
 
 
   getSceneHotkeys(sceneId: string): Hotkey[] {
@@ -322,20 +330,16 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
 
-  private setAccelerators(hotkeys: IHotkey[]) {
-    // This is a slow O(n^2) process, and may need to
-    // be optimized later.
-    hotkeys.forEach(updatedHotkeyModel => {
-      const accelerators = updatedHotkeyModel.accelerators;
-      const hotkeyInd = this.state.hotkeys.findIndex(hotkeyModel => {
-        return this.getHotkey(hotkeyModel).isSameHotkey(updatedHotkeyModel);
-      });
-      this.SET_ACCELERATORS(hotkeyInd, accelerators);
+  private setHotkeys(hotkeys: IHotkey[]) {
+    this.CLEAR_HOTKEYS();
+    hotkeys.forEach(hotkey => {
+      if (hotkey.accelerators.length) this.ADD_HOTKEY(hotkey);
     });
+    this.updateRegisteredHotkeys();
   }
 
 
-  private bindHotkeys() {
+  bindHotkeys() {
     this.unregisterAll();
 
     const downAcceleratorMap = new Map<string, Hotkey[]>();
