@@ -17,15 +17,17 @@ export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
   private hotkeysService: HotkeysService;
 
   getItems(context: IContext = {}): Hotkey[] {
+    let items: Hotkey[] = [];
     if (context.sceneId) {
-      return this.hotkeysService.getSceneHotkeys(context.sceneId);
+      items = this.hotkeysService.getSceneHotkeys(context.sceneId);
     } else if (context.sceneItemId) {
-      return this.hotkeysService.getSceneItemHotkeys(context.sceneItemId);
+      items = this.hotkeysService.getSceneItemHotkeys(context.sceneItemId);
     } else if (context.sourceId) {
-      return this.hotkeysService.getSourceHotkeys(context.sourceId);
+      items = this.hotkeysService.getSourceHotkeys(context.sourceId);
     } else {
-      return this.hotkeysService.getGeneralHotkeys();
+      items = this.hotkeysService.getGeneralHotkeys();
     }
+    return items.filter(hotkey => hotkey.accelerators.length);
   }
 
 
