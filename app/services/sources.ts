@@ -146,13 +146,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
-    const obsInput = obs.InputFactory.create(type, name);
+    const obsInput = obs.InputFactory.create(type, name, settings);
 
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-
-    obsInput.update(settings);
 
     const properties = this.getPropertiesFormData(id);
 
