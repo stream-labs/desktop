@@ -3164,6 +3164,15 @@ fstream@^1.0.0, fstream@^1.0.2, fstream@~1.0.10:
     mkdirp ">=0.5 0"
     rimraf "2"
 
+fstream@^1.0.10:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/fstream/-/fstream-1.0.11.tgz#5c1fb1f117477114f0632a0eb4b71b3cb0fd3171"
+  dependencies:
+    graceful-fs "^4.1.2"
+    inherits "~2.0.0"
+    mkdirp ">=0.5 0"
+    rimraf "2"
+
 function-bind@^1.0.2, function-bind@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.0.tgz#16176714c801798e4e8f2cf7f7529467bb4a5771"
@@ -4518,6 +4527,13 @@ natives@^1.1.0:
 natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
+
+node-archiver@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/node-archiver/-/node-archiver-0.3.0.tgz#b9f1afe5006d0bdf29260181833a070978bc6947"
+  dependencies:
+    fstream "^1.0.10"
+    tar "^2.2.1"
 
 node-emoji@^1.8.1:
   version "1.8.1"
@@ -6256,6 +6272,14 @@ tar@^1.0.3:
     fstream "^1.0.2"
     inherits "2"
 
+tar@^2.2.1, tar@~2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-2.2.1.tgz#8e4d2a256c0e2185c6b18ad694aec968b83cb1d1"
+  dependencies:
+    block-stream "*"
+    fstream "^1.0.2"
+    inherits "2"
+
 tar@^3.1.5:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/tar/-/tar-3.2.1.tgz#9aa8e41c88f09e76c166075bc71f93d5166e61b1"
@@ -6265,14 +6289,6 @@ tar@^3.1.5:
     minizlib "^1.0.3"
     mkdirp "^0.5.0"
     yallist "^3.0.2"
-
-tar@~2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-2.2.1.tgz#8e4d2a256c0e2185c6b18ad694aec968b83cb1d1"
-  dependencies:
-    block-stream "*"
-    fstream "^1.0.2"
-    inherits "2"
 
 temp-file@^1.0.1:
   version "1.0.2"

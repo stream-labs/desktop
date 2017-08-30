@@ -26,6 +26,7 @@ import { WindowService } from  './services/window';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
+import { CacheUploaderService } from './services/cache-uploader';
 import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
@@ -85,7 +86,8 @@ export class ServicesManager extends Service {
     WindowService,
     FontLibraryService,
     ObsImporterService,
-    ConfigPersistenceService
+    ConfigPersistenceService,
+    CacheUploaderService
   };
 
   private instances: Dictionary<Service> = {};
