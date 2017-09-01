@@ -40,17 +40,16 @@ export class EditMenu extends Menu {
 
     if (this.scene) {
       this.append({
-        label: 'Paste',
+        label: 'Paste (Reference)',
         enabled: this.clipboardService.hasItems(),
         click: () => this.clipboardService.pasteReference()
       });
 
-      // TODO: uncomment when API will allow to know which sources is possible to duplicate
-      // this.append({
-      //   label: 'Paste (Duplicate)',
-      //   enabled: this.clipboardService.hasItems(),
-      //   click: () => this.clipboardService.pasteDuplicate()
-      // });
+      this.append({
+        label: 'Paste (Duplicate)',
+        enabled: this.clipboardService.hasItems(),
+        click: () => this.clipboardService.pasteDuplicate()
+      });
     }
 
     if (this.sceneItem) {

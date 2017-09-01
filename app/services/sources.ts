@@ -27,6 +27,7 @@ export interface ISource {
   muted: boolean;
   width: number;
   height: number;
+  doNotDuplicate: boolean;
   properties: TFormData;
   channel?: number;
 }
@@ -115,6 +116,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
+      doNotDuplicate: false,
 
       // Unscaled width and height
       width: 0,
@@ -226,12 +228,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   private refreshSourceFlags(source: ISource, id: string) {
-    const flags = nodeObs.OBS_content_getSourceFlags(source.name);
-    const audio = !!flags.audio;
-    const video = !!flags.video;
+    const flags = this.getSource(id).getObsInput().outputFlags;
+    const audio = !!(obs.EOutputFlags.Audio & flags);
+    const video = !!(obs.EOutputFlags.Video & flags);
+    const doNotDuplicate = !!(obs.EOutputFlags.DoNotDuplicate & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id, audio, video });
+      this.UPDATE_SOURCE({ id, audio, video, doNotDuplicate });
       this.sourceUpdated.next(source);
     }
   }
@@ -344,6 +347,7 @@ export class Source implements ISourceApi {
   muted: boolean;
   width: number;
   height: number;
+  doNotDuplicate: boolean;
   properties: TFormData;
   channel?: number;
 
@@ -388,6 +392,7 @@ export class Source implements ISourceApi {
 
 
   duplicate(): Source {
+    if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(
       this.sourcesService.suggestName(this.name),
       this.type,
