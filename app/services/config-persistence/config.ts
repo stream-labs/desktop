@@ -5,6 +5,7 @@ import { ScenesNode } from './nodes/scenes';
 import { SceneItemsNode } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { FiltersNode } from './nodes/filters';
+import { HotkeysNode } from './nodes/hotkeys';
 import electron from '../../vendor/electron';
 import { ScenesService } from '../scenes';
 import { SourcesService } from '../sources';
@@ -20,7 +21,8 @@ const NODE_TYPES = {
   ScenesNode,
   SceneItemsNode,
   TransitionNode,
-  FiltersNode
+  FiltersNode,
+  HotkeysNode
 };
 
 // This class exposes the public API for saving and loading
@@ -53,6 +55,10 @@ export class ConfigPersistenceService extends Service {
       const data = fs.readFileSync(this.configFilePath).toString();
       const root = parse(data, NODE_TYPES);
       root.load();
+
+      // Make sure we actually loaded at least one scene, otherwise
+      // create the default one
+      if (this.scenesService.scenes.length === 0) this.setUpDefaults();
     } else {
       this.setUpDefaults();
       this.save();

@@ -2,6 +2,9 @@ import { ArrayNode } from './array-node';
 import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
 import { AudioService } from '../../audio';
+import { HotkeysService } from '../../hotkeys';
+import { Inject } from '../../../util/injector';
+import { HotkeysNode } from './hotkeys';
 
 interface ISchema {
   id: string;
@@ -10,6 +13,7 @@ interface ISchema {
   settings: object;
   volume: number;
   filters: FiltersNode;
+  hotkeys?: HotkeysNode;
   channel?: number;
 }
 
@@ -17,8 +21,8 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
 
   schemaVersion = 1;
 
-  sourcesService: SourcesService = SourcesService.instance;
-  audioService: AudioService = AudioService.instance;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private audioService: AudioService;
 
   getItems() {
     return this.sourcesService.sources;
@@ -28,6 +32,9 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     const filters = new FiltersNode();
     filters.save({ source });
 
+    const hotkeys = new HotkeysNode();
+    hotkeys.save({ sourceId: source.sourceId });
+
     return {
       id: source.sourceId,
       name: source.name,
@@ -35,7 +42,8 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
       settings: source.getObsInput().settings,
       volume: source.getObsInput().volume,
       channel: source.channel,
-      filters
+      filters,
+      hotkeys
     };
   }
 
@@ -54,6 +62,8 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     }
 
     obj.filters.load({ source });
+
+    if (obj.hotkeys) obj.hotkeys.load({ sourceId: source.sourceId });
   }
 
 }

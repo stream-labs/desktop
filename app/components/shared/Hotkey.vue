@@ -46,10 +46,10 @@ export default class HotkeyComponent extends Vue {
   bindings: IBinding[] = [];
 
   created() {
-    if (this.hotkey.accelerators.size === 0) {
+    if (this.hotkey.accelerators.length === 0) {
       this.bindings = [this.createBindingWithKey('')];
     } else {
-      this.bindings = Array.from(this.hotkey.accelerators.values()).map(binding => {
+      this.bindings = Array.from(this.hotkey.accelerators).map(binding => {
         return this.createBindingWithKey(binding);
       });
     }
@@ -118,13 +118,13 @@ export default class HotkeyComponent extends Vue {
 
   // Sets the bindings on the hotkey object
   setBindings() {
-    const set = new Set();
+    const accelerators: string[] = []
 
     this.bindings.forEach(binding => {
-      if (binding.binding) set.add(binding.binding);
+      if (binding.binding) accelerators.push(binding.binding);
     });
 
-    this.hotkey.accelerators = set;
+    this.hotkey.accelerators = accelerators;
   }
 
 }

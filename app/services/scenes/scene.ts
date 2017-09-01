@@ -1,4 +1,4 @@
-import { Mutator, mutation } from '../stateful-service';
+import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { ISourceApi, SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
@@ -32,7 +32,7 @@ export interface ISceneApi extends IScene {
 }
 
 
-@Mutator()
+@ServiceHelper()
 export class Scene implements ISceneApi {
   id: string;
   name: string;

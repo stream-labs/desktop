@@ -2,8 +2,12 @@
 <div class="main" :class="{'night-theme': nightTheme}">
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
-  <top-nav v-if="page !== 'Onboarding'"></top-nav>
+  <div v-if="applicationLoading" class="main-loading">
+    <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
+  </div>
+  <top-nav v-if="(page !== 'Onboarding') && !applicationLoading"></top-nav>
   <component
+    v-if="!applicationLoading"
     class="main-page-container"
     :is="page"/>
 </div>
@@ -24,6 +28,7 @@ import windowMixin from '../mixins/window';
 import { Inject } from '../../util/injector';
 import { CustomizationService } from '../../services/customization';
 import { NavigationService } from '../../services/navigation';
+import { StartupService } from '../../services/startup';
 import electron from '../../vendor/electron';
 
 const { remote } = electron;
@@ -49,12 +54,19 @@ export default class Main extends Vue {
   @Inject()
   navigationService: NavigationService;
 
+  @Inject()
+  startupService: StartupService;
+
   get page() {
     return this.navigationService.state.currentPage;
   }
 
   get nightTheme() {
     return this.customizationService.nightMode;
+  }
+
+  get applicationLoading() {
+    return this.startupService.state.loading;
   }
 
 }
@@ -78,5 +90,17 @@ export default class Main extends Vue {
   flex-grow: 1;
   display: flex;
   position: relative;
+}
+
+.main-loading {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-loading-spinner {
+  font-size: 42px;
 }
 </style>

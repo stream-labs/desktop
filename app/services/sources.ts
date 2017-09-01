@@ -5,7 +5,7 @@ import {
   inputValuesToObsValues,
   obsValuesToInputValues, IListOption
 } from '../components/shared/forms/Input';
-import { StatefulService, mutation, Mutator } from './stateful-service';
+import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
 import electron from '../vendor/electron';
@@ -27,6 +27,7 @@ export interface ISource {
   muted: boolean;
   width: number;
   height: number;
+  doNotDuplicate: boolean;
   properties: TFormData;
   channel?: number;
 }
@@ -115,6 +116,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
+      doNotDuplicate: false,
 
       // Unscaled width and height
       width: 0,
@@ -146,13 +148,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   ): Source {
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
-    const obsInput = obs.InputFactory.create(type, name);
+    const obsInput = obs.InputFactory.create(type, name, settings);
 
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-
-    obsInput.update(settings);
 
     const properties = this.getPropertiesFormData(id);
 
@@ -228,12 +228,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   private refreshSourceFlags(source: ISource, id: string) {
-    const flags = nodeObs.OBS_content_getSourceFlags(source.name);
-    const audio = !!flags.audio;
-    const video = !!flags.video;
+    const flags = this.getSource(id).getObsInput().outputFlags;
+    const audio = !!(obs.EOutputFlags.Audio & flags);
+    const video = !!(obs.EOutputFlags.Video & flags);
+    const doNotDuplicate = !!(obs.EOutputFlags.DoNotDuplicate & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id, audio, video });
+      this.UPDATE_SOURCE({ id, audio, video, doNotDuplicate });
       this.sourceUpdated.next(source);
     }
   }
@@ -265,11 +266,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   setMuted(id: string, muted: boolean) {
-    const source = this.state.sources[id];
-
-    nodeObs.OBS_content_sourceSetMuted(source.name, muted);
+    const source = this.getSource(id);
+    source.getObsInput().muted = muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.sourceUpdated.next(source);
+    this.sourceUpdated.next(source.sourceState);
   }
 
 
@@ -337,7 +337,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 }
 
-@Mutator()
+@ServiceHelper()
 export class Source implements ISourceApi {
   sourceId: string;
   name: string;
@@ -347,6 +347,7 @@ export class Source implements ISourceApi {
   muted: boolean;
   width: number;
   height: number;
+  doNotDuplicate: boolean;
   properties: TFormData;
   channel?: number;
 
@@ -391,6 +392,7 @@ export class Source implements ISourceApi {
 
 
   duplicate(): Source {
+    if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(
       this.sourcesService.suggestName(this.name),
       this.type,

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, InitAfter, Mutator } from './stateful-service';
+import { mutation, StatefulService, InitAfter, ServiceHelper } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
 import * as obs from '../../obs-api';
@@ -142,7 +142,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
     const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
 
-    (obsAudioInput.properties.get('device_id').details as any).items
+    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
         devices.push({
           id: item.value,
@@ -151,7 +151,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
         });
       });
 
-    (obsAudioOutput.properties.get('device_id').details as any).items
+    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
         devices.push({
           id: item.value,
@@ -197,7 +197,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 }
 
-@Mutator()
+@ServiceHelper()
 export class AudioSource extends Source implements IAudioSourceApi {
   fader: IFader;
 

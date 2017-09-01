@@ -10,7 +10,7 @@ import { ClipboardService } from  './services/clipboard';
 import { AudioService, AudioSource } from  './services/audio';
 import { CustomizationService } from  './services/customization';
 import { HostsService } from  './services/hosts';
-import { HotkeysService } from  './services/hotkeys';
+import { Hotkey, HotkeysService } from  './services/hotkeys';
 import { KeyListenerService } from  './services/key-listener';
 import { NavigationService } from  './services/navigation';
 import { ObsApiService } from  './services/obs-api';
@@ -26,6 +26,9 @@ import { WindowService } from  './services/window';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
+import { StartupService } from './services/startup';
+import { ShortcutsService } from './services/shortcuts';
+import { CacheUploaderService } from './services/cache-uploader';
 import SourceFiltersService from  './services/source-filters';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
@@ -67,7 +70,7 @@ export class ServicesManager extends Service {
     AudioService, AudioSource,
     CustomizationService,
     HostsService,
-    HotkeysService,
+    HotkeysService, Hotkey,
     KeyListenerService,
     NavigationService,
     ObsApiService,
@@ -85,7 +88,10 @@ export class ServicesManager extends Service {
     WindowService,
     FontLibraryService,
     ObsImporterService,
-    ConfigPersistenceService
+    ConfigPersistenceService,
+    StartupService,
+    ShortcutsService,
+    CacheUploaderService
   };
 
   private instances: Dictionary<Service> = {};
@@ -152,27 +158,27 @@ export class ServicesManager extends Service {
           serviceName,
           methodName,
           args,
-          isMutator,
+          isHelper,
           constructorArgs
         } = request.payload;
 
         let responsePayload: any;
 
-        if (isMutator) {
-          const mutator = this.getMutator(serviceName, constructorArgs);
-          responsePayload = mutator[methodName].apply(mutator, args);
+        if (isHelper) {
+          const helper = this.getHelper(serviceName, constructorArgs);
+          responsePayload = helper[methodName].apply(helper, args);
         } else {
           const service = this.getInstance(serviceName);
           responsePayload = service[methodName].apply(service, args);
         }
 
-        if (responsePayload && responsePayload.isMutator) {
+        if (responsePayload && responsePayload.isHelper) {
           response = {
             id: request.id,
             mutations: this.stopBufferingMutations(),
             payload: {
-              isMutator: true,
-              mutatorName: responsePayload.mutatorName,
+              isHelper: true,
+              helperName: responsePayload.helperName,
               constructorArgs: responsePayload.constructorArgs
             }
           };
@@ -238,7 +244,8 @@ export class ServicesManager extends Service {
       'Scene',
       'SceneItem',
       'Source',
-      'AudioSource'
+      'AudioSource',
+      'HotkeysService'
     ];
 
     if (!whiteList.includes(service.constructor.name)) return service;
@@ -248,7 +255,7 @@ export class ServicesManager extends Service {
 
         if (!target[property]) return target[property];
 
-        if (target[property].isMutator) {
+        if (target[property].isHelper) {
           return this.applyIpcProxy(target[property]);
         }
 
@@ -256,8 +263,8 @@ export class ServicesManager extends Service {
 
         const serviceName = target.constructor.name;
         const methodName = property;
-        const isMutator = target['isMutator'];
-        const constructorArgs = isMutator ? target['constructorArgs'] : [];
+        const isHelper = target['isHelper'];
+        const constructorArgs = isHelper ? target['constructorArgs'] : [];
 
         return (...args: any[]) => {
 
@@ -266,23 +273,23 @@ export class ServicesManager extends Service {
             serviceName,
             methodName,
             args,
-            isMutator,
+            isHelper,
             constructorArgs
           });
 
           const payload = response.payload;
           response.mutations.forEach(mutation => commitMutation(mutation));
 
-          if (payload && payload.isMutator) {
-            const mutator = this.getMutator(payload.mutatorName, payload.constructorArgs);
-            return this.applyIpcProxy(mutator);
+          if (payload && payload.isHelper) {
+            const helper = this.getHelper(payload.helperName, payload.constructorArgs);
+            return this.applyIpcProxy(helper);
           } else {
-            // payload can contain mutators-objects
+            // payload can contain helpers-objects
             // we have to wrap them in IpcProxy too
             traverse(payload).forEach((item: any) => {
-              if (item && item.isMutator) {
-                const mutator = this.getMutator(item.mutatorName, item.constructorArgs);
-                return this.applyIpcProxy(mutator);
+              if (item && item.isHelper) {
+                const helper = this.getHelper(item.helperName, item.constructorArgs);
+                return this.applyIpcProxy(helper);
               }
             });
             return payload;
@@ -296,9 +303,9 @@ export class ServicesManager extends Service {
   }
 
 
-  private getMutator(name: string, constructorArgs: any[]) {
-    const Mutator = this.services[name];
-    return new (Mutator as any)(...constructorArgs);
+  private getHelper(name: string, constructorArgs: any[]) {
+    const Helper = this.services[name];
+    return new (Helper as any)(...constructorArgs);
   }
 
 

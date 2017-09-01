@@ -49,6 +49,10 @@ export class ClipboardService extends StatefulService<IClipboardState> {
       const source = this.sourcesService.getSource(clipboardItem.id);
       if (!source) return;
       const duplicatedSource = source.duplicate();
+      if (!duplicatedSource) {
+        alert(`Unable to duplicate ${source.name}`);
+        return;
+      }
       this.scenesService.activeScene.addSource(duplicatedSource.sourceId);
     });
   }

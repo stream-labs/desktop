@@ -29,40 +29,94 @@
 
             <!-- live stream information -->
             <div class="stream-info">
-              <div class="stream-info-wrapper">
+              <div class="stream-info__actions">
+                <a
+                  class="stream-info__more-info"
+                  v-if="streamInfoExpanded == false"
+                  @click="expandStreamInfo">
+                  More Info</a>
+                <a
+                  :class="{hide: isExpanded}"
+                  class="stream-info__more-info"
+                  v-if="streamInfoExpanded == true"
+                  @click="collapseStreamInfo">
+                  Less Info</a>
+
                 <span
-                  class="stream-edit-title"
-                  v-if="editingStreamTitle">
-                  <input class="input--transparent" v-model="streamTitle" type="text">
-                  <i
-                    @click="updateStreamTitle()"
-                    class="fa fa-check teal" />
-                  <i
-                    @click="cancelStreamTitle()"
-                    class="fa fa-times warning" />
-                </span>
-                <span
-                  class="stream-title-wrapper"
-                  v-else>
-                  <span class="stream-title">{{ streamStatus }}</span>
-                  <span
-                    class="stream-title__edit icon-btn"
-                    @click="editStreamTitle()">
-                    <i class="fa fa-pencil" />
-                  </span>
-                </span>
-                <span
-                  class="icon-btn icon-btn--lg"
+                  class="stream-expand-preview icon-btn icon-btn--lg"
                   @click="expandOutput">
                   <i class="fa fa-expand" />
                 </span>
               </div>
 
-              <div class="stream-info-wrapper stream-info-stats">
-                <span class="stream-viewer-stat"><i class="fa fa-user" /> {{ streamCCU }}</span>
-                <span>
-                  <span class="stream-performance-stat">CPU: {{ cpuPercent }}%</span>
-                  <span class="stream-performance-stat">{{ frameRate }} FPS</span>
+              <span class="stream-info__row">
+                <span
+                  class="stream-info__inputs stream-info__title"
+                  v-if="editingStreamTitle">
+                  <input class="input--transparent" v-model="streamTitle" type="text">
+                  <i
+                    v-if="!updatingStreamInfo"
+                    @click="updateStreamInfo('title')"
+                    class="fa fa-check teal" />
+                  <i
+                    v-if="updatingStreamInfo"
+                    class="fa fa-spinner fa-pulse" />
+                  <i
+                    @click="cancelStreamTitle()"
+                    class="fa fa-times warning" />
+                </span>
+
+                <span v-else>
+                  <span class="stream-title">{{ streamStatus }}</span>
+                  <span
+                    class="stream__edit icon-btn"
+                    @click="editStreamTitle()">
+                    <i class="fa fa-pencil" />
+                  </span>
+                </span>
+              </span>
+
+              <span
+                v-if="streamInfoExpanded"
+                class="stream-viewer-stat stream-info__row">
+                <i class="fa fa-user" /> {{ streamCCU }}
+              </span>
+
+              <div v-show="platform === 'twitch'">
+                <span
+                  v-if="streamInfoExpanded"
+                  class="stream-info__row">
+                  <span
+                    class="stream-info__inputs"
+                    v-if="editingStreamGame">
+                    <ListInput
+                      class="input-container--no-label input-container--no-margin input-wrapper--inverted"
+                      :value="gameValues"
+                      :allowEmpty="true"
+                      placeholder="Search"
+                      :loading="searchingGames"
+                      @search-change="debouncedGameSeach"
+                      @input="onGameInput"/>
+                    <i
+                      v-if="!updatingStreamInfo"
+                      @click="updateStreamInfo('game')"
+                      class="fa fa-check teal" />
+                    <i
+                      v-if="updatingStreamInfo"
+                      class="fa fa-spinner fa-pulse" />
+                    <i
+                      @click="cancelStreamGame()"
+                      class="fa fa-times warning" />
+                  </span>
+
+                  <span v-else>
+                    <span class="stream-game">{{ streamGame }}</span>
+                    <span
+                      class="stream__edit icon-btn"
+                      @click="editStreamGame()">
+                      <i class="fa fa-pencil" />
+                    </span>
+                  </span>
                 </span>
               </div>
             </div>
@@ -97,15 +151,25 @@ import { ScenesService } from '../../services/scenes';
 import { Display, VideoService } from '../../services/video';
 import { PerformanceService } from '../../services/performance';
 import electron from '../../vendor/electron';
+import { ListInput } from '../shared/forms';
+import { debounce } from 'lodash';
 
 const { webFrame, screen } = electron;
+
+interface GameInput {
+  name: string;
+  value: string;
+  options: object[];
+}
+
 
 @Component({
   components: {
     SceneSelector,
     Mixer,
     Chat,
-    StudioFooter
+    StudioFooter,
+    ListInput
   }
 })
 export default class Live extends Vue {
@@ -124,7 +188,7 @@ export default class Live extends Vue {
   @Inject()
   performanceService: PerformanceService;
 
-  streamInfo: IStreamInfo = { status: '', viewers: 0 };
+  streamInfo: IStreamInfo = { status: 'Fetching Information', viewers: 0, game: 'Game' };
 
   streamTitle: string = '';
 
@@ -137,6 +201,22 @@ export default class Live extends Vue {
   $refs: {
     display: HTMLElement
   };
+
+  debouncedGameSeach: (search: string) => void;
+
+  updatingStreamInfo = false;
+
+  gameValues = {
+    name: 'streamGame',
+    value: 'My value',
+    options: [
+      { description: '', value: '' }
+    ]
+  };
+
+  created() {
+    this.debouncedGameSeach = debounce((search: string) => this.onGameSearchChange(search), 500);
+  }
 
   mounted() {
     this.fetchLiveStreamInfo();
@@ -156,6 +236,10 @@ export default class Live extends Vue {
 
     window.removeEventListener('resize', this.onResize);
     this.obsDisplay.destroy();
+  }
+
+  onGameInput(gameInput: GameInput) {
+    this.streamInfo.game = gameInput.value;
   }
 
   onResize() {
@@ -181,7 +265,20 @@ export default class Live extends Vue {
       this.isExpanded = false;
     } else {
       this.isExpanded = true;
+      this.streamInfoExpanded = true;
+      this.editingStreamTitle = false;
+      this.editingStreamGame = false;
     }
+  }
+
+  streamInfoExpanded = true;
+
+  expandStreamInfo() {
+    this.streamInfoExpanded = true;
+  }
+
+  collapseStreamInfo() {
+    this.streamInfoExpanded = false;
   }
 
   editingStreamTitle = false;
@@ -194,35 +291,79 @@ export default class Live extends Vue {
     this.editingStreamTitle = false;
   }
 
-  updateStreamTitle() {
+  updateStreamInfo(field: string) {
+    if (this.updatingStreamInfo) return;
+    this.updatingStreamInfo = true;
+
     const platform = this.userService.platform.type;
     const platformId = this.userService.platformId;
-    const token = this.userService.platform.token;
+    const oauthToken = this.userService.platform.token;
     const service = getPlatformService(platform);
 
-    service.putLiveStreamTitle(this.streamTitle, platformId, this.userService.platform.token).then(status => {
+    let streamTitle = this.streamInfo.status;
+    let streamGame = this.streamInfo.game;
+
+    if (field === 'title') {
+      streamTitle = this.streamTitle;
+    }
+
+    service.putStreamInfo(streamTitle, streamGame, platformId, this.userService.platform.token).then(status => {
+      this.updatingStreamInfo = false;
+
       if (status) {
         this.streamInfo.status = this.streamTitle;
         this.editingStreamTitle = false;
+        this.editingStreamGame = false;
       } else {
         this.streamInfo.status = 'Error';
         this.editingStreamTitle = false;
+        this.editingStreamGame = false;
       }
     });
   }
 
-  fetchLiveStreamInfo() {
-    {
-      //Avoid hitting Twitch API if user is not streaming
-      if (this.streamingService.isStreaming) {
-        const platform = this.userService.platform.type;
-        const platformId = this.userService.platformId;
-        const service = getPlatformService(platform);
+  editingStreamGame = false;
 
-        service.fetchLiveStreamInfo(platformId).then(streamInfo => {
-          this.streamInfo = streamInfo;
-        });
-      }
+  editStreamGame() {
+    this.editingStreamGame = true;
+  }
+
+  searchingGames = false;
+
+  onGameSearchChange(searchString: string) {
+    if (searchString !== '') {
+      this.searchingGames = true;
+      const platform = this.userService.platform.type;
+      const service = getPlatformService(platform);
+
+      this.gameValues.options = [];
+
+      service.searchGames(searchString).then(games => {
+        this.searchingGames = false;
+        if (games && games.length) {
+          games.forEach(game => {
+            this.gameValues.options.push({description: game.name, value: game.name});
+          });
+        }
+      });
+    }
+  }
+
+  cancelStreamGame() {
+    this.editingStreamGame = false;
+  }
+
+  fetchLiveStreamInfo() {
+    //Avoid hitting Twitch API if user is not streaming
+    if (this.streamingService.isStreaming) {
+      const platform = this.userService.platform.type;
+      const platformId = this.userService.platformId;
+      const service = getPlatformService(platform);
+      const oauthToken = this.userService.platform.token;
+
+      service.fetchLiveStreamInfo(platformId, oauthToken).then(streamInfo => {
+        this.streamInfo = streamInfo;
+      });
     }
   }
 
@@ -240,12 +381,20 @@ export default class Live extends Vue {
     return this.streamInfo.viewers;
   }
 
+  get streamGame() {
+    return this.streamInfo.game;
+  }
+
   get cpuPercent() {
     return this.performanceService.state.CPU;
   }
 
   get frameRate() {
     return this.performanceService.state.frameRate.toFixed(2);
+  }
+
+  get platform() {
+    return this.userService.platform.type;
   }
 
 }
@@ -296,7 +445,6 @@ export default class Live extends Vue {
   background-color: @day-secondary;
   .border;
   .radius;
-  overflow: hidden;
 }
 
 .output-container--full {
@@ -312,7 +460,7 @@ export default class Live extends Vue {
     justify-content: center;
 
     .content {
-      bottom: 62px;
+      bottom: 46px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -320,10 +468,24 @@ export default class Live extends Vue {
   }
 
   .stream-info {
+    flex-direction: row;
     position: absolute;
     right: 8px;
     left: 8px;
     bottom: 0;
+  }
+
+  .stream-info__row {
+    margin-bottom: 0;
+    margin-right: 40px;
+  }
+
+  .stream-info__row--editing {
+    flex-direction: row-reverse;
+  }
+
+  .stream__edit {
+    display: none;
   }
 }
 
@@ -340,21 +502,50 @@ export default class Live extends Vue {
   display: flex;
   flex-direction: column;
   padding: 10px 12px;
-}
+  position: relative;
 
-.stream-info-wrapper {
-  display: flex;
-  justify-content: space-between;
-
-  &:first-child {
-    margin-bottom: 4px;
+  .stream-info__row {
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 
-.stream-edit-title {
+.stream-info__actions {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+}
+
+.stream-info__more-info {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .4px
+}
+
+.stream-info-expanded {
+  display: flex;
+  flex-direction: column;
+}
+
+.stream-info__row {
   display: flex;
   align-items: center;
-  width: 80%;
+  margin-bottom: 2px;
+}
+
+.stream-info__row--editing {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+}
+
+.stream-info__inputs {
+  display: flex;
+  align-items: center;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 6px;
 
   .fa {
     margin-left: 12px;
@@ -369,10 +560,8 @@ export default class Live extends Vue {
   }
 }
 
-.stream-title-wrapper {
-  height: 26px;
-  display: flex;
-  align-items: center;
+.stream-info__title {
+  width: 70%;
 }
 
 .stream-title {

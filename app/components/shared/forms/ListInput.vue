@@ -10,9 +10,12 @@
       :options="value.options"
       track-by="value"
       :close-on-select="true"
-      :allow-empty="false"
+      :allow-empty="allowEmpty"
+      :placeholder="placeholder"
+      :loading="loading"
       label="description"
-      @input="onInputHandler">
+      @input="onInputHandler"
+      @search-change="onSearchChange">
       <template slot="option" scope="props">
         <span>
           {{ props.option.description }}
@@ -39,8 +42,21 @@ class ListInput extends Input<IListInputValue> {
   @Prop()
   value: IListInputValue;
 
+  @Prop({ default: false })
+  allowEmpty: boolean;
+
+  @Prop({ default: 'Select Option' })
+  placeholder: string;
+
+  @Prop({ default: false })
+  loading: boolean;
+
   onInputHandler(option: IListOption<string>) {
     this.emitInput({ ...this.value, value: option.value });
+  }
+
+  onSearchChange(value: string) {
+    this.$emit('search-change', value);
   }
 
   get currentValue() {
@@ -48,7 +64,9 @@ class ListInput extends Input<IListInputValue> {
       return this.value.value === opt.value;
     });
 
-    return option || this.value.options[0];
+    if (option) return option;
+    if (this.allowEmpty) return '';
+    return this.value.options[0];
   }
 
 }
