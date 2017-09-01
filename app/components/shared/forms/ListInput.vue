@@ -12,7 +12,8 @@
       :close-on-select="true"
       :allow-empty="false"
       label="description"
-      @input="onInputHandler">
+      @input="onInputHandler"
+      @search-change="onSearchChange">
       <template slot="option" scope="props">
         <span>
           {{ props.option.description }}
@@ -41,6 +42,10 @@ class ListInput extends Input<IListInputValue> {
 
   onInputHandler(option: IListOption<string>) {
     this.emitInput({ ...this.value, value: option.value });
+  }
+
+  onSearchChange(value: string) {
+    this.$emit('search-change', value);
   }
 
   get currentValue() {

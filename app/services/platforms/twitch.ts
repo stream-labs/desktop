@@ -64,7 +64,7 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
-  fetchLiveStreamInfo(twitchId: string): Promise<IStreamInfo> {
+  fetchLiveStreamInfo(twitchId: string, oauthToken: string): Promise<IStreamInfo> {
     const headers = new Headers();
 
     headers.append('Client-Id', this.clientId);
@@ -77,14 +77,15 @@ export class TwitchService extends Service implements IPlatformService {
     }).then(json => {
       return {
         status: json.stream.channel.status,
-        viewers: json.stream.viewers
+        viewers: json.stream.viewers,
+        game: json.stream.game
       };
     }).catch(() => {
-      return { status: '', viewers: 0 };
+      return { status: '', viewers: 0, game: '' };
     });
   }
 
-  putLiveStreamTitle(streamTitle: string, twitchId:string, oauthToken: string) {
+  putStreamInfo(streamTitle: string, streamGame: string, twitchId:string, oauthToken: string) {
     const headers = new Headers();
 
     headers.append('Client-Id', this.clientId);
@@ -92,7 +93,7 @@ export class TwitchService extends Service implements IPlatformService {
     headers.append('Authorization', `OAuth ${oauthToken}`);
     headers.append('Content-Type', 'application/json');
 
-    const data = { channel: { status : streamTitle } };
+    const data = { channel: { status : streamTitle, game : streamGame } };
 
     const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}`, {
       method: 'PUT',
@@ -109,4 +110,23 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
+  searchGames(searchString: string) {
+    const headers = new Headers();
+
+    headers.append('Client-ID', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+
+    const request = new Request(`https://api.twitch.tv/kraken/search/games?query=${searchString}`, { headers });
+
+    return fetch(request).then(response => {
+      return response.json();
+    }).then(json => {
+      return json.games;
+    });
+  }
+
+  getChatUrl(username: string, oauthToken: string, mode: string) {
+    const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
+    return Promise.resolve(`https://twitch.tv/${username}/chat?${nightMode}`);
+  }
 }

@@ -5,6 +5,11 @@ import { YoutubeService } from './youtube';
 export interface IStreamInfo {
   status: string;
   viewers: number;
+  game: string;
+}
+
+export interface Game {
+  name: string;
 }
 
 
@@ -20,9 +25,13 @@ export interface IPlatformService {
   // settings for this platform, given an auth.
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
-  fetchLiveStreamInfo: (platformId: string) => Promise<IStreamInfo>;
+  fetchLiveStreamInfo: (platformId: string, oauthToken: string) => Promise<IStreamInfo>;
 
-  putLiveStreamTitle: (streamTitle: string, platformId: string, oauthToken: string) => Promise<boolean>;
+  putStreamInfo: (streamTitle: string, streamGame: string, platformId: string, oauthToken: string) => Promise<boolean>;
+
+  searchGames: (searchString: string) => Promise<Game[]>;
+
+  getChatUrl: (username: string, oauthToken: string, mode: string) => Promise<string>;
 }
 
 export interface IPlatformAuth {
