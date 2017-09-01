@@ -190,7 +190,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   @Inject()
   private keyListenerService: KeyListenerService;
 
-  private registeredHotkeys: Hotkey[] = [];
+  private registeredHotkeys: Hotkey[];
 
 
   addHotkey(hotkeyModel: IHotkey) {
