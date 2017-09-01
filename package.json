@@ -53,12 +53,12 @@
     "arch": "x64"
   },
   "dependencies": {
+    "archiver": "^2.0.3",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
-    "node-archiver": "^0.3.0",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "file:./obs-studio-nan",
     "rimraf": "^2.6.1",
