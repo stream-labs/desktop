@@ -81,7 +81,7 @@ export class YoutubeService extends Service implements IPlatformService {
         return {
           status: json.items[0].snippet.localized.title,
           viewers: json.items[0].liveStreamingDetails.concurrentViewers || 0,
-          game: 'Dota 2'
+          game: ''
         };
       }).catch(() => {
         return { status: '', viewers: 0, game: '' };
@@ -127,7 +127,9 @@ export class YoutubeService extends Service implements IPlatformService {
     return fetch(request).then(response => {
       return response.json();
     }).then(json => {
-      this.liveStreamId = json.items[0].id;
+      if (json.items.length) {
+        this.liveStreamId = json.items[0].id;
+      }
     });
   }
 

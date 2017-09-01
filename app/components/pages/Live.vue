@@ -55,8 +55,12 @@
                   v-if="editingStreamTitle">
                   <input class="input--transparent" v-model="streamTitle" type="text">
                   <i
+                    v-if="!updatingStreamInfo"
                     @click="updateStreamInfo('title')"
                     class="fa fa-check teal" />
+                  <i
+                    v-if="updatingStreamInfo"
+                    class="fa fa-spinner fa-pulse" />
                   <i
                     @click="cancelStreamTitle()"
                     class="fa fa-times warning" />
@@ -88,11 +92,18 @@
                     <ListInput
                       class="input-container--no-label input-container--no-margin input-wrapper--inverted"
                       :value="gameValues"
-                      @search-change="onGameSearchChange"
+                      :allowEmpty="true"
+                      placeholder="Search"
+                      :loading="searchingGames"
+                      @search-change="debouncedGameSeach"
                       @input="onGameInput"/>
                     <i
+                      v-if="!updatingStreamInfo"
                       @click="updateStreamInfo('game')"
                       class="fa fa-check teal" />
+                    <i
+                      v-if="updatingStreamInfo"
+                      class="fa fa-spinner fa-pulse" />
                     <i
                       @click="cancelStreamGame()"
                       class="fa fa-times warning" />
@@ -141,6 +152,7 @@ import { Display, VideoService } from '../../services/video';
 import { PerformanceService } from '../../services/performance';
 import electron from '../../vendor/electron';
 import { ListInput } from '../shared/forms';
+import { debounce } from 'lodash';
 
 const { webFrame, screen } = electron;
 
@@ -176,7 +188,7 @@ export default class Live extends Vue {
   @Inject()
   performanceService: PerformanceService;
 
-  streamInfo: IStreamInfo = { status: '', viewers: 0, game: 'Game' };
+  streamInfo: IStreamInfo = { status: 'Fetching Information', viewers: 0, game: 'Game' };
 
   streamTitle: string = '';
 
@@ -190,6 +202,10 @@ export default class Live extends Vue {
     display: HTMLElement
   };
 
+  debouncedGameSeach: (search: string) => void;
+
+  updatingStreamInfo = false;
+
   gameValues = {
     name: 'streamGame',
     value: 'My value',
@@ -197,6 +213,10 @@ export default class Live extends Vue {
       { description: '', value: '' }
     ]
   };
+
+  created() {
+    this.debouncedGameSeach = debounce((search: string) => this.onGameSearchChange(search), 500);
+  }
 
   mounted() {
     this.fetchLiveStreamInfo();
@@ -272,6 +292,9 @@ export default class Live extends Vue {
   }
 
   updateStreamInfo(field: string) {
+    if (this.updatingStreamInfo) return;
+    this.updatingStreamInfo = true;
+
     const platform = this.userService.platform.type;
     const platformId = this.userService.platformId;
     const oauthToken = this.userService.platform.token;
@@ -285,6 +308,8 @@ export default class Live extends Vue {
     }
 
     service.putStreamInfo(streamTitle, streamGame, platformId, this.userService.platform.token).then(status => {
+      this.updatingStreamInfo = false;
+
       if (status) {
         this.streamInfo.status = this.streamTitle;
         this.editingStreamTitle = false;
@@ -303,17 +328,23 @@ export default class Live extends Vue {
     this.editingStreamGame = true;
   }
 
+  searchingGames = false;
+
   onGameSearchChange(searchString: string) {
     if (searchString !== '') {
+      this.searchingGames = true;
       const platform = this.userService.platform.type;
       const service = getPlatformService(platform);
 
       this.gameValues.options = [];
 
       service.searchGames(searchString).then(games => {
-        games.forEach(game => {
-          this.gameValues.options.push({description: game.name, value: game.name});
-        });
+        this.searchingGames = false;
+        if (games && games.length) {
+          games.forEach(game => {
+            this.gameValues.options.push({description: game.name, value: game.name});
+          });
+        }
       });
     }
   }
@@ -323,18 +354,16 @@ export default class Live extends Vue {
   }
 
   fetchLiveStreamInfo() {
-    {
-      //Avoid hitting Twitch API if user is not streaming
-      if (this.streamingService.isStreaming) {
-        const platform = this.userService.platform.type;
-        const platformId = this.userService.platformId;
-        const service = getPlatformService(platform);
-        const oauthToken = this.userService.platform.token;
+    //Avoid hitting Twitch API if user is not streaming
+    if (this.streamingService.isStreaming) {
+      const platform = this.userService.platform.type;
+      const platformId = this.userService.platformId;
+      const service = getPlatformService(platform);
+      const oauthToken = this.userService.platform.token;
 
-        service.fetchLiveStreamInfo(platformId, oauthToken).then(streamInfo => {
-          this.streamInfo = streamInfo;
-        });
-      }
+      service.fetchLiveStreamInfo(platformId, oauthToken).then(streamInfo => {
+        this.streamInfo = streamInfo;
+      });
     }
   }
 
