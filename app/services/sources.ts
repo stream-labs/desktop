@@ -96,7 +96,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   protected init() {
     setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
-    this.scenesService.sourceRemoved.subscribe(
+    this.scenesService.itemRemoved.subscribe(
       (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
     );
   }
