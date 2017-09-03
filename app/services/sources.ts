@@ -2,8 +2,10 @@ import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import {
   TFormData,
-  inputValuesToObsValues,
-  obsValuesToInputValues, IListOption
+  IListOption,
+  getPropertiesFormData,
+  setPropertiesFormData,
+  setupSourceDefaults
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { nodeObs } from './obs-api';
@@ -37,14 +39,14 @@ export interface ISourceApi extends ISource {
   displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
+  getPropertiesFormData(): TFormData;
+  setPropertiesFormData(properties: TFormData): void;
 }
 
 
 export interface ISourcesServiceApi {
   createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
   getAvailableSourcesTypes(): IListOption<TSourceType>[];
-  getPropertiesFormData(sourceId: string): TFormData;
-  setProperties(sourceId: string, properties: TFormData): void;
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
@@ -105,12 +107,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, channel?: number) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number) {
     const sourceModel: ISource = {
       sourceId: id,
       name,
       type,
-      properties,
+      properties: [],
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -154,9 +156,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       obs.Global.setOutputSource(options.channel, obsInput);
     }
 
-    const properties = this.getPropertiesFormData(id);
+    obsInput.update(settings);
+    setupSourceDefaults(obsInput);
 
-    this.ADD_SOURCE(id, name, type, properties, options.channel);
+    this.ADD_SOURCE(id, name, type, options.channel);
+    this.refreshProperties(id);
+
     const source = this.state.sources[id];
     const muted = nodeObs.OBS_content_isSourceMuted(name);
     this.UPDATE_SOURCE({ id, muted });
@@ -174,7 +179,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(name, (name) => this.getSourceByName(name));
+    return namingHelpers.suggestName(name, (name: string) => this.getSourceByName(name));
   }
 
 
@@ -205,7 +210,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   refreshProperties(id: string) {
-    const properties = this.getPropertiesFormData(id);
+    const properties = this.getSource(id).getPropertiesFormData();
 
     this.UPDATE_SOURCE({ id, properties });
   }
@@ -237,31 +242,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       this.UPDATE_SOURCE({ id, audio, video, doNotDuplicate });
       this.sourceUpdated.next(source);
     }
-  }
-
-
-  setProperties(sourceId: string, properties: TFormData) {
-    const source = this.state.sources[sourceId];
-    const propertiesToSave = inputValuesToObsValues(properties, {
-      boolToString: true,
-      intToString: true,
-      valueToObject: true
-    });
-
-    for (const prop of propertiesToSave) {
-      // TODO: This is a temporary hack
-      if (prop.name === 'font') {
-        this.getSource(sourceId).getObsInput().update({ custom_font: prop.value.path });
-      }
-
-      nodeObs.OBS_content_setProperty(
-        source.name,
-        prop.name,
-        prop.value
-      );
-    }
-
-    this.refreshProperties(sourceId);
   }
 
 
@@ -306,35 +286,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.sources;
   }
 
-
-  getPropertiesFormData(sourceId: string) {
-    const source = this.getSourceById(sourceId);
-    if (!source) return [];
-
-    const obsProps = nodeObs.OBS_content_getSourceProperties(source.name);
-    const props = obsValuesToInputValues(obsProps, {
-      boolIsString: true,
-      valueIsObject: true,
-      valueGetter: (propName) => {
-        const val = nodeObs.OBS_content_getSourcePropertyCurrentValue(
-          source.name,
-          propName
-        );
-
-        // TODO: This is a temporary hack
-        if (propName === 'font') {
-          val.path = source.getObsInput().settings['custom_font'];
-        }
-
-        return val;
-      },
-      subParametersGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertiesSubParameters(source.name, propName);
-      }
-    });
-
-    return props;
-  }
 }
 
 @ServiceHelper()
@@ -388,6 +339,17 @@ export class Source implements ISourceApi {
 
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
+  }
+
+
+  getPropertiesFormData(): TFormData {
+    return getPropertiesFormData(this.getObsInput());
+  }
+
+
+  setPropertiesFormData(properties: TFormData) {
+    setPropertiesFormData(this.getObsInput(), properties);
+    this.sourcesService.refreshProperties(this.sourceId);
   }
 
 

@@ -1,12 +1,28 @@
-import { StatefulService } from './stateful-service';
-import { obsValuesToInputValues, inputValuesToObsValues, TFormData } from '../components/shared/forms/Input';
-
-import { nodeObs } from './obs-api';
+import { Service } from './service';
+import { TFormData, getPropertiesFormData, setPropertiesFormData, IListOption } from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
+import * as obs from '../../obs-api';
+
+export type TSourceFilterType =
+  'mask_filter' |
+  'crop_filter' |
+  'gain_filter' |
+  'color_filter' |
+  'scale_filter' |
+  'scroll_filter' |
+  'gpu_delay' |
+  'color_key_filter' |
+  'clut_filter' |
+  'sharpness_filter' |
+  'chroma_key_filter' |
+  'async_delay_filter' |
+  'noise_suppress_filter' |
+  'noise_gate_filter' |
+  'compressor_filter';
 
 interface ISourceFilterType {
-  type: string;
+  type: TSourceFilterType;
   description: string;
   video: boolean;
   audio: boolean;
@@ -18,71 +34,104 @@ export interface ISourceFilter {
   visible: boolean;
 }
 
-interface ISourceFiltersState {
-  availableTypes: ISourceFilterType[];
-}
 
-export default class SourceFiltersService extends StatefulService<ISourceFiltersState> {
-
-
-  static initialState: ISourceFiltersState = {
-    availableTypes: nodeObs.OBS_content_getListFilters()
-  };
+export class SourceFiltersService extends Service {
 
   @Inject()
   sourcesService: SourcesService;
 
+  getTypesList(): IListOption<TSourceFilterType>[] {
+    return [
+      { description: 'Image Mask/Blend', value: 'mask_filter' },
+      { description: 'Crop/Pad', value: 'crop_filter' },
+      { description: 'Gain', value: 'gain_filter' },
+      { description: 'Color Correction', value: 'color_filter' },
+      { description: 'Scaling/Aspect Ratio', value: 'scale_filter' },
+      { description: 'Scroll', value: 'scroll_filter' },
+      { description: 'Render Delay', value: 'gpu_delay' },
+      { description: 'Color Key', value: 'color_key_filter' },
+      { description: 'Apply LUT', value: 'clut_filter' },
+      { description: 'Sharpen', value: 'sharpness_filter' },
+      { description: 'Chroma Key', value: 'chroma_key_filter' },
+      { description: 'Video Delay (Async)', value: 'async_delay_filter' },
+      { description: 'Noise Suppression', value: 'noise_suppress_filter' },
+      { description: 'Noise Gate', value: 'noise_gate_filter' },
+      { description: 'Compressor', value: 'compressor_filter' }
+    ];
+  }
 
-  add(sourceName: string, filterType: string, filterName: string) {
-    nodeObs.OBS_content_addSourceFilter(sourceName, filterType, filterName);
+
+  getTypes(): ISourceFilterType[] {
+    const typesList = this.getTypesList();
+    const types: ISourceFilterType[] = [];
+
+    obs.FilterFactory.types().forEach((type: TSourceFilterType) => {
+      const listItem = typesList.find(item => item.value === type);
+      if (!listItem) {
+        console.warn(`filter ${type} is not found in available types`);
+        return;
+      }
+      const description = listItem.description;
+      const flags = obs.Global.getOutputFlagsFromId(type);
+      types.push({
+        audio: !!(obs.EOutputFlags.Audio & flags),
+        video: !!(obs.EOutputFlags.Video & flags),
+        async: !!(obs.EOutputFlags.Async & flags),
+        type,
+        description
+      });
+    });
+
+    return types;
+  }
+
+
+  getTypesForSource(sourceName: string): ISourceFilterType[] {
+    const source = this.sourcesService.getSourceByName(sourceName);
+    return this.getTypes().filter(filterType => {
+      return (filterType.audio && source.audio) || (filterType.video && source.video);
+    });
+  }
+
+
+  add(sourceName: string, filterType: TSourceFilterType, filterName: string) {
+    const source = this.sourcesService.getSourceByName(sourceName);
+    const obsFilter = obs.FilterFactory.create(filterType, filterName);
+    source.getObsInput().addFilter(obsFilter);
   }
 
 
   remove(sourceName: string, filterName: string) {
-    nodeObs.OBS_content_removeSourceFilter(sourceName, filterName);
+    const obsFilter = this.getObsFilter(sourceName, filterName);
+    const source = this.sourcesService.getSourceByName(sourceName);
+    source.getObsInput().removeFilter(obsFilter);
   }
 
 
-  setProperties(sourceName: string, filterName: string, properties: TFormData) {
-    const propertiesToSave = inputValuesToObsValues(properties, {
-      boolToString: true,
-      intToString: true,
-      valueToCurrentValue: true,
-      valueToObject: true
-    });
-
-    for (const prop of propertiesToSave) {
-      nodeObs.OBS_content_setSourceFilterProperty(
-        sourceName,
-        filterName,
-        prop.name,
-        prop.value
-      );
-    }
+  setPropertiesFormData(sourceName: string, filterName: string, properties: TFormData) {
+    if (!filterName) return;
+    setPropertiesFormData(this.getObsFilter(sourceName, filterName), properties);
   }
 
 
   getFilters(sourceName: string): ISourceFilter[] {
-    const filtersNames: string[] = nodeObs.OBS_content_getListSourceFilters(sourceName);
-    return filtersNames.map(filterName => {
-      return {
-        name: filterName,
-        visible: nodeObs.OBS_content_getSourceFilterVisibility(sourceName, filterName, name) as boolean
-      };
-    });
+    return this.sourcesService
+      .getSourceByName(sourceName)
+      .getObsInput()
+      .filters.map(obsFilter => ({
+        visible: obsFilter.enabled,
+        name: obsFilter.name
+      }));
   }
 
 
   setVisibility(sourceName: string, filterName: string, visible: boolean) {
-    nodeObs.OBS_content_setSourceFilterVisibility(sourceName, filterName, visible);
+    this.getObsFilter(sourceName, filterName).enabled = visible;
   }
 
 
   getAddNewFormData(sourceName: string) {
-    const source = this.sourcesService.getSourceByName(sourceName);
-    const availableTypes = this.state.availableTypes.filter(filterType => {
-      return (filterType.audio && source.audio) || (filterType.video && source.video);
-    }).map(filterType => {
+    const availableTypesList = this.getTypesForSource(sourceName).map(filterType => {
       return { description: filterType.description, value: filterType.type };
     });
 
@@ -90,8 +139,8 @@ export default class SourceFiltersService extends StatefulService<ISourceFilters
       type: {
         description: 'Filter type',
         name: 'type',
-        value: this.state.availableTypes[0].type,
-        options: availableTypes
+        value: availableTypesList[0].value,
+        options: availableTypesList
       },
       name: {
         description: 'Filter name',
@@ -102,26 +151,13 @@ export default class SourceFiltersService extends StatefulService<ISourceFilters
   }
 
 
-  getPropertiesFormData(sourceName: string, filterName: string) {
-    let properties = nodeObs.OBS_content_getSourceFilterProperties(sourceName, filterName);
-    if (!properties) return [];
-
-    properties = obsValuesToInputValues(properties, {
-      valueIsObject: true,
-      boolIsString: true,
-      valueGetter: propName => {
-        return nodeObs.OBS_content_getSourceFilterPropertyCurrentValue(
-          sourceName, filterName, propName
-        );
-      },
-      subParametersGetter: propName => {
-        return nodeObs.OBS_content_getSourceFilterPropertiesSubParameters(
-          sourceName, filterName, propName
-        );
-      }
-    });
-
-    return properties;
+  getPropertiesFormData(sourceName: string, filterName: string): TFormData {
+    if (!filterName) return [];
+    return getPropertiesFormData(this.getObsFilter(sourceName, filterName));
   }
 
+
+  private getObsFilter(sourceName: string, filterName: string): obs.IFilter {
+    return this.sourcesService.getSourceByName(sourceName).getObsInput().findFilter(filterName);
+  }
 }

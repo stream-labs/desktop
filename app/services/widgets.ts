@@ -243,7 +243,7 @@ export class WidgetsService extends Service {
     });
 
     const sceneItem = scene.createAndAddSource(suggestedName, 'browser_source');
-    const properties = this.sourcesService.getPropertiesFormData(sceneItem.sourceId);
+    const properties = sceneItem.source.getPropertiesFormData();
 
     // Find the URL property and set it
     properties.forEach(prop => {
@@ -264,7 +264,7 @@ export class WidgetsService extends Service {
       }
     });
 
-    this.sourcesService.setProperties(sceneItem.sourceId, properties);
+    sceneItem.source.setPropertiesFormData(properties);
 
     // Give a couple seconds for the resize to propagate
     setTimeout(() => {

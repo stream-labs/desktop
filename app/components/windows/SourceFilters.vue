@@ -53,7 +53,7 @@ import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
-import SourceFiltersService from '../../services/source-filters';
+import { SourceFiltersService } from '../../services/source-filters';
 import { ISourcesServiceApi } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
@@ -96,7 +96,7 @@ export default class SourceFilters extends Vue {
   }
 
   save() {
-    this.sourceFiltersService.setProperties(
+    this.sourceFiltersService.setPropertiesFormData(
       this.sourceName,
       this.selectedFilterName,
       this.properties
