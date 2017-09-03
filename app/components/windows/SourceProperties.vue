@@ -4,7 +4,7 @@
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200">
-  <SourcePreview slot="fixed" :sourceName="sourceName"></SourcePreview>
+  <SourcePreview slot="fixed" v-if="source" :sourceName="source.name"></SourcePreview>
   <div slot="content">
     <GenericForm v-model="properties" @input="onInputHandler"/>
   </div>
@@ -35,15 +35,16 @@ export default class SourceProperties extends Vue {
 
   windowService = WindowService.instance;
   sourceId = this.windowService.getOptions().sourceId;
-  properties = this.sourcesService.getPropertiesFormData(this.sourceId);
+  source = this.sourcesService.getSource(this.sourceId);
+  properties = this.source ? this.source.getPropertiesFormData() : [];
 
 
   onInputHandler(properties: TFormData, changedIndex: number) {
-    this.sourcesService.setProperties(
-      this.sourceId,
+    const source = this.sourcesService.getSource(this.sourceId);
+    source.setPropertiesFormData(
       [properties[changedIndex]]
     );
-    this.properties = this.sourcesService.getPropertiesFormData(this.sourceId);
+    this.properties = source.getPropertiesFormData();
   }
 
   closeWindow() {
@@ -62,10 +63,6 @@ export default class SourceProperties extends Vue {
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
     return source ? `Properties for '${source.displayName}'` : '';
-  }
-
-  get sourceName() {
-    return this.sourcesService.getSource(this.sourceId).name;
   }
 
 }

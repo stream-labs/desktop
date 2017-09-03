@@ -28,15 +28,15 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType, Input } from './Input';
+import { IFormInput, TObsType, Input } from './Input';
 
 @Component
-class IntInput extends Input<IInputValue<number>> {
+class IntInput extends Input<IFormInput<number>> {
 
   static obsType: TObsType[];
 
   @Prop()
-  value: IInputValue<number>;
+  value: IFormInput<number>;
 
   $refs: {
     input: HTMLInputElement

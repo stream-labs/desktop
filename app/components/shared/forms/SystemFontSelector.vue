@@ -52,7 +52,7 @@
 <script lang="ts">
 import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
-import { IInputValue, Input, IFont } from './Input';
+import { IFormInput, Input, IFont } from './Input';
 import { Multiselect } from 'vue-multiselect';
 import FontSizeSelector from './FontSizeSelector.vue';
 
@@ -84,10 +84,10 @@ const fontManager = window['require']('font-manager');
 @Component({
   components: { Multiselect, FontSizeSelector }
 })
-export default class SystemFontSelector extends Input<IInputValue<IFont>>{
+export default class SystemFontSelector extends Input<IFormInput<IFont>>{
 
   @Prop()
-  value: IInputValue<IFont>;
+  value: IFormInput<IFont>;
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 
@@ -162,7 +162,7 @@ export default class SystemFontSelector extends Input<IInputValue<IFont>>{
   }
 
   setSize(size: string) {
-    this.setFont({ size });
+    this.setFont({ size: Number(size) });
   }
 
   // Generic function for setting the current font.

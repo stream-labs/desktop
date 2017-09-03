@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
+import * as obs from '../../../../obs-api';
+import { isListProperty, isEditableListProperty, isNumberProperty } from '../../../util/properties-type-guards';
 
 /**
  * all possible OBS properties types
@@ -25,12 +27,12 @@ export declare type TObsType =
 /**
  * OBS values that frontend application can change
  */
-export declare type TObsValue = number | string | boolean | IFont | IStringList;
+export declare type TObsValue = number | string | boolean | IFont | TObsStringList;
 
 /**
  * common interface for OBS objects properties
  */
-export interface IInputValue<TValueType> {
+export interface IFormInput<TValueType> {
   value: TValueType;
   name: string;
   description: string;
@@ -40,9 +42,9 @@ export interface IInputValue<TValueType> {
   type?: TObsType;
 }
 
-export declare type TFormData = (IInputValue<TObsValue> | IListInputValue)[];
+export declare type TFormData = (IFormInput<TObsValue> | IListInputValue)[];
 
-export interface IListInputValue extends IInputValue<string> {
+export interface IListInputValue extends IFormInput<string> {
   options: IListOption<string>[];
 }
 
@@ -51,11 +53,11 @@ export interface IListOption<TValue> {
   value: TValue;
 }
 
-export interface IPathInputValue extends IInputValue<string> {
+export interface IPathInputValue extends IFormInput<string> {
   filters: IElectronOpenDialogFilter[];
 }
 
-export interface ISliderInputValue extends IInputValue<number> {
+export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
   stepVal: number;
@@ -64,7 +66,7 @@ export interface ISliderInputValue extends IInputValue<number> {
 export interface IFont {
   face?: string;
   flags?: number;
-  size?: string;
+  size?: number;
   path?: string;
 }
 
@@ -73,11 +75,9 @@ export interface IGoogleFont {
   size?: string;
 }
 
-export interface IStringList {
-  valuesArray: string[];
-}
+export type TObsStringList = { value: string }[];
 
-export interface IEditableListInputValue extends IInputValue<IStringList> {
+export interface IEditableListInputValue extends IFormInput<TObsStringList> {
   defaultPath?: string;
   filters?: IElectronOpenDialogFilter[];
 }
@@ -137,7 +137,7 @@ export function obsValuesToInputValues(
   const resultProps: TFormData = [];
 
   for (const obsProp of obsProps) {
-    let prop = { ...obsProp } as IInputValue<TObsValue>;
+    let prop = { ...obsProp } as IFormInput<TObsValue>;
     let valueObject: Dictionary<any>;
     let obsValue = obsProp.currentValue;
 
@@ -267,6 +267,128 @@ export function inputValuesToObsValues(
     }
   }
   return obsProps;
+}
+
+
+export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
+
+  setupSourceDefaults(obsSource);
+
+  const formData: TFormData = [];
+  const obsProps = obsSource.properties;
+  const obsSettings = obsSource.settings;
+
+  let obsProp = obsProps.first();
+  do {
+    let obsType: TObsType;
+
+    switch (obsProp.type) {
+      case obs.EPropertyType.Boolean:
+        obsType = 'OBS_PROPERTY_BOOL'; break;
+      case obs.EPropertyType.Int:
+        obsType = 'OBS_PROPERTY_INT'; break;
+      case obs.EPropertyType.Float:
+        obsType = 'OBS_PROPERTY_FLOAT'; break;
+      case obs.EPropertyType.List:
+        obsType = 'OBS_PROPERTY_LIST'; break;
+      case obs.EPropertyType.Text:
+        obsType = 'OBS_PROPERTY_TEXT'; break;
+      case obs.EPropertyType.Color:
+        obsType = 'OBS_PROPERTY_COLOR'; break;
+      case obs.EPropertyType.Font:
+        obsType = 'OBS_PROPERTY_FONT'; break;
+      case obs.EPropertyType.EditableList:
+        obsType = 'OBS_PROPERTY_EDITABLE_LIST'; break;
+      case obs.EPropertyType.Button:
+        obsType = 'OBS_PROPERTY_BUTTON'; break;
+      case obs.EPropertyType.Path:
+        switch ((obsProp as obs.IPathProperty).details.type) {
+          case obs.EPathType.File: obsType = 'OBS_PROPERTY_FILE'; break;
+          case obs.EPathType.Directory: obsType = 'OBS_PROPERTY_PATH'; break;
+        }
+        break;
+    }
+
+    const formItem: IFormInput<TObsValue> = {
+      value: obsSettings[obsProp.name],
+      name: obsProp.name,
+      description: obsProp.description,
+      enabled: obsProp.enabled,
+      visible: obsProp.visible,
+      type: obsType
+    };
+
+    // handle property details
+
+    if (isListProperty(obsProp)) {
+      const options: IListOption<any>[] = obsProp.details.items.map(option => {
+        return { value: option.value, description: option.name };
+      });
+      (formItem as IListInputValue).options = options;
+    }
+
+    if (isNumberProperty(obsProp)) {
+      if (obsProp.details.type === obs.ENumberType.Slider) {
+        Object.assign(formItem as ISliderInputValue, {
+          minVal: obsProp.details.min,
+          maxVal: obsProp.details.max,
+          stepVal: obsProp.details.step,
+          type: 'OBS_PROPERTY_SLIDER'
+        });
+      }
+    }
+
+    if (isEditableListProperty(obsProp)) {
+      Object.assign(formItem as IEditableListInputValue, {
+        filters: parsePathFilters(obsProp.details.filter),
+        defaultPath: obsProp.details.defaultPath
+      });
+    }
+
+    formData.push(formItem);
+  } while (obsProp = obsProp.next());
+
+  return formData;
+}
+
+
+export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
+  const buttons: IFormInput<boolean>[] = [];
+  const formInputs: IFormInput<TObsValue>[] = [];
+
+  form.forEach(item => {
+    if (item.type === 'OBS_PROPERTY_BUTTON') {
+      buttons.push(item as IFormInput<boolean>);
+    } else {
+      formInputs.push(item);
+    }
+  });
+
+  const settings: Dictionary<any> = {};
+  formInputs.map(property => settings[property.name] = property.value);
+  obsSource.update(settings);
+
+  buttons.forEach(buttonInput => {
+    if (!buttonInput.value) return;
+    const obsButtonProp = obsSource.properties.get(buttonInput.name) as obs.IButtonProperty;
+    obsButtonProp.buttonClicked(obsSource);
+  });
+}
+
+
+export function setupSourceDefaults(obsSource: obs.ISource) {
+  const propSettings = obsSource.settings;
+  const defaultSettings = {};
+  let obsProp = obsSource.properties.first();
+  do {
+    if (
+      propSettings[obsProp.name] !== void 0 ||
+      !isListProperty(obsProp) ||
+      obsProp.details.items.length === 0
+    ) continue;
+    defaultSettings[obsProp.name] = obsProp.details.items[0].value;
+  } while (obsProp = obsProp.next());
+  obsSource.update(defaultSettings);
 }
 
 export abstract class Input<TValueType> extends Vue {

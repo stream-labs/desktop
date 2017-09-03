@@ -3,10 +3,9 @@ import electron from '../vendor/electron';
 import { Service } from './service';
 import fs from 'fs';
 import path from 'path';
-import { parse } from './config-persistence/';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
-import  SourceFiltersService from './source-filters';
+import { SourceFiltersService } from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
 import { ConfigPersistenceService } from './config-persistence/config';
@@ -64,7 +63,7 @@ export class ObsImporterService extends Service {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
 
-        const isFilterAvailable = this.filtersService.state.availableTypes.find((availableFilter) => {
+        const isFilterAvailable = this.filtersService.getTypes().find((availableFilter) => {
           return availableFilter.type === filterJSON.id;
         });
 
@@ -84,7 +83,7 @@ export class ObsImporterService extends Service {
             }
           }
 
-          this.filtersService.setProperties(source.name, filterJSON.name, properties);
+          this.filtersService.setPropertiesFormData(source.name, filterJSON.name, properties);
         } else {
            // TODO Report to the user that slobs does not support the filter
         }
