@@ -108,7 +108,7 @@ export class Scene implements ISceneApi {
 
     sceneItem.loadAttributes();
 
-    this.scenesService.sourceAdded.next(sceneItem.sceneItemState);
+    this.scenesService.itemAdded.next(sceneItem.sceneItemState);
     return sceneItem;
   }
 
@@ -117,7 +117,7 @@ export class Scene implements ISceneApi {
     const sceneItem = this.getItem(sceneItemId);
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);
-    this.scenesService.sourceRemoved.next(sceneItem.sceneItemState);
+    this.scenesService.itemRemoved.next(sceneItem.sceneItemState);
   }
 
 
