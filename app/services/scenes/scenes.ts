@@ -122,8 +122,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
-  removeScene(id: string) {
-    if (Object.keys(this.state.scenes).length < 2) {
+  removeScene(id: string, force = false): IScene {
+    if (!force && Object.keys(this.state.scenes).length < 2) {
       alert('There needs to be at least one scene.');
       return;
     }
@@ -146,6 +146,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       }
     }
     this.sceneRemoved.next(sceneModel);
+    return sceneModel;
   }
 
 

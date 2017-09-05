@@ -56,6 +56,11 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   }
 
 
+  release() {
+    this.getCurrentTransition().release();
+  }
+
+
   private getCurrentTransition() {
     return obs.Global.getOutputSource(0) as obs.ITransition;
   }

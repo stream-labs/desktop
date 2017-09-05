@@ -113,6 +113,11 @@ export class Scene implements ISceneApi {
   }
 
 
+  remove(force?: boolean): IScene {
+    return this.scenesService.removeScene(this.id, force);
+  }
+
+
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
     sceneItem.getObsSceneItem().remove();

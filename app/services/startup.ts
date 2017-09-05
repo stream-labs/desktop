@@ -5,9 +5,11 @@ import { HotkeysService } from './hotkeys';
 import { UserService } from './user';
 import { ShortcutsService } from './shortcuts';
 import { Inject } from '../util/injector';
-import Utils from './utils.ts';
 import electron from '../vendor/electron';
 import { ServicesManager } from '../services-manager';
+import { ScenesTransitionsService } from './scenes-transitions';
+import { SourcesService } from './sources';
+import { ScenesService } from './scenes/scenes';
 
 interface IStartupState {
   loading: boolean;
@@ -36,6 +38,17 @@ export class StartupService extends StatefulService<IStartupState> {
     loading: true
   };
 
+  private autosaveInterval: number;
+
+  @Inject()
+  scenesTransitionsService: ScenesTransitionsService;
+
+  @Inject()
+  sourcesService: SourcesService;
+
+  @Inject()
+  scenesService: ScenesService;
+
   load() {
     // This is synchronous and can take a really long time for large configs.
     // Setting a timeout allows the spinner and loading text to be drawn to
@@ -50,16 +63,12 @@ export class StartupService extends StatefulService<IStartupState> {
       }
 
       // Set up auto save
-      const autoSave = setInterval(() => {
+      this.autosaveInterval = setInterval(() => {
         this.configPersistenceService.save();
       }, 60 * 1000);
 
 
-      electron.ipcRenderer.on('shutdown', () => {
-        clearInterval(autoSave);
-        this.configPersistenceService.rawSave();
-        electron.remote.getCurrentWindow().close();
-      });
+      electron.ipcRenderer.on('shutdown', () => this.shutdownHandler());
 
       this.hotkeysService.bindHotkeys();
       this.userService;
@@ -72,9 +81,19 @@ export class StartupService extends StatefulService<IStartupState> {
 
   }
 
+  private shutdownHandler() {
+    clearInterval(this.autosaveInterval);
+    this.configPersistenceService.rawSave();
+
+    this.scenesTransitionsService.release();
+    this.scenesService.scenes.forEach(scene => scene.remove(true));
+    this.sourcesService.sources.forEach(source => source.remove());
+
+    electron.remote.getCurrentWindow().close();
+  }
 
   @mutation()
-  FINISH_LOADING() {
+  private FINISH_LOADING() {
     this.state.loading = false;
   }
 
