@@ -42,6 +42,7 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Paste (Reference)',
         enabled: this.clipboardService.hasItems(),
+        accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.pasteReference()
       });
 
@@ -56,7 +57,14 @@ export class EditMenu extends Menu {
 
       this.append({
         label: 'Copy',
+        accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
+      });
+
+      this.append({
+        label: 'Remove',
+        accelerator: 'Delete',
+        click: () => this.scene.removeItem(this.sceneItem.sceneItemId)
       });
 
       this.append({
