@@ -363,6 +363,11 @@ export class Source implements ISourceApi {
   }
 
 
+  remove() {
+    this.sourcesService.removeSource(this.sourceId);
+  }
+
+
   @Inject()
   protected sourcesService: SourcesService;
 
