@@ -22,15 +22,15 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType, Input } from './Input';
+import { IFormInput, TObsType, Input } from './Input';
 
 @Component
-class TextInput extends Input<IInputValue<string>> {
+class TextInput extends Input<IFormInput<string>> {
 
   static obsType: TObsType[];
 
   @Prop()
-  value: IInputValue<string>;
+  value: IFormInput<string>;
 
   textVisible = !this.value.masked;
 

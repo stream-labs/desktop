@@ -14,18 +14,18 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { Input, IInputValue, TObsType } from './Input';
+import { Input, IFormInput, TObsType } from './Input';
 
 @Component
-class ButtonInput extends Input<IInputValue<{}>> {
+class ButtonInput extends Input<IFormInput<boolean>> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: IInputValue<{}>;
+  value: IFormInput<boolean>;
 
   handleClick() {
-    this.emitInput({ ...this.value, value: {} });
+    this.emitInput({ ...this.value, value: true });
   }
 
 }

@@ -27,23 +27,23 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { Input, IInputValue, TObsType, IFont, IGoogleFont } from './Input';
+import { Input, IFormInput, TObsType, IFont, IGoogleFont } from './Input';
 import GoogleFontSelector from './GoogleFontSelector.vue';
 import SystemFontSelector from './SystemFontSelector.vue';
 
 @Component({
   components: { GoogleFontSelector, SystemFontSelector }
 })
-class FontInput extends Input<IInputValue<IFont>> {
+class FontInput extends Input<IFormInput<IFont>> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: IInputValue<IFont>;
+  value: IFormInput<IFont>;
 
   isGoogleFont = !!this.value.value.path;
 
-  setFont(font: IInputValue<IFont>) {
+  setFont(font: IFormInput<IFont>) {
     this.emitInput(font);
   }
 
@@ -53,7 +53,7 @@ class FontInput extends Input<IInputValue<IFont>> {
       ...this.value,
       value: {
         path: font.path,
-        size: font.size
+        size: Number(font.size)
       }
     });
   }

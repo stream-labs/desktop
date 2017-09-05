@@ -27,13 +27,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 
 @Component({ components: { Multiselect } })
-export default class FontSizeSelector extends Input<string> {
+export default class FontSizeSelector extends Input<number> {
 
   @Prop()
-  value: string;
+  value: number;
 
   setFontSizePreset(size: string) {
-    this.emitInput(size);
+    this.emitInput(Number(size));
   }
 
   get fontSizePresets() {

@@ -43,8 +43,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     scenes: {}
   };
 
-  sourceAdded = new Subject<ISceneItem>();
-  sourceRemoved = new Subject<ISceneItem>();
+  sceneAdded = new Subject<IScene>();
+  sceneRemoved= new Subject<IScene>();
+  itemAdded = new Subject<ISceneItem>();
+  itemRemoved = new Subject<ISceneItem>();
 
   @Inject()
   private sourcesService: SourcesService;
@@ -115,7 +117,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     }
 
     if (options.makeActive) this.makeSceneActive(id);
-
+    this.sceneAdded.next(this.state.scenes[id]);
     return this.getSceneByName(name);
   }
 
@@ -127,6 +129,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     }
 
     const scene = this.getScene(id);
+    const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
@@ -142,6 +145,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
         this.makeSceneActive(sceneIds[0]);
       }
     }
+    this.sceneRemoved.next(sceneModel);
   }
 
 
