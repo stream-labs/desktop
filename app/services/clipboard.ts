@@ -1,6 +1,7 @@
 import { mutation, StatefulService } from './stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
+import { shortcut } from './shortcuts';
 import { Inject } from '../util/injector';
 
 // TODO: add Filter type
@@ -28,6 +29,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   sourcesService: SourcesService;
 
 
+  @shortcut('Ctrl+C')
   copy() {
     const source = this.scenesService.activeScene.activeItem;
     if (!source) return;
@@ -35,6 +37,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   }
 
 
+  @shortcut('Ctrl+V')
   pasteReference() {
     this.state.items.forEach(clipboardItem => {
       const source = this.sourcesService.getSource(clipboardItem.id);

@@ -24,8 +24,8 @@ export class ShortcutsService extends Service {
   init() {
     document.addEventListener('keydown', e => {
       // TODO: Maybe look at the event target and see if we should ignore it
-
-      const handler = this.shortcuts.get(e.key);
+      const shortcutName = ShortcutsService.getShortcutName(e);
+      const handler = this.shortcuts.get(shortcutName);
 
       if (handler) handler(e);
     });
@@ -36,7 +36,16 @@ export class ShortcutsService extends Service {
     // We only register shortcuts in the main window for now
     if (Utils.isChildWindow()) return;
 
-    this.shortcuts.set(key, handler);
+    this.shortcuts.set(key.split(' ').join('').toUpperCase(), handler);
   }
 
+
+  private static getShortcutName(event: KeyboardEvent): string {
+    const keys: string[] = [];
+    if (event.ctrlKey) keys.push('Ctrl');
+    if (event.shiftKey) keys.push('Shift');
+    if (event.altKey) keys.push('Alt');
+    keys.push(event.key);
+    return keys.join('+').toUpperCase();
+  }
 }
