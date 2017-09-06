@@ -46,7 +46,32 @@ interface IRequestToService {
 interface IServiceResponce {
   id: string;
   mutations: IMutation[];
+  payload: {
+    isHelper?: boolean;
+    helperName?: string;
+    constructorArgs?: any[];
+
+    isPromise?: boolean;
+    promiseId?: string;
+  };
+}
+
+enum E_PUSH_MESSAGE_TYPE { PROMISE }
+
+interface IPushMessage {
+  type: E_PUSH_MESSAGE_TYPE;
   payload: any;
+}
+
+interface IPromiseMessage extends IPushMessage {
+  type: E_PUSH_MESSAGE_TYPE.PROMISE;
+  payload: IPromisePayload;
+}
+
+interface IPromisePayload {
+  promiseId: string;
+  isRejected: boolean;
+  data: any;
 }
 
 
@@ -97,6 +122,13 @@ export class ServicesManager extends Service {
   private instances: Dictionary<Service> = {};
   private mutationsBufferingEnabled = false;
   private bufferedMutations: IMutation[] = [];
+
+  /**
+   * if result of calling a service method in the main window is promise -
+   * we create a linked promise in the child window and keep it callbacks here until
+   * the promise in the main window will be resolved or rejected
+   */
+  private promises: Dictionary<Function[]> = {};
 
   init() {
 
@@ -172,7 +204,26 @@ export class ServicesManager extends Service {
           responsePayload = service[methodName].apply(service, args);
         }
 
-        if (responsePayload && responsePayload.isHelper) {
+        const isPromise = !!(responsePayload && responsePayload.then);
+
+        if (isPromise) {
+          const promiseId = ipcRenderer.sendSync('getUniqueId');
+          const promise = responsePayload as PromiseLike<any>;
+
+          promise.then(
+            (data) => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
+            (data) => this.sendPromiseMessage({ isRejected: true, promiseId, data })
+          );
+
+          response = {
+            id: request.id,
+            mutations: this.stopBufferingMutations(),
+            payload: {
+              isPromise: true,
+              promiseId
+            }
+          };
+        } else if (responsePayload && responsePayload.isHelper) {
           response = {
             id: request.id,
             mutations: this.stopBufferingMutations(),
@@ -194,6 +245,25 @@ export class ServicesManager extends Service {
       ipcRenderer.send('services-response', response);
     });
     ipcRenderer.send('services-ready');
+  }
+
+  /**
+   * start listen messages from main window
+   */
+  listenMessages() {
+    const promises = this.promises;
+
+    ipcRenderer.on('services-message', (event, message: IPushMessage) => {
+      // handle promise reject/resolve
+      const promisePayload = message.type === E_PUSH_MESSAGE_TYPE.PROMISE && message.payload as IPromisePayload;
+      if (promisePayload) {
+        const [resolve, reject] = promises[promisePayload.promiseId];
+        const callback = promisePayload.isRejected ? reject : resolve;
+        callback(promisePayload.data);
+        delete promises[promisePayload.promiseId];
+      }
+
+    });
   }
 
 
@@ -246,7 +316,8 @@ export class ServicesManager extends Service {
       'Source',
       'AudioSource',
       'SourceFiltersService',
-      'HotkeysService'
+      'HotkeysService',
+      'CacheUploaderService'
     ];
 
     if (!whiteList.includes(service.constructor.name)) return service;
@@ -281,7 +352,11 @@ export class ServicesManager extends Service {
           const payload = response.payload;
           response.mutations.forEach(mutation => commitMutation(mutation));
 
-          if (payload && payload.isHelper) {
+          if (payload && payload.isPromise) {
+            return new Promise((resolve, reject) => {
+              this.promises[payload.promiseId] = [resolve, reject];
+            });
+          } else if (payload && payload.isHelper) {
             const helper = this.getHelper(payload.helperName, payload.constructorArgs);
             return this.applyIpcProxy(helper);
           } else {
@@ -322,4 +397,18 @@ export class ServicesManager extends Service {
     return this.instances[serviceName];
   }
 
+  /**
+   * send push-message to child window
+   */
+  private sendMessage(message: IPushMessage) {
+    ipcRenderer.send('services-message', message);
+  }
+
+
+  private sendPromiseMessage(payload: IPromisePayload) {
+    this.sendMessage({
+      type: E_PUSH_MESSAGE_TYPE.PROMISE,
+      payload
+    });
+  }
 }

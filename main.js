@@ -141,6 +141,10 @@ function startApp() {
     delete requests[response.id];
   });
 
+  ipcMain.on('services-message', (event, payload) => {
+    childWindow.webContents.send('services-message', payload);
+  });
+
 
   if (isDevMode) {
     const devtoolsInstaller = require('electron-devtools-installer');
