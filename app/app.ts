@@ -11,9 +11,10 @@ import { createStore } from './store';
 import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
 import { StartupService } from './services/startup';
+import { ServicesManager } from './services-manager';
 import electron from './vendor/electron';
 
-const { ipcRenderer, remote } = electron;
+const { ipcRenderer } = electron;
 
 require('./app.less');
 
@@ -31,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.on('closeWindow', () => {
       windowService.closeWindow();
     });
+    const servicesManager: ServicesManager = ServicesManager.instance;
+    servicesManager.listenMessages();
   } else {
     windowService.setWindowOptions({ component: 'Main' });
     StartupService.instance.load();

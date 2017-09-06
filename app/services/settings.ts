@@ -73,7 +73,6 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     this.loadSettingsIntoStore();
   }
 
-
   loadSettingsIntoStore() {
     // load configuration from nodeObs to state
     const settingsFormData = {};
