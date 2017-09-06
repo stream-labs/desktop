@@ -317,6 +317,7 @@ export class ServicesManager extends Service {
       'AudioSource',
       'SourceFiltersService',
       'HotkeysService',
+      'ClipboardService',
       'CacheUploaderService'
     ];
 

@@ -3,23 +3,19 @@ import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { shortcut } from './shortcuts';
 import { Inject } from '../util/injector';
+import { SourceFiltersService } from './source-filters';
 
-// TODO: add Filter type
-enum EClipboardItemType { Source }
-
-interface IClipboardItem {
-  type: EClipboardItemType;
-  id: string;
-}
 
 interface IClipboardState {
-  items: IClipboardItem[];
+  sourcesIds: string[];
+  filtersIds: string[];
 }
 
 export class ClipboardService extends StatefulService<IClipboardState> {
 
   static initialState: IClipboardState = {
-    items: []
+    sourcesIds: [],
+    filtersIds: []
   };
 
   @Inject()
@@ -28,28 +24,31 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   @Inject()
   sourcesService: SourcesService;
 
+  @Inject()
+  sourceFiltersService: SourceFiltersService;
+
 
   @shortcut('Ctrl+C')
   copy() {
     const source = this.scenesService.activeScene.activeItem;
     if (!source) return;
-    this.SET_ITEMS([{ id: source.sourceId, type: EClipboardItemType.Source }]);
+    this.SET_SOURCES_IDS([source.sourceId]);
   }
 
 
   @shortcut('Ctrl+V')
   pasteReference() {
-    this.state.items.forEach(clipboardItem => {
-      const source = this.sourcesService.getSource(clipboardItem.id);
+    this.state.sourcesIds.forEach(sourceId => {
+      const source = this.sourcesService.getSource(sourceId);
       if (!source) return;
-      this.scenesService.activeScene.addSource(source.sourceId);
+      this.scenesService.activeScene.addSource(sourceId);
     });
   }
 
 
   pasteDuplicate() {
-    this.state.items.forEach(clipboardItem => {
-      const source = this.sourcesService.getSource(clipboardItem.id);
+    this.state.sourcesIds.forEach(sceneItemId => {
+      const source = this.sourcesService.getSource(sceneItemId);
       if (!source) return;
       const duplicatedSource = source.duplicate();
       if (!duplicatedSource) {
@@ -61,14 +60,40 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   }
 
 
-  hasItems() {
-    return !!this.state.items.length;
+  copyFilters() {
+    const source = this.scenesService.activeScene.activeItem;
+    if (!source) return;
+    this.SET_FILTERS_IDS([source.sourceId]);
+  }
+
+
+  pasteFilters(toSourceId: string) {
+    this.state.filtersIds.forEach(fromSourceId => {
+      const fromSource = this.sourcesService.getSource(fromSourceId);
+      const toSource = this.sourcesService.getSource(toSourceId);
+      if (!fromSource) return;
+      this.sourceFiltersService.copyFilters(fromSource.name, toSource.name);
+    });
+  }
+
+
+  hasSources() {
+    return !!this.state.sourcesIds.length;
+  }
+
+
+  hasFilters() {
+    return !!this.state.filtersIds.length;
   }
 
 
   @mutation()
-  private SET_ITEMS(items: IClipboardItem[]) {
-    this.state.items = items;
+  private SET_SOURCES_IDS(sourcesIds: string[]) {
+    this.state.sourcesIds = sourcesIds;
   }
 
+  @mutation()
+  private SET_FILTERS_IDS(filtersIds: string[]) {
+    this.state.filtersIds = filtersIds;
+  }
 }
