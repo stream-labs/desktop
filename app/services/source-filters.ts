@@ -1,8 +1,13 @@
 import { Service } from './service';
-import { TFormData, getPropertiesFormData, setPropertiesFormData, IListOption } from '../components/shared/forms/Input';
+import {
+  TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
+  TObsValue
+} from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import * as obs from '../../obs-api';
+import namingHelpers from '../util/NamingHelpers';
+
 
 export type TSourceFilterType =
   'mask_filter' |
@@ -31,7 +36,9 @@ interface ISourceFilterType {
 
 export interface ISourceFilter {
   name: string;
+  type: TSourceFilterType;
   visible: boolean;
+  settings: Dictionary<TObsValue>;
 }
 
 
@@ -94,10 +101,28 @@ export class SourceFiltersService extends Service {
   }
 
 
-  add(sourceName: string, filterType: TSourceFilterType, filterName: string) {
+  add(sourceName: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
     const source = this.sourcesService.getSourceByName(sourceName);
     const obsFilter = obs.FilterFactory.create(filterType, filterName);
     source.getObsInput().addFilter(obsFilter);
+    if (settings) obsFilter.update(settings);
+  }
+
+
+  copyFilters(fromSourceName: string, toSourceName: string) {
+    this.getFilters(fromSourceName).forEach(filter => {
+      this.add(
+        toSourceName,
+        filter.type,
+        this.suggestName(toSourceName, filter.name),
+        filter.settings
+      );
+    });
+  }
+
+
+  suggestName(sourceName: string, filterName: string): string {
+    return namingHelpers.suggestName(filterName, (name: string) => this.getObsFilter(sourceName, name));
   }
 
 
@@ -120,7 +145,9 @@ export class SourceFiltersService extends Service {
       .getObsInput()
       .filters.map(obsFilter => ({
         visible: obsFilter.enabled,
-        name: obsFilter.name
+        name: obsFilter.name,
+        type: obsFilter.id as TSourceFilterType,
+        settings: obsFilter.settings
       }));
   }
 

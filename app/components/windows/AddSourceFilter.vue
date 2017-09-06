@@ -24,7 +24,6 @@ import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
 import { SourceFiltersService } from '../../services/source-filters';
-import namingHelpers from '../../util/NamingHelpers';
 
 import * as inputComponents from '../shared/forms';
 import ModalLayout from '../ModalLayout.vue';
@@ -80,9 +79,7 @@ export default class AddSourceFilter extends Vue {
     const name = this.availableTypes.find(({ type }) => {
       return type === this.form.type.value;
     }).description;
-    this.form.name.value = namingHelpers.suggestName(
-      name, (suggestedName: string) => this.validateName(suggestedName)
-    );
+    this.form.name.value = this.filtersService.suggestName(this.sourceName, name);
   }
 
 }
