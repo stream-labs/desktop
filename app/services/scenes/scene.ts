@@ -1,6 +1,6 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { ISourceApi, SourcesService, TSourceType } from '../sources';
+import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
 import * as obs from '../obs-api';

@@ -63,11 +63,6 @@ interface IPushMessage {
   payload: any;
 }
 
-interface IPromiseMessage extends IPushMessage {
-  type: E_PUSH_MESSAGE_TYPE.PROMISE;
-  payload: IPromisePayload;
-}
-
 interface IPromisePayload {
   promiseId: string;
   isRejected: boolean;
@@ -155,14 +150,15 @@ export class ServicesManager extends Service {
   }
 
 
-  getStatefulServices(): Dictionary<typeof StatefulService> {
-    let statefulServices = {};
+  getStatefulServicesAndMutators(): Dictionary<typeof StatefulService> {
+    const statefulServices = {};
     Object.keys(this.services).forEach(serviceName => {
-      if (!this.services[serviceName]['initialState']) return;
+      const ServiceClass = this.services[serviceName];
+      const isStatefulService = ServiceClass['initialState'];
+      const isMutator = ServiceClass.prototype.mutations;
+      if (!isStatefulService && !isMutator) return;
       statefulServices[serviceName] = this.services[serviceName];
     });
-    // TODO: rid of stateless services like Scene, Source, etc.. here
-    statefulServices = { ...statefulServices, Scene, Source, SceneItem, AudioSource };
     return statefulServices;
   }
 

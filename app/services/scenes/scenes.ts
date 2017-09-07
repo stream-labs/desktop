@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
-import { nodeObs } from '../obs-api';
 import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';

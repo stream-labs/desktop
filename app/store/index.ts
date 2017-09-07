@@ -81,7 +81,7 @@ export function createStore() {
 
   const statefulServiceModules = {};
   const servicesManager: ServicesManager = ServicesManager.instance;
-  const statefulServices = servicesManager.getStatefulServices();
+  const statefulServices = servicesManager.getStatefulServicesAndMutators();
   Object.keys(statefulServices).forEach(serviceName => {
     statefulServiceModules[serviceName] = getModule(statefulServices[serviceName]);
   });
