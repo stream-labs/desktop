@@ -302,22 +302,9 @@ export class ServicesManager extends Service {
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
-    // TODO: add all services to whitelist
-    const whiteList = [
-      'SourcesService',
-      'ScenesService',
-      'AudioService',
-      'Scene',
-      'SceneItem',
-      'Source',
-      'AudioSource',
-      'SourceFiltersService',
-      'HotkeysService',
-      'ClipboardService',
-      'CacheUploaderService'
-    ];
-
-    if (!whiteList.includes(service.constructor.name)) return service;
+    // TODO: rid of blacklist
+    const blackList = ['WindowService', 'ObsApiService'];
+    if (blackList.includes(service.constructor.name)) return service;
 
     return new Proxy(service, {
       get: (target, property, receiver) => {
