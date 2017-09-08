@@ -184,6 +184,8 @@ export class Scene implements ISceneApi {
         right: 0
       },
 
+      rotation: 0,
+
       locked: false
     });
   }
