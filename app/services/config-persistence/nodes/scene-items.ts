@@ -14,6 +14,7 @@ interface ISchema {
   crop: ICrop;
   hotkeys?: HotkeysNode;
   locked?: boolean;
+  rotation?: number;
 }
 
 interface IContext {
@@ -42,7 +43,8 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       visible: sceneItem.visible,
       crop: sceneItem.crop,
       locked: sceneItem.locked,
-      hotkeys
+      hotkeys,
+      rotation: sceneItem.rotation
     };
   }
 
@@ -61,6 +63,7 @@ export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
     item.setVisibility(obj.visible);
     item.setCrop(obj.crop);
     item.setLocked(obj.locked || false);
+    item.setRotation(obj.rotation || 0);
 
     if (obj.hotkeys) obj.hotkeys.load({ sceneItemId: obj.id });
   }

@@ -1,3 +1,5 @@
+import { get, set, invert } from 'lodash';
+
 // This class is used for simplifying math that deals
 // with rectangles that can be scaled, including
 // negative scales.
@@ -38,6 +40,7 @@ export class ScalableRectangle implements IScalableRectangle {
   width: number;
   height: number;
   crop: ICrop;
+  rotation: number;
 
   private anchor: AnchorPoint;
 
@@ -57,6 +60,8 @@ export class ScalableRectangle implements IScalableRectangle {
       right: 0,
       ...options.crop
     };
+
+    this.rotation = options.rotation || 0;
 
     this.anchor = AnchorPoint.NorthWest;
   }
@@ -106,9 +111,85 @@ export class ScalableRectangle implements IScalableRectangle {
     this.anchor = anchor;
   }
 
+  /**
+   * Adjust width, height, position, and crop to make this appear
+  * like an unrotated object to the rest of the code.
+  * Note that this only works on 90 degree increments of rotation.
+  * @returns a function to undo the operation.
+  */
+  private zeroRotation() {
+    // A set a fields to map values
+    const mapFields: Dictionary<string> = {};
 
-  // Executes the function with a specific anchor point, after
-  // which it is returned to its original anchor point.
+    // This is where the anchor point would actually be if this
+    // were a zero rotated object
+    let anchor = AnchorPoint.NorthWest;
+
+    if (this.rotation === 90) {
+      mapFields['width'] = 'height';
+      mapFields['height'] = 'width';
+      mapFields['scaleX'] = 'scaleY';
+      mapFields['scaleY'] = 'scaleX';
+      mapFields['crop.top'] = 'crop.left';
+      mapFields['crop.right'] = 'crop.top';
+      mapFields['crop.bottom'] = 'crop.right';
+      mapFields['crop.left'] = 'crop.bottom';
+      anchor = AnchorPoint.NorthEast;
+    } else if (this.rotation === 180) {
+      mapFields['crop.top'] = 'crop.bottom';
+      mapFields['crop.right'] = 'crop.left';
+      mapFields['crop.bottom'] = 'crop.top';
+      mapFields['crop.left'] = 'crop.right';
+      anchor = AnchorPoint.SouthEast;
+    } else if (this.rotation === 270) {
+      mapFields['width'] = 'height';
+      mapFields['height'] = 'width';
+      mapFields['scaleX'] = 'scaleY';
+      mapFields['scaleY'] = 'scaleX';
+      mapFields['crop.top'] = 'crop.right';
+      mapFields['crop.right'] = 'crop.bottom';
+      mapFields['crop.bottom'] = 'crop.left';
+      mapFields['crop.left'] = 'crop.top';
+      anchor = AnchorPoint.SouthWest;
+    }
+
+    this.mapFields(mapFields);
+
+    this.anchor = anchor;
+
+    // Return the anchor to the NW, since the editor code assumes
+    // that all rectangles are anchored from the NW
+    this.setAnchor(AnchorPoint.NorthWest);
+
+    const rotation = this.rotation;
+    this.rotation = 0;
+
+    // Return a function to undo these operations in the reverse order
+    return () => {
+      this.rotation = rotation;
+      this.setAnchor(anchor);
+      this.mapFields(invert(mapFields));
+    };
+  }
+
+
+  private mapFields(fields: Dictionary<string>) {
+    const currentValues: any = {};
+
+    Object.keys(fields).forEach(key => {
+      currentValues[key] = get(this, fields[key]);
+    });
+
+    Object.keys(fields).forEach(key => {
+      set(this, key, currentValues[key]);
+    });
+  }
+
+
+  /**
+   * Executes the function with a specific anchor point, after
+   * which it is returned to its original anchor point.
+   */
   withAnchor(anchor: AnchorPoint, fun: Function) {
     const oldAnchor = this.anchor;
     this.setAnchor(anchor);
@@ -119,10 +200,14 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
 
-  // Normalizes this rectangle into a rectangle that does not
-  // have any negative scales.  It returns a function that
-  // can be used to undo the operation.
+  /**
+   * Normalizes this rectangle into a rectangle that does not
+   * have any negative scales.
+   * @returns a function that can be used to undo the operation.
+   */
   normalize(): () => void {
+    const derotate = this.zeroRotation();
+
     const xFlipped = this.scaleX < 0;
     const yFlipped = this.scaleY < 0;
 
@@ -132,13 +217,16 @@ export class ScalableRectangle implements IScalableRectangle {
     return () => {
       if (xFlipped) this.flipX();
       if (yFlipped) this.flipY();
+      derotate();
     };
   }
 
 
-  // This is a convenience method that will run the passed
-  // function in a normalized environment, and then return
-  // it back to its original state afterwards.
+  /**
+   * This is a convenience method that will run the passed
+   * function in a normalized environment, and then return
+   * it back to its original state afterwards.
+   */
   normalized(fun: Function) {
     const denormalize = this.normalize();
 
@@ -168,8 +256,10 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
 
-  // Stretches this rectangle across the provided
-  // rectangle.  Aspect ratio may not be preserved.
+  /**
+   * Stretches this rectangle across the provided
+   * rectangle.  Aspect ratio may not be preserved.
+   */
   stretchAcross(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
     this.normalized(() => rect.normalized(() => {
@@ -181,8 +271,10 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
 
-  // Fits this rectangle inside the provided rectangle
-  // while preserving the aspect ratio of this rectangle.
+  /**
+   * Fits this rectangle inside the provided rectangle
+   * while preserving the aspect ratio of this rectangle.
+   */
   fitTo(rect: ScalableRectangle) {
     // Normalize both rectangles for this operation
     this.normalized(() => rect.normalized(() => {
@@ -199,16 +291,21 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
 
-  // Centers this rectangle on the provided rectangle
-  // without changing the scale.
+  /**
+   * Centers this rectangle on the provided rectangle
+   * without changing the scale.
+   */
   centerOn(rect: ScalableRectangle) {
-    // Anchor both rectangles in the center
-    this.withAnchor(AnchorPoint.Center, () => {
-      rect.withAnchor(AnchorPoint.Center, () => {
-        this.x = rect.x;
-        this.y = rect.y;
+    // Normalize both rectangles for this operation
+    this.normalized(() => rect.normalized(() => {
+      // Anchor both rectangles in the center
+      this.withAnchor(AnchorPoint.Center, () => {
+        rect.withAnchor(AnchorPoint.Center, () => {
+          this.x = rect.x;
+          this.y = rect.y;
+        });
       });
-    });
+    }));
   }
 
 }

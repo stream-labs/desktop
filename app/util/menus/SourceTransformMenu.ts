@@ -64,6 +64,26 @@ export class SourceTransformMenu extends Menu {
       }
     });
 
+    this.append({
+      label: 'Rotate 90 degrees CW',
+      click: () => {
+        this.rotate(90);
+      }
+    });
+
+    this.append({
+      label: 'Rotate 90 degrees CCW',
+      click: () => {
+        this.rotate(-90);
+      }
+    });
+
+    this.append({
+      label: 'Rotate 180 degrees',
+      click: () => {
+        this.rotate(180);
+      }
+    });
   }
 
 
@@ -75,6 +95,7 @@ export class SourceTransformMenu extends Menu {
       right: 0,
       bottom: 0
     });
+    this.source.setRotation(0);
   }
 
 
@@ -106,16 +127,20 @@ export class SourceTransformMenu extends Menu {
 
 
   flipVertical() {
-    const source = this.getSourceRectangle();
-    source.flipY();
-    this.setRectangle(source);
+    this.preservePosition(() => {
+      const source = this.getSourceRectangle();
+      source.flipY();
+      this.setRectangle(source);
+    });
   }
 
 
   flipHorizontal() {
-    const source = this.getSourceRectangle();
-    source.flipX();
-    this.setRectangle(source);
+    this.preservePosition(() => {
+      const source = this.getSourceRectangle();
+      source.flipX();
+      this.setRectangle(source);
+    });
   }
 
 
@@ -137,6 +162,34 @@ export class SourceTransformMenu extends Menu {
     const source = this.getSourceRectangle();
     source.centerOn(this.getScreenRectangle());
     this.setRectangle(source);
+  }
+
+
+  rotate(deltaRotation: number) {
+    this.preservePosition(() => {
+      this.source.setRotation(this.source.rotation + deltaRotation);
+    });
+  }
+
+  // Many of these transforms can unexpectedly change the position of the
+  // object.  For example, rotations happen around the NW axis.  This function
+  // records the normalized x,y position before the operation and returns it to
+  // that position after the operation has been performed.
+  preservePosition(fun: Function) {
+    const rect = this.getSourceRectangle();
+    rect.normalize();
+    const x = rect.x;
+    const y = rect.y;
+
+    fun();
+
+    const newRect = this.getSourceRectangle();
+    newRect.normalized(() => {
+      newRect.x = x;
+      newRect.y = y;
+    });
+
+    this.source.setPosition({ x: newRect.x, y: newRect.y });
   }
 
 }

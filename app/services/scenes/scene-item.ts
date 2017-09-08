@@ -17,6 +17,7 @@ export interface ISceneItem {
   visible: boolean;
   crop: ICrop;
   locked: boolean;
+  rotation: number;
 }
 
 
@@ -59,6 +60,7 @@ export class SceneItem implements ISceneItemApi {
   visible: boolean;
   crop: ICrop;
   locked: boolean;
+  rotation: number;
 
   // Some computed attributes
 
@@ -141,6 +143,16 @@ export class SceneItem implements ISceneItemApi {
   setVisibility(visible: boolean) {
     this.getObsSceneItem().visible = visible;
     this.UPDATE({ sceneItemId: this.sceneItemId, visible });
+  }
+
+
+  setRotation(rotation: number) {
+    // Adjusts any positve or negative rotation value into a normalized
+    // value between 0 and 360.
+    const effectiveRotation = ((rotation % 360) + 360) % 360;
+
+    this.getObsSceneItem().rotation = effectiveRotation;
+    this.UPDATE({ sceneItemId: this.sceneItemId, rotation: effectiveRotation });
   }
 
 
