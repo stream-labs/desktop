@@ -5,7 +5,7 @@
             "name": "Launch",
             "type": "node",
             "request": "launch",
-            "protocol": "legacy",
+            "protocol": "inspector",
             "runtimeArgs": [
                 "${workspaceRoot}"
             ],
