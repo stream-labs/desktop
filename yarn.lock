@@ -2499,9 +2499,9 @@ electron-updater@^1.14.0:
     source-map-support "^0.4.14"
     xelement "^1.0.13"
 
-electron@1.7.6:
-  version "1.7.6"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.6.tgz#fb69ea31bd03df0eff247f26f0b538bd29b6ee72"
+electron@1.7.7:
+  version "1.7.7"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-1.7.7.tgz#cfd89ca9eba79d763ac0b0c6dcc583792097b9b6"
   dependencies:
     "@types/node" "^7.0.18"
     electron-download "^3.0.1"
