@@ -52,7 +52,11 @@ export class CacheUploaderService extends Service {
       });
 
       archive.pipe(output);
-      archive.directory(cacheDir, false);
+      archive.directory(path.join(cacheDir, 'node-obs'), 'node-obs');
+      archive.directory(path.join(cacheDir, 'SceneConfigs'), 'SceneConfigs');
+      archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
+      archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
+      archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
       archive.finalize();
     });
   }
