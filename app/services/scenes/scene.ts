@@ -32,6 +32,8 @@ export interface ISceneItemInfo {
   scaleY: number;
   visible: boolean;
   crop: ICrop;
+  locked?: boolean;
+  rotation?: number;
 }
 
 export interface ISceneApi extends IScene {
@@ -178,6 +180,8 @@ export class Scene implements ISceneApi {
           visible: item.visible,
           x: item.x,
           y: item.y,
+          locked: item.locked,
+          rotation: item.rotation
         });
       }
     });

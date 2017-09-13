@@ -5,6 +5,7 @@ import { Source, SourcesService, TSourceType } from '../sources';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
+import { ISceneItemInfo } from '../config-persistence/nodes/scene-items';
 
 export interface ISceneItem {
   sceneItemId: string;
@@ -207,7 +208,7 @@ export class SceneItem implements ISceneItemApi {
     });
   }
 
-  loadItemAttributes(customSceneItem: obs.ISceneItemInfo) {
+  loadItemAttributes(customSceneItem: ISceneItemInfo) {
     const visible = customSceneItem.visible;
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
@@ -218,7 +219,9 @@ export class SceneItem implements ISceneItemApi {
       scaleY: customSceneItem.scaleY,
       visible,
       ...position,
-      crop
+      crop,
+      locked: !!customSceneItem.locked,
+      rotation: customSceneItem.rotation
     });
   }
 
