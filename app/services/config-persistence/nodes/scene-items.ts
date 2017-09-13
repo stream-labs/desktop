@@ -58,7 +58,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
             visible: sceneItem.visible,
             crop: sceneItem.crop,
             locked: sceneItem.locked,
-            hotkeys
+            hotkeys,
+            rotation: sceneItem.rotation
           });
         });
       });
@@ -78,7 +79,6 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     this.data.items.forEach(item => {
-      this.scenesService.getSceneItem(item.id).setLocked(item.locked || false);
       if (item.hotkeys) promises.push(item.hotkeys.load({ sceneItemId: item.id }));
     });
 
