@@ -30,6 +30,7 @@ import { SourceFiltersService } from  './services/source-filters';
 import { StartupService } from './services/startup';
 import { ShortcutsService } from './services/shortcuts';
 import { CacheUploaderService } from './services/cache-uploader';
+import { UsageStatisticsService } from './services/usage-statistics';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
@@ -111,7 +112,8 @@ export class ServicesManager extends Service {
     ConfigPersistenceService,
     StartupService,
     ShortcutsService,
-    CacheUploaderService
+    CacheUploaderService,
+    UsageStatisticsService
   };
 
   private instances: Dictionary<Service> = {};

@@ -74,6 +74,24 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
+  /**
+   * This is a uuid that persists across the application lifetime and uniquely
+   * identifies this particular installation of slobs, even when the user is
+   * not logged in.
+   */
+  getLocalUserId() {
+    const localStorageKey = 'SlobsLocalUserId';
+    let userId = localStorage.getItem(localStorageKey);
+
+    if (!userId) {
+      userId = electron.ipcRenderer.sendSync('getUniqueId');
+      localStorage.setItem(localStorageKey, userId);
+    }
+
+    return userId;
+  }
+
+
   get widgetToken() {
     if (this.isLoggedIn()) {
       return this.state.auth.widgetToken;
@@ -119,8 +137,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
-  // Starts the authentication process.  Multiple callbacks
-  // can be passed for various events.
+  /**
+   * Starts the authentication process.  Multiple callbacks
+   * can be passed for various events.
+   */
   startAuth(platform: TPlatform, onWindowShow: Function, onAuthFinish: Function) {
     const service = getPlatformService(platform);
 
@@ -154,7 +174,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
 
-  // Parses tokens out of the auth URL
+  /**
+   * Parses tokens out of the auth URL
+   */
   private parseAuthFromUrl(url: string) {
     const query = URI.parseQuery(URI.parse(url).query);
 
@@ -175,8 +197,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
 }
 
-// You can use this decorator to ensure the user is logged in
-// before proceeding
+/**
+ * You can use this decorator to ensure the user is logged in
+ * before proceeding
+ */
 export function requiresLogin() {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
     const original = descriptor.value;
