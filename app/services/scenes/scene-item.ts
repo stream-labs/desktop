@@ -207,6 +207,21 @@ export class SceneItem implements ISceneItemApi {
     });
   }
 
+  loadItemAttributes(customSceneItem: obs.ISceneItemInfo) {
+    const visible = customSceneItem.visible;
+    const position = { x: customSceneItem.x, y: customSceneItem.y };
+    const crop = customSceneItem.crop;
+
+    this.UPDATE({
+      sceneItemId: this.sceneItemId,
+      scaleX: customSceneItem.scaleX,
+      scaleY: customSceneItem.scaleY,
+      visible,
+      ...position,
+      crop
+    });
+  }
+
   @mutation()
   private UPDATE(patch: {sceneItemId: string} & Partial<ISceneItem>) {
     Object.assign(this.sceneItemState, patch);

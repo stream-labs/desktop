@@ -16,32 +16,48 @@ export class RootNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
 
-  save() {
+  save(): Promise<void> {
     const sources = new SourcesNode();
-    sources.save({});
-
     const scenes = new ScenesNode();
-    scenes.save({});
-
     const transition = new TransitionNode();
-    transition.save();
-
     const hotkeys = new HotkeysNode();
-    hotkeys.save({});
 
-    this.data = {
-      sources,
-      scenes,
-      transition,
-      hotkeys
-    };
+    return new Promise(resolve => {
+      sources.save({}).then(() => {
+        return scenes.save({});
+      }).then(() => {
+        return transition.save();
+      }).then(() => {
+        return hotkeys.save({});
+      }).then(() => {
+        this.data = {
+          sources,
+          scenes,
+          transition,
+          hotkeys
+        };
+
+        resolve();
+      });
+    });
   }
 
-  load() {
-    this.data.sources.load({});
-    this.data.scenes.load({});
-    this.data.transition.load();
-    if (this.data.hotkeys) this.data.hotkeys.load({});
+  load(): Promise<void> {
+    return new Promise(resolve => {
+      this.data.sources.load({}).then(() => {
+        return this.data.scenes.load({});
+      }).then(() => {
+        return this.data.transition.load();
+      }).then(() => {
+        if (this.data.hotkeys) {
+          return this.data.hotkeys.load({});
+        } else {
+          return Promise.resolve();
+        }
+      }).then(() => {
+        resolve();
+      });
+    });
   }
 
 }

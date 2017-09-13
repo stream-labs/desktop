@@ -96,7 +96,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
     this.ADD_SCENE(id, name);
-    obs.SceneFactory.create(name);
+    const scene = obs.SceneFactory.create(name);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);

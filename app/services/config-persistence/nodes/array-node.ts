@@ -7,23 +7,28 @@ interface IArraySchema<TSchema> {
 
 export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySchema<TSchema>, TContext> {
 
-  abstract saveItem(item: TItem, context: TContext): TSchema;
+  abstract saveItem(item: TItem, context: TContext): Promise<TSchema>;
 
-  abstract loadItem(item: TSchema, context: TContext): void;
+  abstract loadItem(item: TSchema, context: TContext): Promise<void>;
 
   abstract getItems(context: TContext): TItem[];
 
-  save(context: TContext) {
-    this.data = {
-      items: compact(this.getItems(context).map(item => {
+  save(context: TContext): Promise<void> {
+    return new Promise(resolve => {
+      Promise.all(this.getItems(context).map(item => {
         return this.saveItem(item, context);
-      }))
-    };
+      })).then(values => {
+        this.data = { items: compact(values) };
+        resolve();
+      });
+    });
   }
 
-  load(context: TContext) {
-    this.data.items.forEach(item => {
-      this.loadItem(item, context);
+  load(context: TContext): Promise<void> {
+    return new Promise(resolve => {
+      Promise.all(this.data.items.map(item => {
+        return this.loadItem(item, context);
+      })).then(() => resolve());
     });
   }
 

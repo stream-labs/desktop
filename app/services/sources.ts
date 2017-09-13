@@ -18,6 +18,10 @@ import namingHelpers from '../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
 
+const AudioFlag = obs.EOutputFlags.Audio;
+const VideoFlag = obs.EOutputFlags.Video;
+const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
+
 const SOURCES_UPDATE_INTERVAL = 1000;
 
 export interface ISource {
@@ -95,7 +99,23 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   protected init() {
-    setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
+    setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
+
+    ipcRenderer.on('notifySourceAttributes', (e, data: obs.ISourceSize[]) => {
+      data.forEach(update => {
+        const source = this.getSourceByName(update.name);
+
+        if (!source) return;
+
+        if ((source.width !== update.width) || (source.height !== update.height)) {
+          const size = { id: source.sourceId, width: update.width,
+            height: update.height };
+          this.UPDATE_SOURCE(size);
+        }
+        this.updateSourceFlags(source, update.outputFlags);
+      });
+    });
+
     this.scenesService.itemRemoved.subscribe(
       (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
     );
@@ -152,22 +172,24 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     const obsInput = obs.InputFactory.create(type, name, settings);
 
+    this.addSource(obsInput, id, options);
+
+    return this.getSource(id);
+  }
+
+  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-
-    obsInput.update(settings);
     setupSourceDefaults(obsInput);
-
-    this.ADD_SOURCE(id, name, type, options.channel);
-    this.refreshProperties(id);
-
+    const type: TSourceType = obsInput.id as TSourceType;
+    this.ADD_SOURCE(id, obsInput.name, type, options.channel);
     const source = this.state.sources[id];
-    const muted = nodeObs.OBS_content_isSourceMuted(name);
+    const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.refreshSourceFlags(source, id);
+    this.updateSourceFlags(source, obsInput.outputFlags);
+
     this.sourceAdded.next(source);
-    return this.getSource(id);
   }
 
   removeSource(id: string) {
@@ -216,30 +238,49 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
+
   refreshSourceAttributes() {
-    Object.keys(this.state.sources).forEach(id => {
-      const source = this.state.sources[id];
+    const activeItems = this.scenesService.activeScene.getItems();
+    const sourcesNames: string[] = [];
 
-      const size: {width: number, height: number } = nodeObs.OBS_content_getSourceSize(source.name);
+    activeItems.forEach(activeItem => {
+      sourcesNames.push(activeItem.name);
+    });
 
-      if ((source.width !== size.width) || (source.height !== size.height)) {
-        const { width, height } = size;
-        this.UPDATE_SOURCE({ id, width, height });
+    const sourcesSize = obs.getSourcesSize(sourcesNames);
+
+    activeItems.forEach((item, index) => {
+      const source = this.state.sources[item.sourceId];
+
+      if ((source.width !== sourcesSize[index].width) || (source.height !== sourcesSize[index].height)) {
+        const size = { id: item.sourceId, width: sourcesSize[index].width,
+          height: sourcesSize[index].height };
+        this.UPDATE_SOURCE(size);
       }
-
-      this.refreshSourceFlags(source, id);
+      this.updateSourceFlags(source, sourcesSize[index].outputFlags);
     });
   }
 
+  requestSourceSizes() {
+    const activeScene = this.scenesService.activeScene;
+    if (activeScene) {
+      const activeItems = activeScene.getItems();
+      const sourcesNames: string[] = [];
 
-  private refreshSourceFlags(source: ISource, id: string) {
-    const flags = this.getSource(id).getObsInput().outputFlags;
-    const audio = !!(obs.EOutputFlags.Audio & flags);
-    const video = !!(obs.EOutputFlags.Video & flags);
-    const doNotDuplicate = !!(obs.EOutputFlags.DoNotDuplicate & flags);
+      activeItems.forEach(activeItem => {
+        sourcesNames.push(activeItem.name);
+      });
+      ipcRenderer.send('requestSourceAttributes', sourcesNames);
+    }
+  }
+
+  private updateSourceFlags(source: ISource, flags: number) {
+    const audio = !!(AudioFlag & flags);
+    const video = !!(VideoFlag & flags);
+    const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id, audio, video, doNotDuplicate });
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
       this.sourceUpdated.next(source);
     }
   }

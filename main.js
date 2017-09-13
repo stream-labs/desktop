@@ -382,3 +382,10 @@ ipcMain.on('restartApp', () => {
   // Closing the main window starts the shut down sequence
   mainWindow.close();
 });
+
+ipcMain.on('requestSourceAttributes', (e, names) => {
+  const sizes = require('obs-studio-node').getSourcesSize(names);
+
+  e.sender.send('notifySourceAttributes', sizes);
+});
+
