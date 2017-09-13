@@ -14,14 +14,14 @@ export abstract class Node<TSchema, TContext> {
   // application state and saving it into the data property.
   // It is also responsible for calling save on all child
   // nodes in the desired save order.
-  abstract save(context: TContext): void;
+  abstract save(context: TContext): Promise<void>;
 
 
   // The load method is responsible for taking the data saved
   // in the data propertly and loading it into the application
   // state.  It is also responsible for calling load on all child
   // nodes in the desired load order.
-  abstract load(context: TContext): void;
+  abstract load(context: TContext): Promise<void>;
 
 
   data: TSchema;

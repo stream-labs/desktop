@@ -40,6 +40,8 @@ export class WebcamNode extends Node<ISchema, IContext> {
       width: rect.scaledWidth / this.videoService.baseWidth,
       height: rect.scaledHeight / this.videoService.baseHeight
     };
+
+    return Promise.resolve();
   }
 
 
@@ -79,6 +81,8 @@ export class WebcamNode extends Node<ISchema, IContext> {
       scale,
       crop
     );
+
+    return Promise.resolve();
   }
 
 

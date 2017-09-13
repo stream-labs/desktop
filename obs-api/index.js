@@ -20,3 +20,6 @@ exports.VolmeterFactory = obs.VolmeterFactory;
 exports.FaderFactory = obs.FaderFactory;
 exports.Video = obs.Video;
 exports.ModuleFactory = obs.ModuleFactory;
+exports.addItems = obs.addItems;
+exports.createSources = obs.createSources;
+exports.getSourcesSize = obs.getSourcesSize;

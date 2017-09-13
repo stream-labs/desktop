@@ -24,7 +24,7 @@ export class VideoNode extends Node<ISchema, IContext> {
     const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
 
     // Copy the video file
-    // TODO: Allow save to return a promise and use an asynchronous pipe
+    // TODO: Now that config loading is asynchronous, do not use blocking file IO
     const destination = path.join(context.assetsPath, newFileName);
     fs.writeFileSync(destination, fs.readFileSync(filePath));
 
@@ -35,6 +35,8 @@ export class VideoNode extends Node<ISchema, IContext> {
       settings,
       filename: newFileName
     };
+
+    return Promise.resolve();
   }
 
 
@@ -43,6 +45,8 @@ export class VideoNode extends Node<ISchema, IContext> {
     const settings = { ...this.data.settings };
     settings['local_file'] = filePath;
     context.sceneItem.getObsInput().update(settings);
+
+    return Promise.resolve();
   }
 
 }

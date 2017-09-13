@@ -6,6 +6,7 @@ import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from '../../vendor/electron';
 import { Inject } from '../../util/injector';
+import { HotkeysNode } from '../config-persistence/nodes/hotkeys';
 
 const { ipcRenderer } = electron;
 
@@ -22,6 +23,16 @@ export interface ISceneItemAddOptions {
   sceneItemId?: string; // A new ID will be assigned if one is not provided
 }
 
+export interface ISceneItemInfo {
+  id: string;
+  sourceId: string;
+  x: number;
+  y: number;
+  scaleX: number;
+  scaleY: number;
+  visible: boolean;
+  crop: ICrop;
+}
 
 export interface ISceneApi extends IScene {
   getItem(sceneItemId: string): ISceneItemApi;
@@ -151,6 +162,33 @@ export class Scene implements ISceneApi {
     return this.sceneState.items.findIndex(sceneItemModel => sceneItemModel.sceneItemId === sceneItemId);
   }
 
+  addSources(items: ISceneItemInfo[]) {
+    const arrayItems: (ISceneItemInfo & obs.ISceneItemInfo)[] = [];
+
+    items.forEach(item => {
+      const source = this.sourcesService.getSource(item.sourceId);
+      if (source) {
+        arrayItems.push({
+          name: source.name,
+          id: item.id,
+          sourceId: source.sourceId,
+          crop: item.crop,
+          scaleX: item.scaleX,
+          scaleY: item.scaleY,
+          visible: item.visible,
+          x: item.x,
+          y: item.y,
+        });
+      }
+    });
+
+    const sceneItems = obs.addItems(this.getObsScene(), arrayItems);
+
+    arrayItems.forEach((sceneItem, index) => {
+      this.ADD_SOURCE_TO_SCENE(items[index].id, items[index].sourceId, sceneItems[index].id);
+      this.getItem(items[index].id).loadItemAttributes(sceneItem);
+    });
+  }
 
   @mutation()
   private MAKE_SOURCE_ACTIVE(sceneItemId: string) {

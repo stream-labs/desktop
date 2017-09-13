@@ -23,20 +23,26 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
   }
 
 
-  saveItem(scene: Scene, context: IContext): ISchema {
-    const slots = new SlotsNode();
-    slots.save({ scene, assetsPath: context.assetsPath });
-
-    return {
-      name: scene.name,
-      slots
-    };
+  saveItem(scene: Scene, context: IContext): Promise<ISchema> {
+    return new Promise(resolve => {
+      const slots = new SlotsNode();
+      slots.save({ scene, assetsPath: context.assetsPath }).then(() => {
+        resolve({
+          name: scene.name,
+          slots
+        });
+      });
+    });
   }
 
 
-  loadItem(obj: ISchema, context: IContext) {
-    const scene = this.scenesService.createScene(obj.name, { makeActive: true });
-    obj.slots.load({ scene, assetsPath: context.assetsPath });
+  loadItem(obj: ISchema, context: IContext): Promise<void> {
+    return new Promise(resolve => {
+      const scene = this.scenesService.createScene(obj.name, { makeActive: true });
+      obj.slots.load({ scene, assetsPath: context.assetsPath }).then(() => {
+        resolve();
+      });
+    });
   }
 
 }

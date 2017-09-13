@@ -26,18 +26,19 @@ export class FiltersNode extends ArrayNode<ISchema, IContext, obs.IFilter> {
   }
 
 
-  saveItem(filter: obs.IFilter) {
-    return {
+  saveItem(filter: obs.IFilter): Promise<ISchema> {
+    return Promise.resolve({
       type: filter.id,
       name: filter.name,
       settings: filter.settings
-    };
+    });
   }
 
 
-  loadItem(obj: ISchema, context: IContext) {
+  loadItem(obj: ISchema, context: IContext): Promise<void> {
     const filter = obs.FilterFactory.create(obj.type, obj.name, obj.settings);
     context.source.getObsInput().addFilter(filter);
+    return Promise.resolve();
   }
 
 }

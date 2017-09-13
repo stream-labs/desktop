@@ -33,6 +33,8 @@ export class TextNode extends Node<ISchema, IContext> {
     }
 
     this.data = { settings };
+
+    return Promise.resolve();
   }
 
 
@@ -50,6 +52,8 @@ export class TextNode extends Node<ISchema, IContext> {
     } else {
       this.updateInput(context);
     }
+
+    return Promise.resolve();
   }
 
 

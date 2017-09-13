@@ -1,12 +1,17 @@
-import { ArrayNode } from './array-node';
+import { Node } from './node';
 import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
 import { AudioService } from '../../audio';
 import { HotkeysService } from '../../hotkeys';
 import { Inject } from '../../../util/injector';
 import { HotkeysNode } from './hotkeys';
+import * as obs from '../../../../obs-api';
 
 interface ISchema {
+  items: ISourceInfo[];
+}
+
+interface ISourceInfo {
   id: string;
   name: string;
   type: TSourceType;
@@ -15,9 +20,10 @@ interface ISchema {
   filters: FiltersNode;
   hotkeys?: HotkeysNode;
   channel?: number;
+  muted?: boolean;
 }
 
-export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
+export class SourcesNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
 
@@ -28,42 +34,60 @@ export class SourcesNode extends ArrayNode<ISchema, {}, Source> {
     return this.sourcesService.sources;
   }
 
-  saveItem(source: Source): ISchema {
-    const filters = new FiltersNode();
-    filters.save({ source });
+  save(context: {}): Promise<void> {
+    const items: ISourceInfo[] = [];
+    const promises: Promise<ISourceInfo>[] = this.getItems().map(source => {
+      return new Promise(resolve => {
+        const filters = new FiltersNode();
+        const hotkeys = new HotkeysNode();
 
-    const hotkeys = new HotkeysNode();
-    hotkeys.save({ sourceId: source.sourceId });
+        filters.save({ source }).then(() => {
+          return hotkeys.save({ sourceId: source.sourceId });
+        }).then(() => {
+          resolve({
+            id: source.sourceId,
+            name: source.name,
+            type: source.type,
+            settings: source.getObsInput().settings,
+            volume: source.getObsInput().volume,
+            channel: source.channel,
+            filters,
+            hotkeys,
+            muted: source.getObsInput().muted
+          });
+        });
+      });
+    });
 
-    return {
-      id: source.sourceId,
-      name: source.name,
-      type: source.type,
-      settings: source.getObsInput().settings,
-      volume: source.getObsInput().volume,
-      channel: source.channel,
-      filters,
-      hotkeys
-    };
+    return new Promise(resolve => {
+      Promise.all(promises).then(items => {
+        this.data = { items };
+        resolve();
+      });
+    });
   }
 
-  loadItem(obj: ISchema) {
-    const source = this.sourcesService.createSource(
-      obj.name,
-      obj.type,
-      obj.settings,
-      { sourceId: obj.id, channel: obj.channel }
-    );
+  load(context: {}): Promise<void> {
+    const sources = obs.createSources(this.data.items);
+    const promises: Promise<void>[] = [];
 
-    this.sourcesService.refreshProperties(source.sourceId);
+    sources.forEach((source, index) => {
+      this.sourcesService.addSource(
+        source,
+        this.data.items[index].id,
+        { channel: this.data.items[index].channel }
+      );
+      if (source.audioMixers) {
+        this.audioService.getSource(this.data.items[index].id).setMul(this.data.items[index].volume);
+      }
 
-    if (source.audio) {
-      this.audioService.getSource(source.sourceId).setMul(obj.volume);
-    }
+      if (this.data.items[index].hotkeys) {
+        promises.push(this.data.items[index].hotkeys.load({ sourceId: this.data.items[index].id }));
+      }
+    });
 
-    obj.filters.load({ source });
-
-    if (obj.hotkeys) obj.hotkeys.load({ sourceId: source.sourceId });
+    return new Promise(resolve => {
+      Promise.all(promises).then(() => resolve());
+    });
   }
-
 }
