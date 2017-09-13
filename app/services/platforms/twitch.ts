@@ -129,4 +129,71 @@ export class TwitchService extends Service implements IPlatformService {
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
     return Promise.resolve(`https://twitch.tv/${username}/chat?${nightMode}`);
   }
+
+  searchCommunities(searchString: string) {
+    const headers = new Headers();
+
+    headers.append('Content-Type', 'application/json');
+
+    const data = {
+      requests:[
+        { indexName: 'community',
+          params: `query=${searchString}&page=0&hitsPerPage=50&numericFilters=&facets=*&facetFilters=` 
+        }
+      ]};
+
+    const communitySearchUrl = 'https://xluo134hor-dsn.algolia.net/1/indexes/*/queries?x-algolia-application-id=XLUO134HOR&x-algolia-api-key=d157112f6fc2cab93ce4b01227c80a6d';
+
+    const request = new Request(communitySearchUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request).then(response => {
+      return response.json();
+    }).then(json => {
+      return json.results[0].hits;
+    });
+  }
+
+  getStreamCommunities(twitchId: string) {
+    const headers = new Headers();
+
+    headers.append('Client-Id', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+
+    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}/communities`, { headers });
+
+    return fetch(request).then(response => {
+      return response.json();
+    }).then(json => {
+      return json.communities;
+    });
+  }
+
+  putStreamCommunities(communityIDs: string[], twitchId:string, oauthToken: string): Promise<boolean> {
+    const headers = new Headers();
+
+    headers.append('Client-Id', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+    headers.append('Authorization', `OAuth ${oauthToken}`);
+    headers.append('Content-Type', 'application/json');
+
+    const data = { community_ids: communityIDs };
+
+    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}/communities`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request).then(response => {
+      return response.json();
+    }).then(json => {
+      return true;
+    }).catch(() => {
+      return false;
+    });
+  }
 }

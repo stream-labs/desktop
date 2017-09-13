@@ -95,7 +95,7 @@
                       :allowEmpty="true"
                       placeholder="Search"
                       :loading="searchingGames"
-                      @search-change="debouncedGameSeach"
+                      @search-change="debouncedGameSearch"
                       @input="onGameInput"/>
                     <i
                       v-if="!updatingStreamInfo"
@@ -114,6 +114,53 @@
                     <span
                       class="stream__edit icon-btn"
                       @click="editStreamGame()">
+                      <i class="fa fa-pencil" />
+                    </span>
+                  </span>
+                </span>
+              </div>
+              <div v-show="platform === 'twitch'">
+                <span
+                  v-if="streamInfoExpanded"
+                  class="stream-info__row"
+                  :class="{'stream-info__row--editing': editingStreamCommunities}">
+                  <span class="stream-communities">
+                    <span v-for="(community, i) in streamCommunities" class="stream-community">
+                      {{ community.name }}
+                      <i
+                        v-if="editingStreamCommunities"
+                        @click="removeCommunity(i)"
+                        class="fa fa-times stream-community__remove"/>
+                    </span>
+                  </span>
+
+                  <span
+                    class="stream-info__inputs"
+                    v-if="editingStreamCommunities">
+                    <ListInput
+                      class="input-container--no-label input-container--no-margin input-wrapper--inverted"
+                      :value="communityValues"
+                      :allowEmpty="true"
+                      placeholder="Search"
+                      :loading="searchingCommunities"
+                      @search-change="debouncedCommunitySearch"
+                      @input="onCommunityInput"/>
+                    <i
+                      v-if="!updatingStreamCommunity"
+                      @click="updateStreamCommunities()"
+                      class="fa fa-check teal" />
+                    <i
+                      v-if="updatingStreamCommunity"
+                      class="fa fa-spinner fa-pulse" />
+                    <i
+                      @click="cancelStreamCommunities()"
+                      class="fa fa-times warning" />
+                  </span>
+
+                  <span v-else>
+                    <span
+                      class="stream__edit icon-btn"
+                      @click="editStreamCommunities()">
                       <i class="fa fa-pencil" />
                     </span>
                   </span>
@@ -145,19 +192,26 @@ import Chat from '../Chat.vue';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import StreamingService from '../../services/streaming';
-import { getPlatformService, IStreamInfo } from '../../services/platforms';
+import { getPlatformService, IStreamInfo, Community } from '../../services/platforms';
 import StudioFooter from '../StudioFooter.vue';
 import { ScenesService } from '../../services/scenes';
 import { Display, VideoService } from '../../services/video';
 import { PerformanceService } from '../../services/performance';
 import electron from '../../vendor/electron';
 import { ListInput } from '../shared/forms';
-import { debounce } from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 
 const { webFrame, screen } = electron;
 
 interface GameInput {
   name: string;
+  value: string;
+  options: object[];
+}
+
+interface CommunityInput {
+  name: string;
+  description: string;
   value: string;
   options: object[];
 }
@@ -190,6 +244,10 @@ export default class Live extends Vue {
 
   streamInfo: IStreamInfo = { status: 'Fetching Information', viewers: 0, game: 'Game' };
 
+  streamCommunities: Community[] = [];
+
+  tempStreamCommunities: Community[] = [];
+
   streamTitle: string = '';
 
   status: boolean = true;
@@ -202,9 +260,13 @@ export default class Live extends Vue {
     display: HTMLElement
   };
 
-  debouncedGameSeach: (search: string) => void;
+  debouncedGameSearch: (search: string) => void;
+
+  debouncedCommunitySearch: (search: string) => void;
 
   updatingStreamInfo = false;
+
+  updatingStreamCommunity = false;
 
   gameValues = {
     name: 'streamGame',
@@ -214,8 +276,17 @@ export default class Live extends Vue {
     ]
   };
 
+  communityValues = {
+    name: 'streamCommunity',
+    value: 'My value',
+    options: [
+      { description: '', value: '' }
+    ]
+  };
+
   created() {
-    this.debouncedGameSeach = debounce((search: string) => this.onGameSearchChange(search), 500);
+    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
+    this.debouncedCommunitySearch = debounce((search: string) => this.onCommunitySearchChange(search), 500);
   }
 
   mounted() {
@@ -240,6 +311,12 @@ export default class Live extends Vue {
 
   onGameInput(gameInput: GameInput) {
     this.streamInfo.game = gameInput.value;
+  }
+
+  onCommunityInput(communityInput: CommunityInput) {
+    if (this.streamCommunities.length < 3) {
+      this.streamCommunities.push({name: communityInput.description, objectID: communityInput.value});
+    }
   }
 
   onResize() {
@@ -268,6 +345,7 @@ export default class Live extends Vue {
       this.streamInfoExpanded = true;
       this.editingStreamTitle = false;
       this.editingStreamGame = false;
+      this.editingStreamCommunities = false;
     }
   }
 
@@ -353,6 +431,65 @@ export default class Live extends Vue {
     this.editingStreamGame = false;
   }
 
+  editingStreamCommunities = false;
+
+  editStreamCommunities() {
+    this.editingStreamCommunities = true;
+    this.tempStreamCommunities = cloneDeep(this.streamCommunities);
+  }
+
+  searchingCommunities = false;
+
+  onCommunitySearchChange(searchString: string) {
+    if (searchString !== '') {
+      this.searchingCommunities = true;
+      const platform = this.userService.platform.type;
+      const service = getPlatformService(platform);
+
+      this.communityValues.options = [];
+
+      service.searchCommunities(searchString).then(communities => {
+        this.searchingCommunities = false;
+        if (communities && communities.length) {
+          communities.forEach(community => {
+            this.communityValues.options.push({description: community.name, value: community.objectID});
+          });
+        }
+      });
+    }
+  }
+
+  updateStreamCommunities() {
+    if (this.updatingStreamCommunity) return;
+    this.updatingStreamCommunity = true;
+
+    const communityIDs = this.streamCommunities.map(community => community.objectID);
+
+    const platform = this.userService.platform.type;
+    const platformId = this.userService.platformId;
+    const oauthToken = this.userService.platform.token;
+    const service = getPlatformService(platform);
+
+    service.putStreamCommunities(communityIDs, platformId, oauthToken).then(status => {
+      this.updatingStreamCommunity = false;
+      if (status) {
+        this.editingStreamCommunities = false;
+      } else {
+        this.editingStreamCommunities = false;
+      }
+    });
+  }
+
+  cancelStreamCommunities() {
+    this.editingStreamCommunities = false;
+    this.streamCommunities = cloneDeep(this.tempStreamCommunities);
+  }
+
+  removeCommunity(index: number) {
+    this.streamCommunities.splice(index, 1);
+  }
+
+
   fetchLiveStreamInfo() {
     //Avoid hitting Twitch API if user is not streaming
     if (this.streamingService.isStreaming) {
@@ -364,6 +501,14 @@ export default class Live extends Vue {
       service.fetchLiveStreamInfo(platformId, oauthToken).then(streamInfo => {
         this.streamInfo = streamInfo;
       });
+
+      if (platform === 'twitch') {
+        service.getStreamCommunities(platformId).then(communities => {
+          this.streamCommunities = communities.map(community => {
+            return { name: community.name, objectID: community._id };
+          });
+        });
+      }
     }
   }
 
@@ -484,6 +629,11 @@ export default class Live extends Vue {
     flex-direction: row-reverse;
   }
 
+  .stream-communities[data-v-2c1d5f1c] {
+    flex-wrap: nowrap;
+    margin-left: 20px;
+  }
+
   .stream__edit {
     display: none;
   }
@@ -568,6 +718,33 @@ export default class Live extends Vue {
   .semibold;
 }
 
+
+.stream-communities {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.stream-community {
+  border: 1px solid @teal-med-opac;
+  border-radius: 3px;
+  padding: 0px 6px;
+  color: @teal;
+  background: @teal-light-opac;
+  font-size: 12px;
+  margin: 3px 10px 3px 0px;
+  white-space: nowrap;
+}
+
+.stream-community__remove {
+  margin-left: 6px;
+  font-size: 10px;
+  cursor: pointer;
+
+  &:hover {
+    color: @navy;
+  }
+}
+
 .stream-info-stats {
   color: @grey;
 }
@@ -602,6 +779,12 @@ export default class Live extends Vue {
 
   .stream-title {
     color: @white;
+  }
+
+  .stream-community__remove {
+    &:hover {
+      color: @white;
+    }
   }
 }
 </style>
