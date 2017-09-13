@@ -1,9 +1,17 @@
-import { ArrayNode } from './array-node';
+import { Node } from './node';
 import { SceneItem } from '../../scenes/scene-item';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
+import * as obs from '../../../../obs-api';
+import { SourcesService } from '../../sources';
+import { ScenesService } from '../../scenes';
+import { Inject } from '../../../util/injector';
 
 interface ISchema {
+  items: ISceneItemInfo[];
+}
+
+export interface ISceneItemInfo {
   id: string;
   sourceId: string;
   x: number;
@@ -14,55 +22,69 @@ interface ISchema {
   crop: ICrop;
   hotkeys?: HotkeysNode;
   locked?: boolean;
+  rotation?: number;
 }
 
 interface IContext {
   scene: Scene;
 }
 
-export class SceneItemsNode extends ArrayNode<ISchema, IContext, SceneItem> {
+export class SceneItemsNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
+
+  @Inject('SourcesService')
+  sourcesService: SourcesService;
+
+  @Inject('ScenesService')
+  scenesService: ScenesService;
 
   getItems(context: IContext) {
     return context.scene.getItems().slice().reverse();
   }
 
-  saveItem(sceneItem: SceneItem): ISchema {
-    const hotkeys = new HotkeysNode();
-    hotkeys.save({ sceneItemId: sceneItem.sceneItemId });
+  save(context: IContext): Promise<void> {
+    const promises: Promise<ISceneItemInfo>[] = this.getItems(context).map(sceneItem => {
+      return new Promise(resolve => {
+        const hotkeys = new HotkeysNode();
+        hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
+          resolve({
+            id: sceneItem.sceneItemId,
+            sourceId: sceneItem.sourceId,
+            x: sceneItem.x,
+            y: sceneItem.y,
+            scaleX: sceneItem.scaleX,
+            scaleY: sceneItem.scaleY,
+            visible: sceneItem.visible,
+            crop: sceneItem.crop,
+            locked: sceneItem.locked,
+            hotkeys,
+            rotation: sceneItem.rotation
+          });
+        });
+      });
+    });
 
-    return {
-      id: sceneItem.sceneItemId,
-      sourceId: sceneItem.sourceId,
-      x: sceneItem.x,
-      y: sceneItem.y,
-      scaleX: sceneItem.scaleX,
-      scaleY: sceneItem.scaleY,
-      visible: sceneItem.visible,
-      crop: sceneItem.crop,
-      locked: sceneItem.locked,
-      hotkeys
-    };
+    return new Promise(resolve => {
+      Promise.all(promises).then(items => {
+        this.data = { items };
+        resolve();
+      });
+    });
   }
 
-  loadItem(obj: ISchema, context: IContext) {
-    const item = context.scene.addSource(
-      obj.sourceId,
-      { sceneItemId: obj.id }
-    );
+  load(context: IContext): Promise<void> {
+    context.scene.addSources(this.data.items);
 
-    item.setPositionAndScale(
-      obj.x,
-      obj.y,
-      obj.scaleX,
-      obj.scaleY
-    );
-    item.setVisibility(obj.visible);
-    item.setCrop(obj.crop);
-    item.setLocked(obj.locked || false);
+    const promises: Promise<void>[] = [];
 
-    if (obj.hotkeys) obj.hotkeys.load({ sceneItemId: obj.id });
+    this.data.items.forEach(item => {
+      if (item.hotkeys) promises.push(item.hotkeys.load({ sceneItemId: item.id }));
+    });
+
+    return new Promise(resolve => {
+      Promise.all(promises).then(() => resolve());
+    });
   }
 
 }

@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
-import { nodeObs } from '../obs-api';
 import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';
@@ -43,8 +42,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     scenes: {}
   };
 
-  sourceAdded = new Subject<ISceneItem>();
-  sourceRemoved = new Subject<ISceneItem>();
+  sceneAdded = new Subject<IScene>();
+  sceneRemoved= new Subject<IScene>();
+  itemAdded = new Subject<ISceneItem>();
+  itemRemoved = new Subject<ISceneItem>();
 
   @Inject()
   private sourcesService: SourcesService;
@@ -95,7 +96,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
     this.ADD_SCENE(id, name);
-    obs.SceneFactory.create(name);
+    const scene = obs.SceneFactory.create(name);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
@@ -115,18 +116,19 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     }
 
     if (options.makeActive) this.makeSceneActive(id);
-
+    this.sceneAdded.next(this.state.scenes[id]);
     return this.getSceneByName(name);
   }
 
 
-  removeScene(id: string) {
-    if (Object.keys(this.state.scenes).length < 2) {
+  removeScene(id: string, force = false): IScene {
+    if (!force && Object.keys(this.state.scenes).length < 2) {
       alert('There needs to be at least one scene.');
       return;
     }
 
     const scene = this.getScene(id);
+    const sceneModel = this.state.scenes[id];
 
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
@@ -142,6 +144,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
         this.makeSceneActive(sceneIds[0]);
       }
     }
+    this.sceneRemoved.next(sceneModel);
+    return sceneModel;
   }
 
 

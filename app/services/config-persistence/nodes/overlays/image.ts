@@ -30,6 +30,8 @@ export class ImageNode extends Node<ISchema, IContext> {
     this.data = {
       filename: newFileName
     };
+
+    return Promise.resolve();
   }
 
 
@@ -38,6 +40,8 @@ export class ImageNode extends Node<ISchema, IContext> {
     const settings = { ...context.sceneItem.getObsInput().settings };
     settings['file'] = filePath;
     context.sceneItem.getObsInput().update(settings);
+
+    return Promise.resolve();
   }
 
 }

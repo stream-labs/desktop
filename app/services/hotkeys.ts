@@ -189,12 +189,26 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   @Inject()
   private keyListenerService: KeyListenerService;
-
   private registeredHotkeys: Hotkey[];
+
+
+  init() {
+    this.scenesService.sceneAdded.subscribe(() => this.invalidate());
+    this.scenesService.sceneRemoved.subscribe(() => this.invalidate());
+    this.scenesService.itemAdded.subscribe(() => this.invalidate());
+    this.scenesService.itemRemoved.subscribe(() => this.invalidate());
+    this.sourcesService.sourceAdded.subscribe(() => this.invalidate());
+    this.sourcesService.sourceRemoved.subscribe(() => this.invalidate());
+  }
 
 
   addHotkey(hotkeyModel: IHotkey) {
     this.ADD_HOTKEY(hotkeyModel);
+  }
+
+
+  private invalidate() {
+    this.registeredHotkeys = null;
   }
 
   private updateRegisteredHotkeys() {
@@ -265,7 +279,6 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
 
   getHotkeysSet(): IHotkeysSet {
-    this.updateRegisteredHotkeys();
 
     const sourcesHotkeys: Dictionary<Hotkey[]> = {};
     this.sourcesService.getSources().forEach(source => {
@@ -335,7 +348,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
     hotkeys.forEach(hotkey => {
       if (hotkey.accelerators.length) this.ADD_HOTKEY(hotkey);
     });
-    this.updateRegisteredHotkeys();
+    this.invalidate();
   }
 
 

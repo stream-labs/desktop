@@ -33,7 +33,8 @@
 import _ from 'lodash';
 import { Component, Watch, Prop } from 'vue-property-decorator';
 import { debounce } from 'lodash-decorators';
-import { TObsType, IInputValue, Input } from './Input';
+import { TObsType, IFormInput, Input } from './Input';
+import Utils from './../../../services/utils';
 const VueColor = require('vue-color');
 
 interface IColor {
@@ -44,12 +45,12 @@ interface IColor {
 @Component({
   components: { ColorPicker: VueColor.Sketch }
 })
-class ColorInput extends Input<IInputValue<string>> {
+class ColorInput extends Input<IFormInput<number>> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: IInputValue<string>;
+  value: IFormInput<number>;
 
   color: IColor = {
     hex: '#ffffff',
@@ -68,8 +69,16 @@ class ColorInput extends Input<IInputValue<string>> {
 
   @debounce(500)
   setValue() {
-    if ((this.color.a !== this.obsColor.a) || (this.color.hex !== this.obsColor.hex)) {
-      this.emitInput({ ...this.value, value: this.hexRGBA });
+    const { a, hex } = this.color;
+    if ((a !== this.obsColor.a) || (hex !== this.obsColor.hex)) {
+
+      const intColor = Utils.rgbaToInt(
+        parseInt(hex.substr(1, 2), 16),
+        parseInt(hex.substr(3, 2), 16),
+        parseInt(hex.substr(5, 2), 16),
+        Math.round(255 / a),
+      );
+      this.emitInput({ ...this.value, value: intColor });
     }
   }
 
@@ -96,11 +105,6 @@ class ColorInput extends Input<IInputValue<string>> {
     return this.color.hex.substr(1);
   }
 
-  // This is what node-obs uses
-  get hexRGBA() {
-    return (this.hexColor + this.hexAlpha).toLowerCase();
-  }
-
   // This is displayed to the user
   get hexARGB() {
     return ('#' + this.hexAlpha + this.hexColor).toLowerCase();
@@ -113,13 +117,13 @@ class ColorInput extends Input<IInputValue<string>> {
     };
   }
 
-  // This represents the actual value in the property in OBS
+
   get obsColor(): IColor {
-    let obsStr = this.value.value;
+    const rgba = Utils.intToRgba(this.value.value);
 
     return {
-      hex: '#' + obsStr.substr(0, 6),
-      a: parseInt(obsStr.substr(6), 16) / 255
+      hex: '#' + ((rgba.r << 16) + (rgba.g << 8) + (rgba.b)).toString(16),
+      a: rgba.a / 255
     };
   }
 

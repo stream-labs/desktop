@@ -1,11 +1,12 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { ISourceApi, SourcesService, TSourceType } from '../sources';
+import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from '../../vendor/electron';
 import { Inject } from '../../util/injector';
+import { HotkeysNode } from '../config-persistence/nodes/hotkeys';
 
 const { ipcRenderer } = electron;
 
@@ -22,6 +23,18 @@ export interface ISceneItemAddOptions {
   sceneItemId?: string; // A new ID will be assigned if one is not provided
 }
 
+export interface ISceneItemInfo {
+  id: string;
+  sourceId: string;
+  x: number;
+  y: number;
+  scaleX: number;
+  scaleY: number;
+  visible: boolean;
+  crop: ICrop;
+  locked?: boolean;
+  rotation?: number;
+}
 
 export interface ISceneApi extends IScene {
   getItem(sceneItemId: string): ISceneItemApi;
@@ -108,8 +121,13 @@ export class Scene implements ISceneApi {
 
     sceneItem.loadAttributes();
 
-    this.scenesService.sourceAdded.next(sceneItem.sceneItemState);
+    this.scenesService.itemAdded.next(sceneItem.sceneItemState);
     return sceneItem;
+  }
+
+
+  remove(force?: boolean): IScene {
+    return this.scenesService.removeScene(this.id, force);
   }
 
 
@@ -117,7 +135,7 @@ export class Scene implements ISceneApi {
     const sceneItem = this.getItem(sceneItemId);
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);
-    this.scenesService.sourceRemoved.next(sceneItem.sceneItemState);
+    this.scenesService.itemRemoved.next(sceneItem.sceneItemState);
   }
 
 
@@ -146,6 +164,35 @@ export class Scene implements ISceneApi {
     return this.sceneState.items.findIndex(sceneItemModel => sceneItemModel.sceneItemId === sceneItemId);
   }
 
+  addSources(items: ISceneItemInfo[]) {
+    const arrayItems: (ISceneItemInfo & obs.ISceneItemInfo)[] = [];
+
+    items.forEach(item => {
+      const source = this.sourcesService.getSource(item.sourceId);
+      if (source) {
+        arrayItems.push({
+          name: source.name,
+          id: item.id,
+          sourceId: source.sourceId,
+          crop: item.crop,
+          scaleX: item.scaleX,
+          scaleY: item.scaleY,
+          visible: item.visible,
+          x: item.x,
+          y: item.y,
+          locked: item.locked,
+          rotation: item.rotation || 0
+        });
+      }
+    });
+
+    const sceneItems = obs.addItems(this.getObsScene(), arrayItems);
+
+    arrayItems.forEach((sceneItem, index) => {
+      this.ADD_SOURCE_TO_SCENE(items[index].id, items[index].sourceId, sceneItems[index].id);
+      this.getItem(items[index].id).loadItemAttributes(sceneItem);
+    });
+  }
 
   @mutation()
   private MAKE_SOURCE_ACTIVE(sceneItemId: string) {
@@ -178,6 +225,8 @@ export class Scene implements ISceneApi {
         left: 0,
         right: 0
       },
+
+      rotation: 0,
 
       locked: false
     });

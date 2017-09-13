@@ -23,8 +23,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowService } from '../../services/window';
 import windowMixin from '../mixins/window';
-import SourceFiltersService from '../../services/source-filters';
-import namingHelpers from '../../util/NamingHelpers';
+import { SourceFiltersService } from '../../services/source-filters';
 
 import * as inputComponents from '../shared/forms';
 import ModalLayout from '../ModalLayout.vue';
@@ -43,13 +42,12 @@ export default class AddSourceFilter extends Vue {
 
   sourceName: string = this.windowService.getOptions().sourceName;
   form = this.filtersService.getAddNewFormData(this.sourceName);
+  availableTypes = this.filtersService.getTypesForSource(this.sourceName);
   error = '';
 
   mounted() {
     this.setTypeAsName();
   }
-
-  get state() { return this.filtersService.state; }
 
   done() {
     const name = this.form.name.value;
@@ -78,12 +76,10 @@ export default class AddSourceFilter extends Vue {
   }
 
   setTypeAsName() {
-    const name = this.state.availableTypes.find(({ type }) => {
+    const name = this.availableTypes.find(({ type }) => {
       return type === this.form.type.value;
     }).description;
-    this.form.name.value = namingHelpers.suggestName(
-      name, (suggestedName: string) => this.validateName(suggestedName)
-    );
+    this.form.name.value = this.filtersService.suggestName(this.sourceName, name);
   }
 
 }

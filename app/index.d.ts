@@ -15,6 +15,7 @@ interface IScalableRectangle extends IRectangle {
   scaleX?: number;
   scaleY?: number;
   crop?: ICrop;
+  rotation?: number;
 }
 
 declare type TPatch<TEntity> = { id: string } & Partial<TEntity>;

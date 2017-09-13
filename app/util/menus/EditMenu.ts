@@ -41,13 +41,14 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: 'Paste (Reference)',
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.hasSources(),
+        accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.pasteReference()
       });
 
       this.append({
         label: 'Paste (Duplicate)',
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.hasSources(),
         click: () => this.clipboardService.pasteDuplicate()
       });
     }
@@ -56,7 +57,14 @@ export class EditMenu extends Menu {
 
       this.append({
         label: 'Copy',
+        accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
+      });
+
+      this.append({
+        label: 'Remove',
+        accelerator: 'Delete',
+        click: () => this.scene.removeItem(this.sceneItem.sceneItemId)
       });
 
       this.append({
@@ -81,6 +89,18 @@ export class EditMenu extends Menu {
           this.showFilters();
         }
       });
+
+      this.append({
+        label: 'Copy filters',
+        click: () => this.clipboardService.copyFilters()
+      });
+
+      this.append({
+        label: 'Paste filters',
+        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
+        enabled: this.clipboardService.hasFilters()
+      });
+
 
       this.append({
         label: 'Properties',

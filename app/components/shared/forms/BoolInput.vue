@@ -18,15 +18,15 @@
 
 <script lang="ts">
 import { Component, Prop } from 'vue-property-decorator';
-import { Input, IInputValue, TObsType } from './Input';
+import { Input, IFormInput, TObsType } from './Input';
 
 @Component
-class BoolInput extends Input<IInputValue<boolean>> {
+class BoolInput extends Input<IFormInput<boolean>> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: IInputValue<boolean>;
+  value: IFormInput<boolean>;
 
   onChangeHandler(event: Event) {
     this.emitInput({ ...this.value, value: !!event.target['checked'] });

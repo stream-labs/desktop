@@ -283,7 +283,8 @@ class DragHandler {
       height: source.height,
       scaleX: source.scaleX,
       scaleY: source.scaleY,
-      crop: source.crop
+      crop: source.crop,
+      rotation: source.rotation
     });
 
     rect.normalize();

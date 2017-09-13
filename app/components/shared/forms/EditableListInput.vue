@@ -127,11 +127,12 @@ class EditableListProperty extends Input<IEditableListInputValue> {
   }
 
   setList(list: string[]) {
-    this.emitInput({ ...this.value, value: { valuesArray: list } });
+    this.emitInput({ ...this.value, value: list.map(item => ({ value: item })) });
   }
 
   get list(): string[] {
-    return _.cloneDeep(this.value.value.valuesArray);
+    const items = this.value.value || [];
+    return _.cloneDeep(items.map(item => item.value ));
   }
 
 }

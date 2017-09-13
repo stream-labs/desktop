@@ -141,6 +141,10 @@ function startApp() {
     delete requests[response.id];
   });
 
+  ipcMain.on('services-message', (event, payload) => {
+    childWindow.webContents.send('services-message', payload);
+  });
+
 
   if (isDevMode) {
     const devtoolsInstaller = require('electron-devtools-installer');
@@ -378,3 +382,10 @@ ipcMain.on('restartApp', () => {
   // Closing the main window starts the shut down sequence
   mainWindow.close();
 });
+
+ipcMain.on('requestSourceAttributes', (e, names) => {
+  const sizes = require('obs-studio-node').getSourcesSize(names);
+
+  e.sender.send('notifySourceAttributes', sizes);
+});
+

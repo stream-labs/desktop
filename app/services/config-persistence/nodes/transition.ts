@@ -19,11 +19,13 @@ export class TransitionNode extends Node<ISchema, {}> {
       type: this.transitionsService.state.type,
       duration: this.transitionsService.state.duration
     };
+    return Promise.resolve();
   }
 
   load() {
     this.transitionsService.setType(this.data.type);
     this.transitionsService.setDuration(this.data.duration);
+    return Promise.resolve();
   }
 
 }

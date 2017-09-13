@@ -5,6 +5,7 @@ import { Source, SourcesService, TSourceType } from '../sources';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
+import { ISceneItemInfo } from '../config-persistence/nodes/scene-items';
 
 export interface ISceneItem {
   sceneItemId: string;
@@ -17,6 +18,7 @@ export interface ISceneItem {
   visible: boolean;
   crop: ICrop;
   locked: boolean;
+  rotation: number;
 }
 
 
@@ -59,6 +61,7 @@ export class SceneItem implements ISceneItemApi {
   visible: boolean;
   crop: ICrop;
   locked: boolean;
+  rotation: number;
 
   // Some computed attributes
 
@@ -144,6 +147,16 @@ export class SceneItem implements ISceneItemApi {
   }
 
 
+  setRotation(rotation: number) {
+    // Adjusts any positve or negative rotation value into a normalized
+    // value between 0 and 360.
+    const effectiveRotation = ((rotation % 360) + 360) % 360;
+
+    this.getObsSceneItem().rotation = effectiveRotation;
+    this.UPDATE({ sceneItemId: this.sceneItemId, rotation: effectiveRotation });
+  }
+
+
   setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number) {
     const obsSceneItem = this.getObsSceneItem();
     obsSceneItem.position = { x, y };
@@ -192,6 +205,23 @@ export class SceneItem implements ISceneItemApi {
       visible,
       ...position,
       crop
+    });
+  }
+
+  loadItemAttributes(customSceneItem: ISceneItemInfo) {
+    const visible = customSceneItem.visible;
+    const position = { x: customSceneItem.x, y: customSceneItem.y };
+    const crop = customSceneItem.crop;
+
+    this.UPDATE({
+      sceneItemId: this.sceneItemId,
+      scaleX: customSceneItem.scaleX,
+      scaleY: customSceneItem.scaleY,
+      visible,
+      ...position,
+      crop,
+      locked: !!customSceneItem.locked,
+      rotation: customSceneItem.rotation
     });
   }
 

@@ -52,7 +52,7 @@ class ListInput extends Input<IListInputValue> {
   loading: boolean;
 
   onInputHandler(option: IListOption<string>) {
-    this.emitInput({ ...this.value, value: option.value });
+    this.emitInput({ ...this.value, value: option.value, description:option.description });
   }
 
   onSearchChange(value: string) {

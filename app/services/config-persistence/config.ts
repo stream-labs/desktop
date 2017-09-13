@@ -38,31 +38,39 @@ export class ConfigPersistenceService extends Service {
 
   @throttle(5000)
   save() {
-    this.rawSave();
+    return this.rawSave();
   }
 
 
-  rawSave() {
-    const root = new RootNode();
-    root.save();
-    this.ensureDirectory();
-    fs.writeFileSync(this.configFilePath, JSON.stringify(root, null, 2));
+  rawSave(): Promise<void> {
+    return new Promise(resolve => {
+      const root = new RootNode();
+      root.save().then(() => {
+        this.ensureDirectory();
+        fs.writeFileSync(this.configFilePath, JSON.stringify(root, null, 2));
+        resolve();
+      });
+    });
   }
 
 
-  load() {
-    if (fs.existsSync(this.configFilePath)) {
-      const data = fs.readFileSync(this.configFilePath).toString();
-      const root = parse(data, NODE_TYPES);
-      root.load();
-
-      // Make sure we actually loaded at least one scene, otherwise
-      // create the default one
-      if (this.scenesService.scenes.length === 0) this.setUpDefaults();
-    } else {
-      this.setUpDefaults();
-      this.save();
-    }
+  load(): Promise<void> {
+    return new Promise(resolve => {
+      if (fs.existsSync(this.configFilePath)) {
+        const data = fs.readFileSync(this.configFilePath).toString();
+        const root = parse(data, NODE_TYPES);
+        root.load().then(() => {
+          // Make sure we actually loaded at least one scene, otherwise
+          // create the default one
+          if (this.scenesService.scenes.length === 0) this.setUpDefaults();
+          resolve();
+        });
+      } else {
+        this.setUpDefaults();
+        this.save();
+        resolve();
+      }
+    });
   }
 
 

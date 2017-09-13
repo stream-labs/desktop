@@ -2,8 +2,10 @@ import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import {
   TFormData,
-  inputValuesToObsValues,
-  obsValuesToInputValues, IListOption
+  IListOption,
+  getPropertiesFormData,
+  setPropertiesFormData,
+  setupSourceDefaults
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { nodeObs } from './obs-api';
@@ -15,6 +17,10 @@ import { Inject } from '../util/injector';
 import namingHelpers from '../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
+
+const AudioFlag = obs.EOutputFlags.Audio;
+const VideoFlag = obs.EOutputFlags.Video;
+const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
 
@@ -37,14 +43,14 @@ export interface ISourceApi extends ISource {
   displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
+  getPropertiesFormData(): TFormData;
+  setPropertiesFormData(properties: TFormData): void;
 }
 
 
 export interface ISourcesServiceApi {
   createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
   getAvailableSourcesTypes(): IListOption<TSourceType>[];
-  getPropertiesFormData(sourceId: string): TFormData;
-  setProperties(sourceId: string, properties: TFormData): void;
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
@@ -93,8 +99,24 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   protected init() {
-    setInterval(() => this.refreshSourceAttributes(), SOURCES_UPDATE_INTERVAL);
-    this.scenesService.sourceRemoved.subscribe(
+    setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
+
+    ipcRenderer.on('notifySourceAttributes', (e, data: obs.ISourceSize[]) => {
+      data.forEach(update => {
+        const source = this.getSourceByName(update.name);
+
+        if (!source) return;
+
+        if ((source.width !== update.width) || (source.height !== update.height)) {
+          const size = { id: source.sourceId, width: update.width,
+            height: update.height };
+          this.UPDATE_SOURCE(size);
+        }
+        this.updateSourceFlags(source, update.outputFlags);
+      });
+    });
+
+    this.scenesService.itemRemoved.subscribe(
       (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
     );
   }
@@ -105,12 +127,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, properties: TFormData, channel?: number) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number) {
     const sourceModel: ISource = {
       sourceId: id,
       name,
       type,
-      properties,
+      properties: [],
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -150,19 +172,24 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     const obsInput = obs.InputFactory.create(type, name, settings);
 
+    this.addSource(obsInput, id, options);
+
+    return this.getSource(id);
+  }
+
+  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-
-    const properties = this.getPropertiesFormData(id);
-
-    this.ADD_SOURCE(id, name, type, properties, options.channel);
+    setupSourceDefaults(obsInput);
+    const type: TSourceType = obsInput.id as TSourceType;
+    this.ADD_SOURCE(id, obsInput.name, type, options.channel);
     const source = this.state.sources[id];
-    const muted = nodeObs.OBS_content_isSourceMuted(name);
+    const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.refreshSourceFlags(source, id);
+    this.updateSourceFlags(source, obsInput.outputFlags);
+
     this.sourceAdded.next(source);
-    return this.getSource(id);
   }
 
   removeSource(id: string) {
@@ -174,7 +201,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(name, (name) => this.getSourceByName(name));
+    return namingHelpers.suggestName(name, (name: string) => this.getSourceByName(name));
   }
 
 
@@ -205,63 +232,57 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   refreshProperties(id: string) {
-    const properties = this.getPropertiesFormData(id);
+    const properties = this.getSource(id).getPropertiesFormData();
 
     this.UPDATE_SOURCE({ id, properties });
   }
 
 
+
   refreshSourceAttributes() {
-    Object.keys(this.state.sources).forEach(id => {
-      const source = this.state.sources[id];
+    const activeItems = this.scenesService.activeScene.getItems();
+    const sourcesNames: string[] = [];
 
-      const size: {width: number, height: number } = nodeObs.OBS_content_getSourceSize(source.name);
+    activeItems.forEach(activeItem => {
+      sourcesNames.push(activeItem.name);
+    });
 
-      if ((source.width !== size.width) || (source.height !== size.height)) {
-        const { width, height } = size;
-        this.UPDATE_SOURCE({ id, width, height });
+    const sourcesSize = obs.getSourcesSize(sourcesNames);
+
+    activeItems.forEach((item, index) => {
+      const source = this.state.sources[item.sourceId];
+
+      if ((source.width !== sourcesSize[index].width) || (source.height !== sourcesSize[index].height)) {
+        const size = { id: item.sourceId, width: sourcesSize[index].width,
+          height: sourcesSize[index].height };
+        this.UPDATE_SOURCE(size);
       }
-
-      this.refreshSourceFlags(source, id);
+      this.updateSourceFlags(source, sourcesSize[index].outputFlags);
     });
   }
 
+  requestSourceSizes() {
+    const activeScene = this.scenesService.activeScene;
+    if (activeScene) {
+      const activeItems = activeScene.getItems();
+      const sourcesNames: string[] = [];
 
-  private refreshSourceFlags(source: ISource, id: string) {
-    const flags = this.getSource(id).getObsInput().outputFlags;
-    const audio = !!(obs.EOutputFlags.Audio & flags);
-    const video = !!(obs.EOutputFlags.Video & flags);
-    const doNotDuplicate = !!(obs.EOutputFlags.DoNotDuplicate & flags);
+      activeItems.forEach(activeItem => {
+        sourcesNames.push(activeItem.name);
+      });
+      ipcRenderer.send('requestSourceAttributes', sourcesNames);
+    }
+  }
+
+  private updateSourceFlags(source: ISource, flags: number) {
+    const audio = !!(AudioFlag & flags);
+    const video = !!(VideoFlag & flags);
+    const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id, audio, video, doNotDuplicate });
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
       this.sourceUpdated.next(source);
     }
-  }
-
-
-  setProperties(sourceId: string, properties: TFormData) {
-    const source = this.state.sources[sourceId];
-    const propertiesToSave = inputValuesToObsValues(properties, {
-      boolToString: true,
-      intToString: true,
-      valueToObject: true
-    });
-
-    for (const prop of propertiesToSave) {
-      // TODO: This is a temporary hack
-      if (prop.name === 'font') {
-        this.getSource(sourceId).getObsInput().update({ custom_font: prop.value.path });
-      }
-
-      nodeObs.OBS_content_setProperty(
-        source.name,
-        prop.name,
-        prop.value
-      );
-    }
-
-    this.refreshProperties(sourceId);
   }
 
 
@@ -306,35 +327,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.sources;
   }
 
-
-  getPropertiesFormData(sourceId: string) {
-    const source = this.getSourceById(sourceId);
-    if (!source) return [];
-
-    const obsProps = nodeObs.OBS_content_getSourceProperties(source.name);
-    const props = obsValuesToInputValues(obsProps, {
-      boolIsString: true,
-      valueIsObject: true,
-      valueGetter: (propName) => {
-        const val = nodeObs.OBS_content_getSourcePropertyCurrentValue(
-          source.name,
-          propName
-        );
-
-        // TODO: This is a temporary hack
-        if (propName === 'font') {
-          val.path = source.getObsInput().settings['custom_font'];
-        }
-
-        return val;
-      },
-      subParametersGetter: (propName) => {
-        return nodeObs.OBS_content_getSourcePropertiesSubParameters(source.name, propName);
-      }
-    });
-
-    return props;
-  }
 }
 
 @ServiceHelper()
@@ -391,6 +383,17 @@ export class Source implements ISourceApi {
   }
 
 
+  getPropertiesFormData(): TFormData {
+    return getPropertiesFormData(this.getObsInput());
+  }
+
+
+  setPropertiesFormData(properties: TFormData) {
+    setPropertiesFormData(this.getObsInput(), properties);
+    this.sourcesService.refreshProperties(this.sourceId);
+  }
+
+
   duplicate(): Source {
     if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(
@@ -398,6 +401,11 @@ export class Source implements ISourceApi {
       this.type,
       this.getSettings()
     );
+  }
+
+
+  remove() {
+    this.sourcesService.removeSource(this.sourceId);
   }
 
 

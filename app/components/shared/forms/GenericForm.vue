@@ -14,7 +14,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IInputValue, TObsType, TObsValue } from "./Input";
+import { IFormInput, TObsType, TObsValue } from "./Input";
 import NumberInput from './NumberInput.vue';
 import * as comps from './index';
 
@@ -27,7 +27,7 @@ const inputComponents = comps as any as { [key: string]: typeof Vue };
 export default class GenericForm extends Vue {
 
   @Prop()
-  value: IInputValue<TObsValue>[];
+  value: IFormInput<TObsValue>[];
 
   propertyComponentForType(type: TObsType): typeof Vue {
     const componentName = Object.keys(inputComponents).find(name => {
@@ -40,7 +40,7 @@ export default class GenericForm extends Vue {
     return inputComponents[componentName];
   }
 
-  onInputHandler(value: IInputValue<TObsValue>, index: number) {
+  onInputHandler(value: IFormInput<TObsValue>, index: number) {
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
     this.$emit('input', newValue, index);

@@ -5,6 +5,7 @@ import { StatefulService, mutation } from './stateful-service';
 import { nodeObs } from './obs-api';
 import { SettingsService } from './settings';
 import { padStart } from 'lodash';
+import { track } from './usage-statistics';
 
 interface IStreamingServiceState {
   isStreaming: boolean;
@@ -76,6 +77,8 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     );
   }
 
+
+  @track('stream_start')
   startStreaming() {
     if (this.state.isStreaming) return;
 
@@ -101,6 +104,7 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     }
   }
 
+  @track('stream_end')
   stopStreaming() {
     if (!this.state.isStreaming) return;
 
