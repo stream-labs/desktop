@@ -10,6 +10,7 @@ import { ServicesManager } from '../services-manager';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
 import { ScenesService } from './scenes/scenes';
+import { track } from './usage-statistics';
 
 interface IStartupState {
   loading: boolean;
@@ -49,6 +50,8 @@ export class StartupService extends StatefulService<IStartupState> {
   @Inject()
   scenesService: ScenesService;
 
+
+  @track('app_start')
   load() {
     // This is synchronous and can take a really long time for large configs.
     // Setting a timeout allows the spinner and loading text to be drawn to
@@ -87,6 +90,7 @@ export class StartupService extends StatefulService<IStartupState> {
 
   }
 
+  @track('app_close')
   private shutdownHandler() {
     clearInterval(this.autosaveInterval);
     this.configPersistenceService.rawSave().then(() => {
