@@ -138,11 +138,12 @@ export class TwitchService extends Service implements IPlatformService {
     const data = {
       requests:[
         { indexName: 'community',
-          params: `query=${searchString}&page=0&hitsPerPage=50&numericFilters=&facets=*&facetFilters=` 
+          params: `query=${searchString}&page=0&hitsPerPage=50&numericFilters=&facets=*&facetFilters=`
         }
       ]};
 
-    const communitySearchUrl = 'https://xluo134hor-dsn.algolia.net/1/indexes/*/queries?x-algolia-application-id=XLUO134HOR&x-algolia-api-key=d157112f6fc2cab93ce4b01227c80a6d';
+    const communitySearchUrl = 'https://xluo134hor-dsn.algolia.net/1/indexes/*/queries' +
+      '?x-algolia-application-id=XLUO134HOR&x-algolia-api-key=d157112f6fc2cab93ce4b01227c80a6d';
 
     const request = new Request(communitySearchUrl, {
       method: 'POST',
