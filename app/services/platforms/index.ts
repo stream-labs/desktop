@@ -12,6 +12,16 @@ export interface Game {
   name: string;
 }
 
+export interface Community {
+  name: string;
+  objectID: string;
+}
+
+export interface CommunityGet {
+  name: string;
+  _id: string;
+}
+
 
 // All platform services should implement
 // this interface.
@@ -31,7 +41,13 @@ export interface IPlatformService {
 
   searchGames: (searchString: string) => Promise<Game[]>;
 
+  searchCommunities: (searchString: string) => Promise<Community[]>;
+
   getChatUrl: (username: string, oauthToken: string, mode: string) => Promise<string>;
+
+  getStreamCommunities: (platformId: string) => Promise<CommunityGet[]>;
+
+  putStreamCommunities: (communityIDs: string[], platformId:string, oauthToken: string) => Promise<boolean>;
 }
 
 export interface IPlatformAuth {

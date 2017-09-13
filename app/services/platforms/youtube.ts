@@ -89,7 +89,7 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
-  putStreamInfo(streamTitle: string, streamGame: string, youtubeId: string, oauthToken: string) {
+  putStreamInfo(streamTitle: string, streamGame: string, youtubeId: string, oauthToken: string): Promise<boolean> {
     const headers = new Headers();
 
     headers.append('Content-Type', 'application/json');
@@ -115,6 +115,18 @@ export class YoutubeService extends Service implements IPlatformService {
 
   searchGames(searchString: string) {
     return Promise.resolve(JSON.parse(''));
+  }
+
+  searchCommunities(searchString: string) {
+    return Promise.resolve(JSON.parse(''));
+  }
+
+  getStreamCommunities(platformId: string) {
+    return Promise.resolve([]);
+  }
+
+  putStreamCommunities(communityIDs: string[], platformId:string, oauthToken: string): Promise<boolean> {
+    return Promise.resolve(true);
   }
 
   getLiveStreamId(oauthToken: string, forceGet: boolean): Promise<void> {
