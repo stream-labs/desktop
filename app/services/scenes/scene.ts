@@ -181,7 +181,7 @@ export class Scene implements ISceneApi {
           x: item.x,
           y: item.y,
           locked: item.locked,
-          rotation: item.rotation
+          rotation: item.rotation || 0
         });
       }
     });
