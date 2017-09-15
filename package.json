@@ -2,7 +2,7 @@
   "name": "slobs-client",
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack",
