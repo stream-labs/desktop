@@ -53,8 +53,8 @@ const indexUrl = 'file://' + __dirname + '/index.html';
 
 
 function openDevTools() {
-  childWindow.webContents.openDevTools();
-  mainWindow.webContents.openDevTools();
+  childWindow.webContents.openDevTools({ mode: 'undocked' });
+  mainWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
 
