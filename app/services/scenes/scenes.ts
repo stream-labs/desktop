@@ -149,6 +149,11 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
+  setLockOnAllScenes(locked: boolean) {
+    this.scenes.forEach(scene => scene.setLockOnAllItems(locked));
+  }
+
+
   getSourceScenes(sourceId: string): Scene[] {
     const resultScenes: Scene[] = [];
     this.scenes.forEach(scene => {
