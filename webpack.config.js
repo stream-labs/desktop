@@ -34,6 +34,16 @@ module.exports = {
     extensions: ['.js', '.ts']
   },
 
+  // We want to dynamically require native addons
+  externals: {
+    'font-manager': 'require("font-manager")',
+
+    // Not actually a native addons, but are super big so we don't
+    // bother compiling them into our bundle.
+    'aws-sdk': 'require("aws-sdk")',
+    'asar': 'require("asar")'
+  },
+
   module: {
     rules: [
       {

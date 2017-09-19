@@ -197,7 +197,7 @@ import StudioFooter from '../StudioFooter.vue';
 import { ScenesService } from '../../services/scenes';
 import { Display, VideoService } from '../../services/video';
 import { PerformanceService } from '../../services/performance';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { ListInput } from '../shared/forms';
 import { debounce, cloneDeep } from 'lodash';
 

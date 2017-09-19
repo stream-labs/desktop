@@ -6,7 +6,7 @@ import { SceneItemsNode } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { FiltersNode } from './nodes/filters';
 import { HotkeysNode } from './nodes/hotkeys';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { ScenesService } from '../scenes';
 import { SourcesService } from '../sources';
 import { E_AUDIO_CHANNELS } from '../audio';

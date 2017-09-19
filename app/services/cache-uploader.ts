@@ -1,14 +1,13 @@
 import { Service } from './service';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { compact } from 'lodash';
-
-const archiver = window['require']('archiver');
-const AWS = window['require']('aws-sdk');
+import archiver from 'archiver';
+import AWS from 'aws-sdk';
 
 export class CacheUploaderService extends Service {
 

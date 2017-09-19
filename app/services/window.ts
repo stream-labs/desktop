@@ -11,7 +11,7 @@ import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
 import { mutation, StatefulService } from './stateful-service';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { TSourceType } from './sources';
 import { WidgetType } from './widgets';
 

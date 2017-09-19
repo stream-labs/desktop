@@ -35,7 +35,7 @@ import { Component, Watch, Prop } from 'vue-property-decorator';
 import { debounce } from 'lodash-decorators';
 import { TObsType, IFormInput, Input } from './Input';
 import Utils from './../../../services/utils';
-const VueColor = require('vue-color');
+import VueColor from 'vue-color';
 
 interface IColor {
   hex: string,

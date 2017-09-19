@@ -8,10 +8,11 @@ import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
 import { ConfigPersistenceService, parse } from '.';
 import { Inject } from '../../util/injector';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import asar from 'asar';
 
 const NODE_TYPES = {
   RootNode,
@@ -22,8 +23,6 @@ const NODE_TYPES = {
   WebcamNode,
   VideoNode
 };
-
-const asar = window['require']('asar');
 
 export class OverlaysPersistenceService extends Service {
 

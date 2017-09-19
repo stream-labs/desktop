@@ -4,7 +4,7 @@ import { SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
 import * as obs from '../obs-api';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { Inject } from '../../util/injector';
 import { HotkeysNode } from '../config-persistence/nodes/hotkeys';
 

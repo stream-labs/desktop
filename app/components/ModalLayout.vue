@@ -32,7 +32,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Inject } from '../util/injector';
 import TitleBar from './TitleBar.vue';
 

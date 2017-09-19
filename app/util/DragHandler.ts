@@ -3,7 +3,7 @@ import { Inject } from '../util/injector';
 import { ScenesService, SceneItem } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
 import { ScalableRectangle } from '../util/ScalableRectangle';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 const { webFrame, screen } = electron;
 

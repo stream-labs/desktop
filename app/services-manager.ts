@@ -1,4 +1,4 @@
-import electron from './vendor/electron';
+import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ConfigPersistenceService } from './services/config-persistence';
@@ -169,7 +169,7 @@ export class ServicesManager extends Service {
    * start listen calls to services from child window
    */
   listenApiCalls() {
-    ipcRenderer.on('services-request', (event, request: IRequestToService) => {
+    ipcRenderer.on('services-request', (event: Electron.Event, request: IRequestToService) => {
       const action = request.payload.action;
       let response: IServiceResponce;
       this.startBufferingMutations();
@@ -251,7 +251,7 @@ export class ServicesManager extends Service {
   listenMessages() {
     const promises = this.promises;
 
-    ipcRenderer.on('services-message', (event, message: IPushMessage) => {
+    ipcRenderer.on('services-message', (event: Electron.Event, message: IPushMessage) => {
       // handle promise reject/resolve
       const promisePayload = message.type === E_PUSH_MESSAGE_TYPE.PROMISE && message.payload as IPromisePayload;
       if (promisePayload) {

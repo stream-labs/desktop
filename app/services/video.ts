@@ -1,7 +1,7 @@
 import { Service } from './service';
 import { SettingsService } from './settings';
 import { nodeObs } from './obs-api';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Inject } from '../util/injector';
 
 const { remote } = electron;

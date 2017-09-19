@@ -10,7 +10,7 @@ import {
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
 import { Inject } from '../util/injector';
@@ -101,7 +101,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   protected init() {
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
 
-    ipcRenderer.on('notifySourceAttributes', (e, data: obs.ISourceSize[]) => {
+    ipcRenderer.on('notifySourceAttributes', (e: Electron.Event, data: obs.ISourceSize[]) => {
       data.forEach(update => {
         const source = this.getSourceByName(update.name);
 

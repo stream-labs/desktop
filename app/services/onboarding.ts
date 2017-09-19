@@ -2,7 +2,7 @@ import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 type TOnboardingStep =
   'Connect' |

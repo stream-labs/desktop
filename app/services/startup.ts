@@ -5,7 +5,7 @@ import { HotkeysService } from './hotkeys';
 import { UserService } from './user';
 import { ShortcutsService } from './shortcuts';
 import { Inject } from '../util/injector';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { ServicesManager } from '../services-manager';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';

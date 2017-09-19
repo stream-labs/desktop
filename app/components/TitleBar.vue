@@ -15,7 +15,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { CustomizationService } from '../services/customization';
 import { Inject } from '../util/injector';
 

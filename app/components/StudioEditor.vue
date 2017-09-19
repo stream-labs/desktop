@@ -18,7 +18,7 @@ import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
 import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 const { webFrame, screen } = electron;
 

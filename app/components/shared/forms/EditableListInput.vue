@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import _ from 'lodash';
-import electron from '../../../vendor/electron';
+import electron from 'electron';
 import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import  { IEditableListInputValue, Input, TObsType } from './Input';
