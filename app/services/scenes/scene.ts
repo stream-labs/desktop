@@ -153,6 +153,11 @@ export class Scene implements ISceneApi {
   }
 
 
+  setLockOnAllItems(locked: boolean) {
+    this.getItems().forEach(item => item.setLocked(locked));
+  }
+
+
   setSourceOrder(sceneItemId: string, positionDelta: number, order: string[]) {
     const itemIndex = this.getItemIndex(sceneItemId);
     this.getObsScene().moveItem(itemIndex, itemIndex + positionDelta);

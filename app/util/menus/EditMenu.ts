@@ -53,6 +53,18 @@ export class EditMenu extends Menu {
       });
     }
 
+    if (!this.sceneItem && !this.source) {
+      this.append({
+        label: 'Lock all sources',
+        click: () => this.scenesService.setLockOnAllScenes(true)
+      });
+
+      this.append({
+        label: 'Unlock all sources',
+        click: () => this.scenesService.setLockOnAllScenes(false)
+      });
+    }
+
     if (this.sceneItem) {
 
       this.append({
