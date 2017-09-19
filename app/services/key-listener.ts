@@ -5,7 +5,7 @@
 // a typed interface around it.
 
 import { Service } from './service';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { capitalize } from 'lodash';
 
 export type TKeyEventType = 'registerKeydown' | 'registerKeyup';

@@ -55,6 +55,7 @@ import { Component, Watch, Prop } from 'vue-property-decorator';
 import { IFormInput, Input, IFont } from './Input';
 import { Multiselect } from 'vue-multiselect';
 import FontSizeSelector from './FontSizeSelector.vue';
+import fontManager from 'font-manager';
 
 const OBS_FONT_BOLD = 1 << 0;
 const OBS_FONT_ITALIC = 1 << 1;
@@ -77,9 +78,6 @@ interface IFontDescriptor {
 interface IFontSelect extends HTMLElement {
   value: IFontDescriptor;
 }
-
-// This is a node native module for accessing OS fonts
-const fontManager = window['require']('font-manager');
 
 @Component({
   components: { Multiselect, FontSizeSelector }

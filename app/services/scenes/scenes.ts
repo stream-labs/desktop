@@ -5,7 +5,7 @@ import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { SourcesService } from '../sources';
 import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';

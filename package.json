@@ -67,7 +67,6 @@
   "devDependencies": {
     "7zip-bin": "^2.0.4",
     "@tweenjs/tween.js": "^16.8.0",
-    "@types/electron": "^1.4.37",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
     "ava": "^0.19.1",

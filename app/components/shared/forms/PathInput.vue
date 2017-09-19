@@ -25,7 +25,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { IPathInputValue, TObsType, Input } from './Input';
-import electron from '../../../vendor/electron';
+import electron from 'electron';
 import OpenDialogOptions = Electron.OpenDialogOptions;
 
 @Component

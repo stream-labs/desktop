@@ -29,7 +29,7 @@ import { Inject } from '../../util/injector';
 import { CustomizationService } from '../../services/customization';
 import { NavigationService } from '../../services/navigation';
 import { StartupService } from '../../services/startup';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 
 const { remote } = electron;
 

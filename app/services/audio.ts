@@ -6,7 +6,7 @@ import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
 import * as obs from '../../obs-api';
 import Utils from './utils';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Inject } from '../util/injector';
 
 const { ipcRenderer } = electron;

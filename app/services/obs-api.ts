@@ -2,7 +2,7 @@
 // and the Vue app. This class is intended to be a singleton.
 
 import { Service } from './service';
-import electron from '../vendor/electron';
+import electron from 'electron';
 const { ipcRenderer, remote } = electron;
 export * from '../../obs-api';
 
@@ -37,7 +37,7 @@ export const nodeObs: Dictionary<Function> = new Proxy({}, {
   }
 });
 
-ipcRenderer.on('obs-apiCallback', (event, cbInfo) => {
+ipcRenderer.on('obs-apiCallback', (event: Electron.Event, cbInfo: any) => {
   callbacks[cbInfo.id](...cbInfo.args);
 });
 

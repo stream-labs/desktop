@@ -1,5 +1,5 @@
 
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Service } from './service';
 import fs from 'fs';
 import path from 'path';

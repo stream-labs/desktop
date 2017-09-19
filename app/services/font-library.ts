@@ -2,7 +2,7 @@ import { Service } from './service';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 
 export interface IFontStyle {

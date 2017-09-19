@@ -2,7 +2,7 @@ import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 export type TUsageEvent =
   'stream_start' |

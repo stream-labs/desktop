@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { Store } from 'vuex';
 import _ from 'lodash';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 // Stateful Services and Classes
 import { getModule, StatefulService } from '../services/stateful-service';
@@ -52,13 +52,13 @@ plugins.push((store: Store<any>) => {
   });
 
   // Only the main window should ever receive this
-  ipcRenderer.on('vuex-sendState', (event, windowId) => {
+  ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
     win.webContents.send('vuex-loadState', _.omit(store.state, ['WindowService']));
   });
 
   // Only child windows should ever receive this
-  ipcRenderer.on('vuex-loadState', (event, state) => {
+  ipcRenderer.on('vuex-loadState', (event: Electron.Event, state: any) => {
     store.commit('BULK_LOAD_STATE', {
       state,
       __vuexSyncIgnore: true
@@ -67,7 +67,7 @@ plugins.push((store: Store<any>) => {
   });
 
   // All windows can receive this
-  ipcRenderer.on('vuex-mutation', (event, mutation) => {
+  ipcRenderer.on('vuex-mutation', (event: Electron.Event, mutation: any) => {
     commitMutation(mutation);
   });
 

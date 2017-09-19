@@ -12,7 +12,7 @@ import { ObsApiService } from './services/obs-api';
 import { WindowService } from './services/window';
 import { StartupService } from './services/startup';
 import { ServicesManager } from './services-manager';
-import electron from './vendor/electron';
+import electron from 'electron';
 
 const { ipcRenderer } = electron;
 

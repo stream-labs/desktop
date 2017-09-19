@@ -12,7 +12,7 @@ export class YoutubeService extends Service implements IPlatformService {
   @Inject()
   settingsService: SettingsService;
 
-  authWindowOptions: Electron.BrowserWindowOptions = {
+  authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1000,
     height: 600
   };

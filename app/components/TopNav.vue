@@ -63,7 +63,7 @@ import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";
 import { UserService } from '../services/user';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import Login from './Login.vue';
 
 @Component({

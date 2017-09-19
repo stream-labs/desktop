@@ -27,7 +27,7 @@ export interface CommunityGet {
 // this interface.
 export interface IPlatformService {
 
-  authWindowOptions: Electron.BrowserWindowOptions;
+  authWindowOptions: Electron.BrowserWindowConstructorOptions;
 
   authUrl: string;
 
