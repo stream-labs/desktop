@@ -91,8 +91,10 @@ export default class SourceFilters extends Vue {
   );
 
   @Watch('selectedFilterName')
-  onSelectedFilterChanged() {
-    this.save();
+  updateProperties() {
+    this.properties = this.sourceFiltersService.getPropertiesFormData(
+      this.sourceName, this.selectedFilterName
+    );
   }
 
   save() {
@@ -101,9 +103,7 @@ export default class SourceFilters extends Vue {
       this.selectedFilterName,
       this.properties
     );
-    this.properties = this.sourceFiltersService.getPropertiesFormData(
-      this.sourceName, this.selectedFilterName
-    );
+    this.updateProperties();
   }
 
   done() {
