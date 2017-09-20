@@ -34,7 +34,6 @@ export interface ISource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
-  properties: TFormData;
   channel?: number;
 }
 
@@ -132,7 +131,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       sourceId: id,
       name,
       type,
-      properties: [],
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -229,14 +227,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' }
     ];
   }
-
-
-  refreshProperties(id: string) {
-    const properties = this.getSource(id).getPropertiesFormData();
-
-    this.UPDATE_SOURCE({ id, properties });
-  }
-
 
 
   refreshSourceAttributes() {
@@ -340,7 +330,6 @@ export class Source implements ISourceApi {
   width: number;
   height: number;
   doNotDuplicate: boolean;
-  properties: TFormData;
   channel?: number;
 
   sourceState: ISource;
@@ -390,7 +379,6 @@ export class Source implements ISourceApi {
 
   setPropertiesFormData(properties: TFormData) {
     setPropertiesFormData(this.getObsInput(), properties);
-    this.sourcesService.refreshProperties(this.sourceId);
   }
 
 
