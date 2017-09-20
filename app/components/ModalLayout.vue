@@ -30,13 +30,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { WindowService } from '../services/window';
+import { WindowsService } from '../services/windows';
 import { CustomizationService } from '../services/customization';
-import electron from 'electron';
 import { Inject } from '../util/injector';
 import TitleBar from './TitleBar.vue';
-
-const { remote } = electron;
 
 @Component({
   components: { TitleBar }
@@ -49,7 +46,8 @@ export default class ModalLayout extends Vue {
   @Inject()
   customizationService: CustomizationService;
 
-  windowService: WindowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
 
   // The title shown at the top of the window
   @Prop()
@@ -108,7 +106,7 @@ export default class ModalLayout extends Vue {
     if (this.cancelHandler) {
       this.cancelHandler();
     } else {
-      this.windowService.closeWindow();
+      this.windowsService.closeChildWindow();
     }
   }
 

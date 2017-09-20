@@ -3,7 +3,7 @@ import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
 import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
-import { SourcesService } from '../sources';
+import { WindowsService } from '../windows';
 import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
@@ -48,19 +48,11 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   itemRemoved = new Subject<ISceneItem>();
 
   @Inject()
-  private sourcesService: SourcesService;
+  private windowsService: WindowsService;
 
 
   @Inject('ScenesTransitionsService')
   private transitionsService: ScenesTransitionsService;
-
-
-  @mutation()
-  private RESET_SCENES() {
-    this.state.activeSceneId = null;
-    this.state.displayOrder = [];
-    this.state.scenes = {};
-  }
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -179,11 +171,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   // Utility functions / getters
 
-  getSceneById(id: string): IScene {
-    return this.getScene(id);
-  }
-
-
   getSceneByName(name: string): Scene {
     let foundScene: IScene;
 
@@ -268,5 +255,27 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return this.getScene(this.state.activeSceneId);
   }
 
+
+  showNameScene() {
+    this.windowsService.showWindow({
+      componentName: 'NameScene',
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showDuplicateScene(sceneName: string) {
+    this.windowsService.showWindow({
+      componentName: 'NameScene',
+      queryParams: { sceneToDuplicate: sceneName },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
 }
 

@@ -208,8 +208,8 @@ ipcMain.on('openDevTools', () => {
   openDevTools();
 });
 
-ipcMain.on('window-showChildWindow', (event, data) => {
-  if (data.windowOptions.width && data.windowOptions.height) {
+ipcMain.on('window-showChildWindow', (event, windowOptions) => {
+  if (windowOptions.size.width && windowOptions.size.height) {
     // Center the child window on the main window
 
     // For some unknown reason, electron sometimes gets into a
@@ -218,20 +218,20 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     // about the bounds.
     try {
       const bounds = mainWindow.getBounds();
-      const childX = (bounds.x + (bounds.width / 2)) - (data.windowOptions.width / 2);
-      const childY = (bounds.y + (bounds.height / 2)) - (data.windowOptions.height / 2);
+      const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
+      const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
       childWindow.restore();
       childWindow.setBounds({
         x: childX,
         y: childY,
-        width: data.windowOptions.width,
-        height: data.windowOptions.height
+        width: windowOptions.size.width,
+        height: windowOptions.size.height
       });
     } catch (err) {
       log('Recovering from error:', err);
 
-      childWindow.setSize(data.windowOptions.width, data.windowOptions.height);
+      childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.center();
     }
 
@@ -248,10 +248,17 @@ ipcMain.on('window-showChildWindow', (event, data) => {
     ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
   }).then(() => {
     // The child window will show itself when rendered
-    childWindow.send('window-setContents', data.startupOptions);
+    childWindow.send('window-setContents', windowOptions);
   });
 
 });
+
+
+ipcMain.on('window-closeChildWindow', (event) => {
+  // never close the child window, hide it instead
+  childWindow.hide();
+});
+
 
 ipcMain.on('window-focusMain', () => {
   mainWindow.focus();

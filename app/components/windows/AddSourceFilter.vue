@@ -21,7 +21,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { SourceFiltersService } from '../../services/source-filters';
 
@@ -35,12 +35,13 @@ import ModalLayout from '../ModalLayout.vue';
 })
 export default class AddSourceFilter extends Vue {
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
 
   @Inject('SourceFiltersService')
   filtersService: SourceFiltersService;
 
-  sourceName: string = this.windowService.getOptions().sourceName;
+  sourceName: string = this.windowsService.getChildWindowQueryParams().sourceName;
   form = this.filtersService.getAddNewFormData(this.sourceName);
   availableTypes = this.filtersService.getTypesForSource(this.sourceName);
   error = '';
@@ -60,11 +61,11 @@ export default class AddSourceFilter extends Vue {
       name
     );
 
-    this.windowService.showSourceFilters(this.sourceName, name);
+    this.filtersService.showSourceFilters(this.sourceName, name);
   }
 
   cancel() {
-    this.windowService.showSourceFilters(this.sourceName);
+    this.filtersService.showSourceFilters(this.sourceName);
   }
 
   validateName(name: string) {

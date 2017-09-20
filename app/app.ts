@@ -4,14 +4,14 @@ window['eval'] = global.eval = function () {
 
 import 'reflect-metadata';
 import Vue from 'vue';
-import _ from 'lodash';
 import URI from 'urijs';
 
 import { createStore } from './store';
 import { ObsApiService } from './services/obs-api';
-import { WindowService } from './services/window';
+import { IWindowOptions, WindowsService } from './services/windows';
 import { StartupService } from './services/startup';
 import { ServicesManager } from './services-manager';
+import Utils from './services/utils';
 import electron from 'electron';
 
 const { ipcRenderer } = electron;
@@ -20,22 +20,16 @@ require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
   const store = createStore();
-  const windowService = WindowService.instance;
+  const servicesManager: ServicesManager = ServicesManager.instance;
+  const windowsService: WindowsService = WindowsService.instance;
   const obsApiService = ObsApiService.instance;
-  const query = URI.parseQuery(URI.parse(window.location.href).query);
-  const isChild = query.child;
+  const isChild = Utils.isChildWindow();
 
   if (isChild) {
-    windowService.setWindowAsChild();
-    windowService.setWindowOptions(_.omit(query, ['child']));
-
-    ipcRenderer.on('closeWindow', () => {
-      windowService.closeWindow();
-    });
-    const servicesManager: ServicesManager = ServicesManager.instance;
+    ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
     servicesManager.listenMessages();
   } else {
-    windowService.setWindowOptions({ component: 'Main' });
+    ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
     StartupService.instance.load();
   }
 
@@ -45,16 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     el: '#app',
     store,
     render: h => {
-      const componentName = windowService.state.options.component;
+      const componentName = isChild ?
+          windowsService.state.child.componentName :
+          windowsService.state.main.componentName;
 
-      return h(windowService.components[componentName]);
+      return h(windowsService.components[componentName]);
     }
   });
 
   // Used for replacing the contents of this window with
   // a new top level component
-  ipcRenderer.on('window-setContents', (event: any, options: any) => {
-    windowService.setWindowOptions(options);
+  ipcRenderer.on('window-setContents', (event: Electron.Event, options: IWindowOptions) => {
+    windowsService.setChildWindowOptions(options);
 
     // This is purely for developer convencience.  Changing the URL
     // to match the current contents, as well as pulling the options

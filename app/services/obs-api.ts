@@ -65,9 +65,9 @@ export class ObsApiService extends Service {
     nodeObs.OBS_content_moveDisplay(key, x, y);
   }
 
-  createSourceDisplay(sourceName: string, key: string) {
+  createSourceDisplay(sourceName: string, key: string, nativeWindowHandle: Buffer) {
     return nodeObs.OBS_content_createSourcePreviewDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
+      nativeWindowHandle,
       sourceName,
       key
     );

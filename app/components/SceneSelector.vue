@@ -32,9 +32,9 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { WindowService } from '../services/window';
 import { ScenesService } from '../services/scenes';
 import { Menu } from '../util/menus/Menu';
+import { ScenesTransitionsService } from "../services/scenes-transitions";
 
 @Component({
   components: { Selector }
@@ -44,14 +44,15 @@ export default class SceneSelector extends Vue {
   @Inject()
   scenesService: ScenesService;
 
-  windowService = WindowService.instance;
+  @Inject()
+  scenesTransitionsService: ScenesTransitionsService;
 
   menu = new Menu();
 
   created() {
     this.menu.append({
       label: 'Duplicate',
-      click: () => this.windowService.showDuplicateScene(this.scenesService.activeScene.name)
+      click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
   }
 
@@ -64,7 +65,7 @@ export default class SceneSelector extends Vue {
   }
 
   addScene() {
-    this.windowService.showNameScene();
+    this.scenesService.showNameScene();
   }
 
   removeScene() {
@@ -72,7 +73,7 @@ export default class SceneSelector extends Vue {
   }
 
   showTransitions() {
-    this.windowService.showSceneTransitions();
+    this.scenesTransitionsService.showSceneTransitions();
   }
 
   get scenes() {

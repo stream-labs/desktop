@@ -9,7 +9,7 @@ import { ObsApiService } from '../../services/obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
 
-const { webFrame, screen } = electron;
+const { webFrame, screen, remote } = electron;
 
 @Component({})
 export default class SourcePreview extends Vue {
@@ -32,7 +32,8 @@ export default class SourcePreview extends Vue {
   created() {
     this.obsApiService.createSourceDisplay(
       this.sourceName,
-      'Preview Window'
+      'Preview Window',
+       remote.getCurrentWindow().getNativeWindowHandle()
     );
   }
 

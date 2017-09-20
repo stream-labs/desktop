@@ -8,13 +8,14 @@ import {
   setupSourceDefaults
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
-import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
 import electron from 'electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
 import { Inject } from '../util/injector';
 import namingHelpers from '../util/NamingHelpers';
+import { WindowsService } from './windows';
+import { WidgetType } from './widgets';
 
 const { ipcRenderer } = electron;
 
@@ -54,6 +55,10 @@ export interface ISourcesServiceApi {
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
   suggestName(name: string): string;
+  showSourceProperties(sourceId: string): void;
+  showAddSource(): void;
+  showNameSource(sourceType: TSourceType): void;
+  showNameWidget(widgetType: WidgetType): void;
 }
 
 
@@ -95,6 +100,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @Inject()
   private scenesService: ScenesService;
+
+  @Inject()
+  private windowsService: WindowsService;
 
 
   protected init() {
@@ -315,6 +323,53 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   getSources() {
     return this.sources;
+  }
+
+
+  showSourceProperties(sourceId: string) {
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      queryParams: { sourceId },
+      size: {
+        width: 600,
+        height: 800
+      }
+    });
+  }
+
+
+  showAddSource() {
+    this.windowsService.showWindow({
+      componentName: 'AddSource',
+      size: {
+        width: 800,
+        height: 520
+      }
+    });
+  }
+
+
+  showNameSource(sourceType: TSourceType) {
+    this.windowsService.showWindow({
+      componentName: 'NameSource',
+      queryParams: { sourceType },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showNameWidget(widgetType: WidgetType) {
+    this.windowsService.showWindow({
+      componentName: 'NameSource',
+      queryParams: { widgetType: String(widgetType) },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
   }
 
 }
