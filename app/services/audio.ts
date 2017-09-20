@@ -1,13 +1,14 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, InitAfter, ServiceHelper } from './stateful-service';
+import { mutation, StatefulService, ServiceHelper } from './stateful-service';
 import { SourcesService, ISource, Source } from './sources';
 import { ScenesService } from './scenes';
 import * as obs from '../../obs-api';
 import Utils from './utils';
 import electron from 'electron';
 import { Inject } from '../util/injector';
+import { InitAfter } from '../util/service-observer';
 
 const { ipcRenderer } = electron;
 
@@ -65,7 +66,7 @@ export interface IAudioServiceApi {
 }
 
 
-@InitAfter(SourcesService)
+@InitAfter('SourcesService')
 export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 
   static initialState: IAudioSourcesState = {
@@ -198,20 +199,27 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 }
 
 @ServiceHelper()
-export class AudioSource extends Source implements IAudioSourceApi {
+export class AudioSource implements IAudioSourceApi {
+  name: string;
+  sourceId: string;
   fader: IFader;
+  muted: boolean;
+  source: Source;
 
   @Inject()
   private audioService: AudioService;
 
+  @Inject()
+  private sourcesService: SourcesService;
+
   private audioSourceState: IAudioSource;
 
   constructor(sourceId: string) {
-    super(sourceId);
     this.audioSourceState = this.audioService.state.audioSources[sourceId];
+    this.source = this.sourcesService.getSource(sourceId);
     Utils.applyProxy(this, this.audioSourceState);
+    Utils.applyProxy(this, this.source.sourceState);
   }
-
 
   setDeflection(deflection: number) {
     const fader = this.audioService.obsFaders[this.sourceId];

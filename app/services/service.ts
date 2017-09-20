@@ -2,30 +2,20 @@
  * simple singleton service implementation
  * @see original code http://stackoverflow.com/a/26227662
  */
+import { Subject } from 'rxjs';
 
 const singleton = Symbol();
 const singletonEnforcer = Symbol();
 
-/**
- * Service with InitAfter decorator will be created after the observable
- * service initialization. This allows observable service to know nothing about observer.
- * In this case observer-service is like a "plugin" for observable service.
- */
-export function InitAfter(...observableServices: typeof Service[]) {
-  return function (target: typeof Service) {
-    Service.observeList.push({ ObserverService: target, observableServices });
-  };
-}
-
 export abstract class Service {
-
-  static observeList: {
-    ObserverService: typeof Service,
-    observableServices: typeof Service[]
-  }[] = [];
 
   static hasInstance = false;
   static isSingleton = true;
+
+  /**
+   * lifecycle hook
+   */
+  static serviceAfterInit = new Subject<Service>();
 
 
   private static proxyFn: (service: Service) => Service;
@@ -74,17 +64,9 @@ export abstract class Service {
 
     if (mustInit) instance.init();
     instance.mounted();
-    Service.initObservers(ServiceClass.name);
+    Service.serviceAfterInit.next(instance);
     if (mustInit) instance.afterInit();
     return instance;
-  }
-
-
-  static initObservers(observableServiceName: string): Service[] {
-    const observers = this.observeList.filter(item => {
-      return item.observableServices.find(service => service.name === observableServiceName);
-    });
-    return observers.map(observer => observer.ObserverService.instance);
   }
 
 

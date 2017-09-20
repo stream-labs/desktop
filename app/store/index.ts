@@ -5,7 +5,7 @@ import electron from 'electron';
 
 // Stateful Services and Classes
 import { getModule, StatefulService } from '../services/stateful-service';
-import { WindowService } from '../services/window';
+import { WindowsService } from '../services/window';
 import { ServicesManager, IMutation } from '../services-manager';
 
 
@@ -54,7 +54,7 @@ plugins.push((store: Store<any>) => {
   // Only the main window should ever receive this
   ipcRenderer.on('vuex-sendState', (event: Electron.Event, windowId: number) => {
     const win = remote.BrowserWindow.fromId(windowId);
-    win.webContents.send('vuex-loadState', _.omit(store.state, ['WindowService']));
+    win.webContents.send('vuex-loadState', _.omit(store.state, ['WindowsService']));
   });
 
   // Only child windows should ever receive this

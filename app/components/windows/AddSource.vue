@@ -336,7 +336,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType } from '../../services/sources';
@@ -361,18 +361,19 @@ export default class AddSource extends Vue {
   userService: UserService;
 
   @Inject()
-  widgetsService:WidgetsService;
+  widgetsService: WidgetsService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   widgetTypes = WidgetType;
 
-  windowService: WindowService = WindowService.instance;
-
   selectSource(sourceType: TSourceType) {
-    this.windowService.showNameSource(sourceType);
+    this.sourcesService.showNameSource(sourceType);
   }
 
   selectWidget(type: WidgetType) {
-    this.windowService.showNameWidget(type);
+    this.sourcesService.showNameWidget(type);
   }
 
   inspectedSource: TInspectableSource = null;

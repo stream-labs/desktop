@@ -1,10 +1,11 @@
 import { Inject } from '../../util/injector';
 import { Menu } from './Menu';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/window';
 import { SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
+import { SourceFiltersService } from '../../services/source-filters';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -21,9 +22,10 @@ export class EditMenu extends Menu {
   private scenesService: ScenesService;
 
   @Inject()
-  private clipboardService: ClipboardService;
+  private sourceFiltersService: SourceFiltersService;
 
-  private windowService = WindowService.instance;
+  @Inject()
+  private clipboardService: ClipboardService;
 
   private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
@@ -126,12 +128,12 @@ export class EditMenu extends Menu {
 
   private showFilters() {
     // TODO: This should take an id
-    this.windowService.showSourceFilters(this.source.name);
+    this.sourceFiltersService.showSourceFilters(this.source.name);
   }
 
 
   private showProperties() {
-    this.windowService.showSourceProperties(this.source.sourceId);
+    this.sourcesService.showSourceProperties(this.source.sourceId);
   }
 
 

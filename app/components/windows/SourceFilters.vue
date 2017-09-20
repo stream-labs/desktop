@@ -51,7 +51,7 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { SourceFiltersService } from '../../services/source-filters';
 import { ISourcesServiceApi } from '../../services/sources';
@@ -80,9 +80,10 @@ export default class SourceFilters extends Vue {
   @Inject()
   sourcesService: ISourcesServiceApi;
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
 
-  windowOptions: { sourceName: string, selectedFilterName: string } = this.windowService.getOptions();
+  windowOptions = this.windowsService.getChildWindowQueryParams() as { sourceName: string, selectedFilterName: string };
   sourceName = this.windowOptions.sourceName;
   filters = this.sourceFiltersService.getFilters(this.sourceName);
   selectedFilterName = this.windowOptions.selectedFilterName || (this.filters[0] && this.filters[0].name) || null;
@@ -107,11 +108,11 @@ export default class SourceFilters extends Vue {
   }
 
   done() {
-    this.windowService.closeWindow();
+    this.windowsService.closeChildWindow();
   }
 
   addFilter() {
-    this.windowService.showAddSourceFilter(this.sourceName);
+    this.sourceFiltersService.showAddSourceFilter(this.sourceName);
   }
 
   get sourceDisplayName() {

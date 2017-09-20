@@ -1,12 +1,11 @@
 import { mutation, StatefulService } from './stateful-service';
-import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
 import {
-  obsValuesToInputValues,
-  inputValuesToObsValues,
   IListOption,
   TFormData
 } from '../components/shared/forms/Input';
+import { Inject } from '../util/injector';
+import { WindowsService } from './windows';
 
 interface ISceneTransitionsState {
   availableTransitions: IListOption<string>[];
@@ -30,6 +29,9 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     duration: 300,
     type: '',
   } as ISceneTransitionsState;
+
+  @Inject()
+  windowsService: WindowsService;
 
 
   init() {
@@ -102,4 +104,14 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     };
   }
 
+
+  showSceneTransitions() {
+    this.windowsService.showWindow({
+      componentName: 'SceneTransitions',
+      size: {
+        width: 500,
+        height: 600
+      }
+    });
+  }
 }

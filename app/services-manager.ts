@@ -22,7 +22,7 @@ import { SourcesService, Source } from  './services/sources';
 import { UserService } from  './services/user';
 import { VideoService } from  './services/video';
 import { WidgetsService } from  './services/widgets';
-import { WindowService } from  './services/window';
+import { WindowsService } from  './services/windows';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
@@ -35,6 +35,7 @@ import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
+import { ObserveList } from './util/service-observer';
 
 const { ipcRenderer } = electron;
 
@@ -106,7 +107,7 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
-    WindowService,
+    WindowsService,
     FontLibraryService,
     ObsImporterService,
     ConfigPersistenceService,
@@ -142,8 +143,19 @@ export class ServicesManager extends Service {
 
         return true;
       });
+      return;
     }
 
+    Service.serviceAfterInit.subscribe(service => this.initObservers(service));
+  }
+
+
+  private initObservers(observableService: Service): Service[] {
+    const observeList: ObserveList = ObserveList.instance;
+    const items = observeList.observations.filter(item => {
+      return item.observableServiceName === observableService.serviceName;
+    });
+    return items.map(item => this.getService(item.observerServiceName).instance);
   }
 
 
@@ -303,10 +315,6 @@ export class ServicesManager extends Service {
 
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
-
-    // TODO: rid of blacklist
-    const blackList = ['WindowService', 'ObsApiService'];
-    if (blackList.includes(service.constructor.name)) return service;
 
     return new Proxy(service, {
       get: (target, property, receiver) => {

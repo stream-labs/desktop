@@ -28,7 +28,7 @@ import { Inject } from '../../util/injector';
 import { ScenesTransitionsService } from '../../services/scenes-transitions';
 import ModalLayout from '../ModalLayout.vue';
 import * as inputComponents from '../shared/forms';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 
 @Component({
@@ -43,7 +43,8 @@ export default class SceneTransitions extends Vue {
   @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
   form = this.transitionsService.getFormData();
 
 
@@ -58,7 +59,7 @@ export default class SceneTransitions extends Vue {
 
 
   done() {
-    this.windowService.closeWindow();
+    this.windowsService.closeChildWindow();
   }
 
 }

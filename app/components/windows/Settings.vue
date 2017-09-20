@@ -34,7 +34,7 @@ import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import { ISettingsServiceApi, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
@@ -56,7 +56,8 @@ export default class SceneTransitions extends Vue {
   @Inject()
   settingsService: ISettingsServiceApi;
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
 
   categoryName = 'General';
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
@@ -80,7 +81,7 @@ export default class SceneTransitions extends Vue {
   }
 
   done() {
-    this.windowService.closeWindow();
+    this.windowsService.closeChildWindow();
   }
 
   @Watch('categoryName')

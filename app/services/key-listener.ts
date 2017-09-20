@@ -21,7 +21,7 @@ export class KeyListenerService extends Service {
 
   private libuiohook: INodeLibuiohook;
 
-  mounted() {
+  init() {
     this.libuiohook = electron.remote.require('node-libuiohook');
   }
 
