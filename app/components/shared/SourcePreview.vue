@@ -8,14 +8,22 @@ import { Component, Prop } from 'vue-property-decorator';
 import { ObsApiService } from '../../services/obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
+import { VideoService } from '../../services/video';
+import { WindowsService } from '../../services/windows';
 
-const { webFrame, screen, remote } = electron;
+const { remote } = electron;
 
 @Component({})
 export default class SourcePreview extends Vue {
 
   @Inject()
   obsApiService: ObsApiService;
+
+  @Inject()
+  videoService: VideoService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   @Prop()
   sourceName: string;
@@ -44,7 +52,7 @@ export default class SourcePreview extends Vue {
 
   onResize() {
     const preview = this.$refs.preview;
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.child.scaleFactor;
     const rect = preview.getBoundingClientRect();
 
     this.obsApiService.resizeDisplay(

@@ -12,13 +12,18 @@ export default class Utils {
   }
 
 
-  static getUrlParams(): Dictionary<string> {
-    return URI.parseQuery(URI.parse(window.location.href).query);
+  static getCurrentUrlParams(): Dictionary<string> {
+    return this.getUrlParams(window.location.href);
+  }
+
+
+  static getUrlParams(url: string) {
+    return URI.parseQuery(URI.parse(url).query);
   }
 
 
   static isChildWindow(): boolean {
-    return !!this.getUrlParams().child;
+    return !!this.getCurrentUrlParams().child;
   }
 
   /**

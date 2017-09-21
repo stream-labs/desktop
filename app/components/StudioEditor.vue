@@ -18,6 +18,7 @@ import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
 import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
+import { WindowsService } from '../services/windows';
 import electron from 'electron';
 
 const { webFrame, screen } = electron;
@@ -43,6 +44,9 @@ export default class StudioEditor extends Vue {
 
   @Inject()
   scenesService: ScenesService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   @Inject()
   videoService: VideoService;
@@ -86,7 +90,7 @@ export default class StudioEditor extends Vue {
   onResize() {
     const display = this.$refs.display;
     const rect = display.getBoundingClientRect();
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     this.obsDisplay.resize(
       rect.width * factor,
@@ -172,7 +176,7 @@ export default class StudioEditor extends Vue {
     const mousePosX = event.offsetX - this.renderedOffsetX;
     const mousePosY = event.offsetY - this.renderedOffsetY;
 
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
     const converted = this.convertScalarToBaseSpace(
       mousePosX * factor,
       mousePosY * factor
@@ -331,7 +335,7 @@ export default class StudioEditor extends Vue {
   // Takes the given mouse event, and determines if it is
   // over the given box in base resolution space.
   isOverBox(event: MouseEvent, x: number, y: number, width: number, height: number) {
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     const mouse = this.convertVectorToBaseSpace(
       event.offsetX * factor,
@@ -444,7 +448,7 @@ export default class StudioEditor extends Vue {
 
     const source = this.activeSource;
     const renderedRegionRadius = 5;
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
     const regionRadius = renderedRegionRadius * factor * this.baseWidth / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
