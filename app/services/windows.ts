@@ -15,8 +15,9 @@ import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
 
 const { ipcRenderer, remote } = electron;
+const BrowserWindow = remote.BrowserWindow;
 
-
+type TWindowId = 'main' | 'child';
 
 export interface IWindowOptions {
   componentName: string;
@@ -25,6 +26,7 @@ export interface IWindowOptions {
     width: number;
     height: number;
   };
+  scaleFactor?: number;
 }
 
 interface IWindowsState {
@@ -37,9 +39,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   static initialState: IWindowsState = {
     main: {
       componentName: 'Main',
+      scaleFactor: 1,
     },
     child: {
-      componentName: 'Blank'
+      componentName: 'Blank',
+      scaleFactor: 1,
     }
   };
 
@@ -57,6 +61,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AddSourceFilter,
     Blank
   };
+
+  private windows: Electron.BrowserWindow[] = BrowserWindow.getAllWindows();
+
+
+  init() {
+    this.updateScaleFactor('main');
+    this.updateScaleFactor('child');
+    this.getWindow('main').on('move', () => this.updateScaleFactor('main'));
+    this.getWindow('child').on('move', () => this.updateScaleFactor('child'));
+  }
+
+  private updateScaleFactor(windowId: TWindowId) {
+    const window = this.getWindow(windowId);
+    const bounds = window.getBounds();
+    const currentDisplay = electron.screen.getDisplayMatching(bounds);
+    this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
+  }
 
   // inPlace will replace the contents of the current window
   // with the new window.  This is faster since it doesn't
@@ -96,8 +117,18 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  private getWindow(windowId: TWindowId): Electron.BrowserWindow {
+    return windowId === 'child' ? this.windows[1] : this.windows[0];
+  }
+
+
   @mutation()
   private SET_CHILD_WINDOW_OPTIONS(options: IWindowOptions) {
     this.state.child = options;
+  }
+
+  @mutation()
+  private UPDATE_SCALE_FACTOR(windowId: TWindowId, scaleFactor: number) {
+    this.state[windowId].scaleFactor = scaleFactor;
   }
 }
