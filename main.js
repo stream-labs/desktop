@@ -13,7 +13,7 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
-const { app, BrowserWindow, ipcMain, session } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -21,6 +21,12 @@ const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
+
+crashReporter.start({
+  productName: "slobs-main",
+  companyName: "Streamlabs",
+  submitURL: "http://18.221.86.127:1127/crashreports"
+});
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
