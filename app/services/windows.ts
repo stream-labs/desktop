@@ -26,7 +26,7 @@ export interface IWindowOptions {
     width: number;
     height: number;
   };
-  scaleFactor?: number;
+  scaleFactor: number;
 }
 
 interface IWindowsState {
@@ -83,7 +83,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // with the new window.  This is faster since it doesn't
   // re-load and initialize all the assets. Most windowOptions
   // will be ignored.
-  showWindow(options: IWindowOptions) {
+  showWindow(options: Partial<IWindowOptions>) {
     ipcRenderer.send('window-showChildWindow', options);
   }
 
@@ -92,7 +92,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
-    this.setChildWindowOptions({ componentName: 'Blank' });
+    this.updateChildWindowOptions({ componentName: 'Blank' });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
@@ -112,8 +112,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
-  setChildWindowOptions(options: IWindowOptions) {
-    this.SET_CHILD_WINDOW_OPTIONS(options);
+  updateChildWindowOptions(options: Partial<IWindowOptions>) {
+    this.UPDATE_CHILD_WINDOW_OPTIONS(options);
   }
 
 
@@ -123,8 +123,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
 
   @mutation()
-  private SET_CHILD_WINDOW_OPTIONS(options: IWindowOptions) {
-    this.state.child = options;
+  private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
+    this.state.child = { ...this.state.child, ...options };
   }
 
   @mutation()
