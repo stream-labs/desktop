@@ -16,6 +16,12 @@ import electron from 'electron';
 
 const { ipcRenderer } = electron;
 
+electron.crashReporter.start({
+  productName: 'slobs-renderer',
+  companyName: 'Streamlabs',
+  submitURL: 'http://18.221.86.127:1127/crashreports'
+});
+
 require('./app.less');
 
 document.addEventListener('DOMContentLoaded', () => {
