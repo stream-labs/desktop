@@ -237,19 +237,19 @@ export default class StudioEditor extends Vue {
       rect.withAnchor(options.anchor, () => {
         // There's probably a more generic way to do this math
         if (options.anchor === AnchorPoint.East) {
-          const croppableWidth = rect.width - rect.crop.right;
+          const croppableWidth = rect.width - rect.crop.right - 2;
           const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
           rect.crop.left = _.clamp(distance / rect.scaleX, 0, croppableWidth);
         } else if (options.anchor === AnchorPoint.West) {
-          const croppableWidth = rect.width - rect.crop.left;
+          const croppableWidth = rect.width - rect.crop.left - 2;
           const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
           rect.crop.right = _.clamp(distance / rect.scaleX, 0, croppableWidth);
         } else if (options.anchor === AnchorPoint.South) {
-          const croppableHeight = rect.height - rect.crop.bottom;
+          const croppableHeight = rect.height - rect.crop.bottom - 2;
           const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
           rect.crop.top = _.clamp(distance / rect.scaleY, 0, croppableHeight);
         } else if (options.anchor === AnchorPoint.North) {
-          const croppableHeight = rect.height - rect.crop.top;
+          const croppableHeight = rect.height - rect.crop.top - 2;
           const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
           rect.crop.bottom = _.clamp(distance / rect.scaleY, 0, croppableHeight);
         }
