@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Used for replacing the contents of this window with
   // a new top level component
   ipcRenderer.on('window-setContents', (event: Electron.Event, options: IWindowOptions) => {
-    windowsService.setChildWindowOptions(options);
+    windowsService.updateChildWindowOptions(options);
 
     // This is purely for developer convencience.  Changing the URL
     // to match the current contents, as well as pulling the options
