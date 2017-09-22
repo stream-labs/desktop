@@ -5,8 +5,8 @@
   "version": "0.4.2",
   "main": "main.js",
   "scripts": {
-    "compile": "yarn clear && webpack",
-    "watch": "yarn clear && webpack --watch",
+    "compile": "yarn clear && webpack --progress",
+    "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
     "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.7.7 && rm -rf ../slobs-client/node-obs/ && cp -r ./build/distribute/node-obs/ ../slobs-client/ && cd ../slobs-client && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser_1-30-1-1_3-3112-1646-g6c71485.7z -onode-obs/ && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser_1-30-1-1_3-3112-1646-g6c71485_cef.7z -onode-obs/",
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser_1-30-1-1_3-3112-1646-g6c71485.7z -onode-obs/ && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser_1-30-1-1_3-3112-1646-g6c71485_cef.7z -onode-obs/",
@@ -95,7 +95,6 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "progress": "^2.0.0",
-    "progress-bar-webpack-plugin": "^1.10.0",
     "rxjs": "^5.4.3",
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
