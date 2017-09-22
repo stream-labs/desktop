@@ -62,13 +62,14 @@ export class ObsImporterService extends Service {
   importFilters(filtersJSON :any, source :Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-
+        
         const isFilterAvailable = this.filtersService.getTypes().find((availableFilter) => {
           return availableFilter.type === filterJSON.id;
         });
 
         if (isFilterAvailable) {
-          this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
+          const filter = this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
+          filter.enabled = filterJSON.enabled;
 
           // Setting properties
           const properties = this.filtersService.getPropertiesFormData(source.name, filterJSON.name) ;
