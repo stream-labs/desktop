@@ -1,8 +1,6 @@
 import { Node } from './node';
-import { SceneItem } from '../../scenes/scene-item';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
-import * as obs from '../../../../obs-api';
 import { SourcesService } from '../../sources';
 import { ScenesService } from '../../scenes';
 import { Inject } from '../../../util/injector';

@@ -62,7 +62,7 @@ export default class SourceSelector extends Vue {
 
   addSource() {
     if (this.scenesService.activeScene) {
-      this.sourcesService.showAddSource();
+      this.sourcesService.showShowcase();
     }
   }
 

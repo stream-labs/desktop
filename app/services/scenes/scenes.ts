@@ -4,7 +4,8 @@ import { StatefulService, mutation } from '../stateful-service';
 import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { WindowsService } from '../windows';
-import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
+import { IScene, Scene, ISceneItem, ISceneApi, SceneItem } from '../scenes';
+import { SourcesService } from '../sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
@@ -50,6 +51,9 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   @Inject()
   private windowsService: WindowsService;
 
+  @Inject()
+  private sourcesService: SourcesService;
+
 
   @Inject('ScenesTransitionsService')
   private transitionsService: ScenesTransitionsService;
@@ -88,7 +92,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
     this.ADD_SCENE(id, name);
-    const scene = obs.SceneFactory.create(name);
+    const obsScene = obs.SceneFactory.create(name);
+    this.sourcesService.addSource(obsScene.source, id);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
@@ -125,7 +130,11 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
 
-    scene.getObsScene().release();
+    // remove scene from other scenes if it has been added as a source
+    this.getSceneItems().forEach(sceneItem => {
+      if (sceneItem.sourceId !== scene.id) return;
+      sceneItem.getScene().removeItem(sceneItem.sceneItemId);
+    });
 
     this.REMOVE_SCENE(id);
 
@@ -136,6 +145,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
         this.makeSceneActive(sceneIds[0]);
       }
     }
+
     this.sceneRemoved.next(sceneModel);
     return sceneModel;
   }
@@ -197,6 +207,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       if (sceneItem) return sceneItem;
     }
     return null;
+  }
+
+  getSceneItems(): SceneItem[] {
+    const sceneItems: SceneItem[] = [];
+    this.scenes.forEach(scene => sceneItems.push(...scene.getItems()));
+    return sceneItems;
   }
 
   @shortcut('ArrowLeft')
