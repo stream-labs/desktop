@@ -45,6 +45,7 @@ export interface ISourceApi extends ISource {
   getSettings(): Dictionary<any>;
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
+  hasProps(): boolean;
 }
 
 
@@ -56,7 +57,8 @@ export interface ISourcesServiceApi {
   getSourceByName(name: string): ISourceApi;
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
-  showAddSource(): void;
+  showShowcase(): void;
+  showAddSource(sourceType: TSourceType): void;
   showNameSource(sourceType: TSourceType): void;
   showNameWidget(widgetType: WidgetType): void;
 }
@@ -80,7 +82,9 @@ export type TSourceType =
   'game_capture' |
   'dshow_input' |
   'wasapi_input_capture' |
-  'wasapi_output_capture';
+  'wasapi_output_capture' |
+  'scene'
+  ;
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -124,7 +128,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
 
     this.scenesService.itemRemoved.subscribe(
-      (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
+      (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
+    );
+
+    this.scenesService.sceneRemoved.subscribe(
+      (sceneModel) => this.removeSource(sceneModel.id)
     );
   }
 
@@ -174,6 +182,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     settings: Dictionary<any> = {},
     options: ISourceCreateOptions = {}
   ): Source {
+
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
     const obsInput = obs.InputFactory.create(type, name, settings);
@@ -183,19 +192,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions) {
+  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-    setupSourceDefaults(obsInput);
     const type: TSourceType = obsInput.id as TSourceType;
     this.ADD_SOURCE(id, obsInput.name, type, options.channel);
-    const source = this.state.sources[id];
+    const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source, obsInput.outputFlags);
-
-    this.sourceAdded.next(source);
+    this.updateSourceFlags(source.sourceState, obsInput.outputFlags);
+    if (source.hasProps()) setupSourceDefaults(obsInput);
+    this.sourceAdded.next(source.sourceState);
   }
 
   removeSource(id: string) {
@@ -210,11 +218,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return namingHelpers.suggestName(name, (name: string) => this.getSourceByName(name));
   }
 
-
-  private onSceneSourceRemovedHandler(sceneSourceState: ISceneItem) {
+  private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
-    if (this.scenesService.getSourceScenes(sceneSourceState.sourceId).length > 0) return;
-    this.removeSource(sceneSourceState.sourceId);
+    const source = this.getSource(sceneItemState.sourceId);
+
+    if (source.type === 'scene') return;
+
+    if (this.scenesService.getSourceScenes(source.sourceId).length > 0) return;
+    this.removeSource(source.sourceId);
   }
 
 
@@ -232,7 +243,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Game Capture', value: 'game_capture' },
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
-      { description: 'Audio Output Capture', value: 'wasapi_output_capture' }
+      { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
+      { description: 'Scene', value: 'scene' }
     ];
   }
 
@@ -338,12 +350,24 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showAddSource() {
+  showShowcase() {
     this.windowsService.showWindow({
-      componentName: 'AddSource',
+      componentName: 'SourcesShowcase',
       size: {
         width: 800,
         height: 520
+      }
+    });
+  }
+
+
+  showAddSource(sourceType: TSourceType) {
+    this.windowsService.showWindow({
+      componentName: 'AddSource',
+      queryParams: { sourceType },
+      size: {
+        width: 600,
+        height: 540
       }
     });
   }
@@ -388,6 +412,9 @@ export class Source implements ISourceApi {
   channel?: number;
 
   sourceState: ISource;
+
+  @Inject()
+  scenesService: ScenesService;
 
   /**
    * displayName can be localized in future releases
@@ -449,6 +476,11 @@ export class Source implements ISourceApi {
 
   remove() {
     this.sourcesService.removeSource(this.sourceId);
+  }
+
+
+  hasProps(): boolean {
+    return !!this.getObsInput().properties;
   }
 
 

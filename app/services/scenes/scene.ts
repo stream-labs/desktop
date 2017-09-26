@@ -38,7 +38,7 @@ export interface ISceneItemInfo {
 export interface ISceneApi extends IScene {
   getItem(sceneItemId: string): ISceneItemApi;
   getItems(): ISceneItemApi[];
-  addSource(sourceId: string, options: ISceneItemAddOptions): ISceneItemApi;
+  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   makeItemActive(sceneItemId: string): void;
 }

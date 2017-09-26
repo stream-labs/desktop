@@ -2,7 +2,7 @@
 <ul class="selector-list" @contextmenu="handleContextMenu()">
   <draggable
     :list="normalizedItems"
-    :options="{}"
+    :options="{draggable: draggableSelector}"
     @change="handleChange">
     <li
       class="selector-item"
@@ -16,7 +16,7 @@
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
-        <i class="icon-btn fa fa-bars fa-rotate-90 selector-drag-handle"/>
+        <i v-if="draggable" class="icon-btn fa fa-bars fa-rotate-90 selector-drag-handle"/>
       </div>
     </li>
   </draggable>
@@ -46,6 +46,10 @@ export default class Selector extends Vue {
   @Prop()
   activeItem: string;
 
+  @Prop({ default: true })
+  draggable: boolean;
+
+  draggableSelector: string = this.draggable ? '.selector-item' : 'none';
 
   handleChange(change: any) {
     let order = _.map(this.normalizedItems, item => {

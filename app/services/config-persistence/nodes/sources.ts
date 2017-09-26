@@ -40,7 +40,7 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private audioService: AudioService;
 
   getItems() {
-    return this.sourcesService.sources;
+    return this.sourcesService.sources.filter(source => source.type !== 'scene');
   }
 
   save(context: {}): Promise<void> {

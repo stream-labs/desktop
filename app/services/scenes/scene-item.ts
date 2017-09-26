@@ -1,7 +1,7 @@
 import { ScenesService, Scene, ISceneApi } from '../scenes';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
-import { Source, SourcesService, TSourceType } from '../sources';
+import { ISourceApi, Source, SourcesService, TSourceType } from '../sources';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
@@ -24,6 +24,7 @@ export interface ISceneItem {
 
 export interface ISceneItemApi extends ISceneItem {
   getScene(): ISceneApi;
+  getSource(): ISourceApi;
   setPosition(vec: IVec2): void;
   setVisibility(visible: boolean): void;
   setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
@@ -104,6 +105,10 @@ export class SceneItem implements ISceneItemApi {
 
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
+  }
+
+  getSource() {
+    return this.source;
   }
 
   getObsInput() {

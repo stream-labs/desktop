@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { ObsApiService } from '../../services/obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
@@ -38,15 +38,30 @@ export default class SourcePreview extends Vue {
   }
 
   created() {
-    this.obsApiService.createSourceDisplay(
-      this.sourceName,
-      'Preview Window',
-       remote.getCurrentWindow().getNativeWindowHandle()
-    );
+    this.createDisplay();
+  }
+
+  @Watch('sourceName')
+  changeSource() {
+    this.destroyDisplay();
+    this.createDisplay();
+    this.onResize();
   }
 
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
+    this.destroyDisplay();
+  }
+
+  createDisplay() {
+    this.obsApiService.createSourceDisplay(
+      this.sourceName,
+      'Preview Window',
+      remote.getCurrentWindow().getNativeWindowHandle()
+    );
+  }
+
+  destroyDisplay() {
     this.obsApiService.removeSourceDisplay('Preview Window');
   }
 

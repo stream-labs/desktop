@@ -3,8 +3,9 @@
 
 import Main from '../components/windows/Main.vue';
 import Settings from '../components/windows/Settings.vue';
-import AddSource from '../components/windows/AddSource.vue';
+import SourcesShowcase from '../components/windows/SourcesShowcase.vue';
 import SceneTransitions from '../components/windows/SceneTransitions.vue';
+import AddSource from '../components/windows/AddSource.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
@@ -53,8 +54,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     Main,
     Settings,
     SceneTransitions,
-    AddSource,
+    SourcesShowcase,
     NameSource,
+    AddSource,
     NameScene,
     SourceProperties,
     SourceFilters,
@@ -84,6 +86,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // re-load and initialize all the assets. Most windowOptions
   // will be ignored.
   showWindow(options: Partial<IWindowOptions>) {
+
     ipcRenderer.send('window-showChildWindow', options);
   }
 
