@@ -116,7 +116,7 @@ export default class MixerItem extends Vue {
   volmeter: MixerVolmeter;
 
   mounted() {
-    if (!this.audioSource.muted) this.subscribeVolmeter();
+    this.subscribeVolmeter();
     this.volmeter = new MixerVolmeter(this.$refs.level as HTMLElement, this.$refs.peak as HTMLElement, 50);
     this.volmeter.animate();
   }
