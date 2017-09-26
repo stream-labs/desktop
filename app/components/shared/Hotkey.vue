@@ -9,7 +9,7 @@
         <input
           type="text"
           class="Hotkey-input"
-          :value="binding.binding"
+          :value="getBindingString(binding.binding)"
           @keydown="e => handleKeydown(e, index)"/>
         <i
           class="Hotkey-control fa fa-plus"
@@ -27,10 +27,13 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { compact } from 'lodash';
-import { Hotkey } from '../../services/hotkeys';
+import { Hotkey, IBinding } from '../../services/hotkeys';
 
-interface IBinding {
-  binding: string;
+/**
+ * Represents a binding that has a unique key for CSS animations
+ */
+interface IKeyedBinding {
+  binding: IBinding;
   key: string;
 }
 
@@ -43,13 +46,13 @@ export default class HotkeyComponent extends Vue {
   hotkey: Hotkey;
 
   description = this.hotkey.description;
-  bindings: IBinding[] = [];
+  bindings: IKeyedBinding[] = [];
 
   created() {
-    if (this.hotkey.accelerators.length === 0) {
-      this.bindings = [this.createBindingWithKey('')];
+    if (this.hotkey.bindings.length === 0) {
+      this.bindings = [this.createBindingWithKey(this.getBlankBinding())];
     } else {
-      this.bindings = Array.from(this.hotkey.accelerators).map(binding => {
+      this.bindings = Array.from(this.hotkey.bindings).map(binding => {
         return this.createBindingWithKey(binding);
       });
     }
@@ -60,26 +63,23 @@ export default class HotkeyComponent extends Vue {
 
     if (this.isModifierPress(event)) return;
 
-    const keys = [];
-
-    keys.push(this.getModifier(event));
-    keys.push(event.key);
-
-    const accelerator = compact(keys).join('+');
     const binding = this.bindings[index];
 
-    binding.binding = accelerator;
+    binding.binding = {
+      key: event.code,
+      modifiers: this.getModifiers(event)
+    };
 
     this.setBindings();
   }
 
-  getModifier(event: KeyboardEvent) {
-    if (event.altKey) return 'Alt';
-    if (event.ctrlKey) return 'Ctrl';
-    if (event.metaKey) return 'Super';
-    if (event.shiftKey) return 'Shift';
-
-    return '';
+  getModifiers(event: KeyboardEvent) {
+    return {
+      alt: event.altKey,
+      ctrl: event.ctrlKey,
+      shift: event.shiftKey,
+      meta: event.metaKey
+    };
   }
 
   isModifierPress(event: KeyboardEvent) {
@@ -89,16 +89,32 @@ export default class HotkeyComponent extends Vue {
       (event.key === 'Shift');
   }
 
-  // Adds a new blank binding
+  /**
+   * Adds a new blank binding
+   */
   addBinding(index: number) {
-    this.bindings.splice(index + 1, 0, this.createBindingWithKey(''));
+    this.bindings.splice(index + 1, 0, this.createBindingWithKey(this.getBlankBinding()));
   }
+
+
+  getBlankBinding() {
+    return {
+      key: '',
+      modifiers: {
+        alt: false,
+        ctrl: false,
+        shift: false,
+        meta: false
+      }
+    };
+  }
+
 
   removeBinding(index: number) {
     // If this is the last binding, replace it with an
     // empty binding instead.
     if (this.bindings.length === 1) {
-      this.bindings[0].binding = '';
+      this.bindings[0].binding = this.getBlankBinding();
     } else {
       this.bindings.splice(index, 1);
     }
@@ -109,22 +125,49 @@ export default class HotkeyComponent extends Vue {
   // This is kind of weird, but the key attribute allows
   // us to uniquely identify that binding in the DOM,
   // which allows CSS animations to work properly.
-  createBindingWithKey(binding: string): IBinding {
+  createBindingWithKey(binding: IBinding): IKeyedBinding {
     return {
       binding,
       key: Math.random().toString(36).substring(2, 15)
     };
   }
 
-  // Sets the bindings on the hotkey object
+  /**
+   * Sets the bindings on the hotkey object
+   */
   setBindings() {
-    const accelerators: string[] = []
+    const bindings: IBinding[] = [];
 
     this.bindings.forEach(binding => {
-      if (binding.binding) accelerators.push(binding.binding);
+      if (binding.binding.key) bindings.push(binding.binding);
     });
 
-    this.hotkey.accelerators = accelerators;
+    this.hotkey.bindings = bindings;
+  }
+
+
+  /**
+   * Turns a binding into a string representation
+   */
+  getBindingString(binding: IBinding) {
+    const keys: string[] = [];
+
+    if (binding.modifiers.alt) keys.push('Alt');
+    if (binding.modifiers.ctrl) keys.push('Ctrl');
+    if (binding.modifiers.shift) keys.push('Shift');
+    if (binding.modifiers.meta) keys.push('Win');
+
+    let key = binding.key;
+
+    const matchDigit = binding.key.match(/^Digit([0-9])$/);
+    if (matchDigit) key = matchDigit[1];
+
+    const matchKey = binding.key.match(/^Key([A-Z])$/);
+    if (matchKey) key = matchKey[1];
+
+    keys.push(key);
+
+    return keys.join('+');
   }
 
 }
