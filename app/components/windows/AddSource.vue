@@ -112,6 +112,12 @@ export default class AddSource extends Vue {
   }
 
   addExisting() {
+    const scene = this.scenesService.activeScene;
+    if (!scene.canAddSource(this.selectedSourceId)) {
+      // for now only a scene-source can be a problem
+      alert('Unable to add a source: the scene you are trying to add already contains your current scene');
+      return;
+    }
     this.scenesService.activeScene.addSource(this.selectedSourceId);
     this.close();
   }
