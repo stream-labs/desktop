@@ -127,6 +127,14 @@ function startApp() {
   // WARNING! the child window use synchronous requests and will be frozen
   // until main window asynchronous response
   const requests = { };
+  const REQUEST_TIMEOUT = 2000;
+
+  function resolveRequest(requestId, response) {
+    const request = requests[requestId];
+    request.event.returnValue = response;
+    clearTimeout(request.timeoutId);
+    delete requests[requestId];
+  }
 
   ipcMain.on('services-ready', () => {
     childWindow.loadURL(indexUrl + '?child=true');
@@ -139,12 +147,17 @@ function startApp() {
   ipcMain.on('services-request', (event, payload) => {
     const request = { id: uuid(), payload };
     mainWindow.webContents.send('services-request', request);
-    requests[request.id] = Object.assign({}, request, { event });
+    requests[request.id] = Object.assign(
+      {},
+      request,
+      {
+        event,
+        timeoutId: setTimeout(() => resolveRequest(request.id, { isTimeout: true }), REQUEST_TIMEOUT)
+      });
   });
 
   ipcMain.on('services-response', (event, response) => {
-    requests[response.id].event.returnValue = response;
-    delete requests[response.id];
+    resolveRequest(response.id, response);
   });
 
   ipcMain.on('services-message', (event, payload) => {

@@ -56,6 +56,8 @@ interface IServiceResponce {
     isPromise?: boolean;
     promiseId?: string;
   };
+
+  isTimeout?: boolean;
 }
 
 enum E_PUSH_MESSAGE_TYPE { PROMISE }
@@ -342,6 +344,10 @@ export class ServicesManager extends Service {
             isHelper,
             constructorArgs
           });
+
+          if (response.isTimeout) {
+            throw 'Main window response timeout: check the errors in the main window';
+          }
 
           const payload = response.payload;
           response.mutations.forEach(mutation => commitMutation(mutation));
