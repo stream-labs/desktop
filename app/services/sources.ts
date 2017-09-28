@@ -8,13 +8,14 @@ import {
   setupSourceDefaults
 } from '../components/shared/forms/Input';
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
-import { nodeObs } from './obs-api';
 import * as obs from '../../obs-api';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import Utils from './utils';
 import { ScenesService, ISceneItem } from './scenes';
 import { Inject } from '../util/injector';
 import namingHelpers from '../util/NamingHelpers';
+import { WindowsService } from './windows';
+import { WidgetType } from './widgets';
 
 const { ipcRenderer } = electron;
 
@@ -34,7 +35,6 @@ export interface ISource {
   width: number;
   height: number;
   doNotDuplicate: boolean;
-  properties: TFormData;
   channel?: number;
 }
 
@@ -45,16 +45,23 @@ export interface ISourceApi extends ISource {
   getSettings(): Dictionary<any>;
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
+  hasProps(): boolean;
 }
 
 
 export interface ISourcesServiceApi {
   createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
-  getAvailableSourcesTypes(): IListOption<TSourceType>[];
+  getAvailableSourcesTypes(): TSourceType[];
+  getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
   suggestName(name: string): string;
+  showSourceProperties(sourceId: string): void;
+  showShowcase(): void;
+  showAddSource(sourceType: TSourceType): void;
+  showNameSource(sourceType: TSourceType): void;
+  showNameWidget(widgetType: WidgetType): void;
 }
 
 
@@ -76,7 +83,9 @@ export type TSourceType =
   'game_capture' |
   'dshow_input' |
   'wasapi_input_capture' |
-  'wasapi_output_capture';
+  'wasapi_output_capture' |
+  'scene'
+  ;
 
 interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -97,11 +106,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject()
   private scenesService: ScenesService;
 
+  @Inject()
+  private windowsService: WindowsService;
+
 
   protected init() {
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
 
-    ipcRenderer.on('notifySourceAttributes', (e, data: obs.ISourceSize[]) => {
+    ipcRenderer.on('notifySourceAttributes', (e: Electron.Event, data: obs.ISourceSize[]) => {
       data.forEach(update => {
         const source = this.getSourceByName(update.name);
 
@@ -117,7 +129,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     });
 
     this.scenesService.itemRemoved.subscribe(
-      (sceneSourceState) => this.onSceneSourceRemovedHandler(sceneSourceState)
+      (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
+    );
+
+    this.scenesService.sceneRemoved.subscribe(
+      (sceneModel) => this.removeSource(sceneModel.id)
     );
   }
 
@@ -132,7 +148,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       sourceId: id,
       name,
       type,
-      properties: [],
 
       // Whether the source has audio and/or video
       // Will be updated periodically
@@ -168,7 +183,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     settings: Dictionary<any> = {},
     options: ISourceCreateOptions = {}
   ): Source {
+
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
+
+    if ((type === 'browser_source') && (settings.shutdown === void 0)) {
+      settings.shutdown = true;
+    }
 
     const obsInput = obs.InputFactory.create(type, name, settings);
 
@@ -177,19 +197,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions) {
+  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
-    setupSourceDefaults(obsInput);
     const type: TSourceType = obsInput.id as TSourceType;
     this.ADD_SOURCE(id, obsInput.name, type, options.channel);
-    const source = this.state.sources[id];
+    const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source, obsInput.outputFlags);
-
-    this.sourceAdded.next(source);
+    this.updateSourceFlags(source.sourceState, obsInput.outputFlags);
+    if (source.hasProps()) setupSourceDefaults(obsInput);
+    this.sourceAdded.next(source.sourceState);
   }
 
   removeSource(id: string) {
@@ -204,15 +223,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return namingHelpers.suggestName(name, (name: string) => this.getSourceByName(name));
   }
 
-
-  private onSceneSourceRemovedHandler(sceneSourceState: ISceneItem) {
+  private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
     // remove source if it has been removed from the all scenes
-    if (this.scenesService.getSourceScenes(sceneSourceState.sourceId).length > 0) return;
-    this.removeSource(sceneSourceState.sourceId);
+    const source = this.getSource(sceneItemState.sourceId);
+
+    if (source.type === 'scene') return;
+
+    if (this.scenesService.getSourceScenes(source.sourceId).length > 0) return;
+    this.removeSource(source.sourceId);
   }
 
 
-  getAvailableSourcesTypes(): IListOption<TSourceType>[] {
+  getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
     return [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
@@ -226,18 +248,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Game Capture', value: 'game_capture' },
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
-      { description: 'Audio Output Capture', value: 'wasapi_output_capture' }
+      { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
+      { description: 'Scene', value: 'scene' }
     ];
   }
 
-
-  refreshProperties(id: string) {
-    const properties = this.getSource(id).getPropertiesFormData();
-
-    this.UPDATE_SOURCE({ id, properties });
+  getAvailableSourcesTypes(): TSourceType[] {
+    return this.getAvailableSourcesTypesList().map(listItem => listItem.value);
   }
-
-
 
   refreshSourceAttributes() {
     const activeItems = this.scenesService.activeScene.getItems();
@@ -327,6 +345,65 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     return this.sources;
   }
 
+
+  showSourceProperties(sourceId: string) {
+    this.windowsService.showWindow({
+      componentName: 'SourceProperties',
+      queryParams: { sourceId },
+      size: {
+        width: 600,
+        height: 800
+      }
+    });
+  }
+
+
+  showShowcase() {
+    this.windowsService.showWindow({
+      componentName: 'SourcesShowcase',
+      size: {
+        width: 800,
+        height: 630
+      }
+    });
+  }
+
+
+  showAddSource(sourceType: TSourceType) {
+    this.windowsService.showWindow({
+      componentName: 'AddSource',
+      queryParams: { sourceType },
+      size: {
+        width: 600,
+        height: 540
+      }
+    });
+  }
+
+
+  showNameSource(sourceType: TSourceType) {
+    this.windowsService.showWindow({
+      componentName: 'NameSource',
+      queryParams: { sourceType },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showNameWidget(widgetType: WidgetType) {
+    this.windowsService.showWindow({
+      componentName: 'NameSource',
+      queryParams: { widgetType: String(widgetType) },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
 }
 
 @ServiceHelper()
@@ -340,10 +417,12 @@ export class Source implements ISourceApi {
   width: number;
   height: number;
   doNotDuplicate: boolean;
-  properties: TFormData;
   channel?: number;
 
   sourceState: ISource;
+
+  @Inject()
+  scenesService: ScenesService;
 
   /**
    * displayName can be localized in future releases
@@ -390,7 +469,6 @@ export class Source implements ISourceApi {
 
   setPropertiesFormData(properties: TFormData) {
     setPropertiesFormData(this.getObsInput(), properties);
-    this.sourcesService.refreshProperties(this.sourceId);
   }
 
 
@@ -406,6 +484,11 @@ export class Source implements ISourceApi {
 
   remove() {
     this.sourcesService.removeSource(this.sourceId);
+  }
+
+
+  hasProps(): boolean {
+    return !!this.getObsInput().properties;
   }
 
 

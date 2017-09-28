@@ -11,13 +11,22 @@ interface ISchema {
   items: ISourceInfo[];
 }
 
+interface IFilterInfo {
+  name: string;
+  type: string;
+  settings: obs.ISettings;
+  enabled?: boolean;
+}
+
 interface ISourceInfo {
   id: string;
   name: string;
   type: TSourceType;
-  settings: object;
+  settings: obs.ISettings;
   volume: number;
-  filters: FiltersNode;
+  filters: {
+    items: IFilterInfo[];
+  };
   hotkeys?: HotkeysNode;
   channel?: number;
   muted?: boolean;
@@ -31,30 +40,38 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private audioService: AudioService;
 
   getItems() {
-    return this.sourcesService.sources;
+    return this.sourcesService.sources.filter(source => source.type !== 'scene');
   }
 
   save(context: {}): Promise<void> {
     const items: ISourceInfo[] = [];
     const promises: Promise<ISourceInfo>[] = this.getItems().map(source => {
       return new Promise(resolve => {
-        const filters = new FiltersNode();
         const hotkeys = new HotkeysNode();
 
-        filters.save({ source }).then(() => {
-          return hotkeys.save({ sourceId: source.sourceId });
-        }).then(() => {
-          resolve({
+        return hotkeys.save({ sourceId: source.sourceId }).then(() => {
+          const data: ISourceInfo = {
             id: source.sourceId,
             name: source.name,
             type: source.type,
             settings: source.getObsInput().settings,
             volume: source.getObsInput().volume,
             channel: source.channel,
-            filters,
             hotkeys,
-            muted: source.getObsInput().muted
-          });
+            muted: source.getObsInput().muted,
+            filters: {
+              items: source.getObsInput().filters.map(filter => {
+                return {
+                  name: filter.name,
+                  type: filter.id,
+                  settings: filter.settings,
+                  enabled: filter.enabled
+                };
+              })
+            }
+          };
+
+          resolve(data);
         });
       });
     });
@@ -68,7 +85,26 @@ export class SourcesNode extends Node<ISchema, {}> {
   }
 
   load(context: {}): Promise<void> {
-    const sources = obs.createSources(this.data.items);
+    // This shit is complicated, IPC sucks
+    const sourceCreateData = this.data.items.map(source => {
+      return {
+        name: source.name,
+        type: source.type,
+        muted: source.muted || false,
+        settings: source.settings,
+        volume: source.volume,
+        filters: source.filters.items.map(filter => {
+          return {
+            name: filter.name,
+            type: filter.type,
+            settings: filter.settings,
+            enabled: (filter.enabled === void 0) ? true : filter.enabled
+          };
+        })
+      };
+    });
+
+    const sources = obs.createSources(sourceCreateData);
     const promises: Promise<void>[] = [];
 
     sources.forEach((source, index) => {

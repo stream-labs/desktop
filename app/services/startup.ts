@@ -5,7 +5,7 @@ import { HotkeysService } from './hotkeys';
 import { UserService } from './user';
 import { ShortcutsService } from './shortcuts';
 import { Inject } from '../util/injector';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { ServicesManager } from '../services-manager';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
@@ -96,7 +96,7 @@ export class StartupService extends StatefulService<IStartupState> {
     this.configPersistenceService.rawSave().then(() => {
       this.scenesTransitionsService.release();
       this.scenesService.scenes.forEach(scene => scene.remove(true));
-      this.sourcesService.sources.forEach(source => source.remove());
+      this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
       electron.remote.getCurrentWindow().close();
     });
   }

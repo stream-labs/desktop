@@ -196,8 +196,9 @@ import { getPlatformService, IStreamInfo, Community } from '../../services/platf
 import StudioFooter from '../StudioFooter.vue';
 import { ScenesService } from '../../services/scenes';
 import { Display, VideoService } from '../../services/video';
+import { WindowsService } from '../../services/windows';
 import { PerformanceService } from '../../services/performance';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { ListInput } from '../shared/forms';
 import { debounce, cloneDeep } from 'lodash';
 
@@ -238,6 +239,9 @@ export default class Live extends Vue {
 
   @Inject()
   videoService: VideoService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   @Inject()
   performanceService: PerformanceService;
@@ -322,7 +326,7 @@ export default class Live extends Vue {
   onResize() {
     const display = this.$refs.display;
     const rect = display.getBoundingClientRect();
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     this.obsDisplay.resize(
       rect.width * factor,

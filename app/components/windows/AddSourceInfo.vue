@@ -1,20 +1,20 @@
 <template>
 <div>
   <div class="source-info">
-    <div class="source-info__heading">
+    <div class="source-info__text">
       <h3>{{ name }}</h3>
       <div class="desc">{{ description }}</div>
-    </div>
-    <div class="source-info__body">
+
       <div class="source-support">
         <div class="source-support__label">Supports</div>
         <slot name="support-list"></slot>
       </div>
-      <div class="source-info__media">
-        <slot name="media"></slot>
-      </div>
     </div>
-    <button @click="$emit('clickAdd')" class="button button--action">Add Source</button>
+
+    <div class="source-info__media">
+      <slot name="media"></slot>
+    </div>
+    <!--<button @click="$emit('clickAdd')" class="button button--action">Add Source</button>-->
   </div>
 </div>
 </template>
@@ -48,27 +48,38 @@ export default class AddSourceInfo extends Vue {
   }
 }
 
-.source-info__heading {
-  margin-bottom: 20px;
+.source-info__text {
+  flex: 0 0 50%;
+
+  h3,
+  .desc {
+    margin-bottom: 12px;
+  }
 }
 
 .source-info__media {
   .radius;
   overflow: hidden;
-  height: 106px;
   text-align: center;
   padding-left: 20px;
+  align-items: center;
+  align-content: center;
+  max-height: 150px;
+  justify-content: center;
 
-  video, img {
+  video,
+  img {
     width: auto;
-    max-height: 100%;
+    max-height: 150px;
     max-width: 100%;
     .radius;
   }
 }
 
-.source-support, .source-info__media {
-  width: 50%;
+.source-text,
+.source-info__media {
+  display: flex;
+  flex: 0 0 50%;
 }
 
 .source-support__list {
@@ -76,12 +87,12 @@ export default class AddSourceInfo extends Vue {
   margin-left: 15px;
   display: flex;
   flex-wrap: wrap;
-  height: 85px;
-  width: 250px;
+  flex: 250px;
+  height: 64px;
   flex-direction: column;
 
   li {
-    width: 50%;
+    padding-right: 50px;
   }
 }
 

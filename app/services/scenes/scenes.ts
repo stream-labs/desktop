@@ -3,9 +3,10 @@ import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
 import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
+import { WindowsService } from '../windows';
+import { IScene, Scene, ISceneItem, ISceneApi, SceneItem } from '../scenes';
 import { SourcesService } from '../sources';
-import { IScene, Scene, ISceneItem, ISceneApi } from '../scenes';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
@@ -48,19 +49,14 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   itemRemoved = new Subject<ISceneItem>();
 
   @Inject()
+  private windowsService: WindowsService;
+
+  @Inject()
   private sourcesService: SourcesService;
 
 
   @Inject('ScenesTransitionsService')
   private transitionsService: ScenesTransitionsService;
-
-
-  @mutation()
-  private RESET_SCENES() {
-    this.state.activeSceneId = null;
-    this.state.displayOrder = [];
-    this.state.scenes = {};
-  }
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
@@ -96,7 +92,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // Get an id to identify the scene on the frontend
     const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
     this.ADD_SCENE(id, name);
-    const scene = obs.SceneFactory.create(name);
+    const obsScene = obs.SceneFactory.create(name);
+    this.sourcesService.addSource(obsScene.source, id);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
@@ -133,7 +130,11 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     // remove all sources from scene
     scene.getItems().forEach(sceneItem => scene.removeItem(sceneItem.sceneItemId));
 
-    scene.getObsScene().release();
+    // remove scene from other scenes if it has been added as a source
+    this.getSceneItems().forEach(sceneItem => {
+      if (sceneItem.sourceId !== scene.id) return;
+      sceneItem.getScene().removeItem(sceneItem.sceneItemId);
+    });
 
     this.REMOVE_SCENE(id);
 
@@ -144,8 +145,14 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
         this.makeSceneActive(sceneIds[0]);
       }
     }
+
     this.sceneRemoved.next(sceneModel);
     return sceneModel;
+  }
+
+
+  setLockOnAllScenes(locked: boolean) {
+    this.scenes.forEach(scene => scene.setLockOnAllItems(locked));
   }
 
 
@@ -174,11 +181,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   // Utility functions / getters
 
-  getSceneById(id: string): IScene {
-    return this.getScene(id);
-  }
-
-
   getSceneByName(name: string): Scene {
     let foundScene: IScene;
 
@@ -205,6 +207,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       if (sceneItem) return sceneItem;
     }
     return null;
+  }
+
+  getSceneItems(): SceneItem[] {
+    const sceneItems: SceneItem[] = [];
+    this.scenes.forEach(scene => sceneItems.push(...scene.getItems()));
+    return sceneItems;
   }
 
   @shortcut('ArrowLeft')
@@ -263,5 +271,27 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return this.getScene(this.state.activeSceneId);
   }
 
+
+  showNameScene() {
+    this.windowsService.showWindow({
+      componentName: 'NameScene',
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showDuplicateScene(sceneName: string) {
+    this.windowsService.showWindow({
+      componentName: 'NameScene',
+      queryParams: { sceneToDuplicate: sceneName },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
 }
 

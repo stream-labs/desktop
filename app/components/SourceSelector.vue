@@ -10,8 +10,10 @@
         @click="addSource"/>
       <i
         class="fa fa-minus icon-btn icon-btn--lg"
+        :class="{ disabled: !this.scene.activeItemId}"
         @click="removeItem"/>
       <i
+        :class="{ disabled: !canShowProperties()}"
         class="fa fa-cog icon-btn"
         @click="sourceProperties"/>
     </div>
@@ -45,7 +47,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { WindowService } from '../services/window';
+import { SourcesService } from '../services/sources';
 import { ScenesService, SceneItem } from '../services/scenes';
 import { EditMenu } from '../util/menus/EditMenu';
 
@@ -57,11 +59,12 @@ export default class SourceSelector extends Vue {
   @Inject()
   scenesService: ScenesService;
 
-  windowService = WindowService.instance;
+  @Inject()
+  sourcesService: SourcesService;
 
   addSource() {
     if (this.scenesService.activeScene) {
-      this.windowService.showAddSource();
+      this.sourcesService.showShowcase();
     }
   }
 
@@ -87,9 +90,12 @@ export default class SourceSelector extends Vue {
   }
 
   sourceProperties() {
-    if (this.scene.activeItemId) {
-      this.windowService.showSourceProperties(this.scene.activeItem.sourceId);
-    }
+    if (!this.canShowProperties()) return;
+    this.sourcesService.showSourceProperties(this.scene.activeItem.sourceId);
+  }
+
+  canShowProperties(): boolean {
+    return this.scene.activeItemId && this.scene.activeItem.getSource().hasProps();
   }
 
   handleSort(data: any) {
@@ -156,5 +162,13 @@ export default class SourceSelector extends Vue {
 
 .source-selector-action {
   font-size: 16px;
+}
+
+.fa.disabled {
+  opacity: 0.15;
+  cursor: inherit;
+  :hover {
+    opacity: inherit;
+  }
 }
 </style>

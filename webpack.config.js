@@ -1,9 +1,6 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 const plugins = [];
-
-plugins.push(new ProgressBarPlugin());
 
 
 // uncomment to watch circular dependencies
@@ -32,6 +29,16 @@ module.exports = {
 
   resolve: {
     extensions: ['.js', '.ts']
+  },
+
+  // We want to dynamically require native addons
+  externals: {
+    'font-manager': 'require("font-manager")',
+
+    // Not actually a native addons, but are super big so we don't
+    // bother compiling them into our bundle.
+    'aws-sdk': 'require("aws-sdk")',
+    'asar': 'require("asar")'
   },
 
   module: {

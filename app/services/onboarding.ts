@@ -2,7 +2,7 @@ import { StatefulService, mutation } from './stateful-service';
 import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 type TOnboardingStep =
   'Connect' |
@@ -85,7 +85,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   userService: UserService;
 
 
-  mounted() {
+  init() {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.

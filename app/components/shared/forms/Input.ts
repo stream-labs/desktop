@@ -388,7 +388,8 @@ export function setupSourceDefaults(obsSource: obs.ISource) {
     ) continue;
     defaultSettings[obsProp.name] = obsProp.details.items[0].value;
   } while (obsProp = obsProp.next());
-  obsSource.update(defaultSettings);
+  const needUpdate = Object.keys(defaultSettings).length > 0;
+  if (needUpdate) obsSource.update(defaultSettings);
 }
 
 export abstract class Input<TValueType> extends Vue {

@@ -1,3 +1,5 @@
+import URI from 'urijs';
+
 export default class Utils {
 
   static applyProxy(target: Object, source: Object) {
@@ -10,19 +12,18 @@ export default class Utils {
   }
 
 
-  static getUrlParams(): Dictionary<string> {
-    const queryDict = {};
-    location.search.substr(1)
-      .split('&')
-      .forEach(item => {
-        queryDict[item.split('=')[0]] = item.split('=')[1];
-      });
-    return queryDict;
+  static getCurrentUrlParams(): Dictionary<string> {
+    return this.getUrlParams(window.location.href);
+  }
+
+
+  static getUrlParams(url: string) {
+    return URI.parseQuery(URI.parse(url).query);
   }
 
 
   static isChildWindow(): boolean {
-    return !!this.getUrlParams().child;
+    return !!this.getCurrentUrlParams().child;
   }
 
   /**

@@ -18,7 +18,8 @@ import { ScenesService, SceneItem, Scene } from '../services/scenes';
 import { Display, VideoService } from '../services/video';
 import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
-import electron from '../vendor/electron';
+import { WindowsService } from '../services/windows';
+import electron from 'electron';
 
 const { webFrame, screen } = electron;
 
@@ -43,6 +44,9 @@ export default class StudioEditor extends Vue {
 
   @Inject()
   scenesService: ScenesService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   @Inject()
   videoService: VideoService;
@@ -86,7 +90,7 @@ export default class StudioEditor extends Vue {
   onResize() {
     const display = this.$refs.display;
     const rect = display.getBoundingClientRect();
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     this.obsDisplay.resize(
       rect.width * factor,
@@ -172,7 +176,7 @@ export default class StudioEditor extends Vue {
     const mousePosX = event.offsetX - this.renderedOffsetX;
     const mousePosY = event.offsetY - this.renderedOffsetY;
 
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
     const converted = this.convertScalarToBaseSpace(
       mousePosX * factor,
       mousePosY * factor
@@ -233,19 +237,19 @@ export default class StudioEditor extends Vue {
       rect.withAnchor(options.anchor, () => {
         // There's probably a more generic way to do this math
         if (options.anchor === AnchorPoint.East) {
-          const croppableWidth = rect.width - rect.crop.right;
+          const croppableWidth = rect.width - rect.crop.right - 2;
           const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
           rect.crop.left = _.clamp(distance / rect.scaleX, 0, croppableWidth);
         } else if (options.anchor === AnchorPoint.West) {
-          const croppableWidth = rect.width - rect.crop.left;
+          const croppableWidth = rect.width - rect.crop.left - 2;
           const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
           rect.crop.right = _.clamp(distance / rect.scaleX, 0, croppableWidth);
         } else if (options.anchor === AnchorPoint.South) {
-          const croppableHeight = rect.height - rect.crop.bottom;
+          const croppableHeight = rect.height - rect.crop.bottom - 2;
           const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
           rect.crop.top = _.clamp(distance / rect.scaleY, 0, croppableHeight);
         } else if (options.anchor === AnchorPoint.North) {
-          const croppableHeight = rect.height - rect.crop.top;
+          const croppableHeight = rect.height - rect.crop.top - 2;
           const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
           rect.crop.bottom = _.clamp(distance / rect.scaleY, 0, croppableHeight);
         }
@@ -331,7 +335,7 @@ export default class StudioEditor extends Vue {
   // Takes the given mouse event, and determines if it is
   // over the given box in base resolution space.
   isOverBox(event: MouseEvent, x: number, y: number, width: number, height: number) {
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
 
     const mouse = this.convertVectorToBaseSpace(
       event.offsetX * factor,
@@ -444,7 +448,7 @@ export default class StudioEditor extends Vue {
 
     const source = this.activeSource;
     const renderedRegionRadius = 5;
-    const factor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    const factor = this.windowsService.state.main.scaleFactor;
     const regionRadius = renderedRegionRadius * factor * this.baseWidth / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;

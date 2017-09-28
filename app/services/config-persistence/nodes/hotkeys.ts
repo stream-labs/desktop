@@ -11,7 +11,7 @@ interface IContext {
 
 export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
 
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   @Inject()
   private hotkeysService: HotkeysService;
@@ -27,7 +27,7 @@ export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
     } else {
       items = this.hotkeysService.getGeneralHotkeys();
     }
-    return items.filter(hotkey => hotkey.accelerators.length);
+    return items.filter(hotkey => hotkey.bindings.length);
   }
 
 
@@ -41,6 +41,12 @@ export class HotkeysNode extends ArrayNode<IHotkey, IContext, Hotkey> {
   loadItem(obj: IHotkey, context: IContext): Promise<void> {
     this.hotkeysService.addHotkey({ ...obj, ...context });
     return Promise.resolve();
+  }
+
+
+  migrate(version: number) {
+    // We don't support version 1 hotkey schemas
+    if (version === 1) this.data = { items: [] };
   }
 
 }

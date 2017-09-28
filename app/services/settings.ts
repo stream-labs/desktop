@@ -6,6 +6,7 @@ import { nodeObs } from './obs-api';
 import { SourcesService } from './sources';
 import { Inject } from '../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from './audio';
+import { WindowsService } from './windows';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -68,6 +69,9 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
   @Inject()
   private audioService: AudioService;
 
+  @Inject()
+  private windowsService: WindowsService;
+
 
   init() {
     this.loadSettingsIntoStore();
@@ -80,6 +84,17 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
       settingsFormData[categoryName] = this.getSettingsFormData(categoryName);
     });
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
+  }
+
+
+  showSettings() {
+    this.windowsService.showWindow({
+      componentName: 'Settings',
+      size: {
+        width: 800,
+        height: 800
+      }
+    });
   }
 
 

@@ -1,6 +1,6 @@
 // An abstraction on electron Menus
 
-import electron from '../../vendor/electron';
+import electron from 'electron';
 const { remote } = electron;
 
 export class Menu {
@@ -15,7 +15,7 @@ export class Menu {
     this.menu.popup(remote.getCurrentWindow());
   }
 
-  append(options: Electron.MenuItemOptions) {
+  append(options: Electron.MenuItemConstructorOptions) {
     this.menu.append(new remote.MenuItem(options));
   }
 

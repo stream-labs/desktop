@@ -4,7 +4,7 @@ import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from '../util/injector';
 import { mutation } from './stateful-service';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { HostsService } from './hosts';
 import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
 import { CustomizationService } from './customization';
@@ -46,7 +46,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.
-    electron.ipcRenderer.on('testing-fakeAuth', (e, auth) => {
+    electron.ipcRenderer.on('testing-fakeAuth', (e: Electron.Event, auth: any) => {
       this.LOGIN(auth);
     });
   }

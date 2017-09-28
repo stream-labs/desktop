@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { OverlaysPersistenceService } from '../services/config-persistence';
 import { CacheUploaderService } from '../services/cache-uploader';

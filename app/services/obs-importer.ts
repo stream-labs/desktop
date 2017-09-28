@@ -1,5 +1,5 @@
 
-import electron from '../vendor/electron';
+import electron from 'electron';
 import { Service } from './service';
 import fs from 'fs';
 import path from 'path';
@@ -62,13 +62,14 @@ export class ObsImporterService extends Service {
   importFilters(filtersJSON :any, source :Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-
+        
         const isFilterAvailable = this.filtersService.getTypes().find((availableFilter) => {
           return availableFilter.type === filterJSON.id;
         });
 
         if (isFilterAvailable) {
-          this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
+          const filter = this.filtersService.add(source.name, filterJSON.id, filterJSON.name);
+          filter.enabled = filterJSON.enabled;
 
           // Setting properties
           const properties = this.filtersService.getPropertiesFormData(source.name, filterJSON.name) ;
@@ -96,9 +97,7 @@ export class ObsImporterService extends Service {
 
     if (Array.isArray(sourcesJSON)) {
       sourcesJSON.forEach(sourceJSON => {
-        const isSourceAvailable = this.sourcesService.getAvailableSourcesTypes().find((availableSource) => {
-          return availableSource.value === sourceJSON.id;
-        });
+        const isSourceAvailable = this.sourcesService.getAvailableSourcesTypes().includes(sourceJSON.id);
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {

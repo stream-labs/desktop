@@ -59,24 +59,22 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import { WindowService } from '../services/window';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from "../services/navigation";
 import { UserService } from '../services/user';
-import electron from '../vendor/electron';
+import electron from 'electron';
 import Login from './Login.vue';
+import {SettingsService} from "../services/settings";
 
 @Component({
   components: { Login }
 })
 export default class TopNav extends Vue {
 
-  windowService: WindowService = WindowService.instance;
-  customizationService: CustomizationService = CustomizationService.instance;
-  navigationService: NavigationService = NavigationService.instance;
-
-  @Inject()
-  userService: UserService;
+  @Inject() settingsService: SettingsService;
+  @Inject() customizationService: CustomizationService;
+  @Inject() navigationService: NavigationService;
+  @Inject() userService: UserService;
 
   slideOpen = false;
 
@@ -97,7 +95,7 @@ export default class TopNav extends Vue {
   }
 
   openSettingsWindow() {
-    this.windowService.showSettings();
+    this.settingsService.showSettings();
   }
 
   toggleNightTheme() {

@@ -1,4 +1,4 @@
-import electron from './vendor/electron';
+import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ConfigPersistenceService } from './services/config-persistence';
@@ -22,7 +22,7 @@ import { SourcesService, Source } from  './services/sources';
 import { UserService } from  './services/user';
 import { VideoService } from  './services/video';
 import { WidgetsService } from  './services/widgets';
-import { WindowService } from  './services/window';
+import { WindowsService } from  './services/windows';
 import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
@@ -35,6 +35,7 @@ import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
+import { ObserveList } from './util/service-observer';
 
 const { ipcRenderer } = electron;
 
@@ -55,6 +56,8 @@ interface IServiceResponce {
     isPromise?: boolean;
     promiseId?: string;
   };
+
+  isTimeout?: boolean;
 }
 
 enum E_PUSH_MESSAGE_TYPE { PROMISE }
@@ -106,7 +109,7 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
-    WindowService,
+    WindowsService,
     FontLibraryService,
     ObsImporterService,
     ConfigPersistenceService,
@@ -142,8 +145,19 @@ export class ServicesManager extends Service {
 
         return true;
       });
+      return;
     }
 
+    Service.serviceAfterInit.subscribe(service => this.initObservers(service));
+  }
+
+
+  private initObservers(observableService: Service): Service[] {
+    const observeList: ObserveList = ObserveList.instance;
+    const items = observeList.observations.filter(item => {
+      return item.observableServiceName === observableService.serviceName;
+    });
+    return items.map(item => this.getService(item.observerServiceName).instance);
   }
 
 
@@ -169,7 +183,7 @@ export class ServicesManager extends Service {
    * start listen calls to services from child window
    */
   listenApiCalls() {
-    ipcRenderer.on('services-request', (event, request: IRequestToService) => {
+    ipcRenderer.on('services-request', (event: Electron.Event, request: IRequestToService) => {
       const action = request.payload.action;
       let response: IServiceResponce;
       this.startBufferingMutations();
@@ -251,7 +265,7 @@ export class ServicesManager extends Service {
   listenMessages() {
     const promises = this.promises;
 
-    ipcRenderer.on('services-message', (event, message: IPushMessage) => {
+    ipcRenderer.on('services-message', (event: Electron.Event, message: IPushMessage) => {
       // handle promise reject/resolve
       const promisePayload = message.type === E_PUSH_MESSAGE_TYPE.PROMISE && message.payload as IPromisePayload;
       if (promisePayload) {
@@ -304,10 +318,6 @@ export class ServicesManager extends Service {
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
-    // TODO: rid of blacklist
-    const blackList = ['WindowService', 'ObsApiService'];
-    if (blackList.includes(service.constructor.name)) return service;
-
     return new Proxy(service, {
       get: (target, property, receiver) => {
 
@@ -334,6 +344,10 @@ export class ServicesManager extends Service {
             isHelper,
             constructorArgs
           });
+
+          if (response.isTimeout) {
+            throw 'Main window response timeout: check the errors in the main window';
+          }
 
           const payload = response.payload;
           response.mutations.forEach(mutation => commitMutation(mutation));

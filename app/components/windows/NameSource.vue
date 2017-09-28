@@ -28,11 +28,11 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi } from '../../services/sources';
-import { WidgetsService, WidgetDefinitions } from '../../services/widgets';
+import { ISourcesServiceApi, TSourceType} from '../../services/sources';
+import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
 
 @Component({
   components: { ModalLayout },
@@ -47,16 +47,18 @@ export default class NameSource extends Vue {
   scenesService: IScenesServiceApi;
 
   @Inject()
-  widgetsService:WidgetsService;
+  widgetsService: WidgetsService;
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
+
   name = '';
   error = '';
 
   mounted() {
     const sourceType =
       this.sourceType &&
-      this.sourcesService.getAvailableSourcesTypes()
+      this.sourcesService.getAvailableSourcesTypesList()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
     this.name = this.sourcesService.suggestName(
@@ -82,7 +84,7 @@ export default class NameSource extends Vue {
         ).sourceId;
       }
 
-      this.windowService.showSourceProperties(sourceId);
+      this.sourcesService.showSourceProperties(sourceId);
     }
   }
 
@@ -90,12 +92,12 @@ export default class NameSource extends Vue {
     return this.sourcesService.getSourceByName(name);
   }
 
-  get sourceType() {
-    return this.windowService.getOptions().sourceType;
+  get sourceType(): TSourceType {
+    return this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
   }
 
-  get widgetType() {
-    return this.windowService.getOptions().widgetType;
+  get widgetType(): WidgetType {
+    return parseInt(this.windowsService.getChildWindowQueryParams().widgetType) as WidgetType;
   }
 
 }

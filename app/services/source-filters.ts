@@ -5,6 +5,7 @@ import {
 } from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
+import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
 
@@ -46,6 +47,9 @@ export class SourceFiltersService extends Service {
 
   @Inject()
   sourcesService: SourcesService;
+
+  @Inject()
+  windowsService: WindowsService;
 
   getTypesList(): IListOption<TSourceFilterType>[] {
     return [
@@ -106,6 +110,7 @@ export class SourceFiltersService extends Service {
     const obsFilter = obs.FilterFactory.create(filterType, filterName);
     source.getObsInput().addFilter(obsFilter);
     if (settings) obsFilter.update(settings);
+    return obsFilter;
   }
 
 
@@ -183,6 +188,29 @@ export class SourceFiltersService extends Service {
     return getPropertiesFormData(this.getObsFilter(sourceName, filterName));
   }
 
+
+  showSourceFilters(sourceName: string, selectedFilterName = '') {
+    this.windowsService.showWindow({
+      componentName: 'SourceFilters',
+      queryParams: { sourceName, selectedFilterName },
+      size: {
+        width: 800,
+        height: 800
+      }
+    });
+  }
+
+
+  showAddSourceFilter(sourceName: string) {
+    this.windowsService.showWindow({
+      componentName: 'AddSourceFilter',
+      queryParams: { sourceName },
+      size: {
+        width: 600,
+        height: 400
+      }
+    });
+  }
 
   private getObsFilter(sourceName: string, filterName: string): obs.IFilter {
     return this.sourcesService.getSourceByName(sourceName).getObsInput().findFilter(filterName);

@@ -1,12 +1,11 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
-import { SourcesService, TSourceType } from '../sources';
+import { Source, SourcesService, TSourceType } from '../sources';
 import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
 import Utils from '../utils';
 import * as obs from '../obs-api';
-import electron from '../../vendor/electron';
+import electron from 'electron';
 import { Inject } from '../../util/injector';
-import { HotkeysNode } from '../config-persistence/nodes/hotkeys';
 
 const { ipcRenderer } = electron;
 
@@ -39,9 +38,10 @@ export interface ISceneItemInfo {
 export interface ISceneApi extends IScene {
   getItem(sceneItemId: string): ISceneItemApi;
   getItems(): ISceneItemApi[];
-  addSource(sourceId: string, options: ISceneItemAddOptions): ISceneItemApi;
+  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   makeItemActive(sceneItemId: string): void;
+  canAddSource(sourceId: string): boolean;
 }
 
 
@@ -153,6 +153,11 @@ export class Scene implements ISceneApi {
   }
 
 
+  setLockOnAllItems(locked: boolean) {
+    this.getItems().forEach(item => item.setLocked(locked));
+  }
+
+
   setSourceOrder(sceneItemId: string, positionDelta: number, order: string[]) {
     const itemIndex = this.getItemIndex(sceneItemId);
     this.getObsScene().moveItem(itemIndex, itemIndex + positionDelta);
@@ -193,6 +198,34 @@ export class Scene implements ISceneApi {
       this.getItem(items[index].id).loadItemAttributes(sceneItem);
     });
   }
+
+
+  canAddSource(sourceId: string): boolean {
+    const source = this.sourcesService.getSource(sourceId);
+    if (!source) return false;
+
+    // if source is scene then traverse the scenes tree to detect possible infinity scenes loop
+    if (source.type !== 'scene') return true;
+    if (this.id === source.sourceId) return false;
+
+    const sceneToAdd = this.scenesService.getScene(source.sourceId);
+    return !sceneToAdd.hasNestedScene(this.id);
+  }
+
+
+  hasNestedScene(sceneId: string) {
+    const childScenes = this.getItems()
+      .filter(sceneItem => sceneItem.type === 'scene')
+      .map(sceneItem => this.scenesService.getScene(sceneItem.sourceId));
+
+    for (const childScene of childScenes) {
+      if (childScene.id === sceneId) return true;
+      if (!childScene.hasNestedScene(sceneId)) return true;
+    }
+
+    return false;
+  }
+
 
   @mutation()
   private MAKE_SOURCE_ACTIVE(sceneItemId: string) {

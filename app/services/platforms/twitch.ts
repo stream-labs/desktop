@@ -12,7 +12,7 @@ export class TwitchService extends Service implements IPlatformService {
   @Inject()
   settingsService: SettingsService;
 
-  authWindowOptions: Electron.BrowserWindowOptions = {
+  authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
     height: 800
   };

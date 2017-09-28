@@ -2,7 +2,7 @@
 // and the Vue app. This class is intended to be a singleton.
 
 import { Service } from './service';
-import electron from '../vendor/electron';
+import electron from 'electron';
 const { ipcRenderer, remote } = electron;
 export * from '../../obs-api';
 
@@ -37,7 +37,7 @@ export const nodeObs: Dictionary<Function> = new Proxy({}, {
   }
 });
 
-ipcRenderer.on('obs-apiCallback', (event, cbInfo) => {
+ipcRenderer.on('obs-apiCallback', (event: Electron.Event, cbInfo: any) => {
   callbacks[cbInfo.id](...cbInfo.args);
 });
 
@@ -65,9 +65,9 @@ export class ObsApiService extends Service {
     nodeObs.OBS_content_moveDisplay(key, x, y);
   }
 
-  createSourceDisplay(sourceName: string, key: string) {
+  createSourceDisplay(sourceName: string, key: string, nativeWindowHandle: Buffer) {
     return nodeObs.OBS_content_createSourcePreviewDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
+      nativeWindowHandle,
       sourceName,
       key
     );

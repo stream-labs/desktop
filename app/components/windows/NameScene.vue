@@ -28,7 +28,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import { WindowService } from '../../services/window';
+import { WindowsService } from '../../services/windows';
 import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
@@ -45,9 +45,10 @@ export default class NameScene extends Vue {
   @Inject()
   scenesService: IScenesServiceApi;
 
-  windowService = WindowService.instance;
+  @Inject()
+  windowsService: WindowsService;
 
-  options: { sceneToDuplicate?: string } = this.windowService.getOptions();
+  options: { sceneToDuplicate?: string } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
     const suggestedName = this.options.sceneToDuplicate || 'NewScene';
@@ -67,7 +68,7 @@ export default class NameScene extends Vue {
           makeActive: true
         }
       );
-      this.windowService.closeWindow();
+      this.windowsService.closeChildWindow();
     }
   }
 

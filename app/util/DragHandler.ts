@@ -2,8 +2,9 @@ import { SettingsService } from '../services/settings';
 import { Inject } from '../util/injector';
 import { ScenesService, SceneItem } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
+import { WindowsService } from '../services/windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
-import electron from '../vendor/electron';
+import electron from 'electron';
 
 const { webFrame, screen } = electron;
 
@@ -49,6 +50,12 @@ class DragHandler {
   @Inject()
   scenesService: ScenesService;
 
+  @Inject()
+  videoService: VideoService;
+
+  @Inject()
+  windowsService: WindowsService;
+
   // Settings
   snapEnabled: boolean;
   renderedSnapDistance: number;
@@ -85,11 +92,11 @@ class DragHandler {
     this.centerSnapping = this.settingsService.state.General.CenterSnapping;
 
     // Load some attributes about the video canvas
-    this.baseWidth = VideoService.instance.baseWidth;
-    this.baseHeight = VideoService.instance.baseHeight;
+    this.baseWidth = this.videoService.baseWidth;
+    this.baseHeight = this.videoService.baseHeight;
     this.renderedWidth = display.outputRegion.width;
     this.renderedHeight = display.outputRegion.height;
-    this.scaleFactor = webFrame.getZoomFactor() * screen.getPrimaryDisplay().scaleFactor;
+    this.scaleFactor = this.windowsService.state.main.scaleFactor;
     this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
       this.renderedWidth;
 
