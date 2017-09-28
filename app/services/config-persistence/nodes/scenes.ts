@@ -43,22 +43,28 @@ export class ScenesNode extends ArrayNode<ISchema, {}, Scene> {
     });
   }
 
-  loadItem(obj: ISchema): Promise<void> {
+  loadItem(obj: ISchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
       const scene = this.scenesService.createScene(
         obj.name,
         { sceneId: obj.id }
       );
 
-      obj.sceneItems.load({ scene }).then(() => {
-        if (obj.active) this.scenesService.makeSceneActive(scene.id);
+      resolve(() => {
+        return new Promise(resolve => {
+          obj.sceneItems.load({ scene }).then(() => {
+            if (obj.active) this.scenesService.makeSceneActive(scene.id);
 
-        if (obj.hotkeys) {
-          obj.hotkeys.load({ sceneId: scene.id }).then(() => resolve());
-        } else {
-          resolve();
-        }
+            if (obj.hotkeys) {
+              obj.hotkeys.load({ sceneId: scene.id }).then(() => resolve());
+            } else {
+              resolve();
+            }
+          });
+        });
+
       });
+
     });
   }
 

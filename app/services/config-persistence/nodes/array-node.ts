@@ -9,7 +9,7 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
 
   abstract saveItem(item: TItem, context: TContext): Promise<TSchema>;
 
-  abstract loadItem(item: TSchema, context: TContext): Promise<void>;
+  abstract loadItem(item: TSchema, context: TContext): Promise<(() => Promise<void>) | void>;
 
   abstract getItems(context: TContext): TItem[];
 
@@ -28,7 +28,10 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
     return new Promise(resolve => {
       Promise.all(this.data.items.map(item => {
         return this.loadItem(item, context);
-      })).then(() => resolve());
+      })).then((afterLoadItemsCallbacks) => {
+        Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()))
+          .then(() => resolve());
+      });
     });
   }
 
