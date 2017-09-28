@@ -55,18 +55,6 @@ export class EditMenu extends Menu {
       });
     }
 
-    if (!this.sceneItem && !this.source) {
-      this.append({
-        label: 'Lock all sources',
-        click: () => this.scenesService.setLockOnAllScenes(true)
-      });
-
-      this.append({
-        label: 'Unlock all sources',
-        click: () => this.scenesService.setLockOnAllScenes(false)
-      });
-    }
-
     if (this.sceneItem) {
 
       this.append({
@@ -74,6 +62,8 @@ export class EditMenu extends Menu {
         accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
       });
+
+      this.append({ type: 'separator' });
 
       this.append({
         label: 'Remove',
@@ -97,6 +87,9 @@ export class EditMenu extends Menu {
     }
 
     if (this.source) {
+
+      this.append({ type: 'separator' });
+
       this.append({
         label: 'Filters',
         click: () => {
@@ -115,15 +108,31 @@ export class EditMenu extends Menu {
         enabled: this.clipboardService.hasFilters()
       });
 
+      this.append({ type: 'separator' });
 
       this.append({
         label: 'Properties',
         click: () => {
           this.showProperties();
-        }
+        },
+        enabled: this.source.hasProps()
       });
     }
 
+    if (!this.sceneItem && !this.source) {
+
+      this.append({ type: 'separator' });
+
+      this.append({
+        label: 'Lock all sources',
+        click: () => this.scenesService.setLockOnAllScenes(true)
+      });
+
+      this.append({
+        label: 'Unlock all sources',
+        click: () => this.scenesService.setLockOnAllScenes(false)
+      });
+    }
   }
 
   private showFilters() {
