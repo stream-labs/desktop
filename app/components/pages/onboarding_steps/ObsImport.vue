@@ -112,7 +112,7 @@ export default class ObsImport extends Vue {
 
   startFresh() {
     this.configPersistenceService.load();
-    this.next();
+    this.onboardingService.skip();
   }
 
   next() {

@@ -186,6 +186,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
 
+    if ((type === 'browser_source') && (settings.shutdown === void 0)) {
+      settings.shutdown = true;
+    }
+
     const obsInput = obs.InputFactory.create(type, name, settings);
 
     this.addSource(obsInput, id, options);

@@ -209,11 +209,19 @@ export default class SelectWidgets extends Vue {
 
   busy = false;
 
-  selectedWidgets: WidgetType[] = [
-    WidgetType.AlertBox,
-    WidgetType.EventList,
-    WidgetType.TheJar
-  ];
+  selectedWidgets: WidgetType[] = [];
+
+
+  created() {
+    if (!this.onboardingService.state.completedSteps.includes('ObsImport')) {
+      this.selectedWidgets = [
+        WidgetType.AlertBox,
+        WidgetType.EventList,
+        WidgetType.TheJar
+      ];
+    }
+  }
+
 
   // SelectableWidget components with inspect=true will
   // pop up a full screen modal.  This function can be
