@@ -139,7 +139,7 @@ export default class ModalLayout extends Vue {
 .modal-layout-controls {
   background-color: @day-secondary;
   border-top: 1px solid @day-border;
-  padding: 15px 30px;
+  padding: 10px 20px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;

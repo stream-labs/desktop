@@ -13,10 +13,16 @@ import namingHelpers from '../util/NamingHelpers';
 export enum WidgetType {
   AlertBox,
   DonationGoal,
+  FollowerGoal,
+  SubscriberGoal,
+  BitGoal,
   DonationTicker,
   ChatBox,
   EventList,
-  TheJar
+  TheJar,
+  ViewerCount,
+  StreamBoss,
+  Credits
 }
 
 type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
@@ -153,6 +159,51 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.SouthWest
   },
 
+  [WidgetType.FollowerGoal]: {
+    name: 'Follower Goal',
+    url(host, token) {
+      return `https://${host}/widgets/follower-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.SubscriberGoal]: {
+    name: 'Subscriber Goal',
+    url(host, token) {
+      return `https://${host}/widgets/follower-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.BitGoal]: {
+    name: 'Bit Goal',
+    url(host, token) {
+      return `https://${host}/widgets/bit-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
   [WidgetType.DonationTicker]: {
     name: 'Donation Ticker',
     url(host, token) {
@@ -211,7 +262,52 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 0.5,
 
     anchor: AnchorPoint.East
-  }
+  },
+
+  [WidgetType.ViewerCount]: {
+    name: 'Viewer Count',
+    url(host, token) {
+      return `https://${host}/widgets/viewer-count?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.StreamBoss]: {
+    name: 'Bit Boss',
+    url(host, token) {
+      return `https://${host}/widgets/streamboss?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.Credits]: {
+    name: 'Credits',
+    url(host, token) {
+      return `https://${host}/widgets/end-credits?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
 };
 
 

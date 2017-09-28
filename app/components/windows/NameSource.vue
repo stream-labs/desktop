@@ -58,7 +58,7 @@ export default class NameSource extends Vue {
   mounted() {
     const sourceType =
       this.sourceType &&
-      this.sourcesService.getAvailableSourcesTypes()
+      this.sourcesService.getAvailableSourcesTypesList()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
     this.name = this.sourcesService.suggestName(

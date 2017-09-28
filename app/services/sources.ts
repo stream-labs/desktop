@@ -51,7 +51,8 @@ export interface ISourceApi extends ISource {
 
 export interface ISourcesServiceApi {
   createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
-  getAvailableSourcesTypes(): IListOption<TSourceType>[];
+  getAvailableSourcesTypes(): TSourceType[];
+  getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourceByName(name: string): ISourceApi;
@@ -229,7 +230,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  getAvailableSourcesTypes(): IListOption<TSourceType>[] {
+  getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
     return [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
@@ -248,6 +249,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     ];
   }
 
+  getAvailableSourcesTypes(): TSourceType[] {
+    return this.getAvailableSourcesTypesList().map(listItem => listItem.value);
+  }
 
   refreshSourceAttributes() {
     const activeItems = this.scenesService.activeScene.getItems();
@@ -355,7 +359,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       componentName: 'SourcesShowcase',
       size: {
         width: 800,
-        height: 520
+        height: 630
       }
     });
   }

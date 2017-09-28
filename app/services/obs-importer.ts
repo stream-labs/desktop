@@ -97,9 +97,7 @@ export class ObsImporterService extends Service {
 
     if (Array.isArray(sourcesJSON)) {
       sourcesJSON.forEach(sourceJSON => {
-        const isSourceAvailable = this.sourcesService.getAvailableSourcesTypes().find((availableSource) => {
-          return availableSource.value === sourceJSON.id;
-        });
+        const isSourceAvailable = this.sourcesService.getAvailableSourcesTypes().includes(sourceJSON.id);
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {

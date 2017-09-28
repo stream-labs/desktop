@@ -40,17 +40,14 @@ test('Adding some starter widgets', async t => {
 
   await app.client.click('div=Event List');
   await app.client.click('button=Remove Widget');
-  await clickCloseInspect(t, 'Event List');
 
   await app.client.click('div=Chatbox');
   await app.client.click('button=Add Widget');
-  await clickCloseInspect(t, 'Chatbox');
 
   await app.client.click('div=Donation Goal');
   await app.client.click('button=Add Widget');
-  await clickCloseInspect(t, 'Donation Goal');
 
-  await app.client.click('button=Next');
+  await app.client.click('button=Add 4 Widgets');
   await app.client.click('a=Setup later');
 
   t.true(await app.client.isExisting('li=Alert Box'));

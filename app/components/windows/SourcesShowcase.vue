@@ -22,6 +22,7 @@
         <li>bmp</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'slideshow'"
       @clickAdd="selectSource('slideshow')"
@@ -37,6 +38,7 @@
         <li>bmp</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'ffmpeg_source'"
       @clickAdd="selectSource('ffmpeg_source')"
@@ -58,6 +60,7 @@
         <li>webm</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'window_capture'"
       @clickAdd="selectSource('window_capture')"
@@ -68,6 +71,7 @@
         <li>Compatible with most modern browsers and programs</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'dshow_input'"
       @clickAdd="selectSource('dshow_input')"
@@ -80,6 +84,7 @@
         <li>Capture cards (Elgato, Avermedia, BlackMagic)</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'wasapi_output_capture'"
       @clickAdd="selectSource('wasapi_output_capture')"
@@ -90,6 +95,7 @@
         <li>Desktop audio</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'color_source'"
       @clickAdd="selectSource('color_source')"
@@ -102,6 +108,7 @@
         <li>HSV</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'browser_source'"
       @clickAdd="selectSource('browser_source')"
@@ -114,6 +121,7 @@
         <li>HTML</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'text_gdiplus'"
       @clickAdd="selectSource('text_gdiplus')"
@@ -128,6 +136,7 @@
         <li>System Sizes</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'monitor_capture'"
       @clickAdd="selectSource('monitor_capture')"
@@ -139,6 +148,7 @@
         <li>Secondary monitor</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'game_capture'"
       @clickAdd="selectSource('game_capture')"
@@ -149,6 +159,7 @@
         <li>Built in works with most modern computer games</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === 'wasapi_input_capture'"
       @clickAdd="selectSource('wasapi_input_capture')"
@@ -161,13 +172,14 @@
         <li>Other USB devices</li>
       </ul>
     </add-source-info>
+
     <!-- Widget Sources -->
     <add-source-info
       v-if="inspectedSource === widgetTypes.AlertBox"
       @clickAdd="selectWidget(widgetTypes.AlertBox)"
       name="Alertbox"
       description="Thanks viewers with notification popups.">
-      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-alertbox.mp4"></video>
+      <img slot="media" src="../../../media/source-demos/alertbox.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -176,22 +188,24 @@
         <li>Hosts</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === widgetTypes.DonationTicker"
       @clickAdd="selectWidget(widgetTypes.DonationTicker)"
       name="Donation Ticker"
       description="Show off your most recent donations to your viewers.">
-      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-donation-ticker.mp4"></video>
+      <img slot="media" src="../../../media/source-demos/donationticker.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === widgetTypes.EventList"
       @clickAdd="selectWidget(widgetTypes.EventList)"
       name="Event List"
       description="Include your channel's most recent events into your stream.">
-      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-eventlist.mp4"></video>
+      <img slot="media" src="../../../media/source-demos/eventlist.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -201,33 +215,71 @@
         <li>Redemptions</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === widgetTypes.DonationGoal"
       @clickAdd="selectWidget(widgetTypes.DonationGoal)"
       name="Donation Goal"
-      description="Set a goal for your viewers to help you reach below.">
-      <img slot="media" src="../../../media/source-demos/source-donation-goal.png"/>
+      description="Set a goal for your viewers to help you reach.">
+      <img slot="media" src="../../../media/source-demos/donationgoal.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
     </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === widgetTypes.FollowerGoal"
+      @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
+      name="Follower Goal"
+      description="Set a goal for your viewers to help you reach.">
+      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Twitch Follows</li>
+        <li>Youtube Follows</li>
+        <li>Mixer Follows</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === widgetTypes.BitGoal"
+      @clickAdd="selectWidget(widgetTypes.BitGoal)"
+      name="Bit Goal"
+      description="Set a goal for your viewers to help you reach.">
+      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Twitch Bits</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === widgetTypes.SubscriptionGoal"
+      @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
+      name="Subscription Goal"
+      description="Set a goal for your viewers to help you reach.">
+      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Youtube Subscribers</li>
+      </ul>
+    </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === widgetTypes.ChatBox"
       @clickAdd="selectWidget(widgetTypes.ChatBox)"
       name="Chatbox"
       description="Include your channel's chat into your stream.">
-      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-chatbox.mp4"></video>
+      <img slot="media" src="../../../media/source-demos/chat.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch chat</li>
         <li>Youtube chat</li>
       </ul>
     </add-source-info>
+
     <add-source-info
       v-if="inspectedSource === widgetTypes.TheJar"
       @clickAdd="selectWidget(widgetTypes.TheJar)"
       name="The Jar"
       description="The jar that catches bits, tips, and more.">
-      <video slot="media" autoplay loop muted src="../../../media/source-demos/source-jar.mp4"></video>
+      <img slot="media" src="../../../media/source-demos/jar.gif"/>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -236,19 +288,59 @@
         <li>Hosts</li>
       </ul>
     </add-source-info>
+
     <add-source-info
-        v-if="inspectedSource === 'scene'"
-        @clickAdd="selectSource('scene')"
-        name="Scene"
-        description="Allows you to add existing scene as a source">
+      v-if="inspectedSource === widgetTypes.ViewerCount"
+      @clickAdd="selectWidget(widgetTypes.ViewerCount)"
+      name="Viewer Count"
+      description="Show off your viewers from multiple platforms.">
+      <img slot="media" src="../../../media/source-demos/viewercount-source.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Youtube</li>
+        <li>Twitch</li>
+        <li>Mixer</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === widgetTypes.StreamBoss"
+      @clickAdd="selectWidget(widgetTypes.StreamBoss)"
+      name="Stream Boss"
+      description="Battle with bits to be the boss of the stream!">
+      <img slot="media" src="../../../media/source-demos/streamboss-source.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Twitch Bits</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === widgetTypes.Credits"
+      @clickAdd="selectWidget(widgetTypes.Credits)"
+      name="Credits"
+      description="Rolling credits to play at the end of your stream.">
+      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>New Followers</li>
+        <li>New Subscribers</li>
+        <li>Cheers</li>
+        <li>Donations</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === 'scene'"
+      @clickAdd="selectSource('scene')"
+      name="Scene"
+      description="Allows you to add existing scene as a source">
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
     </add-source-info>
+
     <div
       class="source-info"
       v-if="inspectedSource === null">
-      <h3>Welcome to sources!</h3>
       <div class="source-welcome">
         <div class="source-welcome__text">
+          <h3>Welcome to sources!</h3>
           <ol>
             <li>Browse through our Standard and Widget sources</li>
             <li>Click a source to get more details about it</li>
@@ -268,71 +360,124 @@
           <li
             v-for="source in availableSources"
             class="source source--standard"
+            :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
             @dblclick="selectSource(source.value)">
             {{ source.description }}
           </li>
         </ul>
       </div>
+
       <div class="source-group" v-if="loggedIn">
         <h4>Widgets</h4>
-        <div class="source-list--widgets">
+        <div class="source-list">
           <div
             class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.Alertbox}"
             @click="inspectSource(widgetTypes.AlertBox)"
             @dblclick="selectWidget(widgetTypes.AlertBox)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/alertbox-no-bg.png">
-            </div>
-            <div>Alertbox</div>
+            <div>Alertbox</div><span class="label--essential">Essential</span>
           </div>
+
           <div
             class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationGoal)"
-            @dblclick="selectWidget(widgetTypes.DonationGoal)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/donation-goal-no-bg.png">
-            </div>
-            <div>Donation Goal</div>
-          </div>
-          <div
-            class="source source--widget"
-            @click="inspectSource(widgetTypes.DonationTicker)"
-            @dblclick="selectWidget(widgetTypes.DonationTicker)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/donation-ticker-no-bg.png">
-            </div>
-            <div>Donation Ticker</div>
-          </div>
-          <div
-            class="source source--widget"
-            @click="inspectSource(widgetTypes.ChatBox)"
-            @dblclick="selectWidget(widgetTypes.ChatBox)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/chatbox-no-bg.png">
-            </div>
-            <div>Chatbox</div>
-          </div>
-          <div
-            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.EventList}"
             @click="inspectSource(widgetTypes.EventList)"
             @dblclick="selectWidget(widgetTypes.EventList)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/event-list-no-bg.png">
-            </div>
-            <div>Event List</div>
+            <div>Event List</div><span class="label--essential">Essential</span>
           </div>
+
           <div
             class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
             @click="inspectSource(widgetTypes.TheJar)"
             @dblclick="selectWidget(widgetTypes.TheJar)">
-            <div class="source__icon">
-              <img src="../../../media/images/icons/the-jar-no-bg.png">
-            </div>
-            <div>The Jar</div>
+            <div>The Jar</div><span class="label--essential">Essential</span>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.DonationGoal}"
+            @click="inspectSource(widgetTypes.DonationGoal)"
+            @dblclick="selectWidget(widgetTypes.DonationGoal)">
+            <div>Donation Goal</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
+            @click="inspectSource(widgetTypes.FollowerGoal)"
+            @dblclick="selectWidget(widgetTypes.FollowerGoal)">
+            <div>Follower Goal</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            v-show="platform === 'twitch'"
+            :class="{'source--active': inspectedSource === widgetTypes.BitGoal}"
+            @click="inspectSource(widgetTypes.BitGoal)"
+            @dblclick="selectWidget(widgetTypes.BitGoal)">
+            <div>Bit Goal</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            v-show="platform === 'youtube'"
+            :class="{'source--active': inspectedSource === widgetTypes.SubscriptionGoal}"
+            @click="inspectSource(widgetTypes.SubscriptionGoal)"
+            @dblclick="selectWidget(widgetTypes.SubscriptionGoal)">
+            <div>Subscription Goal</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.DonationTicker}"
+            @click="inspectSource(widgetTypes.DonationTicker)"
+            @dblclick="selectWidget(widgetTypes.DonationTicker)">
+            <div>Donation Ticker</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
+            @click="inspectSource(widgetTypes.ChatBox)"
+            @dblclick="selectWidget(widgetTypes.ChatBox)">
+            <div>Chatbox</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.StreamBoss}"
+            @click="inspectSource(widgetTypes.StreamBoss)"
+            @dblclick="selectWidget(widgetTypes.StreamBoss)">
+            <div>Stream Boss</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.Credits}"
+            @click="inspectSource(widgetTypes.Credits)"
+            @dblclick="selectWidget(widgetTypes.Credits)">
+            <div>Credits</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.ViewerCount}"
+            @click="inspectSource(widgetTypes.ViewerCount)"
+            @dblclick="selectWidget(widgetTypes.ViewerCount)">
+            <div>Viewer Count</div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="modal-layout-controls">
+      <button
+        @click="selectInspectedSource()"
+        class="button button--action"
+        :disabled="inspectedSource === null">
+          Add Source
+      </button>
     </div>
   </div>
 </modal-layout>
@@ -405,8 +550,20 @@ export default class SourcesShowcase extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  get platform() {
+    return this.userService.platform.type;
+  }
+
+  selectInspectedSource() {
+    if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
+      this.selectSource(this.inspectedSource as TSourceType);
+    } else {
+      this.selectWidget(this.inspectedSource as WidgetType)
+    }
+  }
+
   get availableSources() {
-    return this.sourcesService.getAvailableSourcesTypes().filter(type => {
+    return this.sourcesService.getAvailableSourcesTypesList().filter(type => {
       if (type.value === 'text_ft2_source') return false;
       if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
       return true;
@@ -423,16 +580,10 @@ export default class SourcesShowcase extends Vue {
   padding: 20px;
   border-bottom: 1px solid @day-border;
   display: flex;
-  flex-direction: column;
-  background: @day-secondary;
-  flex: 0 0 220px;
-  height: 220px;
-
-  .button {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-  }
+  flex-direction: row;
+  flex: 0 0 190px;
+  height: 190px;
+  align-items: center;
 }
 
 .night-theme {
@@ -455,6 +606,7 @@ h4 {
   display: flex;
   flex-direction: column;
   position: relative;
+  height: 100%;
 }
 
 .source-welcome {
@@ -491,49 +643,45 @@ h4 {
 .source-list {
   list-style-type: none;
   margin: 0;
-}
-
-.source-list--widgets {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+
+  .source {
+    &:nth-child(1),
+    &:nth-child(2) {
+      margin-top: 0;
+    }
+  }
 }
 
 .source {
   color: @navy;
   cursor: pointer;
   .transition;
+  border: 1px solid @day-border;
+  padding: 4px 10px;
+  margin-top: 10px;
+  width: 49%;
 
-  &:hover {
+  &:hover,
+  &.source--active {
     color: @navy-secondary;
     .semibold;
+    border-color: @day-border;
+    background-color: @day-secondary;
   }
 }
 
 .source--standard {
   display: inline-block;
-  width: 49%;
-  padding-right: 1%;
-  margin-bottom: 4px;
 }
 
 .source--widget {
-  border: 1px solid @day-border;
   display: flex;
   align-items: center;
-  padding: 10px;
-  width: 49%;
-  margin-bottom: 10px;
   .radius;
   .transition;
-
-  &:hover {
-    background: @day-secondary;
-  }
-
-  &:nth-child(5), &:nth-child(6) {
-    margin-bottom: 0;
-  }
 }
 
 .source__icon {
@@ -548,18 +696,14 @@ h4 {
 
   .source {
     color: @grey;
+    background: @night-hover;
+    border-color: @night-hover;
 
-    &:hover {
+    &:hover,
+    &.source--active {
       color: @white;
-    }
-  }
-
-  .source--widget {
-    border-color: @night-border;
-
-    &:hover {
-      background: @night-hover;
-      border-color: @night-hover;
+      border-color: @night-secondary;
+      background: @night-secondary;
     }
   }
 
