@@ -26,15 +26,13 @@
           </div>
           <div class="widget__info">
             <div class="widget__name">{{ name }}</div>
-            <div class="widget__desc">
-              {{ description }}
-            </div>
+            <div class="widget__desc">{{ description }}</div>
           </div>
         </div>
         <div class="flex flex--center">
           <button
             class="button button--semi-opac"
-            @click="$emit('toggle')">
+            @click="$emit('toggle') + $emit('close')">
             {{ buttonTextForWidget() }}
           </button>
           <div
@@ -82,29 +80,38 @@ export default class SelectableWidget extends Vue {
 @import "../../../styles/index";
 
 .widget {
-  margin-top: 20px;
+  margin: 20px 10px 0;
   border: 2px solid transparent;
   .radius;
   background: @night-select-bg;
-  padding: 20px;
-  width: 200px;
+  padding: 12px;
   text-align: left;
   display: flex;
   cursor: pointer;
-  width: 360px;
   .transition;
+  position: relative;
 
   &:hover {
     border-color: @teal-light-opac;
   }
 
   &.selected {
-    border-color: @teal-bright;
+    border-color: @teal;
+
+    &:before {
+      content: '\f00c';
+      font-family: FontAwesome;
+      color: @teal;
+      position: absolute;
+      top: 6px;
+      right: 10px;
+    }
   }
 }
 
 .widget__icon {
-  width: 40px;
+  width: 34px;
+  flex: 0 0 auto;
   margin-right: 20px;
 }
 
@@ -135,6 +142,7 @@ export default class SelectableWidget extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 10;
 }
 
 .widget-detail {

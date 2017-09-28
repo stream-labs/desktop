@@ -5,18 +5,17 @@
 
   <div slot="content">
 
-
     <div v-if="sourceType != 'scene'">
       <div class="row">
         <div class="column small-12">
           <h4>Add New Source</h4>
           <p
-              v-if="!error"
-              class="NameSource-label">
+            v-if="!error"
+            class="NameSource-label">
             Please enter the name of the source
           </p>
           <p v-if="error"
-             class="NameSource-label NameSource-label__error">
+            class="NameSource-label NameSource-label__error">
             {{ error }}
           </p>
           <input autofocus type="text" v-model="name"/>
@@ -28,7 +27,6 @@
         </div>
       </div>
     </div>
-
 
     <div class="row">
       <div class="columns small-12">
@@ -56,10 +54,7 @@
         <button @click="addExisting" class="button button--action">Add Existing Source</button>
       </div>
     </div>
-
-
   </div>
-
 
 </modal-layout>
 </template>
@@ -106,7 +101,7 @@ export default class AddSource extends Vue {
   mounted() {
     const sourceType =
       this.sourceType &&
-      this.sourcesService.getAvailableSourcesTypes()
+      this.sourcesService.getAvailableSourcesTypesList()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
     this.name = this.sourcesService.suggestName((this.sourceType && sourceType.description));
   }

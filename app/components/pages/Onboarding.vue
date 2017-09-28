@@ -85,7 +85,8 @@ export default class Onboarding extends Vue {
 }
 
 .onboarding-step--wide {
-  width: 550px;
+  width: 1200px;
+  margin: 0 auto;
 }
 
 .onboarding-step--full {
