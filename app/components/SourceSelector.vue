@@ -10,8 +10,10 @@
         @click="addSource"/>
       <i
         class="fa fa-minus icon-btn icon-btn--lg"
+        :class="{ disabled: !this.scene.activeItemId}"
         @click="removeItem"/>
       <i
+        :class="{ disabled: !canShowProperties()}"
         class="fa fa-cog icon-btn"
         @click="sourceProperties"/>
     </div>
@@ -88,9 +90,12 @@ export default class SourceSelector extends Vue {
   }
 
   sourceProperties() {
-    if (this.scene.activeItemId) {
-      this.sourcesService.showSourceProperties(this.scene.activeItem.sourceId);
-    }
+    if (!this.canShowProperties()) return;
+    this.sourcesService.showSourceProperties(this.scene.activeItem.sourceId);
+  }
+
+  canShowProperties(): boolean {
+    return this.scene.activeItemId && this.scene.activeItem.getSource().hasProps();
   }
 
   handleSort(data: any) {
@@ -157,5 +162,13 @@ export default class SourceSelector extends Vue {
 
 .source-selector-action {
   font-size: 16px;
+}
+
+.fa.disabled {
+  opacity: 0.15;
+  cursor: inherit;
+  :hover {
+    opacity: inherit;
+  }
 }
 </style>
