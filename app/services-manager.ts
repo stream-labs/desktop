@@ -57,7 +57,7 @@ interface IServiceResponce {
     promiseId?: string;
   };
 
-  isTimeout?: boolean;
+  isError?: boolean;
 }
 
 enum E_PUSH_MESSAGE_TYPE { PROMISE }
@@ -184,77 +184,12 @@ export class ServicesManager extends Service {
    */
   listenApiCalls() {
     ipcRenderer.on('services-request', (event: Electron.Event, request: IRequestToService) => {
-      const action = request.payload.action;
-      let response: IServiceResponce;
-      this.startBufferingMutations();
-
-      if (action === 'initService') {
-
-        this.initService(request.payload.serviceName);
-        response = {
-          id: request.id,
-          mutations: this.stopBufferingMutations(),
-          payload: null
-        };
-
-      } else if (action === 'callServiceMethod') {
-        const {
-          serviceName,
-          methodName,
-          args,
-          isHelper,
-          constructorArgs
-        } = request.payload;
-
-        let responsePayload: any;
-
-        if (isHelper) {
-          const helper = this.getHelper(serviceName, constructorArgs);
-          responsePayload = helper[methodName].apply(helper, args);
-        } else {
-          const service = this.getInstance(serviceName);
-          responsePayload = service[methodName].apply(service, args);
-        }
-
-        const isPromise = !!(responsePayload && responsePayload.then);
-
-        if (isPromise) {
-          const promiseId = ipcRenderer.sendSync('getUniqueId');
-          const promise = responsePayload as PromiseLike<any>;
-
-          promise.then(
-            (data) => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
-            (data) => this.sendPromiseMessage({ isRejected: true, promiseId, data })
-          );
-
-          response = {
-            id: request.id,
-            mutations: this.stopBufferingMutations(),
-            payload: {
-              isPromise: true,
-              promiseId
-            }
-          };
-        } else if (responsePayload && responsePayload.isHelper) {
-          response = {
-            id: request.id,
-            mutations: this.stopBufferingMutations(),
-            payload: {
-              isHelper: true,
-              helperName: responsePayload.helperName,
-              constructorArgs: responsePayload.constructorArgs
-            }
-          };
-        } else {
-          response = {
-            id: request.id,
-            mutations: this.stopBufferingMutations(),
-            payload: responsePayload
-          };
-        }
+      try {
+        this.hadleServiceRequest(request);
+      } catch (e) {
+        ipcRenderer.send('services-response', { id: request.id, isError: true });
+        throw e;
       }
-
-      ipcRenderer.send('services-response', response);
     });
     ipcRenderer.send('services-ready');
   }
@@ -286,6 +221,80 @@ export class ServicesManager extends Service {
 
   addMutationToBuffer(mutation: IMutation) {
     this.bufferedMutations.push(mutation);
+  }
+
+  private hadleServiceRequest(request: IRequestToService) {
+    const action = request.payload.action;
+    let response: IServiceResponce;
+    this.startBufferingMutations();
+
+    if (action === 'initService') {
+
+      this.initService(request.payload.serviceName);
+      response = {
+        id: request.id,
+        mutations: this.stopBufferingMutations(),
+        payload: null
+      };
+
+    } else if (action === 'callServiceMethod') {
+      const {
+        serviceName,
+        methodName,
+        args,
+        isHelper,
+        constructorArgs
+      } = request.payload;
+
+      let responsePayload: any;
+
+      if (isHelper) {
+        const helper = this.getHelper(serviceName, constructorArgs);
+        responsePayload = helper[methodName].apply(helper, args);
+      } else {
+        const service = this.getInstance(serviceName);
+        responsePayload = service[methodName].apply(service, args);
+      }
+
+      const isPromise = !!(responsePayload && responsePayload.then);
+
+      if (isPromise) {
+        const promiseId = ipcRenderer.sendSync('getUniqueId');
+        const promise = responsePayload as PromiseLike<any>;
+
+        promise.then(
+          (data) => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
+          (data) => this.sendPromiseMessage({ isRejected: true, promiseId, data })
+        );
+
+        response = {
+          id: request.id,
+          mutations: this.stopBufferingMutations(),
+          payload: {
+            isPromise: true,
+            promiseId
+          }
+        };
+      } else if (responsePayload && responsePayload.isHelper) {
+        response = {
+          id: request.id,
+          mutations: this.stopBufferingMutations(),
+          payload: {
+            isHelper: true,
+            helperName: responsePayload.helperName,
+            constructorArgs: responsePayload.constructorArgs
+          }
+        };
+      } else {
+        response = {
+          id: request.id,
+          mutations: this.stopBufferingMutations(),
+          payload: responsePayload
+        };
+      }
+    }
+
+    ipcRenderer.send('services-response', response);
   }
 
 
@@ -345,8 +354,8 @@ export class ServicesManager extends Service {
             constructorArgs
           });
 
-          if (response.isTimeout) {
-            throw 'Main window response timeout: check the errors in the main window';
+          if (response.isError) {
+            throw 'IPC request failed: check the errors in the main window';
           }
 
           const payload = response.payload;
