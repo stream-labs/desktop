@@ -19,21 +19,7 @@
 </div>
 </template>
 
-<script lang="ts">
-import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
-
-@Component({})
-export default class AddSourceInfo extends Vue {
-
-  @Prop()
-  name: string;
-
-  @Prop()
-  description: string;
-
-}
-</script>
+<script lang="ts" src="./AddSourceInfo.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../styles/index";

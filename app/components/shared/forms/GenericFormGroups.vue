@@ -18,32 +18,7 @@
   </div>
 </template>
 
-<script>
-import GenericForm from './GenericForm.vue';
-
-export default {
-
-  props: ['value'],
-
-  components: { GenericForm },
-
-  data() {
-    return { collapsedGroups: {} };
-  },
-
-  methods: {
-
-    toggleGroup(index) {
-      this.$set(this.collapsedGroups, index, !this.collapsedGroups[index]);
-    },
-
-    onInputHandler() {
-      this.$emit('input', this.value);
-    }
-  }
-
-};
-</script>
+<script lang="ts" src="./GenericFormGroups.vue.ts"></script>
 
 <style lang="less">
 .form-groups {

@@ -39,7 +39,7 @@ export class StartupService extends StatefulService<IStartupState> {
     loading: true
   };
 
-  private autosaveInterval: number;
+  private autosaveInterval: NodeJS.Timer;
 
   @Inject()
   scenesTransitionsService: ScenesTransitionsService;
