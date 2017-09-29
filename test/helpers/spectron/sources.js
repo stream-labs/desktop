@@ -38,7 +38,12 @@ export async function addSource(t, type, name, closeProps=true) {
   await app.client.click(`li=${type}`);
   await app.client.click('button=Add Source');
   await app.client.setValue('input', name);
-  await app.client.click('button=Done');
+
+  if (await app.client.isExisting('button=Done')) {
+    await app.client.click('button=Done');
+  } else {
+    await app.client.click('button=Add New Source');
+  }
 
   // Close source properties too
   if (closeProps) {
