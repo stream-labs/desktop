@@ -39,7 +39,7 @@ export class StartupService extends StatefulService<IStartupState> {
     loading: true
   };
 
-  private autosaveInterval: NodeJS.Timer;
+  private autosaveInterval: number;
 
   @Inject()
   scenesTransitionsService: ScenesTransitionsService;
@@ -71,7 +71,7 @@ export class StartupService extends StatefulService<IStartupState> {
 
       loadingPromise.then(() => {
         // Set up auto save
-        this.autosaveInterval = setInterval(() => {
+        this.autosaveInterval = window.setInterval(() => {
           this.configPersistenceService.save();
         }, 60 * 1000);
 

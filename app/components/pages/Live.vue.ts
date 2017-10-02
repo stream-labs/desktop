@@ -70,7 +70,7 @@ export default class Live extends Vue {
 
   status: boolean = true;
 
-  streamInfoInterval: NodeJS.Timer;
+  streamInfoInterval: number;
 
   obsDisplay: Display;
 
@@ -109,7 +109,7 @@ export default class Live extends Vue {
 
   mounted() {
     this.fetchLiveStreamInfo();
-    this.streamInfoInterval = setInterval(this.fetchLiveStreamInfo, 30 * 1000);
+    this.streamInfoInterval = window.setInterval(this.fetchLiveStreamInfo, 30 * 1000);
 
     this.obsDisplay = this.videoService.createDisplay();
 

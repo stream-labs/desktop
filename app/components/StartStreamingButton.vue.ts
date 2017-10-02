@@ -17,10 +17,10 @@ export default class StartStreamingButton extends Vue {
   navigationService: NavigationService = NavigationService.instance;
 
   streamElapsed = '';
-  elapsedInterval: NodeJS.Timer;
+  elapsedInterval: number;
 
   mounted() {
-    this.elapsedInterval = setInterval(
+    this.elapsedInterval = window.setInterval(
       () => {
         if (this.streamingService.isStreaming) {
           this.streamElapsed = this.getElapsedStreamTime();
