@@ -245,7 +245,7 @@ export class AudioSource implements IAudioSourceApi {
 
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
-    let volmeterCheckTimeoutId: NodeJS.Timer;
+    let volmeterCheckTimeoutId: number;
     const obsVolmeter = this.audioService.obsVolmeters[this.sourceId];
     const obsSubscription = obsVolmeter.addCallback((volmeter: IVolmeter) => {
       if (volmeter.muted) {
@@ -263,7 +263,7 @@ export class AudioSource implements IAudioSourceApi {
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
     }
 
     volmeterCheck();
