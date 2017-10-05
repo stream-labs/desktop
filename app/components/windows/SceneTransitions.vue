@@ -4,18 +4,15 @@
   :done-handler="done">
 
   <div slot="content">
-    <div class="row">
-      <div class="columns small-12">
-        <ListInput
-          v-model="form.type"
-          @input="setTransitionType"/>
-      </div>
-      <div class="columns small-12">
-        <IntInput
-          v-model="form.duration"
-          @input="setTransitionDuration"/>
-      </div>
-    </div>
+    <ListInput
+      v-model="form.type"
+      @input="setTransitionType"/>
+
+    <IntInput
+      v-model="form.duration"
+      @input="setTransitionDuration"/>
+
+    <GenericForm v-model="properties" @input="saveProperties"></GenericForm>
   </div>
 
 </modal-layout>

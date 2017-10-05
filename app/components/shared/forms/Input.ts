@@ -278,6 +278,8 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
 
+  if (!obsProps) return null;
+
   let obsProp = obsProps.first();
   do {
     let obsType: TObsType;
@@ -379,6 +381,7 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
 export function setupSourceDefaults(obsSource: obs.ISource) {
   const propSettings = obsSource.settings;
   const defaultSettings = {};
+  if (!obsSource.properties) return;
   let obsProp = obsSource.properties.first();
   do {
     if (
