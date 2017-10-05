@@ -1,8 +1,9 @@
 import { mutation, StatefulService } from './stateful-service';
 import * as obs from '../../obs-api';
 import {
-  IListOption,
-  TFormData
+  getPropertiesFormData,
+  IListOption, setPropertiesFormData,
+  TFormData, TObsValue
 } from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { WindowsService } from './windows';
@@ -61,6 +62,23 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   release() {
     this.getCurrentTransition().release();
   }
+
+  getSettings(): Dictionary<TObsValue> {
+    return this.getCurrentTransition().settings;
+  }
+
+  setSettings(settings: Dictionary<TObsValue>)  {
+    this.getCurrentTransition().update(settings);
+  }
+
+  getPropertiesFormData(): TFormData {
+    return getPropertiesFormData(this.getCurrentTransition()) || [];
+  }
+
+  setPropertiesFormData(formData: TFormData) {
+    return setPropertiesFormData(this.getCurrentTransition(), formData);
+  }
+
 
 
   private getCurrentTransition() {
