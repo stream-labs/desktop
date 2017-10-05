@@ -56,6 +56,7 @@ export default class StudioEditor extends Vue {
     display: HTMLElement
   };
 
+
   mounted() {
     this.obsDisplay = this.videoService.createDisplay();
 
@@ -66,31 +67,13 @@ export default class StudioEditor extends Vue {
       this.renderedOffsetY = outputRegion.y;
     });
 
-    this.onResize();
-
-    window.addEventListener('resize', this.onResize);
+    this.obsDisplay.trackElement(this.$refs.display);
   }
 
   beforeDestroy() {
-    window.removeEventListener('resize', this.onResize);
     this.obsDisplay.destroy();
   }
 
-  onResize() {
-    const display = this.$refs.display;
-    const rect = display.getBoundingClientRect();
-    const factor = this.windowsService.state.main.scaleFactor;
-
-    this.obsDisplay.resize(
-      rect.width * factor,
-      rect.height * factor
-    );
-
-    this.obsDisplay.move(
-      rect.left * factor,
-      rect.top * factor
-    );
-  }
 
   /*****************
    * Mouse Handling *

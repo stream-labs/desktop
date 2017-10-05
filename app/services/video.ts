@@ -6,6 +6,8 @@ import { Inject } from '../util/injector';
 
 const { remote } = electron;
 
+const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
+
 export class Display {
 
   @Inject()
@@ -13,6 +15,14 @@ export class Display {
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
+
+  trackingInterval: number;
+  currentPosition: IRectangle = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
 
   constructor(public name: string) {
     nodeObs.OBS_content_createDisplay(
@@ -35,17 +45,46 @@ export class Display {
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
   }
 
+  /**
+   * Will keep the display positioned on top of the passed HTML element
+   * @param element the html element to host the display
+   */
+  trackElement(element: HTMLElement) {
+    if (this.trackingInterval) clearInterval(this.trackingInterval);
+
+    const trackingFun = () => {
+      const rect = element.getBoundingClientRect();
+
+      if ((rect.left !== this.currentPosition.x) ||
+        (rect.top !== this.currentPosition.y) ||
+        (rect.width !== this.currentPosition.width) ||
+        (rect.height !== this.currentPosition.height)) {
+
+        this.move(rect.left, rect.top);
+        this.resize(rect.width, rect.height);
+      }
+    };
+
+    trackingFun();
+    this.trackingInterval = window.setInterval(trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
+  }
+
   move(x: number, y: number) {
+    this.currentPosition.x = x;
+    this.currentPosition.y = y;
     nodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
+    this.currentPosition.width = width;
+    this.currentPosition.height = height;
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
     this.refreshOutputRegion();
   }
 
   destroy() {
     nodeObs.OBS_content_destroyDisplay(this.name);
+    if (this.trackingInterval) clearInterval(this.trackingInterval);
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
