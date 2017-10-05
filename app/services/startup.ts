@@ -10,6 +10,7 @@ import { ServicesManager } from '../services-manager';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
 import { ScenesService } from './scenes/scenes';
+import { VideoService } from './video';
 import { track } from './usage-statistics';
 
 interface IStartupState {
@@ -49,6 +50,9 @@ export class StartupService extends StatefulService<IStartupState> {
 
   @Inject()
   scenesService: ScenesService;
+
+  @Inject()
+  videoService: VideoService;
 
 
   @track('app_start')
@@ -94,6 +98,7 @@ export class StartupService extends StatefulService<IStartupState> {
   private shutdownHandler() {
     clearInterval(this.autosaveInterval);
     this.configPersistenceService.rawSave().then(() => {
+      this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
       this.scenesService.scenes.forEach(scene => scene.remove(true));
       this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });

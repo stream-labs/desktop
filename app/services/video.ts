@@ -13,6 +13,9 @@ export class Display {
   @Inject()
   settingsService: SettingsService;
 
+  @Inject()
+  videoService: VideoService;
+
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
 
@@ -43,6 +46,7 @@ export class Display {
     });
 
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    this.videoService.registerDisplay(this);
   }
 
   /**
@@ -83,6 +87,7 @@ export class Display {
   }
 
   destroy() {
+    this.videoService.unregisterDisplay(this);
     nodeObs.OBS_content_destroyDisplay(this.name);
     if (this.trackingInterval) clearInterval(this.trackingInterval);
   }
@@ -116,12 +121,32 @@ export class VideoService extends Service {
   @Inject()
   settingsService: SettingsService;
 
+  activeDisplays: Dictionary<Display> = {};
+
   init() {
     this.settingsService.loadSettingsIntoStore();
   }
 
   createDisplay() {
     return new Display(this.getRandomDisplayId());
+  }
+
+
+  registerDisplay(display: Display) {
+    this.activeDisplays[display.name] = display;
+  }
+
+
+  unregisterDisplay(display: Display) {
+    delete this.activeDisplays[display.name];
+  }
+
+
+  /**
+   * Destroy all active displays.  This is useful on shutdown.
+   */
+  destroyAllDisplays() {
+    Object.values(this.activeDisplays).forEach(display => display.destroy());
   }
 
   // Generates a random string:
