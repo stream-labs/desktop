@@ -75,14 +75,22 @@
     background-color: @slider-background-color;
 
     .volmeter-level {
-      .absolute(0, 100%, 0, 0);
+      .absolute(0, auto, 0, 0);
+      width: 100%;
       background-color: @teal;
+      transition-property: transform;
+      transition-duration: 100ms;
+      transition-timing-function: linear;
+      transform-origin: left center;
     }
 
     .volmeter-peak {
       .absolute(0, auto, 0, 0);
       width: 2px;
       background-color: @input-border-color;
+      transition-property: left;
+      transition-duration: 100ms;
+      transition-timing-function: linear;
     }
   }
 

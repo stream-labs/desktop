@@ -20,7 +20,7 @@ export enum E_AUDIO_CHANNELS {
   INPUT_3 = 5,
 }
 
-const VOLMETER_UPDATE_INTERVAL = 40;
+const VOLMETER_UPDATE_INTERVAL = 100;
 
 export interface IAudioSource {
   sourceId: string;
@@ -247,6 +247,7 @@ export class AudioSource implements IAudioSourceApi {
     let lastVolmeterValue: IVolmeter;
     let volmeterCheckTimeoutId: number;
     const obsVolmeter = this.audioService.obsVolmeters[this.sourceId];
+    obsVolmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
     const obsSubscription = obsVolmeter.addCallback(
       (level: number, magnitude: number, peak: number, muted: boolean) => {
         const volmeter: IVolmeter = { level, magnitude, peak, muted };

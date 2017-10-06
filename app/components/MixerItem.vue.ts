@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import Tween from '@tweenjs/tween.js';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
 import { EditMenu } from '../util/menus/EditMenu';
@@ -29,21 +28,13 @@ class MixerVolmeter {
   }
 
   setData(level: number, peak: number) {
-    (new Tween.Tween(this.data)).to({ level, peak }, this.interval).start();
-  }
-
-  animate() {
-    if (this.shouldContinue) window.requestAnimationFrame(() => this.animate());
-    Tween.update();
+    this.data.level = level;
+    this.data.peak = peak;
     this.draw();
   }
 
-  stop() {
-    this.shouldContinue = false;
-  }
-
   draw() {
-    this.levelElement.style.right = `${100 - (this.data.level * 100)}%`;
+    this.levelElement.style.transform = `scale(${this.data.level}, 1.0)`;
     this.peakElement.style.left = `${100 * this.data.peak}%`;
   }
 
@@ -67,13 +58,11 @@ export default class MixerItem extends Vue {
   mounted() {
     this.subscribeVolmeter();
     this.volmeter = new MixerVolmeter(this.$refs.level as HTMLElement, this.$refs.peak as HTMLElement, 50);
-    this.volmeter.animate();
   }
 
 
   destroyed() {
     this.unsubscribeVolmeter();
-    this.volmeter.stop();
   }
 
 
