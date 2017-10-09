@@ -3,6 +3,8 @@ import { SettingsService } from './settings';
 import { nodeObs } from './obs-api';
 import electron from 'electron';
 import { Inject } from '../util/injector';
+import Utils from './utils';
+import { WindowsService } from './windows';
 
 const { remote } = electron;
 
@@ -16,6 +18,9 @@ export class Display {
   @Inject()
   videoService: VideoService;
 
+  @Inject()
+  windowsService: WindowsService;
+
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
 
@@ -27,7 +32,11 @@ export class Display {
     height: 0
   };
 
+  windowId: string;
+
   constructor(public name: string) {
+    this.windowId = Utils.isChildWindow() ? 'child' : 'main';
+
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
       name
@@ -57,20 +66,31 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
 
     const trackingFun = () => {
-      const rect = element.getBoundingClientRect();
+      const rect = this.getScaledRectangle(element.getBoundingClientRect());
 
-      if ((rect.left !== this.currentPosition.x) ||
-        (rect.top !== this.currentPosition.y) ||
+      if ((rect.x !== this.currentPosition.x) ||
+        (rect.y !== this.currentPosition.y) ||
         (rect.width !== this.currentPosition.width) ||
         (rect.height !== this.currentPosition.height)) {
 
-        this.move(rect.left, rect.top);
+        this.move(rect.x, rect.y);
         this.resize(rect.width, rect.height);
       }
     };
 
     trackingFun();
     this.trackingInterval = window.setInterval(trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
+  }
+
+  getScaledRectangle(rect: ClientRect): IRectangle {
+    const factor: number = this.windowsService.state[this.windowId].scaleFactor;
+
+    return {
+      x: rect.left * factor,
+      y: rect.top * factor,
+      width: rect.width * factor,
+      height: rect.height * factor
+    };
   }
 
   move(x: number, y: number) {
