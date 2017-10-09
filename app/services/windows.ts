@@ -81,12 +81,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
   }
 
-  // inPlace will replace the contents of the current window
-  // with the new window.  This is faster since it doesn't
-  // re-load and initialize all the assets. Most windowOptions
-  // will be ignored.
   showWindow(options: Partial<IWindowOptions>) {
-
     ipcRenderer.send('window-showChildWindow', options);
   }
 
