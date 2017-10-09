@@ -2,7 +2,12 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
 import * as obs from '../../../../obs-api';
-import { isListProperty, isEditableListProperty, isNumberProperty } from '../../../util/properties-type-guards';
+import {
+  isListProperty,
+  isEditableListProperty,
+  isNumberProperty,
+  isTextProperty
+} from '../../../util/properties-type-guards';
 
 /**
  * all possible OBS properties types
@@ -61,6 +66,10 @@ export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
   stepVal: number;
+}
+
+export interface ITextInputValue extends IFormInput<string> {
+  multiline: boolean;
 }
 
 export interface IFont {
@@ -344,6 +353,12 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
       Object.assign(formItem as IEditableListInputValue, {
         filters: parsePathFilters(obsProp.details.filter),
         defaultPath: obsProp.details.defaultPath
+      });
+    }
+
+    if (isTextProperty(obsProp)) {
+      Object.assign(formItem as ITextInputValue, {
+        multiline: obsProp.details.type === obs.ETextType.Multiline
       });
     }
 

@@ -3,7 +3,14 @@
   <div class="input-label">
     <label>{{ value.description }}</label>
   </div>
-  <div class="input-wrapper">
+  <div class="input-wrapper" v-if="value.multiline">
+    <textarea
+      rows="4"
+      :value="value.value"
+      :disabled="value.enabled == false"
+      @change="onInputHandler"/>
+  </div>
+  <div class="input-wrapper" v-else>
     <input
       :type="textVisible ? 'text' : 'password'"
       :value="value.value"
