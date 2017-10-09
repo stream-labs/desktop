@@ -13,13 +13,15 @@ import { ScenesService } from './scenes/scenes';
 import { VideoService } from './video';
 import { track } from './usage-statistics';
 
-interface IStartupState {
+interface IAppState {
   loading: boolean;
 }
 
-// Performs operations that happen once at startup.  This service
-// mainly calls into other services to do the heavy lifting.
-export class StartupService extends StatefulService<IStartupState> {
+/**
+ * Performs operations that happen once at startup and shutdown. This service
+ * mainly calls into other services to do the heavy lifting.
+ */
+export class AppService extends StatefulService<IAppState> {
 
   @Inject()
   onboardingService: OnboardingService;
@@ -36,7 +38,7 @@ export class StartupService extends StatefulService<IStartupState> {
   @Inject()
   shortcutsService: ShortcutsService;
 
-  static initialState: IStartupState = {
+  static initialState: IAppState = {
     loading: true
   };
 
@@ -57,6 +59,7 @@ export class StartupService extends StatefulService<IStartupState> {
 
   @track('app_start')
   load() {
+
     // This is synchronous and can take a really long time for large configs.
     // Setting a timeout allows the spinner and loading text to be drawn to
     // the screen before starting on the slow synchronous operation.
@@ -67,43 +70,96 @@ export class StartupService extends StatefulService<IStartupState> {
       // If we're not showing the onboarding steps, we should load
       // the config file.  Otherwise the onboarding process will
       // handle it based on what the user wants.
-      if (!this.onboardingService.startOnboardingIfRequired()) {
-        loadingPromise = this.configPersistenceService.load();
+      const onboarded = this.onboardingService.startOnboardingIfRequired();
+      if (!onboarded) {
+        loadingPromise = this.loadConfig('', { saveCurrent: false });
       } else {
         loadingPromise = Promise.resolve();
       }
 
       loadingPromise.then(() => {
-        // Set up auto save
-        this.autosaveInterval = window.setInterval(() => {
-          this.configPersistenceService.save();
-        }, 60 * 1000);
 
+        if (onboarded) this.enableAutoSave();
 
         electron.ipcRenderer.on('shutdown', () => this.shutdownHandler());
 
-        this.hotkeysService.bindHotkeys();
         this.userService;
         this.shortcutsService;
 
         ServicesManager.instance.listenApiCalls();
-
         this.FINISH_LOADING();
       });
     }, 500);
 
+
   }
+
+  /**
+   * reset current scene collection and load new one
+   */
+  loadConfig(configName?: string, options = { saveCurrent: true }): Promise<void> {
+    return new Promise(resolve => {
+      this.START_LOADING();
+
+      window.setTimeout(() => {
+        // wait while current config will be saved
+        (options.saveCurrent ? this.configPersistenceService.rawSave() : Promise.resolve()).then(() => {
+          this.reset();
+
+          this.configPersistenceService.load(configName).then(() => {
+            this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+            this.hotkeysService.bindHotkeys();
+            this.enableAutoSave();
+            this.FINISH_LOADING();
+            resolve();
+          });
+        });
+      }, 500);
+    });
+  }
+
+
+  removeConfig() {
+    this.configPersistenceService.removeConfig(this.configPersistenceService.state.activeCollection);
+    this.loadConfig('', { saveCurrent: false });
+  }
+
 
   @track('app_close')
   private shutdownHandler() {
-    clearInterval(this.autosaveInterval);
+    this.disableAutosave();
     this.configPersistenceService.rawSave().then(() => {
+      this.reset();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
-      this.scenesService.scenes.forEach(scene => scene.remove(true));
-      this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
       electron.remote.getCurrentWindow().close();
     });
+  }
+
+
+  /**
+   * cleanup all created objects
+   */
+  private reset() {
+    this.disableAutosave();
+    this.scenesService.scenes.forEach(scene => scene.remove(true));
+    this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
+    this.hotkeysService.unregisterAll();
+  }
+
+  private enableAutoSave() {
+    this.autosaveInterval = window.setInterval(() => {
+      this.configPersistenceService.save();
+    }, 60 * 1000);
+  }
+
+  private disableAutosave() {
+    clearInterval(this.autosaveInterval);
+  }
+
+  @mutation()
+  private START_LOADING() {
+    this.state.loading = true;
   }
 
   @mutation()

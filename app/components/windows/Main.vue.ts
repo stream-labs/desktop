@@ -12,7 +12,7 @@ import windowMixin from '../mixins/window';
 import { Inject } from '../../util/injector';
 import { CustomizationService } from '../../services/customization';
 import { NavigationService } from '../../services/navigation';
-import { StartupService } from '../../services/startup';
+import { AppService } from '../../services/app';
 import electron from 'electron';
 
 const { remote } = electron;
@@ -39,7 +39,7 @@ export default class Main extends Vue {
   navigationService: NavigationService;
 
   @Inject()
-  startupService: StartupService;
+  appService: AppService;
 
   get page() {
     return this.navigationService.state.currentPage;
@@ -50,7 +50,7 @@ export default class Main extends Vue {
   }
 
   get applicationLoading() {
-    return this.startupService.state.loading;
+    return this.appService.state.loading;
   }
 
 }

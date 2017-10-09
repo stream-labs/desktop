@@ -27,7 +27,7 @@ import { StatefulService } from './services/stateful-service';
 import { ScenesTransitionsService } from  './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from  './services/source-filters';
-import { StartupService } from './services/startup';
+import { AppService } from './services/app';
 import { ShortcutsService } from './services/shortcuts';
 import { CacheUploaderService } from './services/cache-uploader';
 import { UsageStatisticsService } from './services/usage-statistics';
@@ -113,7 +113,7 @@ export class ServicesManager extends Service {
     FontLibraryService,
     ObsImporterService,
     ConfigPersistenceService,
-    StartupService,
+    AppService,
     ShortcutsService,
     CacheUploaderService,
     UsageStatisticsService
