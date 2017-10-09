@@ -9,7 +9,7 @@ import URI from 'urijs';
 import { createStore } from './store';
 import { ObsApiService } from './services/obs-api';
 import { IWindowOptions, WindowsService } from './services/windows';
-import { StartupService } from './services/startup';
+import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     servicesManager.listenMessages();
   } else {
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-    StartupService.instance.load();
+    AppService.instance.load();
   }
 
   window['obs'] = obsApiService.nodeObs;

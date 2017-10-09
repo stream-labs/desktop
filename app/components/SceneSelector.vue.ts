@@ -4,15 +4,24 @@ import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
 import { ScenesService } from '../services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { ScenesTransitionsService } from "../services/scenes-transitions";
+import { ScenesTransitionsService } from '../services/scenes-transitions';
+import { ConfigPersistenceService } from '../services/config-persistence/config';
+import { AppService } from '../services/app';
+import DropdownMenu from './shared/DropdownMenu.vue';
 
 @Component({
-  components: { Selector }
+  components: { Selector, DropdownMenu },
 })
 export default class SceneSelector extends Vue {
 
   @Inject()
   scenesService: ScenesService;
+
+  @Inject()
+  configPersistenceService: ConfigPersistenceService;
+
+  @Inject()
+  appService: AppService;
 
   @Inject()
   scenesTransitionsService: ScenesTransitionsService;
@@ -46,6 +55,10 @@ export default class SceneSelector extends Vue {
     this.scenesTransitionsService.showSceneTransitions();
   }
 
+  loadConfig(configName: string) {
+    this.appService.loadConfig(configName);
+  }
+
   get scenes() {
     return this.scenesService.scenes.map(scene => {
       return {
@@ -53,6 +66,14 @@ export default class SceneSelector extends Vue {
         value: scene.id
       };
     });
+  }
+
+  get scenesCollections() {
+    return this.configPersistenceService.state.scenesCollections;
+  }
+
+  get activeConfig() {
+    return this.configPersistenceService.state.activeCollection;
   }
 
   get activeSceneId() {
@@ -63,4 +84,25 @@ export default class SceneSelector extends Vue {
     return null;
   }
 
+  addCollection() {
+    this.configPersistenceService.showNameConfig();
+  }
+
+
+  duplicateCollection() {
+    this.configPersistenceService.showNameConfig({
+      scenesCollectionToDuplicate: this.activeConfig
+    });
+  }
+
+
+  renameCollection() {
+    this.configPersistenceService.showNameConfig({ rename: true });
+  }
+
+
+  removeCollection() {
+    if (!confirm(`remove ${this.activeConfig} ?`)) return;
+    this.appService.removeConfig();
+  }
 }

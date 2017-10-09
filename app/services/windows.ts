@@ -6,6 +6,7 @@ import Settings from '../components/windows/Settings.vue';
 import SourcesShowcase from '../components/windows/SourcesShowcase.vue';
 import SceneTransitions from '../components/windows/SceneTransitions.vue';
 import AddSource from '../components/windows/AddSource.vue';
+import NameSceneCollection from '../components/windows/NameSceneCollection.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
@@ -58,6 +59,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     NameSource,
     AddSource,
     NameScene,
+    NameSceneCollection,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,
