@@ -20,7 +20,7 @@ export enum E_AUDIO_CHANNELS {
   INPUT_3 = 5,
 }
 
-const VOLMETER_UPDATE_INTERVAL = 40;
+const VOLMETER_UPDATE_INTERVAL = 100;
 
 export interface IAudioSource {
   sourceId: string;
@@ -247,15 +247,21 @@ export class AudioSource implements IAudioSourceApi {
     let lastVolmeterValue: IVolmeter;
     let volmeterCheckTimeoutId: number;
     const obsVolmeter = this.audioService.obsVolmeters[this.sourceId];
-    const obsSubscription = obsVolmeter.addCallback((volmeter: IVolmeter) => {
-      if (volmeter.muted) {
-        volmeter.level = 0;
-        volmeter.peak = 0;
+    obsVolmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
+    const obsSubscription = obsVolmeter.addCallback(
+      (level: number, magnitude: number, peak: number, muted: boolean) => {
+        const volmeter: IVolmeter = { level, magnitude, peak, muted };
+
+        if (muted) {
+          volmeter.level = 0;
+          volmeter.peak = 0;
+        }
+
+        volmeterStream.next(volmeter);
+        lastVolmeterValue = volmeter;
+        gotEvent = true;
       }
-      volmeterStream.next(volmeter);
-      lastVolmeterValue = volmeter;
-      gotEvent = true;
-    });
+    );
 
     function volmeterCheck() {
       if (!gotEvent) {
@@ -263,7 +269,7 @@ export class AudioSource implements IAudioSourceApi {
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
     }
 
     volmeterCheck();

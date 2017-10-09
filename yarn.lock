@@ -77,10 +77,6 @@
     ansi-styles "^2.2.1"
     esutils "^2.0.2"
 
-"@tweenjs/tween.js@^16.8.0":
-  version "16.8.0"
-  resolved "https://registry.yarnpkg.com/@tweenjs/tween.js/-/tween.js-16.8.0.tgz#5c43965901fd9554b270e21251f4d18ee49069d3"
-
 "@types/glob@*":
   version "5.0.30"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-5.0.30.tgz#1026409c5625a8689074602808d082b2867b8a51"

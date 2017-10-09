@@ -2,7 +2,12 @@ import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
 import * as obs from '../../../../obs-api';
-import { isListProperty, isEditableListProperty, isNumberProperty } from '../../../util/properties-type-guards';
+import {
+  isListProperty,
+  isEditableListProperty,
+  isNumberProperty,
+  isTextProperty
+} from '../../../util/properties-type-guards';
 
 /**
  * all possible OBS properties types
@@ -61,6 +66,10 @@ export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
   stepVal: number;
+}
+
+export interface ITextInputValue extends IFormInput<string> {
+  multiline: boolean;
 }
 
 export interface IFont {
@@ -278,6 +287,8 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
 
+  if (!obsProps) return null;
+
   let obsProp = obsProps.first();
   do {
     let obsType: TObsType;
@@ -345,6 +356,12 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
       });
     }
 
+    if (isTextProperty(obsProp)) {
+      Object.assign(formItem as ITextInputValue, {
+        multiline: obsProp.details.type === obs.ETextType.Multiline
+      });
+    }
+
     formData.push(formItem);
   } while (obsProp = obsProp.next());
 
@@ -379,6 +396,7 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
 export function setupSourceDefaults(obsSource: obs.ISource) {
   const propSettings = obsSource.settings;
   const defaultSettings = {};
+  if (!obsSource.properties) return;
   let obsProp = obsSource.properties.first();
   do {
     if (

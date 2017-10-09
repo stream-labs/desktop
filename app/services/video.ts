@@ -3,18 +3,40 @@ import { SettingsService } from './settings';
 import { nodeObs } from './obs-api';
 import electron from 'electron';
 import { Inject } from '../util/injector';
+import Utils from './utils';
+import { WindowsService } from './windows';
 
 const { remote } = electron;
+
+const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 
 export class Display {
 
   @Inject()
   settingsService: SettingsService;
 
+  @Inject()
+  videoService: VideoService;
+
+  @Inject()
+  windowsService: WindowsService;
+
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
 
+  trackingInterval: number;
+  currentPosition: IRectangle = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  };
+
+  windowId: string;
+
   constructor(public name: string) {
+    this.windowId = Utils.isChildWindow() ? 'child' : 'main';
+
     nodeObs.OBS_content_createDisplay(
       remote.getCurrentWindow().getNativeWindowHandle(),
       name
@@ -33,19 +55,61 @@ export class Display {
     });
 
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    this.videoService.registerDisplay(this);
+  }
+
+  /**
+   * Will keep the display positioned on top of the passed HTML element
+   * @param element the html element to host the display
+   */
+  trackElement(element: HTMLElement) {
+    if (this.trackingInterval) clearInterval(this.trackingInterval);
+
+    const trackingFun = () => {
+      const rect = this.getScaledRectangle(element.getBoundingClientRect());
+
+      if ((rect.x !== this.currentPosition.x) ||
+        (rect.y !== this.currentPosition.y) ||
+        (rect.width !== this.currentPosition.width) ||
+        (rect.height !== this.currentPosition.height)) {
+
+        this.move(rect.x, rect.y);
+        this.resize(rect.width, rect.height);
+      }
+    };
+
+    trackingFun();
+    this.trackingInterval = window.setInterval(trackingFun, DISPLAY_ELEMENT_POLLING_INTERVAL);
+  }
+
+  getScaledRectangle(rect: ClientRect): IRectangle {
+    const factor: number = this.windowsService.state[this.windowId].scaleFactor;
+
+    return {
+      x: rect.left * factor,
+      y: rect.top * factor,
+      width: rect.width * factor,
+      height: rect.height * factor
+    };
   }
 
   move(x: number, y: number) {
+    this.currentPosition.x = x;
+    this.currentPosition.y = y;
     nodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
+    this.currentPosition.width = width;
+    this.currentPosition.height = height;
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
     this.refreshOutputRegion();
   }
 
   destroy() {
+    this.videoService.unregisterDisplay(this);
     nodeObs.OBS_content_destroyDisplay(this.name);
+    if (this.trackingInterval) clearInterval(this.trackingInterval);
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -77,12 +141,32 @@ export class VideoService extends Service {
   @Inject()
   settingsService: SettingsService;
 
+  activeDisplays: Dictionary<Display> = {};
+
   init() {
     this.settingsService.loadSettingsIntoStore();
   }
 
   createDisplay() {
     return new Display(this.getRandomDisplayId());
+  }
+
+
+  registerDisplay(display: Display) {
+    this.activeDisplays[display.name] = display;
+  }
+
+
+  unregisterDisplay(display: Display) {
+    delete this.activeDisplays[display.name];
+  }
+
+
+  /**
+   * Destroy all active displays.  This is useful on shutdown.
+   */
+  destroyAllDisplays() {
+    Object.values(this.activeDisplays).forEach(display => display.destroy());
   }
 
   // Generates a random string:

@@ -7,7 +7,7 @@ install:
   - git submodule update --init --recursive
   - git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs
   - yarn install
-  - yarn compile
+  - yarn ci:compile
 
 test_script:
   - yarn test -- -v
