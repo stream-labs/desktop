@@ -1,4 +1,5 @@
 <template>
+<div class="slider-container">
   <vue-slider class="slider"
     @input="value => updateValue(value)"
     :value="value"
@@ -10,6 +11,15 @@
     :height="4"
     :tooltip="tooltip"
   />
+  <input
+    v-if="valueBox"
+    class="slider-input"
+    type="text"
+    :value="value"
+    @change="updateValue(parseFloat($event.target.value))"
+    @keydown="handleKeydown"
+  />
+</div>
 </template>
 
 <script lang="ts" src="./Slider.vue.ts"></script>
@@ -17,10 +27,21 @@
 <style lang="less">
 @import "../../styles/index";
 
+.slider-container {
+  width: 100%;
+  display: flex;
+}
+
+.slider-input {
+  margin-left: 10px;
+  width: 60px;
+}
+
 .slider {
   background: transparent;
   padding:8px 0 !important;
   margin: 0;
+  flex-grow: 1;
 
   &:hover {
     .vue-slider-tooltip {
