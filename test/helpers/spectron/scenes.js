@@ -28,7 +28,6 @@ export async function addScene(t, name) {
 
   await focusMain(t);
   await clickAddScene(t);
-
   await focusChild(t);
   await app.client.setValue('input', name);
   await app.client.click('button=Done');
