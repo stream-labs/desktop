@@ -1,6 +1,5 @@
 // Scene helper functions
 import { focusMain, focusChild } from '.';
-import {sleep} from "../sleep";
 
 async function clickSceneAction(t, selector) {
   await t.context.app.client
@@ -30,7 +29,6 @@ export async function addScene(t, name) {
   await focusMain(t);
   await clickAddScene(t);
 
-  await sleep(5000);
   await focusChild(t);
   await app.client.setValue('input', name);
   await app.client.click('button=Done');

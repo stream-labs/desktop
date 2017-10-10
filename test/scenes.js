@@ -1,4 +1,5 @@
 import test from 'ava';
+import { sleep } from './helpers/sleep';
 import { useSpectron, focusMain } from './helpers/spectron';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene } from './helpers/spectron/scenes';
@@ -67,6 +68,7 @@ test('Restarting the app preserves the default sources', async t => {
   t.true(await app.client.isExisting(`div=${sceneName}`));
 
   await t.context.app.restart();
+  await sleep(5000);
 
   await focusMain(t);
   await selectScene(t, sceneName);
