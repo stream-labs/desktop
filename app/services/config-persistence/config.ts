@@ -57,12 +57,16 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
   init() {
     super.init();
     this.CLEAR_SCENES_COLLECTION();
-    if (!fs.exists(this.configFileDirectory)) return;
-
-    const configsNames = fs.readdirSync(this.configFileDirectory).map(file => file.replace(/\.[^/.]+$/, ''));
-    if (configsNames.length) {
-      this.ADD_SCENES_COLLECTIONS(configsNames);
+    if (!fs.existsSync(this.configFileDirectory)) {
+      this.ADD_SCENES_COLLECTIONS([DEFAULT_SCENES_COLLECTION_NAME]);
+      this.SET_ACTIVE_COLLECTION(DEFAULT_SCENES_COLLECTION_NAME);
+    } else {
+      const configsNames = fs.readdirSync(this.configFileDirectory).map(file => file.replace(/\.[^/.]+$/, ''));
+      if (configsNames.length) {
+        this.ADD_SCENES_COLLECTIONS(configsNames);
+      }
     }
+
   }
 
   @throttle(5000)

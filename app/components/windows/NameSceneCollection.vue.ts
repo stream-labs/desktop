@@ -33,7 +33,7 @@ export default class NameSceneCollection extends Vue {
   options: INameSceneCollectionOptions = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
-    const suggestedName = this.options.scenesCollectionToDuplicate || 'NewScenesCollection';
+    const suggestedName = this.options.scenesCollectionToDuplicate || 'New Scene Collection';
     this.name = this.configPersistenceService.suggestName(suggestedName);
   }
 
