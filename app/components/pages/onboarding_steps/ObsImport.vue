@@ -14,14 +14,6 @@
         <i class="importing-spinner fa fa-spinner fa-pulse" />
       </div>
       <div v-if="status === 'initial'">
-        <label>OBS Scene Collection</label>
-        <multiselect
-          v-model="selectedSceneCollection"
-          :options="sceneCollections"
-          label="name"
-          track-by="name"
-          :allow-empty="false"
-          :show-labels="false"/>
         <button
           class="button button--action button--lg"
           @click="startImport">

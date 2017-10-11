@@ -49,11 +49,10 @@ export default class NameSceneCollection extends Vue {
       const fromConfig = this.options.scenesCollectionToDuplicate;
       const toConfig = this.name;
       (fromConfig ?
-        this.configPersistenceService.duplicateConfig(fromConfig, toConfig) :
-        Promise.resolve<any>(this.configPersistenceService.createConfig(toConfig))
+        this.configPersistenceService.duplicateConfig(toConfig) :
+        Promise.resolve<any>(this.appService.switchToBlankConfig(toConfig))
       ).then(() => {
         this.windowsService.closeChildWindow();
-        this.appService.loadConfig(this.name);
       });
     }
   }

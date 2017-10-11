@@ -9,6 +9,7 @@ import { SourceFiltersService } from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
 import { ConfigPersistenceService } from './config-persistence/config';
+import { AppService } from './app';
 
 interface Source {
   name?: string;
@@ -37,26 +38,31 @@ export class ObsImporterService extends Service {
   @Inject('ConfigPersistenceService')
   configPersistenceService: ConfigPersistenceService;
 
-  load(sceneCollectionSelected: ISceneCollection) {
-    if (this.isOBSinstalled()) {
-      const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, sceneCollectionSelected.filename);
-      const data = fs.readFileSync(sceneCollectionPath).toString();
-      const root = this.parseOBSconfig(data);
+  @Inject()
+  appService: AppService;
 
-      if (this.scenesService.scenes.length === 0) {
-        this.configPersistenceService.setUpDefaults();
-      }
+  async load() {
+    if (!this.isOBSinstalled()) return;
+    const collections = this.getSceneCollections();
+    for (const collection of collections) {
+      this.appService.reset();
+      await this.importCollection(collection);
     }
   }
 
-  parseOBSconfig(config: string) {
-    const configJSON = JSON.parse(config);
+  private importCollection(collection: ISceneCollection): Promise<void> {
+    const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    const configJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     this.importSources(configJSON);
     this.importScenes(configJSON);
     this.importSceneOrder(configJSON);
     this.importMixerSources(configJSON);
     this.importTransitions(configJSON);
+    if (this.scenesService.scenes.length === 0) {
+      this.configPersistenceService.setUpDefaults();
+    }
+    return this.configPersistenceService.rawSave(collection.name);
   }
 
   importFilters(filtersJSON :any, source :Source) {

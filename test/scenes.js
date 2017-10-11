@@ -3,7 +3,6 @@ import { sleep } from './helpers/sleep';
 import { useSpectron, focusMain } from './helpers/spectron';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene } from './helpers/spectron/scenes';
-import { sleep } from './helpers/sleep';
 
 useSpectron();
 
@@ -68,7 +67,6 @@ test('Restarting the app preserves the default sources', async t => {
   await focusMain(t);
   t.true(await app.client.isExisting(`div=${sceneName}`));
   await t.context.app.restart();
-  await sleep(5000);
 
   // wait while config will be loaded
   await sleep(5000);
