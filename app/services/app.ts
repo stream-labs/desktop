@@ -56,7 +56,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject()
   videoService: VideoService;
 
-
   @track('app_start')
   load() {
 
@@ -72,7 +71,12 @@ export class AppService extends StatefulService<IAppState> {
       // handle it based on what the user wants.
       const onboarded = this.onboardingService.startOnboardingIfRequired();
       if (!onboarded) {
-        loadingPromise = this.loadConfig('', { saveCurrent: false });
+        if (this.configPersistenceService.hasConfigs()) {
+          loadingPromise = this.loadConfig('', { saveCurrent: false });
+        } else {
+          this.configPersistenceService.switchToBlankConfig();
+          loadingPromise = Promise.resolve();
+        }
       } else {
         loadingPromise = Promise.resolve();
       }
@@ -119,9 +123,26 @@ export class AppService extends StatefulService<IAppState> {
   }
 
 
+  /**
+   * remove the config and load the new one
+   */
   removeConfig() {
-    this.configPersistenceService.removeConfig(this.configPersistenceService.state.activeCollection);
-    this.loadConfig('', { saveCurrent: false });
+    this.configPersistenceService.removeConfig();
+    if (this.configPersistenceService.hasConfigs()) {
+      this.loadConfig('', { saveCurrent: false });
+    } else {
+      this.switchToBlankConfig();
+    }
+  }
+
+
+  /**
+   * reset current scenes and switch to blank config
+   */
+  switchToBlankConfig(configName?: string) {
+    this.reset();
+    this.configPersistenceService.switchToBlankConfig(configName);
+    this.enableAutoSave();
   }
 
 
@@ -140,7 +161,7 @@ export class AppService extends StatefulService<IAppState> {
   /**
    * cleanup all created objects
    */
-  private reset() {
+  reset() {
     this.disableAutosave();
     this.scenesService.scenes.forEach(scene => scene.remove(true));
     this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
