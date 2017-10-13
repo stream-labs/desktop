@@ -8,6 +8,7 @@ import electron from 'electron';
 import Login from './Login.vue';
 import { SettingsService } from '../services/settings';
 
+
 @Component({
   components: { Login }
 })

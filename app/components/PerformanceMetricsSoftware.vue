@@ -1,0 +1,70 @@
+<template>
+<div class="performance-metrics flex flex--center">
+  <span class="performance-metric-wrapper">
+    <img class="performance-metric-icon" src="../../media/images/icons/cpu.png">
+    <span class="performance-metric">
+      <span class="performance-metric__value">{{ cpuPercent }}%</span> CPU
+    </span>
+  </span>
+
+  <span class="performance-metric-wrapper">
+    <img class="performance-metric-icon" src="../../media/images/icons/fps.png">
+    <span class="performance-metric">
+      <span class="performance-metric__value">{{ frameRate }}</span> FPS
+    </span>
+  </span>
+</div>
+</template>
+
+<script lang="ts" src="./PerformanceMetricsSoftware.vue.ts"></script>
+
+<style lang="less">
+@import "../styles/index";
+
+.performance-metrics {
+  .performance-metric-wrapper {
+    &:first-child {
+      padding-right: 12px;
+
+      &:before {
+        content: '';
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+.performance-metric-wrapper {
+  color: @grey;
+  white-space: nowrap;
+
+  &:before {
+    content: '|';
+    padding-right: 12px;
+    opacity: .5;
+  }
+
+  @media(max-width: 1200px) {
+    font-size: 12px;
+  }
+}
+
+.performance-metric {
+  vertical-align: middle;
+}
+
+.performance-metric-icon {
+  height: 15px;
+  width: auto;
+  vertical-align: text-top;
+  margin-right: 4px;
+
+  @media(max-width: 1200px) {
+    height: 13px;
+  }
+}
+
+.performance-metric__value {
+  .semibold;
+}
+</style>

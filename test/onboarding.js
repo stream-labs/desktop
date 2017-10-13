@@ -4,13 +4,6 @@ import { selectSource, clickSourceProperties } from './helpers/spectron/sources'
 
 useSpectron(false);
 
-async function clickCloseInspect(t, widgetName) {
-  const app = t.context.app;
-
-  await app.client.$(`div=${widgetName}`).$('..').$('..').$('..')
-    .click('.fa-times');
-}
-
 test('Adding some starter widgets', async t => {
   const app = t.context.app;
   await focusMain(t);

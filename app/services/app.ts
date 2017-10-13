@@ -11,6 +11,7 @@ import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
 import { ScenesService } from './scenes/scenes';
 import { VideoService } from './video';
+import { StreamInfoService } from './stream-info';
 import { track } from './usage-statistics';
 
 interface IAppState {
@@ -37,6 +38,8 @@ export class AppService extends StatefulService<IAppState> {
 
   @Inject()
   shortcutsService: ShortcutsService;
+
+  @Inject() streamInfoService: StreamInfoService;
 
   static initialState: IAppState = {
     loading: true
@@ -89,6 +92,9 @@ export class AppService extends StatefulService<IAppState> {
 
         this.userService;
         this.shortcutsService;
+
+        // Pre-fetch stream info
+        this.streamInfoService;
 
         ServicesManager.instance.listenApiCalls();
         this.FINISH_LOADING();

@@ -77,12 +77,16 @@ textarea {
   right: 8px;
   top: 0px;
   line-height: 32px;
+  position: relative;
 
   &:before {
     font-family: FontAwesome;
     content: '\f078';
     border: none;
     font-size: 9px;
+    position: absolute;
+    right: 0;
+    top: 2px;
   }
 }
 
@@ -97,9 +101,9 @@ textarea {
     cursor: pointer;
   }
 }
+
 .multiselect__input,
 .multiselect__single {
-
   &:hover, &:focus {
     background: @day-input-bg;
     border-color: @day-focus-border;
@@ -109,10 +113,18 @@ textarea {
 .multiselect__content {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-  border-color: @day-border;
-  top: 36px;
+  border: 1px solid @day-focus-border;
+  top: 35px;
   background: @day-input-bg;
+  list-style-type: none;
+  margin: 0;
+  width: 100%;
+  z-index: 10;
+  position: relative;
+  max-height: 300px;
+  overflow-y: auto;
 }
+
 .multiselect__element {
   font-size: 13px;
 }
@@ -123,6 +135,8 @@ textarea {
   min-height: 0;
   line-height: 36px;
   .transition;
+  display: block;
+  cursor: pointer;
 
   &:after {
     display: none;
@@ -152,6 +166,20 @@ textarea {
 
   &:after {
     display: none;
+  }
+}
+
+.multiselect--disabled {
+  opacity: .5;
+
+  &:focus {
+    outline: none;
+  }
+
+  .multiselect__tags {
+    .multiselect__input {
+      cursor: not-allowed;
+    }
   }
 }
 

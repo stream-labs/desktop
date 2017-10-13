@@ -1,6 +1,7 @@
 <template>
 <button
-  class="button button--action button--md button--go-live"
+  class="button button--go-live"
+  :class="{'button--soft-warning': (streamingService.isStreaming && streamingService.stopStreaming), 'button--action': streamingService.startStreaming}"
   @click="toggleStreaming">
   {{ streamButtonLabel }}
 </button>
@@ -10,6 +11,6 @@
 
 <style lang="less" scoped>
 .button--go-live {
-  width: 100px;
+  width: 140px;
 }
 </style>

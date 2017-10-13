@@ -121,7 +121,8 @@ button, .button {
   }
 }
 
-.square-button--yt, .button--yt {
+.square-button--yt,
+.button--yt {
   background: #D22222;
 
   &:hover {
@@ -145,6 +146,23 @@ button, .button {
 
   &:hover {
     background: lighten(#1DA1F2, 4%)
+  }
+}
+
+.button--soft-warning {
+  color: @red;
+  border-color: rgba(251,72,76,.3);
+  background: rgba(251,72,76,.08);
+
+  &:focus {
+    color: @red;
+    border-color: rgba(251,72,76,.3);
+    background: rgba(251,72,76,.08);
+  }
+
+  &:hover {
+    border-color: rgba(251,72,76,.4);
+    background: rgba(251,72,76,.12);
   }
 }
 

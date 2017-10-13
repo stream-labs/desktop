@@ -11,6 +11,8 @@
 <style lang="less" scoped>
 @import "../styles/index";
 .chat {
+  position: absolute;
+  width: 100%;
   height: 100%;
 }
 </style>

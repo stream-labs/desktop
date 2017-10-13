@@ -30,15 +30,15 @@
 
   <div class="top-nav-right">
     <div class="top-nav-item" v-if="isDevMode">
-      <a @click="openDevTools">Dev Tools</a>
+      <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item">
-      <a @click="bugReport">Bug Report</a>
+      <a class="link" @click="bugReport">Bug Report</a>
     </div>
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
-          <i class="fa fa-sun-o"/>
-          <i class="fa fa-moon-o"/>
+        <i class="fa fa-sun-o"/>
+        <i class="fa fa-moon-o"/>
       </button>
     </div>
     <div class="top-nav-item">
@@ -69,6 +69,7 @@
   max-width:  none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
+  flex: 0 0 48px;
 }
 
 .top-nav-right {
@@ -83,6 +84,10 @@
   margin-left: 20px;
   display: flex;
   align-items: center;
+
+  @media(max-width: 1200px) {
+    font-size: 12px;
+  }
 }
 
 .theme-toggle {

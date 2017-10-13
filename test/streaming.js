@@ -24,7 +24,7 @@ test('Streaming to Twitch', async t => {
   await focusMain(t);
   await app.client.click('button=Go Live');
 
-  // Wait up to 15 seconds for the "Stream OK" message to appear
-  await app.client.waitForExist('div*=Stream OK', 15 * 1000);
+  // TODO: Rewrite this test to use the logged in state and the live dock
+  await app.client.waitForExist('button=End Stream', 5 * 1000);
   t.pass();
 });

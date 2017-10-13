@@ -61,6 +61,11 @@ export class TwitchService extends Service implements IPlatformService {
 
     return fetch(request).then(response => {
       return response.json();
+    }).then(json => {
+      return {
+        ...json,
+        title: json.status,
+      };
     });
   }
 
@@ -85,7 +90,7 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
-  putStreamInfo(streamTitle: string, streamGame: string, twitchId:string, oauthToken: string) {
+  putStreamInfo(streamTitle: string, streamGame: string, twitchId: string, oauthToken: string) {
     const headers = new Headers();
 
     headers.append('Client-Id', this.clientId);

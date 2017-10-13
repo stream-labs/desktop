@@ -70,6 +70,16 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
+
+  // TODO
+  fetchChannelInfo(token: string) {
+    return Promise.resolve({
+      title: '',
+      game: ''
+    });
+  }
+
+
   fetchLiveStreamInfo(youtubeId: string, oauthToken: string): Promise<IStreamInfo> {
     return this.getLiveStreamId(oauthToken, false).then(() => {
       const endpoint = `videos?part=snippet,liveStreamingDetails`;

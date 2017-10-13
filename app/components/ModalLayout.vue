@@ -24,6 +24,9 @@
       Done
     </button>
   </div>
+  <div v-if="customControls" class="modal-layout-controls">
+    <slot name="controls" />
+  </div>
 </div>
 </template>
 
