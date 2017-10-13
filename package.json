@@ -57,6 +57,7 @@
     "archiver": "^2.0.3",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
+    "bugsplat": "^2.1.5",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
