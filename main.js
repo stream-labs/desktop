@@ -97,6 +97,7 @@ function startApp() {
   });
 
   mainWindow.on('closed', () => {
+    childWindow.destroy();
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
