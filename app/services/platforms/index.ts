@@ -8,6 +8,11 @@ export interface IStreamInfo {
   game: string;
 }
 
+export interface IChannelInfo {
+  title: string;
+  game: string;
+}
+
 export interface Game {
   name: string;
 }
@@ -36,6 +41,8 @@ export interface IPlatformService {
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
   fetchLiveStreamInfo: (platformId: string, oauthToken: string) => Promise<IStreamInfo>;
+
+  fetchChannelInfo: (token: string) => Promise<IChannelInfo>;
 
   putStreamInfo: (streamTitle: string, streamGame: string, platformId: string, oauthToken: string) => Promise<boolean>;
 

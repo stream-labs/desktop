@@ -2,14 +2,20 @@
 <div class="main" :class="{'night-theme': nightTheme}">
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
-  <div v-if="applicationLoading" class="main-loading">
-    <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
+  <div class="main-contents">
+    <div class="main-left">
+      <div v-if="applicationLoading" class="main-loading">
+        <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
+      </div>
+      <top-nav v-if="(page !== 'Onboarding') && !applicationLoading"></top-nav>
+      <component
+        v-if="!applicationLoading"
+        class="main-page-container"
+        :is="page"/>
+      <studio-footer v-if="(page !== 'Onboarding') && !applicationLoading"/>
+    </div>
+    <live-dock class="main-right" v-if="isStreaming && isLoggedIn" />
   </div>
-  <top-nav v-if="(page !== 'Onboarding') && !applicationLoading"></top-nav>
-  <component
-    v-if="!applicationLoading"
-    class="main-page-container"
-    :is="page"/>
 </div>
 </template>
 
@@ -19,7 +25,19 @@
 @import "../../styles/index";
 
 .main {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.main-contents {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.main-left {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
 }

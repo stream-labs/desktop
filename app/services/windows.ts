@@ -12,6 +12,7 @@ import NameScene from '../components/windows/NameScene.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
+import EditStreamInfo from '../components/windows/EditStreamInfo.vue';
 import Blank from '../components/windows/Blank.vue';
 import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
@@ -63,7 +64,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     SourceProperties,
     SourceFilters,
     AddSourceFilter,
-    Blank
+    Blank,
+    EditStreamInfo
   };
 
   private windows: Electron.BrowserWindow[] = BrowserWindow.getAllWindows();

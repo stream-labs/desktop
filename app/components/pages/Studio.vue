@@ -2,7 +2,6 @@
 <div class="studio-page">
   <studio-editor />
   <studio-controls />
-  <studio-footer />
 </div>
 </template>
 

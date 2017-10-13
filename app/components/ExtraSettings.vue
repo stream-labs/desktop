@@ -17,6 +17,9 @@
       <i class="fa fa-spinner fa-spin" v-if="cacheUploading" />
     </button>
   </div>
+  <div class="section">
+    <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
+  </div>
   <!-- TODO: Uncomment when we want to expose this feature -->
   <!-- <div class="section">
     <p>

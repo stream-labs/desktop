@@ -4,8 +4,13 @@ import { Component } from 'vue-property-decorator';
 import { OverlaysPersistenceService } from '../services/config-persistence';
 import { CacheUploaderService } from '../services/cache-uploader';
 import { Inject } from '../util/injector';
+import BoolInput from './shared/forms/BoolInput.vue';
+import { IFormInput } from './shared/forms/Input';
+import { CustomizationService } from '../services/customization';
 
-@Component({})
+@Component({
+  components: { BoolInput }
+})
 export default class ExtraSettings extends Vue {
 
   @Inject('OverlaysPersistenceService')
@@ -14,9 +19,21 @@ export default class ExtraSettings extends Vue {
   @Inject()
   cacheUploaderService: CacheUploaderService;
 
+  @Inject() customizationService: CustomizationService;
+
   overlaySaving = false;
 
   cacheUploading = false;
+
+  streamInfoUpdateModel: IFormInput<boolean> = {
+    name: 'stream_info_udpate',
+    description: 'Confirm stream title and game before going live',
+    value: this.customizationService.state.updateStreamInfoOnLive
+  };
+
+  setStreamInfoUpdate(model: IFormInput<boolean>) {
+    this.customizationService.setUpdateStreamInfoOnLive(model.value);
+  }
 
   showCacheDir() {
     electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));
