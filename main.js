@@ -115,13 +115,13 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!appExiting) {
       appExiting = true;
+      childWindow.destroy();
       mainWindow.send('shutdown');
       e.preventDefault();
     }
   });
 
   mainWindow.on('closed', () => {
-    childWindow.destroy();
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
