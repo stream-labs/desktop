@@ -23,12 +23,25 @@ export default class SliderInput extends Vue {
   @Prop()
   disabled: boolean;
 
-   @Prop()
+  @Prop()
   tooltip: string;
 
-  @throttle(100)
+  @Prop()
+  valueBox: boolean;
+
+  @throttle(500)
   updateValue(value: number) {
-    this.$emit('input', value);
+    this.$emit('input', this.roundNumber(value));
+  }
+
+  handleKeydown(event: KeyboardEvent) {
+    if (event.code === 'ArrowUp') this.updateValue(this.value + this.interval);
+    if (event.code === 'ArrowDown') this.updateValue(this.value - this.interval);
+  }
+
+  // Javascript precision is weird
+  roundNumber(num: number) {
+    return parseFloat(num.toFixed(6));
   }
 
 }

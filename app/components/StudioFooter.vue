@@ -1,6 +1,6 @@
 <template>
 <div class="footer">
-  <performance-metrics/>
+  <performance-metrics-software />
   <div class="nav-right">
     <div class="nav-item">
       <test-widgets v-if="loggedIn" />
@@ -10,7 +10,7 @@
         class="record-button"
         @click="toggleRecording"
         :class="{ active: streamingService.isRecording }">
-        <i class="fa fa-circle"/>
+        <span>REC</span>
       </button>
     </div>
     <div class="nav-item">
@@ -50,19 +50,22 @@
   position: relative;
   width: 30px;
   height: 30px;
-  color: @red;
+  background-color: #dcdfe2;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .4;
+  opacity: .7;
   .transition;
+  .bold;
+  border: 1px solid #c4c5c5;
+  box-sizing: content-box;
+  letter-spacing: .2px;
 
-  .fa-circle {
-    top: 4px;
-    left: 4px;
-    font-size: 20px;
+  span {
+    font-size: 10px;
+    color: @red;
   }
 
   &:hover {
@@ -77,19 +80,24 @@
 
 @keyframes pulse {
   0% {
-    transform: scale(.7);
+    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
   }
-  50% {
-    transform: scale(1.1);
+  70% {
+    box-shadow: 0 0 0 6px rgba(0, 0, 0, 0);
   }
   100% {
-    transform: scale(.7);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
 .night-theme {
   .footer {
     background-color: @night-primary;
+    border-color: @night-border;
+  }
+
+  .record-button {
+    background-color: #3c4c53;
     border-color: @night-border;
   }
 }

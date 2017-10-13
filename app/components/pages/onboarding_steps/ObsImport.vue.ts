@@ -25,7 +25,9 @@ export default class ObsImport extends Vue {
 
   sceneCollections = this.obsImporterService.getSceneCollections();
 
-  selectedSceneCollection = this.sceneCollections[0] || { filename: '', name: '' };
+  profiles = this.obsImporterService.getProfiles();
+
+  selectedProfile = this.profiles[0] || '';
 
   created() {
     if (this.sceneCollections.length < 1) {
@@ -47,21 +49,21 @@ export default class ObsImport extends Vue {
 
   get description() {
     if (this.status === 'importing') {
-      return `Importing your scenes and sources from "${this.selectedSceneCollection.name}"`;
+      return `Importing your scenes and sources`;
     }
 
     if (this.status === 'done') {
-      return `All scenes and sources from "${this.selectedSceneCollection.name}" have been imported.`;
+      return `All scenes, sources and settings have been imported.`;
     }
 
-    return 'Import your scenes from OBS with a simple click, or start fresh.';
+    return 'Import your scenes and your settings from OBS with a simple click, or start fresh.';
   }
 
   startImport() {
     this.status = 'importing';
     defer(() => {
       try {
-        this.obsImporterService.load(this.selectedSceneCollection);
+        this.obsImporterService.load(this.selectedProfile);
         this.status = 'done';
       } catch (e) {
         // I suppose let's pretend we succeeded for now.
@@ -71,7 +73,7 @@ export default class ObsImport extends Vue {
   }
 
   startFresh() {
-    this.configPersistenceService.load();
+    this.configPersistenceService.switchToBlankConfig();
     this.onboardingService.skip();
   }
 

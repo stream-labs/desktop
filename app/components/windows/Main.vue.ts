@@ -12,8 +12,12 @@ import windowMixin from '../mixins/window';
 import { Inject } from '../../util/injector';
 import { CustomizationService } from '../../services/customization';
 import { NavigationService } from '../../services/navigation';
-import { StartupService } from '../../services/startup';
+import { AppService } from '../../services/app';
+import { UserService } from '../../services/user';
 import electron from 'electron';
+import StreamingService from '../../services/streaming';
+import LiveDock from '../LiveDock.vue';
+import StudioFooter from '../StudioFooter.vue';
 
 const { remote } = electron;
 
@@ -25,7 +29,9 @@ const { remote } = electron;
     Studio,
     Dashboard,
     Live,
-    Onboarding
+    Onboarding,
+    LiveDock,
+    StudioFooter
   }
 })
 export default class Main extends Vue {
@@ -39,7 +45,13 @@ export default class Main extends Vue {
   navigationService: NavigationService;
 
   @Inject()
-  startupService: StartupService;
+  appService: AppService;
+
+  @Inject()
+  streamingService: StreamingService;
+
+  @Inject()
+  userService: UserService;
 
   get page() {
     return this.navigationService.state.currentPage;
@@ -50,7 +62,15 @@ export default class Main extends Vue {
   }
 
   get applicationLoading() {
-    return this.startupService.state.loading;
+    return this.appService.state.loading;
+  }
+
+  get isStreaming() {
+    return this.streamingService.isStreaming;
+  }
+
+  get isLoggedIn() {
+    return this.userService.isLoggedIn();
   }
 
 }

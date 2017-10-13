@@ -6,6 +6,7 @@ import { nodeObs } from './obs-api';
 import { SettingsService } from './settings';
 import { padStart } from 'lodash';
 import { track } from './usage-statistics';
+import { WindowsService } from './windows';
 
 interface IStreamingServiceState {
   isStreaming: boolean;
@@ -17,8 +18,8 @@ interface IStreamingServiceState {
 
 export default class StreamingService extends StatefulService<IStreamingServiceState> {
 
-  @Inject()
-  settingsService: SettingsService;
+  @Inject() settingsService: SettingsService;
+  @Inject() windowsService: WindowsService;
 
   static initialState = {
     isStreaming: false,
@@ -136,6 +137,17 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
 
     nodeObs.OBS_service_stopRecording();
     this.STOP_RECORDING();
+  }
+
+  showEditStreamInfo() {
+    this.windowsService.showWindow({
+      componentName: 'EditStreamInfo',
+      queryParams: {  },
+      size: {
+        width: 500,
+        height: 400
+      }
+    });
   }
 
   // Getters / Utilty

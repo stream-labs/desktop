@@ -51,6 +51,13 @@ export default class ModalLayout extends Vue {
   @Prop()
   fixedSectionHeight: number;
 
+  /**
+   * Set to true when using custom controls.
+   * Custom controls go in the "controls" slot.
+   */
+  @Prop({ default: false })
+  customControls: boolean;
+
 
   created() {
     const contentStyle = {

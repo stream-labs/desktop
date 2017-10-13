@@ -34,10 +34,11 @@ class PathInput extends Input<IPathInputValue> {
     }
 
     const paths = electron.remote.dialog.showOpenDialog(options);
-    const path = paths ? paths[0] : '';
 
-    this.$refs.input.value = path;
-    this.handleChange();
+    if (paths) {
+      this.$refs.input.value = paths[0];
+      this.handleChange();
+    }
   }
 
 

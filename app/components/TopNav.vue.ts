@@ -2,11 +2,12 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import { CustomizationService } from '../services/customization';
-import { NavigationService } from "../services/navigation";
+import { NavigationService } from '../services/navigation';
 import { UserService } from '../services/user';
 import electron from 'electron';
 import Login from './Login.vue';
-import {SettingsService} from "../services/settings";
+import { SettingsService } from '../services/settings';
+
 
 @Component({
   components: { Login }

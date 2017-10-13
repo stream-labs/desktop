@@ -7,6 +7,11 @@ body {
   background: @white;
 }
 
+a {
+  .transition;
+  text-decoration: underline;
+}
+
 // Layout
 .page-container {
   display: flex;
@@ -50,6 +55,7 @@ h4 {
   .semibold;
   color: @grey;
   .transition;
+  text-decoration: none;
 
   &:hover {
     color: @navy;
@@ -61,6 +67,10 @@ h4 {
   letter-spacing: .7px;
 }
 
+.label--icon {
+  margin-right: 4px;
+}
+
 // Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown'
 // On 'dropdown__toggle' use @click="showDropdown = !showDropdown"
 // On 'dropdown__menu' use v-if="showDropdown"
@@ -69,7 +79,8 @@ h4 {
   display: inline-block;
 }
 
-.dropdown__toggle, .slide-open__open {
+.dropdown__toggle,
+.slide-open__open {
   .semibold;
   color: @grey;
   text-transform: uppercase;
@@ -209,6 +220,7 @@ h4 {
     }
   }
 }
+
 .tabs {
   background: transparent;
   padding: 0;
@@ -248,7 +260,8 @@ h4 {
   &.disabled {
     opacity: 0.5;
 
-    &.checkbox input:checked~label, &.checkbox input~label {
+    &.checkbox input:checked~label,
+    &.checkbox input~label {
       &:before {
         border-color: gray;
         background: transparent;
@@ -256,6 +269,12 @@ h4 {
 
       &:after {color: gray}
     }
+  }
+}
+
+.checkbox {
+  label {
+    text-transform: none;
   }
 }
 
@@ -283,11 +302,13 @@ select {
 }
 
 // Vue transitions
-.slide-fade-enter-active, .slide-fade-leave-active {
+.slide-fade-enter-active,
+.slide-fade-leave-active {
   transition: all .3s ease;
 }
 
-.slide-fade-enter, .slide-fade-leave-to {
+.slide-fade-enter,
+.slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
 }

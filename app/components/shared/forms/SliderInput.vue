@@ -13,6 +13,7 @@
           :min="value.minVal"
           :interval="value.stepVal"
           tooltip="always"
+          :valueBox="true"
         />
       </div>
     </div>

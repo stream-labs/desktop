@@ -9,17 +9,28 @@ import URI from 'urijs';
 import { createStore } from './store';
 import { ObsApiService } from './services/obs-api';
 import { IWindowOptions, WindowsService } from './services/windows';
-import { StartupService } from './services/startup';
+import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
 
-const { ipcRenderer } = electron;
+const { ipcRenderer, remote } = electron;
+
+const slobsVersion = remote.process.env.SLOBS_VERSION;
+
+if (remote.process.env.NODE_ENV === 'production') {
+  const bugsplat = require('bugsplat')('slobs', 'slobs-renderer', slobsVersion);
+  window.onerror = (messageOrEvent, source, lineno, colno, error) => bugsplat.post(error);
+}
 
 electron.crashReporter.start({
-  productName: 'slobs-renderer',
   companyName: 'Streamlabs',
-  submitURL: 'http://18.221.86.127:1127/crashreports'
+  productName: 'Streamlabs OBS',
+  submitURL: 'http://slobs.bugsplat.com/post/bp/crash/postBP.php',
+  extra: {
+    prod: 'slobs-renderer',
+    key: slobsVersion
+  }
 });
 
 require('./app.less');
@@ -36,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     servicesManager.listenMessages();
   } else {
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
-    StartupService.instance.load();
+    AppService.instance.load();
   }
 
   window['obs'] = obsApiService.nodeObs;

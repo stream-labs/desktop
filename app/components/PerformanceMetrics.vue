@@ -36,27 +36,3 @@
 </template>
 
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
-
-<style lang="less">
-.performance-metric-wrapper {
-  &:first-child {
-    .performance-metric {
-      padding-left: 0;
-
-      &:before {
-        content: '';
-        padding-right: 0;
-      }
-    }
-  }
-}
-
-.performance-metric {
-  padding-left: 12px;
-
-  &:before {
-    content: '|';
-    padding-right: 10px;
-  }
-}
-</style>

@@ -13,7 +13,7 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
-const { app, BrowserWindow, ipcMain, session, crashReporter } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -21,11 +21,35 @@ const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
+const bugsplat = require('bugsplat')('slobs', 'slobs-main', pjson.version);
+
+function handleUnhandledException() {
+  // We recommend you quit your application if an uncaughtException occurs
+  dialog.showErrorBox(`Unhandled Exception`,
+  'An unexpected error occured and the application must be shut down.\n' +
+  'Information concerning this occasion has been sent for debugging purposes.\n' +
+  'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
+  'Please restart the application.');
+
+  if (app) {
+    app.quit();
+  }
+}
+
+if (pjson.env === 'production') {
+  process.on("uncaughtException", bugsplat.post);
+  bugsplat.setCallback(handleUnhandledException);
+  ipcMain.on('rendererCrash', handleUnhandledException);
+}
 
 crashReporter.start({
-  productName: "slobs-main",
-  companyName: "Streamlabs",
-  submitURL: "http://18.221.86.127:1127/crashreports"
+  companyName: 'Streamlabs',
+  productName: 'Streamlabs OBS',
+  submitURL: 'http://slobs.bugsplat.com/post/bp/crash/postBP.php',
+  extra: {
+    prod: 'slobs-main',
+    key: pjson.version
+  }
 });
 
 if (process.argv.includes('--clearCacheDir')) {
@@ -91,6 +115,7 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!appExiting) {
       appExiting = true;
+      childWindow.destroy();
       mainWindow.send('shutdown');
       e.preventDefault();
     }

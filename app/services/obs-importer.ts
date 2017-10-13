@@ -9,6 +9,7 @@ import { SourceFiltersService } from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
 import { ConfigPersistenceService } from './config-persistence/config';
+import { AppService } from './app';
 
 interface Source {
   name?: string;
@@ -37,26 +38,36 @@ export class ObsImporterService extends Service {
   @Inject('ConfigPersistenceService')
   configPersistenceService: ConfigPersistenceService;
 
-  load(sceneCollectionSelected: ISceneCollection) {
-    if (this.isOBSinstalled()) {
-      const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, sceneCollectionSelected.filename);
-      const data = fs.readFileSync(sceneCollectionPath).toString();
-      const root = this.parseOBSconfig(data);
+  @Inject()
+  appService: AppService;
 
-      if (this.scenesService.scenes.length === 0) {
-        this.configPersistenceService.setUpDefaults();
-      }
+  async load(selectedprofile: string) {
+    if (!this.isOBSinstalled()) return;
+
+    // Scene collections
+    const collections = this.getSceneCollections();
+    for (const collection of collections) {
+      this.appService.reset();
+      await this.importCollection(collection);
     }
+
+    // Profile
+    this.importProfile(selectedprofile);
   }
 
-  parseOBSconfig(config: string) {
-    const configJSON = JSON.parse(config);
+  private importCollection(collection: ISceneCollection): Promise<void> {
+    const sceneCollectionPath = path.join(this.sceneCollectionsDirectory, collection.filename);
+    const configJSON = JSON.parse(fs.readFileSync(sceneCollectionPath).toString());
 
     this.importSources(configJSON);
     this.importScenes(configJSON);
     this.importSceneOrder(configJSON);
     this.importMixerSources(configJSON);
     this.importTransitions(configJSON);
+    if (this.scenesService.scenes.length === 0) {
+      this.configPersistenceService.setUpDefaults();
+    }
+    return this.configPersistenceService.rawSave(collection.name);
   }
 
   importFilters(filtersJSON :any, source :Source) {
@@ -205,8 +216,26 @@ export class ObsImporterService extends Service {
     }
   }
 
+  importProfile(profile: string) {
+    const profileDirectory =  path.join(this.profilesDirectory, profile);
+    const files = fs.readdirSync(profileDirectory);
+
+    files.forEach(file => {
+      if (file === 'basic.ini' ||
+          file === 'streamEncoder.json' ||
+          file === 'recordEncoder.json') {
+        const obsFilePath = path.join(profileDirectory, file);
+
+        const appData = electron.remote.app.getPath('userData');
+        const currentFilePath = path.join(appData, file);
+
+        fs.createReadStream(obsFilePath).pipe(fs.createWriteStream(currentFilePath));
+      }
+    });
+  }
+
   getSceneCollections(): ISceneCollection[] {
-    if (!this.isOBSinstalled()) return [];
+    if (!this.isOBSinstalled()) return;
 
     let files =  fs.readdirSync(this.sceneCollectionsDirectory);
 
@@ -219,14 +248,12 @@ export class ObsImporterService extends Service {
     });
   }
 
-  getProfiles() {
-    fs.readdir(this.profilesDirectory, (error, files) => {
-      if (error) {
-        return null;
-      } else {
-        return files;
-      }
-    });
+  getProfiles(): string[] {
+    if (!this.isOBSinstalled()) return [];
+
+    let profiles = fs.readdirSync(this.profilesDirectory);
+    profiles = profiles.filter(profile => !profile.match(/\./));
+    return profiles;
   }
 
   get OBSconfigFileDirectory() {
