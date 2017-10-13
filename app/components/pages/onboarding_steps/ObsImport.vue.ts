@@ -25,6 +25,9 @@ export default class ObsImport extends Vue {
 
   sceneCollections = this.obsImporterService.getSceneCollections();
 
+  profiles = this.obsImporterService.getProfiles();
+
+  selectedProfile = this.profiles[0] || '';
 
   created() {
     if (this.sceneCollections.length < 1) {
@@ -50,17 +53,17 @@ export default class ObsImport extends Vue {
     }
 
     if (this.status === 'done') {
-      return `All scenes and sources have been imported.`;
+      return `All scenes, sources and settings have been imported.`;
     }
 
-    return 'Import your scenes from OBS with a simple click, or start fresh.';
+    return 'Import your scenes and your settings from OBS with a simple click, or start fresh.';
   }
 
   startImport() {
     this.status = 'importing';
     defer(() => {
       try {
-        this.obsImporterService.load();
+        this.obsImporterService.load(this.selectedProfile);
         this.status = 'done';
       } catch (e) {
         // I suppose let's pretend we succeeded for now.

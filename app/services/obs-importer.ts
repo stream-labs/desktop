@@ -41,13 +41,18 @@ export class ObsImporterService extends Service {
   @Inject()
   appService: AppService;
 
-  async load() {
+  async load(selectedprofile: string) {
     if (!this.isOBSinstalled()) return;
+
+    // Scene collections
     const collections = this.getSceneCollections();
     for (const collection of collections) {
       this.appService.reset();
       await this.importCollection(collection);
     }
+
+    // Profile
+    this.importProfile(selectedprofile);
   }
 
   private importCollection(collection: ISceneCollection): Promise<void> {
@@ -211,8 +216,26 @@ export class ObsImporterService extends Service {
     }
   }
 
+  importProfile(profile: string) {
+    const profileDirectory =  path.join(this.profilesDirectory, profile);
+    const files = fs.readdirSync(profileDirectory);
+
+    files.forEach(file => {
+      if (file === 'basic.ini' ||
+          file === 'streamEncoder.json' ||
+          file === 'recordEncoder.json') {
+        const obsFilePath = path.join(profileDirectory, file);
+
+        const appData = electron.remote.app.getPath('userData');
+        const currentFilePath = path.join(appData, file);
+
+        fs.createReadStream(obsFilePath).pipe(fs.createWriteStream(currentFilePath));
+      }
+    });
+  }
+
   getSceneCollections(): ISceneCollection[] {
-    if (!this.isOBSinstalled()) return [];
+    if (!this.isOBSinstalled()) return;
 
     let files =  fs.readdirSync(this.sceneCollectionsDirectory);
 
@@ -225,14 +248,12 @@ export class ObsImporterService extends Service {
     });
   }
 
-  getProfiles() {
-    fs.readdir(this.profilesDirectory, (error, files) => {
-      if (error) {
-        return null;
-      } else {
-        return files;
-      }
-    });
+  getProfiles(): string[] {
+    if (!this.isOBSinstalled()) return [];
+
+    let profiles = fs.readdirSync(this.profilesDirectory);
+    profiles = profiles.filter(profile => !profile.match(/\./));
+    return profiles;
   }
 
   get OBSconfigFileDirectory() {
