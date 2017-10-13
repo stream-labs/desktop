@@ -27,7 +27,7 @@ const NODE_TYPES = {
   HotkeysNode
 };
 
-const DEFAULT_SCENES_COLLECTION_NAME = 'default';
+const DEFAULT_SCENES_COLLECTION_NAME = 'scenes';
 
 
 interface IScenesCollectionState {
