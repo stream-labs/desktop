@@ -14,6 +14,15 @@
         <i class="importing-spinner fa fa-spinner fa-pulse" />
       </div>
       <div v-if="status === 'initial'">
+        <div v-if="profiles.length > 1">
+          Select an OBS profile to import
+          <multiselect
+            v-if="profiles.length > 1"
+            v-model="selectedProfile"
+            :options="profiles"
+            :allow-empty="false"
+            :show-labels="false"/>
+        </div>
         <button
           class="button button--action button--lg"
           @click="startImport">
