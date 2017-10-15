@@ -7,6 +7,7 @@ import { UserService } from '../services/user';
 import electron from 'electron';
 import Login from './Login.vue';
 import { SettingsService } from '../services/settings';
+import Utils from '../services/utils';
 
 
 @Component({
@@ -50,7 +51,7 @@ export default class TopNav extends Vue {
   }
 
   get isDevMode() {
-    return electron.remote.process.env.NODE_ENV !== 'production';
+    return Utils.isDevMode();
   }
 
   openDevTools() {

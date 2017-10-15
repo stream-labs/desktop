@@ -28,7 +28,7 @@ export async function rightClickSource(t, name) {
   await t.context.app.client.rightClick(`li=${name}`);
 }
 
-export async function addSource(t, type, name, closeProps=true) {
+export async function addSource(t, type, name, closeProps = true) {
   const app = t.context.app;
 
   await focusMain(t);
@@ -49,4 +49,17 @@ export async function addSource(t, type, name, closeProps=true) {
   if (closeProps) {
     await app.client.click('button=Done');
   }
+}
+
+export async function addExistingSource(t, type, name, closeProps = true) {
+  const app = t.context.app;
+
+  await focusMain(t);
+  await clickAddSource(t);
+
+  await focusChild(t);
+  await app.client.click(`li=${type}`);
+  await app.client.click('button=Add Source');
+  await app.client.click(`div=${name}`);
+  await app.client.click('button=Add Existing Source');
 }

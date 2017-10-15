@@ -112,7 +112,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   getSourcesForCurrentScene(): AudioSource[] {
     const scene = this.scenesService.activeScene;
-    const sceneSources = scene.getItems().filter(sceneItem => sceneItem.audio).map(sceneItem => sceneItem.source);
+    const sceneSources = scene.getNestedSources({ excludeScenes: true })
+      .filter(sceneItem => sceneItem.audio);
+
     const globalSources = this.sourcesService.getSources().filter(source => source.channel !== void 0);
     return globalSources
       .concat(sceneSources)

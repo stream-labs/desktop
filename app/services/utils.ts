@@ -1,4 +1,5 @@
 import URI from 'urijs';
+import electron from 'electron';
 
 export default class Utils {
 
@@ -24,6 +25,10 @@ export default class Utils {
 
   static isChildWindow(): boolean {
     return !!this.getCurrentUrlParams().child;
+  }
+
+  static isDevMode() {
+    return electron.remote.process.env.NODE_ENV !== 'production';
   }
 
   /**
