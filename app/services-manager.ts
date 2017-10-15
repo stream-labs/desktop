@@ -151,6 +151,11 @@ export class ServicesManager extends Service {
     }
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
+
+    // this helps to debug services from console
+    if (Utils.isDevMode()) {
+      window['sm'] = this;
+    }
   }
 
 

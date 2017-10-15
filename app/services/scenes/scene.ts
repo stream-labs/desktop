@@ -6,6 +6,7 @@ import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
+import _ from 'lodash';
 
 const { ipcRenderer } = electron;
 
@@ -224,6 +225,33 @@ export class Scene implements ISceneApi {
     }
 
     return false;
+  }
+
+
+  /**
+   * returns scene items of scene + scene items of nested scenes
+   */
+  getNestedItems(options = { excludeScenes: false }): SceneItem[] {
+    let result = this.getItems();
+    result
+      .filter(sceneItem => sceneItem.type === 'scene')
+      .map(sceneItem => {
+        return this.scenesService.getScene(sceneItem.sourceId).getNestedItems();
+      }).forEach(sceneItems => {
+        result = result.concat(sceneItems);
+      });
+    if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
+    return _.uniqBy(result, 'sceneItemId');
+  }
+
+
+  /**
+   * returns sources of scene + sources of nested scenes
+   * result also includes nested scenes
+   */
+  getNestedSources(options = { excludeScenes: false }): Source[] {
+    const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
+    return _.uniqBy(sources, 'sourceId');
   }
 
 
