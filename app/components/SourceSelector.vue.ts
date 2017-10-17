@@ -37,20 +37,21 @@ export default class SourceSelector extends Vue {
     menu.popup();
   }
 
-  removeItem() {
-    // We can only remove a source if one is selected
-    if (this.scene.activeItemId) {
-      this.scene.removeItem(this.scene.activeItemId);
+  removeItems() {
+    // We can only remove a source if at least one is selected
+    if (this.scene.activeItemIds.length > 0) {
+      this.scene.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
     }
   }
 
   sourceProperties() {
     if (!this.canShowProperties()) return;
-    this.sourcesService.showSourceProperties(this.scene.activeItem.sourceId);
+    this.sourcesService.showSourceProperties(this.scene.activeItems[0].sourceId);
   }
 
   canShowProperties(): boolean {
-    return this.scene.activeItemId && this.scene.activeItem.getSource().hasProps();
+    if (this.scene.activeItemIds.length === 0) return false;
+    return this.scene.activeItems[0].getSource().hasProps();
   }
 
   handleSort(data: any) {
@@ -64,7 +65,7 @@ export default class SourceSelector extends Vue {
   }
 
   makeActive(sceneItemId: string) {
-    this.scene.makeItemActive(sceneItemId);
+    this.scene.makeItemsActive([sceneItemId]);
   }
 
   toggleVisibility(sceneItemId: string) {

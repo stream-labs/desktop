@@ -6,7 +6,7 @@
     @change="handleChange">
     <li
       class="selector-item"
-      :class="{ 'selector-item--active': item.value === activeItem }"
+      :class="{ 'selector-item--active': activeItems.includes(item.value) }"
       v-for="(item, index) in normalizedItems"
       @contextmenu.stop="handleContextMenu(index)"
       @click="handleSelect(index)"

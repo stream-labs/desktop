@@ -14,7 +14,7 @@ const { ipcRenderer } = electron;
 export interface IScene {
   id: string;
   name: string;
-  activeItemId: string;
+  activeItemIds: string[];
   items: ISceneItem[];
 }
 
@@ -41,7 +41,7 @@ export interface ISceneApi extends IScene {
   getItems(): ISceneItemApi[];
   addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
-  makeItemActive(sceneItemId: string): void;
+  makeItemsActive(sceneItemIds: string[]): void;
   canAddSource(sourceId: string): boolean;
 }
 
@@ -50,7 +50,7 @@ export interface ISceneApi extends IScene {
 export class Scene implements ISceneApi {
   id: string;
   name: string;
-  activeItemId: string;
+  activeItemIds: string[];
   items: ISceneItem[];
 
   @Inject()
@@ -89,15 +89,15 @@ export class Scene implements ISceneApi {
 
   get inactiveSources(): SceneItem[] {
     return this.sceneState.items.filter(sourceModel => {
-      return sourceModel.sceneItemId !== this.activeItemId;
+      return !this.activeItemIds.includes(sourceModel.sceneItemId);
     }).map(source => {
       return this.getItem(source.sceneItemId);
     });
   }
 
 
-  get activeItem(): SceneItem {
-    return this.getItem(this.activeItemId);
+  get activeItems(): SceneItem[] {
+    return this.activeItemIds.map(itemId => this.getItem(itemId));
   }
 
 
@@ -118,7 +118,7 @@ export class Scene implements ISceneApi {
     const sceneItem = this.getItem(sceneItemId);
 
     // Newly added sources are immediately active
-    this.makeItemActive(sceneItemId);
+    this.makeItemsActive([sceneItemId]);
 
     sceneItem.loadAttributes();
 
@@ -140,17 +140,18 @@ export class Scene implements ISceneApi {
   }
 
 
-  makeItemActive(sceneItemId: string) {
-    const selectedItem = this.getItem(sceneItemId);
+  makeItemsActive(sceneItemIds: string[]) {
+    const activeObsIds = sceneItemIds.map(itemId => this.getItem(itemId).obsSceneItemId);
+
     this.getObsScene().getItems().forEach(obsSceneItem => {
-      if (!selectedItem || selectedItem.obsSceneItemId !== obsSceneItem.id) {
+      if (activeObsIds.includes(obsSceneItem.id)) {
+        obsSceneItem.selected = true;
+      } else {
         obsSceneItem.selected = false;
-        return;
       }
-      obsSceneItem.selected = true;
     });
 
-    this.MAKE_SOURCE_ACTIVE(sceneItemId);
+    this.MAKE_SOURCES_ACTIVE(sceneItemIds);
   }
 
 
@@ -256,8 +257,8 @@ export class Scene implements ISceneApi {
 
 
   @mutation()
-  private MAKE_SOURCE_ACTIVE(sceneItemId: string) {
-    this.sceneState.activeItemId = sceneItemId;
+  private MAKE_SOURCES_ACTIVE(sceneItemIds: string[]) {
+    this.sceneState.activeItemIds = sceneItemIds;
   }
 
   @mutation()
@@ -296,8 +297,8 @@ export class Scene implements ISceneApi {
   @mutation()
   private REMOVE_SOURCE_FROM_SCENE(sceneItemId: string) {
 
-    if (this.sceneState.activeItemId === sceneItemId) {
-      this.sceneState.activeItemId = null;
+    if (this.sceneState.activeItemIds.includes(sceneItemId)) {
+      this.sceneState.activeItemIds = _.without(this.sceneState.activeItemIds, sceneItemId);
     }
 
     this.sceneState.items = this.sceneState.items.filter(source => {

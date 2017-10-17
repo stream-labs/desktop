@@ -20,7 +20,7 @@
     <selector
       class="editable-list__list"
       :items="list"
-      :activeItem="activeItem"
+      :activeItems="activeItem ? [activeItem] : []"
       @select="handleSelect"
       @sort="handleSort"/>
   </div>
