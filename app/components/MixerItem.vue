@@ -105,6 +105,7 @@
   .controls {
     width: 60px;
     text-align: right;
+    flex: 0 0 60px;
 
     .fa-volume-off {
       color: @red;
