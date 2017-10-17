@@ -35,6 +35,7 @@
   background-color: @day-secondary;
   border-top: 1px solid @day-border;
   max-width: none;
+  flex: 0 0 auto;
 }
 
 .nav-right {

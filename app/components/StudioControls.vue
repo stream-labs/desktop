@@ -14,7 +14,7 @@
 .studio-controls {
   height: 240px;
   width: 100%;
-  padding: 20px 5px;
+  padding: 20px 10px;
 }
 </style>
 
@@ -25,7 +25,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 15px;
+  padding: 0 10px;
 }
 
 .studio-controls-top {
