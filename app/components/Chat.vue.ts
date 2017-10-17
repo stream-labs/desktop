@@ -7,26 +7,17 @@ import { CustomizationService } from '../services/customization';
 
 @Component({})
 export default class Chat extends Vue {
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  customizationService: CustomizationService;
+  @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
   chatUrl: string = '';
 
   mounted() {
     const platform = this.userService.platform.type;
-    const platformId = this.userService.platformId;
     const service = getPlatformService(platform);
-
-    const username = this.userService.username;
-    const oauthToken = this.userService.platform.token;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    service.getChatUrl(username, oauthToken, nightMode).then(chatUrl => {
-      this.chatUrl = chatUrl;
-    });
+    service.getChatUrl(nightMode).then(chatUrl => this.chatUrl = chatUrl);
   }
 
   get isTwitch() {

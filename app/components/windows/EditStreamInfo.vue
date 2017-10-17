@@ -12,6 +12,7 @@
       <a @click="refreshStreamInfo">fetching the information again</a>,
       or you can
       <a @click="goLive">just go live.</a>
+      If this error persists, you can try logging out and back in.
     </div>
     <div v-if="!infoLoading && !infoError">
       <TextInput v-model="streamTitleModel" />
