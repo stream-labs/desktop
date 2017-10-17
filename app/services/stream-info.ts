@@ -1,5 +1,5 @@
 import { StatefulService, mutation } from './stateful-service';
-import { IChannelInfo, getPlatformService, Community } from './platforms';
+import { IChannelInfo, getPlatformService } from './platforms';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
 import StreamingService from '../services/streaming';
@@ -10,7 +10,6 @@ interface IStreamInfoServiceState {
   error: boolean;
   viewerCount: number;
   channelInfo: IChannelInfo;
-  communities: Community[]; // Twitch only
 }
 
 
@@ -32,8 +31,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
     fetching: false,
     error: false,
     viewerCount: 0, // TODO: Implement this
-    channelInfo: null,
-    communities: []
+    channelInfo: null
   };
 
 
@@ -47,36 +45,23 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
       if (this.streamingService.isStreaming) {
         const platform = getPlatformService(this.userService.platform.type);
 
-        platform.fetchLiveStreamInfo(this.userService.platformId, this.userService.platform.token).then(info => {
-          this.SET_VIEWER_COUNT(info.viewers);
+        platform.fetchViewerCount().then(viewers => {
+          this.SET_VIEWER_COUNT(viewers);
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
   }
 
 
-  refreshStreamInfo() {
-    if (!this.userService.isLoggedIn()) return;
+  refreshStreamInfo(): Promise<void> {
+    if (!this.userService.isLoggedIn()) return Promise.reject(null);
 
     this.SET_ERROR(false);
     this.SET_FETCHING(true);
 
-    const promises: Promise<any>[] = [];
-
     const platform = getPlatformService(this.userService.platform.type);
-    promises.push(platform.fetchChannelInfo(this.userService.platform.token).then(info => {
+    return platform.fetchChannelInfo().then(info => {
       this.SET_CHANNEL_INFO(info);
-    }));
-
-    if (this.userService.platform.type === 'twitch') {
-      promises.push(platform.getStreamCommunities(this.userService.platformId).then(communities => {
-        this.SET_COMMUNITIES(communities.map(community => {
-          return { name: community.name, objectID: community._id };
-        }));
-      }));
-    }
-
-    return Promise.all(promises).then(() => {
       this.SET_FETCHING(false);
     }).catch(() => {
       this.SET_FETCHING(false);
@@ -88,12 +73,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   setStreamInfo(title: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
 
-    return platform.putStreamInfo(
-      title,
-      game,
-      this.userService.platformId,
-      this.userService.platform.token
-    ).then(success => {
+    return platform.putChannelInfo(title, game).then(success => {
       this.refreshStreamInfo();
       return success;
     }).catch(() => {
@@ -116,11 +96,6 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   @mutation()
   SET_CHANNEL_INFO(info: IChannelInfo) {
     this.state.channelInfo = info;
-  }
-
-  @mutation()
-  SET_COMMUNITIES(communities: Community[]) {
-    this.state.communities = communities;
   }
 
   @mutation()
