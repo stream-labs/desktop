@@ -18,7 +18,7 @@ export default class Selector extends Vue {
   items: ISelectorItem[];
 
   @Prop()
-  activeItem: string;
+  activeItems: string[];
 
   @Prop({ default: true })
   draggable: boolean;
@@ -26,7 +26,7 @@ export default class Selector extends Vue {
   draggableSelector: string = this.draggable ? '.selector-item' : 'none';
 
   handleChange(change: any) {
-    let order = _.map(this.normalizedItems, item => {
+    const order = _.map(this.normalizedItems, item => {
       return item.value;
     });
 
@@ -37,7 +37,7 @@ export default class Selector extends Vue {
   }
 
   handleSelect(index: number) {
-    let value = this.normalizedItems[index].value;
+    const value = this.normalizedItems[index].value;
     this.$emit('select', value);
   }
 

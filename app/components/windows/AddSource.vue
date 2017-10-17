@@ -40,7 +40,7 @@
             :draggable="false"
             @dblclick="addExisting"
             @select="sourceId => { selectedSourceId = sourceId }"
-            :activeItem="selectedSourceId"
+            :activeItems="selectedSourceId ? [selectedSourceId] : []"
             :items="existingSources">
         </selector>
       </div>

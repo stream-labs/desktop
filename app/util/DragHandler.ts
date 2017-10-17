@@ -102,9 +102,9 @@ class DragHandler {
 
     // Load some attributes about sources
     const scene = this.scenesService.activeScene;
-    this.draggedSource = scene.activeItem;
+    this.draggedSource = scene.activeItems[0];
     this.otherSources = scene.inactiveSources.filter(source => {
-      return source.isOverlaySource;
+      return source.isVisualSource;
     });
 
     // Store the starting mouse event

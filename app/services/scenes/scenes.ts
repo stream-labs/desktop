@@ -63,7 +63,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      activeItemId: null,
+      activeItemIds: [],
       items: []
     });
     this.state.displayOrder.push(id);
@@ -216,42 +216,32 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
   @shortcut('ArrowLeft')
-  nudgeActiveItemLeft() {
-    if (this.activeScene.activeItem) {
-      this.activeScene.activeItem.nudgeLeft();
-    }
+  nudgeActiveItemsLeft() {
+    this.activeScene.activeItems.forEach(item => item.nudgeLeft());
   }
 
 
   @shortcut('ArrowRight')
   nudgeActiveItemRight() {
-    if (this.activeScene.activeItem) {
-      this.activeScene.activeItem.nudgeRight();
-    }
+    this.activeScene.activeItems.forEach(item => item.nudgeRight());
   }
 
 
   @shortcut('ArrowUp')
-  nudgeActiveItemUp() {
-    if (this.activeScene.activeItem) {
-      this.activeScene.activeItem.nudgeUp();
-    }
+  nudgeActiveItemsUp() {
+    this.activeScene.activeItems.forEach(item => item.nudgeUp());
   }
 
 
   @shortcut('ArrowDown')
-  nudgeActiveItemDown() {
-    if (this.activeScene.activeItem) {
-      this.activeScene.activeItem.nudgeDown();
-    }
+  nudgeActiveItemsDown() {
+    this.activeScene.activeItems.forEach(item => item.nudgeDown());
   }
 
 
   @shortcut('Delete')
-  removeActiveItem() {
-    if (this.activeScene.activeItem) {
-      this.activeScene.removeItem(this.activeScene.activeItem.sceneItemId);
-    }
+  removeActiveItems() {
+    this.activeScene.activeItems.forEach(item => this.activeScene.removeItem(item.sceneItemId));
   }
 
 

@@ -74,8 +74,8 @@ export class SceneItem implements ISceneItemApi {
     return this.height * this.scaleY;
   }
 
-  // An overlay source is visible in the overlay editor and not locked
-  get isOverlaySource() {
+  // A visual source is visible in the editor and not locked
+  get isVisualSource() {
     return (this.video && (this.width > 0) && (this.height > 0)) && !this.locked;
   }
 
@@ -193,8 +193,8 @@ export class SceneItem implements ISceneItemApi {
 
   setLocked(locked: boolean) {
     const scene = this.getScene();
-    if (locked && (scene.activeItemId === this.sceneItemId)) {
-      scene.makeItemActive(null);
+    if (locked && (scene.activeItemIds.includes(this.sceneItemId))) {
+      scene.makeItemsActive([]);
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, locked });

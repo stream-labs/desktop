@@ -30,7 +30,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
   @shortcut('Ctrl+C')
   copy() {
-    const source = this.scenesService.activeScene.activeItem;
+    const source = this.scenesService.activeScene.activeItems[0];
     if (!source) return;
     this.SET_SOURCES_IDS([source.sourceId]);
   }
@@ -61,7 +61,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
 
   copyFilters() {
-    const source = this.scenesService.activeScene.activeItem;
+    const source = this.scenesService.activeScene.activeItems[0];
     if (!source) return;
     this.SET_FILTERS_IDS([source.sourceId]);
   }
