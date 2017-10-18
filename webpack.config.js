@@ -88,7 +88,7 @@ module.exports = {
         test: /\.(png|jpe?g|gif|svg|mp4|ico)(\?.*)?$/,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]',
+          name: '[name]-[hash].[ext]',
           outputPath: 'media/',
           publicPath: 'bundles/'
         }
