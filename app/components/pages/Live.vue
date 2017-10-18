@@ -34,8 +34,8 @@
         <div class="aspect-ratio--16-9" v-else>
           <div class="content">
             <div class="live-display-placeholder">
-              <img class="live-display-placeholder__img live-display-placeholder__img--day" src="media/images/sleeping-kevin-day.png">
-              <img class="live-display-placeholder__img live-display-placeholder__img--night" src="media/images/sleeping-kevin-night.png">
+              <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
+              <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
               <span>Your preview is currently disabled</span>
             </div>
           </div>
