@@ -1,32 +1,14 @@
 import { TwitchService } from './twitch';
 import { YoutubeService } from './youtube';
 
-
-export interface IStreamInfo {
-  status: string;
-  viewers: number;
-  game: string;
-}
-
 export interface IChannelInfo {
   title: string;
   game: string;
 }
 
-export interface Game {
+export interface IGame {
   name: string;
 }
-
-export interface Community {
-  name: string;
-  objectID: string;
-}
-
-export interface CommunityGet {
-  name: string;
-  _id: string;
-}
-
 
 // All platform services should implement
 // this interface.
@@ -40,21 +22,17 @@ export interface IPlatformService {
   // settings for this platform, given an auth.
   setupStreamSettings: (auth: IPlatformAuth) => void;
 
-  fetchLiveStreamInfo: (platformId: string, oauthToken: string) => Promise<IStreamInfo>;
+  fetchViewerCount: () => Promise<number>;
 
-  fetchChannelInfo: (token: string) => Promise<IChannelInfo>;
+  fetchStreamKey: () => Promise<string>;
 
-  putStreamInfo: (streamTitle: string, streamGame: string, platformId: string, oauthToken: string) => Promise<boolean>;
+  fetchChannelInfo: () => Promise<IChannelInfo>;
 
-  searchGames: (searchString: string) => Promise<Game[]>;
+  putChannelInfo: (streamTitle: string, streamGame: string) => Promise<boolean>;
 
-  searchCommunities: (searchString: string) => Promise<Community[]>;
+  searchGames: (searchString: string) => Promise<IGame[]>;
 
-  getChatUrl: (username: string, oauthToken: string, mode: string) => Promise<string>;
-
-  getStreamCommunities: (platformId: string) => Promise<CommunityGet[]>;
-
-  putStreamCommunities: (communityIDs: string[], platformId:string, oauthToken: string) => Promise<boolean>;
+  getChatUrl: (mode: string) => Promise<string>;
 }
 
 export interface IPlatformAuth {

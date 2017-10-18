@@ -1,16 +1,16 @@
 import { Service } from '../service';
-import { IPlatformService, IPlatformAuth, IStreamInfo } from '.';
+import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
+import { handleErrors } from '../../util/requests';
+import { UserService } from '../user';
 
 export class TwitchService extends Service implements IPlatformService {
 
-  @Inject()
-  hostsService: HostsService;
-
-  @Inject()
-  settingsService: SettingsService;
+  @Inject() hostsService: HostsService;
+  @Inject() settingsService: SettingsService;
+  @Inject() userService: UserService;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 600,
@@ -27,11 +27,32 @@ export class TwitchService extends Service implements IPlatformService {
     return `https://${host}/login?${query}`;
   }
 
+  get oauthToken() {
+    return this.userService.platform.token;
+  }
+
+  get twitchId() {
+    return this.userService.platform.id;
+  }
+
+
+  getHeaders(authorized = false): Headers {
+    const headers = new Headers();
+
+    headers.append('Client-Id', this.clientId);
+    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+    headers.append('Content-Type', 'application/json');
+
+    if (authorized) headers.append('Authorization', `OAuth ${this.oauthToken}`);
+
+    return headers;
+  }
+
 
   // TODO: Some of this code could probably eventually be
   // shared with the Youtube platform.
   setupStreamSettings(auth: IPlatformAuth) {
-    this.fetchChannelInfo(auth.platform.token).then(info => {
+    this.fetchStreamKey().then(key => {
       const settings = this.settingsService.getSettingsFormData('Stream');
 
       settings.forEach(subCategory => {
@@ -41,7 +62,7 @@ export class TwitchService extends Service implements IPlatformService {
           }
 
           if (parameter.name === 'key') {
-            parameter.value = info.stream_key;
+            parameter.value = key;
           }
         });
       });
@@ -51,94 +72,73 @@ export class TwitchService extends Service implements IPlatformService {
   }
 
 
-  fetchChannelInfo(token: string) {
-    const headers = new Headers();
-
-    headers.append('Client-ID', this.clientId);
-    headers.append('Authorization', `OAuth ${token}`);
-
+  fetchRawChannelInfo() {
+    const headers = this.getHeaders(true);
     const request = new Request('https://api.twitch.tv/kraken/channel', { headers });
 
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+
+  fetchStreamKey(): Promise<string> {
+    return this.fetchRawChannelInfo().then(json => json.stream_key);
+  }
+
+
+  fetchChannelInfo(): Promise<IChannelInfo> {
+    return this.fetchRawChannelInfo().then(json => {
       return {
-        ...json,
         title: json.status,
+        game: json.game
       };
     });
   }
 
-  fetchLiveStreamInfo(twitchId: string, oauthToken: string): Promise<IStreamInfo> {
-    const headers = new Headers();
 
-    headers.append('Client-Id', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
+  fetchViewerCount(): Promise<number> {
+    const headers = this.getHeaders();
+    const request = new Request(`https://api.twitch.tv/kraken/streams/${this.twitchId}`, { headers });
 
-    const request = new Request(`https://api.twitch.tv/kraken/streams/${twitchId}`, { headers });
-
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return {
-        status: json.stream.channel.status,
-        viewers: json.stream.viewers,
-        game: json.stream.game
-      };
-    }).catch(() => {
-      return { status: 'Fetching Information', viewers: 0, game: 'Game' };
-    });
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => json.stream.viewers);
   }
 
-  putStreamInfo(streamTitle: string, streamGame: string, twitchId: string, oauthToken: string) {
-    const headers = new Headers();
 
-    headers.append('Client-Id', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
-    headers.append('Authorization', `OAuth ${oauthToken}`);
-    headers.append('Content-Type', 'application/json');
-
+  putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
+    const headers = this.getHeaders(true);
     const data = { channel: { status : streamTitle, game : streamGame } };
-
-    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}`, {
+    const request = new Request(`https://api.twitch.tv/kraken/channels/${this.twitchId}`, {
       method: 'PUT',
       headers,
       body: JSON.stringify(data)
     });
 
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return true;
-    }).catch(() => {
-      return false;
-    });
+    return fetch(request)
+      .then(handleErrors)
+      .then(() => true);
   }
 
-  searchGames(searchString: string) {
-    const headers = new Headers();
-
-    headers.append('Client-ID', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
-
+  searchGames(searchString: string): Promise<IGame[]> {
+    const headers = this.getHeaders();
     const request = new Request(`https://api.twitch.tv/kraken/search/games?query=${searchString}`, { headers });
 
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return json.games;
-    });
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => json.games);
   }
 
-  getChatUrl(username: string, oauthToken: string, mode: string) {
+  getChatUrl(mode: string) {
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    return Promise.resolve(`https://twitch.tv/${username}/chat?${nightMode}`);
+    return Promise.resolve(`https://twitch.tv/${this.userService.platform.username}/chat?${nightMode}`);
   }
 
   searchCommunities(searchString: string) {
-    const headers = new Headers();
-
-    headers.append('Content-Type', 'application/json');
+    const headers = this.getHeaders();
 
     const data = {
       requests:[
@@ -156,50 +156,10 @@ export class TwitchService extends Service implements IPlatformService {
       body: JSON.stringify(data)
     });
 
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return json.results[0].hits;
-    });
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => json.results[0].hits);
   }
 
-  getStreamCommunities(twitchId: string) {
-    const headers = new Headers();
-
-    headers.append('Client-Id', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
-
-    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}/communities`, { headers });
-
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return json.communities;
-    });
-  }
-
-  putStreamCommunities(communityIDs: string[], twitchId:string, oauthToken: string): Promise<boolean> {
-    const headers = new Headers();
-
-    headers.append('Client-Id', this.clientId);
-    headers.append('Accept', 'application/vnd.twitchtv.v5+json');
-    headers.append('Authorization', `OAuth ${oauthToken}`);
-    headers.append('Content-Type', 'application/json');
-
-    const data = { community_ids: communityIDs };
-
-    const request = new Request(`https://api.twitch.tv/kraken/channels/${twitchId}/communities`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request).then(response => {
-      return response.json();
-    }).then(json => {
-      return true;
-    }).catch(() => {
-      return false;
-    });
-  }
 }

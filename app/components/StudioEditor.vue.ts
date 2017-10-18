@@ -19,13 +19,14 @@ interface IResizeRegion {
   width: number;
   height: number;
   cursor: string;
+  item: SceneItem;
 }
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
   lockX: boolean; // prevent changes to the X scale (default: false)
   lockY: boolean; // lockY: prevent changes to the Y scale (default: false)
-  anchor: AnchorPoint // anchor: an AnchorPoint enum to resize around
+  anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
 }
 
 @Component({})
@@ -80,7 +81,7 @@ export default class StudioEditor extends Vue {
    *****************/
 
   handleMouseDown(event: MouseEvent) {
-    if (this.activeSource) {
+    if (this.activeSources.length > 0) {
       const overResize = this.isOverResize(event);
 
       if (overResize) {
@@ -112,8 +113,8 @@ export default class StudioEditor extends Vue {
         return this.isOverSource(event, source);
       });
 
-      // Either select a new source, or deselect all sources (null)
-      this.scene.makeItemActive(overSource ? overSource.sceneItemId : null);
+      // Either select a new source, or deselect all sources
+      this.scene.makeItemsActive(overSource ? [overSource.sceneItemId] : []);
 
       if ((event.button === 2)) {
         let menu: EditMenu;
@@ -183,7 +184,7 @@ export default class StudioEditor extends Vue {
       this.dragHandler.move(event);
     } else if (event.buttons === 1) {
       // We might need to start dragging
-      const sourcesInPriorityOrder = _.compact([this.activeSource].concat(this.sceneItems));
+      const sourcesInPriorityOrder = _.compact(this.activeSources.concat(this.sceneItems));
 
       const overSource = sourcesInPriorityOrder.find(source => {
         return this.isOverSource(event, source);
@@ -191,7 +192,7 @@ export default class StudioEditor extends Vue {
 
       if (overSource) {
         // Make this source active
-        this.scene.makeItemActive(overSource.sceneItemId);
+        this.scene.makeItemsActive([overSource.sceneItemId]);
 
         // Start dragging it
         this.startDragging(event);
@@ -202,7 +203,7 @@ export default class StudioEditor extends Vue {
   }
 
   crop(x: number, y: number, options: IResizeOptions) {
-    const source = this.activeSource;
+    const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source);
 
     rect.normalized(() => {
@@ -245,7 +246,7 @@ export default class StudioEditor extends Vue {
       ...options
     };
 
-    const source = this.activeSource;
+    const source = this.resizeRegion.item;
     const rect = new ScalableRectangle(source);
 
     rect.normalized(() => {
@@ -353,7 +354,7 @@ export default class StudioEditor extends Vue {
   // Determines if the given mouse event is over any
   // of the active source's resize regions.
   isOverResize(event: MouseEvent) {
-    if (this.activeSource) {
+    if (this.activeSources.length > 0) {
       return _.find(this.resizeRegions, region => {
         return this.isOverBox(event, region.x, region.y, region.width, region.height);
       });
@@ -383,17 +384,17 @@ export default class StudioEditor extends Vue {
 
   // getters
 
-  get activeSource(): SceneItem {
-    const activeSource = this.scenesService.activeScene.activeItem;
-
-    if (activeSource && activeSource.isOverlaySource) return activeSource;
+  get activeSources(): SceneItem[] {
+    return this.scenesService.activeScene.activeItems.filter(item => {
+      return item.isVisualSource;
+    });
   }
 
   get sceneItems(): SceneItem[] {
     const scene = this.scenesService.activeScene;
     if (scene) {
       return scene.getItems().filter(source => {
-        return source.isOverlaySource;
+        return source.isVisualSource;
       });
     }
 
@@ -414,18 +415,24 @@ export default class StudioEditor extends Vue {
 
   // Using a computed property since it is cached
   get resizeRegions(): IResizeRegion[] {
-    if (!this.activeSource) {
-      return [];
-    }
+    let regions: IResizeRegion[] = [];
 
-    const source = this.activeSource;
+    this.scene.activeItems.forEach(item => {
+      regions = regions.concat(this.generateResizeRegionsForItem(item));
+    });
+
+    return regions;
+  }
+
+
+  generateResizeRegionsForItem(item: SceneItem): IResizeRegion[] {
     const renderedRegionRadius = 5;
     const factor = this.windowsService.state.main.scaleFactor;
     const regionRadius = renderedRegionRadius * factor * this.baseWidth / this.renderedWidth;
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 
-    const rect = new ScalableRectangle(source);
+    const rect = new ScalableRectangle(item);
     rect.normalize();
 
     return [
@@ -435,7 +442,8 @@ export default class StudioEditor extends Vue {
         y: rect.y - regionRadius,
         width,
         height,
-        cursor: 'nwse-resize'
+        cursor: 'nwse-resize',
+        item
       },
       {
         name: 'n',
@@ -443,7 +451,8 @@ export default class StudioEditor extends Vue {
         y: rect.y - regionRadius,
         width,
         height,
-        cursor: 'ns-resize'
+        cursor: 'ns-resize',
+        item
       },
       {
         name: 'ne',
@@ -451,7 +460,8 @@ export default class StudioEditor extends Vue {
         y: rect.y - regionRadius,
         width,
         height,
-        cursor: 'nesw-resize'
+        cursor: 'nesw-resize',
+        item
       },
       {
         name: 'e',
@@ -459,7 +469,8 @@ export default class StudioEditor extends Vue {
         y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
         width,
         height,
-        cursor: 'ew-resize'
+        cursor: 'ew-resize',
+        item
       },
       {
         name: 'se',
@@ -467,7 +478,8 @@ export default class StudioEditor extends Vue {
         y: (rect.y + rect.scaledHeight) - regionRadius,
         width,
         height,
-        cursor: 'nwse-resize'
+        cursor: 'nwse-resize',
+        item
       },
       {
         name: 's',
@@ -475,7 +487,8 @@ export default class StudioEditor extends Vue {
         y: (rect.y + rect.scaledHeight) - regionRadius,
         width,
         height,
-        cursor: 'ns-resize'
+        cursor: 'ns-resize',
+        item
       },
       {
         name: 'sw',
@@ -483,7 +496,8 @@ export default class StudioEditor extends Vue {
         y: (rect.y + rect.scaledHeight) - regionRadius,
         width,
         height,
-        cursor: 'nesw-resize'
+        cursor: 'nesw-resize',
+        item
       },
       {
         name: 'w',
@@ -491,7 +505,8 @@ export default class StudioEditor extends Vue {
         y: (rect.y + (rect.scaledHeight / 2)) - regionRadius,
         width,
         height,
-        cursor: 'ew-resize'
+        cursor: 'ew-resize',
+        item
       }
     ];
   }

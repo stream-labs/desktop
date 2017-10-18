@@ -38,7 +38,7 @@
   <selector
     class="studio-controls-selector"
     :items="scenes"
-    :activeItem="activeSceneId"
+    :activeItems="activeSceneId ? [activeSceneId] : []"
     @select="makeActive"
     @sort="handleSort"
     @contextmenu="menu.popup()"
