@@ -158,7 +158,7 @@ function startApp() {
   // The child window is never closed, it just hides in the
   // background until it is needed.
   childWindow.on('close', e => {
-    if (!appExiting) {
+    if (!shutdownStarted) {
       childWindow.send('closeWindow');
 
       // Prevent the window from actually closing
