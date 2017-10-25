@@ -80,7 +80,9 @@ class Updater {
   }
 
   pushState() {
-    this.browserWindow.send('autoUpdate-pushState', this.updateState);
+    if (!this.browserWindow.isDestroyed()) {
+      this.browserWindow.send('autoUpdate-pushState', this.updateState);
+    }
   }
 
 }
