@@ -77,7 +77,9 @@ let childWindowIsReadyToShow = false;
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
 // closing the windows before exit.
-let appExiting = false;
+let allowMainWindowClose = false;
+let shutdownStarted = false;
+let appShutdownTimeout;
 
 const indexUrl = 'file://' + __dirname + '/index.html';
 
@@ -113,12 +115,29 @@ function startApp() {
   }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
-    if (!appExiting) {
-      appExiting = true;
+    if (!shutdownStarted) {
+      shutdownStarted = true;
       childWindow.destroy();
       mainWindow.send('shutdown');
-      e.preventDefault();
+
+      // We give the main window 10 seconds to acknowledge a request
+      // to shut down.  Otherwise, we just close it.
+      appShutdownTimeout = setTimeout(() => {
+        allowMainWindowClose = true;
+        if (!mainWindow.isDestroyed()) mainWindow.close();
+      }, 10 * 1000);
     }
+
+    if (!allowMainWindowClose) e.preventDefault();
+  });
+
+  ipcMain.on('acknowledgeShutdown', () => {
+    if (appShutdownTimeout) clearTimeout(appShutdownTimeout);
+  });
+
+  ipcMain.on('shutdownComplete', () => {
+    allowMainWindowClose = true;
+    mainWindow.close();
   });
 
   mainWindow.on('closed', () => {
@@ -139,7 +158,7 @@ function startApp() {
   // The child window is never closed, it just hides in the
   // background until it is needed.
   childWindow.on('close', e => {
-    if (!appExiting) {
+    if (!shutdownStarted) {
       childWindow.send('closeWindow');
 
       // Prevent the window from actually closing

@@ -110,6 +110,10 @@ textarea {
   }
 }
 
+.multiselect__content-wrapper {
+  position: relative;
+}
+
 .multiselect__content {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
@@ -119,14 +123,17 @@ textarea {
   list-style-type: none;
   margin: 0;
   width: 100%;
-  z-index: 10;
-  position: relative;
+  z-index: 100;
+  position: absolute;
   max-height: 300px;
   overflow-y: auto;
 }
 
 .multiselect__element {
   font-size: 13px;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 100%;
 }
 
 .multiselect__option {

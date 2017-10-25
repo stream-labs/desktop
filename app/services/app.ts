@@ -88,7 +88,10 @@ export class AppService extends StatefulService<IAppState> {
 
         if (onboarded) this.enableAutoSave();
 
-        electron.ipcRenderer.on('shutdown', () => this.shutdownHandler());
+        electron.ipcRenderer.on('shutdown', () => {
+          electron.ipcRenderer.send('acknowledgeShutdown');
+          this.shutdownHandler();
+        });
 
         this.userService;
         this.shortcutsService;
@@ -159,7 +162,7 @@ export class AppService extends StatefulService<IAppState> {
       this.reset();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
-      electron.remote.getCurrentWindow().close();
+      electron.ipcRenderer.send('shutdownComplete');
     });
   }
 
