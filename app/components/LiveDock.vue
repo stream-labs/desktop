@@ -14,9 +14,9 @@
       <i class="fa fa-chevron-right live-dock-chevron icon-btn" @click="collapse" />
       <div class="live-dock-header">
         <div class="flex flex--center">
-          <div class="live-dock-pulse" />
+          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
           <span class="live-dock-text">
-            LIVE
+            {{ liveText }}
           </span>
           <span class="live-dock-timer">
             {{ elapsedStreamTime }}
@@ -125,6 +125,11 @@
   margin: 0 6px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
   animation: livepulse 2s infinite;
+
+  &.live-dock-offline {
+    background: @grey;
+    animation: none;
+  }
 }
 
 @keyframes livepulse {

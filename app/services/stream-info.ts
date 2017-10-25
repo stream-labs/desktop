@@ -30,7 +30,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   static initialState: IStreamInfoServiceState = {
     fetching: false,
     error: false,
-    viewerCount: 0, // TODO: Implement this
+    viewerCount: 0,
     channelInfo: null
   };
 

@@ -6,6 +6,7 @@ import { Inject } from '../util/injector';
 import PerformanceMetricsStream from './PerformanceMetricsStream.vue';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   components: {
@@ -22,21 +23,30 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
 
-  collapsed = false;
+  collapsed = true;
+
+  subscription: Subscription;
 
   mounted() {
     this.elapsedInterval = window.setInterval(
       () => {
         if (this.streamingService.isStreaming) {
           this.elapsedStreamTime = this.getElapsedStreamTime();
+        } else {
+          this.elapsedStreamTime = '';
         }
       },
       100
     );
+
+    this.subscription = this.streamingService.streamingStatusChange.subscribe(status => {
+      if (status) this.collapsed = false;
+    });
   }
 
   beforeDestroy() {
     clearInterval(this.elapsedInterval);
+    this.subscription.unsubscribe();
   }
 
   getElapsedStreamTime() {
@@ -49,6 +59,14 @@ export default class LiveDock extends Vue {
 
   expand() {
     this.collapsed = false;
+  }
+
+  get isStreaming() {
+    return this.streamingService.isStreaming;
+  }
+
+  get liveText() {
+    return this.isStreaming ? 'LIVE' : 'OFFLINE';
   }
 
   get viewerCount() {
