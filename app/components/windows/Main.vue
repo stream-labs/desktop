@@ -14,7 +14,7 @@
         :is="page"/>
       <studio-footer v-if="(page !== 'Onboarding') && !applicationLoading"/>
     </div>
-    <live-dock class="main-right" v-if="isStreaming && isLoggedIn" />
+    <live-dock class="main-right" v-if="isLoggedIn" />
   </div>
 </div>
 </template>

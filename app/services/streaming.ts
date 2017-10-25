@@ -7,6 +7,7 @@ import { SettingsService } from './settings';
 import { padStart } from 'lodash';
 import { track } from './usage-statistics';
 import { WindowsService } from './windows';
+import { Subject } from 'rxjs/Subject';
 
 interface IStreamingServiceState {
   isStreaming: boolean;
@@ -58,6 +59,10 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     this.state.streamOk = streamOk;
   }
 
+
+  streamingStatusChange = new Subject<boolean>();
+
+
   // Only runs once per app lifecycle
   init() {
 
@@ -97,6 +102,7 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
 
     nodeObs.OBS_service_startStreaming();
     this.START_STREAMING((new Date()).toISOString());
+    this.streamingStatusChange.next(true);
 
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
 
@@ -117,6 +123,7 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     nodeObs.OBS_service_stopStreaming();
     this.STOP_STREAMING();
     this.SET_STREAM_STATUS(null);
+    this.streamingStatusChange.next(false);
 
     const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
 
