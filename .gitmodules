@@ -1,6 +1,6 @@
 [submodule "node-libuiohook"]
 	path = node-libuiohook
-	url = git@github.com:twitchalerts/node-libuiohook.git
-[submodule "obs-studio-nan"]
-	path = obs-studio-nan
-	url = git@github.com:twitchalerts/obs-studio-nan.git
+	url = git@github.com:stream-labs/node-libuiohook.git
+[submodule "obs-studio-node"]
+	path = obs-studio-node
+	url = git@github.com:stream-labs/obs-studio-node.git
