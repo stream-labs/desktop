@@ -203,31 +203,7 @@ function startApp() {
   }
 
   // Initialize various OBS services
-  obs.OBS_API_initOBS_API(app.getPath('userData'));
-
-  obs.OBS_API_openAllModules();
-  obs.OBS_API_initAllModules();
-
-  obs.OBS_service_createStreamingOutput();
-  obs.OBS_service_createRecordingOutput();
-
-  obs.OBS_service_createVideoStreamingEncoder();
-  obs.OBS_service_createVideoRecordingEncoder();
-
-  obs.OBS_service_createAudioEncoder();
-
-  obs.OBS_service_resetAudioContext();
-  obs.OBS_service_resetVideoContext();
-
-  obs.OBS_service_associateAudioAndVideoToTheCurrentStreamingContext();
-  obs.OBS_service_associateAudioAndVideoToTheCurrentRecordingContext();
-
-  obs.OBS_service_createService();
-
-  obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentStreamingOutput();
-  obs.OBS_service_associateAudioAndVideoEncodersToTheCurrentRecordingOutput();
-
-  obs.OBS_service_setServiceToTheStreamingOutput();
+  obs.OBS_API_initAPI(app.getPath('userData'));
 }
 
 // This ensures that only one copy of our app can run at once.
