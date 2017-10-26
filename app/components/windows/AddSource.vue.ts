@@ -26,8 +26,9 @@ export default class AddSource extends Vue {
   sources = this.sourcesService.getSources().filter(source => {
     return (
       source.type === this.sourceType &&
-      source.sourceId !== this.scenesService.activeSceneId
-    )
+      source.sourceId !== this.scenesService.activeSceneId &&
+      !source.channel
+    );
   });
 
   existingSources = this.sources.map(source => {
