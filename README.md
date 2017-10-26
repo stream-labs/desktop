@@ -1,40 +1,27 @@
-# slobs-client
+# streamlabs-obs
 Electron client for the Streamlabs OBS streaming software.
+
+This application currently only supports 64-bit Windows.
 
 ## Dependencies
 
 ### Node OBS
 
-Node OBS is our C++ Node module that provides a javascript
+Node OBS is our (deprecated) C++ Node module that provides a javascript
 interface to OBS.  For SLOBS to start properly, it needs to
-find a built version of node OBS at `./node-obs`.  There are
-currently a number of different ways to acquire this.
+find a built version of node OBS at `./node-obs`.
 
-The simplest is to clone the prebuild repo into slobs:
+You will have to clone and do the compilation yourself.
+Instructions can be found here:
 
-```
-git clone git@github.com:twitchalerts/node-obs-prebuild.git node-obs
-```
-
-This repo is updated frequently from the `staging` branch on
-the node-obs repo.  If you need more bleeding edge access, or
-need a specific branch, you will have to do the compilation
-yourself.  Instructions can be found here:
-
-https://github.com/twitchalerts/node-obs
+https://github.com/stream-labs/node-obs
 
 ### Yarn
 
 In order to ensure you are using the correct version of each
-node module, you should use the yarn package manager. On OS X
-you can install yarn via homebrew:
+node module, you should use the yarn package manager.
+Installation instructions can be found here:
 
-```
-brew update
-brew install yarn
-```
-
-For other platforms, check the yarn docs:
 https://yarnpkg.com/en/docs/install
 
 ### Visual C++ Compiler
@@ -100,17 +87,10 @@ The packager will use whatever version of node-obs you have
 checked out in the slobs directory (at `./node-obs`).  You
 should make sure that node-obs is compiled correctly with 32-bit
 and 64-bit plugins, and works properly with the currently checked
-out version of `slobs-client`.  If you're releasing, that should
+out version of `streamlabs-obs`.  If you're releasing, that should
 probably be the `master` branch.  You should probably try running
 the app from your dev environment to make sure everything is
 working before you start the release process.
-
-### Bumping the Version
-
-Before you release, you should bump the version.  This is done
-manually (for now) by changing the version number in the `pakcage.json`.
-Commit the changes to the `package.json`, tag the commit in the format
-of `v0.0.1`, and push the commit and tag to the origin.
 
 ### Packaging and Deploying
 
@@ -126,6 +106,11 @@ yarn package
 This will package a distributable installer `.exe` to the `dist/`
 directory.  There is also an unpacked version in `dist/win-unpacked`.
 
+If you plan on deploying the app to our update server, you should make
+sure that the packager can sign the executables.
+This will only happen if you have `CSC_LINK` and `CSC_KEY_PASSWORD`
+set in your environment.  Only authorized team members have access to these.
+
 If you want to deploy the packaged installer such that it will be
 picked up by the auto-updater, you can run:
 
@@ -137,14 +122,9 @@ You should thoroughly test the packaged app before running this, since
 all users will be forced to upgrade to this verion the next time they
 start the app.
 
-You should also make sure that the packager signed the executables.
-This will only happen if you have `CSC_LINK` and `CSC_KEY_PASSWORD`
-set in your environment.  Someone on the team can give these to you.
-
 In order for this to work, you will need to have `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY` set in your environment. These values
-are secret. If you need to set up your machine, ask someone on the
-team who has them, or someone with admin access on our AWS account.
+are secret. Only authorized team members have deploy access.
 
 ### Deploy Checklist
 
