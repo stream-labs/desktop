@@ -102,7 +102,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-
   @Inject()
   private scenesService: ScenesService;
 
@@ -486,6 +485,10 @@ export class Source implements ISourceApi {
     this.sourcesService.removeSource(this.sourceId);
   }
 
+  setName(newName: string) {
+    this.getObsInput().name = newName;
+    this.SET_NAME(newName);
+  }
 
   hasProps(): boolean {
     return !!this.getObsInput().properties;
@@ -502,6 +505,11 @@ export class Source implements ISourceApi {
     // the read-only nature of this data
     this.sourceState = this.sourcesService.state.sources[sourceId];
     Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+  }
+
+  @mutation()
+  private SET_NAME(newName: string) {
+    this.sourceState.name = newName;
   }
 }
 

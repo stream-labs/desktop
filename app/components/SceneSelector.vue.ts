@@ -33,6 +33,10 @@ export default class SceneSelector extends Vue {
       label: 'Duplicate',
       click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
+    this.menu.append({
+      label: 'Rename',
+      click: () => this.scenesService.showNameScene(this.scenesService.activeScene.name)
+    });
   }
 
   makeActive(id: string) {

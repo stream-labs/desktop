@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Name Scene"
+  :title="options.rename ? 'Rename Scene' : 'Name Scene'"
   :done-handler="submit">
   <form
     slot="content"

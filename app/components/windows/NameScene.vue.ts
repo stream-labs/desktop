@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import namingHelpers from '../../util/NamingHelpers';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
+import { ISourcesServiceApi } from '../../services/sources';
 
 @Component({
   components: { ModalLayout },
@@ -20,20 +20,25 @@ export default class NameScene extends Vue {
   scenesService: IScenesServiceApi;
 
   @Inject()
+  sourcesService: ISourcesServiceApi;
+
+  @Inject()
   windowsService: WindowsService;
 
-  options: { sceneToDuplicate?: string } = this.windowsService.getChildWindowQueryParams();
+  options: { sceneToDuplicate?: string, rename?: string } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
-    const suggestedName = this.options.sceneToDuplicate || 'NewScene';
-    this.name = namingHelpers.suggestName(
-      suggestedName, (name: string) => this.isTaken(name)
-    );
+    this.name = this.options.rename ?
+      this.options.rename :
+      this.sourcesService.suggestName(this.options.sceneToDuplicate || 'NewScene');
   }
 
   submit() {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
+    } else if (this.options.rename) {
+      this.scenesService.getSceneByName(this.options.rename).setName(this.name);
+      this.windowsService.closeChildWindow();
     } else {
       this.scenesService.createScene(
         this.name,
@@ -47,7 +52,7 @@ export default class NameScene extends Vue {
   }
 
   isTaken(name: string) {
-    return this.scenesService.getSceneByName(name);
+    return this.sourcesService.getSourceByName(name);
   }
 
 }

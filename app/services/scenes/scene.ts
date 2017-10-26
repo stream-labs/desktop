@@ -43,6 +43,7 @@ export interface ISceneApi extends IScene {
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   makeItemsActive(sceneItemIds: string[]): void;
   canAddSource(sourceId: string): boolean;
+  setName(newName: string): void;
 }
 
 
@@ -100,6 +101,11 @@ export class Scene implements ISceneApi {
     return this.activeItemIds.map(itemId => this.getItem(itemId));
   }
 
+  setName(newName: string) {
+    const sceneSource = this.sourcesService.getSource(this.id);
+    sceneSource.setName(newName);
+    this.SET_NAME(newName);
+  }
 
   createAndAddSource(sourceName: string, type: TSourceType, settings?: Dictionary<any>): SceneItem {
     const source = this.sourcesService.createSource(sourceName, type, settings);
@@ -253,6 +259,11 @@ export class Scene implements ISceneApi {
   getNestedSources(options = { excludeScenes: false }): Source[] {
     const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
     return _.uniqBy(sources, 'sourceId');
+  }
+
+  @mutation()
+  private SET_NAME(newName: string) {
+    this.sceneState.name = newName;
   }
 
 
