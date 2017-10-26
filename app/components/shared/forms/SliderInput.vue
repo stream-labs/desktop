@@ -1,6 +1,6 @@
 <template>
   <div class="input-container">
-    <div class="input-label">
+    <div v-if="value.showDescription !== false" class="input-label">
       <label>{{ value.description }}</label>
     </div>
     <div class="input-wrapper">

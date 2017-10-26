@@ -1,17 +1,17 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { TObsType, IListInputValue, IListOption, Input } from './Input';
+import { TObsType, IListInput, IListOption, Input, TObsValue } from './Input';
 import { Multiselect } from 'vue-multiselect';
 
 @Component({
   components: { Multiselect }
 })
 
-class ListInput extends Input<IListInputValue> {
+class ListInput extends Input<IListInput<TObsValue>> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: IListInputValue;
+  value: IListInput<TObsValue>;
 
   @Prop({ default: false })
   allowEmpty: boolean;

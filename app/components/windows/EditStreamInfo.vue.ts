@@ -5,7 +5,7 @@ import windowMixin from '../mixins/window';
 import TextInput from '../shared/forms/TextInput.vue';
 import ListInput from '../shared/forms/ListInput.vue';
 import BoolInput from '../shared/forms/BoolInput.vue';
-import { IFormInput, IListInputValue } from '../shared/forms/Input';
+import { IFormInput, IListInput } from '../shared/forms/Input';
 import { StreamInfoService } from '../../services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
@@ -49,7 +49,7 @@ export default class EditStreamInfo extends Vue {
     value: ''
   };
 
-  gameModel: IListInputValue = {
+  gameModel: IListInput<string> = {
     name: 'stream_game',
     description: 'Game',
     value: '',
@@ -113,7 +113,7 @@ export default class EditStreamInfo extends Vue {
 
 
   // For some reason, v-model doesn't work with ListInput
-  onGameInput(gameModel: IListInputValue) {
+  onGameInput(gameModel: IListInput<string>) {
     this.gameModel = gameModel;
   }
 

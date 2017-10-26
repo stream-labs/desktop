@@ -23,7 +23,12 @@ interface ISourceInfo {
   name: string;
   type: TSourceType;
   settings: obs.ISettings;
+
   volume: number;
+  forceMono?: boolean;
+  audioMixers?: number;
+  monitoringType?: obs.EMonitoringType;
+
   filters: {
     items: IFilterInfo[];
   };
@@ -50,7 +55,10 @@ export class SourcesNode extends Node<ISchema, {}> {
         const hotkeys = new HotkeysNode();
 
         return hotkeys.save({ sourceId: source.sourceId }).then(() => {
-          const data: ISourceInfo = {
+
+          const audioSource = this.audioService.getSource(source.sourceId);
+
+          let data: ISourceInfo = {
             id: source.sourceId,
             name: source.name,
             type: source.type,
@@ -69,6 +77,13 @@ export class SourcesNode extends Node<ISchema, {}> {
                 };
               })
             }
+          };
+
+          if (audioSource) data = {
+            ...data,
+            forceMono: audioSource.forceMono,
+            audioMixers: audioSource.audioMixers,
+            monitoringType: audioSource.monitoringType,
           };
 
           resolve(data);
@@ -108,17 +123,25 @@ export class SourcesNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     sources.forEach((source, index) => {
+
+      const sourceInfo = this.data.items[index];
+
       this.sourcesService.addSource(
         source,
         this.data.items[index].id,
-        { channel: this.data.items[index].channel }
+        { channel: sourceInfo.channel }
       );
       if (source.audioMixers) {
-        this.audioService.getSource(this.data.items[index].id).setMul(this.data.items[index].volume);
+        this.audioService.getSource(sourceInfo.id).setMul(sourceInfo.volume);
+        this.audioService.getSource(sourceInfo.id).setSettings({
+          forceMono: sourceInfo.forceMono,
+          audioMixers: sourceInfo.audioMixers,
+          monitoringType: sourceInfo.monitoringType
+        });
       }
 
-      if (this.data.items[index].hotkeys) {
-        promises.push(this.data.items[index].hotkeys.load({ sourceId: this.data.items[index].id }));
+      if (sourceInfo.hotkeys) {
+        promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
     });
 

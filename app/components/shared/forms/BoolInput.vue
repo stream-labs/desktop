@@ -10,7 +10,7 @@
         :disabled="value.enabled == false"
         @change="onChangeHandler"
       />
-      <label>{{ value.description }}</label>
+      <label><span v-if="value.showDescription !== false">{{ value.description }}</span></label>
     </div>
   </div>
 </div>

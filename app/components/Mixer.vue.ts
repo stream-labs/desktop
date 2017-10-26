@@ -12,6 +12,10 @@ export default class Mixer extends Vue {
   @Inject()
   audioService: AudioService;
 
+  showAdvancedSettings() {
+    this.audioService.showAdvancedSettings();
+  }
+
   get audioSources() {
     return this.audioService.getSourcesForCurrentScene();
   }

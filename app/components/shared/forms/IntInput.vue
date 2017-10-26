@@ -1,7 +1,7 @@
 <template>
 <div class="input-container IntInput" :class="{disabled: value.enabled == false}">
   <div class="input-label">
-    <label>{{ value.description }}</label>
+    <label v-if="value.showDescription !== false">{{ value.description }}</label>
   </div>
   <div class="input-wrapper">
     <div class="int-input">

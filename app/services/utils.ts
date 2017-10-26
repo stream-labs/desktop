@@ -1,6 +1,8 @@
 import URI from 'urijs';
 import electron from 'electron';
 
+export const enum EBit { ZERO, ONE }
+
 export default class Utils {
 
   static applyProxy(target: Object, source: Object) {
@@ -53,5 +55,29 @@ export default class Utils {
       b: (value & 0x00ff0000) >>> 16,
       a: (value & 0xff000000) >>> 24
     };
+  }
+
+
+  static numberToBinnaryArray(num: number, size: number): EBit[] {
+    const result: EBit[] = [];
+    num = Math.round(num);
+    size = Math.round(size);
+    while (size--) {
+      result.unshift(num & 1);
+      num = num >> 1;
+    }
+    return result;
+  }
+
+
+  static binnaryArrayToNumber(arr: EBit[]): number {
+    let result = 0;
+    let ind = arr.length;
+    let pow = 0;
+    while (ind--) {
+      result += arr[ind] * (1 << pow);
+      pow++;
+    }
+    return result;
   }
 }

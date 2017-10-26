@@ -4,6 +4,11 @@
     <h4 class="studio-controls__label">
       Mixer
     </h4>
+    <div>
+      <i
+          class="fa fa-cog icon-btn"
+          @click="showAdvancedSettings()"/>
+    </div>
   </div>
   <div class="studio-controls-selector mixer-panel">
     <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="audioSource.name"/>

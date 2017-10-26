@@ -27,7 +27,8 @@ export declare type TObsType =
   'OBS_PROPERTY_SLIDER' |
   'OBS_PROPERTY_FONT' |
   'OBS_PROPERTY_EDITABLE_LIST' |
-  'OBS_PROPERTY_BUTTON';
+  'OBS_PROPERTY_BUTTON' |
+  'OBS_PROPERTY_BITMASK';
 
 /**
  * OBS values that frontend application can change
@@ -41,16 +42,17 @@ export interface IFormInput<TValueType> {
   value: TValueType;
   name: string;
   description: string;
+  showDescription?: boolean;
   enabled?: boolean;
   visible?: boolean;
   masked?: boolean;
   type?: TObsType;
 }
 
-export declare type TFormData = (IFormInput<TObsValue> | IListInputValue)[];
+export declare type TFormData = (IFormInput<TObsValue> | IListInput<TObsValue>)[];
 
-export interface IListInputValue extends IFormInput<string> {
-  options: IListOption<string>[];
+export interface IListInput<TValue> extends IFormInput<TValue> {
+  options: IListOption<TValue>[];
 }
 
 export interface IListOption<TValue> {
@@ -70,6 +72,10 @@ export interface ISliderInputValue extends IFormInput<number> {
 
 export interface ITextInputValue extends IFormInput<string> {
   multiline: boolean;
+}
+
+export interface IBitmaskInput extends IFormInput<number> {
+  size: number;
 }
 
 export interface IFont {
@@ -335,7 +341,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
       const options: IListOption<any>[] = obsProp.details.items.map(option => {
         return { value: option.value, description: option.name };
       });
-      (formItem as IListInputValue).options = options;
+      (formItem as IListInput<TObsValue>).options = options;
     }
 
     if (isNumberProperty(obsProp)) {
@@ -409,6 +415,7 @@ export function setupSourceDefaults(obsSource: obs.ISource) {
   const needUpdate = Object.keys(defaultSettings).length > 0;
   if (needUpdate) obsSource.update(defaultSettings);
 }
+
 
 export abstract class Input<TValueType> extends Vue {
 

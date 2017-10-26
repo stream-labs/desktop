@@ -284,6 +284,45 @@ select {
   height: 36px;
 }
 
+table {
+  tr {
+    td,
+    th {
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+td,
+th {
+  padding-right: 20px;
+
+  .input-container {
+    width: 100%;
+    margin-bottom: 0;
+    display: block;
+  }
+
+  .input-label {
+    display: none;
+  }
+
+  .input-wrapper {
+    width: 100%;
+  }
+}
+
+th {
+  color: @grey;
+  text-transform: uppercase;
+  .semibold;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  padding-bottom: 10px;
+}
+
 // Scrolls
 ::-webkit-scrollbar {
   width: 6px;

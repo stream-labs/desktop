@@ -9,6 +9,11 @@ import Utils from './utils';
 import electron from 'electron';
 import { Inject } from '../util/injector';
 import { InitAfter } from '../util/service-observer';
+import { WindowsService } from './windows';
+import {
+  IBitmaskInput, IFormInput, IListInput, ISliderInputValue, TFormData,
+  TObsValue
+} from '../components/shared/forms/Input';
 
 const { ipcRenderer } = electron;
 
@@ -25,6 +30,10 @@ const VOLMETER_UPDATE_INTERVAL = 100;
 export interface IAudioSource {
   sourceId: string;
   fader: IFader;
+  audioMixers: number;
+  monitoringType: obs.EMonitoringType;
+  forceMono: boolean;
+  syncOffset: number;
 }
 
 
@@ -33,6 +42,8 @@ export interface IAudioSourceApi extends IAudioSource {
   setMul(mul: number): void;
   setMuted(muted: boolean): void;
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
+  getSettingsForm(): TFormData;
+  setSettings(patch: Partial<IAudioSource>): void;
 }
 
 
@@ -63,6 +74,7 @@ interface IAudioSourcesState {
 export interface IAudioServiceApi {
   getDevices(): IAudioDevice[];
   getSource(sourceId: string): IAudioSourceApi;
+  getSourcesForCurrentScene(): IAudioSourceApi[];
 }
 
 
@@ -78,6 +90,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
 
 
   protected init() {
@@ -105,6 +118,20 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   }
 
+
+  static timeSpecToMs(timeSpec: obs.ITimeSpec): number {
+    return timeSpec.sec * 1000 + Math.floor(timeSpec.nsec / 1000);
+  }
+
+
+  static msToTimeSpec(ms: number): obs.ITimeSpec {
+    return {
+      sec: Math.floor(ms / 1000),
+      nsec: Math.floor(ms % 1000 * 1000)
+    };
+  }
+
+
   getSource(sourceId: string): AudioSource {
     return this.state.audioSources[sourceId] ? new AudioSource(sourceId) : void 0;
   }
@@ -125,17 +152,22 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   fetchAudioSource(sourceName: string): IAudioSource {
     const source = this.sourcesService.getSourceByName(sourceName);
+    const obsSource = source.getObsInput();
     const obsFader = this.obsFaders[source.sourceId];
 
     const fader: IFader = {
       db: obsFader.db || 0,
       deflection: obsFader.deflection,
-      mul: obsFader.mul
+      mul: obsFader.mul,
     };
 
     return {
       sourceId: source.sourceId,
-      fader
+      fader,
+      audioMixers: obsSource.audioMixers,
+      monitoringType: obsSource.monitoringType,
+      forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
+      syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset)
     };
   }
 
@@ -166,6 +198,16 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     obsAudioInput.release();
     obsAudioOutput.release();
     return devices;
+  }
+
+  showAdvancedSettings() {
+    this.windowsService.showWindow({
+      componentName: 'AdvancedAudio',
+      size: {
+        width: 1150,
+        height: 600
+      }
+    });
   }
 
 
@@ -206,6 +248,11 @@ export class AudioSource implements IAudioSourceApi {
   sourceId: string;
   fader: IFader;
   muted: boolean;
+  forceMono: boolean;
+  audioMixers: number;
+  monitoringType: obs.EMonitoringType;
+  syncOffset: number;
+
   source: Source;
 
   @Inject()
@@ -221,6 +268,99 @@ export class AudioSource implements IAudioSourceApi {
     this.source = this.sourcesService.getSource(sourceId);
     Utils.applyProxy(this, this.audioSourceState);
     Utils.applyProxy(this, this.source.sourceState);
+  }
+
+  get displayName() {
+    return this.source.displayName;
+  }
+
+  getSettingsForm(): TFormData {
+
+    return [
+      <ISliderInputValue>{
+        name: 'deflection',
+        value: Math.round(this.fader.deflection * 100),
+        description: 'Volume (%)',
+        showDescription: false,
+        visible: true,
+        enabled: true,
+        minVal: 0,
+        maxVal: 100,
+        type: 'OBS_PROPERTY_INT'
+      },
+
+      <IFormInput<boolean>> {
+        value: this.forceMono,
+        name: 'forceMono',
+        description: 'Downmix to Mono',
+        showDescription: false,
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IFormInput<number>> {
+        value: this.syncOffset,
+        name: 'syncOffset',
+        description: 'Sync Offset (ms)',
+        showDescription: false,
+        type: 'OBS_PROPERTY_INT',
+        visible: true,
+        enabled: true,
+      },
+
+      <IListInput<obs.EMonitoringType>> {
+        value: this.monitoringType,
+        name: 'monitoringType',
+        description: 'Audio Monitoring',
+        showDescription: false,
+        type: 'OBS_PROPERTY_LIST',
+        visible: true,
+        enabled: true,
+        options: [
+          { value: obs.EMonitoringType.None, description: 'Monitor Off' },
+          { value: obs.EMonitoringType.MonitoringOnly, description: 'Monitor Only (mute output)' },
+          { value: obs.EMonitoringType.MonitoringAndOutput, description: 'Monitor and Output' }
+        ]
+      },
+
+
+      <IBitmaskInput> {
+        value: this.audioMixers,
+        name: 'audioMixers',
+        description: 'Tracks',
+        showDescription: false,
+        type: 'OBS_PROPERTY_BITMASK',
+        visible: true,
+        enabled: true,
+        size: 6
+      }
+    ];
+  }
+
+
+  setSettings(patch: Partial<IAudioSource>) {
+    const obsInput = this.source.getObsInput();
+
+    Object.keys(patch).forEach(name => {
+      const value = patch[name];
+      if (value === void 0) return;
+
+      if (name === 'deflection') {
+        this.setDeflection(value / 100);
+      } else if (name === 'syncOffset') {
+        this.source.getObsInput().syncOffset = AudioService.msToTimeSpec(value);
+      } else if (name === 'forceMono') {
+        if (this.forceMono !== value) {
+          value ?
+            obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono :
+            obsInput.flags -= obs.ESourceFlags.ForceMono;
+        }
+      } else {
+        obsInput[name] = value;
+      }
+    });
+    this.UPDATE({ sourceId: this.sourceId, ...patch });
   }
 
   setDeflection(deflection: number) {

@@ -1,30 +1,16 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IFormInput, TObsType, TObsValue } from "./Input";
-import NumberInput from './NumberInput.vue';
-import * as comps from './index';
+import { IFormInput, TObsValue } from './Input';
+import { propertyComponentForType } from './Components';
 
-// modules with "export default" lose types when we use re-exports
-const inputComponents = comps as any as { [key: string]: typeof Vue };
 
-@Component({
-  components: inputComponents
-})
+@Component({})
 export default class GenericForm extends Vue {
 
   @Prop()
   value: IFormInput<TObsValue>[];
 
-  propertyComponentForType(type: TObsType): typeof Vue {
-    const componentName = Object.keys(inputComponents).find(name => {
-      const componentObsType = inputComponents[name]['obsType'];
-      return Array.isArray(componentObsType) ?
-        componentObsType.includes(type) :
-        componentObsType === type;
-    });
-    if (!componentName) console.log('Component not found. Type:', type);
-    return inputComponents[componentName];
-  }
+  propertyComponentForType = propertyComponentForType;
 
   onInputHandler(value: IFormInput<TObsValue>, index: number) {
     const newValue = [].concat(this.value);
