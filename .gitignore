@@ -1,0 +1,13 @@
+.DS_Store
+.idea
+node_modules/
+build/
+npm-debug.log
+lib/
+rtmp-services/
+text-freetype2/
+data/
+dist/
+bundles/
+node-obs/
+node-boost/

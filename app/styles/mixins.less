@@ -1,0 +1,73 @@
+/* Positioning */
+.absolute (@top: auto, @right: auto, @bottom: auto, @left: auto) {
+  display: block;
+  position: absolute;
+  top: @top;
+  right: @right;
+  bottom: @bottom;
+  left: @left;
+}
+
+/* Aspect ratio for responsive height/width */
+.aspect-ratio(@width, @height) {
+  position: relative;
+  &:before {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: (@height / @width) * 100%;
+  }
+  > .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    span:before{
+      content:"@{width}";
+    }
+    
+    span:after{
+      content:"@{height}";
+    }
+  }
+}
+
+/* Box shadows */
+.shadow {
+  box-shadow: 0 6px 20px rgba(0,0,0,.2);
+}
+
+/* Border radius */
+.radius {
+  border-radius: 3px;
+}
+
+/* Borders */
+.border {
+  border: 1px solid @day-border;
+}
+
+/* Typography */
+.normal {
+  font-weight: 400;
+}
+.semibold {
+  font-weight: 500;
+}
+.bold {
+  font-weight: 700;
+}
+
+/* Paddings */
+.no-padding-left {
+  padding-left: 0;
+}
+.no-padding-right {
+  padding-right: 0;
+}
+
+/* Transitiions */
+.transition {
+  transition: all 275ms;
+}

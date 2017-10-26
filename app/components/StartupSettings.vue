@@ -1,0 +1,137 @@
+<template>
+<div>
+  <div class="section" v-if="enabled">
+    <bool-input
+      :value="obsMode"
+      @input="val => saveSetting(val, 'obsMode')"/>
+    <list-input
+      :value="profile"
+      @input="val => saveSetting(val, 'profile')"/>
+    <list-input
+      :value="sceneCollection"
+      @input="val => saveSetting(val, 'sceneCollection')"/>
+    <p>
+      These settings will take effect when the application is relaunched.
+    </p>
+    <button class="button button--action" @click="restartApp">
+      Relaunch Now
+    </button>
+  </div>
+  <div class="section" v-if="enabled">
+    <p>
+      If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.  The application can not be running when you delete your cache directory.
+    </p>
+    <button class="button button--action" @click="showCacheDir">
+      Show Cache Directory
+    </button>
+  </div>
+</div>
+</template>
+
+<script>
+// This component is temporary and will be removed before release
+
+import { BoolInput, ListInput } from './shared/forms';
+import Obs from '../api/Obs';
+
+const { remote, ipcRenderer } = window.require('electron');
+const path = window.require('path');
+const fs = window.require('fs');
+
+export default {
+
+  components: {
+    BoolInput,
+    ListInput
+  },
+
+  data() {
+    const obsInstalled = Obs.isObsInstalled();
+
+    if (obsInstalled) {
+      const profileOptions = Obs.getObsProfiles().map(profile => {
+        return {
+          value: profile,
+          description: profile
+        };
+      });
+
+      const sceneCollectionOptions = Obs.getObsSceneCollections().map(coll => {
+        return {
+          value: coll,
+          description: coll
+        };
+      });
+
+      this.settingsPath = path.join(remote.app.getPath('userData'), 'startup.json');
+
+      let settings;
+
+      if (fs.existsSync(this.settingsPath)) {
+        settings = this.loadSettings();
+
+        // Support legacy file format:
+        settings.obsMode = !!settings.obsMode;
+      } else {
+        // Ensure we have default settings
+        settings = {
+          obsMode: false,
+          profile: profileOptions[0].value,
+          sceneCollection: sceneCollectionOptions[0].value
+        };
+
+        fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
+      }
+
+      return {
+        enabled: true,
+
+        obsMode: {
+          description: 'Load configuration from OBS',
+          value: settings.obsMode,
+          enabled: true
+        },
+
+        profile: {
+          options: profileOptions,
+          description: 'OBS Profile',
+          value: settings.profile
+        },
+
+        sceneCollection: {
+          options: sceneCollectionOptions,
+          description: 'OBS Scene Collection',
+          value: settings.sceneCollection
+        }
+      };
+    }
+
+    return {
+      enabled: false
+    };
+  },
+
+  methods: {
+    loadSettings() {
+      return JSON.parse(fs.readFileSync(this.settingsPath));
+    },
+
+    saveSetting(val, attr) {
+      const settings = this.loadSettings();
+      settings[attr] = val.value;
+      fs.writeFileSync(this.settingsPath, JSON.stringify(settings));
+      this[attr].currentValue = val.currentValue;
+    },
+
+    restartApp() {
+      ipcRenderer.send('restartApp');
+    },
+
+    showCacheDir() {
+      remote.shell.showItemInFolder(remote.app.getPath('userData'));
+    }
+  }
+
+};
+
+</script>

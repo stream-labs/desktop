@@ -1,0 +1,3 @@
+[submodule "node-libuiohook"]
+	path = node-libuiohook
+	url = git@github.com:twitchalerts/node-libuiohook.git
