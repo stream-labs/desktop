@@ -25,7 +25,8 @@ export type TSourceFilterType =
   'async_delay_filter' |
   'noise_suppress_filter' |
   'noise_gate_filter' |
-  'compressor_filter';
+  'compressor_filter' |
+  'vst_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -67,7 +68,8 @@ export class SourceFiltersService extends Service {
       { description: 'Video Delay (Async)', value: 'async_delay_filter' },
       { description: 'Noise Suppression', value: 'noise_suppress_filter' },
       { description: 'Noise Gate', value: 'noise_gate_filter' },
-      { description: 'Compressor', value: 'compressor_filter' }
+      { description: 'Compressor', value: 'compressor_filter' },
+      { description: 'VST 2.x Plugin', value: 'vst_filter' }
     ];
   }
 
