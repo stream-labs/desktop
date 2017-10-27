@@ -5,8 +5,8 @@ environment:
 
 install:
   - git submodule update --init --recursive
-  - git clone https://github.com/stream-labs/node-obs-prebuild.git node-obs
   - yarn install
+  - yarn install-node-obs
   - yarn ci:compile
 
 test_script:
