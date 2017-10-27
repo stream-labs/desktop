@@ -2,7 +2,7 @@
  * This script downloads and exctracts the specified release of node-obs
  */
 
-const NODE_OBS_VERSION = '0.1.22';
+const NODE_OBS_VERSION = '0.1.23';
 
 const https = require('https');
 const fs = require('fs');
