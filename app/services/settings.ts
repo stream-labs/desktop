@@ -127,7 +127,6 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
       'DelaySec',
       'DelayEnable',
       'MaxRetries',
-      'MonitoringDeviceName',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
       'ProcessPriority',
