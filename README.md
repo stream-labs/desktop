@@ -140,9 +140,10 @@ This is a checklist to run through every time you deploy.
 
 - [ ] Merge `staging` into `master` - DO NOT "Squash & Merge", just do a regular merge
 - [ ] Check out `master`
-- [ ] Download the latest signed build of `node-obs` from Github
-- [ ] Copy `node-obs` into the root of `slobs-client`
-- [ ] Install OBS plugins `yarn install-plugins`
+- [ ] If submodules are out of date `git submodule update --init --recursive`
+- [ ] Remove node modules `rm -rf node_modules`
+- [ ] Install fresh packages `yarn install`
+- [ ] Install node-obs with latest plugins `yarn install-node-obs`
 - [ ] Compile assets `yarn compile`
 - [ ] Run the test suite `yarn test`
 - [ ] Change the version in `package.json`
