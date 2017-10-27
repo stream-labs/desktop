@@ -321,13 +321,16 @@ ipcMain.on('vuex-register', event => {
 
 // Proxy vuex-mutation events to all other subscribed windows
 ipcMain.on('vuex-mutation', (event, mutation) => {
-  let windowId = BrowserWindow.fromWebContents(event.sender).id;
+  const senderWindow = BrowserWindow.fromWebContents(event.sender);
 
-  _.each(_.omit(registeredStores, [windowId]), win => {
-    win.webContents.send('vuex-mutation', mutation);
-  });
+  if (senderWindow && !senderWindow.isDestroyed()) {
+    const windowId = senderWindow.id;
+
+    _.each(_.omit(registeredStores, [windowId]), win => {
+      if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
+    });
+  }
 });
-
 
 
 // Handle service initialization
