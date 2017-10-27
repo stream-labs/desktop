@@ -11,9 +11,14 @@ Node OBS is our (deprecated) C++ Node module that provides a javascript
 interface to OBS.  For SLOBS to start properly, it needs to
 find a built version of node OBS at `./node-obs`.
 
-You will have to clone and do the compilation yourself.
-Instructions can be found here:
+The easiest way to get this is to simply run the command:
+```
+yarn install-node-obs
+```
 
+This will download the current release and extract it.
+
+If you wish to compile it yourself, instructions can be found here:
 https://github.com/stream-labs/node-obs
 
 ### Yarn
