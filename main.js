@@ -327,7 +327,7 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
     const windowId = senderWindow.id;
 
     _.each(_.omit(registeredStores, [windowId]), win => {
-      win.webContents.send('vuex-mutation', mutation);
+      if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
   }
 });
