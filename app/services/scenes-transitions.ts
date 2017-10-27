@@ -21,7 +21,8 @@ const TRANSITION_TYPES: IListOption<string>[] = [
   { description: 'Swipe', value: 'swipe_transition' },
   { description: 'Slide', value: 'slide_transition' },
   { description: 'Fade to Color', value: 'fade_to_color_transition' },
-  { description: 'Luma Wipe', value: 'wipe_transition' }
+  { description: 'Luma Wipe', value: 'wipe_transition' },
+  { description: 'Stinger', value: 'obs_stinger_transition' }
 ];
 
 export class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
