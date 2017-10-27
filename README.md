@@ -1,4 +1,4 @@
-# streamlabs-obs
+# streamlabs-obs ![build-status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)
 Electron client for the Streamlabs OBS streaming software.
 
 This application currently only supports 64-bit Windows.
