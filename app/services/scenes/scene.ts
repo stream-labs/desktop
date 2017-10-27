@@ -188,11 +188,11 @@ export class Scene implements ISceneApi {
           id: item.id,
           sourceId: source.sourceId,
           crop: item.crop,
-          scaleX: item.scaleX,
-          scaleY: item.scaleY,
+          scaleX: item.scaleX == null ? 1 : item.scaleX,
+          scaleY: item.scaleY == null ? 1 : item.scaleY,
           visible: item.visible,
-          x: item.x,
-          y: item.y,
+          x: item.x == null ? 0 : item.x,
+          y: item.y == null ? 0 : item.y,
           locked: item.locked,
           rotation: item.rotation || 0
         });
