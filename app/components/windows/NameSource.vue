@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  :title="options.rename ? 'Reame Source' : 'NameSource'"
+  :title="options.rename ? 'Rename Source' : 'Name Source'"
   :done-handler="submit">
   <form
     slot="content"
