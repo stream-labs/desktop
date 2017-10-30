@@ -1,4 +1,5 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const path = require('path');
 
 const plugins = [];
 
@@ -28,7 +29,8 @@ module.exports = {
   target: 'electron-renderer',
 
   resolve: {
-    extensions: ['.js', '.ts']
+    extensions: ['.js', '.ts'],
+    modules: [path.resolve(__dirname, 'app'), 'node_modules']
   },
 
   // We want to dynamically require native addons

@@ -5,7 +5,7 @@
     "lib": [
       "dom",
       "es7",
-      "ES2017"
+      "es2017"
     ],
     "module": "es2015",
     "moduleResolution": "node",
@@ -21,7 +21,8 @@
     "sourceMap": true,
     "allowJs": false,
     "strictNullChecks": false,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./app"
   },
   "exclude": [
     "node_modules"

@@ -26,7 +26,13 @@ export default class NameSource extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  name = '';
+  options: {
+    sourceType?: TSourceType,
+    widgetType?: string,
+    rename?: string
+  }  = this.windowsService.getChildWindowQueryParams();
+
+  name = this.options.rename || '';
   error = '';
 
   mounted() {
@@ -43,6 +49,9 @@ export default class NameSource extends Vue {
   submit() {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
+    } else if (this.options.rename) {
+      this.sourcesService.getSourceByName(this.options.rename).setName(this.name);
+      this.windowsService.closeChildWindow();
     } else {
       let sourceId: string;
 
@@ -67,11 +76,11 @@ export default class NameSource extends Vue {
   }
 
   get sourceType(): TSourceType {
-    return this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+    return this.options.sourceType;
   }
 
   get widgetType(): WidgetType {
-    return parseInt(this.windowsService.getChildWindowQueryParams().widgetType) as WidgetType;
+    return parseInt(this.options.widgetType) as WidgetType;
   }
 
 }

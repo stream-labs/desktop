@@ -89,16 +89,22 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
 
   setType(type: string) {
     const oldTransition = this.getCurrentTransition() as obs.ITransition;
-    const newTransition = obs.TransitionFactory.create(type, 'Global Transition');
 
-    obs.Global.setOutputSource(0, newTransition);
+    const transition = TRANSITION_TYPES.find(transition => {
+      return transition.value === type;
+    });
 
-    if (oldTransition && oldTransition.getActiveSource) {
-      newTransition.set(oldTransition.getActiveSource());
-      oldTransition.release();
+    if (transition) {
+      const newTransition = obs.TransitionFactory.create(type, 'Global Transition');
+      obs.Global.setOutputSource(0, newTransition);
+
+      if (oldTransition && oldTransition.getActiveSource) {
+        newTransition.set(oldTransition.getActiveSource());
+        oldTransition.release();
+      }
+
+      this.SET_TYPE(type);
     }
-
-    this.SET_TYPE(type);
   }
 
 
