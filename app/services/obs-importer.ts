@@ -233,7 +233,6 @@ export class ObsImporterService extends Service {
         const appData = electron.remote.app.getPath('userData');
         const currentFilePath = path.join(appData, file);
 
-        fs.createReadStream(obsFilePath).pipe(fs.createWriteStream(currentFilePath));
         const readData = fs.readFileSync(obsFilePath);
         fs.writeFileSync(currentFilePath, readData);
       }
