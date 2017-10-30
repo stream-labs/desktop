@@ -6,16 +6,16 @@ import {
   getPropertiesFormData,
   setPropertiesFormData,
   setupSourceDefaults
-} from '../components/shared/forms/Input';
-import { StatefulService, mutation, ServiceHelper } from './stateful-service';
-import * as obs from '../../obs-api';
+} from 'components/shared/forms/Input';
+import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
+import * as obs from '../../../obs-api';
 import electron from 'electron';
-import Utils from './utils';
-import { ScenesService, ISceneItem } from './scenes';
-import { Inject } from '../util/injector';
-import namingHelpers from '../util/NamingHelpers';
-import { WindowsService } from './windows';
-import { WidgetType } from './widgets';
+import Utils from 'services/utils';
+import { ScenesService, ISceneItem } from 'services/scenes';
+import { Inject } from 'util/injector';
+import namingHelpers from 'util/NamingHelpers';
+import { WindowsService } from 'services/windows';
+import { WidgetType } from 'services/widgets';
 
 const { ipcRenderer } = electron;
 
