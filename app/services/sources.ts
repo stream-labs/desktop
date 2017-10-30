@@ -46,6 +46,7 @@ export interface ISourceApi extends ISource {
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
   hasProps(): boolean;
+  setName(newName: string): void;
 }
 
 
@@ -384,6 +385,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.windowsService.showWindow({
       componentName: 'NameSource',
       queryParams: { sourceType },
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showRenameSource(sourceName: string) {
+    this.windowsService.showWindow({
+      componentName: 'NameSource',
+      queryParams: { rename: sourceName },
       size: {
         width: 400,
         height: 250
