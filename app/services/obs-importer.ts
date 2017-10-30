@@ -54,8 +54,7 @@ export class ObsImporterService extends Service {
 
     // Profile
     this.importProfile(selectedprofile);
-    
-    debugger;
+
     nodeObs.OBS_service_resetVideoContext();
     nodeObs.OBS_service_resetAudioContext();
   }
