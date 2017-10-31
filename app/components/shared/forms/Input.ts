@@ -8,6 +8,7 @@ import {
   isNumberProperty,
   isTextProperty
 } from '../../../util/properties-type-guards';
+import { ipcRenderer } from 'electron';
 
 /**
  * all possible OBS properties types
@@ -290,13 +291,14 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
   setupSourceDefaults(obsSource);
 
   const formData: TFormData = [];
-  const obsProps = obsSource.properties;
-  const obsSettings = obsSource.settings;
+  const propData = ipcRenderer.sendSync('fetchSourceProperties', obsSource.name);
+
+  const obsProps = propData.properties as obs.IProperty[];
+  const obsSettings = propData.settings;
 
   if (!obsProps) return null;
 
-  let obsProp = obsProps.first();
-  do {
+  obsProps.forEach(obsProp => {
     let obsType: TObsType;
 
     switch (obsProp.type) {
@@ -369,7 +371,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     }
 
     formData.push(formItem);
-  } while (obsProp = obsProp.next());
+  });
 
   return formData;
 }
@@ -400,18 +402,23 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
 
 
 export function setupSourceDefaults(obsSource: obs.ISource) {
-  const propSettings = obsSource.settings;
+  const propData = ipcRenderer.sendSync('fetchSourceProperties', obsSource.name);
+  const propSettings = propData.settings;
+
   const defaultSettings = {};
-  if (!obsSource.properties) return;
-  let obsProp = obsSource.properties.first();
-  do {
+
+  if (!propData.properties) return;
+
+  (propData.properties as obs.IProperty[]).forEach(prop => {
     if (
-      propSettings[obsProp.name] !== void 0 ||
-      !isListProperty(obsProp) ||
-      obsProp.details.items.length === 0
-    ) continue;
-    defaultSettings[obsProp.name] = obsProp.details.items[0].value;
-  } while (obsProp = obsProp.next());
+      propSettings[prop.name] === void 0 &&
+      isListProperty(prop) &&
+      prop.details.items.length > 0
+    ) {
+      defaultSettings[prop.name] = prop.details.items[0].value;
+    }
+  });
+
   const needUpdate = Object.keys(defaultSettings).length > 0;
   if (needUpdate) obsSource.update(defaultSettings);
 }
