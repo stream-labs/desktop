@@ -17,6 +17,10 @@ import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { WidgetType } from 'services/widgets';
 
+import { IPropertyManager } from './properties-managers/properties-manager';
+import { DefaultManager } from './properties-managers/default-manager';
+import { WidgetManager } from './properties-managers/widget-manager';
+
 const { ipcRenderer } = electron;
 
 const AudioFlag = obs.EOutputFlags.Audio;
@@ -24,6 +28,15 @@ const VideoFlag = obs.EOutputFlags.Video;
 const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
 
 const SOURCES_UPDATE_INTERVAL = 1000;
+
+
+// Register new properties manager here
+export type TPropertiesManager = 'default' | 'widget';
+const PROPERTIES_MANAGER_TYPES = {
+  default: DefaultManager,
+  widget: WidgetManager
+};
+
 
 export interface ISource {
   sourceId: string;
@@ -43,6 +56,8 @@ export interface ISourceApi extends ISource {
   displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
+  getPropertiesManagerType(): TPropertiesManager;
+  getPropertiesManagerSettings(): Dictionary<any>;
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
   hasProps(): boolean;
@@ -69,6 +84,8 @@ export interface ISourcesServiceApi {
 export interface ISourceCreateOptions {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
+  propertiesManager?: TPropertiesManager;
+  propertiesManagerSettings?: any;
 }
 
 export type TSourceType =
@@ -92,6 +109,11 @@ interface ISourcesState {
   sources: Dictionary<ISource>;
 }
 
+interface IActivePropertyManager {
+  manager: IPropertyManager;
+  type: TPropertiesManager;
+}
+
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
 
@@ -108,6 +130,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   @Inject()
   private windowsService: WindowsService;
+
+  /**
+   * Maps a source id to a property manager
+   */
+  propertiesManagers: Dictionary<IActivePropertyManager> = {};
 
 
   protected init() {
@@ -207,6 +234,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
     this.updateSourceFlags(source.sourceState, obsInput.outputFlags);
+
+    const managerType = options.propertiesManager || 'default';
+    const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
+    this.propertiesManagers[id] = {
+      manager: new managerKlass(obsInput, options.propertiesManagerSettings),
+      type: managerType
+    };
+
     if (source.hasProps()) setupSourceDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
   }
@@ -215,6 +250,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     source.getObsInput().release();
     this.REMOVE_SOURCE(id);
+    delete this.propertiesManagers[id];
     this.sourceRemoved.next(source.sourceState);
   }
 
@@ -474,13 +510,27 @@ export class Source implements ISourceApi {
   }
 
 
+  getPropertiesManagerType(): TPropertiesManager {
+    return this.sourcesService.propertiesManagers[this.sourceId].type;
+  }
+
+
+  getPropertiesManagerSettings(): Dictionary<any> {
+    return this.sourcesService.propertiesManagers[this.sourceId].manager.settings;
+  }
+
+
   getPropertiesFormData(): TFormData {
-    return getPropertiesFormData(this.getObsInput());
+    const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
+    return manager.getPropertiesFormData();
   }
 
 
   setPropertiesFormData(properties: TFormData) {
-    setPropertiesFormData(this.getObsInput(), properties);
+    const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
+    properties.forEach(prop => {
+      manager.setPropertyFormData(prop);
+    });
   }
 
 
