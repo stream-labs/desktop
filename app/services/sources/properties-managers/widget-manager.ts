@@ -9,8 +9,10 @@ export interface IWidgetManagerSettings {
 
 
 /**
- * This properties manager simply exposes all properties
- * and does not modify them.
+ * This properties manager is designed to wrap a browser
+ * source and allows switching the widget type.  In the
+ * future, this will be responsible for changing the URL
+ * when the user logs into another account.
  */
 export class WidgetManager extends PropertiesManager {
 
