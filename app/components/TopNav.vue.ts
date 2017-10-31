@@ -47,7 +47,7 @@ export default class TopNav extends Vue {
   }
 
   bugReport() {
-    electron.remote.shell.openExternal('https://docs.google.com/forms/d/e/1FAIpQLSf_UvkZU2vuIsNI4WKM_s2-_eRuDbFeLByr5zsY6YDQphMOZg/viewform?usp=sf_link')
+    electron.remote.shell.openExternal('https://tracker.streamlabs.com');
   }
 
   get isDevMode() {
