@@ -119,8 +119,6 @@ export abstract class PropertiesManager implements IPropertyManager {
     propsArray = propsArray.concat(customProperties).concat(obsProperties);
     propsArray = propsArray.filter(prop => !this.blacklist.includes(prop.name));
 
-    console.log(propsArray);
-
     return propsArray;
   }
 
