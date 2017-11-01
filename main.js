@@ -425,36 +425,3 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
 
   e.sender.send('notifySourceAttributes', sizes);
 });
-
-
-/**
- * Temporary IPC optimization that prevents enumerating all
- * input properties with lots of IPC calls.
- */
-ipcMain.on('fetchSourceProperties', (e, name) => {
-  const input = require('obs-studio-node').InputFactory.fromName(name);
-  const props = input.properties;
-  const settings = input.settings;
-  const propsArray = [];
-
-  let currentProp = props.first();
-
-  do {
-    propsArray.push(_.pick(currentProp, [
-      'status',
-      'name',
-      'description',
-      'longDescription',
-      'enabled',
-      'visible',
-      'type',
-      'details'
-    ]));
-  } while (currentProp = currentProp.next());
-
-  e.returnValue = {
-    properties: propsArray,
-    settings
-  };
-});
-
