@@ -21,7 +21,7 @@ export interface ICustomProperty<TValue> extends input.IFormInput<TValue> {
 }
 
 
-export interface ICustomListProperty<TValue> extends ICustomProperty<TValue> {
+export interface ICustomListProperty<TValue extends input.TObsValue> extends ICustomProperty<TValue> {
   options: input.IListOption<TValue>[];
 }
 
