@@ -85,7 +85,7 @@ export interface ISourceCreateOptions {
   channel?: number;
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
-  propertiesManagerSettings?: any;
+  propertiesManagerSettings?: Dictionary<any>;
 }
 
 export type TSourceType =
