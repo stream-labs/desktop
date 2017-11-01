@@ -120,14 +120,14 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
 
   static timeSpecToMs(timeSpec: obs.ITimeSpec): number {
-    return timeSpec.sec * 1000 + Math.floor(timeSpec.nsec / 1000);
+    return timeSpec.sec * 1000 + Math.floor(timeSpec.nsec / 1000000);
   }
 
 
   static msToTimeSpec(ms: number): obs.ITimeSpec {
     return {
       sec: Math.floor(ms / 1000),
-      nsec: Math.floor(ms % 1000 * 1000)
+      nsec: Math.floor(ms % 1000) * 1000000
     };
   }
 
