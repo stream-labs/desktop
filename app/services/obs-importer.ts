@@ -10,6 +10,7 @@ import { ScenesTransitionsService } from './scenes-transitions';
 import { Inject } from '../util/injector';
 import { ConfigPersistenceService } from './config-persistence/config';
 import { AppService } from './app';
+import { nodeObs } from './obs-api';
 
 interface Source {
   name?: string;
@@ -53,6 +54,9 @@ export class ObsImporterService extends Service {
 
     // Profile
     this.importProfile(selectedprofile);
+
+    nodeObs.OBS_service_resetVideoContext();
+    nodeObs.OBS_service_resetAudioContext();
   }
 
   private importCollection(collection: ISceneCollection): Promise<void> {
@@ -73,7 +77,7 @@ export class ObsImporterService extends Service {
   importFilters(filtersJSON :any, source :Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
-        
+
         const isFilterAvailable = this.filtersService.getTypes().find((availableFilter) => {
           return availableFilter.type === filterJSON.id;
         });
@@ -229,7 +233,8 @@ export class ObsImporterService extends Service {
         const appData = electron.remote.app.getPath('userData');
         const currentFilePath = path.join(appData, file);
 
-        fs.createReadStream(obsFilePath).pipe(fs.createWriteStream(currentFilePath));
+        const readData = fs.readFileSync(obsFilePath);
+        fs.writeFileSync(currentFilePath, readData);
       }
     });
   }
