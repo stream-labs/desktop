@@ -9,8 +9,12 @@ class BoolInput extends Input<IFormInput<boolean>> {
   @Prop()
   value: IFormInput<boolean>;
 
-  onChangeHandler(event: Event) {
-    this.emitInput({ ...this.value, value: !!event.target['checked'] });
+
+
+  handleClick() {
+    console.log("WTF");
+    console.log(this.value);
+    this.emitInput({ ...this.value, value: !this.value.value });
   }
 
 }
