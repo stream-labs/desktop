@@ -9,8 +9,6 @@ class BoolInput extends Input<IFormInput<boolean>> {
   @Prop()
   value: IFormInput<boolean>;
 
-
-
   handleClick() {
     this.emitInput({ ...this.value, value: !this.value.value });
   }
