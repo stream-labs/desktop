@@ -33,7 +33,7 @@ export default class ExtraSettings extends Vue {
 
   leftDockModel: IFormInput<boolean> = {
     name: 'left_dock',
-    description: 'Show live dock with chat on the left side',
+    description: 'Show the live dock (chat) on the left side',
     value: this.customizationService.state.leftDock
   };
 
