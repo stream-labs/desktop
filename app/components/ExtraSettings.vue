@@ -19,6 +19,7 @@
   </div>
   <div class="section">
     <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
+    <BoolInput :value="leftDockModel" @input="setLeftDock" />
   </div>
   <!-- TODO: Uncomment when we want to expose this feature -->
   <!-- <div class="section">
