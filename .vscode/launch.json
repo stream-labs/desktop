@@ -11,7 +11,8 @@
             ],
             "cwd": "${workspaceRoot}",
             "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-            "envFile": "${workspaceRoot}/.env"
+            "envFile": "${workspaceRoot}/.env",
+            "outputCapture": "std"
         }
     ]
 }
