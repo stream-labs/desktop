@@ -31,8 +31,18 @@ export default class ExtraSettings extends Vue {
     value: this.customizationService.state.updateStreamInfoOnLive
   };
 
+  leftDockModel: IFormInput<boolean> = {
+    name: 'left_dock',
+    description: 'Show the live dock (chat) on the left side',
+    value: this.customizationService.state.leftDock
+  };
+
   setStreamInfoUpdate(model: IFormInput<boolean>) {
     this.customizationService.setUpdateStreamInfoOnLive(model.value);
+  }
+
+  setLeftDock(model: IFormInput<boolean>) {
+    this.customizationService.setLeftDock(model.value);
   }
 
   showCacheDir() {

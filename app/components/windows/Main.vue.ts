@@ -73,4 +73,8 @@ export default class Main extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  get leftDock() {
+    return this.customizationService.state.leftDock;
+  }
+
 }

@@ -5,6 +5,7 @@ interface ICustomizationServiceState {
   nightMode: boolean;
   updateStreamInfoOnLive: boolean;
   livePreviewEnabled: boolean;
+  leftDock: boolean;
 }
 
 /**
@@ -16,7 +17,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   static defaultState: ICustomizationServiceState = {
     nightMode: true,
     updateStreamInfoOnLive: true,
-    livePreviewEnabled: true
+    livePreviewEnabled: true,
+    leftDock: false
   };
 
   @mutation()
@@ -34,6 +36,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.state.livePreviewEnabled = enabled;
   }
 
+  @mutation()
+  SET_LEFT_DOCK(enabled: boolean) {
+    this.state.leftDock = enabled;
+  }
+
   set nightMode(val: boolean) {
     this.SET_NIGHT_MODE(val);
   }
@@ -48,6 +55,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setLivePreviewEnabled(enabled: boolean) {
     this.SET_LIVE_PREVIEW_ENABLED(enabled);
+  }
+
+  setLeftDock(enabled: boolean) {
+    this.SET_LEFT_DOCK(enabled);
   }
 
 }
