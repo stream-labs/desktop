@@ -83,6 +83,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.26.1",
+    "devtron": "^1.4.0",
     "electron": "1.7.7",
     "electron-builder": "^19.22.1",
     "electron-devtools-installer": "^2.1.0",

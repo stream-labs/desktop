@@ -6,6 +6,7 @@ import { HotkeysService } from '../../hotkeys';
 import { Inject } from '../../../util/injector';
 import { HotkeysNode } from './hotkeys';
 import * as obs from '../../../../obs-api';
+import { TPropertiesManager } from 'services/sources';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -35,6 +36,9 @@ interface ISourceInfo {
   hotkeys?: HotkeysNode;
   channel?: number;
   muted?: boolean;
+
+  propertiesManager?: TPropertiesManager;
+  propertiesManagerSettings?: Dictionary<any>;
 }
 
 export class SourcesNode extends Node<ISchema, {}> {
@@ -76,7 +80,9 @@ export class SourcesNode extends Node<ISchema, {}> {
                   enabled: filter.enabled
                 };
               })
-            }
+            },
+            propertiesManager: source.getPropertiesManagerType(),
+            propertiesManagerSettings: source.getPropertiesManagerSettings()
           };
 
           if (audioSource) data = {
@@ -129,7 +135,11 @@ export class SourcesNode extends Node<ISchema, {}> {
       this.sourcesService.addSource(
         source,
         this.data.items[index].id,
-        { channel: sourceInfo.channel }
+        {
+          channel: sourceInfo.channel,
+          propertiesManager: sourceInfo.propertiesManager,
+          propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
+        }
       );
       if (source.audioMixers) {
         this.audioService.getSource(sourceInfo.id).setMul(sourceInfo.volume);

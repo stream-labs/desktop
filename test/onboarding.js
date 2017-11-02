@@ -54,6 +54,5 @@ test('Adding some starter widgets', async t => {
   await clickSourceProperties(t);
   await focusChild(t);
 
-  const url = await app.client.$('label=URL').$('../..').getValue('input');
-  t.regex(url, /SomeWidgetToken/);
+  t.true(await app.client.isExisting('label=Widget'));
 });

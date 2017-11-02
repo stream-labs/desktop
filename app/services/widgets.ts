@@ -110,8 +110,7 @@ export class WidgetTester {
 }
 
 
-// TODO: Default width, height, and position
-interface IWidget {
+export interface IWidget {
   name: string;
   url: TUrlGenerator;
 
@@ -338,29 +337,21 @@ export class WidgetsService extends Service {
       return this.sourcesService.getSourceByName(name);
     });
 
-    const sceneItem = scene.createAndAddSource(suggestedName, 'browser_source');
-    const properties = sceneItem.source.getPropertiesFormData();
-
-    // Find the URL property and set it
-    properties.forEach(prop => {
-      if (prop.name === 'url') {
-        prop.value = widget.url(
-          this.hostsService.streamlabs,
-          this.userService.widgetToken,
-          this.userService.platform.type
-        );
-      }
-
-      if (prop.name === 'width') {
-        prop.value = widget.width;
-      }
-
-      if (prop.name === 'height') {
-        prop.value = widget.height;
+    const source = this.sourcesService.createSource(suggestedName, 'browser_source', {
+      url: widget.url(
+        this.hostsService.streamlabs,
+        this.userService.widgetToken,
+        this.userService.platform.type
+      ),
+      width: widget.width,
+      height: widget.height
+    }, {
+      propertiesManager: 'widget',
+      propertiesManagerSettings: {
+        widgetType: type
       }
     });
-
-    sceneItem.source.setPropertiesFormData(properties);
+    const sceneItem = scene.addSource(source.sourceId);
 
     // Give a couple seconds for the resize to propagate
     setTimeout(() => {
@@ -381,6 +372,15 @@ export class WidgetsService extends Service {
     }, 1500);
 
     return sceneItem;
+  }
+
+  @requiresLogin()
+  getWidgetUrl(type: WidgetType) {
+    return WidgetDefinitions[type].url(
+      this.hostsService.streamlabs,
+      this.userService.widgetToken,
+      this.userService.platform.type
+    );
   }
 
   @requiresLogin()
