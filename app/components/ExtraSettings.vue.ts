@@ -25,17 +25,21 @@ export default class ExtraSettings extends Vue {
 
   cacheUploading = false;
 
-  streamInfoUpdateModel: IFormInput<boolean> = {
-    name: 'stream_info_udpate',
-    description: 'Confirm stream title and game before going live',
-    value: this.customizationService.state.updateStreamInfoOnLive
-  };
+  get streamInfoUpdateModel(): IFormInput<boolean> {
+    return {
+      name: 'stream_info_udpate',
+      description: 'Confirm stream title and game before going live',
+      value: this.customizationService.state.updateStreamInfoOnLive
+    };
+  }
 
-  leftDockModel: IFormInput<boolean> = {
-    name: 'left_dock',
-    description: 'Show the live dock (chat) on the left side',
-    value: this.customizationService.state.leftDock
-  };
+  get leftDockModel(): IFormInput<boolean> {
+    return {
+      name: 'left_dock',
+      description: 'Show the live dock (chat) on the left side',
+      value: this.customizationService.state.leftDock
+    };
+  }
 
   setStreamInfoUpdate(model: IFormInput<boolean>) {
     this.customizationService.setUpdateStreamInfoOnLive(model.value);
