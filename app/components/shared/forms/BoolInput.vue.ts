@@ -12,8 +12,6 @@ class BoolInput extends Input<IFormInput<boolean>> {
 
 
   handleClick() {
-    console.log("WTF");
-    console.log(this.value);
     this.emitInput({ ...this.value, value: !this.value.value });
   }
 
