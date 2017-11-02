@@ -37,7 +37,7 @@ const channelFileName = `${channel}.yml`;
 const channelFilePath = path.join(distDir, channelFileName);
 
 if (!fs.existsSync(channelFilePath)) {
-  err(`Could not find ${path.resolve(chanelFilePath)}`);
+  err(`Could not find ${path.resolve(channelFilePath)}`);
   exitErr();
 }
 
