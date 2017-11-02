@@ -3,12 +3,11 @@
   <div class="input-label">
   </div>
   <div class="input-wrapper">
-    <div class="checkbox">
+    <div class="checkbox" @click="handleClick">
       <input
         type="checkbox"
         :checked="value.value"
         :disabled="value.enabled == false"
-        @change="onChangeHandler"
       />
       <label><span v-if="value.showDescription !== false">{{ value.description }}</span></label>
     </div>
