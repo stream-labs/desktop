@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import StreamingService from '../services/streaming';
 import { Inject } from '../util/injector';
@@ -19,6 +19,8 @@ export default class LiveDock extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() userService: UserService;
+
+  @Prop({ default: false }) onLeft: boolean;
 
   elapsedStreamTime = '';
   elapsedInterval: number;
