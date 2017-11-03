@@ -32,7 +32,7 @@ export default class AddSource extends Vue {
   });
 
   existingSources = this.sources.map(source => {
-    return { name: source.displayName, value: source.sourceId }
+    return { name: source.displayName, value: source.sourceId };
   });
 
   selectedSourceId = this.sources[0].sourceId;

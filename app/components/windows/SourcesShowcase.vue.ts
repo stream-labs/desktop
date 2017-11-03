@@ -40,7 +40,9 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType) {
     const sameTypeCount = this.sourcesService.getSources()
-      .filter(source => source.type === sourceType)
+      .filter((source) => {
+        return (source.type === sourceType) && !source.channel;
+      })
       .length;
 
     if (sameTypeCount > 0) {

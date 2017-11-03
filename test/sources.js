@@ -4,20 +4,39 @@ import { addSource, clickRemoveSource, clickSourceProperties, selectSource } fro
 
 useSpectron();
 
-test('Adding and removing a source', async t => {
+const sourceTypes = [
+  'Video Capture Device',
+  'Audio Output Capture',
+  'Audio Input Capture',
+  'Game Capture',
+  'Window Capture',
+  'Display Capture',
+  'Image',
+  'Image Slide Show',
+  'Media Source',
+  'Text (GDI+)',
+  'Color Source',
+  'Browser Source'
+];
+
+
+test('Adding and removing some sources', async t => {
   const app = t.context.app;
-  const sourceName = 'Example Video Capture';
-  const sourceSelector = `li=${sourceName}`;
 
-  await addSource(t, 'Video Capture Device', sourceName);
+  for (const sourceType of sourceTypes) {
+    const sourceName = `Example ${sourceType}`;
+    const sourceSelector = `li=${sourceName}`;
 
-  await focusMain(t);
-  t.true(await app.client.isExisting(sourceSelector));
+    await addSource(t, sourceType, sourceName);
+    await focusMain(t);
 
-  await selectSource(t, sourceName);
-  await clickRemoveSource(t);
+    t.true(await app.client.isExisting(sourceSelector));
 
-  t.false(await app.client.isExisting(sourceSelector));
+    await selectSource(t, sourceName);
+    await clickRemoveSource(t);
+
+    t.false(await app.client.isExisting(sourceSelector));
+  }
 });
 
 test('Viewing source properties', async t => {
