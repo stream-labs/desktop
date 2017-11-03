@@ -7,6 +7,7 @@ import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { SourceFiltersService } from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
+import { AudioService } from './audio';
 import { Inject } from '../util/injector';
 import { ConfigPersistenceService } from './config-persistence/config';
 import { AppService } from './app';
@@ -38,6 +39,9 @@ export class ObsImporterService extends Service {
 
   @Inject('ConfigPersistenceService')
   configPersistenceService: ConfigPersistenceService;
+
+  @Inject()
+  audioService: AudioService;
 
   @Inject()
   appService: AppService;
@@ -122,6 +126,11 @@ export class ObsImporterService extends Service {
               sourceJSON.settings,
               { channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0 }
             );
+
+            if (source.audio) {
+              this.audioService.getSource(source.sourceId).setMuted(sourceJSON.muted);
+              this.audioService.getSource(source.sourceId).setMul(sourceJSON.volume);
+            }
 
             // Adding the filters
             const filtersJSON = sourceJSON.filters;
@@ -210,12 +219,15 @@ export class ObsImporterService extends Service {
     mixerSources.forEach((source, i) => {
       const mixerSource = mixerSources[i];
       if (mixerSource) {
-        this.sourcesService.createSource(
+        const newSource = this.sourcesService.createSource(
           mixerSource.name,
           mixerSource.id,
           {},
           { channel: i + 1 }
         );
+
+        this.audioService.getSource(newSource.sourceId).setMuted(mixerSource.muted);
+        this.audioService.getSource(newSource.sourceId).setMul(mixerSource.volume);
       }
     });
   }
