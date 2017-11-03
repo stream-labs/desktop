@@ -36,6 +36,7 @@ module.exports = {
   // We want to dynamically require native addons
   externals: {
     'font-manager': 'require("font-manager")',
+    'socket.io-client': 'require("socket.io-client")',
 
     // Not actually a native addons, but are super big so we don't
     // bother compiling them into our bundle.

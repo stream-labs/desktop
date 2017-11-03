@@ -13,6 +13,7 @@ import { ScenesService } from './scenes/scenes';
 import { VideoService } from './video';
 import { StreamInfoService } from './stream-info';
 import { track } from './usage-statistics';
+import { StreamlabelsService } from 'services/streamlabels';
 
 interface IAppState {
   loading: boolean;
@@ -59,6 +60,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject()
   videoService: VideoService;
 
+  @Inject() streamlabelsService: StreamlabelsService;
+
   @track('app_start')
   load() {
 
@@ -95,6 +98,7 @@ export class AppService extends StatefulService<IAppState> {
 
         this.userService;
         this.shortcutsService;
+        this.streamlabelsService;
 
         // Pre-fetch stream info
         this.streamInfoService;

@@ -67,7 +67,8 @@
     "obs-studio-node": "file:./obs-studio-node",
     "rimraf": "^2.6.1",
     "uuid": "^3.0.1",
-    "vue-popperjs": "^1.2.2"
+    "vue-popperjs": "^1.2.2",
+    "socket.io-client": "2.0.3"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
