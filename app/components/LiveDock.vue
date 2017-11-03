@@ -1,17 +1,26 @@
 <template>
-<div class="live-dock" :class="{ collapsed }">
+<div class="live-dock" :class="{ collapsed, 'live-dock--left': onLeft }">
   <div
     class="live-dock-chevron icon-btn"
     v-if="collapsed"
     @click="expand">
-    <i class="fa fa-chevron-left" />
+    <i class="fa" :class="{
+      'fa-chevron-left': !onLeft,
+      'fa-chevron-right': onLeft
+    }" />
   </div>
 
   <transition name="slide-fade">
     <div
       v-show="!collapsed"
       class="live-dock-expanded-contents">
-      <i class="fa fa-chevron-right live-dock-chevron icon-btn" @click="collapse" />
+      <i
+        class="fa live-dock-chevron icon-btn"
+        :class="{
+          'fa-chevron-left': onLeft,
+          'fa-chevron-right': !onLeft
+        }"
+        @click="collapse" />
       <div class="live-dock-header">
         <div class="flex flex--center">
           <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
@@ -53,6 +62,15 @@
   border-left: 1px solid @day-border;
   padding: 16px 20px 10px;
   transition: all 275ms;
+
+  &.live-dock--left {
+    border-right: 1px solid @day-border;
+
+    .live-dock-chevron {
+      right: 5px;
+      left: inherit;
+    }
+  }
 
   &.collapsed {
     width: 20px;
