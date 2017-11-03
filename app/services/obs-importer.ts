@@ -139,10 +139,19 @@ export class ObsImporterService extends Service {
     const currentScene = configJSON.current_scene;
 
     if (Array.isArray(sourcesJSON)) {
+      // Create all the scenes
       sourcesJSON.forEach(sourceJSON => {
         if (sourceJSON.id === 'scene') {
           const scene = this.scenesService.createScene(sourceJSON.name,
             { makeActive: (sourceJSON.name === currentScene) });
+        }
+      });
+
+      // Add all the sceneItems to every scene
+      sourcesJSON.forEach(sourceJSON => {
+        if (sourceJSON.id === 'scene') {
+          const scene = this.scenesService.getSceneByName(sourceJSON.name);
+          if (!scene) return;
 
           const sceneItems = sourceJSON.settings.items;
           if (Array.isArray(sceneItems)) {
