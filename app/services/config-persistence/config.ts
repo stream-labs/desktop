@@ -106,15 +106,23 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
       const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
 
       if (data) {
-        const root = parse(data, NODE_TYPES);
-        root.load().then(() => {
-          // Make sure we actually loaded at least one scene, otherwise
-          // create the default one
-          if (this.scenesService.scenes.length === 0) this.setUpDefaults();
+        try {
+          const root = parse(data, NODE_TYPES);
+          root.load().then(() => {
+            // Make sure we actually loaded at least one scene, otherwise
+            // create the default one
+            if (this.scenesService.scenes.length === 0) this.setUpDefaults();
+            this.SET_ACTIVE_COLLECTION(configName);
+            this.configIsSaved = true;
+            resolve();
+          });
+        } catch (e) {
+          this.setUpDefaults();
           this.SET_ACTIVE_COLLECTION(configName);
           this.configIsSaved = true;
           resolve();
-        });
+        }
+
       } else {
         this.switchToBlankConfig(configName);
       }
