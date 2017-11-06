@@ -102,6 +102,7 @@ export type TSourceType =
   'dshow_input' |
   'wasapi_input_capture' |
   'wasapi_output_capture' |
+  'decklink-input' |
   'scene'
   ;
 
@@ -285,6 +286,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
+      { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'Scene', value: 'scene' }
     ];
   }
