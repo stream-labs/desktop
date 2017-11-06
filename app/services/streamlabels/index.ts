@@ -5,10 +5,19 @@ import { HostsService } from 'services/hosts';
 import { handleErrors } from 'util/requests';
 import io from 'socket.io-client';
 
+
+export interface IStreamlabelsData {
+  [label: string]: string;
+}
+
+
 export class StreamlabelsService extends Service {
 
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+
+
+  data: IStreamlabelsData;
 
 
   init() {
@@ -20,31 +29,30 @@ export class StreamlabelsService extends Service {
 
       const socket = io(url, { transports: ['websocket'] });
 
-      socket.on('connect', () => {
-        console.log('Connection Opened');
-      });
-
-      socket.on('connect_error', (e: any) => {
-        console.log('Connection Error', e);
-      });
-
-      socket.on('connect_timeout', () => {
-        console.log('Connection Timeout');
-      });
-
-      socket.on('error', () => {
-        console.log('Error');
-      });
-
-
-      socket.on('disconnect', () => {
-        console.log('Connection Closed');
-      });
+      // These are useful for debugging
+      socket.on('connect', this.log('Connection Opened'));
+      socket.on('connect_error', (e: any) => this.log('Connection Error', e));
+      socket.on('connect_timeout', () => this.log('Connection Timeout'));
+      socket.on('error', () => console.log('Error'));
+      socket.on('disconnect', () => console.log('Connection Closed'));
 
       socket.on('event', (e: any) => {
         console.log('Message Received', e);
       });
     });
+  }
+
+
+  log(message: string, ...args: any[]) {
+    console.log(`Streamlabels: ${message}`, args);
+  }
+
+
+  /**
+   * Attempt to load init
+   */
+  fetchInitialData() {
+    // TODO: Implement
   }
 
 
@@ -58,6 +66,13 @@ export class StreamlabelsService extends Service {
       .then(handleErrors)
       .then(response => response.json())
       .then(json => json.socket_token);
+  }
+
+
+  setStreamlabelsData(data: IStreamlabelsData) {
+    // TODO: Write data files based on current subscriptions
+
+    this.data = data;
   }
 
 }
