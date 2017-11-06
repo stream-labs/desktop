@@ -33,8 +33,8 @@ export class StreamlabelsService extends Service {
       socket.on('connect', this.log('Connection Opened'));
       socket.on('connect_error', (e: any) => this.log('Connection Error', e));
       socket.on('connect_timeout', () => this.log('Connection Timeout'));
-      socket.on('error', () => console.log('Error'));
-      socket.on('disconnect', () => console.log('Connection Closed'));
+      socket.on('error', () => this.log('Error'));
+      socket.on('disconnect', () => this.log('Connection Closed'));
 
       socket.on('event', (e: any) => {
         console.log('Message Received', e);
@@ -44,7 +44,7 @@ export class StreamlabelsService extends Service {
 
 
   log(message: string, ...args: any[]) {
-    console.log(`Streamlabels: ${message}`, args);
+    console.log(`Streamlabels: ${message}`, ...args);
   }
 
 
