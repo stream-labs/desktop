@@ -107,7 +107,7 @@ export class AppService extends StatefulService<IAppState> {
         this.streamInfoService;
 
         this.ipcServerService.listen();
-        this.tcpServerService.listenTcp();
+        this.tcpServerService.listenWebsokets();
         this.FINISH_LOADING();
       });
     }, 500);

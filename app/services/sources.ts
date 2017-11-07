@@ -16,6 +16,7 @@ import { Inject } from '../util/injector';
 import namingHelpers from '../util/NamingHelpers';
 import { WindowsService } from './windows';
 import { WidgetType } from './widgets';
+import { Observable } from 'rxjs/Observable';
 
 const { ipcRenderer } = electron;
 
@@ -62,6 +63,9 @@ export interface ISourcesServiceApi {
   showAddSource(sourceType: TSourceType): void;
   showNameSource(sourceType: TSourceType): void;
   showNameWidget(widgetType: WidgetType): void;
+  sourceAdded: Observable<ISource>;
+  sourceUpdated: Observable<ISource>;
+  sourceRemoved: Observable<ISource>;
 }
 
 
@@ -450,6 +454,9 @@ export class Source implements ISourceApi {
     return obs.InputFactory.fromName(this.name);
   }
 
+  getModel() {
+    return this.sourceState;
+  }
 
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);

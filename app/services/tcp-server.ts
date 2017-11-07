@@ -3,12 +3,12 @@ import {
   E_JSON_RPC_ERROR, IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse,
   ServicesManager
 } from '../services-manager';
-import { Socket } from 'net';
 
 const net = require('net');
 
+const ALLOW_REMOTE_CONNECTIONS = true;
 const DEFAULT_TCP_PORT = 59652;
-const HOSTNAME = '127.0.0.1';
+const HOSTNAME = ALLOW_REMOTE_CONNECTIONS ? '0.0.0.0' : '127.0.0.1';
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
@@ -62,7 +62,7 @@ export class TcpServerService extends Service {
 
     this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
 
-    console.log('tcp-server created');
+    console.log('tcp-server created:', HOSTNAME);
   }
 
   private createNamedPipeServer() {

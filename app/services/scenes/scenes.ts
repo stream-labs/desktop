@@ -118,8 +118,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       });
     }
 
-    if (options.makeActive) this.makeSceneActive(id);
     this.sceneAdded.next(this.state.scenes[id]);
+    if (options.makeActive) this.makeSceneActive(id);
     return this.getSceneByName(name);
   }
 

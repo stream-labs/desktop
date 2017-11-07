@@ -258,7 +258,7 @@ export class ServicesManager extends Service {
       id: options.id,
       error: {
         code: options.code,
-        message: E_JSON_RPC_ERROR[options.code] + options.message ? (' ' + options.message) : '',
+        message: E_JSON_RPC_ERROR[options.code] + (options.message ? (' ' + options.message) : ''),
       }
     };
   }
@@ -493,6 +493,7 @@ export class ServicesManager extends Service {
 
   private getHelper(name: string, constructorArgs: any[]) {
     const Helper = this.services[name];
+    if (!Helper) return null;
     return new (Helper as any)(...constructorArgs);
   }
 
