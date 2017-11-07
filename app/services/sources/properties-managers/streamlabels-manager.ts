@@ -15,7 +15,7 @@ export class StreamlabelsManager extends PropertiesManager {
 
   settings: IStreamlabelsManagerSettings;
   filename: string;
-
+  blacklist = ['read_from_file', 'file'];
   customUIComponent = 'StreamlabelProperties';
 
 
