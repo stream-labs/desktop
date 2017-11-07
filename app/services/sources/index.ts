@@ -59,7 +59,9 @@ export interface ISourceApi extends ISource {
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
   getPropertiesManagerType(): TPropertiesManager;
+  getPropertiesManagerUI(): string;
   getPropertiesManagerSettings(): Dictionary<any>;
+  setPropertiesManagerSettings(settings: Dictionary<any>): void;
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
   hasProps(): boolean;
@@ -523,6 +525,16 @@ export class Source implements ISourceApi {
   }
 
 
+  getPropertiesManagerUI() {
+    return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
+  }
+
+
+  setPropertiesManagerSettings(settings: Dictionary<any>) {
+    this.sourcesService.propertiesManagers[this.sourceId].manager.applySettings(settings);
+  }
+
+
   getPropertiesFormData(): TFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
@@ -531,9 +543,7 @@ export class Source implements ISourceApi {
 
   setPropertiesFormData(properties: TFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
-    properties.forEach(prop => {
-      manager.setPropertyFormData(prop);
-    });
+    manager.setPropertiesFormData(properties);
   }
 
 

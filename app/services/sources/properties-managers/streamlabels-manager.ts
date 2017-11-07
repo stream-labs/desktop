@@ -1,4 +1,4 @@
-import { PropertiesManager, TCustomProperty, ICustomListProperty } from './properties-manager';
+import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
 import { StreamlabelsService } from 'services/streamlabels';
 import { getDefinitions } from 'services/streamlabels/definitions';
@@ -16,16 +16,7 @@ export class StreamlabelsManager extends PropertiesManager {
   settings: IStreamlabelsManagerSettings;
   filename: string;
 
-  init() {
-    if (!this.settings) {
-      this.settings = {
-        statname: 'all_time_top_donator'
-      };
-    }
-    this.refreshSubscription();
-
-    window['obsSource'] = this.obsSource;
-  }
+  customUIComponent = 'StreamlabelProperties';
 
 
   destroy() {
@@ -33,39 +24,15 @@ export class StreamlabelsManager extends PropertiesManager {
   }
 
 
-  getCustomProperties(): TCustomProperty[] {
-    const definitions = getDefinitions(this.userService.platform.type);
-    const options: { value: string; description: string }[] = [];
+  applySettings(settings: Dictionary<any>) {
+    this.settings = {
+      // Default to All-Time Top Donator
+      statname: 'all_time_top_donator',
+      ...this.settings,
+      ...settings
+    };
 
-    Object.values(definitions).forEach(category => {
-      category.files.forEach(file => {
-        options.push({
-          value: file.name,
-          description: file.label
-        });
-      });
-    });
-
-    return [
-      {
-        type: 'OBS_PROPERTY_LIST',
-        value: this.settings.statname,
-        name: 'streamlabelsStatname',
-        enabled: true,
-        visible: true,
-        isCustom: true,
-        description: 'Statistic',
-        options
-      }
-    ];
-  }
-
-
-  setCustomProperty(property: TCustomProperty) {
-    if (property.name === 'streamlabelsStatname') {
-      this.settings.statname = property.value as string;
-      this.refreshSubscription();
-    }
+    this.refreshSubscription();
   }
 
 

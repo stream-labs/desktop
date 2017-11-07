@@ -425,3 +425,11 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
 
   e.sender.send('notifySourceAttributes', sizes);
 });
+
+ipcMain.on('streamlabels-writeFile', (e, info) => {
+  fs.writeFile(info.path, info.data, err => {
+    if (err) {
+      console.log('Streamlabels: Error writing file', err);
+    }
+  });
+});

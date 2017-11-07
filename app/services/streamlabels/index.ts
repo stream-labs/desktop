@@ -19,7 +19,6 @@ export interface IStreamlabelsData {
 export interface IStreamlabelsSubscription {
   filename: string;
   statname: string;
-  fileHandle: number;
 }
 
 
@@ -67,9 +66,8 @@ export class StreamlabelsService extends Service {
 
   subscribe(statname: string): string {
     const filename = uuid();
-    const fileHandle = fs.openSync(this.getStreamlabelsPath(filename), 'w');
 
-    const subscription: IStreamlabelsSubscription = { filename, statname, fileHandle };
+    const subscription: IStreamlabelsSubscription = { filename, statname };
     this.subscriptions.push(subscription);
     this.updateSubscription(subscription);
 
@@ -79,12 +77,7 @@ export class StreamlabelsService extends Service {
 
   unsubscribe(filename: string) {
     this.subscriptions = this.subscriptions.filter(subscription => {
-      if (subscription.filename === filename) {
-        fs.closeSync(subscription.fileHandle);
-        return false;
-      }
-
-      return true;
+      return subscription.filename !== filename;
     });
   }
 
@@ -152,12 +145,13 @@ export class StreamlabelsService extends Service {
    * @param statname the name of the stat
    */
   updateSubscription(subscription: IStreamlabelsSubscription) {
+    if (!this.data) return;
+
     console.log('Writing file', subscription.filename, subscription.statname);
 
-    const str = this.data ? this.data[subscription.statname] : '';
-
-    fs.write(subscription.fileHandle, str, 0, 'utf8', (err) => {
-      if (err) this.log(`Error writing to ${subscription.filename}`, err);
+    electron.ipcRenderer.send('streamlabels-writeFile', {
+      path: this.getStreamlabelsPath(subscription.filename),
+      data: this.data[subscription.statname]
     });
   }
 
