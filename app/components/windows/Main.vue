@@ -3,7 +3,8 @@
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
   <div class="main-contents">
-    <div class="main-left">
+    <live-dock v-if="isLoggedIn && leftDock" :onLeft="true" />
+    <div class="main-middle">
       <div v-if="applicationLoading" class="main-loading">
         <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
       </div>
@@ -14,7 +15,7 @@
         :is="page"/>
       <studio-footer v-if="(page !== 'Onboarding') && !applicationLoading"/>
     </div>
-    <live-dock class="main-right" v-if="isLoggedIn" />
+    <live-dock v-if="isLoggedIn && !leftDock" />
   </div>
 </div>
 </template>
@@ -36,7 +37,7 @@
   flex-grow: 1;
 }
 
-.main-left {
+.main-middle {
   flex-grow: 1;
   display: flex;
   flex-direction: column;

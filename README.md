@@ -1,28 +1,12 @@
 # Streamlabs OBS
 
-[![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
+[![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
 
 Electron client for the Streamlabs OBS streaming software.
 
 This application currently only supports 64-bit Windows.
 
 ## Dependencies
-
-### Node OBS
-
-Node OBS is our (deprecated) C++ Node module that provides a javascript
-interface to OBS.  For SLOBS to start properly, it needs to
-find a built version of node OBS at `./node-obs`.
-
-The easiest way to get this is to simply run the command:
-```
-yarn install-node-obs
-```
-
-This will download the current release and extract it.
-
-If you wish to compile it yourself, instructions can be found here:
-https://github.com/stream-labs/node-obs
 
 ### Yarn
 
@@ -56,6 +40,15 @@ Install all node modules via yarn:
 ```
 yarn install
 ```
+
+Install the current release of node-obs:
+
+```
+yarn install-node-obs
+```
+
+If you would prefer to compile this yourself, you can find instructions here:
+https://github.com/stream-labs/node-obs
 
 Then, compile assets with webpack:
 

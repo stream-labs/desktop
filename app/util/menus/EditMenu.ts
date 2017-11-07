@@ -66,6 +66,11 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
+        label: 'Rename',
+        click: () => this.sourcesService.showRenameSource(this.sceneItem.name)
+      });
+
+      this.append({
         label: 'Remove',
         accelerator: 'Delete',
         click: () => this.scene.removeItem(this.sceneItem.sceneItemId)
