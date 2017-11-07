@@ -4,7 +4,7 @@ import { Inject } from '../util/injector';
 import StreamingService from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
-import PerformanceMetricsSoftware from './PerformanceMetricsSoftware.vue';
+import PerformanceMetrics from './PerformanceMetrics.vue';
 import { UserService } from '../services/user';
 import { NavigationService } from "../services/navigation";
 
@@ -12,7 +12,7 @@ import { NavigationService } from "../services/navigation";
   components: {
     StartStreamingButton,
     TestWidgets,
-    PerformanceMetricsSoftware
+    PerformanceMetrics
   }
 })
 export default class StudioFooterComponent extends Vue {
