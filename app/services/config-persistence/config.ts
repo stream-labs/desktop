@@ -65,7 +65,7 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     const configsNamesWithoutBackup: string[] = [];
 
     if (configsNames.length) {
-      configsNames.forEach (configName => {
+      configsNames.forEach(configName => {
         if (configName.indexOf('_backup') === -1) configsNamesWithoutBackup.push(configName);
       });
       this.ADD_SCENES_COLLECTIONS(configsNamesWithoutBackup);
