@@ -5,7 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType} from '../../services/sources';
+import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
 import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
 
 @Component({
@@ -29,7 +29,8 @@ export default class NameSource extends Vue {
   options: {
     sourceType?: TSourceType,
     widgetType?: string,
-    rename?: string
+    rename?: string,
+    propertiesManager?: TPropertiesManager
   }  = this.windowsService.getChildWindowQueryParams();
 
   name = this.options.rename || '';
@@ -56,10 +57,16 @@ export default class NameSource extends Vue {
       let sourceId: string;
 
       if (this.sourceType != null) {
-        sourceId = this.scenesService.activeScene.createAndAddSource(
+        const source = this.sourcesService.createSource(
           this.name,
-          this.sourceType
-        ).sourceId;
+          this.sourceType,
+          {},
+          {
+            propertiesManager: this.options.propertiesManager || void 0
+          }
+        );
+
+        this.scenesService.activeScene.addSource(source.sourceId);
       } else if (this.widgetType != null) {
         sourceId = this.widgetsService.createWidget(
           this.widgetType,

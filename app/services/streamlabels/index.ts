@@ -4,10 +4,22 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { handleErrors } from 'util/requests';
 import io from 'socket.io-client';
+import uuid from 'uuid/v4';
+import fs from 'fs';
+import path from 'path';
+import electron from 'electron';
+import rimraf from 'rimraf';
 
 
 export interface IStreamlabelsData {
   [label: string]: string;
+}
+
+
+export interface IStreamlabelsSubscription {
+  filename: string;
+  statname: string;
+  fileHandle: number;
 }
 
 
@@ -19,18 +31,19 @@ export class StreamlabelsService extends Service {
 
   data: IStreamlabelsData;
 
+  subscriptions: IStreamlabelsSubscription[] = [];
+
 
   init() {
+    this.ensureDirectory();
+    this.fetchInitialData();
+
     this.fetchSocketToken().then(token => {
       const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
-
-      console.log('Connecting with token: ', token);
-      console.log('Connecting to url:', url);
-
       const socket = io(url, { transports: ['websocket'] });
 
       // These are useful for debugging
-      socket.on('connect', this.log('Connection Opened'));
+      socket.on('connect', () => this.log('Connection Opened'));
       socket.on('connect_error', (e: any) => this.log('Connection Error', e));
       socket.on('connect_timeout', () => this.log('Connection Timeout'));
       socket.on('error', () => this.log('Error'));
@@ -38,6 +51,10 @@ export class StreamlabelsService extends Service {
 
       socket.on('event', (e: any) => {
         console.log('Message Received', e);
+
+        if (e.type === 'streamlabels') {
+          this.setStreamlabelsData(e.message.data);
+        }
       });
     });
   }
@@ -48,11 +65,45 @@ export class StreamlabelsService extends Service {
   }
 
 
+  subscribe(statname: string): string {
+    const filename = uuid();
+    const fileHandle = fs.openSync(this.getStreamlabelsPath(filename), 'w');
+
+    const subscription: IStreamlabelsSubscription = { filename, statname, fileHandle };
+    this.subscriptions.push(subscription);
+    this.updateSubscription(subscription);
+
+    return filename;
+  }
+
+
+  unsubscribe(filename: string) {
+    this.subscriptions = this.subscriptions.filter(subscription => {
+      if (subscription.filename === filename) {
+        fs.closeSync(subscription.fileHandle);
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+
   /**
-   * Attempt to load init
+   * Attempt to load initial data via HTTP instead of waiting
+   * for a socket event
    */
   fetchInitialData() {
-    // TODO: Implement
+    if (!this.userService.isLoggedIn()) return;
+
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
+      `/files?token=${this.userService.widgetToken}`;
+    const request = new Request(url);
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => this.setStreamlabelsData(json.data));
   }
 
 
@@ -70,9 +121,44 @@ export class StreamlabelsService extends Service {
 
 
   setStreamlabelsData(data: IStreamlabelsData) {
-    // TODO: Write data files based on current subscriptions
+    this.data = { ...data };
 
-    this.data = data;
+    this.subscriptions.forEach(subscription => this.updateSubscription(subscription));
+  }
+
+
+  private ensureDirectory() {
+    if (fs.existsSync(this.streamlabelsDirectory)) {
+      rimraf.sync(this.streamlabelsDirectory);
+    }
+
+    fs.mkdirSync(this.streamlabelsDirectory);
+  }
+
+
+  private get streamlabelsDirectory() {
+    return path.join(electron.remote.app.getPath('userData'), 'Streamlabels');
+  }
+
+
+  getStreamlabelsPath(filename: string) {
+    return path.join(this.streamlabelsDirectory, `${filename}.txt`);
+  }
+
+
+  /**
+   * Updates the data in a single streamlabels file
+   * @param filename the filename
+   * @param statname the name of the stat
+   */
+  updateSubscription(subscription: IStreamlabelsSubscription) {
+    console.log('Writing file', subscription.filename, subscription.statname);
+
+    const str = this.data ? this.data[subscription.statname] : '';
+
+    fs.write(subscription.fileHandle, str, 0, 'utf8', (err) => {
+      if (err) this.log(`Error writing to ${subscription.filename}`, err);
+    });
   }
 
 }

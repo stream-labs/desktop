@@ -335,6 +335,20 @@
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
     </add-source-info>
 
+    <add-source-info
+      v-if="inspectedSource === 'streamlabel'"
+      @clickAdd="selectWidget(widgetTypes.Credits)"
+      name="Stream Label"
+      description="This is a placeholder description for streamlabels.">
+      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>New Followers</li>
+        <li>New Subscribers</li>
+        <li>Cheers</li>
+        <li>Donations</li>
+      </ul>
+    </add-source-info>
+
     <div
       class="source-info"
       v-if="inspectedSource === null">
@@ -467,6 +481,14 @@
             @click="inspectSource(widgetTypes.ViewerCount)"
             @dblclick="selectWidget(widgetTypes.ViewerCount)">
             <div>Viewer Count</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === 'streamlabel'}"
+            @click="inspectSource('streamlabel')"
+            @dblclick="selectSource('text_gdiplus', 'streamlabels')">
+            <div>Stream Label</div>
           </div>
         </div>
       </div>

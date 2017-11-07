@@ -46,6 +46,15 @@ export abstract class PropertiesManager implements IPropertyManager {
    * @param settings The manager settings.  These are *NOT* OBS settings
    */
   constructor(public obsSource: obs.ISource, public settings: Dictionary<any>) {
+    this.init();
+  }
+
+
+  /**
+   * Can be used to attach custom startup behavior to this
+   * properties manager.
+   */
+  init() {
   }
 
 

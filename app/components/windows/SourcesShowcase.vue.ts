@@ -5,12 +5,12 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
-import { SourcesService, TSourceType } from '../../services/sources';
+import { SourcesService, TSourceType, TPropertiesManager } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { UserService } from '../../services/user';
 import { WidgetsService, WidgetType } from '../../services/widgets';
 
-type TInspectableSource = TSourceType | WidgetType;
+type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
 
 @Component({
   components: {
@@ -38,7 +38,7 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
 
-  selectSource(sourceType: TSourceType) {
+  selectSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     const sameTypeCount = this.sourcesService.getSources()
       .filter((source) => {
         return (source.type === sourceType) && !source.channel;
@@ -46,7 +46,7 @@ export default class SourcesShowcase extends Vue {
       .length;
 
     if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType);
+      this.sourcesService.showAddSource(sourceType, propertiesManager);
     } else {
       this.sourcesService.showNameSource(sourceType);
     }
@@ -73,8 +73,10 @@ export default class SourcesShowcase extends Vue {
   selectInspectedSource() {
     if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
       this.selectSource(this.inspectedSource as TSourceType);
+    } else if (this.inspectedSource === 'streamlabel') {
+      this.selectSource('text_gdiplus', 'streamlabels');
     } else {
-      this.selectWidget(this.inspectedSource as WidgetType)
+      this.selectWidget(this.inspectedSource as WidgetType);
     }
   }
 
