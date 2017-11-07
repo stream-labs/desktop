@@ -287,11 +287,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
-      { description: 'Blackmagic Device', value: 'decklink-input' },
-      { description: 'Scene', value: 'scene' }
+      { description: 'Blackmagic Device', value: 'decklink-input' }
     ];
 
-    return Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes);
+    const availableWhitelistedType = Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes);
+    // 'scene' is not an obs input type so we have to set it manually
+    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+
+    return availableWhitelistedType;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
