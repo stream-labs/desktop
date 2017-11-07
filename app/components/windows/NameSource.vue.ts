@@ -67,6 +67,7 @@ export default class NameSource extends Vue {
         );
 
         this.scenesService.activeScene.addSource(source.sourceId);
+        sourceId = source.sourceId;
       } else if (this.widgetType != null) {
         sourceId = this.widgetsService.createWidget(
           this.widgetType,
