@@ -291,17 +291,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Scene', value: 'scene' }
     ];
 
-    const whitelistedAvailableTypes: IListOption<TSourceType>[] = [];
-
-    whitelistedTypes.forEach(whitelistedType => {
-      obsAvailableTypes.forEach(obsAvailableType => {
-        if (whitelistedType.value === obsAvailableType) {
-          whitelistedAvailableTypes.push(whitelistedType);
-        }
-      });
-    });
-
-    return whitelistedAvailableTypes;
+    return Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes);
   }
 
   getAvailableSourcesTypes(): TSourceType[] {

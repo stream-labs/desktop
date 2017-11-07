@@ -80,4 +80,18 @@ export default class Utils {
     }
     return result;
   }
+
+  static getAvailableWhitelistedType  (obsAvailableTypes: string[], whitelistedTypes:  any[]):  any[] {
+    const whitelistedAvailableTypes: any[] = [];
+
+    whitelistedTypes.forEach(whitelistedType => {
+      obsAvailableTypes.forEach(obsAvailableType => {
+        if (whitelistedType.value === obsAvailableType) {
+          whitelistedAvailableTypes.push(whitelistedType);
+        }
+      });
+    });
+
+    return whitelistedAvailableTypes;
+  }
 }

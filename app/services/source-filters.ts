@@ -8,6 +8,7 @@ import { SourcesService } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
+import Utils from 'services/utils';
 
 
 export type TSourceFilterType =
@@ -53,7 +54,8 @@ export class SourceFiltersService extends Service {
   windowsService: WindowsService;
 
   getTypesList(): IListOption<TSourceFilterType>[] {
-    return [
+    const obsAvailableTypes = obs.FilterFactory.types();
+    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
       { description: 'Image Mask/Blend', value: 'mask_filter' },
       { description: 'Crop/Pad', value: 'crop_filter' },
       { description: 'Gain', value: 'gain_filter' },
@@ -71,6 +73,8 @@ export class SourceFiltersService extends Service {
       { description: 'Compressor', value: 'compressor_filter' },
       { description: 'VST 2.x Plugin', value: 'vst_filter' }
     ];
+
+    return Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes); 
   }
 
 
