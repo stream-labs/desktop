@@ -1,6 +1,7 @@
 <template>
 <div class="footer">
-  <performance-metrics-software />
+  <performance-metrics />
+
   <div class="nav-right">
     <div class="nav-item">
       <test-widgets v-if="loggedIn" />
@@ -45,6 +46,11 @@
 
 .nav-item {
   margin-left: 20px;
+
+  @media(max-width: 1200px) {
+    font-size: 12px;
+    margin-left: 12px;
+  }
 }
 
 .record-button {
