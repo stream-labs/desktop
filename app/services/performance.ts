@@ -2,6 +2,7 @@ import Vue from 'vue';
 
 import { StatefulService, mutation } from './stateful-service';
 import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 
 interface IPerformanceState {
   CPU: number;

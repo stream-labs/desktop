@@ -7,6 +7,7 @@ import { ShortcutsService } from './shortcuts';
 import { Inject } from '../util/injector';
 import electron from 'electron';
 import { ServicesManager } from '../services-manager';
+import { MonitorService }  from './monitor';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
 import { ScenesService } from './scenes/scenes';
@@ -95,6 +96,7 @@ export class AppService extends StatefulService<IAppState> {
 
         this.userService;
         this.shortcutsService;
+        MonitorService.instance.start();
 
         // Pre-fetch stream info
         this.streamInfoService;
@@ -164,6 +166,7 @@ export class AppService extends StatefulService<IAppState> {
       this.scenesTransitionsService.release();
       electron.ipcRenderer.send('shutdownComplete');
     });
+    MonitorService.instance.stop();
   }
 
 
