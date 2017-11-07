@@ -272,7 +272,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
-    return [
+    const obsAvailableTypes = obs.InputFactory.types();
+    const whitelistedTypes: IListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -289,6 +290,18 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'Scene', value: 'scene' }
     ];
+
+    const whitelistedAvailableTypes: IListOption<TSourceType>[] = [];
+
+    whitelistedTypes.forEach(whitelistedType => {
+      obsAvailableTypes.forEach(obsAvailableType => {
+        if (whitelistedType.value === obsAvailableType) {
+          whitelistedAvailableTypes.push(whitelistedType);
+        }
+      });
+    });
+
+    return whitelistedAvailableTypes;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
