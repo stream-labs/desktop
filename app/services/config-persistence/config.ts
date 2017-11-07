@@ -117,32 +117,54 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
       if (data) {
         try {
           const root = parse(data, NODE_TYPES);
+          this.SET_ACTIVE_COLLECTION(configName);
           root.load().then(() => {
             // Make sure we actually loaded at least one scene, otherwise
             // create the default one
             if (this.scenesService.scenes.length === 0) this.setUpDefaults();
-            this.SET_ACTIVE_COLLECTION(configName);
             this.configIsSaved = true;
             this.rawSave(configName + '_backup', true);
             resolve();
-          });
-        } catch (e) {
-          const backupData = fs.readFileSync(this.getConfigFilePath(configName + '_backup')).toString();
-          if (backupData) {
-            const root = parse(backupData, NODE_TYPES);
-            root.load().then(() => {
-              this.SET_ACTIVE_COLLECTION(configName);
-              this.configIsSaved = true;
-              this.rawSave(configName);
+          }).catch((error: any) => {
+            this.loadBackupConfigFile().then(() => {
               resolve();
             });
-          } else {
-            this.switchToBlankConfig(configName);
-          }
+          });
+        } catch (e) {
+          this.loadBackupConfigFile().then(() => {
+            resolve();
+          });
         }
-
       } else {
         this.switchToBlankConfig(configName);
+      }
+    });
+  }
+
+  loadBackupConfigFile() {
+    return new Promise(resolve => {
+      const configName = this.state.activeCollection;
+
+      this.scenesService.scenes.forEach(scene => {
+        scene.remove();
+      });
+
+      if (fs.existsSync(this.getConfigFilePath(configName + '_backup'))) {
+        const backupData = fs.readFileSync(this.getConfigFilePath(configName + '_backup')).toString();
+        if (backupData) {
+          const root = parse(backupData, NODE_TYPES);
+          root.load().then(() => {
+            this.configIsSaved = true;
+            this.rawSave(configName);
+            resolve();
+          });
+        } else {
+          this.switchToBlankConfig(configName);
+          resolve();
+        }
+      } else {
+        this.switchToBlankConfig(configName);
+        resolve();
       }
     });
   }
