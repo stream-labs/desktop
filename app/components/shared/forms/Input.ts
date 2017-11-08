@@ -166,12 +166,9 @@ export function obsValuesToInputValues(
     }
 
     prop.value = obsValue;
-
-    if (options.boolIsString) {
-      prop.masked = obsProp.masked === 'true';
-      prop.enabled = obsProp.enabled === 'true';
-      prop.visible = obsProp.visible === 'true';
-    }
+    prop.masked = !!obsProp.masked;
+    prop.enabled = !!obsProp.enabled;
+    prop.visible = !!obsProp.visible;
 
     if (options.disabledFields && options.disabledFields.includes(prop.name)) {
       prop.enabled = false;
