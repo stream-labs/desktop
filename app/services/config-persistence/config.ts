@@ -62,7 +62,7 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     if (!fs.existsSync(this.configFileDirectory)) return;
 
     const configsNames = fs.readdirSync(this.configFileDirectory).filter(fileName => {
-      return fileName.indexOf('.bak') === -1;
+      return !fileName.match(/\.bak$/);
     }).map(file => file.replace(/\.[^/.]+$/, ''));
 
     this.ADD_SCENES_COLLECTIONS(configsNames);
