@@ -57,8 +57,6 @@ export class StreamlabelsService extends Service {
       socket.on('disconnect', () => this.log('Connection Closed'));
 
       socket.on('event', (e: any) => {
-        console.log('Message Received', e);
-
         if (e.type === 'streamlabels') {
           this.setStreamlabelsData(e.message.data);
         }
