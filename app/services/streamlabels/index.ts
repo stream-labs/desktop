@@ -22,6 +22,14 @@ export interface IStreamlabelsSubscription {
 }
 
 
+export interface IStreamlabelSettings {
+  format: string;
+  item_format?: string;
+  item_separator?: string;
+  limit?: number;
+}
+
+
 export class StreamlabelsService extends Service {
 
   @Inject() userService: UserService;
@@ -29,14 +37,14 @@ export class StreamlabelsService extends Service {
 
 
   data: IStreamlabelsData;
-
+  settings: Dictionary<IStreamlabelSettings>;
   subscriptions: IStreamlabelsSubscription[] = [];
 
 
   init() {
     this.ensureDirectory();
     this.fetchInitialData();
-
+    this.fetchSettings().then(settings => this.settings = settings);
     this.fetchSocketToken().then(token => {
       const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
       const socket = io(url, { transports: ['websocket'] });
@@ -82,6 +90,11 @@ export class StreamlabelsService extends Service {
   }
 
 
+  getSettingsForStat(statname: string) {
+    return this.settings[statname];
+  }
+
+
   /**
    * Attempt to load initial data via HTTP instead of waiting
    * for a socket event
@@ -97,6 +110,19 @@ export class StreamlabelsService extends Service {
       .then(handleErrors)
       .then(response => response.json())
       .then(json => this.setStreamlabelsData(json.data));
+  }
+
+
+  fetchSettings(): Promise<Dictionary<IStreamlabelSettings>> {
+    if (!this.userService.isLoggedIn()) return Promise.reject({});
+
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
+      `/settings?token=${this.userService.widgetToken}`;
+    const request = new Request(url);
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
   }
 
 

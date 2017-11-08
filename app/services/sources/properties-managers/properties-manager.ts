@@ -97,7 +97,7 @@ export abstract class PropertiesManager implements IPropertyManager {
   applySettings(settings: Dictionary<any>) {
     this.settings = {
       ...this.settings,
-      settings
+      ...settings
     };
   }
 

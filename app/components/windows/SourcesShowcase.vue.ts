@@ -50,7 +50,7 @@ export default class SourcesShowcase extends Vue {
     if (sameTypeCount > 0) {
       this.sourcesService.showAddSource(sourceType, propertiesManager);
     } else {
-      this.sourcesService.showNameSource(sourceType);
+      this.sourcesService.showNameSource(sourceType, propertiesManager);
     }
   }
 
