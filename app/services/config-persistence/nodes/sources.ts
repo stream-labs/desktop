@@ -142,7 +142,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         }
       );
       if (source.audioMixers) {
-        this.audioService.getSource(sourceInfo.id).setMul(sourceInfo.volume || 1);
+        this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
           forceMono: sourceInfo.forceMono,
           audioMixers: sourceInfo.audioMixers,
