@@ -446,7 +446,6 @@ export class ServicesManager extends Service {
 
         return (...args: any[]) => {
 
-          console.log('call', methodName, args);
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync('services-request', {
             id: ipcRenderer.sendSync('getUniqueId'),
             method: methodName,

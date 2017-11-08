@@ -1,97 +1,269 @@
-import { Service } from './service';
 import {
   E_JSON_RPC_ERROR, IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse,
   ServicesManager
 } from '../services-manager';
+import { PersistentStatefulService } from './persistent-stateful-service';
+import { IFormInput } from '../components/shared/forms/Input';
+import { ISettingsSubCategory } from './settings';
+import WritableStream = NodeJS.WritableStream;
+import { mutation } from './stateful-service';
 
 const net = require('net');
 
-const ALLOW_REMOTE_CONNECTIONS = true;
-const DEFAULT_TCP_PORT = 59652;
-const HOSTNAME = ALLOW_REMOTE_CONNECTIONS ? '0.0.0.0' : '127.0.0.1';
 
-const PIPE_NAME = 'slobs';
-const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
+const LOCAL_HOST_NAME = '127.0.0.1';
+const WILDCARD_HOST_NAME = '0.0.0.0';
 
 
 interface IClient {
   id: number;
-  socket: ISocket;
+  socket: WritableStream;
   subscriptions: string[];
 }
 
 interface IServer {
-  on(eventName: string, cb: (event: any) => any): any;
+  nativeServer: {
+    on(eventName: string, cb: (event: any) => any): any;
+  };
+  close(): void;
 }
 
-interface ISocket {
-  write(data: string | Buffer): any;
-  on(eventName: string, cb: (event: any) => any): any;
+
+export interface ITcpServersSettings {
+  tcp: {
+    enabled: boolean;
+    port: number;
+    allowRemote: boolean;
+  };
+  namedPipe: {
+    enabled: boolean;
+    pipeName: string;
+  };
+  websockets: {
+    enabled: boolean;
+    port: number;
+    allowRemote: boolean;
+  };
+}
+
+export interface ITcpServerServiceAPI {
+  getApiSettingsFormData(): ISettingsSubCategory[];
+  setSettings(settings: Partial<ITcpServersSettings>): void;
+  getDefaultSettings(): ITcpServersSettings;
+  listen(): void;
+  stopListen(): void;
 }
 
 
-export class TcpServerService extends Service {
+export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceAPI {
 
-  servicesManager: ServicesManager = ServicesManager.instance;
+  static defaultState: ITcpServersSettings = {
+    tcp: {
+      enabled: false,
+      port: 59651,
+      allowRemote: false
+    },
+    namedPipe: {
+      enabled: false,
+      pipeName: 'slobs'
+    },
+    websockets: {
+      enabled: false,
+      port: 59652,
+      allowRemote: false
+    }
+  };
 
+  private servicesManager: ServicesManager = ServicesManager.instance;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
+  private servers: IServer[] = [];
+
+  // enable to debug
+  private enableLogs = false;
 
 
-  listenWebsokets() {
-    this.listenConnections(this.createWebsoketsServer());
+  init() {
+    super.init();
+    this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
   }
 
 
-  listenNamedPipe() {
-    this.listenConnections(this.createNamedPipeServer());
+  listen() {
+    if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
+    if (this.state.tcp.enabled) this.listenConnections(this.createTcpServer());
+    if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
 
-  listenTcp() {
-    this.listenConnections(this.createTcpServer());
+  stopListen() {
+    this.servers.forEach(server => server.close());
+    Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
   }
 
+
+  getDefaultSettings(): ITcpServersSettings {
+    return TcpServerService.defaultState;
+  }
+
+
+  setSettings(settings: Partial<ITcpServersSettings>) {
+    this.SET_SETTINGS(settings);
+  }
+
+  getApiSettingsFormData(): ISettingsSubCategory[] {
+    const settings = this.state;
+    return [
+      {
+        nameSubCategory: 'TCP',
+        codeSubCategory: 'tcp',
+        parameters: [
+          <IFormInput<boolean>> {
+            value: settings.tcp.enabled,
+            name: 'enabled',
+            description: 'Enabled',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: true,
+          },
+
+          <IFormInput<boolean>> {
+            value: settings.tcp.allowRemote,
+            name: 'allowRemote',
+            description: 'Allow Remote Connections',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: settings.tcp.enabled,
+          },
+
+          <IFormInput<number>> {
+            value: settings.tcp.port,
+            name: 'port',
+            description: 'Port',
+            type: 'OBS_PROPERTY_INT',
+            minVal: 0,
+            maxVal: 65535,
+            visible: true,
+            enabled: settings.tcp.enabled,
+          }
+        ]
+      },
+      {
+        nameSubCategory: 'Named Pipe',
+        codeSubCategory: 'namedPipe',
+        parameters: [
+          <IFormInput<boolean>> {
+            value: settings.namedPipe.enabled,
+            name: 'enabled',
+            description: 'Enabled',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: true,
+          },
+
+          <IFormInput<string>> {
+            value: settings.namedPipe.pipeName,
+            name: 'pipeName',
+            description: 'Pipe Name',
+            type: 'OBS_PROPERTY_TEXT',
+            visible: true,
+            enabled: settings.namedPipe.enabled,
+          }
+        ]
+      },
+      {
+        nameSubCategory: 'Websockets',
+        codeSubCategory: 'websockets',
+        parameters: [
+          <IFormInput<boolean>> {
+            value: settings.websockets.enabled,
+            name: 'enabled',
+            description: 'Enabled',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: true,
+          },
+
+          <IFormInput<boolean>> {
+            value: settings.websockets.allowRemote,
+            name: 'allowRemote',
+            description: 'Allow Remote Connections',
+            type: 'OBS_PROPERTY_BOOL',
+            visible: true,
+            enabled: settings.websockets.enabled,
+          },
+
+          <IFormInput<number>> {
+            value: settings.websockets.port,
+            name: 'port',
+            description: 'Port',
+            type: 'OBS_PROPERTY_INT',
+            minVal: 0,
+            maxVal: 65535,
+            visible: true,
+            enabled: settings.websockets.enabled,
+          }
+        ]
+      }
+    ];
+  }
 
   private listenConnections(server: IServer) {
-    server.on('connection', (socket: ISocket) => this.onConnectionHandler(socket));
+    this.servers.push(server);
 
-    server.on('error', (error) => {
+    server.nativeServer.on('connection', (socket) => this.onConnectionHandler(socket));
+
+    server.nativeServer.on('error', (error) => {
       throw error;
     });
-
-    this.servicesManager.serviceEvent.subscribe(event => this.onServiceEventHandler(event));
-
-    console.log('tcp-server created:', HOSTNAME);
   }
 
-  private createNamedPipeServer() {
+
+  private createNamedPipeServer(): IServer {
+    const settings = this.state.namedPipe;
     const server = net.createServer();
-    server.listen(PIPE_PATH);
-    return server;
+    server.listen('\\\\.\\pipe\\' + settings.pipeName);
+    return {
+      nativeServer: server,
+      close() {
+        server.close();
+      }
+    };
   }
 
 
-  private createTcpServer() {
+  private createTcpServer(): IServer {
     const server = net.createServer();
-    server.listen(DEFAULT_TCP_PORT, HOSTNAME);
-    return server;
+    const settings = this.state.tcp;
+    server.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
+    return {
+      nativeServer: server,
+      close() {
+        server.close();
+      }
+    };
   }
 
 
-  private createWebsoketsServer() {
+  private createWebsoketsServer(): IServer {
+    const settings = this.state.websockets;
     const http = require('http');
     const sockjs = require('sockjs');
-    const server = sockjs.createServer();
+    const websocketsServer = sockjs.createServer();
     const httpServer = http.createServer();
-    server.installHandlers(httpServer, { prefix:'/api' });
-    httpServer.listen(DEFAULT_TCP_PORT, HOSTNAME);
-    return server;
+    websocketsServer.installHandlers(httpServer, { prefix:'/api' });
+    httpServer.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
+    return {
+      nativeServer: websocketsServer,
+      close() {
+        httpServer.close();
+      }
+    };
   }
 
 
-  private onConnectionHandler(socket: ISocket) {
-    console.log('new connection');
+  private onConnectionHandler(socket: WritableStream) {
+    this.log('new connection');
 
     const id = this.nextClientId++;
     const client: IClient = { id, socket, subscriptions: [] };
@@ -112,7 +284,7 @@ export class TcpServerService extends Service {
 
 
   private onRequestHandler(client: IClient, data: string) {
-    console.log('tcp request', data);
+    this.log('tcp request', data);
     const requests = data.split('\n');
     requests.forEach(requestString => {
       if (!requestString) return;
@@ -176,13 +348,29 @@ export class TcpServerService extends Service {
 
 
   private onDisconnectHandler(client: IClient) {
-    console.log('client disconnected');
+    this.log('client disconnected');
     delete this.clients[client.id];
   }
 
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
+    this.log('send response', response);
     client.socket.write(JSON.stringify(response));
   }
 
+  private disconnectClient(clientId: number) {
+    const client = this.clients[clientId];
+    client.socket.end();
+    delete this.clients[clientId];
+  }
+
+  private log(...messages: any[]) {
+    if (!this.enableLogs) return;
+    console.log(...messages);
+  }
+
+  @mutation()
+  private SET_SETTINGS(patch: Partial<ITcpServersSettings>) {
+    this.state = { ...this.state, ...patch };
+  }
 }

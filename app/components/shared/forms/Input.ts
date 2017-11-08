@@ -64,6 +64,11 @@ export interface IPathInputValue extends IFormInput<string> {
   filters: IElectronOpenDialogFilter[];
 }
 
+export interface INumberInputValue extends IFormInput<number> {
+  minVal?: number;
+  maxVal?: number;
+}
+
 export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;

@@ -4,6 +4,7 @@ import {
   ServicesManager
 } from '../services-manager';
 import electron from 'electron';
+import { Subscription } from 'rxjs/Subscription';
 const { ipcRenderer } = electron;
 
 /**
@@ -13,17 +14,24 @@ const { ipcRenderer } = electron;
 export class IpcServerService extends Service {
 
   servicesManager: ServicesManager = ServicesManager.instance;
+  servicesEventsSubscription: Subscription;
+  requestHandler: Function;
 
   listen() {
-    ipcRenderer.on('services-request', (event: Electron.Event, request: IJsonRpcRequest) => {
+    this.requestHandler = (event: Electron.Event, request: IJsonRpcRequest) => {
       const response: IJsonRpcResponse<any> = this.servicesManager.executeServiceRequest(request);
       ipcRenderer.send('services-response', response);
-    });
+    };
+    ipcRenderer.on('services-request', this.requestHandler);
     ipcRenderer.send('services-ready');
 
-    this.servicesManager.serviceEvent.subscribe(event => this.sendEvent(event));
+    this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(event => this.sendEvent(event));
   }
 
+  stopListen() {
+    ipcRenderer.removeListener('services-request', this.requestHandler);
+    this.servicesEventsSubscription.unsubscribe();
+  }
 
   private sendEvent(event: IJsonRpcResponse<IJsonRpcEvent>) {
     ipcRenderer.send('services-message', event);

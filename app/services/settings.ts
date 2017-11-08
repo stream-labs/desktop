@@ -10,6 +10,7 @@ import { WindowsService } from './windows';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
+  codeSubCategory?: string;
   parameters: TFormData;
 }
 
@@ -33,7 +34,6 @@ export interface ISettingsState {
     Base: string;
   };
   Audio: Dictionary<TObsValue>;
-  Hotkeys: Dictionary<TObsValue>;
   Advanced: Dictionary<TObsValue>;
 }
 
@@ -99,7 +99,7 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
 
   getCategories(): string[] {
-    return nodeObs.OBS_settings_getListCategories();
+    return nodeObs.OBS_settings_getListCategories().concat(['API']);
   }
 
 

@@ -107,7 +107,7 @@ export class AppService extends StatefulService<IAppState> {
         this.streamInfoService;
 
         this.ipcServerService.listen();
-        this.tcpServerService.listenWebsokets();
+        this.tcpServerService.listen();
         this.FINISH_LOADING();
       });
     }, 500);
@@ -166,6 +166,8 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.disableAutosave();
+    this.ipcServerService.stopListen();
+    this.tcpServerService.stopListen();
     this.configPersistenceService.rawSave().then(() => {
       this.reset();
       this.videoService.destroyAllDisplays();
