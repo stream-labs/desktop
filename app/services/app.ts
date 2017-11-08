@@ -98,7 +98,7 @@ export class AppService extends StatefulService<IAppState> {
 
         this.userService;
         this.shortcutsService;
-        window['slsvc'] = this.streamlabelsService;
+        this.streamlabelsService;
 
         // Pre-fetch stream info
         this.streamInfoService;
