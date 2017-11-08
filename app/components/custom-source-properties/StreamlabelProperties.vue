@@ -22,10 +22,25 @@
     <div class="input-wrapper">
       <input
         type="text"
-        :value="labelTemplate"/>
+        v-model="labelSettings.format"
+        @input="debouncedSetSettings"/>
       <div>
         <b>Tokens:</b>
         <span class="streamlabel-token" v-for="token in labelTemplateTokens">{{ token }} </span>
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <div class="input-label">
+      <label>Preview</label>
+    </div>
+    <div class="input-wrapper">
+      <div class="streamlabel-preview">
+        {{ preview }}
+      </div>
+      <div>
+        <b>Note:</b>
+        Actual label text may take up to 60 seconds to update
       </div>
     </div>
   </div>
@@ -39,5 +54,15 @@
 
 .streamlabel-token {
   color: @teal;
+}
+
+.streamlabel-preview {
+  color: @black;
+}
+
+.night-theme {
+  .streamlabel-preview {
+    color: @white;
+  }
 }
 </style>

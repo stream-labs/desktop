@@ -95,6 +95,28 @@ export class StreamlabelsService extends Service {
   }
 
 
+  setSettingsForStat(statname: string, settings: IStreamlabelSettings): Promise<boolean> {
+    this.settings[statname] = settings;
+
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
+    `/settings?token=${this.userService.widgetToken}`;
+    const request = new Request(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(this.settings)
+    });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => console.log(json))
+      .then(() => true);
+  }
+
+
   /**
    * Attempt to load initial data via HTTP instead of waiting
    * for a socket event
