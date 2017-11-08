@@ -199,7 +199,7 @@ export function obsValuesToInputValues(
 
     } else if (obsProp.type === 'OBS_PROPERTY_BOOL') {
 
-      if (options.boolIsString) prop.value = prop.value === 'true';
+      prop.value = !!prop.value;
 
     } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
 
