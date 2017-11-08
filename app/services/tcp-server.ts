@@ -69,7 +69,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     },
     websockets: {
       enabled: false,
-      port: 59652,
+      port: 59650,
       allowRemote: false
     }
   };
@@ -300,6 +300,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             id: String(request.id)
           });
           this.sendResponse(client, errorResponse);
+          return;
         }
 
         // handle unsubscribing by clearing client subscriptions
