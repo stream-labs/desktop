@@ -143,9 +143,8 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     return new Promise(resolve => {
       const configName = this.state.activeCollection;
 
-      this.scenesService.scenes.forEach(scene => {
-        scene.remove();
-      });
+      this.scenesService.scenes.forEach(scene => scene.remove(true));
+      this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
 
       const backConfigFile = this.getConfigFilePath(configName) + '.bak';
 
