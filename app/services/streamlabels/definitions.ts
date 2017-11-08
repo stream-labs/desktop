@@ -13,7 +13,6 @@ export interface IStreamlabelDefinition {
   name: string;
   label: string;
   settings: IStreamlabelSettingsDefinition;
-  template: TStreamlabelFormType;
 }
 
 export interface IStreamlabelSettingsDefinition {
@@ -59,36 +58,31 @@ const allDefinitions: IStreamlabelSet = {
       label: 'All-Time Top Donator',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_top_donator',
       label: 'Session Top Donator',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_top_donator',
       label: 'Monthly Top Donator',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_top_donator',
       label: '30-Day Top Donator',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_top_donator',
       label: 'Weekly Top Donator',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
   top_donators: {
@@ -100,8 +94,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'session_top_donators',
       label: 'Session Top Donators',
@@ -109,8 +102,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'monthly_top_donators',
       label: 'Monthly Top Donators',
@@ -118,8 +110,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: '30day_top_donators',
       label: '30-Day Top Donators',
@@ -127,8 +118,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'weekly_top_donators',
       label: 'Weekly Top Donators',
@@ -136,8 +126,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }]
   },
   top_donations: {
@@ -149,8 +138,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'session_top_donations',
       label: 'Session Top Donations',
@@ -158,8 +146,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'monthly_top_donations',
       label: 'Monthly Top Donations',
@@ -167,8 +154,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: '30day_top_donations',
       label: '30-Day Top Donations',
@@ -176,8 +162,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'weekly_top_donations',
       label: 'Weekly Top Donations',
@@ -185,8 +170,7 @@ const allDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }]
   },
   donation_amount: {
@@ -196,36 +180,31 @@ const allDefinitions: IStreamlabelSet = {
       label: 'Total Donation Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_donation_amount',
       label: 'Session Donation Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_donation_amount',
       label: 'Monthly Donation Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_donation_amount',
       label: '30-Day Donation Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_donation_amount',
       label: 'Weekly Donation Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
   donators: {
@@ -236,8 +215,7 @@ const allDefinitions: IStreamlabelSet = {
         label: 'Most Recent Donator',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }, {
         name: 'session_donators',
         label: 'Session Donators (Max 25)',
@@ -245,15 +223,13 @@ const allDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       }, {
         name: 'session_most_recent_donator',
         label: 'Session Recent Donator',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -265,8 +241,7 @@ const allDefinitions: IStreamlabelSet = {
         label: 'Donation Goal',
         settings: {
           format: { tokens: ['{title}', '{currentAmount}', '{goalAmount}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   }
@@ -296,8 +271,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         label: 'Total Subscriber Count',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'most_recent_youtube_subscriber',
@@ -305,8 +279,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_youtube_subscribers',
@@ -316,8 +289,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}'] },
           item_separator: { tokens: ['\\n'] },
           includeResubsOption: true
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_youtube_subscriber_count',
@@ -325,8 +297,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{count}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_most_recent_youtube_subscriber',
@@ -334,8 +305,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -347,8 +317,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         label: 'Total Sponsor Count',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'most_recent_youtube_sponsor',
@@ -356,8 +325,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_youtube_sponsors',
@@ -367,8 +335,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}'] },
           item_separator: { tokens: ['\\n'] },
           includeResubsOption: true
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_youtube_sponsor_count',
@@ -376,8 +343,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{count}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_most_recent_youtube_sponsor',
@@ -385,8 +351,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -397,36 +362,31 @@ const youtubeDefinitions: IStreamlabelSet = {
       label: 'Total Super Chat Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_youtube_superchat_amount',
       label: 'Session Super Chat Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_youtube_superchat_amount',
       label: 'Monthly Super Chat Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_youtube_superchat_amount',
       label: '30-Day Super Chat Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_youtube_superchat_amount',
       label: 'Weekly Super Chat Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
 
@@ -439,8 +399,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'session_top_youtube_superchatters',
       label: 'Session Top Super Chatters',
@@ -448,8 +407,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'monthly_top_youtube_superchatters',
       label: 'Monthly Top Super Chatters',
@@ -457,8 +415,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: '30day_top_youtube_superchatters',
       label: '30-Day Top Super Chatters',
@@ -466,8 +423,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'weekly_top_youtube_superchatters',
       label: 'Weekly Top Super Chatters',
@@ -475,8 +431,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }]
   },
 
@@ -487,36 +442,31 @@ const youtubeDefinitions: IStreamlabelSet = {
       label: 'All-Time Top Super Chatter',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_top_youtube_superchatter',
       label: 'Session Top Super Chatter',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_top_youtube_superchatter',
       label: 'Monthly Top Super Chatter',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_top_youtube_superchatter',
       label: '30-Day Top Super Chatter',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_top_youtube_superchatter',
       label: 'Weekly Top Super Chatter',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
 
@@ -528,8 +478,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         label: 'Most Recent Super Chatter',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }, {
         name: 'session_superchatters',
         label: 'Session Super Chatters (Max 25)',
@@ -537,15 +486,13 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       }, {
         name: 'session_most_recent_youtube_superchatter',
         label: 'Session Recent Super Chatter',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -560,9 +507,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
-
+        }
       },
       {
         name: 'monthly_top_youtube_superchats',
@@ -571,8 +516,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: '30day_top_youtube_superchats',
@@ -581,8 +525,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'weekly_top_youtube_superchats',
@@ -591,8 +534,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_top_youtube_superchats',
@@ -601,8 +543,7 @@ const youtubeDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       }
     ]
   },
@@ -641,36 +582,31 @@ const twitchDefinitions: IStreamlabelSet = {
       label: 'All-Time Top Cheerer',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_top_cheerer',
       label: 'Session Top Cheerer',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_top_cheerer',
       label: 'Monthly Top Cheerer',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_top_cheerer',
       label: '30-Day Top Cheerer',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_top_cheerer',
       label: 'Weekly Top Cheerer',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
   top_cheerers: {
@@ -682,8 +618,7 @@ const twitchDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'session_top_cheerers',
       label: 'Session Top Cheerers',
@@ -691,8 +626,7 @@ const twitchDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'monthly_top_cheerers',
       label: 'Monthly Top Cheerers',
@@ -700,8 +634,7 @@ const twitchDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: '30day_top_cheerers',
       label: '30-Day Top Cheerers',
@@ -709,8 +642,7 @@ const twitchDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }, {
       name: 'weekly_top_cheerers',
       label: 'Weekly Top Cheerers',
@@ -718,8 +650,7 @@ const twitchDefinitions: IStreamlabelSet = {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
         item_separator: { tokens: ['\\n'] }
-      },
-      template: 'itemFileForm'
+      }
     }]
   },
   top_cheers: {
@@ -732,9 +663,7 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
-
+        }
       },
       {
         name: 'monthly_top_cheers',
@@ -743,8 +672,7 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: '30day_top_cheers',
@@ -753,8 +681,7 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'weekly_top_cheers',
@@ -763,8 +690,7 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_top_cheers',
@@ -773,8 +699,7 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       }
     ]
   },
@@ -785,36 +710,31 @@ const twitchDefinitions: IStreamlabelSet = {
       label: 'Total Cheer Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'session_cheer_amount',
       label: 'Session Cheer Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'monthly_cheer_amount',
       label: 'Monthly Cheer Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: '30day_cheer_amount',
       label: '30-Day Cheer Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }, {
       name: 'weekly_cheer_amount',
       label: 'Weekly Cheer Amount',
       settings: {
         format: { tokens: ['{amount}'] }
-      },
-      template: 'simpleFileForm'
+      }
     }]
   },
   cheerers: {
@@ -825,8 +745,7 @@ const twitchDefinitions: IStreamlabelSet = {
         label: 'Most Recent Cheerer',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }, {
         name: 'session_cheerers',
         label: 'Session Cheerers (Max 25)',
@@ -834,15 +753,13 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       }, {
         name: 'session_most_recent_cheerer',
         label: 'Session Recent Cheerer',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -854,16 +771,14 @@ const twitchDefinitions: IStreamlabelSet = {
         label: 'Total Follower Count',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'most_recent_follower',
         label: 'Most Recent Follower',
         settings: {
           format: { tokens: ['{name}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_followers',
@@ -872,24 +787,21 @@ const twitchDefinitions: IStreamlabelSet = {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}'] },
           item_separator: { tokens: ['\\n'] }
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_follower_count',
         label: 'Session Follower Count',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_most_recent_follower',
         label: 'Session Most Recent Follower',
         settings: {
           format: { tokens: ['{name}'] }
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   },
@@ -901,16 +813,14 @@ const twitchDefinitions: IStreamlabelSet = {
         label: 'Total Subscriber Count',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'total_subscriber_score',
         label: 'Total Subscriber Points',
         settings: {
           format: { tokens: ['{count}'] }
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'most_recent_subscriber',
@@ -918,8 +828,7 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{months}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_subscribers',
@@ -929,8 +838,7 @@ const twitchDefinitions: IStreamlabelSet = {
           item_format: { tokens: ['{name}'] },
           item_separator: { tokens: ['\\n'] },
           includeResubsOption: true
-        },
-        template: 'itemFileForm'
+        }
       },
       {
         name: 'session_subscriber_count',
@@ -938,8 +846,7 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{count}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       },
       {
         name: 'session_most_recent_subscriber',
@@ -947,8 +854,7 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{name}', '{months}'] },
           includeResubsOption: true
-        },
-        template: 'simpleFileForm'
+        }
       }
     ]
   }
