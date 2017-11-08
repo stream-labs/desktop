@@ -55,6 +55,12 @@ export default class StreamlabelProperties extends Vue {
   debouncedSetSettings: () => void;
 
   setSettings() {
+    if (this.labelSettings.limit) {
+      if (isNaN(this.labelSettings.limit)) this.labelSettings.limit = 0;
+      if (this.labelSettings.limit < 0) this.labelSettings.limit = 0;
+      if (this.labelSettings.limit > 100) this.labelSettings.limit = 100;
+    }
+
     this.streamlabelsService.setSettingsForStat(
       this.currentlySelected.name,
       this.labelSettings
@@ -62,8 +68,16 @@ export default class StreamlabelProperties extends Vue {
   }
 
 
+  /**
+   * Returns the preview split on newlines
+   */
+  get splitPreview() {
+    return this.preview.split('\\n');
+  }
+
+
   get preview() {
-    return this.labelSettings.format
+    let replaced = this.labelSettings.format
       .replace(/{name}/gi, 'Fishstickslol')
       .replace(/{title}/gi, 'New Computer')
       .replace(/{currentAmount}/gi, '$12')
@@ -72,6 +86,33 @@ export default class StreamlabelProperties extends Vue {
       .replace(/{amount}/gi, '$4.99')
       .replace(/{months}/gi, '3')
       .replace(/{either_amount}/gi, ['$4.99', '499 Bits'][Math.floor(Math.random() * 2)]);
+
+    if (this.labelSettings.item_format) {
+      const itemStr = this.sampleItems.join(this.labelSettings.item_separator);
+      replaced = replaced.replace(/{list}/gi, itemStr);
+    }
+
+    return replaced;
   }
+
+
+  get sampleItems() {
+    return this.sampleItemData.map(data => {
+      return this.labelSettings.item_format
+        .replace(/{name}/gi, data.name)
+        .replace(/{months}/gi, data.months)
+        .replace(/{amount}/gi, data.amount)
+        .replace(/{either_amount}/gi, [data.amount, data.bits_amount][Math.floor(Math.random() * 2)])
+        .replace(/{message}/gi, data.message);
+    });
+  }
+
+
+  sampleItemData = [
+    { name: 'Fishstickslol', months: '5', amount: '$4.98', message: 'I love you!', bits_amount: '498 Bits' },
+    { name: 'ChocoPie', months: '2', amount: '$5', message: 'I love you!', bits_amount: '500 Bits' },
+    { name: 'Beecreative', months: '3', amount: '$1.43', message: 'I love you!', bits_amount: '143 Bits' },
+    { name: 'ActionBa5tard', months: '1', amount: '$13.37', message: 'Love your stream!', bits_amount: '1337 Bits'}
+  ];
 
 }

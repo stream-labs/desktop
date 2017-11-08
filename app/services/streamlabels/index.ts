@@ -91,11 +91,21 @@ export class StreamlabelsService extends Service {
 
 
   getSettingsForStat(statname: string) {
-    return this.settings[statname];
+    const settings = { ...this.settings[statname] };
+
+    if (settings.item_separator) {
+      settings.item_separator = settings.item_separator.replace(/\n/gi, '\\n');
+    }
+
+    return settings;
   }
 
 
   setSettingsForStat(statname: string, settings: IStreamlabelSettings): Promise<boolean> {
+    if (settings.item_separator) {
+      settings.item_separator = settings.item_separator.replace(/\\n/gi, '\n');
+    }
+
     this.settings[statname] = settings;
 
     const headers = new Headers();

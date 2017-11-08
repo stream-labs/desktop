@@ -92,7 +92,9 @@
     </div>
     <div class="input-wrapper">
       <div class="streamlabel-preview">
-        {{ preview }}
+        <div v-for="line in splitPreview" :key="line">
+          {{ line }}
+        </div>
       </div>
       <div>
         <b>Note:</b>
