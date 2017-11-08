@@ -61,16 +61,11 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     this.CLEAR_SCENES_COLLECTIONS();
     if (!fs.existsSync(this.configFileDirectory)) return;
 
-    const configsNames = fs.readdirSync(this.configFileDirectory).map(file => file.replace(/\.[^/.]+$/, ''));
-    const configsNamesWithoutBackup: string[] = [];
+    const configsNames = fs.readdirSync(this.configFileDirectory).filter(fileName => {
+      return fileName.indexOf('.bak') === -1;
+    }).map(file => file.replace(/\.[^/.]+$/, ''));
 
-    if (configsNames.length) {
-      configsNames.forEach(configName => {
-        if (configName.indexOf('_backup') === -1) configsNamesWithoutBackup.push(configName);
-      });
-      this.ADD_SCENES_COLLECTIONS(configsNamesWithoutBackup);
-    }
-
+    this.ADD_SCENES_COLLECTIONS(configsNames);
   }
 
   @throttle(5000)
@@ -87,16 +82,19 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
       const root = new RootNode();
       root.save().then(() => {
         this.ensureDirectory();
-        fs.writeFileSync(
-          this.getConfigFilePath(configName || this.state.activeCollection),
-          JSON.stringify(root, null, 2)
-        );
+        let configFileName = this.getConfigFilePath(configName || this.state.activeCollection);
 
-        if (!backup) {
+        if (backup) {
+          configFileName = configFileName.concat('.bak');
+        } else {
           if (!this.hasConfig(configName)) this.ADD_SCENES_COLLECTIONS([configName]);
           this.SET_ACTIVE_COLLECTION(configName);
           this.configIsSaved = true;
         }
+
+        fs.writeFileSync(configFileName,
+          JSON.stringify(root, null, 2)
+        );
 
         resolve();
       });
@@ -123,7 +121,7 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
             // create the default one
             if (this.scenesService.scenes.length === 0) this.setUpDefaults();
             this.configIsSaved = true;
-            this.rawSave(configName + '_backup', true);
+            this.rawSave(configName, true);
             resolve();
           }).catch((error: any) => {
             this.loadBackupConfigFile().then(() => {
@@ -149,8 +147,10 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
         scene.remove();
       });
 
-      if (fs.existsSync(this.getConfigFilePath(configName + '_backup'))) {
-        const backupData = fs.readFileSync(this.getConfigFilePath(configName + '_backup')).toString();
+      const backConfigFile = this.getConfigFilePath(configName) + '.bak';
+
+      if (fs.existsSync(backConfigFile)) {
+        const backupData = fs.readFileSync(backConfigFile).toString();
         if (backupData) {
           const root = parse(backupData, NODE_TYPES);
           root.load().then(() => {
