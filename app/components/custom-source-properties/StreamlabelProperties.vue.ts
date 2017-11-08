@@ -24,27 +24,13 @@ export default class StreamlabelProperties extends Vue {
     return Object.values(definitions);
   }
 
-
-  get labelTemplateTokens() {
-    if (this.currentlySelected) {
-      return this.currentlySelected.settings.format.tokens;
-    }
-  }
-
   currentlySelected: IStreamlabelDefinition = null;
+  labelSettings: IStreamlabelSettings = null;
 
   created() {
     this.refreshPropertyValues();
     this.debouncedSetSettings = debounce(() => this.setSettings(), 1000);
   }
-
-
-  labelSettings: IStreamlabelSettings = {
-    format: '',
-    item_format: '',
-    item_separator: '',
-    limit: 0
-  };
 
 
   refreshPropertyValues() {

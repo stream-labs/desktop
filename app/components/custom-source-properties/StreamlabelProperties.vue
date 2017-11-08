@@ -26,8 +26,64 @@
         @input="debouncedSetSettings"/>
       <div>
         <b>Tokens:</b>
-        <span class="streamlabel-token" v-for="token in labelTemplateTokens">{{ token }} </span>
+        <span
+          class="streamlabel-token"
+          v-for="token in currentlySelected.settings.format.tokens"
+          :key="token">
+          {{ token }}
+        </span>
       </div>
+    </div>
+  </div>
+  <div class="input-container" v-if="labelSettings.item_format != null">
+    <div class="input-label">
+      <label>Item Template</label>
+    </div>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        v-model="labelSettings.item_format"
+        @input="debouncedSetSettings"/>
+      <div>
+        <b>Tokens:</b>
+        <span
+          class="streamlabel-token"
+          v-for="token in currentlySelected.settings.item_format.tokens"
+          :key="token">
+          {{ token }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="input-container" v-if="labelSettings.item_separator != null">
+    <div class="input-label">
+      <label>Item Separator</label>
+    </div>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        v-model="labelSettings.item_separator"
+        @input="debouncedSetSettings"/>
+      <div>
+        <b>Tokens:</b>
+        <span
+          class="streamlabel-token"
+          v-for="token in currentlySelected.settings.item_separator.tokens"
+          :key="token">
+          {{ token }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="input-container" v-if="labelSettings.limit != null">
+    <div class="input-label">
+      <label>Item Limit</label>
+    </div>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        v-model="labelSettings.limit"
+        @input="debouncedSetSettings"/>
     </div>
   </div>
   <div class="input-container">

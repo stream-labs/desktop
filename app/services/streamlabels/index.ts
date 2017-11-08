@@ -111,8 +111,6 @@ export class StreamlabelsService extends Service {
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json())
-      .then(json => console.log(json))
       .then(() => true);
   }
 
