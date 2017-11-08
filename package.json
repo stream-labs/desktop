@@ -11,7 +11,7 @@
     "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
     "install-node-obs": "node bin/install-node-obs.js && yarn install-plugins",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.7.7 && rm -rf ../streamlabs-obs/node-obs/ && cp -r ./build/distribute/node-obs/ ../streamlabs-obs/ && cd ../streamlabs-obs && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
+    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.7.7 && cmake --build build --target install --config Release && rm -rf ../streamlabs-obs/node-obs/ && cp -r ./build/distribute/node-obs/ ../streamlabs-obs/ && cd ../streamlabs-obs && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js",
