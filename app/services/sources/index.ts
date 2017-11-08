@@ -102,6 +102,7 @@ export type TSourceType =
   'dshow_input' |
   'wasapi_input_capture' |
   'wasapi_output_capture' |
+  'decklink-input' |
   'scene'
   ;
 
@@ -271,7 +272,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
-    return [
+    const obsAvailableTypes = obs.InputFactory.types();
+    const whitelistedTypes: IListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -285,8 +287,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
-      { description: 'Scene', value: 'scene' }
+      { description: 'Blackmagic Device', value: 'decklink-input' }
     ];
+
+    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    // 'scene' is not an obs input type so we have to set it manually
+    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+
+    return availableWhitelistedType;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
