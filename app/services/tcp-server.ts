@@ -64,7 +64,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       allowRemote: false
     },
     namedPipe: {
-      enabled: false,
+      enabled: true,
       pipeName: 'slobs'
     },
     websockets: {
