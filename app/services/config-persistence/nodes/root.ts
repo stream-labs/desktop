@@ -59,5 +59,4 @@ export class RootNode extends Node<ISchema, {}> {
       });
     });
   }
-
 }
