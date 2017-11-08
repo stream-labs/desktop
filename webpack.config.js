@@ -42,7 +42,8 @@ module.exports = {
     // Not actually a native addons, but are super big so we don't
     // bother compiling them into our bundle.
     'aws-sdk': 'require("aws-sdk")',
-    'asar': 'require("asar")'
+    'asar': 'require("asar")',
+    'backtrace-node': 'require("backtrace-node")'
   },
 
   module: {
