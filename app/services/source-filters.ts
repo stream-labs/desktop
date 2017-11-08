@@ -74,7 +74,7 @@ export class SourceFiltersService extends Service {
       { description: 'VST 2.x Plugin', value: 'vst_filter' }
     ];
 
-    return Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes); 
+    return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
   }
 
 

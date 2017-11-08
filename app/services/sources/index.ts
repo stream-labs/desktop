@@ -290,7 +290,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Blackmagic Device', value: 'decklink-input' }
     ];
 
-    const availableWhitelistedType = Utils.getAvailableWhitelistedType(obsAvailableTypes, whitelistedTypes);
+    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
     // 'scene' is not an obs input type so we have to set it manually
     availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
 
