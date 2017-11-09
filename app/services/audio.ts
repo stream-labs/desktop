@@ -34,6 +34,7 @@ export interface IAudioSource {
   monitoringType: obs.EMonitoringType;
   forceMono: boolean;
   syncOffset: number;
+  muted: boolean;
 }
 
 
@@ -44,6 +45,7 @@ export interface IAudioSourceApi extends IAudioSource {
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
   getSettingsForm(): TFormData;
   setSettings(patch: Partial<IAudioSource>): void;
+  getModel(): IAudioSource & ISource;
 }
 
 
@@ -74,6 +76,7 @@ interface IAudioSourcesState {
 export interface IAudioServiceApi {
   getDevices(): IAudioDevice[];
   getSource(sourceId: string): IAudioSourceApi;
+  getSourcesForScene(sceneId: string): IAudioSourceApi[];
   getSourcesForCurrentScene(): IAudioSourceApi[];
 }
 
@@ -138,7 +141,12 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
 
   getSourcesForCurrentScene(): AudioSource[] {
-    const scene = this.scenesService.activeScene;
+    return this.getSourcesForScene(this.scenesService.activeSceneId);
+  }
+
+
+  getSourcesForScene(sceneId: string): AudioSource[] {
+    const scene = this.scenesService.getScene(sceneId);
     const sceneSources = scene.getNestedSources({ excludeScenes: true })
       .filter(sceneItem => sceneItem.audio);
 
@@ -167,7 +175,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       audioMixers: obsSource.audioMixers,
       monitoringType: obsSource.monitoringType,
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
-      syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset)
+      syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
+      muted: obsSource.muted
     };
   }
 
@@ -272,6 +281,10 @@ export class AudioSource implements IAudioSourceApi {
 
   get displayName() {
     return this.source.displayName;
+  }
+
+  getModel(): IAudioSource & ISource {
+    return { ...this.audioSourceState, ...this.source.sourceState };
   }
 
   getSettingsForm(): TFormData {

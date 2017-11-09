@@ -10,6 +10,8 @@ import {
 import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
+import { Observable } from 'rxjs/Observable';
+
 import Utils from 'services/utils';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { Inject } from 'util/injector';
@@ -78,6 +80,9 @@ export interface ISourcesServiceApi {
   showAddSource(sourceType: TSourceType): void;
   showNameSource(sourceType: TSourceType): void;
   showNameWidget(widgetType: WidgetType): void;
+  sourceAdded: Observable<ISource>;
+  sourceUpdated: Observable<ISource>;
+  sourceRemoved: Observable<ISource>;
 }
 
 
@@ -507,6 +512,9 @@ export class Source implements ISourceApi {
     return obs.InputFactory.fromName(this.name);
   }
 
+  getModel() {
+    return this.sourceState;
+  }
 
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);

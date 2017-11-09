@@ -44,6 +44,7 @@ export interface ISceneApi extends IScene {
   makeItemsActive(sceneItemIds: string[]): void;
   canAddSource(sourceId: string): boolean;
   setName(newName: string): void;
+  getModel(): IScene;
 }
 
 
@@ -67,6 +68,9 @@ export class Scene implements ISceneApi {
     Utils.applyProxy(this, this.sceneState);
   }
 
+  getModel(): IScene {
+    return this.sceneState;
+  }
 
   getObsScene(): obs.IScene {
     return obs.SceneFactory.fromName(this.name);

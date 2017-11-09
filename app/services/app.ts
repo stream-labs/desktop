@@ -6,13 +6,14 @@ import { UserService } from './user';
 import { ShortcutsService } from './shortcuts';
 import { Inject } from '../util/injector';
 import electron from 'electron';
-import { ServicesManager } from '../services-manager';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { SourcesService } from './sources';
 import { ScenesService } from './scenes/scenes';
 import { VideoService } from './video';
 import { StreamInfoService } from './stream-info';
 import { track } from './usage-statistics';
+import { IpcServerService } from './ipc-server';
+import { TcpServerService } from './tcp-server';
 
 interface IAppState {
   loading: boolean;
@@ -59,6 +60,12 @@ export class AppService extends StatefulService<IAppState> {
   @Inject()
   videoService: VideoService;
 
+  @Inject()
+  private ipcServerService: IpcServerService;
+
+  @Inject()
+  private tcpServerService: TcpServerService;
+
   @track('app_start')
   load() {
 
@@ -99,7 +106,8 @@ export class AppService extends StatefulService<IAppState> {
         // Pre-fetch stream info
         this.streamInfoService;
 
-        ServicesManager.instance.listenApiCalls();
+        this.ipcServerService.listen();
+        this.tcpServerService.listen();
         this.FINISH_LOADING();
       });
     }, 500);
@@ -158,6 +166,8 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.disableAutosave();
+    this.ipcServerService.stopListening();
+    this.tcpServerService.stopListening();
     this.configPersistenceService.rawSave().then(() => {
       this.reset();
       this.videoService.destroyAllDisplays();
