@@ -25,17 +25,11 @@ export default class StreamlabelProperties extends Vue {
   }
 
   currentlySelected: IStreamlabelDefinition = null;
+  labelSettings: IStreamlabelSettings = null;
 
   created() {
     this.refreshPropertyValues();
     this.debouncedSetSettings = debounce(() => this.setSettings(), 1000);
-  }
-
-
-  get labelSettings(): IStreamlabelSettings {
-    if (!this.currentlySelected) return {};
-
-    return this.streamlabelsService.state.settings[this.currentlySelected.name];
   }
 
 
@@ -44,7 +38,10 @@ export default class StreamlabelProperties extends Vue {
 
     this.statOptions.forEach(category => {
       category.files.forEach(file => {
-        if (file.name === settings.statname) this.currentlySelected = file;
+        if (file.name === settings.statname) {
+          this.currentlySelected = file;
+          this.labelSettings = this.streamlabelsService.getSettingsForStat(settings.statname);
+        }
       });
     });
   }

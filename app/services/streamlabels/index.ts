@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
@@ -23,37 +23,28 @@ export interface IStreamlabelsSubscription {
 
 
 export interface IStreamlabelSettings {
-  format?: string;
+  format: string;
   item_format?: string;
   item_separator?: string;
   limit?: number;
 }
 
 
-interface IStreamlabelsServiceState {
-  settings: Dictionary<IStreamlabelSettings>;
-}
-
-
-export class StreamlabelsService extends StatefulService<IStreamlabelsServiceState> {
+export class StreamlabelsService extends Service {
 
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
 
 
   data: IStreamlabelsData;
+  settings: Dictionary<IStreamlabelSettings>;
   subscriptions: IStreamlabelsSubscription[] = [];
-
-
-  static initialState: IStreamlabelsServiceState = {
-    settings: {}
-  };
 
 
   init() {
     this.ensureDirectory();
     this.fetchInitialData();
-    this.fetchSettings();
+    this.fetchSettings().then(settings => this.settings = settings);
     this.fetchSocketToken().then(token => {
       const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
       const socket = io(url, { transports: ['websocket'] });
@@ -98,7 +89,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
 
 
   getSettingsForStat(statname: string) {
-    const settings = { ...this.state.settings[statname] };
+    const settings = { ...this.settings[statname] };
 
     if (settings.item_separator) {
       settings.item_separator = settings.item_separator.replace(/\n/gi, '\\n');
@@ -113,7 +104,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
       settings.item_separator = settings.item_separator.replace(/\\n/gi, '\n');
     }
 
-    this.SET_SETTINGS({ [statname]: settings });
+    this.settings[statname] = settings;
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -123,7 +114,7 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
     const request = new Request(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(this.state.settings)
+      body: JSON.stringify(this.settings)
     });
 
     return fetch(request)
@@ -150,17 +141,16 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
   }
 
 
-  fetchSettings(): void {
-    if (!this.userService.isLoggedIn()) return;
+  fetchSettings(): Promise<Dictionary<IStreamlabelSettings>> {
+    if (!this.userService.isLoggedIn()) return Promise.reject({});
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
       `/settings?token=${this.userService.widgetToken}`;
     const request = new Request(url);
 
-    fetch(request)
+    return fetch(request)
       .then(handleErrors)
-      .then(response => response.json())
-      .then(settings => this.SET_SETTINGS(settings));
+      .then(response => response.json());
   }
 
 
@@ -214,15 +204,6 @@ export class StreamlabelsService extends StatefulService<IStreamlabelsServiceSta
       path: this.getStreamlabelsPath(subscription.filename),
       data: this.data[subscription.statname]
     });
-  }
-
-
-  @mutation()
-  SET_SETTINGS(settingsPatch: Dictionary<IStreamlabelSettings>) {
-    this.state.settings = {
-      ...this.state.settings,
-      ...settingsPatch
-    };
   }
 
 }
