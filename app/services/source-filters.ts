@@ -27,7 +27,8 @@ export type TSourceFilterType =
   'noise_suppress_filter' |
   'noise_gate_filter' |
   'compressor_filter' |
-  'vst_filter';
+  'vst_filter' |
+  'face_mask_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -71,7 +72,8 @@ export class SourceFiltersService extends Service {
       { description: 'Noise Suppression', value: 'noise_suppress_filter' },
       { description: 'Noise Gate', value: 'noise_gate_filter' },
       { description: 'Compressor', value: 'compressor_filter' },
-      { description: 'VST 2.x Plugin', value: 'vst_filter' }
+      { description: 'VST 2.x Plugin', value: 'vst_filter' },
+      { description: 'Face Mask Plugin', value: 'face_mask_filter' }
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
