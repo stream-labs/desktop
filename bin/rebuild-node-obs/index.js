@@ -13,6 +13,7 @@ let cmake_js_path = null;
 const cmake_generator = 'Visual Studio 14 2015 Win64';
 const runtime = 'electron';
 const runtime_version = '1.7.7';
+const config_type = 'Release'
 
 /** This assumes cmake is in the global PATH variable. */
 function buildNodeObs() {
@@ -21,8 +22,8 @@ function buildNodeObs() {
 	shell.exec(`"${cmake_js_path}" --directory ${node_obs_path} build --runtime ${runtime} --runtime-version ${runtime_version}`);
 
 	const node_obs_build_path = path.resolve(node_obs_path, `build`);
-	shell.exec(`cmake --build ${node_obs_build_path} --config Release`);
-	shell.exec(`cmake --build ${node_obs_build_path} --target install`);
+	shell.exec(`cmake --build ${node_obs_build_path} --config ${config_type}`);
+	shell.exec(`cmake --build ${node_obs_build_path} --target install --config ${config_type}`);
 
 	if (process.argv.length >= 4) {
 		/* Binaries are hardcoded to be put in <node obs dir>/<build dir>/distribute */
