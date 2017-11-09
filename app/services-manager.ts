@@ -34,6 +34,7 @@ import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
+import { StreamlabelsService } from './services/streamlabels';
 import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
@@ -138,9 +139,10 @@ export class ServicesManager extends Service {
     ShortcutsService,
     CacheUploaderService,
     UsageStatisticsService,
+    StreamInfoService,
+    StreamlabelsService,
     IpcServerService,
-    TcpServerService,
-    StreamInfoService
+    TcpServerService
   };
 
   private instances: Dictionary<Service> = {};

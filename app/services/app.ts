@@ -12,6 +12,7 @@ import { ScenesService } from './scenes/scenes';
 import { VideoService } from './video';
 import { StreamInfoService } from './stream-info';
 import { track } from './usage-statistics';
+import { StreamlabelsService } from 'services/streamlabels';
 import { IpcServerService } from './ipc-server';
 import { TcpServerService } from './tcp-server';
 
@@ -60,11 +61,9 @@ export class AppService extends StatefulService<IAppState> {
   @Inject()
   videoService: VideoService;
 
-  @Inject()
-  private ipcServerService: IpcServerService;
-
-  @Inject()
-  private tcpServerService: TcpServerService;
+  @Inject() streamlabelsService: StreamlabelsService;
+  @Inject() private ipcServerService: IpcServerService;
+  @Inject() private tcpServerService: TcpServerService;
 
   @track('app_start')
   load() {
@@ -102,6 +101,7 @@ export class AppService extends StatefulService<IAppState> {
 
         this.userService;
         this.shortcutsService;
+        this.streamlabelsService;
 
         // Pre-fetch stream info
         this.streamInfoService;
