@@ -13,7 +13,7 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, powerSaveBlocker } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
@@ -21,7 +21,7 @@ const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
-const bt = require('backtrace-node')
+const bt = require('backtrace-node');
 
 function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
@@ -111,6 +111,8 @@ function startApp() {
     app.setPath('userData', process.env.SLOBS_CACHE_DIR);
   }
 
+  const powerSaveId = powerSaveBlocker.start('prevent-display-sleep');
+
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 1000,
@@ -158,6 +160,7 @@ function startApp() {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
     obs.OBS_API_destroyOBS_API();
+    powerSaveBlocker.stop(powerSaveId);
     app.quit();
   });
 
