@@ -8,6 +8,7 @@ import { padStart } from 'lodash';
 import { track } from './usage-statistics';
 import { WindowsService } from './windows';
 import { Subject } from 'rxjs/Subject';
+import electron from 'electron';
 
 interface IStreamingServiceState {
   isStreaming: boolean;
@@ -62,6 +63,8 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
 
   streamingStatusChange = new Subject<boolean>();
 
+  powerSaveId: number;
+
 
   // Only runs once per app lifecycle
   init() {
@@ -100,6 +103,8 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
       return;
     }
 
+    this.powerSaveId = electron.powerSaveBlocker.start('prevent-display-sleep');
+
     nodeObs.OBS_service_startStreaming();
     this.START_STREAMING((new Date()).toISOString());
     this.streamingStatusChange.next(true);
@@ -119,6 +124,8 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
     const confirmText = 'Are you sure you want to stop streaming?';
 
     if (shouldConfirm && !confirm(confirmText)) return;
+
+    if (this.powerSaveId) electron.powerSaveBlocker.stop(this.powerSaveId);
 
     nodeObs.OBS_service_stopStreaming();
     this.STOP_STREAMING();
