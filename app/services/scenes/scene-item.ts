@@ -1,38 +1,10 @@
-import { ScenesService, Scene, ISceneApi } from '../scenes';
+import { ScenesService, Scene, ISceneApi, ISceneItem, ISceneItemApi, ISceneItemInfo } from './index';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { ISourceApi, Source, SourcesService, TSourceType } from '../sources';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
-import { ISceneItemInfo } from '../config-persistence/nodes/scene-items';
-
-export interface ISceneItem {
-  sceneItemId: string;
-  sourceId: string;
-  obsSceneItemId: number;
-  x: number;
-  y: number;
-  scaleX: number;
-  scaleY: number;
-  visible: boolean;
-  crop: ICrop;
-  locked: boolean;
-  rotation: number;
-}
-
-
-export interface ISceneItemApi extends ISceneItem {
-  getScene(): ISceneApi;
-  getSource(): ISourceApi;
-  setPosition(vec: IVec2): void;
-  setVisibility(visible: boolean): void;
-  setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
-  setCrop(crop: ICrop): ICrop;
-  setPositionAndCrop(x: number, y: number, crop: ICrop): void;
-  setLocked(locked: boolean): void;
-  getModel(): ISceneItem;
-}
 
 
 /**

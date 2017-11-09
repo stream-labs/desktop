@@ -1,42 +1,27 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
-import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { WindowsService } from '../windows';
-import { IScene, Scene, ISceneItem, ISceneApi, SceneItem } from '../scenes';
+import {
+  IScene,
+  Scene,
+  ISceneItem,
+  SceneItem,
+  IScenesState,
+  ISceneCreateOptions,
+  IScenesServiceApi
+} from './index';
 import { SourcesService } from '../sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
-import { Observable } from 'rxjs/Observable';
+import * as obs from '../obs-api';
 
 const { ipcRenderer } = electron;
 
-interface IScenesState {
-  activeSceneId: string;
-  displayOrder: string[];
-  scenes: Dictionary<IScene>;
-}
 
-interface ISceneCreateOptions {
-  duplicateSourcesFromScene?: string;
-  sceneId?: string; // A new ID will be generated if one is not provided
-  makeActive?: boolean;
-}
-
-
-export interface IScenesServiceApi {
-  createScene(name: string, options: ISceneCreateOptions): ISceneApi;
-  scenes: ISceneApi[];
-  activeScene: ISceneApi;
-  activeSceneId: string;
-  getSceneByName(name: string): ISceneApi;
-  getScenes(): ISceneApi[];
-  getModel(): IScenesState;
-  sceneSwitched: Observable<IScene>;
-}
 
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {

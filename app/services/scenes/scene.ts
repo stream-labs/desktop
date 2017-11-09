@@ -1,7 +1,14 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from '../sources';
-import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
+import {
+  ISceneItem,
+  SceneItem,
+  IScene,
+  ISceneApi,
+  ISceneItemAddOptions,
+  ISceneItemInfo
+} from './index';
 import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
@@ -10,42 +17,6 @@ import _ from 'lodash';
 
 const { ipcRenderer } = electron;
 
-
-export interface IScene {
-  id: string;
-  name: string;
-  activeItemIds: string[];
-  items: ISceneItem[];
-}
-
-
-export interface ISceneItemAddOptions {
-  sceneItemId?: string; // A new ID will be assigned if one is not provided
-}
-
-export interface ISceneItemInfo {
-  id: string;
-  sourceId: string;
-  x: number;
-  y: number;
-  scaleX: number;
-  scaleY: number;
-  visible: boolean;
-  crop: ICrop;
-  locked?: boolean;
-  rotation?: number;
-}
-
-export interface ISceneApi extends IScene {
-  getItem(sceneItemId: string): ISceneItemApi;
-  getItems(): ISceneItemApi[];
-  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
-  createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
-  makeItemsActive(sceneItemIds: string[]): void;
-  canAddSource(sourceId: string): boolean;
-  setName(newName: string): void;
-  getModel(): IScene;
-}
 
 
 @ServiceHelper()
