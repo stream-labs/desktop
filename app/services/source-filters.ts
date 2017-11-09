@@ -8,6 +8,7 @@ import { SourcesService } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
+import Utils from 'services/utils';
 
 
 export type TSourceFilterType =
@@ -26,7 +27,8 @@ export type TSourceFilterType =
   'noise_suppress_filter' |
   'noise_gate_filter' |
   'compressor_filter' |
-  'vst_filter';
+  'vst_filter' |
+  'face_mask_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -53,7 +55,8 @@ export class SourceFiltersService extends Service {
   windowsService: WindowsService;
 
   getTypesList(): IListOption<TSourceFilterType>[] {
-    return [
+    const obsAvailableTypes = obs.FilterFactory.types();
+    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
       { description: 'Image Mask/Blend', value: 'mask_filter' },
       { description: 'Crop/Pad', value: 'crop_filter' },
       { description: 'Gain', value: 'gain_filter' },
@@ -69,8 +72,11 @@ export class SourceFiltersService extends Service {
       { description: 'Noise Suppression', value: 'noise_suppress_filter' },
       { description: 'Noise Gate', value: 'noise_gate_filter' },
       { description: 'Compressor', value: 'compressor_filter' },
-      { description: 'VST 2.x Plugin', value: 'vst_filter' }
+      { description: 'VST 2.x Plugin', value: 'vst_filter' },
+      { description: 'Face Mask Plugin', value: 'face_mask_filter' }
     ];
+
+    return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
   }
 
 

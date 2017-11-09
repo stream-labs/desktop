@@ -173,6 +173,17 @@
       </ul>
     </add-source-info>
 
+    <add-source-info
+      v-if="inspectedSource === 'decklink-input'"
+      @clickAdd="selectSource('decklink-input')"
+      name="Blackmagic Device"
+      description="Capture the feed your decklink device is capturing.">
+      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>Works with most of the recent Blackmagic cards.</li>
+      </ul>
+    </add-source-info>
+
     <!-- Widget Sources -->
     <add-source-info
       v-if="inspectedSource === widgetTypes.AlertBox"

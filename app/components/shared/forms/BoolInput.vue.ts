@@ -10,6 +10,7 @@ class BoolInput extends Input<IFormInput<boolean>> {
   value: IFormInput<boolean>;
 
   handleClick() {
+    if (this.value.enabled === false) return;
     this.emitInput({ ...this.value, value: !this.value.value });
   }
 

@@ -195,7 +195,7 @@ function startApp() {
   });
 
   ipcMain.on('services-request', (event, payload) => {
-    const request = { id: uuid(), payload };
+    const request = payload;
     mainWindow.webContents.send('services-request', request);
     requests[request.id] = Object.assign({}, request, { event });
   });
