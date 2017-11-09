@@ -21,7 +21,7 @@ const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
-const bt = require('backtrace-node')
+const bt = require('backtrace-node');
 
 function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
