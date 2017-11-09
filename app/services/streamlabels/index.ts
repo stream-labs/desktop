@@ -194,9 +194,8 @@ export class StreamlabelsService extends Service {
 
 
   /**
-   * Updates the data in a single streamlabels file
-   * @param filename the filename
-   * @param statname the name of the stat
+   * Updates the data for a single streamlabels subscription
+   * @param subscription the subscription to update
    */
   updateSubscription(subscription: IStreamlabelsSubscription) {
     if (!this.data) return;
