@@ -7,6 +7,7 @@ import { SourcesService } from './sources';
 import { Inject } from '../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from './audio';
 import { WindowsService } from './windows';
+import Utils from './utils';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -99,7 +100,12 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
 
   getCategories(): string[] {
-    return nodeObs.OBS_settings_getListCategories().concat(['API']);
+    let categories = nodeObs.OBS_settings_getListCategories();
+
+    // we decided to not expose API settings for production version yet
+    if (Utils.isDevMode()) categories = categories.concat(['API']);
+
+    return categories;
   }
 
 

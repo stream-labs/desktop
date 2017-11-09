@@ -166,8 +166,8 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_close')
   private shutdownHandler() {
     this.disableAutosave();
-    this.ipcServerService.stopListen();
-    this.tcpServerService.stopListen();
+    this.ipcServerService.stopListening();
+    this.tcpServerService.stopListening();
     this.configPersistenceService.rawSave().then(() => {
       this.reset();
       this.videoService.destroyAllDisplays();
