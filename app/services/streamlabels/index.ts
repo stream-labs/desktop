@@ -66,7 +66,7 @@ export class StreamlabelsService extends Service {
 
 
   log(message: string, ...args: any[]) {
-    console.log(`Streamlabels: ${message}`, ...args);
+    console.debug(`Streamlabels: ${message}`, ...args);
   }
 
 
@@ -200,8 +200,6 @@ export class StreamlabelsService extends Service {
    */
   updateSubscription(subscription: IStreamlabelsSubscription) {
     if (!this.data) return;
-
-    console.log('Writing file', subscription.filename, subscription.statname);
 
     electron.ipcRenderer.send('streamlabels-writeFile', {
       path: this.getStreamlabelsPath(subscription.filename),
