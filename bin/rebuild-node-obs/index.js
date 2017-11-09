@@ -26,7 +26,7 @@ function buildNodeObs() {
 
 	if (process.argv.length >= 4) {
 		/* Binaries are hardcoded to be put in <node obs dir>/<build dir>/distribute */
-		const distribute_path = path.resolve(node_obs_build_path, path.normalize('distribute/*'));
+		const distribute_path = path.resolve(node_obs_build_path, path.normalize('distribute/node-obs'));
 		shell.cp('-uR' /* Copy if Newer, Recursive */, distribute_path, path.normalize(process.argv[3]));
 	}
 }
