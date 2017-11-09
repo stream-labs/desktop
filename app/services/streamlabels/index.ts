@@ -127,14 +127,14 @@ export class StreamlabelsService extends Service {
    * Attempt to load initial data via HTTP instead of waiting
    * for a socket event
    */
-  fetchInitialData() {
+  fetchInitialData(): void {
     if (!this.userService.isLoggedIn()) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
       `/files?token=${this.userService.widgetToken}`;
     const request = new Request(url);
 
-    return fetch(request)
+    fetch(request)
       .then(handleErrors)
       .then(response => response.json())
       .then(json => this.setStreamlabelsData(json.data));
