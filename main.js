@@ -21,10 +21,9 @@ const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
-const bugsplat = require('bugsplat')('slobs', 'slobs-main', pjson.version);
+const bt = require('backtrace-node');
 
-function handleUnhandledException() {
-  // We recommend you quit your application if an uncaughtException occurs
+function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
   'An unexpected error occured and the application must be shut down.\n' +
   'Information concerning this occasion has been sent for debugging purposes.\n' +
@@ -36,19 +35,34 @@ function handleUnhandledException() {
   }
 }
 
+function handleUnhandledException(err) {
+  bt.report(err, {}, handleFinishedReport);
+}
+
 if (pjson.env === 'production') {
-  process.on("uncaughtException", bugsplat.post);
-  bugsplat.setCallback(handleUnhandledException);
-  ipcMain.on('rendererCrash', handleUnhandledException);
+  bt.initialize({
+    disableGlobalHandler: true,
+    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
+    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    attributes: {
+      version: pjson.version,
+      processType: 'main'
+    }
+  });
+
+  process.on("uncaughtException", handleUnhandledException);
 }
 
 crashReporter.start({
-  companyName: 'Streamlabs',
-  productName: 'Streamlabs OBS',
-  submitURL: 'http://slobs.bugsplat.com/post/bp/crash/postBP.php',
+  productName: 'streamlabs-obs',
+  companyName: 'streamlabs',
+  submitURL: 
+    'https://streamlabs.sp.backtrace.io:6098/post?' +
+    'format=minidump&' +
+    'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
   extra: {
-    prod: 'slobs-main',
-    key: pjson.version
+    version: pjson.version,
+    processType: 'main'
   }
 });
 
@@ -424,4 +438,12 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   const sizes = require('obs-studio-node').getSourcesSize(names);
 
   e.sender.send('notifySourceAttributes', sizes);
+});
+
+ipcMain.on('streamlabels-writeFile', (e, info) => {
+  fs.writeFile(info.path, info.data, err => {
+    if (err) {
+      console.log('Streamlabels: Error writing file', err);
+    }
+  });
 });

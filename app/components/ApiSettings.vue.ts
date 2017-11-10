@@ -16,8 +16,9 @@ export default class ApiSettings extends Vue {
   settingsFormData: ISettingsSubCategory[] = null;
 
   created() {
-    // stop listen by security reasons
-    this.tcpServerService.stopListen();
+
+    // Stop listening for security reasons
+    this.tcpServerService.stopListening();
     this.settingsFormData = this.getApiSettingsFormData();
   }
 

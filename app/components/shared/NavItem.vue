@@ -17,7 +17,7 @@
 .nav-item {
   cursor: pointer;
   list-style: none;
-  border-left: 3px solid transparent;
+  border-left: 1px solid transparent;
   padding-left: 50px;
   opacity: 0.7;
   font-size: 14px;
@@ -26,11 +26,11 @@
   &.active {
     opacity: 1;
     .semibold;
-    border-color: @yellow;
+    border-color: @navy;
     color: @navy;
 
     .fa {
-      color: @yellow;
+      color: @navy;
     }
   }
 
@@ -53,7 +53,12 @@
 .night-theme {
   .nav-item {
     &.active {
+      border-color: @white;
       color: @white;
+
+      .fa {
+        color: @white;
+      }
     }
   }
 }

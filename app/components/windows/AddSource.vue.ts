@@ -4,7 +4,7 @@ import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType} from '../../services/sources';
+import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
 
 import ModalLayout from '../ModalLayout.vue';
 import Selector from '../Selector.vue';
@@ -23,9 +23,11 @@ export default class AddSource extends Vue {
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
+  propertiesManager = this.windowsService.getChildWindowQueryParams().propertiesManager as TPropertiesManager;
   sources = this.sourcesService.getSources().filter(source => {
     return (
       source.type === this.sourceType &&
+      source.getPropertiesManagerType() === (this.propertiesManager || 'default') &&
       source.sourceId !== this.scenesService.activeSceneId &&
       !source.channel
     );
@@ -65,11 +67,16 @@ export default class AddSource extends Vue {
     if (this.isTaken(this.name)) {
       this.error = 'That name is already taken';
     } else {
-      const sceneItem = this.scenesService.activeScene.createAndAddSource(
+      const source = this.sourcesService.createSource(
         this.name,
-        this.sourceType
+        this.sourceType,
+        {},
+        {
+          propertiesManager: this.propertiesManager ? this.propertiesManager : void 0
+        }
       );
-      const source = sceneItem.getSource();
+
+      this.scenesService.activeScene.addSource(source.sourceId);
       this.close();
       if (source.hasProps()) this.sourcesService.showSourceProperties(source.sourceId);
     }

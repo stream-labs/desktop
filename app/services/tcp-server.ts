@@ -51,7 +51,7 @@ export interface ITcpServerServiceAPI {
   setSettings(settings: Partial<ITcpServersSettings>): void;
   getDefaultSettings(): ITcpServersSettings;
   listen(): void;
-  stopListen(): void;
+  stopListening(): void;
 }
 
 
@@ -96,7 +96,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
 
-  stopListen() {
+
+  stopListening() {
     this.servers.forEach(server => server.close());
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
   }

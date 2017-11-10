@@ -18,7 +18,6 @@ import _ from 'lodash';
 const { ipcRenderer } = electron;
 
 
-
 @ServiceHelper()
 export class Scene implements ISceneApi {
   id: string;

@@ -3,7 +3,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import Chat from './Chat.vue';
 import { StreamingService } from '../services/streaming';
 import { Inject } from '../util/injector';
-import PerformanceMetricsStream from './PerformanceMetricsStream.vue';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { Subscription } from 'rxjs/Subscription';
@@ -11,7 +10,6 @@ import { Subscription } from 'rxjs/Subscription';
 @Component({
   components: {
     Chat,
-    PerformanceMetricsStream,
   }
 })
 export default class LiveDock extends Vue {

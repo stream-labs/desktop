@@ -69,7 +69,7 @@
   max-width:  none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
-  flex: 0 0 48px;
+  flex: 0 0 45px;
 }
 
 .top-nav-right {

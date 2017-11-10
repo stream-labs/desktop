@@ -60,11 +60,11 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     this.CLEAR_SCENES_COLLECTIONS();
     if (!fs.existsSync(this.configFileDirectory)) return;
 
-    const configsNames = fs.readdirSync(this.configFileDirectory).map(file => file.replace(/\.[^/.]+$/, ''));
-    if (configsNames.length) {
-      this.ADD_SCENES_COLLECTIONS(configsNames);
-    }
+    const configsNames = fs.readdirSync(this.configFileDirectory).filter(fileName => {
+      return !fileName.match(/\.bak$/);
+    }).map(file => file.replace(/\.[^/.]+$/, ''));
 
+    this.ADD_SCENES_COLLECTIONS(configsNames);
   }
 
   @throttle(5000)
@@ -73,25 +73,35 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
   }
 
 
+
   getState(): IScenesCollectionState {
     return this.state;
   }
 
 
-  rawSave(configName?: string): Promise<void> {
+
+  rawSave(configName?: string, backup?: boolean): Promise<void> {
     configName = configName || this.state.activeCollection;
+    backup = backup || false;
 
     return new Promise(resolve => {
       const root = new RootNode();
       root.save().then(() => {
         this.ensureDirectory();
-        fs.writeFileSync(
-          this.getConfigFilePath(configName || this.state.activeCollection),
+        let configFileName = this.getConfigFilePath(configName || this.state.activeCollection);
+
+        if (backup) {
+          configFileName = configFileName.concat('.bak');
+        } else {
+          if (!this.hasConfig(configName)) this.ADD_SCENES_COLLECTIONS([configName]);
+          this.SET_ACTIVE_COLLECTION(configName);
+          this.configIsSaved = true;
+        }
+
+        fs.writeFileSync(configFileName,
           JSON.stringify(root, null, 2)
         );
-        if (!this.hasConfig(configName)) this.ADD_SCENES_COLLECTIONS([configName]);
-        this.SET_ACTIVE_COLLECTION(configName);
-        this.configIsSaved = true;
+
         resolve();
       });
     });
@@ -106,21 +116,60 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
     }
 
     return new Promise(resolve => {
-
       const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
 
       if (data) {
-        const root = parse(data, NODE_TYPES);
-        root.load().then(() => {
-          // Make sure we actually loaded at least one scene, otherwise
-          // create the default one
-          if (this.scenesService.scenes.length === 0) this.setUpDefaults();
+        try {
+          const root = parse(data, NODE_TYPES);
           this.SET_ACTIVE_COLLECTION(configName);
-          this.configIsSaved = true;
-          resolve();
-        });
+          root.load().then(() => {
+            // Make sure we actually loaded at least one scene, otherwise
+            // create the default one
+            if (this.scenesService.scenes.length === 0) this.setUpDefaults();
+            this.configIsSaved = true;
+            this.rawSave(configName, true);
+            resolve();
+          }).catch((error: any) => {
+            this.loadBackupConfigFile().then(() => {
+              resolve();
+            });
+          });
+        } catch (e) {
+          this.loadBackupConfigFile().then(() => {
+            resolve();
+          });
+        }
       } else {
         this.switchToBlankConfig(configName);
+      }
+    });
+  }
+
+  loadBackupConfigFile() {
+    return new Promise(resolve => {
+      const configName = this.state.activeCollection;
+
+      this.scenesService.scenes.forEach(scene => scene.remove(true));
+      this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
+
+      const backConfigFile = this.getConfigFilePath(configName) + '.bak';
+
+      if (fs.existsSync(backConfigFile)) {
+        const backupData = fs.readFileSync(backConfigFile).toString();
+        if (backupData) {
+          const root = parse(backupData, NODE_TYPES);
+          root.load().then(() => {
+            this.configIsSaved = true;
+            this.rawSave(configName);
+            resolve();
+          });
+        } else {
+          this.switchToBlankConfig(configName);
+          resolve();
+        }
+      } else {
+        this.switchToBlankConfig(configName);
+        resolve();
       }
     });
   }

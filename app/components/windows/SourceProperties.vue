@@ -6,6 +6,11 @@
   :fixedSectionHeight="200">
   <SourcePreview slot="fixed" v-if="source" :sourceName="source.name"></SourcePreview>
   <div slot="content">
+    <component
+      v-if="propertiesManagerUI"
+      :is="propertiesManagerUI"
+      :source="source"
+      @update="refresh" />
     <GenericForm v-model="properties" @input="onInputHandler"/>
   </div>
 </modal-layout>

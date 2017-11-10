@@ -15,6 +15,7 @@ import { track } from '../usage-statistics';
 import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
+import { StreamlabelsService } from '../streamlabels';
 
 interface IAppState {
   loading: boolean;
@@ -61,11 +62,10 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   @Inject()
   videoService: VideoService;
 
-  @Inject()
-  private ipcServerService: IpcServerService;
 
-  @Inject()
-  private tcpServerService: TcpServerService;
+  @Inject() streamlabelsService: StreamlabelsService;
+  @Inject() private ipcServerService: IpcServerService;
+  @Inject() private tcpServerService: TcpServerService;
 
   @track('app_start')
   load() {
@@ -103,6 +103,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
         this.userService;
         this.shortcutsService;
+        this.streamlabelsService;
 
         // Pre-fetch stream info
         this.streamInfoService;
@@ -167,8 +168,9 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   @track('app_close')
   private shutdownHandler() {
     this.disableAutosave();
-    this.ipcServerService.stopListen();
-    this.tcpServerService.stopListen();
+
+    this.ipcServerService.stopListening();
+    this.tcpServerService.stopListening();
     this.configPersistenceService.rawSave().then(() => {
       this.reset();
       this.videoService.destroyAllDisplays();

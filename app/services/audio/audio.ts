@@ -30,7 +30,6 @@ export enum E_AUDIO_CHANNELS {
 
 const VOLMETER_UPDATE_INTERVAL = 100;
 
-
 @InitAfter('SourcesService')
 export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 

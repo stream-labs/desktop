@@ -24,7 +24,7 @@ export class TwitchService extends Service implements IPlatformService {
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&scope=channel_read,
       channel_editor`;
-    return `https://${host}/login?${query}`;
+    return `https://${host}/slobs/login?${query}`;
   }
 
   get oauthToken() {

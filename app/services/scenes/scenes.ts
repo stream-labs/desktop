@@ -23,7 +23,6 @@ const { ipcRenderer } = electron;
 
 
 
-
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
   static initialState: IScenesState = {
