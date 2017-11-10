@@ -206,4 +206,4 @@ response
 
 # Caveats
 You can send several json-rpc requests in one request sting.
-In this case all requests should be separated with new-line character `\n`
+In this case all requests have to be separated with new-line character `\n`
