@@ -20,7 +20,6 @@ export interface IStreamlabelSettingsDefinition {
   item_format?: { tokens: string[]; };
   item_separator?: { tokens: string[]; };
   includeResubsOption?: boolean;
-  isTrain?: boolean;
 }
 
 type TStreamlabelFormType = 'simpleFileForm' | 'itemFileForm';
@@ -556,46 +555,36 @@ const youtubeDefinitions: IStreamlabelSet = {
 const twitchDefinitions: IStreamlabelSet = {
   // Trains are currently disabled
 
-  // donation_train: {
-  //   label: 'Donation Train',
-  //   files: [
-  //     {
-  //       name: 'donation_train_clock',
-  //       label: 'Donation Train Clock',
-  //       settings: {
-  //         isTrain: true
-  //       }
-  //     },
-  //     {
-  //       name: 'donation_train_counter',
-  //       label: 'Donation Train Counter',
-  //       settings: {
-  //         isTrain: true
-  //       }
-  //     },
-  //     {
-  //       name: 'donation_train_latest_amount',
-  //       label: 'Donation Train Latest Amount',
-  //       settings: {
-  //         isTrain: true
-  //       }
-  //     },
-  //     {
-  //       name: 'donation_train_latest_donor',
-  //       label: 'Donation Train Latest Donor',
-  //       settings: {
-  //         isTrain: true
-  //       }
-  //     },
-  //     {
-  //       name: 'donation_train_total_amount',
-  //       label: 'Donation Train Total Amount',
-  //       settings: {
-  //         isTrain: true
-  //       }
-  //     }
-  //   ]
-  // },
+  donation_train: {
+    label: 'Donation Train',
+    files: [
+      {
+        name: 'donation_train_clock',
+        label: 'Donation Train Clock',
+        settings: {}
+      },
+      {
+        name: 'donation_train_counter',
+        label: 'Donation Train Counter',
+        settings: {}
+      },
+      {
+        name: 'donation_train_latest_amount',
+        label: 'Donation Train Latest Amount',
+        settings: {}
+      },
+      {
+        name: 'donation_train_latest_name',
+        label: 'Donation Train Latest Donor',
+        settings: {}
+      },
+      {
+        name: 'donation_train_total_amount',
+        label: 'Donation Train Total Amount',
+        settings: {}
+      }
+    ]
+  },
   top_cheerer: {
     label: 'Top Cheerer',
     files: [{

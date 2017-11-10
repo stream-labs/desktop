@@ -77,6 +77,8 @@ export default class StreamlabelProperties extends Vue {
 
 
   get preview() {
+    if (this.labelSettings.format == null) return '';
+
     let replaced = this.labelSettings.format
       .replace(/{name}/gi, 'Fishstickslol')
       .replace(/{title}/gi, 'New Computer')

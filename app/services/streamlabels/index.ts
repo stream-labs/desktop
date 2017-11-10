@@ -11,7 +11,6 @@ import electron from 'electron';
 import rimraf from 'rimraf';
 import { without } from 'lodash';
 
-
 interface IStreamlabelActiveSubscriptions {
   filename: string;
   subscribers: string[];
@@ -38,6 +37,32 @@ export interface IStreamlabelSettings {
 }
 
 
+interface ITrainInfo {
+  mostRecentEventAt: number;
+  mostRecentName: string;
+  counter: number;
+}
+
+
+interface IDonationTrainInfo extends ITrainInfo {
+  mostRecentAmount: number;
+  totalAmount: number;
+  donationTrain: boolean;
+}
+
+
+interface ITrains {
+  donation: IDonationTrainInfo;
+  subscription: ITrainInfo;
+  follow: ITrainInfo;
+}
+
+
+function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
+  return (train as IDonationTrainInfo).donationTrain;
+}
+
+
 export class StreamlabelsService extends Service {
 
   @Inject() userService: UserService;
@@ -61,11 +86,42 @@ export class StreamlabelsService extends Service {
   subscriptions: Dictionary<IStreamlabelActiveSubscriptions> = {};
 
 
+  trainInterval: number;
+
+
+  /**
+   * Holds data about the currently running trains.
+   * Will be updated by socket events and be used to
+   * generate output.
+   */
+  trains: ITrains = {
+    donation: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0,
+      mostRecentAmount: null,
+      totalAmount: 0,
+      donationTrain: true
+    },
+    subscription: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0
+    },
+    follow: {
+      mostRecentEventAt: null,
+      mostRecentName: null,
+      counter: 0
+    }
+  };
+
+
   init() {
     this.ensureDirectory();
     this.fetchInitialData();
     this.fetchSettings();
     this.initSocketConnection();
+    this.initTrainClockInterval();
   }
 
 
@@ -215,13 +271,94 @@ export class StreamlabelsService extends Service {
   }
 
 
-  // TODO: Interface for socket events
-  private onSocketEvent(event: any) {
-    if (event.type === 'streamlabels') {
-      this.updateOutput(event.message.data);
-    }
+  private initTrainClockInterval() {
+    this.trainInterval = window.setInterval(() => {
+      Object.keys(this.trains).forEach(trainType => {
+        const train = this.trains[trainType] as ITrainInfo;
+
+        if (train.mostRecentEventAt == null) return;
+
+        const statname = `${trainType}_train_clock`;
+        const duration = 60 * 1000; // 60 seconds
+        const msRemaining = duration - (Date.now() - train.mostRecentEventAt);
+
+        if (msRemaining < 0) {
+          // Clear the clock
+          this.updateOutput({ [statname]: '0:00' });
+          this.clearTrain(trainType);
+          this.outputTrainInfo(trainType);
+        } else {
+          const minutes = Math.floor(msRemaining / (60 * 1000));
+          const seconds = Math.floor(msRemaining % (60 * 1000) / 1000);
+          const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+          this.updateOutput({
+            [statname]: formatted
+          });
+        }
+      });
+    }, 1000);
   }
 
+
+  private clearTrain(trainType: string) {
+    const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
+
+    if (isDonationTrain(train)) {
+      train.mostRecentAmount = null;
+      train.totalAmount = 0;
+    }
+
+    train.counter = 0;
+    train.mostRecentEventAt = null;
+    train.mostRecentName = null;
+  }
+
+
+  /**
+   * Outputs everything except for the clock on a train
+   */
+  private outputTrainInfo(trainType: string) {
+    const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
+    const output = {
+      [`${trainType}_train_counter`]: train.counter.toString(),
+      [`${trainType}_train_latest_name`]: train.mostRecentName || ''
+    };
+
+    if (isDonationTrain(train)) {
+      const latestAmount = train.mostRecentAmount ?
+        train.mostRecentAmount.toFixed(2) : '';
+      const totalAmount = train.totalAmount ?
+        train.totalAmount.toFixed(2) : '';
+
+      output[`${trainType}_train_latest_amount`] = latestAmount;
+      output[`${trainType}_train_total_amount`] = totalAmount;
+    }
+
+    this.updateOutput(output);
+  }
+
+
+  // TODO: Interface for socket events
+  private onSocketEvent(event: any) {
+    console.log('Socket Event', event);
+
+    if (event.type === 'streamlabels') {
+      this.updateOutput(event.message.data);
+    } else if (event.type === 'donation') {
+      this.trains.donation.mostRecentEventAt = Date.now();
+      this.trains.donation.counter += event.message.length;
+      this.trains.donation.totalAmount += event.message.reduce((sum: number, donation: any) => {
+        return sum + parseFloat(donation.amount);
+      }, 0);
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.donation.mostRecentName = latest.name;
+      this.trains.donation.mostRecentAmount = parseFloat(latest.amount);
+
+      this.outputTrainInfo('donation');
+    }
+  }
 
 
   private ensureDirectory() {

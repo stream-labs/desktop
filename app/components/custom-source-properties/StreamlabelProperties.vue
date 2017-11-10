@@ -15,7 +15,7 @@
         @input="handleInput"/>
     </div>
   </div>
-  <div class="input-container">
+  <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
       <label>Label Template</label>
     </div>
@@ -86,7 +86,7 @@
         @input="debouncedSetSettings"/>
     </div>
   </div>
-  <div class="input-container">
+  <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
       <label>Preview</label>
     </div>
