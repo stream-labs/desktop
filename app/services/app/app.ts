@@ -1,19 +1,20 @@
-import { StatefulService, mutation } from './stateful-service';
-import { OnboardingService } from './onboarding';
-import { ConfigPersistenceService } from './config-persistence';
-import { HotkeysService } from './hotkeys';
-import { UserService } from './user';
-import { ShortcutsService } from './shortcuts';
-import { Inject } from '../util/injector';
+import { StatefulService, mutation } from '../stateful-service';
+import { OnboardingService } from '../onboarding';
+import { ConfigPersistenceService } from '../config-persistence';
+import { HotkeysService } from '../hotkeys';
+import { UserService } from '../user';
+import { ShortcutsService } from '../shortcuts';
+import { Inject } from '../../util/injector';
 import electron from 'electron';
-import { ScenesTransitionsService } from './scenes-transitions';
-import { SourcesService } from './sources';
-import { ScenesService } from './scenes/scenes';
-import { VideoService } from './video';
-import { StreamInfoService } from './stream-info';
-import { track } from './usage-statistics';
-import { IpcServerService } from './ipc-server';
-import { TcpServerService } from './tcp-server';
+import { ScenesTransitionsService } from '../scenes-transitions';
+import { SourcesService } from '../sources';
+import { ScenesService } from '../scenes';
+import { VideoService } from '../video';
+import { StreamInfoService } from '../stream-info';
+import { track } from '../usage-statistics';
+import { IpcServerService } from '../ipc-server';
+import { TcpServerService } from '../tcp-server';
+import { IAppServiceApi } from './app-api';
 
 interface IAppState {
   loading: boolean;
@@ -23,7 +24,7 @@ interface IAppState {
  * Performs operations that happen once at startup and shutdown. This service
  * mainly calls into other services to do the heavy lifting.
  */
-export class AppService extends StatefulService<IAppState> {
+export class AppService extends StatefulService<IAppState> implements IAppServiceApi {
 
   @Inject()
   onboardingService: OnboardingService;
@@ -143,7 +144,7 @@ export class AppService extends StatefulService<IAppState> {
   /**
    * remove the config and load the new one
    */
-  removeConfig() {
+  removeCurrentConfig() {
     this.configPersistenceService.removeConfig();
     if (this.configPersistenceService.hasConfigs()) {
       this.loadConfig('', { saveCurrent: false });

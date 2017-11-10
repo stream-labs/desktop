@@ -107,6 +107,6 @@ export default class SceneSelector extends Vue {
 
   removeCollection() {
     if (!confirm(`remove ${this.activeConfig} ?`)) return;
-    this.appService.removeConfig();
+    this.appService.removeCurrentConfig();
   }
 }

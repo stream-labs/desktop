@@ -1,19 +1,22 @@
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
-import { mutation, StatefulService, ServiceHelper } from './stateful-service';
-import { SourcesService, ISource, Source } from './sources';
-import { ScenesService } from './scenes';
-import * as obs from '../../obs-api';
-import Utils from './utils';
+import { mutation, StatefulService, ServiceHelper } from '../stateful-service';
+import { SourcesService, ISource, Source } from '../sources';
+import { ScenesService } from '../scenes';
+import * as obs from '../../../obs-api';
+import Utils from '../utils';
 import electron from 'electron';
-import { Inject } from '../util/injector';
-import { InitAfter } from '../util/service-observer';
-import { WindowsService } from './windows';
+import { Inject } from '../../util/injector';
+import { InitAfter } from '../../util/service-observer';
+import { WindowsService } from '../windows';
 import {
   IBitmaskInput, IFormInput, IListInput, ISliderInputValue, TFormData,
-  TObsValue
-} from '../components/shared/forms/Input';
+} from '../../components/shared/forms/Input';
+import {
+  IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
+  IVolmeter
+} from './audio-api';
 
 const { ipcRenderer } = electron;
 
@@ -26,59 +29,6 @@ export enum E_AUDIO_CHANNELS {
 }
 
 const VOLMETER_UPDATE_INTERVAL = 100;
-
-export interface IAudioSource {
-  sourceId: string;
-  fader: IFader;
-  audioMixers: number;
-  monitoringType: obs.EMonitoringType;
-  forceMono: boolean;
-  syncOffset: number;
-  muted: boolean;
-}
-
-
-export interface IAudioSourceApi extends IAudioSource {
-  setDeflection(deflection: number): void;
-  setMul(mul: number): void;
-  setMuted(muted: boolean): void;
-  subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription;
-  getSettingsForm(): TFormData;
-  setSettings(patch: Partial<IAudioSource>): void;
-  getModel(): IAudioSource & ISource;
-}
-
-
-export interface IVolmeter {
-  level: number;
-  magnitude: number;
-  peak: number;
-  muted: boolean;
-}
-
-export interface IAudioDevice {
-  id: string;
-  description: string;
-  type: 'input' | 'output';
-}
-
-
-interface IFader {
-  db: number;
-  deflection: number;
-  mul: number;
-}
-
-interface IAudioSourcesState {
-  audioSources: Dictionary<IAudioSource>;
-}
-
-export interface IAudioServiceApi {
-  getDevices(): IAudioDevice[];
-  getSource(sourceId: string): IAudioSourceApi;
-  getSourcesForScene(sceneId: string): IAudioSourceApi[];
-  getSourcesForCurrentScene(): IAudioSourceApi[];
-}
 
 
 @InitAfter('SourcesService')

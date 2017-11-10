@@ -1,3 +1,6 @@
+/**
+ * Api for scenes management
+ */
 import { Observable } from 'rxjs/Observable';
 import { ISourceApi, TSourceType } from '../sources';
 
@@ -11,6 +14,10 @@ export interface IScenesServiceApi {
   getScenes(): ISceneApi[];
   getModel(): IScenesState;
   sceneSwitched: Observable<IScene>;
+  sceneAdded: Observable<IScene>;
+  sceneRemoved: Observable<IScene>;
+  itemAdded: Observable<ISceneItem>;
+  itemRemoved: Observable<ISceneItem>;
 }
 
 

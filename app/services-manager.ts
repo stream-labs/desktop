@@ -34,7 +34,7 @@ import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
-import StreamingService from  './services/streaming';
+import { StreamingService } from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -354,7 +354,7 @@ export class ServicesManager extends Service {
         if (item && item.isHelper) {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
-            _type: 'RESOURCE',
+            _type: 'HELPER',
             resourceId: helper.resourceId,
             ...(!compactMode ? this.getHelperModel(helper) : {})
           };
@@ -476,7 +476,7 @@ export class ServicesManager extends Service {
             // payload can contain helpers-objects
             // we have to wrap them in IpcProxy too
             traverse(result).forEach((item: any) => {
-              if (item && item._type === 'RESOURCE') {
+              if (item && item._type === 'HELPER') {
                 const helper = this.getResource(item.resourceId);
                 return this.applyIpcProxy(helper);
               }

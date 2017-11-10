@@ -1,13 +1,14 @@
 import moment from 'moment';
 
-import { Inject } from '../util/injector';
-import { StatefulService, mutation } from './stateful-service';
-import { nodeObs } from './obs-api';
-import { SettingsService } from './settings';
+import { Inject } from '../../util/injector';
+import { StatefulService, mutation } from '../stateful-service';
+import { nodeObs } from '../obs-api';
+import { SettingsService } from '../settings';
 import { padStart } from 'lodash';
-import { track } from './usage-statistics';
-import { WindowsService } from './windows';
+import { track } from '../usage-statistics';
+import { WindowsService } from '../windows';
 import { Subject } from 'rxjs/Subject';
+import { IStreamingServiceApi } from './streaming-api';
 
 interface IStreamingServiceState {
   isStreaming: boolean;
@@ -17,7 +18,7 @@ interface IStreamingServiceState {
   streamOk: boolean;
 }
 
-export default class StreamingService extends StatefulService<IStreamingServiceState> {
+export class StreamingService extends StatefulService<IStreamingServiceState> implements IStreamingServiceApi {
 
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
