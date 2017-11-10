@@ -9,16 +9,24 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import rimraf from 'rimraf';
+import { without } from 'lodash';
 
 
-export interface IStreamlabelsData {
-  [label: string]: string;
+interface IStreamlabelActiveSubscriptions {
+  filename: string;
+  subscribers: string[];
 }
 
 
-export interface IStreamlabelsSubscription {
-  filename: string;
+/**
+ * Returned to streamlabels subscribers.  Contains
+ * information about the subscription, and must be
+ * passed back when unsubscribing.
+ */
+export interface IStreamlabelSubscription {
+  id: string;
   statname: string;
+  path: string;
 }
 
 
@@ -36,55 +44,73 @@ export class StreamlabelsService extends Service {
   @Inject() hostsService: HostsService;
 
 
-  data: IStreamlabelsData;
-  settings: Dictionary<IStreamlabelSettings>;
-  subscriptions: IStreamlabelsSubscription[] = [];
+  /**
+   * Represents the raw strings that should be
+   * written to the files.
+   */
+  output: Dictionary<string> = {};
+
+  /**
+   * Represents settings which are stored on the server
+   */
+  settings: Dictionary<IStreamlabelSettings> = {};
+
+  /**
+   * Holds info about currently active subscribers
+   */
+  subscriptions: Dictionary<IStreamlabelActiveSubscriptions> = {};
 
 
   init() {
     this.ensureDirectory();
     this.fetchInitialData();
-    this.fetchSettings().then(settings => this.settings = settings);
-    this.fetchSocketToken().then(token => {
-      const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
-      const socket = io(url, { transports: ['websocket'] });
-
-      // These are useful for debugging
-      socket.on('connect', () => this.log('Connection Opened'));
-      socket.on('connect_error', (e: any) => this.log('Connection Error', e));
-      socket.on('connect_timeout', () => this.log('Connection Timeout'));
-      socket.on('error', () => this.log('Error'));
-      socket.on('disconnect', () => this.log('Connection Closed'));
-
-      socket.on('event', (e: any) => {
-        if (e.type === 'streamlabels') {
-          this.setStreamlabelsData(e.message.data);
-        }
-      });
-    });
+    this.fetchSettings();
+    this.initSocketConnection();
   }
 
 
-  log(message: string, ...args: any[]) {
-    console.debug(`Streamlabels: ${message}`, ...args);
+  /**
+   * Subscribe to a particular streamlabels stat
+   * @param statname the stat to subscribe to
+   */
+  subscribe(statname: string): IStreamlabelSubscription {
+    const subscriptionId = uuid();
+
+    if (this.subscriptions[statname]) {
+      this.subscriptions[statname].subscribers.push(subscriptionId);
+    } else {
+      this.subscriptions[statname] = {
+        filename: uuid(),
+        subscribers: [subscriptionId]
+      };
+
+      this.writeFileForStat(statname);
+    }
+
+    const subscription: IStreamlabelSubscription = {
+      id: subscriptionId,
+      path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
+      statname
+    };
+
+    return subscription;
   }
 
 
-  subscribe(statname: string): string {
-    const filename = uuid();
+  /**
+   * End a streamlabel subscription
+   * @param subscription the subscription object
+   */
+  unsubscribe(subscription: IStreamlabelSubscription) {
+    const subInfo = this.subscriptions[subscription.statname];
 
-    const subscription: IStreamlabelsSubscription = { filename, statname };
-    this.subscriptions.push(subscription);
-    this.updateSubscription(subscription);
+    if (!subInfo) return;
 
-    return filename;
-  }
+    subInfo.subscribers = without(subInfo.subscribers, subscription.id);
 
-
-  unsubscribe(filename: string) {
-    this.subscriptions = this.subscriptions.filter(subscription => {
-      return subscription.filename !== filename;
-    });
+    if (subInfo.subscribers.length === 0) {
+      delete this.subscriptions[subscription.statname];
+    }
   }
 
 
@@ -123,11 +149,16 @@ export class StreamlabelsService extends Service {
   }
 
 
+  private log(message: string, ...args: any[]) {
+    console.debug(`Streamlabels: ${message}`, ...args);
+  }
+
+
   /**
    * Attempt to load initial data via HTTP instead of waiting
    * for a socket event
    */
-  fetchInitialData(): void {
+  private fetchInitialData(): void {
     if (!this.userService.isLoggedIn()) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
@@ -137,41 +168,60 @@ export class StreamlabelsService extends Service {
     fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(json => this.setStreamlabelsData(json.data));
+      .then(json => this.updateOutput(json.data));
   }
 
 
-  fetchSettings(): Promise<Dictionary<IStreamlabelSettings>> {
-    if (!this.userService.isLoggedIn()) return Promise.reject({});
+  private fetchSettings(): void {
+    if (!this.userService.isLoggedIn()) return;
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
       `/settings?token=${this.userService.widgetToken}`;
     const request = new Request(url);
 
-    return fetch(request)
+    fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => response.json())
+      .then(settings => this.updateSettings(settings));
   }
 
 
-  fetchSocketToken(): Promise<string> {
-    if (!this.userService.isLoggedIn()) return Promise.reject('User must be logged in');
+  private initSocketConnection(): void {
+    if (!this.userService.isLoggedIn()) {
+      console.warn('User must be logged in for streamlabels socket connection');
+      return;
+    }
 
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token/${this.userService.widgetToken}`;
     const request = new Request(url);
 
-    return fetch(request)
+    fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(json => json.socket_token);
+      .then(json => json.socket_token)
+      .then(token => {
+        const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
+        const socket = io(url, { transports: ['websocket'] });
+
+        // These are useful for debugging
+        socket.on('connect', () => this.log('Connection Opened'));
+        socket.on('connect_error', (e: any) => this.log('Connection Error', e));
+        socket.on('connect_timeout', () => this.log('Connection Timeout'));
+        socket.on('error', () => this.log('Error'));
+        socket.on('disconnect', () => this.log('Connection Closed'));
+
+        socket.on('event', (e: any) => this.onSocketEvent(e));
+      });
   }
 
 
-  setStreamlabelsData(data: IStreamlabelsData) {
-    this.data = { ...data };
-
-    this.subscriptions.forEach(subscription => this.updateSubscription(subscription));
+  // TODO: Interface for socket events
+  private onSocketEvent(event: any) {
+    if (event.type === 'streamlabels') {
+      this.updateOutput(event.message.data);
+    }
   }
+
 
 
   private ensureDirectory() {
@@ -188,21 +238,49 @@ export class StreamlabelsService extends Service {
   }
 
 
-  getStreamlabelsPath(filename: string) {
+  private getStreamlabelsPath(filename: string) {
     return path.join(this.streamlabelsDirectory, `${filename}.txt`);
+  }
+
+  /**
+   * Applies a patch to the settings object
+   * @param settingsPatch the new settings to be applied
+   */
+  private updateSettings(settingsPatch: Dictionary<IStreamlabelSettings>) {
+    this.settings = {
+      ...this.settings,
+      ...settingsPatch
+    };
   }
 
 
   /**
-   * Updates the data for a single streamlabels subscription
-   * @param subscription the subscription to update
+   * Applies a patch to the output object and writes files for
+   * the newly updated outputs.
+   * @param outputPatch the new output strings
    */
-  updateSubscription(subscription: IStreamlabelsSubscription) {
-    if (!this.data) return;
+  private updateOutput(outputPatch: Dictionary<string>) {
+    this.output = {
+      ...this.output,
+      ...outputPatch
+    };
+
+    Object.keys(outputPatch).forEach(stat => this.writeFileForStat(stat));
+  }
+
+
+  /**
+   * Writes data for a particular stat.  Will not do anything
+   * if there is no data available for that stat, or if there
+   * are no subscribers for that particular stat.
+   */
+  private writeFileForStat(statname: string) {
+    if (this.output[statname] == null) return;
+    if (this.subscriptions[statname] == null) return;
 
     electron.ipcRenderer.send('streamlabels-writeFile', {
-      path: this.getStreamlabelsPath(subscription.filename),
-      data: this.data[subscription.statname]
+      path: this.getStreamlabelsPath(this.subscriptions[statname].filename),
+      data: this.output[statname]
     });
   }
 

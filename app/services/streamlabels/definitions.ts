@@ -16,10 +16,11 @@ export interface IStreamlabelDefinition {
 }
 
 export interface IStreamlabelSettingsDefinition {
-  format: { tokens: string[]; };
+  format?: { tokens: string[]; };
   item_format?: { tokens: string[]; };
   item_separator?: { tokens: string[]; };
   includeResubsOption?: boolean;
+  isTrain?: boolean;
 }
 
 type TStreamlabelFormType = 'simpleFileForm' | 'itemFileForm';
@@ -52,44 +53,44 @@ export function getDefinitions(platform: TPlatform) {
  */
 const allDefinitions: IStreamlabelSet = {
   top_donator: {
-    label: 'Top Donator',
+    label: 'Top Donor',
     files: [{
       name: 'all_time_top_donator',
-      label: 'All-Time Top Donator',
+      label: 'All-Time Top Donor',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
       }
     }, {
       name: 'session_top_donator',
-      label: 'Session Top Donator',
+      label: 'Session Top Donor',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
       }
     }, {
       name: 'monthly_top_donator',
-      label: 'Monthly Top Donator',
+      label: 'Monthly Top Donor',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
       }
     }, {
       name: '30day_top_donator',
-      label: '30-Day Top Donator',
+      label: '30-Day Top Donor',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
       }
     }, {
       name: 'weekly_top_donator',
-      label: 'Weekly Top Donator',
+      label: 'Weekly Top Donor',
       settings: {
         format: { tokens: ['{name}', '{amount}'] }
       }
     }]
   },
   top_donators: {
-    label: 'Top Donators (Top 10)',
+    label: 'Top Donors (Top 10)',
     files: [{
       name: 'all_time_top_donators',
-      label: 'All-Time Top Donators',
+      label: 'All-Time Top Donors',
       settings: {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
@@ -97,7 +98,7 @@ const allDefinitions: IStreamlabelSet = {
       }
     }, {
       name: 'session_top_donators',
-      label: 'Session Top Donators',
+      label: 'Session Top Donors',
       settings: {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
@@ -105,7 +106,7 @@ const allDefinitions: IStreamlabelSet = {
       }
     }, {
       name: 'monthly_top_donators',
-      label: 'Monthly Top Donators',
+      label: 'Monthly Top Donors',
       settings: {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
@@ -113,7 +114,7 @@ const allDefinitions: IStreamlabelSet = {
       }
     }, {
       name: '30day_top_donators',
-      label: '30-Day Top Donators',
+      label: '30-Day Top Donors',
       settings: {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
@@ -121,7 +122,7 @@ const allDefinitions: IStreamlabelSet = {
       }
     }, {
       name: 'weekly_top_donators',
-      label: 'Weekly Top Donators',
+      label: 'Weekly Top Donors',
       settings: {
         format: { tokens: ['{list}'] },
         item_format: { tokens: ['{name}', '{amount}'] },
@@ -208,17 +209,17 @@ const allDefinitions: IStreamlabelSet = {
     }]
   },
   donators: {
-    label: 'Donators',
+    label: 'Donors',
     files: [
       {
         name: 'most_recent_donator',
-        label: 'Most Recent Donator',
+        label: 'Most Recent Donor',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
         }
       }, {
         name: 'session_donators',
-        label: 'Session Donators (Max 25)',
+        label: 'Session Donors (Max 25)',
         settings: {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}', '{amount}', '{message}'] },
@@ -226,7 +227,7 @@ const allDefinitions: IStreamlabelSet = {
         }
       }, {
         name: 'session_most_recent_donator',
-        label: 'Session Recent Donator',
+        label: 'Session Recent Donor',
         settings: {
           format: { tokens: ['{name}', '{amount}', '{message}'] }
         }
@@ -555,23 +556,43 @@ const youtubeDefinitions: IStreamlabelSet = {
 const twitchDefinitions: IStreamlabelSet = {
   // Trains are currently disabled
 
-  // trains_combos: {
-  //   label: 'Trains/Combos',
+  // donation_train: {
+  //   label: 'Donation Train',
   //   files: [
   //     {
-  //       name: 'train_tips',
-  //       label: 'Donation Train',
-  //       template: 'trainFileForm'
+  //       name: 'donation_train_clock',
+  //       label: 'Donation Train Clock',
+  //       settings: {
+  //         isTrain: true
+  //       }
   //     },
   //     {
-  //       name: 'train_twitch_follows',
-  //       label: 'Follows Train',
-  //       template: 'trainFileForm'
+  //       name: 'donation_train_counter',
+  //       label: 'Donation Train Counter',
+  //       settings: {
+  //         isTrain: true
+  //       }
   //     },
   //     {
-  //       name: 'train_twitch_subscriptions',
-  //       label: 'Subscription Train',
-  //       template: 'trainFileForm'
+  //       name: 'donation_train_latest_amount',
+  //       label: 'Donation Train Latest Amount',
+  //       settings: {
+  //         isTrain: true
+  //       }
+  //     },
+  //     {
+  //       name: 'donation_train_latest_donor',
+  //       label: 'Donation Train Latest Donor',
+  //       settings: {
+  //         isTrain: true
+  //       }
+  //     },
+  //     {
+  //       name: 'donation_train_total_amount',
+  //       label: 'Donation Train Total Amount',
+  //       settings: {
+  //         isTrain: true
+  //       }
   //     }
   //   ]
   // },
