@@ -8,16 +8,9 @@ import { padStart } from 'lodash';
 import { track } from '../usage-statistics';
 import { WindowsService } from '../windows';
 import { Subject } from 'rxjs/Subject';
-import { IStreamingServiceApi } from './streaming-api';
+import { IStreamingServiceApi, IStreamingServiceState } from './streaming-api';
 import electron from 'electron';
 
-interface IStreamingServiceState {
-  isStreaming: boolean;
-  streamStartTime: string;
-  isRecording: boolean;
-  recordStartTime: string;
-  streamOk: boolean;
-}
 
 export class StreamingService extends StatefulService<IStreamingServiceState> implements IStreamingServiceApi {
 
@@ -85,6 +78,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
       },
       10 * 1000
     );
+  }
+
+
+  getModel(): IStreamingServiceState {
+    return this.state;
   }
 
 
