@@ -6,7 +6,7 @@ import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
 import { Multiselect } from 'vue-multiselect';
 import { StreamlabelsService, IStreamlabelSettings } from 'services/streamlabels';
-import { debounce } from 'lodash';
+import { debounce, pick } from 'lodash';
 
 @Component({
   components: { Multiselect }
@@ -40,7 +40,15 @@ export default class StreamlabelProperties extends Vue {
       category.files.forEach(file => {
         if (file.name === settings.statname) {
           this.currentlySelected = file;
-          this.labelSettings = this.streamlabelsService.getSettingsForStat(settings.statname);
+          let settingsStat = file.name;
+
+          if (file.settings.settingsStat) settingsStat = file.settings.settingsStat;
+
+          this.labelSettings = this.streamlabelsService.getSettingsForStat(settingsStat);
+
+          if (file.settings.settingsWhitelist) {
+            this.labelSettings = pick(this.labelSettings, file.settings.settingsWhitelist);
+          }
         }
       });
     });
@@ -56,13 +64,22 @@ export default class StreamlabelProperties extends Vue {
 
   setSettings() {
     if (this.labelSettings.limit) {
+      this.labelSettings.limit = parseInt(this.labelSettings.limit as any, 10);
       if (isNaN(this.labelSettings.limit)) this.labelSettings.limit = 0;
       if (this.labelSettings.limit < 0) this.labelSettings.limit = 0;
       if (this.labelSettings.limit > 100) this.labelSettings.limit = 100;
     }
 
+    if (this.labelSettings.duration) {
+      this.labelSettings.duration = parseInt(this.labelSettings.duration as any, 10);
+      if (isNaN(this.labelSettings.duration)) this.labelSettings.duration = 1;
+      if (this.labelSettings.duration < 1) this.labelSettings.duration = 1;
+    }
+
     this.streamlabelsService.setSettingsForStat(
-      this.currentlySelected.name,
+      this.currentlySelected.settings.settingsStat ?
+        this.currentlySelected.settings.settingsStat :
+        this.currentlySelected.name,
       this.labelSettings
     );
   }

@@ -34,6 +34,10 @@ export interface IStreamlabelSettings {
   item_format?: string;
   item_separator?: string;
   limit?: number;
+  duration?: number;
+  show_clock?: 'always' | 'active';
+  show_count?: 'always' | 'active';
+  show_latest?: 'always' | 'active';
 }
 
 
@@ -41,6 +45,7 @@ interface ITrainInfo {
   mostRecentEventAt: number;
   mostRecentName: string;
   counter: number;
+  setting: string;
 }
 
 
@@ -101,17 +106,20 @@ export class StreamlabelsService extends Service {
       counter: 0,
       mostRecentAmount: null,
       totalAmount: 0,
-      donationTrain: true
+      donationTrain: true,
+      setting: 'train_tips'
     },
     subscription: {
       mostRecentEventAt: null,
       mostRecentName: null,
-      counter: 0
+      counter: 0,
+      setting: 'train_twitch_follows'
     },
     follow: {
       mostRecentEventAt: null,
       mostRecentName: null,
-      counter: 0
+      counter: 0,
+      setting: 'train_twitch_subscriptions'
     }
   };
 
@@ -186,7 +194,15 @@ export class StreamlabelsService extends Service {
       settings.item_separator = settings.item_separator.replace(/\\n/gi, '\n');
     }
 
-    this.settings[statname] = settings;
+    this.settings[statname] = {
+      ...this.settings[statname],
+      ...settings
+    };
+
+    // Because trains are client-side, we can force a fast update
+    if (['train_tips', 'train_twitch_follows', 'train_twitch_subscriptions'].includes(statname)) {
+      this.outputAllTrains();
+    }
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -279,12 +295,14 @@ export class StreamlabelsService extends Service {
         if (train.mostRecentEventAt == null) return;
 
         const statname = `${trainType}_train_clock`;
-        const duration = 60 * 1000; // 60 seconds
+        const settings = this.getSettingsForStat(train.setting);
+
+        // There is currently a bug where this will sometimes come back
+        // from the server as a string.
+        const duration = parseInt(settings.duration as any, 10) * 1000;
         const msRemaining = duration - (Date.now() - train.mostRecentEventAt);
 
         if (msRemaining < 0) {
-          // Clear the clock
-          this.updateOutput({ [statname]: '0:00' });
           this.clearTrain(trainType);
           this.outputTrainInfo(trainType);
         } else {
@@ -315,14 +333,21 @@ export class StreamlabelsService extends Service {
   }
 
 
+  private outputAllTrains() {
+    Object.keys(this.trains).forEach(train => this.outputTrainInfo(train));
+  }
+
+
   /**
-   * Outputs everything except for the clock on a train
+   * Outputs all files on a train, except for the clock while the
+   * train is running.
    */
   private outputTrainInfo(trainType: string) {
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
+    const settings = this.getSettingsForStat(train.setting);
     const output = {
-      [`${trainType}_train_counter`]: train.counter.toString(),
-      [`${trainType}_train_latest_name`]: train.mostRecentName || ''
+      [`${trainType}_train_counter`]: settings.show_count ? train.counter.toString() : '',
+      [`${trainType}_train_latest_name`]: settings.show_latest ? train.mostRecentName || '' : ''
     };
 
     if (isDonationTrain(train)) {
@@ -333,6 +358,10 @@ export class StreamlabelsService extends Service {
 
       output[`${trainType}_train_latest_amount`] = latestAmount;
       output[`${trainType}_train_total_amount`] = totalAmount;
+    }
+
+    if (train.mostRecentEventAt == null) {
+      output[`${trainType}_train_clock`] = settings.show_clock === 'always' ? '0:00' : '';
     }
 
     this.updateOutput(output);
@@ -388,6 +417,7 @@ export class StreamlabelsService extends Service {
       ...this.settings,
       ...settingsPatch
     };
+    this.outputAllTrains();
   }
 
 

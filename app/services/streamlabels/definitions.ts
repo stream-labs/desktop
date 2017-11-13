@@ -20,6 +20,8 @@ export interface IStreamlabelSettingsDefinition {
   item_format?: { tokens: string[]; };
   item_separator?: { tokens: string[]; };
   includeResubsOption?: boolean;
+  settingsStat?: string;
+  settingsWhitelist?: string[];
 }
 
 type TStreamlabelFormType = 'simpleFileForm' | 'itemFileForm';
@@ -561,27 +563,100 @@ const twitchDefinitions: IStreamlabelSet = {
       {
         name: 'donation_train_clock',
         label: 'Donation Train Clock',
-        settings: {}
+        settings: {
+          settingsStat: 'train_tips',
+          settingsWhitelist: ['duration', 'show_clock']
+        }
       },
       {
         name: 'donation_train_counter',
         label: 'Donation Train Counter',
-        settings: {}
+        settings: {
+          settingsStat: 'train_tips',
+          settingsWhitelist: ['show_count']
+        }
       },
       {
         name: 'donation_train_latest_amount',
         label: 'Donation Train Latest Amount',
-        settings: {}
+        settings: {
+          settingsStat: 'train_tips',
+          settingsWhitelist: []
+        }
       },
       {
         name: 'donation_train_latest_name',
         label: 'Donation Train Latest Donor',
-        settings: {}
+        settings: {
+          settingsStat: 'train_tips',
+          settingsWhitelist: ['show_latest']
+        }
       },
       {
         name: 'donation_train_total_amount',
         label: 'Donation Train Total Amount',
-        settings: {}
+        settings: {
+          settingsStat: 'train_tips',
+          settingsWhitelist: []
+        }
+      }
+    ]
+  },
+  follow_train: {
+    label: 'Follow Train',
+    files: [
+      {
+        name: 'follow_train_clock',
+        label: 'Follow Train Clock',
+        settings: {
+          settingsStat: 'train_twitch_follows',
+          settingsWhitelist: ['duration', 'show_clock']
+        }
+      },
+      {
+        name: 'follow_train_counter',
+        label: 'Follow Train Counter',
+        settings: {
+          settingsStat: 'train_twitch_follows',
+          settingsWhitelist: ['show_count']
+        }
+      },
+      {
+        name: 'follow_train_latest_name',
+        label: 'Follow Train Latest Donor',
+        settings: {
+          settingsStat: 'train_twitch_follows',
+          settingsWhitelist: ['show_latest']
+        }
+      }
+    ]
+  },
+  subscription_train: {
+    label: 'Subscription Train',
+    files: [
+      {
+        name: 'subscription_train_clock',
+        label: 'Subscription Train Clock',
+        settings: {
+          settingsStat: 'train_twitch_subscriptions',
+          settingsWhitelist: ['duration', 'show_clock']
+        }
+      },
+      {
+        name: 'subscription_train_counter',
+        label: 'Subscription Train Counter',
+        settings: {
+          settingsStat: 'train_twitch_subscriptions',
+          settingsWhitelist: ['show_count']
+        }
+      },
+      {
+        name: 'subscription_train_latest_name',
+        label: 'Subscription Train Latest Donor',
+        settings: {
+          settingsStat: 'train_twitch_subscriptions',
+          settingsWhitelist: ['show_latest']
+        }
       }
     ]
   },
