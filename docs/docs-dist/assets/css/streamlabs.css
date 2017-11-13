@@ -1,0 +1,110 @@
+body {
+    background-color: #09161d;
+    color: #BDC2C4;
+    font-family: 'Roboto', sans-serif;
+}
+
+h1, h2, h3, h4 {
+    color: #eef2f3;
+    font-weight: normal;
+}
+
+a {
+    color: #31c3a2;
+}
+
+a:hover {
+    color: white;
+}
+
+pre {
+    background-color: black;
+    border-radius: 3px;
+}
+
+code {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.tsd-panel > h1, .tsd-panel > h2, .tsd-panel > h3 {
+    border-color: transparent;
+}
+
+.tsd-index-panel h3 {
+    /*border-bottom-color: #152127;*/
+    border-bottom-color: transparent;
+}
+
+.tsd-signature, .tsd-signatures {
+    border-color: transparent;
+}
+
+.tsd-page-title, .tsd-page-toolbar {
+    border: none;
+    background: none;
+}
+
+.tsd-page-title {
+    border-bottom: 1px solid #2b383f;
+}
+
+.tsd-page-toolbar {
+    text-align: right;
+}
+
+
+.title img {
+    height: 40px;
+    padding-top: 10px;
+}
+
+.tsd-panel {
+    background-color: #2b383f;
+    border-radius: 3px;
+}
+
+.tsd-breadcrumb {
+    margin-bottom: 10px;
+}
+
+.tsd-panel b {
+    color: white;
+}
+
+.tsd-navigation a {
+    color: #91979a;
+}
+
+.tsd-navigation a:hover {
+    text-decoration: none;
+    color: white;
+}
+
+.tsd-navigation.primary li {
+    border-top: none;
+}
+
+.tsd-navigation.primary > ul {
+    border-bottom: none;
+}
+
+li.label.tsd-is-external {
+    display: none;
+}
+
+.tsd-navigation.secondary li.current > a {
+    color: white;
+}
+
+.tsd-navigation.secondary ul.current a {
+    border-left-color: #31c3a2;
+}
+
+.tsd-flag {
+    background-color: #31c3a2;
+}
+
+footer {
+    border-top: 1px solid #2b383f;
+    background: none;
+}
