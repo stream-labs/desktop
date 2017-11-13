@@ -386,6 +386,22 @@ export class StreamlabelsService extends Service {
       this.trains.donation.mostRecentAmount = parseFloat(latest.amount);
 
       this.outputTrainInfo('donation');
+    } else if (event.type === 'follow') {
+      this.trains.follow.mostRecentEventAt = Date.now();
+      this.trains.follow.counter += event.message.length;
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.follow.mostRecentName = latest.name;
+
+      this.outputTrainInfo('follow');
+    } else if (event.type === 'subscription') {
+      this.trains.subscription.mostRecentEventAt = Date.now();
+      this.trains.subscription.counter += event.message.length;
+
+      const latest = event.message[event.message.length - 1];
+      this.trains.subscription.mostRecentName = latest.name;
+
+      this.outputTrainInfo('subscription');
     }
   }
 
