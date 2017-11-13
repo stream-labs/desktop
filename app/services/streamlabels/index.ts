@@ -113,13 +113,13 @@ export class StreamlabelsService extends Service {
       mostRecentEventAt: null,
       mostRecentName: null,
       counter: 0,
-      setting: 'train_twitch_follows'
+      setting: 'train_twitch_subscriptions'
     },
     follow: {
       mostRecentEventAt: null,
       mostRecentName: null,
       counter: 0,
-      setting: 'train_twitch_subscriptions'
+      setting: 'train_twitch_follows'
     }
   };
 
