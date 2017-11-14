@@ -63,6 +63,7 @@ interface ITrains {
   follow: ITrainInfo;
 }
 
+type TTrainType = 'donation' | 'follow' | 'subscription';
 
 type TSocketEvent =
   IStreamlabelsSocketEvent |
@@ -326,7 +327,7 @@ export class StreamlabelsService extends Service {
 
   private initTrainClockInterval() {
     this.trainInterval = window.setInterval(() => {
-      Object.keys(this.trains).forEach(trainType => {
+      Object.keys(this.trains).forEach((trainType: TTrainType) => {
         const train = this.trains[trainType] as ITrainInfo;
 
         if (train.mostRecentEventAt == null) return;
@@ -356,7 +357,7 @@ export class StreamlabelsService extends Service {
   }
 
 
-  private clearTrain(trainType: string) {
+  private clearTrain(trainType: TTrainType) {
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
 
     if (isDonationTrain(train)) {
@@ -371,7 +372,7 @@ export class StreamlabelsService extends Service {
 
 
   private outputAllTrains() {
-    Object.keys(this.trains).forEach(train => this.outputTrainInfo(train));
+    Object.keys(this.trains).forEach((train: TTrainType) => this.outputTrainInfo(train));
   }
 
 
@@ -379,7 +380,7 @@ export class StreamlabelsService extends Service {
    * Outputs all files on a train, except for the clock while the
    * train is running.
    */
-  private outputTrainInfo(trainType: string) {
+  private outputTrainInfo(trainType: TTrainType) {
     const train = this.trains[trainType] as ITrainInfo | IDonationTrainInfo;
     const settings = this.getSettingsForStat(train.setting);
     const output = {
