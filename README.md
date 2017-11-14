@@ -41,6 +41,13 @@ download it here:
 
 https://cmake.org/download/
 
+### Python 2.7
+
+Node-gyp requires python 2.7 available in your path to install some
+native addons.  You can download it here:
+
+https://www.python.org/
+
 ## Installation
 
 First, make sure you have initialized git submodules:
