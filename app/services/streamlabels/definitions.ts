@@ -252,7 +252,7 @@ const allDefinitions: IStreamlabelSet = {
  * Used by Youtube only
  */
 const youtubeDefinitions: IStreamlabelSet = {
-  // Trains are currently disabled
+  // Trains are currently disabled for youtube
 
   // trains_combos: {
   //   label: 'Trains/Combos',
@@ -546,8 +546,6 @@ const youtubeDefinitions: IStreamlabelSet = {
  * Used by Twitch
  */
 const twitchDefinitions: IStreamlabelSet = {
-  // Trains are currently disabled
-
   donation_train: {
     label: 'Donation Train',
     files: [
