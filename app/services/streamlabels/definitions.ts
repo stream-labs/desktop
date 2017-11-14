@@ -614,7 +614,7 @@ const twitchDefinitions: IStreamlabelSet = {
       },
       {
         name: 'follow_train_latest_name',
-        label: 'Follow Train Latest Donor',
+        label: 'Follow Train Latest Follower',
         settings: {
           settingsStat: 'train_twitch_follows',
           settingsWhitelist: ['show_latest']
@@ -643,7 +643,7 @@ const twitchDefinitions: IStreamlabelSet = {
       },
       {
         name: 'subscription_train_latest_name',
-        label: 'Subscription Train Latest Donor',
+        label: 'Subscription Train Latest Subscriber',
         settings: {
           settingsStat: 'train_twitch_subscriptions',
           settingsWhitelist: ['show_latest']
