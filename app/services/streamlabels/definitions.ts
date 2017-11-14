@@ -19,7 +19,6 @@ export interface IStreamlabelSettingsDefinition {
   format?: { tokens: string[]; };
   item_format?: { tokens: string[]; };
   item_separator?: { tokens: string[]; };
-  includeResubsOption?: boolean;
   settingsStat?: string;
   settingsWhitelist?: string[];
 }
@@ -279,8 +278,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         name: 'most_recent_youtube_subscriber',
         label: 'Most Recent Subscriber',
         settings: {
-          format: { tokens: ['{name}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}'] }
         }
       },
       {
@@ -289,24 +287,21 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}'] },
-          item_separator: { tokens: ['\\n'] },
-          includeResubsOption: true
+          item_separator: { tokens: ['\\n'] }
         }
       },
       {
         name: 'session_youtube_subscriber_count',
         label: 'Session Subscriber Count',
         settings: {
-          format: { tokens: ['{count}'] },
-          includeResubsOption: true
+          format: { tokens: ['{count}'] }
         }
       },
       {
         name: 'session_most_recent_youtube_subscriber',
         label: 'Session Most Recent Subscriber',
         settings: {
-          format: { tokens: ['{name}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}'] }
         }
       }
     ]
@@ -325,8 +320,7 @@ const youtubeDefinitions: IStreamlabelSet = {
         name: 'most_recent_youtube_sponsor',
         label: 'Most Recent Sponsor',
         settings: {
-          format: { tokens: ['{name}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}'] }
         }
       },
       {
@@ -335,24 +329,21 @@ const youtubeDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}'] },
-          item_separator: { tokens: ['\\n'] },
-          includeResubsOption: true
+          item_separator: { tokens: ['\\n'] }
         }
       },
       {
         name: 'session_youtube_sponsor_count',
         label: 'Session Sponsor Count',
         settings: {
-          format: { tokens: ['{count}'] },
-          includeResubsOption: true
+          format: { tokens: ['{count}'] }
         }
       },
       {
         name: 'session_most_recent_youtube_sponsor',
         label: 'Session Most Recent Sponsor',
         settings: {
-          format: { tokens: ['{name}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}'] }
         }
       }
     ]
@@ -911,8 +902,7 @@ const twitchDefinitions: IStreamlabelSet = {
         name: 'most_recent_subscriber',
         label: 'Most Recent Subscriber',
         settings: {
-          format: { tokens: ['{name}', '{months}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}', '{months}'] }
         }
       },
       {
@@ -921,24 +911,21 @@ const twitchDefinitions: IStreamlabelSet = {
         settings: {
           format: { tokens: ['{list}'] },
           item_format: { tokens: ['{name}'] },
-          item_separator: { tokens: ['\\n'] },
-          includeResubsOption: true
+          item_separator: { tokens: ['\\n'] }
         }
       },
       {
         name: 'session_subscriber_count',
         label: 'Session Subscriber Count',
         settings: {
-          format: { tokens: ['{count}'] },
-          includeResubsOption: true
+          format: { tokens: ['{count}'] }
         }
       },
       {
         name: 'session_most_recent_subscriber',
         label: 'Session Most Recent Subscriber',
         settings: {
-          format: { tokens: ['{name}', '{months}'] },
-          includeResubsOption: true
+          format: { tokens: ['{name}', '{months}'] }
         }
       }
     ]

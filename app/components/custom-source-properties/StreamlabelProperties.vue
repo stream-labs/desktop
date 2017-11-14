@@ -148,6 +148,19 @@
         @input="debouncedSetSettings"/>
     </div>
   </div>
+  <div class="input-container" v-if="labelSettings.include_resubs != null">
+    <div class="input-label">
+    </div>
+    <div class="input-wrapper">
+      <div class="checkbox">
+        <input
+          type="checkbox"
+          v-model="labelSettings.include_resubs"
+          @change="debouncedSetSettings"/>
+        <label>Include Resubs</label>
+      </div>
+    </div>
+  </div>
   <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
       <label>Preview</label>

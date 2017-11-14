@@ -63,6 +63,8 @@ export default class StreamlabelProperties extends Vue {
   debouncedSetSettings: () => void;
 
   setSettings() {
+    console.log('dafuq');
+
     if (this.labelSettings.limit) {
       this.labelSettings.limit = parseInt(this.labelSettings.limit as any, 10);
       if (isNaN(this.labelSettings.limit)) this.labelSettings.limit = 0;

@@ -38,6 +38,7 @@ export interface IStreamlabelSettings {
   show_clock?: 'always' | 'active';
   show_count?: 'always' | 'active';
   show_latest?: 'always' | 'active';
+  include_resubs?: boolean;
 }
 
 
