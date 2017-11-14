@@ -406,7 +406,7 @@ export class StreamlabelsService extends Service {
 
 
   private onSocketEvent(event: TSocketEvent) {
-    console.log('Socket Event', event);
+    this.log('Socket Event', event);
 
     if (event.type === 'streamlabels') {
       this.updateOutput(event.message.data);
