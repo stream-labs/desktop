@@ -14,7 +14,7 @@ export class StreamlabelsManager extends PropertiesManager {
   @Inject() userService: UserService;
 
   settings: IStreamlabelsManagerSettings;
-  subscription: IStreamlabelSubscription;
+  private subscription: IStreamlabelSubscription;
   blacklist = ['read_from_file', 'file'];
   customUIComponent = 'StreamlabelProperties';
 
@@ -36,14 +36,14 @@ export class StreamlabelsManager extends PropertiesManager {
   }
 
 
-  unsubscribe() {
+  private unsubscribe() {
     if (this.subscription) {
       this.streamlabelsService.unsubscribe(this.subscription);
     }
   }
 
 
-  refreshSubscription() {
+  private refreshSubscription() {
     this.unsubscribe();
 
     this.subscription = this.streamlabelsService.subscribe(this.settings.statname);
