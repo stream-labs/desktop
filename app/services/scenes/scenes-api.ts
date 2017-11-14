@@ -2,7 +2,7 @@
  * Api for scenes management
  */
 import { Observable } from 'rxjs/Observable';
-import { ISourceApi, TSourceType } from '../sources';
+import { ISourceApi, TSourceType, ISource } from '../sources';
 
 
 export interface IScenesServiceApi {
@@ -18,6 +18,7 @@ export interface IScenesServiceApi {
   sceneRemoved: Observable<IScene>;
   itemAdded: Observable<ISceneItem>;
   itemRemoved: Observable<ISceneItem>;
+  itemUpdated: Observable<ISceneItem>;
 }
 
 
@@ -99,5 +100,5 @@ export interface ISceneItemApi extends ISceneItem {
   setCrop(crop: ICrop): ICrop;
   setPositionAndCrop(x: number, y: number, crop: ICrop): void;
   setLocked(locked: boolean): void;
-  getModel(): ISceneItem;
+  getModel(): ISceneItem & ISource;
 }

@@ -35,6 +35,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   sceneRemoved = new Subject<IScene>();
   itemAdded = new Subject<ISceneItem>();
   itemRemoved = new Subject<ISceneItem>();
+  itemUpdated = new Subject<ISceneItem>();
   sceneSwitched = new Subject<IScene>();
 
 

@@ -1,7 +1,7 @@
 import { ScenesService, Scene, ISceneApi, ISceneItem, ISceneItemApi, ISceneItemInfo } from './index';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
-import { ISourceApi, Source, SourcesService, TSourceType } from '../sources';
+import { Source, SourcesService, TSourceType, ISource } from '../sources';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
@@ -75,8 +75,8 @@ export class SceneItem implements ISceneItemApi {
     Utils.applyProxy(this, this.sceneItemState);
   }
 
-  getModel(): ISceneItem {
-    return this.sceneItemState;
+  getModel(): ISceneItem & ISource {
+    return { ...this.sceneItemState, ...this.source.sourceState };
   }
 
   getScene(): Scene {
@@ -98,7 +98,7 @@ export class SceneItem implements ISceneItemApi {
 
   setPosition(vec: IVec2) {
     this.getObsSceneItem().position = { x: vec.x, y: vec.y };
-    this.UPDATE({ sceneItemId: this.sceneItemId, x: vec.x, y: vec.y });
+    this.update({ sceneItemId: this.sceneItemId, x: vec.x, y: vec.y });
   }
 
 
@@ -124,7 +124,7 @@ export class SceneItem implements ISceneItemApi {
 
   setVisibility(visible: boolean) {
     this.getObsSceneItem().visible = visible;
-    this.UPDATE({ sceneItemId: this.sceneItemId, visible });
+    this.update({ sceneItemId: this.sceneItemId, visible });
   }
 
 
@@ -134,7 +134,7 @@ export class SceneItem implements ISceneItemApi {
     const effectiveRotation = ((rotation % 360) + 360) % 360;
 
     this.getObsSceneItem().rotation = effectiveRotation;
-    this.UPDATE({ sceneItemId: this.sceneItemId, rotation: effectiveRotation });
+    this.update({ sceneItemId: this.sceneItemId, rotation: effectiveRotation });
   }
 
 
@@ -142,7 +142,7 @@ export class SceneItem implements ISceneItemApi {
     const obsSceneItem = this.getObsSceneItem();
     obsSceneItem.position = { x, y };
     obsSceneItem.scale = { x: scaleX, y: scaleY };
-    this.UPDATE({ sceneItemId: this.sceneItemId, x, y, scaleX, scaleY });
+    this.update({ sceneItemId: this.sceneItemId, x, y, scaleX, scaleY });
   }
 
 
@@ -154,7 +154,7 @@ export class SceneItem implements ISceneItemApi {
       left: Math.round(crop.left)
     };
     this.getObsSceneItem().crop = cropModel;
-    this.UPDATE({ sceneItemId: this.sceneItemId, crop: { ...crop } });
+    this.update({ sceneItemId: this.sceneItemId, crop: { ...crop } });
     return cropModel;
   }
 
@@ -163,7 +163,7 @@ export class SceneItem implements ISceneItemApi {
     const obsSceneItem = this.getObsSceneItem();
     this.setCrop(crop);
     obsSceneItem.position = { x, y };
-    this.UPDATE({ sceneItemId: this.sceneItemId, x, y });
+    this.update({ sceneItemId: this.sceneItemId, x, y });
   }
 
 
@@ -173,13 +173,13 @@ export class SceneItem implements ISceneItemApi {
       scene.makeItemsActive([]);
     }
 
-    this.UPDATE({ sceneItemId: this.sceneItemId, locked });
+    this.update({ sceneItemId: this.sceneItemId, locked });
   }
 
 
   loadAttributes() {
     const { position, scale, visible, crop } = this.getObsSceneItem();
-    this.UPDATE({
+    this.update({
       sceneItemId: this.sceneItemId,
       scaleX: scale.x,
       scaleY: scale.y,
@@ -194,7 +194,7 @@ export class SceneItem implements ISceneItemApi {
     const position = { x: customSceneItem.x, y: customSceneItem.y };
     const crop = customSceneItem.crop;
 
-    this.UPDATE({
+    this.update({
       sceneItemId: this.sceneItemId,
       scaleX: customSceneItem.scaleX,
       scaleY: customSceneItem.scaleY,
@@ -205,6 +205,13 @@ export class SceneItem implements ISceneItemApi {
       rotation: customSceneItem.rotation
     });
   }
+
+
+  private update(patch: {sceneItemId: string} & Partial<ISceneItem>) {
+    this.UPDATE(patch);
+    this.scenesService.itemUpdated.next(this.sceneItemState);
+  }
+
 
   @mutation()
   private UPDATE(patch: {sceneItemId: string} & Partial<ISceneItem>) {
