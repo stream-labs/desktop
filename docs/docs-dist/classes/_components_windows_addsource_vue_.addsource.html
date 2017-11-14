@@ -127,6 +127,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#error" class="tsd-kind-icon">error</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#existingsources" class="tsd-kind-icon">existing<wbr>Sources</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#propertiesmanager" class="tsd-kind-icon">properties<wbr>Manager</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#scenesservice" class="tsd-kind-icon">scenes<wbr>Service</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#selectedsourceid" class="tsd-kind-icon">selected<wbr>Source<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-external"><a href="_components_windows_addsource_vue_.addsource.html#sourcetype" class="tsd-kind-icon">source<wbr>Type</a></li>
@@ -388,7 +389,7 @@
 					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L24">components/windows/AddSource.vue.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L24">components/windows/AddSource.vue.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -398,7 +399,7 @@
 					<div class="tsd-signature tsd-kind-icon">existing<wbr>Sources<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;this.sources.map(source &#x3D;&gt; {return { name: source.displayName, value: source.sourceId };})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L34">components/windows/AddSource.vue.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L36">components/windows/AddSource.vue.ts:36</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -408,7 +409,17 @@
 					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L23">components/windows/AddSource.vue.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L23">components/windows/AddSource.vue.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-external">
+					<a name="propertiesmanager" class="tsd-anchor"></a>
+					<h3>properties<wbr>Manager</h3>
+					<div class="tsd-signature tsd-kind-icon">properties<wbr>Manager<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"default"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"widget"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"streamlabels"</span><span class="tsd-signature-symbol"> =&nbsp;this.windowsService.getChildWindowQueryParams().propertiesManager as TPropertiesManager</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L26">components/windows/AddSource.vue.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -418,7 +429,7 @@
 					<div class="tsd-signature tsd-kind-icon">scenes<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_scenes_scenes_api_.iscenesserviceapi.html" class="tsd-signature-type">IScenesServiceApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L20">components/windows/AddSource.vue.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L20">components/windows/AddSource.vue.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -428,27 +439,27 @@
 					<div class="tsd-signature tsd-kind-icon">selected<wbr>Source<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;this.sources[0].sourceId</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L38">components/windows/AddSource.vue.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L40">components/windows/AddSource.vue.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-external">
 					<a name="sourcetype" class="tsd-anchor"></a>
 					<h3>source<wbr>Type</h3>
-					<div class="tsd-signature tsd-kind-icon">source<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"image_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"color_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"browser_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"slideshow"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ffmpeg_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"text_gdiplus"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"text_ft2_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"monitor_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"window_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"game_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"dshow_input"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wasapi_input_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wasapi_output_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"scene"</span><span class="tsd-signature-symbol"> =&nbsp;this.windowsService.getChildWindowQueryParams().sourceType as TSourceType</span></div>
+					<div class="tsd-signature tsd-kind-icon">source<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"image_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"color_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"browser_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"slideshow"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"ffmpeg_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"text_gdiplus"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"text_ft2_source"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"monitor_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"window_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"game_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"dshow_input"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wasapi_input_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"wasapi_output_capture"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"decklink-input"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"scene"</span><span class="tsd-signature-symbol"> =&nbsp;this.windowsService.getChildWindowQueryParams().sourceType as TSourceType</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L25">components/windows/AddSource.vue.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L25">components/windows/AddSource.vue.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-external">
 					<a name="sources" class="tsd-anchor"></a>
 					<h3>sources</h3>
-					<div class="tsd-signature tsd-kind-icon">sources<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_sources_sources_api_.isourceapi.html" class="tsd-signature-type">ISourceApi</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;this.sourcesService.getSources().filter(source &#x3D;&gt; {return (source.type &#x3D;&#x3D;&#x3D; this.sourceType &amp;&amp;source.sourceId !&#x3D;&#x3D; this.scenesService.activeSceneId &amp;&amp;!source.channel);})</span></div>
+					<div class="tsd-signature tsd-kind-icon">sources<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_sources_sources_api_.isourceapi.html" class="tsd-signature-type">ISourceApi</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;this.sourcesService.getSources().filter(source &#x3D;&gt; {return (source.type &#x3D;&#x3D;&#x3D; this.sourceType &amp;&amp;source.getPropertiesManagerType() &#x3D;&#x3D;&#x3D; (this.propertiesManager || &#x27;default&#x27;) &amp;&amp;source.sourceId !&#x3D;&#x3D; this.scenesService.activeSceneId &amp;&amp;!source.channel);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L26">components/windows/AddSource.vue.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L27">components/windows/AddSource.vue.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -458,7 +469,7 @@
 					<div class="tsd-signature tsd-kind-icon">sources<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_sources_sources_api_.isourcesserviceapi.html" class="tsd-signature-type">ISourcesServiceApi</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L19">components/windows/AddSource.vue.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L19">components/windows/AddSource.vue.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -468,7 +479,7 @@
 					<div class="tsd-signature tsd-kind-icon">windows<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="_services_windows_.windowsservice.html" class="tsd-signature-type">WindowsService</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L21">components/windows/AddSource.vue.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L21">components/windows/AddSource.vue.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -565,7 +576,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L82">components/windows/AddSource.vue.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L89">components/windows/AddSource.vue.ts:89</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_services_sources_sources_api_.isourceapi.html" class="tsd-signature-type">ISourceApi</a></h4>
@@ -908,7 +919,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L48">components/windows/AddSource.vue.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L50">components/windows/AddSource.vue.ts:50</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -925,7 +936,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L64">components/windows/AddSource.vue.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L66">components/windows/AddSource.vue.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -942,7 +953,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L59">components/windows/AddSource.vue.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L61">components/windows/AddSource.vue.ts:61</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -959,7 +970,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L78">components/windows/AddSource.vue.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L85">components/windows/AddSource.vue.ts:85</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -982,7 +993,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/components/windows/AddSource.vue.ts#L40">components/windows/AddSource.vue.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/components/windows/AddSource.vue.ts#L42">components/windows/AddSource.vue.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1513,6 +1524,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
 								<a href="_components_windows_addsource_vue_.addsource.html#name" class="tsd-kind-icon">name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
+								<a href="_components_windows_addsource_vue_.addsource.html#propertiesmanager" class="tsd-kind-icon">properties<wbr>Manager</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
 								<a href="_components_windows_addsource_vue_.addsource.html#scenesservice" class="tsd-kind-icon">scenes<wbr>Service</a>

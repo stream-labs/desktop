@@ -81,7 +81,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="_services_stateful_service_.statefulservice.html" class="tsd-signature-type">StatefulService</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol">&gt;</span>
+						<a href="_services_stateful_service_.statefulservice.html" class="tsd-signature-type">StatefulService</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol">&gt;</span>
 						<ul class="tsd-hierarchy">
 							<li>
 								<span class="target">StreamingService</span>
@@ -111,6 +111,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_services_streaming_streaming_.streamingservice.html#options" class="tsd-kind-icon">options</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#powersaveid" class="tsd-kind-icon">power<wbr>Save<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_services_streaming_streaming_.streamingservice.html#servicename" class="tsd-kind-icon">service<wbr>Name</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#settingsservice" class="tsd-kind-icon">settings<wbr>Service</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#streamingstatuschange" class="tsd-kind-icon">streaming<wbr>Status<wbr>Change</a></li>
@@ -145,6 +146,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#stop_recording" class="tsd-kind-icon">STOP_<wbr>RECORDING</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#stop_streaming" class="tsd-kind-icon">STOP_<wbr>STREAMING</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_services_streaming_streaming_.streamingservice.html#afterinit" class="tsd-kind-icon">after<wbr>Init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#getmodel" class="tsd-kind-icon">get<wbr>Model</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_services_streaming_streaming_.streamingservice.html#init" class="tsd-kind-icon">init</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_services_streaming_streaming_.streamingservice.html#mounted" class="tsd-kind-icon">mounted</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_services_streaming_streaming_.streamingservice.html#showeditstreaminfo" class="tsd-kind-icon">show<wbr>Edit<wbr>Stream<wbr>Info</a></li>
@@ -175,7 +177,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L70">services/service.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L70">services/service.ts:70</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -201,7 +203,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#options">options</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L29">services/service.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L29">services/service.ts:29</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -210,6 +212,16 @@
 						</ul>
 					</div>
 				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="powersaveid" class="tsd-anchor"></a>
+					<h3>power<wbr>Save<wbr>Id</h3>
+					<div class="tsd-signature tsd-kind-icon">power<wbr>Save<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L60">services/streaming/streaming.ts:60</a></li>
+						</ul>
+					</aside>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 					<a name="servicename" class="tsd-anchor"></a>
 					<h3>service<wbr>Name</h3>
@@ -217,7 +229,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#servicename">serviceName</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L28">services/service.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L28">services/service.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -227,7 +239,7 @@
 					<div class="tsd-signature tsd-kind-icon">settings<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="_services_settings_.settingsservice.html" class="tsd-signature-type">SettingsService</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L23">services/streaming/streaming.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L17">services/streaming/streaming.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -237,7 +249,7 @@
 					<div class="tsd-signature tsd-kind-icon">streaming<wbr>Status<wbr>Change<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Subject</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Subject&lt;boolean&gt;()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L64">services/streaming/streaming.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L58">services/streaming/streaming.ts:58</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -247,7 +259,7 @@
 					<div class="tsd-signature tsd-kind-icon">windows<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="_services_windows_.windowsservice.html" class="tsd-signature-type">WindowsService</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L24">services/streaming/streaming.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L18">services/streaming/streaming.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -258,17 +270,17 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#hasinstance">hasInstance</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L12">services/service.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L12">services/service.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 					<a name="initialstate" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> initial<wbr>State</h3>
-					<div class="tsd-signature tsd-kind-icon">initial<wbr>State<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol"> =&nbsp;{isStreaming: false,streamStartTime: null,isRecording: false,recordStartTime: null,streamOk: null} as IStreamingServiceState</span></div>
+					<div class="tsd-signature tsd-kind-icon">initial<wbr>State<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol"> =&nbsp;{isStreaming: false,streamStartTime: null,isRecording: false,recordStartTime: null,streamOk: null} as IStreamingServiceState</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L26">services/streaming/streaming.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L20">services/streaming/streaming.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -279,7 +291,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#issingleton">isSingleton</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L13">services/service.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L13">services/service.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -290,7 +302,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#serviceafterinit">serviceAfterInit</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L18">services/service.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L18">services/service.ts:18</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -312,7 +324,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L187">services/streaming/streaming.ts:187</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L192">services/streaming/streaming.ts:192</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -329,7 +341,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L171">services/streaming/streaming.ts:171</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L176">services/streaming/streaming.ts:176</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -346,7 +358,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L179">services/streaming/streaming.ts:179</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L184">services/streaming/streaming.ts:184</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -363,7 +375,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L163">services/streaming/streaming.ts:163</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L168">services/streaming/streaming.ts:168</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -380,7 +392,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L183">services/streaming/streaming.ts:183</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L188">services/streaming/streaming.ts:188</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Moment</span></h4>
@@ -391,30 +403,30 @@
 					<a name="state" class="tsd-anchor"></a>
 					<h3>state</h3>
 					<ul class="tsd-signatures tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> state<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></li>
-						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> state<span class="tsd-signature-symbol">(</span>newState<span class="tsd-signature-symbol">: </span><a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> state<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></li>
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">set</span> state<span class="tsd-signature-symbol">(</span>newState<span class="tsd-signature-symbol">: </span><a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_stateful_service_.statefulservice.html">StatefulService</a>.<a href="_services_stateful_service_.statefulservice.html#state">state</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/stateful-service.ts#L64">services/stateful-service.ts:64</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/stateful-service.ts#L64">services/stateful-service.ts:64</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></h4>
 						</li>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_stateful_service_.statefulservice.html">StatefulService</a>.<a href="_services_stateful_service_.statefulservice.html#state">state</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/stateful-service.ts#L69">services/stateful-service.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/stateful-service.ts#L69">services/stateful-service.ts:69</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>newState: <a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></h5>
+									<h5>newState: <a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -432,7 +444,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_stateful_service_.statefulservice.html">StatefulService</a>.<a href="_services_stateful_service_.statefulservice.html#store">store</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/stateful-service.ts#L60">services/stateful-service.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/stateful-service.ts#L60">services/stateful-service.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Store</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -449,7 +461,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L175">services/streaming/streaming.ts:175</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L180">services/streaming/streaming.ts:180</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -466,7 +478,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L167">services/streaming/streaming.ts:167</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L172">services/streaming/streaming.ts:172</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Moment</span></h4>
@@ -484,7 +496,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#instance">instance</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L31">services/service.ts:31</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L31">services/service.ts:31</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
@@ -504,7 +516,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L59">services/streaming/streaming.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L53">services/streaming/streaming.ts:53</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -527,7 +539,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L47">services/streaming/streaming.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L41">services/streaming/streaming.ts:41</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -550,7 +562,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L35">services/streaming/streaming.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L29">services/streaming/streaming.ts:29</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -573,7 +585,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L53">services/streaming/streaming.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L47">services/streaming/streaming.ts:47</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -590,7 +602,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L41">services/streaming/streaming.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L35">services/streaming/streaming.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -608,7 +620,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#afterinit">afterInit</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L97">services/service.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L97">services/service.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -618,6 +630,24 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getmodel" class="tsd-anchor"></a>
+					<h3>get<wbr>Model</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Model<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html">IStreamingServiceApi</a>.<a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html#getmodel">getModel</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L84">services/streaming/streaming.ts:84</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_services_streaming_streaming_api_.istreamingservicestate.html" class="tsd-signature-type">IStreamingServiceState</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -632,7 +662,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#init">init</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L68">services/streaming/streaming.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L64">services/streaming/streaming.ts:64</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -650,7 +680,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#mounted">mounted</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L89">services/service.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L89">services/service.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -672,7 +702,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L150">services/streaming/streaming.ts:150</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L155">services/streaming/streaming.ts:155</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -690,7 +720,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html">IStreamingServiceApi</a>.<a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html#startrecording">startRecording</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L136">services/streaming/streaming.ts:136</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L141">services/streaming/streaming.ts:141</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -708,7 +738,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html">IStreamingServiceApi</a>.<a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html#startstreaming">startStreaming</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L89">services/streaming/streaming.ts:89</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L90">services/streaming/streaming.ts:90</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -726,7 +756,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html">IStreamingServiceApi</a>.<a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html#stoprecording">stopRecording</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L143">services/streaming/streaming.ts:143</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L148">services/streaming/streaming.ts:148</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -744,7 +774,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html">IStreamingServiceApi</a>.<a href="../interfaces/_services_streaming_streaming_api_.istreamingserviceapi.html#stopstreaming">stopStreaming</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/streaming/streaming.ts#L116">services/streaming/streaming.ts:116</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/streaming/streaming.ts#L119">services/streaming/streaming.ts:119</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -762,7 +792,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#createinstance">createInstance</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L54">services/service.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L54">services/service.ts:54</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -794,7 +824,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_stateful_service_.statefulservice.html">StatefulService</a>.<a href="_services_stateful_service_.statefulservice.html#getstore">getStore</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/stateful-service.ts#L55">services/stateful-service.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/stateful-service.ts#L55">services/stateful-service.ts:55</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Store</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -812,7 +842,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#setupinitfunction">setupInitFunction</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L46">services/service.ts:46</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L46">services/service.ts:46</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -859,7 +889,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_service_.service.html">Service</a>.<a href="_services_service_.service.html#setupproxy">setupProxy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/service.ts#L39">services/service.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/service.ts#L39">services/service.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -906,7 +936,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_stateful_service_.statefulservice.html">StatefulService</a>.<a href="_services_stateful_service_.statefulservice.html#setupvuexstore">setupVuexStore</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/stateful-service.ts#L51">services/stateful-service.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/stateful-service.ts#L51">services/stateful-service.ts:51</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -944,6 +974,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="_services_streaming_streaming_.streamingservice.html#options" class="tsd-kind-icon">options</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_services_streaming_streaming_.streamingservice.html#powersaveid" class="tsd-kind-icon">power<wbr>Save<wbr>Id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="_services_streaming_streaming_.streamingservice.html#servicename" class="tsd-kind-icon">service<wbr>Name</a>
@@ -1017,6 +1050,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
 								<a href="_services_streaming_streaming_.streamingservice.html#afterinit" class="tsd-kind-icon">after<wbr>Init</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_services_streaming_streaming_.streamingservice.html#getmodel" class="tsd-kind-icon">get<wbr>Model</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_services_streaming_streaming_.streamingservice.html#init" class="tsd-kind-icon">init</a>
 							</li>
@@ -1057,9 +1093,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_services_streaming_streaming_.istreamingservicestate.html" class="tsd-kind-icon">IStreaming<wbr>Service<wbr>State</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

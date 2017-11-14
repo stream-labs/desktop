@@ -102,6 +102,8 @@
 			<!---->
 			<!--<li><a href="../classes/_services_sources_properties_managers_properties_manager_.propertiesmanager.html" class="tsd-signature-type">PropertiesManager</a></li>-->
 			<!---->
+			<!--<li><a href="../classes/_services_sources_properties_managers_streamlabels_manager_.streamlabelsmanager.html" class="tsd-signature-type">StreamlabelsManager</a></li>-->
+			<!---->
 			<!--<li><a href="../classes/_services_sources_properties_managers_widget_manager_.widgetmanager.html" class="tsd-signature-type">WidgetManager</a></li>-->
 			<!---->
 			<!--</ul>-->
@@ -114,15 +116,17 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#customuicomponent" class="tsd-kind-icon">customUIComponent</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#settings" class="tsd-kind-icon">settings</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#applysettings" class="tsd-kind-icon">apply<wbr>Settings</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#destroy" class="tsd-kind-icon">destroy</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#getpropertiesformdata" class="tsd-kind-icon">get<wbr>Properties<wbr>Form<wbr>Data</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertyformdata" class="tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertiesformdata" class="tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data</a></li>
 							</ul>
 						</section>
 					</div>
@@ -131,18 +135,51 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="customuicomponent" class="tsd-anchor"></a>
+					<h3>customUIComponent</h3>
+					<div class="tsd-signature tsd-kind-icon">customUIComponent<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L15">services/sources/properties-managers/properties-manager.ts:15</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="settings" class="tsd-anchor"></a>
 					<h3>settings</h3>
 					<div class="tsd-signature tsd-kind-icon">settings<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L15">services/sources/properties-managers/properties-manager.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L13">services/sources/properties-managers/properties-manager.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="applysettings" class="tsd-anchor"></a>
+					<h3>apply<wbr>Settings</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">apply<wbr>Settings<span class="tsd-signature-symbol">(</span>settings<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L14">services/sources/properties-managers/properties-manager.ts:14</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>settings: <span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="destroy" class="tsd-anchor"></a>
 					<h3>destroy</h3>
@@ -153,7 +190,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L10">services/sources/properties-managers/properties-manager.ts:10</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L10">services/sources/properties-managers/properties-manager.ts:10</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -170,7 +207,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L11">services/sources/properties-managers/properties-manager.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L11">services/sources/properties-managers/properties-manager.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">input.TFormData</span></h4>
@@ -178,22 +215,22 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="setpropertyformdata" class="tsd-anchor"></a>
-					<h3>set<wbr>Property<wbr>Form<wbr>Data</h3>
+					<a name="setpropertiesformdata" class="tsd-anchor"></a>
+					<h3>set<wbr>Properties<wbr>Form<wbr>Data</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data<span class="tsd-signature-symbol">(</span>property<span class="tsd-signature-symbol">: </span><a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol"> | </span><a href="_components_shared_forms_input_.iforminput.html" class="tsd-signature-type">IFormInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="_components_shared_forms_input_.ilistinput.html" class="tsd-signature-type">IListInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data<span class="tsd-signature-symbol">(</span>property<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">input.TFormData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L12">services/sources/properties-managers/properties-manager.ts:12</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L12">services/sources/properties-managers/properties-manager.ts:12</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>property: <a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol"> | </span><a href="_components_shared_forms_input_.iforminput.html" class="tsd-signature-type">IFormInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="_components_shared_forms_input_.ilistinput.html" class="tsd-signature-type">IListInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>property: <span class="tsd-signature-type">input.TFormData</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -218,19 +255,19 @@
 					<li class=" tsd-kind-class tsd-parent-kind-external-module">
 						<a href="../classes/_services_sources_properties_managers_properties_manager_.propertiesmanager.html" class="tsd-kind-icon">Properties<wbr>Manager</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_services_sources_properties_managers_properties_manager_.icustomlistproperty.html" class="tsd-kind-icon">ICustom<wbr>List<wbr>Property</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-has-type-parameter">
-						<a href="_services_sources_properties_managers_properties_manager_.icustomproperty.html" class="tsd-kind-icon">ICustom<wbr>Property</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-external-module">
 						<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html" class="tsd-kind-icon">IProperty<wbr>Manager</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#customuicomponent" class="tsd-kind-icon">customUIComponent</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
 								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#settings" class="tsd-kind-icon">settings</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#applysettings" class="tsd-kind-icon">apply<wbr>Settings</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#destroy" class="tsd-kind-icon">destroy</a>
@@ -239,15 +276,12 @@
 								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#getpropertiesformdata" class="tsd-kind-icon">get<wbr>Properties<wbr>Form<wbr>Data</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertyformdata" class="tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data</a>
+								<a href="_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertiesformdata" class="tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module">
-						<a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-kind-icon">TCustom<wbr>Property</a>
-					</li>
 				</ul>
 			</nav>
 		</div>

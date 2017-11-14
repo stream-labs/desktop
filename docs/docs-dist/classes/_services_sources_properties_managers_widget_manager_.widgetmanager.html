@@ -121,20 +121,21 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#blacklist" class="tsd-kind-icon">blacklist</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#customuicomponent" class="tsd-kind-icon">customUIComponent</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#displayorder" class="tsd-kind-icon">display<wbr>Order</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#obssource" class="tsd-kind-icon">obs<wbr>Source</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#settings" class="tsd-kind-icon">settings</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#settings" class="tsd-kind-icon">settings</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#widgetsservice" class="tsd-kind-icon">widgets<wbr>Service</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#applysettings" class="tsd-kind-icon">apply<wbr>Settings</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#destroy" class="tsd-kind-icon">destroy</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#getcustomproperties" class="tsd-kind-icon">get<wbr>Custom<wbr>Properties</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#getpropertiesformdata" class="tsd-kind-icon">get<wbr>Properties<wbr>Form<wbr>Data</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setcustomproperty" class="tsd-kind-icon">set<wbr>Custom<wbr>Property</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setpropertyformdata" class="tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#init" class="tsd-kind-icon">init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setpropertiesformdata" class="tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setwidgettype" class="tsd-kind-icon">set<wbr>Widget<wbr>Type</a></li>
 							</ul>
 						</section>
@@ -154,7 +155,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L41">services/sources/properties-managers/properties-manager.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L31">services/sources/properties-managers/properties-manager.ts:31</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -195,7 +196,19 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#blacklist">blacklist</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L21">services/sources/properties-managers/widget-manager.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L21">services/sources/properties-managers/widget-manager.ts:21</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+					<a name="customuicomponent" class="tsd-anchor"></a>
+					<h3>customUIComponent</h3>
+					<div class="tsd-signature tsd-kind-icon">customUIComponent<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;WidgetProperties&quot;</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#customuicomponent">customUIComponent</a></p>
+						<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#customuicomponent">customUIComponent</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L24">services/sources/properties-managers/widget-manager.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -206,7 +219,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#displayorder">displayOrder</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L22">services/sources/properties-managers/widget-manager.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L22">services/sources/properties-managers/widget-manager.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,7 +230,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#obssource">obsSource</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L48">services/sources/properties-managers/properties-manager.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L38">services/sources/properties-managers/properties-manager.ts:38</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -226,22 +239,17 @@
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
 					<a name="settings" class="tsd-anchor"></a>
 					<h3>settings</h3>
-					<div class="tsd-signature tsd-kind-icon">settings<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">settings<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_services_sources_properties_managers_widget_manager_.iwidgetmanagersettings.html" class="tsd-signature-type">IWidgetManagerSettings</a></div>
 					<aside class="tsd-sources">
 						<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#settings">settings</a></p>
+						<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#settings">settings</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L25">services/sources/properties-managers/widget-manager.ts:25</a></li>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L48">services/sources/properties-managers/properties-manager.ts:48</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L26">services/sources/properties-managers/widget-manager.ts:26</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The manager settings.  These are <em>NOT</em> OBS settings</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="widgetsservice" class="tsd-anchor"></a>
@@ -249,13 +257,38 @@
 					<div class="tsd-signature tsd-kind-icon">widgets<wbr>Service<span class="tsd-signature-symbol">:</span> <a href="_services_widgets_.widgetsservice.html" class="tsd-signature-type">WidgetsService</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L19">services/sources/properties-managers/widget-manager.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L19">services/sources/properties-managers/widget-manager.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="applysettings" class="tsd-anchor"></a>
+					<h3>apply<wbr>Settings</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">apply<wbr>Settings<span class="tsd-signature-symbol">(</span>settings<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#applysettings">applySettings</a></p>
+								<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#applysettings">applySettings</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L29">services/sources/properties-managers/widget-manager.ts:29</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>settings: <span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="destroy" class="tsd-anchor"></a>
 					<h3>destroy</h3>
@@ -268,7 +301,7 @@
 								<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#destroy">destroy</a></p>
 								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#destroy">destroy</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L56">services/sources/properties-managers/properties-manager.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L64">services/sources/properties-managers/properties-manager.ts:64</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -278,24 +311,6 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-					<a name="getcustomproperties" class="tsd-anchor"></a>
-					<h3>get<wbr>Custom<wbr>Properties</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Custom<wbr>Properties<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol">[]</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#getcustomproperties">getCustomProperties</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L28">services/sources/properties-managers/widget-manager.ts:28</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -311,56 +326,67 @@
 								<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#getpropertiesformdata">getPropertiesFormData</a></p>
 								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#getpropertiesformdata">getPropertiesFormData</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L97">services/sources/properties-managers/properties-manager.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L105">services/sources/properties-managers/properties-manager.ts:105</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">input.TFormData</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-					<a name="setcustomproperty" class="tsd-anchor"></a>
-					<h3>set<wbr>Custom<wbr>Property</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Custom<wbr>Property<span class="tsd-signature-symbol">(</span>property<span class="tsd-signature-symbol">: </span><a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="init" class="tsd-anchor"></a>
+					<h3>init</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Overrides <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#setcustomproperty">setCustomProperty</a></p>
+								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#init">init</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L51">services/sources/properties-managers/widget-manager.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L56">services/sources/properties-managers/properties-manager.ts:56</a></li>
 								</ul>
 							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>property: <a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a></h5>
-								</li>
-							</ul>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Can be used to attach custom startup behavior to this
+									properties manager.</p>
+								</div>
+							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-					<a name="setpropertyformdata" class="tsd-anchor"></a>
-					<h3>set<wbr>Property<wbr>Form<wbr>Data</h3>
+					<a name="setpropertiesformdata" class="tsd-anchor"></a>
+					<h3>set<wbr>Properties<wbr>Form<wbr>Data</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data<span class="tsd-signature-symbol">(</span>property<span class="tsd-signature-symbol">: </span><a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_components_shared_forms_input_.iforminput.html" class="tsd-signature-type">IFormInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_components_shared_forms_input_.ilistinput.html" class="tsd-signature-type">IListInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data<span class="tsd-signature-symbol">(</span>properties<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">input.TFormData</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertyformdata">setPropertyFormData</a></p>
-								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#setpropertyformdata">setPropertyFormData</a></p>
+								<p>Implementation of <a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html">IPropertyManager</a>.<a href="../interfaces/_services_sources_properties_managers_properties_manager_.ipropertymanager.html#setpropertiesformdata">setPropertiesFormData</a></p>
+								<p>Inherited from <a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html">PropertiesManager</a>.<a href="_services_sources_properties_managers_properties_manager_.propertiesmanager.html#setpropertiesformdata">setPropertiesFormData</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/properties-manager.ts#L126">services/sources/properties-managers/properties-manager.ts:126</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/properties-manager.ts#L133">services/sources/properties-managers/properties-manager.ts:133</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>By default, simply delegates to the normal
+										setPropertiesFormData function in Input.ts.
+										Can be overridden to modify propreties as they
+									are edited by the user.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>property: <a href="../modules/_services_sources_properties_managers_properties_manager_.html#tcustomproperty" class="tsd-signature-type">TCustomProperty</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_components_shared_forms_input_.iforminput.html" class="tsd-signature-type">IFormInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_components_shared_forms_input_.ilistinput.html" class="tsd-signature-type">IListInput</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">input.TObsValue</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<h5>properties: <span class="tsd-signature-type">input.TFormData</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The OBS properties</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -377,7 +403,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3e52a4a/app/services/sources/properties-managers/widget-manager.ts#L59">services/sources/properties-managers/widget-manager.ts:59</a></li>
+									<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/3d13104/app/services/sources/properties-managers/widget-manager.ts#L35">services/sources/properties-managers/widget-manager.ts:35</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -417,31 +443,34 @@
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#blacklist" class="tsd-kind-icon">blacklist</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#customuicomponent" class="tsd-kind-icon">customUIComponent</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#displayorder" class="tsd-kind-icon">display<wbr>Order</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#obssource" class="tsd-kind-icon">obs<wbr>Source</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class">
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-overwrite">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#settings" class="tsd-kind-icon">settings</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#widgetsservice" class="tsd-kind-icon">widgets<wbr>Service</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#applysettings" class="tsd-kind-icon">apply<wbr>Settings</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#destroy" class="tsd-kind-icon">destroy</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#getcustomproperties" class="tsd-kind-icon">get<wbr>Custom<wbr>Properties</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#getpropertiesformdata" class="tsd-kind-icon">get<wbr>Properties<wbr>Form<wbr>Data</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
-								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setcustomproperty" class="tsd-kind-icon">set<wbr>Custom<wbr>Property</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#init" class="tsd-kind-icon">init</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setpropertyformdata" class="tsd-kind-icon">set<wbr>Property<wbr>Form<wbr>Data</a>
+								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setpropertiesformdata" class="tsd-kind-icon">set<wbr>Properties<wbr>Form<wbr>Data</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_services_sources_properties_managers_widget_manager_.widgetmanager.html#setwidgettype" class="tsd-kind-icon">set<wbr>Widget<wbr>Type</a>

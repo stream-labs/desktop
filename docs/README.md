@@ -115,7 +115,7 @@ response
 {
     "jsonrpc": "2.0",
     "id": 4,
-    "result": ⊖{
+    "result": {
         "_type": "SUBSCRIPTION",
         "resourceId": "ScenesService.sceneSwitched"
     }
