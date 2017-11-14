@@ -8,6 +8,13 @@ This application currently only supports 64-bit Windows.
 
 ## Dependencies
 
+### Node.js
+
+Node is required for installing npm packages and for running
+various scripts.  We recommend the current LTS released, 8.9.1:
+
+https://nodejs.org
+
 ### Yarn
 
 In order to ensure you are using the correct version of each
@@ -26,6 +33,13 @@ Visual Studio Community 2015 with Update 3
 
 Make sure you do a custom installation and select Visual C++ from
 the languages section.
+
+### CMake
+
+Some of our native addons require CMake for compilation.  You can
+download it here:
+
+https://cmake.org/download/
 
 ## Installation
 
