@@ -64,6 +64,42 @@ interface ITrains {
 }
 
 
+type TSocketEvent =
+  IStreamlabelsSocketEvent |
+  IDonationSocketEvent |
+  IFollowSocketEvent |
+  ISubscriptionSocketEvent;
+
+interface IStreamlabelsSocketEvent {
+  type: 'streamlabels';
+  message: {
+    data: Dictionary<string>;
+  };
+}
+
+interface IDonationSocketEvent {
+  type: 'donation';
+  message: {
+    name: string;
+    amount: string;
+  }[];
+}
+
+interface IFollowSocketEvent {
+  type: 'follow';
+  message: {
+    name: string;
+  }[];
+}
+
+interface ISubscriptionSocketEvent {
+  type: 'subscription';
+  message: {
+    name: string;
+  }[];
+}
+
+
 function isDonationTrain(train: ITrainInfo | IDonationTrainInfo): train is IDonationTrainInfo {
   return (train as IDonationTrainInfo).donationTrain;
 }
@@ -369,8 +405,7 @@ export class StreamlabelsService extends Service {
   }
 
 
-  // TODO: Interface for socket events
-  private onSocketEvent(event: any) {
+  private onSocketEvent(event: TSocketEvent) {
     console.log('Socket Event', event);
 
     if (event.type === 'streamlabels') {
