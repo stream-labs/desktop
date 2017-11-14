@@ -11,7 +11,7 @@ This application currently only supports 64-bit Windows.
 ### Node.js
 
 Node is required for installing npm packages and for running
-various scripts.  We recommend the current LTS released, 8.9.1:
+various scripts.  We recommend the current LTS release, 8.9.1:
 
 https://nodejs.org
 
