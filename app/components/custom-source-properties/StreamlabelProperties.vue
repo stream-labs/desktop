@@ -11,6 +11,7 @@
         group-values="files"
         track-by="name"
         label="label"
+        :allow-empty="false"
         :value="currentlySelected"
         @input="handleInput"/>
     </div>
