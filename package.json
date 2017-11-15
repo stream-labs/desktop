@@ -36,7 +36,8 @@
     ],
     "extraFiles": [
       "node-obs",
-      "LICENSE"
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -46,7 +47,7 @@
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
     },
     "nsis": {
-      "license": "LICENSE"
+      "license": "AGREEMENT"
     }
   },
   "ava": {
