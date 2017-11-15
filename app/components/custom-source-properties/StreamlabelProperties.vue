@@ -11,11 +11,12 @@
         group-values="files"
         track-by="name"
         label="label"
+        :allow-empty="false"
         :value="currentlySelected"
         @input="handleInput"/>
     </div>
   </div>
-  <div class="input-container">
+  <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
       <label>Label Template</label>
     </div>
@@ -86,7 +87,82 @@
         @input="debouncedSetSettings"/>
     </div>
   </div>
-  <div class="input-container">
+  <div class="input-container" v-if="labelSettings.duration != null">
+    <div class="input-label">
+      <label>Duration (seconds)</label>
+    </div>
+    <div class="input-wrapper">
+      <input
+        type="text"
+        v-model="labelSettings.duration"
+        @input="debouncedSetSettings"/>
+    </div>
+  </div>
+  <div class="input-container select" v-if="labelSettings.show_clock != null">
+    <div class="input-label">
+      <label>Show Clock</label>
+    </div>
+    <div class="input-wrapper">
+      <multiselect
+        :options="['always', 'active']"
+        :custom-label="val => {
+          return val === 'always' ?
+            'Always, show 0:00 when inactive' :
+            'Hide when inactive';
+        }"
+        :allow-empty="false"
+        v-model="labelSettings.show_clock"
+        @input="debouncedSetSettings"/>
+    </div>
+  </div>
+  <div class="input-container select" v-if="labelSettings.show_count != null">
+    <div class="input-label">
+      <label>Show Count</label>
+    </div>
+    <div class="input-wrapper">
+      <multiselect
+        :options="['always', 'active']"
+        :custom-label="val => {
+          return val === 'always' ?
+            'Always, show 0 when inactive' :
+            'Hide when inactive';
+        }"
+        :allow-empty="false"
+        v-model="labelSettings.show_count"
+        @input="debouncedSetSettings"/>
+    </div>
+  </div>
+  <div class="input-container select" v-if="labelSettings.show_latest != null">
+    <div class="input-label">
+      <label>Show Latest</label>
+    </div>
+    <div class="input-wrapper">
+      <multiselect
+        :options="['always', 'active']"
+        :custom-label="val => {
+          return val === 'always' ?
+            'Always, show last person when inactive' :
+            'Hide when inactive';
+        }"
+        :allow-empty="false"
+        v-model="labelSettings.show_latest"
+        @input="debouncedSetSettings"/>
+    </div>
+  </div>
+  <div class="input-container" v-if="labelSettings.include_resubs != null">
+    <div class="input-label">
+    </div>
+    <div class="input-wrapper">
+      <div class="checkbox">
+        <input
+          type="checkbox"
+          v-model="labelSettings.include_resubs"
+          @change="debouncedSetSettings"/>
+        <label>Include Resubs</label>
+      </div>
+    </div>
+  </div>
+  <div class="input-container" v-if="labelSettings.format != null">
     <div class="input-label">
       <label>Preview</label>
     </div>

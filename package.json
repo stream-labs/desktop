@@ -35,7 +35,9 @@
       "obs-api"
     ],
     "extraFiles": [
-      "node-obs"
+      "node-obs",
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -43,6 +45,9 @@
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+    },
+    "nsis": {
+      "license": "AGREEMENT"
     }
   },
   "ava": {
