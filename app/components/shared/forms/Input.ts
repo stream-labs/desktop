@@ -292,7 +292,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
   setupSourceDefaults(obsSource);
 
   const formData: TFormData = [];
-  const obsProps = obsSource.properties;
+  const obsProps = obsSource.properties();
   const obsSettings = obsSource.settings;
 
   if (!obsProps) return null;
@@ -395,7 +395,7 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
 
   buttons.forEach(buttonInput => {
     if (!buttonInput.value) return;
-    const obsButtonProp = obsSource.properties.get(buttonInput.name) as obs.IButtonProperty;
+    const obsButtonProp = obsSource.properties().get(buttonInput.name) as obs.IButtonProperty;
     obsButtonProp.buttonClicked(obsSource);
   });
 }
@@ -404,8 +404,9 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
 export function setupSourceDefaults(obsSource: obs.ISource) {
   const propSettings = obsSource.settings;
   const defaultSettings = {};
-  if (!obsSource.properties) return;
-  let obsProp = obsSource.properties.first();
+  const properties = obsSource.properties();
+  if (!properties) return;
+  let obsProp = properties.first();
   do {
     if (
       propSettings[obsProp.name] !== void 0 ||

@@ -93,12 +93,13 @@ export class WebcamNode extends Node<ISchema, IContext> {
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
     const input = item.getObsInput();
+    const deviceProperties = input.properties();
 
     // Select the first video device
     // TODO: Maybe do some string matching to figure out which
     // one is actually the webcam.  For most users, their webcam
     // will be the only option here.
-    const deviceProperty = input.properties.get('video_device_id');
+    const deviceProperty = deviceProperties.get('video_device_id');
 
     // Stop loading if there aren't any devices
     if ((deviceProperty as IListProperty).details.items.length === 0) return;
@@ -110,7 +111,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
     input.update(settings);
 
     // Figure out which resolutions this device can run at
-    const resolutionOptions = (input.properties.get('resolution') as IListProperty).details.items.map(item => {
+    const resolutionOptions = (deviceProperties.get('resolution') as IListProperty).details.items.map(item => {
       return this.resStringToResolution(item.value as string);
     });
 
