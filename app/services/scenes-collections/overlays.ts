@@ -6,7 +6,7 @@ import { ImageNode } from './nodes/overlays/image';
 import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
-import { ConfigPersistenceService, parse } from '.';
+import { ScenesCollectionsService, parse } from '.';
 import { Inject } from '../../util/injector';
 import electron from 'electron';
 import fs from 'fs';
@@ -27,7 +27,7 @@ const NODE_TYPES = {
 export class OverlaysPersistenceService extends Service {
 
   @Inject()
-  configPersistenceService: ConfigPersistenceService;
+  scenesCollectionsService: ScenesCollectionsService;
 
 
   loadOverlay(overlayFilePath: string) {
@@ -42,7 +42,7 @@ export class OverlaysPersistenceService extends Service {
     const root = parse(data, NODE_TYPES);
     root.load({ assetsPath });
 
-    this.configPersistenceService.setUpDefaultAudio();
+    this.scenesCollectionsService.setUpDefaultAudio();
   }
 
 

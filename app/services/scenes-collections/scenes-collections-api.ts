@@ -1,4 +1,4 @@
-export interface IConfigPersistenceServiceApi {
+export interface IScenesCollectionsApi {
   getState(): IScenesCollectionState;
 }
 

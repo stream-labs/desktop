@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from '../stateful-service';
 import { OnboardingService } from '../onboarding';
-import { ConfigPersistenceService } from '../config-persistence';
+import { ScenesCollectionsService } from '../scenes-collections';
 import { HotkeysService } from '../hotkeys';
 import { UserService } from '../user';
 import { ShortcutsService } from '../shortcuts';
@@ -31,7 +31,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   onboardingService: OnboardingService;
 
   @Inject()
-  configPersistenceService: ConfigPersistenceService;
+  scenesCollectionsService: ScenesCollectionsService;
 
   @Inject()
   hotkeysService: HotkeysService;
@@ -82,10 +82,10 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
       // handle it based on what the user wants.
       const onboarded = this.onboardingService.startOnboardingIfRequired();
       if (!onboarded) {
-        if (this.configPersistenceService.hasConfigs()) {
+        if (this.scenesCollectionsService.hasConfigs()) {
           loadingPromise = this.loadConfig('', { saveCurrent: false });
         } else {
-          this.configPersistenceService.switchToBlankConfig();
+          this.scenesCollectionsService.switchToBlankConfig();
           loadingPromise = Promise.resolve();
         }
       } else {
@@ -126,10 +126,10 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
       window.setTimeout(() => {
         // wait while current config will be saved
-        (options.saveCurrent ? this.configPersistenceService.rawSave() : Promise.resolve()).then(() => {
+        (options.saveCurrent ? this.scenesCollectionsService.rawSave() : Promise.resolve()).then(() => {
           this.reset();
 
-          this.configPersistenceService.load(configName).then(() => {
+          this.scenesCollectionsService.load(configName).then(() => {
             this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
             this.hotkeysService.bindHotkeys();
             this.enableAutoSave();
@@ -146,8 +146,8 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
    * remove the config and load the new one
    */
   removeCurrentConfig() {
-    this.configPersistenceService.removeConfig();
-    if (this.configPersistenceService.hasConfigs()) {
+    this.scenesCollectionsService.removeConfig();
+    if (this.scenesCollectionsService.hasConfigs()) {
       this.loadConfig('', { saveCurrent: false });
     } else {
       this.switchToBlankConfig();
@@ -160,7 +160,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
    */
   switchToBlankConfig(configName?: string) {
     this.reset();
-    this.configPersistenceService.switchToBlankConfig(configName);
+    this.scenesCollectionsService.switchToBlankConfig(configName);
     this.enableAutoSave();
   }
 
@@ -171,7 +171,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
     this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
-    this.configPersistenceService.rawSave().then(() => {
+    this.scenesCollectionsService.rawSave().then(() => {
       this.reset();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
@@ -192,7 +192,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
   private enableAutoSave() {
     this.autosaveInterval = window.setInterval(() => {
-      this.configPersistenceService.save();
+      this.scenesCollectionsService.save();
     }, 60 * 1000);
   }
 
