@@ -1,17 +1,18 @@
 # API reference
 
-Streamlabs-OBS allows to manage application via RPC based API.
-The API represented with several different services.
-You can asses services' methods and properties by sending [JSON-RPC](http://www.jsonrpc.org/specification) messages
-to named pipe `slobs`
+Streamlabs-OBS allows remote management of the application via
+an RPC-based API. The API is split into several different services.
+You can access services' methods and properties by sending
+[JSON-RPC](http://www.jsonrpc.org/specification) messages to the
+named pipe `slobs`.
 
 # Examples
 
 
-Get list of scenes:
+## Get a list of scenes
 
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -21,12 +22,11 @@ request
         "resource": "ScenesService"
     }
 }
-
 ```
 
 
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -34,7 +34,7 @@ response
     "result": [
        {
             "_type": "HELPER",
-            "resourceId": "Scene[\"6b615869aba3\"]",
+            "resourceId": "Scene[\"3efd436e5546\"]",
             "id": "3efd436e5546",
             "name": "My super scene",
             "activeItemIds": []
@@ -50,12 +50,14 @@ response
 }
 ```
 
-Property `"_type": "HELPER"` means that you can fetch some additional information
-by calling methods of this object. To do that just put `resourceId` from response to `resource` in request.
+The property `"_type": "HELPER"` means that you can fetch some
+additional information by calling methods on this object. To do
+that, just include the `resourceId` from the response to `resource`
+in the new request.
 
-Get scene items:
+## Get items in a scene
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -66,10 +68,9 @@ request
         "args": []
     }
 }
-
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -95,9 +96,9 @@ response
 
 ## Event subscriptions
 
-Subscribe to `sceneSwitched` event:
+Subscribe to the `sceneSwitched` event:
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -110,7 +111,7 @@ request
 }
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -122,9 +123,10 @@ response
 }
 ```
 
-After subscription yo will receive events when user are switching between scenes:
+After subscribing, you will receive events when the user
+switches between scenes:
 
-event
+### Event
 ```
 {
     "jsonrpc": "2.0",
@@ -155,7 +157,11 @@ request
 }
 ```
 
-## Tasks execution
+## Asynchronous Execution
+
+Some service methods are asynchronous and return a Javascript promise.
+This is exposed via the API by 
+
 Some services' methods, for example `AppService.loadConfig()` return `Promise` which is also subscription that
 causes only one event when task is finished.
 
