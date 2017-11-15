@@ -227,25 +227,27 @@ h4 {
 }
 
 .tab-button {
-  border-bottom: 3px solid transparent;
-  padding: 16px 0;
+  border-bottom: 1px solid transparent;
+  height: 45px;
   margin-right: 10px;
   text-transform: uppercase;
   font-size: 12px;
   .semibold;
   letter-spacing: .7px;
   color: @grey;
+  .transition;
 
   .fa {
     margin-right: 4px;
   }
 
-  &.active {
-    border-color: @yellow;
+  &.active,
+  &:hover {
+    border-color: @navy;
     color: @navy;
 
     .fa {
-      color: @yellow;
+      color: @navy;
     }
   }
 }
@@ -410,8 +412,14 @@ th {
   }
 
   .tab-button{
-    &.active {
+    &.active,
+    &:hover {
       color: @white;
+      border-bottom-color: @white;
+
+      .fa {
+        color: @white;
+      }
     }
   }
 

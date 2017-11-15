@@ -11,12 +11,13 @@
     "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
     "install-node-obs": "node bin/install-node-obs.js && yarn install-plugins",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.7.7 && rm -rf ../streamlabs-obs/node-obs/ && cp -r ./build/distribute/node-obs/ ../streamlabs-obs/ && cd ../streamlabs-obs && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
+    "rebuild-node-obs": "yarn install --cwd bin/rebuild-node-obs && node bin/rebuild-node-obs/ ../node-obs ./node-obs",
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js",
     "test": "ava",
-    "clear": "rm -rf bundles/media"
+    "clear": "rm -rf bundles/media",
+    "typedoc": "typedoc --out ./docs ./app/services --ignoreCompilerErrors --excludeExternals --json ./docs/docs.json"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -34,7 +35,9 @@
       "obs-api"
     ],
     "extraFiles": [
-      "node-obs"
+      "node-obs",
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -42,6 +45,9 @@
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+    },
+    "nsis": {
+      "license": "AGREEMENT"
     }
   },
   "ava": {
@@ -59,13 +65,14 @@
     "archiver": "^2.0.3",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
-    "bugsplat": "^2.1.5",
+    "backtrace-node": "^0.7.3",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "file:./obs-studio-node",
     "rimraf": "^2.6.1",
+    "socket.io-client": "2.0.3",
     "uuid": "^3.0.1",
     "vue-popperjs": "^1.2.2"
   },
@@ -73,6 +80,7 @@
     "7zip-bin": "^2.0.4",
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
+    "@types/socket.io-client": "^1.4.31",
     "ava": "^0.19.1",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
@@ -101,6 +109,8 @@
     "moment": "^2.17.1",
     "progress": "^2.0.0",
     "rxjs": "^5.4.3",
+    "sockjs": "^0.3.19",
+    "sockjs-client": "^1.1.4",
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "traverse": "^0.6.6",
@@ -108,6 +118,7 @@
     "tslint": "^5.4.2",
     "tslint-config-airbnb": "^5.0.1",
     "tslint-loader": "^3.5.3",
+    "typedoc": "^0.9.0",
     "typescript": "^2.4.2",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",

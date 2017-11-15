@@ -1,13 +1,13 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IFormInput, TObsType, Input } from './Input';
+import { TObsType, Input, INumberInputValue } from './Input';
 
 @Component
-class IntInput extends Input<IFormInput<number>> {
+class IntInput extends Input<INumberInputValue> {
 
   static obsType: TObsType[];
 
   @Prop()
-  value: IFormInput<number>;
+  value: INumberInputValue;
 
   $refs: {
     input: HTMLInputElement
@@ -18,6 +18,16 @@ class IntInput extends Input<IFormInput<number>> {
     if (this.value.type == 'OBS_PROPERTY_UINT' && Number(formattedValue) < 0) {
       formattedValue = '0';
     }
+
+    if (this.value.minVal !== void 0 && Number(value) < this.value.minVal) {
+      formattedValue = String(this.value.minVal);
+    }
+
+    if (this.value.maxVal !== void 0 && Number(value) > this.value.maxVal) {
+      formattedValue = String(this.value.maxVal);
+    }
+
+
     if (formattedValue != value) {
       this.$refs.input.value = formattedValue;
     }

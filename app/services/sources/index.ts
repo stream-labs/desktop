@@ -10,6 +10,8 @@ import {
 import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
+import { Observable } from 'rxjs/Observable';
+
 import Utils from 'services/utils';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { Inject } from 'util/injector';
@@ -20,6 +22,7 @@ import { WidgetType } from 'services/widgets';
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
+import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 
 const { ipcRenderer } = electron;
 
@@ -31,10 +34,11 @@ const SOURCES_UPDATE_INTERVAL = 1000;
 
 
 // Register new properties manager here
-export type TPropertiesManager = 'default' | 'widget';
+export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
 const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
-  widget: WidgetManager
+  widget: WidgetManager,
+  streamlabels: StreamlabelsManager
 };
 
 
@@ -57,7 +61,9 @@ export interface ISourceApi extends ISource {
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
   getPropertiesManagerType(): TPropertiesManager;
+  getPropertiesManagerUI(): string;
   getPropertiesManagerSettings(): Dictionary<any>;
+  setPropertiesManagerSettings(settings: Dictionary<any>): void;
   getPropertiesFormData(): TFormData;
   setPropertiesFormData(properties: TFormData): void;
   hasProps(): boolean;
@@ -66,7 +72,7 @@ export interface ISourceApi extends ISource {
 
 
 export interface ISourcesServiceApi {
-  createSource(name: string, type: TSourceType, options: ISourceCreateOptions): Source;
+  createSource(name: string, type: TSourceType, settings: Dictionary<any>, options: ISourceCreateOptions): Source;
   getAvailableSourcesTypes(): TSourceType[];
   getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];
@@ -78,6 +84,9 @@ export interface ISourcesServiceApi {
   showAddSource(sourceType: TSourceType): void;
   showNameSource(sourceType: TSourceType): void;
   showNameWidget(widgetType: WidgetType): void;
+  sourceAdded: Observable<ISource>;
+  sourceUpdated: Observable<ISource>;
+  sourceRemoved: Observable<ISource>;
 }
 
 
@@ -102,6 +111,7 @@ export type TSourceType =
   'dshow_input' |
   'wasapi_input_capture' |
   'wasapi_output_capture' |
+  'decklink-input' |
   'scene'
   ;
 
@@ -250,6 +260,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     source.getObsInput().release();
     this.REMOVE_SOURCE(id);
+    this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
     this.sourceRemoved.next(source.sourceState);
   }
@@ -271,7 +282,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
-    return [
+    const obsAvailableTypes = obs.InputFactory.types();
+    const whitelistedTypes: IListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
@@ -285,8 +297,14 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
-      { description: 'Scene', value: 'scene' }
+      { description: 'Blackmagic Device', value: 'decklink-input' }
     ];
+
+    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    // 'scene' is not an obs input type so we have to set it manually
+    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+
+    return availableWhitelistedType;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
@@ -405,10 +423,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showAddSource(sourceType: TSourceType) {
+  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
-      queryParams: { sourceType },
+      queryParams: { sourceType, propertiesManager },
       size: {
         width: 600,
         height: 540
@@ -417,10 +435,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showNameSource(sourceType: TSourceType) {
+  showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
-      queryParams: { sourceType },
+      queryParams: { sourceType, propertiesManager },
       size: {
         width: 400,
         height: 250
@@ -499,6 +517,9 @@ export class Source implements ISourceApi {
     return obs.InputFactory.fromName(this.name);
   }
 
+  getModel() {
+    return this.sourceState;
+  }
 
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);
@@ -520,6 +541,16 @@ export class Source implements ISourceApi {
   }
 
 
+  getPropertiesManagerUI() {
+    return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
+  }
+
+
+  setPropertiesManagerSettings(settings: Dictionary<any>) {
+    this.sourcesService.propertiesManagers[this.sourceId].manager.applySettings(settings);
+  }
+
+
   getPropertiesFormData(): TFormData {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     return manager.getPropertiesFormData();
@@ -528,9 +559,7 @@ export class Source implements ISourceApi {
 
   setPropertiesFormData(properties: TFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
-    properties.forEach(prop => {
-      manager.setPropertyFormData(prop);
-    });
+    manager.setPropertiesFormData(properties);
   }
 
 

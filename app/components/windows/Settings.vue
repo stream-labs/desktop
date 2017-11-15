@@ -17,8 +17,9 @@
     <div class="settings-container">
       <extra-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
+      <api-settings v-if="categoryName === 'API'" />
       <GenericFormGroups
-        v-if="categoryName !== 'Hotkeys'"
+        v-if="!['Hotkeys', 'API'].includes(categoryName)"
         v-model="settingsData"
         @input="save" />
     </div>

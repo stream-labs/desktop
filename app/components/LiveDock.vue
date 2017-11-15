@@ -39,7 +39,6 @@
 
       <div class="live-dock-info">
         <a @click="showEditStreamInfo" v-if="isTwitch">Edit Stream Info</a>
-        <PerformanceMetricsStream />
       </div>
 
       <div class="live-dock-chat">
@@ -58,7 +57,7 @@
 .live-dock {
   position: relative;
   z-index: 1000;
-  width: 30%;
+  width: 28%;
   border-left: 1px solid @day-border;
   padding: 16px 20px 10px;
   transition: all 275ms;
@@ -85,8 +84,13 @@
 .live-dock-chevron {
   cursor: pointer;
   position: absolute;
-  top: 50%;
-  left: 5px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  left: 0px;
+  padding-left: 5px;
 
   &:hover {
     opacity: 1;

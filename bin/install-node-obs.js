@@ -2,7 +2,7 @@
  * This script downloads and exctracts the specified release of node-obs
  */
 
-const NODE_OBS_VERSION = '0.1.28';
+const NODE_OBS_VERSION = '0.1.29';
 
 const https = require('https');
 const fs = require('fs');
@@ -31,7 +31,7 @@ continuePromise.then(() => {
   const releaseUrl = `https://github.com/stream-labs/node-obs/releases/download/v${NODE_OBS_VERSION}/node-obs.zip`;
 
   archive.on('finish', () => {
-    childProcess.exec(`${zipExe} x "${archivePath}" -o"${slobsDir}"`, (error, stdout, stderr) => {
+    childProcess.exec(`"${zipExe}" x "${archivePath}" -o"${slobsDir}"`, (error, stdout, stderr) => {
         if (error) {
           console.error(`Extraction error: ${error}`);
           return;

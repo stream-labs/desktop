@@ -9,6 +9,7 @@ import { WindowsService } from '../../services/windows';
 import { ISettingsServiceApi, ISettingsState, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
+import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 
 @Component({
@@ -18,7 +19,8 @@ import Hotkeys from '../Hotkeys.vue';
     NavMenu,
     NavItem,
     ExtraSettings,
-    Hotkeys
+    Hotkeys,
+    ApiSettings
   },
   mixins: [windowMixin]
 })
@@ -32,14 +34,15 @@ export default class SceneTransitions extends Vue {
 
   categoryName = 'General';
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
-  icons: {[key in keyof ISettingsState]: string} = {
+  icons: Dictionary<string> = {
     General: 'th-large',
     Stream: 'globe',
     Output: 'microchip',
     Video: 'film',
     Audio: 'volume-up',
     Hotkeys: 'keyboard-o',
-    Advanced: 'cogs'
+    Advanced: 'cogs',
+    API: 'file-code-o'
   };
 
   get categoryNames() {

@@ -64,6 +64,11 @@ export interface IPathInputValue extends IFormInput<string> {
   filters: IElectronOpenDialogFilter[];
 }
 
+export interface INumberInputValue extends IFormInput<number> {
+  minVal?: number;
+  maxVal?: number;
+}
+
 export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
@@ -166,12 +171,9 @@ export function obsValuesToInputValues(
     }
 
     prop.value = obsValue;
-
-    if (options.boolIsString) {
-      prop.masked = obsProp.masked === 'true';
-      prop.enabled = obsProp.enabled === 'true';
-      prop.visible = obsProp.visible === 'true';
-    }
+    prop.masked = !!obsProp.masked;
+    prop.enabled = !!obsProp.enabled;
+    prop.visible = !!obsProp.visible;
 
     if (options.disabledFields && options.disabledFields.includes(prop.name)) {
       prop.enabled = false;
@@ -202,7 +204,7 @@ export function obsValuesToInputValues(
 
     } else if (obsProp.type === 'OBS_PROPERTY_BOOL') {
 
-      if (options.boolIsString) prop.value = prop.value === 'true';
+      prop.value = !!prop.value;
 
     } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
 

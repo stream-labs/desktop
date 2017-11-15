@@ -9,24 +9,14 @@ import * as obs from '../../../../obs-api';
 export interface IPropertyManager {
   destroy(): void;
   getPropertiesFormData(): input.TFormData;
-  setPropertyFormData(property: TCustomProperty |
-    input.IFormInput<input.TObsValue> |
-    input.IListInput<input.TObsValue>): void;
+  setPropertiesFormData(property: input.TFormData): void;
   settings: Dictionary<any>;
+  applySettings(settings: Dictionary<any>): void;
+  customUIComponent: string;
 }
 
 
-export interface ICustomProperty<TValue> extends input.IFormInput<TValue> {
-  isCustom: true;
-}
 
-
-export interface ICustomListProperty<TValue extends input.TObsValue> extends ICustomProperty<TValue> {
-  options: input.IListOption<TValue>[];
-}
-
-
-export type TCustomProperty = ICustomProperty<input.TObsValue> | ICustomListProperty<input.TObsValue>;
 
 
 /**
@@ -35,8 +25,8 @@ export type TCustomProperty = ICustomProperty<input.TObsValue> | ICustomListProp
  * lifetime of the source, and may automatically change
  * settings on the source if it wants to.  It is also
  * responsible for deciding which properties are exposed
- * to the user, and injecting additional properties if
- * needed.
+ * to the user, and for managing any custom UI that may
+ * be exposed.
  */
 export abstract class PropertiesManager implements IPropertyManager {
 
@@ -45,7 +35,25 @@ export abstract class PropertiesManager implements IPropertyManager {
    * @param obsSource The source this class manages
    * @param settings The manager settings.  These are *NOT* OBS settings
    */
-  constructor(public obsSource: obs.ISource, public settings: Dictionary<any>) {
+  constructor(public obsSource: obs.ISource, settings: Dictionary<any>) {
+    this.settings = {};
+    this.init();
+    this.applySettings(settings);
+  }
+
+
+  /**
+   * These are settings for the properties manager
+   * that are stored in the application configuration.
+   */
+  settings: Dictionary<any>;
+
+
+  /**
+   * Can be used to attach custom startup behavior to this
+   * properties manager.
+   */
+  init() {
   }
 
 
@@ -66,48 +74,40 @@ export abstract class PropertiesManager implements IPropertyManager {
 
   /**
    * displayOrder will be used as a list of property
-   * names (custom or OBS) to used when ordering
-   * properties displayed to the user.  Properties not
-   * appearing in the list will be shown at the end in the
-   * order they are defined, with custom properties first,
-   * followed by OBS properties.
+   * names to used when ordering properties displayed to the user.
+   * Properties not appearing in the list will be shown at the
+   * end in the order they are defined.
    */
   displayOrder: string[] = [];
 
 
   /**
-   * Returns a list of custom properties to be shown
-   * to the user.  The property names should not conflict
-   * with OBS property names.
+   * The name of a custom component that will be shown in the
+   * source properties window.
    */
-  getCustomProperties(): TCustomProperty[] {
-    return [];
-  }
+  customUIComponent: string;
 
 
   /**
-   * Should handle custom logic for settting custom properties.
-   * This function will not be called for OBS properties.
-   * @param property The custom property being set
+   * Called to apply new settings on the properties manager.
+   * This function should set the settings attribute on the
+   * instance and make any changes in OBS or elsewhere
+   * @param settings the new settings
    */
-  setCustomProperty(property: TCustomProperty) {
+  applySettings(settings: Dictionary<any>) {
+    this.settings = {
+      ...this.settings,
+      ...settings
+    };
   }
 
 
   getPropertiesFormData(): input.TFormData {
     const obsProperties = input.getPropertiesFormData(this.obsSource);
-    const customProperties = this.getCustomProperties();
     let propsArray: input.TFormData = [];
 
     // First, add properties that appear in the display order
     this.displayOrder.forEach(name => {
-      const customIndex = customProperties.findIndex(prop => prop.name === name);
-
-      if (customIndex !== -1) {
-        propsArray.push(customProperties[customIndex]);
-        customProperties.splice(customIndex, 1);
-      }
-
       const obsIndex = obsProperties.findIndex(prop => prop.name === name);
 
       if (obsIndex !== -1) {
@@ -116,22 +116,22 @@ export abstract class PropertiesManager implements IPropertyManager {
       }
     });
 
-    propsArray = propsArray.concat(customProperties).concat(obsProperties);
+    propsArray = propsArray.concat(obsProperties);
     propsArray = propsArray.filter(prop => !this.blacklist.includes(prop.name));
 
     return propsArray;
   }
 
 
-  setPropertyFormData(property: TCustomProperty |
-    input.IFormInput<input.TObsValue> |
-    input.IListInput<input.TObsValue>) {
-
-    if ((property as TCustomProperty).isCustom) {
-      this.setCustomProperty(property as TCustomProperty);
-    } else {
-      input.setPropertiesFormData(this.obsSource, [property]);
-    }
+  /**
+   * By default, simply delegates to the normal
+   * setPropertiesFormData function in Input.ts.
+   * Can be overridden to modify propreties as they
+   * are edited by the user.
+   * @param properties The OBS properties
+   */
+  setPropertiesFormData(properties: input.TFormData) {
+    input.setPropertiesFormData(this.obsSource, properties);
   }
 
 }

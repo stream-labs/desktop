@@ -10,6 +10,7 @@ import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
+import { Observable } from 'rxjs/Observable';
 
 const { ipcRenderer } = electron;
 
@@ -32,6 +33,9 @@ export interface IScenesServiceApi {
   activeScene: ISceneApi;
   activeSceneId: string;
   getSceneByName(name: string): ISceneApi;
+  getScenes(): ISceneApi[];
+  getModel(): IScenesState;
+  sceneSwitched: Observable<IScene>;
 }
 
 
@@ -44,9 +48,11 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   };
 
   sceneAdded = new Subject<IScene>();
-  sceneRemoved= new Subject<IScene>();
+  sceneRemoved = new Subject<IScene>();
   itemAdded = new Subject<ISceneItem>();
   itemRemoved = new Subject<ISceneItem>();
+  sceneSwitched = new Subject<IScene>();
+
 
   @Inject()
   private windowsService: WindowsService;
@@ -112,8 +118,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       });
     }
 
-    if (options.makeActive) this.makeSceneActive(id);
     this.sceneAdded.next(this.state.scenes[id]);
+    if (options.makeActive) this.makeSceneActive(id);
     return this.getSceneByName(name);
   }
 
@@ -167,10 +173,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
 
   makeSceneActive(id: string) {
-    const scene = this.getScene(id).getObsScene();
+    const scene = this.getScene(id);
+    const obsScene = scene.getObsScene();
 
-    this.transitionsService.transitionTo(scene);
+    this.transitionsService.transitionTo(obsScene);
     this.MAKE_SCENE_ACTIVE(id);
+    this.sceneSwitched.next(scene.getModel());
   }
 
 
@@ -195,6 +203,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return foundScene ? this.getScene(foundScene.id) : null;
   }
 
+
+  getModel(): IScenesState  {
+    return this.state;
+  }
 
   getScene(id: string) {
     return !this.state.scenes[id] ? null : new Scene(id);
@@ -244,6 +256,9 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     this.activeScene.activeItems.forEach(item => this.activeScene.removeItem(item.sceneItemId));
   }
 
+  getScenes(): Scene[] {
+    return this.scenes;
+  }
 
   get scenes(): Scene[] {
     return this.state.displayOrder.map(id => {

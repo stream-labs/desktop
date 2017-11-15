@@ -19,17 +19,30 @@ const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 
 if (remote.process.env.NODE_ENV === 'production') {
-  const bugsplat = require('bugsplat')('slobs', 'slobs-renderer', slobsVersion);
-  window.onerror = (messageOrEvent, source, lineno, colno, error) => bugsplat.post(error);
+  const bt = require('backtrace-node');
+
+  bt.initialize({
+    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
+    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    attributes: {
+      version: slobsVersion,
+      processType: 'renderer'
+    }
+  });
+
+  window.onerror = (messageOrEvent, source, lineno, colno, error) => bt.report(error);
 }
 
 electron.crashReporter.start({
-  companyName: 'Streamlabs',
-  productName: 'Streamlabs OBS',
-  submitURL: 'http://slobs.bugsplat.com/post/bp/crash/postBP.php',
+  productName: 'streamlabs-obs',
+  companyName: 'streamlabs',
+  submitURL: 
+    'https://streamlabs.sp.backtrace.io:6098/post?' +
+    'format=minidump&' +
+    'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
   extra: {
-    prod: 'slobs-renderer',
-    key: slobsVersion
+    version: slobsVersion,
+    processType: 'renderer'
   }
 });
 

@@ -31,6 +31,7 @@ export interface ISceneItemApi extends ISceneItem {
   setCrop(crop: ICrop): ICrop;
   setPositionAndCrop(x: number, y: number, crop: ICrop): void;
   setLocked(locked: boolean): void;
+  getModel(): ISceneItem;
 }
 
 
@@ -102,6 +103,9 @@ export class SceneItem implements ISceneItemApi {
     Utils.applyProxy(this, this.sceneItemState);
   }
 
+  getModel(): ISceneItem {
+    return this.sceneItemState;
+  }
 
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
