@@ -149,7 +149,7 @@ switches between scenes:
 
 Use `resourceId` to unsubscribe:
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -161,15 +161,21 @@ request
 }
 ```
 
-## Asynchronous Execution
+## Asynchronous Task Execution
 
 Some service methods are asynchronous and return a Javascript promise.
-This is exposed via the API by 
+This is exposed via the API by returning a subscription that will
+fire a single event.  You can think of the subscription response as
+the acknowledgement of your request, and the event as a notification
+of completion with a result.
 
-Some services' methods, for example `AppService.loadConfig()` return `Promise` which is also subscription that
-causes only one event when task is finished.
+Although fundamentally all requests sent over the socket are asynchronous,
+a function that returns a promise is a good indication that your
+application consuming the API should probably not block waiting for a
+response.  Functions that return a promise do not guarantee fast
+execution.
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -182,7 +188,7 @@ request
 }
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -194,7 +200,7 @@ response
 }
 ```
 
-event
+### Event
 ```
 {
     "jsonrpc": "2.0",
@@ -209,12 +215,12 @@ event
 ```
 
 ## Reducing response body
-By default if response returns resources with `"_type": "HELPER"` Streamlabs-OBS
-will attach some data by calling `getModel()` method of resource.
-To disable that use `compactMode` parameter in JSON-RPC request:
+By default if the response returns resources with `"_type": "HELPER"`,
+Streamlabs-OBS will attach some data by calling `getModel()` method of resource.
+To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -228,7 +234,7 @@ request
 }
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
