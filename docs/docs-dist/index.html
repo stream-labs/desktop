@@ -70,16 +70,17 @@
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
 				<h1 id="api-reference">API reference</h1>
-				<p>Streamlabs-OBS allows to manage application via RPC based API.
-					The API represented with several different services.
-					You can asses services&#39; methods and properties by sending <a href="http://www.jsonrpc.org/specification">JSON-RPC</a> messages
-				to named pipe <code>\\.\pipe\slobs</code></p>
-				<h1 id="caveats">Caveats</h1>
-				<p>You can send several json-rpc requests in one request sting.
-				In this case all requests have to be separated with new-line character <code>\n</code></p>
+				<p>Streamlabs-OBS allows remote management of the application via
+					an RPC-based API. The API is split into several different services.
+					You can access services&#39; methods and properties by sending
+					<a href="http://www.jsonrpc.org/specification">JSON-RPC</a> messages to the
+				named pipe <code>slobs</code>.</p>
+				<p>Individual JSON-RPC requests should be separated by a single newline
+					character <code>LF</code> ( ASCII code 10).  You should ensure that your JSON message does not
+				contain any newline characters. Use <code>\n</code> as replacement for new lines in JSON. </p>
 				<h1 id="examples">Examples</h1>
-				<p>Get list of scenes:</p>
-				<p>request</p>
+				<h2 id="get-a-list-of-scenes">Get a list of scenes</h2>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">1</span>,
@@ -88,14 +89,14 @@
         <span class="hljs-attr">"resource"</span>: <span class="hljs-string">"ScenesService"</span>
     }
 }
-</code></pre><p>response</p>
+</code></pre><h3 id="response">Response</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">1</span>,
     <span class="hljs-attr">"result"</span>: [
        {
             <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"HELPER"</span>,
-            <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Scene[\"6b615869aba3\"]"</span>,
+            <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Scene[\"3efd436e5546\"]"</span>,
             <span class="hljs-attr">"id"</span>: <span class="hljs-string">"3efd436e5546"</span>,
             <span class="hljs-attr">"name"</span>: <span class="hljs-string">"My super scene"</span>,
             <span class="hljs-attr">"activeItemIds"</span>: []
@@ -109,10 +110,12 @@
         }
     ]
 }
-</code></pre><p>Property <code>&quot;_type&quot;: &quot;HELPER&quot;</code> means that you can fetch some additional information
-				by calling methods of this object. To do that just put <code>resourceId</code> from response to <code>resource</code> in request.</p>
-				<p>Get scene items:</p>
-				<p>request</p>
+</code></pre><p>The property <code>&quot;_type&quot;: &quot;HELPER&quot;</code> means that you can fetch some
+					additional information by calling methods on this object. To do
+					that, just include the <code>resourceId</code> from the response to <code>resource</code>
+				in the new request.</p>
+				<h2 id="get-items-in-a-scene">Get items in a scene</h2>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">2</span>,
@@ -122,7 +125,7 @@
         <span class="hljs-attr">"args"</span>: []
     }
 }
-</code></pre><p>response</p>
+</code></pre><h3 id="response">Response</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">2</span>,
@@ -144,8 +147,8 @@
     ]
 }
 </code></pre><h2 id="event-subscriptions">Event subscriptions</h2>
-				<p>Subscribe to <code>sceneSwitched</code> event:</p>
-				<p>request</p>
+				<p>Subscribe to the <code>sceneSwitched</code> event:</p>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">3</span>,
@@ -155,7 +158,7 @@
         <span class="hljs-attr">"args"</span>: []
     }
 }
-</code></pre><p>response</p>
+</code></pre><h3 id="response">Response</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">4</span>,
@@ -164,8 +167,9 @@
         <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"ScenesService.sceneSwitched"</span>
     }
 }
-</code></pre><p>After subscription yo will receive events when user are switching between scenes:</p>
-				<p>event</p>
+</code></pre><p>After subscribing, you will receive events when the user
+				switches between scenes:</p>
+				<h3 id="event">Event</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"result"</span>: {
@@ -180,7 +184,7 @@
     }
 }
 </code></pre><p>Use <code>resourceId</code> to unsubscribe:</p>
-				<p>request</p>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">5</span>,
@@ -189,10 +193,18 @@
         <span class="hljs-attr">"resource"</span>: <span class="hljs-string">"ScenesService.sceneSwitched"</span>,
     }
 }
-</code></pre><h2 id="tasks-execution">Tasks execution</h2>
-				<p>Some services&#39; methods, for example <code>AppService.loadConfig()</code> return <code>Promise</code> which is also subscription that
-				causes only one event when task is finished.</p>
-				<p>request</p>
+</code></pre><h2 id="asynchronous-task-execution">Asynchronous Task Execution</h2>
+				<p>Some service methods are asynchronous and return a Javascript promise.
+					This is exposed via the API by returning a subscription that will
+					fire a single event.  You can think of the subscription response as
+					the acknowledgement of your request, and the event as a notification
+				of completion with a result.</p>
+				<p>Although fundamentally all requests sent over the socket are asynchronous,
+					a function that returns a promise is a good indication that your
+					application consuming the API should probably not block waiting for a
+					response.  Functions that return a promise do not guarantee fast
+				execution.</p>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">5</span>,
@@ -202,7 +214,7 @@
         <span class="hljs-attr">"args"</span>: [<span class="hljs-string">"MyScenes"</span>]
     }
 }
-</code></pre><p>response</p>
+</code></pre><h3 id="response">Response</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">5</span>,
@@ -211,7 +223,7 @@
         <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"5c3cf84f797a"</span>
     }
 }
-</code></pre><p>event</p>
+</code></pre><h3 id="event">Event</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"result"</span>: {
@@ -223,10 +235,10 @@
     }
 }
 </code></pre><h2 id="reducing-response-body">Reducing response body</h2>
-				<p>By default if response returns resources with <code>&quot;_type&quot;: &quot;HELPER&quot;</code> Streamlabs-OBS
-					will attach some data by calling <code>getModel()</code> method of resource.
-				To disable that use <code>compactMode</code> parameter in JSON-RPC request:</p>
-				<p>request</p>
+				<p>By default if the response returns resources with <code>&quot;_type&quot;: &quot;HELPER&quot;</code>,
+					Streamlabs-OBS will attach some data by calling <code>getModel()</code> method of resource.
+				To disable that behavior, use the <code>compactMode</code> parameter in JSON-RPC request:</p>
+				<h3 id="request">Request</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">6</span>,
@@ -237,7 +249,7 @@
         <span class="hljs-attr">"compactMode"</span>: <span class="hljs-literal">true</span>
     }
 }
-</code></pre><p>response</p>
+</code></pre><h3 id="response">Response</h3>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">6</span>,

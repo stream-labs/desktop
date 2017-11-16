@@ -7,8 +7,8 @@ You can access services' methods and properties by sending
 named pipe `slobs`.
 
 Individual JSON-RPC requests should be separated by a single newline
-character `\n`.  You should ensure that your JSON message does not
-contain any newline characters.
+character `LF` ( ASCII code 10).  You should ensure that your JSON message does not
+contain any newline characters. Use `\n` as replacement for new lines in JSON. 
 
 # Examples
 
