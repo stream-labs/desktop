@@ -102,7 +102,7 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
   }
 
   advancedSettingEnabled(): boolean {
-    return Utils.isDevMode() || this.appService.state.argv.indexOf('--adv-settings') !== -1;
+    return Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings');
   }
 
 

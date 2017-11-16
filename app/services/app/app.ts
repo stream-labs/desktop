@@ -19,7 +19,7 @@ import { StreamlabelsService } from '../streamlabels';
 
 interface IAppState {
   loading: boolean;
-  argv: string;
+  argv: string[];
 }
 
 /**
@@ -47,7 +47,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
   static initialState: IAppState = {
     loading: true,
-    argv: ''
+    argv: []
   };
 
   private autosaveInterval: number;
@@ -146,7 +146,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   /**
    * the main process sends argv string here
    */
-  setArgv(argv: string) {
+  setArgv(argv: string[]) {
     this.SET_ARGV(argv);
   }
 
@@ -219,7 +219,7 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   }
 
   @mutation()
-  private SET_ARGV(argv: string) {
+  private SET_ARGV(argv: string[]) {
     this.state.argv = argv;
   }
 
