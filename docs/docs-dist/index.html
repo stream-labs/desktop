@@ -73,7 +73,10 @@
 				<p>Streamlabs-OBS allows to manage application via RPC based API.
 					The API represented with several different services.
 					You can asses services&#39; methods and properties by sending <a href="http://www.jsonrpc.org/specification">JSON-RPC</a> messages
-				to named pipe <code>slobs</code></p>
+				to named pipe <code>\\.\pipe\slobs</code></p>
+				<h1 id="caveats">Caveats</h1>
+				<p>You can send several json-rpc requests in one request sting.
+				In this case all requests have to be separated with new-line character <code>\n</code></p>
 				<h1 id="examples">Examples</h1>
 				<p>Get list of scenes:</p>
 				<p>request</p>
@@ -189,6 +192,26 @@
 </code></pre><h2 id="tasks-execution">Tasks execution</h2>
 				<p>Some services&#39; methods, for example <code>AppService.loadConfig()</code> return <code>Promise</code> which is also subscription that
 				causes only one event when task is finished.</p>
+				<p>request</p>
+				<pre><code>{
+    <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
+    <span class="hljs-attr">"id"</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">"method"</span>: <span class="hljs-string">"loadConfig"</span>,
+    <span class="hljs-attr">"params"</span>: {
+        <span class="hljs-attr">"resource"</span>: <span class="hljs-string">"AppService"</span>,
+        <span class="hljs-attr">"args"</span>: [<span class="hljs-string">"MyScenes"</span>]
+    }
+}
+</code></pre><p>response</p>
+				<pre><code>{
+    <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
+    <span class="hljs-attr">"id"</span>: <span class="hljs-number">5</span>,
+    <span class="hljs-attr">"result"</span>: {
+        <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"SUBSCRIPTION"</span>,
+        <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"5c3cf84f797a"</span>
+    }
+}
+</code></pre><p>event</p>
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"result"</span>: {
@@ -207,10 +230,10 @@
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">6</span>,
-    <span class="hljs-attr">"method"</span>: <span class="hljs-string">"getSource"</span>,
+    <span class="hljs-attr">"method"</span>: <span class="hljs-string">"getSources"</span>,
     <span class="hljs-attr">"params"</span>: {
         <span class="hljs-attr">"resource"</span>: <span class="hljs-string">"SourcesService"</span>,
-        <span class="hljs-attr">"args"</span>: [<span class="hljs-string">"5c3cf84f797a"</span>],
+        <span class="hljs-attr">"args"</span>: [],
         <span class="hljs-attr">"compactMode"</span>: <span class="hljs-literal">true</span>
     }
 }
@@ -218,14 +241,22 @@
 				<pre><code>{
     <span class="hljs-attr">"jsonrpc"</span>: <span class="hljs-string">"2.0"</span>,
     <span class="hljs-attr">"id"</span>: <span class="hljs-number">6</span>,
-    <span class="hljs-attr">"result"</span>: {
-        <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"HELPER"</span>,
-        <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Source[\"5c3cf84f797a\"]"</span>,
+    <span class="hljs-attr">"result"</span>: [
+        {
+            <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"HELPER"</span>,
+            <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Source[\"5c3cf84f797a\"]"</span>,
+        },
+        {
+            <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"HELPER"</span>,
+            <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Source[\"5c3cf84f797b\"]"</span>,
+        },
+        {
+            <span class="hljs-attr">"_type"</span>: <span class="hljs-string">"HELPER"</span>,
+            <span class="hljs-attr">"resourceId"</span>: <span class="hljs-string">"Source[\"5c3cf84f797c\"]"</span>,
+        },
     }
 }
-</code></pre><h1 id="caveats">Caveats</h1>
-				<p>You can send several json-rpc requests in one request sting.
-				In this case all requests have to be separated with new-line character <code>\n</code></p>
+</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -263,66 +294,6 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_clipboard_.html">"clipboard"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_config_.html">"config-<wbr>persistence/config"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_config_persistence_api_.html">"config-<wbr>persistence/config-<wbr>persistence-<wbr>api"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_index_.html">"config-<wbr>persistence/index"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_array_node_.html">"config-<wbr>persistence/nodes/array-<wbr>node"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_hotkeys_.html">"config-<wbr>persistence/nodes/hotkeys"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_node_.html">"config-<wbr>persistence/nodes/node"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_image_.html">"config-<wbr>persistence/nodes/overlays/image"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_root_.html">"config-<wbr>persistence/nodes/overlays/root"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_scenes_.html">"config-<wbr>persistence/nodes/overlays/scenes"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_slots_.html">"config-<wbr>persistence/nodes/overlays/slots"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_text_.html">"config-<wbr>persistence/nodes/overlays/text"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_video_.html">"config-<wbr>persistence/nodes/overlays/video"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_overlays_webcam_.html">"config-<wbr>persistence/nodes/overlays/webcam"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_root_.html">"config-<wbr>persistence/nodes/root"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_scene_items_.html">"config-<wbr>persistence/nodes/scene-<wbr>items"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_scenes_.html">"config-<wbr>persistence/nodes/scenes"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_sources_.html">"config-<wbr>persistence/nodes/sources"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_nodes_transition_.html">"config-<wbr>persistence/nodes/transition"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_overlays_.html">"config-<wbr>persistence/overlays"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="modules/_config_persistence_parse_.html">"config-<wbr>persistence/parse"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_customization_.html">"customization"</a>
@@ -368,6 +339,66 @@
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_platforms_youtube_.html">"platforms/youtube"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_config_.html">"scenes-<wbr>collections/config"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_index_.html">"scenes-<wbr>collections/index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_array_node_.html">"scenes-<wbr>collections/nodes/array-<wbr>node"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_hotkeys_.html">"scenes-<wbr>collections/nodes/hotkeys"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_node_.html">"scenes-<wbr>collections/nodes/node"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_image_.html">"scenes-<wbr>collections/nodes/overlays/image"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_root_.html">"scenes-<wbr>collections/nodes/overlays/root"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_scenes_.html">"scenes-<wbr>collections/nodes/overlays/scenes"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_slots_.html">"scenes-<wbr>collections/nodes/overlays/slots"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_text_.html">"scenes-<wbr>collections/nodes/overlays/text"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_video_.html">"scenes-<wbr>collections/nodes/overlays/video"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_overlays_webcam_.html">"scenes-<wbr>collections/nodes/overlays/webcam"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_root_.html">"scenes-<wbr>collections/nodes/root"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_scene_items_.html">"scenes-<wbr>collections/nodes/scene-<wbr>items"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_scenes_.html">"scenes-<wbr>collections/nodes/scenes"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_sources_.html">"scenes-<wbr>collections/nodes/sources"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_nodes_transition_.html">"scenes-<wbr>collections/nodes/transition"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_overlays_.html">"scenes-<wbr>collections/overlays"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_parse_.html">"scenes-<wbr>collections/parse"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_scenes_collections_scenes_collections_api_.html">"scenes-<wbr>collections/scenes-<wbr>collections-<wbr>api"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
 						<a href="modules/_scenes_transitions_.html">"scenes-<wbr>transitions"</a>

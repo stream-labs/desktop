@@ -8,6 +8,7 @@ import { Inject } from '../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from './audio';
 import { WindowsService } from './windows';
 import Utils from './utils';
+import { AppService } from './app';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -73,6 +74,8 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
   @Inject()
   private windowsService: WindowsService;
 
+  @Inject()
+  private appService: AppService;
 
   init() {
     this.loadSettingsIntoStore();
@@ -98,12 +101,16 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     });
   }
 
+  advancedSettingEnabled(): boolean {
+    return Utils.isDevMode() || this.appService.state.argv.indexOf('--adv-settings') !== -1;
+  }
+
 
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
 
     // we decided to not expose API settings for production version yet
-    if (Utils.isDevMode()) categories = categories.concat(['API']);
+    if (this.advancedSettingEnabled()) categories = categories.concat(['API']);
 
     return categories;
   }

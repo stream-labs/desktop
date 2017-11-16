@@ -1,5 +1,32 @@
 // customization monkeypatch
 
+$(() => {
+
+  var projectName = 'Streamlabs-OBS';
+
+  // patch header
+  var $header = document.querySelector('h1');
+  $header.innerHTML = patchHeaderText($header.innerHTML);
+
+  // hide index
+  var $index = document.querySelector('.tsd-index-group');
+  if ($index) $index.style.display = 'none';
+
+  // hide sources
+  document.querySelectorAll('.tsd-sources').forEach(item => item.style.display = 'none');
+
+  patchNavigation();
+  patchBreadcrumbs();
+  patchSeeTags();
+  patchHierarchyBlock();
+  patchImplementedByBlock();
+  patchLegend();
+
+  console.log('monkeypatch applied');
+
+});
+
+
 
 function patchLinkText(linkText) {
 
@@ -28,13 +55,15 @@ function getRootInterfaceName(linkText) {
   return 'I' + patchLinkText(linkText) + 'Api';
 }
 
-function getRootInterfaceHref(linkText, prefix = '') {
+function getRootInterfaceHref(linkText) {
   var filename = linkText.replace(/[\/\-"]/g, '_').replace(/<wbr>/g, '');
-  return prefix + 'interfaces/' + filename + '.' + getRootInterfaceName(linkText).toLowerCase() + '.html';
+  return (isHomePage() ? 'interfaces/' : './') +
+    filename + '.' +
+    getRootInterfaceName(linkText).toLowerCase() + '.html';
 }
 
-function getRootInterfaceLink(linkText, prefix) {
-  return '<a href="' + getRootInterfaceHref(linkText, prefix) + '">' + getRootInterfaceName(linkText) + '</a>';
+function getRootInterfaceLink(linkText) {
+  return '<a href="' + getRootInterfaceHref(linkText) + '">' + getRootInterfaceName(linkText) + '</a>';
 }
 
 
@@ -47,20 +76,27 @@ function patchHeaderText(headerText) {
   return patchLinkText(linkText) + ': ' + getRootInterfaceLink(linkText, '../');
 }
 
+function patchHierarchyBlock() {
+  var $hierarchy = document.querySelector('.tsd-panel.tsd-hierarchy');
+  if (!$hierarchy) return;
 
-$(() => {
-  console.log('monkeypatch applied');
+  var hierarchySize = $hierarchy.querySelectorAll('ul').length;
 
-  var projectName = 'Streamlabs-OBS';
+  // hide hierarchy if only one element presents
+  if (hierarchySize <= 1) {
+    $hierarchy.style.display = 'none';
+  }
+}
 
-  // hide toolbar and search-bar
-  // document.querySelector('.tsd-page-toolbar .container').innerHTML = '<div class="title">' + projectName + '</div>';
+function isServicePage() {
+  return location.href.match(/\.i.+serviceapi\.html$/);
+}
 
-  // patch header
-  var $header = document.querySelector('h1');
-  $header.innerHTML = patchHeaderText($header.innerHTML);
+function isHomePage() {
+  return location.href.match(/index\.html$/);
+}
 
-  // patch navigation
+function patchNavigation() {
   document.querySelectorAll('.tsd-navigation.primary li a').forEach(link => {
     var linkText = link.innerHTML;
 
@@ -70,21 +106,32 @@ $(() => {
     }
 
     link.innerHTML = patchLinkText(linkText);
+    link.href = getRootInterfaceHref(linkText);
   });
+}
 
-  // patch breadcrumbs
-  document.querySelectorAll('.tsd-breadcrumb li a').forEach(breadcrumb => {
-    breadcrumb.innerHTML = patchLinkText(breadcrumb.innerHTML);
+function patchImplementedByBlock() {
+  var $implementedBy = document.querySelector('.tsd-panel.tsd-implemented-by');
+  if (!$implementedBy) return;
 
-    if (breadcrumb.href.match('globals.html')) {
-      breadcrumb.href = breadcrumb.href.replace('globals', 'index');
-      breadcrumb.innerHTML = 'Home';
-    }
-  });
+  // show block only on service page
+  if (!isServicePage()) {
+    $implementedBy.style.display = 'none';
+    return;
+  }
 
-  // hide sources
-  document.querySelectorAll('.tsd-sources').forEach(item => item.style.display = 'none');
+  // remove links to classes
+  $implementedBy.querySelector('a').removeAttribute('href');
 
+  // add comment
+  var $comment = document.createElement('div');
+  $comment.classList.add('tsd-block-comment');
+  $comment.innerHTML = 'Use this name as <code>resource</code> in JSONRPC request';
+  $implementedBy.appendChild($comment);
+}
+
+
+function patchLegend() {
   // patch legend
   const whitelist = [
     'Type alias',
@@ -106,4 +153,39 @@ $(() => {
     }
   });
 
-});
+}
+
+
+function patchBreadcrumbs() {
+  document.querySelectorAll('.tsd-breadcrumb li a').forEach(breadcrumb => {
+    breadcrumb.innerHTML = patchLinkText(breadcrumb.innerHTML);
+
+    if (breadcrumb.href.match('globals.html')) {
+      breadcrumb.href = breadcrumb.href.replace('globals', 'index');
+      breadcrumb.innerHTML = 'Home';
+    }
+  });
+}
+
+
+function patchSeeTags() {
+  document.querySelectorAll('.tsd-comment-tags dt').forEach($el => {
+    if ($el.innerHTML !== 'see') return;
+    var $tag = $el.parentElement.querySelector('p');
+    var isServiceName = $tag.innerHTML.match(/[a-zA-Z]+Service$/);
+    if (!isServiceName) return;
+    var serviceName = $tag.innerHTML;
+    var href = getLinkToService(serviceName);
+    $tag.innerHTML = '<a href="' + href + '">' + serviceName + '</a>';
+  });
+}
+
+
+function getLinkToService(serviceName) {
+  var shortName = serviceName.replace('Service', '');
+  var filename = '_' +
+    humps.decamelize(shortName) + '_' +
+    humps.decamelize(shortName + '_api') + '_.' +
+    'i' + serviceName.toLowerCase() + 'api.html';
+  return (isHomePage() ? 'interfaces/' : './') + filename;
+}

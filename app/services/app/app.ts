@@ -19,6 +19,7 @@ import { StreamlabelsService } from '../streamlabels';
 
 interface IAppState {
   loading: boolean;
+  argv: string;
 }
 
 /**
@@ -45,7 +46,8 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   @Inject() streamInfoService: StreamInfoService;
 
   static initialState: IAppState = {
-    loading: true
+    loading: true,
+    argv: ''
   };
 
   private autosaveInterval: number;
@@ -141,6 +143,12 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
     });
   }
 
+  /**
+   * the main process sends argv string here
+   */
+  setArgv(argv: string) {
+    this.SET_ARGV(argv);
+  }
 
   /**
    * remove the config and load the new one
@@ -208,6 +216,11 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   @mutation()
   private FINISH_LOADING() {
     this.state.loading = false;
+  }
+
+  @mutation()
+  private SET_ARGV(argv: string) {
+    this.state.argv = argv;
   }
 
 }
