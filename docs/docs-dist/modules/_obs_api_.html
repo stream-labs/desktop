@@ -102,7 +102,7 @@
 					<div class="tsd-signature tsd-kind-icon">callbacks<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/048dd5a/app/services/obs-api.ts#L10">obs-api.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/25ba07f/app/services/obs-api.ts#L10">obs-api.ts:10</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -117,7 +117,7 @@
 					<div class="tsd-signature tsd-kind-icon">id<wbr>Counter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/048dd5a/app/services/obs-api.ts#L9">obs-api.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/25ba07f/app/services/obs-api.ts#L9">obs-api.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -127,7 +127,7 @@
 					<div class="tsd-signature tsd-kind-icon">ipc<wbr>Renderer<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">IpcRenderer</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/048dd5a/app/services/obs-api.ts#L6">obs-api.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/25ba07f/app/services/obs-api.ts#L6">obs-api.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -137,7 +137,7 @@
 					<div class="tsd-signature tsd-kind-icon">node<wbr>Obs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Dictionary</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;new Proxy({}, {get(target, key) {return (...args: any[]) &#x3D;&gt; {const mappedArgs &#x3D; args.map(arg &#x3D;&gt; {if (typeof arg &#x3D;&#x3D;&#x3D; &#x27;function&#x27;) {idCounter +&#x3D; 1;callbacks[idCounter] &#x3D; arg;return {__obsCallback: true,id: idCounter};}return arg;});return ipcRenderer.sendSync(&#x27;obs-apiCall&#x27;, {method: key,args: mappedArgs,});};}})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/048dd5a/app/services/obs-api.ts#L14">obs-api.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/25ba07f/app/services/obs-api.ts#L14">obs-api.ts:14</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -147,7 +147,7 @@
 					<div class="tsd-signature tsd-kind-icon">remote<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Remote</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/048dd5a/app/services/obs-api.ts#L6">obs-api.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/stream-labs/streamlabs-obs/blob/25ba07f/app/services/obs-api.ts#L6">obs-api.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>

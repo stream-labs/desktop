@@ -3,6 +3,7 @@
 $(() => {
 
   var projectName = 'Streamlabs-OBS';
+  if (isHomePage()) document.querySelector('h1').innerHTML = projectName;
 
   // patch header
   var $header = document.querySelector('h1');
@@ -89,11 +90,11 @@ function patchHierarchyBlock() {
 }
 
 function isServicePage() {
-  return location.href.match(/\.i.+serviceapi\.html$/);
+  return location.pathname.match(/\.i.+serviceapi\.html$/);
 }
 
 function isHomePage() {
-  return location.href.match(/index\.html$/);
+  return location.pathname.match(/index\.html$/);
 }
 
 function patchNavigation() {
