@@ -280,7 +280,11 @@ export class ServicesManager extends Service {
 
     const resource = this.getResource(resourceId);
     if (!resource) {
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.INVALID_PARAMS, id: request.id });
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.INVALID_PARAMS,
+        id: request.id,
+        message: 'resource not found'
+      });
     } else if (!resource[methodName]) {
       response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND, id: request.id });
     }
