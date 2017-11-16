@@ -68,6 +68,19 @@
   }
 }
 
+.modal--side-nav {
+  display: flex;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.modal-container--side-nav {
+  flex-grow: 1;
+  margin: -20px -20px -20px 0;
+  overflow: auto;
+}
+
 .night-theme {
   &.modal-layout {
     background-color: @night-primary;
