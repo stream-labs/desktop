@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
-import { ConfigPersistenceService } from './services/config-persistence';
+import { ScenesCollectionsService } from './services/scenes-collections';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
@@ -134,7 +134,7 @@ export class ServicesManager extends Service {
     WindowsService,
     FontLibraryService,
     ObsImporterService,
-    ConfigPersistenceService,
+    ScenesCollectionsService,
     AppService,
     ShortcutsService,
     CacheUploaderService,

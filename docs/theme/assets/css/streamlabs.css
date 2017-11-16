@@ -104,6 +104,20 @@ li.label.tsd-is-external {
     background-color: #31c3a2;
 }
 
+.tsd-block-comment {
+    margin-top: 15px;
+}
+
+.tsd-panel.tsd-implemented-by li a{
+    color: #31c3a2;
+}
+
+.tsd-panel.tsd-implemented-by li a:hover {
+    color: #31c3a2;
+    text-decoration: inherit;
+}
+
+
 footer {
     border-top: 1px solid #2b383f;
     background: none;

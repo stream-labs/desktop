@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.6.7",
+  "version": "0.7.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
@@ -35,7 +35,9 @@
       "obs-api"
     ],
     "extraFiles": [
-      "node-obs"
+      "node-obs",
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -43,6 +45,9 @@
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+    },
+    "nsis": {
+      "license": "AGREEMENT"
     }
   },
   "ava": {

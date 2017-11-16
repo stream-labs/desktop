@@ -6,6 +6,10 @@ You can access services' methods and properties by sending
 [JSON-RPC](http://www.jsonrpc.org/specification) messages to the
 named pipe `slobs`.
 
+Individual JSON-RPC requests should be separated by a single newline
+character `\n`.  You should ensure that your JSON message does not
+contain any newline characters.
+
 # Examples
 
 
@@ -165,6 +169,32 @@ This is exposed via the API by
 Some services' methods, for example `AppService.loadConfig()` return `Promise` which is also subscription that
 causes only one event when task is finished.
 
+request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 5,
+    "method": "loadConfig",
+    "params": {
+        "resource": "AppService",
+        "args": ["MyScenes"]
+    }
+}
+```
+
+response
+```
+{
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+        "_type": "SUBSCRIPTION",
+        "resourceId": "5c3cf84f797a"
+    }
+}
+```
+
+event
 ```
 {
     "jsonrpc": "2.0",
@@ -189,10 +219,10 @@ request
 {
     "jsonrpc": "2.0",
     "id": 6,
-    "method": "getSource",
+    "method": "getSources",
     "params": {
         "resource": "SourcesService",
-        "args": ["5c3cf84f797a"],
+        "args": [],
         "compactMode": true
     }
 }
@@ -203,13 +233,19 @@ response
 {
     "jsonrpc": "2.0",
     "id": 6,
-    "result": {
-        "_type": "HELPER",
-        "resourceId": "Source[\"5c3cf84f797a\"]",
+    "result": [
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797a\"]",
+        },
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797b\"]",
+        },
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797c\"]",
+        },
     }
 }
 ```
-
-# Caveats
-You can send several json-rpc requests in one request sting.
-In this case all requests have to be separated with new-line character `\n`

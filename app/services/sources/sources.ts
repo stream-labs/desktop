@@ -11,6 +11,7 @@ import { WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
+import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
@@ -30,7 +31,8 @@ const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
 
 const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
-  widget: WidgetManager
+  widget: WidgetManager,
+  streamlabels: StreamlabelsManager
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
