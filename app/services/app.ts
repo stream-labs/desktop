@@ -183,7 +183,7 @@ export class AppService extends StatefulService<IAppState> {
   reset() {
     this.disableAutosave();
 
-    // we should remove inactive scenes first to avoid thewitching between scenes
+    // we should remove inactive scenes first to avoid the switching between scenes
     this.scenesService.scenes.forEach(scene => {
       if (scene.id === this.scenesService.activeSceneId) return;
       scene.remove(true);
