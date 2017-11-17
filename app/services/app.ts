@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from './stateful-service';
 import { OnboardingService } from './onboarding';
-import { ConfigPersistenceService } from './config-persistence';
+import { ConfigPersistenceService, OverlaysPersistenceService } from './config-persistence';
 import { HotkeysService } from './hotkeys';
 import { UserService } from './user';
 import { ShortcutsService } from './shortcuts';
@@ -31,6 +31,9 @@ export class AppService extends StatefulService<IAppState> {
 
   @Inject()
   configPersistenceService: ConfigPersistenceService;
+
+  @Inject()
+  overlaysPersistenceService: OverlaysPersistenceService;
 
   @Inject()
   hotkeysService: HotkeysService;
@@ -137,6 +140,30 @@ export class AppService extends StatefulService<IAppState> {
         });
       }, 500);
     });
+  }
+
+
+  /**
+   * Loads an overlay file as a new scene collection
+   * @param collectionName The name of the new scene collection
+   * @param overlayPath The path to the overlay file
+   */
+  async loadOverlay(collectionName: string, overlayPath: string) {
+    this.START_LOADING();
+
+    // Make sure the current collection is saved
+    await this.configPersistenceService.rawSave();
+
+    this.reset();
+    this.configPersistenceService.switchToEmptyConfig(collectionName);
+    await this.overlaysPersistenceService.loadOverlay(overlayPath);
+    this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+
+    // Save the newly loaded config
+    await this.configPersistenceService.rawSave();
+
+    this.enableAutoSave();
+    this.FINISH_LOADING();
   }
 
 

@@ -12,37 +12,28 @@ interface IContext {
 }
 
 export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
-
   schemaVersion = 1;
 
   scenesService: ScenesService = ScenesService.instance;
-
 
   getItems() {
     return this.scenesService.scenes;
   }
 
+  async saveItem(scene: Scene, context: IContext): Promise<ISchema> {
+    const slots = new SlotsNode();
+    await slots.save({ scene, assetsPath: context.assetsPath });
 
-  saveItem(scene: Scene, context: IContext): Promise<ISchema> {
-    return new Promise(resolve => {
-      const slots = new SlotsNode();
-      slots.save({ scene, assetsPath: context.assetsPath }).then(() => {
-        resolve({
-          name: scene.name,
-          slots
-        });
-      });
-    });
+    return {
+      name: scene.name,
+      slots
+    };
   }
 
-
-  loadItem(obj: ISchema, context: IContext): Promise<void> {
-    return new Promise(resolve => {
-      const scene = this.scenesService.createScene(obj.name, { makeActive: true });
-      obj.slots.load({ scene, assetsPath: context.assetsPath }).then(() => {
-        resolve();
-      });
+  async loadItem(obj: ISchema, context: IContext): Promise<void> {
+    const scene = this.scenesService.createScene(obj.name, {
+      makeActive: true
     });
+    await obj.slots.load({ scene, assetsPath: context.assetsPath });
   }
-
 }

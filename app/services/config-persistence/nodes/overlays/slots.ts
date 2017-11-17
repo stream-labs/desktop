@@ -7,8 +7,16 @@ import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
+import { StreamlabelNode } from './streamlabel';
+import { WidgetNode } from './widget';
 
-type TContent = ImageNode | TextNode | WebcamNode | VideoNode;
+type TContent =
+  | ImageNode
+  | TextNode
+  | WebcamNode
+  | VideoNode
+  | StreamlabelNode
+  | WidgetNode;
 
 interface ISchema {
   name: string;
@@ -29,102 +37,97 @@ interface IContext {
 }
 
 export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
-
   schemaVersion = 1;
 
-  @Inject()
-  videoService: VideoService;
+  @Inject() videoService: VideoService;
 
-  @Inject()
-  sourcesService: SourcesService;
+  @Inject() sourcesService: SourcesService;
 
   getItems(context: IContext) {
-    return context.scene.getItems().slice().reverse();
+    return context.scene
+      .getItems()
+      .slice()
+      .reverse();
   }
 
+  async saveItem(sceneItem: SceneItem, context: IContext): Promise<ISchema> {
+    const details = {
+      name: sceneItem.name,
+      x: sceneItem.x / this.videoService.baseWidth,
+      y: sceneItem.y / this.videoService.baseHeight,
+      scaleX: sceneItem.scaleX / this.videoService.baseWidth,
+      scaleY: sceneItem.scaleY / this.videoService.baseHeight
+    };
 
-  saveItem(sceneItem: SceneItem, context: IContext): Promise<ISchema> {
-    return new Promise(resolve => {
-      const details = {
-        name: sceneItem.name,
-        x: sceneItem.x / this.videoService.baseWidth,
-        y: sceneItem.y / this.videoService.baseHeight,
-        scaleX: sceneItem.scaleX / this.videoService.baseWidth,
-        scaleY: sceneItem.scaleY / this.videoService.baseHeight
-      };
+    const manager = sceneItem.source.getPropertiesManagerType();
 
-      if (sceneItem.type === 'image_source') {
-        const content = new ImageNode();
-        content.save({ sceneItem, assetsPath: context.assetsPath }).then(() => {
-          resolve({ ...details, content });
-        });
-      } else if (sceneItem.type === 'text_gdiplus') {
-        const content = new TextNode();
-        content.save({ sceneItem, assetsPath: context.assetsPath }).then(() => {
-          resolve({ ...details, content });
-        });
-      } else if (sceneItem.type === 'dshow_input') {
-        const content = new WebcamNode();
-        content.save({ sceneItem, assetsPath: context.assetsPath }).then(() => {
-          resolve({ ...details, content });
-        });
-      } else if (sceneItem.type === 'ffmpeg_source') {
-        const content = new VideoNode();
-        content.save({ sceneItem, assetsPath: context.assetsPath }).then(() => {
-          resolve({ ...details, content });
-        });
-      }
-
-      resolve(null);
-    });
-
-
+    if (manager === 'streamlabels') {
+      const content = new StreamlabelNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    } else if (manager === 'widget') {
+      const content = new WidgetNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    } else if (sceneItem.type === 'image_source') {
+      const content = new ImageNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    } else if (sceneItem.type === 'text_gdiplus') {
+      const content = new TextNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    } else if (sceneItem.type === 'dshow_input') {
+      const content = new WebcamNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    } else if (sceneItem.type === 'ffmpeg_source') {
+      const content = new VideoNode();
+      await content.save({ sceneItem, assetsPath: context.assetsPath });
+      return { ...details, content };
+    }
   }
 
+  async loadItem(obj: ISchema, context: IContext): Promise<void> {
+    let sceneItem: SceneItem;
 
-  loadItem(obj: ISchema, context: IContext): Promise<void> {
-    return new Promise(resolve => {
-      let sceneItem: SceneItem;
+    if (obj.content instanceof WebcamNode) {
+      const existingWebcam = this.sourcesService.sources.find(source => {
+        return source.type === 'dshow_input';
+      });
 
-      if (obj.content instanceof WebcamNode) {
-        const existingWebcam = this.sourcesService.sources.find(source => {
-          return source.type === 'dshow_input';
-        });
-
-        if (existingWebcam) {
-          sceneItem = context.scene.addSource(existingWebcam.sourceId);
-        } else {
-          sceneItem = context.scene.createAndAddSource(obj.name, 'dshow_input');
-        }
-
-        this.adjustPositionAndScale(sceneItem, obj);
-
-        obj.content.load({
-          sceneItem,
-          assetsPath: context.assetsPath,
-          existing: existingWebcam !== void 0
-        }).then(() => {
-          resolve();
-        });
-
-        return;
-      }
-
-      if (obj.content instanceof ImageNode) {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'image_source');
-      } else if (obj.content instanceof TextNode) {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus');
-      } else if (obj.content instanceof VideoNode) {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source');
+      if (existingWebcam) {
+        sceneItem = context.scene.addSource(existingWebcam.sourceId);
+      } else {
+        sceneItem = context.scene.createAndAddSource(obj.name, 'dshow_input');
       }
 
       this.adjustPositionAndScale(sceneItem, obj);
-      obj.content.load({ sceneItem, assetsPath: context.assetsPath }).then(() => {
-        resolve();
-      });
-    });
-  }
 
+      await obj.content.load({
+        sceneItem,
+        assetsPath: context.assetsPath,
+        existing: existingWebcam !== void 0
+      });
+
+      return;
+    }
+
+    if (obj.content instanceof ImageNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'image_source');
+    } else if (obj.content instanceof TextNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus');
+    } else if (obj.content instanceof VideoNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source');
+    } else if (obj.content instanceof StreamlabelNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus');
+    } else if (obj.content instanceof WidgetNode) {
+      sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source');
+    }
+
+    this.adjustPositionAndScale(sceneItem, obj);
+    await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+  }
 
   adjustPositionAndScale(item: SceneItem, obj: ISchema) {
     item.setPositionAndScale(
@@ -135,14 +138,11 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
     );
   }
 
-
   normalizedScale(scale: number) {
     return scale * (1920 / this.videoService.baseWidth);
   }
 
-
   denormalizedScale(scale: number) {
     return scale / (1920 / this.videoService.baseWidth);
   }
-
 }

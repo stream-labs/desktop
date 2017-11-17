@@ -26,26 +26,21 @@ interface IResolution {
 }
 
 export class WebcamNode extends Node<ISchema, IContext> {
-
   schemaVersion = 1;
 
   videoService: VideoService = VideoService.instance;
   sourcesService: SourcesService = SourcesService.instance;
 
-
-  save(context: IContext) {
+  async save(context: IContext) {
     const rect = new ScalableRectangle(context.sceneItem);
 
     this.data = {
       width: rect.scaledWidth / this.videoService.baseWidth,
       height: rect.scaledHeight / this.videoService.baseHeight
     };
-
-    return Promise.resolve();
   }
 
-
-  load(context: IContext) {
+  async load(context: IContext) {
     const targetWidth = this.data.width * this.videoService.baseWidth;
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
@@ -69,22 +64,15 @@ export class WebcamNode extends Node<ISchema, IContext> {
       bottom: 0
     };
 
-    if ((resolution.width * scale) > targetWidth) {
-      const delta = ((resolution.width * scale) - targetWidth) / scale;
+    if (resolution.width * scale > targetWidth) {
+      const delta = (resolution.width * scale - targetWidth) / scale;
 
       crop.left = delta / 2;
       crop.right = delta / 2;
     }
 
-    this.applyScaleAndCrop(
-      context.sceneItem,
-      scale,
-      crop
-    );
-
-    return Promise.resolve();
+    this.applyScaleAndCrop(context.sceneItem, scale, crop);
   }
-
 
   // This selects the video device and picks the best resolution.
   // It should not be performed if context.existing is true
@@ -111,7 +99,9 @@ export class WebcamNode extends Node<ISchema, IContext> {
     input.update(settings);
 
     // Figure out which resolutions this device can run at
-    const resolutionOptions = (deviceProperties.get('resolution') as IListProperty).details.items.map(item => {
+    const resolutionOptions = (deviceProperties.get(
+      'resolution'
+    ) as IListProperty).details.items.map(item => {
       return this.resStringToResolution(item.value as string);
     });
 
@@ -157,7 +147,6 @@ export class WebcamNode extends Node<ISchema, IContext> {
     return bestResolution;
   }
 
-
   applyResolution(sceneItem: SceneItem, resolution: string) {
     const input = sceneItem.getObsInput();
     const settings = { ...input.settings };
@@ -169,18 +158,11 @@ export class WebcamNode extends Node<ISchema, IContext> {
     input.update(settings);
   }
 
-
   applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {
-    item.setPositionAndScale(
-      item.x,
-      item.y,
-      scale,
-      scale
-    );
+    item.setPositionAndScale(item.x, item.y, scale, scale);
 
     item.setCrop(crop);
   }
-
 
   resStringToResolution(resString: string): IResolution {
     const parts = resString.split('x');
@@ -190,5 +172,4 @@ export class WebcamNode extends Node<ISchema, IContext> {
       height: parseInt(parts[1], 10)
     };
   }
-
 }

@@ -62,7 +62,6 @@
     "arch": "x64"
   },
   "dependencies": {
-    "archiver": "^2.0.3",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
@@ -73,6 +72,7 @@
     "obs-studio-node": "file:./obs-studio-node",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
+    "unzip": "^0.1.11",
     "uuid": "^3.0.1",
     "vue-popperjs": "^1.2.2"
   },
@@ -82,6 +82,7 @@
     "@types/lodash": "^4.14.64",
     "@types/node": "^7.0.18",
     "@types/socket.io-client": "^1.4.31",
+    "archiver": "^2.0.3",
     "ava": "^0.19.1",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
@@ -95,7 +96,7 @@
     "devtron": "^1.4.0",
     "electron": "1.7.7",
     "electron-builder": "^19.22.1",
-    "electron-devtools-installer": "^2.1.0",
+    "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",

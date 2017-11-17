@@ -212,8 +212,8 @@ function startApp() {
 
   if (isDevMode) {
     require('devtron').install();
-    const devtoolsInstaller = require('electron-devtools-installer');
-    devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+    // const devtoolsInstaller = require('electron-devtools-installer');
+    // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
     openDevTools();
   }
 

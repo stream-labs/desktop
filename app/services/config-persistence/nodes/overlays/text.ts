@@ -14,15 +14,12 @@ interface IContext {
 }
 
 export class TextNode extends Node<ISchema, IContext> {
-
   schemaVersion = 1;
 
-  @Inject()
-  fontLibraryService: FontLibraryService;
+  @Inject() fontLibraryService: FontLibraryService;
 
-
-  save(context: IContext) {
-    const settings = context.sceneItem.getObsInput().settings;
+  async save(context: IContext) {
+    const settings = { ...context.sceneItem.getObsInput().settings };
 
     // We only store the filename for the custom font, to prevent
     // storing a full path that could possibly leak information
@@ -32,33 +29,28 @@ export class TextNode extends Node<ISchema, IContext> {
       settings['custom_font'] = file;
     }
 
-    this.data = { settings };
+    settings['file'] = '';
 
-    return Promise.resolve();
+    this.data = { settings };
   }
 
-
-  load(context: IContext) {
+  async load(context: IContext) {
     // If a custom font was set, try to load it as a google font.
     // If this fails, not font will be installed and the plugin
     // will automatically fall back to Arial
     if (this.data.settings['custom_font']) {
-      this.fontLibraryService.downloadFont(this.data.settings['custom_font'])
-        .then(path => {
-          this.data.settings['custom_font'] = path;
-          this.updateInput(context);
-        })
-        .catch(() => this.updateInput(context));
+      const path = await this.fontLibraryService.downloadFont(
+        this.data.settings['custom_font']
+      );
+
+      this.data.settings['custom_font'] = path;
+      this.updateInput(context);
     } else {
       this.updateInput(context);
     }
-
-    return Promise.resolve();
   }
-
 
   updateInput(context: IContext) {
     context.sceneItem.getObsInput().update(this.data.settings);
   }
-
 }

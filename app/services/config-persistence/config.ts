@@ -236,12 +236,17 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
 
 
   switchToBlankConfig(configName = DEFAULT_SCENES_COLLECTION_NAME) {
+    this.switchToBlankConfig(configName);
+    this.setUpDefaults();
+  }
+
+
+  switchToEmptyConfig(configName: string) {
     if (this.scenesService.state.scenes.length) {
       throw 'unable to switch to blank config while current config is loaded';
     }
     this.SET_ACTIVE_COLLECTION(configName);
     this.ADD_SCENES_COLLECTIONS([configName]);
-    this.setUpDefaults();
   }
 
 
