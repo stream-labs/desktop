@@ -43,7 +43,8 @@ module.exports = {
     // bother compiling them into our bundle.
     'aws-sdk': 'require("aws-sdk")',
     'asar': 'require("asar")',
-    'backtrace-node': 'require("backtrace-node")'
+    'backtrace-js': 'require("backtrace-js")'
+
   },
 
   module: {
