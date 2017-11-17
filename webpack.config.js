@@ -44,7 +44,8 @@ module.exports = {
     'backtrace-node': 'require("backtrace-node")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
-    'unzip': 'require("unzip")'
+    'unzip': 'require("unzip")',
+    'backtrace-js': 'require("backtrace-js")'
   },
 
   module: {
