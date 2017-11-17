@@ -1,9 +1,9 @@
 {
-  "name": "streamlabs-obs",
+  "name": "slobs-client",
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.6.7",
+  "version": "0.7.2",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
@@ -17,7 +17,7 @@
     "deploy": "node bin/deploy.js",
     "test": "ava",
     "clear": "rm -rf bundles/media",
-    "typedoc": "typedoc --out docs/docs-dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --hideGenerator"
+    "typedoc": "typedoc --out docs/docs-dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -35,7 +35,9 @@
       "obs-api"
     ],
     "extraFiles": [
-      "node-obs"
+      "node-obs",
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -43,6 +45,9 @@
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+    },
+    "nsis": {
+      "license": "AGREEMENT"
     }
   },
   "ava": {

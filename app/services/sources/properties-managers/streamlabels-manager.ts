@@ -1,6 +1,6 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
-import { StreamlabelsService } from 'services/streamlabels';
+import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
 import { getDefinitions } from 'services/streamlabels/definitions';
 import { UserService } from 'services/user';
 
@@ -14,7 +14,7 @@ export class StreamlabelsManager extends PropertiesManager {
   @Inject() userService: UserService;
 
   settings: IStreamlabelsManagerSettings;
-  filename: string;
+  private subscription: IStreamlabelSubscription;
   blacklist = ['read_from_file', 'file'];
   customUIComponent = 'StreamlabelProperties';
 
@@ -36,22 +36,22 @@ export class StreamlabelsManager extends PropertiesManager {
   }
 
 
-  unsubscribe() {
-    if (this.filename) {
-      this.streamlabelsService.unsubscribe(this.filename);
+  private unsubscribe() {
+    if (this.subscription) {
+      this.streamlabelsService.unsubscribe(this.subscription);
     }
   }
 
 
-  refreshSubscription() {
+  private refreshSubscription() {
     this.unsubscribe();
 
-    this.filename = this.streamlabelsService.subscribe(this.settings.statname);
+    this.subscription = this.streamlabelsService.subscribe(this.settings.statname);
 
     this.obsSource.update({
       ...this.obsSource.settings,
       read_from_file: true,
-      file: this.streamlabelsService.getStreamlabelsPath(this.filename)
+      file: this.subscription.path
     });
   }
 

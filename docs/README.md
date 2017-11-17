@@ -1,17 +1,22 @@
 # API reference
 
-Streamlabs-OBS allows to manage application via RPC based API.
-The API represented with several different services.
-You can asses services' methods and properties by sending [JSON-RPC](http://www.jsonrpc.org/specification) messages
-to named pipe `slobs`
+Streamlabs-OBS allows remote management of the application via
+an RPC-based API. The API is split into several different services.
+You can access services' methods and properties by sending
+[JSON-RPC](http://www.jsonrpc.org/specification) messages to the
+named pipe `slobs`.
+
+Individual JSON-RPC requests should be separated by a single newline
+character `LF` ( ASCII code 10).  You should ensure that your JSON message does not
+contain any newline characters. Use `\n` as replacement for new lines in JSON. 
 
 # Examples
 
 
-Get list of scenes:
+## Get a list of scenes
 
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -21,12 +26,11 @@ request
         "resource": "ScenesService"
     }
 }
-
 ```
 
 
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -34,7 +38,7 @@ response
     "result": [
        {
             "_type": "HELPER",
-            "resourceId": "Scene[\"6b615869aba3\"]",
+            "resourceId": "Scene[\"3efd436e5546\"]",
             "id": "3efd436e5546",
             "name": "My super scene",
             "activeItemIds": []
@@ -50,12 +54,14 @@ response
 }
 ```
 
-Property `"_type": "HELPER"` means that you can fetch some additional information
-by calling methods of this object. To do that just put `resourceId` from response to `resource` in request.
+The property `"_type": "HELPER"` means that you can fetch some
+additional information by calling methods on this object. To do
+that, just include the `resourceId` from the response to `resource`
+in the new request.
 
-Get scene items:
+## Get items in a scene
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -66,10 +72,9 @@ request
         "args": []
     }
 }
-
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -95,9 +100,9 @@ response
 
 ## Event subscriptions
 
-Subscribe to `sceneSwitched` event:
+Subscribe to the `sceneSwitched` event:
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -110,7 +115,7 @@ request
 }
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
@@ -122,9 +127,10 @@ response
 }
 ```
 
-After subscription yo will receive events when user are switching between scenes:
+After subscribing, you will receive events when the user
+switches between scenes:
 
-event
+### Event
 ```
 {
     "jsonrpc": "2.0",
@@ -143,7 +149,7 @@ event
 
 Use `resourceId` to unsubscribe:
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
@@ -155,10 +161,46 @@ request
 }
 ```
 
-## Tasks execution
-Some services' methods, for example `AppService.loadConfig()` return `Promise` which is also subscription that
-causes only one event when task is finished.
+## Asynchronous Task Execution
 
+Some service methods are asynchronous and return a Javascript promise.
+This is exposed via the API by returning a subscription that will
+fire a single event.  You can think of the subscription response as
+the acknowledgement of your request, and the event as a notification
+of completion with a result.
+
+Although fundamentally all requests sent over the socket are asynchronous,
+a function that returns a promise is a good indication that your
+application consuming the API should probably not block waiting for a
+response.  Functions that return a promise do not guarantee fast
+execution.
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 5,
+    "method": "loadConfig",
+    "params": {
+        "resource": "AppService",
+        "args": ["MyScenes"]
+    }
+}
+```
+
+### Response
+```
+{
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+        "_type": "SUBSCRIPTION",
+        "resourceId": "5c3cf84f797a"
+    }
+}
+```
+
+### Event
 ```
 {
     "jsonrpc": "2.0",
@@ -173,37 +215,43 @@ causes only one event when task is finished.
 ```
 
 ## Reducing response body
-By default if response returns resources with `"_type": "HELPER"` Streamlabs-OBS
-will attach some data by calling `getModel()` method of resource.
-To disable that use `compactMode` parameter in JSON-RPC request:
+By default if the response returns resources with `"_type": "HELPER"`,
+Streamlabs-OBS will attach some data by calling `getModel()` method of resource.
+To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 
 
-request
+### Request
 ```
 {
     "jsonrpc": "2.0",
     "id": 6,
-    "method": "getSource",
+    "method": "getSources",
     "params": {
         "resource": "SourcesService",
-        "args": ["5c3cf84f797a"],
+        "args": [],
         "compactMode": true
     }
 }
 ```
 
-response
+### Response
 ```
 {
     "jsonrpc": "2.0",
     "id": 6,
-    "result": {
-        "_type": "HELPER",
-        "resourceId": "Source[\"5c3cf84f797a\"]",
+    "result": [
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797a\"]",
+        },
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797b\"]",
+        },
+        {
+            "_type": "HELPER",
+            "resourceId": "Source[\"5c3cf84f797c\"]",
+        },
     }
 }
 ```
-
-# Caveats
-You can send several json-rpc requests in one request sting.
-In this case all requests have to be separated with new-line character `\n`

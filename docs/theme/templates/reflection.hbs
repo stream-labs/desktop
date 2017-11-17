@@ -6,12 +6,24 @@
     {{/if}}
 {{/with}}
 
+{{#if model.implementedBy}}
+  <section class="tsd-panel tsd-implemented-by">
+    <h3>Implemented by</h3>
+    <ul class="tsd-hierarchy">
+      {{#each model.implementedBy}}
+        <li>{{> type}}</li>
+      {{/each}}
+    </ul>
+  </section>
+{{/if}}
+
 {{#if model.typeParameters}}
     <section class="tsd-panel tsd-type-parameters">
         <h3>Type parameters</h3>
         {{#with model}}{{> typeParameters}}{{/with}}
     </section>
 {{/if}}
+
 
 {{#if model.typeHierarchy}}
     <section class="tsd-panel tsd-hierarchy">
@@ -31,16 +43,6 @@
     </section>
 {{/if}}
 
-<!--{{#if model.implementedBy}}-->
-    <!--<section class="tsd-panel">-->
-        <!--<h3>Implemented by</h3>-->
-        <!--<ul class="tsd-hierarchy">-->
-            <!--{{#each model.implementedBy}}-->
-                <!--<li>{{> type}}</li>-->
-            <!--{{/each}}-->
-        <!--</ul>-->
-    <!--</section>-->
-<!--{{/if}}-->
 
 {{#if model.signatures}}
     <section class="tsd-panel">

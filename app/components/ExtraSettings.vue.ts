@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { OverlaysPersistenceService } from '../services/config-persistence';
+import { OverlaysPersistenceService } from '../services/scenes-collections';
 import { CacheUploaderService } from '../services/cache-uploader';
 import { Inject } from '../util/injector';
 import BoolInput from './shared/forms/BoolInput.vue';
