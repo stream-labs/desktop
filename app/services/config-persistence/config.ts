@@ -236,7 +236,7 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
 
 
   switchToBlankConfig(configName = DEFAULT_SCENES_COLLECTION_NAME) {
-    this.switchToBlankConfig(configName);
+    this.switchToEmptyConfig(configName);
     this.setUpDefaults();
   }
 
