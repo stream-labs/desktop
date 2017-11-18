@@ -1,5 +1,6 @@
 import test from 'ava';
 import { Application } from 'spectron';
+import { getClient } from '../api-client';
 
 const path = require('path');
 const fs = require('fs');
@@ -28,9 +29,18 @@ export async function focusChild(t) {
   await focusWindow(t, /child=true/);
 }
 
+const DEFAULT_OPTIONS = {
+  skipOnboarding: true,
+  restartAppAfterEachTest: true,
+  initApiClient: false
+};
 
-export function useSpectron(skipOnboarding = true) {
-  test.beforeEach(async t => {
+export function useSpectron(options) {
+  options = Object.assign({}, DEFAULT_OPTIONS, options);
+  let appIsRunning = false;
+  let context = null;
+
+  async function startApp(t) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
@@ -50,7 +60,7 @@ export function useSpectron(skipOnboarding = true) {
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
-    if (skipOnboarding) {
+    if (options.skipOnboarding) {
       await focusMain(t);
       await t.context.app.client.click('a=Setup later');
 
@@ -59,12 +69,32 @@ export function useSpectron(skipOnboarding = true) {
         await t.context.app.client.click('button=Start Fresh');
       }
     }
+
+    context = t.context;
+    appIsRunning = true;
+  }
+
+  async function stopApp() {
+    await context.app.stop();
+    await new Promise((resolve) => {
+      rimraf(context.cacheDir, resolve);
+    });
+    appIsRunning = false;
+  }
+
+  test.beforeEach(async t => {
+    if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
 
   test.afterEach.always(async t => {
-    await t.context.app.stop();
-    await new Promise((resolve) => {
-      rimraf(t.context.cacheDir, resolve);
-    });
+    if (options.initApiClient) {
+      const client = await getClient();
+      await client.unsubscribeAll();
+    }
+    if (options.restartAppAfterEachTest) await stopApp(t);
+  });
+
+  test.after.always(async t => {
+    if (appIsRunning) await stopApp(t);
   });
 }

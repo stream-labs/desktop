@@ -286,7 +286,11 @@ export class ServicesManager extends Service {
         message: 'resource not found'
       });
     } else if (!resource[methodName]) {
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND, id: request.id });
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
+        id: request.id,
+        message: methodName
+      });
     }
 
     if (response) {

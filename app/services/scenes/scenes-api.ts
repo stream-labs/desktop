@@ -1,12 +1,13 @@
-/**
- * Api for scenes management
- */
 import { Observable } from 'rxjs/Observable';
 import { ISourceApi, TSourceType, ISource } from '../sources';
 
-
+/**
+ * Api for scenes management
+ */
 export interface IScenesServiceApi {
   createScene(name: string, options: ISceneCreateOptions): ISceneApi;
+  makeSceneActive(id: string): void;
+  removeScene(id: string): IScene;
   scenes: ISceneApi[];
   activeScene: ISceneApi;
   activeSceneId: string;
@@ -35,6 +36,8 @@ export interface ISceneApi extends IScene {
   getItems(): ISceneItemApi[];
   addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
+  removeItem(sceneItemId: string): void;
+  remove(): void;
   makeItemsActive(sceneItemIds: string[]): void;
   canAddSource(sourceId: string): boolean;
   setName(newName: string): void;
@@ -101,4 +104,5 @@ export interface ISceneItemApi extends ISceneItem {
   setPositionAndCrop(x: number, y: number, crop: ICrop): void;
   setLocked(locked: boolean): void;
   getModel(): ISceneItem & ISource;
+  remove(): void;
 }

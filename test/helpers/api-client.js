@@ -5,32 +5,39 @@ const net = require('net');
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
 
-export class ApiClient {
+let clientInstance = null;
 
-  resolveConnection = null;
-  rejectConnection = null;
-  nextRequestId = 1;
-  socket = new net.Socket();
-  requests = {};
+export class ApiClient {
 
   constructor() {
 
+    this.nextRequestId = 1;
+    this.socket = new net.Socket();
+    this.resolveConnection = null;
+    this.rejectConnection = null;
+    this.requests = {};
+    this.subscriptions = {};
+
+    // set to 'true' for debugging
+    this.logsEnabled = false;
+
     this.socket.on('connect', () => {
-      console.log('connected');
+      this.log('connected');
       this.resolveConnection();
     });
 
     this.socket.on('error', (error) => {
-      console.log('error', error);
+      this.log('error', error);
       this.rejectConnection();
     });
 
     this.socket.on('data', (data) => {
-      console.log(`Received: ${data}`);
+      this.log(`Received: ${data}`);
+      this.onMessageHandler(data);
     });
 
     this.socket.on('close', () => {
-      console.log('Connection closed');
+      this.log('Connection closed');
     });
   }
 
@@ -42,6 +49,10 @@ export class ApiClient {
       this.socket.connect(PIPE_PATH);
     });
 
+  }
+
+  log(...messages) {
+    if (this.logsEnabled) console.log(...messages);
   }
 
 
@@ -69,8 +80,6 @@ export class ApiClient {
 
     if (!requestBody.id) throw 'id is required';
 
-    this.logMessage(requestBody, 'request');
-
     return new Promise((resolve, reject) => {
       this.requests[requestBody.id] = {
         body: requestBody,
@@ -78,30 +87,35 @@ export class ApiClient {
         reject,
         completed: false
       };
-      this.socket.send(JSON.stringify(requestBody));
+      const rawMessage = JSON.stringify(requestBody) + '\n';
+      this.log('Sent:', rawMessage);
+      this.socket.write(rawMessage);
     });
   }
 
 
   onMessageHandler(data) {
-    const message = JSON.parse(data);
-    const request = this.requests[message.id];
+    data.toString().split('\n').forEach(rawMessage => {
+      if (!rawMessage) return;
+      const message = JSON.parse(rawMessage);
+      const request = this.requests[message.id];
 
-    if (request) {
-      if (message.error) {
-        request.reject(message.error);
-      } else {
-        request.resolve(message.result);
+      if (request) {
+        if (message.error) {
+          request.reject(message.error);
+        } else {
+          request.resolve(message.result);
+        }
+        delete this.requests[message.id];
       }
-      delete this.requests[message.id];
-    }
 
-    const result = message.result;
-    if (!result) return;
+      const result = message.result;
+      if (!result) return;
 
-    if (result._type === 'EVENT') {
-      this.subscriptions[message.result.resourceId](result.data);
-    }
+      if (result._type === 'EVENT') {
+        this.subscriptions[message.result.resourceId](result.data);
+      }
+    });
 
   }
 
@@ -111,4 +125,21 @@ export class ApiClient {
       this.subscriptions[subscriptionInfo.resourceId] = cb;
     });
   }
+
+  unsubscribe(subscriptionId) {
+    return this.request(subscriptionId, 'unsubscribe');
+  }
+
+  unsubscribeAll() {
+    return Promise.all(
+      Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId))
+    );
+  }
+}
+
+export async function getClient() {
+  if (clientInstance) return clientInstance;
+  clientInstance = new ApiClient();
+  await clientInstance.connect();
+  return clientInstance;
 }
