@@ -21,8 +21,6 @@ export default class ExtraSettings extends Vue {
 
   @Inject() customizationService: CustomizationService;
 
-  overlaySaving = false;
-
   cacheUploading = false;
 
   get streamInfoUpdateModel(): IFormInput<boolean> {
@@ -66,20 +64,6 @@ export default class ExtraSettings extends Vue {
       electron.remote.clipboard.writeText(file);
       alert(`Your cache directory has been successfully uploaded.  The file name ${file} has been copied to your clipboard.  Please paste it into discord and tag a developer.`);
       this.cacheUploading = false;
-    });
-  }
-
-  exportOverlay() {
-    const path = electron.remote.dialog.showSaveDialog({
-      filters: [{ name: 'Overlay File', extensions: ['overlay'] }]
-    });
-
-    if (!path) return;
-
-    this.overlaySaving = true;
-
-    this.overlaysService.saveOverlay(path).then(() => {
-      this.overlaySaving = false;
     });
   }
 

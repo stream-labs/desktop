@@ -104,6 +104,7 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
     // we decided to not expose API settings for production version yet
     if (Utils.isDevMode()) categories = categories.concat(['API']);
+    categories = categories.concat('Overlays');
 
     return categories;
   }

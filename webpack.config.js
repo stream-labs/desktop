@@ -36,15 +36,15 @@ module.exports = {
   // We want to dynamically require native addons
   externals: {
     'font-manager': 'require("font-manager")',
-    'socket.io-client': 'require("socket.io-client")',
-    'rimraf': 'require("rimraf")',
 
-    // Not actually a native addons, but are super big so we don't
-    // bother compiling them into our bundle.
+    // Not actually a native addons, but for one reason or another
+    // we don't want them compiled in our webpack bundle.
     'aws-sdk': 'require("aws-sdk")',
     'asar': 'require("asar")',
+    'backtrace-node': 'require("backtrace-node")',
+    'socket.io-client': 'require("socket.io-client")',
+    'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")'
-
   },
 
   module: {

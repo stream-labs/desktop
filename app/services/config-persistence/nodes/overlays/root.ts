@@ -10,25 +10,15 @@ interface IContext {
 }
 
 export class RootNode extends Node<ISchema, IContext> {
-
   schemaVersion = 1;
 
-  save(context: IContext): Promise<void> {
-    return new Promise(resolve => {
-      const scenes = new ScenesNode();
-      scenes.save(context).then(() => {
-        this.data = {
-          scenes
-        };
-        resolve();
-      });
-    });
+  async save(context: IContext): Promise<void> {
+    const scenes = new ScenesNode();
+    await scenes.save(context);
+    this.data = { scenes };
   }
 
-  load(context: IContext): Promise<void> {
-    return new Promise(resolve => {
-      this.data.scenes.load(context).then(() => resolve());
-    });
+  async load(context: IContext): Promise<void> {
+    await this.data.scenes.load(context);
   }
-
 }
