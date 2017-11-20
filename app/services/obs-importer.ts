@@ -208,26 +208,25 @@ export class ObsImporterService extends Service {
   }
 
   importMixerSources(configJSON :any) {
-    const mixerSources = [
-      configJSON.DesktopAudioDevice1,
-      configJSON.DesktopAudioDevice2,
-      configJSON.AuxAudioDevice1,
-      configJSON.AuxAudioDevice2,
-      configJSON.AuxAudioDevice3
+    const channelNames = [
+      'DesktopAudioDevice1',
+      'DesktopAudioDevice2',
+      'AuxAudioDevice1',
+      'AuxAudioDevice2',
+      'AuxAudioDevice3',
     ];
-
-    mixerSources.forEach((source, i) => {
-      const mixerSource = mixerSources[i];
-      if (mixerSource) {
+    channelNames.forEach((channelName, i) => {
+      const audioSource = configJSON[channelName];
+      if (audioSource) {
         const newSource = this.sourcesService.createSource(
-          mixerSource.name,
-          mixerSource.id,
+          channelName,
+          audioSource.id,
           {},
           { channel: i + 1 }
         );
 
-        this.audioService.getSource(newSource.sourceId).setMuted(mixerSource.muted);
-        this.audioService.getSource(newSource.sourceId).setMul(mixerSource.volume);
+        this.audioService.getSource(newSource.sourceId).setMuted(audioSource.muted);
+        this.audioService.getSource(newSource.sourceId).setMul(audioSource.volume);
       }
     });
   }
