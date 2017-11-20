@@ -1,7 +1,5 @@
 const net = require('net');
 
-// TCP TEST
-
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
 
