@@ -4,7 +4,6 @@
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
   "version": "0.7.2",
-  "env": "production",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
