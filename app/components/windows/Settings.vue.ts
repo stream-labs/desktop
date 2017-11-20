@@ -11,6 +11,7 @@ import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
+import OverlaySettings from 'components/OverlaySettings.vue';
 
 @Component({
   components: {
@@ -20,7 +21,8 @@ import Hotkeys from '../Hotkeys.vue';
     NavItem,
     ExtraSettings,
     Hotkeys,
-    ApiSettings
+    ApiSettings,
+    OverlaySettings
   },
   mixins: [windowMixin]
 })
@@ -42,7 +44,8 @@ export default class SceneTransitions extends Vue {
     Audio: 'volume-up',
     Hotkeys: 'keyboard-o',
     Advanced: 'cogs',
-    API: 'file-code-o'
+    API: 'file-code-o',
+    Overlays: 'picture-o'
   };
 
   get categoryNames() {

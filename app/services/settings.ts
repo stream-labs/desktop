@@ -108,6 +108,7 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
+    categories = categories.concat('Overlays');
 
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['API']);

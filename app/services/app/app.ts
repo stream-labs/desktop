@@ -1,6 +1,6 @@
 import { StatefulService, mutation } from '../stateful-service';
 import { OnboardingService } from '../onboarding';
-import { ScenesCollectionsService } from '../scenes-collections';
+import { ScenesCollectionsService, OverlaysPersistenceService } from '../scenes-collections';
 import { HotkeysService } from '../hotkeys';
 import { UserService } from '../user';
 import { ShortcutsService } from '../shortcuts';
@@ -33,6 +33,9 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
   @Inject()
   scenesCollectionsService: ScenesCollectionsService;
+
+  @Inject()
+  overlaysPersistenceService: OverlaysPersistenceService;
 
   @Inject()
   hotkeysService: HotkeysService;
@@ -149,6 +152,30 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   setArgv(argv: string[]) {
     this.SET_ARGV(argv);
   }
+
+  /**
+   * Loads an overlay file as a new scene collection
+   * @param collectionName The name of the new scene collection
+   * @param overlayPath The path to the overlay file
+   */
+  async loadOverlay(collectionName: string, overlayPath: string) {
+    this.START_LOADING();
+
+    // Make sure the current collection is saved
+    await this.scenesCollectionsService.rawSave();
+
+    this.reset();
+    this.scenesCollectionsService.switchToEmptyConfig(collectionName);
+    await this.overlaysPersistenceService.loadOverlay(overlayPath);
+    this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+
+    // Save the newly loaded config
+    await this.scenesCollectionsService.rawSave();
+
+    this.enableAutoSave();
+    this.FINISH_LOADING();
+  }
+
 
   /**
    * remove the config and load the new one
