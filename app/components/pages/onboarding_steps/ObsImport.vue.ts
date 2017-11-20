@@ -5,7 +5,7 @@ import { OnboardingService } from '../../../services/onboarding';
 import { Multiselect } from 'vue-multiselect';
 import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
-import { ConfigPersistenceService } from '../../../services/config-persistence';
+import { ScenesCollectionsService } from '../../../services/scenes-collections';
 
 @Component({
   components: { Multiselect }
@@ -19,7 +19,7 @@ export default class ObsImport extends Vue {
   obsImporterService: ObsImporterService;
 
   @Inject()
-  configPersistenceService: ConfigPersistenceService;
+  scenesCollectionsService: ScenesCollectionsService;
 
   status = 'initial';
 
@@ -73,7 +73,7 @@ export default class ObsImport extends Vue {
   }
 
   startFresh() {
-    this.configPersistenceService.switchToBlankConfig();
+    this.scenesCollectionsService.switchToBlankConfig();
     this.onboardingService.skip();
   }
 

@@ -1,4 +1,4 @@
-import StreamingService from './streaming';
+import { StreamingService } from './streaming';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
 import { KeyListenerService } from './key-listener';

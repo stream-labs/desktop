@@ -17,6 +17,7 @@ import { throttle } from 'lodash-decorators';
 import { parse } from '.';
 import fs from 'fs';
 import path from 'path';
+import { IScenesCollectionsServiceApi, IScenesCollectionState } from './scenes-collections-api';
 
 const NODE_TYPES = {
   RootNode,
@@ -30,10 +31,7 @@ const NODE_TYPES = {
 const DEFAULT_SCENES_COLLECTION_NAME = 'scenes';
 
 
-interface IScenesCollectionState {
-  activeCollection: string;
-  scenesCollections: string[];
-}
+
 
 
 /**
@@ -43,7 +41,8 @@ interface IScenesCollectionState {
  * for the config files, and handling any data migrations from
  * one version to another.
  */
-export class ConfigPersistenceService extends PersistentStatefulService<IScenesCollectionState> {
+export class ScenesCollectionsService extends PersistentStatefulService<IScenesCollectionState>
+  implements IScenesCollectionsServiceApi {
 
   static defaultState: IScenesCollectionState = {
     activeCollection: '',
@@ -72,6 +71,13 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
   save() {
     this.rawSave();
   }
+
+
+
+  getState(): IScenesCollectionState {
+    return this.state;
+  }
+
 
 
   rawSave(configName?: string, backup?: boolean): Promise<void> {
@@ -225,7 +231,7 @@ export class ConfigPersistenceService extends PersistentStatefulService<IScenesC
   }
 
 
-  hasConfig(configName: string) {
+  hasConfig(configName: string): boolean {
     return this.state.scenesCollections.includes(configName);
   }
 

@@ -6,9 +6,9 @@ import { ImageNode } from './nodes/overlays/image';
 import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
+import { ScenesCollectionsService, parse } from '.';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
-import { ConfigPersistenceService, parse } from '.';
 import { Inject } from '../../util/injector';
 import electron from 'electron';
 import fs from 'fs';
@@ -30,9 +30,11 @@ const NODE_TYPES = {
 };
 
 export class OverlaysPersistenceService extends Service {
-  @Inject() configPersistenceService: ConfigPersistenceService;
+  @Inject() scenesCollectionsService: ScenesCollectionsService;
+
 
   async loadOverlay(overlayFilePath: string) {
+
     const overlayName = path.parse(overlayFilePath).name;
     const assetsPath = path.join(this.overlaysDirectory, overlayName);
 
@@ -51,7 +53,7 @@ export class OverlaysPersistenceService extends Service {
     const root = parse(data, NODE_TYPES);
     root.load({ assetsPath });
 
-    this.configPersistenceService.setUpDefaultAudio();
+    this.scenesCollectionsService.setUpDefaultAudio();
   }
 
   async saveOverlay(overlayFilePath: string) {

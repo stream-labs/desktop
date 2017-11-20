@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { OverlaysPersistenceService, ConfigPersistenceService } from 'services/config-persistence';
+import { OverlaysPersistenceService, ScenesCollectionsService } from 'services/scenes-collections';
 import electron from 'electron';
 import path from 'path';
 import { AppService } from 'services/app';
@@ -9,7 +9,7 @@ import { AppService } from 'services/app';
 @Component({})
 export default class OverlaySettings extends Vue {
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
-  @Inject() configPersistenceService: ConfigPersistenceService;
+  @Inject() scenesCollectionsService: ScenesCollectionsService;
   @Inject() appService: AppService;
 
   busy = false;
@@ -43,7 +43,7 @@ export default class OverlaySettings extends Vue {
     this.message = '';
 
     const filename = path.parse(chosenPath[0]).name;
-    const configName = this.configPersistenceService.suggestName(filename);
+    const configName = this.scenesCollectionsService.suggestName(filename);
 
     this.appService.loadOverlay(configName, chosenPath[0]).then(() => {
       this.busy = false;

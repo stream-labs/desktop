@@ -9,7 +9,7 @@ import { SourceFiltersService } from './source-filters';
 import { ScenesTransitionsService } from './scenes-transitions';
 import { AudioService } from './audio';
 import { Inject } from '../util/injector';
-import { ConfigPersistenceService } from './config-persistence/config';
+import { ScenesCollectionsService } from './scenes-collections/config';
 import { AppService } from './app';
 import { nodeObs } from './obs-api';
 
@@ -37,8 +37,8 @@ export class ObsImporterService extends Service {
   @Inject('ScenesTransitionsService')
   transitionsService: ScenesTransitionsService;
 
-  @Inject('ConfigPersistenceService')
-  configPersistenceService: ConfigPersistenceService;
+  @Inject()
+  scenesCollectionsService: ScenesCollectionsService;
 
   @Inject()
   audioService: AudioService;
@@ -73,9 +73,9 @@ export class ObsImporterService extends Service {
     this.importMixerSources(configJSON);
     this.importTransitions(configJSON);
     if (this.scenesService.scenes.length === 0) {
-      this.configPersistenceService.setUpDefaults();
+      this.scenesCollectionsService.setUpDefaults();
     }
-    return this.configPersistenceService.rawSave(collection.name);
+    return this.scenesCollectionsService.rawSave(collection.name);
   }
 
   importFilters(filtersJSON :any, source :Source) {
