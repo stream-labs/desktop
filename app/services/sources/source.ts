@@ -1,5 +1,12 @@
 
-import { ISourceApi, TSourceType, ISource, SourcesService, TPropertiesManager } from './index';
+import {
+  ISourceApi,
+  TSourceType,
+  ISource,
+  SourcesService,
+  TPropertiesManager,
+  PROPERTIES_MANAGER_TYPES
+} from './index';
 import { mutation, ServiceHelper } from '../stateful-service';
 import { Inject } from '../../util/injector';
 import { ScenesService } from '../scenes';
@@ -79,6 +86,21 @@ export class Source implements ISourceApi {
 
   getPropertiesManagerUI(): string {
     return this.sourcesService.propertiesManagers[this.sourceId].manager.customUIComponent;
+  }
+
+  /**
+   * Replaces the current properties manager on a source
+   * @param type the type of the new properties manager
+   * @param settings the properties manager settings
+   */
+  replacePropertiesManager(type: TPropertiesManager, settings: Dictionary<any>) {
+    const oldManager = this.sourcesService.propertiesManagers[this.sourceId].manager;
+    oldManager.destroy();
+
+    const managerKlass = PROPERTIES_MANAGER_TYPES[type];
+    this.sourcesService.propertiesManagers[this.sourceId].manager =
+      new managerKlass(this.getObsInput(), settings);
+    this.sourcesService.propertiesManagers[this.sourceId].type = type;
   }
 
 

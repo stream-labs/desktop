@@ -19,7 +19,7 @@ const { ipcRenderer, remote } = electron;
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 
 if (remote.process.env.NODE_ENV === 'production') {
-  const bt = require('backtrace-node');
+  const bt = require('backtrace-js');
 
   bt.initialize({
     endpoint: 'https://streamlabs.sp.backtrace.io:6098',
@@ -29,8 +29,6 @@ if (remote.process.env.NODE_ENV === 'production') {
       processType: 'renderer'
     }
   });
-
-  window.onerror = (messageOrEvent, source, lineno, colno, error) => bt.report(error);
 }
 
 electron.crashReporter.start({

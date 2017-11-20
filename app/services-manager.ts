@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
-import { ScenesCollectionsService } from './services/scenes-collections';
+import { ScenesCollectionsService, OverlaysPersistenceService } from './services/scenes-collections';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
@@ -135,6 +135,7 @@ export class ServicesManager extends Service {
     FontLibraryService,
     ObsImporterService,
     ScenesCollectionsService,
+    OverlaysPersistenceService,
     AppService,
     ShortcutsService,
     CacheUploaderService,

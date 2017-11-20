@@ -18,8 +18,9 @@
       <extra-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
       <api-settings v-if="categoryName === 'API'" />
+      <overlay-settings v-if="categoryName === 'Overlays'" />
       <GenericFormGroups
-        v-if="!['Hotkeys', 'API'].includes(categoryName)"
+        v-if="!['Hotkeys', 'API', 'Overlays'].includes(categoryName)"
         v-model="settingsData"
         @input="save" />
     </div>

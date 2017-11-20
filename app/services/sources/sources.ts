@@ -29,7 +29,7 @@ const AudioFlag = obs.EOutputFlags.Audio;
 const VideoFlag = obs.EOutputFlags.Video;
 const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
 
-const PROPERTIES_MANAGER_TYPES = {
+export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   widget: WidgetManager,
   streamlabels: StreamlabelsManager
