@@ -1,6 +1,7 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
+
 useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
 
 
@@ -123,4 +124,4 @@ test('Scenes events', async t => {
 
 
 });
-//
+
