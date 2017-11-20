@@ -28,6 +28,7 @@ export class IpcServerService extends Service {
     this.servicesEventsSubscription = this.servicesManager.serviceEvent.subscribe(event => this.sendEvent(event));
   }
 
+
   stopListening() {
     ipcRenderer.removeListener('services-request', this.requestHandler);
     this.servicesEventsSubscription.unsubscribe();

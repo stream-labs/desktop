@@ -1,24 +1,18 @@
 import moment from 'moment';
 
-import { Inject } from '../util/injector';
-import { StatefulService, mutation } from './stateful-service';
-import { nodeObs } from './obs-api';
-import { SettingsService } from './settings';
+import { Inject } from '../../util/injector';
+import { StatefulService, mutation } from '../stateful-service';
+import { nodeObs } from '../obs-api';
+import { SettingsService } from '../settings';
 import { padStart } from 'lodash';
-import { track } from './usage-statistics';
-import { WindowsService } from './windows';
+import { track } from '../usage-statistics';
+import { WindowsService } from '../windows';
 import { Subject } from 'rxjs/Subject';
+import { IStreamingServiceApi, IStreamingServiceState } from './streaming-api';
 import electron from 'electron';
 
-interface IStreamingServiceState {
-  isStreaming: boolean;
-  streamStartTime: string;
-  isRecording: boolean;
-  recordStartTime: string;
-  streamOk: boolean;
-}
 
-export default class StreamingService extends StatefulService<IStreamingServiceState> {
+export class StreamingService extends StatefulService<IStreamingServiceState> implements IStreamingServiceApi {
 
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
@@ -84,6 +78,11 @@ export default class StreamingService extends StatefulService<IStreamingServiceS
       },
       10 * 1000
     );
+  }
+
+
+  getModel(): IStreamingServiceState {
+    return this.state;
   }
 
 

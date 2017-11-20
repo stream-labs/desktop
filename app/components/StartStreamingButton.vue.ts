@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import StreamingService from '../services/streaming';
+import { StreamingService } from '../services/streaming';
 import { Inject } from '../util/injector';
 import { NavigationService } from '../services/navigation';
 import { UserService } from '../services/user';
