@@ -64,8 +64,8 @@
   "dependencies": {
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
-    "backtrace-node": "^0.7.3",
     "backtrace-js": "^0.0.4",
+    "backtrace-node": "^0.7.3",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
@@ -73,7 +73,6 @@
     "obs-studio-node": "file:./obs-studio-node",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "unzip": "^0.1.11",
     "uuid": "^3.0.1",
     "vue-popperjs": "^1.2.2"
   },
@@ -123,6 +122,7 @@
     "tslint-loader": "^3.5.3",
     "typedoc": "^0.9.0",
     "typescript": "^2.4.2",
+    "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
     "vue-color": "^2.0.6",

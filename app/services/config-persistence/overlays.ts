@@ -14,7 +14,7 @@ import electron from 'electron';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import unzip from 'unzip';
+import unzip from 'unzip-stream';
 import archiver from 'archiver';
 
 const NODE_TYPES = {
