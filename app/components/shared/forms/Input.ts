@@ -6,7 +6,8 @@ import {
   isListProperty,
   isEditableListProperty,
   isNumberProperty,
-  isTextProperty
+  isTextProperty,
+  isFontProperty
 } from '../../../util/properties-type-guards';
 
 /**
@@ -370,6 +371,10 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
       });
     }
 
+    if (isFontProperty(obsProp)) {
+      (formItem as IFormInput<IFont>).value.path = obsSource.settings['custom_font'];
+    }
+
     formData.push(formItem);
   } while (obsProp = obsProp.next());
 
@@ -390,7 +395,15 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
   });
 
   const settings: Dictionary<any> = {};
-  formInputs.map(property => settings[property.name] = property.value);
+  formInputs.forEach(property => {
+    settings[property.name] = property.value;
+
+    if (property.type === 'OBS_PROPERTY_FONT') {
+      settings['custom_font'] = (property.value as IFont).path;
+      delete settings[property.name]['path'];
+    }
+  });
+
   obsSource.update(settings);
 
   buttons.forEach(buttonInput => {
