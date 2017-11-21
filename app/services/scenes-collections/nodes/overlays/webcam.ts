@@ -53,22 +53,29 @@ export class WebcamNode extends Node<ISchema, IContext> {
       resolution = this.performInitialSetup(context.sceneItem);
     }
 
-    // Figure out how far we have to scale it
-    const scale = targetHeight / resolution.height;
-
-    // Crop the width down to size
+    const currentAspect = resolution.width / resolution.height;
     const crop: ICrop = {
       top: 0,
       left: 0,
       right: 0,
       bottom: 0
     };
+    let scale: number;
 
-    if (resolution.width * scale > targetWidth) {
-      const delta = (resolution.width * scale - targetWidth) / scale;
+    if (currentAspect >= targetAspect) {
+      // Scale the height to match, and crop the remaining width
+      scale = targetHeight / resolution.height;
+      const deltaWidth = (resolution.width * scale - targetWidth) / scale;
 
-      crop.left = delta / 2;
-      crop.right = delta / 2;
+      crop.left = Math.floor(deltaWidth / 2);
+      crop.right = Math.floor(deltaWidth / 2);
+    } else {
+      // Scale the width to match, and crop the remaining height
+      scale = targetWidth / resolution.width;
+      const deltaHeight = (resolution.height * scale - targetHeight) / scale;
+
+      crop.top = Math.floor(deltaHeight / 2);
+      crop.bottom = Math.floor(deltaHeight / 2);
     }
 
     this.applyScaleAndCrop(context.sceneItem, scale, crop);
