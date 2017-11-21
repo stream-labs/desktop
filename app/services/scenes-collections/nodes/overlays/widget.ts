@@ -34,5 +34,6 @@ export class WidgetNode extends Node<ISchema, IContext> {
     context.sceneItem.source.replacePropertiesManager('widget', {
       widgetType: this.data.type
     });
+    context.sceneItem.getObsInput().update(this.data.settings);
   }
 }
