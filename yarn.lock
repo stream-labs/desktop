@@ -77,6 +77,12 @@
     ansi-styles "^2.2.1"
     esutils "^2.0.2"
 
+"@types/archiver@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/archiver/-/archiver-2.0.1.tgz#223044ac1e924d07b679b727a145755f858c413b"
+  dependencies:
+    "@types/glob" "*"
+
 "@types/fs-extra@4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-4.0.0.tgz#1dd742ad5c9bce308f7a52d02ebc01421bc9102f"
@@ -125,6 +131,10 @@
 "@types/node@^7.0.18":
   version "7.0.18"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.18.tgz#cd67f27d3dc0cfb746f0bdd5e086c4c5d55be173"
+
+"@types/node@^8.0.0":
+  version "8.0.53"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.53.tgz#396b35af826fa66aad472c8cb7b8d5e277f4e6d8"
 
 "@types/shelljs@0.7.0":
   version "0.7.0"
@@ -1254,6 +1264,10 @@ babylon@^6.11.0:
 backo2@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/backo2/-/backo2-1.0.2.tgz#31ab1ac8b129363463e35b3ebb69f4dfcfba7947"
+
+backtrace-js@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/backtrace-js/-/backtrace-js-0.0.4.tgz#01c68e2d5c57635eda92afc634b6ec18c5416d16"
 
 backtrace-node@^0.7.3:
   version "0.7.3"
@@ -2541,9 +2555,9 @@ electron-chromedriver@~1.7.1:
     electron-download "^4.1.0"
     extract-zip "^1.6.5"
 
-electron-devtools-installer@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/electron-devtools-installer/-/electron-devtools-installer-2.1.0.tgz#fee3b23e491aa10dfc77192c58cf5596cc2ba53e"
+electron-devtools-installer@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/electron-devtools-installer/-/electron-devtools-installer-2.2.1.tgz#0beb73ccbf65cbc4d09e706cebda638f839b8c55"
   dependencies:
     "7zip" "0.0.6"
     cross-unzip "0.0.2"
@@ -7107,6 +7121,13 @@ universalify@^0.1.0:
 unzip-response@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/unzip-response/-/unzip-response-2.0.1.tgz#d2f0f737d16b0615e72a6935ed04214572d56f97"
+
+unzip-stream@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/unzip-stream/-/unzip-stream-0.2.1.tgz#2a52fde6e57788dfb1297aab38c70ec548dfae91"
+  dependencies:
+    binary "^0.3.0"
+    mkdirp "^0.5.1"
 
 unzip@^0.1.11:
   version "0.1.11"

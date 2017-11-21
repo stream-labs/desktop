@@ -96,6 +96,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
 
+
   stopListening() {
     this.servers.forEach(server => server.close());
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
@@ -309,6 +310,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);
           this.sendResponse(client,{
             jsonrpc: '2.0',
+            id: request.id,
             result: subscriptionInd !== -1
           });
           return;
@@ -356,7 +358,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
     this.log('send response', response);
-    client.socket.write(JSON.stringify(response));
+    client.socket.write(JSON.stringify(response) + '\n');
   }
 
   private disconnectClient(clientId: number) {

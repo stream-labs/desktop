@@ -15,7 +15,7 @@ import { NavigationService } from '../../services/navigation';
 import { AppService } from '../../services/app';
 import { UserService } from '../../services/user';
 import electron from 'electron';
-import StreamingService from '../../services/streaming';
+import { StreamingService } from '../../services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 

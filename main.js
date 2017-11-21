@@ -186,7 +186,26 @@ function startApp() {
   // until main window asynchronous response
   const requests = { };
 
+  function sendRequest(request, event = null) {
+    mainWindow.webContents.send('services-request', request);
+    if (!event) return;
+    requests[request.id] = Object.assign({}, request, { event });
+  }
+
+  // use this function to call some service method from the main process
+  function callService(resource, method, ...args) {
+    sendRequest({
+      jsonrpc: '2.0',
+      method,
+      params: {
+        resource,
+        args
+      }
+    });
+  }
+
   ipcMain.on('services-ready', () => {
+    callService('AppService', 'setArgv', process.argv);
     childWindow.loadURL(indexUrl + '?child=true');
   });
 
@@ -195,12 +214,11 @@ function startApp() {
   });
 
   ipcMain.on('services-request', (event, payload) => {
-    const request = payload;
-    mainWindow.webContents.send('services-request', request);
-    requests[request.id] = Object.assign({}, request, { event });
+    sendRequest(payload, event);
   });
 
   ipcMain.on('services-response', (event, response) => {
+    if (!requests[response.id]) return;
     requests[response.id].event.returnValue = response;
     delete requests[response.id];
   });
@@ -212,8 +230,14 @@ function startApp() {
 
   if (isDevMode) {
     require('devtron').install();
-    const devtoolsInstaller = require('electron-devtools-installer');
-    devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+
+    // Vue dev tools appears to cause strange non-deterministic
+    // interference with certain NodeJS APIs, expecially asynchronous
+    // IO from the renderer process.  Enable at your own risk.
+
+    // const devtoolsInstaller = require('electron-devtools-installer');
+    // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+
     openDevTools();
   }
 

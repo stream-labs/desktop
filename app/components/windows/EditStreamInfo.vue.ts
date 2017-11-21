@@ -11,7 +11,7 @@ import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { debounce } from 'lodash';
 import { getPlatformService } from '../../services/platforms';
-import StreamingService from '../../services/streaming';
+import { StreamingService } from '../../services/streaming';
 import { WindowsService } from '../../services/windows';
 import { NavigationService } from '../../services/navigation';
 import { CustomizationService } from '../../services/customization';

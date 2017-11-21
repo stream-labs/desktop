@@ -5,7 +5,7 @@ import Selector from './Selector.vue';
 import { ScenesService } from '../services/scenes';
 import { Menu } from '../util/menus/Menu';
 import { ScenesTransitionsService } from '../services/scenes-transitions';
-import { ConfigPersistenceService } from '../services/config-persistence/config';
+import { ScenesCollectionsService } from '../services/scenes-collections/config';
 import { AppService } from '../services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 
@@ -18,7 +18,7 @@ export default class SceneSelector extends Vue {
   scenesService: ScenesService;
 
   @Inject()
-  configPersistenceService: ConfigPersistenceService;
+  scenesCollectionsService: ScenesCollectionsService;
 
   @Inject()
   appService: AppService;
@@ -73,11 +73,11 @@ export default class SceneSelector extends Vue {
   }
 
   get scenesCollections() {
-    return this.configPersistenceService.state.scenesCollections;
+    return this.scenesCollectionsService.state.scenesCollections;
   }
 
   get activeConfig() {
-    return this.configPersistenceService.state.activeCollection;
+    return this.scenesCollectionsService.state.activeCollection;
   }
 
   get activeSceneId() {
@@ -89,24 +89,24 @@ export default class SceneSelector extends Vue {
   }
 
   addCollection() {
-    this.configPersistenceService.showNameConfig();
+    this.scenesCollectionsService.showNameConfig();
   }
 
 
   duplicateCollection() {
-    this.configPersistenceService.showNameConfig({
+    this.scenesCollectionsService.showNameConfig({
       scenesCollectionToDuplicate: this.activeConfig
     });
   }
 
 
   renameCollection() {
-    this.configPersistenceService.showNameConfig({ rename: true });
+    this.scenesCollectionsService.showNameConfig({ rename: true });
   }
 
 
   removeCollection() {
     if (!confirm(`remove ${this.activeConfig} ?`)) return;
-    this.appService.removeConfig();
+    this.appService.removeCurrentConfig();
   }
 }

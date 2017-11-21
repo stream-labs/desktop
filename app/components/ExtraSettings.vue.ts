@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import electron from 'electron';
 import { Component } from 'vue-property-decorator';
-import { OverlaysPersistenceService } from '../services/config-persistence';
+import { OverlaysPersistenceService } from '../services/scenes-collections';
 import { CacheUploaderService } from '../services/cache-uploader';
 import { Inject } from '../util/injector';
 import BoolInput from './shared/forms/BoolInput.vue';
@@ -20,8 +20,6 @@ export default class ExtraSettings extends Vue {
   cacheUploaderService: CacheUploaderService;
 
   @Inject() customizationService: CustomizationService;
-
-  overlaySaving = false;
 
   cacheUploading = false;
 
@@ -66,20 +64,6 @@ export default class ExtraSettings extends Vue {
       electron.remote.clipboard.writeText(file);
       alert(`Your cache directory has been successfully uploaded.  The file name ${file} has been copied to your clipboard.  Please paste it into discord and tag a developer.`);
       this.cacheUploading = false;
-    });
-  }
-
-  exportOverlay() {
-    const path = electron.remote.dialog.showSaveDialog({
-      filters: [{ name: 'Overlay File', extensions: ['overlay'] }]
-    });
-
-    if (!path) return;
-
-    this.overlaySaving = true;
-
-    this.overlaysService.saveOverlay(path).then(() => {
-      this.overlaySaving = false;
     });
   }
 

@@ -1,7 +1,7 @@
 import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
-import { ConfigPersistenceService } from './services/config-persistence';
+import { ScenesCollectionsService, OverlaysPersistenceService } from './services/scenes-collections';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
@@ -34,8 +34,8 @@ import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
+import { StreamingService } from  './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
-import StreamingService from  './services/streaming';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -134,15 +134,16 @@ export class ServicesManager extends Service {
     WindowsService,
     FontLibraryService,
     ObsImporterService,
-    ConfigPersistenceService,
+    ScenesCollectionsService,
+    OverlaysPersistenceService,
     AppService,
     ShortcutsService,
     CacheUploaderService,
     UsageStatisticsService,
-    StreamInfoService,
-    StreamlabelsService,
     IpcServerService,
-    TcpServerService
+    TcpServerService,
+    StreamInfoService,
+    StreamlabelsService
   };
 
   private instances: Dictionary<Service> = {};
@@ -280,9 +281,17 @@ export class ServicesManager extends Service {
 
     const resource = this.getResource(resourceId);
     if (!resource) {
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.INVALID_PARAMS, id: request.id });
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.INVALID_PARAMS,
+        id: request.id,
+        message: 'resource not found'
+      });
     } else if (!resource[methodName]) {
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND, id: request.id });
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
+        id: request.id,
+        message: methodName
+      });
     }
 
     if (response) {
@@ -356,7 +365,7 @@ export class ServicesManager extends Service {
         if (item && item.isHelper) {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
-            _type: 'RESOURCE',
+            _type: 'HELPER',
             resourceId: helper.resourceId,
             ...(!compactMode ? this.getHelperModel(helper) : {})
           };
@@ -478,7 +487,7 @@ export class ServicesManager extends Service {
             // payload can contain helpers-objects
             // we have to wrap them in IpcProxy too
             traverse(result).forEach((item: any) => {
-              if (item && item._type === 'RESOURCE') {
+              if (item && item._type === 'HELPER') {
                 const helper = this.getResource(item.resourceId);
                 return this.applyIpcProxy(helper);
               }
