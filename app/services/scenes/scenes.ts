@@ -84,7 +84,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const id = options.sceneId || ('scene_' + ipcRenderer.sendSync('getUniqueId'));
     this.ADD_SCENE(id, name);
     const obsScene = obs.SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, id);
+    this.sourcesService.addSource(obsScene.source, name);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
