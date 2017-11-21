@@ -109,7 +109,7 @@ export class SourcesNode extends Node<ISchema, {}> {
     // This shit is complicated, IPC sucks
     const sourceCreateData = this.data.items.map(source => {
       return {
-        name: source.name,
+        name: source.id,
         type: source.type,
         muted: source.muted || false,
         settings: source.settings,
@@ -134,7 +134,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
       this.sourcesService.addSource(
         source,
-        this.data.items[index].id,
+        this.data.items[index].name,
         {
           channel: sourceInfo.channel,
           propertiesManager: sourceInfo.propertiesManager,

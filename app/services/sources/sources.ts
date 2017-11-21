@@ -62,7 +62,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     ipcRenderer.on('notifySourceAttributes', (e: Electron.Event, data: obs.ISourceSize[]) => {
       data.forEach(update => {
-        const source = this.getSourceByName(update.name);
+        const source = this.getSource(update.name);
 
         if (!source) return;
 
@@ -131,25 +131,28 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string = options.sourceId || ipcRenderer.sendSync('getUniqueId');
+    const id: string =
+      options.sourceId ||
+      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
 
     if ((type === 'browser_source') && (settings.shutdown === void 0)) {
       settings.shutdown = true;
     }
 
-    const obsInput = obs.InputFactory.create(type, name, settings);
+    const obsInput = obs.InputFactory.create(type, id, settings);
 
-    this.addSource(obsInput, id, options);
+    this.addSource(obsInput, name, options);
 
     return this.getSource(id);
   }
 
-  addSource(obsInput: obs.IInput, id: string, options: ISourceCreateOptions = {}) {
+  addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }
+    const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, obsInput.name, type, options.channel);
+    this.ADD_SOURCE(id, name, type, options.channel);
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
@@ -250,7 +253,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const sourcesNames: string[] = [];
 
       activeItems.forEach(activeItem => {
-        sourcesNames.push(activeItem.name);
+        sourcesNames.push(activeItem.sourceId);
       });
       ipcRenderer.send('requestSourceAttributes', sourcesNames);
     }
