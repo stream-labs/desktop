@@ -95,6 +95,9 @@ export class SceneItem implements ISceneItemApi {
     return this.getScene().getObsScene().findItem(this.obsSceneItemId);
   }
 
+  remove() {
+    this.scenesService.getScene(this.sceneId).removeItem(this.sceneItemId);
+  }
 
   setPosition(vec: IVec2) {
     this.getObsSceneItem().position = { x: vec.x, y: vec.y };

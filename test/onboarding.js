@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron';
 import { selectSource, clickSourceProperties } from './helpers/spectron/sources';
 
-useSpectron(false);
+useSpectron({ skipOnboarding: false });
 
 test('Adding some starter widgets', async t => {
   const app = t.context.app;
