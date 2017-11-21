@@ -6,7 +6,7 @@ useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
 
 
 
-test('Default scene exist', async t => {
+test('The default scene exists', async t => {
   const client = await getClient();
   const scenes = await client.request('ScenesService', 'getScenes');
 
