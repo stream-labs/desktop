@@ -141,7 +141,7 @@ export class Source implements ISourceApi {
   }
 
   hasProps(): boolean {
-    return !!this.getObsInput().properties;
+    return this.getObsInput().configurable;
   }
 
 
