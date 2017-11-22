@@ -43,7 +43,7 @@ export class Scene implements ISceneApi {
   }
 
   getObsScene(): obs.IScene {
-    return obs.SceneFactory.fromName(this.name);
+    return obs.SceneFactory.fromName(this.id);
   }
 
 
@@ -158,7 +158,7 @@ export class Scene implements ISceneApi {
       const source = this.sourcesService.getSource(item.sourceId);
       if (source) {
         arrayItems.push({
-          name: source.name,
+          name: source.sourceId,
           id: item.id,
           sourceId: source.sourceId,
           crop: item.crop,

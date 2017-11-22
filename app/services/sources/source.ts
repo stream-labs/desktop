@@ -57,7 +57,7 @@ export class Source implements ISourceApi {
 
 
   getObsInput(): obs.IInput {
-    return obs.InputFactory.fromName(this.name);
+    return obs.InputFactory.fromName(this.sourceId);
   }
 
   getModel() {
