@@ -151,6 +151,7 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
 
   // Ends the onboarding process
   finish() {
+    localStorage.setItem(this.localStorageKey, 'true');
     this.navigationService.navigate('Studio');
   }
 
@@ -180,7 +181,6 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
   startOnboardingIfRequired() {
     if (localStorage.getItem(this.localStorageKey)) return false;
 
-    localStorage.setItem(this.localStorageKey, 'true');
     this.start();
     return true;
   }
