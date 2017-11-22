@@ -34,9 +34,7 @@ export class WidgetManager extends PropertiesManager {
 
   setWidgetType(type: WidgetType) {
     this.obsSource.update({
-      url: this.widgetsService.getWidgetUrl(type),
-      width: WidgetDefinitions[type].width,
-      height: WidgetDefinitions[type].height
+      url: this.widgetsService.getWidgetUrl(type)
     });
   }
 

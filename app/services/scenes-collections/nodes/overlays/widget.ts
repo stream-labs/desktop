@@ -34,5 +34,9 @@ export class WidgetNode extends Node<ISchema, IContext> {
     context.sceneItem.source.replacePropertiesManager('widget', {
       widgetType: this.data.type
     });
+
+    // Make sure we don't override the url setting
+    delete this.data.settings['url'];
+    context.sceneItem.getSource().updateSettings(this.data.settings);
   }
 }
