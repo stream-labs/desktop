@@ -37,6 +37,6 @@ export class WidgetNode extends Node<ISchema, IContext> {
 
     // Make sure we don't override the url setting
     delete this.data.settings['url'];
-    context.sceneItem.getObsInput().update(this.data.settings);
+    context.sceneItem.getSource().updateSettings(this.data.settings);
   }
 }
