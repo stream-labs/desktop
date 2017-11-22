@@ -15,7 +15,6 @@ process.env.SLOBS_VERSION = pjson.version;
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
 const fs = require('fs');
-const path = require('path');
 const _ = require('lodash');
 const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
@@ -369,15 +368,6 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
       if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
   }
-});
-
-
-// Handle service initialization
-const servicesInitialized = new Set();
-
-ipcMain.on('services-shouldInit', (event, service) => {
-  event.returnValue = !servicesInitialized.has(service);
-  servicesInitialized.add(service);
 });
 
 
