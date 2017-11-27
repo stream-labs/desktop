@@ -6,6 +6,12 @@ Electron client for the Streamlabs OBS streaming software.
 
 This application currently only supports 64-bit Windows.
 
+## Issues
+
+Please submit all issues here:
+
+https://tracker.streamlabs.com
+
 ## Dependencies
 
 ### Node.js
