@@ -107,8 +107,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 
 
-  fetchAudioSource(sourceName: string): IAudioSource {
-    const source = this.sourcesService.getSourceByName(sourceName);
+  fetchAudioSource(sourceId: string): IAudioSource {
+    const source = this.sourcesService.getSource(sourceId);
     const obsSource = source.getObsInput();
     const obsFader = this.obsFaders[source.sourceId];
 
@@ -178,7 +178,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     obsFader.attach(source.getObsInput());
     this.obsFaders[source.sourceId] = obsFader;
 
-    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.name));
+    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.sourceId));
   }
 
   private removeAudioSource(sourceId: string) {
@@ -328,14 +328,14 @@ export class AudioSource implements IAudioSourceApi {
   setDeflection(deflection: number) {
     const fader = this.audioService.obsFaders[this.sourceId];
     fader.deflection = deflection;
-    this.UPDATE(this.audioService.fetchAudioSource(this.name));
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
 
   setMul(mul: number) {
     const fader = this.audioService.obsFaders[this.sourceId];
     fader.mul = mul;
-    this.UPDATE(this.audioService.fetchAudioSource(this.name));
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
 

@@ -141,8 +141,7 @@ export class EditMenu extends Menu {
   }
 
   private showFilters() {
-    // TODO: This should take an id
-    this.sourceFiltersService.showSourceFilters(this.source.name);
+    this.sourceFiltersService.showSourceFilters(this.source.sourceId);
   }
 
 

@@ -180,7 +180,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   suggestName(name: string): string {
-    return namingHelpers.suggestName(name, (name: string) => this.getSourceByName(name));
+    return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
   }
 
   private onSceneItemRemovedHandler(sceneItemState: ISceneItem) {
@@ -290,11 +290,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  getSourceByName(name: string): Source {
-    const sourceModel = Object.values(this.state.sources).find(source => {
+  getSourcesByName(name: string): Source[] {
+    const sourceModels = Object.values(this.state.sources).filter(source => {
       return source.name === name;
     });
-    return sourceModel ? this.getSource(sourceModel.sourceId) : void 0;
+    return sourceModels.map(sourceModel => this.getSource(sourceModel.sourceId));
   }
 
 
@@ -360,10 +360,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showRenameSource(sourceName: string) {
+  showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
-      queryParams: { rename: sourceName },
+      queryParams: { rename: sourceId },
       size: {
         width: 400,
         height: 250

@@ -333,8 +333,8 @@ export class WidgetsService extends Service {
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
-    const suggestedName = namingHelpers.suggestName(name || widget.name, (name: string) => {
-      return this.sourcesService.getSourceByName(name);
+    const suggestedName = name || namingHelpers.suggestName(name || widget.name, (name: string) => {
+      return this.sourcesService.getSourcesByName(name).length;
     });
 
     const source = this.sourcesService.createSource(suggestedName, 'browser_source', {

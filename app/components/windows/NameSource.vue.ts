@@ -48,10 +48,10 @@ export default class NameSource extends Vue {
   }
 
   submit() {
-    if (this.isTaken(this.name)) {
-      this.error = 'That name is already taken';
+    if (!this.name) {
+      this.error = 'The source name is required';
     } else if (this.options.rename) {
-      this.sourcesService.getSourceByName(this.options.rename).setName(this.name);
+      this.sourcesService.getSource(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
       let sourceId: string;
@@ -77,10 +77,6 @@ export default class NameSource extends Vue {
 
       this.sourcesService.showSourceProperties(sourceId);
     }
-  }
-
-  isTaken(name: string) {
-    return this.sourcesService.getSourceByName(name);
   }
 
   get sourceType(): TSourceType {

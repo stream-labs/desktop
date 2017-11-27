@@ -43,7 +43,7 @@ export interface ISourcesServiceApi {
   getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
-  getSourceByName(name: string): ISourceApi;
+  getSourcesByName(name: string): ISourceApi[];
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;
