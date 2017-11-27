@@ -88,7 +88,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
     const targetHeight = this.data.height * this.videoService.baseHeight;
     const targetAspect = targetWidth / targetHeight;
     const input = item.getObsInput();
-    const deviceProperties = input.properties();
+    const deviceProperties = input.properties;
 
     // Select the first video device
     // TODO: Maybe do some string matching to figure out which
