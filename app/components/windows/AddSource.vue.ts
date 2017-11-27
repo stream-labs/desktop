@@ -64,8 +64,8 @@ export default class AddSource extends Vue {
 
 
   addNew() {
-    if (this.isTaken(this.name)) {
-      this.error = 'That name is already taken';
+    if (!this.name) {
+      this.error = 'The source name is required';
     } else {
       const source = this.sourcesService.createSource(
         this.name,
@@ -82,9 +82,7 @@ export default class AddSource extends Vue {
     }
   }
 
-  isTaken(name: string) {
-    return this.sourcesService.getSourceByName(name);
-  }
+
 
   get selectedSource() {
     return this.sourcesService.getSource(this.selectedSourceId);

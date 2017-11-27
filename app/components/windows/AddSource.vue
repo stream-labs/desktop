@@ -45,7 +45,7 @@
         </selector>
       </div>
       <div class="small-6 columns">
-        <SourcePreview :sourceName="selectedSource.name"/>
+        <SourcePreview :sourceId="selectedSource.id"/>
       </div>
     </div>
 
