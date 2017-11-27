@@ -12,14 +12,7 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
-const fs = require('fs');
-const _ = require('lodash');
-const obs = require(inAsar ? '../../node-obs' : './node-obs');
-const { Updater } = require('./updater/Updater.js');
-const uuid = require('uuid/v4');
-const rimraf = require('rimraf');
 const bt = require('backtrace-node');
 
 function handleFinishedReport() {
@@ -64,6 +57,14 @@ crashReporter.start({
     processType: 'main'
   }
 });
+
+const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
+const fs = require('fs');
+const _ = require('lodash');
+const obs = require(inAsar ? '../../node-obs' : './node-obs');
+const { Updater } = require('./updater/Updater.js');
+const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
