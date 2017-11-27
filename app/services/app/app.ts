@@ -201,17 +201,19 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
 
   @track('app_close')
-  private shutdownHandler() {
+  private async shutdownHandler() {
     this.disableAutosave();
 
     this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
-    this.scenesCollectionsService.rawSave().then(() => {
-      this.reset();
-      this.videoService.destroyAllDisplays();
-      this.scenesTransitionsService.release();
-      electron.ipcRenderer.send('shutdownComplete');
-    });
+    if (this.scenesCollectionsService.state.activeCollection) {
+      await this.scenesCollectionsService.rawSave();
+    }
+
+    this.reset();
+    this.videoService.destroyAllDisplays();
+    this.scenesTransitionsService.release();
+    electron.ipcRenderer.send('shutdownComplete');
   }
 
 
