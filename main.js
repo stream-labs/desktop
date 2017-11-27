@@ -61,7 +61,6 @@ crashReporter.start({
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const fs = require('fs');
 const _ = require('lodash');
-const obs = require(inAsar ? '../../node-obs' : './node-obs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
@@ -101,6 +100,17 @@ const indexUrl = 'file://' + __dirname + '/index.html';
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
+}
+
+// Lazy require OBS
+let _obs;
+
+function getObs() {
+  if (!_obs) {
+    _obs = require(inAsar ? '../../node-obs' : './node-obs');
+  }
+
+  return _obs;
 }
 
 
@@ -157,7 +167,7 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    obs.OBS_API_destroyOBS_API();
+    getObs().OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -242,7 +252,7 @@ function startApp() {
   }
 
   // Initialize various OBS services
-  obs.OBS_API_initAPI(app.getPath('userData'));
+  getObs().OBS_API_initAPI(app.getPath('userData'));
 }
 
 // This ensures that only one copy of our app can run at once.
@@ -424,7 +434,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
   if (nodeObsVirtualMethods[data.method]) {
     retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
   } else {
-    retVal = obs[data.method].apply(obs, mappedArgs);
+    retVal = getObs()[data.method](...mappedArgs);
   }
 
   if (shouldLog) log('OBS RETURN VALUE', retVal);
