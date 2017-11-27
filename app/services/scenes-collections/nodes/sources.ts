@@ -27,6 +27,7 @@ interface ISourceInfo {
 
   volume: number;
   forceMono?: boolean;
+  syncOffset?: obs.ITimeSpec;
   audioMixers?: number;
   monitoringType?: obs.EMonitoringType;
 
@@ -88,6 +89,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           if (audioSource) data = {
             ...data,
             forceMono: audioSource.forceMono,
+            syncOffset: AudioService.msToTimeSpec(audioSource.syncOffset),
             audioMixers: audioSource.audioMixers,
             monitoringType: audioSource.monitoringType,
           };
@@ -145,6 +147,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
           forceMono: sourceInfo.forceMono,
+          syncOffset: sourceInfo.syncOffset ? AudioService.timeSpecToMs(sourceInfo.syncOffset) : 0,
           audioMixers: sourceInfo.audioMixers,
           monitoringType: sourceInfo.monitoringType
         });
