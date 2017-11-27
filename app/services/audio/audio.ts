@@ -135,7 +135,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
     const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
 
-    (obsAudioInput.properties().get('device_id') as obs.IListProperty).details.items
+    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
         devices.push({
           id: item.value,
@@ -144,7 +144,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
         });
       });
 
-    (obsAudioOutput.properties().get('device_id') as obs.IListProperty).details.items
+    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items
       .forEach((item: { name: string, value: string}) => {
         devices.push({
           id: item.value,
