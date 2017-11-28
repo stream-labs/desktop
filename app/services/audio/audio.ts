@@ -318,6 +318,8 @@ export class AudioSource implements IAudioSourceApi {
             obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono :
             obsInput.flags -= obs.ESourceFlags.ForceMono;
         }
+      } else if (name === 'muted') {
+        this.setMuted(value);
       } else {
         obsInput[name] = value;
       }

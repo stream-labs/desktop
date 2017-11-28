@@ -15,17 +15,20 @@ export class ApiClient {
     this.rejectConnection = null;
     this.requests = {};
     this.subscriptions = {};
+    this.connectionStatus = 'disconnected'; // disconnected|pending|connected
 
     // set to 'true' for debugging
     this.logsEnabled = false;
 
     this.socket.on('connect', () => {
       this.log('connected');
+      this.connectionStatus = 'connected';
       this.resolveConnection();
     });
 
     this.socket.on('error', (error) => {
       this.log('error', error);
+      this.connectionStatus = 'disconnected';
       this.rejectConnection();
     });
 
@@ -35,12 +38,14 @@ export class ApiClient {
     });
 
     this.socket.on('close', () => {
+      this.connectionStatus = 'disconnected';
       this.log('Connection closed');
     });
   }
 
   connect() {
-
+    this.log('connecting...');
+    this.connectionStatus = 'pending';
     return new Promise((resolve, reject) => {
       this.resolveConnection = resolve;
       this.rejectConnection = reject;
@@ -54,7 +59,12 @@ export class ApiClient {
   }
 
 
-  request(resourceId, methodName, ...args) {
+  async request(resourceId, methodName, ...args) {
+
+    if (this.connectionStatus === 'disconnected') {
+      await this.connect();
+    }
+
     const id = this.nextRequestId++;
     const requestBody = {
       jsonrpc: '2.0',
