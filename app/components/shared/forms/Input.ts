@@ -63,12 +63,14 @@ export interface IListOption<TValue> {
 }
 
 export interface IPathInputValue extends IFormInput<string> {
+  defaultPath: string;
   filters: IElectronOpenDialogFilter[];
 }
 
 export interface INumberInputValue extends IFormInput<number> {
-  minVal?: number;
-  maxVal?: number;
+  minVal: number;
+  maxVal: number;
+  stepVal: number;
 }
 
 export interface ISliderInputValue extends IFormInput<number> {
@@ -92,6 +94,10 @@ export interface IFont {
   path?: string;
 }
 
+export interface IFontInputValue extends IFormInput<IFont> {
+
+}
+
 export interface IGoogleFont {
   path?: string;
   size?: string;
@@ -100,8 +106,8 @@ export interface IGoogleFont {
 export type TObsStringList = { value: string }[];
 
 export interface IEditableListInputValue extends IFormInput<TObsStringList> {
-  defaultPath?: string;
-  filters?: IElectronOpenDialogFilter[];
+  defaultPath: string;
+  filters: IElectronOpenDialogFilter[];
 }
 
 export interface IElectronOpenDialogFilter {
@@ -350,37 +356,41 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
 
     if (isNumberProperty(obsProp)) {
       if (obsProp.details.type === obs.ENumberType.Slider) {
-        Object.assign(formItem as ISliderInputValue, {
+        (formItem as INumberInputValue) = {
+          ...formItem as INumberInputValue,
           minVal: obsProp.details.min,
           maxVal: obsProp.details.max,
           stepVal: obsProp.details.step,
           type: 'OBS_PROPERTY_SLIDER'
-        });
+        };
       }
     }
 
     if (isEditableListProperty(obsProp)) {
-      Object.assign(formItem as IEditableListInputValue, {
+      (formItem as IEditableListInputValue) = {
+        ...formItem as IEditableListInputValue,
         filters: parsePathFilters(obsProp.details.filter),
         defaultPath: obsProp.details.defaultPath
-      });
+      };
     }
 
     if (isPathProperty(obsProp)) {
-      Object.assign(formItem as IPathInputValue, {
+      (formItem as IPathInputValue) = {
+        ...formItem as IPathInputValue,
         filters: parsePathFilters(obsProp.details.filter),
         defaultPath: obsProp.details.defaultPath
-      });
+      };
     }
 
     if (isTextProperty(obsProp)) {
-      Object.assign(formItem as ITextInputValue, {
+      (formItem as ITextInputValue) = {
+        ...formItem as ITextInputValue,
         multiline: obsProp.details.type === obs.ETextType.Multiline
-      });
+      };
     }
 
     if (isFontProperty(obsProp)) {
-      (formItem as IFormInput<IFont>).value.path = obsSource.settings['custom_font'];
+      (formItem as IFontInputValue).value.path = obsSource.settings['custom_font'];
     }
 
     formData.push(formItem);
