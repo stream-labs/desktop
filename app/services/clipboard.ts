@@ -1,4 +1,3 @@
-import { clipboard } from 'electron';
 import { mutation, StatefulService } from './stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
