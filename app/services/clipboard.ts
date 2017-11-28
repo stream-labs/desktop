@@ -1,3 +1,4 @@
+import { clipboard } from 'electron';
 import { mutation, StatefulService } from './stateful-service';
 import { ScenesService } from './scenes';
 import { SourcesService } from './sources';
@@ -19,14 +20,13 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   };
 
   @Inject()
-  scenesService: ScenesService;
+  private scenesService: ScenesService;
 
   @Inject()
-  sourcesService: SourcesService;
+  private sourcesService: SourcesService;
 
   @Inject()
-  sourceFiltersService: SourceFiltersService;
-
+  private sourceFiltersService: SourceFiltersService;
 
   @shortcut('Ctrl+C')
   copy() {
