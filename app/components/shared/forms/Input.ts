@@ -7,7 +7,8 @@ import {
   isEditableListProperty,
   isNumberProperty,
   isTextProperty,
-  isFontProperty
+  isFontProperty,
+  isPathProperty
 } from '../../../util/properties-type-guards';
 
 /**
@@ -360,6 +361,13 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
 
     if (isEditableListProperty(obsProp)) {
       Object.assign(formItem as IEditableListInputValue, {
+        filters: parsePathFilters(obsProp.details.filter),
+        defaultPath: obsProp.details.defaultPath
+      });
+    }
+
+    if (isPathProperty(obsProp)) {
+      Object.assign(formItem as IPathInputValue, {
         filters: parsePathFilters(obsProp.details.filter),
         defaultPath: obsProp.details.defaultPath
       });
