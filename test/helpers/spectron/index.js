@@ -39,10 +39,11 @@ export function useSpectron(options) {
   options = Object.assign({}, DEFAULT_OPTIONS, options);
   let appIsRunning = false;
   let context = null;
+  let app;
 
   async function startApp(t) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
-    t.context.app = new Application({
+    app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: ['--require', path.join(__dirname, 'context-menu-injected.js'), '.'],
       env: {
@@ -83,6 +84,7 @@ export function useSpectron(options) {
   }
 
   test.beforeEach(async t => {
+    t.context.app = app;
     if (options.restartAppAfterEachTest || !appIsRunning) await startApp(t);
   });
 
