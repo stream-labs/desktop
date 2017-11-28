@@ -1,0 +1,14 @@
+{
+  "name": "streamlabs-obs-release",
+  "description": "Streamlabs streaming software release script",
+  "author": "General Workings, Inc.",
+  "license": "GPL-3.0",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "inquirer": "^4.0.0",
+    "semver": "^5.4.1",
+    "shelljs": "^0.7.8"
+  }
+}

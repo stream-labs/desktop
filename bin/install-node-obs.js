@@ -32,13 +32,13 @@ continuePromise.then(() => {
 
   archive.on('finish', () => {
     childProcess.exec(`"${zipExe}" x "${archivePath}" -o"${slobsDir}"`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Extraction error: ${error}`);
-          return;
-        }
+      if (error) {
+        console.error(`Extraction error: ${error}`);
+        return;
+      }
 
-        console.log(stdout);
-        console.log(stderr);
+      console.log(stdout);
+      console.log(stderr);
     });
   });
 

@@ -95,9 +95,9 @@ function uploadFile(name, path) {
 uploadFile(installerFileName, installerFilePath).then(data => {
   info(`Finished uploading ${installerFileName}`);
 
-  uploadFile(channelFileName, channelFilePath).then(data => {
-    info(`Finished uploading ${channelFileName}`);
-    info(`Deploy completed successully`);
-    process.exit();
-  });
+  return uploadFile(channelFileName, channelFilePath);
+}).then(data => {
+  info(`Finished uploading ${channelFileName}`);
+  info(`Deploy completed successully`);
+  process.exit();
 });

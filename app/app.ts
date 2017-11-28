@@ -13,22 +13,20 @@ import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
+import Raven from 'raven-js';
+import RavenVue from 'raven-js/plugins/vue';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 
 if (remote.process.env.NODE_ENV === 'production') {
-  const bt = require('backtrace-js');
-
-  bt.initialize({
-    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    attributes: {
-      version: slobsVersion,
-      processType: 'renderer'
-    }
-  });
+  Raven
+    .config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+      release: slobsVersion
+    })
+    .addPlugin(RavenVue, Vue)
+    .install();
 }
 
 electron.crashReporter.start({
