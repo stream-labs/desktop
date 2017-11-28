@@ -8,6 +8,17 @@ const semver = require('semver');
 const colors = require('colors/safe');
 const fs = require('fs');
 const path = require('path');
+const AWS = require('aws-sdk');
+const ProgressBar = require('progress');
+const yml = require('js-yaml');
+
+
+/**
+ * CONFIGURATION
+ */
+const channel = 'latest';
+const s3Bucket = 'streamlabs-obs';
+
 
 function info(msg) {
   sh.echo(colors.magenta(msg));
@@ -47,6 +58,38 @@ function checkEnv(varName) {
   }
 }
 
+async function uploadS3File(name, filePath) {
+  info(`Starting upload of ${name}...`);
+
+  const stream = fs.createReadStream(filePath);
+  const upload = new AWS.S3.ManagedUpload({
+    params: {
+      Bucket: s3Bucket,
+      Key: name,
+      ACL: 'public-read',
+      Body: stream
+    },
+    queueSize: 1
+  });
+
+  const bar = new ProgressBar(`${name} [:bar] :percent :etas`, {
+    total: 100,
+    clear: true
+  });
+
+  upload.on('httpUploadProgress', progress => {
+    bar.update(progress.loaded / progress.total);
+  });
+
+  try {
+    await upload.promise();
+  } catch (err) {
+    error(`Upload of ${name} failed`);
+    sh.echo(err);
+    sh.exit(1);
+  }
+}
+
 /**
  * This is the main function of the script
  */
@@ -65,7 +108,7 @@ async function runScript() {
   checkEnv('CSC_KEY_PASSWORD');
 
   // Make sure the release environment is clean
-  info('All current un-committed changes will be stashed');
+  info('Stashing all uncommitted changes...');
   // executeCmd('git add -A');
   // executeCmd('git stash');
 
@@ -135,6 +178,69 @@ async function runScript() {
   })).newVersion;
 
   if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
+
+  pjson.version = newVersion;
+
+  info(`Writing ${newVersion} to package.json`);
+  fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
+
+  // Packaging the app takes a long time and sometimes fails, so we
+  // do this step before committing and tagging the release.  This way
+  // we can re-run the script without "wasting" a version number.
+  info('Packaging the app...');
+  executeCmd('yarn package');
+
+  info('Committing changes...');
+  executeCmd('git add -A');
+  executeCmd(`git commit -m "Release version ${newVersion}"`);
+
+  info('Pushing changes...');
+  executeCmd('git push origin HEAD');
+
+  info(`Tagging version ${newVersion}...`);
+  executeCmd(`git tag 'v${newVersion}'`);
+  executeCmd('git push --tags');
+
+  info(`Version ${newVersion} is ready to be deployed.`);
+  info('You can find the packaged app at dist/win-unpacked.');
+  info('Please run the packaged application now to ensure it starts up properly.');
+  info('When you have confirmed the packaged app works properly, you');
+  info('can continue with the deploy.');
+
+  if (!await confirm('Are you ready to deploy?')) {
+    warn('The deploy has been canceled, however the release has already been tagged.');
+    warn(`${newVersion} should be marked as an unreleased version, and a new version should be packaged.`);
+    sh.exit(0);
+  }
+
+  info('Discovering publichsing artifacts...');
+
+  const distDir = path.resolve('.', 'dist');
+  const channelFileName = `${channel}.yml`;
+  const channelFilePath = path.join(distDir, channelFileName);
+
+  if (!fs.existsSync(channelFilePath)) {
+    error(`Could not find ${path.resolve(channelFilePath)}`);
+    sh.exit(1);
+  }
+
+  info(`Discovered ${channelFileName}`);
+
+  const parsedLatest = yml.safeLoad(fs.readFileSync(channelFilePath));
+  const installerFileName = parsedLatest.path;
+  const installerFilePath = path.join(distDir, installerFileName);
+
+  if (!fs.existsSync(installerFilePath)) {
+    error(`Could not find ${path.resolve(installerFilePath)}`);
+    sh.exit(1);
+  }
+
+  info(`Disovered ${installerFileName}`);
+
+  info('Uploading publishing artifacts...');
+
+  await uploadS3File(installerFileName, installerFilePath);
+  await uploadS3File(channelFileName, channelFilePath);
 }
 
 runScript().then(() => {
