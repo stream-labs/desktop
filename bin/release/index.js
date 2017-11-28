@@ -17,7 +17,7 @@ const yml = require('js-yaml');
  * CONFIGURATION
  */
 const channel = 'latest';
-const s3Bucket = 'streamlabs-obs';
+const s3Bucket = 'streamlabs-obs-dev';
 
 
 function info(msg) {
@@ -129,35 +129,35 @@ async function runScript() {
   })).deployType;
 
   if (deployType === 'normal') {
-    // executeCmd('git checkout staging');
-    // executeCmd('git pull');
-    // executeCmd('git checkout master');
-    // executeCmd('git pull');
-    // executeCmd('git merge staging');
-    // executeCmd('git push origin HEAD');
+    executeCmd('git checkout staging');
+    executeCmd('git pull');
+    executeCmd('git checkout master');
+    executeCmd('git pull');
+    executeCmd('git merge staging');
+    executeCmd('git push origin HEAD');
   } else {
     warn('You are about to release the current branch as-is.');
     warn('You should only do this if you know what you are doing.');
     if (!await confirm('Are you absolutely sure you want to release the current branch?')) sh.exit(0);
   }
 
-  // info('Ensuring submodules are up to date...');
-  // executeCmd('git submodule update --init --recursive');
+  info('Ensuring submodules are up to date...');
+  executeCmd('git submodule update --init --recursive');
 
-  // info('Removing old packages...');
-  // sh.rm('-rf', 'node_modules');
+  info('Removing old packages...');
+  sh.rm('-rf', 'node_modules');
 
-  // info('Installing fresh packages...');
-  // executeCmd('yarn install');
+  info('Installing fresh packages...');
+  executeCmd('yarn install');
 
-  // info('Installing node-obs...');
-  // executeCmd('yarn install-node-obs');
+  info('Installing node-obs...');
+  executeCmd('yarn install-node-obs');
 
-  // info('Compiling assets...');
-  // executeCmd('yarn compile');
+  info('Compiling assets...');
+  executeCmd('yarn compile');
 
-  // info('Running tests...');
-  // executeCmd('yarn test');
+  info('Running tests...');
+  executeCmd('yarn test');
 
   info('The current revision has passed testing and is ready to be');
   info('packaged and released');
