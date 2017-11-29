@@ -118,8 +118,8 @@ async function runScript() {
 
   // Make sure the release environment is clean
   info('Stashing all uncommitted changes...');
-  // executeCmd('git add -A');
-  // executeCmd('git stash');
+  executeCmd('git add -A');
+  executeCmd('git stash');
 
   const deployType = (await inq.prompt({
     type: 'list',
