@@ -199,17 +199,6 @@ async function runScript() {
   info('Packaging the app...');
   executeCmd('yarn package');
 
-  info('Committing changes...');
-  executeCmd('git add -A');
-  executeCmd(`git commit -m "Release version ${newVersion}"`);
-
-  info('Pushing changes...');
-  executeCmd('git push origin HEAD');
-
-  info(`Tagging version ${newVersion}...`);
-  executeCmd(`git tag 'v${newVersion}'`);
-  executeCmd('git push --tags');
-
   info(`Version ${newVersion} is ready to be deployed.`);
   info('You can find the packaged app at dist/win-unpacked.');
   info('Please run the packaged application now to ensure it starts up properly.');
@@ -222,12 +211,23 @@ async function runScript() {
     sh.exit(0);
   }
 
+  info('Committing changes...');
+  executeCmd('git add -A');
+  executeCmd(`git commit -m "Release version ${newVersion}"`);
+
+  info('Pushing changes...');
+  executeCmd('git push origin HEAD');
+
+  info(`Tagging version ${newVersion}...`);
+  executeCmd(`git tag 'v${newVersion}'`);
+  executeCmd('git push --tags');
+
   info(`Registering ${newVersion} with sentry...`);
   sentryCli(`new "${newVersion}"`);
 
   info('Uploading source maps to sentry...');
   const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  sentryCli(`files "${newVersion}" upload-sourcemaps "${sourceMapPath}"`);
+  sentryCli(`files "${newVersion}" upload-sourcemaps --url-prefix "file://" "${sourceMapPath}"`);
 
   info('Discovering publichsing artifacts...');
 
