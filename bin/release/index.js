@@ -18,6 +18,8 @@ const yml = require('js-yaml');
  */
 const channel = 'latest';
 const s3Bucket = 'streamlabs-obs-dev';
+const sentryOrg = 'streamlabs-obs';
+const sentryProject = 'streamlabs-obs-dev';
 
 
 function info(msg) {
@@ -39,6 +41,12 @@ function executeCmd(cmd) {
     error(`Command Failed >>> ${cmd}`);
     sh.exit(1);
   }
+}
+
+function sentryCli(cmd) {
+  const sentryPath = path.join('bin', 'release', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
+
+  executeCmd(`${sentryPath} --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
 }
 
 async function confirm(msg) {
@@ -106,6 +114,7 @@ async function runScript() {
   checkEnv('AWS_SECRET_ACCESS_KEY');
   checkEnv('CSC_LINK');
   checkEnv('CSC_KEY_PASSWORD');
+  checkEnv('SENTRY_AUTH_TOKEN');
 
   // Make sure the release environment is clean
   info('Stashing all uncommitted changes...');
@@ -129,12 +138,12 @@ async function runScript() {
   })).deployType;
 
   if (deployType === 'normal') {
+    info('Merging staging into master...');
     executeCmd('git checkout staging');
     executeCmd('git pull');
     executeCmd('git checkout master');
     executeCmd('git pull');
     executeCmd('git merge staging');
-    executeCmd('git push origin HEAD');
   } else {
     warn('You are about to release the current branch as-is.');
     warn('You should only do this if you know what you are doing.');
@@ -213,6 +222,13 @@ async function runScript() {
     sh.exit(0);
   }
 
+  info(`Registering ${newVersion} with sentry...`);
+  sentryCli(`releases new "${newVersion}"`);
+
+  info('Uploading source maps to sentry...');
+  const sourceMapPath = path.join('bundles', 'renderer.js.map');
+  sentryCli(`releases files "${newVersion}" upload-sourcemaps "${sourceMapPath}"`);
+
   info('Discovering publichsing artifacts...');
 
   const distDir = path.resolve('.', 'dist');
@@ -238,9 +254,20 @@ async function runScript() {
   info(`Disovered ${installerFileName}`);
 
   info('Uploading publishing artifacts...');
-
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
+
+  info('Finalizing release with sentry...');
+  sentryCli(`releases finalize "${newVersion}`);
+
+  if (deployType === 'normal') {
+    info('Merging master back into staging...');
+    executeCmd('git checkout staging');
+    executeCmd('git merge master');
+    executeCmd('git push origin HEAD');
+  }
+
+  info('Release process completed successfully!');
 }
 
 runScript().then(() => {

@@ -12,6 +12,7 @@
     "js-yaml": "^3.10.0",
     "progress": "^2.0.0",
     "semver": "^5.4.1",
+    "sentry-cli-binary": "^1.24.1",
     "shelljs": "^0.7.8"
   }
 }
