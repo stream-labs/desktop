@@ -130,7 +130,7 @@
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
-    "vue-color": "^2.0.6",
+    "vue-color": "^2.4.3",
     "vue-loader": "^10.2.0",
     "vue-multiselect": "2.0.3",
     "vue-property-decorator": "^5.0.1",
