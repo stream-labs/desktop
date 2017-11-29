@@ -1,12 +1,13 @@
 {
-  "name": "streamlabs-obs-release",
-  "description": "Streamlabs streaming software release script",
+  "name": "streamlabs-obs-bin",
+  "description": "Dependencies for the Streamlabs OBS bin scripts",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
   "version": "0.0.1",
   "dependencies": {},
   "devDependencies": {
     "aws-sdk": "^2.157.0",
+    "cmake-js": "^3.5.0",
     "colors": "^1.1.2",
     "inquirer": "^4.0.0",
     "js-yaml": "^3.10.0",
