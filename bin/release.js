@@ -44,7 +44,7 @@ function executeCmd(cmd) {
 }
 
 function sentryCli(cmd) {
-  const sentryPath = path.join('bin', 'release', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
+  const sentryPath = path.join('bin', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
 
   executeCmd(`${sentryPath} releases --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
 }
