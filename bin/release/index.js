@@ -225,9 +225,11 @@ async function runScript() {
   info(`Registering ${newVersion} with sentry...`);
   sentryCli(`new "${newVersion}"`);
 
-  info('Uploading source maps to sentry...');
+  info('Uploading compiled source to sentry...');
+  const sourcePath = path.join('bundles', 'renderer.js');
   const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  sentryCli(`files "${newVersion}" upload-sourcemaps --url-prefix "file://" "${sourceMapPath}"`);
+  sentryCli(`files "${newVersion}" upload "${sourcePath}" "file://bundles/renderer.js"`);
+  sentryCli(`files "${newVersion}" upload-sourcemaps --url-prefix "file://bundles/" "${sourceMapPath}"`);
 
   info('Discovering publichsing artifacts...');
 
