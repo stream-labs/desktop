@@ -69,7 +69,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     {
       name: 'TOGGLE_STOP_STREAMING',
       description: () => 'Stop Streaming',
-      down: () => getStreamingService().startStreaming(),
+      down: () => getStreamingService().stopStreaming(),
       isActive: () => !getStreamingService().isStreaming
     },
     {
