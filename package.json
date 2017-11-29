@@ -10,7 +10,7 @@
     "ci:compile": "yarn clear && webpack",
     "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
-    "install-node-obs": "node bin/install-node-obs.js && yarn install-plugins",
+    "install-node-obs": "yarn install --cwd bin && node bin/install-node-obs.js && yarn install-plugins",
     "rebuild-node-obs": "yarn install --cwd bin && node bin/rebuild-node-obs.js ../node-obs ./node-obs",
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
