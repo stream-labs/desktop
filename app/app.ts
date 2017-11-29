@@ -13,22 +13,39 @@ import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
 import Utils from './services/utils';
 import electron from 'electron';
+import Raven from 'raven-js';
+import RavenVue from 'raven-js/plugins/vue';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 
 if (remote.process.env.NODE_ENV === 'production') {
-  const bt = require('backtrace-js');
+  Raven
+    .config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+      release: slobsVersion,
+      dataCallback: data => {
+        // Because our URLs are local files and not publicly
+        // accessible URLs, we simply truncate and send only
+        // the filename.  Unfortunately sentry's electron support
+        // isn't that great, so we do this hack.
+        // Some discussion here: https://github.com/getsentry/sentry/issues/2708
+        const normalize = (filename: string) => {
+          const splitArray = filename.split('/');
+          return splitArray[splitArray.length - 1];
+        };
 
-  bt.initialize({
-    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    attributes: {
-      version: slobsVersion,
-      processType: 'renderer'
-    }
-  });
+        data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
+          frame.filename = normalize(frame.filename);
+        });
+
+        data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
+
+        return data;
+      }
+    })
+    .addPlugin(RavenVue, Vue)
+    .install();
 }
 
 electron.crashReporter.start({
