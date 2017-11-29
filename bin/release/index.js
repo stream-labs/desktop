@@ -102,9 +102,9 @@ async function uploadS3File(name, filePath) {
  * This is the main function of the script
  */
 async function runScript() {
-  sh.echo(colors.magenta('|-------------------------------------------|'));
-  sh.echo(colors.magenta('| Streamlabs OBS Interactive Release Script |'));
-  sh.echo(colors.magenta('|-------------------------------------------|'));
+  info(colors.magenta('|-------------------------------------------|'));
+  info(colors.magenta('| Streamlabs OBS Interactive Release Script |'));
+  info(colors.magenta('|-------------------------------------------|'));
 
   if (!await confirm('Are you sure you want to release?')) sh.exit(0);
 
@@ -138,11 +138,17 @@ async function runScript() {
   })).deployType;
 
   if (deployType === 'normal') {
+    warn(
+      'Any commits on local staging/master branches that are not present\n' +
+      'on the origin staging/master branches will be discarded'
+    );
+    if (!await confirm('Are you sure you want to continue?')) sh.exit(0);
+
     info('Merging staging into master...');
     executeCmd('git checkout staging');
-    executeCmd('git pull');
+    executeCmd('git reset --hard origin/staging');
     executeCmd('git checkout master');
-    executeCmd('git pull');
+    executeCmd('git reset --hard origin/master');
     executeCmd('git merge staging');
   } else {
     warn('You are about to release the current branch as-is.');
