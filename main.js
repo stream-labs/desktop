@@ -43,20 +43,20 @@ if (pjson.env === 'production') {
   });
 
   process.on("uncaughtException", handleUnhandledException);
-}
 
-crashReporter.start({
-  productName: 'streamlabs-obs',
-  companyName: 'streamlabs',
-  submitURL: 
-    'https://streamlabs.sp.backtrace.io:6098/post?' +
-    'format=minidump&' +
-    'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-  extra: {
-    version: pjson.version,
-    processType: 'main'
-  }
-});
+  crashReporter.start({
+    productName: 'streamlabs-obs',
+    companyName: 'streamlabs',
+    submitURL: 
+      'https://streamlabs.sp.backtrace.io:6098/post?' +
+      'format=minidump&' +
+      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    extra: {
+      version: pjson.version,
+      processType: 'main'
+    }
+  });
+}
 
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const fs = require('fs');
