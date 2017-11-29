@@ -127,7 +127,7 @@ async function runScript() {
     message: 'How would you like to release?',
     choices: [
       {
-        name: 'Merge staging into master and release from master (normal deploy)',
+        name: 'Merge staging into master and release from master (normal release)',
         value: 'normal'
       },
       {
@@ -147,6 +147,7 @@ async function runScript() {
   } else {
     warn('You are about to release the current branch as-is.');
     warn('You should only do this if you know what you are doing.');
+    warn('The current branch you are about to release should almost definitely be master');
     if (!await confirm('Are you absolutely sure you want to release the current branch?')) sh.exit(0);
   }
 
@@ -190,7 +191,7 @@ async function runScript() {
 
   pjson.version = newVersion;
 
-  info(`Writing ${newVersion} to package.json`);
+  info(`Writing ${newVersion} to package.json...`);
   fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
 
   // Packaging the app takes a long time and sometimes fails, so we
@@ -231,7 +232,7 @@ async function runScript() {
   sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
   sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
-  info('Discovering publichsing artifacts...');
+  info('Discovering publishing artifacts...');
 
   const distDir = path.resolve('.', 'dist');
   const channelFileName = `${channel}.yml`;
