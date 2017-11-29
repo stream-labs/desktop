@@ -276,7 +276,7 @@ async function runScript() {
     executeCmd('git push origin HEAD');
   }
 
-  info('Release process completed successfully!');
+  info(`Version ${newVersion} released successfully!`);
 }
 
 runScript().then(() => {
