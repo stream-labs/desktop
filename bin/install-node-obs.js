@@ -70,6 +70,10 @@ async function runScript() {
     sh.echo(colors.red('ERROR: Extraction failed!'));
     sh.exit(1);
   }
+
+  sh.echo('Cleaning up archives...');
+  sh.rm(nodeObsnodeObsArchivePath);
+  sh.rm(faceMaskArchivePath);
 }
 
 runScript().then(() => sh.exit(0));
