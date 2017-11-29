@@ -138,17 +138,17 @@ async function runScript() {
   })).deployType;
 
   if (deployType === 'normal') {
-    warn(
-      'Any commits on local staging/master branches that are not present\n' +
-      'on the origin staging/master branches will be discarded'
-    );
-    if (!await confirm('Are you sure you want to continue?')) sh.exit(0);
+    info('Syncing staging with the origin...');
+    executeCmd('git checkout staging');
+    executeCmd('git pull');
+    executeCmd('git reset --hard origin/staging');
+
+    info('Syncing master with the origin...');
+    executeCmd('git checkout master');
+    executeCmd('git pull');
+    executeCmd('git reset --hard origin/master');
 
     info('Merging staging into master...');
-    executeCmd('git checkout staging');
-    executeCmd('git reset --hard origin/staging');
-    executeCmd('git checkout master');
-    executeCmd('git reset --hard origin/master');
     executeCmd('git merge staging');
   } else {
     warn('You are about to release the current branch as-is.');
