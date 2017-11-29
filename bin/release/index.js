@@ -46,7 +46,7 @@ function executeCmd(cmd) {
 function sentryCli(cmd) {
   const sentryPath = path.join('bin', 'release', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
 
-  executeCmd(`${sentryPath} --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
+  executeCmd(`${sentryPath} releases --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
 }
 
 async function confirm(msg) {
@@ -223,11 +223,11 @@ async function runScript() {
   }
 
   info(`Registering ${newVersion} with sentry...`);
-  sentryCli(`releases new "${newVersion}"`);
+  sentryCli(`new "${newVersion}"`);
 
   info('Uploading source maps to sentry...');
   const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  sentryCli(`releases files "${newVersion}" upload-sourcemaps "${sourceMapPath}"`);
+  sentryCli(`files "${newVersion}" upload-sourcemaps "${sourceMapPath}"`);
 
   info('Discovering publichsing artifacts...');
 
@@ -258,7 +258,7 @@ async function runScript() {
   await uploadS3File(channelFileName, channelFilePath);
 
   info('Finalizing release with sentry...');
-  sentryCli(`releases finalize "${newVersion}`);
+  sentryCli(`finalize "${newVersion}`);
 
   if (deployType === 'normal') {
     info('Merging master back into staging...');
