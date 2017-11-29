@@ -46,20 +46,20 @@ if (remote.process.env.NODE_ENV === 'production') {
     })
     .addPlugin(RavenVue, Vue)
     .install();
-}
 
-electron.crashReporter.start({
-  productName: 'streamlabs-obs',
-  companyName: 'streamlabs',
-  submitURL: 
-    'https://streamlabs.sp.backtrace.io:6098/post?' +
-    'format=minidump&' +
-    'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-  extra: {
-    version: slobsVersion,
-    processType: 'renderer'
-  }
-});
+  electron.crashReporter.start({
+    productName: 'streamlabs-obs',
+    companyName: 'streamlabs',
+    submitURL: 
+      'https://streamlabs.sp.backtrace.io:6098/post?' +
+      'format=minidump&' +
+      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    extra: {
+      version: slobsVersion,
+      processType: 'renderer'
+    }
+  });
+}
 
 require('./app.less');
 
