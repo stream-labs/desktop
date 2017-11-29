@@ -23,7 +23,9 @@ export class ShortcutsService extends Service {
 
   init() {
     document.addEventListener('keydown', e => {
-      // TODO: Maybe look at the event target and see if we should ignore it
+      // ignore key events from webview
+      if ((e.target as HTMLElement).tagName === 'WEBVIEW') return;
+
       const shortcutName = ShortcutsService.getShortcutName(e);
       const handler = this.shortcuts.get(shortcutName);
 
