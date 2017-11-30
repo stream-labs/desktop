@@ -19,10 +19,32 @@ import RavenVue from 'raven-js/plugins/vue';
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
+const isProduction = remote.process.env.NODE_ENV === 'production';
 
-if (remote.process.env.NODE_ENV === 'production') {
+// This is the development DSN
+let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
+
+if (isProduction) {
+  // This is the production DSN
+  sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
+
+  electron.crashReporter.start({
+    productName: 'streamlabs-obs',
+    companyName: 'streamlabs',
+    submitURL:
+      'https://streamlabs.sp.backtrace.io:6098/post?' +
+      'format=minidump&' +
+      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    extra: {
+      version: slobsVersion,
+      processType: 'renderer'
+    }
+  });
+}
+
+if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
   Raven
-    .config('https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674', {
+    .config(sentryDsn, {
       release: slobsVersion,
       dataCallback: data => {
         // Because our URLs are local files and not publicly
@@ -46,19 +68,6 @@ if (remote.process.env.NODE_ENV === 'production') {
     })
     .addPlugin(RavenVue, Vue)
     .install();
-
-  electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    submitURL: 
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
-      'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    extra: {
-      version: slobsVersion,
-      processType: 'renderer'
-    }
-  });
 }
 
 require('./app.less');
