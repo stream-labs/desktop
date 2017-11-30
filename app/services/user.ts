@@ -8,49 +8,44 @@ import electron from 'electron';
 import { HostsService } from './hosts';
 import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
 import { CustomizationService } from './customization';
+import Raven from 'raven-js';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
-
 export class UserService extends PersistentStatefulService<IUserServiceState> {
-
-  @Inject()
-  hostsService: HostsService;
-
-  @Inject()
-  customizationService: CustomizationService;
+  @Inject() hostsService: HostsService;
+  @Inject() customizationService: CustomizationService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
     Vue.set(this.state, 'auth', auth);
   }
 
-
   @mutation()
   LOGOUT() {
     Vue.delete(this.state, 'auth');
   }
 
-
   init() {
     super.init();
-
+    this.setRavenContext();
     this.validateLogin();
   }
-
 
   mounted() {
     // This is used for faking authentication in tests.  We have
     // to do this because Twitch adds a captcha when we try to
     // actually log in from integration tests.
-    electron.ipcRenderer.on('testing-fakeAuth', (e: Electron.Event, auth: any) => {
-      this.LOGIN(auth);
-    });
+    electron.ipcRenderer.on(
+      'testing-fakeAuth',
+      (e: Electron.Event, auth: any) => {
+        this.LOGIN(auth);
+      }
+    );
   }
-
 
   // Makes sure the user's login is still good
   validateLogin() {
@@ -61,18 +56,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const url = `https://${host}/api/v5/slobs/validate/${token}`;
     const request = new Request(url);
 
-    fetch(request).then(res => {
-      return res.text();
-    }).then(valid => {
-      if (valid.match(/false/)) this.LOGOUT();
-    });
+    fetch(request)
+      .then(res => {
+        return res.text();
+      })
+      .then(valid => {
+        if (valid.match(/false/)) this.LOGOUT();
+      });
   }
-
 
   isLoggedIn() {
     return !!(this.state.auth && this.state.auth.widgetToken);
   }
-
 
   /**
    * This is a uuid that persists across the application lifetime and uniquely
@@ -91,20 +86,17 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return userId;
   }
 
-
   get widgetToken() {
     if (this.isLoggedIn()) {
       return this.state.auth.widgetToken;
     }
   }
 
-
   get platform() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform;
     }
   }
-
 
   get username() {
     if (this.isLoggedIn()) {
@@ -118,16 +110,19 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-
   widgetUrl(type: string) {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
       if (type === 'recent-events') {
-        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
+        return `https://${host}/dashboard/recent-events?token=${token}&mode=${
+          nightMode
+        }&electron`;
       } else if (type === 'dashboard') {
-        return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&show_recent_events=0`;
+        return `https://${host}/slobs/dashboard/${token}?mode=${
+          nightMode
+        }&show_recent_events=0`;
       }
     }
   }
@@ -136,12 +131,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
   }
 
-
   /**
    * Starts the authentication process.  Multiple callbacks
    * can be passed for various events.
    */
-  startAuth(platform: TPlatform, onWindowShow: Function, onAuthFinish: Function) {
+  startAuth(
+    platform: TPlatform,
+    onWindowShow: Function,
+    onAuthFinish: Function
+  ) {
     const service = getPlatformService(platform);
 
     const authWindow = new electron.remote.BrowserWindow({
@@ -159,6 +157,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (parsed) {
         authWindow.close();
         this.LOGIN(parsed);
+        this.setRavenContext();
         service.setupStreamSettings(parsed);
         defer(onAuthFinish);
       }
@@ -173,14 +172,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     authWindow.loadURL(service.authUrl);
   }
 
-
   /**
    * Parses tokens out of the auth URL
    */
   private parseAuthFromUrl(url: string) {
     const query = URI.parseQuery(URI.parse(url).query);
 
-    if (query.token && query.platform_username && query.platform_token && query.platform_id) {
+    if (
+      query.token &&
+      query.platform_username &&
+      query.platform_token &&
+      query.platform_id
+    ) {
       return {
         widgetToken: query.token,
         platform: {
@@ -195,6 +198,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return false;
   }
 
+  /**
+   * Registers the current user information with Raven so
+   * we can view more detailed information in sentry.
+   */
+  setRavenContext() {
+    if (!this.isLoggedIn()) return;
+    Raven.setUserContext({ username: this.username });
+    Raven.setExtraContext({ platform: this.platform.type });
+  }
 }
 
 /**
@@ -209,7 +221,8 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
+        if (UserService.instance.isLoggedIn())
+          return original.apply(target, args);
       }
     };
   };

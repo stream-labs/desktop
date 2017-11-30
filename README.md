@@ -105,6 +105,8 @@ this would only run in production.
 
 `SLOBS_DISABLE_MAIN_LOGGING`: Disable javascript logging in the main process.
 
+`SLOBS_REPORT_TO_SENTRY`: Report errors to sentry in the dev environment
+
 ## Packaging / Distributing
 
 Currently only Windows x64 packaging is supported.

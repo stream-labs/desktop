@@ -56,48 +56,46 @@ export class AppService extends StatefulService<IAppState>
 
   @track('app_start')
   load() {
-    // This is synchronous and can take a really long time for large configs.
-    // Setting a timeout allows the spinner and loading text to be drawn to
-    // the screen before starting on the slow synchronous operation.
-    // TODO: loading should be async
-    setTimeout(() => {
-      let loadingPromise: Promise<void>;
+    let loadingPromise: Promise<void>;
 
-      // If we're not showing the onboarding steps, we should load
-      // the config file.  Otherwise the onboarding process will
-      // handle it based on what the user wants.
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
-      if (!onboarded) {
-        if (this.scenesCollectionsService.hasConfigs()) {
-          loadingPromise = this.loadConfig('', { saveCurrent: false });
-        } else {
-          this.scenesCollectionsService.switchToBlankConfig();
-          loadingPromise = Promise.resolve();
-        }
+    // We want to start this as early as possible so that any
+    // exceptions raised while loading the configuration are
+    // associated with the user in sentry.
+    this.userService;
+
+    // If we're not showing the onboarding steps, we should load
+    // the config file.  Otherwise the onboarding process will
+    // handle it based on what the user wants.
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    if (!onboarded) {
+      if (this.scenesCollectionsService.hasConfigs()) {
+        loadingPromise = this.loadConfig('', { saveCurrent: false });
       } else {
+        this.scenesCollectionsService.switchToBlankConfig();
         loadingPromise = Promise.resolve();
       }
+    } else {
+      loadingPromise = Promise.resolve();
+    }
 
-      loadingPromise.then(() => {
-        if (onboarded) this.enableAutoSave();
+    loadingPromise.then(() => {
+      if (onboarded) this.enableAutoSave();
 
-        electron.ipcRenderer.on('shutdown', () => {
-          electron.ipcRenderer.send('acknowledgeShutdown');
-          this.shutdownHandler();
-        });
-
-        this.userService;
-        this.shortcutsService;
-        this.streamlabelsService;
-
-        // Pre-fetch stream info
-        this.streamInfoService;
-
-        this.ipcServerService.listen();
-        this.tcpServerService.listen();
-        this.FINISH_LOADING();
+      electron.ipcRenderer.on('shutdown', () => {
+        electron.ipcRenderer.send('acknowledgeShutdown');
+        this.shutdownHandler();
       });
-    }, 500);
+
+      this.shortcutsService;
+      this.streamlabelsService;
+
+      // Pre-fetch stream info
+      this.streamInfoService;
+
+      this.ipcServerService.listen();
+      this.tcpServerService.listen();
+      this.FINISH_LOADING();
+    });
   }
 
   /**
