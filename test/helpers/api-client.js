@@ -1,4 +1,6 @@
 const net = require('net');
+const { spawnSync } = require('child_process');
+const  traverse = require('traverse');
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
@@ -51,8 +53,13 @@ export class ApiClient {
       this.rejectConnection = reject;
       this.socket.connect(PIPE_PATH);
     });
-
   }
+
+
+  disconnect() {
+    this.socket.end();
+  }
+
 
   log(...messages) {
     if (this.logsEnabled) console.log(...messages);
@@ -73,6 +80,19 @@ export class ApiClient {
       params: { resource: resourceId, args }
     };
     return this.sendMessage(requestBody);
+  }
+
+
+  requestSync(resourceId, methodName, ...args) {
+    const process = spawnSync(
+      'node',
+      ['./test-dist/helpers/cmd-client.js', resourceId, methodName, args.join(' ')]
+    );
+
+    const err = process.stderr.toString();
+    if (err) throw err;
+    const response = JSON.parse(process.stdout.toString());
+    return response;
   }
 
 
@@ -143,7 +163,47 @@ export class ApiClient {
       Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId))
     );
   }
+
+  getResource(resourceId, resourceModel = {}) {
+    return new Proxy(resourceModel, {
+      get: (target, property, receiver) => {
+
+
+        if (resourceModel[property]) return resourceModel[property];
+
+
+        return (...args) => {
+
+          const result = this.requestSync(resourceId, property, ...args);
+
+          // TODO: add promises support
+          if (result && result._type === 'HELPER') {
+            return this.getResource(result.resourceId, result);
+          } else {
+            // result can contain helpers-objects
+            traverse(result).forEach((item) => {
+              if (item && item._type === 'HELPER') {
+                return this.getResource(result.resourceId, result);
+              }
+            });
+            return result;
+          }
+
+        };
+      }
+    });
+  }
 }
+
+
+export class Resource {
+
+  constructor(id) {
+    this.id = id;
+  }
+
+}
+
 
 export async function getClient() {
   if (clientInstance) return clientInstance;

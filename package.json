@@ -15,7 +15,8 @@
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "deploy": "node bin/deploy.js",
-    "test": "ava",
+    "test": "cd test && tsc && ava",
+    "test-uncompiled": "ava",
     "clear": "rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator"
   },
@@ -56,8 +57,8 @@
   },
   "ava": {
     "files": [
-      "test/*.js",
-      "test/api/*.js"
+      "test-dist/*.js",
+      "test-dist/api/*.js"
     ],
     "serial": true
   },

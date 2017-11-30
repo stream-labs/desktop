@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "../test-dist",
+    "target": "es5",
+    "lib": [
+      "dom",
+      "es7",
+      "es2017"
+    ],
+    "module": "commonjs",
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "noImplicitThis": true,
+    "removeComments": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
