@@ -67,7 +67,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: 'Rename',
-        click: () => this.sourcesService.showRenameSource(this.sceneItem.name)
+        click: () => this.sourcesService.showRenameSource(this.sceneItem.sourceId)
       });
 
       this.append({

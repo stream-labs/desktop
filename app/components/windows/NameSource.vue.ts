@@ -29,14 +29,21 @@ export default class NameSource extends Vue {
   options: {
     sourceType?: TSourceType,
     widgetType?: string,
-    rename?: string,
+    renameId?: string,
     propertiesManager?: TPropertiesManager
   }  = this.windowsService.getChildWindowQueryParams();
 
-  name = this.options.rename || '';
+  name = '';
   error = '';
 
   mounted() {
+
+    if (this.options.renameId) {
+      const source = this.sourcesService.getSource(this.options.renameId);
+      this.name = source.name;
+      return;
+    }
+
     const sourceType =
       this.sourceType &&
       this.sourcesService.getAvailableSourcesTypesList()
@@ -50,8 +57,8 @@ export default class NameSource extends Vue {
   submit() {
     if (!this.name) {
       this.error = 'The source name is required';
-    } else if (this.options.rename) {
-      this.sourcesService.getSource(this.options.rename).setName(this.name);
+    } else if (this.options.renameId) {
+      this.sourcesService.getSource(this.options.renameId).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
       let sourceId: string;

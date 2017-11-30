@@ -2,7 +2,7 @@ import test from 'ava';
 import { sleep } from './helpers/sleep';
 import { useSpectron, focusMain } from './helpers/spectron';
 import { addSource } from './helpers/spectron/sources';
-import { addScene, clickRemoveScene, selectScene } from './helpers/spectron/scenes';
+import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
 
 useSpectron();
 
@@ -74,4 +74,18 @@ test('Restarting the app preserves the default sources', async t => {
   await focusMain(t);
   await selectScene(t, sceneName);
   await checkDefaultSources(t);
+});
+
+
+test('Rename scene', async t => {
+  const app = t.context.app;
+  const newSceneName = 'Scene2';
+
+  await openRenameWindow(t, 'Scene');
+  await app.client.setValue('input', newSceneName);
+  await app.client.click('button=Done');
+
+  await focusMain(t);
+
+  t.true(await app.client.isExisting(`div=${newSceneName}`));
 });
