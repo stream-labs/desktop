@@ -1,4 +1,5 @@
 import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
+import { Subject } from 'rxjs/Subject';
 
 const net = require('net');
 const { spawnSync } = require('child_process');
@@ -16,7 +17,7 @@ export class ApiClient {
   resolveConnection: Function;
   rejectConnection: Function;
   requests = {};
-  subscriptions = {};
+  subscriptions: Dictionary<Subject<any>> = {};
   connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
 
   // set to 'true' for debugging
@@ -143,18 +144,18 @@ export class ApiClient {
       if (!result) return;
 
       if (result._type === 'EVENT') {
-        this.subscriptions[message.result.resourceId](result.data);
+        this.subscriptions[message.result.resourceId].next(result.data);
       }
     });
 
   }
 
 
-  subscribe(resourceId: string, channelName: string, cb: Function) {
-    return this.request(resourceId, channelName).then((subscriptionInfo: {resourceId: string}) => {
-      this.subscriptions[subscriptionInfo.resourceId] = cb;
-    });
-  }
+  // subscribe(resourceId: string, channelName: string, cb: Function) {
+  //   return this.request(resourceId, channelName).then((subscriptionInfo: {resourceId: string}) => {
+  //     this.subscriptions[subscriptionInfo.resourceId] = cb;
+  //   });
+  // }
 
   unsubscribe(subscriptionId: string) {
     return this.request(subscriptionId, 'unsubscribe');
@@ -180,8 +181,10 @@ export class ApiClient {
           const result = this.requestSync(resourceId, property as string, ...args);
 
           // TODO: add promises support
-          if (result && result._type === 'SUBSCRIPTION') {
-
+          if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
+            let subject = this.subscriptions[result.resourceId];
+            if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
+            return subject;
           } else if (result && result._type === 'HELPER') {
             return this.getResource(result.resourceId, result);
           } else {
