@@ -236,6 +236,7 @@ async function runScript() {
   info('Uploading compiled source to sentry...');
   const sourcePath = path.join('bundles', 'renderer.js');
   const sourceMapPath = path.join('bundles', 'renderer.js.map');
+  sentryCli(`files "${newVersion}" delete --all`);
   sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
   sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
