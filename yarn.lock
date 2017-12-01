@@ -1265,10 +1265,6 @@ backo2@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/backo2/-/backo2-1.0.2.tgz#31ab1ac8b129363463e35b3ebb69f4dfcfba7947"
 
-backtrace-js@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/backtrace-js/-/backtrace-js-0.0.4.tgz#01c68e2d5c57635eda92afc634b6ec18c5416d16"
-
 backtrace-node@^0.7.3:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/backtrace-node/-/backtrace-node-0.7.3.tgz#cdc0d1f89f45a1d30fb3b77a2311947eea339e08"
@@ -5776,6 +5772,10 @@ randombytes@^2.0.0, randombytes@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.0.3.tgz#674c99760901c3c4112771a31e521dc349cc09ec"
 
+raven-js@^3.20.1:
+  version "3.20.1"
+  resolved "https://registry.yarnpkg.com/raven-js/-/raven-js-3.20.1.tgz#3170bdb35c05098ddb8548ee5be0687f9d763330"
+
 rc@^1.0.1, rc@^1.1.6, rc@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.1.tgz#2e03e8e42ee450b8cb3dce65be1bf8974e1dfd95"
@@ -7296,9 +7296,9 @@ vue-class-component@^5.0.0:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-5.0.1.tgz#feda06c3da266cee9064e224ba491e089923dce8"
 
-vue-color@^2.0.6:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.0.6.tgz#3a5d214dcb8cbb8c5fc2073986e01c268a8fe83c"
+vue-color@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/vue-color/-/vue-color-2.4.3.tgz#184bff4e4c163a6dd391cdbf460172cef600c187"
   dependencies:
     lodash.throttle "^4.0.0"
     material-colors "^1.0.0"

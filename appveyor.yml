@@ -1,9 +1,7 @@
 build: off
 
-environment:
-  nodejs_version: "7.4.0"
-
 install:
+  - ps: Install-Product node 8
   - git submodule update --init --recursive
   - yarn install
   - yarn install-node-obs

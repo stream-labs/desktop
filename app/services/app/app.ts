@@ -1,6 +1,9 @@
 import { StatefulService, mutation } from '../stateful-service';
 import { OnboardingService } from '../onboarding';
-import { ScenesCollectionsService, OverlaysPersistenceService } from '../scenes-collections';
+import {
+  ScenesCollectionsService,
+  OverlaysPersistenceService
+} from '../scenes-collections';
 import { HotkeysService } from '../hotkeys';
 import { UserService } from '../user';
 import { ShortcutsService } from '../shortcuts';
@@ -26,26 +29,14 @@ interface IAppState {
  * Performs operations that happen once at startup and shutdown. This service
  * mainly calls into other services to do the heavy lifting.
  */
-export class AppService extends StatefulService<IAppState> implements IAppServiceApi {
-
-  @Inject()
-  onboardingService: OnboardingService;
-
-  @Inject()
-  scenesCollectionsService: ScenesCollectionsService;
-
-  @Inject()
-  overlaysPersistenceService: OverlaysPersistenceService;
-
-  @Inject()
-  hotkeysService: HotkeysService;
-
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  shortcutsService: ShortcutsService;
-
+export class AppService extends StatefulService<IAppState>
+  implements IAppServiceApi {
+  @Inject() onboardingService: OnboardingService;
+  @Inject() scenesCollectionsService: ScenesCollectionsService;
+  @Inject() overlaysPersistenceService: OverlaysPersistenceService;
+  @Inject() hotkeysService: HotkeysService;
+  @Inject() userService: UserService;
+  @Inject() shortcutsService: ShortcutsService;
   @Inject() streamInfoService: StreamInfoService;
 
   static initialState: IAppState = {
@@ -55,87 +46,80 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
 
   private autosaveInterval: number;
 
-  @Inject()
-  scenesTransitionsService: ScenesTransitionsService;
-
-  @Inject()
-  sourcesService: SourcesService;
-
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  videoService: VideoService;
-
-
+  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() sourcesService: SourcesService;
+  @Inject() scenesService: ScenesService;
+  @Inject() videoService: VideoService;
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
 
   @track('app_start')
   load() {
+    let loadingPromise: Promise<void>;
 
-    // This is synchronous and can take a really long time for large configs.
-    // Setting a timeout allows the spinner and loading text to be drawn to
-    // the screen before starting on the slow synchronous operation.
-    // TODO: loading should be async
-    setTimeout(() => {
-      let loadingPromise: Promise<void>;
+    // We want to start this as early as possible so that any
+    // exceptions raised while loading the configuration are
+    // associated with the user in sentry.
+    this.userService;
 
-      // If we're not showing the onboarding steps, we should load
-      // the config file.  Otherwise the onboarding process will
-      // handle it based on what the user wants.
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
-      if (!onboarded) {
-        if (this.scenesCollectionsService.hasConfigs()) {
-          loadingPromise = this.loadConfig('', { saveCurrent: false });
-        } else {
-          this.scenesCollectionsService.switchToBlankConfig();
-          loadingPromise = Promise.resolve();
-        }
+    // If we're not showing the onboarding steps, we should load
+    // the config file.  Otherwise the onboarding process will
+    // handle it based on what the user wants.
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    if (!onboarded) {
+      if (this.scenesCollectionsService.hasConfigs()) {
+        loadingPromise = this.loadConfig('', { saveCurrent: false });
       } else {
+        this.scenesCollectionsService.switchToBlankConfig();
         loadingPromise = Promise.resolve();
       }
+    } else {
+      loadingPromise = Promise.resolve();
+    }
 
-      loadingPromise.then(() => {
+    loadingPromise.then(() => {
+      if (onboarded) this.enableAutoSave();
 
-        if (onboarded) this.enableAutoSave();
-
-        electron.ipcRenderer.on('shutdown', () => {
-          electron.ipcRenderer.send('acknowledgeShutdown');
-          this.shutdownHandler();
-        });
-
-        this.userService;
-        this.shortcutsService;
-        this.streamlabelsService;
-
-        // Pre-fetch stream info
-        this.streamInfoService;
-
-        this.ipcServerService.listen();
-        this.tcpServerService.listen();
-        this.FINISH_LOADING();
+      electron.ipcRenderer.on('shutdown', () => {
+        electron.ipcRenderer.send('acknowledgeShutdown');
+        this.shutdownHandler();
       });
-    }, 500);
 
+      this.shortcutsService;
+      this.streamlabelsService;
 
+      // Pre-fetch stream info
+      this.streamInfoService;
+
+      this.ipcServerService.listen();
+      this.tcpServerService.listen();
+      this.FINISH_LOADING();
+    });
   }
 
   /**
    * reset current scene collection and load new one
    */
-  loadConfig(configName?: string, options = { saveCurrent: true }): Promise<void> {
+  loadConfig(
+    configName?: string,
+    options = { saveCurrent: true }
+  ): Promise<void> {
     return new Promise(resolve => {
       this.START_LOADING();
 
       window.setTimeout(() => {
         // wait while current config will be saved
-        (options.saveCurrent ? this.scenesCollectionsService.rawSave() : Promise.resolve()).then(() => {
+        (options.saveCurrent
+          ? this.scenesCollectionsService.rawSave()
+          : Promise.resolve()
+        ).then(() => {
           this.reset();
 
           this.scenesCollectionsService.load(configName).then(() => {
-            this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+            this.scenesService.makeSceneActive(
+              this.scenesService.activeSceneId
+            );
             this.hotkeysService.bindHotkeys();
             this.enableAutoSave();
             this.FINISH_LOADING();
@@ -176,7 +160,6 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
     this.FINISH_LOADING();
   }
 
-
   /**
    * remove the config and load the new one
    */
@@ -189,7 +172,6 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
     }
   }
 
-
   /**
    * reset current scenes and switch to blank config
    */
@@ -199,23 +181,26 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
     this.enableAutoSave();
   }
 
-
   @track('app_close')
-  private async shutdownHandler() {
-    this.disableAutosave();
+  private shutdownHandler() {
+    this.START_LOADING();
 
-    this.ipcServerService.stopListening();
-    this.tcpServerService.stopListening();
-    if (this.scenesCollectionsService.state.activeCollection) {
-      await this.scenesCollectionsService.rawSave();
-    }
+    window.setTimeout(async () => {
+      this.disableAutosave();
 
-    this.reset();
-    this.videoService.destroyAllDisplays();
-    this.scenesTransitionsService.release();
-    electron.ipcRenderer.send('shutdownComplete');
+      this.ipcServerService.stopListening();
+      this.tcpServerService.stopListening();
+
+      if (this.scenesCollectionsService.state.activeCollection) {
+        await this.scenesCollectionsService.rawSave();
+      }
+
+      this.reset();
+      this.videoService.destroyAllDisplays();
+      this.scenesTransitionsService.release();
+      electron.ipcRenderer.send('shutdownComplete');
+    }, 300);
   }
-
 
   /**
    * cleanup all created objects
@@ -228,9 +213,15 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
       if (scene.id === this.scenesService.activeSceneId) return;
       scene.remove(true);
     });
-    if (this.scenesService.activeScene) this.scenesService.activeScene.remove(true);
 
-    this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
+    if (this.scenesService.activeScene) {
+      this.scenesService.activeScene.remove(true);
+    }
+
+    this.sourcesService.sources.forEach(source => {
+      if (source.type !== 'scene') source.remove();
+    });
+
     this.hotkeysService.unregisterAll();
   }
 
@@ -258,5 +249,4 @@ export class AppService extends StatefulService<IAppState> implements IAppServic
   private SET_ARGV(argv: string[]) {
     this.state.argv = argv;
   }
-
 }
