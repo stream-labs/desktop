@@ -88,6 +88,9 @@ export class Scene implements ISceneApi {
 
 
   addSource(sourceId: string, options: ISceneItemAddOptions = {}): SceneItem {
+
+    if (!this.canAddSource(sourceId)) return null;
+
     const source = this.sourcesService.getSource(sourceId);
     const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
@@ -202,7 +205,7 @@ export class Scene implements ISceneApi {
 
     for (const childScene of childScenes) {
       if (childScene.id === sceneId) return true;
-      if (!childScene.hasNestedScene(sceneId)) return true;
+      if (childScene.hasNestedScene(sceneId)) return true;
     }
 
     return false;
