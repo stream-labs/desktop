@@ -68,6 +68,7 @@
     "arch": "x64"
   },
   "dependencies": {
+    "@types/webdriverio": "^4.8.6",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",

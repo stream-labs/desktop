@@ -1,3 +1,5 @@
+import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
+
 const net = require('net');
 const { spawnSync } = require('child_process');
 const  traverse = require('traverse');
@@ -5,22 +7,22 @@ const  traverse = require('traverse');
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
 
-let clientInstance = null;
+let clientInstance: ApiClient = null;
 
 export class ApiClient {
 
+  nextRequestId = 1;
+  socket = new net.Socket();
+  resolveConnection: Function;
+  rejectConnection: Function;
+  requests = {};
+  subscriptions = {};
+  connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
+
+  // set to 'true' for debugging
+  logsEnabled = false;
+
   constructor() {
-
-    this.nextRequestId = 1;
-    this.socket = new net.Socket();
-    this.resolveConnection = null;
-    this.rejectConnection = null;
-    this.requests = {};
-    this.subscriptions = {};
-    this.connectionStatus = 'disconnected'; // disconnected|pending|connected
-
-    // set to 'true' for debugging
-    this.logsEnabled = false;
 
     this.socket.on('connect', () => {
       this.log('connected');
@@ -28,13 +30,13 @@ export class ApiClient {
       this.resolveConnection();
     });
 
-    this.socket.on('error', (error) => {
+    this.socket.on('error', (error: any) => {
       this.log('error', error);
       this.connectionStatus = 'disconnected';
       this.rejectConnection();
     });
 
-    this.socket.on('data', (data) => {
+    this.socket.on('data', (data: any) => {
       this.log(`Received: ${data}`);
       this.onMessageHandler(data);
     });
@@ -61,19 +63,19 @@ export class ApiClient {
   }
 
 
-  log(...messages) {
+  log(...messages: string[]) {
     if (this.logsEnabled) console.log(...messages);
   }
 
 
-  async request(resourceId, methodName, ...args) {
+  async request(resourceId: string, methodName: string, ...args: any[]) {
 
     if (this.connectionStatus === 'disconnected') {
       await this.connect();
     }
 
     const id = this.nextRequestId++;
-    const requestBody = {
+    const requestBody: IJsonRpcRequest = {
       jsonrpc: '2.0',
       id,
       method: methodName,
@@ -83,7 +85,7 @@ export class ApiClient {
   }
 
 
-  requestSync(resourceId, methodName, ...args) {
+  requestSync(resourceId: string, methodName: string, ...args: string[]) {
     const process = spawnSync(
       'node',
       ['./test-dist/helpers/cmd-client.js', resourceId, methodName, args.join(' ')]
@@ -96,8 +98,8 @@ export class ApiClient {
   }
 
 
-  sendMessage(message) {
-    let requestBody = message;
+  sendMessage(message: string | Object) {
+    let requestBody: IJsonRpcRequest = message as IJsonRpcRequest;
     if (typeof message === 'string') {
       try {
         requestBody = JSON.parse(message);
@@ -122,7 +124,7 @@ export class ApiClient {
   }
 
 
-  onMessageHandler(data) {
+  onMessageHandler(data: ArrayBuffer) {
     data.toString().split('\n').forEach(rawMessage => {
       if (!rawMessage) return;
       const message = JSON.parse(rawMessage);
@@ -148,13 +150,13 @@ export class ApiClient {
   }
 
 
-  subscribe(resourceId, channelName, cb) {
-    this.request(resourceId, channelName).then(subscriptionInfo => {
+  subscribe(resourceId: string, channelName: string, cb: Function) {
+    return this.request(resourceId, channelName).then((subscriptionInfo: {resourceId: string}) => {
       this.subscriptions[subscriptionInfo.resourceId] = cb;
     });
   }
 
-  unsubscribe(subscriptionId) {
+  unsubscribe(subscriptionId: string) {
     return this.request(subscriptionId, 'unsubscribe');
   }
 
@@ -164,24 +166,27 @@ export class ApiClient {
     );
   }
 
-  getResource(resourceId, resourceModel = {}) {
+  getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
+
     return new Proxy(resourceModel, {
       get: (target, property, receiver) => {
 
 
-        if (resourceModel[property]) return resourceModel[property];
+        if (resourceModel[property] !== void 0) return resourceModel[property];
 
 
-        return (...args) => {
+        return (...args: any[]) => {
 
-          const result = this.requestSync(resourceId, property, ...args);
+          const result = this.requestSync(resourceId, property as string, ...args);
 
           // TODO: add promises support
-          if (result && result._type === 'HELPER') {
+          if (result && result._type === 'SUBSCRIPTION') {
+
+          } else if (result && result._type === 'HELPER') {
             return this.getResource(result.resourceId, result);
           } else {
             // result can contain helpers-objects
-            traverse(result).forEach((item) => {
+            traverse(result).forEach((item: any) => {
               if (item && item._type === 'HELPER') {
                 return this.getResource(result.resourceId, result);
               }
@@ -191,17 +196,8 @@ export class ApiClient {
 
         };
       }
-    });
+    }) as TResourceType;
   }
-}
-
-
-export class Resource {
-
-  constructor(id) {
-    this.id = id;
-  }
-
 }
 
 

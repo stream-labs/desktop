@@ -5,7 +5,7 @@ import { ISourceApi, TSourceType, ISource } from '../sources';
  * Api for scenes management
  */
 export interface IScenesServiceApi {
-  createScene(name: string, options: ISceneCreateOptions): ISceneApi;
+  createScene(name: string, options?: ISceneCreateOptions): ISceneApi;
   makeSceneActive(id: string): void;
   removeScene(id: string): IScene;
   scenes: ISceneApi[];

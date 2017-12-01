@@ -18,6 +18,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
+    "baseUrl": "../app"
   },
   "exclude": [
     "node_modules"
