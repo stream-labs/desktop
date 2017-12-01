@@ -136,7 +136,6 @@ export class Source implements ISourceApi {
   }
 
   setName(newName: string) {
-    this.getObsInput().name = newName;
     this.SET_NAME(newName);
   }
 

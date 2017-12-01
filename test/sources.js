@@ -1,6 +1,12 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron';
-import { addSource, clickRemoveSource, clickSourceProperties, selectSource } from './helpers/spectron/sources';
+import {
+  addSource,
+  clickRemoveSource,
+  clickSourceProperties,
+  selectSource,
+  openRenameWindow
+} from './helpers/spectron/sources';
 
 useSpectron();
 
@@ -51,4 +57,22 @@ test('Viewing source properties', async t => {
 
   await focusChild(t);
   t.true(await app.client.isExisting('label=Color'));
+});
+
+
+test('Rename source', async t => {
+  const app = t.context.app;
+  const sourceName = 'MyColorSource1';
+  const newSourceName = 'MyColorSource2';
+
+  await addSource(t, 'Color Source', sourceName);
+
+  await openRenameWindow(t, sourceName);
+  await app.client.setValue('input', newSourceName);
+  await app.client.click('button=Done');
+
+
+  await focusMain(t);
+  const sourceSelector = `li=${newSourceName}`;
+  t.true(await app.client.isExisting(sourceSelector));
 });

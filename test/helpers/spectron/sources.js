@@ -1,5 +1,6 @@
 // Source helper functions
 import { focusMain, focusChild } from '.';
+import { contextMenuClick } from './context-menu';
 
 async function clickSourceAction(t, selector) {
   await t.context.app.client
@@ -62,4 +63,12 @@ export async function addExistingSource(t, type, name, closeProps = true) {
   await app.client.click('button=Add Source');
   await app.client.click(`div=${name}`);
   await app.client.click('button=Add Existing Source');
+}
+
+
+export async function openRenameWindow(t, sourceName) {
+  await focusMain(t);
+  await rightClickSource(t, sourceName);
+  await contextMenuClick(t, 'Rename');
+  await focusChild(t);
 }
