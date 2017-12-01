@@ -13,7 +13,7 @@ const colors = require('colors/safe');
 
 // CONFIGURATION
 const NODE_OBS_VERSION = '0.1.31';
-const FACE_MASK_VERSION = '0.3.3';
+const FACE_MASK_VERSION = '0.3.4';
 
 // This is the main function
 async function runScript() {
