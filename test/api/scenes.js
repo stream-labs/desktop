@@ -125,3 +125,31 @@ test('Scenes events', async t => {
 
 });
 
+
+test('Creating nested scenes', async t => {
+  const client = await getClient();
+
+  const sceneA = await client.request('ScenesService', 'createScene', 'SceneA');
+  const sceneB = await client.request('ScenesService', 'createScene', 'SceneB');
+  const sceneC = await client.request('ScenesService', 'createScene', 'SceneC');
+
+  await client.request(sceneA.resourceId, 'addSource', sceneB.id);
+  let sceneAItems = await client.request(sceneA.resourceId, 'getItems');
+  let itemsANames = sceneAItems.map(item => item.name);
+
+  t.deepEqual(itemsANames, ['SceneB']);
+
+  await client.request(sceneC.resourceId, 'addSource', sceneA.id);
+  const sceneCItems = await client.request(sceneC.resourceId, 'getItems');
+  const itemsCNames = sceneCItems.map(item => item.name);
+
+  t.deepEqual(itemsCNames, ['SceneA']);
+
+  // Unable to add a source when the scene you are trying to add already contains your current scene
+  await client.request(sceneA.resourceId, 'addSource', sceneC.id);
+  sceneAItems = await client.request(sceneA.resourceId, 'getItems');
+  itemsANames = sceneAItems.map(item => item.name);
+
+  t.deepEqual(itemsANames, ['SceneB']);
+
+});
