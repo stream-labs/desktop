@@ -8,14 +8,18 @@
 
     <div
       class="flex__item studio-controls"
-      :height="heightOfChildren">
+      :style="{ height: heightOfChild + 'px' }">
+
       <vue-draggable-resizable
         :draggable="false"
-        :parent="true"
         :handles="['tl', 'tm', 'tl']"
         :h="200"
-        axis="y"
-        class="draggable-section">
+        :w="'100%'"
+        :minh="100"
+        :active="true"
+        class="draggable-section"
+        @resizing="onResizing">
+
         <scene-selector class="studio-controls-panel" />
 
         <mixer class="studio-controls-panel" />
@@ -81,9 +85,9 @@
 }
 
 .studio-controls {
-  // height: 200px;
   display: flex;
   position: relative;
+  max-height: 500px;
 }
 
 .studio-controls-panel {
@@ -94,13 +98,13 @@
 }
 
 .live-preview-container {
-  flex: 0 0 304px;
+  flex: 0 0;
 }
 
 .live-display,
 .live-display-placeholder {
-  width: 304px;
-  height: 171px;
+  // width: 304px;
+  // height: 171px;
 }
 
 .live-display-placeholder {
@@ -134,9 +138,9 @@
 }
 
 .draggable-section {
-  height: 100%;
-  width: 100%;
   display: flex;
+  width: 100%!important;
+  top: 0!important;
 }
 
 .night-theme {

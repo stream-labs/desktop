@@ -16,10 +16,12 @@ import VueDraggableResizable from 'vue-draggable-resizable'
     'vue-draggable-resizable': VueDraggableResizable,
   }
 })
+
 export default class Live extends Vue {
 
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+
 
   get previewEnabled() {
     return this.customizationService.state.livePreviewEnabled;
@@ -31,6 +33,12 @@ export default class Live extends Vue {
 
   get recenteventsUrl() {
     return this.userService.widgetUrl('recent-events');
+  }
+
+  heightOfChild: number = 500;
+
+  onResizing(left:number, top:number, width:number, height:number) {
+    this.heightOfChild = height;
   }
 
 }
