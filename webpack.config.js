@@ -17,7 +17,8 @@ const plugins = [];
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js'
+    updater: './updater/ui.js',
+    'guest-api': './guest-api'
   },
   output: {
     path: __dirname + '/bundles',
