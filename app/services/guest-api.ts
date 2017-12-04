@@ -22,7 +22,7 @@ export interface IGuestApiCallback {
 }
 
 /**
- * A dictionary of functions to expose to the child window
+ * A dictionary of functions to expose to the guest content
  */
 export interface IRequestHandler {
   [key: string]: (...args: any[]) => Promise<any>;
