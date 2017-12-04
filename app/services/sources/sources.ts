@@ -363,7 +363,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
-      queryParams: { rename: sourceId },
+      queryParams: { renameId: sourceId },
       size: {
         width: 400,
         height: 250

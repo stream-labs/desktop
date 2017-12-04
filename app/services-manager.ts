@@ -305,8 +305,7 @@ export class ServicesManager extends Service {
       const subscriptionId = `${resourceId}.${methodName}`;
       responsePayload = {
         _type: 'SUBSCRIPTION',
-        resourceId: subscriptionId,
-        emitter: 'STREAM',
+        resourceId: subscriptionId
       };
       if (!this.subscriptions[subscriptionId]) {
         this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
@@ -343,8 +342,7 @@ export class ServicesManager extends Service {
         id: request.id,
         result: {
           _type: 'SUBSCRIPTION',
-          resourceId: promiseId,
-          emitter: 'PROMISE',
+          resourceId: promiseId
         }
       };
     } else if (responsePayload && responsePayload.isHelper) {

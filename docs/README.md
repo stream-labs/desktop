@@ -122,8 +122,7 @@ Subscribe to the `sceneSwitched` event:
     "id": 4,
     "result": {
         "_type": "SUBSCRIPTION",
-        "resourceId": "ScenesService.sceneSwitched",
-        "emitter": "STREAM"
+        "resourceId": "ScenesService.sceneSwitched"
     }
 }
 ```
@@ -196,8 +195,7 @@ execution.
     "id": 5,
     "result": {
         "_type": "SUBSCRIPTION",
-        "resourceId": "5c3cf84f797a",
-        "emitter": "PROMISE"
+        "resourceId": "5c3cf84f797a"
     }
 }
 ```

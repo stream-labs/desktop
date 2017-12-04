@@ -89,9 +89,13 @@ export class ApiClient {
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
     const process = spawnSync(
       'node',
-      ['./test-dist/helpers/cmd-client.js', resourceId, methodName, args.join(' ')]
+      ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, args.join(' ')],
+      { timeout: 1000000 }
     );
 
+    console.log('syncRequest', resourceId, methodName, args);
+    console.log('err', process.stderr.toString());
+    console.log('stdout', process.stdout.toString());
     const err = process.stderr.toString();
     if (err) throw err;
     const response = JSON.parse(process.stdout.toString());
@@ -169,16 +173,23 @@ export class ApiClient {
 
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
 
+    const hanleRequest = (resourceId: string, property: string, ...args: any[]): any => {
+
+
+    };
+
     return new Proxy(resourceModel, {
+
+
       get: (target, property, receiver) => {
 
 
         if (resourceModel[property] !== void 0) return resourceModel[property];
 
-
         return (...args: any[]) => {
-
           const result = this.requestSync(resourceId, property as string, ...args);
+
+          console.log('result', result);
 
           // TODO: add promises support
           if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
@@ -188,16 +199,31 @@ export class ApiClient {
           } else if (result && result._type === 'HELPER') {
             return this.getResource(result.resourceId, result);
           } else {
+
+            console.log('wrap')
             // result can contain helpers-objects
-            traverse(result).forEach((item: any) => {
-              if (item && item._type === 'HELPER') {
-                return this.getResource(result.resourceId, result);
+
+            if (Array.isArray(result)) {
+              let i = result.length;
+              while (i--) {
+                const item = result[i];
+                if (item._type !== 'HELPER') continue;
+                result.splice(i, 1, this.getResource(item.resourceId, { ...item }));
               }
-            });
+            }
+
+            // traverse(result).forEach((item: any) => {
+            //   if (item && item._type === 'HELPER') {
+            //     return this.getResource(item.resourceId, { ...item } );
+            //   }
+            // });
+            console.log('before returning');
+            // process.stdout.write(JSON.stringify(result));
+            console.log('return');
             return result;
           }
-
         };
+
       }
     }) as TResourceType;
   }

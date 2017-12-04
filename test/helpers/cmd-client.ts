@@ -11,11 +11,15 @@ console.log = () => {};
   const args = process.argv.slice(4);
 
   const client = await getClient();
-  const response = await client.request(resource, method, ...args);
+  client.request(resource, method, ...args).then(
+    response => {
+      process.stdout.write(JSON.stringify(response));
+    },
+    error => {
+      process.stderr.write(JSON.stringify(error));
+    }
+  );
   client.disconnect();
-
-  process.stdout.write(JSON.stringify(response));
-
 
 })();
 
