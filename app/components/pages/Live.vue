@@ -5,42 +5,53 @@
     <div class="flex__item mission-control-container">
       <webview class="mission-control" id="recentEventsWebview" :src="recenteventsUrl"></webview>
     </div>
-    <div class="flex__item studio-controls">
-      <scene-selector class="studio-controls-panel no-padding-left" />
 
-      <mixer class="studio-controls-panel" />
+    <div
+      class="flex__item studio-controls"
+      :height="heightOfChildren">
+      <vue-draggable-resizable
+        :draggable="false"
+        :parent="true"
+        :handles="['tl', 'tm', 'tl']"
+        :h="200"
+        axis="y"
+        class="draggable-section">
+        <scene-selector class="studio-controls-panel" />
 
-      <div class="live-preview-container">
-        <div class="studio-controls-top">
-          <h4 class="studio-controls__label">
-            Preview
-          </h4>
-          <div>
-            <i
-              v-if="previewEnabled"
-              class="fa fa-eye icon-btn icon-btn--lg"
-              @click="previewEnabled = false"/>
-            <i
-              v-if="!previewEnabled"
-              class="fa fa-eye-slash icon-btn icon-btn--lg"
-              @click="previewEnabled = true"/>
+        <mixer class="studio-controls-panel" />
+
+        <div class="live-preview-container">
+          <div class="studio-controls-top">
+            <h4 class="studio-controls__label">
+              Preview
+            </h4>
+            <div>
+              <i
+                v-if="previewEnabled"
+                class="fa fa-eye icon-btn icon-btn--lg"
+                @click="previewEnabled = false"/>
+              <i
+                v-if="!previewEnabled"
+                class="fa fa-eye-slash icon-btn icon-btn--lg"
+                @click="previewEnabled = true"/>
+            </div>
           </div>
-        </div>
-        <div class="aspect-ratio--16-9" v-if="previewEnabled">
-          <div class="content">
-            <display class="live-display" :drawUI="false" />
+          <div class="aspect-ratio--16-9" v-if="previewEnabled">
+            <div class="content">
+              <display class="live-display" :drawUI="false" />
+            </div>
           </div>
-        </div>
-        <div class="aspect-ratio--16-9" v-else>
-          <div class="content">
-            <div class="live-display-placeholder">
-              <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-              <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-              <span>Your preview is currently disabled</span>
+          <div class="aspect-ratio--16-9" v-else>
+            <div class="content">
+              <div class="live-display-placeholder">
+                <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
+                <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
+                <span>Your preview is currently disabled</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </vue-draggable-resizable>
     </div>
   </div>
 </div>
@@ -70,8 +81,9 @@
 }
 
 .studio-controls {
-  height: 200px;
+  // height: 200px;
   display: flex;
+  position: relative;
 }
 
 .studio-controls-panel {
@@ -113,6 +125,18 @@
 
 .live-display-placeholder__img--night {
   display: none;
+}
+
+.draggable-section-parent {
+  position: relative;
+  display: inline-block;
+  height: 100%;
+}
+
+.draggable-section {
+  height: 100%;
+  width: 100%;
+  display: flex;
 }
 
 .night-theme {

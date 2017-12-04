@@ -6,12 +6,14 @@ import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import Display from '../Display.vue';
 import { CustomizationService } from '../../services/customization';
+import VueDraggableResizable from 'vue-draggable-resizable'
 
 @Component({
   components: {
     SceneSelector,
     Mixer,
-    Display
+    Display,
+    'vue-draggable-resizable': VueDraggableResizable,
   }
 })
 export default class Live extends Vue {
