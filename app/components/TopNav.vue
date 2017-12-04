@@ -9,6 +9,12 @@
 
   <div class="tabs">
     <button
+      @click="navigateOverlays"
+      class="tab-button"
+      :class="{ active: page === 'BrowseOverlays' }" :disabled="!isUserLoggedIn">
+      <i class="fa fa-tachometer"/> Browse Overlays
+    </button>
+    <button
       @click="navigateDashboard"
       class="tab-button"
       :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn">

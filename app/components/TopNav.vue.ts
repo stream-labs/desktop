@@ -30,6 +30,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('Dashboard');
   }
 
+  navigateOverlays() {
+    this.navigationService.navigate('BrowseOverlays');
+  }
+
   navigateLive() {
     this.navigationService.navigate('Live');
   }
