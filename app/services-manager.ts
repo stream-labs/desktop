@@ -305,7 +305,8 @@ export class ServicesManager extends Service {
       const subscriptionId = `${resourceId}.${methodName}`;
       responsePayload = {
         _type: 'SUBSCRIPTION',
-        resourceId: subscriptionId
+        resourceId: subscriptionId,
+        emitter: 'STREAM',
       };
       if (!this.subscriptions[subscriptionId]) {
         this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
@@ -342,10 +343,11 @@ export class ServicesManager extends Service {
         id: request.id,
         result: {
           _type: 'SUBSCRIPTION',
-          resourceId: promiseId
+          resourceId: promiseId,
+          emitter: 'PROMISE',
         }
       };
-    } else if (responsePayload && responsePayload.isHelper) {
+    } else if (responsePayload && responsePayload.isHelper === true) {
       const helper = responsePayload;
 
       response = {
@@ -362,7 +364,7 @@ export class ServicesManager extends Service {
       // payload can contain helpers-objects
       // we have to wrap them in IpcProxy too
       traverse(responsePayload).forEach((item: any) => {
-        if (item && item.isHelper) {
+        if (item && item.isHelper === true) {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
             _type: 'HELPER',
@@ -394,6 +396,10 @@ export class ServicesManager extends Service {
    */
   private getResource(resourceId: string) {
 
+    if (resourceId === 'ServicesManager') {
+      return this;
+    }
+
     if (this.services[resourceId]) {
       return this.getInstance(resourceId) || this.initService(resourceId);
     }
@@ -405,8 +411,27 @@ export class ServicesManager extends Service {
   }
 
 
+  /**
+   * the information about resource scheme helps to improve performance for API clients
+   * this is undocumented feature mainly for our API client that we're using in tests
+   */
+  getResourceScheme(resourceId: string): Dictionary<string> {
+    const resource = this.getResource(resourceId);
+    const resourceScheme = {};
+
+    Object.keys(resource.__proto__).concat(Object.keys(resource))
+      .forEach(key => {
+        resourceScheme[key] = typeof resource[key];
+      });
+
+    return resourceScheme;
+  }
+
+
   private getHelperModel(helper: Object): Object {
-    if (helper['getModel']) return helper['getModel']();
+    if (helper['getModel'] && typeof helper['getModel'] === 'function') {
+      return helper['getModel']();
+    }
     return {};
   }
 

@@ -3,6 +3,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
+import { sleep } from '../helpers/sleep.js';
 
 useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
 
@@ -47,22 +48,20 @@ test('Switching between scenes', async t => {
 
   const scene = scenesService.getSceneByName('Scene');
   const scene2 = scenesService.createScene('Scene2');
-  let activeSceneId = scenesService.getActiveSceneId();
 
 
-  t.is(scene.id, activeSceneId);
+  t.is(scene.id, scenesService.activeSceneId);
 
   scenesService.makeSceneActive(scene2.id);
-  activeSceneId = scenesService.getActiveSceneId();
 
-  t.is(scene2.id, activeSceneId);
+  t.is(scene2.id, scenesService.activeSceneId);
 
   scene2.remove();
-  activeSceneId = scenesService.getActiveSceneId();
 
-  t.is(scene.id, activeSceneId);
+  t.is(scene.id, scenesService.activeSceneId);
 
 });
+
 
 test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
@@ -70,69 +69,105 @@ test('Creating, fetching and removing scene-items', async t => {
 
   const scene = scenesService.getSceneByName('Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
-  // const image2 = scene.createAndAddSource('Image2', 'image_source');
-  // t.is(image1['name'], 'Image1');
-  //
-  // let items = scene.getItems();
-  // let itemsNames = items.map(item => item['name']);
-  // t.deepEqual(itemsNames, ['Image2', 'Image1']);
-  //
-  //
-  // scene.removeItem(image2.sceneItemId);
-  // items = scene.getItems();
-  // itemsNames = items.map(item => item['name']);
-  // t.deepEqual(itemsNames, ['Image1']);
+  const image2 = scene.createAndAddSource('Image2', 'image_source');
+  t.is(image1['name'], 'Image1');
+
+  let items = scene.getItems();
+  let itemsNames = items.map(item => item['name']);
+  t.deepEqual(itemsNames, ['Image2', 'Image1']);
+
+
+  scene.removeItem(image2.sceneItemId);
+  items = scene.getItems();
+  itemsNames = items.map(item => item['name']);
+  t.deepEqual(itemsNames, ['Image1']);
 
 });
 
-//
-// test('Scenes events', async t => {
-//   const client = await getClient();
-//   let lastEventData = null;
-//   const onEventHandler = (event) => {
-//     lastEventData = event;
-//   };
-//
-//   await client.subscribe('ScenesService', 'sceneSwitched', onEventHandler);
-//   await client.subscribe('ScenesService', 'sceneAdded', onEventHandler);
-//   await client.subscribe('ScenesService', 'sceneRemoved', onEventHandler);
-//   await client.subscribe('ScenesService', 'itemAdded', onEventHandler);
-//   await client.subscribe('ScenesService', 'itemRemoved', onEventHandler);
-//   await client.subscribe('ScenesService', 'itemUpdated', onEventHandler);
-//
-//   const scene2 = await client.request('ScenesService', 'createScene', 'Scene2');
-//   t.is(lastEventData.name, 'Scene2');
-//
-//   const scene3 = await client.request('ScenesService', 'createScene', 'Scene3');
-//   t.is(lastEventData.name, 'Scene3');
-//
-//   await client.request('ScenesService', 'makeSceneActive', scene2.id);
-//   t.is(lastEventData.name, 'Scene2');
-//
-//   await client.request('ScenesService', 'removeScene', scene3.id);
-//   t.is(lastEventData.name, 'Scene3');
-//
-//
-//   const audioInput = await client.request(
-//     scene2.resourceId, 'createAndAddSource', 'AudioInput', 'wasapi_input_capture'
-//   );
-//   t.is(lastEventData.sceneItemId, audioInput.sceneItemId);
-//
-//
-//   await client.request(audioInput.resourceId, 'setVisibility', false);
-//   t.is(lastEventData.visible, false);
-//
-//   lastEventData = null;
-//   await client.request(audioInput.resourceId, 'remove');
-//   t.is(lastEventData.sceneItemId, audioInput.sceneItemId);
-//
-//
-//   // test unsubscribing
-//   lastEventData = null;
-//   await client.unsubscribeAll();
-//   await client.request('ScenesService', 'removeScene', scene2.id);
-//   t.is(lastEventData, null);
-//
-//
-// });
-//
+
+test('Scenes events', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+
+  let lastEventData = null;
+  const onEventHandler = (event: any) => {
+    // console.log('NEW EVENT', event);
+    lastEventData = event;
+  };
+
+  scenesService.sceneSwitched.subscribe(onEventHandler);
+  scenesService.sceneAdded.subscribe(onEventHandler);
+  scenesService.sceneRemoved.subscribe(onEventHandler);
+  scenesService.itemAdded.subscribe(onEventHandler);
+  scenesService.itemRemoved.subscribe(onEventHandler);
+  scenesService.itemUpdated.subscribe(onEventHandler);
+
+  const scene2 = scenesService.createScene('Scene2');
+  await sleep(100);
+
+  t.is(lastEventData && lastEventData['name'], 'Scene2');
+
+  const scene3 = scenesService.createScene('Scene3');
+  await sleep(100);
+
+  scenesService.makeSceneActive(scene2.id);
+  await sleep(100);
+  t.is(lastEventData && lastEventData['name'], 'Scene2');
+
+  scene3.remove();
+  await sleep(100);
+  t.is(lastEventData && lastEventData['name'], 'Scene3');
+
+
+  const image = scene2.createAndAddSource('image', 'image_source');
+  await sleep(100);
+  t.is(lastEventData && lastEventData['sceneItemId'], image.sceneItemId);
+
+
+  image.setVisibility(false);
+  await sleep(100);
+  t.is(lastEventData && lastEventData['visible'], false);
+
+  lastEventData = null;
+  image.remove();
+  await sleep(100);
+  t.is(lastEventData && lastEventData['sceneItemId'], image.sceneItemId);
+
+
+  // test unsubscribing
+  lastEventData = null;
+  await client.unsubscribeAll();
+  await client.request('ScenesService', 'removeScene', scene2.id);
+  t.is(lastEventData, null);
+
+});
+
+
+test('Creating nested scenes', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+
+  const sceneA = scenesService.createScene('SceneA');
+  const sceneB = scenesService.createScene('SceneB');
+  const sceneC = scenesService.createScene('SceneC');
+
+  sceneA.addSource(sceneB.id);
+  let sceneAItems = sceneA.getItems();
+  let itemsANames = sceneAItems.map(item => item['name']);
+
+  t.deepEqual(itemsANames, ['SceneB']);
+
+  sceneC.addSource(sceneA.id);
+  const sceneCItems = sceneC.getItems()
+  const itemsCNames = sceneCItems.map(item => item['name']);
+
+  t.deepEqual(itemsCNames, ['SceneA']);
+
+  // Unable to add a source when the scene you are trying to add already contains your current scene
+  sceneA.addSource(sceneC.id);
+  sceneAItems = sceneA.getItems();
+  itemsANames = sceneAItems.map(item => item['name']);
+
+  t.deepEqual(itemsANames, ['SceneB']);
+
+});

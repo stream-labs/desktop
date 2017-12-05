@@ -12,13 +12,18 @@ let clientInstance: ApiClient = null;
 
 export class ApiClient {
 
-  nextRequestId = 1;
-  socket = new net.Socket();
-  resolveConnection: Function;
-  rejectConnection: Function;
-  requests = {};
-  subscriptions: Dictionary<Subject<any>> = {};
-  connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
+  private nextRequestId = 1;
+  private socket = new net.Socket();
+  private resolveConnection: Function;
+  private rejectConnection: Function;
+  private requests = {};
+  private subscriptions: Dictionary<Subject<any>> = {};
+  private connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
+
+  /**
+   * cached resourceSchemes
+   */
+  private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
   // set to 'true' for debugging
   logsEnabled = false;
@@ -87,18 +92,19 @@ export class ApiClient {
 
 
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
+    this.log('SYNC_REQUEST:', resourceId, methodName, ...args);
+    const stringifiedArgs = args.map(arg => typeof arg === 'string' ? `\"${arg}\"` : arg);
     const process = spawnSync(
       'node',
-      ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, args.join(' ')],
-      { timeout: 1000000 }
+      ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, ...stringifiedArgs],
+      { timeout: 5000 }
     );
 
-    console.log('syncRequest', resourceId, methodName, args);
-    console.log('err', process.stderr.toString());
-    console.log('stdout', process.stdout.toString());
     const err = process.stderr.toString();
+    const responseStr = process.stdout.toString();
     if (err) throw err;
-    const response = JSON.parse(process.stdout.toString());
+    this.log('SYNC_RESPONSE:', responseStr);
+    const response = JSON.parse(responseStr);
     return response;
   }
 
@@ -175,57 +181,70 @@ export class ApiClient {
 
     const hanleRequest = (resourceId: string, property: string, ...args: any[]): any => {
 
+      const result = this.requestSync(resourceId, property as string, ...args);
+
+      // TODO: add promises support
+      if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
+        let subject = this.subscriptions[result.resourceId];
+        if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
+        return subject;
+      } else if (result && result._type === 'HELPER') {
+        return this.getResource(result.resourceId, result);
+      } else {
+
+        // result can contain helpers-objects
+
+        if (Array.isArray(result)) {
+          let i = result.length;
+          while (i--) {
+            const item = result[i];
+            if (item._type !== 'HELPER') continue;
+            result.splice(i, 1, this.getResource(item.resourceId, { ...item }));
+          }
+        }
+
+        return result;
+      }
 
     };
 
     return new Proxy(resourceModel, {
-
 
       get: (target, property, receiver) => {
 
 
         if (resourceModel[property] !== void 0) return resourceModel[property];
 
+        const resourceScheme = this.getResourceScheme(resourceId);
+
+        if (resourceScheme[property] !== 'function') {
+          return hanleRequest(resourceId, property as string);
+        }
+
         return (...args: any[]) => {
-          const result = this.requestSync(resourceId, property as string, ...args);
-
-          console.log('result', result);
-
-          // TODO: add promises support
-          if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
-            let subject = this.subscriptions[result.resourceId];
-            if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
-            return subject;
-          } else if (result && result._type === 'HELPER') {
-            return this.getResource(result.resourceId, result);
-          } else {
-
-            console.log('wrap')
-            // result can contain helpers-objects
-
-            if (Array.isArray(result)) {
-              let i = result.length;
-              while (i--) {
-                const item = result[i];
-                if (item._type !== 'HELPER') continue;
-                result.splice(i, 1, this.getResource(item.resourceId, { ...item }));
-              }
-            }
-
-            // traverse(result).forEach((item: any) => {
-            //   if (item && item._type === 'HELPER') {
-            //     return this.getResource(item.resourceId, { ...item } );
-            //   }
-            // });
-            console.log('before returning');
-            // process.stdout.write(JSON.stringify(result));
-            console.log('return');
-            return result;
-          }
+          return hanleRequest(resourceId, property as string, ...args);
         };
 
       }
     }) as TResourceType;
+  }
+
+  private getResourceTypeName(resourceId: string): string {
+    return resourceId.split('[')[0];
+  }
+
+  private getResourceScheme(resourceId: string): Dictionary<string> {
+    const resourceTypeName = this.getResourceTypeName(resourceId);
+
+    if (!this.resourceSchemes[resourceTypeName]) {
+      this.resourceSchemes[resourceTypeName] = this.requestSync(
+        'ServicesManager',
+        'getResourceScheme',
+        resourceId
+      );
+    }
+
+    return this.resourceSchemes[resourceTypeName];
   }
 }
 
@@ -234,5 +253,6 @@ export async function getClient() {
   if (clientInstance) return clientInstance;
   clientInstance = new ApiClient();
   await clientInstance.connect();
+  await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
   return clientInstance;
 }

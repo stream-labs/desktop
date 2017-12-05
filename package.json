@@ -15,7 +15,7 @@
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "release": "yarn install --cwd bin && node bin/release.js",
-    "test": "ava",
+    "test": "cd test && tsc && ava",
     "clear": "rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator"
   },
