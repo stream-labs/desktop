@@ -1,7 +1,13 @@
 <template>
 <div>
   <div class="overlays-container">
-    <webview class="overlays" id="overlaysWebview" :src="overlaysUrl"></webview>
+    <webview
+      class="overlays"
+      id="overlaysWebview"
+      :src="overlaysUrl"
+      ref="overlaysWebview"
+      preload="bundles/guest-api">
+    </webview>
   </div>
 </div>
 </template>
