@@ -2,7 +2,8 @@ import { StatefulService, mutation } from '../stateful-service';
 import { OnboardingService } from '../onboarding';
 import {
   ScenesCollectionsService,
-  OverlaysPersistenceService
+  OverlaysPersistenceService,
+  IDownloadProgress
 } from '../scenes-collections';
 import { HotkeysService } from '../hotkeys';
 import { UserService } from '../user';
@@ -92,6 +93,8 @@ export class AppService extends StatefulService<IAppState>
       // Pre-fetch stream info
       this.streamInfoService;
 
+      window['overlays'] = this.overlaysPersistenceService;
+
       this.ipcServerService.listen();
       this.tcpServerService.listen();
       this.FINISH_LOADING();
@@ -158,6 +161,14 @@ export class AppService extends StatefulService<IAppState>
 
     this.enableAutoSave();
     this.FINISH_LOADING();
+  }
+
+  /**
+   * Downloads and installs an overlay
+   * @param url the URL of the overlay
+   */
+  async installOverlay(url: string, progressCallback?: (info: IDownloadProgress) => void) {
+    const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
   }
 
   /**
