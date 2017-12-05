@@ -1,6 +1,6 @@
 /**
- * This code allows to execute API requests from terminal.
- * Tests run this code in separated process via `spawnSync` to emulate synchronous nature of our API.
+ * This code allows to execute API requests from a terminal.
+ * Tests run this code in separated process via `spawnSync` to emulate the synchronous nature of our API.
  * If this solution will become too slow we can use for example synchronous http/ajax requests instead.
  * @example
  * node cmd-client.js ScenesService getScenes
