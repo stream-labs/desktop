@@ -373,6 +373,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       return true;
     }
 
+    // handle `listenAllSubscriptions` directive
     if (
       request.method === 'listenAllSubscriptions' &&
       request.params.resource === 'TcpServerService'

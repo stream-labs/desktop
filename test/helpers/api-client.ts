@@ -172,21 +172,17 @@ export class ApiClient {
   }
 
 
-  // subscribe(resourceId: string, channelName: string, cb: Function) {
-  //   return this.request(resourceId, channelName).then((subscriptionInfo: {resourceId: string}) => {
-  //     this.subscriptions[subscriptionInfo.resourceId] = cb;
-  //   });
-  // }
-
   unsubscribe(subscriptionId: string) {
     return this.request(subscriptionId, 'unsubscribe');
   }
+
 
   unsubscribeAll() {
     return Promise.all(
       Object.keys(this.subscriptions).map(subscriptionId => this.unsubscribe(subscriptionId))
     );
   }
+
 
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
 
@@ -240,9 +236,11 @@ export class ApiClient {
     }) as TResourceType;
   }
 
+
   private getResourceTypeName(resourceId: string): string {
     return resourceId.split('[')[0];
   }
+
 
   private getResourceScheme(resourceId: string): Dictionary<string> {
     const resourceTypeName = this.getResourceTypeName(resourceId);

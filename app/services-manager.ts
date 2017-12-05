@@ -440,7 +440,7 @@ export class ServicesManager extends Service {
 
   /**
    * the information about resource scheme helps to improve performance for API clients
-   * this is undocumented feature mainly for our API client that we're using in tests
+   * this is undocumented feature is mainly for our API client that we're using in tests
    */
   getResourceScheme(resourceId: string): Dictionary<string> {
     const resource = this.getResource(resourceId);

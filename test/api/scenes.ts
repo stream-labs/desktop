@@ -25,7 +25,6 @@ test('Creating, fetching and removing scenes', async t => {
 
   const scene2 = scenesService.createScene('Scene2');
 
-  // const scene2 = await client.request('ScenesService', 'createScene', 'Scene2');
   t.is(scene2.name, 'Scene2');
 
   let scenes = scenesService.getScenes();
@@ -90,7 +89,6 @@ test('Scenes events', async t => {
 
   let lastEventData = null;
   const onEventHandler = (event: any) => {
-    // console.log('NEW EVENT', event);
     lastEventData = event;
   };
 
