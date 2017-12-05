@@ -12,6 +12,7 @@ const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
 
+let promptToContinue = false;
 
 /**
  * CONFIGURATION
@@ -39,6 +40,13 @@ function executeCmd(cmd) {
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
+
+    if (promptToContinue) {
+      info('Because this release was succssfully packaged before the process failed, you');
+      info('may safely choose the option "Continue a failed release" when re-running');
+      info('this script.  This will skip packaging and will not use up another version number.');
+    }
+
     sh.exit(1);
   }
 }
@@ -116,11 +124,6 @@ async function runScript() {
   checkEnv('CSC_KEY_PASSWORD');
   checkEnv('SENTRY_AUTH_TOKEN');
 
-  // Make sure the release environment is clean
-  info('Stashing all uncommitted changes...');
-  executeCmd('git add -A');
-  executeCmd('git stash');
-
   const deployType = (await inq.prompt({
     type: 'list',
     name: 'deployType',
@@ -132,7 +135,11 @@ async function runScript() {
       },
       {
         name: 'Release the current branch as-is (high priority hotfix releases only)',
-        value: 'not-normal'
+        value: 'as-is'
+      },
+      {
+        name: 'Continue a failed release (skips all packaging and testing)',
+        value: 'continue'
       }
     ]
   })).deployType;
@@ -150,73 +157,93 @@ async function runScript() {
 
     info('Merging staging into master...');
     executeCmd('git merge staging');
-  } else {
+  } else if (deployType === 'as-is') {
     warn('You are about to release the current branch as-is.');
     warn('You should only do this if you know what you are doing.');
     warn('The current branch you are about to release should almost definitely be master');
     if (!await confirm('Are you absolutely sure you want to release the current branch?')) sh.exit(0);
+  } else if (deployType === 'continue') {
+    warn('You are about to deploy the packaged app as-is in your dist/ directory.');
+    warn('You should only run this if a release just failed during one of the following steps:');
+    warn('- Pushing changes to the origin git repository');
+    warn('- Registering the release and source code with sentry');
+    warn('- Uploading the release artifacts to S3');
+    if (!await confirm('Are you absolutely sure you want to continue with the release?')) sh.exit(0);
   }
 
-  info('Ensuring submodules are up to date...');
-  executeCmd('git submodule update --init --recursive');
+  let newVersion;
 
-  info('Removing old packages...');
-  sh.rm('-rf', 'node_modules');
+  if (deployType === 'continue') {
+    const pjson = JSON.parse(fs.readFileSync('package.json'));
+    newVersion = pjson.version;
+  } else {
+    // Make sure the release environment is clean
+    info('Stashing all uncommitted changes...');
+    executeCmd('git add -A');
+    executeCmd('git stash');
 
-  info('Installing fresh packages...');
-  executeCmd('yarn install');
+    info('Ensuring submodules are up to date...');
+    executeCmd('git submodule update --init --recursive');
 
-  info('Installing node-obs...');
-  executeCmd('yarn install-node-obs');
+    info('Removing old packages...');
+    sh.rm('-rf', 'node_modules');
 
-  info('Compiling assets...');
-  executeCmd('yarn compile');
+    info('Installing fresh packages...');
+    executeCmd('yarn install');
 
-  info('Running tests...');
-  executeCmd('yarn test');
+    info('Installing node-obs...');
+    executeCmd('yarn install-node-obs');
 
-  info('The current revision has passed testing and is ready to be');
-  info('packaged and released');
+    info('Compiling assets...');
+    executeCmd('yarn compile');
 
-  const pjson = JSON.parse(fs.readFileSync('package.json'));
-  const currentVersion = pjson.version;
+    info('Running tests...');
+    executeCmd('yarn test');
 
-  info(`The current application version is ${currentVersion}`);
-  const newVersion = (await inq.prompt({
-    type: 'list',
-    name: 'newVersion',
-    message: 'What should the new version number be?',
-    choices: [
-      semver.inc(currentVersion, 'patch'),
-      semver.inc(currentVersion, 'minor'),
-      semver.inc(currentVersion, 'major')
-    ]
-  })).newVersion;
+    info('The current revision has passed testing and is ready to be');
+    info('packaged and released');
 
-  if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
+    const pjson = JSON.parse(fs.readFileSync('package.json'));
+    const currentVersion = pjson.version;
 
-  pjson.version = newVersion;
+    info(`The current application version is ${currentVersion}`);
+    newVersion = (await inq.prompt({
+      type: 'list',
+      name: 'newVersion',
+      message: 'What should the new version number be?',
+      choices: [
+        semver.inc(currentVersion, 'patch'),
+        semver.inc(currentVersion, 'minor'),
+        semver.inc(currentVersion, 'major')
+      ]
+    })).newVersion;
 
-  info(`Writing ${newVersion} to package.json...`);
-  fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
+    if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
 
-  // Packaging the app takes a long time and sometimes fails, so we
-  // do this step before committing and tagging the release.  This way
-  // we can re-run the script without "wasting" a version number.
-  info('Packaging the app...');
-  executeCmd('yarn package');
+    pjson.version = newVersion;
 
-  info(`Version ${newVersion} is ready to be deployed.`);
-  info('You can find the packaged app at dist/win-unpacked.');
-  info('Please run the packaged application now to ensure it starts up properly.');
-  info('When you have confirmed the packaged app works properly, you');
-  info('can continue with the deploy.');
+    info(`Writing ${newVersion} to package.json...`);
+    fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
 
-  if (!await confirm('Are you ready to deploy?')) {
-    warn('The deploy has been canceled, however the release has already been tagged.');
-    warn(`${newVersion} should be marked as an unreleased version, and a new version should be packaged.`);
-    sh.exit(0);
+    // Packaging the app takes a long time and sometimes fails, so we
+    // do this step before committing and tagging the release.  This way
+    // we can re-run the script without "wasting" a version number.
+    info('Packaging the app...');
+    executeCmd('yarn package');
+
+    info(`Version ${newVersion} is ready to be deployed.`);
+    info('You can find the packaged app at dist/win-unpacked.');
+    info('Please run the packaged application now to ensure it starts up properly.');
+    info('When you have confirmed the packaged app works properly, you');
+    info('can continue with the deploy.');
+
+    if (!await confirm('Are you ready to deploy?')) sh.exit(0);
   }
+
+  // This prints a special error message on exits that lets the user know
+  // they can optionally choose to perform a "continue" release, which will
+  // skip re-packaging the app and will not increase the version number again.
+  promptToContinue = true;
 
   info('Committing changes...');
   executeCmd('git add -A');
@@ -226,7 +253,7 @@ async function runScript() {
   executeCmd('git push origin HEAD');
 
   info(`Tagging version ${newVersion}...`);
-  executeCmd(`git tag 'v${newVersion}'`);
+  executeCmd(`git tag -f 'v${newVersion}'`);
   executeCmd('git push --tags');
 
   info(`Registering ${newVersion} with sentry...`);
