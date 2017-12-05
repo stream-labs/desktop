@@ -9,12 +9,6 @@
 
   <div class="tabs">
     <button
-      @click="navigateOverlays"
-      class="tab-button"
-      :class="{ active: page === 'BrowseOverlays' }" :disabled="!isUserLoggedIn">
-      <i class="fa fa-tachometer"/> Browse Overlays
-    </button>
-    <button
       @click="navigateDashboard"
       class="tab-button"
       :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn">
@@ -24,13 +18,19 @@
       @click="navigateStudio"
       class="tab-button"
       :class="{ active: page === 'Studio' }">
-      <i class="fa fa-video-camera"/> Editor
+      <i class="fa fa-object-group"/> Editor
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
       :class="{ active: page === 'Live' }" :disabled="!isUserLoggedIn">
-      <i class="fa fa-list"/> Live
+      <i class="fa fa-feed"/> Live
+    </button>
+    <button
+      @click="navigateOverlays"
+      class="tab-button"
+      :class="{ active: page === 'BrowseOverlays' }" :disabled="!isUserLoggedIn">
+      <i class="fa fa-image"/> Library
     </button>
   </div>
 

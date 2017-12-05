@@ -15,6 +15,7 @@
   right: 0;
   bottom: 0;
   left: 0;
+  margin-top: 20px;
 }
 
 .overlays {
