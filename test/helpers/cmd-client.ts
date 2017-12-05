@@ -1,6 +1,13 @@
+/**
+ * This code allows to execute API requests from terminal.
+ * Tests run this code in separated process via `spawnSync` to emulate synchronous nature of our API.
+ * If this solution will become too slow we can use for example synchronous http/ajax requests instead.
+ * @example
+ * node cmd-client.js ScenesService getScenes
+ */
 import { getClient } from './api-client';
 
-// prevent logs to be sent in stdout
+// prevents logs from other parts of code to be sent in stdout
 console.log = () => {};
 
 !(async function () {
