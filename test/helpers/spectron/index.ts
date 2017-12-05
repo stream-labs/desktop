@@ -1,4 +1,5 @@
 /// <reference path="../../../app/index.d.ts" />
+import 'rxjs/add/operator/first';
 import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';

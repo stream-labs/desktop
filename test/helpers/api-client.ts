@@ -1,9 +1,10 @@
 import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
 import { Subject } from 'rxjs/Subject';
 
+
 const net = require('net');
 const { spawnSync } = require('child_process');
-const  traverse = require('traverse');
+
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
@@ -11,6 +12,8 @@ const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
 let clientInstance: ApiClient = null;
 
 export class ApiClient {
+
+  eventReceived = new Subject<any>();
 
   private nextRequestId = 1;
   private socket = new net.Socket();
@@ -165,6 +168,7 @@ export class ApiClient {
 
       if (result._type === 'EVENT') {
         const eventSubject = this.subscriptions[message.result.resourceId];
+        this.eventReceived.next(result.data);
         if (eventSubject) eventSubject.next(result.data);
       }
     });
@@ -234,6 +238,14 @@ export class ApiClient {
 
       }
     }) as TResourceType;
+  }
+
+
+  fetchNextEvent(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.eventReceived.first().subscribe(event => resolve(event));
+      setTimeout(() => reject('timeout'), 2000);
+    });
   }
 
 

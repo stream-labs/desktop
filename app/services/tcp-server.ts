@@ -21,9 +21,8 @@ interface IClient {
   subscriptions: string[];
 
   /**
-   * Client with `listenAllSubscriptions=true` receives the events
-   * that has been sent for other clients.
-   * this is helpful for tests
+   * Clients with listenAllSubscriptions=true receive events that have been sent to other clients.
+   * This is helpful for tests.
    */
   listenAllSubscriptions: boolean;
 }

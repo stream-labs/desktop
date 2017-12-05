@@ -16,8 +16,6 @@ console.log = () => {};
   const method = process.argv[3];
   const args = process.argv.slice(4);
 
-  // console.info('args', args);
-
   // parse arguments
   args.forEach((arg, ind) => {
     if (arg.charAt(0) === '"') {
@@ -27,8 +25,6 @@ console.log = () => {};
       args[ind] = JSON.parse(args[ind]);
     }
   });
-
-  // console.info(args);
 
   const client = await getClient();
   client.request(resource, method, ...args).then(response => {

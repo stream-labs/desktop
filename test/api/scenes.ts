@@ -86,57 +86,53 @@ test('Creating, fetching and removing scene-items', async t => {
 test('Scenes events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  let eventData: Dictionary<any>;
 
-  let lastEventData = null;
-  const onEventHandler = (event: any) => {
-    lastEventData = event;
-  };
-
-  scenesService.sceneSwitched.subscribe(onEventHandler);
-  scenesService.sceneAdded.subscribe(onEventHandler);
-  scenesService.sceneRemoved.subscribe(onEventHandler);
-  scenesService.itemAdded.subscribe(onEventHandler);
-  scenesService.itemRemoved.subscribe(onEventHandler);
-  scenesService.itemUpdated.subscribe(onEventHandler);
+  scenesService.sceneSwitched.subscribe(() => void 0);
+  scenesService.sceneAdded.subscribe(() => void 0);
+  scenesService.sceneRemoved.subscribe(() => void 0);
+  scenesService.itemAdded.subscribe(() => void 0);
+  scenesService.itemRemoved.subscribe(() => void 0);
+  scenesService.itemUpdated.subscribe(() => void 0);
 
   const scene2 = scenesService.createScene('Scene2');
-  await sleep(100);
+  eventData = await client.fetchNextEvent();
 
-  t.is(lastEventData && lastEventData['name'], 'Scene2');
+  t.is(eventData.name, 'Scene2');
 
   const scene3 = scenesService.createScene('Scene3');
-  await sleep(100);
+  await client.fetchNextEvent();
 
   scenesService.makeSceneActive(scene2.id);
-  await sleep(100);
-  t.is(lastEventData && lastEventData['name'], 'Scene2');
+  eventData = await client.fetchNextEvent();
+  t.is(eventData.name, 'Scene2');
 
   scene3.remove();
-  await sleep(100);
-  t.is(lastEventData && lastEventData['name'], 'Scene3');
+  eventData = await client.fetchNextEvent();
+  t.is(eventData.name, 'Scene3');
 
 
   const image = scene2.createAndAddSource('image', 'image_source');
-  await sleep(100);
-  t.is(lastEventData && lastEventData['sceneItemId'], image.sceneItemId);
+  eventData = await client.fetchNextEvent();
+  t.is(eventData.sceneItemId, image.sceneItemId);
 
 
   image.setVisibility(false);
-  await sleep(100);
-  t.is(lastEventData && lastEventData['visible'], false);
+  eventData = await client.fetchNextEvent();
+  t.is(eventData.visible, false);
 
-  lastEventData = null;
+
   image.remove();
-  await sleep(100);
-  t.is(lastEventData && lastEventData['sceneItemId'], image.sceneItemId);
+  eventData = await client.fetchNextEvent();
+  t.is(eventData.sceneItemId, image.sceneItemId);
 
 
   // test unsubscribing
-  lastEventData = null;
   await client.unsubscribeAll();
   await client.request('ScenesService', 'removeScene', scene2.id);
-  t.is(lastEventData, null);
 
+  const promise = client.fetchNextEvent();
+  await t.throws(promise);
 });
 
 
