@@ -20,6 +20,7 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
+import path from 'path';
 
 interface IAppState {
   loading: boolean;
@@ -171,7 +172,8 @@ export class AppService extends StatefulService<IAppState>
     this.START_LOADING();
 
     const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
-    const configName = this.scenesCollectionsService.suggestName('This should be changed');
+    const filename = path.parse(url).name;
+    const configName = this.scenesCollectionsService.suggestName(filename);
 
     await this.loadOverlay(configName, pathName);
   }

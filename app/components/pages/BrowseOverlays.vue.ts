@@ -5,12 +5,14 @@ import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { IDownloadProgress } from 'services/scenes-collections';
 import { AppService } from 'services/app';
+import { NavigationService } from 'services/navigation';
 
 @Component({})
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
   @Inject() appService: AppService;
+  @Inject() navigationService: NavigationService;
 
   $refs: {
     overlaysWebview: Electron.WebviewTag;
@@ -30,11 +32,9 @@ export default class BrowseOverlays extends Vue {
     url: string,
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
-    console.log(this);
-    console.log('Called installOverlay');
-
     // TODO: Perform some security checking of the URL hostname
     await this.appService.installOverlay(url, progressCallback);
+    this.navigationService.navigate('Studio');
   }
 
   get overlaysUrl() {
