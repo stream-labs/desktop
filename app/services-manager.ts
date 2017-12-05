@@ -43,6 +43,7 @@ import { ObserveList } from './util/service-observer';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import { GuestApiService } from 'services/guest-api';
 
 const { ipcRenderer } = electron;
 
@@ -143,7 +144,8 @@ export class ServicesManager extends Service {
     IpcServerService,
     TcpServerService,
     StreamInfoService,
-    StreamlabelsService
+    StreamlabelsService,
+    GuestApiService
   };
 
   private instances: Dictionary<Service> = {};
