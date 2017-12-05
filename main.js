@@ -12,19 +12,10 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
-const fs = require('fs');
-const path = require('path');
-const _ = require('lodash');
-const obs = require(inAsar ? '../../node-obs' : './node-obs');
-const { Updater } = require('./updater/Updater.js');
-const uuid = require('uuid/v4');
-const rimraf = require('rimraf');
-const bugsplat = require('bugsplat')('slobs', 'slobs-main', pjson.version);
+const bt = require('backtrace-node');
 
-function handleUnhandledException() {
-  // We recommend you quit your application if an uncaughtException occurs
+function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
   'An unexpected error occured and the application must be shut down.\n' +
   'Information concerning this occasion has been sent for debugging purposes.\n' +
@@ -36,21 +27,43 @@ function handleUnhandledException() {
   }
 }
 
-if (pjson.env === 'production') {
-  process.on("uncaughtException", bugsplat.post);
-  bugsplat.setCallback(handleUnhandledException);
-  ipcMain.on('rendererCrash', handleUnhandledException);
+function handleUnhandledException(err) {
+  bt.report(err, {}, handleFinishedReport);
 }
 
-crashReporter.start({
-  companyName: 'Streamlabs',
-  productName: 'Streamlabs OBS',
-  submitURL: 'http://slobs.bugsplat.com/post/bp/crash/postBP.php',
-  extra: {
-    prod: 'slobs-main',
-    key: pjson.version
-  }
-});
+if (pjson.env === 'production') {
+  bt.initialize({
+    disableGlobalHandler: true,
+    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
+    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    attributes: {
+      version: pjson.version,
+      processType: 'main'
+    }
+  });
+
+  process.on("uncaughtException", handleUnhandledException);
+
+  crashReporter.start({
+    productName: 'streamlabs-obs',
+    companyName: 'streamlabs',
+    submitURL: 
+      'https://streamlabs.sp.backtrace.io:6098/post?' +
+      'format=minidump&' +
+      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+    extra: {
+      version: pjson.version,
+      processType: 'main'
+    }
+  });
+}
+
+const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
+const fs = require('fs');
+const _ = require('lodash');
+const { Updater } = require('./updater/Updater.js');
+const uuid = require('uuid/v4');
+const rimraf = require('rimraf');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -87,6 +100,17 @@ const indexUrl = 'file://' + __dirname + '/index.html';
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
+}
+
+// Lazy require OBS
+let _obs;
+
+function getObs() {
+  if (!_obs) {
+    _obs = require(inAsar ? '../../node-obs' : './node-obs');
+  }
+
+  return _obs;
 }
 
 
@@ -143,7 +167,7 @@ function startApp() {
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();
     session.defaultSession.flushStorageData();
-    obs.OBS_API_destroyOBS_API();
+    getObs().OBS_API_destroyOBS_API();
     app.quit();
   });
 
@@ -172,7 +196,26 @@ function startApp() {
   // until main window asynchronous response
   const requests = { };
 
+  function sendRequest(request, event = null) {
+    mainWindow.webContents.send('services-request', request);
+    if (!event) return;
+    requests[request.id] = Object.assign({}, request, { event });
+  }
+
+  // use this function to call some service method from the main process
+  function callService(resource, method, ...args) {
+    sendRequest({
+      jsonrpc: '2.0',
+      method,
+      params: {
+        resource,
+        args
+      }
+    });
+  }
+
   ipcMain.on('services-ready', () => {
+    callService('AppService', 'setArgv', process.argv);
     childWindow.loadURL(indexUrl + '?child=true');
   });
 
@@ -181,12 +224,11 @@ function startApp() {
   });
 
   ipcMain.on('services-request', (event, payload) => {
-    const request = { id: uuid(), payload };
-    mainWindow.webContents.send('services-request', request);
-    requests[request.id] = Object.assign({}, request, { event });
+    sendRequest(payload, event);
   });
 
   ipcMain.on('services-response', (event, response) => {
+    if (!requests[response.id]) return;
     requests[response.id].event.returnValue = response;
     delete requests[response.id];
   });
@@ -198,13 +240,19 @@ function startApp() {
 
   if (isDevMode) {
     require('devtron').install();
-    const devtoolsInstaller = require('electron-devtools-installer');
-    devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+
+    // Vue dev tools appears to cause strange non-deterministic
+    // interference with certain NodeJS APIs, expecially asynchronous
+    // IO from the renderer process.  Enable at your own risk.
+
+    // const devtoolsInstaller = require('electron-devtools-installer');
+    // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+
     openDevTools();
   }
 
   // Initialize various OBS services
-  obs.OBS_API_initAPI(app.getPath('userData'));
+  getObs().OBS_API_initAPI(app.getPath('userData'));
 }
 
 // This ensures that only one copy of our app can run at once.
@@ -334,15 +382,6 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
 });
 
 
-// Handle service initialization
-const servicesInitialized = new Set();
-
-ipcMain.on('services-shouldInit', (event, service) => {
-  event.returnValue = !servicesInitialized.has(service);
-  servicesInitialized.add(service);
-});
-
-
 // Virtual node OBS calls:
 //
 // These are methods that appear upstream to be OBS
@@ -395,7 +434,7 @@ ipcMain.on('obs-apiCall', (event, data) => {
   if (nodeObsVirtualMethods[data.method]) {
     retVal = nodeObsVirtualMethods[data.method].apply(null, mappedArgs);
   } else {
-    retVal = obs[data.method].apply(obs, mappedArgs);
+    retVal = getObs()[data.method](...mappedArgs);
   }
 
   if (shouldLog) log('OBS RETURN VALUE', retVal);
@@ -424,4 +463,12 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   const sizes = require('obs-studio-node').getSourcesSize(names);
 
   e.sender.send('notifySourceAttributes', sizes);
+});
+
+ipcMain.on('streamlabels-writeFile', (e, info) => {
+  fs.writeFile(info.path, info.data, err => {
+    if (err) {
+      console.log('Streamlabels: Error writing file', err);
+    }
+  });
 });

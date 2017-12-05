@@ -11,19 +11,19 @@
     <button
       @click="navigateDashboard"
       class="tab-button"
-      :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn">
+      :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-tachometer"/> Dashboard
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
-      :class="{ active: page === 'Studio' }">
+      :class="{ active: page === 'Studio' }" :disabled="locked">
       <i class="fa fa-video-camera"/> Editor
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
-      :class="{ active: page === 'Live' }" :disabled="!isUserLoggedIn">
+      :class="{ active: page === 'Live' }" :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-list"/> Live
     </button>
   </div>
@@ -69,7 +69,7 @@
   max-width:  none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
-  flex: 0 0 48px;
+  flex: 0 0 45px;
 }
 
 .top-nav-right {

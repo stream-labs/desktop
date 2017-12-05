@@ -9,7 +9,7 @@ import { ISettingsSubCategory } from '../../../services/settings';
 export default class GenericFormGroups extends Vue {
 
   @Prop()
-  value: ISettingsSubCategory;
+  value: ISettingsSubCategory[];
 
   collapsedGroups: Dictionary<boolean> = {};
 

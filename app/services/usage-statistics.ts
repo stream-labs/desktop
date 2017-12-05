@@ -23,7 +23,7 @@ export function track(event: TUsageEvent) {
 
     return {
       ...descriptor,
-      value(...args: any[]) {
+      value(...args: any[]): any {
         UsageStatisticsService.instance.recordEvent(event);
         descriptor.value.apply(this, args);
       }

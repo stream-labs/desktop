@@ -6,7 +6,20 @@ Electron client for the Streamlabs OBS streaming software.
 
 This application currently only supports 64-bit Windows.
 
+## Issues
+
+Please submit all issues here:
+
+https://tracker.streamlabs.com
+
 ## Dependencies
+
+### Node.js
+
+Node is required for installing npm packages and for running
+various scripts.  We recommend the current LTS release, 8.9.1:
+
+https://nodejs.org
 
 ### Yarn
 
@@ -26,6 +39,20 @@ Visual Studio Community 2015 with Update 3
 
 Make sure you do a custom installation and select Visual C++ from
 the languages section.
+
+### CMake
+
+Some of our native addons require CMake for compilation.  You can
+download it here:
+
+https://cmake.org/download/
+
+### Python 2.7
+
+Node-gyp requires python 2.7 available in your path to install some
+native addons.  You can download it here:
+
+https://www.python.org/
 
 ## Installation
 
@@ -78,6 +105,8 @@ this would only run in production.
 
 `SLOBS_DISABLE_MAIN_LOGGING`: Disable javascript logging in the main process.
 
+`SLOBS_REPORT_TO_SENTRY`: Report errors to sentry in the dev environment
+
 ## Packaging / Distributing
 
 Currently only Windows x64 packaging is supported.
@@ -93,7 +122,7 @@ probably be the `master` branch.  You should probably try running
 the app from your dev environment to make sure everything is
 working before you start the release process.
 
-### Packaging and Deploying
+### Packaging
 
 Make sure the app is not running in your dev environment
 before you start the packaging process.
@@ -107,29 +136,39 @@ yarn package
 This will package a distributable installer `.exe` to the `dist/`
 directory.  There is also an unpacked version in `dist/win-unpacked`.
 
-If you plan on deploying the app to our update server, you should make
-sure that the packager can sign the executables.
-This will only happen if you have `CSC_LINK` and `CSC_KEY_PASSWORD`
-set in your environment.  Only authorized team members have access to these.
+### Releasing
 
-If you want to deploy the packaged installer such that it will be
-picked up by the auto-updater, you can run:
+If you want to release a new version to the update server, you will need
+the following variables in your environment:
 
 ```
-yarn deploy
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+CSC_LINK
+CSC_KEY_PASSWORD
+SENTRY_AUTH_TOKEN
 ```
 
-You should thoroughly test the packaged app before running this, since
-all users will be forced to upgrade to this verion the next time they
-start the app.
+Only authorized team members have permission to release new versions.
+If you need help setting up your environment for release, you can ask
+someone on the team for help.
 
-In order for this to work, you will need to have `AWS_ACCESS_KEY_ID`
-and `AWS_SECRET_ACCESS_KEY` set in your environment. These values
-are secret. Only authorized team members have deploy access.
+If your environment is properly set up, you can use the automated
+release script to push out a new release.
 
-### Deploy Checklist
+Simply run:
 
-This is a checklist to run through every time you deploy.
+```
+yarn release
+```
+
+and follow the instructions.
+
+### Legacy Release Checklist
+
+NOTE: This checklist is deprecated, and is only kept here in case
+the automated deploy script isn't working and we need to do a
+manual deploy.
 
 - [ ] Merge `staging` into `master` - DO NOT "Squash & Merge", just do a regular merge
 - [ ] Check out `master`

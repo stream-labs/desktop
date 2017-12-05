@@ -67,7 +67,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: 'Rename',
-        click: () => this.sourcesService.showRenameSource(this.sceneItem.name)
+        click: () => this.sourcesService.showRenameSource(this.sceneItem.sourceId)
       });
 
       this.append({
@@ -141,8 +141,7 @@ export class EditMenu extends Menu {
   }
 
   private showFilters() {
-    // TODO: This should take an id
-    this.sourceFiltersService.showSourceFilters(this.source.name);
+    this.sourceFiltersService.showSourceFilters(this.source.sourceId);
   }
 
 

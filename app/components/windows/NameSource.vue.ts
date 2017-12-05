@@ -5,7 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType} from '../../services/sources';
+import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
 import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
 
 @Component({
@@ -29,13 +29,21 @@ export default class NameSource extends Vue {
   options: {
     sourceType?: TSourceType,
     widgetType?: string,
-    rename?: string
+    renameId?: string,
+    propertiesManager?: TPropertiesManager
   }  = this.windowsService.getChildWindowQueryParams();
 
-  name = this.options.rename || '';
+  name = '';
   error = '';
 
   mounted() {
+
+    if (this.options.renameId) {
+      const source = this.sourcesService.getSource(this.options.renameId);
+      this.name = source.name;
+      return;
+    }
+
     const sourceType =
       this.sourceType &&
       this.sourcesService.getAvailableSourcesTypesList()
@@ -47,19 +55,26 @@ export default class NameSource extends Vue {
   }
 
   submit() {
-    if (this.isTaken(this.name)) {
-      this.error = 'That name is already taken';
-    } else if (this.options.rename) {
-      this.sourcesService.getSourceByName(this.options.rename).setName(this.name);
+    if (!this.name) {
+      this.error = 'The source name is required';
+    } else if (this.options.renameId) {
+      this.sourcesService.getSource(this.options.renameId).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
       let sourceId: string;
 
       if (this.sourceType != null) {
-        sourceId = this.scenesService.activeScene.createAndAddSource(
+        const source = this.sourcesService.createSource(
           this.name,
-          this.sourceType
-        ).sourceId;
+          this.sourceType,
+          {},
+          {
+            propertiesManager: this.options.propertiesManager || void 0
+          }
+        );
+
+        this.scenesService.activeScene.addSource(source.sourceId);
+        sourceId = source.sourceId;
       } else if (this.widgetType != null) {
         sourceId = this.widgetsService.createWidget(
           this.widgetType,
@@ -69,10 +84,6 @@ export default class NameSource extends Vue {
 
       this.sourcesService.showSourceProperties(sourceId);
     }
-  }
-
-  isTaken(name: string) {
-    return this.sourcesService.getSourceByName(name);
   }
 
   get sourceType(): TSourceType {

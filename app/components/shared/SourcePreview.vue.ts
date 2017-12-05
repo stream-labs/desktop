@@ -21,7 +21,7 @@ export default class SourcePreview extends Vue {
   windowsService: WindowsService;
 
   @Prop()
-  sourceName: string;
+  sourceId: string;
 
   $refs: {
     preview: HTMLElement
@@ -36,7 +36,7 @@ export default class SourcePreview extends Vue {
     this.createDisplay();
   }
 
-  @Watch('sourceName')
+  @Watch('sourceId')
   changeSource() {
     this.destroyDisplay();
     this.createDisplay();
@@ -50,7 +50,7 @@ export default class SourcePreview extends Vue {
 
   createDisplay() {
     this.obsApiService.createSourceDisplay(
-      this.sourceName,
+      this.sourceId,
       'Preview Window',
       remote.getCurrentWindow().getNativeWindowHandle()
     );

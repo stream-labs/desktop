@@ -21,9 +21,9 @@ export default class AddSourceFilter extends Vue {
   @Inject('SourceFiltersService')
   filtersService: SourceFiltersService;
 
-  sourceName: string = this.windowsService.getChildWindowQueryParams().sourceName;
-  form = this.filtersService.getAddNewFormData(this.sourceName);
-  availableTypes = this.filtersService.getTypesForSource(this.sourceName);
+  sourceId: string = this.windowsService.getChildWindowQueryParams().sourceId;
+  form = this.filtersService.getAddNewFormData(this.sourceId);
+  availableTypes = this.filtersService.getTypesForSource(this.sourceId);
   error = '';
 
   mounted() {
@@ -36,21 +36,21 @@ export default class AddSourceFilter extends Vue {
     if (this.error) return;
 
     this.filtersService.add(
-      this.sourceName,
+      this.sourceId,
       this.form.type.value,
       name
     );
 
-    this.filtersService.showSourceFilters(this.sourceName, name);
+    this.filtersService.showSourceFilters(this.sourceId, name);
   }
 
   cancel() {
-    this.filtersService.showSourceFilters(this.sourceName);
+    this.filtersService.showSourceFilters(this.sourceId);
   }
 
   validateName(name: string) {
     if (!name) return 'Name is required';
-    if (this.filtersService.getFilters(this.sourceName).find(filter => filter.name === name)) {
+    if (this.filtersService.getFilters(this.sourceId).find(filter => filter.name === name)) {
       return 'That name is already taken';
     }
     return '';
@@ -60,7 +60,7 @@ export default class AddSourceFilter extends Vue {
     const name = this.availableTypes.find(({ type }) => {
       return type === this.form.type.value;
     }).description;
-    this.form.name.value = this.filtersService.suggestName(this.sourceName, name);
+    this.form.name.value = this.filtersService.suggestName(this.sourceId, name);
   }
 
 }

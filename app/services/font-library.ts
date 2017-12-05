@@ -1,7 +1,7 @@
 import { Service } from './service';
 import path from 'path';
 import fs from 'fs';
-import http from 'http';
+import https from 'https';
 import electron from 'electron';
 
 
@@ -96,7 +96,7 @@ export class FontLibraryService extends Service {
     return new Promise(resolve => {
       this.ensureFontsDirectory();
 
-      http.get(this.libraryUrl(file), response => {
+      https.get(this.libraryUrl(file), response => {
         const fontFile = fs.createWriteStream(fontPath);
 
         fontFile.on('finish', () => resolve(fontPath));
@@ -126,7 +126,7 @@ export class FontLibraryService extends Service {
 
   // Create an s3 font library url from a filename
   private libraryUrl(file: string) {
-    return `http://s3-us-west-2.amazonaws.com/streamlabs-obs/fonts/${file}`;
+    return `https://d1g6eog1uhe0xm.cloudfront.net/fonts/${file}`;
   }
 
 }

@@ -1,12 +1,14 @@
 <template>
 <div class="footer">
-  <performance-metrics-software />
+  <performance-metrics />
+
   <div class="nav-right">
     <div class="nav-item">
       <test-widgets v-if="loggedIn" />
     </div>
     <div class="nav-item">
       <button
+        :disabled="locked"
         class="record-button"
         @click="toggleRecording"
         :class="{ active: streamingService.isRecording }">
@@ -14,7 +16,7 @@
       </button>
     </div>
     <div class="nav-item">
-      <start-streaming-button />
+      <start-streaming-button :disabled="locked" />
     </div>
   </div>
 </div>
@@ -45,6 +47,11 @@
 
 .nav-item {
   margin-left: 20px;
+
+  @media(max-width: 1200px) {
+    font-size: 12px;
+    margin-left: 12px;
+  }
 }
 
 .record-button {

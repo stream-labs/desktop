@@ -19,14 +19,13 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   };
 
   @Inject()
-  scenesService: ScenesService;
+  private scenesService: ScenesService;
 
   @Inject()
-  sourcesService: SourcesService;
+  private sourcesService: SourcesService;
 
   @Inject()
-  sourceFiltersService: SourceFiltersService;
-
+  private sourceFiltersService: SourceFiltersService;
 
   @shortcut('Ctrl+C')
   copy() {
@@ -70,9 +69,8 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   pasteFilters(toSourceId: string) {
     this.state.filtersIds.forEach(fromSourceId => {
       const fromSource = this.sourcesService.getSource(fromSourceId);
-      const toSource = this.sourcesService.getSource(toSourceId);
       if (!fromSource) return;
-      this.sourceFiltersService.copyFilters(fromSource.name, toSource.name);
+      this.sourceFiltersService.copyFilters(fromSource.sourceId, toSourceId);
     });
   }
 

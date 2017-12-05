@@ -2,6 +2,7 @@
   <webview
     class="chat"
     id="recentEventsWebview"
+    ref="chat"
     :src="chatUrl">
   </webview>
 </template>

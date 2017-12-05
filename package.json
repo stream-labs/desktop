@@ -3,20 +3,21 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.6.7",
+  "version": "0.7.9",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
     "ci:compile": "yarn clear && webpack",
     "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
-    "install-node-obs": "node bin/install-node-obs.js && yarn install-plugins",
-    "rebuild-node-obs": "cd ../node-obs/ && cmake-js build --runtime electron --runtime-version 1.7.7 && rm -rf ../streamlabs-obs/node-obs/ && cp -r ./build/distribute/node-obs/ ../streamlabs-obs/ && cd ../streamlabs-obs && node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
+    "install-node-obs": "yarn install --cwd bin && node bin/install-node-obs.js && yarn install-plugins",
+    "rebuild-node-obs": "yarn install --cwd bin && node bin/rebuild-node-obs.js ../node-obs ./node-obs",
     "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode-obs/",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
-    "deploy": "node bin/deploy.js",
+    "release": "yarn install --cwd bin && node bin/release.js",
     "test": "ava",
-    "clear": "rm -rf bundles/media"
+    "clear": "rm -rf bundles/media",
+    "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator"
   },
   "build": {
     "appId": "com.streamlabs.slobs",
@@ -25,7 +26,11 @@
     "files": [
       "bundles",
       "node_modules",
-      "!node_modules/obs-studio-node/obs-studio",
+      "!node_modules/obs-studio-node/obs-prebuild",
+      "!node_modules/obs-studio-node/logs",
+      "!node_modules/obs-studio-node/build",
+      "!node_modules/obs-studio-node/scripts",
+      "!node_modules/obs-studio-node/src",
       "vendor",
       "updater/index.html",
       "updater/Updater.js",
@@ -34,7 +39,9 @@
       "obs-api"
     ],
     "extraFiles": [
-      "node-obs"
+      "node-obs",
+      "LICENSE",
+      "AGREEMENT"
     ],
     "asarUnpack": [
       "**/*.node"
@@ -42,11 +49,15 @@
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+    },
+    "nsis": {
+      "license": "AGREEMENT"
     }
   },
   "ava": {
     "files": [
-      "test/*.js"
+      "test/*.js",
+      "test/api/*.js"
     ],
     "serial": true
   },
@@ -56,23 +67,26 @@
     "arch": "x64"
   },
   "dependencies": {
-    "archiver": "^2.0.3",
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
-    "bugsplat": "^2.1.5",
+    "backtrace-node": "^0.7.3",
     "electron-updater": "^1.14.0",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "file:./obs-studio-node",
     "rimraf": "^2.6.1",
+    "socket.io-client": "2.0.3",
     "uuid": "^3.0.1",
     "vue-popperjs": "^1.2.2"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
+    "@types/archiver": "^2.0.1",
     "@types/lodash": "^4.14.64",
-    "@types/node": "^7.0.18",
+    "@types/node": "^8.0.0",
+    "@types/socket.io-client": "^1.4.31",
+    "archiver": "^2.0.3",
     "ava": "^0.19.1",
     "babel-core": "^6.22.1",
     "babel-eslint": "^7.2.3",
@@ -86,7 +100,7 @@
     "devtron": "^1.4.0",
     "electron": "1.7.7",
     "electron-builder": "^19.22.1",
-    "electron-devtools-installer": "^2.1.0",
+    "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
@@ -100,7 +114,10 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "progress": "^2.0.0",
+    "raven-js": "^3.20.1",
     "rxjs": "^5.4.3",
+    "sockjs": "^0.3.19",
+    "sockjs-client": "^1.1.4",
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "traverse": "^0.6.6",
@@ -108,10 +125,12 @@
     "tslint": "^5.4.2",
     "tslint-config-airbnb": "^5.0.1",
     "tslint-loader": "^3.5.3",
+    "typedoc": "^0.9.0",
     "typescript": "^2.4.2",
+    "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "vue": "^2.1.10",
-    "vue-color": "^2.0.6",
+    "vue-color": "^2.4.3",
     "vue-loader": "^10.2.0",
     "vue-multiselect": "2.0.3",
     "vue-property-decorator": "^5.0.1",

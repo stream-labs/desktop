@@ -3,19 +3,19 @@
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
   <div class="main-contents">
-    <live-dock v-if="isLoggedIn && leftDock" :onLeft="true" />
+    <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
     <div class="main-middle">
-      <div v-if="applicationLoading" class="main-loading">
+      <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
+      <div v-if="shouldLockContent" class="main-loading">
         <i class="fa fa-spinner fa-pulse main-loading-spinner"/>
       </div>
-      <top-nav v-if="(page !== 'Onboarding') && !applicationLoading"></top-nav>
       <component
-        v-if="!applicationLoading"
+        v-if="!shouldLockContent"
         class="main-page-container"
         :is="page"/>
-      <studio-footer v-if="(page !== 'Onboarding') && !applicationLoading"/>
+      <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
     </div>
-    <live-dock v-if="isLoggedIn && !leftDock" />
+    <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
   </div>
 </div>
 </template>

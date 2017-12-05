@@ -5,58 +5,48 @@
     :done-handler="done"
     :fixedSectionHeight="250"
   >
-    <SourcePreview slot="fixed" :sourceName="sourceName"></SourcePreview>
+    <SourcePreview slot="fixed" :sourceId="sourceId"></SourcePreview>
 
-    <div slot="content">
-      <div class="row">
-        <div class="columns small-3">
-
-          <div class="side-menu">
-            <NavMenu v-model="selectedFilterName">
-              <NavItem
-                v-for="filter in filters"
-                :to="filter.name"
-                :ico="filter.visible ? 'eye' : 'eye-slash'"
-                @iconClick="toggleVisibility">
-                {{ filter.name }}
-              </NavItem>
-            </NavMenu>
-            <div class="controls">
-              <div class="fa fa-plus icon-btn" @click="addFilter"></div>
-              <div
-                class="fa fa-minus icon-btn"
-                v-if="selectedFilterName"
-                @click="removeFilter"
-              >
-              </div>
-            </div>
+    <div slot="content" class="modal--side-nav">
+      <NavMenu v-model="selectedFilterName" class="side-menu">
+        <div class="controls">
+          <div class="fa fa-plus icon-btn" @click="addFilter"></div>
+          <div
+            class="fa fa-minus icon-btn"
+            v-if="selectedFilterName"
+            @click="removeFilter">
           </div>
-
         </div>
-        <div class="columns small-9">
-          <div v-if="selectedFilterName">
-            <GenericForm v-model="properties" @input="save"></GenericForm>
-          </div>
-          <div v-if="!selectedFilterName">
-            No filters applied
-          </div>
+        <NavItem
+          v-for="filter in filters"
+          :to="filter.name"
+          :ico="filter.visible ? 'eye' : 'eye-slash'"
+          @iconClick="toggleVisibility">
+          {{ filter.name }}
+        </NavItem>
+      </NavMenu>
+
+      <div class="modal-container--side-nav">
+        <div v-if="selectedFilterName">
+          <GenericForm v-model="properties" @input="save"></GenericForm>
+        </div>
+        <div v-if="!selectedFilterName">
+          No filters applied
         </div>
       </div>
     </div>
-
   </modal-layout>
 </template>
 
 <script lang="ts" src="./SourceFilters.vue.ts"></script>
 
 <style lang="less" scoped>
-.side-menu {
-  position: fixed;
-  left: 0;
+.modal-container--side-nav {
+  padding: 20px;
 }
 
 .controls {
-  margin-left: 15px;
-  margin-top: 15px;
+  margin-left: 13px;
+  margin-bottom: 20px;
 }
 </style>

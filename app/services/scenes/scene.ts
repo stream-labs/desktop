@@ -1,7 +1,14 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { ScenesService } from './scenes';
 import { Source, SourcesService, TSourceType } from '../sources';
-import { ISceneItem, ISceneItemApi, SceneItem } from './scene-item';
+import {
+  ISceneItem,
+  SceneItem,
+  IScene,
+  ISceneApi,
+  ISceneItemAddOptions,
+  ISceneItemInfo
+} from './index';
 import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
@@ -9,42 +16,6 @@ import { Inject } from '../../util/injector';
 import _ from 'lodash';
 
 const { ipcRenderer } = electron;
-
-
-export interface IScene {
-  id: string;
-  name: string;
-  activeItemIds: string[];
-  items: ISceneItem[];
-}
-
-
-export interface ISceneItemAddOptions {
-  sceneItemId?: string; // A new ID will be assigned if one is not provided
-}
-
-export interface ISceneItemInfo {
-  id: string;
-  sourceId: string;
-  x: number;
-  y: number;
-  scaleX: number;
-  scaleY: number;
-  visible: boolean;
-  crop: ICrop;
-  locked?: boolean;
-  rotation?: number;
-}
-
-export interface ISceneApi extends IScene {
-  getItem(sceneItemId: string): ISceneItemApi;
-  getItems(): ISceneItemApi[];
-  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
-  createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
-  makeItemsActive(sceneItemIds: string[]): void;
-  canAddSource(sourceId: string): boolean;
-  setName(newName: string): void;
-}
 
 
 @ServiceHelper()
@@ -67,9 +38,12 @@ export class Scene implements ISceneApi {
     Utils.applyProxy(this, this.sceneState);
   }
 
+  getModel(): IScene {
+    return this.sceneState;
+  }
 
   getObsScene(): obs.IScene {
-    return obs.SceneFactory.fromName(this.name);
+    return obs.SceneFactory.fromName(this.id);
   }
 
 
@@ -114,6 +88,9 @@ export class Scene implements ISceneApi {
 
 
   addSource(sourceId: string, options: ISceneItemAddOptions = {}): SceneItem {
+
+    if (!this.canAddSource(sourceId)) return null;
+
     const source = this.sourcesService.getSource(sourceId);
     const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
@@ -184,7 +161,7 @@ export class Scene implements ISceneApi {
       const source = this.sourcesService.getSource(item.sourceId);
       if (source) {
         arrayItems.push({
-          name: source.name,
+          name: source.sourceId,
           id: item.id,
           sourceId: source.sourceId,
           crop: item.crop,
@@ -228,7 +205,7 @@ export class Scene implements ISceneApi {
 
     for (const childScene of childScenes) {
       if (childScene.id === sceneId) return true;
-      if (!childScene.hasNestedScene(sceneId)) return true;
+      if (childScene.hasNestedScene(sceneId)) return true;
     }
 
     return false;

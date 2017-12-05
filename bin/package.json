@@ -1,0 +1,20 @@
+{
+  "name": "streamlabs-obs-bin",
+  "description": "Dependencies for the Streamlabs OBS bin scripts",
+  "author": "General Workings, Inc.",
+  "license": "GPL-3.0",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "7zip-bin": "^2.2.7",
+    "aws-sdk": "^2.157.0",
+    "cmake-js": "^3.5.0",
+    "colors": "^1.1.2",
+    "inquirer": "^4.0.0",
+    "js-yaml": "^3.10.0",
+    "progress": "^2.0.0",
+    "semver": "^5.4.1",
+    "sentry-cli-binary": "^1.24.1",
+    "shelljs": "^0.7.8"
+  }
+}

@@ -15,7 +15,7 @@ import { NavigationService } from '../../services/navigation';
 import { AppService } from '../../services/app';
 import { UserService } from '../../services/user';
 import electron from 'electron';
-import StreamingService from '../../services/streaming';
+import { StreamingService } from '../../services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 
@@ -75,6 +75,20 @@ export default class Main extends Vue {
 
   get leftDock() {
     return this.customizationService.state.leftDock;
+  }
+
+  get isOnboarding() {
+    return this.navigationService.state.currentPage === 'Onboarding';
+  }
+
+  /**
+   * Only certain pages get locked out while the application
+   * is loading.  Other pages are OK to keep using.
+   */
+  get shouldLockContent() {
+    return this.applicationLoading &&
+      ((this.navigationService.state.currentPage === 'Studio') ||
+      (this.navigationService.state.currentPage === 'Live'));
   }
 
 }

@@ -1,38 +1,26 @@
 import Vue from 'vue';
 import { without } from 'lodash';
 import { StatefulService, mutation } from '../stateful-service';
-import * as obs from '../../../obs-api';
 import { ScenesTransitionsService } from '../scenes-transitions';
 import { WindowsService } from '../windows';
-import { IScene, Scene, ISceneItem, ISceneApi, SceneItem } from '../scenes';
+import {
+  IScene,
+  Scene,
+  ISceneItem,
+  SceneItem,
+  IScenesState,
+  ISceneCreateOptions,
+  IScenesServiceApi
+} from './index';
 import { SourcesService } from '../sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
+import * as obs from '../obs-api';
 
 const { ipcRenderer } = electron;
 
-interface IScenesState {
-  activeSceneId: string;
-  displayOrder: string[];
-  scenes: Dictionary<IScene>;
-}
-
-interface ISceneCreateOptions {
-  duplicateSourcesFromScene?: string;
-  sceneId?: string; // A new ID will be generated if one is not provided
-  makeActive?: boolean;
-}
-
-
-export interface IScenesServiceApi {
-  createScene(name: string, options: ISceneCreateOptions): ISceneApi;
-  scenes: ISceneApi[];
-  activeScene: ISceneApi;
-  activeSceneId: string;
-  getSceneByName(name: string): ISceneApi;
-}
 
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
@@ -44,9 +32,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   };
 
   sceneAdded = new Subject<IScene>();
-  sceneRemoved= new Subject<IScene>();
+  sceneRemoved = new Subject<IScene>();
   itemAdded = new Subject<ISceneItem>();
   itemRemoved = new Subject<ISceneItem>();
+  itemUpdated = new Subject<ISceneItem>();
+  sceneSwitched = new Subject<IScene>();
+
 
   @Inject()
   private windowsService: WindowsService;
@@ -90,10 +81,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
-    const id = options.sceneId || ipcRenderer.sendSync('getUniqueId');
+    const id = options.sceneId || ('scene_' + ipcRenderer.sendSync('getUniqueId'));
     this.ADD_SCENE(id, name);
-    const obsScene = obs.SceneFactory.create(name);
-    this.sourcesService.addSource(obsScene.source, id);
+    const obsScene = obs.SceneFactory.create(id);
+    this.sourcesService.addSource(obsScene.source, name);
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
@@ -112,8 +103,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       });
     }
 
-    if (options.makeActive) this.makeSceneActive(id);
     this.sceneAdded.next(this.state.scenes[id]);
+    if (options.makeActive) this.makeSceneActive(id);
     return this.getSceneByName(name);
   }
 
@@ -167,10 +158,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
 
   makeSceneActive(id: string) {
-    const scene = this.getScene(id).getObsScene();
+    const scene = this.getScene(id);
+    const obsScene = scene.getObsScene();
 
-    this.transitionsService.transitionTo(scene);
+    this.transitionsService.transitionTo(obsScene);
     this.MAKE_SCENE_ACTIVE(id);
+    this.sceneSwitched.next(scene.getModel());
   }
 
 
@@ -195,6 +188,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return foundScene ? this.getScene(foundScene.id) : null;
   }
 
+
+  getModel(): IScenesState  {
+    return this.state;
+  }
 
   getScene(id: string) {
     return !this.state.scenes[id] ? null : new Scene(id);
@@ -244,6 +241,9 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     this.activeScene.activeItems.forEach(item => this.activeScene.removeItem(item.sceneItemId));
   }
 
+  getScenes(): Scene[] {
+    return this.scenes;
+  }
 
   get scenes(): Scene[] {
     return this.state.displayOrder.map(id => {

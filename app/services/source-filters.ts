@@ -26,7 +26,8 @@ export type TSourceFilterType =
   'noise_suppress_filter' |
   'noise_gate_filter' |
   'compressor_filter' |
-  'vst_filter';
+  'vst_filter' |
+  'face_mask_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -53,7 +54,8 @@ export class SourceFiltersService extends Service {
   windowsService: WindowsService;
 
   getTypesList(): IListOption<TSourceFilterType>[] {
-    return [
+    const obsAvailableTypes = obs.FilterFactory.types();
+    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
       { description: 'Image Mask/Blend', value: 'mask_filter' },
       { description: 'Crop/Pad', value: 'crop_filter' },
       { description: 'Gain', value: 'gain_filter' },
@@ -69,8 +71,11 @@ export class SourceFiltersService extends Service {
       { description: 'Noise Suppression', value: 'noise_suppress_filter' },
       { description: 'Noise Gate', value: 'noise_gate_filter' },
       { description: 'Compressor', value: 'compressor_filter' },
-      { description: 'VST 2.x Plugin', value: 'vst_filter' }
+      { description: 'VST 2.x Plugin', value: 'vst_filter' },
+      { description: 'Face Mask Plugin', value: 'face_mask_filter' }
     ];
+
+    return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
   }
 
 
@@ -99,16 +104,16 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getTypesForSource(sourceName: string): ISourceFilterType[] {
-    const source = this.sourcesService.getSourceByName(sourceName);
+  getTypesForSource(sourceId: string): ISourceFilterType[] {
+    const source = this.sourcesService.getSource(sourceId);
     return this.getTypes().filter(filterType => {
       return (filterType.audio && source.audio) || (filterType.video && source.video);
     });
   }
 
 
-  add(sourceName: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
-    const source = this.sourcesService.getSourceByName(sourceName);
+  add(sourceId: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
+    const source = this.sourcesService.getSource(sourceId);
     const obsFilter = obs.FilterFactory.create(filterType, filterName);
     source.getObsInput().addFilter(obsFilter);
     if (settings) obsFilter.update(settings);
@@ -116,39 +121,39 @@ export class SourceFiltersService extends Service {
   }
 
 
-  copyFilters(fromSourceName: string, toSourceName: string) {
-    this.getFilters(fromSourceName).forEach(filter => {
+  copyFilters(fromSourceId: string, toSourceId: string) {
+    this.getFilters(fromSourceId).forEach(filter => {
       this.add(
-        toSourceName,
+        toSourceId,
         filter.type,
-        this.suggestName(toSourceName, filter.name),
+        this.suggestName(toSourceId, filter.name),
         filter.settings
       );
     });
   }
 
 
-  suggestName(sourceName: string, filterName: string): string {
-    return namingHelpers.suggestName(filterName, (name: string) => this.getObsFilter(sourceName, name));
+  suggestName(sourceId: string, filterName: string): string {
+    return namingHelpers.suggestName(filterName, (name: string) => this.getObsFilter(sourceId, name));
   }
 
 
-  remove(sourceName: string, filterName: string) {
-    const obsFilter = this.getObsFilter(sourceName, filterName);
-    const source = this.sourcesService.getSourceByName(sourceName);
+  remove(sourceId: string, filterName: string) {
+    const obsFilter = this.getObsFilter(sourceId, filterName);
+    const source = this.sourcesService.getSource(sourceId);
     source.getObsInput().removeFilter(obsFilter);
   }
 
 
-  setPropertiesFormData(sourceName: string, filterName: string, properties: TFormData) {
+  setPropertiesFormData(sourceId: string, filterName: string, properties: TFormData) {
     if (!filterName) return;
-    setPropertiesFormData(this.getObsFilter(sourceName, filterName), properties);
+    setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
   }
 
 
-  getFilters(sourceName: string): ISourceFilter[] {
+  getFilters(sourceId: string): ISourceFilter[] {
     return this.sourcesService
-      .getSourceByName(sourceName)
+      .getSource(sourceId)
       .getObsInput()
       .filters.map(obsFilter => ({
         visible: obsFilter.enabled,
@@ -159,13 +164,13 @@ export class SourceFiltersService extends Service {
   }
 
 
-  setVisibility(sourceName: string, filterName: string, visible: boolean) {
-    this.getObsFilter(sourceName, filterName).enabled = visible;
+  setVisibility(sourceId: string, filterName: string, visible: boolean) {
+    this.getObsFilter(sourceId, filterName).enabled = visible;
   }
 
 
-  getAddNewFormData(sourceName: string) {
-    const availableTypesList = this.getTypesForSource(sourceName).map(filterType => {
+  getAddNewFormData(sourceId: string) {
+    const availableTypesList = this.getTypesForSource(sourceId).map(filterType => {
       return { description: filterType.description, value: filterType.type };
     });
 
@@ -185,16 +190,16 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getPropertiesFormData(sourceName: string, filterName: string): TFormData {
+  getPropertiesFormData(sourceId: string, filterName: string): TFormData {
     if (!filterName) return [];
-    return getPropertiesFormData(this.getObsFilter(sourceName, filterName));
+    return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
   }
 
 
-  showSourceFilters(sourceName: string, selectedFilterName = '') {
+  showSourceFilters(sourceId: string, selectedFilterName = '') {
     this.windowsService.showWindow({
       componentName: 'SourceFilters',
-      queryParams: { sourceName, selectedFilterName },
+      queryParams: { sourceId, selectedFilterName },
       size: {
         width: 800,
         height: 800
@@ -203,10 +208,10 @@ export class SourceFiltersService extends Service {
   }
 
 
-  showAddSourceFilter(sourceName: string) {
+  showAddSourceFilter(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'AddSourceFilter',
-      queryParams: { sourceName },
+      queryParams: { sourceId },
       size: {
         width: 600,
         height: 400
@@ -214,7 +219,7 @@ export class SourceFiltersService extends Service {
     });
   }
 
-  private getObsFilter(sourceName: string, filterName: string): obs.IFilter {
-    return this.sourcesService.getSourceByName(sourceName).getObsInput().findFilter(filterName);
+  private getObsFilter(sourceId: string, filterName: string): obs.IFilter {
+    return this.sourcesService.getSource(sourceId).getObsInput().findFilter(filterName);
   }
 }

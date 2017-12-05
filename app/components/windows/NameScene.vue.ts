@@ -34,8 +34,8 @@ export default class NameScene extends Vue {
   }
 
   submit() {
-    if (this.isTaken(this.name)) {
-      this.error = 'That name is already taken';
+    if (!this.name) {
+      this.error = 'The scene name is required';
     } else if (this.options.rename) {
       this.scenesService.getSceneByName(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
@@ -49,10 +49,6 @@ export default class NameScene extends Vue {
       );
       this.windowsService.closeChildWindow();
     }
-  }
-
-  isTaken(name: string) {
-    return this.sourcesService.getSourceByName(name);
   }
 
 }
