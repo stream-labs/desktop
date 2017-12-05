@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import { StreamingService } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
@@ -15,12 +15,10 @@ import { UserService } from '../services/user';
   }
 })
 export default class StudioFooterComponent extends Vue {
+  @Inject() streamingService: StreamingService;
+  @Inject() userService: UserService;
 
-  @Inject()
-  streamingService: StreamingService;
-
-  @Inject()
-  userService:UserService;
+  @Prop() locked: boolean;
 
   toggleRecording() {
     if (this.recording) {
@@ -37,5 +35,4 @@ export default class StudioFooterComponent extends Vue {
   get loggedIn() {
     return this.userService.isLoggedIn();
   }
-
 }
