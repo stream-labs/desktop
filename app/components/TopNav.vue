@@ -11,25 +11,29 @@
     <button
       @click="navigateDashboard"
       class="tab-button"
-      :class="{ active: page === 'Dashboard' }" :disabled="!isUserLoggedIn">
+      :class="{ active: page === 'Dashboard' }"
+      :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-tachometer"/> Dashboard
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
-      :class="{ active: page === 'Studio' }">
+      :class="{ active: page === 'Studio' }"
+      :disabled="locked">
       <i class="fa fa-object-group"/> Editor
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
-      :class="{ active: page === 'Live' }" :disabled="!isUserLoggedIn">
+      :class="{ active: page === 'Live' }"
+      :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-feed"/> Live
     </button>
     <button
       @click="navigateOverlays"
       class="tab-button"
-      :class="{ active: page === 'BrowseOverlays' }" :disabled="!isUserLoggedIn">
+      :class="{ active: page === 'BrowseOverlays' }"
+      :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-image"/> Library
     </button>
   </div>

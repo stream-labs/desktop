@@ -8,6 +8,7 @@
     </div>
     <div class="nav-item">
       <button
+        :disabled="locked"
         class="record-button"
         @click="toggleRecording"
         :class="{ active: streamingService.isRecording }">
@@ -15,7 +16,7 @@
       </button>
     </div>
     <div class="nav-item">
-      <start-streaming-button />
+      <start-streaming-button :disabled="locked" />
     </div>
   </div>
 </div>
