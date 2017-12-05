@@ -60,18 +60,15 @@ export class SceneItem implements ISceneItemApi {
   @Inject()
   private sourcesService: SourcesService;
 
-
-  source: Source = null;
-
   constructor(private sceneId: string, sceneItemId: string, sourceId: string) {
 
     const sceneSourceState = this.scenesService.state.scenes[sceneId].items.find(source => {
       return source.sceneItemId === sceneItemId;
     });
-    this.source = this.sourcesService.getSource(sourceId);
+    const sourceState = this.sourcesService.state.sources[sourceId];
     this.sceneItemState = sceneSourceState;
     this.sceneId = sceneId;
-    Utils.applyProxy(this, this.source.sourceState);
+    Utils.applyProxy(this, sourceState);
     Utils.applyProxy(this, this.sceneItemState);
   }
 
@@ -81,6 +78,10 @@ export class SceneItem implements ISceneItemApi {
 
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
+  }
+
+  get source() {
+    return this.sourcesService.getSource(this.sourceId);
   }
 
   getSource() {

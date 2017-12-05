@@ -2,7 +2,7 @@
 
 import test from 'ava';
 import { uniqueId, sample } from 'lodash';
-import { useSpectron, focusMain } from '../helpers/spectron';
+import { useSpectron, focusMain } from '../helpers/spectron/index';
 import { addScene, clickRemoveScene } from '../helpers/spectron/scenes';
 import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
 

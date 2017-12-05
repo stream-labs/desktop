@@ -1,4 +1,3 @@
-/// <reference path="../../app/index.d.ts" />
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
@@ -158,7 +157,7 @@ test('Creating nested scenes', async t => {
   t.deepEqual(itemsANames, ['SceneB']);
 
   sceneC.addSource(sceneA.id);
-  const sceneCItems = sceneC.getItems()
+  const sceneCItems = sceneC.getItems();
   const itemsCNames = sceneCItems.map(item => item['name']);
 
   t.deepEqual(itemsCNames, ['SceneA']);

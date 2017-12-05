@@ -211,8 +211,6 @@ export class AudioSource implements IAudioSourceApi {
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
 
-  source: Source;
-
   @Inject()
   private audioService: AudioService;
 
@@ -223,9 +221,9 @@ export class AudioSource implements IAudioSourceApi {
 
   constructor(sourceId: string) {
     this.audioSourceState = this.audioService.state.audioSources[sourceId];
-    this.source = this.sourcesService.getSource(sourceId);
+    const sourceState = this.sourcesService.state.sources[sourceId];
     Utils.applyProxy(this, this.audioSourceState);
-    Utils.applyProxy(this, this.source.sourceState);
+    Utils.applyProxy(this, sourceState);
   }
 
   get displayName() {
@@ -298,6 +296,10 @@ export class AudioSource implements IAudioSourceApi {
         size: 6
       }
     ];
+  }
+
+  get source() {
+    return this.sourcesService.getSource(this.sourceId);
   }
 
 

@@ -1,5 +1,5 @@
 import test from 'ava';
-import { useSpectron, focusMain, focusChild } from './helpers/spectron';
+import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { setFormInput } from './helpers/spectron/forms';
 
 useSpectron();

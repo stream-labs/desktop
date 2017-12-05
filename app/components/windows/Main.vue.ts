@@ -77,4 +77,8 @@ export default class Main extends Vue {
     return this.customizationService.state.leftDock;
   }
 
+  get isOnboarding() {
+    return this.navigationService.state.currentPage === 'Onboarding';
+  }
+
 }

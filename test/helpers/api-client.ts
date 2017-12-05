@@ -93,7 +93,17 @@ export class ApiClient {
 
   requestSync(resourceId: string, methodName: string, ...args: string[]) {
     this.log('SYNC_REQUEST:', resourceId, methodName, ...args);
-    const stringifiedArgs = args.map(arg => typeof arg === 'string' ? `\"${arg}\"` : arg);
+
+    const stringifiedArgs = args.map(arg => {
+      if (typeof arg === 'string') {
+        return `\"${arg}\"`;
+      } else if (typeof arg === 'object') {
+        return JSON.stringify(arg);
+      } else {
+        return arg;
+      }
+    });
+
     const process = spawnSync(
       'node',
       ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, ...stringifiedArgs],
@@ -154,7 +164,8 @@ export class ApiClient {
       if (!result) return;
 
       if (result._type === 'EVENT') {
-        this.subscriptions[message.result.resourceId].next(result.data);
+        const eventSubject = this.subscriptions[message.result.resourceId];
+        if (eventSubject) eventSubject.next(result.data);
       }
     });
 

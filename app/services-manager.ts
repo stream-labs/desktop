@@ -43,6 +43,7 @@ import { ObserveList } from './util/service-observer';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import { GuestApiService } from 'services/guest-api';
 
 const { ipcRenderer } = electron;
 
@@ -143,12 +144,19 @@ export class ServicesManager extends Service {
     IpcServerService,
     TcpServerService,
     StreamInfoService,
-    StreamlabelsService
+    StreamlabelsService,
+    GuestApiService
   };
 
   private instances: Dictionary<Service> = {};
   private mutationsBufferingEnabled = false;
   private bufferedMutations: IMutation[] = [];
+
+  /**
+   * contains additional information about errors
+   * while JSONRPC request handling
+   */
+  private requestErrors: string[] = [];
 
   /**
    * if result of calling a service method in the main window is promise -
@@ -242,11 +250,30 @@ export class ServicesManager extends Service {
 
   executeServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
+    this.requestErrors = [];
+
+    const handleErrors = (e?: any) => {
+      if (!e && this.requestErrors.length === 0) return;
+      if (e) {
+        console.error(e);
+
+        // re-rise error for Raven
+        const isChildWindowRequest = request.params && request.params.fetchMutations;
+        if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
+      }
+
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
+        id: request.id,
+        message: this.requestErrors.join(';')
+      });
+    };
+
     try {
       response = this.handleServiceRequest(request);
+      handleErrors();
     } catch (e) {
-      console.error(e);
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR, id: request.id });
+      handleErrors(e);
     } finally {
       return response;
     }
@@ -417,6 +444,10 @@ export class ServicesManager extends Service {
    */
   getResourceScheme(resourceId: string): Dictionary<string> {
     const resource = this.getResource(resourceId);
+    if (!resource) {
+      this.requestErrors.push(`Resource not found: ${resourceId}`);
+      return null;
+    }
     const resourceScheme = {};
 
     Object.keys(resource.__proto__).concat(Object.keys(resource))
