@@ -21,7 +21,6 @@ console.log = () => {};
     if (arg.charAt(0) === '"') {
       args[ind] = arg.substring(1, arg.length - 1);
     } else {
-      // console.info('argis', args[ind]);
       args[ind] = JSON.parse(args[ind]);
     }
   });
