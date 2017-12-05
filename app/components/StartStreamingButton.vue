@@ -1,7 +1,11 @@
 <template>
 <button
   class="button button--go-live"
-  :class="{'button--soft-warning': (streamingService.isStreaming && streamingService.stopStreaming), 'button--action': streamingService.startStreaming}"
+  :class="{
+    'button--soft-warning': (streamingService.isStreaming && streamingService.stopStreaming),
+    'button--action': streamingService.startStreaming
+  }"
+  :disabled="disabled"
   @click="toggleStreaming">{{streamButtonLabel}}</button>
 </template>
 
