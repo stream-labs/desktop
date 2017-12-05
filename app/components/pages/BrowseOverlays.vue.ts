@@ -34,7 +34,7 @@ export default class BrowseOverlays extends Vue {
     console.log('Called installOverlay');
 
     // TODO: Perform some security checking of the URL hostname
-    this.appService.installOverlay(url, progressCallback);
+    await this.appService.installOverlay(url, progressCallback);
   }
 
   get overlaysUrl() {
