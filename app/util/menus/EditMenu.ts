@@ -6,6 +6,8 @@ import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { SourceFiltersService } from '../../services/source-filters';
+import { WidgetsService } from 'services/widgets';
+import electron from 'electron';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -14,22 +16,17 @@ interface IEditMenuOptions {
 }
 
 export class EditMenu extends Menu {
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourceFiltersService: SourceFiltersService;
-
-  @Inject()
-  private clipboardService: ClipboardService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
+  @Inject() private clipboardService: ClipboardService;
+  @Inject() private widgetsService: WidgetsService;
 
   private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
-  private sceneItem = this.scene ? this.scene.getItem(this.options.selectedSceneItemId) : null;
+  private sceneItem = this.scene
+    ? this.scene.getItem(this.options.selectedSceneItemId)
+    : null;
 
   constructor(private options: IEditMenuOptions) {
     super();
@@ -37,9 +34,7 @@ export class EditMenu extends Menu {
     this.appendEditMenuItems();
   }
 
-
   private appendEditMenuItems() {
-
     if (this.scene) {
       this.append({
         label: 'Paste (Reference)',
@@ -56,7 +51,6 @@ export class EditMenu extends Menu {
     }
 
     if (this.sceneItem) {
-
       this.append({
         label: 'Copy',
         accelerator: 'CommandOrControl+C',
@@ -67,7 +61,8 @@ export class EditMenu extends Menu {
 
       this.append({
         label: 'Rename',
-        click: () => this.sourcesService.showRenameSource(this.sceneItem.sourceId)
+        click: () =>
+          this.sourcesService.showRenameSource(this.sceneItem.sourceId)
       });
 
       this.append({
@@ -89,10 +84,24 @@ export class EditMenu extends Menu {
           this.sceneItem.setVisibility(!this.sceneItem.visible);
         }
       });
+
+      if (this.source.getPropertiesManagerType() === 'widget') {
+        this.append({
+          label: 'Export Widget',
+          click: () => {
+            const chosenPath = electron.remote.dialog.showSaveDialog({
+              filters: [{ name: 'Widget File', extensions: ['widget'] }]
+            });
+
+            if (!chosenPath) return;
+
+            this.widgetsService.saveWidgetFile(chosenPath, this.sceneItem);
+          }
+        });
+      }
     }
 
     if (this.source) {
-
       this.append({ type: 'separator' });
 
       this.append({
@@ -125,7 +134,6 @@ export class EditMenu extends Menu {
     }
 
     if (!this.sceneItem && !this.source) {
-
       this.append({ type: 'separator' });
 
       this.append({
@@ -144,11 +152,9 @@ export class EditMenu extends Menu {
     this.sourceFiltersService.showSourceFilters(this.source.sourceId);
   }
 
-
   private showProperties() {
     this.sourcesService.showSourceProperties(this.source.sourceId);
   }
-
 
   private transformSubmenu() {
     return new SourceTransformMenu(this.scene.id, this.sceneItem.sceneItemId);
