@@ -148,7 +148,19 @@ export class ObsImporterService extends Service {
                 .setMuted(sourceJSON.muted);
               this.audioService
                 .getSource(source.sourceId)
-                .setMul(sourceJSON.volume);
+                .setDeflection(sourceJSON.volume);
+              this.audioService
+                .getSource(source.sourceId)
+                .setSyncOffset(sourceJSON.sync);
+              this.audioService
+                .getSource(source.sourceId)
+                .setMonitoringType(sourceJSON.monitoring_type);
+              this.audioService
+                .getSource(source.sourceId)
+                .setFlags(sourceJSON.flags);
+              this.audioService
+                .getSource(source.sourceId)
+                .setAudioMixers(sourceJSON.mixers);
             }
 
             // Adding the filters
@@ -254,7 +266,19 @@ export class ObsImporterService extends Service {
           .setMuted(audioSource.muted);
         this.audioService
           .getSource(newSource.sourceId)
-          .setMul(audioSource.volume);
+          .setDeflection(audioSource.volume);
+        this.audioService
+          .getSource(newSource.sourceId)
+          .setSyncOffset(audioSource.sync);
+        this.audioService
+          .getSource(newSource.sourceId)
+          .setMonitoringType(audioSource.monitoring_type);
+        this.audioService
+          .getSource(newSource.sourceId)
+          .setFlags(audioSource.flags);
+        this.audioService
+          .getSource(newSource.sourceId)
+          .setAudioMixers(audioSource.mixers);
       }
     });
   }

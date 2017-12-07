@@ -3,7 +3,7 @@ import { useSpectron, focusMain, focusChild } from './helpers/spectron';
 import { selectSource, clickSourceProperties } from './helpers/spectron/sources';
 import { openFiltersWindow, closeFilterProperties } from './helpers/spectron/filters';
 import { getFormInput, setFormDropdown } from './helpers/spectron/forms';
-import { getInputValue, getInputValueId } from './helpers/spectron/advancedAudioSettings';
+import { getInputValue, getInputValueId, getInputCheckboxValue } from './helpers/spectron/advancedAudioSettings';
 
 useSpectron({ skipOnboarding: false });
 
@@ -145,10 +145,6 @@ test('Obs-importer', async t => {
     t.is(await getFormInput(t, 'Hue Shift'), '0');
     t.is(await getFormInput(t, 'Opacity'), '100');
 
-    // Check filter visibility
-    t.true(await app.client.isExisting('li=Color Key'));
-    // t.true(await app.client.isExisting('fa fa-eye-slash'));
-
     await closeFilterProperties(t);
     await focusMain(t);
 
@@ -157,13 +153,13 @@ test('Obs-importer', async t => {
     await focusChild(t);
 
     // Mic/Aux
-    // t.true(await sourceSelector.isExisting(`td=Mic/Aux`));
-    // t.is(await getInputValue(t, '.column-deflection .IntInput .input-wrapper .int-input', 1), '75');
-    // t.is(await getInputValue(t, '.column-forceMono .input-wrapper', 1), 'on');
-    // t.is(await getInputValue(t, '.column-syncOffset .IntInput .input-wrapper .int-input', 1), '0');
-    // t.is(await getInputValue(t, '.column-monitoringType .select .input-wrapper .multiselect__content', 1), 'Monitor Only (mute output)');
-    // const mixerValues = ['off', 'off', 'off', 'on', 'on', 'on'];
-    // t.is(await getInputValue(t, '.column-audioMixers .input-container .input-wrapper', 1), mixerValues);
+    t.true(await sourceSelector.isExisting(`td=Mic/Aux`));
+    t.is(await getInputValue(t, '.column-deflection .IntInput .input-wrapper .int-input', 1), '75');
+    t.is(await getInputCheckboxValue(t, '.column-forceMono .input-wrapper', 1), true);
+    t.is(await getInputValue(t, '.column-syncOffset .IntInput .input-wrapper .int-input', 1), '0');
+    t.is(await getInputValue(t, '.column-monitoringType', 1), 'Monitor Only (mute output)');
+    const mixerValues = [false, false, true, true, true, true];
+    t.deepEqual(await getInputCheckboxValue(t, '.column-audioMixers', 1), mixerValues);
 
     await focusMain(t);
     await app.client.click('.fa-cog');

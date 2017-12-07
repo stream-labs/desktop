@@ -7,6 +7,14 @@ export async function getInputValue(t, element, index = 0) {
     const id = await getInputValueId(t, element, index);
 
     return t.context.app.client
-    .elementIdElement(id, '../..')
+    .elementIdElement(id, '.')
     .getValue('input');
+}
+
+export async function getInputCheckboxValue(t, element, index = 0) {
+    const id = await getInputValueId(t, element, index);
+
+    return t.context.app.client
+    .elementIdElement(id, '.')
+    .isSelected('input');
 }

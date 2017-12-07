@@ -342,6 +342,26 @@ export class AudioSource implements IAudioSourceApi {
     this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
+  setSyncOffset(syncOffset: number) {
+    this.source.getObsInput().syncOffset = AudioService.msToTimeSpec(syncOffset / 1000000);
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+  }
+
+  setMonitoringType(monitoringType: obs.EMonitoringType) {
+    this.source.getObsInput().monitoringType = monitoringType;
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+  }
+
+  setFlags(flags: number) {
+    this.source.getObsInput().flags = flags;
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+  }
+
+  setAudioMixers(audioMixers: number) {
+    this.source.getObsInput().audioMixers = audioMixers;
+    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+  }
+
 
   setMuted(muted: boolean) {
     this.sourcesService.setMuted(this.sourceId, muted);
