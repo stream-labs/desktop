@@ -163,22 +163,26 @@ export class AppService extends StatefulService<IAppState>
   /**
    * remove the config and load the new one
    */
-  removeCurrentConfig() {
+  async removeCurrentConfig() {
+    this.START_LOADING();
+    this.disableAutosave();
     this.scenesCollectionsService.removeConfig();
     if (this.scenesCollectionsService.hasConfigs()) {
       this.loadConfig('', { saveCurrent: false });
     } else {
-      this.switchToBlankConfig();
+      await this.switchToBlankConfig();
     }
   }
 
   /**
    * reset current scenes and switch to blank config
    */
-  switchToBlankConfig(configName?: string) {
+  async switchToBlankConfig(configName?: string) {
     this.reset();
     this.scenesCollectionsService.switchToBlankConfig(configName);
+    await this.scenesCollectionsService.rawSave();
     this.enableAutoSave();
+    this.FINISH_LOADING();
   }
 
   @track('app_close')
