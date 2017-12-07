@@ -95,7 +95,7 @@ export class EditMenu extends Menu {
 
             if (!chosenPath) return;
 
-            this.widgetsService.saveWidgetFile(chosenPath, this.sceneItem);
+            this.widgetsService.saveWidgetFile(chosenPath, this.sceneItem.sceneItemId);
           }
         });
       }

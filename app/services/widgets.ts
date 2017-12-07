@@ -420,9 +420,10 @@ export class WidgetsService extends Service {
   /**
    * Save a widget file to the given path
    * @param path the path to the save the widget file
-   * @param widgetItem the widget to save
+   * @param widgetItemId the id of the widget to save
    */
-  async saveWidgetFile(path: string, widgetItem: SceneItem) {
+  async saveWidgetFile(path: string, widgetItemId: string) {
+    const widgetItem = this.scenesService.getSceneItem(widgetItemId);
     const data = this.exportWidgetJSON(widgetItem);
     const json = JSON.stringify(data, null, 2);
 
@@ -442,7 +443,7 @@ export class WidgetsService extends Service {
    * which can be saved into a file and imported later.
    * @param widgetItem the SceneItem of the widget to export
    */
-  exportWidgetJSON(widgetItem: SceneItem): ISerializableWidget {
+  private exportWidgetJSON(widgetItem: SceneItem): ISerializableWidget {
     const source = widgetItem.getSource();
 
     if (source.getPropertiesManagerType() !== 'widget') {
@@ -489,7 +490,7 @@ export class WidgetsService extends Service {
    * @param widget the widget to import
    * @param scene the scene to import into
    */
-  importWidgetJSON(widget: ISerializableWidget, scene: Scene) {
+  private importWidgetJSON(widget: ISerializableWidget, scene: Scene) {
     let widgetItem: SceneItem;
 
     // First, look for an existing widget of the same type
