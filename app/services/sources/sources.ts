@@ -25,9 +25,9 @@ const SOURCES_UPDATE_INTERVAL = 1000;
 
 const { ipcRenderer } = electron;
 
-const AudioFlag = obs.EOutputFlags.Audio;
-const VideoFlag = obs.EOutputFlags.Video;
-const DoNotDuplicateFlag = obs.EOutputFlags.DoNotDuplicate;
+const AudioFlag = obs.ESourceOutputFlags.Audio;
+const VideoFlag = obs.ESourceOutputFlags.Video;
+const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
