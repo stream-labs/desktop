@@ -107,7 +107,7 @@ let _obs;
 
 function getObs() {
   if (!_obs) {
-    _obs = require('obs-studio-node');
+    _obs = require('obs-studio-node').NodeObs;
   }
 
   return _obs;
