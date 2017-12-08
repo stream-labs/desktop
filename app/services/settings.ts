@@ -45,6 +45,7 @@ export interface ISettingsServiceApi {
   getCategories(): string[];
   getSettingsFormData(categoryName: string): ISettingsSubCategory[];
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
+  showSettings(): void;
 }
 
 export class SettingsService extends StatefulService<ISettingsState> implements ISettingsServiceApi {
