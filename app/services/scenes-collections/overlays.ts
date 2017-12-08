@@ -42,8 +42,13 @@ export class OverlaysPersistenceService extends Service {
   /**
    * Downloads the requested overlay into a temporary directory
    */
-  async downloadOverlay(url: string, progressCallback?: (progress: IDownloadProgress) => void) {
-    const overlayFilename = `${electron.ipcRenderer.sendSync('getUniqueId')}.overlay`;
+  async downloadOverlay(
+    url: string,
+    progressCallback?: (progress: IDownloadProgress) => void
+  ) {
+    const overlayFilename = `${electron.ipcRenderer.sendSync(
+      'getUniqueId'
+    )}.overlay`;
     const overlayPath = path.join(os.tmpdir(), overlayFilename);
     const fileStream = fs.createWriteStream(overlayPath);
 
@@ -55,23 +60,17 @@ export class OverlaysPersistenceService extends Service {
         response.on('data', (chunk: any) => {
           fileStream.write(chunk);
           downloaded += chunk.length;
-          console.log(`Progress: ${downloaded}/${totalSize}`);
-          if (progressCallback) progressCallback({
-            totalBytes: totalSize,
-            downloadedBytes: downloaded,
-            percent: downloaded / totalSize
-          });
+
+          if (progressCallback)
+            progressCallback({
+              totalBytes: totalSize,
+              downloadedBytes: downloaded,
+              percent: downloaded / totalSize
+            });
         });
 
-        response.on('end', () => {
-          console.log('Download Complete');
-          resolve();
-        });
-
-        response.on('error', (err: any) => {
-          console.log('Download Error', err);
-          reject(err);
-        });
+        response.on('end', () => resolve());
+        response.on('error', (err: any) => reject(err));
       });
     });
 

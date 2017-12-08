@@ -94,8 +94,6 @@ export class AppService extends StatefulService<IAppState>
       // Pre-fetch stream info
       this.streamInfoService;
 
-      window['overlays'] = this.overlaysPersistenceService;
-
       this.ipcServerService.listen();
       this.tcpServerService.listen();
       this.FINISH_LOADING();

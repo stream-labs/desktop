@@ -6,6 +6,7 @@ import { GuestApiService } from 'services/guest-api';
 import { IDownloadProgress } from 'services/scenes-collections';
 import { AppService } from 'services/app';
 import { NavigationService } from 'services/navigation';
+import urlLib from 'url';
 
 @Component({})
 export default class BrowseOverlays extends Vue {
@@ -22,17 +23,20 @@ export default class BrowseOverlays extends Vue {
     this.guestApiService.exposeApi(this.$refs.overlaysWebview, {
       installOverlay: this.installOverlay
     });
-
-    this.$refs.overlaysWebview.addEventListener('dom-ready', () => {
-      this.$refs.overlaysWebview.openDevTools();
-    });
   }
 
   async installOverlay(
     url: string,
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
-    // TODO: Perform some security checking of the URL hostname
+    const host = (new urlLib.URL(url)).hostname;
+    const trustedHosts = ['cdn.streamlabs.com'];
+
+    if (!trustedHosts.includes(host)) {
+      console.error(`Ignoring overlay install from untrusted host: ${host}`);
+      return;
+    }
+
     await this.appService.installOverlay(url, progressCallback);
     this.navigationService.navigate('Studio');
   }
