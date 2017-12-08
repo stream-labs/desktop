@@ -153,7 +153,8 @@ export class AppService extends StatefulService<IAppState>
     this.reset();
     this.scenesCollectionsService.switchToEmptyConfig(collectionName);
     await this.overlaysPersistenceService.loadOverlay(overlayPath);
-    this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    this.scenesService.activeScene.makeItemsActive([]);
 
     // Save the newly loaded config
     await this.scenesCollectionsService.rawSave();
@@ -169,7 +170,16 @@ export class AppService extends StatefulService<IAppState>
   async installOverlay(url: string, progressCallback?: (info: IDownloadProgress) => void) {
     this.START_LOADING();
 
-    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+    let pathName: string;
+
+    // A download error should not result in an infinite spinner
+    try {
+      pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+    } catch (e) {
+      this.FINISH_LOADING();
+      throw e;
+    }
+
     const filename = path.parse(url).name;
     const configName = this.scenesCollectionsService.suggestName(filename);
 
