@@ -38,6 +38,10 @@ export default class Notifications extends Vue {
     };
   }
 
+  get notificationsCount() {
+    return this.notificationsService.getAll().length;
+  }
+
 
   onNotificationClickHandler(id: number) {
     this.notificationsService.applyAction(id);

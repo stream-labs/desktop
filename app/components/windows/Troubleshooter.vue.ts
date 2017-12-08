@@ -7,6 +7,7 @@ import windowMixin from '../mixins/window';
 import { TPerformanceIssueCode } from 'services/performance-monitor';
 import { INotificationsApi, INotification } from 'services/notifications';
 import { ISettingsServiceApi } from 'services/settings';
+import { WindowsService } from 'services/windows';
 
 
 @Component({
@@ -17,19 +18,15 @@ export default class Troubleshooter extends Vue {
 
   @Inject() private notificationsService: INotificationsApi;
   @Inject() private settingsService: ISettingsServiceApi;
+  @Inject() private windowsService: WindowsService;
 
-  get issues(): INotification[] {
-    // get last issues based on notifications
-    const issues: INotification[] = [];
-    const issuesCodes: TPerformanceIssueCode[] = ['FRAMES_SKIPPED', 'FRAMES_LAGGED'];
-    const notifications = this.notificationsService.getAll();
-    issuesCodes.forEach(issueCode => {
-      const issue = notifications.find(notify => notify.code === issueCode);
-      if (issue) issues.push(issue);
-    });
+  issueCode = this.windowsService.getChildWindowQueryParams().issueCode as TPerformanceIssueCode;
 
-    return issues;
+
+  get issue(): INotification {
+    return this.notificationsService.getAll().find(notify => notify.code === this.issueCode);
   }
+
 
   showSettings() {
     this.settingsService.showSettings();

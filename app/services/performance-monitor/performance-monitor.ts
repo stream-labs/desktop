@@ -88,24 +88,26 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   }
 
   private pushSkippedFrameNotify(factor: number) {
+    const code = 'FRAMES_SKIPPED';
     this.notificationsService.push({
       type: ENotificationType.WARNING,
-      code: 'FRAMES_SKIPPED',
+      code,
       message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
-        this.notificationsService, 'showTroubleshooter'
+        this.notificationsService, 'showTroubleshooter', code
       )
     });
   }
 
 
   private pushLaggedFrameNotify(factor: number) {
+    const code = 'FRAMES_LAGGED';
     this.notificationsService.push({
       type: ENotificationType.WARNING,
-      code: 'FRAMES_LAGGED',
+      code,
       message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
-        this.notificationsService, 'showTroubleshooter'
+        this.notificationsService, 'showTroubleshooter', code
       )
     });
   }

@@ -7,7 +7,7 @@
     :class="{
       'info': notify.type == 'INFO',
       'warning': notify.type == 'WARNING',
-      'has-action': notify.action,
+      'has-action': notify.action && !notify.outdated,
       'outdated': notify.outdated
     }"
   >
@@ -15,7 +15,7 @@
 
   </div>
 
-  <div class="counter"
+  <div class="counter warning"
      v-if="unreadCount"
      title="New Notifications"
      @click="showNotifications"
@@ -25,6 +25,14 @@
     >
     </span>
     {{ unreadCount }}
+  </div>
+
+  <div class="counter"
+       v-if="!unreadCount"
+       title="Show Notifications"
+       @click="showNotifications"
+  >
+    <span class="fa fa-info-circle"></span>
   </div>
 
 
@@ -78,13 +86,16 @@
 
 
 .counter {
-  color: #f23f40;
   position: absolute;
   right: 5px;
   cursor: pointer;
   top: 6px;
-  .fa {
-    color: #f23f40;
+
+  &.warning {
+    color: @red;
+    .fa {
+      color: @red;
+    }
   }
 }
 

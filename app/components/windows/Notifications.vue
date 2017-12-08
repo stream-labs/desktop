@@ -5,6 +5,10 @@
 >
   <div slot="content">
 
+    <h4 v-if="!notificationsCount">
+      You don't have notifications
+    </h4>
+
     <div v-for="(notifications, groupName) in notificationGroups">
       <h4 v-if="notifications.length">
         {{ groupName == 'unread' ? 'New Notifications' : 'Log' }}

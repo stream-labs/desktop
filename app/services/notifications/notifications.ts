@@ -3,6 +3,7 @@ import { StatefulService, mutation } from '../stateful-service';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
+import { TPerformanceIssueCode } from 'services/performance-monitor';
 import {
   ENotificationType,
   INotification,
@@ -87,9 +88,10 @@ export class NotificationsService extends StatefulService<INotificationsState> i
   }
 
 
-  showTroubleshooter() {
+  showTroubleshooter(issueCode: TPerformanceIssueCode) {
     this.windowsService.showWindow({
       componentName: 'Troubleshooter',
+      queryParams: { issueCode },
       size: {
         width: 500,
         height: 500

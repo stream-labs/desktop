@@ -61,6 +61,8 @@ export default class NotificationsArea extends Vue {
   }
 
   onNotificationClickHandler(id: number) {
+    const notify = this.notifications.find(notify => notify.id === id);
+    if (notify.outdated) return;
     this.notificationsService.applyAction(id);
   }
 
