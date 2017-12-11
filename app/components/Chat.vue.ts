@@ -37,4 +37,8 @@ export default class Chat extends Vue {
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
   }
+
+  refresh() {
+    this.$refs.chat.reload();
+  }
 }
