@@ -9,13 +9,13 @@
       You don't have notifications
     </h4>
 
-    <div v-for="(notifications, groupName) in notificationGroups">
-      <h4 v-if="notifications.length">
+    <div v-for="(notificationsService, groupName) in notificationGroups">
+      <h4 v-if="notificationsService.length">
         {{ groupName == 'unread' ? 'New Notifications' : 'Log' }}
       </h4>
       <div
         class="notification"
-        v-for="notify in notifications"
+        v-for="notify in notificationsService"
         @click="onNotificationClickHandler(notify.id)"
         :class = "{
           'unread': notify.unread,

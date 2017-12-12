@@ -3,10 +3,14 @@ import * as obs from '../../../obs-api';
 import { Inject } from '../../util/injector';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { ServicesManager } from '../../services-manager';
+import { PerformanceService } from 'services/performance';
+import { Subscription } from 'rxjs/Subscription';
 
 const INTERVAL = 30000;
 const SKIPPED_THRESHOLD = 0.3;
 const LAGGED_THRESHOLD = 0.1;
+const DROPPED_THRESHOLD = 0.1;
+
 
 interface IMonitorState {
   framesLagged: number;
@@ -15,7 +19,7 @@ interface IMonitorState {
   framesEncoded: number;
 }
 
-export type TPerformanceIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED';
+export type TIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED' | 'FRAMES_DROPPED';
 
 /**
  * Keeps a store of up-to-date performance metrics
@@ -33,10 +37,14 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     framesEncoded: 0
   };
 
+
   @Inject() private notificationsService: NotificationsService;
+  @Inject() private performanceService: PerformanceService;
   servicesManager: ServicesManager = ServicesManager.instance;
 
   private intervalId: number = null;
+  private droppedFramesRecords: number[] = [];
+  private droppedFramesSubscr: Subscription = null;
 
 
   start() {
@@ -45,13 +53,17 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     this.intervalId = window.setInterval(() => {
       this.update();
     }, INTERVAL);
+
+    this.droppedFramesSubscr = this.performanceService.droppedFramesDetected.subscribe(factor => {
+      this.droppedFramesRecords.push(factor);
+    });
   }
 
 
   stop() {
-    if (!this.intervalId) return;
     clearInterval(this.intervalId);
     this.intervalId = null;
+    if (this.droppedFramesSubscr) this.droppedFramesSubscr.unsubscribe();
   }
 
   private update() {
@@ -68,9 +80,9 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       const framesEncoded = currentStats.framesEncoded - this.state.framesEncoded;
       const skippedFactor = framesSkipped / framesEncoded;
 
-      if (skippedFactor > SKIPPED_THRESHOLD) {
+      if (skippedFactor >= SKIPPED_THRESHOLD) {
 
-        this.pushSkippedFrameNotify(skippedFactor);
+        this.pushSkippedFramesNotify(skippedFactor);
       }
     }
 
@@ -79,19 +91,28 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       const framesRendered = currentStats.framesRendered - this.state.framesRendered;
       const laggedFactor = framesLagged / framesRendered;
 
-      if (laggedFactor > LAGGED_THRESHOLD) {
-        this.pushLaggedFrameNotify(laggedFactor);
+      if (laggedFactor >= LAGGED_THRESHOLD) {
+        this.pushLaggedFramesNotify(laggedFactor);
+      }
+    }
+
+    if (this.droppedFramesRecords.length) {
+      const droppedFramesFactor = this.droppedFramesRecords.reduce((a, b) => a + b);
+      this.droppedFramesRecords = [];
+      if (droppedFramesFactor >= DROPPED_THRESHOLD) {
+        this.pushDroppedFramesNotify(droppedFramesFactor);
       }
     }
 
     this.SET_STATE(currentStats);
   }
 
-  private pushSkippedFrameNotify(factor: number) {
+  private pushSkippedFramesNotify(factor: number) {
     const code = 'FRAMES_SKIPPED';
     this.notificationsService.push({
       type: ENotificationType.WARNING,
       code,
+      data: factor,
       message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
@@ -100,11 +121,12 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
   }
 
 
-  private pushLaggedFrameNotify(factor: number) {
+  private pushLaggedFramesNotify(factor: number) {
     const code = 'FRAMES_LAGGED';
     this.notificationsService.push({
       type: ENotificationType.WARNING,
       code,
+      data: factor,
       message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
@@ -112,6 +134,19 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     });
   }
 
+
+  private pushDroppedFramesNotify(factor: number) {
+    const code = 'FRAMES_DROPPED';
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      code,
+      data: factor,
+      message: `Dropped frames detected: ${ Math.round(factor * 100)}%`,
+      action: this.servicesManager.createRequest(
+        this.notificationsService, 'showTroubleshooter', code
+      )
+    });
+  }
 
 
   @mutation()

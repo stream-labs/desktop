@@ -1,25 +1,34 @@
 import { Inject } from '../../util/injector';
-import { StatefulService, mutation } from '../stateful-service';
+import { mutation } from '../stateful-service';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
-import { TPerformanceIssueCode } from 'services/performance-monitor';
+import { TIssueCode } from 'services/performance-monitor';
+import { IFormInput, TFormData } from '../../components/shared/forms/Input';
 import {
   ENotificationType,
   INotification,
-  INotificationOptions, INotificationsApi
+  INotificationOptions,
+  INotificationsApi,
+  INotificationsSettings
 } from './notifications-api';
 
 
 interface INotificationsState {
+  settings: INotificationsSettings;
   notifications: INotification[];
 }
 
 
-export class NotificationsService extends StatefulService<INotificationsState> implements INotificationsApi {
+export class NotificationsService extends PersistentStatefulService<INotificationsState> implements INotificationsApi {
 
-  static initialState: INotificationsState = {
-    notifications: []
+  static defaultState: INotificationsState = {
+    notifications: [],
+    settings: {
+      enabled: true,
+      playSound: true
+    }
   };
 
   @Inject() private windowsService: WindowsService;
@@ -29,12 +38,19 @@ export class NotificationsService extends StatefulService<INotificationsState> i
   private nextId = 1;
 
 
+  init() {
+    super.init();
+    this.CLEAR();
+  }
+
+
   push(notifyInfo: INotificationOptions): INotification {
     const notify = {
       id: this.nextId++,
       unread: true,
       date: Date.now(),
       type: ENotificationType.INFO,
+      playSound: true,
       ...notifyInfo
     };
     this.PUSH(notify);
@@ -77,6 +93,40 @@ export class NotificationsService extends StatefulService<INotificationsState> i
   }
 
 
+  getSettings(): INotificationsSettings {
+    return this.state.settings;
+  }
+
+
+  getSettingsFormData(): TFormData {
+    const settings = this.state.settings;
+    return [
+      <IFormInput<boolean>> {
+        value: settings.enabled,
+        name: 'enabled',
+        description: 'Enable notifications',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IFormInput<boolean>> {
+        value: settings.playSound,
+        name: 'playSound',
+        description: 'Enable sound',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: settings.enabled
+      }
+    ];
+  }
+
+
+  setSettings(patch: Partial<INotificationsSettings>) {
+    this.SET_SETTINGS(patch);
+  }
+
+
   showNotifications() {
     this.windowsService.showWindow({
       componentName: 'Notifications',
@@ -88,7 +138,7 @@ export class NotificationsService extends StatefulService<INotificationsState> i
   }
 
 
-  showTroubleshooter(issueCode: TPerformanceIssueCode) {
+  showTroubleshooter(issueCode: TIssueCode) {
     this.windowsService.showWindow({
       componentName: 'Troubleshooter',
       queryParams: { issueCode },
@@ -105,7 +155,7 @@ export class NotificationsService extends StatefulService<INotificationsState> i
   testWarning() {
     this.push({
       type: ENotificationType.WARNING,
-      message: 'This is warning notification '
+      message: 'This is warning notification'
     });
   }
 
@@ -119,8 +169,21 @@ export class NotificationsService extends StatefulService<INotificationsState> i
 
 
   @mutation()
+  private SET_SETTINGS(patch: Partial<INotificationsSettings>) {
+    this.state.settings = { ...this.state.settings, ...patch };
+  }
+
+
+
+  @mutation()
   private PUSH(notify: INotification) {
     this.state.notifications.unshift(notify);
+  }
+
+
+  @mutation()
+  private CLEAR() {
+    this.state.notifications.length = 0;
   }
 
 

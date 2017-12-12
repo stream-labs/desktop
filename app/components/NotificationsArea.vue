@@ -1,5 +1,5 @@
 <template>
-<div class="notifications-area">
+<div class="notifications-area" v-if="settings.enabled">
   <div
     v-for="notify in notifications"
     class="notification"

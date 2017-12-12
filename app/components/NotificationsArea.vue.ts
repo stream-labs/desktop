@@ -36,10 +36,18 @@ export default class NotificationsArea extends Vue {
       .length;
   }
 
+  get settings() {
+    return this.notificationsService.state.settings;
+  }
+
 
   onNotificationHandler(notify: INotification) {
 
-    this.notifyAudio.play();
+    if (!this.settings.enabled) return;
+
+    if (notify.playSound && this.settings.playSound) {
+      this.notifyAudio.play();
+    }
 
     this.notifications = this.notifications.filter(notify => {
       return !notify.outdated;
@@ -56,15 +64,18 @@ export default class NotificationsArea extends Vue {
     });
   }
 
+
   showNotifications() {
     this.notificationsService.showNotifications();
   }
+
 
   onNotificationClickHandler(id: number) {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
   }
+
 
   private hideOutdated() {
     this.notifications.forEach(notify => {
