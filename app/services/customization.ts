@@ -6,6 +6,7 @@ interface ICustomizationServiceState {
   updateStreamInfoOnLive: boolean;
   livePreviewEnabled: boolean;
   leftDock: boolean;
+  hideViewerCount: boolean;
 }
 
 /**
@@ -18,7 +19,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     nightMode: true,
     updateStreamInfoOnLive: true,
     livePreviewEnabled: true,
-    leftDock: false
+    leftDock: false,
+    hideViewerCount: false
   };
 
   @mutation()
@@ -41,6 +43,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.state.leftDock = enabled;
   }
 
+  @mutation()
+  SET_HIDDEN_VIEWER_COUNT(hidden: boolean) {
+    this.state.hideViewerCount = hidden;
+  }
+
   set nightMode(val: boolean) {
     this.SET_NIGHT_MODE(val);
   }
@@ -59,6 +66,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setLeftDock(enabled: boolean) {
     this.SET_LEFT_DOCK(enabled);
+  }
+
+  setHiddenViewerCount(hidden: boolean) {
+    this.SET_HIDDEN_VIEWER_COUNT(hidden);
   }
 
 }

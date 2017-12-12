@@ -32,6 +32,13 @@
           </span>
         </div>
         <div class="live-dock-viewer-count">
+          <i
+            class="fa fa-eye live-dock-viewer-count-toggle label--icon"
+            :class="{
+              'fa-eye': !hideViewerCount,
+              'fa-eye-slash': hideViewerCount
+            }"
+            @click="toggleViewerCount"/>
           <i class="fa fa-user label--icon" />
           <span class="semibold">{{ viewerCount }}</span> viewers
         </div>
@@ -39,10 +46,11 @@
 
       <div class="live-dock-info">
         <a @click="showEditStreamInfo" v-if="isTwitch">Edit Stream Info</a>
+        <a @click="refreshChat">Refresh Chat</a>
       </div>
 
       <div class="live-dock-chat">
-        <chat/>
+        <chat ref="chat" />
       </div>
     </div>
   </transition>
@@ -131,6 +139,19 @@
 
   @media (max-width: 1200px) {
     font-size: 12px;
+  }
+}
+
+.live-dock-viewer-count {
+  .live-dock-viewer-count-toggle {
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &:hover {
+    .live-dock-viewer-count-toggle {
+      opacity: 1;
+    }
   }
 }
 

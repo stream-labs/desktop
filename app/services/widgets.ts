@@ -3,30 +3,45 @@ import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService, requiresLogin } from './user';
 import { TPlatform } from './platforms';
-import { ScenesService, SceneItem } from './scenes';
+import { ScenesService, SceneItem, Scene } from './scenes';
 import { SourcesService } from './sources';
 import { VideoService } from './video';
 import { HostsService } from './hosts';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import namingHelpers from '../util/NamingHelpers';
+import { Dictionary } from 'lodash';
+import fs from 'fs';
 
 export enum WidgetType {
-  AlertBox,
-  DonationGoal,
-  FollowerGoal,
-  SubscriberGoal,
-  BitGoal,
-  DonationTicker,
-  ChatBox,
-  EventList,
-  TheJar,
-  ViewerCount,
-  StreamBoss,
-  Credits
+  AlertBox = 0,
+  DonationGoal = 1,
+  FollowerGoal = 2,
+  SubscriberGoal = 3,
+  BitGoal = 4,
+  DonationTicker = 5,
+  ChatBox = 6,
+  EventList = 7,
+  TheJar = 8,
+  ViewerCount = 9,
+  StreamBoss = 10,
+  Credits = 11
 }
 
-type TUrlGenerator = (host: string, token: string, platform: TPlatform) => string;
+export interface ISerializableWidget {
+  name: string;
+  type: WidgetType;
+  settings: Dictionary<any>;
+  x: number;
+  y: number;
+  scaleX: number;
+  scaleY: number;
+}
 
+type TUrlGenerator = (
+  host: string,
+  token: string,
+  platform: TPlatform
+) => string;
 
 export interface IWidgetTester {
   name: string;
@@ -40,28 +55,36 @@ const WidgetTesters: IWidgetTester[] = [
   {
     name: 'Follow',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${
+        token
+      }`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Subscriber',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${
+        token
+      }`;
     },
     platforms: ['youtube']
   },
   {
     name: 'Subscription',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+      return `https://${host}/api/v5/slobs/test/${
+        platform
+      }_account/subscription/${token}`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Sponsor',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+      return `https://${host}/api/v5/slobs/test/${
+        platform
+      }_account/subscription/${token}`;
     },
     platforms: ['youtube']
   },
@@ -75,40 +98,40 @@ const WidgetTesters: IWidgetTester[] = [
   {
     name: 'Bits',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${
+        token
+      }`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Host',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${
+        token
+      }`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Super Chat',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${
+        token
+      }`;
     },
     platforms: ['youtube']
   }
 ];
 
-
 export class WidgetTester {
-
-  constructor(public name: string, private url: string) {
-
-  }
+  constructor(public name: string, private url: string) {}
 
   @throttle(1000)
   test() {
     fetch(new Request(this.url));
   }
-
 }
-
 
 export interface IWidget {
   name: string;
@@ -306,51 +329,46 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 1,
 
     anchor: AnchorPoint.SouthWest
-  },
+  }
 };
 
-
-
 export class WidgetsService extends Service {
-
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: SourcesService;
-
-  @Inject()
-  hostsService: HostsService;
-
-  @Inject()
-  videoService: VideoService;
+  @Inject() userService: UserService;
+  @Inject() scenesService: ScenesService;
+  @Inject() sourcesService: SourcesService;
+  @Inject() hostsService: HostsService;
+  @Inject() videoService: VideoService;
 
   @requiresLogin()
   createWidget(type: WidgetType, name?: string): SceneItem {
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
-    const suggestedName = name || namingHelpers.suggestName(name || widget.name, (name: string) => {
-      return this.sourcesService.getSourcesByName(name).length;
-    });
+    const suggestedName =
+      name ||
+      namingHelpers.suggestName(name || widget.name, (name: string) => {
+        return this.sourcesService.getSourcesByName(name).length;
+      });
 
-    const source = this.sourcesService.createSource(suggestedName, 'browser_source', {
-      url: widget.url(
-        this.hostsService.streamlabs,
-        this.userService.widgetToken,
-        this.userService.platform.type
-      ),
-      width: widget.width,
-      height: widget.height
-    }, {
-      propertiesManager: 'widget',
-      propertiesManagerSettings: {
-        widgetType: type
+    const source = this.sourcesService.createSource(
+      suggestedName,
+      'browser_source',
+      {
+        url: widget.url(
+          this.hostsService.streamlabs,
+          this.userService.widgetToken,
+          this.userService.platform.type
+        ),
+        width: widget.width,
+        height: widget.height
+      },
+      {
+        propertiesManager: 'widget',
+        propertiesManagerSettings: {
+          widgetType: type
+        }
       }
-    });
+    );
     const sceneItem = scene.addSource(source.sourceId);
 
     // Give a couple seconds for the resize to propagate
@@ -388,12 +406,116 @@ export class WidgetsService extends Service {
     return WidgetTesters.filter(tester => {
       return tester.platforms.includes(this.userService.platform.type);
     }).map(tester => {
-      return new WidgetTester(tester.name, tester.url(
-        this.hostsService.streamlabs,
-        this.userService.widgetToken,
-        this.userService.platform.type
-      ));
+      return new WidgetTester(
+        tester.name,
+        tester.url(
+          this.hostsService.streamlabs,
+          this.userService.widgetToken,
+          this.userService.platform.type
+        )
+      );
     });
   }
 
+  /**
+   * Save a widget file to the given path
+   * @param path the path to the save the widget file
+   * @param widgetItemId the id of the widget to save
+   */
+  async saveWidgetFile(path: string, widgetItemId: string) {
+    const widgetItem = this.scenesService.getSceneItem(widgetItemId);
+    const data = this.exportWidgetJSON(widgetItem);
+    const json = JSON.stringify(data, null, 2);
+
+    await new Promise((resolve, reject) => {
+      fs.writeFile(path, json, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
+  /**
+   * Exports a serializable object representing the widget
+   * which can be saved into a file and imported later.
+   * @param widgetItem the SceneItem of the widget to export
+   */
+  private exportWidgetJSON(widgetItem: SceneItem): ISerializableWidget {
+    const source = widgetItem.getSource();
+
+    if (source.getPropertiesManagerType() !== 'widget') {
+      throw new Error('Cannot export widget JSON for non-widget');
+    }
+
+    const settings = { ...source.getObsInput().settings };
+    settings.url = '';
+
+    return {
+      name: source.name,
+      type: source.getPropertiesManagerSettings().widgetType,
+      settings,
+      x: widgetItem.x / this.videoService.baseWidth,
+      y: widgetItem.y / this.videoService.baseHeight,
+      scaleX: widgetItem.scaleX / this.videoService.baseWidth,
+      scaleY: widgetItem.scaleY / this.videoService.baseHeight
+    };
+  }
+
+  /**
+   * Load a widget file from the given path
+   * @param path the path to the widget file to laod
+   * @param sceneId the id of the scene to load into
+   */
+  async loadWidgetFile(path: string, sceneId: string) {
+    const scene = this.scenesService.getScene(sceneId);
+    const json = await new Promise<string>((resolve, reject) => {
+      fs.readFile(path, (err, data) => {
+        if (err) {
+          reject();
+        } else {
+          resolve(data.toString());
+        }
+      });
+    });
+
+    const widget = JSON.parse(json);
+    this.importWidgetJSON(widget, scene);
+  }
+
+  /**
+   * Imports a serialized widget into a scene
+   * @param widget the widget to import
+   * @param scene the scene to import into
+   */
+  private importWidgetJSON(widget: ISerializableWidget, scene: Scene) {
+    let widgetItem: SceneItem;
+
+    // First, look for an existing widget of the same type
+    widgetItem = scene.getItems().find(item => {
+      const source = item.getSource();
+      if (source.getPropertiesManagerType() !== 'widget') return false;
+      if (source.getPropertiesManagerSettings().widgetType !== widget.type) return false;
+      return true;
+    });
+
+    // Otherwise, create a new one
+    if (!widgetItem) {
+      widgetItem = scene.createAndAddSource(scene.name, 'browser_source');
+    }
+
+    const source = widgetItem.getSource();
+
+    source.setName(widget.name);
+    source.updateSettings(widget.settings);
+    source.replacePropertiesManager('widget', { widgetType: widget.type });
+    widgetItem.setPositionAndScale(
+      widget.x * this.videoService.baseWidth,
+      widget.y * this.videoService.baseHeight,
+      widget.scaleX * this.videoService.baseWidth,
+      widget.scaleY * this.videoService.baseHeight
+    );
+  }
 }
