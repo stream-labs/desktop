@@ -127,6 +127,18 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  overlaysUrl() {
+    const host = this.hostsService.beta2;
+    const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
+    let url = `https://${host}/marketplace?mode=${uiTheme}&slobs`;
+
+    if (this.isLoggedIn()) {
+      url = url + `&token=${this.widgetToken}`;
+    }
+
+    return url;
+  }
+
   logOut() {
     this.LOGOUT();
   }

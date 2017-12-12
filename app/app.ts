@@ -72,6 +72,10 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
 
 require('./app.less');
 
+// Disable chrome default drag/drop behavior
+document.addEventListener('dragover', event => event.preventDefault());
+document.addEventListener('drop', event => event.preventDefault());
+
 document.addEventListener('DOMContentLoaded', () => {
   const store = createStore();
   const servicesManager: ServicesManager = ServicesManager.instance;
