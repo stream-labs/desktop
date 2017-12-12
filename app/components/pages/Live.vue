@@ -6,25 +6,16 @@
       <webview class="mission-control" id="recentEventsWebview" :src="recenteventsUrl"></webview>
     </div>
 
-    <div
-      class="flex__item studio-controls"
-      :style="{ height: heightOfChild + 'px' }">
+    <div class="flex__item studio-controls" :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
 
-      <vue-draggable-resizable
-        :draggable="false"
-        :handles="['tl', 'tm', 'tl']"
-        :h="200"
-        :w="'100%'"
-        :minh="100"
-        :active="true"
-        class="draggable-section"
-        @resizing="onResizing">
+      <scene-selector class="studio-controls-panel" />
 
-        <scene-selector class="studio-controls-panel" />
+      <mixer class="studio-controls-panel" />
 
-        <mixer class="studio-controls-panel" />
-
-        <div class="live-preview-container">
+      <div
+        class="live-preview-container"
+        :style="{ width: previewSize + 'px' }">
+        <div class="content">
           <div class="studio-controls-top">
             <h4 class="studio-controls__label">
               Preview
@@ -40,22 +31,40 @@
                 @click="previewEnabled = true"/>
             </div>
           </div>
-          <div class="aspect-ratio--16-9" v-if="previewEnabled">
-            <div class="content">
-              <display class="live-display" :drawUI="false" />
-            </div>
-          </div>
-          <div class="aspect-ratio--16-9" v-else>
-            <div class="content">
-              <div class="live-display-placeholder">
-                <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-                <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-                <span>Your preview is currently disabled</span>
+
+          <div class="sizer-container">
+            <div class="aspect-ratio--16-9 live-display-wrapper" v-if="previewEnabled">
+              <div class="content">
+                <display class="live-display" :drawUI="false" />
               </div>
+            </div>
+
+            <div class="aspect-ratio--16-9" v-else>
+              <div class="content">
+                <div class="live-display-placeholder">
+                  <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
+                  <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
+                  <span>Your preview is currently disabled</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sizer-items">
+              <Slider
+                v-model="previewSize"
+                :min="260"
+                :max="600"
+                :interval="1"
+                tooltip="false"
+                class="sizer"
+                :dotSize="12"
+                :sliderStyle="{ 'background-color': '#3c4c53' }"
+              />
+              <i class="fa fa-search fa-flip-horizontal" />
             </div>
           </div>
         </div>
-      </vue-draggable-resizable>
+      </div>
     </div>
   </div>
 </div>
@@ -78,6 +87,7 @@
   margin-bottom: 20px;
   .radius;
   overflow: hidden;
+  position: relative;
 }
 
 .mission-control {
@@ -87,24 +97,72 @@
 .studio-controls {
   display: flex;
   position: relative;
-  max-height: 500px;
+  flex: 0 0 200px;
 }
 
 .studio-controls-panel {
-  flex-grow: 1;
   flex-basis: 50%;
   padding-left: 0;
   padding-right: 20px;
 }
 
-.live-preview-container {
-  flex: 0 0;
+.sizer-container {
+  width: 100%;
+  .radius;
+  background-color: @day-secondary;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  .border;
+  border-top: 0;
+  height: calc(~'100% - 29px');
+
+  .fa {
+    opacity: .4;
+    font-size: 12px;
+  }
 }
 
-.live-display,
+.sizer-items {
+  position: absolute;
+  bottom: 4px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.sizer {
+  width: 100px;
+  margin: 0 12px;
+  height: auto;
+
+  .vue-slider {
+    .vue-slider-dot {
+      &:after {
+        display: none;
+      }
+    }
+  }
+}
+
+.live-preview-container {
+  width: 300px;
+  .aspect-ratio(4,3);
+  flex: 0 0 auto;
+}
+
+.live-display-wrapper {
+  width: 100%;
+}
+
+.live-display {
+  width: 100%;
+  height: 100%;
+}
+
 .live-display-placeholder {
-  // width: 304px;
-  // height: 171px;
+  height: 100%;
 }
 
 .live-display-placeholder {
@@ -131,18 +189,6 @@
   display: none;
 }
 
-.draggable-section-parent {
-  position: relative;
-  display: inline-block;
-  height: 100%;
-}
-
-.draggable-section {
-  display: flex;
-  width: 100%!important;
-  top: 0!important;
-}
-
 .night-theme {
   .mission-control-container {
     border-color: @night-secondary;
@@ -164,6 +210,16 @@
 
   .live-display-placeholder__img--night {
     display: block;
+  }
+
+  .live-display-size-wrapper {
+    background-color: @night-secondary;
+    border-color: @night-secondary;
+  }
+
+  .sizer-container {
+    background-color: @night-secondary;
+    border-color: @night-secondary;
   }
 }
 </style>

@@ -78,7 +78,6 @@
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1",
-    "vue-draggable-resizable": "^1.5.3",
     "vue-popperjs": "^1.2.2"
   },
   "devDependencies": {
