@@ -166,8 +166,9 @@ export class AppService extends StatefulService<IAppState>
   /**
    * Downloads and installs an overlay
    * @param url the URL of the overlay
+   * @param name the name of the overlay
    */
-  async installOverlay(url: string, progressCallback?: (info: IDownloadProgress) => void) {
+  async installOverlay(url: string, name:string, progressCallback?: (info: IDownloadProgress) => void) {
     this.START_LOADING();
 
     let pathName: string;
@@ -180,8 +181,7 @@ export class AppService extends StatefulService<IAppState>
       throw e;
     }
 
-    const filename = path.parse(url).name;
-    const configName = this.scenesCollectionsService.suggestName(filename);
+    const configName = this.scenesCollectionsService.suggestName(name);
 
     await this.loadOverlay(configName, pathName);
   }
