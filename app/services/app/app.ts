@@ -20,7 +20,6 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
-import path from 'path';
 
 interface IAppState {
   loading: boolean;

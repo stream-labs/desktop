@@ -89,9 +89,12 @@ export class Scene implements ISceneApi {
 
   addSource(sourceId: string, options: ISceneItemAddOptions = {}): SceneItem {
 
+    const source = this.sourcesService.getSource(sourceId);
+    if (!source) throw new Error(`Source ${sourceId} not found`);
+
     if (!this.canAddSource(sourceId)) return null;
 
-    const source = this.sourcesService.getSource(sourceId);
+
     const sceneItemId = options.sceneItemId || ipcRenderer.sendSync('getUniqueId');
 
     let obsSceneItem: obs.ISceneItem;
@@ -117,6 +120,8 @@ export class Scene implements ISceneApi {
 
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
+    if (!sceneItem) throw new Error(`SceneItem ${sceneItemId} not found`);
+
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);
     this.scenesService.itemRemoved.next(sceneItem.sceneItemState);

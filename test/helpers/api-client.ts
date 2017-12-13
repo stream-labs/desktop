@@ -28,6 +28,15 @@ export class ApiClient {
    */
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
+
+  /**
+   * if result of calling a service method is promise -
+   * we create a linked promise and keep it callbacks here until
+   * the promise in the application will be resolved or rejected
+   */
+  private promises: Dictionary<Function[]> = {};
+
+
   // set to 'true' for debugging
   logsEnabled = false;
 
@@ -167,9 +176,19 @@ export class ApiClient {
       if (!result) return;
 
       if (result._type === 'EVENT') {
-        const eventSubject = this.subscriptions[message.result.resourceId];
-        this.eventReceived.next(result.data);
-        if (eventSubject) eventSubject.next(result.data);
+        if (result.emitter === 'STREAM') {
+          const eventSubject = this.subscriptions[message.result.resourceId];
+          this.eventReceived.next(result.data);
+          if (eventSubject) eventSubject.next(result.data);
+
+        } else if (result.emitter === 'PROMISE') {
+          const [resolve, reject] = this.promises[result.resourceId];
+          if (result.isRejected) {
+            reject(result.data);
+          } else {
+            resolve(result.data);
+          }
+        }
       }
     });
 
@@ -195,7 +214,11 @@ export class ApiClient {
       const result = this.requestSync(resourceId, property as string, ...args);
 
       // TODO: add promises support
-      if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
+      if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
+        return new Promise((resolve, reject) => {
+          this.promises[result.resourceId] = [resolve, reject];
+        });
+      } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
         if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
         return subject;
