@@ -31,8 +31,6 @@
 
       </div>
     </div>
-
-
   </div>
 
 </modal-layout>
@@ -41,31 +39,46 @@
 <script lang="ts" src="./Notifications.vue.ts"></script>
 
 <style lang="less" scoped>
-
   @import "../../styles/index";
 
+.notification {
+  color: @grey;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+  display: grid;
+  grid-template-columns: 30px 1fr 130px;
+  background: @day-primary;
+  .border;
 
+  &.has-action:hover {
+    color: @navy;
+    background: @day-secondary;
+    cursor: pointer;
+  }
+
+  &:last-child {
+    margin-bottom: 20px;
+  }
+
+  .fa-warning {
+    color: @red;
+  }
+
+  .date {
+    text-align: right;
+  }
+}
+
+.night-theme {
   .notification {
-    color: @grey;
-    padding: 5px 10px;
-    margin-bottom: 5px;
-    display: grid;
-    grid-template-columns: 30px 1fr 130px;
     background: @night-hover;
     border-color: @night-hover;
-
 
     &.has-action:hover {
       color: @white;
       border-color: @night-secondary;
       background: @night-secondary;
-      cursor: pointer;
     }
-
-    &:last-child { margin-bottom: 20px;}
-    .fa-warning { color: @red; }
-    .fa-info-circle { color: @teal; }
-    .date { text-align: right;}
   }
-
+}
 </style>

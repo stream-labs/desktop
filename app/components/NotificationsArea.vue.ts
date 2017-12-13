@@ -7,7 +7,7 @@ import {
   INotification
 } from 'services/notifications';
 
-const LIFE_TIME = 5000;
+const LIFE_TIME = 8000;
 
 interface IUiNotification extends INotification {
   outdated?: boolean;
