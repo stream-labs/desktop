@@ -42,19 +42,22 @@
     <div class="top-nav-item" v-if="isDevMode">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
-    <div class="top-nav-item">
+    <!--<div class="top-nav-item">
       <a class="link" @click="bugReport">Bug Report</a>
-    </div>
+    </div>-->
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
-        <i class="fa fa-sun-o"/>
-        <i class="fa fa-moon-o"/>
+        <!--<i class="fa fa-sun-o"/>
+        <i class="fa fa-moon-o"/>-->
+        <div class="theme-toggle__bg"></div>
+        <img class="theme-toggle__icon theme-toggle__icon--moon" src="../../media/images/moon.png"/>
+        <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
       </button>
     </div>
     <div class="top-nav-item">
       <a
         @click="openSettingsWindow"
-        class="link link--uppercase">
+        class="link">
         <i class="fa fa-cog"/> Settings
       </a>
     </div>
@@ -80,6 +83,10 @@
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 45px;
+
+  .link {
+    font-size: 14px;
+  }
 }
 
 .top-nav-right {
@@ -101,6 +108,10 @@
 }
 
 .theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+
   .fa {
     overflow: hidden;
     position: relative;
@@ -113,6 +124,31 @@
   .fa-moon-o {
     display: none;
   }
+}
+
+.theme-toggle__bg {
+  height: 14px;
+  width: 30px;
+  padding: 0px 16px;
+  background: #e3e8eb;
+  position: relative;
+  border-radius: 10px;
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  top: -2px;
+}
+
+.theme-toggle__icon--sun {
+  width: 19px;
+  right: -2px;
+}
+
+.theme-toggle__icon--moon {
+  width: 18px;
+  display: none;
+  left: -2px;
 }
 
 .night-theme {
@@ -137,6 +173,18 @@
     &:hover {
       color: @white;
     }
+  }
+
+  .theme-toggle__bg {
+    background-color: rgba(255, 255, 255, .2);
+  }
+
+  .theme-toggle__icon--moon {
+    display: block;
+  }
+
+  .theme-toggle__icon--sun {
+    display: none;
   }
 }
 </style>
