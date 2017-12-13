@@ -19,6 +19,7 @@ import electron from 'electron';
 import { StreamingService } from '../../services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
+import CustomLoader from '../CustomLoader.vue';
 
 const { remote } = electron;
 
@@ -33,7 +34,8 @@ const { remote } = electron;
     Live,
     Onboarding,
     LiveDock,
-    StudioFooter
+    StudioFooter,
+    CustomLoader,
   }
 })
 export default class Main extends Vue {
