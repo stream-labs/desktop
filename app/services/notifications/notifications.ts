@@ -150,24 +150,6 @@ export class NotificationsService extends PersistentStatefulService<INotificatio
   }
 
 
-  // TODO comment test methods before release
-
-  testWarning() {
-    this.push({
-      type: ENotificationType.WARNING,
-      message: 'This is warning notification'
-    });
-  }
-
-
-  testInfo() {
-    this.push({
-      type: ENotificationType.INFO,
-      message: 'This is info notification'
-    });
-  }
-
-
   @mutation()
   private SET_SETTINGS(patch: Partial<INotificationsSettings>) {
     this.state.settings = { ...this.state.settings, ...patch };
