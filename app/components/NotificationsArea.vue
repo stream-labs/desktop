@@ -1,6 +1,23 @@
 <template>
 <div class="notifications-area" v-if="settings.enabled">
   <div
+    class="notifications__counter notifications__counter--warning"
+    v-if="unreadCount"
+    title="New Notifications"
+    @click="showNotifications">
+    <span class="fa fa-exclamation-triangle"></span>
+    {{ unreadCount }}
+  </div>
+
+  <div
+    class="notifications__counter"
+    v-if="!unreadCount"
+    title="Show Notifications"
+    @click="showNotifications">
+    <span class="fa fa-info-circle"></span>
+  </div>
+
+  <div
     v-for="notify in notifications"
     class="notification"
     @click="onNotificationClickHandler(notify.id)"
@@ -12,30 +29,7 @@
     }"
   >
     {{ notify.message }}
-
   </div>
-
-  <div class="counter warning"
-     v-if="unreadCount"
-     title="New Notifications"
-     @click="showNotifications"
-  >
-    <span
-      class="fa fa-warning"
-    >
-    </span>
-    {{ unreadCount }}
-  </div>
-
-  <div class="counter"
-       v-if="!unreadCount"
-       title="Show Notifications"
-       @click="showNotifications"
-  >
-    <span class="fa fa-info-circle"></span>
-  </div>
-
-
 </div>
 </template>
 
@@ -47,15 +41,12 @@
 .notifications-area {
   overflow: hidden;
   min-width: 300px;
-  height: 43px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-
 .notification {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 30px;
   line-height: 30px;
   padding-left: 10px;
@@ -63,39 +54,49 @@
   border-radius: 3px;
   white-space: nowrap;
   overflow: hidden;
+  margin-left: 10px;
   animation: notify-appears 0.3s;
 
   &.info {
-    background-color: fade(@teal, 30%);
-    color: @teal;
+    background-color: fade(@grey, 15%);
+    color: @grey;
   }
 
   &.warning {
-    background-color: fade(@red, 30%);
+    background-color: fade(@red, 20%);
     color: @red;
   }
 
   &.has-action {
     cursor: pointer;
-  };
+  }
 
   &.outdated {
     animation: notify-disappears 1s forwards;
+    display: none;
   }
 }
 
-
-.counter {
-  position: absolute;
-  right: 5px;
+.notifications__counter {
   cursor: pointer;
-  top: 6px;
 
-  &.warning {
+  &:before {
+    content: '|';
+    padding-right: 12px;
+    opacity: .5;
+    color: @grey;
+  }
+
+  .fa {
+    font-size: 15px;
+  }
+}
+
+.notifications__counter--warning {
+  color: @red;
+
+  .fa {
     color: @red;
-    .fa {
-      color: @red;
-    }
   }
 }
 
@@ -106,7 +107,7 @@
 
 @keyframes notify-disappears {
   from {opacity: 1}
-  to {opacity: 0}
+  to {opacity: 0;}
 }
 
 </style>

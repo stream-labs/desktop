@@ -1,7 +1,9 @@
 <template>
 <div class="footer">
-  <performance-metrics />
-  <notifications-area class="notifications-area"/>
+  <div class="flex flex--center">
+    <performance-metrics />
+    <notifications-area class="notifications-area"/>
+  </div>
 
   <div class="nav-right">
     <div class="nav-item">
@@ -53,12 +55,6 @@
     font-size: 12px;
     margin-left: 12px;
   }
-}
-
-.notifications-area {
-  position: fixed;
-  right: 370px;
-  bottom: 0;
 }
 
 .record-button {
