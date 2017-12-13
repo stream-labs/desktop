@@ -56,6 +56,7 @@
   overflow: hidden;
   margin-left: 10px;
   animation: notify-appears 0.3s;
+  position: relative;
 
   &.info {
     background-color: fade(@grey, 15%);
@@ -73,7 +74,6 @@
 
   &.outdated {
     animation: notify-disappears 1s forwards;
-    display: none;
   }
 }
 
@@ -102,12 +102,12 @@
 
 @keyframes notify-appears {
   from {opacity: 0; top: 50px}
-  to {opacity: 1;}
+  to {opacity: 1;  top: 0}
 }
 
 @keyframes notify-disappears {
   from {opacity: 1}
-  to {opacity: 0;}
+  to {opacity: 0; display: none}
 }
 
 </style>
