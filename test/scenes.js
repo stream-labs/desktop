@@ -1,10 +1,11 @@
 import test from 'ava';
 import { sleep } from './helpers/sleep';
-import { useSpectron, focusMain } from './helpers/spectron';
+import { useSpectron, focusMain } from './helpers/spectron/index';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
+import { getClient } from './helpers/api-client';
 
-useSpectron();
+useSpectron({ initApiClient: true });
 
 // Checks for the default audio sources
 async function checkDefaultSources(t) {
@@ -59,6 +60,7 @@ test('Scene switching with sources', async t => {
 });
 
 test('Restarting the app preserves the default sources', async t => {
+  const client = await getClient();
   const app = t.context.app;
   const sceneName = 'Coolest Scene Ever';
 
@@ -66,9 +68,12 @@ test('Restarting the app preserves the default sources', async t => {
 
   await focusMain(t);
   t.true(await app.client.isExisting(`div=${sceneName}`));
-  await t.context.app.restart();
+
+  // reload config
+  client.request('AppService', 'loadConfig', 'scenes');
 
   // wait while config will be loaded
+  // TODO: add Promises support to ApiClient
   await sleep(5000);
 
   await focusMain(t);

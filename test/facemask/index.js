@@ -1,5 +1,5 @@
 import test from 'ava';
-import { useSpectron, focusMain, focusChild } from '../helpers/spectron';
+import { useSpectron, focusMain, focusChild } from '../helpers/spectron/index';
 import { addSource, clickRemoveSource, clickSourceProperties, selectSource } from '../helpers/spectron/sources';
 import { addFilter, openFilterProperties, closeFilterProperties, removeFilter } from '../helpers/spectron/filters';
 import { setFormInput, setFormDropdown, clickFormInput, setSliderPercent } from '../helpers/spectron/forms';

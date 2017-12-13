@@ -157,6 +157,12 @@ export class ServicesManager extends Service {
   private bufferedMutations: IMutation[] = [];
 
   /**
+   * contains additional information about errors
+   * while JSONRPC request handling
+   */
+  private requestErrors: string[] = [];
+
+  /**
    * if result of calling a service method in the main window is promise -
    * we create a linked promise in the child window and keep it callbacks here until
    * the promise in the main window will be resolved or rejected
@@ -248,11 +254,29 @@ export class ServicesManager extends Service {
 
   executeServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
+    this.requestErrors = [];
+
+    const handleErrors = (e?: any) => {
+      if (!e && this.requestErrors.length === 0) return;
+      if (e) {
+
+        // re-raise error for Raven
+        const isChildWindowRequest = request.params && request.params.fetchMutations;
+        if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
+      }
+
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
+        id: request.id,
+        message: this.requestErrors.join(';')
+      });
+    };
+
     try {
       response = this.handleServiceRequest(request);
+      handleErrors();
     } catch (e) {
-      console.error(e);
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR, id: request.id });
+      handleErrors(e);
     } finally {
       return response;
     }
@@ -327,7 +351,8 @@ export class ServicesManager extends Service {
       const subscriptionId = `${resourceId}.${methodName}`;
       responsePayload = {
         _type: 'SUBSCRIPTION',
-        resourceId: subscriptionId
+        resourceId: subscriptionId,
+        emitter: 'STREAM',
       };
       if (!this.subscriptions[subscriptionId]) {
         this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
@@ -364,10 +389,11 @@ export class ServicesManager extends Service {
         id: request.id,
         result: {
           _type: 'SUBSCRIPTION',
-          resourceId: promiseId
+          resourceId: promiseId,
+          emitter: 'PROMISE',
         }
       };
-    } else if (responsePayload && responsePayload.isHelper) {
+    } else if (responsePayload && responsePayload.isHelper === true) {
       const helper = responsePayload;
 
       response = {
@@ -384,7 +410,7 @@ export class ServicesManager extends Service {
       // payload can contain helpers-objects
       // we have to wrap them in IpcProxy too
       traverse(responsePayload).forEach((item: any) => {
-        if (item && item.isHelper) {
+        if (item && item.isHelper === true) {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
             _type: 'HELPER',
@@ -416,6 +442,10 @@ export class ServicesManager extends Service {
    */
   private getResource(resourceId: string) {
 
+    if (resourceId === 'ServicesManager') {
+      return this;
+    }
+
     if (this.services[resourceId]) {
       return this.getInstance(resourceId) || this.initService(resourceId);
     }
@@ -427,8 +457,31 @@ export class ServicesManager extends Service {
   }
 
 
+  /**
+   * the information about resource scheme helps to improve performance for API clients
+   * this is undocumented feature is mainly for our API client that we're using in tests
+   */
+  getResourceScheme(resourceId: string): Dictionary<string> {
+    const resource = this.getResource(resourceId);
+    if (!resource) {
+      this.requestErrors.push(`Resource not found: ${resourceId}`);
+      return null;
+    }
+    const resourceScheme = {};
+
+    Object.keys(Object.getPrototypeOf(resource)).concat(Object.keys(resource))
+      .forEach(key => {
+        resourceScheme[key] = typeof resource[key];
+      });
+
+    return resourceScheme;
+  }
+
+
   private getHelperModel(helper: Object): Object {
-    if (helper['getModel']) return helper['getModel']();
+    if (helper['getModel'] && typeof helper['getModel'] === 'function') {
+      return helper['getModel']();
+    }
     return {};
   }
 

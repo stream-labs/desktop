@@ -1,13 +1,12 @@
 import { StatefulService, mutation } from './stateful-service';
 
-type TAppPage = 'Studio' | 'Dashboard' | 'Live' | 'Onboarding';
+type TAppPage = 'Studio' | 'Dashboard' | 'Live' | 'Onboarding' | 'BrowseOverlays';
 
 interface INavigationState {
   currentPage: TAppPage;
 }
 
 export class NavigationService extends StatefulService<INavigationState> {
-
   static initialState: INavigationState = {
     currentPage: 'Studio'
   };
@@ -20,5 +19,4 @@ export class NavigationService extends StatefulService<INavigationState> {
   private NAVINGATE(page: TAppPage) {
     this.state.currentPage = page;
   }
-
 }

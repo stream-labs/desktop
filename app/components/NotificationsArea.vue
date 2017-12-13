@@ -17,19 +17,22 @@
     <span class="fa fa-info-circle"></span>
   </div>
 
-  <div
-    v-for="notify in notifications"
-    class="notification"
-    @click="onNotificationClickHandler(notify.id)"
-    :class="{
+  <div class="notifications__container">
+    <div
+        v-for="notify in notifications"
+        class="notification"
+        @click="onNotificationClickHandler(notify.id)"
+        :class="{
       'info': notify.type == 'INFO',
       'warning': notify.type == 'WARNING',
       'has-action': notify.action && !notify.outdated,
       'outdated': notify.outdated
     }"
-  >
-    {{ notify.message }}
+    >
+      {{ notify.message }}
+    </div>
   </div>
+
 </div>
 </template>
 
@@ -46,6 +49,12 @@
   justify-content: flex-start;
 }
 
+.notifications__container {
+  position: relative;
+  min-width: 300px;
+  height: 30px;
+}
+
 .notification {
   height: 30px;
   line-height: 30px;
@@ -55,8 +64,10 @@
   white-space: nowrap;
   overflow: hidden;
   margin-left: 10px;
+  position: absolute;
+  left: 20px;
   animation: notify-appears 0.3s;
-  position: relative;
+
 
   &.info {
     background-color: fade(@grey, 15%);
@@ -102,7 +113,7 @@
 
 @keyframes notify-appears {
   from {opacity: 0; top: 50px}
-  to {opacity: 1;  top: 0}
+  to {opacity: 1; top: 0 }
 }
 
 @keyframes notify-disappears {
