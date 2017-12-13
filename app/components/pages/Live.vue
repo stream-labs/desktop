@@ -33,14 +33,12 @@
           </div>
 
           <div class="sizer-container">
-            <div class="aspect-ratio--16-9 live-display-wrapper" v-if="previewEnabled">
-              <div class="content">
+            <div class="aspect-ratio--16-9 live-display-wrapper" >
+              <div class="content" v-if="previewEnabled">
                 <display class="live-display" :drawUI="false" />
               </div>
-            </div>
 
-            <div class="aspect-ratio--16-9" v-else>
-              <div class="content">
+              <div class="content" v-else>
                 <div class="live-display-placeholder">
                   <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
                   <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
@@ -52,12 +50,12 @@
             <div class="sizer-items">
               <Slider
                 v-model="previewSize"
-                :min="260"
+                :min="270"
                 :max="600"
                 :interval="1"
                 tooltip="false"
                 class="sizer"
-                :dotSize="12"
+                :dotSize="11"
                 :sliderStyle="{ 'background-color': '#3c4c53' }"
               />
               <i class="fa fa-search fa-flip-horizontal" />
@@ -71,6 +69,39 @@
 </template>
 
 <script lang="ts" src="./Live.vue.ts"></script>
+
+<style lang="less">
+@import "../../styles/index";
+.sizer-container {
+  width: 100%;
+  .radius;
+  background-color: @day-secondary;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  .border;
+  border-top: 0;
+  height: calc(~'100% - 29px');
+}
+
+.sizer-items {
+  position: absolute;
+  display: flex;
+  align-items: center;
+
+  .fa {
+    opacity: .4;
+    font-size: 12px;
+  }
+}
+
+.sizer {
+  width: 100px;
+  margin: 0 12px;
+  height: auto;
+}
+</style>
 
 <style lang="less" scoped>
 @import "../../styles/index";
@@ -117,33 +148,11 @@
   .border;
   border-top: 0;
   height: calc(~'100% - 29px');
-
-  .fa {
-    opacity: .4;
-    font-size: 12px;
-  }
 }
 
 .sizer-items {
-  position: absolute;
   bottom: 4px;
   right: 12px;
-  display: flex;
-  align-items: center;
-}
-
-.sizer {
-  width: 100px;
-  margin: 0 12px;
-  height: auto;
-
-  .vue-slider {
-    .vue-slider-dot {
-      &:after {
-        display: none;
-      }
-    }
-  }
 }
 
 .live-preview-container {
@@ -170,9 +179,6 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: @day-secondary;
-  .border;
-  .radius;
 
   span {
     color: @grey;
@@ -210,11 +216,6 @@
 
   .live-display-placeholder__img--night {
     display: block;
-  }
-
-  .live-display-size-wrapper {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
   }
 
   .sizer-container {

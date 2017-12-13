@@ -7,10 +7,12 @@ import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { Subscription } from 'rxjs/Subscription';
 import { CustomizationService } from 'services/customization';
+import Slider from './shared/Slider.vue';
 
 @Component({
   components: {
-    Chat
+    Chat,
+    Slider
   }
 })
 export default class LiveDock extends Vue {
@@ -26,6 +28,8 @@ export default class LiveDock extends Vue {
   elapsedInterval: number;
 
   collapsed = true;
+
+  liveDockSize= 28;
 
   subscription: Subscription;
 
