@@ -29,7 +29,7 @@ export default class LiveDock extends Vue {
 
   collapsed = true;
 
-  liveDockSize= 28;
+  liveDockSize = 28;
 
   subscription: Subscription;
 

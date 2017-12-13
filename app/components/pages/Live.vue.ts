@@ -13,16 +13,14 @@ import Slider from '../shared/Slider.vue';
     SceneSelector,
     Mixer,
     Display,
-    Slider,
+    Slider
   }
 })
-
 export default class Live extends Vue {
-
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
-  previewSize= 300;
+  previewSize = 300;
 
   get previewEnabled() {
     return this.customizationService.state.livePreviewEnabled;
