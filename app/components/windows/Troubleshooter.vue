@@ -21,11 +21,11 @@
         {{ issue.message }}
       </h4>
       <p>
-        Streamlabs-OBS detected skipped frames {{ moment(issue.date) }}.<br/>
+        Streamlabs OBS has detected dropped frames {{ moment(issue.date) }}.<br/>
       </p>
-      <h4>What does it mean?</h4>
+      <h4>What does this mean?</h4>
       <p>
-        Some frames have not been uploaded. The problem is usually related to a poor network connection.
+        Some frames have not been uploaded. This problem is usually related to a poor network connection.
       </p>
       <h4>
         What can I do?
@@ -34,7 +34,7 @@
       <ul>
         <li>Check the health of your Internet connection</li>
         <li>Change your ingest server</li>
-        <li>If nothing of these worked, lower your bitrate</li>
+        <li>If none of these worked, lower your bitrate</li>
       </ul>
 
     </div>
@@ -46,12 +46,12 @@
         {{ issue.message }}
       </h4>
       <p>
-        Streamlabs-OBS detected skipped frames {{ moment(issue.date) }}.<br/>
+        Streamlabs OBS has detected skipped frames {{ moment(issue.date) }}.<br/>
       </p>
-      <h4>What does it mean?</h4>
+      <h4>What does this mean?</h4>
       <p>
         Some frames have not been encoded.
-        The problem is usually related to a high CPU usage or to unsuitable encoder settings.
+        This problem is usually due to high CPU usage or unsuitable encoder settings.
       </p>
       <h4>
         What can I do?
@@ -59,7 +59,7 @@
 
       <ul>
         <li>Lower your encoder settings (preset)</li>
-        <li>Ensure that you don't have any huge tasks that use your CPU resources</li>
+        <li>Ensure that you don't have any other applications open that are heavy on your CPU</li>
       </ul>
 
     </div>
@@ -71,19 +71,21 @@
         {{ issue.message }}
       </h4>
       <p>
-        Streamlabs-OBS detected lagged frames {{ moment(issue.date) }}.<br/>
+        Streamlabs OBS has detected lagged frames {{ moment(issue.date) }}.<br/>
       </p>
-      <h4>What does it mean?</h4>
+      <h4>What does this mean?</h4>
       <p>
-        Some frames took too much time to get rendered.
-        Usually the problem is related to a high GPU usage.
+        Some frames took too long to get rendered.
+        Usually the problem is related to your game using up too many GPU resources.
+        When this happens, Streamlabs OBS does not have any resources left over to render frames.
       </p>
       <h4>
         What can I do?
       </h4>
 
       <ul>
-        <li>Enable VSync</li>
+        <li>Cap your in-game framerate</li>
+        <li>Enable VSync in your game</li>
         <li>Disable FreeSync or GSync in your Driver</li>
         <li>Lower graphics settings until you stop lagging frames</li>
       </ul>
