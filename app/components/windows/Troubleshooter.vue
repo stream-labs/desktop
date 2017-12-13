@@ -25,16 +25,15 @@
       </p>
       <h4>What does it mean?</h4>
       <p>
-        Some frames have not been sent to stream. Usually the problem is related to poor network bandwidth
+        Some frames have not been uploaded. The problem is usually related to a poor network connection.
       </p>
       <h4>
         What can I do?
       </h4>
 
       <ul>
-        <li>Verify that your connection is good (try a speedtest, like fast.com) </li>
-        <li>Ensure that nothing else is also uploading</li>
-        <li>Change ingest server, sometimes there are issues</li>
+        <li>Check the health of your Internet connection</li>
+        <li>Change your ingest server</li>
         <li>If nothing of these worked, lower your bitrate</li>
       </ul>
 
@@ -52,7 +51,7 @@
       <h4>What does it mean?</h4>
       <p>
         Some frames have not been encoded.
-        Usually the problem is related to high CPU usage or to unsuitable encoder settings
+        The problem is usually related to a high CPU usage or to unsuitable encoder settings.
       </p>
       <h4>
         What can I do?
@@ -76,18 +75,17 @@
       </p>
       <h4>What does it mean?</h4>
       <p>
-        Some frames took to much time to get rendered.
-        Usually the problem is related to high GPU usage.
+        Some frames took too much time to get rendered.
+        Usually the problem is related to a high GPU usage.
       </p>
       <h4>
         What can I do?
       </h4>
 
       <ul>
-        <li>Reduce your base resolution</li>
-        <li>Reduce your FPS </li>
-        <li>Enable the capping ingame FPS if possible</li>
-        <li>Reduce other video settings</li>
+        <li>Enable VSync</li>
+        <li>Disable FreeSync or GSync in your Driver</li>
+        <li>Lower graphics settings until you stop lagging frames</li>
       </ul>
 
     </div>
