@@ -86,7 +86,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private servers: IServer[] = [];
 
   // enable to debug
-  private enableLogs = true;
+  private enableLogs = false;
 
 
   init() {

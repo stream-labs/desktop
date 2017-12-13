@@ -213,7 +213,6 @@ export class ApiClient {
 
       const result = this.requestSync(resourceId, property as string, ...args);
 
-      // TODO: add promises support
       if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
         return new Promise((resolve, reject) => {
           this.promises[result.resourceId] = [resolve, reject];
