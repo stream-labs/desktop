@@ -16,7 +16,8 @@ import { WindowsService } from '../../services/windows';
 import { NavigationService } from '../../services/navigation';
 import { CustomizationService } from '../../services/customization';
 import { Multiselect } from 'vue-multiselect';
-import { VideoEncodingOptimizationService, IEncoderPreset } from '../../services/video-encoding-optimizations';
+import { VideoEncodingOptimizationService } from '../../services/video-encoding-optimizations';
+import { IProfile, IEncoderPreset } from '../../services/video-encoding-optimizations/definitions';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
