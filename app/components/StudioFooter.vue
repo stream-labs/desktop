@@ -1,6 +1,9 @@
 <template>
 <div class="footer">
-  <performance-metrics />
+  <div class="flex flex--center">
+    <performance-metrics />
+    <notifications-area class="notifications-area"/>
+  </div>
 
   <div class="nav-right">
     <div class="nav-item">
@@ -64,7 +67,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .7;
+  opacity: .6;
   .transition;
   .bold;
   border: 1px solid #c4c5c5;
@@ -83,6 +86,7 @@
   &.active {
     opacity: 1;
     animation: pulse 2.5s infinite;
+    border: 1px solid @red;
   }
 }
 
@@ -107,6 +111,10 @@
   .record-button {
     background-color: #3c4c53;
     border-color: @night-border;
+
+    &.active {
+      border-color: @red;
+    }
   }
 }
 </style>
