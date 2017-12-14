@@ -25,6 +25,7 @@ export interface INotificationOptions {
   playSound?: boolean;
   data?: any;
   lifeTime?: number;
+  showTime?: boolean;
 }
 
 
@@ -36,11 +37,13 @@ export interface INotification extends INotificationOptions {
   date: number;
   playSound: boolean;
   lifeTime: number;
+  showTime: boolean;
 }
 
 
 export interface INotificationsApi {
   notificationPushed: Observable<INotification>;
+  notificationRead: Observable<number[]>;
   push(notifyInfo: INotificationOptions): INotification;
   getNotification(id: number): INotification;
   getAll(type?: ENotificationType): INotification[];
@@ -49,6 +52,7 @@ export interface INotificationsApi {
   getSettings(): INotificationsSettings;
   getSettingsFormData(): TFormData;
   setSettings(patch: Partial<INotificationsSettings>): void;
+  markAsRead(id: number): void;
   markAllAsRead(): void;
   applyAction(notificationId: number): void;
   showNotifications(): void;
