@@ -9,7 +9,9 @@
     :interval="interval"
     :speed="0"
     :height="4"
+    :dotSize="dotSize"
     :tooltip="tooltip"
+    :sliderStyle="sliderStyle"
   />
   <input
     v-if="valueBox"
@@ -42,6 +44,7 @@
   padding:8px 0 !important;
   margin: 0;
   flex-grow: 1;
+  height: auto;
 
   &:hover {
     .vue-slider-tooltip {

@@ -14,6 +14,8 @@ import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
 import EditStreamInfo from '../components/windows/EditStreamInfo.vue';
 import AdvancedAudio from '../components/windows/AdvancedAudio.vue';
+import Notifications from '../components/windows/Notifications.vue';
+import Troubleshooter from '../components/windows/Troubleshooter.vue';
 import Blank from '../components/windows/Blank.vue';
 import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
@@ -67,7 +69,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AddSourceFilter,
     Blank,
     EditStreamInfo,
-    AdvancedAudio
+    AdvancedAudio,
+    Notifications,
+    Troubleshooter
   };
 
   private windows: Electron.BrowserWindow[] = BrowserWindow.getAllWindows();

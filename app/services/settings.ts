@@ -49,6 +49,7 @@ export interface ISettingsServiceApi {
   getCategories(): string[];
   getSettingsFormData(categoryName: string): ISettingsSubCategory[];
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
+  showSettings(): void;
 }
 
 export class SettingsService extends StatefulService<ISettingsState>
@@ -113,7 +114,9 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
-    categories = categories.concat('Overlays');
+    categories = categories
+      .concat('Overlays')
+      .concat('Notifications');
 
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['API']);

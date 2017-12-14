@@ -27,6 +27,7 @@ export default class BrowseOverlays extends Vue {
 
   async installOverlay(
     url: string,
+    name: string,
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
     const host = (new urlLib.URL(url)).hostname;
@@ -37,7 +38,7 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.appService.installOverlay(url, progressCallback);
+    await this.appService.installOverlay(url, name, progressCallback);
     this.navigationService.navigate('Studio');
   }
 
