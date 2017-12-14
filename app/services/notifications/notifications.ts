@@ -26,7 +26,7 @@ export class NotificationsService extends PersistentStatefulService<
     notifications: [],
     settings: {
       enabled: true,
-      playSound: true
+      playSound: false
     }
   };
 

@@ -6,6 +6,7 @@ import {
   NotificationsService,
   INotification
 } from 'services/notifications';
+import notificationAudio from '../../media/sound/ding.wav';
 
 const QUEUE_TIME = 5000;
 
@@ -24,7 +25,7 @@ export default class NotificationsArea extends Vue {
   private canShowNextNotify = true;
 
   mounted() {
-    this.notifyAudio = new Audio('media/sound/ding.wav');
+    this.notifyAudio = new Audio(notificationAudio);
     this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
     });
