@@ -29,7 +29,7 @@
       'outdated': notify.outdated
     }"
     >
-      {{ notify.message }} - {{ moment(notify.date) }}
+      {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
     </div>
   </div>
 

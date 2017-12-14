@@ -8,8 +8,6 @@ import {
   INotification
 } from 'services/notifications';
 import notificationAudio from '../../media/sound/ding.wav';
-import { returnAtIndex } from "lodash-decorators/utils";
-
 const QUEUE_TIME = 5000;
 
 interface IUiNotification extends INotification {
