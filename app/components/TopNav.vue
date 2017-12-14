@@ -16,6 +16,13 @@
       <i class="fa fa-tachometer"/> Dashboard
     </button>
     <button
+      @click="navigateOverlays"
+      class="tab-button"
+      :class="{ active: page === 'BrowseOverlays' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="fa fa-image"/> Library
+    </button>
+    <button
       @click="navigateStudio"
       class="tab-button"
       :class="{ active: page === 'Studio' }"
@@ -28,13 +35,6 @@
       :class="{ active: page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="fa fa-feed"/> Live
-    </button>
-    <button
-      @click="navigateOverlays"
-      class="tab-button"
-      :class="{ active: page === 'BrowseOverlays' }"
-      :disabled="!isUserLoggedIn || locked">
-      <i class="fa fa-image"/> Library
     </button>
   </div>
 
