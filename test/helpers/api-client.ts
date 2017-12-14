@@ -8,9 +8,11 @@ const { spawnSync } = require('child_process');
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
-const PROMISE_TIMEOUT = 20000;
+const PROMISE_TIMEOUT = 20000 * 10000;
 
 let clientInstance: ApiClient = null;
+
+export type TConnectionStatus = 'disconnected'|'pending'|'connected';
 
 export class ApiClient {
 
@@ -22,7 +24,7 @@ export class ApiClient {
   private rejectConnection: Function;
   private requests = {};
   private subscriptions: Dictionary<Subject<any>> = {};
-  private connectionStatus: 'disconnected'|'pending'|'connected' = 'disconnected';
+  private connectionStatus: TConnectionStatus = 'disconnected';
 
   /**
    * cached resourceSchemes
@@ -79,6 +81,13 @@ export class ApiClient {
 
   disconnect() {
     this.socket.end();
+    this.resolveConnection = null;
+    this.rejectConnection = null;
+  }
+
+
+  getConnectionStatus(): TConnectionStatus {
+    return this.connectionStatus;
   }
 
 
@@ -210,7 +219,7 @@ export class ApiClient {
 
   getResource<TResourceType>(resourceId: string, resourceModel = {}): TResourceType {
 
-    const hanleRequest = (resourceId: string, property: string, ...args: any[]): any => {
+    const handleRequest = (resourceId: string, property: string, ...args: any[]): any => {
 
       const result = this.requestSync(resourceId, property as string, ...args);
 
@@ -253,11 +262,11 @@ export class ApiClient {
         const resourceScheme = this.getResourceScheme(resourceId);
 
         if (resourceScheme[property] !== 'function') {
-          return hanleRequest(resourceId, property as string);
+          return handleRequest(resourceId, property as string);
         }
 
         return (...args: any[]) => {
-          return hanleRequest(resourceId, property as string, ...args);
+          return handleRequest(resourceId, property as string, ...args);
         };
 
       }
@@ -295,9 +304,12 @@ export class ApiClient {
 
 
 export async function getClient() {
-  if (clientInstance) return clientInstance;
-  clientInstance = new ApiClient();
-  await clientInstance.connect();
-  await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
+  if (!clientInstance) clientInstance = new ApiClient();
+
+  if (clientInstance.getConnectionStatus() === 'disconnected') {
+    await clientInstance.connect();
+    await clientInstance.request('TcpServerService', 'listenAllSubscriptions');
+  }
+
   return clientInstance;
 }

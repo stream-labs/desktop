@@ -100,8 +100,13 @@ export function useSpectron(options: ITestRunnerOptions) {
     if (options.initApiClient) {
       const client = await getClient();
       await client.unsubscribeAll();
+      if (options.restartAppAfterEachTest) {
+        client.disconnect();
+      }
     }
-    if (options.restartAppAfterEachTest) await stopApp();
+    if (options.restartAppAfterEachTest) {
+      await stopApp();
+    }
   });
 
   test.after.always(async t => {

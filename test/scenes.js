@@ -1,5 +1,4 @@
 import test from 'ava';
-import { sleep } from './helpers/sleep';
 import { useSpectron, focusMain } from './helpers/spectron/index';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
