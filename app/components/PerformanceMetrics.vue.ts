@@ -15,7 +15,7 @@ export default class PerformanceMetrics extends Vue {
   performanceService: PerformanceService;
 
   get cpuPercent() {
-    return this.performanceService.state.CPU;
+    return this.performanceService.state.CPU.toFixed(1);
   }
 
   get frameRate() {
