@@ -26,7 +26,7 @@ export class NotificationsService extends PersistentStatefulService<
     notifications: [],
     settings: {
       enabled: true,
-      playSound: true
+      playSound: false
     }
   };
 
@@ -48,6 +48,7 @@ export class NotificationsService extends PersistentStatefulService<
       date: Date.now(),
       type: ENotificationType.INFO,
       playSound: true,
+      lifeTime: 8000,
       ...notifyInfo
     };
     this.PUSH(notify);

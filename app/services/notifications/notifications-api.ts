@@ -13,7 +13,9 @@ export interface INotificationsSettings {
   playSound: boolean;
 }
 
-
+/**
+ * @param lifeTime The notification's life time in ms. Use -1 for infinity
+ */
 export interface INotificationOptions {
   message: string;
   code?: TIssueCode | string;
@@ -22,6 +24,7 @@ export interface INotificationOptions {
   action?: IJsonRpcRequest;
   playSound?: boolean;
   data?: any;
+  lifeTime?: number;
 }
 
 
@@ -32,6 +35,7 @@ export interface INotification extends INotificationOptions {
   unread: boolean;
   date: number;
   playSound: boolean;
+  lifeTime: number;
 }
 
 
