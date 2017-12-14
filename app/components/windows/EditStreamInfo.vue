@@ -51,9 +51,8 @@
               label="description"
               v-model="encoderProfile">
               <template slot="option" scope="props">
-                <span>
-                  {{ props.option.description }}
-                </span>
+                <div class="edit-stream-info-option-desc">{{ props.option.description }}</div>
+                <div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>
               </template>
             </multiselect>
           </div>
@@ -90,3 +89,25 @@
 </template>
 
 <script lang="ts" src="./EditStreamInfo.vue.ts"></script>
+
+<style lang="less" scoped>
+@import "../../styles/index";
+
+.edit-stream-info-option-desc {
+  height: 20px;
+  line-height: 20px;
+}
+
+.edit-stream-info-option-longdesc {
+  height: 13px;
+  line-height: 13px;
+  font-size: 11px;
+  color: @grey;
+}
+
+.night-theme {
+  .edit-stream-info-option-longdes {
+    color: @night-text;
+  }
+}
+</style>
