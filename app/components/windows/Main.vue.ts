@@ -19,6 +19,7 @@ import electron from 'electron';
 import { StreamingService } from '../../services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
+import CustomLoader from '../CustomLoader.vue';
 
 const { remote } = electron;
 
@@ -33,27 +34,22 @@ const { remote } = electron;
     Live,
     Onboarding,
     LiveDock,
-    StudioFooter
+    StudioFooter,
+    CustomLoader
   }
 })
 export default class Main extends Vue {
-
   title = `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`;
 
-  @Inject()
-  customizationService: CustomizationService;
+  @Inject() customizationService: CustomizationService;
 
-  @Inject()
-  navigationService: NavigationService;
+  @Inject() navigationService: NavigationService;
 
-  @Inject()
-  appService: AppService;
+  @Inject() appService: AppService;
 
-  @Inject()
-  streamingService: StreamingService;
+  @Inject() streamingService: StreamingService;
 
-  @Inject()
-  userService: UserService;
+  @Inject() userService: UserService;
 
   get page() {
     return this.navigationService.state.currentPage;
@@ -88,9 +84,10 @@ export default class Main extends Vue {
    * is loading.  Other pages are OK to keep using.
    */
   get shouldLockContent() {
-    return this.applicationLoading &&
-      ((this.navigationService.state.currentPage === 'Studio') ||
-      (this.navigationService.state.currentPage === 'Live'));
+    return (
+      this.applicationLoading &&
+      (this.navigationService.state.currentPage === 'Studio' ||
+        this.navigationService.state.currentPage === 'Live')
+    );
   }
-
 }
