@@ -25,9 +25,25 @@ export class VideoEncodingOptimizationService extends Service {
   }
 
   getGameProfiles(game: string): IEncoderPreset[] {
-    return getPreset().filter(profile => {
-      return profile.game === game;
+    let profiles: IEncoderPreset[] = [];
+
+    const outputSettings = this.settingsService.getSettingsFormData('Output');
+
+    const subCategory = outputSettings.find(category => {
+      return category.nameSubCategory ===  'Streaming';
     });
+
+    const StreamEncoder = subCategory.parameters.find(parameter => {
+      return parameter.name === 'StreamEncoder';
+    });
+
+    if (StreamEncoder.value === 'obs_x264') {
+      profiles = getPreset().filter(profile => {
+        return profile.game === game;
+      });
+    }
+
+    return profiles;
   }
 
   applyProfile (encoderPreset: IEncoderPreset) {
