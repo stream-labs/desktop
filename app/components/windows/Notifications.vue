@@ -6,7 +6,7 @@
   <div slot="content">
 
     <h4 v-if="!notificationsCount">
-      You don't have notifications
+      You don't have any notifications
     </h4>
 
     <div v-for="(notificationsService, groupName) in notificationGroups">
