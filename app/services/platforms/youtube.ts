@@ -55,7 +55,7 @@ export class YoutubeService extends Service implements IPlatformService {
   }
 
   fetchBoundStreamId(): Promise<string> {
-    const endpoint = `liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent`;
+    const endpoint = 'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
@@ -92,7 +92,7 @@ export class YoutubeService extends Service implements IPlatformService {
   getLiveStreamId(forceGet: boolean): Promise<void> {
     if (this.liveStreamId && !forceGet) return Promise.resolve();
 
-    const endpoint = `liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent`;
+    const endpoint = 'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)
@@ -108,7 +108,7 @@ export class YoutubeService extends Service implements IPlatformService {
 
   fetchViewerCount(): Promise<number> {
     return this.getLiveStreamId(false).then(() => {
-      const endpoint = `videos?part=snippet,liveStreamingDetails`;
+      const endpoint = 'videos?part=snippet,liveStreamingDetails';
       const url = `${this.apiBase}/${endpoint}&id=${this.liveStreamId}&access_token=${this.oauthToken}`;
       const request = new Request(url);
 
@@ -125,7 +125,7 @@ export class YoutubeService extends Service implements IPlatformService {
     headers.append('Content-Type', 'application/json');
 
     const data = { snippet: { title : streamTitle }, id: this.liveStreamId };
-    const endpoint = `liveBroadcasts?part=snippet`;
+    const endpoint = 'liveBroadcasts?part=snippet';
 
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`, {
       method: 'PUT',
@@ -148,7 +148,7 @@ export class YoutubeService extends Service implements IPlatformService {
 
 
   getChatUrl(mode: string) {
-    const endpoint = `liveBroadcasts?part=id&mine=true&broadcastType=persistent`;
+    const endpoint = 'liveBroadcasts?part=id&mine=true&broadcastType=persistent';
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
 
     return fetch(request)

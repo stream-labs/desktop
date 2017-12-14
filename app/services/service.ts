@@ -53,7 +53,7 @@ export abstract class Service {
    */
   static createInstance(ServiceClass: any, options?: Dictionary<any>) {
     if (ServiceClass.hasInstance) {
-      throw `Unable to create more than one singleton service`;
+      throw 'Unable to create more than one singleton service';
     }
     ServiceClass.hasInstance = true;
     ServiceClass.isSingleton = true;
