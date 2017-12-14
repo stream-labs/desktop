@@ -25,6 +25,40 @@
         :loading="searchingGames"
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
+      <div v-if="areAvailableProfiles">
+        <div class="input-container">
+          <div class="input-label"/>
+          <div class="input-wrapper">
+            <div class="checkbox">
+              <input
+               type="checkbox"
+               v-model="useOptimizedProfile"
+              />
+              <label><span>Use optimized encoder settings for this game</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="input-container select">
+          <div class="input-label">
+            <label>Profile</label>
+          </div>
+          <div class="input-wrapper">
+            <multiselect
+              :allowEmpty="false"
+              :options="profiles"
+              track-by="value"
+              :close-on-select="true"
+              label="description"
+              v-model="encoderProfile">
+              <template slot="option" scope="props">
+                <span>
+                  {{ props.option.description }}
+                </span>
+              </template>
+            </multiselect>
+          </div>
+        </div>
+      </div>
       <BoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
