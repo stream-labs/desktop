@@ -33,7 +33,7 @@
            <div class="checkbox">
              <input
                type="checkbox"
-               :v-model="useOptimizedProfile"
+               v-model="useOptimizedProfile"
              />
              <label><span>Use optimized encoder settings for this game</span></label>
            </div>

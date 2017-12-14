@@ -50,7 +50,7 @@ export default class EditStreamInfo extends Vue {
   updatingInfo = false;
   updateError = false;
   areAvailableProfiles = false;
-  useOptimizedProfile = true;
+  useOptimizedProfile = false;
 
 
   // Form Models:
