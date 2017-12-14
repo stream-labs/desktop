@@ -42,9 +42,9 @@
     <div class="top-nav-item" v-if="isDevMode">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
-    <!--<div class="top-nav-item">
+    <div class="top-nav-item">
       <a class="link" @click="bugReport">Bug Report</a>
-    </div>-->
+    </div>
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <!--<i class="fa fa-sun-o"/>
