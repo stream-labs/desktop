@@ -9,6 +9,7 @@ import { AudioService, E_AUDIO_CHANNELS } from './audio';
 import { WindowsService } from './windows';
 import Utils from './utils';
 import { AppService } from './app';
+import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -76,6 +77,9 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
   @Inject()
   private appService: AppService;
+
+  @Inject()
+  private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   init() {
     this.loadSettingsIntoStore();
@@ -154,6 +158,28 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
         disabledFields: BLACK_LIST_NAMES,
         transformListOptions: true
       });
+    }
+
+    // We hide the encoder preset and settings if the optimized ones are in used
+    if (categoryName === 'Output' && this.videoEncodingOptimizationService.isUsingEncodingOptimizations()) {
+      const indexSubCategory =
+      settings.indexOf(settings.find((category: any) => {
+        return category.nameSubCategory ===  'Streaming';
+      }));
+
+      const parameters = settings[indexSubCategory].parameters;
+
+      // Setting preset visibility
+      const indexPreset = parameters.indexOf(parameters.find((parameter: any) => {
+        return parameter.name === 'Preset';
+      }));
+      settings[indexSubCategory].parameters[indexPreset].visible = false;
+
+      // Setting encoder settings value
+      const indexX264Settings = parameters.indexOf(parameters.find((parameter: any) => {
+        return parameter.name === 'x264Settings';
+      }));
+      settings[indexSubCategory].parameters[indexX264Settings].visible = false;
     }
 
     return settings;

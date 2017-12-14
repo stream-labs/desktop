@@ -15,16 +15,25 @@ import { StreamingService } from '../../services/streaming';
 import { WindowsService } from '../../services/windows';
 import { NavigationService } from '../../services/navigation';
 import { CustomizationService } from '../../services/customization';
+import { Multiselect } from 'vue-multiselect';
+import { VideoEncodingOptimizationService, IEncoderPreset } from '../../services/video-encoding-optimizations';
+
+interface IMultiSelectProfiles {
+  value: IEncoderPreset;
+  description: string;
+}
 
 @Component({
   components: {
     ModalLayout,
     TextInput,
     ListInput,
-    BoolInput
+    BoolInput,
+    Multiselect
   },
   mixins: [windowMixin]
 })
+
 export default class EditStreamInfo extends Vue {
 
   @Inject() streamInfoService: StreamInfoService;
@@ -33,12 +42,15 @@ export default class EditStreamInfo extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() navigationService: NavigationService;
   @Inject() customizationService: CustomizationService;
+  @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
 
   // UI State Flags
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
+  areAvailableProfiles = false;
+  useOptimizedProfile = true;
 
 
   // Form Models:
@@ -63,6 +75,7 @@ export default class EditStreamInfo extends Vue {
     value: false
   };
 
+  encoderProfile: IMultiSelectProfiles;
 
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
@@ -89,6 +102,7 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
+    this.getAvailableProfiles();
   }
 
 
@@ -111,10 +125,22 @@ export default class EditStreamInfo extends Vue {
     }
   }
 
+  getAvailableProfiles () {
+    const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
+    this.areAvailableProfiles = availableProfiles.length > 0;
+
+    if (this.areAvailableProfiles)
+      this.encoderProfile = {
+        value: availableProfiles[0],
+        description: availableProfiles[0].profile.description,
+      };
+  }
 
   // For some reason, v-model doesn't work with ListInput
   onGameInput(gameModel: IListInput<string>) {
     this.gameModel = gameModel;
+
+    this.getAvailableProfiles();
   }
 
 
@@ -143,6 +169,10 @@ export default class EditStreamInfo extends Vue {
         this.updatingInfo = false;
       }
     });
+
+    if (this.areAvailableProfiles && this.useOptimizedProfile) {
+      this.videoEncodingOptimizationService.applyProfile(this.encoderProfile.value);
+    }
   }
 
 
@@ -190,6 +220,18 @@ export default class EditStreamInfo extends Vue {
 
   get infoError() {
     return this.streamInfoService.state.error;
+  }
+
+  get profiles() {
+    const multiselectArray: IMultiSelectProfiles[] = [];
+    const profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
+    profiles.forEach(profile => {
+      multiselectArray.push({
+        value: profile,
+        description: profile.profile.description,
+      });
+    });
+    return multiselectArray;
   }
 
 }
