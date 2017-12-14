@@ -53,6 +53,7 @@ export default class NotificationsArea extends Vue {
       return !notify.outdated;
     });
 
+    // setup order of appearing elements via nextTick to have a correct animation
     Vue.nextTick(() => {
       if (this.notifications[0]) {
         this.notifications[0].outdated = true;
