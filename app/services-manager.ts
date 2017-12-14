@@ -13,9 +13,11 @@ import { HostsService } from  './services/hosts';
 import { Hotkey, HotkeysService } from  './services/hotkeys';
 import { KeyListenerService } from  './services/key-listener';
 import { NavigationService } from  './services/navigation';
+import { NotificationsService } from  './services/notifications';
 import { ObsApiService } from  './services/obs-api';
 import { OnboardingService } from  './services/onboarding';
 import { PerformanceService } from  './services/performance';
+import { PerformanceMonitorService } from  './services/performance-monitor';
 import { PersistentStatefulService } from  './services/persistent-stateful-service';
 import { SettingsService } from  './services/settings';
 import { SourcesService, Source } from  './services/sources';
@@ -66,7 +68,7 @@ export interface IJsonRpcRequest {
   method: string;
   params: {
     resource: string,
-    args?: (string|number)[],
+    args?: any[],
     fetchMutations?: boolean,
     compactMode?: boolean
   };
@@ -120,9 +122,11 @@ export class ServicesManager extends Service {
     HotkeysService, Hotkey,
     KeyListenerService,
     NavigationService,
+    NotificationsService,
     ObsApiService,
     OnboardingService,
     PerformanceService,
+    PerformanceMonitorService,
     PersistentStatefulService,
     ScenesTransitionsService,
     SettingsService,
@@ -288,6 +292,22 @@ export class ServicesManager extends Service {
       error: {
         code: options.code,
         message: E_JSON_RPC_ERROR[options.code] + (options.message ? (' ' + options.message) : ''),
+      }
+    };
+  }
+
+
+  createRequest(resource: any, method: string, ...args: any[]): IJsonRpcRequest {
+    const resourceId = resource.resourceId || resource.serviceName;
+    if (!resourceId) throw 'invalid resource';
+
+    return {
+      jsonrpc: '2.0',
+      id: ipcRenderer.sendSync('getUniqueId'),
+      method,
+      params: {
+        resource: resourceId,
+        args
       }
     };
   }

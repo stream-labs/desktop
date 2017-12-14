@@ -1,6 +1,9 @@
 <template>
 <div class="footer">
-  <performance-metrics />
+  <div class="flex flex--center">
+    <performance-metrics />
+    <notifications-area class="notifications-area"/>
+  </div>
 
   <div class="nav-right">
     <div class="nav-item">

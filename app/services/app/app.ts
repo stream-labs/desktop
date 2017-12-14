@@ -20,7 +20,8 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
-import path from 'path';
+import { PerformanceMonitorService } from '../performance-monitor';
+
 
 interface IAppState {
   loading: boolean;
@@ -55,6 +56,7 @@ export class AppService extends StatefulService<IAppState>
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
+  @Inject() private performanceMonitorService: PerformanceMonitorService;
 
   @track('app_start')
   load() {
@@ -93,6 +95,8 @@ export class AppService extends StatefulService<IAppState>
 
       // Pre-fetch stream info
       this.streamInfoService;
+
+      this.performanceMonitorService.start();
 
       this.ipcServerService.listen();
       this.tcpServerService.listen();
@@ -226,6 +230,7 @@ export class AppService extends StatefulService<IAppState>
       }
 
       this.reset();
+      this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
       electron.ipcRenderer.send('shutdownComplete');

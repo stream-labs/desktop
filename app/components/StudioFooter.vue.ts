@@ -5,13 +5,15 @@ import { StreamingService } from '../services/streaming';
 import StartStreamingButton from './StartStreamingButton.vue';
 import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
+import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 
 @Component({
   components: {
     StartStreamingButton,
     TestWidgets,
-    PerformanceMetrics
+    PerformanceMetrics,
+    NotificationsArea
   }
 })
 export default class StudioFooterComponent extends Vue {
