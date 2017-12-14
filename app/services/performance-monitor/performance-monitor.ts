@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { StatefulService, mutation } from '../stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from '../../util/injector';
@@ -113,7 +114,9 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
-      message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
+      lifeTime: -1,
+      message: `Skipped frames detected: ${ Math.round(factor * 100)}% - ` +
+        moment().format('h:mm a'),
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
       )
@@ -127,7 +130,9 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
-      message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
+      lifeTime: -1,
+      message: `Lagged frames detected: ${ Math.round(factor * 100)}% - ` +
+        moment().format('h:mm a'),
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
       )
@@ -141,7 +146,9 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
-      message: `Dropped frames detected: ${ Math.round(factor * 100)}%`,
+      lifeTime: -1,
+      message: `Dropped frames detected: ${ Math.round(factor * 100)}% - ` +
+        moment().format('h:mm a'),
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
       )
