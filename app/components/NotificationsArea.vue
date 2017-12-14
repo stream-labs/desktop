@@ -29,7 +29,7 @@
       'outdated': notify.outdated
     }"
     >
-      {{ notify.message }}
+      {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
     </div>
   </div>
 
@@ -51,7 +51,7 @@
 
 .notifications__container {
   position: relative;
-  min-width: 300px;
+  min-width: 350px;
   height: 30px;
 }
 
@@ -90,6 +90,7 @@
 
 .notifications__counter {
   cursor: pointer;
+  white-space: nowrap;
 
   &:before {
     content: '|';
