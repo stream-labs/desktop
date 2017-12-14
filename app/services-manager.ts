@@ -44,7 +44,7 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { GuestApiService } from 'services/guest-api';
-import { VideoEncodingOptimizationService } from './services/video-encoding-optimizations';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 
 const { ipcRenderer } = electron;
 

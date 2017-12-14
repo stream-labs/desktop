@@ -47,17 +47,13 @@ export interface IEncoderPreset {
   encoder: EncoderType;
 }
 
-export function getPreset() {
-  return Preset;
-}
-
-const Preset: IEncoderPreset[] = [
+export const Presets: IEncoderPreset[] = [
   {
     profile: CPU_profile,
     game: GameType.PUBG,
     settings: 'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 ' +
                 'bframes=3 subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 ' +
-                'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=\'1:0:0\'',
+                'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=-1:-1',
     encoder: EncoderType.x264,
   },
   {

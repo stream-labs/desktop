@@ -6,18 +6,20 @@ import TextInput from '../shared/forms/TextInput.vue';
 import ListInput from '../shared/forms/ListInput.vue';
 import BoolInput from '../shared/forms/BoolInput.vue';
 import { IFormInput, IListInput } from '../shared/forms/Input';
-import { StreamInfoService } from '../../services/stream-info';
+import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { debounce } from 'lodash';
-import { getPlatformService } from '../../services/platforms';
-import { StreamingService } from '../../services/streaming';
-import { WindowsService } from '../../services/windows';
-import { NavigationService } from '../../services/navigation';
-import { CustomizationService } from '../../services/customization';
+import { getPlatformService } from 'services/platforms';
+import { StreamingService } from 'services/streaming';
+import { WindowsService } from 'services/windows';
+import { NavigationService } from 'services/navigation';
+import { CustomizationService } from 'services/customization';
 import { Multiselect } from 'vue-multiselect';
-import { VideoEncodingOptimizationService } from '../../services/video-encoding-optimizations';
-import { IProfile, IEncoderPreset } from '../../services/video-encoding-optimizations/definitions';
+import {
+  VideoEncodingOptimizationService,
+  IEncoderPreset
+} from 'services/video-encoding-optimizations';
 
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
@@ -34,9 +36,7 @@ interface IMultiSelectProfiles {
   },
   mixins: [windowMixin]
 })
-
 export default class EditStreamInfo extends Vue {
-
   @Inject() streamInfoService: StreamInfoService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
@@ -45,14 +45,12 @@ export default class EditStreamInfo extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
-
   // UI State Flags
   searchingGames = false;
   updatingInfo = false;
   updateError = false;
   areAvailableProfiles = false;
   useOptimizedProfile = false;
-
 
   // Form Models:
 
@@ -69,7 +67,6 @@ export default class EditStreamInfo extends Vue {
     options: []
   };
 
-
   doNotShowAgainModel: IFormInput<boolean> = {
     name: 'do_not_show_again',
     description: 'Do not show this message when going live',
@@ -81,9 +78,11 @@ export default class EditStreamInfo extends Vue {
   // Debounced Functions:
   debouncedGameSearch: (search: string) => void;
 
-
   created() {
-    this.debouncedGameSearch = debounce((search: string) => this.onGameSearchChange(search), 500);
+    this.debouncedGameSearch = debounce(
+      (search: string) => this.onGameSearchChange(search),
+      500
+    );
 
     if (this.streamInfoService.state.channelInfo) {
       this.populateModels();
@@ -92,7 +91,6 @@ export default class EditStreamInfo extends Vue {
       this.refreshStreamInfo();
     }
   }
-
 
   populateModels() {
     this.streamTitleModel.value = this.streamInfoService.state.channelInfo.title;
@@ -103,9 +101,8 @@ export default class EditStreamInfo extends Vue {
         value: this.streamInfoService.state.channelInfo.game
       }
     ];
-    this.getAvailableProfiles();
+    this.loadAvailableProfiles();
   }
-
 
   onGameSearchChange(searchString: string) {
     if (searchString !== '') {
@@ -119,21 +116,26 @@ export default class EditStreamInfo extends Vue {
         this.searchingGames = false;
         if (games && games.length) {
           games.forEach(game => {
-            this.gameModel.options.push({ description: game.name, value: game.name });
+            this.gameModel.options.push({
+              description: game.name,
+              value: game.name
+            });
           });
         }
       });
     }
   }
 
-  getAvailableProfiles () {
-    const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
+  loadAvailableProfiles() {
+    const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
+      this.gameModel.value
+    );
     this.areAvailableProfiles = availableProfiles.length > 0;
 
     if (this.areAvailableProfiles)
       this.encoderProfile = {
         value: availableProfiles[0],
-        description: availableProfiles[0].profile.description,
+        description: availableProfiles[0].profile.description
       };
   }
 
@@ -141,41 +143,42 @@ export default class EditStreamInfo extends Vue {
   onGameInput(gameModel: IListInput<string>) {
     this.gameModel = gameModel;
 
-    this.getAvailableProfiles();
+    this.loadAvailableProfiles();
   }
-
 
   updateAndGoLive() {
     this.updatingInfo = true;
 
     if (this.doNotShowAgainModel.value) {
-      alert('You will not be asked again to update your stream info when going live.  ' +
-        'You can re-enable this from the settings.');
+      alert(
+        'You will not be asked again to update your stream info when going live.  ' +
+          'You can re-enable this from the settings.'
+      );
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
     }
 
-    this.streamInfoService.setStreamInfo(
-      this.streamTitleModel.value,
-      this.gameModel.value
-    ).then(success => {
-      if (success) {
-        if (this.midStreamMode) {
-          this.windowsService.closeChildWindow();
+    this.streamInfoService
+      .setStreamInfo(this.streamTitleModel.value, this.gameModel.value)
+      .then(success => {
+        if (success) {
+          if (this.midStreamMode) {
+            this.windowsService.closeChildWindow();
+          } else {
+            this.goLive();
+          }
         } else {
-          this.goLive();
+          this.updateError = true;
+          this.updatingInfo = false;
         }
-      } else {
-        this.updateError = true;
-        this.updatingInfo = false;
-      }
-    });
+      });
 
     if (this.areAvailableProfiles && this.useOptimizedProfile) {
-      this.videoEncodingOptimizationService.applyProfile(this.encoderProfile.value);
+      this.videoEncodingOptimizationService.applyProfile(
+        this.encoderProfile.value
+      );
     }
   }
-
 
   goLive() {
     this.streamingService.startStreaming();
@@ -183,11 +186,9 @@ export default class EditStreamInfo extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-
   cancel() {
     this.windowsService.closeChildWindow();
   }
-
 
   // This should have been pre-fetched, but we can force a refresh
   refreshStreamInfo() {
@@ -196,11 +197,9 @@ export default class EditStreamInfo extends Vue {
     });
   }
 
-
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
   }
-
 
   get submitText() {
     if (this.midStreamMode) return 'Update';
@@ -208,16 +207,13 @@ export default class EditStreamInfo extends Vue {
     return 'Confirm & Go Live';
   }
 
-
   get midStreamMode() {
     return this.streamingService.isStreaming;
   }
 
-
   get infoLoading() {
     return this.streamInfoService.state.fetching;
   }
-
 
   get infoError() {
     return this.streamInfoService.state.error;
@@ -225,14 +221,15 @@ export default class EditStreamInfo extends Vue {
 
   get profiles() {
     const multiselectArray: IMultiSelectProfiles[] = [];
-    const profiles = this.videoEncodingOptimizationService.getGameProfiles(this.gameModel.value);
+    const profiles = this.videoEncodingOptimizationService.getGameProfiles(
+      this.gameModel.value
+    );
     profiles.forEach(profile => {
       multiselectArray.push({
         value: profile,
-        description: profile.profile.description,
+        description: profile.profile.description
       });
     });
     return multiselectArray;
   }
-
 }

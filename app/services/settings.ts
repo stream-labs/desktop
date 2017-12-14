@@ -1,6 +1,9 @@
 import { StatefulService, mutation } from './stateful-service';
 import {
-  obsValuesToInputValues, inputValuesToObsValues, TObsValue, TFormData
+  obsValuesToInputValues,
+  inputValuesToObsValues,
+  TObsValue,
+  TFormData
 } from '../components/shared/forms/Input';
 import { nodeObs } from './obs-api';
 import { SourcesService } from './sources';
@@ -48,11 +51,13 @@ export interface ISettingsServiceApi {
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
 }
 
-export class SettingsService extends StatefulService<ISettingsState> implements ISettingsServiceApi {
-
+export class SettingsService extends StatefulService<ISettingsState>
+  implements ISettingsServiceApi {
   static initialState = {};
 
-  static convertFormDataToState(settingsFormData: TSettingsFormData): ISettingsState {
+  static convertFormDataToState(
+    settingsFormData: TSettingsFormData
+  ): ISettingsState {
     const settingsState: Partial<ISettingsState> = {};
     for (const groupName in settingsFormData) {
       settingsFormData[groupName].forEach(subGroup => {
@@ -66,17 +71,13 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     return settingsState as ISettingsState;
   }
 
-  @Inject()
-  private sourcesService: SourcesService;
+  @Inject() private sourcesService: SourcesService;
 
-  @Inject()
-  private audioService: AudioService;
+  @Inject() private audioService: AudioService;
 
-  @Inject()
-  private windowsService: WindowsService;
+  @Inject() private windowsService: WindowsService;
 
-  @Inject()
-  private appService: AppService;
+  @Inject() private appService: AppService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -94,7 +95,6 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
   }
 
-
   showSettings() {
     this.windowsService.showWindow({
       componentName: 'Settings',
@@ -106,9 +106,10 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
   }
 
   advancedSettingEnabled(): boolean {
-    return Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings');
+    return (
+      Utils.isDevMode() || this.appService.state.argv.includes('--adv-settings')
+    );
   }
-
 
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
@@ -119,7 +120,6 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
     return categories;
   }
-
 
   getSettingsFormData(categoryName: string): ISettingsSubCategory[] {
     if (categoryName === 'Audio') return this.getAudioSettingsFormData();
@@ -161,24 +161,32 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     }
 
     // We hide the encoder preset and settings if the optimized ones are in used
-    if (categoryName === 'Output' && this.videoEncodingOptimizationService.isUsingEncodingOptimizations()) {
-      const indexSubCategory =
-      settings.indexOf(settings.find((category: any) => {
-        return category.nameSubCategory ===  'Streaming';
-      }));
+    if (
+      categoryName === 'Output' &&
+      this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
+    ) {
+      const indexSubCategory = settings.indexOf(
+        settings.find((category: any) => {
+          return category.nameSubCategory === 'Streaming';
+        })
+      );
 
       const parameters = settings[indexSubCategory].parameters;
 
       // Setting preset visibility
-      const indexPreset = parameters.indexOf(parameters.find((parameter: any) => {
-        return parameter.name === 'Preset';
-      }));
+      const indexPreset = parameters.indexOf(
+        parameters.find((parameter: any) => {
+          return parameter.name === 'Preset';
+        })
+      );
       settings[indexSubCategory].parameters[indexPreset].visible = false;
 
       // Setting encoder settings value
-      const indexX264Settings = parameters.indexOf(parameters.find((parameter: any) => {
-        return parameter.name === 'x264Settings';
-      }));
+      const indexX264Settings = parameters.indexOf(
+        parameters.find((parameter: any) => {
+          return parameter.name === 'x264Settings';
+        })
+      );
       settings[indexSubCategory].parameters[indexX264Settings].visible = false;
     }
 
@@ -187,13 +195,21 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
     const audioDevices = this.audioService.getDevices();
-    const sourcesInChannels = this.sourcesService.getSources().filter(source => source.channel !== void 0);
+    const sourcesInChannels = this.sourcesService
+      .getSources()
+      .filter(source => source.channel !== void 0);
 
     const parameters: TFormData = [];
 
     // collect output channels info
-    for (let channel = E_AUDIO_CHANNELS.OUTPUT_1; channel <= E_AUDIO_CHANNELS.OUTPUT_2; channel++) {
-      const source = sourcesInChannels.find(source => source.channel === channel);
+    for (
+      let channel = E_AUDIO_CHANNELS.OUTPUT_1;
+      channel <= E_AUDIO_CHANNELS.OUTPUT_2;
+      channel++
+    ) {
+      const source = sourcesInChannels.find(
+        source => source.channel === channel
+      );
       const deviceInd = channel;
 
       parameters.push({
@@ -203,18 +219,25 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
-        options:
-          [{ description: 'Disabled', value: null }].concat(
-            audioDevices
-              .filter(device => device.type === 'output')
-              .map(device => { return { description: device.description, value: device.id };})
-          )
+        options: [{ description: 'Disabled', value: null }].concat(
+          audioDevices
+            .filter(device => device.type === 'output')
+            .map(device => {
+              return { description: device.description, value: device.id };
+            })
+        )
       });
     }
 
     // collect input channels info
-    for (let channel = E_AUDIO_CHANNELS.INPUT_1; channel <= E_AUDIO_CHANNELS.INPUT_3; channel++) {
-      const source = sourcesInChannels.find(source => source.channel === channel);
+    for (
+      let channel = E_AUDIO_CHANNELS.INPUT_1;
+      channel <= E_AUDIO_CHANNELS.INPUT_3;
+      channel++
+    ) {
+      const source = sourcesInChannels.find(
+        source => source.channel === channel
+      );
       const deviceInd = channel - 2;
 
       parameters.push({
@@ -224,20 +247,20 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
-        options:
-          [{ description: 'Disabled', value: null }].concat(
-            audioDevices
-              .filter(device => device.type === 'input')
-              .map(device => { return { description: device.description, value: device.id };})
-          )
+        options: [{ description: 'Disabled', value: null }].concat(
+          audioDevices.filter(device => device.type === 'input').map(device => {
+            return { description: device.description, value: device.id };
+          })
+        )
       });
     }
 
-
-    return [{
-      nameSubCategory: 'Untitled',
-      parameters
-    }];
+    return [
+      {
+        nameSubCategory: 'Untitled',
+        parameters
+      }
+    ];
   }
 
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]) {
@@ -246,22 +269,29 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
     const dataToSave = [];
 
     for (const subGroup of settingsData) {
-      dataToSave.push({ ...subGroup, parameters: inputValuesToObsValues(
-        subGroup.parameters,
-        { valueToCurrentValue: true }
-      )});
+      dataToSave.push({
+        ...subGroup,
+        parameters: inputValuesToObsValues(subGroup.parameters, {
+          valueToCurrentValue: true
+        })
+      });
     }
     nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
-    this.SET_SETTINGS(SettingsService.convertFormDataToState({ [categoryName]: settingsData }));
+    this.SET_SETTINGS(
+      SettingsService.convertFormDataToState({ [categoryName]: settingsData })
+    );
   }
 
-
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
-
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
-      const isOutput = [E_AUDIO_CHANNELS.OUTPUT_1, E_AUDIO_CHANNELS.OUTPUT_2].includes(channel);
-      let source = this.sourcesService.getSources().find(source => source.channel === channel);
+      const isOutput = [
+        E_AUDIO_CHANNELS.OUTPUT_1,
+        E_AUDIO_CHANNELS.OUTPUT_2
+      ].includes(channel);
+      let source = this.sourcesService
+        .getSources()
+        .find(source => source.channel === channel);
 
       if (source) {
         if (deviceForm.value === null) {
@@ -280,14 +310,11 @@ export class SettingsService extends StatefulService<ISettingsState> implements 
       if (source && deviceForm.value !== null) {
         source.updateSettings({ device_id: deviceForm.value });
       }
-
     });
   }
-
 
   @mutation()
   SET_SETTINGS(settingsData: ISettingsState) {
     this.state = Object.assign({}, this.state, settingsData);
   }
-
 }
