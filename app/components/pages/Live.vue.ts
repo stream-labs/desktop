@@ -6,18 +6,21 @@ import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import Display from '../Display.vue';
 import { CustomizationService } from '../../services/customization';
+import Slider from '../shared/Slider.vue';
 
 @Component({
   components: {
     SceneSelector,
     Mixer,
-    Display
+    Display,
+    Slider
   }
 })
 export default class Live extends Vue {
-
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+
+  previewSize = 300;
 
   get previewEnabled() {
     return this.customizationService.state.livePreviewEnabled;
@@ -30,5 +33,4 @@ export default class Live extends Vue {
   get recenteventsUrl() {
     return this.userService.widgetUrl('recent-events');
   }
-
 }
