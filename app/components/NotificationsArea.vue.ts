@@ -15,12 +15,10 @@ interface IUiNotification extends INotification {
 
 @Component({})
 export default class NotificationsArea extends Vue {
-
   @Inject() private notificationsService: NotificationsService;
 
   notifications: IUiNotification[] = [];
   notifyAudio: HTMLAudioElement;
-
 
   mounted() {
     this.notifyAudio = new Audio('media/sound/ding.wav');
@@ -29,10 +27,8 @@ export default class NotificationsArea extends Vue {
     });
   }
 
-
   get unreadCount() {
-    return this.notificationsService
-      .getUnread(ENotificationType.WARNING)
+    return this.notificationsService.getUnread(ENotificationType.WARNING)
       .length;
   }
 
@@ -40,9 +36,7 @@ export default class NotificationsArea extends Vue {
     return this.notificationsService.state.settings;
   }
 
-
   onNotificationHandler(notify: INotification) {
-
     if (!this.settings.enabled) return;
 
     if (notify.playSound && this.settings.playSound) {
@@ -65,18 +59,15 @@ export default class NotificationsArea extends Vue {
     });
   }
 
-
   showNotifications() {
     this.notificationsService.showNotifications();
   }
-
 
   onNotificationClickHandler(id: number) {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
   }
-
 
   private hideOutdated() {
     this.notifications.forEach(notify => {
