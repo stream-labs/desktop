@@ -8,7 +8,7 @@ const { spawnSync } = require('child_process');
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
-const PROMISE_TIMEOUT = 20000 * 10000;
+const PROMISE_TIMEOUT = 20000;
 
 let clientInstance: ApiClient = null;
 
