@@ -8,6 +8,7 @@ const { spawnSync } = require('child_process');
 
 const PIPE_NAME = 'slobs';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
+const PROMISE_TIMEOUT = 20000;
 
 let clientInstance: ApiClient = null;
 
@@ -216,6 +217,7 @@ export class ApiClient {
       if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'PROMISE') {
         return new Promise((resolve, reject) => {
           this.promises[result.resourceId] = [resolve, reject];
+          setTimeout(() => reject(`promise timeout for ${resourceId}.${property}`), PROMISE_TIMEOUT);
         });
       } else if (result && result._type === 'SUBSCRIPTION' && result.emitter === 'STREAM') {
         let subject = this.subscriptions[result.resourceId];
