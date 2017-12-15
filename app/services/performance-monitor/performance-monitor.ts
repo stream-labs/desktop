@@ -113,6 +113,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
+      lifeTime: -1,
+      showTime: true,
       message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
@@ -127,6 +129,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
+      lifeTime: -1,
+      showTime: true,
       message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code
@@ -141,6 +145,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       type: ENotificationType.WARNING,
       code,
       data: factor,
+      lifeTime: -1,
+      showTime: true,
       message: `Dropped frames detected: ${ Math.round(factor * 100)}%`,
       action: this.servicesManager.createRequest(
         this.notificationsService, 'showTroubleshooter', code

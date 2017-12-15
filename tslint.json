@@ -11,7 +11,8 @@
     "max-line-length": {
       "options": [120]
     },
-    "align": [true, "parameters", "statements"]
+    "align": [true, "parameters", "statements"],
+    "quotemark": [true, "single", "avoid-escape", "avoid-template"]
   },
   "jsRules": {
   }

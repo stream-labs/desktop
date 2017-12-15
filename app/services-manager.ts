@@ -46,6 +46,7 @@ import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { GuestApiService } from 'services/guest-api';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 
 const { ipcRenderer } = electron;
 
@@ -149,7 +150,8 @@ export class ServicesManager extends Service {
     TcpServerService,
     StreamInfoService,
     StreamlabelsService,
-    GuestApiService
+    GuestApiService,
+    VideoEncodingOptimizationService
   };
 
   private instances: Dictionary<Service> = {};

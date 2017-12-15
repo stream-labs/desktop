@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import {
@@ -6,8 +7,8 @@ import {
   NotificationsService,
   INotification
 } from 'services/notifications';
-
-const LIFE_TIME = 15000;
+import notificationAudio from '../../media/sound/ding.wav';
+const QUEUE_TIME = 5000;
 
 interface IUiNotification extends INotification {
   outdated?: boolean;
@@ -18,13 +19,30 @@ export default class NotificationsArea extends Vue {
   @Inject() private notificationsService: NotificationsService;
 
   notifications: IUiNotification[] = [];
-  notifyAudio: HTMLAudioElement;
+  private notificationQueue: INotification[] = [];
+  private notifyAudio: HTMLAudioElement;
+  private checkQueueIntervalId: number = null;
+  private canShowNextNotify = true;
 
   mounted() {
-    this.notifyAudio = new Audio('media/sound/ding.wav');
+    this.notifyAudio = new Audio(notificationAudio);
+
     this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
     });
+
+    this.notificationsService.notificationRead.subscribe(ids => {
+      this.onNotificationsReadHandler(ids);
+    });
+
+    this.checkQueueIntervalId = window.setInterval(
+      () => this.checkQueue(),
+      QUEUE_TIME
+    );
+  }
+
+  destroyed() {
+    clearInterval(this.checkQueueIntervalId);
   }
 
   get unreadCount() {
@@ -36,7 +54,36 @@ export default class NotificationsArea extends Vue {
     return this.notificationsService.state.settings;
   }
 
-  onNotificationHandler(notify: INotification) {
+  moment(time: number): string {
+    return moment(time).fromNow();
+  }
+
+  private checkQueue() {
+
+    this.$forceUpdate(); // update time labels
+    this.hideOutdated();
+
+    if (this.notificationQueue.length === 0) {
+      this.canShowNextNotify = true;
+      return;
+    }
+
+    const notify = this.notificationQueue.shift();
+    this.showNotification(notify);
+    this.canShowNextNotify = false;
+  }
+
+  private onNotificationsReadHandler(ids: number[]) {
+    // remove read notifications from queue
+    this.notificationQueue = this.notificationQueue.filter(notify => {
+      return ids.includes(notify.id);
+    });
+    this.notifications.forEach(notify => {
+      if (ids.includes(notify.id)) notify.outdated = true;
+    });
+  }
+
+  private showNotification(notify: INotification) {
     if (!this.settings.enabled) return;
 
     if (notify.playSound && this.settings.playSound) {
@@ -54,9 +101,15 @@ export default class NotificationsArea extends Vue {
       }
       Vue.nextTick(() => {
         this.notifications.push({ ...notify, outdated: false });
-        window.setTimeout(() => this.hideOutdated(), LIFE_TIME);
+        if (notify.lifeTime !== -1)
+          window.setTimeout(() => this.hideOutdated(), notify.lifeTime);
       });
     });
+  }
+
+  private onNotificationHandler(notify: INotification) {
+    this.notificationQueue.push(notify);
+    if (this.canShowNextNotify) this.checkQueue();
   }
 
   showNotifications() {
@@ -67,12 +120,18 @@ export default class NotificationsArea extends Vue {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
+    notify.outdated = true;
   }
 
   private hideOutdated() {
-    this.notifications.forEach(notify => {
-      if (Date.now() - notify.date < LIFE_TIME) return;
-      notify.outdated = true;
+    this.notifications.forEach(uiNotify => {
+      const notify = this.notificationsService.getNotification(uiNotify.id);
+      if (
+        notify.unread === false ||
+        (notify.lifeTime !== -1 && Date.now() - notify.date < notify.lifeTime)
+      ) {
+        uiNotify.outdated = true;
+      }
     });
   }
 }
