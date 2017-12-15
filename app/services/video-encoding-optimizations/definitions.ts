@@ -26,20 +26,21 @@ enum PresetType {
 export interface IProfile {
   profile: string;
   description: string;
+  longDescription: string;
   preset: PresetType;
 }
 
 const CPU_profile: IProfile = {
   profile: 'CPU',
-  description:
-    'CPU optimized (Reduction of the CPU load for an average video quality)',
+  description: 'CPU optimized',
+  longDescription: 'Reduction of the CPU load for an average video quality',
   preset: PresetType.veryfast
 };
 
 const VQ_profile: IProfile = {
   profile: 'VQ',
-  description:
-    'Video quality optimized (Improvement of the video quality at a very low CPU usage)',
+  description: 'Video quality optimized',
+  longDescription: 'Improvement of the video quality at a very low CPU usage',
   preset: PresetType.ultrafast
 };
 
@@ -83,7 +84,7 @@ export const Presets: IEncoderPreset[] = [
     game: GameType.LeagueOfLegends,
     settings:
       'nal-hrd=cbr weightp=1 me_range=16 threads=6 intra_refresh=0 qcomp=0.60 qpmax=69 ' +
-      'analyse=\'3:275\' psy_rd=\'1.00:0.00\' ratetol=1.0 qcomp=0.60 deblock=1:0 ' +
+      "analyse='3:275' psy_rd='1.00:0.00' ratetol=1.0 qcomp=0.60 deblock=1:0 " +
       'trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=0 bframes=0 ' +
       'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 ' +
       'psy=0 8x8dct=0 fast_pskip=1 lookahead_threads=6',

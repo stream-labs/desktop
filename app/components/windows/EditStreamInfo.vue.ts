@@ -24,6 +24,7 @@ import {
 interface IMultiSelectProfiles {
   value: IEncoderPreset;
   description: string;
+  longDescription: string;
 }
 
 @Component({
@@ -135,7 +136,8 @@ export default class EditStreamInfo extends Vue {
     if (this.areAvailableProfiles)
       this.encoderProfile = {
         value: availableProfiles[0],
-        description: availableProfiles[0].profile.description
+        description: availableProfiles[0].profile.description,
+        longDescription: availableProfiles[0].profile.longDescription,
       };
   }
 
@@ -227,7 +229,8 @@ export default class EditStreamInfo extends Vue {
     profiles.forEach(profile => {
       multiselectArray.push({
         value: profile,
-        description: profile.profile.description
+        description: profile.profile.description,
+        longDescription: profile.profile.longDescription,
       });
     });
     return multiselectArray;

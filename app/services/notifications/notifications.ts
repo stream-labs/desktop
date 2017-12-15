@@ -34,6 +34,8 @@ export class NotificationsService extends PersistentStatefulService<
   servicesManager: ServicesManager = ServicesManager.instance;
 
   notificationPushed = new Subject<INotification>();
+  notificationRead = new Subject<number[]>();
+
   private nextId = 1;
 
   init() {
@@ -49,6 +51,7 @@ export class NotificationsService extends PersistentStatefulService<
       type: ENotificationType.INFO,
       playSound: true,
       lifeTime: 8000,
+      showTime: false,
       ...notifyInfo
     };
     this.PUSH(notify);
@@ -81,8 +84,17 @@ export class NotificationsService extends PersistentStatefulService<
     return this.getAll(type).filter(notify => !notify.unread);
   }
 
+  markAsRead(id: number) {
+    const notify = this.getNotification(id);
+    if (!notify) return;
+    this.notificationRead.next([id]);
+  }
+
   markAllAsRead() {
+    const unreadNotifies = this.getUnread();
+    if (!unreadNotifies.length) return;
     this.MARK_ALL_AS_READ();
+    this.notificationRead.next(unreadNotifies.map(notify => notify.id));
   }
 
   getSettings(): INotificationsSettings {
@@ -155,5 +167,12 @@ export class NotificationsService extends PersistentStatefulService<
   @mutation()
   private MARK_ALL_AS_READ() {
     this.state.notifications.forEach(notify => (notify.unread = false));
+  }
+
+  @mutation()
+  private MARK_AS_READ(id: number) {
+    this.state.notifications
+      .find(notify => (notify.id === id))
+      .unread = false;
   }
 }

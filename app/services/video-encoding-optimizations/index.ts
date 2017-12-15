@@ -90,7 +90,6 @@ export class VideoEncodingOptimizationService extends Service {
   }
 
   applyProfile(encoderPreset: IEncoderPreset) {
-    debugger;
     let outputSettings = this.settingsService.getSettingsFormData('Output');
 
     let indexSubCategory = outputSettings.indexOf(

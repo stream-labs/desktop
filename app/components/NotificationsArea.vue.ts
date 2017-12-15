@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import {
@@ -7,7 +8,6 @@ import {
   INotification
 } from 'services/notifications';
 import notificationAudio from '../../media/sound/ding.wav';
-
 const QUEUE_TIME = 5000;
 
 interface IUiNotification extends INotification {
@@ -26,9 +26,15 @@ export default class NotificationsArea extends Vue {
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
+
     this.notificationsService.notificationPushed.subscribe(notify => {
       this.onNotificationHandler(notify);
     });
+
+    this.notificationsService.notificationRead.subscribe(ids => {
+      this.onNotificationsReadHandler(ids);
+    });
+
     this.checkQueueIntervalId = window.setInterval(
       () => this.checkQueue(),
       QUEUE_TIME
@@ -48,14 +54,33 @@ export default class NotificationsArea extends Vue {
     return this.notificationsService.state.settings;
   }
 
+  moment(time: number): string {
+    return moment(time).fromNow();
+  }
+
   private checkQueue() {
+
+    this.$forceUpdate(); // update time labels
+    this.hideOutdated();
+
     if (this.notificationQueue.length === 0) {
       this.canShowNextNotify = true;
       return;
     }
+
     const notify = this.notificationQueue.shift();
     this.showNotification(notify);
     this.canShowNextNotify = false;
+  }
+
+  private onNotificationsReadHandler(ids: number[]) {
+    // remove read notifications from queue
+    this.notificationQueue = this.notificationQueue.filter(notify => {
+      return ids.includes(notify.id);
+    });
+    this.notifications.forEach(notify => {
+      if (ids.includes(notify.id)) notify.outdated = true;
+    });
   }
 
   private showNotification(notify: INotification) {
@@ -95,13 +120,18 @@ export default class NotificationsArea extends Vue {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
+    notify.outdated = true;
   }
 
   private hideOutdated() {
-    this.notifications.forEach(notify => {
-      if (notify.lifeTime === -1) return;
-      if (Date.now() - notify.date < notify.lifeTime) return;
-      notify.outdated = true;
+    this.notifications.forEach(uiNotify => {
+      const notify = this.notificationsService.getNotification(uiNotify.id);
+      if (
+        notify.unread === false ||
+        (notify.lifeTime !== -1 && Date.now() - notify.date < notify.lifeTime)
+      ) {
+        uiNotify.outdated = true;
+      }
     });
   }
 }
