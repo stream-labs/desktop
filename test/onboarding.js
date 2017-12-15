@@ -1,9 +1,19 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
-import { selectSource, clickSourceProperties } from './helpers/spectron/sources';
-import { openFiltersWindow, closeFilterProperties } from './helpers/spectron/filters';
+import {
+  selectSource,
+  clickSourceProperties
+} from './helpers/spectron/sources';
+import {
+  openFiltersWindow,
+  closeFilterProperties
+} from './helpers/spectron/filters';
 import { getFormInput, setFormDropdown } from './helpers/spectron/forms';
-import { getInputValue, getInputValueId, getInputCheckboxValue } from './helpers/spectron/advancedAudioSettings';
+import {
+  getInputValue,
+  getInputValueId,
+  getInputCheckboxValue
+} from './helpers/spectron/advancedAudioSettings';
 
 useSpectron({ skipOnboarding: false });
 
@@ -146,20 +156,43 @@ test('Obs-importer', async t => {
     await app.client.$('[rel=Mixer]').click('.fa-cog');
     await focusChild(t);
 
-    // Mic/Aux
+    //   // Mic/Aux
     t.true(await sourceSelector.isExisting(`td=Mic/Aux`));
-    t.is(await getInputValue(t, '.column-deflection .IntInput .input-wrapper .int-input', 1), '75');
-    t.is(await getInputCheckboxValue(t, '.column-forceMono .input-wrapper', 1), true);
-    t.is(await getInputValue(t, '.column-syncOffset .IntInput .input-wrapper .int-input', 1), '0');
-    t.is(await getInputValue(t, '.column-monitoringType', 1), 'Monitor Only (mute output)');
+    t.is(
+      await getInputValue(
+        t,
+        '.column-deflection .IntInput .input-wrapper .int-input',
+        1
+      ),
+      '75'
+    );
+    t.is(
+      await getInputCheckboxValue(t, '.column-forceMono .input-wrapper', 1),
+      true
+    );
+    t.is(
+      await getInputValue(
+        t,
+        '.column-syncOffset .IntInput .input-wrapper .int-input',
+        1
+      ),
+      '0'
+    );
+    t.is(
+      await getInputValue(t, '.column-monitoringType', 1),
+      'Monitor Only (mute output)'
+    );
     const mixerValues = [false, false, true, true, true, true];
-    t.deepEqual(await getInputCheckboxValue(t, '.column-audioMixers', 1), mixerValues);
+    t.deepEqual(
+      await getInputCheckboxValue(t, '.column-audioMixers', 1),
+      mixerValues
+    );
 
     await focusMain(t);
     await app.client.click('.fa-cog');
     await focusChild(t);
     t.true(await app.client.isExisting('li=Video'));
     await app.client.click('li=Video');
-    t.is(await getFormInput(t, 'Output (Scaled) Resolution'), '1920x1080');
+    t.is(await getFormInput(t, 'Common FPS Values'), '60');
   }
 });
