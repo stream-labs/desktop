@@ -85,7 +85,8 @@ export class ObsImporterService extends Service {
           });
 
         if (isFilterAvailable) {
-          const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
+          const sourceId = this.sourcesService.getSourcesByName(source.name)[0]
+            .sourceId;
 
           const filter = this.filtersService.add(
             sourceId,
@@ -149,18 +150,15 @@ export class ObsImporterService extends Service {
               this.audioService
                 .getSource(source.sourceId)
                 .setDeflection(sourceJSON.volume);
-              this.audioService
-                .getSource(source.sourceId)
-                .setSyncOffset(sourceJSON.sync);
-              this.audioService
-                .getSource(source.sourceId)
-                .setMonitoringType(sourceJSON.monitoring_type);
-              this.audioService
-                .getSource(source.sourceId)
-                .setFlags(sourceJSON.flags);
-              this.audioService
-                .getSource(source.sourceId)
-                .setAudioMixers(sourceJSON.mixers);
+
+              this.audioService.getSource(source.sourceId).setSettings({
+                forceMono: sourceJSON.flags,
+                syncOffset: sourceJSON.sync
+                  ? AudioService.timeSpecToMs(sourceJSON.sync)
+                  : 0,
+                audioMixers: sourceJSON.mixers,
+                monitoringType: sourceJSON.monitoring_type
+              });
             }
 
             // Adding the filters
@@ -267,18 +265,15 @@ export class ObsImporterService extends Service {
         this.audioService
           .getSource(newSource.sourceId)
           .setDeflection(audioSource.volume);
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setSyncOffset(audioSource.sync);
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setMonitoringType(audioSource.monitoring_type);
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setFlags(audioSource.flags);
-        this.audioService
-          .getSource(newSource.sourceId)
-          .setAudioMixers(audioSource.mixers);
+
+        this.audioService.getSource(newSource.sourceId).setSettings({
+          forceMono: audioSource.flags,
+          syncOffset: audioSource.sync
+            ? AudioService.timeSpecToMs(audioSource.sync)
+            : 0,
+          audioMixers: audioSource.mixers,
+          monitoringType: audioSource.monitoring_type
+        });
       }
     });
   }
