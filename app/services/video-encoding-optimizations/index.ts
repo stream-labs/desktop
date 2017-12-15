@@ -7,9 +7,37 @@ import { cloneDeep } from 'lodash';
 
 export * from './definitions';
 
+enum OutputMode {
+  simple = 'Simple',
+  advanced = 'Advanced'
+}
+
+export interface IOutputSettings {
+  outputMode: OutputMode;
+  encoderField: string;
+  presetField: string;
+  encoderSettingsField: string;
+}
+
 export class VideoEncodingOptimizationService extends Service {
   private previousSettings: any;
   private isUsingEncodingOptimizations = false;
+
+  private simpleOutputSettings: IOutputSettings = {
+    outputMode: OutputMode.simple,
+    encoderField: 'StreamEncoder',
+    presetField: 'Preset',
+    encoderSettingsField: 'x264Settings'
+  };
+
+  private advancedOutputSettings: IOutputSettings = {
+    outputMode: OutputMode.advanced,
+    encoderField: 'Encoder',
+    presetField: 'preset',
+    encoderSettingsField: 'x264opts'
+  };
+
+  private currentOutputSettings: IOutputSettings;
 
   @Inject() settingsService: SettingsService;
   @Inject() streamingService: StreamingService;
@@ -37,12 +65,18 @@ export class VideoEncodingOptimizationService extends Service {
     });
 
     if (mode.value === 'Simple') {
+      this.currentOutputSettings = this.simpleOutputSettings;
+    } else if (mode.value === 'Advanced') {
+      this.currentOutputSettings = this.advancedOutputSettings;
+    }
+
+    if (this.currentOutputSettings) {
       const subCategory = outputSettings.find(category => {
         return category.nameSubCategory === 'Streaming';
       });
 
       const StreamEncoder = subCategory.parameters.find(parameter => {
-        return parameter.name === 'StreamEncoder';
+        return parameter.name === this.currentOutputSettings.encoderField;
       });
 
       if (StreamEncoder.value === 'obs_x264') {
@@ -56,6 +90,7 @@ export class VideoEncodingOptimizationService extends Service {
   }
 
   applyProfile(encoderPreset: IEncoderPreset) {
+    debugger;
     let outputSettings = this.settingsService.getSettingsFormData('Output');
 
     let indexSubCategory = outputSettings.indexOf(
@@ -69,19 +104,23 @@ export class VideoEncodingOptimizationService extends Service {
     // Setting stream encoder value
     const indexStreamEncoder = parameters.indexOf(
       parameters.find(parameter => {
-        return parameter.name === 'StreamEncoder';
+        return parameter.name === this.currentOutputSettings.encoderField;
       })
     );
     outputSettings[indexSubCategory].parameters[indexStreamEncoder].value =
       'obs_x264';
 
-    // Setting use advanced value
-    const indexUseAdvanced = parameters.indexOf(
-      parameters.find(parameter => {
-        return parameter.name === 'UseAdvanced';
-      })
-    );
-    outputSettings[indexSubCategory].parameters[indexUseAdvanced].value = true;
+    if (this.currentOutputSettings.outputMode === 'Simple') {
+      // Setting use advanced value
+      const indexUseAdvanced = parameters.indexOf(
+        parameters.find(parameter => {
+          return parameter.name === 'UseAdvanced';
+        })
+      );
+      outputSettings[indexSubCategory].parameters[
+        indexUseAdvanced
+      ].value = true;
+    }
 
     // Apply these first settings to be able to set the next ones :
     // (Preset and x264Settings)
@@ -100,7 +139,7 @@ export class VideoEncodingOptimizationService extends Service {
     // Setting preset value
     const indexPreset = parameters.indexOf(
       parameters.find(parameter => {
-        return parameter.name === 'Preset';
+        return parameter.name === this.currentOutputSettings.presetField;
       })
     );
     outputSettings[indexSubCategory].parameters[indexPreset].value =
@@ -109,7 +148,9 @@ export class VideoEncodingOptimizationService extends Service {
     // Setting encoder settings value
     const indexX264Settings = parameters.indexOf(
       parameters.find(parameter => {
-        return parameter.name === 'x264Settings';
+        return (
+          parameter.name === this.currentOutputSettings.encoderSettingsField
+        );
       })
     );
     outputSettings[indexSubCategory].parameters[indexX264Settings].value =
@@ -126,5 +167,9 @@ export class VideoEncodingOptimizationService extends Service {
 
   getIsUsingEncodingOptimizations() {
     return this.isUsingEncodingOptimizations;
+  }
+
+  getCurrentOutputSettings(): IOutputSettings {
+    return this.currentOutputSettings;
   }
 }
