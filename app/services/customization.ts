@@ -7,6 +7,7 @@ interface ICustomizationServiceState {
   livePreviewEnabled: boolean;
   leftDock: boolean;
   hideViewerCount: boolean;
+  lifeDockCollapsed: boolean;
 }
 
 /**
@@ -20,8 +21,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     updateStreamInfoOnLive: true,
     livePreviewEnabled: true,
     leftDock: false,
-    hideViewerCount: false
+    hideViewerCount: false,
+    lifeDockCollapsed: true
   };
+
+  init() {
+    super.init();
+    this.setLifedockCollapsed(true); // always collapse lifedoc on start
+  }
 
   @mutation()
   SET_NIGHT_MODE(nightMode: boolean) {
@@ -48,6 +55,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.state.hideViewerCount = hidden;
   }
 
+  @mutation()
+  SET_LIFEDOCK_COLLAPSED(collapsed: boolean) {
+    this.state.lifeDockCollapsed = collapsed;
+  }
+
   set nightMode(val: boolean) {
     this.SET_NIGHT_MODE(val);
   }
@@ -70,6 +82,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setHiddenViewerCount(hidden: boolean) {
     this.SET_HIDDEN_VIEWER_COUNT(hidden);
+  }
+
+  setLifedockCollapsed(collapsed: boolean) {
+    this.SET_LIFEDOCK_COLLAPSED(collapsed);
   }
 
 }

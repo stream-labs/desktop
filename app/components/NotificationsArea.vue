@@ -43,7 +43,6 @@
 
 .notifications-area {
   overflow: hidden;
-  min-width: 300px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -53,6 +52,15 @@
   position: relative;
   min-width: 350px;
   height: 30px;
+  @media (max-width: 1100px) {
+    display: none;
+  }
+}
+
+.life-dock-expanded .notifications__container {
+  @media (max-width: 1410px) {
+    display: none;
+  }
 }
 
 .notification {
@@ -67,7 +75,6 @@
   position: absolute;
   left: 20px;
   animation: notify-appears 0.3s;
-
 
   &.info {
     background-color: fade(@grey, 15%);

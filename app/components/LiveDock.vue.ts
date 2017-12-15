@@ -27,8 +27,6 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
 
-  collapsed = true;
-
   liveDockSize = 28;
 
   subscription: Subscription;
@@ -48,7 +46,7 @@ export default class LiveDock extends Vue {
 
     this.subscription = this.streamingService.streamingStatusChange.subscribe(
       status => {
-        if (status) this.collapsed = false;
+        if (status) this.collapse();
       }
     );
   }
@@ -63,11 +61,15 @@ export default class LiveDock extends Vue {
   }
 
   collapse() {
-    this.collapsed = true;
+    this.customizationService.setLifedockCollapsed(true);
   }
 
   expand() {
-    this.collapsed = false;
+    this.customizationService.setLifedockCollapsed(false);
+  }
+
+  get collapsed() {
+    return this.customizationService.state.lifeDockCollapsed;
   }
 
   get isStreaming() {
