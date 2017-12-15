@@ -1,5 +1,5 @@
 import test from 'ava';
-import { useSpectron, focusChild, focusMain } from './helpers/spectron';
+import { useSpectron, focusChild, focusMain } from './helpers/spectron/index';
 import { clickSceneTransitions } from './helpers/spectron/scenes';
 import { setFormDropdown, setFormInput, getFormInput } from './helpers/spectron/forms';
 

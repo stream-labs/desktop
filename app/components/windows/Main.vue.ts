@@ -5,6 +5,7 @@ import TopNav from '../TopNav.vue';
 // Pages
 import Studio from '../pages/Studio.vue';
 import Dashboard from '../pages/Dashboard.vue';
+import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
@@ -18,6 +19,7 @@ import electron from 'electron';
 import { StreamingService } from '../../services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
+import CustomLoader from '../CustomLoader.vue';
 
 const { remote } = electron;
 
@@ -28,30 +30,26 @@ const { remote } = electron;
     TopNav,
     Studio,
     Dashboard,
+    BrowseOverlays,
     Live,
     Onboarding,
     LiveDock,
-    StudioFooter
+    StudioFooter,
+    CustomLoader
   }
 })
 export default class Main extends Vue {
-
   title = `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`;
 
-  @Inject()
-  customizationService: CustomizationService;
+  @Inject() customizationService: CustomizationService;
 
-  @Inject()
-  navigationService: NavigationService;
+  @Inject() navigationService: NavigationService;
 
-  @Inject()
-  appService: AppService;
+  @Inject() appService: AppService;
 
-  @Inject()
-  streamingService: StreamingService;
+  @Inject() streamingService: StreamingService;
 
-  @Inject()
-  userService: UserService;
+  @Inject() userService: UserService;
 
   get page() {
     return this.navigationService.state.currentPage;
@@ -81,4 +79,15 @@ export default class Main extends Vue {
     return this.navigationService.state.currentPage === 'Onboarding';
   }
 
+  /**
+   * Only certain pages get locked out while the application
+   * is loading.  Other pages are OK to keep using.
+   */
+  get shouldLockContent() {
+    return (
+      this.applicationLoading &&
+      (this.navigationService.state.currentPage === 'Studio' ||
+        this.navigationService.state.currentPage === 'Live')
+    );
+  }
 }

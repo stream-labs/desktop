@@ -19,6 +19,12 @@ interface IClient {
   id: number;
   socket: WritableStream;
   subscriptions: string[];
+
+  /**
+   * Clients with listenAllSubscriptions=true receive events that have been sent to other clients.
+   * This is helpful for tests.
+   */
+  listenAllSubscriptions: boolean;
 }
 
 interface IServer {
@@ -267,7 +273,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     this.log('new connection');
 
     const id = this.nextClientId++;
-    const client: IClient = { id, socket, subscriptions: [] };
+    const client: IClient = { id, socket, subscriptions: [], listenAllSubscriptions: false };
     this.clients[id] = client;
 
     socket.on('data', (data: any) => {
@@ -304,24 +310,23 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           return;
         }
 
-        // handle unsubscribing by clearing client subscriptions
-        if (request.method === 'unsubscribe' && this.servicesManager.subscriptions[request.params.resource]) {
-          const subscriptionInd = client.subscriptions.indexOf(request.params.resource);
-          if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);
-          this.sendResponse(client,{
-            jsonrpc: '2.0',
-            id: request.id,
-            result: subscriptionInd !== -1
-          });
-          return;
-        }
+        // some requests have to be handled by TcpServerService
+        if (this.hadleTcpServerDirectives(client, request)) return;
 
         const response = this.servicesManager.executeServiceRequest(request);
 
         // if response is subscription then add this subscription to client
         if (response.result && response.result._type === 'SUBSCRIPTION') {
-          client.subscriptions.push(response.result.resourceId);
+          const subscriptionId = response.result.resourceId;
+          Object.keys(this.clients).forEach(clientId => {
+            const tcpClient = this.clients[clientId];
+            if (tcpClient.id !== client.id && !tcpClient.listenAllSubscriptions) return;
+            if (!tcpClient.subscriptions.includes(subscriptionId)) {
+              tcpClient.subscriptions.push(subscriptionId);
+            }
+          });
         }
+
         this.sendResponse(client, response);
       } catch (e) {
         this.sendResponse(
@@ -347,6 +352,39 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     if (!request.params) message += ' params is required;';
     if (request.params && !request.params.resource) message += ' resource is required;';
     return message;
+  }
+
+
+  private hadleTcpServerDirectives(client: IClient, request: IJsonRpcRequest) {
+
+    // handle unsubscribing by clearing client subscriptions
+    if (
+      request.method === 'unsubscribe' &&
+      this.servicesManager.subscriptions[request.params.resource]
+    ) {
+      const subscriptionInd = client.subscriptions.indexOf(request.params.resource);
+      if (subscriptionInd !== -1) client.subscriptions.splice(subscriptionInd, 1);
+      this.sendResponse(client,{
+        jsonrpc: '2.0',
+        id: request.id,
+        result: subscriptionInd !== -1
+      });
+      return true;
+    }
+
+    // handle `listenAllSubscriptions` directive
+    if (
+      request.method === 'listenAllSubscriptions' &&
+      request.params.resource === 'TcpServerService'
+    ) {
+      client.listenAllSubscriptions = true;
+      this.sendResponse(client,{
+        jsonrpc: '2.0',
+        id: request.id,
+        result: true
+      });
+      return true;
+    }
   }
 
 

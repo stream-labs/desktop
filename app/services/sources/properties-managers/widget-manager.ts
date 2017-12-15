@@ -1,12 +1,15 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
-import { WidgetsService, WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
-
+import {
+  WidgetsService,
+  WidgetDefinitions,
+  IWidget,
+  WidgetType
+} from 'services/widgets';
 
 export interface IWidgetManagerSettings {
   widgetType: WidgetType;
 }
-
 
 /**
  * This properties manager is designed to wrap a browser
@@ -15,7 +18,6 @@ export interface IWidgetManagerSettings {
  * when the user logs into another account.
  */
 export class WidgetManager extends PropertiesManager {
-
   @Inject() widgetsService: WidgetsService;
 
   blacklist = ['url', 'is_local_file'];
@@ -25,17 +27,14 @@ export class WidgetManager extends PropertiesManager {
 
   settings: IWidgetManagerSettings;
 
-
   applySettings(settings: Dictionary<any>) {
     this.settings.widgetType = parseInt(settings.widgetType, 10);
     this.setWidgetType(this.settings.widgetType);
   }
-
 
   setWidgetType(type: WidgetType) {
     this.obsSource.update({
       url: this.widgetsService.getWidgetUrl(type)
     });
   }
-
 }

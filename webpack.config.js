@@ -17,7 +17,8 @@ const plugins = [];
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js'
+    updater: './updater/ui.js',
+    'guest-api': './guest-api'
   },
   output: {
     path: __dirname + '/bundles',
@@ -91,7 +92,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',

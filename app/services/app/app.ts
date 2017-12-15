@@ -2,7 +2,8 @@ import { StatefulService, mutation } from '../stateful-service';
 import { OnboardingService } from '../onboarding';
 import {
   ScenesCollectionsService,
-  OverlaysPersistenceService
+  OverlaysPersistenceService,
+  IDownloadProgress
 } from '../scenes-collections';
 import { HotkeysService } from '../hotkeys';
 import { UserService } from '../user';
@@ -19,6 +20,8 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
+import { PerformanceMonitorService } from '../performance-monitor';
+
 
 interface IAppState {
   loading: boolean;
@@ -53,6 +56,7 @@ export class AppService extends StatefulService<IAppState>
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
+  @Inject() private performanceMonitorService: PerformanceMonitorService;
 
   @track('app_start')
   load() {
@@ -91,6 +95,8 @@ export class AppService extends StatefulService<IAppState>
 
       // Pre-fetch stream info
       this.streamInfoService;
+
+      this.performanceMonitorService.start();
 
       this.ipcServerService.listen();
       this.tcpServerService.listen();
@@ -151,7 +157,8 @@ export class AppService extends StatefulService<IAppState>
     this.reset();
     this.scenesCollectionsService.switchToEmptyConfig(collectionName);
     await this.overlaysPersistenceService.loadOverlay(overlayPath);
-    this.scenesService.makeSceneActive(this.scenesService.activeSceneId);
+    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    this.scenesService.activeScene.makeItemsActive([]);
 
     // Save the newly loaded config
     await this.scenesCollectionsService.rawSave();
@@ -161,24 +168,51 @@ export class AppService extends StatefulService<IAppState>
   }
 
   /**
+   * Downloads and installs an overlay
+   * @param url the URL of the overlay
+   * @param name the name of the overlay
+   */
+  async installOverlay(url: string, name:string, progressCallback?: (info: IDownloadProgress) => void) {
+    this.START_LOADING();
+
+    let pathName: string;
+
+    // A download error should not result in an infinite spinner
+    try {
+      pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+    } catch (e) {
+      this.FINISH_LOADING();
+      throw e;
+    }
+
+    const configName = this.scenesCollectionsService.suggestName(name);
+
+    await this.loadOverlay(configName, pathName);
+  }
+
+  /**
    * remove the config and load the new one
    */
-  removeCurrentConfig() {
+  async removeCurrentConfig() {
+    this.START_LOADING();
+    this.disableAutosave();
     this.scenesCollectionsService.removeConfig();
     if (this.scenesCollectionsService.hasConfigs()) {
       this.loadConfig('', { saveCurrent: false });
     } else {
-      this.switchToBlankConfig();
+      await this.switchToBlankConfig();
     }
   }
 
   /**
    * reset current scenes and switch to blank config
    */
-  switchToBlankConfig(configName?: string) {
+  async switchToBlankConfig(configName?: string) {
     this.reset();
     this.scenesCollectionsService.switchToBlankConfig(configName);
+    await this.scenesCollectionsService.rawSave();
     this.enableAutoSave();
+    this.FINISH_LOADING();
   }
 
   @track('app_close')
@@ -196,6 +230,7 @@ export class AppService extends StatefulService<IAppState>
       }
 
       this.reset();
+      this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.release();
       electron.ipcRenderer.send('shutdownComplete');

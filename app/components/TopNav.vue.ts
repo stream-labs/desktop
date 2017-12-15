@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import { CustomizationService } from '../services/customization';
 import { NavigationService } from '../services/navigation';
@@ -22,12 +22,18 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
+  @Prop() locked: boolean;
+
   navigateStudio() {
     this.navigationService.navigate('Studio');
   }
 
   navigateDashboard() {
     this.navigationService.navigate('Dashboard');
+  }
+
+  navigateOverlays() {
+    this.navigationService.navigate('BrowseOverlays');
   }
 
   navigateLive() {

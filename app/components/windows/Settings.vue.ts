@@ -12,6 +12,7 @@ import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 import OverlaySettings from 'components/OverlaySettings.vue';
+import NotificationsSettings from 'components/NotificationsSettings.vue';
 
 @Component({
   components: {
@@ -22,7 +23,8 @@ import OverlaySettings from 'components/OverlaySettings.vue';
     ExtraSettings,
     Hotkeys,
     ApiSettings,
-    OverlaySettings
+    OverlaySettings,
+    NotificationsSettings
   },
   mixins: [windowMixin]
 })
@@ -45,7 +47,8 @@ export default class SceneTransitions extends Vue {
     Hotkeys: 'keyboard-o',
     Advanced: 'cogs',
     API: 'file-code-o',
-    Overlays: 'picture-o'
+    Overlays: 'picture-o',
+    Notifications: 'warning'
   };
 
   get categoryNames() {

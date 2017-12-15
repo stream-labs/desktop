@@ -6,42 +6,51 @@ import { Inject } from '../util/injector';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
 import { Subscription } from 'rxjs/Subscription';
+import { CustomizationService } from 'services/customization';
+import Slider from './shared/Slider.vue';
 
 @Component({
   components: {
     Chat,
+    Slider
   }
 })
 export default class LiveDock extends Vue {
-
   @Inject() streamingService: StreamingService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
-  @Prop({ default: false }) onLeft: boolean;
+  @Prop({ default: false })
+  onLeft: boolean;
 
   elapsedStreamTime = '';
   elapsedInterval: number;
 
   collapsed = true;
 
+  liveDockSize = 28;
+
   subscription: Subscription;
 
-  mounted() {
-    this.elapsedInterval = window.setInterval(
-      () => {
-        if (this.streamingService.isStreaming) {
-          this.elapsedStreamTime = this.getElapsedStreamTime();
-        } else {
-          this.elapsedStreamTime = '';
-        }
-      },
-      100
-    );
+  $refs: {
+    chat: Chat;
+  };
 
-    this.subscription = this.streamingService.streamingStatusChange.subscribe(status => {
-      if (status) this.collapsed = false;
-    });
+  mounted() {
+    this.elapsedInterval = window.setInterval(() => {
+      if (this.streamingService.isStreaming) {
+        this.elapsedStreamTime = this.getElapsedStreamTime();
+      } else {
+        this.elapsedStreamTime = '';
+      }
+    }, 100);
+
+    this.subscription = this.streamingService.streamingStatusChange.subscribe(
+      status => {
+        if (status) this.collapsed = false;
+      }
+    );
   }
 
   beforeDestroy() {
@@ -70,7 +79,11 @@ export default class LiveDock extends Vue {
   }
 
   get viewerCount() {
-    return this.streamInfoService.state.viewerCount;
+    if (this.hideViewerCount) {
+      return '?';
+    }
+
+    return this.streamInfoService.state.viewerCount.toString();
   }
 
   showEditStreamInfo() {
@@ -81,4 +94,17 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'twitch';
   }
 
+  get hideViewerCount() {
+    return this.customizationService.state.hideViewerCount;
+  }
+
+  toggleViewerCount() {
+    this.customizationService.setHiddenViewerCount(
+      !this.customizationService.state.hideViewerCount
+    );
+  }
+
+  refreshChat() {
+    this.$refs.chat.refresh();
+  }
 }

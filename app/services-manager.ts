@@ -13,9 +13,11 @@ import { HostsService } from  './services/hosts';
 import { Hotkey, HotkeysService } from  './services/hotkeys';
 import { KeyListenerService } from  './services/key-listener';
 import { NavigationService } from  './services/navigation';
+import { NotificationsService } from  './services/notifications';
 import { ObsApiService } from  './services/obs-api';
 import { OnboardingService } from  './services/onboarding';
 import { PerformanceService } from  './services/performance';
+import { PerformanceMonitorService } from  './services/performance-monitor';
 import { PersistentStatefulService } from  './services/persistent-stateful-service';
 import { SettingsService } from  './services/settings';
 import { SourcesService, Source } from  './services/sources';
@@ -43,6 +45,8 @@ import { ObserveList } from './util/service-observer';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
+import { GuestApiService } from 'services/guest-api';
+import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 
 const { ipcRenderer } = electron;
 
@@ -65,7 +69,7 @@ export interface IJsonRpcRequest {
   method: string;
   params: {
     resource: string,
-    args?: (string|number)[],
+    args?: any[],
     fetchMutations?: boolean,
     compactMode?: boolean
   };
@@ -119,9 +123,11 @@ export class ServicesManager extends Service {
     HotkeysService, Hotkey,
     KeyListenerService,
     NavigationService,
+    NotificationsService,
     ObsApiService,
     OnboardingService,
     PerformanceService,
+    PerformanceMonitorService,
     PersistentStatefulService,
     ScenesTransitionsService,
     SettingsService,
@@ -143,12 +149,20 @@ export class ServicesManager extends Service {
     IpcServerService,
     TcpServerService,
     StreamInfoService,
-    StreamlabelsService
+    StreamlabelsService,
+    GuestApiService,
+    VideoEncodingOptimizationService
   };
 
   private instances: Dictionary<Service> = {};
   private mutationsBufferingEnabled = false;
   private bufferedMutations: IMutation[] = [];
+
+  /**
+   * contains additional information about errors
+   * while JSONRPC request handling
+   */
+  private requestErrors: string[] = [];
 
   /**
    * if result of calling a service method in the main window is promise -
@@ -242,11 +256,29 @@ export class ServicesManager extends Service {
 
   executeServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
+    this.requestErrors = [];
+
+    const handleErrors = (e?: any) => {
+      if (!e && this.requestErrors.length === 0) return;
+      if (e) {
+
+        // re-raise error for Raven
+        const isChildWindowRequest = request.params && request.params.fetchMutations;
+        if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
+      }
+
+      response = this.createErrorResponse({
+        code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
+        id: request.id,
+        message: this.requestErrors.join(';')
+      });
+    };
+
     try {
       response = this.handleServiceRequest(request);
+      handleErrors();
     } catch (e) {
-      console.error(e);
-      response = this.createErrorResponse({ code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR, id: request.id });
+      handleErrors(e);
     } finally {
       return response;
     }
@@ -262,6 +294,22 @@ export class ServicesManager extends Service {
       error: {
         code: options.code,
         message: E_JSON_RPC_ERROR[options.code] + (options.message ? (' ' + options.message) : ''),
+      }
+    };
+  }
+
+
+  createRequest(resource: any, method: string, ...args: any[]): IJsonRpcRequest {
+    const resourceId = resource.resourceId || resource.serviceName;
+    if (!resourceId) throw 'invalid resource';
+
+    return {
+      jsonrpc: '2.0',
+      id: ipcRenderer.sendSync('getUniqueId'),
+      method,
+      params: {
+        resource: resourceId,
+        args
       }
     };
   }
@@ -305,7 +353,8 @@ export class ServicesManager extends Service {
       const subscriptionId = `${resourceId}.${methodName}`;
       responsePayload = {
         _type: 'SUBSCRIPTION',
-        resourceId: subscriptionId
+        resourceId: subscriptionId,
+        emitter: 'STREAM',
       };
       if (!this.subscriptions[subscriptionId]) {
         this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
@@ -342,10 +391,11 @@ export class ServicesManager extends Service {
         id: request.id,
         result: {
           _type: 'SUBSCRIPTION',
-          resourceId: promiseId
+          resourceId: promiseId,
+          emitter: 'PROMISE',
         }
       };
-    } else if (responsePayload && responsePayload.isHelper) {
+    } else if (responsePayload && responsePayload.isHelper === true) {
       const helper = responsePayload;
 
       response = {
@@ -362,7 +412,7 @@ export class ServicesManager extends Service {
       // payload can contain helpers-objects
       // we have to wrap them in IpcProxy too
       traverse(responsePayload).forEach((item: any) => {
-        if (item && item.isHelper) {
+        if (item && item.isHelper === true) {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
             _type: 'HELPER',
@@ -394,6 +444,10 @@ export class ServicesManager extends Service {
    */
   private getResource(resourceId: string) {
 
+    if (resourceId === 'ServicesManager') {
+      return this;
+    }
+
     if (this.services[resourceId]) {
       return this.getInstance(resourceId) || this.initService(resourceId);
     }
@@ -405,8 +459,31 @@ export class ServicesManager extends Service {
   }
 
 
+  /**
+   * the information about resource scheme helps to improve performance for API clients
+   * this is undocumented feature is mainly for our API client that we're using in tests
+   */
+  getResourceScheme(resourceId: string): Dictionary<string> {
+    const resource = this.getResource(resourceId);
+    if (!resource) {
+      this.requestErrors.push(`Resource not found: ${resourceId}`);
+      return null;
+    }
+    const resourceScheme = {};
+
+    Object.keys(Object.getPrototypeOf(resource)).concat(Object.keys(resource))
+      .forEach(key => {
+        resourceScheme[key] = typeof resource[key];
+      });
+
+    return resourceScheme;
+  }
+
+
   private getHelperModel(helper: Object): Object {
-    if (helper['getModel']) return helper['getModel']();
+    if (helper['getModel'] && typeof helper['getModel'] === 'function') {
+      return helper['getModel']();
+    }
     return {};
   }
 

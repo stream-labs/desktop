@@ -29,6 +29,12 @@ export default class SliderInput extends Vue {
   @Prop()
   valueBox: boolean;
 
+  @Prop()
+  dotSize: number;
+
+  @Prop()
+  sliderStyle: object;
+
   @throttle(500)
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));

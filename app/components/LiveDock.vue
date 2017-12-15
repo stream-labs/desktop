@@ -1,5 +1,8 @@
 <template>
-<div class="live-dock" :class="{ collapsed, 'live-dock--left': onLeft }">
+<div
+  class="live-dock"
+  :class="{ collapsed, 'live-dock--left': onLeft }"
+  :style="{ width: liveDockSize + '%' }">
   <div
     class="live-dock-chevron icon-btn"
     v-if="collapsed"
@@ -32,6 +35,13 @@
           </span>
         </div>
         <div class="live-dock-viewer-count">
+          <i
+            class="fa fa-eye live-dock-viewer-count-toggle label--icon"
+            :class="{
+              'fa-eye': !hideViewerCount,
+              'fa-eye-slash': hideViewerCount
+            }"
+            @click="toggleViewerCount"/>
           <i class="fa fa-user label--icon" />
           <span class="semibold">{{ viewerCount }}</span> viewers
         </div>
@@ -39,10 +49,25 @@
 
       <div class="live-dock-info">
         <a @click="showEditStreamInfo" v-if="isTwitch">Edit Stream Info</a>
+        <a @click="refreshChat">Refresh Chat</a>
       </div>
 
       <div class="live-dock-chat">
-        <chat/>
+        <chat ref="chat" />
+      </div>
+
+      <div class="sizer-items">
+        <Slider
+          v-model="liveDockSize"
+          :min="15"
+          :max="50"
+          :interval="1"
+          tooltip="false"
+          class="sizer"
+          :dotSize="11"
+          :sliderStyle="{ 'background-color': '#3c4c53' }"
+        />
+        <i class="fa fa-search fa-flip-horizontal" />
       </div>
     </div>
   </transition>
@@ -72,7 +97,7 @@
   }
 
   &.collapsed {
-    width: 20px;
+    width: 20px!important;
     padding: 0;
   }
 
@@ -134,9 +159,23 @@
   }
 }
 
+.live-dock-viewer-count {
+  .live-dock-viewer-count-toggle {
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  &:hover {
+    .live-dock-viewer-count-toggle {
+      opacity: 1;
+    }
+  }
+}
+
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
+  margin-bottom: 20px;
 }
 
 .live-dock-pulse {
@@ -164,6 +203,11 @@
   100% {
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
+}
+
+.sizer-items {
+  bottom: 5px;
+  right: 20px;
 }
 
 .night-theme {
