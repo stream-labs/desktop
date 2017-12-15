@@ -190,6 +190,6 @@ test('Obs-importer', async t => {
     await focusChild(t);
     t.true(await app.client.isExisting('li=Video'));
     await app.client.click('li=Video');
-    t.is(await getFormInput(t, 'Output (Scaled) Resolution'), '1920x1080');
+    t.is(await getFormInput(t, 'Common FPS Values'), '60');
   }
 });
