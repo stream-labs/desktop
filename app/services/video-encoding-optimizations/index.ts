@@ -28,18 +28,28 @@ export class VideoEncodingOptimizationService extends Service {
 
     const outputSettings = this.settingsService.getSettingsFormData('Output');
 
-    const subCategory = outputSettings.find(category => {
-      return category.nameSubCategory === 'Streaming';
+    const generalOutputSettings = outputSettings.find(category => {
+      return category.nameSubCategory === 'Untitled';
     });
 
-    const StreamEncoder = subCategory.parameters.find(parameter => {
-      return parameter.name === 'StreamEncoder';
+    const mode = generalOutputSettings.parameters.find(parameter => {
+      return parameter.name === 'Mode';
     });
 
-    if (StreamEncoder.value === 'obs_x264') {
-      profiles = Presets.filter(profile => {
-        return profile.game === game;
+    if (mode.value === 'Simple') {
+      const subCategory = outputSettings.find(category => {
+        return category.nameSubCategory === 'Streaming';
       });
+
+      const StreamEncoder = subCategory.parameters.find(parameter => {
+        return parameter.name === 'StreamEncoder';
+      });
+
+      if (StreamEncoder.value === 'obs_x264') {
+        profiles = Presets.filter(profile => {
+          return profile.game === game;
+        });
+      }
     }
 
     return profiles;
