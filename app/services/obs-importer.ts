@@ -152,7 +152,7 @@ export class ObsImporterService extends Service {
                 .setDeflection(sourceJSON.volume);
 
               this.audioService.getSource(source.sourceId).setSettings({
-                forceMono: sourceJSON.flags,
+                forceMono: sourceJSON.flags > 0,
                 syncOffset: sourceJSON.sync
                   ? AudioService.timeSpecToMs(sourceJSON.sync)
                   : 0,
@@ -267,7 +267,7 @@ export class ObsImporterService extends Service {
           .setDeflection(audioSource.volume);
 
         this.audioService.getSource(newSource.sourceId).setSettings({
-          forceMono: audioSource.flags,
+          forceMono: audioSource.flags > 0,
           syncOffset: audioSource.sync
             ? AudioService.timeSpecToMs(audioSource.sync)
             : 0,

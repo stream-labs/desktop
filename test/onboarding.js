@@ -1,16 +1,25 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
-import { selectSource, clickSourceProperties } from './helpers/spectron/sources';
-import { openFiltersWindow, closeFilterProperties } from './helpers/spectron/filters';
+import {
+  selectSource,
+  clickSourceProperties
+} from './helpers/spectron/sources';
+import {
+  openFiltersWindow,
+  closeFilterProperties
+} from './helpers/spectron/filters';
 import { getFormInput, setFormDropdown } from './helpers/spectron/forms';
-import { getInputValue, getInputValueId, getInputCheckboxValue } from './helpers/spectron/advancedAudioSettings';
+import {
+  getInputValue,
+  getInputValueId,
+  getInputCheckboxValue
+} from './helpers/spectron/advancedAudioSettings';
 
 useSpectron({ skipOnboarding: false });
 
 test('Adding some starter widgets', async t => {
   const app = t.context.app;
   await focusMain(t);
-
   const widgetToken = 'SomeWidgetToken';
   const platform = {
     type: 'twitch',
@@ -18,45 +27,34 @@ test('Adding some starter widgets', async t => {
     token: 'SomeToken',
     id: 'SomeId'
   };
-
   // Wait for the auth screen to appear
   await app.client.isExisting('button=Twitch');
-
   await app.webContents.send('testing-fakeAuth', {
     widgetToken,
     platform
   });
-
   // This will only show up if OBS is installed
   if (await t.context.app.client.isExisting('button=Start Fresh')) {
     await t.context.app.client.click('button=Start Fresh');
   }
-
   // Select and deselect some widgets
-
   await app.client.click('div=Event List');
   await app.client.click('button=Remove Widget');
-
   await app.client.click('div=Chatbox');
   await app.client.click('button=Add Widget');
-
   await app.client.click('div=Donation Goal');
   await app.client.click('button=Add Widget');
-
   await app.client.click('button=Add 4 Widgets');
   await app.client.click('a=Setup later');
-
   t.true(await app.client.isExisting('li=Alert Box'));
   t.false(await app.client.isExisting('li=Event List'));
   t.true(await app.client.isExisting('li=The Jar'));
   t.true(await app.client.isExisting('li=Chat Box'));
   t.false(await app.client.isExisting('li=Donation Ticker'));
   t.true(await app.client.isExisting('li=Donation Goal'));
-
   await selectSource(t, 'Alert Box');
   await clickSourceProperties(t);
   await focusChild(t);
-
   t.true(await app.client.isExisting('label=Widget Type'));
 });
 
@@ -65,13 +63,16 @@ test('Obs-importer', async t => {
   const sh = require('shelljs');
 
   const app = t.context.app;
-  const zipExe = path.resolve( __dirname, '..', 'node_modules', '7zip-bin-win', 'x64', '7za.exe');
+  const zipExe = path.resolve( __dirname, '..', '..', 'node_modules', '7zip-bin-win', 'x64', '7za.exe');
   const userData = t.context.cacheDir;
-  const obsStudioCache = path.resolve(__dirname, 'ressources', 'obs-studio.zip');
-
-  sh.echo(zipExe);
-  sh.echo(userData);
-  sh.echo(obsStudioCache);
+  const obsStudioCache = path.resolve(
+    __dirname,
+    '..',
+    '..',
+    'test',
+    'ressources',
+    'obs-studio.zip'
+  );
 
   let result = sh.exec(`"${zipExe}" x "${obsStudioCache}" -o"${userData}"`);
 
@@ -152,14 +153,37 @@ test('Obs-importer', async t => {
     await app.client.$('[rel=Mixer]').click('.fa-cog');
     await focusChild(t);
 
-    // Mic/Aux
+    //   // Mic/Aux
     t.true(await sourceSelector.isExisting(`td=Mic/Aux`));
-    t.is(await getInputValue(t, '.column-deflection .IntInput .input-wrapper .int-input', 1), '75');
-    t.is(await getInputCheckboxValue(t, '.column-forceMono .input-wrapper', 1), true);
-    t.is(await getInputValue(t, '.column-syncOffset .IntInput .input-wrapper .int-input', 1), '0');
-    t.is(await getInputValue(t, '.column-monitoringType', 1), 'Monitor Only (mute output)');
+    t.is(
+      await getInputValue(
+        t,
+        '.column-deflection .IntInput .input-wrapper .int-input',
+        1
+      ),
+      '75'
+    );
+    t.is(
+      await getInputCheckboxValue(t, '.column-forceMono .input-wrapper', 1),
+      true
+    );
+    t.is(
+      await getInputValue(
+        t,
+        '.column-syncOffset .IntInput .input-wrapper .int-input',
+        1
+      ),
+      '0'
+    );
+    t.is(
+      await getInputValue(t, '.column-monitoringType', 1),
+      'Monitor Only (mute output)'
+    );
     const mixerValues = [false, false, true, true, true, true];
-    t.deepEqual(await getInputCheckboxValue(t, '.column-audioMixers', 1), mixerValues);
+    t.deepEqual(
+      await getInputCheckboxValue(t, '.column-audioMixers', 1),
+      mixerValues
+    );
 
     await focusMain(t);
     await app.client.click('.fa-cog');
