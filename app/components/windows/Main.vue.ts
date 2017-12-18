@@ -79,6 +79,10 @@ export default class Main extends Vue {
     return this.navigationService.state.currentPage === 'Onboarding';
   }
 
+  get lifeDockCollapsed() {
+    return this.customizationService.state.lifeDockCollapsed;
+  }
+
   /**
    * Only certain pages get locked out while the application
    * is loading.  Other pages are OK to keep using.

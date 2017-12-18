@@ -1,5 +1,9 @@
 <template>
-<div class="main" :class="{'night-theme': nightTheme}">
+<div class="main" :class="{
+    'night-theme': nightTheme,
+    'life-dock-expanded': !lifeDockCollapsed
+  }"
+>
   <title-bar :title="title" />
   <div class="main-spacer bgColor-teal"></div>
   <div class="main-contents">
