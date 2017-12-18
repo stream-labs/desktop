@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericForm from './shared/forms/GenericForm.vue';
-import { INotificationsApi, INotificationsSettings } from 'services/notifications';
+import { INotificationsServiceApi, INotificationsSettings } from 'services/notifications';
 import { TFormData } from './shared/forms/Input';
 
 @Component({
@@ -10,7 +10,7 @@ import { TFormData } from './shared/forms/Input';
 })
 export default class NotificationsSettings extends Vue {
 
-  @Inject() notificationsService: INotificationsApi;
+  @Inject() notificationsService: INotificationsServiceApi;
 
   settingsFormData: TFormData = null;
 

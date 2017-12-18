@@ -14,7 +14,7 @@ export enum E_JSON_RPC_ERROR {
 
 export interface IJsonRpcRequest {
   jsonrpc: '2.0';
-  id: string | number;
+  id: string;
   method: string;
   params: {
     resource: string,
@@ -44,4 +44,21 @@ export interface IJsonRpcEvent {
   emitter: 'PROMISE' | 'STREAM';
   data: any;
   isRejected?: boolean;  // for PROMISE emitter only
+}
+
+
+export interface IMutation {
+  type: string;
+  payload: any;
+}
+
+
+export interface IJsonrpcServiceApi {
+
+  createRequest(
+    resourceId: string,
+    method: string,
+    ...args: any[]
+  ): IJsonRpcRequest;
+
 }
