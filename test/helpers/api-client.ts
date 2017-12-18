@@ -29,7 +29,7 @@ export class ApiClient {
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
   // set to 'true' for debugging
-  logsEnabled = false;
+  logsEnabled = true;
 
   constructor() {
 
@@ -83,7 +83,7 @@ export class ApiClient {
       await this.connect();
     }
 
-    const id = this.nextRequestId++;
+    const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
       jsonrpc: '2.0',
       id,
@@ -115,7 +115,11 @@ export class ApiClient {
 
     const err = process.stderr.toString();
     const responseStr = process.stdout.toString();
-    if (err) throw err;
+
+    if (err) {
+      this.log('SYNC_RESPONSE_ERR:', err);
+      throw err;
+    }
     this.log('SYNC_RESPONSE:', responseStr);
     const response = JSON.parse(responseStr);
     return response;
