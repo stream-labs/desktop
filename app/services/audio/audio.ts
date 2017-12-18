@@ -30,6 +30,13 @@ export enum E_AUDIO_CHANNELS {
 
 const VOLMETER_UPDATE_INTERVAL = 100;
 
+interface IAudioSourceData {
+  fader?: obs.IFader;
+  volmeter?: obs.IVolmeter;
+  callbackInfo?: obs.ICallbackData;
+  stream?: Subject<IVolmeter>;
+}
+
 @InitAfter('SourcesService')
 export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
 
@@ -37,8 +44,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     audioSources: {}
   };
 
-  obsFaders: Dictionary<obs.IFader> = {};
-  obsVolmeters: Dictionary<obs.IVolmeter> = {};
+
+  sourceData: Dictionary<IAudioSourceData> = {};
 
   @Inject() private sourcesService: SourcesService;
   @Inject() private scenesService: ScenesService;
@@ -55,13 +62,14 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
     this.sourcesService.sourceUpdated.subscribe(source => {
       const audioSource = this.getSource(source.sourceId);
-      if (!audioSource) return;
 
-      if (!source.audio) {
-        this.removeAudioSource(source.sourceId);
-        return;
+      if (!audioSource && source.audio) {
+        this.createAudioSource(this.sourcesService.getSource(source.sourceId));
       }
 
+      if (audioSource && !source.audio) {
+        this.removeAudioSource(source.sourceId);
+      }
     });
 
     this.sourcesService.sourceRemoved.subscribe(source => {
@@ -110,7 +118,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   fetchAudioSource(sourceId: string): IAudioSource {
     const source = this.sourcesService.getSource(sourceId);
     const obsSource = source.getObsInput();
-    const obsFader = this.obsFaders[source.sourceId];
+    const obsFader = this.sourceData[source.sourceId].fader;
 
     const fader: IFader = {
       db: obsFader.db || 0,
@@ -170,20 +178,59 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
 
   private createAudioSource(source: Source) {
+    this.sourceData[source.sourceId] = {};
+
     const obsVolmeter = obs.VolmeterFactory.create(obs.EFaderType.IEC);
     obsVolmeter.attach(source.getObsInput());
-    this.obsVolmeters[source.sourceId] = obsVolmeter;
+    this.sourceData[source.sourceId].volmeter = obsVolmeter;
 
     const obsFader = obs.FaderFactory.create(obs.EFaderType.IEC);
     obsFader.attach(source.getObsInput());
-    this.obsFaders[source.sourceId] = obsFader;
+    this.sourceData[source.sourceId].fader = obsFader;
 
+    this.initVolmeterStream(source.sourceId);
     this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.sourceId));
   }
 
+  private initVolmeterStream(sourceId: string) {
+    const volmeterStream = new Subject<IVolmeter>();
+
+    let gotEvent = false;
+    let lastVolmeterValue: IVolmeter;
+    let volmeterCheckTimeoutId: number;
+    this.sourceData[sourceId].volmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
+    this.sourceData[sourceId].callbackInfo = this.sourceData[sourceId].volmeter.addCallback(
+      (level: number, magnitude: number, peak: number, muted: boolean) => {
+        const volmeter: IVolmeter = { level, magnitude, peak, muted };
+
+        if (muted) {
+          volmeter.level = 0;
+          volmeter.peak = 0;
+        }
+
+        volmeterStream.next(volmeter);
+        lastVolmeterValue = volmeter;
+        gotEvent = true;
+      }
+    );
+
+    function volmeterCheck() {
+      if (!gotEvent) {
+        volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
+      }
+
+      gotEvent = false;
+      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+    }
+
+    volmeterCheck();
+
+    this.sourceData[sourceId].stream = volmeterStream;
+  }
+
   private removeAudioSource(sourceId: string) {
-    delete this.obsFaders[sourceId];
-    delete this.obsVolmeters[sourceId];
+    this.sourceData[sourceId].volmeter.removeCallback(this.sourceData[sourceId].callbackInfo);
+    delete this.sourceData[sourceId];
     this.REMOVE_AUDIO_SOURCE(sourceId);
   }
 
@@ -330,14 +377,14 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   setDeflection(deflection: number) {
-    const fader = this.audioService.obsFaders[this.sourceId];
+    const fader = this.audioService.sourceData[this.sourceId].fader;
     fader.deflection = deflection;
     this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
 
   setMul(mul: number) {
-    const fader = this.audioService.obsFaders[this.sourceId];
+    const fader = this.audioService.sourceData[this.sourceId].fader;
     fader.mul = mul;
     this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
@@ -349,43 +396,8 @@ export class AudioSource implements IAudioSourceApi {
 
 
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription {
-    const volmeterStream = new Subject<IVolmeter>();
-
-    let gotEvent = false;
-    let lastVolmeterValue: IVolmeter;
-    let volmeterCheckTimeoutId: number;
-    const obsVolmeter = this.audioService.obsVolmeters[this.sourceId];
-    obsVolmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
-    const obsSubscription = obsVolmeter.addCallback(
-      (level: number, magnitude: number, peak: number, muted: boolean) => {
-        const volmeter: IVolmeter = { level, magnitude, peak, muted };
-
-        if (muted) {
-          volmeter.level = 0;
-          volmeter.peak = 0;
-        }
-
-        volmeterStream.next(volmeter);
-        lastVolmeterValue = volmeter;
-        gotEvent = true;
-      }
-    );
-
-    function volmeterCheck() {
-      if (!gotEvent) {
-        volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
-      }
-
-      gotEvent = false;
-      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
-    }
-
-    volmeterCheck();
-
-    return volmeterStream.subscribe(cb).add(() => {
-      clearTimeout(volmeterCheckTimeoutId);
-      obsVolmeter.removeCallback(obsSubscription);
-    });
+    const stream = this.audioService.sourceData[this.sourceId].stream;
+    return stream.subscribe(cb);
   }
 
 
