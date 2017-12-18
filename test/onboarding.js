@@ -71,19 +71,17 @@ test.skip('Adding some starter widgets', async t => {
 });
 
 test('Obs-importer', async t => {
-  const path = require('path');
-  const sh = require('shelljs');
 
+  const unzip = require('unzip');
+  const fs = require('fs');
   const app = t.context.app;
-  const zipExe = path.resolve('node_modules', '7zip-bin-win', 'x64', '7za.exe');
-  const userData = t.context.cacheDir;
-  const obsStudioCache = path.resolve('test', 'ressources', 'obs-studio.zip');
 
-  let result = sh.exec(`"${zipExe}" x "${obsStudioCache}" -o"${userData}"`);
-
-  if (result.code !== 0) {
-    sh.echo('ERROR: Extraction failed!');
-  }
+  await new Promise((resolve, reject) => {
+    fs.createReadStream('test/ressources/obs-studio.zip')
+      .pipe(unzip.Extract({ path: t.context.cacheDir }))
+      .on('close', resolve)
+      .on('error', reject);
+  });
 
   await focusMain(t);
 
