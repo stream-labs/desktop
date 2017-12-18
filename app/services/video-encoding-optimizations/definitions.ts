@@ -1,8 +1,8 @@
 enum EncoderType {
-  x264 = 0,
-  nvenc = 1,
-  amd = 2,
-  qsv = 3
+  x264 = 'obs_x264',
+  nvenc = 'ffmpeg_nvenc',
+  amd = 'amd_amf_h264',
+  qsv = 'obs_qsv11'
 }
 
 enum GameType {

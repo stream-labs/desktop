@@ -52,6 +52,7 @@ export default class EditStreamInfo extends Vue {
   updateError = false;
   areAvailableProfiles = false;
   useOptimizedProfile = false;
+  genericProfiles = false;
 
   // Form Models:
 
@@ -132,14 +133,29 @@ export default class EditStreamInfo extends Vue {
       const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
         this.gameModel.value
       );
-      this.areAvailableProfiles = availableProfiles.length > 0;
 
-      if (this.areAvailableProfiles)
+      const genericProfiles = this.videoEncodingOptimizationService.getGameProfiles(
+        'Generic'
+      );
+
+      this.areAvailableProfiles = availableProfiles.length > 0 || genericProfiles.length > 0;
+
+      if (this.areAvailableProfiles) {
+        let profiles: IEncoderPreset[] = [];
+
+        if (availableProfiles.length > 0) {
+          profiles = availableProfiles;
+        } else {
+          profiles = genericProfiles;
+          this.genericProfiles = true;
+        }
+
         this.encoderProfile = {
-          value: availableProfiles[0],
-          description: availableProfiles[0].profile.description,
-          longDescription: availableProfiles[0].profile.longDescription,
+          value: profiles[0],
+          description: profiles[0].profile.description,
+          longDescription: profiles[0].profile.longDescription,
         };
+      }
     }
   }
 
@@ -225,9 +241,14 @@ export default class EditStreamInfo extends Vue {
 
   get profiles() {
     const multiselectArray: IMultiSelectProfiles[] = [];
-    const profiles = this.videoEncodingOptimizationService.getGameProfiles(
+    let profiles = this.videoEncodingOptimizationService.getGameProfiles(
       this.gameModel.value
     );
+    if (profiles.length === 0) {
+      profiles = this.videoEncodingOptimizationService.getGameProfiles(
+        'Generic'
+      );
+    }
     profiles.forEach(profile => {
       multiselectArray.push({
         value: profile,

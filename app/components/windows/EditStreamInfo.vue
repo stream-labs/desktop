@@ -30,11 +30,20 @@
           <div class="input-label"/>
           <div class="input-wrapper">
             <div class="checkbox">
-              <input
-               type="checkbox"
-               v-model="useOptimizedProfile"
-              />
-              <label><span>Use optimized encoder settings for this game</span></label>
+              <div v-if="!genericProfiles">
+                <input
+                type="checkbox"
+                v-model="useOptimizedProfile"
+                />
+                <label><span>Use optimized encoder settings for this game</span></label>
+              </div>
+              <div v-else>
+                <input
+                type="checkbox"
+                v-model="useOptimizedProfile"
+                />
+                <label><span>No optimized profiles have been found for this game, use generic profiles</span></label>
+              </div>
             </div>
           </div>
         </div>
