@@ -142,6 +142,17 @@ export class ObsImporterService extends Service {
               }
             );
 
+            // Check "Shutdown source when not visible" by default for browser sources
+            if (source.type === 'browser_source') {
+              const sourcesProperties = source.getPropertiesFormData();
+              const shutdownPropertyIndex = sourcesProperties.indexOf(sourcesProperties.find(property => {
+                return property.name === 'shutdown';
+              }));
+
+              sourcesProperties[shutdownPropertyIndex].value = true;
+              source.setPropertiesFormData(sourcesProperties);
+            }
+
             if (source.audio) {
               this.audioService
                 .getSource(source.sourceId)
