@@ -12,7 +12,10 @@ import { AudioService, E_AUDIO_CHANNELS } from './audio';
 import { WindowsService } from './windows';
 import Utils from './utils';
 import { AppService } from './app';
-import { VideoEncodingOptimizationService } from './video-encoding-optimizations';
+import {
+  VideoEncodingOptimizationService,
+  IOutputSettings
+} from './video-encoding-optimizations';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
@@ -114,9 +117,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
-    categories = categories
-      .concat('Overlays')
-      .concat('Notifications');
+    categories = categories.concat('Overlays').concat('Notifications');
 
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['API']);
@@ -168,6 +169,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       categoryName === 'Output' &&
       this.videoEncodingOptimizationService.getIsUsingEncodingOptimizations()
     ) {
+      const outputSettings: IOutputSettings = this.videoEncodingOptimizationService.getCurrentOutputSettings();
+
       const indexSubCategory = settings.indexOf(
         settings.find((category: any) => {
           return category.nameSubCategory === 'Streaming';
@@ -179,7 +182,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       // Setting preset visibility
       const indexPreset = parameters.indexOf(
         parameters.find((parameter: any) => {
-          return parameter.name === 'Preset';
+          return parameter.name === outputSettings.presetField;
         })
       );
       settings[indexSubCategory].parameters[indexPreset].visible = false;
@@ -187,7 +190,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       // Setting encoder settings value
       const indexX264Settings = parameters.indexOf(
         parameters.find((parameter: any) => {
-          return parameter.name === 'x264Settings';
+          return parameter.name === outputSettings.encoderSettingsField;
         })
       );
       settings[indexSubCategory].parameters[indexX264Settings].visible = false;
