@@ -97,7 +97,9 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     }
 
     if (this.droppedFramesRecords.length) {
-      const droppedFramesFactor = this.droppedFramesRecords.reduce((a, b) => a + b);
+      const droppedFramesFactor =
+        this.droppedFramesRecords.reduce((a, b) => a + b) /
+        this.droppedFramesRecords.length;
       this.droppedFramesRecords = [];
       if (droppedFramesFactor >= DROPPED_THRESHOLD) {
         this.pushDroppedFramesNotify(droppedFramesFactor);
