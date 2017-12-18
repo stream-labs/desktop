@@ -22,7 +22,6 @@ import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
 
-
 interface IAppState {
   loading: boolean;
   argv: string[];
