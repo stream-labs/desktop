@@ -9,7 +9,8 @@ enum GameType {
   PUBG = "PLAYERUNKNOWN'S BATTLEGROUNDS",
   LeagueOfLegends = 'League of Legends',
   Fortnite = 'Fortnite',
-  Destiny2 = 'Destiny 2'
+  Destiny2 = 'Destiny 2',
+  Generic = 'Generic',
 }
 
 enum PresetType {
@@ -32,15 +33,15 @@ export interface IProfile {
 
 const CPU_profile: IProfile = {
   profile: 'CPU',
-  description: 'CPU optimized',
-  longDescription: 'Reduction of the CPU load for an average video quality',
+  description: 'Medium',
+  longDescription: 'Optimized profile for average CPU',
   preset: PresetType.veryfast
 };
 
 const VQ_profile: IProfile = {
   profile: 'VQ',
-  description: 'Video quality optimized',
-  longDescription: 'Improvement of the video quality at a very low CPU usage',
+  description: 'Low',
+  longDescription: 'Optimized profile for weak CPU',
   preset: PresetType.ultrafast
 };
 
@@ -124,6 +125,24 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=-2 bframes=0 subme=1 ' +
       'b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
+    encoder: EncoderType.x264
+  },
+  {
+    profile: CPU_profile,
+    game: GameType.Generic,
+    settings:
+      'nal-hrd=cbr deblock=1:0 trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=2 ' +
+      'subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 ' +
+      'lookahead_threads=6',
+    encoder: EncoderType.x264
+  },
+  {
+    profile: VQ_profile,
+    game: GameType.Generic,
+    settings:
+      'nal-hrd=cbr deblock=1:0 trellis=0 me=tesa force-cfr=1 rc-lookahead=10 ref=0 chroma-qp-offset=-2 bframes=0 ' +
+      'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 fast_pskip=1 ' +
+      'lookahead_threads=6',
     encoder: EncoderType.x264
   }
 ];
