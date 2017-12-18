@@ -133,6 +133,11 @@ export class ObsImporterService extends Service {
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            if (sourceJSON.id === 'browser_source') {
+              sourceJSON.settings.shutdown = true;
+            }
+
+            // Check "Shutdown source when not visible" by default for browser sources
             const source = this.sourcesService.createSource(
               sourceJSON.name,
               sourceJSON.id,
@@ -141,17 +146,6 @@ export class ObsImporterService extends Service {
                 channel: sourceJSON.channel !== 0 ? sourceJSON.channel : void 0
               }
             );
-
-            // Check "Shutdown source when not visible" by default for browser sources
-            if (source.type === 'browser_source') {
-              const sourcesProperties = source.getPropertiesFormData();
-              const shutdownPropertyIndex = sourcesProperties.indexOf(sourcesProperties.find(property => {
-                return property.name === 'shutdown';
-              }));
-
-              sourcesProperties[shutdownPropertyIndex].value = true;
-              source.setPropertiesFormData(sourcesProperties);
-            }
 
             if (source.audio) {
               this.audioService
