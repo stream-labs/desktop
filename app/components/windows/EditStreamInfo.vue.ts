@@ -128,17 +128,19 @@ export default class EditStreamInfo extends Vue {
   }
 
   loadAvailableProfiles() {
-    const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
-      this.gameModel.value
-    );
-    this.areAvailableProfiles = availableProfiles.length > 0;
+    if (!this.midStreamMode) {
+      const availableProfiles = this.videoEncodingOptimizationService.getGameProfiles(
+        this.gameModel.value
+      );
+      this.areAvailableProfiles = availableProfiles.length > 0;
 
-    if (this.areAvailableProfiles)
-      this.encoderProfile = {
-        value: availableProfiles[0],
-        description: availableProfiles[0].profile.description,
-        longDescription: availableProfiles[0].profile.longDescription,
-      };
+      if (this.areAvailableProfiles)
+        this.encoderProfile = {
+          value: availableProfiles[0],
+          description: availableProfiles[0].profile.description,
+          longDescription: availableProfiles[0].profile.longDescription,
+        };
+    }
   }
 
   // For some reason, v-model doesn't work with ListInput
