@@ -1,4 +1,4 @@
-import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
+import { IJsonRpcRequest } from '../../app/services/jsonrpc';
 import { Subject } from 'rxjs/Subject';
 
 
