@@ -59,6 +59,7 @@ export default class NotificationsArea extends Vue {
 
   destroyed() {
     clearInterval(this.checkQueueIntervalId);
+    clearInterval(this.sizeCheckIntervalId);
   }
 
   get unreadCount() {
