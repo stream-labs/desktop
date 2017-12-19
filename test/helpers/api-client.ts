@@ -29,7 +29,7 @@ export class ApiClient {
   private resourceSchemes: Dictionary<Dictionary<string>> = {};
 
   // set to 'true' for debugging
-  logsEnabled = true;
+  logsEnabled = false;
 
   constructor() {
 

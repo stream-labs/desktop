@@ -16,7 +16,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     options: { code: E_JSON_RPC_ERROR; message?: string }
   ): IJsonRpcResponse<any> {
     const id =
-      typeof arguments[0] === 'object'
+      (arguments[0] && typeof arguments[0] === 'object')
         ? (arguments[0] as IJsonRpcRequest).id
         : arguments[0];
     return {
@@ -53,7 +53,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     options: { compactMode: boolean, fetchMutations: boolean },
     ...args: any[]
   ): IJsonRpcRequest {
-    const request = this.createRequest(resourceId, method, args);
+    const request = this.createRequest(resourceId, method, ...args);
     request.params = { ...request.params, ...options };
     return request;
   }
@@ -63,7 +63,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     result: TResult
   ): IJsonRpcResponse<TResult> {
     const id =
-      typeof arguments[0] === 'object'
+      (arguments[0] && typeof arguments[0] === 'object')
         ? (arguments[0] as IJsonRpcRequest).id
         : arguments[0];
     return { jsonrpc: '2.0', id, result } as IJsonRpcResponse<TResult>;

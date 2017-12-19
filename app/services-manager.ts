@@ -221,6 +221,7 @@ export class ServicesManager extends Service {
     const handleErrors = (e?: any) => {
       if (!e && this.requestErrors.length === 0) return;
       if (e) {
+        console.error(e);
         // re-raise error for Raven
         const isChildWindowRequest =
           request.params && request.params.fetchMutations;
@@ -465,6 +466,7 @@ export class ServicesManager extends Service {
             throw 'IPC request failed: check the errors in the main window';
           }
 
+          console.log('response', response);
           const result = response.result;
           response.mutations.forEach(mutation => commitMutation(mutation));
 
