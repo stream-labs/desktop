@@ -65,7 +65,7 @@ export function useSpectron(options: ITestRunnerOptions) {
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
-    t.context.app.client.timeouts('implicit', 2000);
+    t.context.app.client.timeouts('implicit', 5000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
