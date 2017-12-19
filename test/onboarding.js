@@ -153,7 +153,7 @@ test('Obs-importer', async t => {
     await focusMain(t);
 
     // // Check Advanced audio settings
-    await app.client.$('[rel=Mixer]').click('.fa-cog');
+    await app.client.$('[rel=SceneSelector]').click('.fa-cog');
     await focusChild(t);
 
     // // Mic/Aux
