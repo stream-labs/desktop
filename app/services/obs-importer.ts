@@ -85,7 +85,8 @@ export class ObsImporterService extends Service {
           });
 
         if (isFilterAvailable) {
-          const sourceId = this.sourcesService.getSourcesByName(source.name)[0].sourceId;
+          const sourceId = this.sourcesService.getSourcesByName(source.name)[0]
+            .sourceId;
 
           const filter = this.filtersService.add(
             sourceId,
@@ -148,7 +149,16 @@ export class ObsImporterService extends Service {
                 .setMuted(sourceJSON.muted);
               this.audioService
                 .getSource(source.sourceId)
-                .setMul(sourceJSON.volume);
+                .setDeflection(sourceJSON.volume);
+
+              this.audioService.getSource(source.sourceId).setSettings({
+                forceMono: sourceJSON.flags > 0,
+                syncOffset: sourceJSON.sync
+                  ? AudioService.timeSpecToMs(sourceJSON.sync)
+                  : 0,
+                audioMixers: sourceJSON.mixers,
+                monitoringType: sourceJSON.monitoring_type
+              });
             }
 
             // Adding the filters
@@ -254,7 +264,16 @@ export class ObsImporterService extends Service {
           .setMuted(audioSource.muted);
         this.audioService
           .getSource(newSource.sourceId)
-          .setMul(audioSource.volume);
+          .setDeflection(audioSource.volume);
+
+        this.audioService.getSource(newSource.sourceId).setSettings({
+          forceMono: audioSource.flags > 0,
+          syncOffset: audioSource.sync
+            ? AudioService.timeSpecToMs(audioSource.sync)
+            : 0,
+          audioMixers: audioSource.mixers,
+          monitoringType: audioSource.monitoring_type
+        });
       }
     });
   }

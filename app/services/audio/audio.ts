@@ -11,10 +11,19 @@ import { Inject } from '../../util/injector';
 import { InitAfter } from '../../util/service-observer';
 import { WindowsService } from '../windows';
 import {
-  IBitmaskInput, IFormInput, IListInput, ISliderInputValue, TFormData,
+  IBitmaskInput,
+  IFormInput,
+  IListInput,
+  ISliderInputValue,
+  TFormData
 } from '../../components/shared/forms/Input';
 import {
-  IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
+  IAudioDevice,
+  IAudioServiceApi,
+  IAudioSource,
+  IAudioSourceApi,
+  IAudioSourcesState,
+  IFader,
   IVolmeter
 } from './audio-api';
 
@@ -25,14 +34,14 @@ export enum E_AUDIO_CHANNELS {
   OUTPUT_2 = 2,
   INPUT_1 = 3,
   INPUT_2 = 4,
-  INPUT_3 = 5,
+  INPUT_3 = 5
 }
 
 const VOLMETER_UPDATE_INTERVAL = 100;
 
 @InitAfter('SourcesService')
-export class AudioService extends StatefulService<IAudioSourcesState> implements IAudioServiceApi {
-
+export class AudioService extends StatefulService<IAudioSourcesState>
+  implements IAudioServiceApi {
   static initialState: IAudioSourcesState = {
     audioSources: {}
   };
@@ -44,9 +53,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
 
-
   protected init() {
-
     this.sourcesService.sourceAdded.subscribe(sourceModel => {
       const source = this.sourcesService.getSource(sourceModel.sourceId);
       if (!source.audio) return;
@@ -61,20 +68,16 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
         this.removeAudioSource(source.sourceId);
         return;
       }
-
     });
 
     this.sourcesService.sourceRemoved.subscribe(source => {
       if (source.audio) this.removeAudioSource(source.sourceId);
     });
-
   }
-
 
   static timeSpecToMs(timeSpec: obs.ITimeSpec): number {
     return timeSpec.sec * 1000 + Math.floor(timeSpec.nsec / 1000000);
   }
-
 
   static msToTimeSpec(ms: number): obs.ITimeSpec {
     return {
@@ -83,29 +86,30 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     };
   }
 
-
   getSource(sourceId: string): AudioSource {
-    return this.state.audioSources[sourceId] ? new AudioSource(sourceId) : void 0;
+    return this.state.audioSources[sourceId]
+      ? new AudioSource(sourceId)
+      : void 0;
   }
-
 
   getSourcesForCurrentScene(): AudioSource[] {
     return this.getSourcesForScene(this.scenesService.activeSceneId);
   }
 
-
   getSourcesForScene(sceneId: string): AudioSource[] {
     const scene = this.scenesService.getScene(sceneId);
-    const sceneSources = scene.getNestedSources({ excludeScenes: true })
+    const sceneSources = scene
+      .getNestedSources({ excludeScenes: true })
       .filter(sceneItem => sceneItem.audio);
 
-    const globalSources = this.sourcesService.getSources().filter(source => source.channel !== void 0);
+    const globalSources = this.sourcesService
+      .getSources()
+      .filter(source => source.channel !== void 0);
     return globalSources
       .concat(sceneSources)
       .map((sceneSource: ISource) => this.getSource(sceneSource.sourceId))
       .filter(item => item);
   }
-
 
   fetchAudioSource(sourceId: string): IAudioSource {
     const source = this.sourcesService.getSource(sourceId);
@@ -115,7 +119,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     const fader: IFader = {
       db: obsFader.db || 0,
       deflection: obsFader.deflection,
-      mul: obsFader.mul,
+      mul: obsFader.mul
     };
 
     return {
@@ -129,29 +133,40 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     };
   }
 
-
   getDevices(): IAudioDevice[] {
     const devices: IAudioDevice[] = [];
-    const obsAudioInput = obs.InputFactory.create('wasapi_input_capture', ipcRenderer.sendSync('getUniqueId'));
-    const obsAudioOutput = obs.InputFactory.create('wasapi_output_capture', ipcRenderer.sendSync('getUniqueId'));
+    const obsAudioInput = obs.InputFactory.create(
+      'wasapi_input_capture',
+      ipcRenderer.sendSync('getUniqueId')
+    );
+    const obsAudioOutput = obs.InputFactory.create(
+      'wasapi_output_capture',
+      ipcRenderer.sendSync('getUniqueId')
+    );
 
-    (obsAudioInput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
+    (obsAudioInput.properties.get(
+      'device_id'
+    ) as obs.IListProperty).details.items.forEach(
+      (item: { name: string; value: string }) => {
         devices.push({
           id: item.value,
           description: item.name,
           type: 'input'
         });
-      });
+      }
+    );
 
-    (obsAudioOutput.properties.get('device_id') as obs.IListProperty).details.items
-      .forEach((item: { name: string, value: string}) => {
+    (obsAudioOutput.properties.get(
+      'device_id'
+    ) as obs.IListProperty).details.items.forEach(
+      (item: { name: string; value: string }) => {
         devices.push({
           id: item.value,
           description: item.name,
           type: 'output'
         });
-      });
+      }
+    );
 
     obsAudioInput.release();
     obsAudioOutput.release();
@@ -167,7 +182,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       }
     });
   }
-
 
   private createAudioSource(source: Source) {
     const obsVolmeter = obs.VolmeterFactory.create(obs.EFaderType.IEC);
@@ -187,12 +201,10 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     this.REMOVE_AUDIO_SOURCE(sourceId);
   }
 
-
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     Vue.set(this.state.audioSources, source.sourceId, source);
   }
-
 
   @mutation()
   private REMOVE_AUDIO_SOURCE(sourceId: string) {
@@ -211,11 +223,9 @@ export class AudioSource implements IAudioSourceApi {
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
 
-  @Inject()
-  private audioService: AudioService;
+  @Inject() private audioService: AudioService;
 
-  @Inject()
-  private sourcesService: SourcesService;
+  @Inject() private sourcesService: SourcesService;
 
   private audioSourceState: IAudioSource;
 
@@ -235,7 +245,6 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getSettingsForm(): TFormData {
-
     return [
       <ISliderInputValue>{
         name: 'deflection',
@@ -249,27 +258,27 @@ export class AudioSource implements IAudioSourceApi {
         type: 'OBS_PROPERTY_INT'
       },
 
-      <IFormInput<boolean>> {
+      <IFormInput<boolean>>{
         value: this.forceMono,
         name: 'forceMono',
         description: 'Downmix to Mono',
         showDescription: false,
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
-        enabled: true,
+        enabled: true
       },
 
-      <IFormInput<number>> {
+      <IFormInput<number>>{
         value: this.syncOffset,
         name: 'syncOffset',
         description: 'Sync Offset (ms)',
         showDescription: false,
         type: 'OBS_PROPERTY_INT',
         visible: true,
-        enabled: true,
+        enabled: true
       },
 
-      <IListInput<obs.EMonitoringType>> {
+      <IListInput<obs.EMonitoringType>>{
         value: this.monitoringType,
         name: 'monitoringType',
         description: 'Audio Monitoring',
@@ -279,13 +288,18 @@ export class AudioSource implements IAudioSourceApi {
         enabled: true,
         options: [
           { value: obs.EMonitoringType.None, description: 'Monitor Off' },
-          { value: obs.EMonitoringType.MonitoringOnly, description: 'Monitor Only (mute output)' },
-          { value: obs.EMonitoringType.MonitoringAndOutput, description: 'Monitor and Output' }
+          {
+            value: obs.EMonitoringType.MonitoringOnly,
+            description: 'Monitor Only (mute output)'
+          },
+          {
+            value: obs.EMonitoringType.MonitoringAndOutput,
+            description: 'Monitor and Output'
+          }
         ]
       },
 
-
-      <IBitmaskInput> {
+      <IBitmaskInput>{
         value: this.audioMixers,
         name: 'audioMixers',
         description: 'Tracks',
@@ -302,7 +316,6 @@ export class AudioSource implements IAudioSourceApi {
     return this.sourcesService.getSource(this.sourceId);
   }
 
-
   setSettings(patch: Partial<IAudioSource>) {
     const obsInput = this.source.getObsInput();
 
@@ -316,9 +329,9 @@ export class AudioSource implements IAudioSourceApi {
         this.source.getObsInput().syncOffset = AudioService.msToTimeSpec(value);
       } else if (name === 'forceMono') {
         if (this.forceMono !== value) {
-          value ?
-            obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono :
-            obsInput.flags -= obs.ESourceFlags.ForceMono;
+          value
+            ? (obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono)
+            : (obsInput.flags -= obs.ESourceFlags.ForceMono);
         }
       } else if (name === 'muted') {
         this.setMuted(value);
@@ -335,18 +348,15 @@ export class AudioSource implements IAudioSourceApi {
     this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
-
   setMul(mul: number) {
     const fader = this.audioService.obsFaders[this.sourceId];
     fader.mul = mul;
     this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
   }
 
-
   setMuted(muted: boolean) {
     this.sourcesService.setMuted(this.sourceId, muted);
   }
-
 
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription {
     const volmeterStream = new Subject<IVolmeter>();
@@ -377,7 +387,10 @@ export class AudioSource implements IAudioSourceApi {
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+      volmeterCheckTimeoutId = window.setTimeout(
+        volmeterCheck,
+        VOLMETER_UPDATE_INTERVAL * 2
+      );
     }
 
     volmeterCheck();
@@ -388,10 +401,8 @@ export class AudioSource implements IAudioSourceApi {
     });
   }
 
-
   @mutation()
   private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
     Object.assign(this.audioSourceState, patch);
   }
-
 }
