@@ -7,5 +7,11 @@ install:
   - yarn install-node-obs
   - yarn ci:compile
 
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 test_script:
   - yarn test -- -v
+
+environment:
+  APPVEYOR_RDP_PASSWORD: slobs
