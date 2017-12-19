@@ -18,11 +18,19 @@ interface IUiNotification extends INotification {
 export default class NotificationsArea extends Vue {
   @Inject() private notificationsService: NotificationsService;
 
+  showExtendedNotifications = true;
+
+  sizeCheckIntervalId: number;
+
   notifications: IUiNotification[] = [];
   private notificationQueue: INotification[] = [];
   private notifyAudio: HTMLAudioElement;
   private checkQueueIntervalId: number = null;
   private canShowNextNotify = true;
+
+  $refs: {
+    notificationsContainer: HTMLDivElement;
+  };
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
@@ -39,10 +47,19 @@ export default class NotificationsArea extends Vue {
       () => this.checkQueue(),
       QUEUE_TIME
     );
+
+    this.sizeCheckIntervalId = window.setInterval(() => {
+      if (this.$refs.notificationsContainer.offsetWidth < 300) {
+        this.showExtendedNotifications = false;
+      } else {
+        this.showExtendedNotifications = true;
+      }
+    }, 1000);
   }
 
   destroyed() {
     clearInterval(this.checkQueueIntervalId);
+    clearInterval(this.sizeCheckIntervalId);
   }
 
   get unreadCount() {

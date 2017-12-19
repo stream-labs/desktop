@@ -171,6 +171,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   removeSource(id: string) {
     const source = this.getSource(id);
+    if (!source) throw  new Error(`Source ${id} not found`);
+
     source.getObsInput().release();
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
