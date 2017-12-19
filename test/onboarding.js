@@ -135,26 +135,26 @@ test('Obs-importer', async t => {
     await sceneSelector.click('li=Game');
     t.true(await sourceSelector.isExisting(`li=Game Capture`));
 
-    // Filter checking
-    await sceneSelector.click('li=Basic Content');
-    await openFiltersWindow(t, 'Video Capture Device');
-    await focusChild(t);
+    // // Filter checking
+    // await sceneSelector.click('li=Basic Content');
+    // await openFiltersWindow(t, 'Video Capture Device');
+    // await focusChild(t);
 
-    // Check filter current values
-    t.true(await app.client.isExisting('li=Color Correction'));
-    t.is(await getFormInput(t, 'Gamma'), '0.6');
-    t.is(await getFormInput(t, 'Contrast'), '0.67');
-    t.is(await getFormInput(t, 'Brightness'), '0');
-    t.is(await getFormInput(t, 'Saturation'), '0.78');
-    t.is(await getFormInput(t, 'Hue Shift'), '0');
-    t.is(await getFormInput(t, 'Opacity'), '100');
+    // // Check filter current values
+    // t.true(await app.client.isExisting('li=Color Correction'));
+    // t.is(await getFormInput(t, 'Gamma'), '0.6');
+    // t.is(await getFormInput(t, 'Contrast'), '0.67');
+    // t.is(await getFormInput(t, 'Brightness'), '0');
+    // t.is(await getFormInput(t, 'Saturation'), '0.78');
+    // t.is(await getFormInput(t, 'Hue Shift'), '0');
+    // t.is(await getFormInput(t, 'Opacity'), '100');
 
-    await closeFilterProperties(t);
-    await focusMain(t);
+    // await closeFilterProperties(t);
+    // await focusMain(t);
 
-    // Check Advanced audio settings
-    await app.client.$('[rel=Mixer]').click('.fa-cog');
-    await focusChild(t);
+    // // Check Advanced audio settings
+    // await app.client.$('[rel=Mixer]').click('.fa-cog');
+    // await focusChild(t);
 
     // // Mic/Aux
     // t.true(await sourceSelector.isExisting(`td=Mic/Aux`));
