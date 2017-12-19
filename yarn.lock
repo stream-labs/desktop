@@ -7288,9 +7288,9 @@ vrsource-tslint-rules@^5.1.0:
     chokidar-cli "~1.2.0"
     tslint "~5.1.0"
 
-vue-class-component@^5.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-5.0.1.tgz#feda06c3da266cee9064e224ba491e089923dce8"
+vue-class-component@^6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/vue-class-component/-/vue-class-component-6.1.2.tgz#87ac0265b0db71a3f49f10d90e4f69f9be9c2fbd"
 
 vue-color@^2.4.3:
   version "2.4.3"
@@ -7331,12 +7331,12 @@ vue-popperjs@^1.2.2:
     popper.js "^1.9.1"
     vue "^2.3.3"
 
-vue-property-decorator@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/vue-property-decorator/-/vue-property-decorator-5.0.1.tgz#1be12d62e84b0c83732a03df7a4a8f882a410001"
+"vue-property-decorator@git+ssh://git@github.com:stream-labs/vue-property-decorator.git#8f8caaed03a1b31e027af507f3f54ed7b4823fcf":
+  version "5.2.1"
+  resolved "git+ssh://git@github.com:stream-labs/vue-property-decorator.git#8f8caaed03a1b31e027af507f3f54ed7b4823fcf"
   dependencies:
     reflect-metadata "^0.1.9"
-    vue-class-component "^5.0.0"
+    vue-class-component "^6.1.2"
 
 vue-slider-component@^2.2.7:
   version "2.2.7"
