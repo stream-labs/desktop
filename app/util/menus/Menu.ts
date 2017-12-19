@@ -19,4 +19,11 @@ export class Menu {
     this.menu.append(new remote.MenuItem(options));
   }
 
+  destroy() {
+    this.menu.items.forEach((item: any) => {
+      if (item.submenu && item.submenu.destroy) item.submenu.destroy();
+    });
+    (this.menu as any).destroy();
+  }
+
 }

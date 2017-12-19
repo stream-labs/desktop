@@ -13,30 +13,23 @@ import DropdownMenu from './shared/DropdownMenu.vue';
   components: { Selector, DropdownMenu },
 })
 export default class SceneSelector extends Vue {
+  @Inject() scenesService: ScenesService;
+  @Inject() scenesCollectionsService: ScenesCollectionsService;
+  @Inject() appService: AppService;
+  @Inject() scenesTransitionsService: ScenesTransitionsService;
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  scenesCollectionsService: ScenesCollectionsService;
-
-  @Inject()
-  appService: AppService;
-
-  @Inject()
-  scenesTransitionsService: ScenesTransitionsService;
-
-  menu = new Menu();
-
-  created() {
-    this.menu.append({
+  showContextMenu() {
+    const menu = new Menu();
+    menu.append({
       label: 'Duplicate',
       click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
-    this.menu.append({
+    menu.append({
       label: 'Rename',
       click: () => this.scenesService.showNameScene(this.scenesService.activeScene.name)
     });
+    menu.popup();
+    menu.destroy();
   }
 
   makeActive(id: string) {

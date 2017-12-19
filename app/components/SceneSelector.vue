@@ -41,7 +41,7 @@
     :activeItems="activeSceneId ? [activeSceneId] : []"
     @select="makeActive"
     @sort="handleSort"
-    @contextmenu="menu.popup()"
+    @contextmenu="showContextMenu"
   />
 </div>
 </template>
