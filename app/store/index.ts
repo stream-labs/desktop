@@ -69,7 +69,7 @@ plugins.push((store: Store<any>) => {
 });
 
 
-let store: Vuex.Store<any> = null;
+let store: Store<any> = null;
 
 export function createStore() {
 

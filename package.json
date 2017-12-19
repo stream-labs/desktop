@@ -130,15 +130,15 @@
     "typescript": "^2.4.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
-    "vue": "^2.1.10",
+    "vue": "^2.5.12",
     "vue-color": "^2.4.3",
     "vue-loader": "^10.2.0",
     "vue-multiselect": "2.0.3",
     "vue-property-decorator": "^5.0.1",
     "vue-slider-component": "^2.2.7",
-    "vue-template-compiler": "^2.1.10",
+    "vue-template-compiler": "^2.5.12",
     "vuedraggable": "^2.8.5",
-    "vuex": "^2.1.1",
+    "vuex": "^3.0.1",
     "webpack": "^2.2.1"
   }
 }
