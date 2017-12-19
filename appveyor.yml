@@ -14,4 +14,4 @@ test_script:
   - yarn test -- -v
 
 environment:
-  APPVEYOR_RDP_PASSWORD: slobs
+  APPVEYOR_RDP_PASSWORD: ThisIsASecurePassword123
