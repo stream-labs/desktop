@@ -6,7 +6,7 @@ import { addScene } from './helpers/spectron/scenes';
 useSpectron();
 
 
-test('Adding and removing a AudioSource', async t => {
+test.skip('Adding and removing a AudioSource', async t => {
   const app = t.context.app;
 
   await addSource(t, 'Media Source', 'Source With Audio');
@@ -25,7 +25,7 @@ test('Adding and removing a AudioSource', async t => {
 });
 
 
-test('Nested scenes should provide audio sources to mixer', async t => {
+test.skip('Nested scenes should provide audio sources to mixer', async t => {
   const app = t.context.app;
 
   await addSource(t, 'Media Source', 'Nested Media Source');

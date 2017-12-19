@@ -6,7 +6,7 @@ import { addSource } from './helpers/spectron/sources';
 useSpectron();
 
 
-test('Adding and removing a source filter', async t => {
+test.skip('Adding and removing a source filter', async t => {
   const app = t.context.app;
   const sourceName = 'Color Source';
   const filterName = 'Color Correction';
