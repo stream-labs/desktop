@@ -17,6 +17,7 @@ import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
 } from './audio-api';
+import { Observable } from 'rxjs/Observable';
 
 const { ipcRenderer } = electron;
 
@@ -34,7 +35,7 @@ interface IAudioSourceData {
   fader?: obs.IFader;
   volmeter?: obs.IVolmeter;
   callbackInfo?: obs.ICallbackData;
-  stream?: Subject<IVolmeter>;
+  stream?: Observable<IVolmeter>;
 }
 
 @InitAfter('SourcesService')
