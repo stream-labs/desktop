@@ -116,24 +116,24 @@ test('Obs-importer', async t => {
     const sceneSelector = app.client.$('[rel=SceneSelector]');
     const sourceSelector = app.client.$('[rel=SourceSelector]');
 
-    // Scenes checking
-    t.true(await sceneSelector.isExisting(`li=Basic Content`));
-    t.true(await sceneSelector.isExisting(`li=Intermediate Scene`));
-    t.true(await sceneSelector.isExisting(`li=Main Scene`));
-    t.true(await sceneSelector.isExisting(`li=Game`));
+    // // Scenes checking
+    // t.true(await sceneSelector.isExisting(`li=Basic Content`));
+    // t.true(await sceneSelector.isExisting(`li=Intermediate Scene`));
+    // t.true(await sceneSelector.isExisting(`li=Main Scene`));
+    // t.true(await sceneSelector.isExisting(`li=Game`));
 
-    // Sources checking
-    t.true(await sourceSelector.isExisting(`li=Chat box`));
-    t.true(await sourceSelector.isExisting(`li=The Jar`));
-    t.true(await sourceSelector.isExisting(`li=Alert box`));
-    t.true(await sourceSelector.isExisting(`li=Video Capture Device`));
-    await sceneSelector.click('li=Intermediate Scene');
-    t.true(await sourceSelector.isExisting(`li=Basic Content`));
-    await sceneSelector.click('li=Main Scene');
-    t.true(await sourceSelector.isExisting(`li=Game`));
-    t.true(await sourceSelector.isExisting(`li=Intermediate Scene`));
-    await sceneSelector.click('li=Game');
-    t.true(await sourceSelector.isExisting(`li=Game Capture`));
+    // // Sources checking
+    // t.true(await sourceSelector.isExisting(`li=Chat box`));
+    // t.true(await sourceSelector.isExisting(`li=The Jar`));
+    // t.true(await sourceSelector.isExisting(`li=Alert box`));
+    // t.true(await sourceSelector.isExisting(`li=Video Capture Device`));
+    // await sceneSelector.click('li=Intermediate Scene');
+    // t.true(await sourceSelector.isExisting(`li=Basic Content`));
+    // await sceneSelector.click('li=Main Scene');
+    // t.true(await sourceSelector.isExisting(`li=Game`));
+    // t.true(await sourceSelector.isExisting(`li=Intermediate Scene`));
+    // await sceneSelector.click('li=Game');
+    // t.true(await sourceSelector.isExisting(`li=Game Capture`));
 
     // // Filter checking
     // await sceneSelector.click('li=Basic Content');
