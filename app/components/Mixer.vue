@@ -4,7 +4,7 @@
     <h4 class="studio-controls__label">
       Mixer
     </h4>
-    <div>
+    <div class="mixerWheel">
       <i
           class="fa fa-cog icon-btn"
           @click="showAdvancedSettings()"/>
