@@ -221,7 +221,7 @@ export class ServicesManager extends Service {
     const handleErrors = (e?: any) => {
       if (!e && this.requestErrors.length === 0) return;
       if (e) {
-        console.error(e);
+
         // re-raise error for Raven
         const isChildWindowRequest = request.params && request.params.fetchMutations;
         if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
