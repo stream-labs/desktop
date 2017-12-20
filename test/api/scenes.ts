@@ -123,13 +123,6 @@ test('Scenes events', async t => {
   eventData = await client.fetchNextEvent();
   t.is(eventData.sceneItemId, image.sceneItemId);
 
-
-  // test unsubscribing
-  await client.unsubscribeAll();
-  await client.request('ScenesService', 'removeScene', scene2.id);
-
-  const promise = client.fetchNextEvent();
-  await t.throws(promise);
 });
 
 

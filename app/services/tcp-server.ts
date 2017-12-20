@@ -323,13 +323,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         // if response is subscription then add this subscription to client
         if (response.result && response.result._type === 'SUBSCRIPTION') {
           const subscriptionId = response.result.resourceId;
-          Object.keys(this.clients).forEach(clientId => {
-            const tcpClient = this.clients[clientId];
-            if (tcpClient.id !== client.id && !tcpClient.listenAllSubscriptions) return;
-            if (!tcpClient.subscriptions.includes(subscriptionId)) {
-              tcpClient.subscriptions.push(subscriptionId);
-            }
-          });
+          if (!client.subscriptions.includes(subscriptionId)) {
+            client.subscriptions.push(subscriptionId);
+          }
         }
 
         this.sendResponse(client, response);
@@ -346,7 +342,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
-      if (client.subscriptions.includes(event.result.resourceId)) this.sendResponse(client, event);
+      const needToSendEvent = client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
+      if (needToSendEvent) this.sendResponse(client, event);
     });
   }
 

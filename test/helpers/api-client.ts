@@ -281,7 +281,7 @@ export class ApiClient {
   fetchNextEvent(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.eventReceived.first().subscribe(event => resolve(event));
-      setTimeout(() => reject('timeout'), 2000);
+      setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
     });
   }
 

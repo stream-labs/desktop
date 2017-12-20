@@ -67,11 +67,4 @@ test('Source events', async t => {
 
   t.is(eventData.name, 'audio3');
 
-
-  // test unsubscribing
-  await client.unsubscribeAll();
-  await source1.setName('audio1');
-
-  const promise = client.fetchNextEvent();
-  await t.throws(promise);
 });
