@@ -52,7 +52,7 @@ export default class EditStreamInfo extends Vue {
   updateError = false;
   areAvailableProfiles = false;
   useOptimizedProfile = false;
-  genericProfiles = false;
+  isGenericProfiles = false;
 
   // Form Models:
 
@@ -145,9 +145,10 @@ export default class EditStreamInfo extends Vue {
 
         if (availableProfiles.length > 0) {
           profiles = availableProfiles;
+          this.isGenericProfiles = false;
         } else {
           profiles = genericProfiles;
-          this.genericProfiles = true;
+          this.isGenericProfiles = true;
         }
 
         this.encoderProfile = {
