@@ -26,7 +26,7 @@
     :activeItems="scene.activeItemIds"
     @select="makeActive"
     @sort="handleSort">
-    <template slot="actions" scope="props">
+    <template slot="actions" slot-scope="props">
       <i
         class="fa fa-lock icon-btn source-selector-action"
         :class="lockClassesForSource(props.item.value)"

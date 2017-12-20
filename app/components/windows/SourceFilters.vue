@@ -19,6 +19,7 @@
         </div>
         <NavItem
           v-for="filter in filters"
+          :key="filter.name"
           :to="filter.name"
           :ico="filter.visible ? 'eye' : 'eye-slash'"
           @iconClick="toggleVisibility">

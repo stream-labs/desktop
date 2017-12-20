@@ -16,7 +16,7 @@
       label="description"
       @input="onInputHandler"
       @search-change="onSearchChange">
-      <template slot="option" scope="props">
+      <template slot="option" slot-scope="props">
         <span>
           {{ props.option.description }}
         </span>

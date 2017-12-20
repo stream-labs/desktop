@@ -40,9 +40,9 @@ export class FontLibraryService extends Service {
       }).catch(() => {
         return { families: [] };
       });
-    } else {
-      return Promise.resolve(this.manifest);
     }
+
+    return Promise.resolve(this.manifest);
   }
 
 

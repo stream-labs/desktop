@@ -15,8 +15,8 @@ export function parse(config: string, nodeTypes: Dictionary<any>) {
 
       instance.fromJSON(value);
       return instance;
-    } else {
-      return value;
     }
+
+    return value;
   });
 }

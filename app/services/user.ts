@@ -115,11 +115,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+
       if (type === 'recent-events') {
         return `https://${host}/dashboard/recent-events?token=${token}&mode=${
           nightMode
         }&electron`;
-      } else if (type === 'dashboard') {
+      }
+
+      if (type === 'dashboard') {
         return `https://${host}/slobs/dashboard/${token}?mode=${
           nightMode
         }&show_recent_events=0`;

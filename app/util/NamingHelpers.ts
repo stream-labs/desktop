@@ -12,12 +12,12 @@ export default {
         const num = parseInt(match[1], 10);
 
         return this.suggestName(name.replace(/(.*\()([0-9]+)(\))$/, '$1' + (num + 1) + '$3'), isTaken);
-      } else {
-        return this.suggestName(name + ' (1)', isTaken);
       }
-    } else {
-      return name;
+
+      return this.suggestName(name + ' (1)', isTaken);
     }
+
+    return name;
   }
 
 };

@@ -65,23 +65,33 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
       const content = new StreamlabelNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };
-    } else if (manager === 'widget') {
+    }
+
+    if (manager === 'widget') {
       const content = new WidgetNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };
-    } else if (sceneItem.type === 'image_source') {
+    }
+
+    if (sceneItem.type === 'image_source') {
       const content = new ImageNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };
-    } else if (sceneItem.type === 'text_gdiplus') {
+    }
+
+    if (sceneItem.type === 'text_gdiplus') {
       const content = new TextNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };
-    } else if (sceneItem.type === 'dshow_input') {
+    }
+
+    if (sceneItem.type === 'dshow_input') {
       const content = new WebcamNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };
-    } else if (sceneItem.type === 'ffmpeg_source') {
+    }
+
+    if (sceneItem.type === 'ffmpeg_source') {
       const content = new VideoNode();
       await content.save({ sceneItem, assetsPath: context.assetsPath });
       return { ...details, content };

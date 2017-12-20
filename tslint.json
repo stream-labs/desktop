@@ -8,6 +8,9 @@
     "import-name": false,
     "no-increment-decrement": false,
     "no-param-reassign": false,
+    "object-shorthand-properties-first": false,
+    "no-boolean-literal-compare": false,
+    "strict-boolean-expressions": false,
     "max-line-length": {
       "options": [120]
     },

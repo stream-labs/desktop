@@ -4,10 +4,12 @@
     :hotkeys="hotkeySet.general"/>
   <hotkey-group
     v-for="(scenesHotkeys, sceneId) in hotkeySet.scenes"
+    :key="sceneId"
     :title="scenesService.getScene(sceneId).name"
     :hotkeys="scenesHotkeys"/>
   <hotkey-group
     v-for="(sourceHotkeys, sourceId) in hotkeySet.sources"
+    :key="sourceId"
     :title="sourcesService.getSource(sourceId).displayName"
     :hotkeys="sourceHotkeys"/>
 </div>

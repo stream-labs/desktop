@@ -59,7 +59,7 @@
               :close-on-select="true"
               label="description"
               v-model="encoderProfile">
-              <template slot="option" scope="props">
+              <template slot="option" slot-scope="props">
                 <div class="edit-stream-info-option-desc">{{ props.option.description }}</div>
                 <div class="edit-stream-info-option-longdesc">{{ props.option.longDescription }}</div>
               </template>
