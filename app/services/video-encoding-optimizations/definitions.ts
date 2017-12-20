@@ -34,14 +34,14 @@ export interface IProfile {
 const CPU_profile: IProfile = {
   profile: 'CPU',
   description: 'Medium',
-  longDescription: 'Optimized profile for average CPU',
+  longDescription: 'Optimized profile for average CPUs',
   preset: PresetType.veryfast
 };
 
 const VQ_profile: IProfile = {
   profile: 'VQ',
   description: 'Low',
-  longDescription: 'Optimized profile for weak CPU',
+  longDescription: 'Optimized profile for weak CPUs',
   preset: PresetType.ultrafast
 };
 

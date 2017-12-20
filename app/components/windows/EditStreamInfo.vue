@@ -32,15 +32,15 @@
             <div class="checkbox">
               <div v-if="!isGenericProfiles">
                 <input
-                type="checkbox"
-                v-model="useOptimizedProfile"
+                  type="checkbox"
+                  v-model="useOptimizedProfile"
                 />
                 <label><span>Use {{gameModel.value}} encoder settings</span></label>
               </div>
               <div v-else>
                 <input
-                type="checkbox"
-                v-model="useOptimizedProfile"
+                  type="checkbox"
+                  v-model="useOptimizedProfile"
                 />
                 <label><span>Use optimized encoder settings</span></label>
               </div>
