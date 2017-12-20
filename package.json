@@ -122,12 +122,12 @@
     "spectron": "^3.6.4",
     "style-loader": "^0.13.1",
     "traverse": "^0.6.6",
-    "ts-loader": "^2.3.2",
+    "ts-loader": "^3.2.0",
     "tslint": "^5.4.2",
     "tslint-config-airbnb": "^5.0.1",
     "tslint-loader": "^3.5.3",
     "typedoc": "^0.9.0",
-    "typescript": "^2.4.2",
+    "typescript": "^2.6.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "vue": "^2.5.12",
@@ -139,6 +139,6 @@
     "vue-template-compiler": "^2.5.12",
     "vuedraggable": "^2.8.5",
     "vuex": "^3.0.1",
-    "webpack": "^2.2.1"
+    "webpack": "^3.10.0"
   }
 }
