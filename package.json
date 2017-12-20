@@ -134,7 +134,7 @@
     "vue-color": "^2.4.3",
     "vue-loader": "^10.2.0",
     "vue-multiselect": "2.0.3",
-    "vue-property-decorator": "^5.0.1",
+    "vue-property-decorator": "git+ssh://git@github.com:stream-labs/vue-property-decorator.git#8f8caaed03a1b31e027af507f3f54ed7b4823fcf",
     "vue-slider-component": "^2.2.7",
     "vue-template-compiler": "^2.5.12",
     "vuedraggable": "^2.8.5",
