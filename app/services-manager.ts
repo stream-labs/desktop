@@ -1,34 +1,37 @@
 import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
-import { ScenesCollectionsService, OverlaysPersistenceService } from './services/scenes-collections';
+import {
+  ScenesCollectionsService,
+  OverlaysPersistenceService
+} from './services/scenes-collections';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
 import { ScenesService, SceneItem, Scene } from './services/scenes';
-import { ClipboardService } from  './services/clipboard';
-import { AudioService, AudioSource } from  './services/audio';
-import { CustomizationService } from  './services/customization';
-import { HostsService } from  './services/hosts';
-import { Hotkey, HotkeysService } from  './services/hotkeys';
-import { KeyListenerService } from  './services/key-listener';
-import { NavigationService } from  './services/navigation';
-import { NotificationsService } from  './services/notifications';
-import { ObsApiService } from  './services/obs-api';
-import { OnboardingService } from  './services/onboarding';
-import { PerformanceService } from  './services/performance';
-import { PerformanceMonitorService } from  './services/performance-monitor';
-import { PersistentStatefulService } from  './services/persistent-stateful-service';
-import { SettingsService } from  './services/settings';
-import { SourcesService, Source } from  './services/sources';
-import { UserService } from  './services/user';
-import { VideoService } from  './services/video';
-import { WidgetsService } from  './services/widgets';
-import { WindowsService } from  './services/windows';
+import { ClipboardService } from './services/clipboard';
+import { AudioService, AudioSource } from './services/audio';
+import { CustomizationService } from './services/customization';
+import { HostsService } from './services/hosts';
+import { Hotkey, HotkeysService } from './services/hotkeys';
+import { KeyListenerService } from './services/key-listener';
+import { NavigationService } from './services/navigation';
+import { NotificationsService } from './services/notifications';
+import { ObsApiService } from './services/obs-api';
+import { OnboardingService } from './services/onboarding';
+import { PerformanceService } from './services/performance';
+import { PerformanceMonitorService } from './services/performance-monitor';
+import { PersistentStatefulService } from './services/persistent-stateful-service';
+import { SettingsService } from './services/settings';
+import { SourcesService, Source } from './services/sources';
+import { UserService } from './services/user';
+import { VideoService } from './services/video';
+import { WidgetsService } from './services/widgets';
+import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
-import { ScenesTransitionsService } from  './services/scenes-transitions';
+import { ScenesTransitionsService } from './services/scenes-transitions';
 import { FontLibraryService } from './services/font-library';
-import { SourceFiltersService } from  './services/source-filters';
+import { SourceFiltersService } from './services/source-filters';
 import { AppService } from './services/app';
 import { ShortcutsService } from './services/shortcuts';
 import { CacheUploaderService } from './services/cache-uploader';
@@ -36,7 +39,7 @@ import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
-import { StreamingService } from  './services/streaming';
+import { StreamingService } from './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
 import Utils from './services/utils';
 import { commitMutation } from './store';
@@ -47,65 +50,18 @@ import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
+import {
+  IJsonRpcResponse,
+  IJsonRpcEvent,
+  IJsonRpcRequest,
+  E_JSON_RPC_ERROR,
+  IMutation
+} from 'services/jsonrpc';
+import { JsonrpcService } from './services/jsonrpc/jsonrpc';
 
 const { ipcRenderer } = electron;
 
-
-/**
- * @see http://www.jsonrpc.org/specification
- */
-export enum E_JSON_RPC_ERROR {
-  PARSE_ERROR = -32700,
-  INVALID_REQUEST = -32600,
-  METHOD_NOT_FOUND = -32601,
-  INVALID_PARAMS = -32602,
-  INTERNAL_JSON_RPC_ERROR = -32603,
-  INTERNAL_SERVER_ERROR = -32000
-}
-
-export interface IJsonRpcRequest {
-  jsonrpc: '2.0';
-  id: string | number;
-  method: string;
-  params: {
-    resource: string,
-    args?: any[],
-    fetchMutations?: boolean,
-    compactMode?: boolean
-  };
-}
-
-export interface IJsonRpcResponse<TResponse> {
-  jsonrpc: '2.0';
-  id?: string | number;
-  result?: TResponse;
-  error?: {
-    code: number;
-    message?: string
-  };
-  mutations?: IMutation[];
-}
-
-declare type TResourceType = 'HELPER' | 'SUBSCRIPTION' | 'EVENT';
-
-
-export interface IJsonRpcEvent {
-  _type: 'EVENT';
-  resourceId: string;
-  emitter: 'PROMISE' | 'STREAM';
-  data: any;
-  isRejected?: boolean;  // for PROMISE emitter only
-}
-
-
-export interface IMutation {
-  type: string;
-  payload: any;
-}
-
-
 export class ServicesManager extends Service {
-
   serviceEvent = new Subject<IJsonRpcResponse<IJsonRpcEvent>>();
 
   /**
@@ -115,12 +71,16 @@ export class ServicesManager extends Service {
     AutoConfigService,
     YoutubeService,
     TwitchService,
-    ScenesService, SceneItem, Scene,
+    ScenesService,
+    SceneItem,
+    Scene,
     ClipboardService,
-    AudioService, AudioSource,
+    AudioService,
+    AudioSource,
     CustomizationService,
     HostsService,
-    HotkeysService, Hotkey,
+    HotkeysService,
+    Hotkey,
     KeyListenerService,
     NavigationService,
     NotificationsService,
@@ -132,7 +92,8 @@ export class ServicesManager extends Service {
     ScenesTransitionsService,
     SettingsService,
     SourceFiltersService,
-    SourcesService, Source,
+    SourcesService,
+    Source,
     StreamingService,
     UserService,
     VideoService,
@@ -177,7 +138,6 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
-
     if (Utils.isChildWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
@@ -194,20 +154,19 @@ export class ServicesManager extends Service {
     }
   }
 
-
   private initObservers(observableService: Service): Service[] {
     const observeList: ObserveList = ObserveList.instance;
     const items = observeList.observations.filter(item => {
       return item.observableServiceName === observableService.serviceName;
     });
-    return items.map(item => this.getService(item.observerServiceName).instance);
+    return items.map(
+      item => this.getService(item.observerServiceName).instance
+    );
   }
-
 
   getService(serviceName: string) {
     return this.services[serviceName];
   }
-
 
   getStatefulServicesAndMutators(): Dictionary<typeof StatefulService> {
     const statefulServices = {};
@@ -221,38 +180,39 @@ export class ServicesManager extends Service {
     return statefulServices;
   }
 
-
-
   /**
    * start listen messages from main window
    */
   listenMessages() {
     const promises = this.promises;
 
-    ipcRenderer.on('services-message', (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
-      // handle promise reject/resolve
-      if (message.result._type !== 'EVENT' || message.result.emitter !== 'PROMISE') return;
-      const promisePayload = message.result;
-      if (promisePayload) {
-        const [resolve, reject] = promises[promisePayload.resourceId];
-        const callback = promisePayload.isRejected ? reject : resolve;
-        callback(promisePayload.data);
-        delete promises[promisePayload.resourceId];
+    ipcRenderer.on(
+      'services-message',
+      (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
+        // handle promise reject/resolve
+        if (
+          message.result._type !== 'EVENT' ||
+          message.result.emitter !== 'PROMISE'
+        )
+          return;
+        const promisePayload = message.result;
+        if (promisePayload) {
+          const [resolve, reject] = promises[promisePayload.resourceId];
+          const callback = promisePayload.isRejected ? reject : resolve;
+          callback(promisePayload.data);
+          delete promises[promisePayload.resourceId];
+        }
       }
-
-    });
+    );
   }
-
 
   isMutationBufferingEnabled() {
     return this.mutationsBufferingEnabled;
   }
 
-
   addMutationToBuffer(mutation: IMutation) {
     this.bufferedMutations.push(mutation);
   }
-
 
   executeServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
@@ -269,9 +229,8 @@ export class ServicesManager extends Service {
         if (e.message) this.requestErrors.push(e.message);
       }
 
-      response = this.createErrorResponse({
+      response = this.jsonrpc.createError(request,{
         code: E_JSON_RPC_ERROR.INTERNAL_SERVER_ERROR,
-        id: request.id,
         message: this.requestErrors.join(';')
       });
     };
@@ -286,38 +245,13 @@ export class ServicesManager extends Service {
     }
   }
 
+  private get jsonrpc(): JsonrpcService {
+    return JsonrpcService.instance;
+  }
 
-  createErrorResponse(
-    options: { code: E_JSON_RPC_ERROR, id?: string|number, message?: string }
+  private handleServiceRequest(
+    request: IJsonRpcRequest
   ): IJsonRpcResponse<any> {
-    return {
-      jsonrpc: '2.0',
-      id: options.id,
-      error: {
-        code: options.code,
-        message: E_JSON_RPC_ERROR[options.code] + (options.message ? (' ' + options.message) : ''),
-      }
-    };
-  }
-
-
-  createRequest(resource: any, method: string, ...args: any[]): IJsonRpcRequest {
-    const resourceId = resource.resourceId || resource.serviceName;
-    if (!resourceId) throw 'invalid resource';
-
-    return {
-      jsonrpc: '2.0',
-      id: ipcRenderer.sendSync('getUniqueId'),
-      method,
-      params: {
-        resource: resourceId,
-        args
-      }
-    };
-  }
-
-
-  private handleServiceRequest(request: IJsonRpcRequest): IJsonRpcResponse<any> {
     let response: IJsonRpcResponse<any>;
     const methodName = request.method;
     const {
@@ -331,15 +265,13 @@ export class ServicesManager extends Service {
 
     const resource = this.getResource(resourceId);
     if (!resource) {
-      response = this.createErrorResponse({
+      response = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-        id: request.id,
         message: 'resource not found'
       });
     } else if (!resource[methodName]) {
-      response = this.createErrorResponse({
+      response = this.jsonrpc.createError(request, {
         code: E_JSON_RPC_ERROR.METHOD_NOT_FOUND,
-        id: request.id,
         message: methodName
       });
     }
@@ -356,20 +288,20 @@ export class ServicesManager extends Service {
       responsePayload = {
         _type: 'SUBSCRIPTION',
         resourceId: subscriptionId,
-        emitter: 'STREAM',
+        emitter: 'STREAM'
       };
       if (!this.subscriptions[subscriptionId]) {
-        this.subscriptions[subscriptionId] = resource[methodName].subscribe((data: any) => {
-          this.serviceEvent.next({
-            jsonrpc: '2.0',
-            result: {
-              _type: 'EVENT',
-              emitter: 'STREAM',
-              resourceId: subscriptionId,
-              data,
-            } as IJsonRpcEvent
-          });
-        });
+        this.subscriptions[subscriptionId] = resource[methodName].subscribe(
+          (data: any) => {
+            this.serviceEvent.next(
+              this.jsonrpc.createEvent({
+                emitter: 'STREAM',
+                resourceId: subscriptionId,
+                data
+              })
+            );
+          }
+        );
       }
     } else if (typeof resource[methodName] === 'function') {
       responsePayload = resource[methodName].apply(resource, args);
@@ -384,33 +316,24 @@ export class ServicesManager extends Service {
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
-        (data) => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
-        (data) => this.sendPromiseMessage({ isRejected: true, promiseId, data })
+        data => this.sendPromiseMessage({ isRejected: false, promiseId, data }),
+        data => this.sendPromiseMessage({ isRejected: true, promiseId, data })
       );
 
-      response = {
-        jsonrpc: '2.0',
-        id: request.id,
-        result: {
-          _type: 'SUBSCRIPTION',
-          resourceId: promiseId,
-          emitter: 'PROMISE',
-        }
-      };
+      response = this.jsonrpc.createResponse(request, {
+        _type: 'SUBSCRIPTION',
+        resourceId: promiseId,
+        emitter: 'PROMISE'
+      });
     } else if (responsePayload && responsePayload.isHelper === true) {
       const helper = responsePayload;
 
-      response = {
-        jsonrpc: '2.0',
-        id: request.id,
-        result: {
-          _type: 'HELPER',
-          resourceId: helper.resourceId,
-          ...(!compactMode ? this.getHelperModel(helper) : {})
-        }
-      };
+      response = this.jsonrpc.createResponse(request, {
+        _type: 'HELPER',
+        resourceId: helper.resourceId,
+        ...!compactMode ? this.getHelperModel(helper) : {}
+      });
     } else {
-
       // payload can contain helpers-objects
       // we have to wrap them in IpcProxy too
       traverse(responsePayload).forEach((item: any) => {
@@ -419,16 +342,12 @@ export class ServicesManager extends Service {
           return {
             _type: 'HELPER',
             resourceId: helper.resourceId,
-            ...(!compactMode ? this.getHelperModel(helper) : {})
+            ...!compactMode ? this.getHelperModel(helper) : {}
           };
         }
       });
 
-      response = {
-        jsonrpc: '2.0',
-        id: request.id,
-        result: responsePayload
-      };
+      response = this.jsonrpc.createResponse(request, responsePayload);
     }
 
     if (fetchMutations) response.mutations = this.stopBufferingMutations();
@@ -445,7 +364,6 @@ export class ServicesManager extends Service {
    * source = getResource('Source[12]')
    */
   private getResource(resourceId: string) {
-
     if (resourceId === 'ServicesManager') {
       return this;
     }
@@ -456,10 +374,11 @@ export class ServicesManager extends Service {
 
     const helperName = resourceId.split('[')[0];
     const constructorArgsStr = resourceId.substr(helperName.length);
-    const constructorArgs = constructorArgsStr ? JSON.parse(constructorArgsStr) : void 0;
+    const constructorArgs = constructorArgsStr
+      ? JSON.parse(constructorArgsStr)
+      : void 0;
     return this.getHelper(helperName, constructorArgs);
   }
-
 
   /**
    * the information about resource scheme helps to improve performance for API clients
@@ -473,14 +392,14 @@ export class ServicesManager extends Service {
     }
     const resourceScheme = {};
 
-    Object.keys(Object.getPrototypeOf(resource)).concat(Object.keys(resource))
+    Object.keys(Object.getPrototypeOf(resource))
+      .concat(Object.keys(resource))
       .forEach(key => {
         resourceScheme[key] = typeof resource[key];
       });
 
     return resourceScheme;
   }
-
 
   private getHelperModel(helper: Object): Object {
     if (helper['getModel'] && typeof helper['getModel'] === 'function') {
@@ -489,7 +408,6 @@ export class ServicesManager extends Service {
     return {};
   }
 
-
   /**
    * start buffering mutations to send them
    * as result of a service's method call
@@ -497,7 +415,6 @@ export class ServicesManager extends Service {
   private startBufferingMutations() {
     this.mutationsBufferingEnabled = true;
   }
-
 
   /**
    * stop buffering and clear buffer
@@ -509,19 +426,16 @@ export class ServicesManager extends Service {
     return mutations;
   }
 
-
   /**
    * uses for child window services
    * all services methods calls will be sent to the main window
    */
   private applyIpcProxy(service: Service): Service {
-
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
     return new Proxy(service, {
       get: (target, property, receiver) => {
-
         if (!target[property]) return target[property];
 
         if (target[property].isHelper) {
@@ -536,21 +450,21 @@ export class ServicesManager extends Service {
 
         return (...args: any[]) => {
 
-          const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync('services-request', {
-            id: ipcRenderer.sendSync('getUniqueId'),
-            method: methodName,
-            params: {
-              resource: isHelper ? target['resourceId'] : serviceName,
-              args,
-              compactMode: true,
-              fetchMutations: true
-            }
-          } as IJsonRpcRequest);
+          const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
+            'services-request',
+            this.jsonrpc.createRequestWithOptions(
+              isHelper ? target['resourceId'] : serviceName,
+              methodName as string,
+              { compactMode: true, fetchMutations: true },
+              ...args
+            )
+          );
 
           if (response.error) {
             throw 'IPC request failed: check the errors in the main window';
           }
 
+          console.log('response', response);
           const result = response.result;
           response.mutations.forEach(mutation => commitMutation(mutation));
 
@@ -573,19 +487,16 @@ export class ServicesManager extends Service {
             });
             return result;
           }
-
         };
       }
     });
   }
-
 
   private getHelper(name: string, constructorArgs: any[]) {
     const Helper = this.services[name];
     if (!Helper) return null;
     return new (Helper as any)(...constructorArgs);
   }
-
 
   private initService(serviceName: string): Service {
     const ServiceClass = this.services[serviceName];
@@ -595,23 +506,22 @@ export class ServicesManager extends Service {
     return ServiceClass.instance;
   }
 
-
   private getInstance(serviceName: string): Service {
     return this.instances[serviceName];
   }
 
-
-
-  private sendPromiseMessage(info: { isRejected: boolean, promiseId: string, data: any }) {
-    this.serviceEvent.next({
-      jsonrpc: '2.0',
-      result: {
-        _type: 'EVENT',
+  private sendPromiseMessage(info: {
+    isRejected: boolean;
+    promiseId: string;
+    data: any;
+  }) {
+    this.serviceEvent.next(
+      this.jsonrpc.createEvent({
         emitter: 'PROMISE',
         data: info.data,
         resourceId: info.promiseId,
         isRejected: info.isRejected
-      } as IJsonRpcEvent
-    });
+      })
+    );
   }
 }

@@ -4,7 +4,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import windowMixin from '../mixins/window';
-import { INotification, INotificationsApi } from 'services/notifications';
+import { INotification, INotificationsServiceApi } from 'services/notifications';
 
 @Component({
   components: { ModalLayout },
@@ -12,7 +12,7 @@ import { INotification, INotificationsApi } from 'services/notifications';
 })
 export default class Notifications extends Vue {
 
-  @Inject() private notificationsService: INotificationsApi;
+  @Inject() private notificationsService: INotificationsServiceApi;
 
   private updateInterval = 0;
 

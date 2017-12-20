@@ -2,10 +2,8 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { sleep } from '../helpers/sleep.js';
 
 useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
-
 
 
 test('The default scene exists', async t => {
@@ -16,7 +14,6 @@ test('The default scene exists', async t => {
   t.true(scenes.length === 1);
 
 });
-
 
 
 test('Creating, fetching and removing scenes', async t => {
@@ -126,13 +123,6 @@ test('Scenes events', async t => {
   eventData = await client.fetchNextEvent();
   t.is(eventData.sceneItemId, image.sceneItemId);
 
-
-  // test unsubscribing
-  await client.unsubscribeAll();
-  await client.request('ScenesService', 'removeScene', scene2.id);
-
-  const promise = client.fetchNextEvent();
-  await t.throws(promise);
 });
 
 

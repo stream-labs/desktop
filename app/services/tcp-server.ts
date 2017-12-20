@@ -1,12 +1,17 @@
-import {
-  E_JSON_RPC_ERROR, IJsonRpcEvent, IJsonRpcRequest, IJsonRpcResponse,
-  ServicesManager
-} from '../services-manager';
+import WritableStream = NodeJS.WritableStream;
+import { ServicesManager } from '../services-manager';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { IFormInput } from '../components/shared/forms/Input';
 import { ISettingsSubCategory } from './settings';
-import WritableStream = NodeJS.WritableStream;
 import { mutation } from './stateful-service';
+import { Inject } from '../util/injector';
+import {
+  JsonrpcService,
+  E_JSON_RPC_ERROR,
+  IJsonRpcEvent,
+  IJsonRpcRequest,
+  IJsonRpcResponse
+} from 'services/jsonrpc';
 
 const net = require('net');
 
@@ -80,6 +85,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     }
   };
 
+  @Inject() private jsonrpcService: JsonrpcService;
   private servicesManager: ServicesManager = ServicesManager.instance;
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
@@ -301,10 +307,9 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         const errorMessage = this.validateRequest(request);
 
         if (errorMessage) {
-          const errorResponse = this.servicesManager.createErrorResponse({
+          const errorResponse = this.jsonrpcService.createError(request, {
             code: E_JSON_RPC_ERROR.INVALID_PARAMS,
-            message: errorMessage,
-            id: String(request.id)
+            message: errorMessage
           });
           this.sendResponse(client, errorResponse);
           return;
@@ -318,20 +323,16 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         // if response is subscription then add this subscription to client
         if (response.result && response.result._type === 'SUBSCRIPTION') {
           const subscriptionId = response.result.resourceId;
-          Object.keys(this.clients).forEach(clientId => {
-            const tcpClient = this.clients[clientId];
-            if (tcpClient.id !== client.id && !tcpClient.listenAllSubscriptions) return;
-            if (!tcpClient.subscriptions.includes(subscriptionId)) {
-              tcpClient.subscriptions.push(subscriptionId);
-            }
-          });
+          if (!client.subscriptions.includes(subscriptionId)) {
+            client.subscriptions.push(subscriptionId);
+          }
         }
 
         this.sendResponse(client, response);
       } catch (e) {
         this.sendResponse(
           client,
-          this.servicesManager.createErrorResponse({ code: E_JSON_RPC_ERROR.INVALID_REQUEST }));
+          this.jsonrpcService.createError(null,{ code: E_JSON_RPC_ERROR.INVALID_REQUEST }));
       }
     });
   }
@@ -341,7 +342,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
-      if (client.subscriptions.includes(event.result.resourceId)) this.sendResponse(client, event);
+      const needToSendEvent = client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
+      if (needToSendEvent) this.sendResponse(client, event);
     });
   }
 

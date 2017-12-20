@@ -1,10 +1,11 @@
-import { StatefulService, mutation } from '../stateful-service';
+import { StatefulService, mutation, Service } from '../stateful-service';
 import * as obs from '../../../obs-api';
 import { Inject } from '../../util/injector';
 import { NotificationsService, ENotificationType } from 'services/notifications';
 import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs/Subscription';
+import { JsonrpcService } from '../jsonrpc/jsonrpc';
 
 const INTERVAL = 2 * 60 * 1000;
 const SKIPPED_THRESHOLD = 0.3;
@@ -40,6 +41,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
 
   @Inject() private notificationsService: NotificationsService;
   @Inject() private performanceService: PerformanceService;
+  @Inject() private jsonrpcService: JsonrpcService;
   servicesManager: ServicesManager = ServicesManager.instance;
 
   private intervalId: number = null;
@@ -118,8 +120,10 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       lifeTime: -1,
       showTime: true,
       message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
-      action: this.servicesManager.createRequest(
-        this.notificationsService, 'showTroubleshooter', code
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.notificationsService),
+        'showTroubleshooter',
+        code
       )
     });
   }
@@ -134,8 +138,10 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       lifeTime: -1,
       showTime: true,
       message: `Lagged frames detected: ${ Math.round(factor * 100)}%`,
-      action: this.servicesManager.createRequest(
-        this.notificationsService, 'showTroubleshooter', code
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.notificationsService),
+        'showTroubleshooter',
+        code
       )
     });
   }
@@ -150,8 +156,10 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       lifeTime: -1,
       showTime: true,
       message: `Dropped frames detected: ${ Math.round(factor * 100)}%`,
-      action: this.servicesManager.createRequest(
-        this.notificationsService, 'showTroubleshooter', code
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.notificationsService),
+        'showTroubleshooter',
+        code
       )
     });
   }

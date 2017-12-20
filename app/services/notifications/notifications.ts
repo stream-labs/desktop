@@ -10,7 +10,7 @@ import {
   ENotificationType,
   INotification,
   INotificationOptions,
-  INotificationsApi,
+  INotificationsServiceApi,
   INotificationsSettings
 } from './notifications-api';
 
@@ -21,7 +21,7 @@ interface INotificationsState {
 
 export class NotificationsService extends PersistentStatefulService<
   INotificationsState
-> implements INotificationsApi {
+> implements INotificationsServiceApi {
   static defaultState: INotificationsState = {
     notifications: [],
     settings: {
