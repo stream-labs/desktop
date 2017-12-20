@@ -8,6 +8,7 @@
     <NavMenu v-model="categoryName" class="side-menu">
       <NavItem
         v-for="category in categoryNames"
+        :key="category"
         :to="category"
         :ico="icons[category]"
       >

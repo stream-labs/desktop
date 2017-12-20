@@ -473,20 +473,22 @@ export class ServicesManager extends Service {
               const promiseId = result.resourceId;
               this.promises[promiseId] = [resolve, reject];
             });
-          } else if (result && result._type === 'HELPER') {
+          }
+
+          if (result && result._type === 'HELPER') {
             const helper = this.getResource(result.resourceId);
             return this.applyIpcProxy(helper);
-          } else {
-            // payload can contain helpers-objects
-            // we have to wrap them in IpcProxy too
-            traverse(result).forEach((item: any) => {
-              if (item && item._type === 'HELPER') {
-                const helper = this.getResource(item.resourceId);
-                return this.applyIpcProxy(helper);
-              }
-            });
-            return result;
           }
+
+          // payload can contain helpers-objects
+          // we have to wrap them in IpcProxy too
+          traverse(result).forEach((item: any) => {
+            if (item && item._type === 'HELPER') {
+              const helper = this.getResource(item.resourceId);
+              return this.applyIpcProxy(helper);
+            }
+          });
+          return result;
         };
       }
     });
