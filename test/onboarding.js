@@ -154,6 +154,7 @@ test('Obs-importer', async t => {
 
     // // Check Advanced audio settings
     t.true(await app.client.isExisting('.mixerWheel'));
+    await app.client.click('.mixerWheel');
     // await focusChild(t);
 
     // // Mic/Aux
