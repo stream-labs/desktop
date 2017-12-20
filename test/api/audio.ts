@@ -53,11 +53,7 @@ test('The audio sources have to keep settings after application restart', async 
   const audioSourceModel = audioSource.getModel();
 
   // reload config
-  appService.loadConfig('scenes');
-
-  // wait while config will be loaded
-  // TODO: add Promises support to ApiClient
-  await sleep(5000);
+  await appService.loadConfig('scenes');
 
   const loadedAudioSourceModel = audioService.getSource(source.sourceId).getModel();
 

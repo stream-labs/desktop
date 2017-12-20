@@ -137,6 +137,7 @@ export class Source implements ISourceApi {
 
   setName(newName: string) {
     this.SET_NAME(newName);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
   hasProps(): boolean {

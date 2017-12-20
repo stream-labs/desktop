@@ -79,11 +79,9 @@ export class VideoEncodingOptimizationService extends Service {
         return parameter.name === this.currentOutputSettings.encoderField;
       });
 
-      if (StreamEncoder.value === 'obs_x264') {
-        profiles = Presets.filter(profile => {
-          return profile.game === game;
-        });
-      }
+      profiles = Presets.filter(profile => {
+        return profile.game === game && profile.encoder === StreamEncoder.value;
+      });
     }
 
     return profiles;

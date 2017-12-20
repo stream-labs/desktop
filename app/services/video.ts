@@ -11,15 +11,9 @@ const { remote } = electron;
 const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 
 export class Display {
-
-  @Inject()
-  settingsService: SettingsService;
-
-  @Inject()
-  videoService: VideoService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
+  @Inject() videoService: VideoService;
+  @Inject() windowsService: WindowsService;
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
@@ -42,17 +36,6 @@ export class Display {
       name
     );
     this.outputRegionCallbacks = [];
-
-    // Watch for changes to the base resolution.
-    // This seems super freaking hacky.
-    this.settingsService.store.watch(state => {
-      return state.SettingsService.Video.Base;
-    }, () => {
-      // This gives the setting time to propagate
-      setTimeout(() => {
-        this.refreshOutputRegion();
-      }, 1000);
-    });
 
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
     this.videoService.registerDisplay(this);
@@ -145,6 +128,19 @@ export class VideoService extends Service {
 
   init() {
     this.settingsService.loadSettingsIntoStore();
+
+    // Watch for changes to the base resolution.
+    // This seems super freaking hacky.
+    this.settingsService.store.watch(state => {
+      return state.SettingsService.Video.Base;
+    }, () => {
+      // This gives the setting time to propagate
+      setTimeout(() => {
+        Object.values(this.activeDisplays).forEach(display => {
+          display.refreshOutputRegion();
+        });
+      }, 1000);
+    });
   }
 
   createDisplay() {

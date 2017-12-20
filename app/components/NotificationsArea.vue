@@ -17,17 +17,18 @@
     <span class="fa fa-info-circle"></span>
   </div>
 
-  <div class="notifications__container">
+  <div class="notifications__container flex--grow" ref="notificationsContainer">
     <div
-        v-for="notify in notifications"
-        class="notification"
-        @click="onNotificationClickHandler(notify.id)"
-        :class="{
-      'info': notify.type == 'INFO',
-      'warning': notify.type == 'WARNING',
-      'has-action': notify.action && !notify.outdated,
-      'outdated': notify.outdated
-    }"
+      v-for="notify in notifications"
+      class="notification"
+      v-show="showExtendedNotifications"
+      @click="onNotificationClickHandler(notify.id)"
+      :class="{
+        'info': notify.type == 'INFO',
+        'warning': notify.type == 'WARNING',
+        'has-action': notify.action && !notify.outdated,
+        'outdated': notify.outdated
+      }"
     >
       {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
     </div>
@@ -43,7 +44,7 @@
 
 .notifications-area {
   overflow: hidden;
-  min-width: 300px;
+  min-width: 50px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -51,7 +52,6 @@
 
 .notifications__container {
   position: relative;
-  min-width: 350px;
   height: 30px;
 }
 

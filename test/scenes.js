@@ -1,5 +1,4 @@
 import test from 'ava';
-import { sleep } from './helpers/sleep';
 import { useSpectron, focusMain } from './helpers/spectron/index';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
@@ -63,6 +62,7 @@ test('Restarting the app preserves the default sources', async t => {
   const client = await getClient();
   const app = t.context.app;
   const sceneName = 'Coolest Scene Ever';
+  const appService = client.getResource('AppService');
 
   await addScene(t, sceneName);
 
@@ -70,11 +70,7 @@ test('Restarting the app preserves the default sources', async t => {
   t.true(await app.client.isExisting(`div=${sceneName}`));
 
   // reload config
-  client.request('AppService', 'loadConfig', 'scenes');
-
-  // wait while config will be loaded
-  // TODO: add Promises support to ApiClient
-  await sleep(5000);
+  await appService.loadConfig('scenes');
 
   await focusMain(t);
   await selectScene(t, sceneName);

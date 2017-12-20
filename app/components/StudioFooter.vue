@@ -1,8 +1,8 @@
 <template>
 <div class="footer">
-  <div class="flex flex--center">
+  <div class="flex flex--center flex--grow">
     <performance-metrics />
-    <notifications-area class="notifications-area"/>
+    <notifications-area class="notifications-area flex--grow"/>
   </div>
 
   <div class="nav-right">

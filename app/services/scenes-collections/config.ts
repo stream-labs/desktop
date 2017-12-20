@@ -117,8 +117,7 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
 
     return new Promise(resolve => {
       const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
-
-      if (data) {
+      if (data != null) {
         try {
           const root = parse(data, NODE_TYPES);
           this.SET_ACTIVE_COLLECTION(configName);

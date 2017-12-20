@@ -133,6 +133,11 @@ export class ObsImporterService extends Service {
 
         if (isSourceAvailable) {
           if (sourceJSON.id !== 'scene') {
+            if (sourceJSON.id === 'browser_source') {
+              sourceJSON.settings.shutdown = true;
+            }
+
+            // Check "Shutdown source when not visible" by default for browser sources
             const source = this.sourcesService.createSource(
               sourceJSON.name,
               sourceJSON.id,

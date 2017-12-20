@@ -42,13 +42,9 @@ export default class Main extends Vue {
   title = `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`;
 
   @Inject() customizationService: CustomizationService;
-
   @Inject() navigationService: NavigationService;
-
   @Inject() appService: AppService;
-
   @Inject() streamingService: StreamingService;
-
   @Inject() userService: UserService;
 
   get page() {

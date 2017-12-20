@@ -6,7 +6,7 @@ import { ServicesManager } from '../../services-manager';
 import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs/Subscription';
 
-const INTERVAL = 30000;
+const INTERVAL = 2 * 60 * 1000;
 const SKIPPED_THRESHOLD = 0.3;
 const LAGGED_THRESHOLD = 0.1;
 const DROPPED_THRESHOLD = 0.1;
