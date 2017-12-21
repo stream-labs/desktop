@@ -12,36 +12,19 @@ const os = require('os');
 const colors = require('colors/safe');
 
 // CONFIGURATION
-const NODE_OBS_VERSION = '0.1.31';
 const FACE_MASK_VERSION = '0.3.8';
 
 // This is the main function
 async function runScript() {
   const zipExe = path.resolve(__dirname, 'node_modules', '7zip-bin-win', 'x64', '7za.exe');
   const slobsDir = path.resolve(__dirname, '..');
-  const nodeObsPath = path.join(slobsDir, 'node-obs');
+  const nodeObsPath = path.join(slobsDir, 'node_modules', 'obs-studio-node', 'distribute');
 
-  /* INSTALL NODE-OBS */
-  const nodeObsnodeObsArchivePath = path.join(os.tmpdir(), `node-obs-${NODE_OBS_VERSION}.zip`);
-  const nodeObsArchive = fs.createWriteStream(nodeObsnodeObsArchivePath);
-  const nodeObsArchiveFinishPromise = new Promise(resolve => nodeObsArchive.on('finish', resolve));
-  const nodeObsReleaseUrl = `https://github.com/stream-labs/node-obs/releases/download/v${NODE_OBS_VERSION}/node-obs.zip`;
+  /* EXTRACT BROWSER PLUGIN */
+  const browserPluginArchivePath = path.join(slobsDir, 'plugins', 'obs-browser-2987-old.7z');
 
-  sh.echo('Removing old version of node-obs...');
-  if (fs.existsSync(nodeObsPath)) {
-    sh.rm('-rf', nodeObsPath);
-  }
-
-  sh.echo(`Downloading node-obs version ${NODE_OBS_VERSION}...`);
-  https.get(nodeObsReleaseUrl, response => {
-    // Follow redirect
-    https.get(response.headers.location, response => response.pipe(nodeObsArchive));
-  });
-
-  await nodeObsArchiveFinishPromise;
-
-  sh.echo('Extracting node-obs archive...');
-  let result = sh.exec(`"${zipExe}" x "${nodeObsnodeObsArchivePath}" -o"${slobsDir}"`);
+  sh.echo('Extracting obs-browser archive...');
+  let result = sh.exec(`"${zipExe}" x "${browserPluginArchivePath}" -o"${nodeObsPath}"`);
 
   if (result.code !== 0) {
     sh.echo(colors.red('ERROR: Extraction failed!'));
@@ -72,7 +55,6 @@ async function runScript() {
   }
 
   sh.echo('Cleaning up archives...');
-  sh.rm(nodeObsnodeObsArchivePath);
   sh.rm(faceMaskArchivePath);
 }
 

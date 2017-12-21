@@ -10,7 +10,7 @@
     "ci:compile": "yarn clear && webpack",
     "watch": "yarn clear && webpack --watch --progress",
     "start": "electron .",
-    "install-plugins": "node_modules/7zip-bin-win/x64/7za.exe x plugins/obs-browser-2987-old.7z -onode_modules/obs-studio-node/distribute/",
+    "install-plugins": "yarn install --cwd bin && node bin/install-plugins.js",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava",
