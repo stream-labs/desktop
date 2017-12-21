@@ -145,6 +145,11 @@ async function runScript() {
   })).deployType;
 
   if (deployType === 'normal') {
+    // Make sure the release environment is clean
+    info('Stashing all uncommitted changes...');
+    executeCmd('git add -A');
+    executeCmd('git stash');
+
     info('Syncing staging with the origin...');
     executeCmd('git checkout staging');
     executeCmd('git pull');
@@ -177,11 +182,6 @@ async function runScript() {
     const pjson = JSON.parse(fs.readFileSync('package.json'));
     newVersion = pjson.version;
   } else {
-    // Make sure the release environment is clean
-    info('Stashing all uncommitted changes...');
-    executeCmd('git add -A');
-    executeCmd('git stash');
-
     info('Ensuring submodules are up to date...');
     executeCmd('git submodule update --init --recursive');
 
@@ -191,8 +191,8 @@ async function runScript() {
     info('Installing fresh packages...');
     executeCmd('yarn install');
 
-    info('Installing node-obs...');
-    executeCmd('yarn install-node-obs');
+    info('Installing OBS plugins...');
+    executeCmd('yarn install-plugins');
 
     info('Compiling assets...');
     executeCmd('yarn compile');
