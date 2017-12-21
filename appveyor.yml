@@ -4,7 +4,7 @@ install:
   - ps: Install-Product node 8
   - git submodule update --init --recursive
   - yarn install
-  - yarn install-node-obs
+  - yarn install-plugins
   - yarn ci:compile
 
 test_script:

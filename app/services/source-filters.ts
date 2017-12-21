@@ -92,9 +92,9 @@ export class SourceFiltersService extends Service {
       const description = listItem.description;
       const flags = obs.Global.getOutputFlagsFromId(type);
       types.push({
-        audio: !!(obs.EOutputFlags.Audio & flags),
-        video: !!(obs.EOutputFlags.Video & flags),
-        async: !!(obs.EOutputFlags.Async & flags),
+        audio: !!(obs.ESourceOutputFlags.Audio & flags),
+        video: !!(obs.ESourceOutputFlags.Video & flags),
+        async: !!(obs.ESourceOutputFlags.Async & flags),
         type,
         description
       });
