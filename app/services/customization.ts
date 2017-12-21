@@ -56,6 +56,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return this.state.nightMode;
   }
 
+  setNightMode(val: boolean) {
+    this.nightMode = val;
+  }
+
   setUpdateStreamInfoOnLive(update: boolean) {
     this.SET_UPDATE_STREAM_INFO_ON_LIVE(update);
   }
