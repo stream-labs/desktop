@@ -73,8 +73,8 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     const currentStats: IMonitorState = {
       framesLagged: obs.Global.laggedFrames,
       framesRendered: obs.Global.totalFrames,
-      framesSkipped: obs.Video.skippedFrames,
-      framesEncoded: obs.Video.totalFrames
+      framesSkipped: obs.VideoFactory.getGlobal().skippedFrames,
+      framesEncoded: obs.VideoFactory.getGlobal().totalFrames
     };
 
     if (currentStats.framesEncoded !== 0) {
