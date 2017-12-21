@@ -68,7 +68,7 @@ Install all node modules via yarn:
 yarn install
 ```
 
-Install some OBS plugins:
+Install OBS plugins:
 
 ```
 yarn install-plugins
