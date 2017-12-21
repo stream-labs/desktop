@@ -68,14 +68,11 @@ Install all node modules via yarn:
 yarn install
 ```
 
-Install the current release of node-obs:
+Install some OBS plugins:
 
 ```
-yarn install-node-obs
+yarn install-plugins
 ```
-
-If you would prefer to compile this yourself, you can find instructions here:
-https://github.com/stream-labs/node-obs
 
 Then, compile assets with webpack:
 
