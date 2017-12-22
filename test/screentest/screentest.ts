@@ -1,7 +1,7 @@
-import { getClient } from "../helpers/api-client";
-import { CustomizationService } from "../../app/services/customization";
-import test from "ava";
-import { async } from "rxjs/scheduler/async";
+import { getClient } from '../helpers/api-client';
+import { CustomizationService } from '../../app/services/customization';
+import { execSync } from 'child_process';
+import test from 'ava';
 
 const fs = require('fs');
 
@@ -11,6 +11,8 @@ const CONFIG_VARIATION = {
   // livedocIsOpen: [true, false],
   nightMode: [true, false]
 };
+
+let branchName: string;
 
 /**
  * get set of unique configs
@@ -58,9 +60,7 @@ export async function makeScreenshots(t: any) {
     await t.context.app.browserWindow.capturePage().then((imageBuffer: ArrayBuffer) => {
       const testName = t['_test'].title.replace('afterEach for ', '');
       const imageFileName = testName + '__' + encodeURIComponent(JSON.stringify(config)) + '.png';
-      console.log('image captured', testName);
-      const dir = 'test-dist/screentest';
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+      const dir = `test-dist/screentest/${branchName}`;
       fs.writeFileSync(`${dir}/${imageFileName}`, imageBuffer);
     });
   }
@@ -68,6 +68,9 @@ export async function makeScreenshots(t: any) {
 }
 
 export function useScreentest() {
+
+  branchName = execSync('git status').toString().replace('On branch ', '').split('\n')[0];
+
   test.afterEach(async t => {
     await makeScreenshots(t);
   });
