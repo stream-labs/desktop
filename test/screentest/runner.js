@@ -1,22 +1,18 @@
-import * as rimraf from 'rimraf';
-
+const rimraf = require('rimraf');
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const BRANCH_TO_COMPARE = 'regression_testing_screenshots_example';
+const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
 const branches = [
   execSync('git status').toString().replace('On branch ', '').split('\n')[0],
-  BRANCH_TO_COMPARE
+  CONFIG.baseBranch
 ];
 
 (function main() {
 
-
-
-
-  const dir = 'test-dist/screentest';
-  rimraf(dir);
+  const dir = CONFIG.dist;
+  rimraf.sync(dir);
   fs.mkdirSync(dir);
 
 
@@ -37,7 +33,7 @@ const branches = [
     log('tests compilation');
 
     try {
-      execSync('yarn compile-tests')
+      execSync('yarn compile-tests');
     } catch (e) {
       err('compilation failed', e);
       return;

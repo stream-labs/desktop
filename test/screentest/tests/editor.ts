@@ -3,8 +3,7 @@ import { useSpectron } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
 import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
-import { useScreentest } from '../screentest';
-const fs = require('fs');
+import { useScreentest } from '../screenshoter';
 
 
 useSpectron({ restartAppAfterEachTest: false, initApiClient: true });

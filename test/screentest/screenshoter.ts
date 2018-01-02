@@ -4,13 +4,8 @@ import { execSync } from 'child_process';
 import test from 'ava';
 
 const fs = require('fs');
-
-
-const CONFIG_VARIATION = {
-  resolution: [{ width: 1000, height: 700 }, { width: 1500, height: 900 }],
-  // livedocIsOpen: [true, false],
-  nightMode: [true, false]
-};
+const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+const CONFIG_VARIATION = CONFIG.configs;
 
 let branchName: string;
 
@@ -60,7 +55,7 @@ export async function makeScreenshots(t: any) {
     await t.context.app.browserWindow.capturePage().then((imageBuffer: ArrayBuffer) => {
       const testName = t['_test'].title.replace('afterEach for ', '');
       const imageFileName = testName + '__' + encodeURIComponent(JSON.stringify(config)) + '.png';
-      const dir = `test-dist/screentest/${branchName}`;
+      const dir = `${CONFIG.dist}/${branchName}`;
       fs.writeFileSync(`${dir}/${imageFileName}`, imageBuffer);
     });
   }
