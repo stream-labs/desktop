@@ -16,7 +16,7 @@ const branches = [
   fs.mkdirSync(dir);
 
 
-  branches.forEach(branchName => {
+  for (const branchName of branches) {
 
     execSync(`git checkout ${branchName}`);
 
@@ -41,13 +41,13 @@ const branches = [
 
     log('creating screenshots');
     try {
-      execSync('yarn ava test-dist/test/screentest/tests/*.js');
+      execSync(`yarn ava ${dir}/tests/*.js`);
     } catch (e) {
       err('creating screenshots failed');
       return;
     }
 
-  });
+  };
 
 })();
 

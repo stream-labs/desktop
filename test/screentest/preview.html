@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Regression preview</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+
+<div id="app">
+  <div v-for="regression of regressions">
+    {{ regression.name }} ({{ JSON.stringify(regression.params) }})
+    <table>
+      <tr>
+        <td width="50%">
+          <img :src="'../../' + regression.branchImage" alt="branch image">
+        </td>
+        <td width="50%">
+          <img :src="'../../' + regression.diffImage" alt="branch image">
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  const data = { 'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png':
+  { name: 'Warm up',
+    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
+    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
+    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
+    isNew: false,
+    params: { resolution: { "width": 1000, "height": 700 }, nightMode: true },
+    isChanged: true },
+  'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png':
+  { name: 'Warm up',
+    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
+    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
+    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
+    isNew: false,
+    params: { resolution: { "width": 1000, "height": 700 }, nightMode: false },
+    isChanged: true },
+  'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png':
+  { name: 'Warm up',
+    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
+    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
+    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
+    isNew: false,
+    params: { resolution: { "width": 1500, "height": 900 }, nightMode: true },
+    isChanged: true } }
+
+
+  var app = new Vue({
+    el: '#app',
+    data: {
+      regressions: data
+    }
+  })
+
+</script>
+</body>
+</html>

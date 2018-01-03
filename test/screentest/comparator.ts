@@ -1,22 +1,108 @@
 const fs = require('fs');
+const querystring = require('querystring');
 const PNG = require('pngjs').PNG;
 const pixelmatch = require('pixelmatch');
+import { getConfigs } from 'utils';
 
-const branches = process.argv.slice(1, 2);
+const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+const branches = process.argv.slice(2, 4);
+const [newBranchName, baseBranchName] = branches;
 
-const imagesToCompare = fs.readdirSync(path[, options])
+console.log('argv:', process.argv);
+console.log('branches to compare:', branches);
 
-var img1 = fs.createReadStream('img1.png').pipe(new PNG()).on('parsed', doneReading),
-  img2 = fs.createReadStream('img2.png').pipe(new PNG()).on('parsed', doneReading),
-  filesRead = 0;
+const images = fs.readdirSync(`${CONFIG.dist}/${newBranchName}`);
 
-function doneReading() {
-  if (++filesRead < 2) return;
-  var diff = new PNG({width: img1.width, height: img1.height});
-
-  pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: 0.1 });
-
-  diff.pack().pipe(fs.createWriteStream('diff.png'));
+interface IRegression {
+  name: string;
+  baseImage: string;
+  branchImage: string;
+  diffImage?: string;
+  isChanged: boolean;
+  isNew: boolean;
+  params: Dictionary<any>;
 }
 
+interface IParsedImage {
+  base: any;
+  branch: any;
+  diff: any;
+}
 
+const regressions: {[imageName: string]: IRegression} = {};
+const parsedImages: {[imageName: string]: IParsedImage } = {};
+
+(async function main() {
+
+  if (!fs.existsSync(`${CONFIG.dist}/diff`)) fs.mkdirSync(`${CONFIG.dist}/diff`);
+
+  const configs = getConfigs();
+
+  console.log('read images...');
+
+  await new Promise(resolve => {
+    let parsedImagesCount = 0;
+
+    const doneReading = (count: number) => {
+      parsedImagesCount += count;
+      if (parsedImagesCount / 2 === images.length) resolve();
+    };
+
+    for (const image of images) {
+      const baseImage = `${CONFIG.dist}/${baseBranchName}/${image}`;
+      const branchImage = `${CONFIG.dist}/${newBranchName}/${image}`;
+      const diffImage = `${CONFIG.dist}/diff/${image}`;
+      const isNew = !fs.existsSync(baseImage);
+      const [name, restFileName] = image.split('__');
+      const configInd = Number(restFileName.slice(0, -4));
+      const params = configs[configInd];
+
+      regressions[image] = {
+        name,
+        baseImage,
+        branchImage,
+        diffImage,
+        isNew,
+        params,
+        isChanged: false
+      };
+
+      if (isNew) {
+        doneReading(2);
+      } else {
+        parsedImages[image] = {
+          base: fs.createReadStream(baseImage).pipe(new PNG()).on('parsed', () => doneReading(1)),
+          branch: fs.createReadStream(branchImage).pipe(new PNG()).on('parsed', () => doneReading(1)),
+          diff: null
+        };
+      }
+
+    }
+  });
+
+
+  console.log('compare images...');
+  for (const image of images) {
+    const regression = regressions[image];
+    if (regression.isNew) continue;
+
+    const parsedImage = parsedImages[image];
+    const baseImage = parsedImage.base;
+    parsedImage.diff = new PNG({ width: baseImage.width, height: baseImage.height });
+
+    const numDiffPixels = pixelmatch(
+      parsedImage.base.data,
+      parsedImage.branch.data,
+      parsedImage.diff.data,
+      baseImage.width,
+      baseImage.height,
+      { threshold: 0.1 }
+    );
+
+    regression.isChanged = numDiffPixels > 0;
+    parsedImage.diff.pack().pipe(fs.createWriteStream(regression.diffImage));
+  }
+
+  console.log('regressions', regressions);
+
+})();
