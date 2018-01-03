@@ -33,6 +33,7 @@ function executeCmd(cmd) {
 
   if (result.code !== 0) {
     error(`Command Failed >>> ${cmd}`);
+    sh.exit(1);
   }
 }
 
