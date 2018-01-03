@@ -3,6 +3,7 @@ import { CustomizationService } from '../../app/services/customization';
 import { execSync } from 'child_process';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
+import { sleep } from '../helpers/sleep';
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -20,6 +21,8 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
   t.context.app.browserWindow.setSize(
     config.resolution.width, config.resolution.height
   );
+
+  await sleep(400);
 }
 
 
