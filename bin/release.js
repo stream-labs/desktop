@@ -275,7 +275,7 @@ async function runScript() {
 
   info('Discovering publishing artifacts...');
   const distDir = path.resolve('.', 'dist');
-  const channelFileName = sh.ls(path.join(distDir, '*.yml'))[0].name;
+  const channelFileName = path.parse(sh.ls(path.join(distDir, '*.yml'))[0]).base;
   const channelFilePath = path.join(distDir, channelFileName);
 
   info(`Discovered ${channelFileName}`);
