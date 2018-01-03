@@ -2,8 +2,13 @@
   "baseBranch": "regression_testing_screenshots_example",
   "dist": "test-dist/screentest",
   "configs": {
-    "resolution": [{ "width": 1000, "height": 700 }, { "width": 1500, "height": 900 }],
-    "nightMode": [true, false]
+    "resolution": {
+      "window": "main",
+      "options": [{ "width": 1000, "height": 700 }, { "width": 1500, "height": 900 }]
+    },
+    "nightMode": {
+      "options": [true, false]
+    }
   }
 
 }
