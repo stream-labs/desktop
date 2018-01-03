@@ -1,17 +1,25 @@
 const fs = require('fs');
-const querystring = require('querystring');
 const PNG = require('pngjs').PNG;
 const pixelmatch = require('pixelmatch');
-import { getConfigs } from 'utils';
+import { getConfigsVariations, getConfig } from './utils';
 
-const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+const CONFIG = getConfig();
 const branches = process.argv.slice(2, 4);
 const [newBranchName, baseBranchName] = branches;
 
-console.log('argv:', process.argv);
 console.log('branches to compare:', branches);
 
 const images = fs.readdirSync(`${CONFIG.dist}/${newBranchName}`);
+
+interface IState {
+  regressions: {[imageName: string]: IRegression};
+  branches: string[];
+  totalScreens: number;
+  changedScreens: number;
+  newScreens: number;
+  configs: any[];
+}
+
 
 interface IRegression {
   name: string;
@@ -29,14 +37,21 @@ interface IParsedImage {
   diff: any;
 }
 
-const regressions: {[imageName: string]: IRegression} = {};
 const parsedImages: {[imageName: string]: IParsedImage } = {};
 
 (async function main() {
 
   if (!fs.existsSync(`${CONFIG.dist}/diff`)) fs.mkdirSync(`${CONFIG.dist}/diff`);
 
-  const configs = getConfigs();
+  const configs = getConfigsVariations();
+  const state: IState = {
+    regressions: {},
+    totalScreens: 0,
+    changedScreens: 0,
+    newScreens: 0,
+    configs,
+    branches
+  };
 
   console.log('read images...');
 
@@ -49,6 +64,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     };
 
     for (const image of images) {
+      state.totalScreens++;
       const baseImage = `${CONFIG.dist}/${baseBranchName}/${image}`;
       const branchImage = `${CONFIG.dist}/${newBranchName}/${image}`;
       const diffImage = `${CONFIG.dist}/diff/${image}`;
@@ -57,7 +73,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
       const configInd = Number(restFileName.slice(0, -4));
       const params = configs[configInd];
 
-      regressions[image] = {
+      state.regressions[image] = {
         name,
         baseImage,
         branchImage,
@@ -68,6 +84,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
       };
 
       if (isNew) {
+        state.newScreens++;
         doneReading(2);
       } else {
         parsedImages[image] = {
@@ -83,7 +100,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
 
   console.log('compare images...');
   for (const image of images) {
-    const regression = regressions[image];
+    const regression = state.regressions[image];
     if (regression.isNew) continue;
 
     const parsedImage = parsedImages[image];
@@ -100,9 +117,14 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     );
 
     regression.isChanged = numDiffPixels > 0;
+
+    if (regression.isChanged) state.changedScreens++;
+
     parsedImage.diff.pack().pipe(fs.createWriteStream(regression.diffImage));
   }
 
-  console.log('regressions', regressions);
+  fs.writeFile(`${CONFIG.dist}/state.json`, JSON.stringify(state), () => {
+    console.log('state.json created');
+  });
 
 })();

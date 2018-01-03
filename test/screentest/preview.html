@@ -3,60 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <title>Regression preview</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://rawgit.com/vuejs/vue/dev/dist/vue.js" type="application/javascript"></script>
 </head>
 <body>
 
 <div id="app">
-  <div v-for="regression of regressions">
-    {{ regression.name }} ({{ JSON.stringify(regression.params) }})
-    <table>
-      <tr>
-        <td width="50%">
-          <img :src="'../../' + regression.branchImage" alt="branch image">
-        </td>
-        <td width="50%">
-          <img :src="'../../' + regression.diffImage" alt="branch image">
-        </td>
-      </tr>
-    </table>
+  <div class="filters">
+    <label><input type="checkbox" name="checkbox" value="value">Text</label>
   </div>
+  <div class="regressions">
+    <div v-for="regression of state.regressions" class="regression">
+      {{ regression.name }} ({{ JSON.stringify(regression.params) }})
+      <table width="100%">
+        <tr>
+          <td @click="toggleBranch(regression.name)" >
+            <a :href="'../../' + regression.branchImage" target="_blank">
+              <img :src="'../../' + regression.branchImage" >
+            </a>
+          </td>
+          <td @click="toggleImage(regression.name)">
+            <a :href="'../../' + regression.baseImage">
+              <img :src="'../../' + regression.baseImage" >
+            </a>
+          </td>
+          <td>
+            <a :href="'../../' + regression.diffImage">
+              <img :src="'../../' + regression.diffImage" >
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script>
-  const data = { 'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png':
-  { name: 'Warm up',
-    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
-    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
-    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1000%2C%22height%22%3A700%7D%2C%22nightMode%22%3Atrue%7D.png',
-    isNew: false,
-    params: { resolution: { "width": 1000, "height": 700 }, nightMode: true },
-    isChanged: true },
-  'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png':
-  { name: 'Warm up',
-    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
-    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
-    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Afalse%7D.png',
-    isNew: false,
-    params: { resolution: { "width": 1000, "height": 700 }, nightMode: false },
-    isChanged: true },
-  'Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png':
-  { name: 'Warm up',
-    baseImage: 'test-dist/screentest/regression_testing_screenshots_example/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
-    branchImage: 'test-dist/screentest/regression_testing_screenshots/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
-    diffImage: 'test-dist/screentest/diff/Warm up__%7B%22resolution%22%3A%7B%22width%22%3A1500%2C%22height%22%3A900%7D%2C%22nightMode%22%3Atrue%7D.png',
-    isNew: false,
-    params: { resolution: { "width": 1500, "height": 900 }, nightMode: true },
-    isChanged: true } }
-
-
+  const state = {"regressions":{"Editor with sources__0.png":{"name":"Editor with sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor with sources__0.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor with sources__0.png","diffImage":"test-dist/screentest/diff/Editor with sources__0.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":true},"isChanged":true},"Editor with sources__1.png":{"name":"Editor with sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor with sources__1.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor with sources__1.png","diffImage":"test-dist/screentest/diff/Editor with sources__1.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":true},"isChanged":true},"Editor with sources__2.png":{"name":"Editor with sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor with sources__2.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor with sources__2.png","diffImage":"test-dist/screentest/diff/Editor with sources__2.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":false},"isChanged":true},"Editor with sources__3.png":{"name":"Editor with sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor with sources__3.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor with sources__3.png","diffImage":"test-dist/screentest/diff/Editor with sources__3.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":false},"isChanged":true},"Editor without sources__0.png":{"name":"Editor without sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor without sources__0.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor without sources__0.png","diffImage":"test-dist/screentest/diff/Editor without sources__0.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":true},"isChanged":true},"Editor without sources__1.png":{"name":"Editor without sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor without sources__1.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor without sources__1.png","diffImage":"test-dist/screentest/diff/Editor without sources__1.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":true},"isChanged":true},"Editor without sources__2.png":{"name":"Editor without sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor without sources__2.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor without sources__2.png","diffImage":"test-dist/screentest/diff/Editor without sources__2.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":false},"isChanged":true},"Editor without sources__3.png":{"name":"Editor without sources","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Editor without sources__3.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Editor without sources__3.png","diffImage":"test-dist/screentest/diff/Editor without sources__3.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":false},"isChanged":true},"Warm up__0.png":{"name":"Warm up","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Warm up__0.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Warm up__0.png","diffImage":"test-dist/screentest/diff/Warm up__0.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":true},"isChanged":true},"Warm up__1.png":{"name":"Warm up","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Warm up__1.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Warm up__1.png","diffImage":"test-dist/screentest/diff/Warm up__1.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":true},"isChanged":true},"Warm up__2.png":{"name":"Warm up","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Warm up__2.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Warm up__2.png","diffImage":"test-dist/screentest/diff/Warm up__2.png","isNew":false,"params":{"resolution":{"width":1000,"height":700},"nightMode":false},"isChanged":true},"Warm up__3.png":{"name":"Warm up","baseImage":"test-dist/screentest/regression_testing_screenshots_example/Warm up__3.png","branchImage":"test-dist/screentest/regression_testing_screenshots/Warm up__3.png","diffImage":"test-dist/screentest/diff/Warm up__3.png","isNew":false,"params":{"resolution":{"width":1500,"height":900},"nightMode":false},"isChanged":true}},"totalScreens":12,"changedScreens":12,"newScreens":0,"configs":[{"resolution":{"width":1000,"height":700},"nightMode":true},{"resolution":{"width":1500,"height":900},"nightMode":true},{"resolution":{"width":1000,"height":700},"nightMode":false},{"resolution":{"width":1500,"height":900},"nightMode":false}],"branches":["regression_testing_screenshots","regression_testing_screenshots_example"]};
   var app = new Vue({
     el: '#app',
     data: {
-      regressions: data
+      state: state,
+      selectedBranches: {}
+    },
+    methods: {
+
+      toggleBranch(regressionName) {
+        Vue.set(
+          this.selectedBranches,
+          this.getBranch(regressionName) === this.state.branches[0] ?
+            this.state.branches[1] :
+            this.state.branches[0]
+        )
+      },
+
+      getBranch(regressionName) {
+        return this.selectedBranches[regressionName] || this.state.branches[0];
+      }
     }
   })
 
 </script>
+<style>
+  .regression img {
+    display:block;
+    width:100%;
+    cursor: pointer;
+  }
+</style>
+
 </body>
 </html>

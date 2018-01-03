@@ -1,14 +1,14 @@
 import { getClient } from '../helpers/api-client';
 import { CustomizationService } from '../../app/services/customization';
 import { execSync } from 'child_process';
-import { getConfigs } from './utils';
+import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 
 const fs = require('fs');
-const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+const CONFIG = getConfig();
+const configs = getConfigsVariations();
 
 let branchName: string;
-const configs = getConfigs();
 
 
 export async function applyConfig(t: any, config: Dictionary<any>) {

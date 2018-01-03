@@ -23,12 +23,12 @@ const branches = [
     fs.mkdirSync(`${dir}/${branchName}`);
 
     log('project compilation');
-    try {
-      execSync('yarn compile')
-    } catch (e) {
-      err('compilation failed', e);
-      return;
-    }
+    // try {
+    //   execSync('yarn compile')
+    // } catch (e) {
+    //   err('compilation failed', e);
+    //   return;
+    // }
 
     log('tests compilation');
 
@@ -41,13 +41,21 @@ const branches = [
 
     log('creating screenshots');
     try {
-      execSync(`yarn ava ${dir}/tests/*.js`);
+      execSync(`yarn ava test-dist/test/screentest/tests`);
     } catch (e) {
       err('creating screenshots failed');
       return;
     }
 
-  };
+  }
+
+  log('comparing screenshots');
+  try {
+    execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
+  } catch (e) {
+    err('comparing screenshots failed');
+    return;
+  }
 
 })();
 
