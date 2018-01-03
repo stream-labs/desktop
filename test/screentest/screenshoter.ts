@@ -17,6 +17,7 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
 
   customizationService.setNightMode(config.nightMode);
+  customizationService.setLifeDockCollapsed(config.lifeDock);
 
   t.context.app.browserWindow.setSize(
     config.resolution.width, config.resolution.height

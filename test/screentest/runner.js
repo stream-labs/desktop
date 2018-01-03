@@ -23,12 +23,12 @@ const branches = [
     fs.mkdirSync(`${dir}/${branchName}`);
 
     log('project compilation');
-    // try {
-    //   execSync('yarn compile')
-    // } catch (e) {
-    //   err('compilation failed', e);
-    //   return;
-    // }
+    try {
+      execSync('yarn compile');
+    } catch (e) {
+      err('compilation failed', e);
+      return;
+    }
 
     log('tests compilation');
 
