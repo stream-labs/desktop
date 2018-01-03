@@ -241,7 +241,7 @@ async function runScript() {
   fs.writeFileSync('package.json', JSON.stringify(pjson, null, 2));
 
   info('Packaging the app...');
-  executeCmd('yarn package');
+  executeCmd(`yarn package${isPreview ? ':preview' : ''}`);
 
   info(`Version ${newVersion} is ready to be deployed.`);
   info('You can find the packaged app at dist/win-unpacked.');
