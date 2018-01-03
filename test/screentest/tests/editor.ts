@@ -9,17 +9,9 @@ import { useScreentest } from '../screenshoter';
 useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
 useScreentest();
 
-test('Warm up', async t => {
-  t.pass();
-});
-
 
 test('Editor without sources', async t => {
   const client = await getClient();
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
-  const scene = scenesService.activeScene;
-
   t.pass();
 });
 
