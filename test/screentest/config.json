@@ -3,8 +3,7 @@
   "dist": "test-dist/screentest",
   "configs": {
     "resolution": [{ "width": 1000, "height": 700 }, { "width": 1500, "height": 900 }],
-    "nightMode": [true, false],
-    "lifeDock": [true, false]
+    "nightMode": [true, false]
   }
 
 }
