@@ -17,7 +17,8 @@ interface IState {
   totalScreens: number;
   changedScreens: number;
   newScreens: number;
-  configs: any[];
+  config: Dictionary<any>;
+  configVariations: Dictionary<any[]>;
 }
 
 
@@ -49,6 +50,7 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     totalScreens: 0,
     changedScreens: 0,
     newScreens: 0,
+    config: CONFIG,
     configs,
     branches
   };
