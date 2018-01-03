@@ -18,7 +18,7 @@ interface IState {
   changedScreens: number;
   newScreens: number;
   config: Dictionary<any>;
-  configVariations: Dictionary<any[]>;
+  configs: Dictionary<any>[];
 }
 
 
