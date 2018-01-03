@@ -28,3 +28,21 @@ test('Editor with sources', async t => {
   t.pass();
 });
 
+
+test('Editor with the big amount of sources and scenes', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+
+  let scenesCount = 15;
+  let sourcesCount = 15;
+
+  while (scenesCount--) {
+    scenesService.createScene(`My scene with a long name ${scenesCount}`);
+  }
+
+  while (sourcesCount--) {
+    scenesService.activeScene.createAndAddSource(`My source with a long name ${sourcesCount}`, 'color_source');
+  }
+
+  t.pass();
+});
