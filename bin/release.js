@@ -15,7 +15,7 @@ const yml = require('js-yaml');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs-dev';
+const s3Bucket = 'streamlabs-obs';
 const sentryOrg = 'streamlabs-obs';
 const sentryProject = 'streamlabs-obs';
 
@@ -264,15 +264,15 @@ async function runScript() {
   executeCmd('git push --tags');
 
   info(`Registering ${newVersion} with sentry...`);
-  // sentryCli(`new "${newVersion}"`);
-  // sentryCli(`set-commits --auto "${newVersion}"`);
+  sentryCli(`new "${newVersion}"`);
+  sentryCli(`set-commits --auto "${newVersion}"`);
 
   info('Uploading compiled source to sentry...');
-  // const sourcePath = path.join('bundles', 'renderer.js');
-  // const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  // sentryCli(`files "${newVersion}" delete --all`);
-  // sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
-  // sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
+  const sourcePath = path.join('bundles', 'renderer.js');
+  const sourceMapPath = path.join('bundles', 'renderer.js.map');
+  sentryCli(`files "${newVersion}" delete --all`);
+  sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
+  sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
   info('Discovering publishing artifacts...');
   const distDir = path.resolve('.', 'dist');
@@ -297,7 +297,7 @@ async function runScript() {
   await uploadS3File(channelFileName, channelFilePath);
 
   info('Finalizing release with sentry...');
-  // sentryCli(`finalize "${newVersion}`);
+  sentryCli(`finalize "${newVersion}`);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`);
