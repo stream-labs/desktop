@@ -299,12 +299,10 @@ async function runScript() {
   info('Finalizing release with sentry...');
   // sentryCli(`finalize "${newVersion}`);
 
-  if (sourceBranch !== targetBranch) {
-    info(`Merging ${targetBranch} back into ${sourceBranch}...`);
-    executeCmd(`git checkout ${sourceBranch}`);
-    executeCmd(`git merge ${targetBranch}`);
-    executeCmd('git push origin HEAD');
-  }
+  info(`Merging ${targetBranch} back into staging...`);
+  executeCmd(`git checkout staging`);
+  executeCmd(`git merge ${targetBranch}`);
+  executeCmd('git push origin HEAD');
 
   info(`Version ${newVersion} released successfully!`);
 }
