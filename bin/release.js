@@ -263,8 +263,8 @@ async function runScript() {
   executeCmd('git push --tags');
 
   info(`Registering ${newVersion} with sentry...`);
-  sentryCli(`new "${newVersion}"`);
-  sentryCli(`set-commits --auto "${newVersion}"`);
+  // sentryCli(`new "${newVersion}"`);
+  // sentryCli(`set-commits --auto "${newVersion}"`);
 
   info('Uploading compiled source to sentry...');
   // const sourcePath = path.join('bundles', 'renderer.js');
