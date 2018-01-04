@@ -15,7 +15,9 @@ export function getConfigsVariations() {
   let configs: Dictionary<any>[] = [];
 
   configKeys.forEach(configKey => {
-    const options = CONFIG_VARIATION[configKey].options;
+    const configParam = CONFIG_VARIATION[configKey];
+
+    const options = configParam.options;
     const updatedConfigs: Dictionary<any>[] = [];
     options.forEach((value: any) => {
       if (!configs.length) {

@@ -33,8 +33,8 @@ test('Editor with the big amount of sources and scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  let scenesCount = 15;
-  let sourcesCount = 15;
+  let scenesCount = 10;
+  let sourcesCount = 10;
 
   while (scenesCount--) {
     scenesService.createScene(`My scene with a long name ${scenesCount}`);
