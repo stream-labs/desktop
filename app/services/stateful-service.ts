@@ -78,7 +78,8 @@ export abstract class StatefulService<TState extends object> extends Service {
  */
 export function getModule(ModuleContainer: any): Module<any, any> {
   return {
-    state: ModuleContainer.initialState || {},
+    state: ModuleContainer.initialState ?
+      JSON.parse(JSON.stringify(ModuleContainer.initialState)) : {},
     mutations: (<any>ModuleContainer.prototype).mutations
   };
 }
