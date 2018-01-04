@@ -133,6 +133,8 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     regression.diffImage = `diff/${image}`;
   }
 
+  // create a json and html reporting file
+
   const stateStr = JSON.stringify(state);
 
   fs.writeFile(`${CONFIG.dist}/state.json`, stateStr, () => {
