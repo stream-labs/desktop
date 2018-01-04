@@ -5,6 +5,9 @@ import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
 import { focusChild } from '../helpers/spectron/index';
+import { PerformanceService } from "../../app/services/performance";
+import { ISourcesServiceApi } from "../../app/services/sources/sources-api";
+import { IAudioServiceApi } from "../../app/services/audio/audio-api";
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -30,6 +33,17 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
 
 
 export async function makeScreenshots(t: any, options: IScreentestOptions) {
+
+  const api = await getClient();
+  const performanceService = api.getResource<PerformanceService>('PerformanceService');
+  const audioService = api.getResource<IAudioServiceApi>('AudioService');
+
+  // tune services to have the same screenshots in any environment
+  // PerformanceService causes different cpu usage
+  performanceService.stop();
+  // AudioSources causes a different volmeter level
+  audioService.getSources().forEach(audioSource => audioSource.setMuted(true));
+
 
   if (options.window === 'child') {
     await focusChild(t);

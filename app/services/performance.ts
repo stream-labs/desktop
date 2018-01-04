@@ -26,6 +26,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   };
 
   droppedFramesDetected = new Subject<number>();
+  private intervalId: number;
 
   @mutation()
   SET_PERFORMANCE_STATS(stats: IPerformanceState) {
@@ -35,13 +36,18 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    setInterval(() => {
+    this.intervalId = window.setInterval(() => {
       const stats: IPerformanceState = nodeObs.OBS_API_getPerformanceStatistics();
       if (stats.percentageDroppedFrames) {
         this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
       }
       this.SET_PERFORMANCE_STATS(stats);
     }, 2 * 1000);
+  }
+
+  stop() {
+    clearInterval(this.intervalId);
+    this.SET_PERFORMANCE_STATS(PerformanceService.initialState);
   }
 
 }

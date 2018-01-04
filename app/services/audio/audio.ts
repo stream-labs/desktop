@@ -98,6 +98,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   }
 
 
+  getSources(): AudioSource[] {
+    return Object.keys(this.state.audioSources).map(sourceId => this.getSource(sourceId));
+  }
+
+
   getSourcesForCurrentScene(): AudioSource[] {
     return this.getSourcesForScene(this.scenesService.activeSceneId);
   }
