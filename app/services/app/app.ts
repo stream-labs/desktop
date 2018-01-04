@@ -116,15 +116,6 @@ export class AppService extends StatefulService<IAppState>
     });
   }
 
-  sleep(milliseconds: number) {
-    const start = new Date().getTime();
-    for (let i = 0; i < 1e7; i++) {
-      if ((new Date().getTime() - start) > milliseconds) {
-        break;
-      }
-    }
-  }
-
   /**
    * reset current scene collection and load new one
    */
