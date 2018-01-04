@@ -22,6 +22,7 @@
       <li>Total: {{ state.totalScreens }}</li>
       <li>Changed: {{ state.changedScreens }}</li>
       <li>New: {{ state.newScreens }}</li>
+      <li><label><input type="checkbox" v-model="showOnlyChanged">Show only changed</label></li>
     </ul>
 
   </div>
@@ -33,7 +34,8 @@
         v-if="canShow(regression)"
     >
 
-      <span v-if="regression.isNew" class="new">NEW</span>
+      <span v-if="regression.isNew" class="badge new">NEW</span>
+      <span v-if="regression.isChanged" class="badge changed">CHANGED</span>
       {{ ind }}
       <pre>({{ JSON.stringify(regression.params) }})</pre>
       <table width="100%">
@@ -78,11 +80,16 @@
 
       return {
         state,
-        filters
+        filters,
+        showOnlyChanged: true
       }
     },
     methods: {
       canShow(regression) {
+
+        if (this.showOnlyChanged && !regression.isChanged && !regression.isNew) {
+          return false;
+        }
 
         for (const paramName in regression.params) {
           const paramValue = regression.params[paramName];
@@ -156,12 +163,20 @@
     cursor: pointer;
   }
 
-  span.new {
-    background-color: #2faf93;
+  span.badge{
     color: white;
     border-radius: 3px;
     padding: 2px 4px;
   }
+
+  .badge.new {
+    background-color: #2faf93;
+  }
+
+  .badge.changed {
+    background-color: orangered;
+  }
+
 
   .regression-new img {
     display: inline;

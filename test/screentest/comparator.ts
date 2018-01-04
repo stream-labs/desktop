@@ -128,11 +128,13 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
   const stateStr = JSON.stringify(state);
 
   fs.writeFile(`${CONFIG.dist}/state.json`, stateStr, () => {
-    console.log('state.json created');
+    console.log('state.json is created');
   });
 
-  let previewHtml = fs.readFileSync('test/screentest/preview-tpl.html');
+  let previewHtml = fs.readFileSync('test/screentest/preview-tpl.html').toString();
   previewHtml = previewHtml.replace('##STATE_PLACEHOLDER##', stateStr);
-  fs.writeFile(`${CONFIG.dist}/preview.html`, previewHtml);
+  fs.writeFile(`${CONFIG.dist}/preview.html`, previewHtml, () => {
+    console.log('preview.html is created');
+  });
 
 })();
