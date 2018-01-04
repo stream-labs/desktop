@@ -125,8 +125,14 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     parsedImage.diff.pack().pipe(fs.createWriteStream(regression.diffImage));
   }
 
-  fs.writeFile(`${CONFIG.dist}/state.json`, JSON.stringify(state), () => {
+  const stateStr = JSON.stringify(state);
+
+  fs.writeFile(`${CONFIG.dist}/state.json`, stateStr, () => {
     console.log('state.json created');
   });
+
+  let previewHtml = fs.readFileSync('test/screentest/preview-tpl.html');
+  previewHtml = previewHtml.replace('##STATE_PLACEHOLDER##', stateStr);
+  fs.writeFile(`${CONFIG.dist}/preview.html`, previewHtml);
 
 })();
