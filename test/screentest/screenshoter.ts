@@ -19,9 +19,11 @@ export async function applyConfig(t: any, config: Dictionary<any>) {
 
   customizationService.setNightMode(config.nightMode);
 
-  t.context.app.browserWindow.setSize(
-    config.resolution.width, config.resolution.height
-  );
+  if (config.resolution) {
+    t.context.app.browserWindow.setSize(
+      config.resolution.width, config.resolution.height
+    );
+  }
 
   await sleep(400);
 }
@@ -62,7 +64,7 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
 }
 
 interface IScreentestOptions {
-  window: 'main' | 'child'
+  window: 'main' | 'child';
 }
 
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
