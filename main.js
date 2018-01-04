@@ -64,6 +64,7 @@ const _ = require('lodash');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
+const path = require('path');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -107,7 +108,7 @@ let _obs;
 
 function getObs() {
   if (!_obs) {
-    _obs = require(inAsar ? '../../node-obs' : './node-obs');
+    _obs = require('obs-studio-node').NodeObs;
   }
 
   return _obs;
@@ -116,10 +117,6 @@ function getObs() {
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
-  // We use a special cache directory for running tests
-  if (process.env.SLOBS_CACHE_DIR) {
-    app.setPath('userData', process.env.SLOBS_CACHE_DIR);
-  }
 
   mainWindow = new BrowserWindow({
     width: 1600,
@@ -254,6 +251,12 @@ function startApp() {
   // Initialize various OBS services
   getObs().OBS_API_initAPI(app.getPath('userData'));
 }
+
+// We use a special cache directory for running tests
+if (process.env.SLOBS_CACHE_DIR) {
+  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+}
+app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
 // This ensures that only one copy of our app can run at once.
 const shouldQuit = app.makeSingleInstance(() => {

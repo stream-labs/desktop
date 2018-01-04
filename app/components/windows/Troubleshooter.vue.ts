@@ -5,7 +5,7 @@ import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import windowMixin from '../mixins/window';
 import { TIssueCode } from 'services/performance-monitor';
-import { INotificationsApi, INotification } from 'services/notifications';
+import { INotificationsServiceApi, INotification } from 'services/notifications';
 import { ISettingsServiceApi } from 'services/settings';
 import { WindowsService } from 'services/windows';
 
@@ -16,7 +16,7 @@ import { WindowsService } from 'services/windows';
 })
 export default class Troubleshooter extends Vue {
 
-  @Inject() private notificationsService: INotificationsApi;
+  @Inject() private notificationsService: INotificationsServiceApi;
   @Inject() private settingsService: ISettingsServiceApi;
   @Inject() private windowsService: WindowsService;
 

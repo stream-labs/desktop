@@ -32,14 +32,16 @@ export function getDefinitions(platform: TPlatform) {
       ...allDefinitions,
       ...twitchDefinitions
     };
-  } else if (platform === 'youtube') {
+  }
+
+  if (platform === 'youtube') {
     return {
       ...allDefinitions,
       ...youtubeDefinitions
     };
-  } else {
-    throw new Error(`${platform} is not a supported platform`);
   }
+
+  throw new Error(`${platform} is not a supported platform`);
 }
 
 

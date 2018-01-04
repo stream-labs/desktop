@@ -69,6 +69,12 @@ export abstract class Service {
     return instance;
   }
 
+  static getResourceId(resource: any): string {
+    const resourceId = resource.resourceId || resource.serviceName;
+    if (!resourceId) throw new Error('invalid resource');
+    return resourceId;
+  }
+
 
   constructor(enforcer: Symbol, options: Dictionary<any>) {
     if (enforcer !== singletonEnforcer) throw 'Cannot construct singleton';

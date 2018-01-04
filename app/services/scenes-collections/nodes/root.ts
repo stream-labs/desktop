@@ -51,9 +51,9 @@ export class RootNode extends Node<ISchema, {}> {
       }).then(() => {
         if (this.data.hotkeys) {
           return this.data.hotkeys.load({});
-        } else {
-          return Promise.resolve();
         }
+
+        return Promise.resolve();
       }).then(() => {
         resolve();
       });

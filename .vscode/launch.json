@@ -2,15 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
             "type": "node",
             "request": "launch",
+            "name": "Launch",
             "protocol": "inspector",
             "runtimeArgs": [
-                "${workspaceRoot}"
+                "."
             ],
             "cwd": "${workspaceRoot}",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "envFile": "${workspaceRoot}/.env",
             "outputCapture": "std"
         }

@@ -1,5 +1,5 @@
 import { TIssueCode } from 'services/performance-monitor';
-import { IJsonRpcRequest } from '../../services-manager';
+import { IJsonRpcRequest } from 'services/jsonrpc';
 import { Observable } from 'rxjs/Observable';
 import { TFormData } from '../../components/shared/forms/Input';
 
@@ -13,9 +13,6 @@ export interface INotificationsSettings {
   playSound: boolean;
 }
 
-/**
- * @param lifeTime The notification's life time in ms. Use -1 for infinity
- */
 export interface INotificationOptions {
   message: string;
   code?: TIssueCode | string;
@@ -24,6 +21,8 @@ export interface INotificationOptions {
   action?: IJsonRpcRequest;
   playSound?: boolean;
   data?: any;
+
+  /** The notification's life time in ms. Use -1 for infinity */
   lifeTime?: number;
   showTime?: boolean;
 }
@@ -41,7 +40,7 @@ export interface INotification extends INotificationOptions {
 }
 
 
-export interface INotificationsApi {
+export interface INotificationsServiceApi {
   notificationPushed: Observable<INotification>;
   notificationRead: Observable<number[]>;
   push(notifyInfo: INotificationOptions): INotification;

@@ -1,4 +1,4 @@
-import { IJsonRpcRequest, IJsonRpcResponse } from '../../app/services-manager';
+import { IJsonRpcRequest } from '../../app/services/jsonrpc';
 import { Subject } from 'rxjs/Subject';
 
 
@@ -102,7 +102,7 @@ export class ApiClient {
       await this.connect();
     }
 
-    const id = this.nextRequestId++;
+    const id = String(this.nextRequestId++);
     const requestBody: IJsonRpcRequest = {
       jsonrpc: '2.0',
       id,
@@ -134,7 +134,11 @@ export class ApiClient {
 
     const err = process.stderr.toString();
     const responseStr = process.stdout.toString();
-    if (err) throw err;
+
+    if (err) {
+      this.log('SYNC_RESPONSE_ERR:', err);
+      throw err;
+    }
     this.log('SYNC_RESPONSE:', responseStr);
     const response = JSON.parse(responseStr);
     return response;
@@ -277,7 +281,7 @@ export class ApiClient {
   fetchNextEvent(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.eventReceived.first().subscribe(event => resolve(event));
-      setTimeout(() => reject('timeout'), 2000);
+      setTimeout(() => reject('Promise timeout'), PROMISE_TIMEOUT);
     });
   }
 

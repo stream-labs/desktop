@@ -14,7 +14,7 @@
           track-by="family"
           label="family"
           @input="setFamily">
-          <template slot="option" scope="props">
+          <template slot="option" slot-scope="props">
             <span :style="{ fontFamily: props.option.family }">
               {{ props.option.family }}
             </span>
@@ -36,7 +36,7 @@
           track-by="style"
           label="style"
           @input="setStyle">
-          <template slot="option" scope="props">
+          <template slot="option" slot-scope="props">
             <span
               :style="styleForFont(props.option)">
               {{ props.option.style }}

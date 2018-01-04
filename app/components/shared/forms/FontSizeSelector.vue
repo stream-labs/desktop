@@ -11,7 +11,7 @@
       :close-on-select="true"
       :allow-empty="false"
       @input="setFontSizePreset">
-      <template slot="option" scope="props">
+      <template slot="option" slot-scope="props">
         <span>
           {{ props.option }}
         </span>
