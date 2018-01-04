@@ -125,6 +125,14 @@ const parsedImages: {[imageName: string]: IParsedImage } = {};
     parsedImage.diff.pack().pipe(fs.createWriteStream(regression.diffImage));
   }
 
+  // replace paths for images
+  for (const image of images) {
+    const regression = state.regressions[image];
+    regression.baseImage = `${baseBranchName}/${image}`;
+    regression.branchImage = `${newBranchName}/${image}`;
+    regression.diffImage = `diff/${image}`;
+  }
+
   const stateStr = JSON.stringify(state);
 
   fs.writeFile(`${CONFIG.dist}/state.json`, stateStr, () => {

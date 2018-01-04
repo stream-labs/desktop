@@ -49,6 +49,8 @@ const branches = [
 
   }
 
+  execSync(`git checkout ${branches[0]}`);
+
   log('comparing screenshots');
   try {
     execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
