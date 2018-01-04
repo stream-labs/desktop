@@ -101,11 +101,11 @@ export class AppService extends StatefulService<IAppState>
       const activeScene = this.scenesService.activeScene;
 
       this.scenesService.makeSceneActive(this.scenesService.getScenes()[0].id);
-      this.scenesService.getScenes().forEach((scene,index) => {
+      this.scenesService.getScenes().forEach((scene, index) => {
         const previousScene = this.scenesService.activeScene;
         this.scenesService.makeSceneActive(scene.id);
         previousScene.items.forEach(item => {
-          let isShowing: Boolean = true;
+          let isShowing = true;
           const start = new Date().getTime();
           while ((new Date().getTime() - start) < 1000 && isShowing) {
             const source = this.sourcesService.getSourceById(item.sourceId);
