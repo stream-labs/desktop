@@ -97,6 +97,25 @@ export class AppService extends StatefulService<IAppState>
 
       this.performanceMonitorService.start();
 
+      // Workaround for the browser source shutdown settings being not applied correctly
+      const activeScene = this.scenesService.activeScene;
+
+      this.scenesService.makeSceneActive(this.scenesService.getScenes()[0].id);
+      this.scenesService.getScenes().forEach((scene, index) => {
+        const previousScene = this.scenesService.activeScene;
+        this.scenesService.makeSceneActive(scene.id);
+        previousScene.items.forEach(item => {
+          let isShowing = true;
+          const start = new Date().getTime();
+          while ((new Date().getTime() - start) < 1000 && isShowing) {
+            const source = this.sourcesService.getSourceById(item.sourceId);
+            const obsSource = source.getObsInput();
+            isShowing = obsSource.showing;
+          }
+        });
+      });
+
+      this.scenesService.makeSceneActive(activeScene.id);
       this.ipcServerService.listen();
       this.tcpServerService.listen();
       this.FINISH_LOADING();
