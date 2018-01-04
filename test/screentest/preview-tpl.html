@@ -41,17 +41,17 @@
       <table width="100%">
         <tr>
           <td >
-            <a :href="'regression.branchImage" target="_blank">
-              <img :src="'regression.branchImage" >
+            <a :href="regression.branchImage" target="_blank">
+              <img :src="regression.branchImage" >
             </a>
           </td>
           <td >
-            <a :href="'regression.baseImage"  target="_blank" v-if="!regression.isNew">
+            <a :href="regression.baseImage"  target="_blank" v-if="!regression.isNew">
               <img :src="regression.baseImage" >
             </a>
           </td>
           <td>
-            <a :href="'regression.diffImage"  target="_blank" v-if="!regression.isNew">
+            <a :href="regression.diffImage"  target="_blank" v-if="!regression.isNew">
               <img :src="regression.diffImage" >
             </a>
           </td>
