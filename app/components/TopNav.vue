@@ -93,6 +93,7 @@
     .fa {
       font-size: 15px;
       vertical-align: middle;
+      margin-right: 4px;
     }
   }
 }
