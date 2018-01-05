@@ -8,9 +8,10 @@ import { ScenesTransitionsService } from '../services/scenes-transitions';
 import { ScenesCollectionsService } from '../services/scenes-collections/config';
 import { AppService } from '../services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
+import HelpTip from './shared/HelpTip.vue';
 
 @Component({
-  components: { Selector, DropdownMenu },
+  components: { Selector, DropdownMenu, HelpTip },
 })
 export default class SceneSelector extends Vue {
   @Inject() scenesService: ScenesService;
