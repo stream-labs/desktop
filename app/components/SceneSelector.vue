@@ -44,7 +44,7 @@
     @contextmenu="showContextMenu"
   />
 
-  <help-tip>
+  <help-tip :dismissable-key="helpTipDismissable">
     <div slot="title">
       Scene Collections
     </div>

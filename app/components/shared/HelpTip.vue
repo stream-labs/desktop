@@ -1,5 +1,5 @@
 <template>
-  <div class="help-tip" v-if="helpTip">
+  <div class="help-tip" v-if="shouldShow">
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close fa fa-times" />
     <div class="help-tip__title">

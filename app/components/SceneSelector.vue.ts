@@ -9,6 +9,7 @@ import { ScenesCollectionsService } from '../services/scenes-collections/config'
 import { AppService } from '../services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
+import { EDismissable } from 'services/dismissables';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -102,5 +103,9 @@ export default class SceneSelector extends Vue {
   removeCollection() {
     if (!confirm(`remove ${this.activeConfig} ?`)) return;
     this.appService.removeCurrentConfig();
+  }
+
+  get helpTipDismissable() {
+    return EDismissable.SceneCollectionsHelpTip;
   }
 }
