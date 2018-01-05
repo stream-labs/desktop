@@ -82,10 +82,18 @@
   max-width:  none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
-  flex: 0 0 45px;
+  flex: 0 0 54px;
 
   .link {
-    font-size: 14px;
+    text-transform: uppercase;
+    font-size: 12px;
+    .semibold;
+    letter-spacing: .7px;
+
+    .fa {
+      font-size: 15px;
+      vertical-align: middle;
+    }
   }
 }
 
