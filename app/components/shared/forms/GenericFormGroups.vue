@@ -10,7 +10,10 @@
         </h4>
       </div>
 
-      <div class="section-content section-content--dropdown" v-if="!collapsedGroups[groupIndex]">
+      <div
+          class="section-content section-content--dropdown"
+          v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
+      >
         <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
       </div>
 
