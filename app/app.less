@@ -79,8 +79,7 @@ h4 {
   display: inline-block;
 }
 
-.dropdown__toggle,
-.slide-open__open {
+.dropdown__toggle {
   .semibold;
   color: @grey;
   text-transform: uppercase;
@@ -211,13 +210,21 @@ h4 {
 .slide-open__close {
   position: absolute;
   left: 25px;
-  color: @grey;
-  transition: all 275ms;
+  .transition;
+}
 
-  &:hover {
-    .fa {
-      color: @navy;
-    }
+.slide-open__open,
+.slide-open__close {
+  .semibold;
+  color: @grey;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  font-size: 12px;
+
+  .fa {
+    font-size: 12px;
+    vertical-align: middle;
+    margin-right: 4px;
   }
 }
 
@@ -228,8 +235,8 @@ h4 {
 
 .tab-button {
   border-bottom: 1px solid transparent;
-  height: 45px;
-  margin-right: 10px;
+  height: 54px;
+  margin-right: 20px;
   text-transform: uppercase;
   font-size: 12px;
   .semibold;
@@ -239,6 +246,8 @@ h4 {
 
   .fa {
     margin-right: 4px;
+    font-size: 15px;
+    vertical-align: middle;
   }
 
   &.active,
