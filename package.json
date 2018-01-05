@@ -43,9 +43,7 @@
       "LICENSE",
       "AGREEMENT"
     ],
-    "asarUnpack": [
-      "**/*.node"
-    ],
+    "asar": false,
     "publish": {
       "provider": "generic",
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
