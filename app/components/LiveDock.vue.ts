@@ -61,15 +61,15 @@ export default class LiveDock extends Vue {
   }
 
   get collapsed() {
-    return this.customizationService.state.lifedockCollapsed;
+    return this.customizationService.state.livedockCollapsed;
   }
 
   collapse() {
-    this.customizationService.setLifeDockCollapsed(true);
+    this.customizationService.setLiveDockCollapsed(true);
   }
 
   expand() {
-    this.customizationService.setLifeDockCollapsed(false);
+    this.customizationService.setLiveDockCollapsed(false);
   }
 
   get isStreaming() {

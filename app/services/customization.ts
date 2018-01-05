@@ -7,7 +7,7 @@ interface ICustomizationServiceState {
   livePreviewEnabled: boolean;
   leftDock: boolean;
   hideViewerCount: boolean;
-  lifedockCollapsed: boolean;
+  livedockCollapsed: boolean;
 }
 
 /**
@@ -22,12 +22,12 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     livePreviewEnabled: true,
     leftDock: false,
     hideViewerCount: false,
-    lifedockCollapsed: true
+    livedockCollapsed: true
   };
 
   init() {
     super.init();
-    this.setLifeDockCollapsed(true);// lifedock is always collapsed on app start
+    this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
   }
 
   @mutation()
@@ -51,8 +51,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   @mutation()
-  SET_LIFEDOCK_COLLAPSED(collapsed: boolean) {
-    this.state.lifedockCollapsed = collapsed;
+  SET_LIVEDOCK_COLLAPSED(collapsed: boolean) {
+    this.state.livedockCollapsed = collapsed;
   }
 
   @mutation()
@@ -84,8 +84,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.SET_LEFT_DOCK(enabled);
   }
 
-  setLifeDockCollapsed(collapsed: boolean) {
-    this.SET_LIFEDOCK_COLLAPSED(collapsed);
+  setLiveDockCollapsed(collapsed: boolean) {
+    this.SET_LIVEDOCK_COLLAPSED(collapsed);
   }
 
   setHiddenViewerCount(hidden: boolean) {
