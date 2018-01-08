@@ -25,6 +25,10 @@ export class DismissablesService extends PersistentStatefulService<IDismissables
     this.DISMISS(key);
   }
 
+  dismissAll() {
+    Object.keys(EDismissable).forEach(key => this.dismiss(EDismissable[key]));
+  }
+
   @mutation()
   DISMISS(key: EDismissable) {
     Vue.set(this.state, key, true);
