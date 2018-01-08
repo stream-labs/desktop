@@ -171,6 +171,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   removeSource(id: string) {
     const source = this.getSource(id);
+
+   /* When we release sources, we need to make
+     * sure we reset the channel it's set to,
+     * otherwise OBS thinks it's still attached
+     * and won't release it. */
+    if (source.channel !== void 0) {
+      obs.Global.setOutputSource(source.channel, null);
+    }
+
     if (!source) throw  new Error(`Source ${id} not found`);
 
     source.getObsInput().release();
