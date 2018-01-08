@@ -63,17 +63,28 @@ export class SourcesNode extends Node<ISchema, {}> {
 
           const audioSource = this.audioService.getSource(source.sourceId);
 
+          const obsInput = source.getObsInput();
+
+          /* Signal to the source that it needs to save settings as 
+           * we're about to cache them to disk. */
+          obsInput.save();
+
           let data: ISourceInfo = {
             id: source.sourceId,
             name: source.name,
             type: source.type,
-            settings: source.getObsInput().settings,
-            volume: source.getObsInput().volume,
+            settings: obsInput.settings,
+            volume: obsInput.volume,
             channel: source.channel,
             hotkeys,
-            muted: source.getObsInput().muted,
+            muted: obsInput.muted,
             filters: {
-              items: source.getObsInput().filters.map(filter => {
+              items: obsInput.filters.map(filter => {
+                /* Remember that filters are also sources. 
+                 * We should eventually do this for transitions
+                 * as well. Scenes can be ignored. */
+                filter.save();
+
                 return {
                   name: filter.name,
                   type: filter.id,
