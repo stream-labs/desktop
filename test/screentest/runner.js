@@ -5,7 +5,7 @@ const fs = require('fs');
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
 const branches = [
-  execSync('git status').toString().replace('On branch ', '').split('\n')[0],
+  execSync('git log').toString().split(' ')[1],
   CONFIG.baseBranch
 ];
 
