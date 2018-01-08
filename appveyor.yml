@@ -9,8 +9,6 @@ install:
 
 test_script:
   - yarn test -- -v
-
-screentest:
   - yarn screentest
 
 artifacts:
