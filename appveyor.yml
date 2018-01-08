@@ -9,3 +9,10 @@ install:
 
 test_script:
   - yarn test -- -v
+
+screentest:
+  - yarn screentest
+
+artifacts:
+  - path: 'test-dist\screentest\**\*'
+    name: Screentests
