@@ -13,7 +13,13 @@ const branches = [
 
   const dir = CONFIG.dist;
   rimraf.sync(dir);
-  fs.mkdirSync(dir);
+
+  let currentPath = '';
+  dir.split('/').forEach(dirName => {
+    currentPath += dirName;
+    if (!fs.existsSync(currentPath)) fs.mkdirSync(currentPath);
+    currentPath += '/';
+  });
 
 
   for (const branchName of branches) {
