@@ -39,12 +39,6 @@
   </div>
 
   <div class="top-nav-right">
-    <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="openDevTools">Dev Tools</a>
-    </div>
-    <div class="top-nav-item">
-      <a class="link" @click="bugReport">Bug Report</a>
-    </div>
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <!--<i class="fa fa-sun-o"/>
@@ -53,6 +47,20 @@
         <img class="theme-toggle__icon theme-toggle__icon--moon" src="../../media/images/moon.png"/>
         <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
       </button>
+    </div>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a class="link" @click="openDevTools">Dev Tools</a>
+    </div>
+    <div class="top-nav-item">
+      <a class="link" @click="bugReport">
+        <i class="fa fa-bug"/> Bug Report</a>
+    </div>
+    <div class="top-nav-item">
+      <a
+        @click="openDiscord"
+        class="link">
+        <span class="ico ico--discord"></span> Discord
+      </a>
     </div>
     <div class="top-nav-item">
       <a
@@ -90,7 +98,8 @@
     .semibold;
     letter-spacing: .7px;
 
-    .fa {
+    .fa,
+    .ico {
       font-size: 15px;
       vertical-align: middle;
       margin-right: 4px;
