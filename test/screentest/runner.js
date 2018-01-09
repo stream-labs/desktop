@@ -3,6 +3,8 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
+// const commit = execSync('git log').toString().split('\n')[0].split(' ')[1];
+
 
 const branches = [
   execSync('git log').toString().split('\n')[0].split(' ')[1],
