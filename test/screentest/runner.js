@@ -14,6 +14,7 @@ const branches = [
   const dir = CONFIG.dist;
   rimraf.sync(dir);
 
+  // create dir
   let currentPath = '';
   dir.split('/').forEach(dirName => {
     currentPath += dirName;
@@ -24,7 +25,6 @@ const branches = [
 
   for (const branchName of branches) {
 
-    console.log('create ', `${dir}/${branchName}`);
     fs.mkdirSync(`${dir}/${branchName}`);
 
     execSync(`git checkout ${branchName}`);
