@@ -5,7 +5,7 @@ const fs = require('fs');
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
 const branches = [
-  execSync('git log').toString().split(' ')[1],
+  execSync('git log').toString().split('\n')[0].split(' ')[1],
   CONFIG.baseBranch
 ];
 
@@ -24,9 +24,11 @@ const branches = [
 
   for (const branchName of branches) {
 
+    console.log('create ', `${dir}/${branchName}`);
+    fs.mkdirSync(`${dir}/${branchName}`);
+
     execSync(`git checkout ${branchName}`);
 
-    fs.mkdirSync(`${dir}/${branchName}`);
 
     log('project compilation');
     try {
