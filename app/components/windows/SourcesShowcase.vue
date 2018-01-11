@@ -190,7 +190,12 @@
       @clickAdd="selectWidget(widgetTypes.AlertBox)"
       name="Alertbox"
       description="Thanks viewers with notification popups.">
-      <img slot="media" src="../../../media/source-demos/alertbox.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-alertbox.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-alertbox.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -205,7 +210,12 @@
       @clickAdd="selectWidget(widgetTypes.DonationTicker)"
       name="Donation Ticker"
       description="Show off your most recent donations to your viewers.">
-      <img slot="media" src="../../../media/source-demos/donationticker.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-donation-ticker.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-donation-ticker.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
@@ -216,7 +226,12 @@
       @clickAdd="selectWidget(widgetTypes.EventList)"
       name="Event List"
       description="Include your channel's most recent events into your stream.">
-      <img slot="media" src="../../../media/source-demos/eventlist.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-eventlist.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-eventlist.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -232,7 +247,12 @@
       @clickAdd="selectWidget(widgetTypes.DonationGoal)"
       name="Donation Goal"
       description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/donationgoal.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-donation-goal.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-donation-goal.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
@@ -243,7 +263,8 @@
       @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
       name="Follower Goal"
       description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch Follows</li>
         <li>Youtube Follows</li>
@@ -256,7 +277,8 @@
       @clickAdd="selectWidget(widgetTypes.BitGoal)"
       name="Bit Goal"
       description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-bit-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-bit-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch Bits</li>
       </ul>
@@ -267,7 +289,8 @@
       @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
       name="Subscription Goal"
       description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Youtube Subscribers</li>
       </ul>
@@ -278,7 +301,12 @@
       @clickAdd="selectWidget(widgetTypes.ChatBox)"
       name="Chatbox"
       description="Include your channel's chat into your stream.">
-      <img slot="media" src="../../../media/source-demos/chat.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-chatbox.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-chatbox.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch chat</li>
         <li>Youtube chat</li>
@@ -290,7 +318,12 @@
       @clickAdd="selectWidget(widgetTypes.TheJar)"
       name="The Jar"
       description="The jar that catches bits, tips, and more.">
-      <img slot="media" src="../../../media/source-demos/jar.gif"/>
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-jar.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-jar.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -305,7 +338,8 @@
       @clickAdd="selectWidget(widgetTypes.ViewerCount)"
       name="Viewer Count"
       description="Show off your viewers from multiple platforms.">
-      <img slot="media" src="../../../media/source-demos/viewercount-source.png"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-viewer-count.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-viewer-count.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Youtube</li>
         <li>Twitch</li>
@@ -339,6 +373,22 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === widgetTypes.SpinWheel"
+      @clickAdd="selectWidget(widgetTypes.SpinWheel)"
+      name="Spin Wheel"
+      description="Rolling credits to play at the end of your stream.">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-wheel.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-wheel.mp4">
+      </video>
+      <ul slot="support-list" class="source-support__list">
+        <li>The streamer manually triggers a spin anytime while they are live.</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
       name="Scene"
@@ -348,15 +398,20 @@
 
     <add-source-info
       v-if="inspectedSource === 'streamlabel'"
-      @clickAdd="selectWidget(widgetTypes.Credits)"
+      @clickAdd="selectWidget(widgetTypes.StreamLabel)"
       name="Stream Label"
       description="This is a placeholder description for streamlabels.">
-      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>New Followers</li>
         <li>New Subscribers</li>
-        <li>Cheers</li>
-        <li>Donations</li>
+        <li>New Cheers</li>
+        <li>New Donations</li>
+        <li>All-Time Top Donator</li>
+        <li>Weekly Top Donator</li>
+        <li>Monthly Follows</li>
+        <li>Many more</li>
       </ul>
     </add-source-info>
 
@@ -415,7 +470,7 @@
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
-            @click="inspectSource(widgetTypes.TheJar)"
+            @click="inspectSource(widgetTypes.TheJar, 'theJar')"
             @dblclick="selectWidget(widgetTypes.TheJar)">
             <div>The Jar</div><span class="label--essential">Essential</span>
           </div>
@@ -465,7 +520,7 @@
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
-            @click="inspectSource(widgetTypes.ChatBox)"
+            @click="inspectSource(widgetTypes.ChatBox, 'chatbox')"
             @dblclick="selectWidget(widgetTypes.ChatBox)">
             <div>Chatbox</div>
           </div>
@@ -492,6 +547,14 @@
             @click="inspectSource(widgetTypes.ViewerCount)"
             @dblclick="selectWidget(widgetTypes.ViewerCount)">
             <div>Viewer Count</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.SpinWheel}"
+            @click="inspectSource(widgetTypes.SpinWheel)"
+            @dblclick="selectWidget(widgetTypes.SpinWheel)">
+            <div>Spin Wheel</div>
           </div>
 
           <div
@@ -634,6 +697,14 @@ h4 {
   width: 30px;
 }
 
+.source__demo--day {
+  display: block;
+}
+
+.source__demo--night {
+  display: none;
+}
+
 .night-theme {
   .add-source {
     color: @grey;
@@ -654,6 +725,14 @@ h4 {
 
   .source-group {
     border-color: @night-border;
+  }
+
+  .source__demo--day {
+    display: none;
+  }
+
+  .source__demo--night {
+    display: block;
   }
 }
 </style>
