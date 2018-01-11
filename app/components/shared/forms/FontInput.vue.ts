@@ -25,6 +25,7 @@ class FontInput extends Input<IFormInput<IFont>> {
       ...this.value,
       value: {
         path: font.path,
+        face: font.face,
         size: Number(font.size)
       }
     });
@@ -34,6 +35,7 @@ class FontInput extends Input<IFormInput<IFont>> {
   get googleFont() {
     return {
       path: this.value.value.path,
+      face: this.value.value.face,
       size: this.value.value.size
     };
   }
