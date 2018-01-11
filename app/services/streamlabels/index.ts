@@ -258,6 +258,18 @@ export class StreamlabelsService extends Service {
       .then(() => true);
   }
 
+  restartSession(): Promise<Boolean> {
+    if (!this.userService.isLoggedIn()) return;
+
+    const url = `https://${this.hostsService.streamlabs}/api/v5/stream-labels` +
+      `/restart-session?token=${this.userService.widgetToken}`;
+    const request = new Request(url);
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(() => true);
+  }
+
 
   private log(message: string, ...args: any[]) {
     console.debug(`Streamlabels: ${message}`, ...args);
@@ -503,5 +515,4 @@ export class StreamlabelsService extends Service {
       data: this.output[statname]
     });
   }
-
 }
