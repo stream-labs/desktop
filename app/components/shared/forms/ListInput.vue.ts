@@ -8,7 +8,7 @@ import { Multiselect } from 'vue-multiselect';
 
 class ListInput extends Input<IListInput<TObsValue>> {
 
-  static obsType: TObsType[];
+  static obsType: TObsType;
 
   @Prop()
   value: IListInput<TObsValue>;
@@ -30,12 +30,6 @@ class ListInput extends Input<IListInput<TObsValue>> {
     this.$emit('search-change', value);
   }
 
-  mounted() {
-    if (this.value.type ===  'OBS_INPUT_RESOLUTION_LIST') {
-      this.placeholder = 'Select Option or Type New Value';
-    }
-  }
-
   get currentValue() {
 
     const option = this.value.options.find((opt: IListOption<string>) => {
@@ -47,17 +41,9 @@ class ListInput extends Input<IListInput<TObsValue>> {
     return this.value.options[0];
   }
 
-  // only for type = OBS_INPUT_RESOLUTION_LIST
-  getCustomResolution(search: string) {
-    const match = search.match(/\d+/g) || [];
-    const width = match[0] || 400;
-    const height = match[1] || 400;
-    const value = `${ width }x${ height }`;
-    return { value, description: value };
-  }
 
 }
 
-ListInput.obsType = ['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'];
+ListInput.obsType = 'OBS_PROPERTY_LIST';
 
 export default ListInput;

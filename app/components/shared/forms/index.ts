@@ -10,3 +10,4 @@ export { default as FontInput } from './FontInput.vue';
 export { default as EditableListInput } from './EditableListInput.vue';
 export { default as ButtonInput } from './ButtonInput.vue';
 export { default as BitmaskInput } from './BitmaskInput.vue';
+export { default as ResolutionInput } from './ResolutionInput.vue';

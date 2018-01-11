@@ -282,6 +282,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         })
       });
     }
+
     nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(
       SettingsService.convertFormDataToState({ [categoryName]: settingsData })

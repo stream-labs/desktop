@@ -10,9 +10,8 @@
       :options="value.options"
       track-by="value"
       :close-on-select="true"
-      :allow-empty="allowEmpty"
       :placeholder="placeholder"
-      :loading="loading"
+      :allow-custom="getCustomResolution"
       label="description"
       @input="onInputHandler"
       @search-change="onSearchChange">
@@ -26,4 +25,4 @@
 </div>
 </template>
 
-<script lang="ts" src="./ListInput.vue.ts"></script>
+<script lang="ts" src="./ResolutionInput.vue.ts"></script>
