@@ -45,6 +45,27 @@ export class FontLibraryService extends Service {
     return Promise.resolve(this.manifest);
   }
 
+  /* This scans the entire manifest (which is slow)
+   * to find a filename, then finds the family name
+   * in the parent. This also doesn't take into account
+   * font files yet. This function is used mostly for
+   * upgrading config schema */
+  findFontFile(baseFileName: string): Promise<IFontFamily> {
+    return this.getManifest().then(manifest => {
+      for (const family_name in manifest.families) {
+        const family = manifest.families[family_name];
+
+        for (const style_name in family.styles) {
+          const style = family.styles[style_name];
+
+          if (baseFileName === style.file) {
+            return family;
+          }
+        }
+      }
+    });
+  }
+
 
   findFamily(family: string): Promise<IFontFamily> {
     return this.getManifest().then(manifest => {

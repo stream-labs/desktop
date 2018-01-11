@@ -1,12 +1,14 @@
 import { Node } from './node';
 import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
+import { FontLibraryService } from '../../font-library';
 import { AudioService } from '../../audio';
 import { HotkeysService } from '../../hotkeys';
 import { Inject } from '../../../util/injector';
 import { HotkeysNode } from './hotkeys';
 import * as obs from '../../../../obs-api';
 import { TPropertiesManager } from 'services/sources';
+import path from 'path';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -44,8 +46,9 @@ interface ISourceInfo {
 
 export class SourcesNode extends Node<ISchema, {}> {
 
-  schemaVersion = 1;
+  schemaVersion = 2;
 
+  @Inject() private fontLibraryService: FontLibraryService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
 
@@ -105,6 +108,31 @@ export class SourcesNode extends Node<ISchema, {}> {
         resolve();
       });
     });
+  }
+
+  migrate(version: number) {
+    if (version < 2) {
+      this.data.items.forEach(item => {
+        if (item.type !== 'text_gdiplus') {
+          return;
+        }
+
+        const settings = item.settings;
+
+        if (!settings.custom_font) {
+          return;
+        }
+
+        const filename = path.basename(settings.custom_font);
+
+        this.fontLibraryService.findFontFile(filename).then(family => {
+          settings['font']['face'] = family.name;
+
+          const source = this.sourcesService.getSource(item.id);
+          source.updateSettings(settings);
+        });
+      });
+    }
   }
 
   load(context: {}): Promise<void> {
