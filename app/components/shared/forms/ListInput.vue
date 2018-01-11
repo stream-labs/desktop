@@ -13,6 +13,7 @@
       :allow-empty="allowEmpty"
       :placeholder="placeholder"
       :loading="loading"
+      :allow-custom="value.type == 'OBS_INPUT_RESOLUTION_LIST' ? getCustomResolution : void 0"
       label="description"
       @input="onInputHandler"
       @search-change="onSearchChange">
