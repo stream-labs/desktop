@@ -51,6 +51,18 @@ export class ObsImporterService extends Service {
     // Profile
     this.importProfile(selectedprofile);
 
+    // Select current scene collection
+    const globalConfigFile = path.join (this.OBSconfigFileDirectory, 'global.ini');
+
+    const data = fs.readFileSync(globalConfigFile).toString();
+
+    if (data) {
+      const currentSceneCollection =
+        data.match(/^SceneCollection\=(.*)$/gm).toString().replace('SceneCollection=', '');
+
+      this.appService.loadConfig(currentSceneCollection);
+    }
+
     nodeObs.OBS_service_resetVideoContext();
     nodeObs.OBS_service_resetAudioContext();
   }
