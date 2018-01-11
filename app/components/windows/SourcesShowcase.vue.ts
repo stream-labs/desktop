@@ -38,12 +38,6 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
 
-  widgets: {
-    AlertBox: {
-      Desciprion: ""
-    }
-  }
-
   selectSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     const sameTypeCount = this.sourcesService.getSources()
       .filter((source) => {
@@ -66,10 +60,8 @@ export default class SourcesShowcase extends Vue {
 
   inspectedSource: TInspectableSource = null;
 
-  inspectSource(inspectedSource: TInspectableSource, widgetType: string) {
+  inspectSource(inspectedSource: TInspectableSource) {
     this.inspectedSource = inspectedSource;
-
-    this.$forceUpdate();
   }
 
   get loggedIn() {
