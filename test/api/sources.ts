@@ -5,7 +5,7 @@ import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../app/services/sources/sources-api';
 
 
-useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
+useSpectron({ restartAppAfterEachTest: false });
 
 
 test('Creating, fetching and removing sources', async t => {

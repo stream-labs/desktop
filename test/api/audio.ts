@@ -6,7 +6,7 @@ import { IAudioServiceApi } from 'services/audio';
 import { IScenesServiceApi } from 'services/scenes';
 import { IAppServiceApi } from "../../app/services/app/app-api";
 
-useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
+useSpectron({ restartAppAfterEachTest: false});
 
 
 test('The default sources exists', async t => {
