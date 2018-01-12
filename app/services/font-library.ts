@@ -52,11 +52,11 @@ export class FontLibraryService extends Service {
    * upgrading config schema */
   findFontFile(baseFileName: string): Promise<IFontFamily> {
     return this.getManifest().then(manifest => {
-      for (const family_name in manifest.families) {
-        const family = manifest.families[family_name];
+      for (let i = 0; i < manifest.families.length; ++i) {
+        const family = manifest.families[i];
 
-        for (const style_name in family.styles) {
-          const style = family.styles[style_name];
+        for (let k = 0; k < family.styles.length; ++k) {
+          const style = family.styles[k];
 
           if (baseFileName === style.file) {
             return family;
