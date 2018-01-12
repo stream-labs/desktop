@@ -57,10 +57,8 @@ export class ObsImporterService extends Service {
     const data = fs.readFileSync(globalConfigFile).toString();
 
     if (data) {
-      const currentSceneCollection =
-        data.match(/^SceneCollection\=(.*)$/gm).toString().replace('SceneCollection=', '');
-
-      this.appService.loadConfig(currentSceneCollection);
+      const match = data.match(/^SceneCollection\=(.*)$/m);
+      if (match && match[1]) this.appService.loadConfig(match[1]);
     }
 
     nodeObs.OBS_service_resetVideoContext();
