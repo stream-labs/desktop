@@ -466,7 +466,6 @@ export class ServicesManager extends Service {
             throw 'IPC request failed: check the errors in the main window';
           }
 
-          console.log('response', response);
           const result = response.result;
           response.mutations.forEach(mutation => commitMutation(mutation));
 

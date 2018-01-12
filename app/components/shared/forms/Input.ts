@@ -93,6 +93,7 @@ export interface IFont {
 }
 
 export interface IGoogleFont {
+  face?: string;
   path?: string;
   size?: string;
 }
