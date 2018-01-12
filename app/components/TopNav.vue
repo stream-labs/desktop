@@ -53,20 +53,21 @@
     </div>
     <div class="top-nav-item">
       <a class="link link--uppercase" @click="bugReport">
-        <i class="fa fa-bug"/> Bug Report</a>
+        <i class="fa fa-bug"/><span>Bug Report</span>
+      </a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openDiscord"
         class="link link--uppercase">
-        <span class="ico ico--discord"></span> Discord
+        <i class="ico ico--discord"></i><span>Discord</span>
       </a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openSettingsWindow"
         class="link link--uppercase">
-        <i class="fa fa-cog"/> Settings
+        <i class="fa fa-cog"/><span>Settings</span>
       </a>
     </div>
     <div class="top-nav-item">
@@ -108,6 +109,14 @@
 
   @media(max-width: 1200px) {
     font-size: 12px;
+  }
+}
+
+.link {
+  @media(max-width: 1450px) {
+    span {
+      display: none;
+    }
   }
 }
 
