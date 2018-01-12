@@ -1,13 +1,12 @@
 import test from 'ava';
 import { useSpectron } from '../../helpers/spectron';
 import { getClient } from '../../helpers/api-client';
-import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
-import { ISettingsServiceApi } from "../../../app/services/settings";
+import { ISettingsServiceApi } from '../../../app/services/settings';
 
 
-useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
+useSpectron({ restartAppAfterEachTest: false });
 useScreentest({ window: 'child' });
 
 
