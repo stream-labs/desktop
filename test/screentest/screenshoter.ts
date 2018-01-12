@@ -84,7 +84,7 @@ interface IScreentestOptions {
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
 
   const currentBranchFile = `${CONFIG.dir}/current-branch.txt`;
-  if (fs.fileExists(currentBranchFile)) {
+  if (fs.existsSync(currentBranchFile)) {
     branchName = fs.readFileSync(currentBranchFile).toString();
   } else {
     branchName = CONFIG.baseBranch;
