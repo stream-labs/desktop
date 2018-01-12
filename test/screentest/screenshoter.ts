@@ -70,8 +70,7 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
     await t.context.app.browserWindow.capturePage().then((imageBuffer: ArrayBuffer) => {
       const testName = t['_test'].title.replace('afterEach for ', '');
       const imageFileName = `${testName}__${configInd}.png`;
-      const dir = `${CONFIG.dist}/${branchName}`;
-      fs.writeFileSync(`${dir}/${imageFileName}`, imageBuffer);
+      fs.writeFileSync(`${CONFIG.dist}/${branchName}/${imageFileName}`, imageBuffer);
     });
   }
 
@@ -83,7 +82,7 @@ interface IScreentestOptions {
 
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
 
-  const currentBranchFile = `${CONFIG.dir}/current-branch.txt`;
+  const currentBranchFile = `${CONFIG.dist}/current-branch.txt`;
   if (fs.existsSync(currentBranchFile)) {
     branchName = fs.readFileSync(currentBranchFile).toString();
   } else {
