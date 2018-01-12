@@ -134,7 +134,7 @@
     "vue": "^2.5.12",
     "vue-color": "^2.4.3",
     "vue-loader": "^13.6.0",
-    "vue-multiselect": "2.0.3",
+    "vue-multiselect": "https://github.com/stream-labs/vue-multiselect.git",
     "vue-property-decorator": "^5.0.1",
     "vue-slider-component": "^2.2.7",
     "vue-template-compiler": "^2.5.12",

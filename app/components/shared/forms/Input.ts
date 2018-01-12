@@ -30,7 +30,8 @@ export declare type TObsType =
   'OBS_PROPERTY_FONT' |
   'OBS_PROPERTY_EDITABLE_LIST' |
   'OBS_PROPERTY_BUTTON' |
-  'OBS_PROPERTY_BITMASK';
+  'OBS_PROPERTY_BITMASK' |
+  'OBS_INPUT_RESOLUTION_LIST';
 
 /**
  * OBS values that frontend application can change
@@ -181,7 +182,7 @@ export function obsValuesToInputValues(
       prop.enabled = false;
     }
 
-    if (obsProp.type === 'OBS_PROPERTY_LIST') {
+    if (['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'].includes(obsProp.type)) {
       const listOptions: any[] = [];
 
       if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
