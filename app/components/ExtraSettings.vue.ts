@@ -7,6 +7,7 @@ import { Inject } from '../util/injector';
 import BoolInput from './shared/forms/BoolInput.vue';
 import { IFormInput } from './shared/forms/Input';
 import { CustomizationService } from '../services/customization';
+import { StreamlabelsService } from '../services/streamlabels';
 
 @Component({
   components: { BoolInput }
@@ -20,6 +21,7 @@ export default class ExtraSettings extends Vue {
   cacheUploaderService: CacheUploaderService;
 
   @Inject() customizationService: CustomizationService;
+  @Inject() streamlabelsService: StreamlabelsService;
 
   cacheUploading = false;
 
@@ -64,6 +66,12 @@ export default class ExtraSettings extends Vue {
       electron.remote.clipboard.writeText(file);
       alert(`Your cache directory has been successfully uploaded.  The file name ${file} has been copied to your clipboard.  Please paste it into discord and tag a developer.`);
       this.cacheUploading = false;
+    });
+  }
+
+  restartStreamlabelsSession() {
+    this.streamlabelsService.restartSession().then(result => {
+      if (result) alert('Streamlabels session has been succesfully restarted!');
     });
   }
 
