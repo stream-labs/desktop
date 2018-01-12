@@ -106,7 +106,8 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
-          outputPath: 'app/fonts/',
+          outputPath: 'fonts/',
+          publicPath: 'bundles/'
         }
       }
     ]
