@@ -3,8 +3,9 @@ import { useSpectron, focusMain } from './helpers/spectron/index';
 import { addSource } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
 import { getClient } from './helpers/api-client';
+import { sleep } from './helpers/sleep';
 
-useSpectron({ initApiClient: true });
+useSpectron();
 
 // Checks for the default audio sources
 async function checkDefaultSources(t) {

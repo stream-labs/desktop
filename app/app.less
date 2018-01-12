@@ -56,15 +56,31 @@ h4 {
   color: @grey;
   .transition;
   text-decoration: none;
+  display: flex;
+  align-items: center;
 
   &:hover {
     color: @navy;
+  }
+
+  .fa,
+  .ico {
+    margin-right: 6px;
+    font-size: 15px;
+  }
+}
+
+.link--underlined {
+  span {
+    text-decoration: underline;
+    font-weight: 400;
   }
 }
 
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
+  font-size: 12px;
 }
 
 .label--icon {
@@ -215,16 +231,8 @@ h4 {
 
 .slide-open__open,
 .slide-open__close {
-  .semibold;
-  color: @grey;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-  font-size: 12px;
-
   .fa {
     font-size: 12px;
-    vertical-align: middle;
-    margin-right: 4px;
   }
 }
 

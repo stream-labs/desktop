@@ -3,6 +3,7 @@ import 'rxjs/add/operator/first';
 import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
+import { DismissablesService } from "../../../app/services/dismissables";
 
 const path = require('path');
 const fs = require('fs');
@@ -34,13 +35,11 @@ export async function focusChild(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
-  initApiClient?: boolean;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
   skipOnboarding: true,
-  restartAppAfterEachTest: true,
-  initApiClient: false
+  restartAppAfterEachTest: true
 };
 
 export function useSpectron(options: ITestRunnerOptions) {
@@ -79,6 +78,11 @@ export function useSpectron(options: ITestRunnerOptions) {
       }
     }
 
+    // disable the popups that prevents context menu to be shown
+    const client = await getClient();
+    const dismissablesService = client.getResource<DismissablesService>('DismissablesService');
+    dismissablesService.dismissAll();
+
     context = t.context;
     appIsRunning = true;
   }
@@ -97,13 +101,12 @@ export function useSpectron(options: ITestRunnerOptions) {
   });
 
   test.afterEach.always(async t => {
-    if (options.initApiClient) {
-      const client = await getClient();
-      await client.unsubscribeAll();
-      if (options.restartAppAfterEachTest) {
-        client.disconnect();
-      }
+    const client = await getClient();
+    await client.unsubscribeAll();
+    if (options.restartAppAfterEachTest) {
+      client.disconnect();
     }
+
     if (options.restartAppAfterEachTest) {
       await stopApp();
     }

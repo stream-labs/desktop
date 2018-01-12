@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="section">
-      <button class="button button--action" @click="showNotifications">
+      <button class="button button--action button--sm" @click="showNotifications">
         Show Notifications
       </button>
     </div>

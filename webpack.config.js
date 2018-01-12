@@ -99,6 +99,16 @@ module.exports = {
           outputPath: 'media/',
           publicPath: 'bundles/'
         }
+      },
+      // Handles custom fonts. Currently used for icons.
+      {
+        test: /\.woff$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'fonts/',
+          publicPath: 'bundles/'
+        }
       }
     ]
   },

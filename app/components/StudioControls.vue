@@ -26,6 +26,7 @@
   flex-direction: column;
   height: 100%;
   padding: 0 10px;
+  position: relative;
 }
 
 .studio-controls-top {
