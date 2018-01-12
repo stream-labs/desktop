@@ -52,20 +52,20 @@
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item">
-      <a class="link" @click="bugReport">
+      <a class="link link--uppercase" @click="bugReport">
         <i class="fa fa-bug"/> Bug Report</a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openDiscord"
-        class="link">
+        class="link link--uppercase">
         <span class="ico ico--discord"></span> Discord
       </a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openSettingsWindow"
-        class="link">
+        class="link link--uppercase">
         <i class="fa fa-cog"/> Settings
       </a>
     </div>
@@ -91,20 +91,6 @@
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 54px;
-
-  .link {
-    text-transform: uppercase;
-    font-size: 12px;
-    .semibold;
-    letter-spacing: .7px;
-
-    .fa,
-    .ico {
-      font-size: 15px;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
-  }
 }
 
 .top-nav-right {

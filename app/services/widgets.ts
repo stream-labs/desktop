@@ -335,7 +335,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.SpinWheel]: {
     name: 'Spin Wheel',
     url(host, token) {
-      return `https://${host}/widgets/spin-wheel?token=${token}`;
+      return `https://${host}/widgets/wheel?token=${token}`;
     },
 
     width: 600,
