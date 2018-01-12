@@ -83,7 +83,12 @@ interface IScreentestOptions {
 
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
 
-  branchName = execSync('git status').toString().replace('On branch ', '').split('\n')[0];
+  const currentBranchFile = `${CONFIG.dir}/current-branch.txt`;
+  if (fs.fileExists(currentBranchFile)) {
+    branchName = fs.readFileSync(currentBranchFile).toString();
+  } else {
+    branchName = CONFIG.baseBranch;
+  }
 
   test.afterEach(async t => {
     await makeScreenshots(t, options);

@@ -3,15 +3,22 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
-// const commit = execSync('git log').toString().split('\n')[0].split(' ')[1];
+const commit = execSync('git log').toString().split('\n')[0].split(' ')[1];
+const currentBranch = execSync(`git branch --contain ${commit}`)
+  .split('\n')
+  .find(branchInfo => branchInfo.indexOf('HEAD detached ') === -1)
+  .replace(' ', '')
+  .replace('*', '');
 
 
 const branches = [
-  execSync('git log').toString().split('\n')[0].split(' ')[1],
+  currentBranch,
   CONFIG.baseBranch
 ];
 
 (function main() {
+
+  log('use branches', branches);
 
   const dir = CONFIG.dist;
   rimraf.sync(dir);
@@ -27,9 +34,8 @@ const branches = [
 
   for (const branchName of branches) {
 
-    fs.mkdirSync(`${dir}/${branchName}`);
 
-    execSync(`git checkout ${branchName}`);
+    checkoutBranch(branchName);
 
 
     log('project compilation');
@@ -82,3 +88,8 @@ function err(...args) {
   console.error(...args);
 }
 
+function checkoutBranch(branchName) {
+  fs.mkdirSync(`${dir}/${branchName}`);
+  execSync(`git checkout ${branchName}`);
+  fs.writeFileSync(`${dir}/current-branch.txt`, branchName);
+}
