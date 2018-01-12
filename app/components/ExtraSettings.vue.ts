@@ -70,9 +70,9 @@ export default class ExtraSettings extends Vue {
   }
 
   restartStreamlabelsSession() {
-    if (this.streamlabelsService.restartSession()) {
-      alert('Streamlabels session has been succesfully restarted!');
-    }
+    this.streamlabelsService.restartSession().then(result => {
+      if (result) alert('Streamlabels session has been succesfully restarted!');
+    });
   }
 
 }
