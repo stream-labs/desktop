@@ -1,13 +1,17 @@
 import { Node } from './node';
-import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
-import { FontLibraryService } from '../../font-library';
-import { AudioService } from '../../audio';
-import { HotkeysService } from '../../hotkeys';
-import { Inject } from '../../../util/injector';
 import { HotkeysNode } from './hotkeys';
+import { 
+  SourcesService, 
+  Source, 
+  TSourceType, 
+  TPropertiesManager 
+} from 'services/sources';
+import { FontLibraryService } from 'services/font-library';
+import { AudioService } from 'services/audio';
+import { HotkeysService } from 'services/hotkeys';
+import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
-import { TPropertiesManager } from 'services/sources';
 import path from 'path';
 
 interface ISchema {
