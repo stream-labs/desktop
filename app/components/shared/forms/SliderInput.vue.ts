@@ -1,17 +1,17 @@
 import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
-import { ISliderInputValue, TObsType, Input } from './Input';
+import { INumberInputValue, TObsType, Input } from './Input';
 import Slider from '../Slider.vue';
 
 @Component({
   components: { Slider }
 })
-class SliderInput extends Input<ISliderInputValue> {
+class SliderInput extends Input<INumberInputValue> {
 
   static obsType: TObsType;
 
   @Prop()
-  value: ISliderInputValue;
+  value: INumberInputValue;
 
   @throttle(100)
   updateValue(value: number) {

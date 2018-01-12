@@ -67,11 +67,6 @@ export interface IPathInputValue extends IFormInput<string> {
 }
 
 export interface INumberInputValue extends IFormInput<number> {
-  minVal?: number;
-  maxVal?: number;
-}
-
-export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
   stepVal: number;
@@ -210,18 +205,16 @@ export function obsValuesToInputValues(
       prop.value = !!prop.value;
 
     } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
-
-      prop.value = Number(prop.value);
+      prop = {
+        ...prop,
+        value: Number(prop.value),
+        minVal: Number(obsProp.minVal),
+        maxVal: Number(obsProp.maxVal),
+        stepVal: Number(obsProp.stepVal)
+      } as INumberInputValue;
 
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
         prop.type = 'OBS_PROPERTY_SLIDER';
-        prop = {
-          ...prop,
-          type: 'OBS_PROPERTY_SLIDER',
-          minVal: Number(obsProp.minVal),
-          maxVal: Number(obsProp.maxVal),
-          stepVal: Number(obsProp.stepVal)
-        } as ISliderInputValue;
       }
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
 
@@ -350,13 +343,14 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     }
 
     if (isNumberProperty(obsProp)) {
+      Object.assign(formItem as INumberInputValue, {
+        minVal: obsProp.details.min,
+        maxVal: obsProp.details.max,
+        stepVal: obsProp.details.step
+      });
+
       if (obsProp.details.type === obs.ENumberType.Slider) {
-        Object.assign(formItem as ISliderInputValue, {
-          minVal: obsProp.details.min,
-          maxVal: obsProp.details.max,
-          stepVal: obsProp.details.step,
-          type: 'OBS_PROPERTY_SLIDER'
-        });
+        formItem.type = 'OBS_PROPERTY_SLIDER';
       }
     }
 
