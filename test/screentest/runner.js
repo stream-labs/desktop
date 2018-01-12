@@ -5,6 +5,7 @@ const fs = require('fs');
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 const commit = execSync('git log').toString().split('\n')[0].split(' ')[1];
 const currentBranch = execSync(`git branch --contain ${commit}`)
+  .toString()
   .split('\n')
   .find(branchInfo => branchInfo.indexOf('HEAD detached ') === -1)
   .replace(' ', '')
@@ -89,7 +90,7 @@ function err(...args) {
 }
 
 function checkoutBranch(branchName) {
-  fs.mkdirSync(`${CONFIG.dir}/${branchName}`);
+  fs.mkdirSync(`${CONFIG.dist}/${branchName}`);
   execSync(`git checkout ${branchName}`);
-  fs.writeFileSync(`${CONFIG.dir}/current-branch.txt`, branchName);
+  fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
