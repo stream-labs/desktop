@@ -503,7 +503,7 @@
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
-            @click="inspectSource(widgetTypes.TheJar, 'theJar')"
+            @click="inspectSource(widgetTypes.TheJar)"
             @dblclick="selectWidget(widgetTypes.TheJar)">
             <div>The Jar</div><span class="label--essential">Essential</span>
           </div>
@@ -553,7 +553,7 @@
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
-            @click="inspectSource(widgetTypes.ChatBox, 'chatbox')"
+            @click="inspectSource(widgetTypes.ChatBox)"
             @dblclick="selectWidget(widgetTypes.ChatBox)">
             <div>Chatbox</div>
           </div>
