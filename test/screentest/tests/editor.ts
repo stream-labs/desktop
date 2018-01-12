@@ -6,7 +6,7 @@ import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 
 
-useSpectron({ restartAppAfterEachTest: false, initApiClient: true });
+useSpectron({ restartAppAfterEachTest: false});
 useScreentest();
 
 
