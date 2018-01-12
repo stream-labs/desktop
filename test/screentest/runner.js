@@ -65,7 +65,7 @@ const branches = [
 
   }
 
-  execSync(`git checkout ${branches[0]}`);
+  checkoutBranch(branches[0]);
 
   log('comparing screenshots');
   try {
@@ -89,7 +89,7 @@ function err(...args) {
 }
 
 function checkoutBranch(branchName) {
-  fs.mkdirSync(`${dir}/${branchName}`);
+  fs.mkdirSync(`${CONFIG.dir}/${branchName}`);
   execSync(`git checkout ${branchName}`);
-  fs.writeFileSync(`${dir}/current-branch.txt`, branchName);
+  fs.writeFileSync(`${CONFIG.dir}/current-branch.txt`, branchName);
 }
