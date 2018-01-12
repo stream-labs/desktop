@@ -65,7 +65,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   }
 
   reset() {
-    this.getCurrentTransition().release();
+    this.release();
     obs.Global.setOutputSource(0, null);
   }
 
