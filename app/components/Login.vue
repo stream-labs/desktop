@@ -21,5 +21,9 @@
 
 .user__name {
   .semibold;
+
+  @media(max-width: 1450px) {
+    display: none;
+  }
 }
 </style>
