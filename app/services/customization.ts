@@ -7,6 +7,7 @@ interface ICustomizationServiceState {
   livePreviewEnabled: boolean;
   leftDock: boolean;
   hideViewerCount: boolean;
+  livedockCollapsed: boolean;
 }
 
 /**
@@ -20,8 +21,14 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     updateStreamInfoOnLive: true,
     livePreviewEnabled: true,
     leftDock: false,
-    hideViewerCount: false
+    hideViewerCount: false,
+    livedockCollapsed: true
   };
+
+  init() {
+    super.init();
+    this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
+  }
 
   @mutation()
   SET_NIGHT_MODE(nightMode: boolean) {
@@ -44,6 +51,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   @mutation()
+  SET_LIVEDOCK_COLLAPSED(collapsed: boolean) {
+    this.state.livedockCollapsed = collapsed;
+  }
+
+  @mutation()
   SET_HIDDEN_VIEWER_COUNT(hidden: boolean) {
     this.state.hideViewerCount = hidden;
   }
@@ -56,6 +68,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     return this.state.nightMode;
   }
 
+  setNightMode(val: boolean) {
+    this.nightMode = val;
+  }
+
   setUpdateStreamInfoOnLive(update: boolean) {
     this.SET_UPDATE_STREAM_INFO_ON_LIVE(update);
   }
@@ -66,6 +82,10 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setLeftDock(enabled: boolean) {
     this.SET_LEFT_DOCK(enabled);
+  }
+
+  setLiveDockCollapsed(collapsed: boolean) {
+    this.SET_LIVEDOCK_COLLAPSED(collapsed);
   }
 
   setHiddenViewerCount(hidden: boolean) {
