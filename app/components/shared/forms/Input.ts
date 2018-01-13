@@ -209,9 +209,9 @@ export function obsValuesToInputValues(
       prop = {
         ...prop,
         value: Number(prop.value),
-        minVal: Number(obsProp.minVal),
-        maxVal: Number(obsProp.maxVal),
-        stepVal: Number(obsProp.stepVal)
+        minVal: obsProp.minVal,
+        maxVal: obsProp.maxVal,
+        stepVal: obsProp.stepVal
       } as INumberInputValue;
 
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
