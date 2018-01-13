@@ -78,7 +78,7 @@ const branches = [
 
 })();
 
-execSync(`git checkout ${branches[0]}`);
+checkoutBranch(branches[0]);
 
 
 function log(...args) {
