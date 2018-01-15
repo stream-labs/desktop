@@ -103,7 +103,7 @@
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
     "electron": "1.7.10",
-    "electron-builder": "^19.53.6",
+    "electron-builder": "19.52.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
