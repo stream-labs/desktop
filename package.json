@@ -51,10 +51,7 @@
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
     },
     "nsis": {
-      "license": "AGREEMENT",
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": true
+      "license": "AGREEMENT"
     }
   },
   "ava": {
@@ -73,7 +70,7 @@
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^1.14.0",
+    "electron-updater": "^2.18.2",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
     "node-libuiohook": "file:./node-libuiohook",
@@ -103,7 +100,7 @@
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
     "electron": "1.7.10",
-    "electron-builder": "^19.22.1",
+    "electron-builder": "19.52.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
