@@ -51,10 +51,7 @@
       "url": "https://d1g6eog1uhe0xm.cloudfront.net"
     },
     "nsis": {
-      "license": "AGREEMENT",
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": true
+      "license": "AGREEMENT"
     }
   },
   "ava": {
