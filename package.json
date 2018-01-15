@@ -53,7 +53,8 @@
     "nsis": {
       "license": "AGREEMENT",
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": true
     }
   },
   "ava": {
