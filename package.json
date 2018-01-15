@@ -73,7 +73,7 @@
     "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^1.14.0",
+    "electron-updater": "^2.18.2",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
     "node-libuiohook": "file:./node-libuiohook",
