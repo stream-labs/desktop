@@ -10,9 +10,29 @@ export interface IScenesCollectionsServiceApi {
   hasConfig(configName: string): boolean;
   renameConfig(newName: string): void;
   duplicateConfig(toConfig: string): void;
+
+  /**
+   * returns list of sources and scenes for each scene collection
+   */
+  getSceneCollectionsSchema(): Dictionary<ISceneCollectionSchema>;
 }
 
 export interface IScenesCollectionState {
   activeCollection: string;
   scenesCollections: string[];
+}
+
+export interface ISceneCollectionSchema {
+  scenes: {
+    id: string;
+    name: string;
+    sceneItems: { sceneItemId: string, sourceId: string }[]
+  }[];
+
+  sources: {
+    sourceId: string;
+    name: string;
+    type: string;
+    channel: number;
+  }[];
 }

@@ -2,14 +2,12 @@ import { Node } from './node';
 import { FiltersNode } from './filters';
 import { HotkeysNode } from './hotkeys';
 import { 
-  SourcesService, 
-  Source, 
+  SourcesService,
   TSourceType, 
   TPropertiesManager 
 } from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
-import { HotkeysService } from 'services/hotkeys';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import path from 'path';
@@ -25,7 +23,7 @@ interface IFilterInfo {
   enabled?: boolean;
 }
 
-interface ISourceInfo {
+export interface ISourceInfo {
   id: string;
   name: string;
   type: TSourceType;
