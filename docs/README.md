@@ -314,7 +314,7 @@ First get the list of audio sources for the current scene
 }
 ```
 
-Usually the AudioSource with name `AuxAudioDevice1` is mike.
+Usually the AudioSource with the name AuxAudioDevice1 is the microphone.
 To mute it you have to call `IAudioSourceApi.setMuted(true)`.
 Use `resourceId` as the reference to `IAudioSourceApi` instance: 
 
@@ -412,8 +412,7 @@ Use `ISceneApi.getSceneItem(sceneItemId)`.
 }
 ```
 
-Now you have a `resourceId` for `ISceneItemApi` instance and can use it's methods includes `setVisibility`.
-
+Now you have a `resourceId` for the `ISceneItemApi` instance and can use its methods including setVisibility.
 ### Request
 ```
 {
