@@ -14,7 +14,7 @@ export interface IScenesCollectionsServiceApi {
   /**
    * returns list of sources and scenes for each scene collection
    */
-  fetchSceneCollectionsSchema(): Dictionary<ISceneCollectionSchema>;
+  fetchSceneCollectionsSchema(): Promise<Dictionary<ISceneCollectionSchema>>;
 }
 
 export interface IScenesCollectionState {

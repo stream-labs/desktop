@@ -301,39 +301,50 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
   }
 
 
-  fetchSceneCollectionsSchema(): Dictionary<ISceneCollectionSchema> {
-    const schemes: Dictionary<ISceneCollectionSchema> = {};
-    this.state.scenesCollections.forEach(configName => {
-      const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
-      const root = parse(data, NODE_TYPES);
-      const collectionScheme = {
-        scenes: root.data.scenes.data.items.map((sceneData: ISceneSchema) => {
-          return {
-            id: sceneData.id,
-            name: sceneData.name,
-            sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
-              return {
-                sceneItemId: sceneItemData.id,
-                sourceId: sceneItemData.sourceId
-              };
-            })
-          };
-        }),
+  fetchSceneCollectionsSchema(): Promise<Dictionary<ISceneCollectionSchema>> {
+    return new Promise(resolve => {
+      const schemes: Dictionary<ISceneCollectionSchema> = {};
+      const parseTasks: Promise<void>[] = [];
+      this.state.scenesCollections.forEach(configName => {
+        parseTasks.push(new Promise(resolveTask => {
+          fs.readFile(this.getConfigFilePath(configName), (err, contents) => {
+            const data = contents.toString();
+            const root = parse(data, NODE_TYPES);
+            const collectionScheme = {
+              scenes: root.data.scenes.data.items.map((sceneData: ISceneSchema) => {
+                return {
+                  id: sceneData.id,
+                  name: sceneData.name,
+                  sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
+                    return {
+                      sceneItemId: sceneItemData.id,
+                      sourceId: sceneItemData.sourceId
+                    };
+                  })
+                };
+              }),
 
-        sources: root.data.sources.data.items.map((sourceData: ISourceInfo) => {
-          return {
-            id: sourceData.id,
-            name: sourceData.name,
-            type: sourceData.type,
-            channel: sourceData.channel
-          };
-        })
+              sources: root.data.sources.data.items.map((sourceData: ISourceInfo) => {
+                return {
+                  id: sourceData.id,
+                  name: sourceData.name,
+                  type: sourceData.type,
+                  channel: sourceData.channel
+                };
+              })
 
-      };
+            };
 
-      schemes[configName] = collectionScheme;
+            schemes[configName] = collectionScheme;
+            resolveTask();
+          });
+        }));
+
+      });
+
+      return Promise.all(parseTasks).then(() => resolve(schemes));
     });
-    return schemes;
+
   }
 
 
