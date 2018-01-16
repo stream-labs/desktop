@@ -326,7 +326,7 @@ Use `resourceId` as the reference to `IAudioSourceApi` instance:
     "method": "setMuted",
     "params": {
         "resource": "AudioSource[\"wasapi_input_capture_d497319b\"]",
-        args: [true]
+        "args": [true]
     }
 }
 ```
