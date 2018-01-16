@@ -151,7 +151,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       'MaxRetries',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
-      'ProcessPriority',
       'RecRBPrefix',
       'Reconnect',
       'RetryDelay'
