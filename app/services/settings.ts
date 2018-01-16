@@ -37,6 +37,7 @@ export interface ISettingsState {
   };
   Stream: {
     key: string;
+    streamType: string;
   };
   Output: Dictionary<TObsValue>;
   Video: {

@@ -95,9 +95,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     if (shouldConfirm && !confirm(confirmText)) return;
 
+    const streamType = this.settingsService.state.Stream.streamType;
     const blankStreamKey = !this.settingsService.state.Stream.key;
+    debugger;
 
-    if (blankStreamKey) {
+    if (streamType !== 'rtmp_custom' && blankStreamKey) {
       alert('No stream key has been entered. Please check your settings and add a valid stream key.');
       return;
     }
