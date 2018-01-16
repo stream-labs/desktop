@@ -43,8 +43,8 @@ export class VideoEncodingOptimizationService extends Service {
   @Inject() streamingService: StreamingService;
 
   init() {
-    this.streamingService.streamingStatusChange.subscribe(status => {
-      if (!status && this.isUsingEncodingOptimizations) {
+    this.streamingService.streamingStateChange.subscribe(status => {
+      if (!status.isStreaming && this.isUsingEncodingOptimizations) {
         this.isUsingEncodingOptimizations = false;
         this.restorePreviousValues();
       }

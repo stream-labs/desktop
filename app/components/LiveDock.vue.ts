@@ -44,9 +44,9 @@ export default class LiveDock extends Vue {
       }
     }, 100);
 
-    this.subscription = this.streamingService.streamingStatusChange.subscribe(
+    this.subscription = this.streamingService.streamingStateChange.subscribe(
       status => {
-        if (status) this.expand();
+        if (status.isStreaming) this.expand();
       }
     );
   }
