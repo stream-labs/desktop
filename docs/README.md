@@ -269,7 +269,7 @@ The same underlying source can be in multiple scenes as a sceneitem.
 Visibility is an attribute on a scene item. 
 So the same source can be visible in one scene and invisible in another for example.
 
-## How to mute a source
+## How to mute a source ?
 
 First get the list of audio sources for the current scene
 
