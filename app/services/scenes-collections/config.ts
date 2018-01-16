@@ -62,7 +62,8 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
 
     const configsNames = fs.readdirSync(this.configFileDirectory).filter(fileName => {
       return !fileName.match(/\.bak$/);
-    }).map(file => file.replace(/\.[^/.]+$/, ''));
+    }).map(file => file.replace(/\.[^/.]+$/, ''))
+      .filter(configName => configName); // rid of empty config names caused by '.json' file
 
     this.ADD_SCENES_COLLECTIONS(configsNames);
   }
