@@ -301,7 +301,7 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
   }
 
 
-  getSceneCollectionsSchema(): Dictionary<ISceneCollectionSchema> {
+  fetchSceneCollectionsSchema(): Dictionary<ISceneCollectionSchema> {
     const schemes: Dictionary<ISceneCollectionSchema> = {};
     this.state.scenesCollections.forEach(configName => {
       const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
