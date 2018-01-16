@@ -2,9 +2,9 @@ import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from '../stateful-service';
 import { Inject } from '../../util/injector';
 import { RootNode } from './nodes/root';
-import { SourcesNode } from './nodes/sources';
-import { ScenesNode } from './nodes/scenes';
-import { SceneItemsNode } from './nodes/scene-items';
+import { ISourceInfo, SourcesNode } from './nodes/sources';
+import { ISceneSchema, ScenesNode } from './nodes/scenes';
+import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { HotkeysNode } from './nodes/hotkeys';
 import { WindowsService } from '../windows';
@@ -17,7 +17,7 @@ import { throttle } from 'lodash-decorators';
 import { parse } from '.';
 import fs from 'fs';
 import path from 'path';
-import { IScenesCollectionsServiceApi, IScenesCollectionState } from './scenes-collections-api';
+import { ISceneCollectionSchema, IScenesCollectionsServiceApi, IScenesCollectionState } from './scenes-collections-api';
 
 const NODE_TYPES = {
   RootNode,
@@ -298,6 +298,53 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
         height: 250
       }
     });
+  }
+
+
+  fetchSceneCollectionsSchema(): Promise<Dictionary<ISceneCollectionSchema>> {
+    return new Promise(resolve => {
+      const schemes: Dictionary<ISceneCollectionSchema> = {};
+      const parseTasks: Promise<void>[] = [];
+      this.state.scenesCollections.forEach(configName => {
+        parseTasks.push(new Promise(resolveTask => {
+          fs.readFile(this.getConfigFilePath(configName), (err, contents) => {
+            const data = contents.toString();
+            const root = parse(data, NODE_TYPES);
+            const collectionScheme = {
+              scenes: root.data.scenes.data.items.map((sceneData: ISceneSchema) => {
+                return {
+                  id: sceneData.id,
+                  name: sceneData.name,
+                  sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
+                    return {
+                      sceneItemId: sceneItemData.id,
+                      sourceId: sceneItemData.sourceId
+                    };
+                  })
+                };
+              }),
+
+              sources: root.data.sources.data.items.map((sourceData: ISourceInfo) => {
+                return {
+                  id: sourceData.id,
+                  name: sourceData.name,
+                  type: sourceData.type,
+                  channel: sourceData.channel
+                };
+              })
+
+            };
+
+            schemes[configName] = collectionScheme;
+            resolveTask();
+          });
+        }));
+
+      });
+
+      return Promise.all(parseTasks).then(() => resolve(schemes));
+    });
+
   }
 
 

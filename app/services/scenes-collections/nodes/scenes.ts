@@ -5,7 +5,7 @@ import { SourcesService, Source, TSourceType } from '../../sources';
 import { HotkeysNode } from './hotkeys';
 import * as obs from '../../../../obs-api';
 
-interface ISchema {
+export interface ISceneSchema {
   id: string;
   name: string;
   sceneItems: SceneItemsNode;
@@ -13,7 +13,7 @@ interface ISchema {
   hotkeys?: HotkeysNode;
 }
 
-export class ScenesNode extends ArrayNode<ISchema, {}, Scene> {
+export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
 
   schemaVersion = 1;
 
@@ -24,7 +24,7 @@ export class ScenesNode extends ArrayNode<ISchema, {}, Scene> {
     return this.scenesService.scenes;
   }
 
-  saveItem(scene: Scene): Promise<ISchema> {
+  saveItem(scene: Scene): Promise<ISceneSchema> {
     return new Promise(resolve => {
       const sceneItems = new SceneItemsNode();
       const hotkeys = new HotkeysNode();
@@ -43,7 +43,7 @@ export class ScenesNode extends ArrayNode<ISchema, {}, Scene> {
     });
   }
 
-  loadItem(obj: ISchema): Promise<() => Promise<void>> {
+  loadItem(obj: ISceneSchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
       const scene = this.scenesService.createScene(
         obj.name,
