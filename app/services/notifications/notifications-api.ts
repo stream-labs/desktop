@@ -1,4 +1,4 @@
-import { TIssueCode } from 'services/performance-monitor';
+import { TIssueCode } from 'services/troubleshooter';
 import { IJsonRpcRequest } from 'services/jsonrpc';
 import { Observable } from 'rxjs/Observable';
 import { TFormData } from '../../components/shared/forms/Input';
@@ -51,6 +51,7 @@ export interface INotificationsServiceApi {
   getSettings(): INotificationsSettings;
   getSettingsFormData(): TFormData;
   setSettings(patch: Partial<INotificationsSettings>): void;
+  restoreDefaultSettings(): void;
   markAsRead(id: number): void;
   markAllAsRead(): void;
   applyAction(notificationId: number): void;

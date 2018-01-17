@@ -4,7 +4,6 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
-import { TIssueCode } from 'services/performance-monitor';
 import { IFormInput, TFormData } from '../../components/shared/forms/Input';
 import {
   ENotificationType,
@@ -128,6 +127,10 @@ export class NotificationsService extends PersistentStatefulService<
     this.SET_SETTINGS(patch);
   }
 
+  restoreDefaultSettings() {
+    this.setSettings(NotificationsService.defaultState.settings);
+  }
+
   showNotifications() {
     this.windowsService.showWindow({
       componentName: 'Notifications',
@@ -138,16 +141,6 @@ export class NotificationsService extends PersistentStatefulService<
     });
   }
 
-  showTroubleshooter(issueCode: TIssueCode) {
-    this.windowsService.showWindow({
-      componentName: 'Troubleshooter',
-      queryParams: { issueCode },
-      size: {
-        width: 500,
-        height: 500
-      }
-    });
-  }
 
   @mutation()
   private SET_SETTINGS(patch: Partial<INotificationsSettings>) {
