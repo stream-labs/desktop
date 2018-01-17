@@ -249,14 +249,14 @@ class DragHandler {
 
       // Screen right
       targetEdges.right.push({
-        depth: this.baseWidth - 1,
+        depth: this.baseWidth,
         offset: 0,
         length: this.baseHeight
       });
 
       // Screen bottom
       targetEdges.bottom.push({
-        depth: this.baseHeight - 1,
+        depth: this.baseHeight,
         offset: 0,
         length: this.baseWidth
       });
