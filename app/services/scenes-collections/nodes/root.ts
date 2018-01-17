@@ -9,6 +9,7 @@ interface ISchema {
   scenes: ScenesNode;
   transition: TransitionNode;
   hotkeys?: HotkeysNode;
+  serverId?: number;
 }
 
 // This is the root node of the config file

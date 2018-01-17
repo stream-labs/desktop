@@ -1,0 +1,113 @@
+import { Service } from 'services/service';
+import { Inject } from 'util/injector';
+import { HostsService } from 'services/hosts';
+import { handleErrors } from 'util/requests';
+import { UserService } from 'services/user';
+
+export interface IServerSceneCollection {
+  id?: number;
+  name: string;
+  data: string;
+  updated_at: Date;
+}
+
+interface ISceneCollectionsResponse {
+  data: IServerSceneCollection[];
+}
+
+/**
+ * This service manages interaction with the scene collections
+ * server API.
+ */
+export class SceneCollectionsServerApiService extends Service {
+  @Inject() hostsService: HostsService;
+  @Inject() userService: UserService;
+
+  fetchSceneCollections(): Promise<ISceneCollectionsResponse> {
+    const url = `${this.baseUrl}/scene-collection`;
+    const request = new Request(url, { headers: this.headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  fetchActiveCollection() {
+    const url = `${this.baseUrl}/active/scene-collection`;
+    const request = new Request(url, { headers: this.headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  makeSceneCollectionActive(id: number) {
+    const url = `${this.baseUrl}/active/scene-collection${id}`;
+    const request = new Request(url, { headers: this.headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  createSceneCollection(collection: IServerSceneCollection) {
+    const url = `${this.baseUrl}/scene-collection`;
+    const headers = this.headers;
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const body = this.formSerializeCollection(collection);
+    const request = new Request(url, { headers, method: 'POST', body });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  updateSceneCollection(collection: IServerSceneCollection) {
+    const url = `${this.baseUrl}/scene-collection/${collection.id}`;
+    const headers = this.headers;
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const body = this.formSerializeCollection(collection);
+    const request = new Request(url, { headers, method: 'PUT', body });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  deleteSceneCollection(id: number) {
+    const url = `${this.baseUrl}/scene-collection/${id}`;
+    const request = new Request(url, { headers: this.headers, method: 'DELETE' });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  private formSerializeCollection(collection: IServerSceneCollection) {
+    const bodyVars: string[] = [];
+    bodyVars.push(`name=${encodeURIComponent(collection.name)}`);
+    bodyVars.push(`data=${encodeURIComponent(collection.data)}`);
+    bodyVars.push(`updated_at=${encodeURIComponent(collection.updated_at.toISOString())}`);
+    return bodyVars.join('&');
+  }
+
+  private get headers() {
+    const headers = new Headers();
+    headers.append('token', this.authToken);
+    return headers;
+  }
+
+  private get overlaysHost() {
+    return this.hostsService.overlays;
+  }
+
+  private get baseUrl() {
+    return `https://${this.overlaysHost}/api`;
+  }
+
+  private get authToken() {
+    return this.userService.widgetToken;
+  }
+}

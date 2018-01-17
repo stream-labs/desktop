@@ -51,6 +51,7 @@ import { Observable } from 'rxjs/Observable';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
+import { SceneCollectionsServerApiService, SceneCollectionsSyncService } from 'services/scenes-collections';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -114,7 +115,9 @@ export class ServicesManager extends Service {
     StreamlabelsService,
     GuestApiService,
     VideoEncodingOptimizationService,
-    DismissablesService
+    DismissablesService,
+    SceneCollectionsServerApiService,
+    SceneCollectionsSyncService
   };
 
   private instances: Dictionary<Service> = {};
