@@ -13,3 +13,4 @@ test_script:
 artifacts:
   - path: 'test-dist\screentest\**\*'
     name: Screentests
+    type: zip
