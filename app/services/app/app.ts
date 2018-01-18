@@ -21,6 +21,7 @@ import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 interface IAppState {
   loading: boolean;
@@ -35,6 +36,7 @@ export class AppService extends StatefulService<IAppState>
   implements IAppServiceApi {
   @Inject() onboardingService: OnboardingService;
   @Inject() scenesCollectionsService: ScenesCollectionsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() hotkeysService: HotkeysService;
   @Inject() userService: UserService;
@@ -66,23 +68,11 @@ export class AppService extends StatefulService<IAppState>
     // associated with the user in sentry.
     this.userService;
 
-    // If we're not showing the onboarding steps, we should load
-    // the config file.  Otherwise the onboarding process will
-    // handle it based on what the user wants.
-    const onboarded = this.onboardingService.startOnboardingIfRequired();
-    if (!onboarded) {
-      if (this.scenesCollectionsService.hasConfigs()) {
-        loadingPromise = this.loadConfig('', { saveCurrent: false });
-      } else {
-        this.scenesCollectionsService.switchToBlankConfig();
-        loadingPromise = Promise.resolve();
-      }
-    } else {
-      loadingPromise = Promise.resolve();
-    }
+    // Will create a new scene collection if there isn't one
+    loadingPromise = this.sceneCollectionsService.initialize();
 
     loadingPromise.then(() => {
-      if (onboarded) this.enableAutoSave();
+      this.onboardingService.startOnboardingIfRequired();
 
       electron.ipcRenderer.on('shutdown', () => {
         electron.ipcRenderer.send('acknowledgeShutdown');
@@ -219,14 +209,14 @@ export class AppService extends StatefulService<IAppState>
     this.START_LOADING();
 
     window.setTimeout(async () => {
-      this.disableAutosave();
+      await this.sceneCollectionsService.deinitialize();
 
       this.ipcServerService.stopListening();
       this.tcpServerService.stopListening();
 
-      if (this.scenesCollectionsService.state.activeCollection) {
-        await this.scenesCollectionsService.rawSave();
-      }
+      // if (this.scenesCollectionsService.state.activeCollection) {
+      //   await this.scenesCollectionsService.rawSave();
+      // }
 
       this.reset();
       this.performanceMonitorService.stop();
@@ -257,6 +247,14 @@ export class AppService extends StatefulService<IAppState>
     });
 
     this.hotkeysService.unregisterAll();
+  }
+
+  startLoading() {
+    this.START_LOADING();
+  }
+
+  finishLoading() {
+    this.FINISH_LOADING();
   }
 
   private enableAutoSave() {

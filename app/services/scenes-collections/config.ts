@@ -14,7 +14,7 @@ import { ScenesService } from '../scenes';
 import { SourcesService } from '../sources';
 import { E_AUDIO_CHANNELS } from '../audio';
 import { throttle } from 'lodash-decorators';
-import { parse, SceneCollectionsSyncService } from '.';
+import { parse } from '.';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -52,7 +52,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() windowsService: WindowsService;
-  @Inject() sceneCollectionsSyncService: SceneCollectionsSyncService;
 
   init() {
     super.init();
@@ -67,7 +66,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<
       .map(file => file.replace(/\.[^/.]+$/, ''));
 
     this.ADD_SCENES_COLLECTIONS(configsNames);
-    this.sceneCollectionsSyncService;
   }
 
   @throttle(5000)

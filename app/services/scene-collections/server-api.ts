@@ -8,7 +8,7 @@ export interface IServerSceneCollection {
   id?: number;
   name: string;
   data: string;
-  updated_at: Date;
+  updated_at: string;
 }
 
 interface ISceneCollectionsResponse {
@@ -50,7 +50,7 @@ export class SceneCollectionsServerApiService extends Service {
       .then(res => res.json());
   }
 
-  createSceneCollection(collection: IServerSceneCollection) {
+  createSceneCollection(collection: IServerSceneCollection): Promise<IServerSceneCollection> {
     const url = `${this.baseUrl}/scene-collection`;
     const headers = this.headers;
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -89,7 +89,7 @@ export class SceneCollectionsServerApiService extends Service {
     const bodyVars: string[] = [];
     bodyVars.push(`name=${encodeURIComponent(collection.name)}`);
     bodyVars.push(`data=${encodeURIComponent(collection.data)}`);
-    bodyVars.push(`updated_at=${encodeURIComponent(collection.updated_at.toISOString())}`);
+    bodyVars.push(`updated_at=${encodeURIComponent(collection.updated_at)}`);
     return bodyVars.join('&');
   }
 
