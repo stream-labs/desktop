@@ -3,13 +3,17 @@ import path from 'path';
 import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
+import { EFontStyle } from 'obs-studio-node';
 
+export interface IFamilyWithStyle {
+  family: IFontFamily;
+  style: IFontStyle;
+}
 
 export interface IFontStyle {
   name: string;
   file: string;
 }
-
 
 export interface IFontFamily {
   name: string;
@@ -45,12 +49,45 @@ export class FontLibraryService extends Service {
     return Promise.resolve(this.manifest);
   }
 
+  getSettingsFromFont(familyName: string, style: string): [string, number] {
+    /* Scrape style string remnants onto actual family name
+     * until we're left with nothing but plugin compatible terms. */
+    const styleSplit = style.split(' ');
+    let actualFamily = familyName;
+    let actualStyle = 0;
+
+    for (let i = 0; i < styleSplit.length; ++i) {
+      switch (styleSplit[i]) {
+        case 'Regular':
+          if (i !== styleSplit.length - 1) {
+            console.log(`Weird font style detected: ${style}`);
+          }
+
+          break;
+        case 'Italic':
+          if (i !== styleSplit.length - 1) {
+            console.log(`Weird font style detected: ${style}`);
+          }
+
+          actualStyle |= EFontStyle.Italic;
+          break;
+        case 'Bold':
+          actualStyle |= EFontStyle.Bold;
+          break;
+        default:
+          actualFamily += ` ${styleSplit[i]}`;
+      }
+    }
+
+    return [actualFamily, actualStyle];
+  }
+
   /* This scans the entire manifest (which is slow)
    * to find a filename, then finds the family name
    * in the parent. This also doesn't take into account
    * font files yet. This function is used mostly for
    * upgrading config schema */
-  findFontFile(baseFileName: string): Promise<IFontFamily> {
+  findFontFile(baseFileName: string): Promise<IFamilyWithStyle> {
     return this.getManifest().then(manifest => {
       for (let i = 0; i < manifest.families.length; ++i) {
         const family = manifest.families[i];
@@ -59,7 +96,7 @@ export class FontLibraryService extends Service {
           const style = family.styles[k];
 
           if (baseFileName === style.file) {
-            return family;
+            return { family, style };
           }
         }
       }
