@@ -56,6 +56,10 @@ export default class TopNav extends Vue {
     electron.remote.shell.openExternal('https://tracker.streamlabs.com');
   }
 
+  openDiscord() {
+    electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
+  }
+
   get isDevMode() {
     return Utils.isDevMode();
   }

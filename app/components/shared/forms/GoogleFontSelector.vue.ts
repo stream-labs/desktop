@@ -67,6 +67,7 @@ export default class GoogleFontSelector extends Input<IGoogleFont> {
       const style = family.styles[0];
 
       this.updateStyles();
+      this.value.face = familyName;
       this.setStyle(style.name);
     });
   }
@@ -77,14 +78,14 @@ export default class GoogleFontSelector extends Input<IGoogleFont> {
 
     this.fontLibraryService.findStyle(this.selectedFamily, styleName).then(style => {
       this.fontLibraryService.downloadFont(style.file).then(fontPath => {
-        this.emitInput({ path: fontPath, size: this.value.size });
+        this.emitInput({ ...this.value, path: fontPath });
         this.loading = false;
       });
     });
   }
 
   setSize(size: string) {
-    this.emitInput({ path: this.value.path, size });
+    this.emitInput({ ...this.value, size });
   }
 
 }

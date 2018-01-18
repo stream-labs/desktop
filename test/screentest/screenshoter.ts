@@ -5,9 +5,8 @@ import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
 import { focusChild } from '../helpers/spectron/index';
-import { PerformanceService } from "../../app/services/performance";
-import { ISourcesServiceApi } from "../../app/services/sources/sources-api";
-import { IAudioServiceApi } from "../../app/services/audio/audio-api";
+import { PerformanceService } from '../../app/services/performance';
+import { IAudioServiceApi } from '../../app/services/audio/audio-api';
 
 const fs = require('fs');
 const CONFIG = getConfig();

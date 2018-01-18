@@ -43,6 +43,15 @@
     @sort="handleSort"
     @contextmenu="showContextMenu"
   />
+
+  <help-tip :dismissable-key="helpTipDismissable">
+    <div slot="title">
+      Scene Collections
+    </div>
+    <div slot="content">
+      This is where your <span class="semibold">Scene Collections</span> live. Clicking the title will dropdown a menu where you can view & manage.
+    </div>
+  </help-tip>
 </div>
 </template>
 

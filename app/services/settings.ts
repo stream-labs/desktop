@@ -37,6 +37,7 @@ export interface ISettingsState {
   };
   Stream: {
     key: string;
+    streamType: string;
   };
   Output: Dictionary<TObsValue>;
   Video: {
@@ -151,7 +152,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       'MaxRetries',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
-      'ProcessPriority',
       'RecRBPrefix',
       'Reconnect',
       'RetryDelay'
@@ -282,6 +282,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         })
       });
     }
+
     nodeObs.OBS_settings_saveSettings(categoryName, dataToSave);
     this.SET_SETTINGS(
       SettingsService.convertFormDataToState({ [categoryName]: settingsData })

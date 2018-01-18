@@ -1,7 +1,7 @@
 <template>
   <div>
     <a
-      class="slide-open__open link"
+      class="slide-open__open link link--uppercase"
       @click="slideOpen = !slideOpen">
       <i class="fa fa-arrow-left" aria-hidden="true"></i> Test Widgets
     </a>
@@ -9,9 +9,9 @@
       <div
         v-if="slideOpen"
         class="slide-open__menu">
-        <a class="slide-open__close"
+        <a class="slide-open__close link link--uppercase"
           @click="slideOpen = !slideOpen">
-          <i class="fa fa-times" aria-hidden="true"></i>
+          <i class="fa fa-arrow-right" aria-hidden="true"></i> Hide Test Widgets
         </a>
         <div class="button-container">
           <button

@@ -39,12 +39,6 @@
   </div>
 
   <div class="top-nav-right">
-    <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="openDevTools">Dev Tools</a>
-    </div>
-    <div class="top-nav-item">
-      <a class="link" @click="bugReport">Bug Report</a>
-    </div>
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <!--<i class="fa fa-sun-o"/>
@@ -54,11 +48,26 @@
         <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
       </button>
     </div>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a class="link" @click="openDevTools">Dev Tools</a>
+    </div>
+    <div class="top-nav-item">
+      <a class="link link--uppercase" @click="bugReport">
+        <i class="fa fa-bug"/><span>Bug Report</span>
+      </a>
+    </div>
+    <div class="top-nav-item">
+      <a
+        @click="openDiscord"
+        class="link link--uppercase">
+        <i class="ico ico--discord"></i><span>Discord</span>
+      </a>
+    </div>
     <div class="top-nav-item">
       <a
         @click="openSettingsWindow"
-        class="link">
-        <i class="fa fa-cog"/> Settings
+        class="link link--uppercase">
+        <i class="fa fa-cog"/><span>Settings</span>
       </a>
     </div>
     <div class="top-nav-item">
@@ -82,11 +91,7 @@
   max-width:  none;
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
-  flex: 0 0 45px;
-
-  .link {
-    font-size: 14px;
-  }
+  flex: 0 0 54px;
 }
 
 .top-nav-right {
@@ -104,6 +109,14 @@
 
   @media(max-width: 1200px) {
     font-size: 12px;
+  }
+}
+
+.link {
+  @media(max-width: 1450px) {
+    span {
+      display: none;
+    }
   }
 }
 

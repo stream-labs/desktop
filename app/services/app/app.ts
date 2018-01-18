@@ -231,7 +231,7 @@ export class AppService extends StatefulService<IAppState>
       this.reset();
       this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
-      this.scenesTransitionsService.release();
+      this.scenesTransitionsService.reset();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

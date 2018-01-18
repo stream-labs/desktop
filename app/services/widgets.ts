@@ -24,7 +24,8 @@ export enum WidgetType {
   TheJar = 8,
   ViewerCount = 9,
   StreamBoss = 10,
-  Credits = 11
+  Credits = 11,
+  SpinWheel = 12
 }
 
 export interface ISerializableWidget {
@@ -324,6 +325,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
 
     width: 600,
     height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.SpinWheel]: {
+    name: 'Spin Wheel',
+    url(host, token) {
+      return `https://${host}/widgets/wheel?token=${token}`;
+    },
+
+    width: 600,
+    height: 600,
 
     x: 0,
     y: 1,

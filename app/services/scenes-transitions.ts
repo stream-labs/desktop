@@ -64,6 +64,11 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
     this.getCurrentTransition().release();
   }
 
+  reset() {
+    this.release();
+    obs.Global.setOutputSource(0, null);
+  }
+
   getSettings(): Dictionary<TObsValue> {
     return this.getCurrentTransition().settings;
   }
@@ -79,8 +84,6 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   setPropertiesFormData(formData: TFormData) {
     return setPropertiesFormData(this.getCurrentTransition(), formData);
   }
-
-
 
   private getCurrentTransition() {
     return obs.Global.getOutputSource(0) as obs.ITransition;

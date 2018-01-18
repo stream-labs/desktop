@@ -4,7 +4,7 @@ import { Inject } from '../../util/injector';
 import { StatefulService, mutation } from '../stateful-service';
 import { nodeObs } from '../obs-api';
 import { SettingsService } from '../settings';
-import { padStart } from 'lodash';
+import { padStart, isEqual } from 'lodash';
 import { track } from '../usage-statistics';
 import { WindowsService } from '../windows';
 import { Subject } from 'rxjs/Subject';
@@ -55,9 +55,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   }
 
 
-  streamingStatusChange = new Subject<boolean>();
+  streamingStateChange = new Subject<IStreamingServiceState>();
 
   powerSaveId: number;
+
+  private emittedState: IStreamingServiceState;
 
 
   // Only runs once per app lifecycle
@@ -75,6 +77,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
         }
 
         this.SET_STREAM_STATUS(status);
+        this.emitStateIfChanged();
       },
       10 * 1000
     );
@@ -95,9 +98,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     if (shouldConfirm && !confirm(confirmText)) return;
 
+    const streamType = this.settingsService.state.Stream.streamType;
     const blankStreamKey = !this.settingsService.state.Stream.key;
 
-    if (blankStreamKey) {
+    if (streamType !== 'rtmp_custom' && blankStreamKey) {
       alert('No stream key has been entered. Please check your settings and add a valid stream key.');
       return;
     }
@@ -106,13 +110,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     nodeObs.OBS_service_startStreaming();
     this.START_STREAMING((new Date()).toISOString());
-    this.streamingStatusChange.next(true);
+
 
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
 
     if (recordWhenStreaming && !this.state.isRecording) {
       this.startRecording();
     }
+    this.emitStateIfChanged();
   }
 
   @track('stream_end')
@@ -129,13 +134,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     nodeObs.OBS_service_stopStreaming();
     this.STOP_STREAMING();
     this.SET_STREAM_STATUS(null);
-    this.streamingStatusChange.next(false);
 
     const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
 
     if (!keepRecording && this.state.isRecording) {
       this.stopRecording();
     }
+
+    this.emitStateIfChanged();
   }
 
   startRecording() {
@@ -143,6 +149,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     nodeObs.OBS_service_startRecording();
     this.START_RECORDING((new Date()).toISOString());
+    this.emitStateIfChanged();
   }
 
   stopRecording() {
@@ -150,6 +157,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     nodeObs.OBS_service_stopRecording();
     this.STOP_RECORDING();
+    this.emitStateIfChanged();
   }
 
   showEditStreamInfo() {
@@ -200,6 +208,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     const hours = padStart(duration.hours().toString(), 2, '0');
 
     return `${hours}:${minutes}:${seconds}`;
+  }
+
+  private emitStateIfChanged() {
+    if (isEqual(this.state, this.emittedState)) return;
+    const stateToEmit = { ...this.state };
+    this.streamingStateChange.next(this.state);
+    this.emittedState = stateToEmit;
   }
 
 }

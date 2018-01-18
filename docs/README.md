@@ -257,3 +257,188 @@ To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
     }
 }
 ```
+
+# FAQ
+
+## What is the difference between Sources and SceneItems?
+
+One thing to keep in mind in OBS is that sources and scene items are different things.
+A source exists outside the context of a scene. Muted is a property of a source. 
+A scene item is essentially an instance of a source in a scene. 
+The same underlying source can be in multiple scenes as a sceneitem. 
+Visibility is an attribute on a scene item. 
+So the same source can be visible in one scene and invisible in another for example.
+
+## How to mute a source ?
+
+First get the list of audio sources for the current scene
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 7,
+    "method": "getSourcesForCurrentScene",
+    "params": {
+        "resource": "AudioService"
+    }
+}
+```
+
+
+### Response
+```
+{
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": [
+       {
+            "_type": "HELPER",
+            "resourceId": "AudioSource[\"wasapi_output_capture_30c2879c\"]",
+            "sourceId": "wasapi_output_capture_30c2879c",
+            "muted": false,
+            "name": "DesktopAudioDevice1",
+            "type": "wasapi_output_capture",
+            "id": "wasapi_output_capture_30c2879c-989e-4230-a293-c2e47941197a"
+        },
+       {
+            "_type": "HELPER",
+            "resourceId": "AudioSource[\"wasapi_input_capture_d497319b\"]",
+            "sourceId": "wasapi_input_capture_d497319b",
+            "muted": false,
+            "name": "AuxAudioDevice1",
+            "type": "wasapi_input_capture"
+            "id": "wasapi_input_capture_d497319b"
+        }
+    ]
+}
+```
+
+Usually the AudioSource with the name AuxAudioDevice1 is the microphone.
+To mute it you have to call `IAudioSourceApi.setMuted(true)`.
+Use `resourceId` as the reference to `IAudioSourceApi` instance: 
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 7,
+    "method": "setMuted",
+    "params": {
+        "resource": "AudioSource[\"wasapi_input_capture_d497319b\"]",
+        "args": [true]
+    }
+}
+```
+
+## How to hide/show a scene item?
+
+First get the active scene
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 8,
+    "method": "activeScene",
+    "params": {
+        "resource": "ScenesService"
+    }
+}
+```
+
+### Response
+```
+{
+    "jsonrpc": "2.0",
+    "id": 8,
+    "result": {
+        "_type": "HELPER",
+        "resourceId": "Scene[\"scene_02da7db7\"]",
+        "id": "scene_02da7db7",
+        "name": "Scene",
+        "items": [
+           {
+                "sceneItemId": "b18ee2b0",
+                "sourceId": "color_source_61221191",
+                "x": 975.2116452561818,
+                "y": 392.0672268907563,
+                "visible": true
+            },
+           {
+                "sceneItemId": "fffadcdd",
+                "sourceId": "image_source_21071a85",
+                "x": 331.0344827586205,
+                "y": 174.25210084033603,
+                "visible": true
+            }
+        ]
+    }
+}
+```
+
+Lets hide the first scene item via `ISceneItemApi.setVisibility(false)` method.
+To do that you need a `resourceId` for this scene item.
+Use `ISceneApi.getSceneItem(sceneItemId)`.
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 9,
+    "method": "getItem",
+    "params": {
+        "resource": "Scene[\"scene_02da7db7\"]",
+        "args": ["b18ee2b0"]
+    }
+}
+```
+
+### Response
+```
+{
+    "jsonrpc": "2.0",
+    "id": 9,
+    "result": {
+        "_type": "HELPER",
+        "resourceId": "SceneItem[\"scene_02da7db7\",\"b18ee2b0-6ff7\",\"color_source_61221191\"]",
+        "sceneItemId": "b18ee2b0",
+        "sourceId": "color_source_61221191",
+        "x": 975.2116452561818,
+        "y": 392.0672268907563,
+        "scaleX": 1,
+        "scaleY": 1,
+        "visible": true
+    }
+}
+```
+
+Now you have a `resourceId` for the `ISceneItemApi` instance and can use its methods including setVisibility.
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 10,
+    "method": "setVisibility",
+    "params": {
+        "resource": "SceneItem[\"scene_02da7db7\",\"b18ee2b0-6ff7\",\"color_source_61221191\"]",
+        "args": [false]
+    }
+}
+```
+
+# How to switch a scene collection?
+
+Use `AppService.loadConfig`
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 11,
+    "method": "loadConfig",
+    "params": {
+        "resource": "AppService",
+        "args": ["MySceneCollectionName"]
+    }
+}
+```

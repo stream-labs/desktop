@@ -57,7 +57,7 @@
     opacity: .5;
   }
 
-  @media(max-width: 1200px) {
+  @media(max-width: 1300px) {
     font-size: 12px;
   }
 }
@@ -73,6 +73,10 @@
   margin-right: 4px;
 
   @media(max-width: 1200px) {
+    display: none;
+  }
+
+  @media(max-width: 1300px) {
     height: 12px;
   }
 }

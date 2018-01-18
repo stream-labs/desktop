@@ -11,7 +11,7 @@ import { Inject } from '../../util/injector';
 import { InitAfter } from '../../util/service-observer';
 import { WindowsService } from '../windows';
 import {
-  IBitmaskInput, IFormInput, IListInput, ISliderInputValue, TFormData,
+  IBitmaskInput, IFormInput, IListInput, INumberInputValue, TFormData,
 } from '../../components/shared/forms/Input';
 import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
@@ -290,7 +290,7 @@ export class AudioSource implements IAudioSourceApi {
   getSettingsForm(): TFormData {
 
     return [
-      <ISliderInputValue>{
+      <INumberInputValue>{
         name: 'deflection',
         value: Math.round(this.fader.deflection * 100),
         description: 'Volume (%)',

@@ -122,7 +122,8 @@ function startApp() {
     width: 1600,
     height: 1000,
     show: false,
-    frame: false
+    frame: false,
+    title: "Streamlabs OBS",
   });
 
   mainWindow.setMenu(null);

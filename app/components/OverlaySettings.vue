@@ -5,14 +5,14 @@
     <br/>
     <br/>
     <button
-      class="button button--action"
+      class="button button--sm button--action margin-right--20"
       :disabled="busy"
       @click="saveOverlay">
       Export Overlay
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <button
-      class="button button--action"
+      class="button button--sm button--action"
       :disabled="busy"
       @click="loadOverlay">
       Import Overlay
@@ -23,7 +23,7 @@
   </div>
   <div class="section">
     <button
-      class="button button--action"
+      class="button button--sm button--action"
       :disabled="busy"
       @click="loadWidget">
       Import Widget in Current Scene

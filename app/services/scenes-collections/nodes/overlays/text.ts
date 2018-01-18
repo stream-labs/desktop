@@ -38,12 +38,22 @@ export class TextNode extends Node<ISchema, IContext> {
     // If a custom font was set, try to load it as a google font.
     // If this fails, not font will be installed and the plugin
     // will automatically fall back to Arial
-    if (this.data.settings['custom_font']) {
-      const path = await this.fontLibraryService.downloadFont(
-        this.data.settings['custom_font']
+    const settings = this.data.settings;
+
+    if (settings['custom_font']) {
+      const font_path = await this.fontLibraryService.downloadFont(
+        settings['custom_font']
       );
 
-      this.data.settings['custom_font'] = path;
+      if (!settings['font']['face']) {
+        const filename = path.basename(font_path);
+
+        await this.fontLibraryService.findFontFile(filename).then(family => {
+          settings['font']['face'] = family.name;
+        });
+      }
+      
+      settings['custom_font'] = font_path;
       this.updateInput(context);
     } else {
       this.updateInput(context);

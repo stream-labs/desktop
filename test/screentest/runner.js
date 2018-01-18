@@ -31,8 +31,8 @@ const branches = [
   });
 
 
-  for (const branchName of branches) {
 
+  for (const branchName of branches) {
 
     checkoutBranch(branchName);
 
@@ -66,6 +66,7 @@ const branches = [
 
   checkoutBranch(branches[0]);
 
+
   log('comparing screenshots');
   try {
     execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
@@ -93,3 +94,4 @@ function checkoutBranch(branchName) {
   execSync(`git checkout ${branchName}`);
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
+

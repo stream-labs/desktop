@@ -1,12 +1,16 @@
 import { Node } from './node';
-import { SourcesService, Source, TSourceType } from '../../sources';
 import { FiltersNode } from './filters';
-import { AudioService } from '../../audio';
-import { HotkeysService } from '../../hotkeys';
-import { Inject } from '../../../util/injector';
 import { HotkeysNode } from './hotkeys';
+import { 
+  SourcesService,
+  TSourceType, 
+  TPropertiesManager 
+} from 'services/sources';
+import { FontLibraryService } from 'services/font-library';
+import { AudioService } from 'services/audio';
+import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
-import { TPropertiesManager } from 'services/sources';
+import path from 'path';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -19,7 +23,7 @@ interface IFilterInfo {
   enabled?: boolean;
 }
 
-interface ISourceInfo {
+export interface ISourceInfo {
   id: string;
   name: string;
   type: TSourceType;
@@ -44,8 +48,9 @@ interface ISourceInfo {
 
 export class SourcesNode extends Node<ISchema, {}> {
 
-  schemaVersion = 1;
+  schemaVersion = 2;
 
+  @Inject() private fontLibraryService: FontLibraryService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
 
@@ -63,17 +68,28 @@ export class SourcesNode extends Node<ISchema, {}> {
 
           const audioSource = this.audioService.getSource(source.sourceId);
 
+          const obsInput = source.getObsInput();
+
+          /* Signal to the source that it needs to save settings as 
+           * we're about to cache them to disk. */
+          obsInput.save();
+
           let data: ISourceInfo = {
             id: source.sourceId,
             name: source.name,
             type: source.type,
-            settings: source.getObsInput().settings,
-            volume: source.getObsInput().volume,
+            settings: obsInput.settings,
+            volume: obsInput.volume,
             channel: source.channel,
             hotkeys,
-            muted: source.getObsInput().muted,
+            muted: obsInput.muted,
             filters: {
-              items: source.getObsInput().filters.map(filter => {
+              items: obsInput.filters.map(filter => {
+                /* Remember that filters are also sources. 
+                 * We should eventually do this for transitions
+                 * as well. Scenes can be ignored. */
+                filter.save();
+
                 return {
                   name: filter.name,
                   type: filter.id,
@@ -107,6 +123,35 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
+  checkTextSourceFace(item: any): Promise<void> {
+    if (item.type !== 'text_gdiplus') {
+      return Promise.resolve();
+    }
+
+    const settings = item.settings;
+
+    if (settings['font']['face']) {
+      return Promise.resolve();
+    }
+
+    /* This should never happen */
+    if (!settings.custom_font) {
+      settings['font']['face'] = 'Arial';
+      const source = this.sourcesService.getSource(item.id);
+      source.updateSettings(settings);
+      return;
+    }
+
+    const filename = path.basename(settings.custom_font);
+
+    return this.fontLibraryService.findFontFile(filename).then(family => {
+      settings['font']['face'] = family.name;
+
+      const source = this.sourcesService.getSource(item.id);
+      source.updateSettings(settings);
+    });
+  }
+
   load(context: {}): Promise<void> {
     // This shit is complicated, IPC sucks
     const sourceCreateData = this.data.items.map(source => {
@@ -131,7 +176,6 @@ export class SourcesNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     sources.forEach((source, index) => {
-
       const sourceInfo = this.data.items[index];
 
       this.sourcesService.addSource(
@@ -143,6 +187,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
         }
       );
+
       if (source.audioMixers) {
         this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
@@ -153,9 +198,12 @@ export class SourcesNode extends Node<ISchema, {}> {
         });
       }
 
+      promises.push(this.checkTextSourceFace(sourceInfo));
+
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
+      
     });
 
     return new Promise(resolve => {

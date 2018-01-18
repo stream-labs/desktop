@@ -56,15 +56,31 @@ h4 {
   color: @grey;
   .transition;
   text-decoration: none;
+  display: flex;
+  align-items: center;
 
   &:hover {
     color: @navy;
+  }
+
+  .fa,
+  .ico {
+    margin-right: 6px;
+    font-size: 15px;
+  }
+}
+
+.link--underlined {
+  span {
+    text-decoration: underline;
+    font-weight: 400;
   }
 }
 
 .link--uppercase {
   text-transform: uppercase;
   letter-spacing: .7px;
+  font-size: 12px;
 }
 
 .label--icon {
@@ -79,8 +95,7 @@ h4 {
   display: inline-block;
 }
 
-.dropdown__toggle,
-.slide-open__open {
+.dropdown__toggle {
   .semibold;
   color: @grey;
   text-transform: uppercase;
@@ -211,13 +226,13 @@ h4 {
 .slide-open__close {
   position: absolute;
   left: 25px;
-  color: @grey;
-  transition: all 275ms;
+  .transition;
+}
 
-  &:hover {
-    .fa {
-      color: @navy;
-    }
+.slide-open__open,
+.slide-open__close {
+  .fa {
+    font-size: 12px;
   }
 }
 
@@ -228,8 +243,8 @@ h4 {
 
 .tab-button {
   border-bottom: 1px solid transparent;
-  height: 45px;
-  margin-right: 10px;
+  height: 54px;
+  margin-right: 20px;
   text-transform: uppercase;
   font-size: 12px;
   .semibold;
@@ -239,6 +254,8 @@ h4 {
 
   .fa {
     margin-right: 4px;
+    font-size: 15px;
+    vertical-align: middle;
   }
 
   &.active,

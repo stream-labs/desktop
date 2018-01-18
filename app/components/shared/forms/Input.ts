@@ -30,7 +30,8 @@ export declare type TObsType =
   'OBS_PROPERTY_FONT' |
   'OBS_PROPERTY_EDITABLE_LIST' |
   'OBS_PROPERTY_BUTTON' |
-  'OBS_PROPERTY_BITMASK';
+  'OBS_PROPERTY_BITMASK' |
+  'OBS_INPUT_RESOLUTION_LIST';
 
 /**
  * OBS values that frontend application can change
@@ -67,11 +68,6 @@ export interface IPathInputValue extends IFormInput<string> {
 }
 
 export interface INumberInputValue extends IFormInput<number> {
-  minVal?: number;
-  maxVal?: number;
-}
-
-export interface ISliderInputValue extends IFormInput<number> {
   minVal: number;
   maxVal: number;
   stepVal: number;
@@ -93,6 +89,7 @@ export interface IFont {
 }
 
 export interface IGoogleFont {
+  face?: string;
   path?: string;
   size?: string;
 }
@@ -181,7 +178,7 @@ export function obsValuesToInputValues(
       prop.enabled = false;
     }
 
-    if (obsProp.type === 'OBS_PROPERTY_LIST') {
+    if (['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'].includes(obsProp.type)) {
       const listOptions: any[] = [];
 
       if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
@@ -209,18 +206,16 @@ export function obsValuesToInputValues(
       prop.value = !!prop.value;
 
     } else if (['OBS_PROPERTY_INT', 'OBS_PROPERTY_FLOAT', 'OBS_PROPERTY_DOUBLE'].includes(obsProp.type)) {
-
-      prop.value = Number(prop.value);
+      prop = {
+        ...prop,
+        value: Number(prop.value),
+        minVal: obsProp.minVal,
+        maxVal: obsProp.maxVal,
+        stepVal: obsProp.stepVal
+      } as INumberInputValue;
 
       if (obsProp.subType === 'OBS_NUMBER_SLIDER') {
         prop.type = 'OBS_PROPERTY_SLIDER';
-        prop = {
-          ...prop,
-          type: 'OBS_PROPERTY_SLIDER',
-          minVal: Number(obsProp.minVal),
-          maxVal: Number(obsProp.maxVal),
-          stepVal: Number(obsProp.stepVal)
-        } as ISliderInputValue;
       }
     } else if (obsProp.type === 'OBS_PROPERTY_PATH') {
 
@@ -349,13 +344,14 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     }
 
     if (isNumberProperty(obsProp)) {
+      Object.assign(formItem as INumberInputValue, {
+        minVal: obsProp.details.min,
+        maxVal: obsProp.details.max,
+        stepVal: obsProp.details.step
+      });
+
       if (obsProp.details.type === obs.ENumberType.Slider) {
-        Object.assign(formItem as ISliderInputValue, {
-          minVal: obsProp.details.min,
-          maxVal: obsProp.details.max,
-          stepVal: obsProp.details.step,
-          type: 'OBS_PROPERTY_SLIDER'
-        });
+        formItem.type = 'OBS_PROPERTY_SLIDER';
       }
     }
 

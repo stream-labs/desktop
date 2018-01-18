@@ -14,7 +14,6 @@
     <div class="source-info__media">
       <slot name="media"></slot>
     </div>
-    <!--<button @click="$emit('clickAdd')" class="button button--action">Add Source</button>-->
   </div>
 </div>
 </template>

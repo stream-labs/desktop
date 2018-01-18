@@ -31,6 +31,7 @@ class ListInput extends Input<IListInput<TObsValue>> {
   }
 
   get currentValue() {
+
     const option = this.value.options.find((opt: IListOption<string>) => {
       return this.value.value === opt.value;
     });
@@ -39,6 +40,7 @@ class ListInput extends Input<IListInput<TObsValue>> {
     if (this.allowEmpty) return '';
     return this.value.options[0];
   }
+
 
 }
 

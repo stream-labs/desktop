@@ -11,7 +11,8 @@
       v-if="inspectedSource === 'image_source'"
       @clickAdd="selectSource('image_source')"
       name="Image"
-      description="Add images to your scene.">
+      description="Add images to your scene."
+      key="1">
       <img slot="media" src="../../../media/source-demos/source-image.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>png</li>
@@ -27,7 +28,8 @@
       v-if="inspectedSource === 'slideshow'"
       @clickAdd="selectSource('slideshow')"
       name="Image Slide Show"
-      description="Add a slideshow of images to your scene.">
+      description="Add a slideshow of images to your scene."
+      key="2">
       <img slot="media" src="../../../media/source-demos/source-slide-show.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>png</li>
@@ -43,7 +45,8 @@
       v-if="inspectedSource === 'ffmpeg_source'"
       @clickAdd="selectSource('ffmpeg_source')"
       name="Media Source"
-      description="Add videos or sound clips to your scene.">
+      description="Add videos or sound clips to your scene."
+      key="3">
       <img slot="media" src="../../../media/source-demos/source-media.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>mp4</li>
@@ -65,7 +68,8 @@
       v-if="inspectedSource === 'window_capture'"
       @clickAdd="selectSource('window_capture')"
       name="Window Capture"
-      description="Capture a specific window that's open on your computer.">
+      description="Capture a specific window that's open on your computer."
+      key="4">
       <img slot="media" src="../../../media/source-demos/source-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Compatible with most modern browsers and programs</li>
@@ -76,7 +80,8 @@
       v-if="inspectedSource === 'dshow_input'"
       @clickAdd="selectSource('dshow_input')"
       name="Video Capture Device"
-      description="Select from your build in USB webcam or an external.">
+      description="Select from your build in USB webcam or an external."
+      key="5">
       <img slot="media" src="../../../media/source-demos/source-video.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in webcam</li>
@@ -89,7 +94,8 @@
       v-if="inspectedSource === 'wasapi_output_capture'"
       @clickAdd="selectSource('wasapi_output_capture')"
       name="Audio Output Capture"
-      description="Captures your desktop audio for the purpose of playing sound, such as music or speech.">
+      description="Captures your desktop audio for the purpose of playing sound, such as music or speech."
+      key="6">
       <img slot="media" src="../../../media/source-demos/source-output.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Desktop audio</li>
@@ -100,7 +106,8 @@
       v-if="inspectedSource === 'color_source'"
       @clickAdd="selectSource('color_source')"
       name="Color Source"
-      description="Add a color to the background of your whole scene or just a part.">
+      description="Add a color to the background of your whole scene or just a part."
+      key="7">
       <img slot="media" src="../../../media/source-demos/source-color.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Hex</li>
@@ -113,7 +120,8 @@
       v-if="inspectedSource === 'browser_source'"
       @clickAdd="selectSource('browser_source')"
       name="BrowserSource"
-      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs.">
+      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs."
+      key="8">
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Websites</li>
@@ -126,7 +134,8 @@
       v-if="inspectedSource === 'text_gdiplus'"
       @clickAdd="selectSource('text_gdiplus')"
       name="Text (GDI+)"
-      description="Add text to your scene and adjust its style.">
+      description="Add text to your scene and adjust its style."
+      key="9">
       <img slot="media" src="../../../media/source-demos/source-text.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Hex</li>
@@ -141,7 +150,8 @@
       v-if="inspectedSource === 'monitor_capture'"
       @clickAdd="selectSource('monitor_capture')"
       name="Display Capture"
-      description="Capture your entire computer monitor.">
+      description="Capture your entire computer monitor."
+      key="10">
       <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Primary monitor</li>
@@ -153,7 +163,8 @@
       v-if="inspectedSource === 'game_capture'"
       @clickAdd="selectSource('game_capture')"
       name="Game Capture"
-      description="Capture a game you're playing on your computer.">
+      description="Capture a game you're playing on your computer."
+      key="11">
       <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in works with most modern computer games</li>
@@ -164,7 +175,8 @@
       v-if="inspectedSource === 'wasapi_input_capture'"
       @clickAdd="selectSource('wasapi_input_capture')"
       name="Audio Input Capture"
-      description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.">
+      description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech."
+      key="12">
       <img slot="media" src="../../../media/source-demos/source-input.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in microphones</li>
@@ -177,7 +189,8 @@
       v-if="inspectedSource === 'decklink-input'"
       @clickAdd="selectSource('decklink-input')"
       name="Blackmagic Device"
-      description="Capture the feed your decklink device is capturing.">
+      description="Capture the feed your decklink device is capturing."
+      key="13">
       <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Works with most of the recent Blackmagic cards.</li>
@@ -189,8 +202,14 @@
       v-if="inspectedSource === widgetTypes.AlertBox"
       @clickAdd="selectWidget(widgetTypes.AlertBox)"
       name="Alertbox"
-      description="Thanks viewers with notification popups.">
-      <img slot="media" src="../../../media/source-demos/alertbox.gif"/>
+      description="Thanks viewers with notification popups."
+      key="14">
+      <video class="source__demo source__demo--day" autoplay loop slot="media">
+        <source src="../../../media/source-demos/day/source-alertbox.mp4">
+      </video>
+      <video class="source__demo source__demo--night" autoplay loop slot="media">
+        <source src="../../../media/source-demos/night/source-alertbox.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -204,8 +223,14 @@
       v-if="inspectedSource === widgetTypes.DonationTicker"
       @clickAdd="selectWidget(widgetTypes.DonationTicker)"
       name="Donation Ticker"
-      description="Show off your most recent donations to your viewers.">
-      <img slot="media" src="../../../media/source-demos/donationticker.gif"/>
+      description="Show off your most recent donations to your viewers."
+      key="15">
+      <video class="source__demo source__demo--day" autoplay loop slot="media">
+        <source src="../../../media/source-demos/day/source-donation-ticker.mp4">
+      </video>
+      <video class="source__demo source__demo--night" autoplay loop slot="media">
+        <source src="../../../media/source-demos/night/source-donation-ticker.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
@@ -215,8 +240,14 @@
       v-if="inspectedSource === widgetTypes.EventList"
       @clickAdd="selectWidget(widgetTypes.EventList)"
       name="Event List"
-      description="Include your channel's most recent events into your stream.">
-      <img slot="media" src="../../../media/source-demos/eventlist.gif"/>
+      description="Include your channel's most recent events into your stream."
+      key="16">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-eventlist.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-eventlist.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -231,8 +262,14 @@
       v-if="inspectedSource === widgetTypes.DonationGoal"
       @clickAdd="selectWidget(widgetTypes.DonationGoal)"
       name="Donation Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/donationgoal.gif"/>
+      description="Set a goal for your viewers to help you reach."
+      key="17">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-donation-goal.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-donation-goal.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
       </ul>
@@ -242,8 +279,10 @@
       v-if="inspectedSource === widgetTypes.FollowerGoal"
       @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
       name="Follower Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      description="Set a goal for your viewers to help you reach."
+      key="18">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch Follows</li>
         <li>Youtube Follows</li>
@@ -255,8 +294,10 @@
       v-if="inspectedSource === widgetTypes.BitGoal"
       @clickAdd="selectWidget(widgetTypes.BitGoal)"
       name="Bit Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      description="Set a goal for your viewers to help you reach."
+      key="19">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-bit-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-bit-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch Bits</li>
       </ul>
@@ -266,8 +307,10 @@
       v-if="inspectedSource === widgetTypes.SubscriptionGoal"
       @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
       name="Subscription Goal"
-      description="Set a goal for your viewers to help you reach.">
-      <img slot="media" src="../../../media/source-demos/followergoal.png"/>
+      description="Set a goal for your viewers to help you reach."
+      key="20">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Youtube Subscribers</li>
       </ul>
@@ -277,8 +320,14 @@
       v-if="inspectedSource === widgetTypes.ChatBox"
       @clickAdd="selectWidget(widgetTypes.ChatBox)"
       name="Chatbox"
-      description="Include your channel's chat into your stream.">
-      <img slot="media" src="../../../media/source-demos/chat.gif"/>
+      description="Include your channel's chat into your stream."
+      key="21">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-chatbox.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-chatbox.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch chat</li>
         <li>Youtube chat</li>
@@ -289,8 +338,14 @@
       v-if="inspectedSource === widgetTypes.TheJar"
       @clickAdd="selectWidget(widgetTypes.TheJar)"
       name="The Jar"
-      description="The jar that catches bits, tips, and more.">
-      <img slot="media" src="../../../media/source-demos/jar.gif"/>
+      description="The jar that catches bits, tips, and more."
+      key="22">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-jar.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-jar.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>Donations</li>
         <li>Subscriptions</li>
@@ -304,8 +359,10 @@
       v-if="inspectedSource === widgetTypes.ViewerCount"
       @clickAdd="selectWidget(widgetTypes.ViewerCount)"
       name="Viewer Count"
-      description="Show off your viewers from multiple platforms.">
-      <img slot="media" src="../../../media/source-demos/viewercount-source.png"/>
+      description="Show off your viewers from multiple platforms."
+      key="23">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-viewer-count.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-viewer-count.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Youtube</li>
         <li>Twitch</li>
@@ -317,7 +374,8 @@
       v-if="inspectedSource === widgetTypes.StreamBoss"
       @clickAdd="selectWidget(widgetTypes.StreamBoss)"
       name="Stream Boss"
-      description="Battle with bits to be the boss of the stream!">
+      description="Battle with bits to be the boss of the stream!"
+      key="24">
       <img slot="media" src="../../../media/source-demos/streamboss-source.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Twitch Bits</li>
@@ -328,8 +386,14 @@
       v-if="inspectedSource === widgetTypes.Credits"
       @clickAdd="selectWidget(widgetTypes.Credits)"
       name="Credits"
-      description="Rolling credits to play at the end of your stream.">
-      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      description="Rolling credits to play at the end of your stream."
+      key="25">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-credits.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-credits.mp4">
+      </video>
       <ul slot="support-list" class="source-support__list">
         <li>New Followers</li>
         <li>New Subscribers</li>
@@ -339,24 +403,48 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === widgetTypes.SpinWheel"
+      @clickAdd="selectWidget(widgetTypes.SpinWheel)"
+      name="Spin Wheel"
+      description="Rolling credits to play at the end of your stream."
+      key="26">
+      <video class="source__demo source__demo--day" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/day/source-wheel.mp4">
+      </video>
+      <video class="source__demo source__demo--night" slot="media" autoplay loop>
+        <source src="../../../media/source-demos/night/source-wheel.mp4">
+      </video>
+      <ul slot="support-list" class="source-support__list">
+        <li>The streamer manually triggers a spin anytime while they are live.</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
       name="Scene"
-      description="Allows you to add existing scene as a source">
+      description="Allows you to add existing scene as a source"
+      key="27">
       <img slot="media" src="../../../media/source-demos/source-browser.png"/>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'streamlabel'"
-      @clickAdd="selectWidget(widgetTypes.Credits)"
+      @clickAdd="selectWidget(widgetTypes.StreamLabel)"
       name="Stream Label"
-      description="This is a placeholder description for streamlabels.">
-      <img slot="media" src="../../../media/source-demos/credits.gif"/>
+      description="This is a placeholder description for streamlabels."
+      key="28">
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>New Followers</li>
         <li>New Subscribers</li>
-        <li>Cheers</li>
-        <li>Donations</li>
+        <li>New Cheers</li>
+        <li>New Donations</li>
+        <li>All-Time Top Donator</li>
+        <li>Weekly Top Donator</li>
+        <li>Monthly Follows</li>
+        <li>Many more</li>
       </ul>
     </add-source-info>
 
@@ -492,6 +580,14 @@
             @click="inspectSource(widgetTypes.ViewerCount)"
             @dblclick="selectWidget(widgetTypes.ViewerCount)">
             <div>Viewer Count</div>
+          </div>
+
+          <div
+            class="source source--widget"
+            :class="{'source--active': inspectedSource === widgetTypes.SpinWheel}"
+            @click="inspectSource(widgetTypes.SpinWheel)"
+            @dblclick="selectWidget(widgetTypes.SpinWheel)">
+            <div>Spin Wheel</div>
           </div>
 
           <div
@@ -634,6 +730,14 @@ h4 {
   width: 30px;
 }
 
+.source__demo--day {
+  display: block;
+}
+
+.source__demo--night {
+  display: none;
+}
+
 .night-theme {
   .add-source {
     color: @grey;
@@ -654,6 +758,14 @@ h4 {
 
   .source-group {
     border-color: @night-border;
+  }
+
+  .source__demo--day {
+    display: none;
+  }
+
+  .source__demo--night {
+    display: block;
   }
 }
 </style>
