@@ -10,7 +10,12 @@ install:
 test_script:
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
+  - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
 
 artifacts:
   - path: 'screentest.zip'
     name: Screentests
+
+notifications:
+  - provider: GitHubPullRequest
+    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} Screentest is finished {{changed_screens}}"
