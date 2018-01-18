@@ -12,6 +12,5 @@ test_script:
   - 7z a screentest.zip test-dist\screentest\**\*
 
 artifacts:
-  - path: 'test-dist\screentest\**\*'
+  - path: 'screentest.zip'
     name: Screentests
-    type: zip
