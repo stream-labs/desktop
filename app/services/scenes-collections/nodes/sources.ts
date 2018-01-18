@@ -123,29 +123,33 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-  migrate(version: number) {
-    if (version < 2) {
-      this.data.items.forEach(item => {
-        if (item.type !== 'text_gdiplus') {
-          return;
-        }
-
-        const settings = item.settings;
-
-        if (!settings.custom_font) {
-          return;
-        }
-
-        const filename = path.basename(settings.custom_font);
-
-        this.fontLibraryService.findFontFile(filename).then(family => {
-          settings['font']['face'] = family.name;
-
-          const source = this.sourcesService.getSource(item.id);
-          source.updateSettings(settings);
-        });
-      });
+  checkTextSourceFace(item: any): Promise<void> {
+    if (item.type !== 'text_gdiplus') {
+      return Promise.resolve();
     }
+
+    const settings = item.settings;
+
+    if (settings['font']['face']) {
+      return Promise.resolve();
+    }
+
+    /* This should never happen */
+    if (!settings.custom_font) {
+      settings['font']['face'] = 'Arial';
+      const source = this.sourcesService.getSource(item.id);
+      source.updateSettings(settings);
+      return;
+    }
+
+    const filename = path.basename(settings.custom_font);
+
+    return this.fontLibraryService.findFontFile(filename).then(family => {
+      settings['font']['face'] = family.name;
+
+      const source = this.sourcesService.getSource(item.id);
+      source.updateSettings(settings);
+    });
   }
 
   load(context: {}): Promise<void> {
@@ -172,7 +176,6 @@ export class SourcesNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     sources.forEach((source, index) => {
-
       const sourceInfo = this.data.items[index];
 
       this.sourcesService.addSource(
@@ -184,6 +187,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
         }
       );
+
       if (source.audioMixers) {
         this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);
         this.audioService.getSource(sourceInfo.id).setSettings({
@@ -194,9 +198,12 @@ export class SourcesNode extends Node<ISchema, {}> {
         });
       }
 
+      promises.push(this.checkTextSourceFace(sourceInfo));
+
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
+      
     });
 
     return new Promise(resolve => {
