@@ -79,6 +79,10 @@ export class FontLibraryService extends Service {
       }
     }
 
+    /* If there are hyphens in the string, we must
+     * remove them. */
+    actualFamily = actualFamily.replace('-', '');
+
     return [actualFamily, actualStyle];
   }
 
