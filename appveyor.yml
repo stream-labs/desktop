@@ -11,6 +11,7 @@ test_script:
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
+  - ps: Add-AppveyorMessage "Changed screens - $env:changed_screens"
 
 artifacts:
   - path: 'screentest.zip'
