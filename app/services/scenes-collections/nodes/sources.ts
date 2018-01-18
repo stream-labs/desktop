@@ -130,13 +130,14 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const settings = item.settings;
 
-    if (settings['font']['face']) {
+    if (settings['font']['face'] && settings['font']['flags']) {
       return Promise.resolve();
     }
 
     /* This should never happen */
     if (!settings.custom_font) {
       settings['font']['face'] = 'Arial';
+      settings['font']['flags'] = 0;
       const source = this.sourcesService.getSource(item.id);
       source.updateSettings(settings);
       return;
@@ -145,7 +146,8 @@ export class SourcesNode extends Node<ISchema, {}> {
     const filename = path.basename(settings.custom_font);
 
     return this.fontLibraryService.findFontFile(filename).then(family => {
-      settings['font']['face'] = family.name;
+      [settings['font']['face'], settings['font']['flags']] = 
+        this.fontLibraryService.getSettingsFromFont(family.family.name, family.style.name);
 
       const source = this.sourcesService.getSource(item.id);
       source.updateSettings(settings);
