@@ -89,7 +89,8 @@ export interface IFont {
 }
 
 export interface IGoogleFont {
-  face?: string;
+  face: string;
+  flags: number;
   path?: string;
   size?: string;
 }

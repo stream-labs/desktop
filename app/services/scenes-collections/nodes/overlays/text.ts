@@ -1,6 +1,8 @@
 import { Node } from '../node';
 import { SceneItem } from '../../../scenes';
-import { FontLibraryService } from '../../../font-library';
+import { 
+  FontLibraryService, 
+  IFontFamily, IFontStyle } from '../../../font-library';
 import { Inject } from '../../../../util/injector';
 import path from 'path';
 
@@ -40,24 +42,32 @@ export class TextNode extends Node<ISchema, IContext> {
     // will automatically fall back to Arial
     const settings = this.data.settings;
 
-    if (settings['custom_font']) {
-      const font_path = await this.fontLibraryService.downloadFont(
-        settings['custom_font']
-      );
-
-      if (!settings['font']['face']) {
-        const filename = path.basename(font_path);
-
-        await this.fontLibraryService.findFontFile(filename).then(family => {
-          settings['font']['face'] = family.name;
-        });
-      }
-      
-      settings['custom_font'] = font_path;
+    if (!settings['custom_font']) {
       this.updateInput(context);
-    } else {
-      this.updateInput(context);
+      return;
     }
+
+    const filename = settings['custom_font'];
+
+    const fontPath = await this.fontLibraryService.downloadFont(
+      settings['custom_font']
+    );
+
+    if (settings['font']['face'] && settings['font']['flags']) {
+      this.updateInput(context);
+      return;
+    }
+
+    await this.fontLibraryService.findFontFile(filename).then(family => {
+      [settings['font']['face'], settings['font']['flags']] = 
+          this.fontLibraryService.getSettingsFromFont(
+            family.family.name, 
+            family.style.name);
+    });
+
+    settings['custom_font'] = fontPath;
+
+    this.updateInput(context);
   }
 
   updateInput(context: IContext) {
