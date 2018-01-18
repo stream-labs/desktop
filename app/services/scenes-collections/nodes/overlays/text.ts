@@ -34,23 +34,6 @@ export class TextNode extends Node<ISchema, IContext> {
     this.data = { settings };
   }
 
-  checkTextSourceFace(settings: any): Promise<void> {
-    if (settings.font.face) {
-      return Promise.resolve();
-    }
-
-    /* This should never happen */
-    if (!settings.custom_font) {
-      throw Error('Face not found but no custom_font to fetch face from');
-    }
-
-    const filename = path.basename(settings.custom_font);
-
-    return this.fontLibraryService.findFontFile(filename).then(family => {
-      settings['font']['face'] = family.name;
-    });
-  }
-
   async load(context: IContext) {
     // If a custom font was set, try to load it as a google font.
     // If this fails, not font will be installed and the plugin
@@ -58,15 +41,19 @@ export class TextNode extends Node<ISchema, IContext> {
     const settings = this.data.settings;
 
     if (settings['custom_font']) {
-      const path = await this.fontLibraryService.downloadFont(
+      const font_path = await this.fontLibraryService.downloadFont(
         settings['custom_font']
       );
 
       if (!settings['font']['face']) {
-        await this.checkTextSourceFace(settings);
-      }
+        const filename = path.basename(font_path);
 
-      settings['custom_font'] = path;
+        await this.fontLibraryService.findFontFile(filename).then(family => {
+          settings['font']['face'] = family.name;
+        });
+      }
+      
+      settings['custom_font'] = font_path;
       this.updateInput(context);
     } else {
       this.updateInput(context);

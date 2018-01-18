@@ -130,13 +130,16 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const settings = item.settings;
 
-    if (settings.font.face) {
+    if (settings['font']['face']) {
       return Promise.resolve();
     }
 
     /* This should never happen */
     if (!settings.custom_font) {
-      throw Error('Face not found but no custom_font to fetch face from');
+      settings['font']['face'] = 'Arial';
+      const source = this.sourcesService.getSource(item.id);
+      source.updateSettings(settings);
+      return;
     }
 
     const filename = path.basename(settings.custom_font);
