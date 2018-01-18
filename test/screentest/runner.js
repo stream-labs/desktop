@@ -8,9 +8,7 @@ const currentBranch = execSync(`git branch --contain ${commit}`)
   .toString()
   .split('\n')
   .find(branchInfo => branchInfo.indexOf('HEAD detached ') === -1)
-  .replace(' ', '')
-  .replace('*', '');
-
+  .replace(/[^a-zA-Z\d\-_]/g, '');
 
 const branches = [
   currentBranch,
