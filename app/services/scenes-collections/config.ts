@@ -54,8 +54,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<
   @Inject() windowsService: WindowsService;
   @Inject() sceneCollectionsSyncService: SceneCollectionsSyncService;
 
-  private configIsSaved = false;
-
   init() {
     super.init();
     this.CLEAR_SCENES_COLLECTIONS();
@@ -81,26 +79,19 @@ export class ScenesCollectionsService extends PersistentStatefulService<
     return this.state;
   }
 
-  rawSave(configName?: string, backup?: boolean): Promise<void> {
+  rawSave(configName?: string): Promise<void> {
     configName = configName || this.state.activeCollection;
-    backup = backup || false;
 
     return new Promise(resolve => {
       const root = new RootNode();
       root.save().then(() => {
         this.ensureDirectory();
-        let configFileName = this.getConfigFilePath(
-          configName || this.state.activeCollection
-        );
+        const configFileName = this.getConfigFilePath(configName);
 
-        if (backup) {
-          configFileName = configFileName.concat('.bak');
-        } else {
-          if (!this.hasConfig(configName))
-            this.ADD_SCENES_COLLECTIONS([configName]);
-          this.SET_ACTIVE_COLLECTION(configName);
-          this.configIsSaved = true;
+        if (!this.hasConfig(configName)) {
+          this.ADD_SCENES_COLLECTIONS([configName]);
         }
+        this.SET_ACTIVE_COLLECTION(configName);
 
         fs.writeFileSync(configFileName, JSON.stringify(root, null, 2));
 
@@ -130,53 +121,16 @@ export class ScenesCollectionsService extends PersistentStatefulService<
               // Make sure we actually loaded at least one scene, otherwise
               // create the default one
               if (this.scenesService.scenes.length === 0) this.setUpDefaults();
-              this.configIsSaved = true;
-              this.rawSave(configName, true);
               resolve();
             })
             .catch((error: any) => {
-              this.loadBackupConfigFile().then(() => {
-                resolve();
-              });
+              // TODO: Download a backup
             });
         } catch (e) {
-          this.loadBackupConfigFile().then(() => {
-            resolve();
-          });
+          // TODO: Download a backup
         }
       } else {
         this.switchToBlankConfig(configName);
-      }
-    });
-  }
-
-  loadBackupConfigFile() {
-    return new Promise(resolve => {
-      const configName = this.state.activeCollection;
-
-      this.scenesService.scenes.forEach(scene => scene.remove(true));
-      this.sourcesService.sources.forEach(source => {
-        if (source.type !== 'scene') source.remove();
-      });
-
-      const backConfigFile = this.getConfigFilePath(configName) + '.bak';
-
-      if (fs.existsSync(backConfigFile)) {
-        const backupData = fs.readFileSync(backConfigFile).toString();
-        if (backupData) {
-          const root = parse(backupData, CONFIG_NODE_TYPES);
-          root.load().then(() => {
-            this.configIsSaved = true;
-            this.rawSave(configName);
-            resolve();
-          });
-        } else {
-          this.switchToBlankConfig(configName);
-          resolve();
-        }
-      } else {
-        this.switchToBlankConfig(configName);
-        resolve();
       }
     });
   }
@@ -228,7 +182,7 @@ export class ScenesCollectionsService extends PersistentStatefulService<
    */
   removeConfig() {
     const configName = this.state.activeCollection;
-    if (this.configIsSaved) fs.unlinkSync(this.getConfigFilePath(configName));
+    fs.unlinkSync(this.getConfigFilePath(configName));
     this.REMOVE_COLLECTION(configName);
   }
 
