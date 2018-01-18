@@ -150,7 +150,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         this.fontLibraryService.getSettingsFromFont(family.family.name, family.style.name);
 
       const source = this.sourcesService.getSource(item.id);
-      source.updateSettings(settings);
+      source.updateSettings({ font: settings.font });
     });
   }
 
