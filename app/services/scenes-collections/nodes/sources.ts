@@ -130,7 +130,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const settings = item.settings;
 
-    if (settings['font']['face'] && settings['font']['flags']) {
+    if (settings['font']['face'] && (settings['font']['flags'] != null)) {
       return Promise.resolve();
     }
 
