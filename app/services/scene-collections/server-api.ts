@@ -7,8 +7,8 @@ import { UserService } from 'services/user';
 export interface IServerSceneCollection {
   id?: number;
   name: string;
-  data: string;
-  updated_at: string;
+  data?: string;
+  last_updated_at: string;
 }
 
 interface ISceneCollectionsResponse {
@@ -23,8 +23,23 @@ export class SceneCollectionsServerApiService extends Service {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
 
+  /**
+   * Fetch a list of all scene collections (doesn't include JSON)
+   */
   fetchSceneCollections(): Promise<ISceneCollectionsResponse> {
     const url = `${this.baseUrl}/scene-collection`;
+    const request = new Request(url, { headers: this.headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json());
+  }
+
+  /**
+   * Fetch a single scene collection (includes JSON)
+   */
+  fetchSceneCollection(id: number) {
+    const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers });
 
     return fetch(request)
@@ -89,7 +104,7 @@ export class SceneCollectionsServerApiService extends Service {
     const bodyVars: string[] = [];
     bodyVars.push(`name=${encodeURIComponent(collection.name)}`);
     bodyVars.push(`data=${encodeURIComponent(collection.data)}`);
-    bodyVars.push(`updated_at=${encodeURIComponent(collection.updated_at)}`);
+    bodyVars.push(`last_updated_at=${encodeURIComponent(collection.last_updated_at)}`);
     return bodyVars.join('&');
   }
 

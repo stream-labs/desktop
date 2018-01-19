@@ -19,6 +19,7 @@ import { AppService } from 'services/app';
 import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
 
 const uuid = window['require']('uuid/v4');
 
@@ -58,6 +59,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   @Inject() appService: AppService;
   @Inject() hotkeysService: HotkeysService;
   @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
 
   static initialState: ISceneCollectionsManifest = {
     activeId: null,
@@ -73,9 +75,13 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     await this.sync();
     if (this.activeCollection) {
       await this.load(this.state.activeId);
+    } else if (this.collections.length > 0) {
+      await this.load(this.collections[0].id);
     } else {
       await this.create();
     }
+
+    window['sapi'] = this.serverApi;
   }
 
   /**
@@ -119,12 +125,12 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   /**
    * Creates and switches to a new blank scene collection
    */
-  async create() {
+  async create(name?: string) {
     this.startLoadingOperation();
     this.deloadCurrentApplicationState();
     this.setupEmptyCollection();
 
-    const name = this.suggestName(DEFAULT_COLLECTION_NAME);
+    name = name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id: string = uuid();
 
     await this.insertCollection(id, name);
@@ -147,6 +153,46 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     }
   }
 
+  /**
+   * Renames the current scene collection
+   * @param name the name of the new scene collection
+   */
+  rename(name: string) {
+    this.RENAME_COLLECTION(this.state.activeId, name, (new Date()).toISOString());
+  }
+
+  /**
+   * Duplicates the current scene collection
+   * @param name the name of the new scene collection
+   */
+  async duplicate(name: string) {
+    await this.save();
+    const id = uuid();
+    await this.insertCollection(id, name);
+    await this.setActiveCollection(id);
+  }
+
+  /**
+   * Based on the provided name, suggest a new name that does
+   * not conflict with any current name.
+   *
+   * Name conflicts are actually ok in this system, but can
+   * be a little confusing for the user, so we soft-enforce
+   * it in the UI layer.
+   * @param name the base name
+   */
+  suggestName(name: string) {
+    return namingHelpers.suggestName(name, (name: string) => {
+      return !!this.collections.find(collection => {
+        return collection.name === name;
+      });
+    });
+  }
+
+  /**
+   * Show the window to name a new scene collection
+   * @param options options
+   */
   showNameConfig(
     options: { sceneCollectionToDuplicate?: string; rename?: boolean } = {}
   ) {
@@ -164,11 +210,11 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   get collections() {
-    return this.state.collections;
+    return this.state.collections.filter(coll => !coll.deleted);
   }
 
   get activeCollection() {
-    return this.state.collections.find(coll => coll.id === this.state.activeId);
+    return this.collections.find(coll => coll.id === this.state.activeId);
   }
 
   /* PRIVATE ----------------------------------------------------- */
@@ -410,14 +456,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     this.SET_ACTIVE_COLLECTION(id);
   }
 
-  private suggestName(name: string) {
-    return namingHelpers.suggestName(name, (name: string) => {
-      return !!this.state.collections.find(collection => {
-        return collection.name === name;
-      });
-    });
-  }
-
   /**
    * Loads the manifest file into the state for this service.
    */
@@ -449,23 +487,46 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
   /**
    * Synchronizes with the server based on the current state
-   * of the manifest.  Can be run in the background, or you can
-   * wait on the promise to ensure that everything is fully sychronized.
+   * of the manifest.  It can either be used in a "fire and forget"
+   * manner, or you can wait on the promise.  If you wait on the
+   * promise, it will ensure that files are fully synchronized as
+   * of the time of the original function invocation.
+   * This function is idempotent.
+   * This function is a no-op if the user is logged out.
+   *
+   * This function essentially performs 6 tasks all in parallel:
+   * - Delete collections on the server that were deleted locally
+   * - Delete collections locally that were deleted on the server
+   * - Create collections on the server that were created locally
+   * - Create collections locally that were created on the server
+   * - Upload collections that have newer versions locally
+   * - Download collections that have newer version on the server
    */
   private async sync() {
+    if (!this.userService.isLoggedIn()) return;
+
     const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
     const promises: Promise<any>[] = [];
 
     serverCollections.forEach(onServer => {
       const inManifest = this.state.collections.find(coll => coll.serverId === onServer.id);
 
+      // console.log('------------');
+      // console.log('Collection ID: ', inManifest.id);
+      // console.log('Local Date: ', inManifest.modified);
+      // console.log('Local Date: ', new Date(inManifest.modified));
+      // console.log('Server Date: ', onServer.last_updated_at);
+      // console.log('Server Date: ', new Date(onServer.last_updated_at));
+
       if (!inManifest) {
         // Insert from server
         const id: string = uuid();
-        promises.push(this.writeDataToCollectionFile(id, onServer.data).then(() => {
-          // Only do this after we know we successfully wrote the file
-          this.ADD_COLLECTION(id, onServer.name, (new Date()).toISOString());
-          this.SET_SERVER_ID(id, onServer.id);
+        promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(() => {
+          return this.writeDataToCollectionFile(id, onServer.data).then(() => {
+            // Only do this after we know we successfully wrote the file
+            this.ADD_COLLECTION(id, onServer.name, (new Date()).toISOString());
+            this.SET_SERVER_ID(id, onServer.id);
+          });
         }));
       } else {
         if (inManifest.deleted) {
@@ -474,19 +535,21 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
             // We can hard delete once we know it has been removed from the server
             this.HARD_DELETE_COLLECTION(inManifest.id);
           }));
-        } else if (new Date(inManifest.modified) > new Date(onServer.updated_at)) {
+        } else if (new Date(inManifest.modified) > new Date(onServer.last_updated_at)) {
           promises.push(this.readCollectionFile(this.getCollectionFilePath(inManifest.id)).then(data => {
             return this.serverApi.updateSceneCollection({
               id: inManifest.serverId,
               name: inManifest.name,
               data,
-              updated_at: inManifest.modified
+              last_updated_at: inManifest.modified
             });
           }));
-        } else if (inManifest.modified < onServer.updated_at) {
-          promises.push(this.writeDataToCollectionFile(inManifest.id, onServer.data).then(() => {
-            // Only do this once we know we have written successfully
-            this.RENAME_COLLECTION(inManifest.id, onServer.name, onServer.updated_at);
+        } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
+          promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(() => {
+            return this.writeDataToCollectionFile(inManifest.id, onServer.data).then(() => {
+              // Only do this once we know we have written successfully
+              this.RENAME_COLLECTION(inManifest.id, onServer.name, onServer.last_updated_at);
+            });
           }));
         } else {
           console.log('Up to date file: ', inManifest.id);
@@ -505,7 +568,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
             return this.serverApi.createSceneCollection({
               name: inManifest.name,
               data,
-              updated_at: inManifest.modified
+              last_updated_at: inManifest.modified
             }).then(response => {
               this.SET_SERVER_ID(inManifest.id, response.id);
             });
@@ -517,6 +580,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     });
 
     await Promise.all(promises);
+    await this.flushManifestFile();
   }
 
   @mutation()
