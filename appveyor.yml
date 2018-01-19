@@ -11,7 +11,7 @@ test_script:
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
-  - ps: if ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:changed_screens screens has been changed"}
+  - ps: if ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:changed_screens screens have been changed"}
 
 artifacts:
   - path: 'screentest.zip'
@@ -19,4 +19,4 @@ artifacts:
 
 notifications:
   - provider: GitHubPullRequest
-    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} Screentest is finished $env:changed_screens"
+    template: "{{#failed}}:x: Build failed {{/failed}}{{#passed}} {{#jobs}} {{#messages}}:warning: {{message}} {{/messages}} {{^messages}} :white_check_mark: Screens are not changed {{/messages}} {{/jobs}} Tests passed{{/passed}}"
