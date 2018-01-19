@@ -19,4 +19,4 @@ artifacts:
 
 notifications:
   - provider: GitHubPullRequest
-    template: "{{#failed}}:x: Build failed {{/failed}}{{#passed}} {{#jobs}} {{#messages}}:warning: {{.}} {{/messages}} {{^messages}}:white_check_mark: Screens are not changed {{/messages}} {{/jobs}} Tests passed{{/passed}}"
+    template: "{{#failed}}:x: Build failed {{/failed}}{{#passed}} {{#messages}}:warning: {{.}} {{/messages}} {{^messages}}:white_check_mark: Screens are not changed {{/messages}} Tests passed{{/passed}}"
