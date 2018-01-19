@@ -27,8 +27,6 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
 
-  liveDockSize = 28;
-
   subscription: Subscription;
 
   $refs: {
@@ -98,6 +96,14 @@ export default class LiveDock extends Vue {
 
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
+  }
+
+  get liveDockSize () {
+    return this.customizationService.state.livedockSize;
+  }
+
+  set liveDockSize (livedockSize) {
+    this.customizationService.setSettings({ livedockSize });
   }
 
   toggleViewerCount() {
