@@ -72,7 +72,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async initialize() {
     await this.loadManifestFile();
-    await this.sync();
+    await this.safeSync();
     if (this.activeCollection) {
       await this.load(this.state.activeId);
     } else if (this.collections.length > 0) {
@@ -90,7 +90,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   async deinitialize() {
     this.disableAutoSave();
     await this.save();
-    await this.sync();
+    await this.safeSync();
     await this.flushManifestFile();
   }
 
@@ -99,6 +99,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async save(): Promise<void> {
     await this.saveCurrentApplicationStateAs(this.state.activeId);
+    this.SET_MODIFIED(this.state.activeId, (new Date()).toISOString());
   }
 
   /**
@@ -107,8 +108,10 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * setting the app in the apropriate loading state, and updating the state
    * and server.
    * @param id The id of the colleciton to load
+   * @param shouldAttemptRecovery whether a new copy of the file should
+   * be downloaded from the server if loading fails.
    */
-  async load(id: string): Promise<void> {
+  async load(id: string, shouldAttemptRecovery = true): Promise<void> {
     this.startLoadingOperation();
     this.deloadCurrentApplicationState();
 
@@ -116,7 +119,12 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
       await this.loadCollectionIntoApplicationState(id);
       await this.setActiveCollection(id);
     } catch (e) {
-      await this.attemptRecovery();
+      if (shouldAttemptRecovery) {
+        await this.attemptRecovery(id);
+      } else {
+        console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
+        await this.create();
+      }
     }
 
     this.finishLoadingOperation();
@@ -249,6 +257,34 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   /**
+   * Attempts to recover and load a copy of this scene
+   * collection from the server.
+   * @param id The id of the collection to recover
+   */
+  private async attemptRecovery(id: string) {
+    // Check if the server has a copy
+    const collection = this.collections.find(coll => coll.id === id);
+
+    if (collection.serverId) {
+      // A local hard delete without notifying the server
+      // will force a fresh download from the server on next sync
+      this.HARD_DELETE_COLLECTION(id);
+      await this.safeSync();
+
+      // Find the newly downloaded collection and load it
+      const newCollection = this.collections.find(coll => coll.serverId === collection.serverId);
+
+      if (newCollection) {
+        await this.load(newCollection.id, false);
+        return;
+      }
+    }
+
+    // Fall back to creating a new collection
+    await this.create();
+  }
+
+  /**
    * Writes data to a collection file
    * @param id The id of the file
    * @param data The data to write
@@ -351,17 +387,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     this.DELETE_COLLECTION(id);
 
     // TODO: Delete the file (for safety and recoverability we soft delete for now)
-  }
-
-  /**
-   * Attempts to recover from a failed config file load
-   */
-  private async attemptRecovery() {
-    // TODO: Implement
-    // - Attempt to download a new copy from the server
-    // - Run some sort of validator script
-    // - Switch to a blank config
-    // - Notify the user
   }
 
   /**
@@ -521,8 +546,8 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
       if (!inManifest) {
         // Insert from server
         const id: string = uuid();
-        promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(() => {
-          return this.writeDataToCollectionFile(id, onServer.data).then(() => {
+        promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(response => {
+          return this.writeDataToCollectionFile(id, response.scene_collection.data).then(() => {
             // Only do this after we know we successfully wrote the file
             this.ADD_COLLECTION(id, onServer.name, (new Date()).toISOString());
             this.SET_SERVER_ID(id, onServer.id);
@@ -545,8 +570,8 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
             });
           }));
         } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
-          promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(() => {
-            return this.writeDataToCollectionFile(inManifest.id, onServer.data).then(() => {
+          promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(response => {
+            return this.writeDataToCollectionFile(inManifest.id, response.scene_collection.data).then(() => {
               // Only do this once we know we have written successfully
               this.RENAME_COLLECTION(inManifest.id, onServer.name, onServer.last_updated_at);
             });
@@ -581,6 +606,18 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
     await Promise.all(promises);
     await this.flushManifestFile();
+  }
+
+  /**
+   * Calls sync, but will never cause a rejected promise.
+   * Instead, it will log an error and continue.
+   */
+  private async safeSync() {
+    try {
+      await this.sync();
+    } catch (e) {
+      console.error('Scene collection sync failed: ', e);
+    }
   }
 
   @mutation()

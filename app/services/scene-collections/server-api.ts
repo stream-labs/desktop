@@ -38,7 +38,7 @@ export class SceneCollectionsServerApiService extends Service {
   /**
    * Fetch a single scene collection (includes JSON)
    */
-  fetchSceneCollection(id: number) {
+  fetchSceneCollection(id: number): Promise<{ scene_collection: IServerSceneCollection }> {
     const url = `${this.baseUrl}/scene-collection/${id}`;
     const request = new Request(url, { headers: this.headers });
 
