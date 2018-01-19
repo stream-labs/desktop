@@ -51,6 +51,7 @@ import { Observable } from 'rxjs/Observable';
 import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
+import { TroubleshooterService } from 'services/troubleshooter';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -114,7 +115,9 @@ export class ServicesManager extends Service {
     StreamlabelsService,
     GuestApiService,
     VideoEncodingOptimizationService,
-    DismissablesService
+    DismissablesService,
+    TroubleshooterService,
+    JsonrpcService
   };
 
   private instances: Dictionary<Service> = {};
@@ -247,8 +250,8 @@ export class ServicesManager extends Service {
     }
   }
 
-  private get jsonrpc(): JsonrpcService {
-    return JsonrpcService.instance;
+  private get jsonrpc(): typeof JsonrpcService {
+    return JsonrpcService;
   }
 
   private handleServiceRequest(
