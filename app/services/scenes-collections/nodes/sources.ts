@@ -123,7 +123,7 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-  checkTextSourceFace(item: any): Promise<void> {
+  checkTextSourceFace(item: ISourceInfo): Promise<void> {
     if (item.type !== 'text_gdiplus') {
       return Promise.resolve();
     }
@@ -139,14 +139,14 @@ export class SourcesNode extends Node<ISchema, {}> {
       settings['font']['face'] = 'Arial';
       settings['font']['flags'] = 0;
       const source = this.sourcesService.getSource(item.id);
-      source.updateSettings(settings);
+      source.updateSettings({ font: settings.font });
       return;
     }
 
     const filename = path.basename(settings.custom_font);
 
     return this.fontLibraryService.findFontFile(filename).then(family => {
-      [settings['font']['face'], settings['font']['flags']] = 
+      [settings['font']['face'], settings['font']['flags']] =
         this.fontLibraryService.getSettingsFromFont(family.family.name, family.style.name);
 
       const source = this.sourcesService.getSource(item.id);
@@ -205,7 +205,6 @@ export class SourcesNode extends Node<ISchema, {}> {
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
       }
-      
     });
 
     return new Promise(resolve => {
