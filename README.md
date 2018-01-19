@@ -47,6 +47,9 @@ download it here:
 
 https://cmake.org/download/
 
+Make sure to add CMake to your path. You may have to restart your
+machine before CMake is available.
+
 ### Python 2.7
 
 Node-gyp requires python 2.7 available in your path to install some
