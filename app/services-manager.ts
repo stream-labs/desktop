@@ -1,10 +1,7 @@
 import electron from 'electron';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
-import {
-  ScenesCollectionsService,
-  OverlaysPersistenceService
-} from './services/scenes-collections';
+import { ScenesCollectionsService } from './services/scenes-collections';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
@@ -54,6 +51,7 @@ import { DismissablesService } from 'services/dismissables';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
+import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,

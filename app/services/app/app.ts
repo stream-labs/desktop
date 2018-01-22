@@ -62,6 +62,7 @@ export class AppService extends StatefulService<IAppState>
   @track('app_start')
   load() {
     let loadingPromise: Promise<void>;
+    this.START_LOADING();
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are

@@ -20,6 +20,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 
 const uuid = window['require']('uuid/v4');
 
@@ -60,11 +61,17 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   @Inject() hotkeysService: HotkeysService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
+  @Inject() overlaysPersistenceService: OverlaysPersistenceService;
 
   static initialState: ISceneCollectionsManifest = {
     activeId: null,
     collections: []
   };
+
+  /**
+   * Whether a valid collection is currently loaded
+   */
+  loaded = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -178,6 +185,29 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     const id = uuid();
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
+  }
+
+  /**
+   * Install a new overlay from a URL
+   * @param url the URL of the overlay file
+   * @param name the name of the overlay
+   * @param progressCallback a callback that receives progress of the download
+   */
+  async installOverlay(url: string, name: string, progressCallback?: (info: IDownloadProgress) => void) {
+    this.startLoadingOperation();
+
+    // TODO: Handle Errors
+    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+    const collectionName = this.suggestName(name);
+
+    await this.deloadCurrentApplicationState();
+    await this.overlaysPersistenceService.loadOverlay(pathName);
+    this.setupDefaultAudio();
+
+    const id: string = uuid();
+    await this.insertCollection(id, name);
+    await this.setActiveCollection(id);
+    this.finishLoadingOperation();
   }
 
   /**
@@ -308,8 +338,11 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * ready to load a new config file.  This should only ever be
    * performed while the application is already in a "LOADING" state.
    */
-  private deloadCurrentApplicationState() {
+  private async deloadCurrentApplicationState() {
+    if (!this.loaded) return;
+
     this.disableAutoSave();
+    await this.save();
 
     // we should remove inactive scenes first to avoid the switching between scenes
     this.scenesService.scenes.forEach(scene => {
@@ -477,6 +510,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   private async setActiveCollection(id: string) {
+    this.loaded = true;
     // TODO: Notify the server
     this.SET_ACTIVE_COLLECTION(id);
   }
