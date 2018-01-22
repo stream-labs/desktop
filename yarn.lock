@@ -5390,9 +5390,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.4/obs-studio-node.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.5/obs-studio-node.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.4/obs-studio-node.tar.gz#2ef14220160f396f4ae27c399f70c89aa51534a5"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.5/obs-studio-node.tar.gz#cbcf68a82d6ab570727d9a36d206e36ebeedcaae"
   dependencies:
     "@types/shelljs" "^0.7.2"
     cmake-js "^3.5.0"
