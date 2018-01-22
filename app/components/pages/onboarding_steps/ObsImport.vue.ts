@@ -5,7 +5,7 @@ import { OnboardingService } from '../../../services/onboarding';
 import { Multiselect } from 'vue-multiselect';
 import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
-import { ScenesCollectionsService } from '../../../services/scenes-collections';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 @Component({
   components: { Multiselect }
@@ -19,7 +19,7 @@ export default class ObsImport extends Vue {
   obsImporterService: ObsImporterService;
 
   @Inject()
-  scenesCollectionsService: ScenesCollectionsService;
+  sceneCollectionsService: SceneCollectionsService;
 
   status = 'initial';
 
@@ -49,11 +49,11 @@ export default class ObsImport extends Vue {
 
   get description() {
     if (this.status === 'importing') {
-      return `Importing your scenes and sources`;
+      return 'Importing your scenes and sources';
     }
 
     if (this.status === 'done') {
-      return `All scenes, sources and settings have been imported.`;
+      return 'All scenes, sources and settings have been imported.';
     }
 
     return 'Import your scenes and your settings from OBS with a simple click, or start fresh.';
@@ -73,7 +73,6 @@ export default class ObsImport extends Vue {
   }
 
   startFresh() {
-    this.scenesCollectionsService.switchToBlankConfig();
     this.onboardingService.skip();
   }
 

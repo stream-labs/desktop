@@ -4,15 +4,15 @@ import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { IDownloadProgress } from 'services/scenes-collections';
-import { AppService } from 'services/app';
 import { NavigationService } from 'services/navigation';
+import { SceneCollectionsService } from 'services/scene-collections';
 import urlLib from 'url';
 
 @Component({})
 export default class BrowseOverlays extends Vue {
   @Inject() userService: UserService;
   @Inject() guestApiService: GuestApiService;
-  @Inject() appService: AppService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() navigationService: NavigationService;
 
   $refs: {
@@ -38,7 +38,7 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.appService.installOverlay(url, name, progressCallback);
+    await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
     this.navigationService.navigate('Studio');
   }
 

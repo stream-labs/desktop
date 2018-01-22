@@ -17,9 +17,13 @@ import { throttle } from 'lodash-decorators';
 import { parse } from '.';
 import fs from 'fs';
 import path from 'path';
-import { ISceneCollectionSchema, IScenesCollectionsServiceApi, IScenesCollectionState } from './scenes-collections-api';
+import {
+  ISceneCollectionSchema,
+  IScenesCollectionsServiceApi,
+  IScenesCollectionState
+} from './scenes-collections-api';
 
-const NODE_TYPES = {
+export const CONFIG_NODE_TYPES = {
   RootNode,
   SourcesNode,
   ScenesNode,
@@ -30,10 +34,6 @@ const NODE_TYPES = {
 
 const DEFAULT_SCENES_COLLECTION_NAME = 'scenes';
 
-
-
-
-
 /**
  * This class exposes the public API for saving and loading
  * the scene configuration.  This service and its supporting
@@ -41,9 +41,9 @@ const DEFAULT_SCENES_COLLECTION_NAME = 'scenes';
  * for the config files, and handling any data migrations from
  * one version to another.
  */
-export class ScenesCollectionsService extends PersistentStatefulService<IScenesCollectionState>
-  implements IScenesCollectionsServiceApi {
-
+export class ScenesCollectionsService extends PersistentStatefulService<
+  IScenesCollectionState
+> implements IScenesCollectionsServiceApi {
   static defaultState: IScenesCollectionState = {
     activeCollection: '',
     scenesCollections: []
@@ -52,8 +52,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() windowsService: WindowsService;
-
-  private configIsSaved = false;
 
   init() {
     super.init();
@@ -73,41 +71,30 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     this.rawSave();
   }
 
-
-
   getState(): IScenesCollectionState {
     return this.state;
   }
 
-
-
-  rawSave(configName?: string, backup?: boolean): Promise<void> {
+  rawSave(configName?: string): Promise<void> {
     configName = configName || this.state.activeCollection;
-    backup = backup || false;
 
     return new Promise(resolve => {
       const root = new RootNode();
       root.save().then(() => {
         this.ensureDirectory();
-        let configFileName = this.getConfigFilePath(configName || this.state.activeCollection);
+        const configFileName = this.getConfigFilePath(configName);
 
-        if (backup) {
-          configFileName = configFileName.concat('.bak');
-        } else {
-          if (!this.hasConfig(configName)) this.ADD_SCENES_COLLECTIONS([configName]);
-          this.SET_ACTIVE_COLLECTION(configName);
-          this.configIsSaved = true;
+        if (!this.hasConfig(configName)) {
+          this.ADD_SCENES_COLLECTIONS([configName]);
         }
+        this.SET_ACTIVE_COLLECTION(configName);
 
-        fs.writeFileSync(configFileName,
-          JSON.stringify(root, null, 2)
-        );
+        fs.writeFileSync(configFileName, JSON.stringify(root, null, 2));
 
         resolve();
       });
     });
   }
-
 
   load(configName?: string): Promise<void> {
     configName = configName || this.state.activeCollection;
@@ -117,63 +104,32 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     }
 
     return new Promise(resolve => {
-      const data = fs.readFileSync(this.getConfigFilePath(configName)).toString();
+      const data = fs
+        .readFileSync(this.getConfigFilePath(configName))
+        .toString();
       if (data != null) {
         try {
-          const root = parse(data, NODE_TYPES);
+          const root = parse(data, CONFIG_NODE_TYPES);
           this.SET_ACTIVE_COLLECTION(configName);
-          root.load().then(() => {
-            // Make sure we actually loaded at least one scene, otherwise
-            // create the default one
-            if (this.scenesService.scenes.length === 0) this.setUpDefaults();
-            this.configIsSaved = true;
-            this.rawSave(configName, true);
-            resolve();
-          }).catch((error: any) => {
-            this.loadBackupConfigFile().then(() => {
+          root
+            .load()
+            .then(() => {
+              // Make sure we actually loaded at least one scene, otherwise
+              // create the default one
+              if (this.scenesService.scenes.length === 0) this.setUpDefaults();
               resolve();
+            })
+            .catch((error: any) => {
+              // TODO: Download a backup
             });
-          });
         } catch (e) {
-          this.loadBackupConfigFile().then(() => {
-            resolve();
-          });
+          // TODO: Download a backup
         }
       } else {
         this.switchToBlankConfig(configName);
       }
     });
   }
-
-  loadBackupConfigFile() {
-    return new Promise(resolve => {
-      const configName = this.state.activeCollection;
-
-      this.scenesService.scenes.forEach(scene => scene.remove(true));
-      this.sourcesService.sources.forEach(source => { if (source.type !== 'scene') source.remove(); });
-
-      const backConfigFile = this.getConfigFilePath(configName) + '.bak';
-
-      if (fs.existsSync(backConfigFile)) {
-        const backupData = fs.readFileSync(backConfigFile).toString();
-        if (backupData) {
-          const root = parse(backupData, NODE_TYPES);
-          root.load().then(() => {
-            this.configIsSaved = true;
-            this.rawSave(configName);
-            resolve();
-          });
-        } else {
-          this.switchToBlankConfig(configName);
-          resolve();
-        }
-      } else {
-        this.switchToBlankConfig(configName);
-        resolve();
-      }
-    });
-  }
-
 
   // Rather than having a default config file that would require
   // updating every time we change the schema, we simply put the
@@ -182,7 +138,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     this.scenesService.createScene('Scene', { makeActive: true });
     this.setUpDefaultAudio();
   }
-
 
   setUpDefaultAudio() {
     this.sourcesService.createSource(
@@ -200,7 +155,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     );
   }
 
-
   duplicateConfig(toConfig: string): Promise<void> {
     return new Promise(resolve => {
       this.rawSave().then(() => {
@@ -208,7 +162,6 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
       });
     });
   }
-
 
   renameConfig(newName: string) {
     fs.renameSync(
@@ -219,33 +172,28 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     this.SET_ACTIVE_COLLECTION(newName);
   }
 
-
   /**
    * removes active config
    * use AppService.removeConfig() to remove the config and to switch to the new one
    */
   removeConfig() {
     const configName = this.state.activeCollection;
-    if (this.configIsSaved) fs.unlinkSync(this.getConfigFilePath(configName));
+    fs.unlinkSync(this.getConfigFilePath(configName));
     this.REMOVE_COLLECTION(configName);
   }
-
 
   hasConfig(configName: string): boolean {
     return this.state.scenesCollections.includes(configName);
   }
 
-
   hasConfigs() {
     return this.state.scenesCollections.length > 0;
   }
-
 
   switchToBlankConfig(configName = DEFAULT_SCENES_COLLECTION_NAME) {
     this.switchToEmptyConfig(configName);
     this.setUpDefaults();
   }
-
 
   switchToEmptyConfig(configName: string) {
     if (this.scenesService.state.scenes.length) {
@@ -255,9 +203,10 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     this.ADD_SCENES_COLLECTIONS([configName]);
   }
 
-
   suggestName(name: string) {
-    return namingHelpers.suggestName(name, (name: string) => this.state.scenesCollections.includes(name));
+    return namingHelpers.suggestName(name, (name: string) =>
+      this.state.scenesCollections.includes(name)
+    );
   }
 
   /**
@@ -268,26 +217,24 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     return /^[^\/\\\.]+$/.test(name);
   }
 
-
   private ensureDirectory() {
     if (!fs.existsSync(this.configFileDirectory)) {
       fs.mkdirSync(this.configFileDirectory);
     }
   }
 
-
   private get configFileDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
   }
-
 
   private getConfigFilePath(configName: string) {
     // Eventually this will be changeable by the user
     return path.join(this.configFileDirectory, `${configName}.json`);
   }
 
-
-  showNameConfig(options: { scenesCollectionToDuplicate?: string, rename?: boolean} = {}) {
+  showNameConfig(
+    options: { scenesCollectionToDuplicate?: string; rename?: boolean } = {}
+  ) {
     this.windowsService.showWindow({
       componentName: 'NameSceneCollection',
       queryParams: {
@@ -301,53 +248,56 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
     });
   }
 
-
   fetchSceneCollectionsSchema(): Promise<Dictionary<ISceneCollectionSchema>> {
     return new Promise(resolve => {
       const schemes: Dictionary<ISceneCollectionSchema> = {};
       const parseTasks: Promise<void>[] = [];
       this.state.scenesCollections.forEach(configName => {
-        parseTasks.push(new Promise(resolveTask => {
-          fs.readFile(this.getConfigFilePath(configName), (err, contents) => {
-            const data = contents.toString();
-            const root = parse(data, NODE_TYPES);
-            const collectionScheme = {
-              scenes: root.data.scenes.data.items.map((sceneData: ISceneSchema) => {
-                return {
-                  id: sceneData.id,
-                  name: sceneData.name,
-                  sceneItems: sceneData.sceneItems.data.items.map((sceneItemData: ISceneItemInfo) => {
+        parseTasks.push(
+          new Promise(resolveTask => {
+            fs.readFile(this.getConfigFilePath(configName), (err, contents) => {
+              const data = contents.toString();
+              const root = parse(data, CONFIG_NODE_TYPES);
+              const collectionScheme = {
+                scenes: root.data.scenes.data.items.map(
+                  (sceneData: ISceneSchema) => {
                     return {
-                      sceneItemId: sceneItemData.id,
-                      sourceId: sceneItemData.sourceId
+                      id: sceneData.id,
+                      name: sceneData.name,
+                      sceneItems: sceneData.sceneItems.data.items.map(
+                        (sceneItemData: ISceneItemInfo) => {
+                          return {
+                            sceneItemId: sceneItemData.id,
+                            sourceId: sceneItemData.sourceId
+                          };
+                        }
+                      )
                     };
-                  })
-                };
-              }),
+                  }
+                ),
 
-              sources: root.data.sources.data.items.map((sourceData: ISourceInfo) => {
-                return {
-                  id: sourceData.id,
-                  name: sourceData.name,
-                  type: sourceData.type,
-                  channel: sourceData.channel
-                };
-              })
+                sources: root.data.sources.data.items.map(
+                  (sourceData: ISourceInfo) => {
+                    return {
+                      id: sourceData.id,
+                      name: sourceData.name,
+                      type: sourceData.type,
+                      channel: sourceData.channel
+                    };
+                  }
+                )
+              };
 
-            };
-
-            schemes[configName] = collectionScheme;
-            resolveTask();
-          });
-        }));
-
+              schemes[configName] = collectionScheme;
+              resolveTask();
+            });
+          })
+        );
       });
 
       return Promise.all(parseTasks).then(() => resolve(schemes));
     });
-
   }
-
 
   @mutation()
   private CLEAR_SCENES_COLLECTIONS() {
@@ -372,6 +322,9 @@ export class ScenesCollectionsService extends PersistentStatefulService<IScenesC
 
   @mutation()
   private REMOVE_COLLECTION(name: string) {
-    this.state.scenesCollections.splice(this.state.scenesCollections.indexOf(name), 1);
+    this.state.scenesCollections.splice(
+      this.state.scenesCollections.indexOf(name),
+      1
+    );
   }
 }
