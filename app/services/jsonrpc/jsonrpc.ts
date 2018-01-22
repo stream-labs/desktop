@@ -11,7 +11,7 @@ import {
 const { ipcRenderer } = electron;
 
 export class JsonrpcService extends Service implements IJsonrpcServiceApi {
-  createError(
+  static createError(
     requestOrRequestId: string | IJsonRpcRequest,
     options: { code: E_JSON_RPC_ERROR; message?: string }
   ): IJsonRpcResponse<any> {
@@ -31,7 +31,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     };
   }
 
-  createRequest(
+  static createRequest(
     resourceId: string,
     method: string,
     ...args: any[]
@@ -47,7 +47,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     };
   }
 
-  createRequestWithOptions(
+  static createRequestWithOptions(
     resourceId: string,
     method: string,
     options: { compactMode: boolean, fetchMutations: boolean },
@@ -58,7 +58,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     return request;
   }
 
-  createResponse<TResult>(
+  static createResponse<TResult>(
     requestOrRequestId: string | IJsonRpcRequest,
     result: TResult
   ): IJsonRpcResponse<TResult> {
@@ -69,7 +69,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
     return { jsonrpc: '2.0', id, result } as IJsonRpcResponse<TResult>;
   }
 
-  createEvent(options: {
+  static createEvent(options: {
     emitter: 'PROMISE' | 'STREAM';
     resourceId: string;
     data: any;
@@ -79,5 +79,46 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
       _type: 'EVENT',
       ...options
     });
+  }
+
+
+  createError(
+    requestOrRequestId: string | IJsonRpcRequest,
+    options: { code: E_JSON_RPC_ERROR; message?: string }
+  ): IJsonRpcResponse<any> {
+    return JsonrpcService.createError.apply(this, arguments);
+  }
+
+  createRequest(
+    resourceId: string,
+    method: string,
+    ...args: any[]
+  ): IJsonRpcRequest {
+    return JsonrpcService.createRequest.apply(this, arguments);
+  }
+
+  createRequestWithOptions(
+    resourceId: string,
+    method: string,
+    options: { compactMode: boolean, fetchMutations: boolean },
+    ...args: any[]
+  ): IJsonRpcRequest {
+    return JsonrpcService.createRequestWithOptions.apply(this, arguments);
+  }
+
+  createResponse<TResult>(
+    requestOrRequestId: string | IJsonRpcRequest,
+    result: TResult
+  ): IJsonRpcResponse<TResult> {
+    return JsonrpcService.createResponse.apply(this, arguments);
+  }
+
+  createEvent(options: {
+    emitter: 'PROMISE' | 'STREAM';
+    resourceId: string;
+    data: any;
+    isRejected?: boolean
+  }): IJsonRpcResponse<IJsonRpcEvent> {
+    return JsonrpcService.createResponse.apply(this, arguments);
   }
 }

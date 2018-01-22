@@ -26,6 +26,7 @@ class FontInput extends Input<IFormInput<IFont>> {
       value: {
         path: font.path,
         face: font.face,
+        flags: font.flags,
         size: Number(font.size)
       }
     });
@@ -36,6 +37,7 @@ class FontInput extends Input<IFormInput<IFont>> {
     return {
       path: this.value.value.path,
       face: this.value.value.face,
+      flags: this.value.value.flags,
       size: this.value.value.size
     };
   }

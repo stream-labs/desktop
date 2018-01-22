@@ -4,7 +4,7 @@ import { getClient } from '../helpers/api-client';
 import { sleep } from '../helpers/sleep';
 import { IAudioServiceApi } from 'services/audio';
 import { IScenesServiceApi } from 'services/scenes';
-import { IAppServiceApi } from "../../app/services/app/app-api";
+import { IAppServiceApi } from '../../app/services/app/app-api';
 
 useSpectron({ restartAppAfterEachTest: false});
 

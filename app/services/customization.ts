@@ -8,7 +8,11 @@ interface ICustomizationServiceState {
   leftDock: boolean;
   hideViewerCount: boolean;
   livedockCollapsed: boolean;
+  previewSize: number;
+  livedockSize: number;
 }
+
+export interface ICustomizationSettings extends ICustomizationServiceState {}
 
 /**
  * This class is used to store general UI behavior flags
@@ -22,7 +26,9 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     livePreviewEnabled: true,
     leftDock: false,
     hideViewerCount: false,
-    livedockCollapsed: true
+    livedockCollapsed: true,
+    previewSize: 300,
+    livedockSize: 28
   };
 
   init() {
@@ -30,38 +36,16 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
   }
 
-  @mutation()
-  SET_NIGHT_MODE(nightMode: boolean) {
-    this.state.nightMode = nightMode;
+  setSettings(settingsPatch: Partial<ICustomizationSettings>) {
+    this.SET_SETTINGS(settingsPatch);
   }
 
-  @mutation()
-  SET_UPDATE_STREAM_INFO_ON_LIVE(update: boolean) {
-    this.state.updateStreamInfoOnLive = update;
-  }
-
-  @mutation()
-  SET_LIVE_PREVIEW_ENABLED(enabled: boolean) {
-    this.state.livePreviewEnabled = enabled;
-  }
-
-  @mutation()
-  SET_LEFT_DOCK(enabled: boolean) {
-    this.state.leftDock = enabled;
-  }
-
-  @mutation()
-  SET_LIVEDOCK_COLLAPSED(collapsed: boolean) {
-    this.state.livedockCollapsed = collapsed;
-  }
-
-  @mutation()
-  SET_HIDDEN_VIEWER_COUNT(hidden: boolean) {
-    this.state.hideViewerCount = hidden;
+  getSettings(): ICustomizationSettings {
+    return this.state;
   }
 
   set nightMode(val: boolean) {
-    this.SET_NIGHT_MODE(val);
+    this.setSettings({ nightMode: val });
   }
 
   get nightMode() {
@@ -73,23 +57,28 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
   }
 
   setUpdateStreamInfoOnLive(update: boolean) {
-    this.SET_UPDATE_STREAM_INFO_ON_LIVE(update);
+    this.setSettings({ updateStreamInfoOnLive: update });
   }
 
   setLivePreviewEnabled(enabled: boolean) {
-    this.SET_LIVE_PREVIEW_ENABLED(enabled);
+    this.setSettings({ livePreviewEnabled: enabled });
   }
 
   setLeftDock(enabled: boolean) {
-    this.SET_LEFT_DOCK(enabled);
+    this.setSettings({ leftDock: enabled });
   }
 
   setLiveDockCollapsed(collapsed: boolean) {
-    this.SET_LIVEDOCK_COLLAPSED(collapsed);
+    this.setSettings({ livedockCollapsed: collapsed });
   }
 
   setHiddenViewerCount(hidden: boolean) {
-    this.SET_HIDDEN_VIEWER_COUNT(hidden);
+    this.setSettings({ hideViewerCount: hidden });
+  }
+
+  @mutation()
+  private SET_SETTINGS(settingsPatch: Partial<ICustomizationSettings>) {
+    Object.assign(this.state, settingsPatch);
   }
 
 }

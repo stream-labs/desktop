@@ -53,6 +53,7 @@ import { VideoEncodingOptimizationService } from 'services/video-encoding-optimi
 import { DismissablesService } from 'services/dismissables';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { TroubleshooterService } from 'services/troubleshooter';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -118,7 +119,9 @@ export class ServicesManager extends Service {
     VideoEncodingOptimizationService,
     DismissablesService,
     SceneCollectionsServerApiService,
-    SceneCollectionsService
+    SceneCollectionsService,
+    TroubleshooterService,
+    JsonrpcService
   };
 
   private instances: Dictionary<Service> = {};
@@ -251,8 +254,8 @@ export class ServicesManager extends Service {
     }
   }
 
-  private get jsonrpc(): JsonrpcService {
-    return JsonrpcService.instance;
+  private get jsonrpc(): typeof JsonrpcService {
+    return JsonrpcService;
   }
 
   private handleServiceRequest(
