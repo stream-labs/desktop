@@ -215,11 +215,6 @@ export class AppService extends StatefulService<IAppState>
       this.ipcServerService.stopListening();
       this.tcpServerService.stopListening();
 
-      // if (this.scenesCollectionsService.state.activeCollection) {
-      //   await this.scenesCollectionsService.rawSave();
-      // }
-
-      this.reset();
       this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.reset();

@@ -96,7 +96,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async deinitialize() {
     this.disableAutoSave();
-    await this.save();
+    await this.deloadCurrentApplicationState();
     await this.safeSync();
     await this.flushManifestFile();
   }
