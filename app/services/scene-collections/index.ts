@@ -69,15 +69,17 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   };
 
   /**
-   * Whether a valid collection is currently loaded
+   * Whether the service has been initialized
    */
-  loaded = false;
+  initialized = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
    * initialization.
    */
   async initialize() {
+    window['sapi'] = this.serverApi;
+
     await this.loadManifestFile();
     await this.safeSync();
     if (this.activeCollection) {
@@ -87,8 +89,20 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     } else {
       await this.create();
     }
+    this.initialized = true;
+  }
 
-    window['sapi'] = this.serverApi;
+  /**
+   * Should be called when a new user logs in.  It clears the manifest
+   * and forces a fresh sync from the server.
+   */
+  async resetManifest() {
+    this.LOAD_STATE({
+      activeId: null,
+      collections: []
+    });
+    await this.ensureDirectory();
+    this.flushManifestFile();
   }
 
   /**
@@ -105,6 +119,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * Saves the current scene collection
    */
   async save(): Promise<void> {
+    if (!this.state.activeId) return;
     await this.saveCurrentApplicationStateAs(this.state.activeId);
     this.SET_MODIFIED(this.state.activeId, (new Date()).toISOString());
   }
@@ -120,7 +135,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async load(id: string, shouldAttemptRecovery = true): Promise<void> {
     this.startLoadingOperation();
-    this.deloadCurrentApplicationState();
+    await this.deloadCurrentApplicationState();
 
     try {
       await this.loadCollectionIntoApplicationState(id);
@@ -142,7 +157,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async create(name?: string) {
     this.startLoadingOperation();
-    this.deloadCurrentApplicationState();
+    await this.deloadCurrentApplicationState();
     this.setupEmptyCollection();
 
     name = name || this.suggestName(DEFAULT_COLLECTION_NAME);
@@ -158,7 +173,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   async delete() {
     this.startLoadingOperation();
-    this.deloadCurrentApplicationState();
+    await this.deloadCurrentApplicationState();
     await this.removeCollection(this.state.activeId);
 
     if (this.collections.length > 0) {
@@ -174,6 +189,18 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   rename(name: string) {
     this.RENAME_COLLECTION(this.state.activeId, name, (new Date()).toISOString());
+  }
+
+  /**
+   * Calls sync, but will never cause a rejected promise.
+   * Instead, it will log an error and continue.
+   */
+  async safeSync() {
+    try {
+      await this.sync();
+    } catch (e) {
+      console.error('Scene collection sync failed: ', e);
+    }
   }
 
   /**
@@ -339,7 +366,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * performed while the application is already in a "LOADING" state.
    */
   private async deloadCurrentApplicationState() {
-    if (!this.loaded) return;
+    if (!this.initialized) return;
 
     this.disableAutoSave();
     await this.save();
@@ -510,7 +537,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   private async setActiveCollection(id: string) {
-    this.loaded = true;
     // TODO: Notify the server
     this.SET_ACTIVE_COLLECTION(id);
   }
@@ -640,18 +666,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
     await Promise.all(promises);
     await this.flushManifestFile();
-  }
-
-  /**
-   * Calls sync, but will never cause a rejected promise.
-   * Instead, it will log an error and continue.
-   */
-  private async safeSync() {
-    try {
-      await this.sync();
-    } catch (e) {
-      console.error('Scene collection sync failed: ', e);
-    }
   }
 
   @mutation()

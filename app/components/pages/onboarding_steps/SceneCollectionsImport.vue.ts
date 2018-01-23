@@ -12,10 +12,8 @@ export default class SceneCollectionsImport extends Vue {
   @Inject() onboardingService: OnboardingService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
-  loading = true;
-
-  created() {
-    this.sceneCollectionsService.
+  get sceneCollections() {
+    return this.sceneCollectionsService.collections;
   }
 
   next() {

@@ -69,12 +69,18 @@ export class AppService extends StatefulService<IAppState>
     // associated with the user in sentry.
     this.userService;
 
-    // Will create a new scene collection if there isn't one
-    loadingPromise = this.sceneCollectionsService.initialize();
+
+    // If we're not showing the onboarding steps, we should load
+    // the config file.  Otherwise the onboarding process will
+    // handle it based on what the user wants.
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
+    if (!onboarded) {
+      loadingPromise = this.sceneCollectionsService.initialize();
+    } else {
+      loadingPromise = Promise.resolve();
+    }
 
     loadingPromise.then(() => {
-      this.onboardingService.startOnboardingIfRequired();
-
       electron.ipcRenderer.on('shutdown', () => {
         electron.ipcRenderer.send('acknowledgeShutdown');
         this.shutdownHandler();

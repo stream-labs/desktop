@@ -7,11 +7,13 @@
       <div class="signup-buttons">
         <button
           class="button button--twitch"
+          :disabled="loadingState"
           @click="authPlatform('twitch')">
           <i class="fa" :class="iconForPlatform('twitch')" /> Twitch
         </button>
         <button
           class="button button--yt"
+          :disabled="loadingState"
           @click="authPlatform('youtube')">
           <i class="fa" :class="iconForPlatform('youtube')" /> Youtube
         </button>

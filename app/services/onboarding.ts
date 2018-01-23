@@ -38,7 +38,6 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   SceneCollectionsImport: {
     isEligible: service => {
-      if (service.state.isLogin) return false;
       return service.userService.isLoggedIn();
     },
     next: 'ObsImport'
