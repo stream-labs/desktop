@@ -9,10 +9,7 @@
     </div>
   </div>
 
-  <div class="volmeter">
-    <div class="volmeter-level" ref="level"></div>
-    <div class="volmeter-peak" ref="peak"></div>
-  </div>
+  <MixerVolmeter :audioSource="audioSource" v-if="previewEnabled"></MixerVolmeter>
 
   <div class="flex">
     <Slider

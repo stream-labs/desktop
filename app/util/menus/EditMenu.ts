@@ -7,6 +7,7 @@ import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { WidgetsService } from 'services/widgets';
+import { CustomizationService } from 'services/customization';
 import electron from 'electron';
 
 interface IEditMenuOptions {
@@ -21,6 +22,7 @@ export class EditMenu extends Menu {
   @Inject() private sourceFiltersService: SourceFiltersService;
   @Inject() private clipboardService: ClipboardService;
   @Inject() private widgetsService: WidgetsService;
+  @Inject() private customizationService: CustomizationService;
 
   private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
@@ -144,6 +146,17 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Unlock all sources',
         click: () => this.scenesService.setLockOnAllScenes(false)
+      });
+
+      this.append({ type: 'separator' });
+
+      this.append({
+        label: 'Preview enabled',
+        type: 'checkbox',
+        checked: this.customizationService.state.previewEnabled,
+        click: () => this.customizationService.setSettings({
+          previewEnabled: !this.customizationService.state.previewEnabled
+        })
       });
     }
   }

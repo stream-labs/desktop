@@ -1,4 +1,5 @@
 import { PersistentStatefulService } from './persistent-stateful-service';
+import { Subject } from 'rxjs/Subject';
 import { mutation } from './stateful-service';
 
 interface ICustomizationServiceState {
@@ -10,6 +11,7 @@ interface ICustomizationServiceState {
   livedockCollapsed: boolean;
   previewSize: number;
   livedockSize: number;
+  previewEnabled: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}
@@ -28,8 +30,11 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     hideViewerCount: false,
     livedockCollapsed: true,
     previewSize: 300,
-    livedockSize: 28
+    livedockSize: 28,
+    previewEnabled: true
   };
+
+  settingsChanged = new Subject<Partial<ICustomizationSettings>>();
 
   init() {
     super.init();
@@ -38,6 +43,7 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
     this.SET_SETTINGS(settingsPatch);
+    this.settingsChanged.next(settingsPatch);
   }
 
   getSettings(): ICustomizationSettings {

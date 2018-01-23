@@ -60,6 +60,7 @@
       <ul>
         <li>Lower your encoder settings (preset)</li>
         <li>Ensure that you don't have any other applications open that are heavy on your CPU</li>
+        <li>Disable preview in the Editor context menu</li>
       </ul>
 
     </div>
