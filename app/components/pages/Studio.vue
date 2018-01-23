@@ -3,8 +3,8 @@
   <studio-editor v-if="previewEnabled" />
   <div v-if="!previewEnabled" class="no-preview">
     <div class="message">
-      Preview is currently disabled
-      <div class="button button--action button--sm" @click="enablePreview">Enable Preview</div>
+      Preview is disabled in performance mode
+      <div class="button button--action button--sm" @click="enablePreview">Disable Performance Mode</div>
     </div>
 
   </div>

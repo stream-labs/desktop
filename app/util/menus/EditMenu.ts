@@ -151,11 +151,11 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Enable Preview',
+        label: 'Performance Mode',
         type: 'checkbox',
-        checked: this.customizationService.state.previewEnabled,
+        checked: this.customizationService.state.performanceMode,
         click: () => this.customizationService.setSettings({
-          previewEnabled: !this.customizationService.state.previewEnabled
+          performanceMode: !this.customizationService.state.performanceMode
         })
       });
     }

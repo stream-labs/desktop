@@ -16,7 +16,7 @@ export default class MixerItem extends Vue {
   @Inject() private customizationService: CustomizationService;
 
   get previewEnabled() {
-    return this.customizationService.state.previewEnabled;
+    return !this.customizationService.state.performanceMode;
   }
 
   setMuted(muted: boolean) {

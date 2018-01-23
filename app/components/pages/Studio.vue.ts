@@ -15,10 +15,10 @@ export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
 
   get previewEnabled() {
-    return this.customizationService.state.previewEnabled;
+    return !this.customizationService.state.performanceMode;
   }
 
   enablePreview() {
-    this.customizationService.setSettings({ previewEnabled: true });
+    this.customizationService.setSettings({ performanceMode: false });
   }
 }
