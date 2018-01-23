@@ -10,6 +10,7 @@ interface ICustomizationServiceState {
   livedockCollapsed: boolean;
   previewSize: number;
   livedockSize: number;
+  performanceMode: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}
@@ -28,7 +29,8 @@ export class CustomizationService extends PersistentStatefulService<ICustomizati
     hideViewerCount: false,
     livedockCollapsed: true,
     previewSize: 300,
-    livedockSize: 28
+    livedockSize: 28,
+    performanceMode: false
   };
 
   init() {
