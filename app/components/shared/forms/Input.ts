@@ -73,6 +73,10 @@ export interface INumberInputValue extends IFormInput<number> {
   stepVal: number;
 }
 
+export interface ISliderInputValue extends INumberInputValue {
+  usePercentages?: boolean;
+}
+
 export interface ITextInputValue extends IFormInput<string> {
   multiline: boolean;
 }
