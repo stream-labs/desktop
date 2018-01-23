@@ -65,6 +65,7 @@ const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
+const windowStateKeeper = require('electron-window-state');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -118,13 +119,22 @@ function getObs() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1600,
+    defaultHeight: 1000
+  });
+
   mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 1000,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     show: false,
     frame: false,
     title: "Streamlabs OBS",
   });
+
+  mainWindowState.manage(mainWindow);
 
   mainWindow.setMenu(null);
 
