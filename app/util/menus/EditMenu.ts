@@ -151,7 +151,7 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Preview enabled',
+        label: 'Enable Preview',
         type: 'checkbox',
         checked: this.customizationService.state.previewEnabled,
         click: () => this.customizationService.setSettings({
