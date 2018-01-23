@@ -20,7 +20,7 @@
             <h4 class="studio-controls__label">
               Preview
             </h4>
-            <div>
+            <div v-if="!performanceModeEnabled">
               <i
                 v-if="previewEnabled"
                 class="fa fa-eye icon-btn icon-btn--lg"
@@ -42,7 +42,8 @@
                 <div class="live-display-placeholder">
                   <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
                   <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-                  <span>Your preview is currently disabled</span>
+                  <span v-if="!performanceModeEnabled">Your preview is currently disabled</span>
+                  <span v-if="performanceModeEnabled">Preview is disabled in performance mode</span>
                 </div>
               </div>
             </div>
