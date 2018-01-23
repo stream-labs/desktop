@@ -76,6 +76,7 @@
     "electron-updater": "^2.18.2",
     "font-manager": "^0.2.2",
     "lodash": "^4.17.4",
+    "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.5/obs-studio-node.tar.gz",
     "rimraf": "^2.6.1",
