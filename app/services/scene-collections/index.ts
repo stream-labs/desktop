@@ -78,8 +78,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * initialization.
    */
   async initialize() {
-    window['sapi'] = this.serverApi;
-
+    await this.migrate();
     await this.loadManifestFile();
     await this.safeSync();
     if (this.activeCollection) {
@@ -93,16 +92,26 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   /**
-   * Should be called when a new user logs in.  It clears the manifest
-   * and forces a fresh sync from the server.
+   * Should be called when a new user logs in.  If the user has
+   * scene collections backed up on the server, it will reset
+   * the manifest and load from the server.
    */
-  async resetManifest() {
-    this.LOAD_STATE({
-      activeId: null,
-      collections: []
-    });
-    await this.ensureDirectory();
-    this.flushManifestFile();
+  async setupNewUser() {
+    const serverCollections = await this.serverApi.fetchSceneCollections();
+
+    if (serverCollections.data.length > 0) {
+      this.LOAD_STATE({
+        activeId: null,
+        collections: []
+      });
+      await this.ensureDirectory();
+      this.flushManifestFile();
+    } else {
+      // Do nothing.
+      // Local files will be synced up to the server
+    }
+
+    await this.initialize();
   }
 
   /**
@@ -566,6 +575,10 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     return path.join(electron.remote.app.getPath('userData'), 'SceneCollections');
   }
 
+  private get legacyDirectory() {
+    return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
+  }
+
   private getCollectionFilePath(id: string) {
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
@@ -595,13 +608,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
     serverCollections.forEach(onServer => {
       const inManifest = this.state.collections.find(coll => coll.serverId === onServer.id);
-
-      // console.log('------------');
-      // console.log('Collection ID: ', inManifest.id);
-      // console.log('Local Date: ', inManifest.modified);
-      // console.log('Local Date: ', new Date(inManifest.modified));
-      // console.log('Server Date: ', onServer.last_updated_at);
-      // console.log('Server Date: ', new Date(onServer.last_updated_at));
 
       if (!inManifest) {
         // Insert from server
@@ -666,6 +672,73 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
     await Promise.all(promises);
     await this.flushManifestFile();
+  }
+
+  /**
+   * Migrates to V2 scene collections if needed.
+   */
+  private async migrate() {
+    const legacyExists = await new Promise<boolean>(resolve => {
+      fs.exists(this.legacyDirectory, exists => resolve(exists));
+    });
+
+    const newExists = await new Promise<boolean>(resolve => {
+      fs.exists(this.collectionsDirectory, exists => resolve(exists));
+    });
+
+    if (legacyExists && !newExists) {
+      const files = await new Promise<string[]>((resolve, reject) => {
+        fs.readdir(this.legacyDirectory, (err, files) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve(files);
+        });
+      });
+
+      const filtered = files.filter(file => {
+        if (file.match(/\.bak$/)) return false;
+        const name = file.replace(/\.[^/.]+$/, '');
+        if (!name) return false;
+        return true;
+      });
+
+      for (const file of filtered) {
+        const oldData = await new Promise<string>((resolve, reject) => {
+          fs.readFile(path.join(this.legacyDirectory, file), (err, data) => {
+            if (err) {
+              console.error(`Failed migrating file ${file}`);
+              resolve('');
+            }
+
+            resolve(data.toString());
+          });
+        });
+
+        if (oldData) {
+          await this.ensureDirectory();
+          const id: string = uuid();
+          await this.writeDataToCollectionFile(id, oldData);
+          this.ADD_COLLECTION(id, file.replace(/\.[^/.]+$/, ''), (new Date()).toISOString());
+        }
+      }
+
+      // Try to import the active collection
+      const data = localStorage.getItem('PersistentStatefulService-ScenesCollectionsService');
+
+      if (data) {
+        const parsed = JSON.parse(data);
+
+        if (parsed['activeCollection']) {
+          const name = parsed['activeCollection'];
+          const collection = this.collections.find(coll => coll.name === name);
+
+          await this.setActiveCollection(collection.id);
+        }
+      }
+    }
   }
 
   @mutation()

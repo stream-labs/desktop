@@ -150,8 +150,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGIN(auth);
     this.setRavenContext();
     service.setupStreamSettings(auth);
-    await this.sceneCollectionsService.resetManifest();
-    await this.sceneCollectionsService.initialize();
+    await this.sceneCollectionsService.setupNewUser();
   }
 
   async logOut() {
