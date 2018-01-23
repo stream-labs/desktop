@@ -4,10 +4,7 @@ import { IFormInput, Input, IFont } from './Input';
 import { Multiselect } from 'vue-multiselect';
 import FontSizeSelector from './FontSizeSelector.vue';
 import fontManager from 'font-manager';
-
-const OBS_FONT_BOLD = 1 << 0;
-const OBS_FONT_ITALIC = 1 << 1;
-
+import { EFontStyle } from 'obs-studio-node';
 
 /**
  * @tutorial https://github.com/devongovett/font-manager
@@ -20,6 +17,7 @@ interface IFontDescriptor {
   weight: number;
   width: number;
   italic: boolean;
+  oblique: boolean;
   monospace: boolean;
 }
 
@@ -76,35 +74,35 @@ export default class SystemFontSelector extends Input<IFormInput<IFont>>{
     // default style.  This will be "Regular" if it exists.
     // Otherwise, it will be the first family on the list.
 
-    let style: string;
+    let selected_font: IFontDescriptor;
 
     let regular = _.find(family.fonts, font => {
       return font.style === 'Regular';
     });
 
     if (regular) {
-      style = regular.style;
+      selected_font = regular;
     } else {
-      style = family.fonts[0].style;
+      selected_font = family.fonts[0];
     }
 
     this.setFont({
       face: family.family,
-      flags: this.styleToFlags(style)
+      flags: this.getFlagsFromFont(selected_font)
     });
   }
 
-  styleToFlags(style: string) {
-    // These are specific to the GDI+ Text property
-    let flags = 0;
-    if (style.match(/Italic/)) flags |= OBS_FONT_ITALIC;
-    if (style.match(/Bold/)) flags |= OBS_FONT_BOLD;
+  getFlagsFromFont(font: IFontDescriptor) {
+    const flags = 
+      (font.italic  ? EFontStyle.Italic : 0) |
+      (font.oblique ? EFontStyle.Italic : 0) |
+      (font.weight > 400 ? EFontStyle.Bold : 0);
 
     return flags;
   }
 
   setStyle(font: IFontDescriptor) {
-    this.setFont({ flags: this.styleToFlags(font.style) });
+    this.setFont({ flags: this.getFlagsFromFont(font) });
   }
 
   setSize(size: string) {
@@ -123,7 +121,7 @@ export default class SystemFontSelector extends Input<IFormInput<IFont>>{
     // Apply current values for parameters that were not passed
     if (fontObj.face === void 0) fontObj.face = this.$refs.font.value.family;
     if (fontObj.size === void 0) fontObj.size = this.value.value.size;
-    if (fontObj.flags === void 0) fontObj.flags = this.styleToFlags(this.$refs.font.value.style);
+    if (fontObj.flags === void 0) fontObj.flags = this.getFlagsFromFont(this.$refs.font.value);
 
     this.emitInput({ ...this.value, value: fontObj });
   }
@@ -165,8 +163,9 @@ export default class SystemFontSelector extends Input<IFormInput<IFont>>{
 
   get selectedFont() {
     return _.find(this.selectedFamily.fonts, font => {
-      if ((this.value.value.flags & OBS_FONT_BOLD) && (!font.style.match(/Bold/))) return false;
-      if ((this.value.value.flags & OBS_FONT_ITALIC) && (!font.style.match(/Italic/))) return false;
+      if (this.value.value.flags !== this.getFlagsFromFont(font)) {
+        return false;
+      }
 
       return true;
     });
