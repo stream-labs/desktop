@@ -3,9 +3,9 @@ import { Inject } from 'util/injector';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import Vue from 'vue';
 import { RootNode } from './nodes/root';
-import { SourcesNode } from './nodes/sources';
-import { ScenesNode } from './nodes/scenes';
-import { SceneItemsNode } from './nodes/scene-items';
+import { SourcesNode, ISourceInfo } from './nodes/sources';
+import { ScenesNode, ISceneSchema } from './nodes/scenes';
+import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { HotkeysNode } from './nodes/hotkeys';
 import path from 'path';
@@ -48,6 +48,24 @@ export const NODE_TYPES = {
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';
 
+export interface ISceneCollectionSchema {
+  name: string;
+  id: string;
+
+  scenes: {
+    id: string;
+    name: string;
+    sceneItems: { sceneItemId: string, sourceId: string }[]
+  }[];
+
+  sources: {
+    sourceId: string;
+    name: string;
+    type: string;
+    channel: number;
+  }[];
+}
+
 /**
  * V2 of the scene collections service:
  * - Completely asynchronous
@@ -78,6 +96,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * initialization.
    */
   async initialize() {
+    window['scs'] = this;
     await this.migrate();
     await this.loadManifestFile();
     await this.safeSync();
@@ -281,6 +300,60 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
         height: 250
       }
     });
+  }
+
+  /**
+   * Used by StreamDeck
+   */
+  fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
+    const promises: Promise<ISceneCollectionSchema>[] = [];
+
+    this.collections.forEach(collection => {
+      promises.push(
+        new Promise<ISceneCollectionSchema>(resolve => {
+          const file = path.join(this.collectionsDirectory, `${collection.id}.json`);
+          this.readCollectionFile(file).then(data => {
+            const root = parse(data, NODE_TYPES);
+            const collectionSchema: ISceneCollectionSchema = {
+              id: collection.id,
+              name: collection.name,
+
+              scenes: root.data.scenes.data.items.map(
+                (sceneData: ISceneSchema) => {
+                  return {
+                    id: sceneData.id,
+                    name: sceneData.name,
+                    sceneItems: sceneData.sceneItems.data.items.map(
+                      (sceneItemData: ISceneItemInfo) => {
+                        return {
+                          sceneItemId: sceneItemData.id,
+                          sourceId: sceneItemData.sourceId
+                        };
+                      }
+                    )
+                  };
+                }
+              ),
+
+              sources: root.data.sources.data.items.map(
+                (sourceData: ISourceInfo) => {
+                  return {
+                    id: sourceData.id,
+                    name: sourceData.name,
+                    type: sourceData.type,
+                    channel: sourceData.channel
+                  };
+                }
+              )
+            };
+
+            resolve(collectionSchema);
+          });
+        })
+      );
+    });
+
+    return Promise.all(promises);
   }
 
   get collections() {
