@@ -43,6 +43,7 @@ module.exports = {
     'aws-sdk': 'require("aws-sdk")',
     'asar': 'require("asar")',
     'backtrace-node': 'require("backtrace-node")',
+    'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
     'backtrace-js': 'require("backtrace-js")'
