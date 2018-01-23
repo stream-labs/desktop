@@ -49,11 +49,10 @@ export class TextNode extends Node<ISchema, IContext> {
 
     const filename = settings['custom_font'];
 
-    const fontPath = await this.fontLibraryService.downloadFont(
-      settings['custom_font']
-    );
+    const fontPath = 
+      await this.fontLibraryService.downloadFont(filename);
 
-    if (settings['font']['face'] && settings['font']['flags']) {
+    if (settings['font']['face'] && settings['font']['flags'] != null) {
       this.updateInput(context);
       return;
     }
