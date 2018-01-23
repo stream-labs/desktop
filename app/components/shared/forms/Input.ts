@@ -74,7 +74,7 @@ export interface INumberInputValue extends IFormInput<number> {
 }
 
 export interface ISliderInputValue extends INumberInputValue {
-  usePercentages: boolean;
+  usePercentages?: boolean;
 }
 
 export interface ITextInputValue extends IFormInput<string> {
