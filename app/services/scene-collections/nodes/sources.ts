@@ -10,6 +10,7 @@ import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
+import * as fi from 'node-fontinfo';
 import path from 'path';
 
 interface ISchema {
@@ -123,35 +124,46 @@ export class SourcesNode extends Node<ISchema, {}> {
     });
   }
 
-  checkTextSourceFace(item: ISourceInfo): Promise<void> {
+
+
+  checkTextSourceValidity(item: ISourceInfo) {
     if (item.type !== 'text_gdiplus') {
-      return Promise.resolve();
+      return;
     }
 
     const settings = item.settings;
 
     if (settings['font']['face'] && (settings['font']['flags'] != null)) {
-      return Promise.resolve();
+      return;
     }
+
+    /* Defaults */
+    settings['font']['face'] = 'Arial';
+    settings['font']['flags'] = 0;
 
     /* This should never happen */
     if (!settings.custom_font) {
-      settings['font']['face'] = 'Arial';
-      settings['font']['flags'] = 0;
       const source = this.sourcesService.getSource(item.id);
       source.updateSettings({ font: settings.font });
       return;
     }
 
-    const filename = path.basename(settings.custom_font);
+    const fontInfo = fi.getFontInfo(settings.custom_path);
 
-    return this.fontLibraryService.findFontFile(filename).then(family => {
-      [settings['font']['face'], settings['font']['flags']] =
-        this.fontLibraryService.getSettingsFromFont(family.family.name, family.style.name);
-
+    if (!fontInfo) { 
       const source = this.sourcesService.getSource(item.id);
       source.updateSettings({ font: settings.font });
-    });
+      return;
+    }
+
+    settings['font']['face'] = fontInfo.family_name;
+
+    settings['font']['flags'] = 
+      (fontInfo.italic ? obs.EFontStyle.Italic : 0) | 
+      (fontInfo.bold ? obs.EFontStyle.Bold : 0);
+
+    const source = this.sourcesService.getSource(item.id);
+    source.updateSettings({ font: settings.font });
   }
 
   load(context: {}): Promise<void> {
@@ -200,7 +212,7 @@ export class SourcesNode extends Node<ISchema, {}> {
         });
       }
 
-      promises.push(this.checkTextSourceFace(sourceInfo));
+      this.checkTextSourceValidity(sourceInfo);
 
       if (sourceInfo.hotkeys) {
         promises.push(this.data.items[index].hotkeys.load({ sourceId: sourceInfo.id }));
