@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs/Subject';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from '../stateful-service';
 import {
@@ -6,6 +7,7 @@ import {
   ICustomizationSettings
 } from './customization-api';
 import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
+import Utils from 'services/utils';
 
 /**
  * This class is used to store general UI behavior flags
@@ -29,13 +31,17 @@ export class CustomizationService
     chatZoomFactor: 1
   };
 
+  settingsChanged = new Subject<Partial<ICustomizationSettings>>();
+
   init() {
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
+    settingsPatch = Utils.getChangedParams(this.state, settingsPatch);
     this.SET_SETTINGS(settingsPatch);
+    this.settingsChanged.next(settingsPatch);
   }
 
   getSettings(): ICustomizationSettings {
@@ -96,30 +102,12 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IFormInput<boolean>> {
-        value: settings.updateStreamInfoOnLive,
-        name: 'updateStreamInfoOnLive',
-        description: 'Confirm stream title and game before going live',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
-      <IFormInput<boolean>> {
-        value: settings.performanceMode,
-        name: 'performanceMode',
-        description: 'Enable performance mode',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      },
-
       <INumberInputValue> {
         value: settings.chatZoomFactor,
         name: 'chatZoomFactor',
         description: 'Chat text size',
         type: 'OBS_PROPERTY_SLIDER',
-        minVal: 0,
+        minVal: 0.25,
         maxVal: 2,
         stepVal: 0.25,
         visible: true,

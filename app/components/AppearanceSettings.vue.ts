@@ -29,11 +29,4 @@ export default class AppearanceSettings extends Vue {
     this.settingsFormData = this.customizationService.getSettingsFormData();
   }
 
-
-
-  restoreDefaults() {
-    this.customizationService.restoreDefaults();
-    this.settingsFormData = this.customizationService.getSettingsFormData();
-  }
-
 }

@@ -5,6 +5,8 @@ import { OverlaysPersistenceService } from '../services/scenes-collections';
 import { CacheUploaderService } from '../services/cache-uploader';
 import { Inject } from '../util/injector';
 import BoolInput from './shared/forms/BoolInput.vue';
+import { CustomizationService } from '../services/customization';
+import { IFormInput } from './shared/forms/Input';
 import { StreamlabelsService } from '../services/streamlabels';
 
 @Component({
@@ -19,9 +21,21 @@ export default class ExtraSettings extends Vue {
   cacheUploaderService: CacheUploaderService;
 
   @Inject() streamlabelsService: StreamlabelsService;
+  @Inject() customizationService: CustomizationService;
 
   cacheUploading = false;
 
+  get streamInfoUpdateModel(): IFormInput<boolean> {
+    return {
+      name: 'stream_info_udpate',
+      description: 'Confirm stream title and game before going live',
+      value: this.customizationService.state.updateStreamInfoOnLive
+    };
+  }
+
+  setStreamInfoUpdate(model: IFormInput<boolean>) {
+    this.customizationService.setUpdateStreamInfoOnLive(model.value);
+  }
 
   showCacheDir() {
     electron.remote.shell.showItemInFolder(electron.remote.app.getPath('userData'));

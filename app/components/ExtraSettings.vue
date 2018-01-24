@@ -19,6 +19,7 @@
     </div>
   </div>
   <div class="section">
+    <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
     <button class="button button--action" @click="restartStreamlabelsSession">
       Restart Streamlabels Session
     </button>
