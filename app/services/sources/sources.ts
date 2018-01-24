@@ -177,7 +177,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
      * otherwise OBS thinks it's still attached
      * and won't release it. */
     if (source.channel !== void 0) {
-      debugger;
       obs.Global.setOutputSource(source.channel, null);
     }
 

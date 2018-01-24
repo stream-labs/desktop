@@ -388,7 +388,7 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   if (senderWindow && !senderWindow.isDestroyed()) {
     const windowId = senderWindow.id;
 
-    Object.keys(registeredStores).filter(id => id !== windowId).forEach(id => {
+    Object.keys(registeredStores).filter(id => id !== windowId.toString()).forEach(id => {
       const win = registeredStores[id];
       if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
