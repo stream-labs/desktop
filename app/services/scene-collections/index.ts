@@ -636,8 +636,12 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   private async setActiveCollection(id: string) {
-    // TODO: Notify the server
-    this.SET_ACTIVE_COLLECTION(id);
+    const collection = this.collections.find(coll => coll.id === id);
+
+    if (collection) {
+      if (collection.serverId) await this.serverApi.makeSceneCollectionActive(collection.serverId);
+      this.SET_ACTIVE_COLLECTION(id);
+    }
   }
 
   /**

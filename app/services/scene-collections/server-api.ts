@@ -57,8 +57,8 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   makeSceneCollectionActive(id: number) {
-    const url = `${this.baseUrl}/active/scene-collection${id}`;
-    const request = new Request(url, { headers: this.headers });
+    const url = `${this.baseUrl}/active/scene-collection/${id}`;
+    const request = new Request(url, { headers: this.headers, method: 'POST' });
 
     return fetch(request)
       .then(handleErrors)
