@@ -45,6 +45,7 @@ export class TroubleshooterService
         stepVal: 0.01,
         visible: true,
         enabled: true,
+        usePercentages: true,
       },
 
       <INumberInputValue> {
@@ -57,6 +58,7 @@ export class TroubleshooterService
         stepVal: 0.01,
         visible: true,
         enabled: true,
+        usePercentages: true,
       },
 
       <INumberInputValue> {
@@ -69,6 +71,7 @@ export class TroubleshooterService
         stepVal: 0.01,
         visible: true,
         enabled: true,
+        usePercentages: true,
       }
     ];
 

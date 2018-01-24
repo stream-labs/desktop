@@ -12,9 +12,10 @@
     :dotSize="dotSize"
     :tooltip="tooltip"
     :sliderStyle="sliderStyle"
+    :formatter="formatter"
   />
   <input
-    v-if="valueBox"
+    v-if="valueBox && !usePercentages"
     class="slider-input"
     type="text"
     :value="value"
