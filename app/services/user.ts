@@ -9,6 +9,7 @@ import { HostsService } from './hosts';
 import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
 import { CustomizationService } from './customization';
 import Raven from 'raven-js';
+import { Subject } from 'rxjs/Subject';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -28,6 +29,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   LOGOUT() {
     Vue.delete(this.state, 'auth');
   }
+
+  userLogin = new Subject<IPlatformAuth>();
 
   init() {
     super.init();
@@ -172,6 +175,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       if (parsed) {
         authWindow.close();
         this.LOGIN(parsed);
+        this.userLogin.next(parsed);
         this.setRavenContext();
         service.setupStreamSettings(parsed);
         defer(onAuthFinish);
