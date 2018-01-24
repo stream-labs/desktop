@@ -79,7 +79,7 @@
     "lodash": "^4.17.4",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.5/obs-studio-node.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.6/obs-studio-node.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1",
