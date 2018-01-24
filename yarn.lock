@@ -2616,7 +2616,7 @@ decompress-zip@0.3.0:
     readable-stream "^1.1.8"
     touch "0.0.3"
 
-deep-equal@^1.0.0:
+deep-equal@^1.0.0, deep-equal@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
 
@@ -2949,6 +2949,14 @@ electron-updater@^2.18.2:
     lodash.isequal "^4.5.0"
     semver "^5.4.1"
     source-map-support "^0.5.0"
+
+electron-window-state@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/electron-window-state/-/electron-window-state-4.1.1.tgz#6b34fdc31b38514dfec8b7c8f7b5d4addb67632d"
+  dependencies:
+    deep-equal "^1.0.1"
+    jsonfile "^2.2.3"
+    mkdirp "^0.5.1"
 
 electron@1.7.11:
   version "1.7.11"
@@ -3561,9 +3569,9 @@ fn-name@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
 
-font-manager@^0.2.2:
+"font-manager@git+https://github.com/computerquip-streamlabs/font-manager.git":
   version "0.2.2"
-  resolved "https://registry.yarnpkg.com/font-manager/-/font-manager-0.2.2.tgz#18a1c5b6ec7f91e22a17c71cbbaa0ea4e68e3a44"
+  resolved "git+https://github.com/computerquip-streamlabs/font-manager.git#b4620d050ed2eeb0431fe014a3a9896fb4bf987d"
   dependencies:
     nan "~2.2.0"
 
@@ -4668,7 +4676,7 @@ json5@^0.5.0, json5@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
-jsonfile@^2.1.0:
+jsonfile@^2.1.0, jsonfile@^2.2.3:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-2.4.0.tgz#3736a2b428b87bbda0cc83b53fa3d633a35c2ae8"
   optionalDependencies:
