@@ -21,8 +21,9 @@
       <api-settings v-if="categoryName === 'API'" />
       <overlay-settings v-if="categoryName === 'Overlays'" />
       <notifications-settings v-if="categoryName === 'Notifications'" />
+      <appearance-settings v-if="categoryName === 'Appearance'" />
       <GenericFormGroups
-        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications'].includes(categoryName)"
+        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance'].includes(categoryName)"
         v-model="settingsData"
         @input="save" />
     </div>

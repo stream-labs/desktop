@@ -102,10 +102,6 @@ export default class LiveDock extends Vue {
     return this.customizationService.state.livedockSize;
   }
 
-  set liveDockSize (livedockSize) {
-    this.customizationService.setSettings({ livedockSize });
-  }
-
   toggleViewerCount() {
     this.customizationService.setHiddenViewerCount(
       !this.customizationService.state.hideViewerCount

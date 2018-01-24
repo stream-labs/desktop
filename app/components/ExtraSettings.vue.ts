@@ -5,8 +5,8 @@ import { OverlaysPersistenceService } from '../services/scenes-collections';
 import { CacheUploaderService } from '../services/cache-uploader';
 import { Inject } from '../util/injector';
 import BoolInput from './shared/forms/BoolInput.vue';
-import { IFormInput } from './shared/forms/Input';
 import { CustomizationService } from '../services/customization';
+import { IFormInput } from './shared/forms/Input';
 import { StreamlabelsService } from '../services/streamlabels';
 
 @Component({
@@ -20,8 +20,8 @@ export default class ExtraSettings extends Vue {
   @Inject()
   cacheUploaderService: CacheUploaderService;
 
-  @Inject() customizationService: CustomizationService;
   @Inject() streamlabelsService: StreamlabelsService;
+  @Inject() customizationService: CustomizationService;
 
   cacheUploading = false;
 
@@ -33,20 +33,8 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  get leftDockModel(): IFormInput<boolean> {
-    return {
-      name: 'left_dock',
-      description: 'Show the live dock (chat) on the left side',
-      value: this.customizationService.state.leftDock
-    };
-  }
-
   setStreamInfoUpdate(model: IFormInput<boolean>) {
     this.customizationService.setUpdateStreamInfoOnLive(model.value);
-  }
-
-  setLeftDock(model: IFormInput<boolean>) {
-    this.customizationService.setLeftDock(model.value);
   }
 
   showCacheDir() {
