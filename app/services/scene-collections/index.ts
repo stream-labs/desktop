@@ -96,7 +96,6 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * initialization.
    */
   async initialize() {
-    window['scs'] = this;
     await this.migrate();
     await this.loadManifestFile();
     await this.safeSync();
@@ -182,11 +181,20 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
   /**
    * Creates and switches to a new blank scene collection
+   * @param name the name of the collection
+   * @param setupFunction a function that can be used to set
+   * up some state.  This should really only be used by the OBS
+   * importer.
    */
-  async create(name?: string) {
+  async create(name?: string, setupFunction?: Function) {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
-    this.setupEmptyCollection();
+
+    if (setupFunction && setupFunction()) {
+      // Do nothing
+    } else {
+      this.setupEmptyCollection();
+    }
 
     name = name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id: string = uuid();
@@ -254,9 +262,18 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     // TODO: Handle Errors
     const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
     const collectionName = this.suggestName(name);
+    await this.loadOverlay(pathName, collectionName);
+  }
 
+  /**
+   * Install a new overlay from a URL
+   * @param filePath the location of the overlay file
+   * @param name the name of the overlay
+   */
+  async loadOverlay(filePath: string, name: string) {
+    this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
-    await this.overlaysPersistenceService.loadOverlay(pathName);
+    await this.overlaysPersistenceService.loadOverlay(filePath);
     this.setupDefaultAudio();
 
     const id: string = uuid();

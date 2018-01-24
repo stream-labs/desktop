@@ -3,9 +3,9 @@ import { Component } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
-import { IDownloadProgress } from 'services/scenes-collections';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { IDownloadProgress } from 'services/scene-collections/overlays';
 import urlLib from 'url';
 
 @Component({})
