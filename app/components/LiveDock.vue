@@ -2,7 +2,7 @@
 <div
   class="live-dock"
   :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: liveDockSize + '%' }">
+  :style="{ width: (liveDockSize * 100) + '%' }">
   <div
     class="live-dock-chevron icon-btn"
     v-if="collapsed"
@@ -59,9 +59,9 @@
       <div class="sizer-items">
         <Slider
           v-model="liveDockSize"
-          :min="15"
-          :max="50"
-          :interval="1"
+          :min="0.15"
+          :max="0.5"
+          :interval="0.01"
           tooltip="false"
           class="sizer"
           :dotSize="11"

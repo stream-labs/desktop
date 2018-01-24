@@ -9,6 +9,9 @@ import {
 import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
 import Utils from 'services/utils';
 
+const LIVEDOCK_MIN_SIZE = 0.15;
+const LIVEDOCK_MAX_SIZE = 0.5;
+
 /**
  * This class is used to store general UI behavior flags
  * that are sticky across application runtimes.
@@ -26,7 +29,7 @@ export class CustomizationService
     hideViewerCount: false,
     livedockCollapsed: true,
     previewSize: 300,
-    livedockSize: 28,
+    livedockSize: 0.28,
     performanceMode: false,
     chatZoomFactor: 1
   };
@@ -36,6 +39,12 @@ export class CustomizationService
   init() {
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
+
+    // migrate livedockSize from % to float number
+    const livedockSize = this.state.livedockSize;
+    if (livedockSize < LIVEDOCK_MAX_SIZE) {
+      this.setSettings({ livedockSize: livedockSize / 100 });
+    }
   }
 
   setSettings(settingsPatch: Partial<ICustomizationSettings>) {
@@ -105,11 +114,24 @@ export class CustomizationService
       <INumberInputValue> {
         value: settings.chatZoomFactor,
         name: 'chatZoomFactor',
-        description: 'Chat text size',
+        description: 'Chat Text Size',
         type: 'OBS_PROPERTY_SLIDER',
         minVal: 0.25,
         maxVal: 2,
         stepVal: 0.25,
+        visible: true,
+        enabled: true,
+        usePercentages: true,
+      },
+
+      <INumberInputValue> {
+        value: settings.livedockSize,
+        name: 'livedockSize',
+        description: 'Chat Width',
+        type: 'OBS_PROPERTY_SLIDER',
+        minVal: LIVEDOCK_MIN_SIZE,
+        maxVal: LIVEDOCK_MAX_SIZE,
+        stepVal: 0.01,
         visible: true,
         enabled: true,
         usePercentages: true,
