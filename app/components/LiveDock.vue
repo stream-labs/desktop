@@ -56,19 +56,7 @@
         <chat ref="chat" />
       </div>
 
-      <div class="sizer-items">
-        <Slider
-          v-model="liveDockSize"
-          :min="0.15"
-          :max="0.5"
-          :interval="0.01"
-          tooltip="false"
-          class="sizer"
-          :dotSize="11"
-          :sliderStyle="{ 'background-color': '#3c4c53' }"
-        />
-        <i class="fa fa-search fa-flip-horizontal" />
-      </div>
+
     </div>
   </transition>
 </div>
@@ -175,7 +163,6 @@
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
-  margin-bottom: 20px;
 }
 
 .live-dock-pulse {
@@ -203,11 +190,6 @@
   100% {
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
-}
-
-.sizer-items {
-  bottom: 5px;
-  right: 20px;
 }
 
 .night-theme {

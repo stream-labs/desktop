@@ -42,8 +42,10 @@ export class CustomizationService
 
     // migrate livedockSize from % to float number
     const livedockSize = this.state.livedockSize;
-    if (livedockSize < LIVEDOCK_MAX_SIZE) {
-      this.setSettings({ livedockSize: livedockSize / 100 });
+    if (livedockSize > LIVEDOCK_MAX_SIZE) {
+      this.setSettings({
+        livedockSize: CustomizationService.defaultState.livedockSize
+      });
     }
   }
 
