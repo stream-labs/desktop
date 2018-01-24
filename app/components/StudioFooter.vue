@@ -1,6 +1,6 @@
 <template>
 <div class="footer">
-  <div class="flex flex--center flex--grow">
+  <div class="flex flex--center flex--grow flex--justify-start">
     <performance-metrics />
     <notifications-area class="notifications-area flex--grow"/>
   </div>

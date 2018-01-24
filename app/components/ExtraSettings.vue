@@ -20,7 +20,6 @@
   </div>
   <div class="section">
     <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
-    <BoolInput :value="leftDockModel" @input="setLeftDock" />
     <button class="button button--action" @click="restartStreamlabelsSession">
       Restart Streamlabels Session
     </button>

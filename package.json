@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.8.6-preview.1",
+  "version": "0.8.6-preview.3",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
@@ -70,20 +70,17 @@
     "arch": "x64"
   },
   "dependencies": {
-    "asar": "^0.13.0",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
     "electron-updater": "^2.18.2",
     "electron-window-state": "^4.1.1",
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
-    "lodash": "^4.17.4",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.5/obs-studio-node.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.7/obs-studio-node.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "uuid": "^3.0.1",
-    "vue-popperjs": "^1.2.2"
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
@@ -117,6 +114,7 @@
     "js-yaml": "^3.8.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
+    "lodash": "^4.17.4",
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "pixelmatch": "^4.0.2",
@@ -140,6 +138,7 @@
     "vue-color": "^2.4.3",
     "vue-loader": "^13.6.0",
     "vue-multiselect": "https://github.com/stream-labs/vue-multiselect.git",
+    "vue-popperjs": "^1.2.2",
     "vue-property-decorator": "^5.0.1",
     "vue-slider-component": "^2.2.7",
     "vue-template-compiler": "^2.5.12",

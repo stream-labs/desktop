@@ -11,6 +11,7 @@ import { CustomizationService } from './customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { Subject } from 'rxjs/Subject';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -32,6 +33,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   LOGOUT() {
     Vue.delete(this.state, 'auth');
   }
+
+  userLogin = new Subject<IPlatformAuth>();
 
   init() {
     super.init();
@@ -148,6 +151,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
     this.LOGIN(auth);
+    this.userLogin.next(auth);
     this.setRavenContext();
     service.setupStreamSettings(auth);
     await this.sceneCollectionsService.setupNewUser();

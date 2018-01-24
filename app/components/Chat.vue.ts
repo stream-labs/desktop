@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { Subscription } from 'rxjs/Subscription';
 import { Component } from 'vue-property-decorator';
 import { UserService } from '../services/user';
 import { Inject } from '../util/injector';
@@ -18,6 +19,8 @@ export default class Chat extends Vue {
     chat: Electron.WebviewTag;
   };
 
+  private settingsSubscr: Subscription = null;
+
   mounted() {
     const platform = this.userService.platform.type;
     const service = getPlatformService(platform);
@@ -32,6 +35,19 @@ export default class Chat extends Vue {
         electron.remote.shell.openExternal(e.url);
       }
     });
+
+    this.$refs.chat.addEventListener('dom-ready', () => {
+      this.$refs.chat.setZoomFactor(this.customizationService.state.chatZoomFactor);
+    });
+
+    this.settingsSubscr = this.customizationService.settingsChanged.subscribe(changedSettings => {
+      if (changedSettings.chatZoomFactor !== void 0)
+        this.$refs.chat.setZoomFactor(changedSettings.chatZoomFactor);
+    });
+  }
+
+  destroyed() {
+    this.settingsSubscr.unsubscribe();
   }
 
   get isTwitch() {

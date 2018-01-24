@@ -3,7 +3,8 @@
     class="chat"
     id="recentEventsWebview"
     ref="chat"
-    :src="chatUrl">
+    :src="chatUrl"
+  >
   </webview>
 </template>
 

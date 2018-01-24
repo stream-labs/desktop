@@ -60,7 +60,6 @@ if (pjson.env === 'production') {
 
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const fs = require('fs');
-const _ = require('lodash');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
@@ -365,12 +364,12 @@ ipcMain.on('vuex-register', event => {
   // refreshed.  We only want to register it once.
   if (!registeredStores[windowId]) {
     registeredStores[windowId] = win;
-    log('Registered vuex stores: ', _.keys(registeredStores));
+    log('Registered vuex stores: ', Object.keys(registeredStores));
 
     // Make sure we unregister is when it is closed
     win.on('closed', () => {
       delete registeredStores[windowId];
-      log('Registered vuex stores: ', _.keys(registeredStores));
+      log('Registered vuex stores: ', Object.keys(registeredStores));
     });
   }
 
@@ -389,7 +388,8 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   if (senderWindow && !senderWindow.isDestroyed()) {
     const windowId = senderWindow.id;
 
-    _.each(_.omit(registeredStores, [windowId]), win => {
+    Object.keys(registeredStores).filter(id => id !== windowId.toString()).forEach(id => {
+      const win = registeredStores[id];
       if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
   }
