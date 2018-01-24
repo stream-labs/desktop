@@ -131,6 +131,8 @@ export class StreamlabelsService extends Service {
 
   trainInterval: number;
 
+  socket: SocketIOClient.Socket;
+
 
   /**
    * Holds data about the currently running trains.
@@ -168,6 +170,17 @@ export class StreamlabelsService extends Service {
     this.fetchSettings();
     this.initSocketConnection();
     this.initTrainClockInterval();
+
+    this.userService.userLogin.subscribe(() => {
+      this.onUserLogin();
+    });
+  }
+
+
+  onUserLogin() {
+    this.fetchInitialData();
+    this.fetchSettings();
+    this.initSocketConnection();
   }
 
 
@@ -314,6 +327,10 @@ export class StreamlabelsService extends Service {
       return;
     }
 
+    if (this.socket) {
+      this.socket.disconnect();
+    }
+
     const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token/${this.userService.widgetToken}`;
     const request = new Request(url);
 
@@ -323,16 +340,16 @@ export class StreamlabelsService extends Service {
       .then(json => json.socket_token)
       .then(token => {
         const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
-        const socket = io(url, { transports: ['websocket'] });
+        this.socket = io(url, { transports: ['websocket'] });
 
         // These are useful for debugging
-        socket.on('connect', () => this.log('Connection Opened'));
-        socket.on('connect_error', (e: any) => this.log('Connection Error', e));
-        socket.on('connect_timeout', () => this.log('Connection Timeout'));
-        socket.on('error', () => this.log('Error'));
-        socket.on('disconnect', () => this.log('Connection Closed'));
+        this.socket.on('connect', () => this.log('Connection Opened'));
+        this.socket.on('connect_error', (e: any) => this.log('Connection Error', e));
+        this.socket.on('connect_timeout', () => this.log('Connection Timeout'));
+        this.socket.on('error', () => this.log('Error'));
+        this.socket.on('disconnect', () => this.log('Connection Closed'));
 
-        socket.on('event', (e: any) => this.onSocketEvent(e));
+        this.socket.on('event', (e: any) => this.onSocketEvent(e));
       });
   }
 
