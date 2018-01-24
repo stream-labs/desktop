@@ -5,7 +5,7 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IFormInput, TFormData } from '../../components/shared/forms/Input';
+import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
 
 /**
  * This class is used to store general UI behavior flags
@@ -112,6 +112,19 @@ export class CustomizationService
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
+      },
+
+      <INumberInputValue> {
+        value: settings.chatZoomFactor,
+        name: 'chatZoomFactor',
+        description: 'Chat text size',
+        type: 'OBS_PROPERTY_SLIDER',
+        minVal: 0,
+        maxVal: 2,
+        stepVal: 0.25,
+        visible: true,
+        enabled: true,
+        usePercentages: true,
       }
 
     ];
