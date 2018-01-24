@@ -53,9 +53,13 @@ export class CacheUploaderService extends Service {
       archive.pipe(output);
       archive.directory(path.join(cacheDir, 'node-obs'), 'node-obs');
       archive.directory(path.join(cacheDir, 'SceneConfigs'), 'SceneConfigs');
+      archive.directory(path.join(cacheDir, 'Streamlabels'), 'Streamlabels');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
       archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
+      archive.file(path.join(cacheDir, 'streamEncoder.json'), { name: 'streamEncoder.json' });
+      archive.file(path.join(cacheDir, 'recordEncoder.json'), { name: 'recordEncoder.json' });
+      archive.file(path.join(cacheDir, 'window-state.json'), { name: 'window-state.json' });
       archive.finalize();
     });
   }
