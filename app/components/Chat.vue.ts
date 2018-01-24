@@ -32,6 +32,10 @@ export default class Chat extends Vue {
         electron.remote.shell.openExternal(e.url);
       }
     });
+
+    this.$refs.chat.addEventListener('dom-ready', () => {
+      this.$refs.chat.setZoomFactor(this.customizationService.state.chatZoomFactor);
+    });
   }
 
   get isTwitch() {
