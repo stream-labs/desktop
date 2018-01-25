@@ -1,6 +1,20 @@
 export interface ISceneCollectionsServiceApi {
-  load(id: string, shouldAttemptRecovery?: boolean): Promise<void>;
-  create(name?: string, setupFunction?: () => void): Promise<void>;
+  /**
+   * Attempt to load a scene collection.
+   * @param id The id of the colleciton to load
+   */
+  load(id: string): Promise<void>;
+
+  /**
+   * Create and load a new empty scene collection
+   * @param name the name of the new collection
+   */
+  create(name?: string): Promise<void>;
+
+  /**
+   * Fetch a list of all scene collections and information
+   * about the scene and sources inside them.
+   */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]>;
 
   collections: ISceneCollectionsManifestEntry[];

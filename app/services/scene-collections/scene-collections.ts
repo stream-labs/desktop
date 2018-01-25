@@ -23,7 +23,8 @@ import { UserService } from 'services/user';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
-  ISceneCollectionSchema
+  ISceneCollectionSchema,
+  ISceneCollectionsServiceApi
 } from '.';
 
 const uuid = window['require']('uuid/v4');
@@ -49,8 +50,11 @@ interface ISceneCollectionsManifest {
  * - Completely asynchronous
  * - Server side backup
  */
-export class SceneCollectionsService extends StatefulService<ISceneCollectionsManifest> {
-  @Inject('SceneCollectionsServerApiService') serverApi: SceneCollectionsServerApiService;
+export class SceneCollectionsService extends StatefulService<
+  ISceneCollectionsManifest
+> implements ISceneCollectionsServiceApi {
+  @Inject('SceneCollectionsServerApiService')
+  serverApi: SceneCollectionsServerApiService;
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() appService: AppService;
@@ -126,7 +130,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   async save(): Promise<void> {
     if (!this.state.activeId) return;
     await this.saveCurrentApplicationStateAs(this.state.activeId);
-    this.SET_MODIFIED(this.state.activeId, (new Date()).toISOString());
+    this.SET_MODIFIED(this.state.activeId, new Date().toISOString());
   }
 
   /**
@@ -149,7 +153,9 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
       if (shouldAttemptRecovery) {
         await this.attemptRecovery(id);
       } else {
-        console.warn(`Unsuccessful recovery of scene collection ${id} attempted`);
+        console.warn(
+          `Unsuccessful recovery of scene collection ${id} attempted`
+        );
         await this.create();
       }
     }
@@ -202,7 +208,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * @param name the name of the new scene collection
    */
   rename(name: string) {
-    this.RENAME_COLLECTION(this.state.activeId, name, (new Date()).toISOString());
+    this.RENAME_COLLECTION(this.state.activeId, name, new Date().toISOString());
   }
 
   /**
@@ -234,11 +240,18 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    * @param name the name of the overlay
    * @param progressCallback a callback that receives progress of the download
    */
-  async installOverlay(url: string, name: string, progressCallback?: (info: IDownloadProgress) => void) {
+  async installOverlay(
+    url: string,
+    name: string,
+    progressCallback?: (info: IDownloadProgress) => void
+  ) {
     this.startLoadingOperation();
 
     // TODO: Handle Errors
-    const pathName = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+    const pathName = await this.overlaysPersistenceService.downloadOverlay(
+      url,
+      progressCallback
+    );
     const collectionName = this.suggestName(name);
     await this.loadOverlay(pathName, collectionName);
   }
@@ -306,7 +319,10 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     this.collections.forEach(collection => {
       promises.push(
         new Promise<ISceneCollectionSchema>(resolve => {
-          const file = path.join(this.collectionsDirectory, `${collection.id}.json`);
+          const file = path.join(
+            this.collectionsDirectory,
+            `${collection.id}.json`
+          );
           this.readCollectionFile(file).then(data => {
             const root = parse(data, NODE_TYPES);
             const collectionSchema: ISceneCollectionSchema = {
@@ -406,7 +422,9 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
       await this.safeSync();
 
       // Find the newly downloaded collection and load it
-      const newCollection = this.collections.find(coll => coll.serverId === collection.serverId);
+      const newCollection = this.collections.find(
+        coll => coll.serverId === collection.serverId
+      );
 
       if (newCollection) {
         await this.load(newCollection.id, false);
@@ -514,7 +532,7 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
    */
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
-    this.ADD_COLLECTION(id, name, (new Date()).toISOString());
+    this.ADD_COLLECTION(id, name, new Date().toISOString());
   }
 
   /**
@@ -617,7 +635,8 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (collection.serverId) await this.serverApi.makeSceneCollectionActive(collection.serverId);
+      if (collection.serverId)
+        await this.serverApi.makeSceneCollectionActive(collection.serverId);
       this.SET_ACTIVE_COLLECTION(id);
     }
   }
@@ -644,7 +663,10 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   }
 
   private get collectionsDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'SceneCollections');
+    return path.join(
+      electron.remote.app.getPath('userData'),
+      'SceneCollections'
+    );
   }
 
   private get legacyDirectory() {
@@ -675,67 +697,103 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
   private async sync() {
     if (!this.userService.isLoggedIn()) return;
 
-    const serverCollections = (await this.serverApi.fetchSceneCollections()).data;
+    const serverCollections = (await this.serverApi.fetchSceneCollections())
+      .data;
     const promises: Promise<any>[] = [];
 
     serverCollections.forEach(onServer => {
-      const inManifest = this.state.collections.find(coll => coll.serverId === onServer.id);
+      const inManifest = this.state.collections.find(
+        coll => coll.serverId === onServer.id
+      );
 
       if (!inManifest) {
         // Insert from server
         const id: string = uuid();
-        promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-          return this.writeDataToCollectionFile(id, response.scene_collection.data).then(() => {
-            // Only do this after we know we successfully wrote the file
-            this.ADD_COLLECTION(id, onServer.name, (new Date()).toISOString());
-            this.SET_SERVER_ID(id, onServer.id);
-          });
-        }));
+        promises.push(
+          this.serverApi.fetchSceneCollection(onServer.id).then(response => {
+            return this.writeDataToCollectionFile(
+              id,
+              response.scene_collection.data
+            ).then(() => {
+              // Only do this after we know we successfully wrote the file
+              this.ADD_COLLECTION(id, onServer.name, new Date().toISOString());
+              this.SET_SERVER_ID(id, onServer.id);
+            });
+          })
+        );
       } else {
         if (inManifest.deleted) {
           // We need to tell the server this was deleted
-          promises.push(this.serverApi.deleteSceneCollection(inManifest.serverId).then(() => {
-            // We can hard delete once we know it has been removed from the server
-            this.HARD_DELETE_COLLECTION(inManifest.id);
-          }));
-        } else if (new Date(inManifest.modified) > new Date(onServer.last_updated_at)) {
-          promises.push(this.readCollectionFile(this.getCollectionFilePath(inManifest.id)).then(data => {
-            return this.serverApi.updateSceneCollection({
-              id: inManifest.serverId,
-              name: inManifest.name,
-              data,
-              last_updated_at: inManifest.modified
-            });
-          }));
-        } else if (new Date(inManifest.modified) < new Date(onServer.last_updated_at)) {
-          promises.push(this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-            return this.writeDataToCollectionFile(inManifest.id, response.scene_collection.data).then(() => {
-              // Only do this once we know we have written successfully
-              this.RENAME_COLLECTION(inManifest.id, onServer.name, onServer.last_updated_at);
-            });
-          }));
+          promises.push(
+            this.serverApi
+              .deleteSceneCollection(inManifest.serverId)
+              .then(() => {
+                // We can hard delete once we know it has been removed from the server
+                this.HARD_DELETE_COLLECTION(inManifest.id);
+              })
+          );
+        } else if (
+          new Date(inManifest.modified) > new Date(onServer.last_updated_at)
+        ) {
+          promises.push(
+            this.readCollectionFile(
+              this.getCollectionFilePath(inManifest.id)
+            ).then(data => {
+              return this.serverApi.updateSceneCollection({
+                id: inManifest.serverId,
+                name: inManifest.name,
+                data,
+                last_updated_at: inManifest.modified
+              });
+            })
+          );
+        } else if (
+          new Date(inManifest.modified) < new Date(onServer.last_updated_at)
+        ) {
+          promises.push(
+            this.serverApi.fetchSceneCollection(onServer.id).then(response => {
+              return this.writeDataToCollectionFile(
+                inManifest.id,
+                response.scene_collection.data
+              ).then(() => {
+                // Only do this once we know we have written successfully
+                this.RENAME_COLLECTION(
+                  inManifest.id,
+                  onServer.name,
+                  onServer.last_updated_at
+                );
+              });
+            })
+          );
         } else {
           console.log('Up to date file: ', inManifest.id);
         }
-
       }
     });
 
     this.state.collections.forEach(inManifest => {
-      const onServer = serverCollections.find(coll => coll.id === inManifest.serverId);
+      const onServer = serverCollections.find(
+        coll => coll.id === inManifest.serverId
+      );
 
       // We already dealt with the overlap above
       if (!onServer) {
         if (!inManifest.serverId) {
-          promises.push(this.readCollectionFile(this.getCollectionFilePath(inManifest.id)).then(data => {
-            return this.serverApi.createSceneCollection({
-              name: inManifest.name,
-              data,
-              last_updated_at: inManifest.modified
-            }).then(response => {
-              this.SET_SERVER_ID(inManifest.id, response.id);
-            });
-          }));
+          promises.push(
+            this.readCollectionFile(
+              this.getCollectionFilePath(inManifest.id)
+            ).then(data => {
+              return this.serverApi
+                .createSceneCollection({
+                  name: inManifest.name,
+                  data,
+                  last_updated_at: inManifest.modified
+                })
+                .then(response => {
+                  this.SET_SERVER_ID(inManifest.id, response.id);
+                });
+            })
+          );
         } else {
           this.HARD_DELETE_COLLECTION(inManifest.id);
         }
@@ -793,12 +851,18 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
           await this.ensureDirectory();
           const id: string = uuid();
           await this.writeDataToCollectionFile(id, oldData);
-          this.ADD_COLLECTION(id, file.replace(/\.[^/.]+$/, ''), (new Date()).toISOString());
+          this.ADD_COLLECTION(
+            id,
+            file.replace(/\.[^/.]+$/, ''),
+            new Date().toISOString()
+          );
         }
       }
 
       // Try to import the active collection
-      const data = localStorage.getItem('PersistentStatefulService-ScenesCollectionsService');
+      const data = localStorage.getItem(
+        'PersistentStatefulService-ScenesCollectionsService'
+      );
 
       if (data) {
         const parsed = JSON.parse(data);
@@ -852,7 +916,9 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
 
   @mutation()
   private HARD_DELETE_COLLECTION(id: string) {
-    this.state.collections = this.state.collections.filter(coll => coll.id !== id);
+    this.state.collections = this.state.collections.filter(
+      coll => coll.id !== id
+    );
   }
 
   @mutation()
@@ -861,5 +927,4 @@ export class SceneCollectionsService extends StatefulService<ISceneCollectionsMa
       Vue.set(this.state, key, state[key]);
     });
   }
-
 }
