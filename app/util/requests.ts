@@ -7,7 +7,7 @@
  * this is NOT the default behavior of the fetch API, so we have to
  * handle it explicitly.
  */
-export function handleErrors(response: Response): Response {
-  if (response.ok) return response;
-  throw new Error(response.statusText);
+export function handleErrors(response: Response): Promise<Response> {
+  if (response.ok) return Promise.resolve(response);
+  return Promise.reject(response);
 }
