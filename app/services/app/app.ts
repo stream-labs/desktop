@@ -52,7 +52,6 @@ export class AppService extends StatefulService<IAppState> {
 
   @track('app_start')
   load() {
-    let loadingPromise: Promise<void>;
     this.START_LOADING();
 
     // We want to start this as early as possible so that any
@@ -60,18 +59,9 @@ export class AppService extends StatefulService<IAppState> {
     // associated with the user in sentry.
     this.userService;
 
+    this.sceneCollectionsService.initialize().then(() => {
+      this.onboardingService.startOnboardingIfRequired();
 
-    // If we're not showing the onboarding steps, we should load
-    // the config file.  Otherwise the onboarding process will
-    // handle it based on what the user wants.
-    const onboarded = this.onboardingService.startOnboardingIfRequired();
-    if (!onboarded) {
-      loadingPromise = this.sceneCollectionsService.initialize();
-    } else {
-      loadingPromise = Promise.resolve();
-    }
-
-    loadingPromise.then(() => {
       electron.ipcRenderer.on('shutdown', () => {
         electron.ipcRenderer.send('acknowledgeShutdown');
         this.shutdownHandler();
