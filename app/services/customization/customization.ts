@@ -32,7 +32,7 @@ export class CustomizationService
     livedockSize: 0.28,
     performanceMode: false,
     chatZoomFactor: 1,
-    enableBTTVEmotes: true
+    enableBTTVEmotes: false
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
