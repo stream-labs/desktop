@@ -145,7 +145,6 @@ export class CustomizationService
         name: 'enableBBTVEmotes',
         description: 'Enable BetterTTV emotes for Twitch',
         type: 'OBS_PROPERTY_BOOL',
-        stepVal: 0.01,
         visible: true,
         enabled: true,
       }
