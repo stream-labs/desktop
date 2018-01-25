@@ -41,20 +41,24 @@ export default class Chat extends Vue {
 
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);
+
+      webview.openDevTools();
+
       if (settings.enableBTTVEmotes && this.isTwitch) {
         webview.executeJavaScript(`
-        
-        localStorage.setItem('bttv_clickTwitchEmotes', true);
-        
-        var bbtvscript1 = document.createElement('script');
-        bbtvscript1.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
-        document.head.appendChild(bbtvscript1);
-        
-        var bbtvscript2 = document.createElement('script');
-        bbtvscript2.setAttribute('src','https://legacy.betterttv.net/betterttv.js');
-        document.head.appendChild(bbtvscript2);
-        
-      `, true);
+          
+          localStorage.setItem('bttv_clickTwitchEmotes', true);
+          localStorage.setItem('bttv_darkenedMode', ${ settings.nightMode ? 'true' : 'false' });
+          
+          var bbtvscript1 = document.createElement('script');
+          bbtvscript1.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
+          document.head.appendChild(bbtvscript1);
+          
+          var bbtvscript2 = document.createElement('script');
+          bbtvscript2.setAttribute('src','https://legacy.betterttv.net/betterttv.js');
+          document.head.appendChild(bbtvscript2);
+          
+        `, true);
       }
     });
 
