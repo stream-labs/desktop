@@ -208,8 +208,8 @@ function requiresToken() {
         return original.apply(target.constructor.instance, args)
         .catch((error:Response) => {
           if (error.status === 401) {
-            target.fetchNewToken().then(() => {
-              original.apply(target.constructor.instance, args);
+            return target.fetchNewToken().then(() => {
+              return original.apply(target.constructor.instance, args);
             });
           }
         });
