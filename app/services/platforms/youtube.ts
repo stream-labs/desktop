@@ -138,7 +138,7 @@ export class YoutubeService extends Service implements IPlatformService {
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/youtube/token/${this.widgetToken}`;
+    const url = `https://${host}/api/v5/slobs/youtube/token/${this.widgetToken}`;
     const request = new Request(url);
 
     return fetch(request)
@@ -206,12 +206,13 @@ function requiresToken() {
       ...descriptor,
       value(...args: any[]) {
         return original.apply(target.constructor.instance, args)
-        .catch((error:Response) => {
+        .catch((error: Response) => {
           if (error.status === 401) {
             return target.fetchNewToken().then(() => {
               return original.apply(target.constructor.instance, args);
             });
           }
+          return Promise.reject(error);
         });
       }
     };
