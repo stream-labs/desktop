@@ -42,8 +42,6 @@ export default class Chat extends Vue {
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);
 
-      webview.openDevTools();
-
       if (settings.enableBTTVEmotes && this.isTwitch) {
         webview.executeJavaScript(`
           
