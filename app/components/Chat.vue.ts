@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import { Subscription } from 'rxjs/Subscription';
 import { Component } from 'vue-property-decorator';
-import { UserService } from '../services/user';
-import { Inject } from '../util/injector';
-import { getPlatformService } from '../services/platforms';
-import { CustomizationService } from '../services/customization';
+import { UserService } from 'services/user';
+import { Inject } from 'util/injector';
+import { getPlatformService } from 'services/platforms';
+import { CustomizationService } from 'services/customization';
 import url from 'url';
 import electron from 'electron';
-import { ICustomizationSettings } from '../services/customization/customization-api';
+import { ICustomizationSettings } from 'services/customization/customization-api';
 
 @Component({})
 export default class Chat extends Vue {
