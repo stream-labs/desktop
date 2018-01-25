@@ -12,6 +12,7 @@ export interface ICustomizationServiceState {
   livedockSize: number;
   performanceMode: boolean;
   chatZoomFactor: number;
+  enableBBTVEmotes: boolean;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}

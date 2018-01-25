@@ -7,6 +7,7 @@ import { getPlatformService } from '../services/platforms';
 import { CustomizationService } from '../services/customization';
 import url from 'url';
 import electron from 'electron';
+import { ICustomizationSettings } from "../services/customization/customization-api";
 
 @Component({})
 export default class Chat extends Vue {
@@ -25,10 +26,12 @@ export default class Chat extends Vue {
     const platform = this.userService.platform.type;
     const service = getPlatformService(platform);
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const webview = this.$refs.chat;
+    const settings = this.customizationService.getSettings();
 
     service.getChatUrl(nightMode).then(chatUrl => this.chatUrl = chatUrl);
 
-    this.$refs.chat.addEventListener('new-window', e => {
+    webview.addEventListener('new-window', e => {
       const protocol = url.parse(e.url).protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
@@ -36,14 +39,28 @@ export default class Chat extends Vue {
       }
     });
 
-    this.$refs.chat.addEventListener('dom-ready', () => {
-      this.$refs.chat.setZoomFactor(this.customizationService.state.chatZoomFactor);
+    webview.addEventListener('dom-ready', () => {
+      webview.setZoomFactor(settings.chatZoomFactor);
+      if (settings.enableBBTVEmotes && this.isTwitch) {
+        webview.executeJavaScript(`
+        
+        localStorage.setItem('bttv_clickTwitchEmotes', true);
+        
+        var bbtvscript1 = document.createElement('script');
+        bbtvscript1.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
+        document.head.appendChild(bbtvscript1);
+        
+        var bbtvscript2 = document.createElement('script');
+        bbtvscript2.setAttribute('src','https://legacy.betterttv.net/betterttv.js');
+        document.head.appendChild(bbtvscript2);
+        
+      `, true);
+      }
     });
 
-    this.settingsSubscr = this.customizationService.settingsChanged.subscribe(changedSettings => {
-      if (changedSettings.chatZoomFactor !== void 0)
-        this.$refs.chat.setZoomFactor(changedSettings.chatZoomFactor);
-    });
+    this.settingsSubscr = this.customizationService.settingsChanged.subscribe(
+      (changedSettings) => this.onSettingsChangedHandler(changedSettings)
+    );
   }
 
   destroyed() {
@@ -57,4 +74,15 @@ export default class Chat extends Vue {
   refresh() {
     this.$refs.chat.reload();
   }
+
+  private onSettingsChangedHandler(changedSettings: Partial<ICustomizationSettings>) {
+    if (changedSettings.chatZoomFactor) {
+      this.$refs.chat.setZoomFactor(changedSettings.chatZoomFactor);
+    }
+
+    if (changedSettings.enableBBTVEmotes !== void 0) {
+      this.refresh();
+    }
+  }
+
 }
