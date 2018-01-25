@@ -32,7 +32,7 @@ export class CustomizationService
     livedockSize: 0.28,
     performanceMode: false,
     chatZoomFactor: 1,
-    enableBBTVEmotes: false
+    enableBTTVEmotes: false
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -141,8 +141,8 @@ export class CustomizationService
       },
 
       <IFormInput<boolean>>  {
-        value: settings.enableBBTVEmotes,
-        name: 'enableBBTVEmotes',
+        value: settings.enableBTTVEmotes,
+        name: 'enableBTTVEmotes',
         description: 'Enable BetterTTV emotes for Twitch',
         type: 'OBS_PROPERTY_BOOL',
         visible: true,

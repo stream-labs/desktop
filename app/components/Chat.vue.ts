@@ -41,7 +41,7 @@ export default class Chat extends Vue {
 
     webview.addEventListener('dom-ready', () => {
       webview.setZoomFactor(settings.chatZoomFactor);
-      if (settings.enableBBTVEmotes && this.isTwitch) {
+      if (settings.enableBTTVEmotes && this.isTwitch) {
         webview.executeJavaScript(`
         
         localStorage.setItem('bttv_clickTwitchEmotes', true);
@@ -80,7 +80,7 @@ export default class Chat extends Vue {
       this.$refs.chat.setZoomFactor(changedSettings.chatZoomFactor);
     }
 
-    if (changedSettings.enableBBTVEmotes !== void 0) {
+    if (changedSettings.enableBTTVEmotes !== void 0) {
       this.refresh();
     }
   }
