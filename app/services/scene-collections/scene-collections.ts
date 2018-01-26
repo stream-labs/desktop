@@ -65,11 +65,6 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
 
-  static initialState: ISceneCollectionsManifest = {
-    activeId: null,
-    collections: []
-  };
-
   /**
    * Whether the service has been initialized
    */

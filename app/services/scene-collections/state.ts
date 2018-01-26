@@ -26,6 +26,11 @@ interface ISceneCollectionsManifest {
 export class SceneCollectionsStateService extends StatefulService<
   ISceneCollectionsManifest
 > {
+  static initialState: ISceneCollectionsManifest = {
+    activeId: null,
+    collections: []
+  };
+
   get collections() {
     return this.state.collections.filter(coll => !coll.deleted);
   }
