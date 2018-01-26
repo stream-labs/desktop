@@ -4,10 +4,9 @@ import { getClient } from '../helpers/api-client';
 import { sleep } from '../helpers/sleep';
 import { IAudioServiceApi } from 'services/audio';
 import { IScenesServiceApi } from 'services/scenes';
-import { IAppServiceApi } from '../../app/services/app/app-api';
+import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 
-useSpectron({ restartAppAfterEachTest: false});
-
+useSpectron({ restartAppAfterEachTest: false });
 
 test('The default sources exists', async t => {
   const client = await getClient();
@@ -36,7 +35,7 @@ test('The audio sources have to keep settings after application restart', async 
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
   const audioService = client.getResource<IAudioServiceApi>('AudioService');
-  const appService = client.getResource<IAppServiceApi>('AppService');
+  const sceneCollectionsService = client.getResource<ISceneCollectionsServiceApi>('SceneCollectionsService');
 
   const scene = scenesService.activeScene;
   const source = scene.createAndAddSource('MyMic', 'wasapi_input_capture');
@@ -53,7 +52,7 @@ test('The audio sources have to keep settings after application restart', async 
   const audioSourceModel = audioSource.getModel();
 
   // reload config
-  await appService.loadConfig('scenes');
+  await sceneCollectionsService.load(sceneCollectionsService.collections[0].id);
 
   const loadedAudioSourceModel = audioService.getSource(source.sourceId).getModel();
 

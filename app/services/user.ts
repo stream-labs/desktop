@@ -6,9 +6,11 @@ import { Inject } from '../util/injector';
 import { mutation } from './stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { getPlatformService, IPlatformAuth, TPlatform } from './platforms';
+import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
 import { CustomizationService } from './customization';
 import Raven from 'raven-js';
+import { AppService } from 'services/app';
+import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 
 // Eventually we will support authing multiple platforms at once
@@ -19,6 +21,8 @@ interface IUserServiceState {
 export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() hostsService: HostsService;
   @Inject() customizationService: CustomizationService;
+  @Inject() appService: AppService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -150,8 +154,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
-  logOut() {
+  private async login(service: IPlatformService, auth: IPlatformAuth) {
+    this.LOGIN(auth);
+    this.userLogin.next(auth);
+    this.setRavenContext();
+    service.setupStreamSettings(auth);
+    await this.sceneCollectionsService.setupNewUser();
+  }
+
+  async logOut() {
+    // Attempt to sync scense before logging out
+    this.appService.startLoading();
+    await this.sceneCollectionsService.save();
+    await this.sceneCollectionsService.safeSync();
     this.LOGOUT();
+    this.appService.finishLoading();
   }
 
   /**
@@ -161,6 +178,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   startAuth(
     platform: TPlatform,
     onWindowShow: Function,
+    onAuthStart: Function,
     onAuthFinish: Function
   ) {
     const service = getPlatformService(platform);
@@ -174,15 +192,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       }
     });
 
-    authWindow.webContents.on('did-navigate', (e, url) => {
+    authWindow.webContents.on('did-navigate', async (e, url) => {
       const parsed = this.parseAuthFromUrl(url);
 
       if (parsed) {
         authWindow.close();
-        this.LOGIN(parsed);
-        this.userLogin.next(parsed);
-        this.setRavenContext();
-        service.setupStreamSettings(parsed);
+        onAuthStart();
+        await this.login(service, parsed);
         defer(onAuthFinish);
       }
     });

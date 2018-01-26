@@ -8,4 +8,4 @@ install:
   - yarn ci:compile
 
 test_script:
-  - yarn test -- -v
+  - yarn test

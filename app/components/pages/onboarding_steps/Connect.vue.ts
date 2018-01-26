@@ -1,27 +1,26 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { UserService } from '../../../services/user';
-import { TPlatform } from '../../../services/platforms';
-import { Inject } from '../../../util/injector';
-import { OnboardingService } from '../../../services/onboarding';
+import { UserService } from 'services/user';
+import { TPlatform } from 'services/platforms';
+import { Inject } from 'util/injector';
+import { OnboardingService } from 'services/onboarding';
 
 @Component({})
 export default class Connect extends Vue {
+  @Inject() userService: UserService;
+  @Inject() onboardingService: OnboardingService;
 
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  onboardingService: OnboardingService;
-
-  loadingState: Dictionary<boolean> = {};
+  loadingState = false;
 
   authPlatform(platform: TPlatform) {
-    Vue.set(this.loadingState, platform, true);
+    this.loadingState = true;
     this.userService.startAuth(
       platform,
       () => {
-        this.loadingState[platform] = false;
+        this.loadingState = false;
+      },
+      () => {
+        this.loadingState = true;
       },
       () => {
         this.onboardingService.next();
@@ -30,7 +29,7 @@ export default class Connect extends Vue {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loadingState[platform]) return 'fa-spinner fa-spin';
+    if (this.loadingState) return 'fa-spinner fa-spin';
 
     return {
       twitch: 'fa-twitch',

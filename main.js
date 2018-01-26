@@ -241,7 +241,7 @@ function startApp() {
   });
 
   ipcMain.on('services-message', (event, payload) => {
-    childWindow.webContents.send('services-message', payload);
+    if (!childWindow.isDestroyed()) childWindow.webContents.send('services-message', payload);
   });
 
 

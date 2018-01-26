@@ -5,7 +5,7 @@ import Selector from './Selector.vue';
 import { ScenesService } from '../services/scenes';
 import { Menu } from '../util/menus/Menu';
 import { ScenesTransitionsService } from '../services/scenes-transitions';
-import { ScenesCollectionsService } from '../services/scenes-collections/config';
+import { SceneCollectionsService } from '../services/scene-collections';
 import { AppService } from '../services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
@@ -16,7 +16,7 @@ import { EDismissable } from 'services/dismissables';
 })
 export default class SceneSelector extends Vue {
   @Inject() scenesService: ScenesService;
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
   @Inject() scenesTransitionsService: ScenesTransitionsService;
 
@@ -58,10 +58,6 @@ export default class SceneSelector extends Vue {
     this.scenesTransitionsService.showSceneTransitions();
   }
 
-  loadConfig(configName: string) {
-    this.appService.loadConfig(configName);
-  }
-
   get scenes() {
     return this.scenesService.scenes.map(scene => {
       return {
@@ -71,12 +67,16 @@ export default class SceneSelector extends Vue {
     });
   }
 
-  get scenesCollections() {
-    return this.scenesCollectionsService.state.scenesCollections;
+  get sceneCollections() {
+    return this.sceneCollectionsService.collections;
   }
 
-  get activeConfig() {
-    return this.scenesCollectionsService.state.activeCollection;
+  get activeId() {
+    return this.sceneCollectionsService.activeCollection.id;
+  }
+
+  get activeCollection() {
+    return this.sceneCollectionsService.activeCollection;
   }
 
   get activeSceneId() {
@@ -87,26 +87,30 @@ export default class SceneSelector extends Vue {
     return null;
   }
 
+  loadCollection(id: string) {
+    this.sceneCollectionsService.load(id);
+  }
+
   addCollection() {
-    this.scenesCollectionsService.showNameConfig();
+    this.sceneCollectionsService.showNameConfig();
   }
 
 
   duplicateCollection() {
-    this.scenesCollectionsService.showNameConfig({
-      scenesCollectionToDuplicate: this.activeConfig
+    this.sceneCollectionsService.showNameConfig({
+      sceneCollectionToDuplicate: this.activeCollection.id
     });
   }
 
 
   renameCollection() {
-    this.scenesCollectionsService.showNameConfig({ rename: true });
+    this.sceneCollectionsService.showNameConfig({ rename: true });
   }
 
 
   removeCollection() {
-    if (!confirm(`remove ${this.activeConfig} ?`)) return;
-    this.appService.removeCurrentConfig();
+    if (!confirm(`remove ${this.activeCollection.name} ?`)) return;
+    this.sceneCollectionsService.delete();
   }
 
   get helpTipDismissable() {
