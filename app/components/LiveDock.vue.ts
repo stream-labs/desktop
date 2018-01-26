@@ -94,6 +94,10 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'twitch';
   }
 
+  get isYoutube() {
+    return this.userService.platform.type === 'youtube';
+  }
+
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
   }

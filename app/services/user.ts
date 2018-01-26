@@ -34,6 +34,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     Vue.delete(this.state, 'auth');
   }
 
+  @mutation()
+  private SET_PLATFORM_TOKEN(token: string) {
+    this.state.auth.platform.token = token;
+  }
+
   userLogin = new Subject<IPlatformAuth>();
 
   init() {
@@ -205,6 +210,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     authWindow.setMenu(null);
     authWindow.loadURL(service.authUrl);
+  }
+
+  updatePlatformToken(token: string) {
+    this.SET_PLATFORM_TOKEN(token);
   }
 
   /**
