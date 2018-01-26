@@ -39,43 +39,39 @@ export class TextNode extends Node<ISchema, IContext> {
   }
 
   async load(context: IContext) {
-    // If a custom font was set, try to load it as a google font.
-    // If this fails, not font will be installed and the plugin
-    // will automatically fall back to Arial
     const settings = this.data.settings;
 
+    // Overlays should always use a custom font, but in case they
+    // don't, just leave all the settings as-is
     if (!settings['custom_font']) {
       this.updateInput(context);
       return;
     }
 
+    // If a custom font was set, try to load it as a google font.
+    // If this fails, no font will be installed and the plugin
+    // will automatically fall back to Arial
     const filename = settings['custom_font'];
 
-    const fontPath = 
+    const fontPath =
       await this.fontLibraryService.downloadFont(filename);
-
-    if (settings['font']['face'] && settings['font']['flags'] != null) {
-      this.updateInput(context);
-      return;
-    }
-
-    /* Defaults */
-    settings['font']['face'] = 'Arial';
-    settings['font']['flags'] = 0;
 
     const fontInfo = fi.getFontInfo(fontPath);
 
-    if (!fontInfo) { 
+    if (!fontInfo) {
+      // Fall back to Arial
+      delete settings['custom_font'];
+      settings['font']['face'] = 'Arial';
+      settings['font']['flags'] = 0;
       this.updateInput(context);
       return;
     }
 
-    settings['font']['face'] = fontInfo.family_name;
-    settings['font']['flags'] = 
-      (fontInfo.italic ? EFontStyle.Italic : 0) | 
-      (fontInfo.bold ? EFontStyle.Bold : 0);
-
     settings['custom_font'] = fontPath;
+    settings['font']['face'] = fontInfo.family_name;
+    settings['font']['flags'] =
+      (fontInfo.italic ? EFontStyle.Italic : 0) |
+      (fontInfo.bold ? EFontStyle.Bold : 0);
 
     this.updateInput(context);
   }
