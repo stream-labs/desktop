@@ -239,7 +239,6 @@ export class SceneCollectionsService extends Service
   ) {
     this.startLoadingOperation();
 
-    // TODO: Handle Errors
     const pathName = await this.overlaysPersistenceService.downloadOverlay(
       url,
       progressCallback
