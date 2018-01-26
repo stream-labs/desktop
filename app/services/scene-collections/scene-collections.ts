@@ -254,7 +254,7 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Install a new overlay from a URL
+   * Install a new overlay from a file path
    * @param filePath the location of the overlay file
    * @param name the name of the overlay
    */
