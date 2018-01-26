@@ -511,7 +511,9 @@ export class SceneCollectionsService extends Service
   private async removeCollection(id: string) {
     this.stateService.DELETE_COLLECTION(id);
 
-    // TODO: Delete the file (for safety and recoverability we soft delete for now)
+    // Currently we don't remove files on disk in case we need to recover them
+    // manually at a later point in time.  Once we are more comfortable with
+    // the system, we can start actually deleting files from disk.
   }
 
   private autoSaveInterval: number;
