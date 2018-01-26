@@ -17,7 +17,14 @@ export interface ISceneCollectionsServiceApi {
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]>;
 
+  /**
+   * Contains a list of collections
+   */
   collections: ISceneCollectionsManifestEntry[];
+
+  /**
+   * Contains the active collection
+   */
   activeCollection: ISceneCollectionsManifestEntry;
 }
 

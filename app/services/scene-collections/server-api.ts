@@ -11,7 +11,7 @@ export interface IServerSceneCollection {
   last_updated_at: string;
 }
 
-interface ISceneCollectionsResponse {
+export interface ISceneCollectionsResponse {
   data: IServerSceneCollection[];
 }
 

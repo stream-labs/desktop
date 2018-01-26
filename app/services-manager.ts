@@ -51,6 +51,7 @@ import { SceneCollectionsServerApiService } from 'services/scene-collections/ser
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
+import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -116,6 +117,7 @@ export class ServicesManager extends Service {
     DismissablesService,
     SceneCollectionsServerApiService,
     SceneCollectionsService,
+    SceneCollectionsStateService,
     TroubleshooterService,
     JsonrpcService
   };

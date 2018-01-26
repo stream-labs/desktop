@@ -1,4 +1,4 @@
-import { StatefulService, mutation } from 'services/stateful-service';
+import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import Vue from 'vue';
@@ -26,6 +26,7 @@ import {
   ISceneCollectionSchema,
   ISceneCollectionsServiceApi
 } from '.';
+import { SceneCollectionsStateService } from './state';
 
 const uuid = window['require']('uuid/v4');
 
@@ -50,11 +51,12 @@ interface ISceneCollectionsManifest {
  * - Completely asynchronous
  * - Server side backup
  */
-export class SceneCollectionsService extends StatefulService<
-  ISceneCollectionsManifest
-> implements ISceneCollectionsServiceApi {
+export class SceneCollectionsService extends Service
+  implements ISceneCollectionsServiceApi {
   @Inject('SceneCollectionsServerApiService')
   serverApi: SceneCollectionsServerApiService;
+  @Inject('SceneCollectionsStateService')
+  stateService: SceneCollectionsStateService;
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() appService: AppService;
@@ -79,10 +81,10 @@ export class SceneCollectionsService extends StatefulService<
    */
   async initialize() {
     await this.migrate();
-    await this.loadManifestFile();
+    await this.stateService.loadManifestFile();
     await this.safeSync();
     if (this.activeCollection) {
-      await this.load(this.state.activeId);
+      await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
       await this.load(this.collections[0].id);
     } else {
@@ -98,19 +100,7 @@ export class SceneCollectionsService extends StatefulService<
    */
   async setupNewUser() {
     const serverCollections = await this.serverApi.fetchSceneCollections();
-
-    if (serverCollections.data.length > 0) {
-      this.LOAD_STATE({
-        activeId: null,
-        collections: []
-      });
-      await this.ensureDirectory();
-      this.flushManifestFile();
-    } else {
-      // Do nothing.
-      // Local files will be synced up to the server
-    }
-
+    await this.stateService.setupNewUser(serverCollections);
     await this.initialize();
   }
 
@@ -121,16 +111,19 @@ export class SceneCollectionsService extends StatefulService<
     this.disableAutoSave();
     await this.deloadCurrentApplicationState();
     await this.safeSync();
-    await this.flushManifestFile();
+    await this.stateService.flushManifestFile();
   }
 
   /**
    * Saves the current scene collection
    */
   async save(): Promise<void> {
-    if (!this.state.activeId) return;
-    await this.saveCurrentApplicationStateAs(this.state.activeId);
-    this.SET_MODIFIED(this.state.activeId, new Date().toISOString());
+    if (!this.activeCollection) return;
+    await this.saveCurrentApplicationStateAs(this.activeCollection.id);
+    this.stateService.SET_MODIFIED(
+      this.activeCollection.id,
+      new Date().toISOString()
+    );
   }
 
   /**
@@ -194,7 +187,7 @@ export class SceneCollectionsService extends StatefulService<
   async delete(): Promise<void> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
-    await this.removeCollection(this.state.activeId);
+    await this.removeCollection(this.activeCollection.id);
 
     if (this.collections.length > 0) {
       this.load(this.collections[0].id);
@@ -208,7 +201,11 @@ export class SceneCollectionsService extends StatefulService<
    * @param name the name of the new scene collection
    */
   rename(name: string) {
-    this.RENAME_COLLECTION(this.state.activeId, name, new Date().toISOString());
+    this.stateService.RENAME_COLLECTION(
+      this.activeCollection.id,
+      name,
+      new Date().toISOString()
+    );
   }
 
   /**
@@ -319,11 +316,8 @@ export class SceneCollectionsService extends StatefulService<
     this.collections.forEach(collection => {
       promises.push(
         new Promise<ISceneCollectionSchema>(resolve => {
-          const file = path.join(
-            this.collectionsDirectory,
-            `${collection.id}.json`
-          );
-          this.readCollectionFile(file).then(data => {
+          const file = this.stateService.getCollectionFilePath(collection.id);
+          this.stateService.readCollectionFile(file).then(data => {
             const root = parse(data, NODE_TYPES);
             const collectionSchema: ISceneCollectionSchema = {
               id: collection.id,
@@ -368,11 +362,11 @@ export class SceneCollectionsService extends StatefulService<
   }
 
   get collections() {
-    return this.state.collections.filter(coll => !coll.deleted);
+    return this.stateService.collections;
   }
 
   get activeCollection() {
-    return this.collections.find(coll => coll.id === this.state.activeId);
+    return this.stateService.activeCollection;
   }
 
   /* PRIVATE ----------------------------------------------------- */
@@ -383,8 +377,8 @@ export class SceneCollectionsService extends StatefulService<
    * @param id The id of the collection to load
    */
   private async loadCollectionIntoApplicationState(id: string): Promise<void> {
-    const filePath = path.join(this.collectionsDirectory, `${id}.json`);
-    const data = await this.readCollectionFile(filePath);
+    const filePath = this.stateService.getCollectionFilePath(id);
+    const data = await this.stateService.readCollectionFile(filePath);
     if (data == null) throw new Error('Got blank data from collection file');
 
     const root = parse(data, NODE_TYPES);
@@ -403,7 +397,7 @@ export class SceneCollectionsService extends StatefulService<
     await root.save();
     const data = JSON.stringify(root, null, 2);
 
-    await this.writeDataToCollectionFile(id, data);
+    await this.stateService.writeDataToCollectionFile(id, data);
   }
 
   /**
@@ -418,7 +412,7 @@ export class SceneCollectionsService extends StatefulService<
     if (collection.serverId) {
       // A local hard delete without notifying the server
       // will force a fresh download from the server on next sync
-      this.HARD_DELETE_COLLECTION(id);
+      this.stateService.HARD_DELETE_COLLECTION(id);
       await this.safeSync();
 
       // Find the newly downloaded collection and load it
@@ -434,25 +428,6 @@ export class SceneCollectionsService extends StatefulService<
 
     // Fall back to creating a new collection
     await this.create();
-  }
-
-  /**
-   * Writes data to a collection file
-   * @param id The id of the file
-   * @param data The data to write
-   */
-  private writeDataToCollectionFile(id: string, data: string) {
-    const collectionPath = this.getCollectionFilePath(id);
-    return new Promise((resolve, reject) => {
-      fs.writeFile(collectionPath, data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve();
-      });
-    });
   }
 
   /**
@@ -532,91 +507,16 @@ export class SceneCollectionsService extends StatefulService<
    */
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
-    this.ADD_COLLECTION(id, name, new Date().toISOString());
+    this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
   }
 
   /**
    * Deletes on the server and removes from the store
    */
   private async removeCollection(id: string) {
-    this.DELETE_COLLECTION(id);
+    this.stateService.DELETE_COLLECTION(id);
 
     // TODO: Delete the file (for safety and recoverability we soft delete for now)
-  }
-
-  /**
-   * Creates the scene collections directory if it doesn't exist
-   */
-  private async ensureDirectory() {
-    const exists = await new Promise(resolve => {
-      fs.exists(this.collectionsDirectory, exists => resolve(exists));
-    });
-
-    if (!exists) {
-      await new Promise((resolve, reject) => {
-        fs.mkdir(this.collectionsDirectory, err => {
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          resolve();
-        });
-      });
-    }
-  }
-
-  /**
-   * Reads the contents of the file into a string
-   * @param filePath The path to the file
-   */
-  private readCollectionFile(filePath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(data.toString());
-      });
-    });
-  }
-
-  /**
-   * Gets the modified time of a collection file
-   * @param id the id of the collection
-   */
-  private getCollectionModified(id: string): Promise<Date> {
-    return new Promise((resolve, reject) => {
-      const filePath = this.getCollectionFilePath(id);
-      fs.stat(filePath, (err, stats) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(stats.mtime);
-      });
-    });
-  }
-
-  /**
-   * The manifest file is simply a copy of the Vuex state of this
-   * service, persisted to disk.
-   */
-  private flushManifestFile() {
-    return new Promise((resolve, reject) => {
-      const data = JSON.stringify(this.state, null, 2);
-      fs.writeFile(this.getCollectionFilePath('manifest'), data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve();
-      });
-    });
   }
 
   private autoSaveInterval: number;
@@ -637,44 +537,12 @@ export class SceneCollectionsService extends StatefulService<
     if (collection) {
       if (collection.serverId)
         await this.serverApi.makeSceneCollectionActive(collection.serverId);
-      this.SET_ACTIVE_COLLECTION(id);
+      this.stateService.SET_ACTIVE_COLLECTION(id);
     }
-  }
-
-  /**
-   * Loads the manifest file into the state for this service.
-   */
-  private async loadManifestFile() {
-    await this.ensureDirectory();
-    const manifestPath = this.getCollectionFilePath('manifest');
-
-    const exists = await new Promise(resolve => {
-      fs.exists(manifestPath, exists => resolve(exists));
-    });
-
-    if (exists) {
-      const data = await this.readCollectionFile(manifestPath);
-      if (data) {
-        this.LOAD_STATE(JSON.parse(data));
-      }
-    } else {
-      await this.flushManifestFile();
-    }
-  }
-
-  private get collectionsDirectory() {
-    return path.join(
-      electron.remote.app.getPath('userData'),
-      'SceneCollections'
-    );
   }
 
   private get legacyDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
-  }
-
-  private getCollectionFilePath(id: string) {
-    return path.join(this.collectionsDirectory, `${id}.json`);
   }
 
   /**
@@ -702,7 +570,7 @@ export class SceneCollectionsService extends StatefulService<
     const promises: Promise<any>[] = [];
 
     serverCollections.forEach(onServer => {
-      const inManifest = this.state.collections.find(
+      const inManifest = this.stateService.state.collections.find(
         coll => coll.serverId === onServer.id
       );
 
@@ -711,14 +579,17 @@ export class SceneCollectionsService extends StatefulService<
         const id: string = uuid();
         promises.push(
           this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-            return this.writeDataToCollectionFile(
-              id,
-              response.scene_collection.data
-            ).then(() => {
-              // Only do this after we know we successfully wrote the file
-              this.ADD_COLLECTION(id, onServer.name, new Date().toISOString());
-              this.SET_SERVER_ID(id, onServer.id);
-            });
+            return this.stateService
+              .writeDataToCollectionFile(id, response.scene_collection.data)
+              .then(() => {
+                // Only do this after we know we successfully wrote the file
+                this.stateService.ADD_COLLECTION(
+                  id,
+                  onServer.name,
+                  new Date().toISOString()
+                );
+                this.stateService.SET_SERVER_ID(id, onServer.id);
+              });
           })
         );
       } else {
@@ -729,40 +600,44 @@ export class SceneCollectionsService extends StatefulService<
               .deleteSceneCollection(inManifest.serverId)
               .then(() => {
                 // We can hard delete once we know it has been removed from the server
-                this.HARD_DELETE_COLLECTION(inManifest.id);
+                this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
               })
           );
         } else if (
           new Date(inManifest.modified) > new Date(onServer.last_updated_at)
         ) {
           promises.push(
-            this.readCollectionFile(
-              this.getCollectionFilePath(inManifest.id)
-            ).then(data => {
-              return this.serverApi.updateSceneCollection({
-                id: inManifest.serverId,
-                name: inManifest.name,
-                data,
-                last_updated_at: inManifest.modified
-              });
-            })
+            this.stateService
+              .readCollectionFile(
+                this.stateService.getCollectionFilePath(inManifest.id)
+              )
+              .then(data => {
+                return this.serverApi.updateSceneCollection({
+                  id: inManifest.serverId,
+                  name: inManifest.name,
+                  data,
+                  last_updated_at: inManifest.modified
+                });
+              })
           );
         } else if (
           new Date(inManifest.modified) < new Date(onServer.last_updated_at)
         ) {
           promises.push(
             this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-              return this.writeDataToCollectionFile(
-                inManifest.id,
-                response.scene_collection.data
-              ).then(() => {
-                // Only do this once we know we have written successfully
-                this.RENAME_COLLECTION(
+              return this.stateService
+                .writeDataToCollectionFile(
                   inManifest.id,
-                  onServer.name,
-                  onServer.last_updated_at
-                );
-              });
+                  response.scene_collection.data
+                )
+                .then(() => {
+                  // Only do this once we know we have written successfully
+                  this.stateService.RENAME_COLLECTION(
+                    inManifest.id,
+                    onServer.name,
+                    onServer.last_updated_at
+                  );
+                });
             })
           );
         } else {
@@ -771,7 +646,7 @@ export class SceneCollectionsService extends StatefulService<
       }
     });
 
-    this.state.collections.forEach(inManifest => {
+    this.stateService.state.collections.forEach(inManifest => {
       const onServer = serverCollections.find(
         coll => coll.id === inManifest.serverId
       );
@@ -780,28 +655,30 @@ export class SceneCollectionsService extends StatefulService<
       if (!onServer) {
         if (!inManifest.serverId) {
           promises.push(
-            this.readCollectionFile(
-              this.getCollectionFilePath(inManifest.id)
-            ).then(data => {
-              return this.serverApi
-                .createSceneCollection({
-                  name: inManifest.name,
-                  data,
-                  last_updated_at: inManifest.modified
-                })
-                .then(response => {
-                  this.SET_SERVER_ID(inManifest.id, response.id);
-                });
-            })
+            this.stateService
+              .readCollectionFile(
+                this.stateService.getCollectionFilePath(inManifest.id)
+              )
+              .then(data => {
+                return this.serverApi
+                  .createSceneCollection({
+                    name: inManifest.name,
+                    data,
+                    last_updated_at: inManifest.modified
+                  })
+                  .then(response => {
+                    this.stateService.SET_SERVER_ID(inManifest.id, response.id);
+                  });
+              })
           );
         } else {
-          this.HARD_DELETE_COLLECTION(inManifest.id);
+          this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
         }
       }
     });
 
     await Promise.all(promises);
-    await this.flushManifestFile();
+    await this.stateService.flushManifestFile();
   }
 
   /**
@@ -813,7 +690,9 @@ export class SceneCollectionsService extends StatefulService<
     });
 
     const newExists = await new Promise<boolean>(resolve => {
-      fs.exists(this.collectionsDirectory, exists => resolve(exists));
+      fs.exists(this.stateService.collectionsDirectory, exists =>
+        resolve(exists)
+      );
     });
 
     if (legacyExists && !newExists) {
@@ -848,10 +727,10 @@ export class SceneCollectionsService extends StatefulService<
         });
 
         if (oldData) {
-          await this.ensureDirectory();
+          await this.stateService.ensureDirectory();
           const id: string = uuid();
-          await this.writeDataToCollectionFile(id, oldData);
-          this.ADD_COLLECTION(
+          await this.stateService.writeDataToCollectionFile(id, oldData);
+          this.stateService.ADD_COLLECTION(
             id,
             file.replace(/\.[^/.]+$/, ''),
             new Date().toISOString()
@@ -875,56 +754,5 @@ export class SceneCollectionsService extends StatefulService<
         }
       }
     }
-  }
-
-  @mutation()
-  private SET_ACTIVE_COLLECTION(id: string) {
-    this.state.activeId = id;
-  }
-
-  @mutation()
-  private ADD_COLLECTION(id: string, name: string, modified: string) {
-    this.state.collections.push({
-      id,
-      name,
-      deleted: false,
-      modified
-    });
-  }
-
-  @mutation()
-  private SET_MODIFIED(id: string, modified: string) {
-    this.state.collections.find(coll => coll.id === id).modified = modified;
-  }
-
-  @mutation()
-  private SET_SERVER_ID(id: string, serverId: number) {
-    this.state.collections.find(coll => coll.id === id).serverId = serverId;
-  }
-
-  @mutation()
-  private RENAME_COLLECTION(id: string, name: string, modified: string) {
-    const coll = this.state.collections.find(coll => coll.id === id);
-    coll.name = name;
-    coll.modified = modified;
-  }
-
-  @mutation()
-  private DELETE_COLLECTION(id: string) {
-    this.state.collections.find(coll => coll.id === id).deleted = true;
-  }
-
-  @mutation()
-  private HARD_DELETE_COLLECTION(id: string) {
-    this.state.collections = this.state.collections.filter(
-      coll => coll.id !== id
-    );
-  }
-
-  @mutation()
-  private LOAD_STATE(state: ISceneCollectionsManifest) {
-    Object.keys(state).forEach(key => {
-      Vue.set(this.state, key, state[key]);
-    });
   }
 }

@@ -68,7 +68,7 @@ export default class SceneSelector extends Vue {
   }
 
   get activeId() {
-    return this.sceneCollectionsService.state.activeId;
+    return this.sceneCollectionsService.activeCollection.id;
   }
 
   get activeCollection() {
