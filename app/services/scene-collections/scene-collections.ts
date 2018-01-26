@@ -216,7 +216,8 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Duplicates the current scene collection
+   * Duplicates the current scene collection and switch
+   * to it.
    * @param name the name of the new scene collection
    */
   async duplicate(name: string) {
