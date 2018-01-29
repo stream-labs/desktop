@@ -148,7 +148,7 @@ export class SourcesNode extends Node<ISchema, {}> {
       return;
     }
 
-    const fontInfo = fi.getFontInfo(settings.custom_path);
+    const fontInfo = fi.getFontInfo(settings.custom_font);
 
     if (!fontInfo) { 
       const source = this.sourcesService.getSource(item.id);
