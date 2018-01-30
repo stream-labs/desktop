@@ -1,16 +1,15 @@
 import electron from 'electron';
-import { Service } from './service';
+import { Service } from 'services/service';
 import fs from 'fs';
 import path from 'path';
-import { ScenesService } from './scenes';
-import { SourcesService } from './sources';
-import { SourceFiltersService } from './source-filters';
-import { ScenesTransitionsService } from './scenes-transitions';
-import { AudioService } from './audio';
-import { Inject } from '../util/injector';
-import { ScenesCollectionsService } from './scenes-collections/config';
-import { AppService } from './app';
-import { nodeObs } from './obs-api';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from 'services/sources';
+import { SourceFiltersService } from 'services/source-filters';
+import { ScenesTransitionsService } from 'services/scenes-transitions';
+import { AudioService } from 'services/audio';
+import { Inject } from 'util/injector';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { nodeObs } from 'services/obs-api';
 
 interface Source {
   name?: string;
@@ -24,19 +23,11 @@ interface ISceneCollection {
 
 export class ObsImporterService extends Service {
   @Inject() scenesService: ScenesService;
-
   @Inject() sourcesService: SourcesService;
-
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;
-
-  @Inject('ScenesTransitionsService')
-  transitionsService: ScenesTransitionsService;
-
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
-
+  @Inject('ScenesTransitionsService') transitionsService: ScenesTransitionsService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() audioService: AudioService;
-
-  @Inject() appService: AppService;
 
   async load(selectedprofile: string) {
     if (!this.isOBSinstalled()) return;
@@ -44,7 +35,6 @@ export class ObsImporterService extends Service {
     // Scene collections
     const collections = this.getSceneCollections();
     for (const collection of collections) {
-      this.appService.reset();
       await this.importCollection(collection);
     }
 
@@ -52,20 +42,23 @@ export class ObsImporterService extends Service {
     this.importProfile(selectedprofile);
 
     // Select current scene collection
-    const globalConfigFile = path.join (this.OBSconfigFileDirectory, 'global.ini');
+    const globalConfigFile = path.join(this.OBSconfigFileDirectory, 'global.ini');
 
     const data = fs.readFileSync(globalConfigFile).toString();
 
     if (data) {
       const match = data.match(/^SceneCollection\=(.*)$/m);
-      if (match && match[1]) this.appService.loadConfig(match[1]);
+      if (match && match[1]) {
+        const coll = this.sceneCollectionsService.collections.find(co => co.name === match[1]);
+        if (coll) this.sceneCollectionsService.load(coll.id);
+      }
     }
 
     nodeObs.OBS_service_resetVideoContext();
     nodeObs.OBS_service_resetAudioContext();
   }
 
-  private importCollection(collection: ISceneCollection): Promise<void> {
+  private async importCollection(collection: ISceneCollection) {
     const sceneCollectionPath = path.join(
       this.sceneCollectionsDirectory,
       collection.filename
@@ -74,15 +67,19 @@ export class ObsImporterService extends Service {
       fs.readFileSync(sceneCollectionPath).toString()
     );
 
-    this.importSources(configJSON);
-    this.importScenes(configJSON);
-    this.importSceneOrder(configJSON);
-    this.importMixerSources(configJSON);
-    this.importTransitions(configJSON);
-    if (this.scenesService.scenes.length === 0) {
-      this.scenesCollectionsService.setUpDefaults();
-    }
-    return this.scenesCollectionsService.rawSave(collection.name);
+    await this.sceneCollectionsService.create(collection.name, () => {
+      this.importSources(configJSON);
+      this.importScenes(configJSON);
+      this.importSceneOrder(configJSON);
+      this.importMixerSources(configJSON);
+      this.importTransitions(configJSON);
+
+      if (this.scenesService.scenes.length === 0) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   importFilters(filtersJSON: any, source: Source) {

@@ -54,7 +54,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      activeItemIds: [],
       items: []
     });
     this.state.displayOrder.push(id);

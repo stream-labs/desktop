@@ -39,14 +39,14 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: 'Paste (Reference)',
-        enabled: this.clipboardService.hasSources(),
+        enabled: this.clipboardService.hasItems(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.pasteReference()
       });
 
       this.append({
         label: 'Paste (Duplicate)',
-        enabled: this.clipboardService.hasSources(),
+        enabled: this.clipboardService.hasItems(),
         click: () => this.clipboardService.pasteDuplicate()
       });
     }
@@ -61,6 +61,11 @@ export class EditMenu extends Menu {
         label: 'Copy',
         accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
+      });
+
+      this.append({
+        label: 'Invert Selection',
+        click: () => this.selectionService.invert()
       });
 
       this.append({ type: 'separator' });

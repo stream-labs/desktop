@@ -10,7 +10,7 @@
         @click="addSource"/>
       <i
         class="fa fa-minus icon-btn icon-btn--lg"
-        :class="{ disabled: this.scene.activeItemIds.length === 0}"
+        :class="{ disabled: activeItemIds.length === 0}"
         @click="removeItems"/>
       <i
         :class="{ disabled: !canShowProperties()}"
@@ -23,7 +23,7 @@
     @contextmenu="showContextMenu"
     @dblclick="sourceProperties"
     :items="sources"
-    :activeItems="scene.activeItemIds"
+    :activeItems="activeItemIds"
     @select="makeActive"
     @sort="handleSort">
     <template slot="actions" slot-scope="props">

@@ -110,9 +110,13 @@ export default class StudioEditor extends Vue {
       // Either select a new source, or deselect all sources
       if (overSource) {
         if (event.ctrlKey) {
-          this.selectionService.add(overSource.sceneItemId);
+          if (this.selectionService.isSelected(overSource.sceneItemId)) {
+            this.selectionService.deselect(overSource.sceneItemId);
+          } else {
+            this.selectionService.add(overSource.sceneItemId);
+          }
         } else if (event.button === 0) {
-          this.selectionService.set([overSource.sceneItemId]);
+          this.selectionService.select([overSource.sceneItemId]);
         }
       } else if (event.button === 0) {
         this.selectionService.reset();
@@ -198,7 +202,7 @@ export default class StudioEditor extends Vue {
         if (event.ctrlKey || this.selectionService.isSelected(overSource)) {
           this.selectionService.add(overSource.sceneItemId);
         } else {
-          this.selectionService.set(overSource.sceneItemId);
+          this.selectionService.select(overSource.sceneItemId);
         }
 
         // Start dragging it
@@ -392,7 +396,7 @@ export default class StudioEditor extends Vue {
   // getters
 
   get activeSources(): SceneItem[] {
-    return this.scenesService.activeScene.activeItems.filter(item => {
+    return this.selectionService.getItems().filter(item => {
       return item.isVisualSource;
     });
   }
@@ -424,7 +428,7 @@ export default class StudioEditor extends Vue {
   get resizeRegions(): IResizeRegion[] {
     let regions: IResizeRegion[] = [];
 
-    this.scene.activeItems.forEach(item => {
+    this.selectionService.getItems().forEach(item => {
       regions = regions.concat(this.generateResizeRegionsForItem(item));
     });
 

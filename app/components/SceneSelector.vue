@@ -4,19 +4,20 @@
 
     <div class="scene-collections-wrapper">
 
-      <DropdownMenu :title="activeConfig">
+      <DropdownMenu :title="activeCollection.name">
         <div class="dropdown-menu__item" @click="addCollection">New</div>
         <div class="dropdown-menu__item" @click="duplicateCollection">Duplicate</div>
         <div class="dropdown-menu__item" @click="renameCollection">Rename</div>
         <div class="dropdown-menu__item" @click="removeCollection">Remove</div>
         <div class="dropdown-menu__separator"></div>
         <div
-          v-for="sceneCollection in scenesCollections"
+          v-for="sceneCollection in sceneCollections"
+          :key="sceneCollection.id"
           class="dropdown-menu__item"
-          :class="{ active: activeConfig === sceneCollection }"
-          @click="loadConfig(sceneCollection)"
+          :class="{ active: activeId === sceneCollection.id }"
+          @click="loadCollection(sceneCollection.id)"
         >
-          {{ sceneCollection }}
+          {{ sceneCollection.name }}
         </div>
       </DropdownMenu>
 

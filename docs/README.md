@@ -428,17 +428,32 @@ Now you have a `resourceId` for the `ISceneItemApi` instance and can use its met
 
 # How to switch a scene collection?
 
-Use `AppService.loadConfig`
+Use `SceneCollectionsService.collections` to find the id of the collection you want to load
 
 ### Request
 ```
 {
     "jsonrpc": "2.0",
     "id": 11,
-    "method": "loadConfig",
+    "method": "collections",
     "params": {
-        "resource": "AppService",
-        "args": ["MySceneCollectionName"]
+        "resource": "SceneCollectionsService",
+        "args": []
+    }
+}
+```
+
+Use `SceneCollectionsService.load` to load it
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 12,
+    "method": "load",
+    "params": {
+        "resource": "SceneCollectionsService",
+        "args": ["d3165bf4-2690-426a-80a1-f3421658e04e"]
     }
 }
 ```

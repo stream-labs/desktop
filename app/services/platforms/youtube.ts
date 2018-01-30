@@ -29,10 +29,13 @@ export class YoutubeService extends Service implements IPlatformService {
     return this.userService.platform.token;
   }
 
+  get widgetToken() {
+    return this.userService.widgetToken;
+  }
+
   get youtubeId() {
     return this.userService.platform.id;
   }
-
 
   setupStreamSettings(auth: IPlatformAuth) {
     this.fetchStreamKey().then(streamKey => {
@@ -54,9 +57,13 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
+  @requiresToken()
   fetchBoundStreamId(): Promise<string> {
-    const endpoint = 'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
-    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
+    const endpoint =
+      'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
+    const request = new Request(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
+    );
 
     return fetch(request)
       .then(handleErrors)
@@ -64,9 +71,12 @@ export class YoutubeService extends Service implements IPlatformService {
       .then(json => json.items[0].contentDetails.boundStreamId);
   }
 
+  @requiresToken()
   fetchStreamKeyForId(streamId: string): Promise<string> {
     const endpoint = `liveStreams?part=cdn&id=${streamId}`;
-    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
+    const request = new Request(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
+    );
 
     return fetch(request)
       .then(handleErrors)
@@ -74,11 +84,11 @@ export class YoutubeService extends Service implements IPlatformService {
       .then(json => json.items[0].cdn.ingestionInfo.streamName);
   }
 
-
   fetchStreamKey(): Promise<string> {
-    return this.fetchBoundStreamId().then(boundStreamId => this.fetchStreamKeyForId(boundStreamId));
+    return this.fetchBoundStreamId().then(boundStreamId =>
+      this.fetchStreamKeyForId(boundStreamId)
+    );
   }
-
 
   // TODO
   fetchChannelInfo(): Promise<IChannelInfo> {
@@ -88,12 +98,15 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
-
+  @requiresToken()
   getLiveStreamId(forceGet: boolean): Promise<void> {
     if (this.liveStreamId && !forceGet) return Promise.resolve();
 
-    const endpoint = 'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
-    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
+    const endpoint =
+      'liveBroadcasts?part=id&broadcastStatus=active&broadcastType=persistent';
+    const request = new Request(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
+    );
 
     return fetch(request)
       .then(handleErrors)
@@ -105,33 +118,53 @@ export class YoutubeService extends Service implements IPlatformService {
       });
   }
 
-
+  @requiresToken()
   fetchViewerCount(): Promise<number> {
     return this.getLiveStreamId(false).then(() => {
       const endpoint = 'videos?part=snippet,liveStreamingDetails';
-      const url = `${this.apiBase}/${endpoint}&id=${this.liveStreamId}&access_token=${this.oauthToken}`;
+      const url = `${this.apiBase}/${endpoint}&id=${
+        this.liveStreamId
+      }&access_token=${this.oauthToken}`;
       const request = new Request(url);
 
       return fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then(json => json.items[0].liveStreamingDetails.concurrentViewers || 0);
+        .then(
+          json => json.items[0].liveStreamingDetails.concurrentViewers || 0
+        );
     });
   }
 
+  fetchNewToken(): Promise<void> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/youtube/token/${this.widgetToken}`;
+    const request = new Request(url);
 
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(response =>
+        this.userService.updatePlatformToken(response.access_token)
+      );
+  }
+
+  @requiresToken()
   putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
 
-    const data = { snippet: { title : streamTitle }, id: this.liveStreamId };
+    const data = { snippet: { title: streamTitle }, id: this.liveStreamId };
     const endpoint = 'liveBroadcasts?part=snippet';
 
-    const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(data)
-    });
+    const request = new Request(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+      {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(data)
+      }
+    );
 
     return fetch(request)
       .then(handleErrors)
@@ -146,7 +179,7 @@ export class YoutubeService extends Service implements IPlatformService {
     return Promise.resolve(JSON.parse(''));
   }
 
-
+  @requiresToken()
   getChatUrl(mode: string) {
     const endpoint = 'liveBroadcasts?part=id&mine=true&broadcastType=persistent';
     const request = new Request(`${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`);
@@ -155,8 +188,33 @@ export class YoutubeService extends Service implements IPlatformService {
       .then(handleErrors)
       .then(response => response.json())
       .then(json => {
-        const youtubeDomain = mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
+        const youtubeDomain =
+          mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
         return `${youtubeDomain}/live_chat?v=${json.items[0].id}&is_popout=1`;
       });
   }
+}
+
+/**
+ * You can use this decorator to ensure that a
+ * fresh youtube api token is available
+ */
+function requiresToken() {
+  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+    return {
+      ...descriptor,
+      value(...args: any[]) {
+        return original.apply(target.constructor.instance, args)
+        .catch((error: Response) => {
+          if (error.status === 401) {
+            return target.fetchNewToken().then(() => {
+              return original.apply(target.constructor.instance, args);
+            });
+          }
+          return Promise.reject(error);
+        });
+      }
+    };
+  };
 }

@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { OverlaysPersistenceService, ScenesCollectionsService } from 'services/scenes-collections';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import electron from 'electron';
 import path from 'path';
 import { AppService } from 'services/app';
@@ -10,8 +11,8 @@ import { ScenesService } from 'services/scenes';
 
 @Component({})
 export default class OverlaySettings extends Vue {
+  @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
   @Inject() appService: AppService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
@@ -47,9 +48,9 @@ export default class OverlaySettings extends Vue {
     this.message = '';
 
     const filename = path.parse(chosenPath[0]).name;
-    const configName = this.scenesCollectionsService.suggestName(filename);
+    const configName = this.sceneCollectionsService.suggestName(filename);
 
-    this.appService.loadOverlay(configName, chosenPath[0]).then(() => {
+    this.sceneCollectionsService.loadOverlay(chosenPath[0], configName).then(() => {
       this.busy = false;
       this.message = `Successfully loaded ${filename}.overlay`;
     });

@@ -21,4 +21,10 @@ export default class GenericFormGroups extends Vue {
     this.$emit('input', this.value);
   }
 
+  hasAnyVisibleSettings(category: ISettingsSubCategory) {
+    return !!category.parameters.find(setting => {
+      return setting.visible;
+    });
+  }
+
 }

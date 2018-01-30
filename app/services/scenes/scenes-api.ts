@@ -26,7 +26,6 @@ export interface IScenesServiceApi {
 export interface IScene {
   id: string;
   name: string;
-  activeItemIds: string[];
   items: ISceneItem[];
 }
 
@@ -38,7 +37,6 @@ export interface ISceneApi extends IScene {
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   removeItem(sceneItemId: string): void;
   remove(): void;
-  makeItemsActive(sceneItemIds: string[]): void;
   canAddSource(sourceId: string): boolean;
   setName(newName: string): void;
   getModel(): IScene;
@@ -77,12 +75,7 @@ export interface ISceneCreateOptions {
   makeActive?: boolean;
 }
 
-
-
-export interface ISceneItem {
-  sceneItemId: string;
-  sourceId: string;
-  obsSceneItemId: number;
+export interface ISceneItemSettings {
   x: number;
   y: number;
   scaleX: number;
@@ -91,6 +84,12 @@ export interface ISceneItem {
   crop: ICrop;
   locked: boolean;
   rotation: number;
+}
+
+export interface ISceneItem extends ISceneItemSettings {
+  sceneItemId: string;
+  sourceId: string;
+  obsSceneItemId: number;
 }
 
 export interface ISceneItemActions {
@@ -102,6 +101,7 @@ export interface ISceneItemActions {
   stretchToScreen(): void;
   fitToScreen(): void;
   centerOnScreen(): void;
+  rotate(deg: number): void;
   remove(): void;
 }
 

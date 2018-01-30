@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.8.6-preview.4",
+  "version": "0.8.9-preview.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack --progress",
@@ -14,7 +14,7 @@
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "package:preview": "rm -rf dist && build -w --x64 --em.env=production --em.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
     "release": "yarn install --cwd bin && node bin/release.js",
-    "test": "tsc -p test && ava",
+    "test": "tsc -p test && ava -v",
     "clear": "rm -rf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
@@ -66,7 +66,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "1.7.10",
+    "runtimeVersion": "1.7.11",
     "arch": "x64"
   },
   "dependencies": {
@@ -77,7 +77,7 @@
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.7/obs-studio-node.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.8/obs-studio-node.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"

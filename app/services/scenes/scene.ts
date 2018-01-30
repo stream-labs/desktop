@@ -13,7 +13,8 @@ import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
-import _ from 'lodash';
+import { SelectionService } from 'services/selection';
+import { uniqBy } from 'lodash';
 
 const { ipcRenderer } = electron;
 
@@ -22,14 +23,11 @@ const { ipcRenderer } = electron;
 export class Scene implements ISceneApi {
   id: string;
   name: string;
-  activeItemIds: string[];
   items: ISceneItem[];
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private selectionService: SelectionService;
 
   private sceneState: IScene;
 
@@ -65,20 +63,6 @@ export class Scene implements ISceneApi {
     return this.sceneState.items.map(item => item.sceneItemId);
   }
 
-
-  get inactiveSources(): SceneItem[] {
-    return this.sceneState.items.filter(sourceModel => {
-      return !this.activeItemIds.includes(sourceModel.sceneItemId);
-    }).map(source => {
-      return this.getItem(source.sceneItemId);
-    });
-  }
-
-
-  get activeItems(): SceneItem[] {
-    return this.activeItemIds.map(itemId => this.getItem(itemId));
-  }
-
   setName(newName: string) {
     const sceneSource = this.sourcesService.getSource(this.id);
     sceneSource.setName(newName);
@@ -108,7 +92,7 @@ export class Scene implements ISceneApi {
     const sceneItem = this.getItem(sceneItemId);
 
     // Newly added sources are immediately active
-    this.makeItemsActive([sceneItemId]);
+    this.selectionService.select(sceneItemId);
 
     sceneItem.loadAttributes();
 
@@ -219,7 +203,7 @@ export class Scene implements ISceneApi {
         result = result.concat(sceneItems);
       });
     if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
-    return _.uniqBy(result, 'sceneItemId');
+    return uniqBy(result, 'sceneItemId');
   }
 
 
@@ -229,18 +213,12 @@ export class Scene implements ISceneApi {
    */
   getNestedSources(options = { excludeScenes: false }): Source[] {
     const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
-    return _.uniqBy(sources, 'sourceId');
+    return uniqBy(sources, 'sourceId');
   }
 
   @mutation()
   private SET_NAME(newName: string) {
     this.sceneState.name = newName;
-  }
-
-
-  @mutation()
-  private MAKE_SOURCES_ACTIVE(sceneItemIds: string[]) {
-    this.sceneState.activeItemIds = sceneItemIds;
   }
 
   @mutation()
@@ -279,8 +257,8 @@ export class Scene implements ISceneApi {
   @mutation()
   private REMOVE_SOURCE_FROM_SCENE(sceneItemId: string) {
 
-    if (this.sceneState.activeItemIds.includes(sceneItemId)) {
-      this.sceneState.activeItemIds = _.without(this.sceneState.activeItemIds, sceneItemId);
+    if (this.selectionService.isSelected(sceneItemId)) {
+      this.selectionService.deselect(sceneItemId);
     }
 
     this.sceneState.items = this.sceneState.items.filter(source => {

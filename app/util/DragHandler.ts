@@ -98,7 +98,9 @@ class DragHandler {
 
     // Load some attributes about sources
     this.draggedSource = this.selectionService.getLastSelected();
-    this.otherSources = this.selectionService.getInverted();
+    this.otherSources = this.selectionService
+      .getInverted()
+      .filter(item => item.isVisualSource);
     // Store the starting mouse event
     this.currentX = startEvent.pageX;
     this.currentY = startEvent.pageY;

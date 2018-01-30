@@ -6,7 +6,7 @@ import { ImageNode } from './nodes/overlays/image';
 import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
-import { ScenesCollectionsService, parse } from '.';
+import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
 import { Inject } from '../../util/injector';
@@ -17,6 +17,8 @@ import path from 'path';
 import unzip from 'unzip-stream';
 import archiver from 'archiver';
 import https from 'https';
+import { ScenesService } from 'services/scenes';
+import { SelectionService } from 'services/selection';
 
 const NODE_TYPES = {
   RootNode,
@@ -37,7 +39,8 @@ export interface IDownloadProgress {
 }
 
 export class OverlaysPersistenceService extends Service {
-  @Inject() scenesCollectionsService: ScenesCollectionsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private selectionService: SelectionService;
 
   /**
    * Downloads the requested overlay into a temporary directory
@@ -96,7 +99,8 @@ export class OverlaysPersistenceService extends Service {
     const root = parse(data, NODE_TYPES);
     root.load({ assetsPath });
 
-    this.scenesCollectionsService.setUpDefaultAudio();
+    this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
+    this.selectionService.reset();
   }
 
   async saveOverlay(overlayFilePath: string) {

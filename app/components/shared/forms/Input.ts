@@ -180,7 +180,7 @@ export function obsValuesToInputValues(
     prop.visible = !!obsProp.visible;
 
     if (options.disabledFields && options.disabledFields.includes(prop.name)) {
-      prop.enabled = false;
+      prop.visible = false;
     }
 
     if (['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'].includes(obsProp.type)) {
