@@ -93,16 +93,25 @@ export interface ISceneItem {
   rotation: number;
 }
 
+export interface ISceneItemActions {
+  setVisibility(visible: boolean): void;
+  setLocked(locked: boolean): void;
+  resetTransform(): void;
+  flipX(): void;
+  flipY(): void;
+  stretchToScreen(): void;
+  fitToScreen(): void;
+  centerOnScreen(): void;
+  remove(): void;
+}
 
-export interface ISceneItemApi extends ISceneItem {
+export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
   getScene(): ISceneApi;
   getSource(): ISourceApi;
+  getModel(): ISceneItem & ISource;
+
   setPosition(vec: IVec2): void;
-  setVisibility(visible: boolean): void;
   setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
   setCrop(crop: ICrop): ICrop;
   setPositionAndCrop(x: number, y: number, crop: ICrop): void;
-  setLocked(locked: boolean): void;
-  getModel(): ISceneItem & ISource;
-  remove(): void;
 }

@@ -8,9 +8,7 @@ import { Display, VideoService } from '../services/video';
 import { EditMenu } from '../util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import { WindowsService } from '../services/windows';
-import electron from 'electron';
-
-const { webFrame, screen } = electron;
+import { SelectionService } from "../services/selection/selection";
 
 interface IResizeRegion {
   name: string;
@@ -32,14 +30,10 @@ interface IResizeOptions {
 @Component({})
 export default class StudioEditor extends Vue {
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  windowsService: WindowsService;
-
-  @Inject()
-  videoService: VideoService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private videoService: VideoService;
+  @Inject() private selectionService: SelectionService;
 
   renderedWidth = 0;
   renderedHeight = 0;
@@ -114,14 +108,23 @@ export default class StudioEditor extends Vue {
       });
 
       // Either select a new source, or deselect all sources
-      this.scene.makeItemsActive(overSource ? [overSource.sceneItemId] : []);
+      if (overSource) {
+        if (event.ctrlKey) {
+          this.selectionService.add(overSource.sceneItemId);
+        } else if (event.button === 0) {
+          this.selectionService.set([overSource.sceneItemId]);
+        }
+      } else if (event.button === 0) {
+        this.selectionService.reset();
+      }
+
 
       if ((event.button === 2)) {
         let menu: EditMenu;
         if (overSource) {
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
-            selectedSceneItemId: overSource.sceneItemId,
+            showSceneItemMenu: true,
             selectedSourceId: overSource.sourceId
           });
         } else {
@@ -192,7 +195,11 @@ export default class StudioEditor extends Vue {
 
       if (overSource) {
         // Make this source active
-        this.scene.makeItemsActive([overSource.sceneItemId]);
+        if (event.ctrlKey || this.selectionService.isSelected(overSource)) {
+          this.selectionService.add(overSource.sceneItemId);
+        } else {
+          this.selectionService.set(overSource.sceneItemId);
+        }
 
         // Start dragging it
         this.startDragging(event);

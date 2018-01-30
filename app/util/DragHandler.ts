@@ -4,6 +4,7 @@ import { ScenesService, SceneItem } from '../services/scenes';
 import { VideoService, Display } from '../services/video';
 import { WindowsService } from '../services/windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
+import { SelectionService } from 'services/selection';
 import electron from 'electron';
 
 const { webFrame, screen } = electron;
@@ -44,17 +45,12 @@ interface IEdgeCollection {
 // Encapsulates logic for dragging sources in the overlay editor
 class DragHandler {
 
-  @Inject()
-  settingsService: SettingsService;
+  @Inject() private settingsService: SettingsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private videoService: VideoService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private selectionService: SelectionService;
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  videoService: VideoService;
-
-  @Inject()
-  windowsService: WindowsService;
 
   // Settings
   snapEnabled: boolean;
@@ -72,8 +68,8 @@ class DragHandler {
   snapDistance: number;
 
   // Sources
-  draggedSource: SceneItem;
-  otherSources: SceneItem[];
+  private draggedSource: SceneItem;
+  private otherSources: SceneItem[];
 
   // Mouse properties
   currentX: number;
@@ -101,12 +97,8 @@ class DragHandler {
       this.renderedWidth;
 
     // Load some attributes about sources
-    const scene = this.scenesService.activeScene;
-    this.draggedSource = scene.activeItems[0];
-    this.otherSources = scene.inactiveSources.filter(source => {
-      return source.isVisualSource;
-    });
-
+    this.draggedSource = this.selectionService.getLastSelected();
+    this.otherSources = this.selectionService.getInverted();
     // Store the starting mouse event
     this.currentX = startEvent.pageX;
     this.currentY = startEvent.pageY;
@@ -166,14 +158,14 @@ class DragHandler {
       });
     }
 
-    rect.x = newX;
-    rect.y = newY;
+    const dx = newX - rect.x;
+    const dy = newY - rect.y;
 
     denormalize();
 
-    this.scenesService.activeScene.getItem(
-      this.draggedSource.sceneItemId
-    ).setPosition(rect);
+    this.selectionService.getItems().forEach(item => {
+      item.setPosition({ x: item.x + dx, y: item.y + dy });
+    });
 
     if (!snappedX) {
       this.currentX = event.pageX;

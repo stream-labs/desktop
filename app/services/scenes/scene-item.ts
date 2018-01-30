@@ -1,7 +1,9 @@
-import { ScenesService, Scene, ISceneApi, ISceneItem, ISceneItemApi, ISceneItemInfo } from './index';
+import { ScenesService, Scene, ISceneItem, ISceneItemApi, ISceneItemInfo } from './index';
 import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
-import { Source, SourcesService, TSourceType, ISource } from '../sources';
+import { SourcesService, TSourceType, ISource } from 'services/sources';
+import { VideoService } from 'services/video';
+import { ScalableRectangle } from '../../util/ScalableRectangle';
 import { Inject } from '../../util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
@@ -54,11 +56,9 @@ export class SceneItem implements ISceneItemApi {
 
   sceneItemState: ISceneItem;
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private videoService: VideoService;
 
   constructor(private sceneId: string, sceneItemId: string, sourceId: string) {
 
@@ -149,6 +149,15 @@ export class SceneItem implements ISceneItemApi {
     this.update({ sceneItemId: this.sceneItemId, x, y, scaleX, scaleY });
   }
 
+  setRectangle(rect: IScalableRectangle) {
+    this.setPositionAndScale(
+      rect.x,
+      rect.y,
+      rect.scaleX,
+      rect.scaleY
+    );
+  }
+
 
   setCrop(crop: ICrop): ICrop {
     const cropModel: ICrop = {
@@ -208,6 +217,90 @@ export class SceneItem implements ISceneItemApi {
       locked: !!customSceneItem.locked,
       rotation: customSceneItem.rotation
     });
+  }
+
+  resetTransform() {
+    this.setPositionAndScale(0, 0, 1.0, 1.0);
+    this.setCrop({
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    });
+    this.setRotation(0);
+  }
+
+  flipY() {
+    this.preservePosition(() => {
+      const rect = this.getRectangle();
+      rect.flipY();
+      this.setRectangle(rect);
+    });
+  }
+
+  flipX() {
+    this.preservePosition(() => {
+      const rect = this.getRectangle();
+      rect.flipX();
+      this.setRectangle(rect);
+    });
+  }
+
+
+  stretchToScreen() {
+    const rect = this.getRectangle();
+    rect.stretchAcross(this.videoService.getScreenRectangle());
+    this.setRectangle(rect);
+  }
+
+
+  fitToScreen() {
+    const rect = this.getRectangle();
+    rect.fitTo(this.videoService.getScreenRectangle());
+    this.setRectangle(rect);
+  }
+
+  centerOnScreen() {
+    const rect = this.getRectangle();
+    rect.centerOn(this.videoService.getScreenRectangle());
+    this.setRectangle(rect);
+  }
+
+  rotate(deltaRotation: number) {
+    this.preservePosition(() => {
+      this.setRotation(this.rotation + deltaRotation);
+    });
+  }
+
+
+  /**
+   * A rectangle representing this sceneItem
+   */
+  private getRectangle(): ScalableRectangle {
+    return new ScalableRectangle(this);
+  }
+
+  /**
+   *   Many of these transforms can unexpectedly change the position of the
+   *   object.  For example, rotations happen around the NW axis.  This function
+   *   records the normalized x,y position before the operation and returns it to
+   *   that position after the operation has been performed.
+   */
+  private preservePosition(fun: Function) {
+    const rect = this.getRectangle();
+    rect.normalize();
+    const x = rect.x;
+    const y = rect.y;
+
+    fun();
+
+    const newRect = this.getRectangle();
+    newRect.normalized(() => {
+      newRect.x = x;
+      newRect.y = y;
+    });
+
+    this.setPosition({ x: newRect.x, y: newRect.y });
   }
 
 

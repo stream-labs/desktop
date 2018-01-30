@@ -61,6 +61,10 @@ export class Scene implements ISceneApi {
     });
   }
 
+  getItemsIds(): string[] {
+    return this.sceneState.items.map(item => item.sceneItemId);
+  }
+
 
   get inactiveSources(): SceneItem[] {
     return this.sceneState.items.filter(sourceModel => {
@@ -125,21 +129,6 @@ export class Scene implements ISceneApi {
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);
     this.scenesService.itemRemoved.next(sceneItem.sceneItemState);
-  }
-
-
-  makeItemsActive(sceneItemIds: string[]) {
-    const activeObsIds = sceneItemIds.map(itemId => this.getItem(itemId).obsSceneItemId);
-
-    this.getObsScene().getItems().forEach(obsSceneItem => {
-      if (activeObsIds.includes(obsSceneItem.id)) {
-        obsSceneItem.selected = true;
-      } else {
-        obsSceneItem.selected = false;
-      }
-    });
-
-    this.MAKE_SOURCES_ACTIVE(sceneItemIds);
   }
 
 

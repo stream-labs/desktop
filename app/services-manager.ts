@@ -52,6 +52,7 @@ import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
 import { TroubleshooterService } from 'services/troubleshooter';
+import { SelectionService } from 'services/selection';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -117,7 +118,8 @@ export class ServicesManager extends Service {
     VideoEncodingOptimizationService,
     DismissablesService,
     TroubleshooterService,
-    JsonrpcService
+    JsonrpcService,
+    SelectionService
   };
 
   private instances: Dictionary<Service> = {};

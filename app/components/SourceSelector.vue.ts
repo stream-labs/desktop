@@ -2,8 +2,9 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { SourcesService } from '../services/sources';
-import { ScenesService, SceneItem } from '../services/scenes';
+import { SourcesService } from 'services/sources';
+import { ScenesService, SceneItem } from 'services/scenes';
+import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 
 @Component({
@@ -11,11 +12,9 @@ import { EditMenu } from '../util/menus/EditMenu';
 })
 export default class SourceSelector extends Vue {
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private selectionService: SelectionService;
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -66,7 +65,7 @@ export default class SourceSelector extends Vue {
   }
 
   makeActive(sceneItemId: string) {
-    this.scene.makeItemsActive([sceneItemId]);
+    this.selectionService.set(sceneItemId);
   }
 
   toggleVisibility(sceneItemId: string) {

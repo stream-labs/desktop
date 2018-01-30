@@ -21,6 +21,7 @@ import { TcpServerService } from '../tcp-server';
 import { IAppServiceApi } from './app-api';
 import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
+import { SelectionService } from 'services/selection';
 
 interface IAppState {
   loading: boolean;
@@ -56,6 +57,7 @@ export class AppService extends StatefulService<IAppState>
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private selectionService: SelectionService;
 
   @track('app_start')
   load() {
