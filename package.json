@@ -45,7 +45,6 @@
       "LICENSE",
       "AGREEMENT"
     ],
-    "includePdb": true,
     "asar": false,
     "publish": {
       "provider": "generic",
