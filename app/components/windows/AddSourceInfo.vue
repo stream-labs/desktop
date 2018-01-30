@@ -20,30 +20,6 @@
 
 <script lang="ts" src="./AddSourceInfo.vue.ts"></script>
 
-<style lang="less">
-@import "../../styles/index";
-.source-info__media {
-  .radius;
-  overflow: hidden;
-  text-align: center;
-  padding-left: 20px;
-  align-items: center;
-  align-content: center;
-  max-height: 150px;
-  justify-content: center;
-  display: flex;
-  flex: 0 0 50%;
-
-  video,
-  img {
-    width: auto;
-    max-height: 150px;
-    max-width: 100%;
-    .radius;
-  }
-}
-</style>
-
 <style lang="less" scoped>
 @import "../../styles/index";
 
@@ -63,6 +39,27 @@
   h3,
   .desc {
     margin-bottom: 12px;
+  }
+}
+
+.source-info__media {
+  .radius;
+  overflow: hidden;
+  text-align: center;
+  padding-left: 20px;
+  align-items: center;
+  align-content: center;
+  max-height: 150px;
+  justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
+
+  video,
+  img {
+    width: auto;
+    max-height: 150px;
+    max-width: 100%;
+    .radius;
   }
 }
 

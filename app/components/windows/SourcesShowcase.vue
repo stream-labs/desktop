@@ -736,6 +736,27 @@ h4 {
   .transition;
 }
 
+.source-info__media {
+  .radius;
+  overflow: hidden;
+  text-align: center;
+  padding-left: 20px;
+  align-items: center;
+  align-content: center;
+  max-height: 150px;
+  justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
+
+  video,
+  img {
+    width: auto;
+    max-height: 150px;
+    max-width: 100%;
+    .radius;
+  }
+}
+
 .source__icon {
   margin-right: 10px;
   width: 30px;
