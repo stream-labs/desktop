@@ -51,6 +51,8 @@
   align-content: center;
   max-height: 150px;
   justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
 
   video,
   img {
@@ -59,12 +61,6 @@
     max-width: 100%;
     .radius;
   }
-}
-
-.source-text,
-.source-info__media {
-  display: flex;
-  flex: 0 0 50%;
 }
 
 .source-support__list {
