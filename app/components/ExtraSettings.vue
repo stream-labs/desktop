@@ -24,7 +24,7 @@
       Restart Streamlabels Session
     </button>
     <br/>
-    <button class="button button--action" @click="runAutoOptimizer" v-if="isLoggedIn">
+    <button class="button button--action" @click="runAutoOptimizer" v-if="isTwitch && !isRecordingOrStreaming">
       Run Auto Optimizer
     </button>
   </div>

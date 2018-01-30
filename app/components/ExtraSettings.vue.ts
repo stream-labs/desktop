@@ -10,6 +10,7 @@ import { StreamlabelsService } from 'services/streamlabels';
 import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { StreamingService } from 'services/streaming';
 
 @Component({
   components: { BoolInput }
@@ -21,6 +22,7 @@ export default class ExtraSettings extends Vue {
   @Inject() onboardingService: OnboardingService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
+  @Inject() streamingService: StreamingService;
 
   cacheUploading = false;
 
@@ -75,7 +77,16 @@ export default class ExtraSettings extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  get isLoggedIn() {
-    return this.userService.isLoggedIn();
+  get isTwitch() {
+    return (
+      this.userService.isLoggedIn() &&
+      this.userService.platform.type === 'twitch'
+    );
+  }
+
+  get isRecordingOrStreaming() {
+    return (
+      this.streamingService.isStreaming || this.streamingService.isRecording
+    );
   }
 }
