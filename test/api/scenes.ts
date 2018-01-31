@@ -172,7 +172,7 @@ test('SceneItem.setSettings()', async t => {
   sceneItem.setSettings({ rotation: 360 + 90 });
   t.is(sceneItem.getModel().rotation, 90);
 
-  sceneItem.setsSettings({
+  sceneItem.setSettings({
     crop: {
       top: 1.2,
       bottom: 5.6,
