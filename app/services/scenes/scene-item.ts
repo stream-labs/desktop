@@ -150,11 +150,11 @@ export class SceneItem implements ISceneItemApi {
 
     if (changed.locked !== void 0) {
       if (changed.locked && (this.selectionService.isSelected(this.sceneItemId))) {
-        this.selectionService.reset();
+        this.selectionService.deselect(this.sceneItemId);
       }
     }
 
-    if (changed.visible) {
+    if (changed.visible !== void 0) {
       this.getObsSceneItem().visible = visible;
     }
 
@@ -197,7 +197,7 @@ export class SceneItem implements ISceneItemApi {
 
 
   setRotation(rotation: number) {
-    this.setRotation(rotation);
+    this.setSettings({ rotation });
   }
 
 
@@ -216,7 +216,7 @@ export class SceneItem implements ISceneItemApi {
 
 
   setCrop(crop: ICrop): ICrop {
-    this.setCrop(crop);
+    this.setSettings({ crop });
     return this.sceneItemState.crop;
   }
 
@@ -227,7 +227,7 @@ export class SceneItem implements ISceneItemApi {
 
 
   setLocked(locked: boolean) {
-    this.setSettings({ locked: true });
+    this.setSettings({ locked });
   }
 
 
@@ -261,14 +261,16 @@ export class SceneItem implements ISceneItemApi {
   }
 
   resetTransform() {
-    this.setPositionAndScale(0, 0, 1.0, 1.0);
-    this.setCrop({
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
+    this.setSettings({
+      x: 0, y: 0, scaleX: 1, scaleY: 1,
+      rotation: 0,
+      crop: {
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      }
     });
-    this.setRotation(0);
   }
 
   flipY() {
@@ -309,7 +311,7 @@ export class SceneItem implements ISceneItemApi {
 
   rotate(deltaRotation: number) {
     this.preservePosition(() => {
-      this.setRotation(this.rotation + deltaRotation);
+      this.setSettings({ rotation: this.rotation + deltaRotation });
     });
   }
 

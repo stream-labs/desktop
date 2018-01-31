@@ -1,10 +1,11 @@
-import { uniq, without } from 'lodash';
+import { uniq } from 'lodash';
 import { mutation, StatefulService } from 'services/stateful-service';
 import {
   Scene,
   SceneItem,
   ScenesService,
-  ISceneItem
+  ISceneItem,
+  ISceneItemSettings
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
@@ -47,8 +48,17 @@ export class SelectionService
     let ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
     ids = uniq(ids);
     const scene = this.getScene();
-    const activeObsIds = ids.map(id => scene.getItem(id).obsSceneItemId);
+    const activeObsIds: number[] = [];
 
+    // omit ids that are not presented on the activeScene
+    ids = ids.filter(id => {
+      const item = scene.getItem(id);
+      if (!item) return false;
+      activeObsIds.push(item.obsSceneItemId);
+      return true;
+    });
+
+    // tell OBS which sceneItems are selected
     scene.getObsScene().getItems().forEach(obsSceneItem => {
       if (activeObsIds.includes(obsSceneItem.id)) {
         obsSceneItem.selected = true;
@@ -123,6 +133,10 @@ export class SelectionService
 
 
   // SCENE_ITEM METHODS
+
+  setSettings(settings: Partial<ISceneItemSettings>) {
+    this.getItems().forEach(item => item.setSettings(settings));
+  }
 
   setVisibility(isVisible: boolean) {
     this.getItems().forEach(item => item.setVisibility(isVisible));

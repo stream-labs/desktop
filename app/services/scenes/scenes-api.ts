@@ -93,6 +93,7 @@ export interface ISceneItem extends ISceneItemSettings {
 }
 
 export interface ISceneItemActions {
+  setSettings(settings: Partial<ISceneItemSettings>): void;
   setVisibility(visible: boolean): void;
   setLocked(locked: boolean): void;
   resetTransform(): void;

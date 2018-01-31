@@ -1,6 +1,6 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
-import { ApiClient, getClient } from '../helpers/api-client';
+import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection/selection-api';
 
@@ -57,14 +57,35 @@ test('Selection actions', async t => {
   const selection = client.getResource<ISelectionServiceApi>('SelectionService');
   const scene = scenesService.activeScene;
 
-  const [color1, color2, color3] = scene.getItems();
+  let [color1, color2, color3] = scene.getItems();
 
   selection.select([color1.sceneItemId, color2.sceneItemId]);
 
-  selection.rotate(90);
+  selection.setSettings({ visible: false });
 
-  t.is(color1.rotation, 90);
-  t.is(color2.rotation, 90);
-  t.is(color3.rotation, 0);
+  [color1, color2, color3] = scene.getItems();
+
+  t.is(color1.visible, false);
+  t.is(color2.visible, false);
+  t.is(color3.visible, true);
+
+});
+
+test('Invalid selection', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const selection = client.getResource<ISelectionServiceApi>('SelectionService');
+  const anotherScene = scenesService.createScene('Another scene');
+  const colorFromAnotherScene = anotherScene.createAndAddSource('MyColor', 'color_source');
+  const [colorSource] = scenesService.activeScene.getItems();
+
+  // invalid ids must be ignored
+  selection.select([colorSource.sceneItemId, 'this_is_an_invalid_id']);
+  t.deepEqual(selection.getIds(), [colorSource.sceneItemId]);
+
+  // ids must be only from active scene
+  selection.select([colorSource.sceneItemId, colorFromAnotherScene.sceneItemId]);
+  t.deepEqual(selection.getIds(), [colorSource.sceneItemId]);
+
 
 });
