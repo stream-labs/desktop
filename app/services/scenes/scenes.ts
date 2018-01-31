@@ -207,35 +207,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return sceneItems;
   }
 
-  // @shortcut('ArrowLeft')
-  // nudgeActiveItemsLeft() {
-  //   this.activeScene.activeItems.forEach(item => item.nudgeLeft());
-  // }
-  //
-  //
-  // @shortcut('ArrowRight')
-  // nudgeActiveItemRight() {
-  //   this.activeScene.activeItems.forEach(item => item.nudgeRight());
-  // }
-  //
-  //
-  // @shortcut('ArrowUp')
-  // nudgeActiveItemsUp() {
-  //   this.activeScene.activeItems.forEach(item => item.nudgeUp());
-  // }
-  //
-  //
-  // @shortcut('ArrowDown')
-  // nudgeActiveItemsDown() {
-  //   this.activeScene.activeItems.forEach(item => item.nudgeDown());
-  // }
-
-
-  // @shortcut('Delete')
-  // removeActiveItems() {
-  //   this.activeScene.activeItems.forEach(item => this.activeScene.removeItem(item.sceneItemId));
-  // }
-
   getScenes(): Scene[] {
     return this.scenes;
   }
