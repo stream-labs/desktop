@@ -126,6 +126,11 @@ export default class StudioEditor extends Vue {
       if ((event.button === 2)) {
         let menu: EditMenu;
         if (overSource) {
+          if (event.ctrlKey) {
+            this.selectionService.add(overSource.sceneItemId);
+          } else {
+            this.selectionService.select(overSource.sceneItemId);
+          }
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
