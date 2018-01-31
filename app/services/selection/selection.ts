@@ -94,7 +94,7 @@ export class SelectionService
 
   getInvertedIds(): string[] {
     const selectedIds = this.getIds();
-    return this.getScene().getItemsIds().filter(id => {
+    return this.getScene().getItemIds().filter(id => {
       return !selectedIds.includes(id);
     });
   }

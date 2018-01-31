@@ -50,7 +50,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
-  @Inject() private selectionService: SelectionService;
 
   @track('app_start')
   load() {

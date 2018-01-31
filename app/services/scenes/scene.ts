@@ -59,7 +59,7 @@ export class Scene implements ISceneApi {
     });
   }
 
-  getItemsIds(): string[] {
+  getItemIds(): string[] {
     return this.sceneState.items.map(item => item.sceneItemId);
   }
 

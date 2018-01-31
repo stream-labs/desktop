@@ -8,15 +8,15 @@ import { SelectionService } from 'services/selection';
 
 
 interface IClipboardState {
-  sceneItemsIds: string[];
-  filtersIds: string[];
+  sceneItemIds: string[];
+  filterIds: string[];
 }
 
 export class ClipboardService extends StatefulService<IClipboardState> {
 
   static initialState: IClipboardState = {
-    sceneItemsIds: [],
-    filtersIds: []
+    sceneItemIds: [],
+    filterIds: []
   };
 
   @Inject() private scenesService: ScenesService;
@@ -26,8 +26,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
   @shortcut('Ctrl+C')
   copy() {
-    const itemsIds = this.selectionService.getIds();
-    this.SET_SCENE_ITEMS_IDS(itemsIds);
+    this.SET_SCENE_ITEMS_IDS(this.selectionService.getIds());
   }
 
 
@@ -35,7 +34,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   pasteReference() {
     const insertedIds: string[] = [];
     const scene = this.scenesService.activeScene;
-    this.state.sceneItemsIds.forEach(sceneItemId => {
+    this.state.sceneItemIds.forEach(sceneItemId => {
       const sceneItem = this.scenesService.getSceneItem(sceneItemId);
       if (!sceneItem) return;
       const insertedItem = scene.addSource(sceneItem.sourceId);
@@ -49,7 +48,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   pasteDuplicate() {
     const insertedIds: string[] = [];
     const scene = this.scenesService.activeScene;
-    this.state.sceneItemsIds.forEach(sceneItemId => {
+    this.state.sceneItemIds.forEach(sceneItemId => {
       const sceneItem = this.scenesService.getSceneItem(sceneItemId);
       if (!sceneItem) return;
       const duplicatedSource = sceneItem.getSource().duplicate();
@@ -73,7 +72,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
 
   pasteFilters(toSourceId: string) {
-    this.state.filtersIds.forEach(fromSourceId => {
+    this.state.filterIds.forEach(fromSourceId => {
       const fromSource = this.sourcesService.getSource(fromSourceId);
       if (!fromSource) return;
       this.sourceFiltersService.copyFilters(fromSource.sourceId, toSourceId);
@@ -82,22 +81,22 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
 
   hasItems() {
-    return !!this.state.sceneItemsIds.length;
+    return !!this.state.sceneItemIds.length;
   }
 
 
   hasFilters() {
-    return !!this.state.filtersIds.length;
+    return !!this.state.filterIds.length;
   }
 
 
   @mutation()
   private SET_SCENE_ITEMS_IDS(ids: string[]) {
-    this.state.sceneItemsIds = ids;
+    this.state.sceneItemIds = ids;
   }
 
   @mutation()
   private SET_FILTERS_IDS(filtersIds: string[]) {
-    this.state.filtersIds = filtersIds;
+    this.state.filterIds = filtersIds;
   }
 }
