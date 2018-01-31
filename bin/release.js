@@ -260,7 +260,7 @@ async function runScript() {
   executeCmd('git push origin HEAD');
 
   info(`Tagging version ${newVersion}...`);
-  executeCmd(`git tag -f 'v${newVersion}'`);
+  executeCmd(`git tag -f "v${newVersion}"`);
   executeCmd('git push --tags');
 
   info(`Registering ${newVersion} with sentry...`);
