@@ -117,7 +117,7 @@ export class Scene implements ISceneApi {
 
 
   setLockOnAllItems(locked: boolean) {
-    this.getItems().forEach(item => item.setLocked(locked));
+    this.getItems().forEach(item => item.setSettings({ locked }));
   }
 
 

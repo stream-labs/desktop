@@ -110,7 +110,7 @@ export default class SourceSelector extends Vue {
 
   toggleLock(sceneItemId: string) {
     const item = this.scene.getItem(sceneItemId);
-    item.setLocked(!item.locked);
+    item.setSettings({ locked: !item.locked });
   }
 
   get scene() {

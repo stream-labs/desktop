@@ -172,11 +172,13 @@ test('SceneItem.setSettings()', async t => {
   sceneItem.setSettings({ rotation: 360 + 90 });
   t.is(sceneItem.getModel().rotation, 90);
 
-  sceneItem.setCrop({
-    top: 1.2,
-    bottom: 5.6,
-    left: 7.1,
-    right: 10,
+  sceneItem.setsSettings({
+    crop: {
+      top: 1.2,
+      bottom: 5.6,
+      left: 7.1,
+      right: 10,
+    }
   });
 
   // crop values must be rounded

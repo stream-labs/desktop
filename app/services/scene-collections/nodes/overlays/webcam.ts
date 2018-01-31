@@ -166,9 +166,13 @@ export class WebcamNode extends Node<ISchema, IContext> {
   }
 
   applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {
-    item.setPositionAndScale(item.x, item.y, scale, scale);
-
-    item.setCrop(crop);
+    item.setSettings({
+      x: item.x,
+      y: item.y,
+      scaleX: scale,
+      scaleY: scale,
+      crop
+    });
   }
 
   resStringToResolution(resString: string): IResolution {

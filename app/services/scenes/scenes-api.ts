@@ -95,7 +95,6 @@ export interface ISceneItem extends ISceneItemSettings {
 export interface ISceneItemActions {
   setSettings(settings: Partial<ISceneItemSettings>): void;
   setVisibility(visible: boolean): void;
-  setLocked(locked: boolean): void;
   resetTransform(): void;
   flipX(): void;
   flipY(): void;
@@ -110,9 +109,4 @@ export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
   getScene(): ISceneApi;
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
-
-  setPosition(vec: IVec2): void;
-  setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number): void;
-  setCrop(crop: ICrop): ICrop;
-  setPositionAndCrop(x: number, y: number, crop: ICrop): void;
 }

@@ -528,11 +528,11 @@ export class WidgetsService extends Service {
     source.setName(widget.name);
     source.updateSettings(widget.settings);
     source.replacePropertiesManager('widget', { widgetType: widget.type });
-    widgetItem.setPositionAndScale(
-      widget.x * this.videoService.baseWidth,
-      widget.y * this.videoService.baseHeight,
-      widget.scaleX * this.videoService.baseWidth,
-      widget.scaleY * this.videoService.baseHeight
-    );
+    widgetItem.setSettings({
+      x: widget.x * this.videoService.baseWidth,
+      y: widget.y * this.videoService.baseHeight,
+      scaleX: widget.scaleX * this.videoService.baseWidth,
+      scaleY: widget.scaleY * this.videoService.baseHeight
+    });
   }
 }

@@ -240,7 +240,7 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getItem(source.sceneItemId).setPositionAndCrop(rect.x, rect.y, rect.crop);
+    this.scene.getItem(source.sceneItemId).setSettings({ x: rect.x, y: rect.y, crop: rect.crop });
   }
 
   resize(
@@ -284,12 +284,12 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getItem(source.sceneItemId).setPositionAndScale(
-      rect.x,
-      rect.y,
-      rect.scaleX,
-      rect.scaleY
-    );
+    this.scene.getItem(source.sceneItemId).setSettings({
+      x: rect.x,
+      y: rect.y,
+      scaleX: rect.scaleX,
+      scaleY: rect.scaleY
+    });
   }
 
   updateCursor(event: MouseEvent) {

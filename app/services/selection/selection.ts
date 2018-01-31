@@ -170,10 +170,6 @@ export class SelectionService
     this.getItems().forEach(item => item.rotate(deg));
   }
 
-  setLocked(isLocked: boolean) {
-    this.getItems().forEach(item => item.setLocked(isLocked));
-  }
-
   @shortcut('Delete')
   remove() {
     this.getItems().forEach(item => item.remove());

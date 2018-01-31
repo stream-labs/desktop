@@ -196,36 +196,6 @@ export class SceneItem implements ISceneItemApi {
   }
 
 
-  setRotation(rotation: number) {
-    this.setSettings({ rotation });
-  }
-
-
-  setPositionAndScale(x: number, y: number, scaleX: number, scaleY: number) {
-    this.setSettings({ x, y, scaleX, scaleY });
-  }
-
-  setRectangle(rect: IScalableRectangle) {
-    this.setPositionAndScale(
-      rect.x,
-      rect.y,
-      rect.scaleX,
-      rect.scaleY
-    );
-  }
-
-
-  setCrop(crop: ICrop): ICrop {
-    this.setSettings({ crop });
-    return this.sceneItemState.crop;
-  }
-
-
-  setPositionAndCrop(x: number, y: number, crop: ICrop) {
-    this.setSettings({ x, y, crop });
-  }
-
-
   setLocked(locked: boolean) {
     this.setSettings({ locked });
   }
@@ -277,7 +247,7 @@ export class SceneItem implements ISceneItemApi {
     this.preservePosition(() => {
       const rect = this.getRectangle();
       rect.flipY();
-      this.setRectangle(rect);
+      this.setSettings(rect);
     });
   }
 
@@ -285,7 +255,7 @@ export class SceneItem implements ISceneItemApi {
     this.preservePosition(() => {
       const rect = this.getRectangle();
       rect.flipX();
-      this.setRectangle(rect);
+      this.setSettings(rect);
     });
   }
 
@@ -293,20 +263,20 @@ export class SceneItem implements ISceneItemApi {
   stretchToScreen() {
     const rect = this.getRectangle();
     rect.stretchAcross(this.videoService.getScreenRectangle());
-    this.setRectangle(rect);
+    this.setSettings(rect);
   }
 
 
   fitToScreen() {
     const rect = this.getRectangle();
     rect.fitTo(this.videoService.getScreenRectangle());
-    this.setRectangle(rect);
+    this.setSettings(rect);
   }
 
   centerOnScreen() {
     const rect = this.getRectangle();
     rect.centerOn(this.videoService.getScreenRectangle());
-    this.setRectangle(rect);
+    this.setSettings(rect);
   }
 
   rotate(deltaRotation: number) {

@@ -91,14 +91,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
       oldScene.getItems().slice().reverse().forEach(item => {
         const newItem = newScene.addSource(item.sourceId);
-        newItem.setPositionAndScale(
-          item.x,
-          item.y,
-          item.scaleX,
-          item.scaleY
-        );
-        newItem.setVisibility(item.visible);
-        newItem.setCrop(item.crop);
+        newItem.setSettings(item.getSettings());
       });
     }
 

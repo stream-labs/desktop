@@ -140,12 +140,12 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   }
 
   adjustPositionAndScale(item: SceneItem, obj: ISchema) {
-    item.setPositionAndScale(
-      obj.x * this.videoService.baseWidth,
-      obj.y * this.videoService.baseHeight,
-      obj.scaleX * this.videoService.baseWidth,
-      obj.scaleY * this.videoService.baseHeight
-    );
+    item.setSettings({
+      x: obj.x * this.videoService.baseWidth,
+      y: obj.y * this.videoService.baseHeight,
+      scaleX: obj.scaleX * this.videoService.baseWidth,
+      scaleY: obj.scaleY * this.videoService.baseHeight
+    });
   }
 
   normalizedScale(scale: number) {
