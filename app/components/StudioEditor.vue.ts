@@ -126,11 +126,7 @@ export default class StudioEditor extends Vue {
       if ((event.button === 2)) {
         let menu: EditMenu;
         if (overSource) {
-          if (event.ctrlKey) {
-            this.selectionService.add(overSource.sceneItemId);
-          } else {
-            this.selectionService.select(overSource.sceneItemId);
-          }
+          this.selectionService.add(overSource.sceneItemId);
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
@@ -220,7 +216,7 @@ export default class StudioEditor extends Vue {
 
   crop(x: number, y: number, options: IResizeOptions) {
     const source = this.resizeRegion.item;
-    const rect = new ScalableRectangle(source);
+    const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
       rect.withAnchor(options.anchor, () => {
@@ -245,7 +241,10 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getItem(source.sceneItemId).setSettings({ x: rect.x, y: rect.y, crop: rect.crop });
+    this.scene.getItem(source.sceneItemId).setTransform({
+      position: { x: rect.x, y: rect.y },
+      crop: rect.crop
+    });
   }
 
   resize(
@@ -263,7 +262,7 @@ export default class StudioEditor extends Vue {
     };
 
     const source = this.resizeRegion.item;
-    const rect = new ScalableRectangle(source);
+    const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
       rect.withAnchor(opts.anchor, () => {
@@ -289,11 +288,15 @@ export default class StudioEditor extends Vue {
       });
     });
 
-    this.scene.getItem(source.sceneItemId).setSettings({
-      x: rect.x,
-      y: rect.y,
-      scaleX: rect.scaleX,
-      scaleY: rect.scaleY
+    this.scene.getItem(source.sceneItemId).setTransform({
+      position: {
+        x: rect.x,
+        y: rect.y
+      },
+      scale: {
+        x: rect.scaleX,
+        y: rect.scaleY
+      }
     });
   }
 
@@ -355,7 +358,7 @@ export default class StudioEditor extends Vue {
   // Determines if the given mouse event is over the
   // given source
   isOverSource(event: MouseEvent, source: SceneItem) {
-    const rect = new ScalableRectangle(source);
+    const rect = new ScalableRectangle(source.getRectangle());
     rect.normalize();
 
     return this.isOverBox(
@@ -448,7 +451,7 @@ export default class StudioEditor extends Vue {
     const width = regionRadius * 2;
     const height = regionRadius * 2;
 
-    const rect = new ScalableRectangle(item);
+    const rect = new ScalableRectangle(item.getRectangle());
     rect.normalize();
 
     return [

@@ -113,7 +113,7 @@ class DragHandler {
   move(event: MouseEvent) {
     const delta = this.mouseDelta(event);
 
-    const rect = new ScalableRectangle(this.draggedSource);
+    const rect = new ScalableRectangle(this.draggedSource.getRectangle());
     const denormalize = rect.normalize();
 
     // The new source location before applying snapping
@@ -166,7 +166,8 @@ class DragHandler {
     denormalize();
 
     this.selectionService.getItems().forEach(item => {
-      item.setPosition({ x: item.x + dx, y: item.y + dy });
+      const pos = item.transform.position;
+      item.setTransform({ position: { x: pos.x + dx, y: pos.y + dy } });
     });
 
     if (!snappedX) {
@@ -259,7 +260,8 @@ class DragHandler {
     // Source edge snapping:
     if (this.sourceSnapping) {
       this.otherSources.forEach(source => {
-        const edges = this.generateSourceEdges(source, source.x, source.y);
+        const pos = source.transform.position;
+        const edges = this.generateSourceEdges(source.getRectangle(), pos.x, pos.y);
 
         // The dragged source snaps to the adjacent edge
         // of other sources.  So the right edge snaps to

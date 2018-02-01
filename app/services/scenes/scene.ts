@@ -231,25 +231,25 @@ export class Scene implements ISceneApi {
       sourceId,
       obsSceneItemId,
 
-      // Position in video space
-      x: 0,
-      y: 0,
+      transform: {
+        // Position in video space
+        position: { x: 0, y: 0 },
 
-      // Scale between 0 and 1
-      scaleX: 1.0,
-      scaleY: 1.0,
+        // Scale between 0 and 1
+        scale: { x: 1.0, y: 1.0 },
 
-      visible: true,
+        crop: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
 
-      crop: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0
+        rotation: 0,
+
       },
 
-      rotation: 0,
-
+      visible: true,
       locked: false
     });
   }

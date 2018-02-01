@@ -75,16 +75,32 @@ export interface ISceneCreateOptions {
   makeActive?: boolean;
 }
 
-export interface ISceneItemSettings {
-  x: number;
-  y: number;
-  scaleX: number;
-  scaleY: number;
-  visible: boolean;
+export interface ITransform {
+  position: IVec2;
+  scale: IVec2;
   crop: ICrop;
-  locked: boolean;
   rotation: number;
 }
+
+export interface IPartialTransform {
+  position?: Partial<IVec2>;
+  scale?: Partial<IVec2>;
+  crop?: Partial<ICrop>;
+  rotation?: number;
+}
+
+export interface ISceneItemSettings {
+  transform: ITransform;
+  visible: boolean;
+  locked: boolean;
+}
+
+export interface IPartialSettings {
+  transform?: IPartialTransform;
+  visible?: boolean;
+  locked?: boolean;
+}
+
 
 export interface ISceneItem extends ISceneItemSettings {
   sceneItemId: string;
