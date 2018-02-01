@@ -10,6 +10,7 @@ import {
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelectionServiceApi } from './selection-api';
+import { IPartialTransform } from "../scenes/scenes-api";
 
 interface ISelectionServiceState {
   lastSelectedId: string;
@@ -140,6 +141,10 @@ export class SelectionService
 
   setVisibility(isVisible: boolean) {
     this.getItems().forEach(item => item.setVisibility(isVisible));
+  }
+
+  setTransform(transform: IPartialTransform) {
+    this.getItems().forEach(item => item.setTransform(transform));
   }
 
   resetTransform() {

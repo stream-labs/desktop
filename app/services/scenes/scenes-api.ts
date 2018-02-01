@@ -111,6 +111,7 @@ export interface ISceneItem extends ISceneItemSettings {
 export interface ISceneItemActions {
   setSettings(settings: Partial<ISceneItemSettings>): void;
   setVisibility(visible: boolean): void;
+  setTransform(transform: IPartialTransform): void;
   resetTransform(): void;
   flipX(): void;
   flipY(): void;

@@ -164,15 +164,15 @@ test('SceneItem.setSettings()', async t => {
 
   const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
 
-  sceneItem.setSettings({ rotation: 90 });
+  sceneItem.setTransform({ rotation: 90 });
 
-  t.is(sceneItem.getModel().rotation, 90);
+  t.is(sceneItem.getModel().transform.rotation, 90);
 
   // rotation must be between 0 and 360
-  sceneItem.setSettings({ rotation: 360 + 90 });
-  t.is(sceneItem.getModel().rotation, 90);
+  sceneItem.setTransform({ rotation: 360 + 90 });
+  t.is(sceneItem.getModel().transform.rotation, 90);
 
-  sceneItem.setSettings({
+  sceneItem.setTransform({
     crop: {
       top: 1.2,
       bottom: 5.6,
@@ -182,7 +182,7 @@ test('SceneItem.setSettings()', async t => {
   });
 
   // crop values must be rounded
-  t.deepEqual(sceneItem.getModel().crop, {
+  t.deepEqual(sceneItem.getModel().transform.crop, {
     top: 1,
     bottom: 6,
     left: 7,
