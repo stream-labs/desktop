@@ -521,6 +521,7 @@ export class SceneCollectionsService extends Service
   private enableAutoSave() {
     this.autoSaveInterval = window.setInterval(() => {
       this.save();
+      this.stateService.flushManifestFile();
     }, 60 * 1000);
   }
 
