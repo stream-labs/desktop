@@ -29,7 +29,7 @@ export enum E_AUDIO_CHANNELS {
   INPUT_3 = 5,
 }
 
-const VOLMETER_UPDATE_INTERVAL = 100;
+const VOLMETER_UPDATE_INTERVAL = 50;
 
 interface IAudioSourceData {
   fader?: obs.IFader;

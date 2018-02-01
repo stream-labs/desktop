@@ -172,23 +172,10 @@
   background: @red;
   margin: 0 6px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
-  animation: livepulse 2s infinite;
 
   &.live-dock-offline {
     background: @grey;
     animation: none;
-  }
-}
-
-@keyframes livepulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
