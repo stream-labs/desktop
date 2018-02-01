@@ -15,6 +15,8 @@ process.env.SLOBS_VERSION = pjson.version;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
 const bt = require('backtrace-node');
 
+app.disableHardwareAcceleration();
+
 function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
   'An unexpected error occured and the application must be shut down.\n' +
