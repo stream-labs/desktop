@@ -11,7 +11,7 @@ let cmakeJsPath = null;
 
 /* Configurable variables */
 const runtime = 'electron';
-const runtimeVersion = '1.7.11';
+const runtimeVersion = '1.7.12';
 const configType = 'Release';
 
 /** This assumes cmake is in the global PATH variable. */
