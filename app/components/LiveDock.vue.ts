@@ -27,8 +27,6 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
 
-  liveDockSize = 28;
-
   subscription: Subscription;
 
   $refs: {
@@ -96,8 +94,16 @@ export default class LiveDock extends Vue {
     return this.userService.platform.type === 'twitch';
   }
 
+  get isYoutube() {
+    return this.userService.platform.type === 'youtube';
+  }
+
   get hideViewerCount() {
     return this.customizationService.state.hideViewerCount;
+  }
+
+  get liveDockSize () {
+    return this.customizationService.state.livedockSize;
   }
 
   toggleViewerCount() {

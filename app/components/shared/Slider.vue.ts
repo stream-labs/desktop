@@ -35,6 +35,9 @@ export default class SliderInput extends Vue {
   @Prop()
   sliderStyle: object;
 
+  @Prop()
+  usePercentages: boolean;
+
   @throttle(500)
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
@@ -50,4 +53,9 @@ export default class SliderInput extends Vue {
     return parseFloat(num.toFixed(6));
   }
 
+  formatter(value: number) {
+    let formattedValue = String(value);
+    if (this.usePercentages) formattedValue = Math.round(value * 100) + '%';
+    return formattedValue;
+  }
 }

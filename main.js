@@ -15,6 +15,8 @@ process.env.SLOBS_VERSION = pjson.version;
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
 const bt = require('backtrace-node');
 
+app.disableHardwareAcceleration();
+
 function handleFinishedReport() {
   dialog.showErrorBox(`Unhandled Exception`,
   'An unexpected error occured and the application must be shut down.\n' +
@@ -60,11 +62,11 @@ if (pjson.env === 'production') {
 
 const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const fs = require('fs');
-const _ = require('lodash');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
+const windowStateKeeper = require('electron-window-state');
 
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
@@ -118,13 +120,22 @@ function getObs() {
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1600,
+    defaultHeight: 1000
+  });
+
   mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 1000,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     show: false,
     frame: false,
     title: "Streamlabs OBS",
   });
+
+  mainWindowState.manage(mainWindow);
 
   mainWindow.setMenu(null);
 
@@ -232,7 +243,7 @@ function startApp() {
   });
 
   ipcMain.on('services-message', (event, payload) => {
-    childWindow.webContents.send('services-message', payload);
+    if (!childWindow.isDestroyed()) childWindow.webContents.send('services-message', payload);
   });
 
 
@@ -355,12 +366,12 @@ ipcMain.on('vuex-register', event => {
   // refreshed.  We only want to register it once.
   if (!registeredStores[windowId]) {
     registeredStores[windowId] = win;
-    log('Registered vuex stores: ', _.keys(registeredStores));
+    log('Registered vuex stores: ', Object.keys(registeredStores));
 
     // Make sure we unregister is when it is closed
     win.on('closed', () => {
       delete registeredStores[windowId];
-      log('Registered vuex stores: ', _.keys(registeredStores));
+      log('Registered vuex stores: ', Object.keys(registeredStores));
     });
   }
 
@@ -379,7 +390,8 @@ ipcMain.on('vuex-mutation', (event, mutation) => {
   if (senderWindow && !senderWindow.isDestroyed()) {
     const windowId = senderWindow.id;
 
-    _.each(_.omit(registeredStores, [windowId]), win => {
+    Object.keys(registeredStores).filter(id => id !== windowId.toString()).forEach(id => {
+      const win = registeredStores[id];
       if (!win.isDestroyed()) win.webContents.send('vuex-mutation', mutation);
     });
   }

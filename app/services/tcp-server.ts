@@ -332,7 +332,12 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       } catch (e) {
         this.sendResponse(
           client,
-          this.jsonrpcService.createError(null,{ code: E_JSON_RPC_ERROR.INVALID_REQUEST }));
+          this.jsonrpcService.createError(null,{
+            code: E_JSON_RPC_ERROR.INVALID_REQUEST,
+            message: 'Make sure that the request is valid json. ' +
+            'If request string contains multiple requests, ensure requests are separated ' +
+            'by a single newline character LF ( ASCII code 10)'
+          }));
       }
     });
   }

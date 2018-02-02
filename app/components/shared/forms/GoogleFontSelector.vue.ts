@@ -5,6 +5,8 @@ import { Inject } from '../../../util/injector';
 import { SourcesService } from '../../../services/sources';
 import { Input, IGoogleFont } from './Input';
 import FontSizeSelector from './FontSizeSelector.vue';
+import * as fi from 'node-fontinfo';
+import { EFontStyle } from 'obs-studio-node';
 import path from 'path';
 
 
@@ -98,8 +100,18 @@ export default class GoogleFontSelector extends Input<IGoogleFont> {
 
     this.fontLibraryService.findStyle(this.selectedFamily, styleName).then(style => {
       this.fontLibraryService.downloadFont(style.file).then(fontPath => {
-        [this.actualFamily, this.actualStyle] = 
-          this.fontLibraryService.getSettingsFromFont(this.selectedFamily, style.name);
+        const fontInfo = fi.getFontInfo(fontPath);
+
+        if (!fontInfo) {
+          this.actualFamily = 'Arial';
+          this.actualStyle = 0;
+        } else {
+          this.actualFamily = fontInfo.family_name;
+
+          this.actualStyle = 
+            (fontInfo.italic ? EFontStyle.Italic : 0) |
+            (fontInfo.bold ? EFontStyle.Bold : 0);
+        }
 
         this.value.face = this.actualFamily;
         this.value.flags = this.actualStyle;

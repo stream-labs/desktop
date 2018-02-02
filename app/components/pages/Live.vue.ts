@@ -20,10 +20,20 @@ export default class Live extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
-  previewSize = 300;
+  get previewSize() {
+    return this.customizationService.state.previewSize;
+  }
+
+  set previewSize(previewSize: number) {
+    this.customizationService.setSettings({ previewSize });
+  }
 
   get previewEnabled() {
-    return this.customizationService.state.livePreviewEnabled;
+    return this.customizationService.state.livePreviewEnabled && !this.performanceModeEnabled;
+  }
+
+  get performanceModeEnabled() {
+    return this.customizationService.state.performanceMode;
   }
 
   set previewEnabled(value: boolean) {

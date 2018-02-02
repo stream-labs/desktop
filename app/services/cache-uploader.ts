@@ -14,10 +14,13 @@ export class CacheUploaderService extends Service {
   @Inject()
   userService: UserService;
 
+  get cacheDir() {
+    return electron.remote.app.getPath('userData');
+  }
 
   uploadCache(): Promise<string> {
     return new Promise(resolve => {
-      const cacheDir = electron.remote.app.getPath('userData');
+      const cacheDir = this.cacheDir;
       const dateStr = (new Date()).toISOString();
       const username = this.userService.username;
       const keyname = `${compact([dateStr, username]).join('-')}.zip`;
@@ -51,13 +54,26 @@ export class CacheUploaderService extends Service {
       });
 
       archive.pipe(output);
-      archive.directory(path.join(cacheDir, 'node-obs'), 'node-obs');
-      archive.directory(path.join(cacheDir, 'SceneConfigs'), 'SceneConfigs');
+      this.addDirIfExists(archive, 'node-obs');
+      this.addDirIfExists(archive, 'SceneConfigs');
+      this.addDirIfExists(archive, 'SceneCollections');
+      this.addDirIfExists(archive, 'Streamlabels');
       archive.file(path.join(cacheDir, 'basic.ini'), { name: 'basic.ini' });
       archive.file(path.join(cacheDir, 'global.ini'), { name: 'global.ini' });
       archive.file(path.join(cacheDir, 'service.json'), { name: 'service.json' });
+      archive.file(path.join(cacheDir, 'streamEncoder.json'), { name: 'streamEncoder.json' });
+      archive.file(path.join(cacheDir, 'recordEncoder.json'), { name: 'recordEncoder.json' });
+      archive.file(path.join(cacheDir, 'window-state.json'), { name: 'window-state.json' });
       archive.finalize();
     });
+  }
+
+  addDirIfExists(archive: archiver.Archiver, name: string) {
+    const dirPath = path.join(this.cacheDir, name);
+
+    if (fs.existsSync(dirPath)) {
+      archive.directory(dirPath, name);
+    }
   }
 
 }

@@ -2,7 +2,7 @@
 <div
   class="live-dock"
   :class="{ collapsed, 'live-dock--left': onLeft }"
-  :style="{ width: liveDockSize + '%' }">
+  :style="{ width: (liveDockSize * 100) + '%' }">
   <div
     class="live-dock-chevron icon-btn"
     v-if="collapsed"
@@ -52,23 +52,11 @@
         <a @click="refreshChat">Refresh Chat</a>
       </div>
 
-      <div class="live-dock-chat">
+      <div class="live-dock-chat" v-if="isTwitch || (isYoutube && isStreaming)">
         <chat ref="chat" />
       </div>
 
-      <div class="sizer-items">
-        <Slider
-          v-model="liveDockSize"
-          :min="15"
-          :max="50"
-          :interval="1"
-          tooltip="false"
-          class="sizer"
-          :dotSize="11"
-          :sliderStyle="{ 'background-color': '#3c4c53' }"
-        />
-        <i class="fa fa-search fa-flip-horizontal" />
-      </div>
+
     </div>
   </transition>
 </div>
@@ -175,7 +163,6 @@
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
-  margin-bottom: 20px;
 }
 
 .live-dock-pulse {
@@ -185,29 +172,11 @@
   background: @red;
   margin: 0 6px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
-  animation: livepulse 2s infinite;
 
   &.live-dock-offline {
     background: @grey;
     animation: none;
   }
-}
-
-@keyframes livepulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-  }
-}
-
-.sizer-items {
-  bottom: 5px;
-  right: 20px;
 }
 
 .night-theme {

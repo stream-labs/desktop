@@ -1,5 +1,6 @@
 import URI from 'urijs';
 import electron from 'electron';
+import { isEqual } from 'lodash';
 
 export const enum EBit { ZERO, ONE }
 
@@ -79,5 +80,13 @@ export default class Utils {
       pow++;
     }
     return result;
+  }
+
+  static getChangedParams<T>(obj: T, patch: T): Partial<T> {
+    const result: Dictionary<any> = {};
+    Object.keys(patch).forEach(key => {
+      if (!isEqual(obj[key], patch[key])) result[key] = patch[key];
+    });
+    return result as Partial<T>;
   }
 }

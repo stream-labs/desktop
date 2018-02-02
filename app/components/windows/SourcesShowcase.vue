@@ -13,7 +13,8 @@
       name="Image"
       description="Add images to your scene."
       key="1">
-      <img slot="media" src="../../../media/source-demos/source-image.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/image.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>png</li>
         <li>jpg</li>
@@ -30,7 +31,8 @@
       name="Image Slide Show"
       description="Add a slideshow of images to your scene."
       key="2">
-      <img slot="media" src="../../../media/source-demos/source-slide-show.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image-slide-show.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/image-slide-show.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>png</li>
         <li>jpg</li>
@@ -47,7 +49,8 @@
       name="Media Source"
       description="Add videos or sound clips to your scene."
       key="3">
-      <img slot="media" src="../../../media/source-demos/source-media.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/media.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/media.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>mp4</li>
         <li>ts</li>
@@ -70,7 +73,8 @@
       name="Window Capture"
       description="Capture a specific window that's open on your computer."
       key="4">
-      <img slot="media" src="../../../media/source-demos/source-capture.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/window-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/window-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Compatible with most modern browsers and programs</li>
       </ul>
@@ -82,7 +86,8 @@
       name="Video Capture Device"
       description="Select from your build in USB webcam or an external."
       key="5">
-      <img slot="media" src="../../../media/source-demos/source-video.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/video-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/video-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in webcam</li>
         <li>Logitech webcam</li>
@@ -96,7 +101,8 @@
       name="Audio Output Capture"
       description="Captures your desktop audio for the purpose of playing sound, such as music or speech."
       key="6">
-      <img slot="media" src="../../../media/source-demos/source-output.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-output.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/audio-output.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Desktop audio</li>
       </ul>
@@ -108,7 +114,8 @@
       name="Color Source"
       description="Add a color to the background of your whole scene or just a part."
       key="7">
-      <img slot="media" src="../../../media/source-demos/source-color.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/color-source.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/color-source.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Hex</li>
         <li>RGBA</li>
@@ -122,7 +129,8 @@
       name="BrowserSource"
       description="Allows you to add web-based content as a source, such as web pages and Flash SWFs."
       key="8">
-      <img slot="media" src="../../../media/source-demos/source-browser.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/browser-source.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/browser-source.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Websites</li>
         <li>Third party widgets</li>
@@ -136,7 +144,8 @@
       name="Text (GDI+)"
       description="Add text to your scene and adjust its style."
       key="9">
-      <img slot="media" src="../../../media/source-demos/source-text.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/text.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/text.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Hex</li>
         <li>RGBA</li>
@@ -152,7 +161,8 @@
       name="Display Capture"
       description="Capture your entire computer monitor."
       key="10">
-      <img slot="media" src="../../../media/source-demos/source-capture-full.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/display-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/display-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Primary monitor</li>
         <li>Secondary monitor</li>
@@ -165,7 +175,8 @@
       name="Game Capture"
       description="Capture a game you're playing on your computer."
       key="11">
-      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/game-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/game-capture.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in works with most modern computer games</li>
       </ul>
@@ -177,7 +188,8 @@
       name="Audio Input Capture"
       description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech."
       key="12">
-      <img slot="media" src="../../../media/source-demos/source-input.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-input.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/audio-input.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Built in microphones</li>
         <li>USB microphones</li>
@@ -191,7 +203,8 @@
       name="Blackmagic Device"
       description="Capture the feed your decklink device is capturing."
       key="13">
-      <img slot="media" src="../../../media/source-demos/source-game-capture.png"/>
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/sources.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>Works with most of the recent Blackmagic cards.</li>
       </ul>
@@ -425,7 +438,8 @@
       name="Scene"
       description="Allows you to add existing scene as a source"
       key="27">
-      <img slot="media" src="../../../media/source-demos/source-browser.png"/>
+      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/scene.png"/>
+      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/scene.png"/>
     </add-source-info>
 
     <add-source-info
@@ -452,7 +466,7 @@
       class="source-info"
       v-if="inspectedSource === null">
       <div class="source-welcome">
-        <div class="source-welcome__text">
+        <div class="source-info__text">
           <h3>Welcome to sources!</h3>
           <ol>
             <li>Browse through our Standard and Widget sources</li>
@@ -460,8 +474,9 @@
             <li>Click 'Add Source' when you're ready to add it to your scene</li>
           </ol>
         </div>
-        <div class="source-welcome__img">
-          <img slot="media" src="../../../media/source-demos/source-welcome.png"/>
+        <div class="source-info__media">
+          <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
+          <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/sources.png"/>
         </div>
       </div>
     </div>
@@ -653,12 +668,8 @@ h4 {
 .source-welcome {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-}
-
-.source-welcome__img {
-  padding: 0 20px 0 40px;
-  flex: 0 0 50%;
+  align-items: center;
+  width: 100%;
 }
 
 .sources {
@@ -723,6 +734,27 @@ h4 {
   align-items: center;
   .radius;
   .transition;
+}
+
+.source-info__media {
+  .radius;
+  overflow: hidden;
+  text-align: center;
+  padding-left: 20px;
+  align-items: center;
+  align-content: center;
+  max-height: 150px;
+  justify-content: center;
+  display: flex;
+  flex: 0 0 50%;
+
+  video,
+  img {
+    width: auto;
+    max-height: 150px;
+    max-width: 100%;
+    .radius;
+  }
 }
 
 .source__icon {

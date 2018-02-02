@@ -1,7 +1,7 @@
 import { throttle } from 'lodash-decorators';
 import { Service } from './service';
 import { Inject } from '../util/injector';
-import { UserService, requiresLogin } from './user';
+import { UserService } from './user';
 import { TPlatform } from './platforms';
 import { ScenesService, SceneItem, Scene } from './scenes';
 import { SourcesService } from './sources';
@@ -355,8 +355,9 @@ export class WidgetsService extends Service {
   @Inject() hostsService: HostsService;
   @Inject() videoService: VideoService;
 
-  @requiresLogin()
   createWidget(type: WidgetType, name?: string): SceneItem {
+    if (!this.userService.isLoggedIn()) return;
+
     const scene = this.scenesService.activeScene;
     const widget = WidgetDefinitions[type];
 
@@ -408,8 +409,8 @@ export class WidgetsService extends Service {
     return sceneItem;
   }
 
-  @requiresLogin()
   getWidgetUrl(type: WidgetType) {
+    if (!this.userService.isLoggedIn()) return;
     return WidgetDefinitions[type].url(
       this.hostsService.streamlabs,
       this.userService.widgetToken,
@@ -417,8 +418,8 @@ export class WidgetsService extends Service {
     );
   }
 
-  @requiresLogin()
   getTesters() {
+    if (!this.userService.isLoggedIn()) return;
     return WidgetTesters.filter(tester => {
       return tester.platforms.includes(this.userService.platform.type);
     }).map(tester => {

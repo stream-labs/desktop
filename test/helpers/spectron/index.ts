@@ -3,7 +3,7 @@ import 'rxjs/add/operator/first';
 import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
-import { DismissablesService } from "../../../app/services/dismissables";
+import { DismissablesService } from 'services/dismissables';
 
 const path = require('path');
 const fs = require('fs');
@@ -76,6 +76,9 @@ export function useSpectron(options: ITestRunnerOptions) {
       if (await t.context.app.client.isExisting('button=Start Fresh')) {
         await t.context.app.client.click('button=Start Fresh');
       }
+    } else {
+      // Wait for the connect screen before moving on
+      await t.context.app.client.isExisting('button=Twitch');
     }
 
     // disable the popups that prevents context menu to be shown

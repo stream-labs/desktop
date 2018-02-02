@@ -10,6 +10,7 @@ type TOnboardingStep =
   'OptimizeA' |
   'OptimizeB' |
   'OptimizeC' |
+  'SceneCollectionsImport' |
   'ObsImport';
 
 interface IOnboardingServiceState {
@@ -32,6 +33,13 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
+    next: 'SceneCollectionsImport'
+  },
+
+  SceneCollectionsImport: {
+    isEligible: service => {
+      return service.userService.isLoggedIn();
+    },
     next: 'ObsImport'
   },
 

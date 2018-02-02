@@ -13,6 +13,7 @@ import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
 import OverlaySettings from 'components/OverlaySettings.vue';
 import NotificationsSettings from 'components/NotificationsSettings.vue';
+import AppearanceSettings from 'components/AppearanceSettings.vue';
 
 @Component({
   components: {
@@ -24,7 +25,8 @@ import NotificationsSettings from 'components/NotificationsSettings.vue';
     Hotkeys,
     ApiSettings,
     OverlaySettings,
-    NotificationsSettings
+    NotificationsSettings,
+    AppearanceSettings
   },
   mixins: [windowMixin]
 })
@@ -48,7 +50,8 @@ export default class SceneTransitions extends Vue {
     Advanced: 'cogs',
     API: 'file-code-o',
     Overlays: 'picture-o',
-    Notifications: 'warning'
+    Notifications: 'warning',
+    Appearance: 'television '
   };
 
   get categoryNames() {
