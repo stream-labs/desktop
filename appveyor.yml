@@ -1,4 +1,4 @@
-build: off
+appveyor.ymlbuild: off
 
 install:
   - ps: Install-Product node 8
@@ -19,4 +19,4 @@ artifacts:
 
 notifications:
   - provider: GitHubPullRequest
-    template: "{{#failed}}:x: Build failed {{/failed}}{{#passed}} {{#messages}}:warning: {{.}} {{/messages}} {{^messages}}:white_check_mark: Screens are not changed {{/messages}} Tests passed{{/passed}}"
+    template: "Build messages: {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
