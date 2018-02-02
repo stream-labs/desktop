@@ -379,6 +379,8 @@ export class SceneCollectionsService extends Service
     const root = parse(data, NODE_TYPES);
     await root.load();
 
+    this.hotkeysService.bindHotkeys();
+
     // Make sure we actually loaded something that works
     if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
   }
