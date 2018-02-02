@@ -1,4 +1,4 @@
-appveyor.ymlbuild: off
+build: off
 
 install:
   - ps: Install-Product node 8
