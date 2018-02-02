@@ -5,16 +5,21 @@ import { Inject } from '../util/injector';
 import electron from 'electron';
 
 type TOnboardingStep =
-  'Connect' |
-  'SelectWidgets' |
-  'OptimizeA' |
-  'OptimizeB' |
-  'OptimizeC' |
-  'SceneCollectionsImport' |
-  'ObsImport';
+  | 'Connect'
+  | 'SelectWidgets'
+  | 'OptimizeA'
+  | 'OptimizeB'
+  | 'OptimizeC'
+  | 'SceneCollectionsImport'
+  | 'ObsImport';
+
+interface IOnboardingOptions {
+  isLogin: boolean; // When logging into a new account after onboarding
+  isOptimize: boolean; // When re-running the optimizer after onboarding
+}
 
 interface IOnboardingServiceState {
-  isLogin: boolean;
+  options: IOnboardingOptions;
   currentStep: TOnboardingStep;
   completedSteps: TOnboardingStep[];
 }
@@ -45,7 +50,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   ObsImport: {
     isEligible: service => {
-      if (service.state.isLogin) return false;
+      if (service.options.isLogin) return false;
       return true;
     },
     next: 'SelectWidgets'
@@ -53,7 +58,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   SelectWidgets: {
     isEligible: service => {
-      if (service.state.isLogin) return false;
+      if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
     next: 'OptimizeA'
@@ -61,7 +66,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeA: {
     isEligible: service => {
-      if (service.state.isLogin) return false;
+      if (service.options.isLogin) return false;
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB'
@@ -69,29 +74,27 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   OptimizeB: {
     isEligible: service => {
-      return service.state.completedSteps.includes('OptimizeA');
+      return service.completedSteps.includes('OptimizeA');
     }
   }
 };
 
-export class OnboardingService extends StatefulService<IOnboardingServiceState> {
-
+export class OnboardingService extends StatefulService<
+  IOnboardingServiceState
+> {
   static initialState: IOnboardingServiceState = {
-    isLogin: false,
+    options: {
+      isLogin: false,
+      isOptimize: false
+    },
     currentStep: null,
     completedSteps: []
   };
 
-
   localStorageKey = 'UserHasBeenOnboarded';
 
-
-  @Inject()
-  navigationService: NavigationService;
-
-  @Inject()
-  userService: UserService;
-
+  @Inject() navigationService: NavigationService;
+  @Inject() userService: UserService;
 
   init() {
     // This is used for faking authentication in tests.  We have
@@ -103,35 +106,37 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     });
   }
 
-
   @mutation()
   SET_CURRENT_STEP(step: TOnboardingStep) {
     this.state.currentStep = step;
   }
-
 
   @mutation()
   RESET_COMPLETED_STEPS() {
     this.state.completedSteps = [];
   }
 
-
   @mutation()
-  SET_LOGIN(login: boolean) {
-    this.state.isLogin = login;
+  SET_OPTIONS(options: Partial<IOnboardingOptions>) {
+    Object.assign(this.state.options, options);
   }
-
 
   @mutation()
   COMPLETE_STEP(step: TOnboardingStep) {
     this.state.completedSteps.push(step);
   }
 
-
   get currentStep() {
     return this.state.currentStep;
   }
 
+  get options() {
+    return this.state.options;
+  }
+
+  get completedSteps() {
+    return this.state.completedSteps;
+  }
 
   // Completes the current step and moves on to the
   // next eligible step.
@@ -146,16 +151,22 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.goToNextStep(ONBOARDING_STEPS[this.state.currentStep].next);
   }
 
-
   // A login attempt is an abbreviated version of the onboarding process,
   // and some steps should be skipped.
-  start(isLogin = false) {
+  start(options: Partial<IOnboardingOptions> = {}) {
+    const actualOptions: IOnboardingOptions = {
+      isLogin: false,
+      isOptimize: false,
+      ...options
+    };
+
+    const step = options.isOptimize ? 'OptimizeA' : 'Connect';
+
     this.RESET_COMPLETED_STEPS();
-    this.SET_LOGIN(isLogin);
-    this.SET_CURRENT_STEP('Connect');
+    this.SET_OPTIONS(actualOptions);
+    this.SET_CURRENT_STEP(step);
     this.navigationService.navigate('Onboarding');
   }
-
 
   // Ends the onboarding process
   finish() {
@@ -163,12 +174,12 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     this.navigationService.navigate('Studio');
   }
 
-
   get isTwitchAuthed() {
-    return this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch';
+    return (
+      this.userService.isLoggedIn() &&
+      this.userService.platform.type === 'twitch'
+    );
   }
-
 
   private goToNextStep(step: TOnboardingStep) {
     if (!step) {
@@ -185,12 +196,10 @@ export class OnboardingService extends StatefulService<IOnboardingServiceState> 
     }
   }
 
-
   startOnboardingIfRequired() {
     if (localStorage.getItem(this.localStorageKey)) return false;
 
     this.start();
     return true;
   }
-
 }

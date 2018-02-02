@@ -24,7 +24,7 @@ export default class Login extends Vue {
   }
 
   login() {
-    this.onboardingService.start(true);
+    this.onboardingService.start({ isLogin: true });
   }
 
 }
