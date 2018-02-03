@@ -25,6 +25,9 @@ export default class Utils {
     return URI.parseQuery(URI.parse(url).query);
   }
 
+  static isMainWindow(): boolean {
+    return !this.getCurrentUrlParams().child;
+  }
 
   static isChildWindow(): boolean {
     return !!this.getCurrentUrlParams().child;
