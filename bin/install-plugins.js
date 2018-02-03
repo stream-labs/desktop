@@ -18,13 +18,13 @@ const FACE_MASK_VERSION = '0.5.1';
 async function runScript() {
   const zipExe = path.resolve(__dirname, 'node_modules', '7zip-bin-win', 'x64', '7za.exe');
   const slobsDir = path.resolve(__dirname, '..');
-  const nodeObsPath = path.join(slobsDir, 'node_modules', 'obs-studio-node', 'distribute');
+  const nodeObsPath = path.join(slobsDir, 'node_modules', 'obs-studio-node', 'libobs');
 
   /* EXTRACT BROWSER PLUGIN */
   const browserPluginArchivePath = path.join(slobsDir, 'plugins', 'obs-browser-2987-old.7z');
 
   sh.echo('Extracting obs-browser archive...');
-  let result = sh.exec(`"${zipExe}" x "${browserPluginArchivePath}" -o"${nodeObsPath}"`);
+  let result = sh.exec(`"${zipExe}" x "${browserPluginArchivePath}" -o"${nodeObsPath}" -aos`);
 
   if (result.code !== 0) {
     sh.echo(colors.red('ERROR: Extraction failed!'));
@@ -47,7 +47,7 @@ async function runScript() {
   await faceMaskArchiveFinishPromise;
 
   sh.echo('Extracting facemask-plugin archive...');
-  result = sh.exec(`"${zipExe}" x "${faceMaskArchivePath}" -o"${nodeObsPath}"`);
+  result = sh.exec(`"${zipExe}" x "${faceMaskArchivePath}" -o"${nodeObsPath}" -aos`);
 
   if (result.code !== 0) {
     sh.echo(colors.red('ERROR: Extraction failed!'));
