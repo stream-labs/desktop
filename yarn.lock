@@ -5301,9 +5301,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.9/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.9/streamlabs-x86_64-signed.tar.gz#3700d2c6164e9ae7ae5fa7d71e9c5f45031f632e"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz#470268fd7a2d399f3d0e9dd623b21cde7ce0b2dd"
   dependencies:
     nan "^2.8.0"
 
