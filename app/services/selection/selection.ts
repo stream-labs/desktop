@@ -5,12 +5,12 @@ import {
   SceneItem,
   ScenesService,
   ISceneItem,
-  ISceneItemSettings
+  ISceneItemSettings,
+  IPartialTransform
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelectionServiceApi } from './selection-api';
-import { IPartialTransform } from "../scenes/scenes-api";
 
 interface ISelectionServiceState {
   lastSelectedId: string;
