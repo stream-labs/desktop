@@ -27,6 +27,7 @@ import {
   ISceneCollectionsServiceApi
 } from '.';
 import { SceneCollectionsStateService } from './state';
+import { Subject } from 'rxjs/Subject';
 
 const uuid = window['require']('uuid/v4');
 
@@ -65,10 +66,14 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
 
+  collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
+  collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
+  collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
+
   /**
    * Whether the service has been initialized
    */
-  initialized = false;
+  private initialized = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -379,6 +384,8 @@ export class SceneCollectionsService extends Service
     const root = parse(data, NODE_TYPES);
     await root.load();
 
+    this.hotkeysService.bindHotkeys();
+
     // Make sure we actually loaded something that works
     if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
   }
@@ -503,12 +510,14 @@ export class SceneCollectionsService extends Service
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
+    this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
 
   /**
    * Deletes on the server and removes from the store
    */
   private async removeCollection(id: string) {
+    this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
 
     // Currently we don't remove files on disk in case we need to recover them
@@ -536,6 +545,7 @@ export class SceneCollectionsService extends Service
       if (collection.serverId)
         await this.serverApi.makeSceneCollectionActive(collection.serverId);
       this.stateService.SET_ACTIVE_COLLECTION(id);
+      this.collectionSwitched.next(collection);
     }
   }
 

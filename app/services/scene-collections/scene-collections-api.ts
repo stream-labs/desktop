@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs/Observable';
+
 export interface ISceneCollectionsServiceApi {
   /**
    * Attempt to load a scene collection.
@@ -26,6 +28,21 @@ export interface ISceneCollectionsServiceApi {
    * Contains the active collection
    */
   activeCollection: ISceneCollectionsManifestEntry;
+
+  /**
+   * Subscribe to receive notifications when a new collection is added
+   */
+  collectionAdded: Observable<ISceneCollectionsManifestEntry>;
+
+  /**
+   * Subscribe to receive notifications when a collection is removed
+   */
+  collectionRemoved: Observable<ISceneCollectionsManifestEntry>;
+
+  /**
+   * Subscribe to receive notifications when a collection is switched to
+   */
+  collectionSwitched: Observable<ISceneCollectionsManifestEntry>;
 }
 
 export interface ISceneCollectionSchema {

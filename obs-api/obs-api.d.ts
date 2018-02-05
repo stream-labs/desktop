@@ -1,1 +1,1 @@
-export * from 'obs-studio-node/distribute/module'
+export * from 'obs-studio-node/module'
