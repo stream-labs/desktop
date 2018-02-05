@@ -63,18 +63,55 @@ export class SceneCollectionsStateService extends StatefulService<
   async loadManifestFile() {
     await this.ensureDirectory();
 
-    const exists = await new Promise(resolve => {
-      fs.exists(this.manifestFilePath, exists => resolve(exists));
+    try {
+      const exists = await new Promise(resolve => {
+        fs.exists(this.manifestFilePath, exists => resolve(exists));
+      });
+      const data = await this.readCollectionFile(this.manifestFilePath);
+
+      if (data) {
+        const parsed = JSON.parse(data);
+        const recovered = await this.checkAndRecoverManifest(parsed);
+
+        if (recovered) this.LOAD_STATE(recovered);
+      }
+    } catch (e) {
+      console.error('Error loading manifest file from disk');
+    }
+
+    await this.flushManifestFile();
+  }
+
+  /**
+   * Takes a parsed manifest and checks it for data integrity
+   * errors.  If possible, it will attempt to recover it.
+   * Otherwise, it will return undefined.
+   */
+  async checkAndRecoverManifest(obj: ISceneCollectionsManifest): Promise<ISceneCollectionsManifest> {
+    // If there is no collections array, this is unrecoverable
+    if (!Array.isArray(obj.collections)) return;
+
+    // Get a list of all json files in the directory
+    const files = await this.listCollectionFiles();
+
+    // Filter out collections we can't recover, and fix ones we can
+    const filtered = obj.collections.filter(coll => {
+      // If there is no id, this is unrecoverable
+      if (coll.id == null) return false;
+
+      // If there isn't a corresponding file on disk, it shouldn't be in
+      // the manifest.  It may be redownloaded from the server.
+      if (!files.includes(`${coll.id}.json`)) return false;
+
+      // We can recover these
+      if (coll.deleted == null) coll.deleted = false;
+      if (coll.modified == null) coll.modified = (new Date()).toISOString();
+
+      return true;
     });
 
-    if (exists) {
-      const data = await this.readCollectionFile(this.manifestFilePath);
-      if (data) {
-        this.LOAD_STATE(JSON.parse(data));
-      }
-    } else {
-      await this.flushManifestFile();
-    }
+    obj.collections = filtered;
+    return obj;
   }
 
   /**
@@ -151,6 +188,22 @@ export class SceneCollectionsStateService extends StatefulService<
         });
       });
     }
+  }
+
+  /**
+   * Returns a list of files in the collections directory
+   */
+  private listCollectionFiles(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      fs.readdir(this.collectionsDirectory, (err, files) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(files);
+      });
+    });
   }
 
   get collectionsDirectory() {
