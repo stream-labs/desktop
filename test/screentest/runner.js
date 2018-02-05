@@ -15,7 +15,7 @@ const currentBranch = execResult
   .replace(/[^a-zA-Z\d\-_]/g, '');
 
 const branches = [
-  currentBranch,
+  'current',
   CONFIG.baseBranch
 ];
 
@@ -95,7 +95,9 @@ function err(...args) {
 function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
-  execSync(`git checkout ${branchName}`);
+  if (branchName !== 'current') {
+    execSync(`git checkout ${branchName}`);
+  }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 

@@ -1,6 +1,5 @@
 import { getClient } from '../helpers/api-client';
 import { CustomizationService } from '../../app/services/customization';
-import { execSync } from 'child_process';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
