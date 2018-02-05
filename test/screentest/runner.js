@@ -4,7 +4,12 @@ const fs = require('fs');
 
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 const commit = execSync('git log').toString().split('\n')[0].split(' ')[1];
-const currentBranch = execSync(`git branch --contain ${commit}`)
+log(`executing git branch --contain ${commit}`);
+const execResult = execSync(`git branch --contain ${commit}`);
+
+log(execResult);
+
+const currentBranch = execResult
   .toString()
   .split('\n')
   .find(branchInfo => branchInfo.indexOf('HEAD detached ') === -1)
