@@ -12,7 +12,8 @@ test_script:
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
-  - ps: if ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:changed_screens screens have been changed"}
+  - ps: if ($env:changed_screens -gt 0) {Add-AppveyorMessage ":warning: $env:changed_screens screens have been changed"} else { Add-AppveyorMessage ":white_check_mark: no screens changed" }
+
 
 artifacts:
   - path: 'screentest.zip'
