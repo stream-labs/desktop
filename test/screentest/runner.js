@@ -97,7 +97,7 @@ function checkoutBranch(branchName) {
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
     execSync(`git checkout ${branchName}`);
-    execSync(`yarn install`);
+    execSync('yarn install');
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
