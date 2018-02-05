@@ -27,13 +27,6 @@
     "files": [
       "bundles",
       "node_modules",
-      "!node_modules/obs-studio-node/obs-prebuild",
-      "!node_modules/obs-studio-node/logs",
-      "!node_modules/obs-studio-node/build",
-      "!node_modules/obs-studio-node/scripts",
-      "!node_modules/obs-studio-node/src",
-      "!node_modules/obs-studio-node/js",
-      "!node_modules/obs-studio-node/resources",
       "vendor",
       "updater/index.html",
       "updater/Updater.js",
