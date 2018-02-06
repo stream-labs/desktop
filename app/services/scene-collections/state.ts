@@ -250,8 +250,14 @@ export class SceneCollectionsStateService extends StatefulService<
       id,
       name,
       deleted: false,
-      modified
+      modified,
+      needsRename: false
     });
+  }
+
+  @mutation()
+  SET_NEEDS_RENAME(id: string) {
+    this.state.collections.find(coll => coll.id === id).needsRename = true;
   }
 
   @mutation()
@@ -269,6 +275,7 @@ export class SceneCollectionsStateService extends StatefulService<
     const coll = this.state.collections.find(coll => coll.id === id);
     coll.name = name;
     coll.modified = modified;
+    coll.needsRename = false;
   }
 
   @mutation()

@@ -69,4 +69,5 @@ export interface ISceneCollectionsManifestEntry {
   serverId?: number;
   deleted: boolean;
   modified: string;
+  needsRename: boolean;
 }
