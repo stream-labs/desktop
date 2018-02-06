@@ -11,6 +11,7 @@ install:
   - yarn ci:compile
 
 test_script:
+  - yarn test
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
   - ps: $env:warning_ico = ":warning:"
