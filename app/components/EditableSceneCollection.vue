@@ -3,14 +3,22 @@
   class="editable-scene-collection flex flex--center flex--justify-start"
   :class="{ 'editable-scene-collection--selected': selected }">
   <span class="editable-scene-collection--name">
-    <div v-if="renaming">
-      <input type="text" v-model="editableName" />
+    <div v-if="renaming" class="flex flex--center flex--justify-start">
+      <input
+        class="input--transparent"
+        type="text"
+        v-model="editableName" />
       <i class="fa fa-check" @click="submitRename" />
       <i class="fa fa-times" @click="cancelRename" />
     </div>
     <div v-else>
       {{ collection.name }}
     </div>
+  </span>
+  <span
+    class="editable-scene-collection--active"
+    v-if="isActive">
+    Active
   </span>
   <span class="editable-scene-collection--modified">
     Updated {{ modified }}
@@ -19,7 +27,7 @@
     <span @click="startRenaming">Rename</span>
   </a>
   <a class="editable-scene-collection--action editable-scene-collection--action-delete link link--underlined">
-    <span>Delete</span>
+    <span @click="remove">Delete</span>
   </a>
 </div>
 </template>
@@ -36,7 +44,7 @@
   font-size: 14px;
   cursor: pointer;
 
-  >span, >a {
+  span, a, input, i {
     margin-right: 8px;
   }
 
@@ -49,6 +57,11 @@
   }
 }
 
+.editable-scene-collection--active {
+  font-size: 12px;
+  color: @teal;
+}
+
 .editable-scene-collection--action {
   display: none;
 }
@@ -59,6 +72,10 @@
 
 .editable-scene-collection--name {
   color: @white;
+
+  input {
+    font-size: 14px;
+  }
 }
 
 .editable-scene-collection--modified {

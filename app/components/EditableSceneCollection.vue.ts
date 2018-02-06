@@ -12,13 +12,18 @@ export default class EditableSceneCollection extends Vue {
 
   renaming = false;
   editableName = '';
+  deleting = false;
 
   get collection() {
-    return this.sceneCollectionsService.getCollection(this.collectionId);
+    return this.sceneCollectionsService.collections.find(coll => coll.id === this.collectionId);
   }
 
   get modified() {
     return moment(this.collection.modified).fromNow();
+  }
+
+  get isActive() {
+    return this.collection.id === this.sceneCollectionsService.activeCollection.id;
   }
 
   startRenaming() {
@@ -36,7 +41,8 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    // TODO: Implement
+    if (!confirm(`Are you sure you want to remove ${this.collection.name}?`)) return;
+    this.sceneCollectionsService.delete(this.collectionId);
   }
 
 }

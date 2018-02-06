@@ -9,7 +9,8 @@
   <div
     class="modal-layout-content"
     :style="contentStyle">
-    <slot name="content"/>
+    <slot name="content" v-if="!loading"/>
+    <i class="fa fa-spinner fa-pulse" v-else/>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button

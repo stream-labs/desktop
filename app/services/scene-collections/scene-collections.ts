@@ -182,17 +182,26 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Deletes the current scene collection
+   * Deletes a scene collection.  If no id is specified, it
+   * will delete the current collection.
+   * @param id the id of the collection to delete
    */
-  async delete(): Promise<void> {
-    this.startLoadingOperation();
-    await this.deloadCurrentApplicationState();
-    await this.removeCollection(this.activeCollection.id);
+  async delete(id?: string): Promise<void> {
+    id = id || this.activeCollection.id;
 
-    if (this.collections.length > 0) {
-      this.load(this.collections[0].id);
-    } else {
-      this.create();
+    const removingActiveCollection = id === this.activeCollection.id;
+
+    this.removeCollection(id);
+
+    if (removingActiveCollection) {
+      this.startLoadingOperation();
+      await this.deloadCurrentApplicationState();
+
+      if (this.collections.length > 0) {
+        this.load(this.collections[0].id);
+      } else {
+        this.create();
+      }
     }
   }
 
@@ -538,7 +547,7 @@ export class SceneCollectionsService extends Service
   /**
    * Deletes on the server and removes from the store
    */
-  private async removeCollection(id: string) {
+  private removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
 
