@@ -19,7 +19,12 @@ export default class ManageSceneCollections extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
   close() {
+    this.sceneCollectionsService.stateService.flushManifestFile();
     this.windowsService.closeChildWindow();
+  }
+
+  create() {
+    this.sceneCollectionsService.create();
   }
 
   get collections() {

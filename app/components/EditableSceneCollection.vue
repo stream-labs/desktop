@@ -1,15 +1,15 @@
 <template>
-<div
-  class="editable-scene-collection flex flex--center flex--justify-start"
-  :class="{ 'editable-scene-collection--selected': selected }">
+<div class="editable-scene-collection flex flex--center flex--justify-start" @dblclick="makeActive">
   <span class="editable-scene-collection--name">
     <div v-if="renaming" class="flex flex--center flex--justify-start">
       <input
+        ref="rename"
         class="input--transparent"
         type="text"
+        @keypress="handleKeypress"
         v-model="editableName" />
-      <i class="fa fa-check" @click="submitRename" />
-      <i class="fa fa-times" @click="cancelRename" />
+      <i class="fa fa-check" @click.stop="submitRename" />
+      <i class="fa fa-times" @click.stop="cancelRename" />
     </div>
     <div v-else>
       {{ collection.name }}
@@ -20,14 +20,18 @@
     v-if="isActive">
     Active
   </span>
-  <span class="editable-scene-collection--modified">
+  <span class="editable-scene-collection--modified flex--grow">
     Updated {{ modified }}
   </span>
   <a class="editable-scene-collection--action link link--underlined">
-    <span @click="startRenaming">Rename</span>
+    <span @click.stop="startRenaming">Rename</span>
   </a>
+  <a v-if="!duplicating" class="editable-scene-collection--action link link--underlined">
+    <span @click.stop="duplicate">Duplicate</span>
+  </a>
+  <i class="fa fa-spinner fa-pulse" v-else />
   <a class="editable-scene-collection--action editable-scene-collection--action-delete link link--underlined">
-    <span @click="remove">Delete</span>
+    <span @click.stop="remove">Delete</span>
   </a>
 </div>
 </template>
@@ -72,9 +76,17 @@
 
 .editable-scene-collection--name {
   color: @black;
+  max-width: 250px;
+
+  >div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   input {
     font-size: 14px;
+    width: 250px;
   }
 }
 

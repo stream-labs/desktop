@@ -91,28 +91,6 @@ export default class SceneSelector extends Vue {
     this.sceneCollectionsService.load(id);
   }
 
-  addCollection() {
-    this.sceneCollectionsService.showNameConfig();
-  }
-
-
-  duplicateCollection() {
-    this.sceneCollectionsService.showNameConfig({
-      sceneCollectionToDuplicate: this.activeCollection.id
-    });
-  }
-
-
-  renameCollection() {
-    this.sceneCollectionsService.showNameConfig({ rename: true });
-  }
-
-
-  removeCollection() {
-    if (!confirm(`remove ${this.activeCollection.name} ?`)) return;
-    this.sceneCollectionsService.delete();
-  }
-
   manageCollections() {
     this.sceneCollectionsService.showManageWindow();
   }

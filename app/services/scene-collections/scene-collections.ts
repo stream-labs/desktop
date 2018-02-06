@@ -231,15 +231,17 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Duplicates the current scene collection and switch
-   * to it.
+   * Duplicates a scene collection.
    * @param name the name of the new scene collection
    */
-  async duplicate(name: string) {
-    await this.save();
-    const id = uuid();
-    await this.insertCollection(id, name);
-    await this.setActiveCollection(id);
+  async duplicate(name: string, id?: string) {
+    this.disableAutoSave();
+
+    id = id || this.activeCollection.id;
+    const newId = uuid();
+    await this.stateService.copyCollectionFile(id, newId);
+    await this.insertCollection(newId, name);
+    this.enableAutoSave();
   }
 
   /**
@@ -324,7 +326,7 @@ export class SceneCollectionsService extends Service
     this.windowsService.showWindow({
       componentName: 'ManageSceneCollections',
       size: {
-        width: 600,
+        width: 700,
         height: 800
       }
     });

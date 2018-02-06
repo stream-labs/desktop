@@ -12,7 +12,11 @@ export default class EditableSceneCollection extends Vue {
 
   renaming = false;
   editableName = '';
-  deleting = false;
+  duplicating = false;
+
+  $refs: {
+    rename: HTMLInputElement;
+  };
 
   get collection() {
     return this.sceneCollectionsService.collections.find(coll => coll.id === this.collectionId);
@@ -26,9 +30,30 @@ export default class EditableSceneCollection extends Vue {
     return this.collection.id === this.sceneCollectionsService.activeCollection.id;
   }
 
+  handleKeypress(e: KeyboardEvent) {
+    if (e.code === 'Enter') this.submitRename();
+  }
+
+  makeActive() {
+    this.sceneCollectionsService.load(this.collection.id);
+  }
+
+  duplicate() {
+    this.duplicating = true;
+
+    setTimeout(() => {
+      this.sceneCollectionsService.duplicate(this.collection.name, this.collection.id).then(() => {
+        this.duplicating = false;
+      }).catch(() => {
+        this.duplicating = false;
+      });
+    }, 500);
+  }
+
   startRenaming() {
     this.renaming = true;
     this.editableName = this.collection.name;
+    this.$nextTick(() => this.$refs.rename.focus());
   }
 
   submitRename() {

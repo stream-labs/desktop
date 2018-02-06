@@ -32,7 +32,11 @@ export class SceneCollectionsStateService extends StatefulService<
   };
 
   get collections() {
-    return this.state.collections.filter(coll => !coll.deleted);
+    return this.state.collections.filter(coll => !coll.deleted).sort((a, b) => {
+      if (a.name < b.name) return -1;
+      if (a.name > b.name) return 1;
+      return 0;
+    });
   }
 
   get activeCollection() {
@@ -165,6 +169,24 @@ export class SceneCollectionsStateService extends StatefulService<
 
         resolve();
       });
+    });
+  }
+
+  /**
+   * Copies a collection file
+   * @param sourceId the scene collection to copy
+   * @param destId the scene collection to copy to
+   */
+  copyCollectionFile(sourceId: string, destId: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const rd = fs.createReadStream(this.getCollectionFilePath(sourceId));
+      const wr = fs.createWriteStream(this.getCollectionFilePath(destId));
+
+      rd.on('error', err => reject(err));
+      wr.on('error', err => reject(err));
+      wr.on('close', () => resolve());
+
+      rd.pipe(wr);
     });
   }
 
