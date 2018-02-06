@@ -6,6 +6,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
 import EditableSceneCollection from 'components/EditableSceneCollection.vue';
+import Fuse from 'fuse.js';
 
 @Component({
   mixins: [windowMixin],
@@ -18,6 +19,8 @@ export default class ManageSceneCollections extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
+  searchQuery = '';
+
   close() {
     this.sceneCollectionsService.stateService.flushManifestFile();
     this.windowsService.closeChildWindow();
@@ -28,7 +31,18 @@ export default class ManageSceneCollections extends Vue {
   }
 
   get collections() {
-    return this.sceneCollectionsService.collections;
+    const list = this.sceneCollectionsService.collections;
+
+    if (this.searchQuery) {
+      const fuse = new Fuse(list, {
+        shouldSort: true,
+        keys: ['name']
+      });
+
+      return fuse.search(this.searchQuery);
+    }
+
+    return list;
   }
 
 }
