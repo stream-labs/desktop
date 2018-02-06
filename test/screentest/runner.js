@@ -86,7 +86,9 @@ function checkoutBranch(branchName) {
   const branchPath = `${CONFIG.dist}/${branchName}`;
   if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
   if (branchName !== 'current') {
+    log(`checkout ${branchName}`);
     execSync(`git checkout ${branchName}`);
+    log('run yarn install');
     execSync('yarn install');
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
