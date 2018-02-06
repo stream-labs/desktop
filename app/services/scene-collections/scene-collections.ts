@@ -178,6 +178,7 @@ export class SceneCollectionsService extends Service
 
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
+    this.stateService.SET_NEEDS_RENAME(id);
     this.finishLoadingOperation();
   }
 
@@ -241,6 +242,7 @@ export class SceneCollectionsService extends Service
     const newId = uuid();
     await this.stateService.copyCollectionFile(id, newId);
     await this.insertCollection(newId, name);
+    this.stateService.SET_NEEDS_RENAME(newId);
     this.enableAutoSave();
   }
 

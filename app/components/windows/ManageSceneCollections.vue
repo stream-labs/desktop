@@ -8,6 +8,7 @@
       <i class="fa fa-plus icon--margin" />
       Create New
     </div>
+    <input type="text" placeholder="Search" v-model="searchQuery" />
     <editable-scene-collection
       v-for="collection in collections"
       :key="collection.id"

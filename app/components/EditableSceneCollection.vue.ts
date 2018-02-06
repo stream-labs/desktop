@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Inject } from 'util/injector';
 import moment from 'moment';
@@ -17,6 +17,19 @@ export default class EditableSceneCollection extends Vue {
   $refs: {
     rename: HTMLInputElement;
   };
+
+  mounted() {
+    if (this.collection.needsRename) this.startRenaming();
+  }
+
+  get needsRename() {
+    return this.collection.needsRename;
+  }
+
+  @Watch('needsRename')
+  onNeedsRenamedChanged(newVal: boolean) {
+    if (newVal) this.startRenaming();
+  }
 
   get collection() {
     return this.sceneCollectionsService.collections.find(coll => coll.id === this.collectionId);
