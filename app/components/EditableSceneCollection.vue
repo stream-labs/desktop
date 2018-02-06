@@ -44,7 +44,7 @@
 .editable-scene-collection {
   height: 35px;
   padding: 5px;
-
+  .radius;
   font-size: 14px;
   cursor: pointer;
 

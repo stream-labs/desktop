@@ -5,7 +5,7 @@
   :done-handler="close">
   <div slot="content">
     <div class="manage-scene-collections--new" @click="create">
-      <i class="fa fa-plus" />
+      <i class="fa fa-plus icon--margin" />
       Create New
     </div>
     <editable-scene-collection
