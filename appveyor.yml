@@ -11,8 +11,10 @@ install:
 test_script:
   - yarn screentest
   - 7z a screentest.zip test-dist\screentest\*
+  - ps: $env:warning_ico = ":warning:"
+  - ps: $env:success_ico = ":white_check_mark:"
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
-  - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage "&#58;warning&#58; $env:changed_screens screens have been changed"} else { Add-AppveyorMessage "&#58;white_check_mark&#58; no screens changed" }
+  - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage $env:warning_ico $env:changed_screens screens have been changed"} else { Add-AppveyorMessage $env:success_ico no screens changed" }
 
 artifacts:
   - path: 'screentest.zip'
@@ -20,4 +22,4 @@ artifacts:
 
 notifications:
   - provider: GitHubPullRequest
-    template: "Build messages: {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
+    template: "{{#fail}}:x: build failed{{/fail}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
