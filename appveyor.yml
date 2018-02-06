@@ -14,7 +14,7 @@ test_script:
   - ps: $env:warning_ico = ":warning:"
   - ps: $env:success_ico = ":white_check_mark:"
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
-  - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage $env:warning_ico $env:changed_screens screens have been changed"} else { Add-AppveyorMessage $env:success_ico no screens changed" }
+  - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:warning_ico $env:changed_screens screens have been changed"} else { Add-AppveyorMessage "$env:success_ico no screens changed" }
 
 artifacts:
   - path: 'screentest.zip'
