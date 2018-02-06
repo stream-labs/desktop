@@ -49,7 +49,7 @@
   }
 
   &:hover {
-    background: @night-accent-light;
+    background: @day-hover;
 
     .editable-scene-collection--action {
       display: inline;
@@ -71,7 +71,7 @@
 }
 
 .editable-scene-collection--name {
-  color: @white;
+  color: @black;
 
   input {
     font-size: 14px;
@@ -80,5 +80,17 @@
 
 .editable-scene-collection--modified {
   font-size: 12px;
+}
+
+.night-theme {
+  .editable-scene-collection {
+    &:hover {
+      background: @night-hover;
+    }
+  }
+
+  .editable-scene-collection--name {
+    color: @white;
+  }
 }
 </style>
