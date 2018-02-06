@@ -9,6 +9,7 @@
         <div class="dropdown-menu__item" @click="duplicateCollection">Duplicate</div>
         <div class="dropdown-menu__item" @click="renameCollection">Rename</div>
         <div class="dropdown-menu__item" @click="removeCollection">Remove</div>
+        <div class="dropdown-menu__item" @click="manageCollections">Manage</div>
         <div class="dropdown-menu__separator"></div>
         <div
           v-for="sceneCollection in sceneCollections"
