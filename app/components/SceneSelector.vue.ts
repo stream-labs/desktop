@@ -113,6 +113,10 @@ export default class SceneSelector extends Vue {
     this.sceneCollectionsService.delete();
   }
 
+  manageCollections() {
+    this.sceneCollectionsService.showManageWindow();
+  }
+
   get helpTipDismissable() {
     return EDismissable.SceneCollectionsHelpTip;
   }

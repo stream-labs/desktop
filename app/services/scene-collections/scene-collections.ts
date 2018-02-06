@@ -197,12 +197,13 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Renames the current scene collection
+   * Renames a scene collection.
    * @param name the name of the new scene collection
+   * @param id if not present, will operate on the current collection
    */
-  rename(name: string) {
+  rename(name: string, id?: string) {
     this.stateService.RENAME_COLLECTION(
-      this.activeCollection.id,
+      id || this.activeCollection.id,
       name,
       new Date().toISOString()
     );
@@ -305,6 +306,27 @@ export class SceneCollectionsService extends Service
         height: 250
       }
     });
+  }
+
+  /**
+   * Show the window to manage scene collections
+   */
+  showManageWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ManageSceneCollections',
+      size: {
+        width: 600,
+        height: 800
+      }
+    });
+  }
+
+  /**
+   * Returns the collection with the specified id
+   * @param id the id of the collection
+   */
+  getCollection(id: string) {
+    return this.collections.find(coll => coll.id === id);
   }
 
   /**
