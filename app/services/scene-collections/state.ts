@@ -32,11 +32,7 @@ export class SceneCollectionsStateService extends StatefulService<
   };
 
   get collections() {
-    return this.state.collections.filter(coll => !coll.deleted).sort((a, b) => {
-      if (a.name < b.name) return -1;
-      if (a.name > b.name) return 1;
-      return 0;
-    });
+    return this.state.collections.filter(coll => !coll.deleted);
   }
 
   get activeCollection() {
@@ -250,7 +246,7 @@ export class SceneCollectionsStateService extends StatefulService<
 
   @mutation()
   ADD_COLLECTION(id: string, name: string, modified: string) {
-    this.state.collections.push({
+    this.state.collections.unshift({
       id,
       name,
       deleted: false,
