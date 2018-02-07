@@ -5305,9 +5305,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.9/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.9/streamlabs-x86_64-signed.tar.gz#3700d2c6164e9ae7ae5fa7d71e9c5f45031f632e"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz#470268fd7a2d399f3d0e9dd623b21cde7ce0b2dd"
   dependencies:
     nan "^2.8.0"
 
@@ -5643,7 +5643,7 @@ pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
 
-pngjs@^3.0.0:
+pngjs@^3.0.0, pngjs@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-3.3.1.tgz#8e14e6679ee7424b544334c3b2d21cea6d8c209a"
 

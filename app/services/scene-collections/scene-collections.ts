@@ -167,7 +167,7 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(options?: ISceneCollectionCreateOptions): Promise<void> {
+  async create(options: ISceneCollectionCreateOptions = {}): Promise<void> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 

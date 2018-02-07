@@ -5,22 +5,31 @@ const fs = require('fs');
 const CONFIG = JSON.parse(fs.readFileSync('test/screentest/config.json'));
 
 const branches = [
-  execSync('git status').toString().replace('On branch ', '').split('\n')[0],
+  'current',
   CONFIG.baseBranch
 ];
 
 (function main() {
 
+  log('use branches', branches);
+
   const dir = CONFIG.dist;
   rimraf.sync(dir);
-  fs.mkdirSync(dir);
+
+  // create dir
+  let currentPath = '';
+  dir.split('/').forEach(dirName => {
+    currentPath += dirName;
+    if (!fs.existsSync(currentPath)) fs.mkdirSync(currentPath);
+    currentPath += '/';
+  });
+
 
 
   for (const branchName of branches) {
 
-    execSync(`git checkout ${branchName}`);
+    checkoutBranch(branchName);
 
-    fs.mkdirSync(`${dir}/${branchName}`);
 
     log('project compilation');
     try {
@@ -49,7 +58,8 @@ const branches = [
 
   }
 
-  execSync(`git checkout ${branches[0]}`);
+  checkoutBranch(branches[0]);
+
 
   log('comparing screenshots');
   try {
@@ -61,7 +71,7 @@ const branches = [
 
 })();
 
-execSync(`git checkout ${branches[0]}`);
+checkoutBranch(branches[0]);
 
 
 function log(...args) {
@@ -70,5 +80,17 @@ function log(...args) {
 
 function err(...args) {
   console.error(...args);
+}
+
+function checkoutBranch(branchName) {
+  const branchPath = `${CONFIG.dist}/${branchName}`;
+  if (!fs.existsSync(branchPath)) fs.mkdirSync(branchPath);
+  if (branchName !== 'current') {
+    log(`checkout ${branchName}`);
+    execSync(`git checkout ${branchName}`);
+    log('run yarn install');
+    execSync('yarn install');
+  }
+  fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }
 
