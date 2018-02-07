@@ -1,13 +1,11 @@
 import { getClient } from '../helpers/api-client';
 import { CustomizationService } from '../../app/services/customization';
-import { execSync } from 'child_process';
 import { getConfigsVariations, getConfig } from './utils';
 import test from 'ava';
 import { sleep } from '../helpers/sleep';
 import { focusChild } from '../helpers/spectron/index';
-import { PerformanceService } from "../../app/services/performance";
-import { ISourcesServiceApi } from "../../app/services/sources/sources-api";
-import { IAudioServiceApi } from "../../app/services/audio/audio-api";
+import { PerformanceService } from '../../app/services/performance';
+import { IAudioServiceApi } from '../../app/services/audio/audio-api';
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -70,8 +68,7 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
     await t.context.app.browserWindow.capturePage().then((imageBuffer: ArrayBuffer) => {
       const testName = t['_test'].title.replace('afterEach for ', '');
       const imageFileName = `${testName}__${configInd}.png`;
-      const dir = `${CONFIG.dist}/${branchName}`;
-      fs.writeFileSync(`${dir}/${imageFileName}`, imageBuffer);
+      fs.writeFileSync(`${CONFIG.dist}/${branchName}/${imageFileName}`, imageBuffer);
     });
   }
 
@@ -83,7 +80,12 @@ interface IScreentestOptions {
 
 export function useScreentest(options: IScreentestOptions = { window: 'main' }) {
 
-  branchName = execSync('git status').toString().replace('On branch ', '').split('\n')[0];
+  const currentBranchFile = `${CONFIG.dist}/current-branch.txt`;
+  if (fs.existsSync(currentBranchFile)) {
+    branchName = fs.readFileSync(currentBranchFile).toString();
+  } else {
+    branchName = CONFIG.baseBranch;
+  }
 
   test.afterEach(async t => {
     await makeScreenshots(t, options);
