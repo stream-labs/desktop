@@ -155,11 +155,11 @@ export class CustomizationService
     ];
   }
 
-  getExperimentalSettings(): TFormData {
+  getExperimentalSettingsFormData(): TFormData {
     const settings = this.getSettings();
     return [
       <IFormInput<boolean>> {
-        value: settings.nightMode,
+        value: settings.experimental.multiselect,
         name: 'multiselect',
         description: 'Multiple Selection',
         type: 'OBS_PROPERTY_BOOL',

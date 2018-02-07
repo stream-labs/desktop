@@ -11,6 +11,7 @@ import {
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelectionServiceApi } from './selection-api';
+import { CustomizationService } from 'services/customization';
 
 interface ISelectionServiceState {
   lastSelectedId: string;
@@ -28,8 +29,8 @@ export class SelectionService
     lastSelectedId: ''
   };
 
-  @Inject()
-  private scenesService: ScenesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private customizationService: CustomizationService;
 
   init() {
     this.scenesService.sceneSwitched.subscribe(() => {
@@ -51,6 +52,11 @@ export class SelectionService
     const scene = this.getScene();
     const activeObsIds: number[] = [];
 
+    // multiselection is experimental feature
+    if (!this.customizationService.state.experimental.multiselect) {
+      ids = [ids[ids.length - 1]];
+    }
+
     // omit ids that are not presented on the activeScene
     ids = ids.filter(id => {
       const item = scene.getItem(id);
@@ -58,6 +64,7 @@ export class SelectionService
       activeObsIds.push(item.obsSceneItemId);
       return true;
     });
+
 
     // tell OBS which sceneItems are selected
     scene.getObsScene().getItems().forEach(obsSceneItem => {

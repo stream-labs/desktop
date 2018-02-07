@@ -63,10 +63,18 @@ export class EditMenu extends Menu {
         click: () => this.clipboardService.copy()
       });
 
-      this.append({
-        label: 'Invert Selection',
-        click: () => this.selectionService.invert()
-      });
+      if (this.customizationService.state.experimental.multiselect) {
+        this.append({
+          label: 'Select All',
+          accelerator: 'CommandOrControl+A',
+          click: () => this.selectionService.selectAll()
+        });
+        this.append({
+          label: 'Invert Selection',
+          click: () => this.selectionService.invert()
+        });
+      }
+
 
       this.append({ type: 'separator' });
 

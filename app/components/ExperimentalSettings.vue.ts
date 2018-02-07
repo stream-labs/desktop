@@ -16,7 +16,7 @@ export default class ExperimentalSettings extends Vue {
 
 
   created() {
-    this.settingsFormData = this.customizationService.getSettingsFormData();
+    this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
   }
 
 
@@ -26,7 +26,7 @@ export default class ExperimentalSettings extends Vue {
       settings[formInput.name] = formInput.value;
     });
     this.customizationService.setSettings({ experimental: settings });
-    this.settingsFormData = this.customizationService.get();
+    this.settingsFormData = this.customizationService.getExperimentalSettingsFormData();
   }
 
 }

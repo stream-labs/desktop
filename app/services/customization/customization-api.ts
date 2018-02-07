@@ -23,6 +23,6 @@ export interface ICustomizationServiceApi {
   setSettings(settingsPatch: Partial<ICustomizationSettings>): void;
   getSettings(): ICustomizationSettings;
   getSettingsFormData(): TFormData;
-  getExperimentalSettings(): TFormData;
+  getExperimentalSettingsFormData(): TFormData;
   restoreDefaults(): void;
 }
