@@ -2,10 +2,16 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { ISelectionServiceApi } from '../../app/services/selection/selection-api';
+import { ISelectionServiceApi } from '../../app/services/selection';
+import { ICustomizationServiceApi } from '../../app/services/customization';
 
 useSpectron({ restartAppAfterEachTest: false });
 
+test.beforeEach(async t => {
+  const client = await getClient();
+  const customizationService = client.getResource<ICustomizationServiceApi>('CustomizationService');
+  customizationService.setSettings({ experimental: { multiselect: true } });
+});
 
 test('Selection', async t => {
   const client = await getClient();
