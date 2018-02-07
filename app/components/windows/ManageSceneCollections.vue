@@ -4,11 +4,16 @@
   :show-cancel="false"
   :done-handler="close">
   <div slot="content">
-    <div class="manage-scene-collections--new" @click="create">
-      <i class="fa fa-plus icon--margin" />
-      Create New
+    <div class="manage-scene-collections__header">
+      <div class="input-wrapper input-wrapper--search">
+        <input class="input--search" type="text" placeholder="Search" v-model="searchQuery" />
+      </div>
+
+      <button class="button button--action" @click="create">
+        <i class="fa fa-plus" />
+        Create New
+      </button>
     </div>
-    <input type="text" placeholder="Search" v-model="searchQuery" />
     <editable-scene-collection
       v-for="collection in collections"
       :key="collection.id"
@@ -22,15 +27,15 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.manage-scene-collections--new {
-  font-size: 14px;
-  height: 35px;
-  padding: 5px;
-  cursor: pointer;
+.manage-scene-collections__header {
+  margin-bottom: 20px;
+  .flex;
+  .flex--space-between;
+  align-items: center;
+}
 
-  &:hover {
-    background: @day-hover;
-  }
+.input-wrapper--search {
+  width: 50%;
 }
 
 .night-theme {
