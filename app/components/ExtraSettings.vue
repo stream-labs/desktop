@@ -23,6 +23,10 @@
     <button class="button button--action" @click="restartStreamlabelsSession">
       Restart Streamlabels Session
     </button>
+    <br/>
+    <button class="button button--action" @click="runAutoOptimizer" v-if="isTwitch && !isRecordingOrStreaming">
+      Run Auto Optimizer
+    </button>
   </div>
 </div>
 </template>
