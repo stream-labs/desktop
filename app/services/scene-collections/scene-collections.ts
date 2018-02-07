@@ -800,7 +800,7 @@ export class SceneCollectionsService extends Service
           const name = parsed['activeCollection'];
           const collection = this.collections.find(coll => coll.name === name);
 
-          await this.setActiveCollection(collection.id);
+          if (collection) await this.setActiveCollection(collection.id);
         }
       }
     }
