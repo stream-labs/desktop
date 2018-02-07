@@ -44,7 +44,7 @@
 .editable-scene-collection {
   height: 35px;
   padding: 5px;
-
+  .radius;
   font-size: 14px;
   cursor: pointer;
 
@@ -75,8 +75,7 @@
 }
 
 .editable-scene-collection--name {
-  color: @black;
-  max-width: 250px;
+  max-width: 230px;
 
   >div {
     white-space: nowrap;
@@ -97,12 +96,16 @@
 .night-theme {
   .editable-scene-collection {
     &:hover {
-      background: @night-hover;
+      background-color: @night-hover;
     }
   }
 
   .editable-scene-collection--name {
     color: @white;
+
+    input {
+      background: transparent;
+    }
   }
 }
 </style>
