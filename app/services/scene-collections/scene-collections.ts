@@ -24,7 +24,8 @@ import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
   ISceneCollectionSchema,
-  ISceneCollectionsServiceApi
+  ISceneCollectionsServiceApi,
+  ISceneCollectionCreateOptions
 } from '.';
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
@@ -69,6 +70,8 @@ export class SceneCollectionsService extends Service
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
   collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
+  collectionWillSwitch = new Subject<void>();
+  collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
    * Whether the service has been initialized
@@ -164,22 +167,22 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(name?: string, setupFunction?: () => void): Promise<void> {
+  async create(options?: ISceneCollectionCreateOptions): Promise<void> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
-    if (setupFunction && setupFunction()) {
+    if (options.setupFunction && options.setupFunction()) {
       // Do nothing
     } else {
       this.setupEmptyCollection();
     }
 
-    name = name || this.suggestName(DEFAULT_COLLECTION_NAME);
+    const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id: string = uuid();
 
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
-    this.stateService.SET_NEEDS_RENAME(id);
+    if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
     this.finishLoadingOperation();
   }
 
@@ -218,6 +221,7 @@ export class SceneCollectionsService extends Service
       name,
       new Date().toISOString()
     );
+    this.collectionUpdated.next(this.getCollection(id));
   }
 
   /**
@@ -475,6 +479,8 @@ export class SceneCollectionsService extends Service
    */
   private async deloadCurrentApplicationState() {
     if (!this.initialized) return;
+
+    this.collectionWillSwitch.next();
 
     this.disableAutoSave();
     await this.save();
