@@ -6,7 +6,7 @@ import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
-import { ISettingsServiceApi, ISettingsState, ISettingsSubCategory } from '../../services/settings';
+import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
@@ -14,6 +14,7 @@ import Hotkeys from '../Hotkeys.vue';
 import OverlaySettings from 'components/OverlaySettings.vue';
 import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
+import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 
 @Component({
   components: {
@@ -26,7 +27,8 @@ import AppearanceSettings from 'components/AppearanceSettings.vue';
     ApiSettings,
     OverlaySettings,
     NotificationsSettings,
-    AppearanceSettings
+    AppearanceSettings,
+    ExperimentalSettings
   },
   mixins: [windowMixin]
 })
@@ -51,7 +53,8 @@ export default class SceneTransitions extends Vue {
     API: 'file-code-o',
     Overlays: 'picture-o',
     Notifications: 'warning',
-    Appearance: 'television '
+    Appearance: 'television',
+    Experimental: 'flask'
   };
 
   get categoryNames() {
