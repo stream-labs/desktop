@@ -1,5 +1,5 @@
 {
-  "baseBranch": "regression_testing_screenshots_example",
+  "baseBranch": "staging",
   "dist": "test-dist/screentest",
   "configs": {
     "resolution": {
