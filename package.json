@@ -111,6 +111,7 @@
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "pixelmatch": "^4.0.2",
+    "pngjs": "^3.3.1",
     "progress": "^2.0.0",
     "raven-js": "^3.20.1",
     "rxjs": "^5.4.3",
