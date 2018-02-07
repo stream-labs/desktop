@@ -27,7 +27,7 @@ export default class ManageSceneCollections extends Vue {
   }
 
   create() {
-    this.sceneCollectionsService.create();
+    this.sceneCollectionsService.create({ needsRename: true });
   }
 
   get collections() {
