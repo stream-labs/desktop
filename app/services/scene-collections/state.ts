@@ -50,7 +50,7 @@ export class SceneCollectionsStateService extends StatefulService<
         collections: []
       });
       await this.ensureDirectory();
-      this.flushManifestFile();
+      await this.flushManifestFile();
     } else {
       // Do nothing.
       // Local files will be synced up to the server
