@@ -13,26 +13,29 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
 
   abstract getItems(context: TContext): TItem[];
 
-  save(context: TContext): Promise<void> {
-    return new Promise(resolve => {
-      Promise.all(this.getItems(context).map(item => {
-        return this.saveItem(item, context);
-      })).then(values => {
-        this.data = { items: compact(values) };
-        resolve();
-      });
-    });
+  async save(context: TContext): Promise<void> {
+    const values = await Promise.all(this.getItems(context).map(item => {
+      return this.saveItem(item, context);
+    }));
+
+    this.data = { items: compact(values) };
   }
 
-  load(context: TContext): Promise<void> {
-    return new Promise(resolve => {
-      Promise.all(this.data.items.map(item => {
-        return this.loadItem(item, context);
-      })).then((afterLoadItemsCallbacks) => {
-        Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()))
-          .then(() => resolve());
-      });
-    });
+  async load(context: TContext): Promise<void> {
+    await this.beforeLoad(context);
+
+    const afterLoadItemsCallbacks = await Promise.all(this.data.items.map(item => {
+      return this.loadItem(item, context);
+    }));
+
+    await Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()));
+  }
+
+  /**
+   * Can be called before loading to do some data munging
+   * @param context the context
+   */
+  async beforeLoad(context: TContext): Promise<void> {
   }
 
 }

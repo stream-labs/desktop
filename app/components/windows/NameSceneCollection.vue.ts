@@ -40,7 +40,7 @@ export default class NameSceneCollection extends Vue {
       this.sceneCollectionsService.duplicate(this.name);
       this.windowsService.closeChildWindow();
     } else {
-      this.sceneCollectionsService.create(this.name);
+      this.sceneCollectionsService.create({ name: this.name });
       this.windowsService.closeChildWindow();
     }
   }

@@ -4,11 +4,14 @@
 
     <div class="scene-collections-wrapper">
 
-      <DropdownMenu :title="activeCollection.name">
-        <div class="dropdown-menu__item" @click="addCollection">New</div>
-        <div class="dropdown-menu__item" @click="duplicateCollection">Duplicate</div>
-        <div class="dropdown-menu__item" @click="renameCollection">Rename</div>
-        <div class="dropdown-menu__item" @click="removeCollection">Remove</div>
+      <DropdownMenu class="scene-collections__dropdown" :title="activeCollection.name">
+        <div class="input-wrapper input-wrapper--search">
+          <input class="input--search" type="text" placeholder="Search" v-model="searchQuery" />
+        </div>
+
+        <div class="link link--pointer" @click="manageCollections">
+          Manage All
+        </div>
         <div class="dropdown-menu__separator"></div>
         <div
           v-for="sceneCollection in sceneCollections"
@@ -65,5 +68,14 @@
   position: relative;
   display: flex;
   align-items: center;
+}
+
+.input-wrapper--search {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.scene-collections__dropdown {
+  min-width: 200px;
 }
 </style>

@@ -166,7 +166,24 @@ export class SourcesNode extends Node<ISchema, {}> {
     source.updateSettings({ font: settings.font });
   }
 
+  /**
+   * Do some data sanitizing
+   */
+  sanitizeIds() {
+    // Look for duplicate ids
+    const ids: Dictionary<boolean> = {};
+
+    this.data.items = this.data.items.filter(item => {
+      if (ids[item.id]) return false;
+
+      ids[item.id] = true;
+      return true;
+    });
+  }
+
   load(context: {}): Promise<void> {
+    this.sanitizeIds();
+
     // This shit is complicated, IPC sucks
     const sourceCreateData = this.data.items.map(source => {
       return {

@@ -67,18 +67,21 @@ export class ObsImporterService extends Service {
       fs.readFileSync(sceneCollectionPath).toString()
     );
 
-    await this.sceneCollectionsService.create(collection.name, () => {
-      this.importSources(configJSON);
-      this.importScenes(configJSON);
-      this.importSceneOrder(configJSON);
-      this.importMixerSources(configJSON);
-      this.importTransitions(configJSON);
+    await this.sceneCollectionsService.create({
+      name: collection.name,
+      setupFunction: () => {
+        this.importSources(configJSON);
+        this.importScenes(configJSON);
+        this.importSceneOrder(configJSON);
+        this.importMixerSources(configJSON);
+        this.importTransitions(configJSON);
 
-      if (this.scenesService.scenes.length === 0) {
-        return false;
+        if (this.scenesService.scenes.length === 0) {
+          return false;
+        }
+
+        return true;
       }
-
-      return true;
     });
   }
 

@@ -104,6 +104,7 @@
     "eslint-plugin-react": "^6.10.3",
     "eslint-plugin-vue": "^2.0.1",
     "file-loader": "^1.1.6",
+    "fuse.js": "^3.2.0",
     "js-yaml": "^3.8.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",

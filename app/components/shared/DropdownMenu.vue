@@ -23,7 +23,7 @@
   background-color: @day-primary;
   .border;
   .radius;
-  padding: 6px 12px;
+  padding: 10px;
   max-height: 166px;
   overflow-y: auto;
   transform: none!important;
@@ -50,7 +50,7 @@
   height: 1px;
   background-color: @grey;
   opacity: .2;
-  margin: 4px 0;
+  margin: 10px 0;
 }
 
 .dropdown-menu__item {
