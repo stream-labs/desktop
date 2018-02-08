@@ -18,9 +18,58 @@ test('Sources showcase window', async t => {
 });
 
 
-test('Settings window', async t => {
+test('Settings General', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
   settingsService.showSettings();
+  t.pass();
+});
+
+test('Settings Stream', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Stream');
+  t.pass();
+});
+
+test('Settings Output', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Output');
+  t.pass();
+});
+
+test('Settings Video', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Video');
+  t.pass();
+});
+
+test('Settings Hotkeys', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Hotkeys');
+  t.pass();
+});
+
+test('Settings Overlays', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Overlays');
+  t.pass();
+});
+
+test('Settings Notifications', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Notifications');
+  t.pass();
+});
+
+test('Settings Appearance', async t => {
+  const client = await getClient();
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
+  settingsService.showSettings('Appearance');
   t.pass();
 });
