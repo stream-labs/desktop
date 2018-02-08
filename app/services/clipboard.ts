@@ -4,70 +4,75 @@ import { SourcesService } from './sources';
 import { shortcut } from './shortcuts';
 import { Inject } from '../util/injector';
 import { SourceFiltersService } from './source-filters';
+import { SelectionService } from 'services/selection';
 
 
 interface IClipboardState {
-  sourcesIds: string[];
-  filtersIds: string[];
+  sceneItemIds: string[];
+  filterIds: string[];
 }
 
 export class ClipboardService extends StatefulService<IClipboardState> {
 
   static initialState: IClipboardState = {
-    sourcesIds: [],
-    filtersIds: []
+    sceneItemIds: [],
+    filterIds: []
   };
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-  @Inject()
-  private sourceFiltersService: SourceFiltersService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private sourceFiltersService: SourceFiltersService;
+  @Inject() private selectionService: SelectionService;
 
   @shortcut('Ctrl+C')
   copy() {
-    const source = this.scenesService.activeScene.activeItems[0];
-    if (!source) return;
-    this.SET_SOURCES_IDS([source.sourceId]);
+    this.SET_SCENE_ITEMS_IDS(this.selectionService.getIds());
   }
 
 
   @shortcut('Ctrl+V')
   pasteReference() {
-    this.state.sourcesIds.forEach(sourceId => {
-      const source = this.sourcesService.getSource(sourceId);
-      if (!source) return;
-      this.scenesService.activeScene.addSource(sourceId);
+    const insertedIds: string[] = [];
+    const scene = this.scenesService.activeScene;
+    this.state.sceneItemIds.forEach(sceneItemId => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+      if (!sceneItem) return;
+      const insertedItem = scene.addSource(sceneItem.sourceId);
+      insertedItem.setSettings(sceneItem.getSettings());
+      insertedIds.push(insertedItem.sceneItemId);
     });
+    if (insertedIds.length) this.selectionService.select(insertedIds);
   }
 
 
   pasteDuplicate() {
-    this.state.sourcesIds.forEach(sceneItemId => {
-      const source = this.sourcesService.getSource(sceneItemId);
-      if (!source) return;
-      const duplicatedSource = source.duplicate();
+    const insertedIds: string[] = [];
+    const scene = this.scenesService.activeScene;
+    this.state.sceneItemIds.forEach(sceneItemId => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+      if (!sceneItem) return;
+      const duplicatedSource = sceneItem.getSource().duplicate();
       if (!duplicatedSource) {
-        alert(`Unable to duplicate ${source.name}`);
+        alert(`Unable to duplicate ${sceneItem.name}`);
         return;
       }
-      this.scenesService.activeScene.addSource(duplicatedSource.sourceId);
+      const insertedItem = scene.addSource(duplicatedSource.sourceId);
+      insertedItem.setSettings(sceneItem.getSettings());
+      insertedIds.push(insertedItem.sceneItemId);
     });
+    if (insertedIds.length) this.selectionService.select(insertedIds);
   }
 
 
   copyFilters() {
-    const source = this.scenesService.activeScene.activeItems[0];
+    const source = this.selectionService.getLastSelected();
     if (!source) return;
     this.SET_FILTERS_IDS([source.sourceId]);
   }
 
 
   pasteFilters(toSourceId: string) {
-    this.state.filtersIds.forEach(fromSourceId => {
+    this.state.filterIds.forEach(fromSourceId => {
       const fromSource = this.sourcesService.getSource(fromSourceId);
       if (!fromSource) return;
       this.sourceFiltersService.copyFilters(fromSource.sourceId, toSourceId);
@@ -75,23 +80,23 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   }
 
 
-  hasSources() {
-    return !!this.state.sourcesIds.length;
+  hasItems() {
+    return !!this.state.sceneItemIds.length;
   }
 
 
   hasFilters() {
-    return !!this.state.filtersIds.length;
+    return !!this.state.filterIds.length;
   }
 
 
   @mutation()
-  private SET_SOURCES_IDS(sourcesIds: string[]) {
-    this.state.sourcesIds = sourcesIds;
+  private SET_SCENE_ITEMS_IDS(ids: string[]) {
+    this.state.sceneItemIds = ids;
   }
 
   @mutation()
   private SET_FILTERS_IDS(filtersIds: string[]) {
-    this.state.filtersIds = filtersIds;
+    this.state.filterIds = filtersIds;
   }
 }

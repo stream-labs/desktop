@@ -35,6 +35,21 @@
   }
 }
 
+.input-wrapper--search {
+  position: relative;
+
+  &:after {
+    content: '\f002';
+    font-family: FontAwesome;
+    .absolute(@top: 0, @right: 8px, @bottom: 0);
+    line-height: 36px;
+  }
+}
+
+.input--search {
+  padding: 0 30px 0 8px;
+}
+
 input[type=text],
 input[type="password"],
 textarea {

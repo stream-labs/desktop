@@ -43,6 +43,21 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
     });
   }
 
+  /**
+   * Do some data sanitizing
+   */
+  async beforeLoad() {
+    // Look for duplicate ids
+    const ids: Dictionary<boolean> = {};
+
+    this.data.items = this.data.items.filter(item => {
+      if (ids[item.id]) return false;
+
+      ids[item.id] = true;
+      return true;
+    });
+  }
+
   loadItem(obj: ISceneSchema): Promise<() => Promise<void>> {
     return new Promise(resolve => {
       const scene = this.scenesService.createScene(

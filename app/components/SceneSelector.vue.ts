@@ -10,6 +10,7 @@ import { AppService } from '../services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
+import Fuse from 'fuse.js';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -19,6 +20,8 @@ export default class SceneSelector extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
   @Inject() scenesTransitionsService: ScenesTransitionsService;
+
+  searchQuery = '';
 
   showContextMenu() {
     const menu = new Menu();
@@ -68,7 +71,18 @@ export default class SceneSelector extends Vue {
   }
 
   get sceneCollections() {
-    return this.sceneCollectionsService.collections;
+    const list = this.sceneCollectionsService.collections;
+
+    if (this.searchQuery) {
+      const fuse = new Fuse(list, {
+        shouldSort: true,
+        keys: ['name']
+      });
+
+      return fuse.search(this.searchQuery);
+    }
+
+    return list;
   }
 
   get activeId() {
@@ -91,26 +105,8 @@ export default class SceneSelector extends Vue {
     this.sceneCollectionsService.load(id);
   }
 
-  addCollection() {
-    this.sceneCollectionsService.showNameConfig();
-  }
-
-
-  duplicateCollection() {
-    this.sceneCollectionsService.showNameConfig({
-      sceneCollectionToDuplicate: this.activeCollection.id
-    });
-  }
-
-
-  renameCollection() {
-    this.sceneCollectionsService.showNameConfig({ rename: true });
-  }
-
-
-  removeCollection() {
-    if (!confirm(`remove ${this.activeCollection.name} ?`)) return;
-    this.sceneCollectionsService.delete();
+  manageCollections() {
+    this.sceneCollectionsService.showManageWindow();
   }
 
   get helpTipDismissable() {

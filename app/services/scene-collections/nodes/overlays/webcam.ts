@@ -32,7 +32,7 @@ export class WebcamNode extends Node<ISchema, IContext> {
   sourcesService: SourcesService = SourcesService.instance;
 
   async save(context: IContext) {
-    const rect = new ScalableRectangle(context.sceneItem);
+    const rect = new ScalableRectangle(context.sceneItem.getRectangle());
 
     this.data = {
       width: rect.scaledWidth / this.videoService.baseWidth,
@@ -166,9 +166,17 @@ export class WebcamNode extends Node<ISchema, IContext> {
   }
 
   applyScaleAndCrop(item: SceneItem, scale: number, crop: ICrop) {
-    item.setPositionAndScale(item.x, item.y, scale, scale);
-
-    item.setCrop(crop);
+    item.setTransform({
+      position: {
+        x: item.transform.position.x,
+        y: item.transform.position.y,
+      },
+      scale: {
+        x: scale,
+        y: scale,
+      },
+      crop
+    });
   }
 
   resStringToResolution(resString: string): IResolution {

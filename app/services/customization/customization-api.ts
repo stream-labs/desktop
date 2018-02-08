@@ -13,6 +13,7 @@ export interface ICustomizationServiceState {
   performanceMode: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
+  experimental: any;
 }
 
 export interface ICustomizationSettings extends ICustomizationServiceState {}
@@ -22,5 +23,6 @@ export interface ICustomizationServiceApi {
   setSettings(settingsPatch: Partial<ICustomizationSettings>): void;
   getSettings(): ICustomizationSettings;
   getSettingsFormData(): TFormData;
+  getExperimentalSettingsFormData(): TFormData;
   restoreDefaults(): void;
 }

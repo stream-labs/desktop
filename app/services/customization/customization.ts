@@ -32,7 +32,10 @@ export class CustomizationService
     livedockSize: 0.28,
     performanceMode: false,
     chatZoomFactor: 1,
-    enableBTTVEmotes: false
+    enableBTTVEmotes: false,
+    experimental: {
+      multiselect: false
+    }
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -149,6 +152,20 @@ export class CustomizationService
         enabled: true,
       }
 
+    ];
+  }
+
+  getExperimentalSettingsFormData(): TFormData {
+    const settings = this.getSettings();
+    return [
+      <IFormInput<boolean>> {
+        value: settings.experimental.multiselect,
+        name: 'multiselect',
+        description: 'Multiple Selection',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      }
     ];
   }
 

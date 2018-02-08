@@ -8,9 +8,9 @@
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
       v-for="(item, index) in normalizedItems"
-      @contextmenu.stop="handleContextMenu(index)"
-      @click="handleSelect(index)"
-      @dblclick="handleDoubleClick(index)">
+      @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
+      @click="(ev) => handleSelect(ev, index)"
+      @dblclick="(ev) => handleDoubleClick(ev, index)">
       <div class="selector-item-text">
         {{item.name}}
       </div>

@@ -3641,6 +3641,10 @@ function-bind@^1.0.2, function-bind@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.0.tgz#16176714c801798e4e8f2cf7f7529467bb4a5771"
 
+fuse.js@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/fuse.js/-/fuse.js-3.2.0.tgz#f0448e8069855bf2a3e683cdc1d320e7e2a07ef4"
+
 gauge@~1.2.0:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/gauge/-/gauge-1.2.7.tgz#e9cec5483d3d4ee0ef44b60a7d99e4935e136d93"
@@ -5301,9 +5305,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.12/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.10/streamlabs-x86_64-signed.tar.gz#470268fd7a2d399f3d0e9dd623b21cde7ce0b2dd"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.12/streamlabs-x86_64-signed.tar.gz#95189c7121f100a52c3ec10cdf12b7f58a832712"
   dependencies:
     nan "^2.8.0"
 

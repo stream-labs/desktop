@@ -67,18 +67,21 @@ export class ObsImporterService extends Service {
       fs.readFileSync(sceneCollectionPath).toString()
     );
 
-    await this.sceneCollectionsService.create(collection.name, () => {
-      this.importSources(configJSON);
-      this.importScenes(configJSON);
-      this.importSceneOrder(configJSON);
-      this.importMixerSources(configJSON);
-      this.importTransitions(configJSON);
+    await this.sceneCollectionsService.create({
+      name: collection.name,
+      setupFunction: () => {
+        this.importSources(configJSON);
+        this.importScenes(configJSON);
+        this.importSceneOrder(configJSON);
+        this.importMixerSources(configJSON);
+        this.importTransitions(configJSON);
 
-      if (this.scenesService.scenes.length === 0) {
-        return false;
+        if (this.scenesService.scenes.length === 0) {
+          return false;
+        }
+
+        return true;
       }
-
-      return true;
     });
   }
 
@@ -215,9 +218,13 @@ export class ObsImporterService extends Service {
                 const pos = item.pos;
                 const scale = item.scale;
 
-                sceneItem.setCrop(crop);
-                sceneItem.setPositionAndScale(pos.x, pos.y, scale.x, scale.y);
-                sceneItem.setVisibility(item.visible);
+                sceneItem.setSettings({
+                  crop,
+                  scaleX: scale.x,
+                  scaleY: scale.y,
+                  visible: item.visible,
+                  ...pos
+                });
               }
             });
           }

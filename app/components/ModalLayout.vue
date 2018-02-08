@@ -9,7 +9,8 @@
   <div
     class="modal-layout-content"
     :style="contentStyle">
-    <slot name="content"/>
+    <slot name="content" v-if="!loading"/>
+    <i class="fa fa-spinner fa-pulse modal-layout-spinner" v-else/>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button
@@ -53,6 +54,14 @@
 .modal-layout-content {
   flex-grow: 1;
   height: 100%;
+}
+
+.modal-layout-spinner {
+  font-size: 36px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin: 100px 0;
 }
 
 .modal-layout-controls {

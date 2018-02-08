@@ -257,7 +257,10 @@ function startApp() {
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    openDevTools();
+    setTimeout(() => {
+      openDevTools();
+    }, 10 * 1000);
+
   }
 
   // Initialize various OBS services
