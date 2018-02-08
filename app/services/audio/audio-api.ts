@@ -38,10 +38,9 @@ export interface IAudioServiceApi {
 }
 
 export interface IVolmeter {
-  level: number;
-  magnitude: number;
-  peak: number;
-  muted: boolean;
+  magnitude: number[];
+  peak: number[];
+  inputPeak: number[];
 }
 
 export interface IAudioDevice {
