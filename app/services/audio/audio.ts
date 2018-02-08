@@ -29,8 +29,6 @@ export enum E_AUDIO_CHANNELS {
   INPUT_3 = 5,
 }
 
-const VOLMETER_UPDATE_INTERVAL = 50;
-
 interface IAudioSourceData {
   fader?: obs.IFader;
   volmeter?: obs.IVolmeter;
@@ -204,15 +202,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
     let volmeterCheckTimeoutId: number;
-    this.sourceData[sourceId].volmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
     this.sourceData[sourceId].callbackInfo = this.sourceData[sourceId].volmeter.addCallback(
-      (level: number, magnitude: number, peak: number, muted: boolean) => {
-        const volmeter: IVolmeter = { level, magnitude, peak, muted };
-
-        if (muted) {
-          volmeter.level = 0;
-          volmeter.peak = 0;
-        }
+      (magnitude: number[], peak: number[], inputPeak: number[]) => {
+        const volmeter: IVolmeter = { magnitude, peak, inputPeak };
 
         volmeterStream.next(volmeter);
         lastVolmeterValue = volmeter;
@@ -220,13 +212,21 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       }
     );
 
+    /* This is useful for media sources since the volmeter will abruptly stop
+     * sending events in the case of hiding the source. It might be better
+     * to eventually just hide the mixer item as well though */
     function volmeterCheck() {
       if (!gotEvent) {
-        volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
+        volmeterStream.next({ 
+          ...lastVolmeterValue, 
+          magnitude: [-Infinity], 
+          peak: [-Infinity], 
+          inputPeak: [-Infinity] 
+        });
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, 100);
     }
 
     volmeterCheck();
