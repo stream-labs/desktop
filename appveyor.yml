@@ -17,7 +17,6 @@ test_script:
   - ps: $env:warning_ico = ":warning:"
   - ps: $env:success_ico = ":white_check_mark:"
   - ps: $env:changed_screens = (Get-Content -Raw -Path test-dist\screentest\state.json | ConvertFrom-Json).changedScreens
-  - ps: $env:success_ico = ":white_check_mark:"
   - ps: $env:project_link = "https://ci.appveyor.com/project/Streamlabs/streamlabs-obs"
   - ps: If ($env:changed_screens -gt 0) {Add-AppveyorMessage "$env:warning_ico $env:changed_screens screens have been changed $env:project_link/build/$env:APPVEYOR_BUILD_VERSION/artifacts"} else { Add-AppveyorMessage "$env:success_ico no screens changed" }
 
