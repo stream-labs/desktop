@@ -71,6 +71,21 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     });
   }
 
+  /**
+   * Do some data sanitizing
+   */
+  sanitizeIds() {
+    // Look for duplicate ids
+    const ids: Dictionary<boolean> = {};
+
+    this.data.items = this.data.items.filter(item => {
+      if (ids[item.id]) return false;
+
+      ids[item.id] = true;
+      return true;
+    });
+  }
+
   load(context: IContext): Promise<void> {
     context.scene.addSources(this.data.items);
 

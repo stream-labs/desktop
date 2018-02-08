@@ -22,11 +22,20 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
   }
 
   async load(context: TContext): Promise<void> {
+    await this.beforeLoad(context);
+
     const afterLoadItemsCallbacks = await Promise.all(this.data.items.map(item => {
       return this.loadItem(item, context);
     }));
 
     await Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()));
+  }
+
+  /**
+   * Can be called before loading to do some data munging
+   * @param context the context
+   */
+  async beforeLoad(context: TContext): Promise<void> {
   }
 
 }
