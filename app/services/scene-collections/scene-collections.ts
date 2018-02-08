@@ -171,18 +171,20 @@ export class SceneCollectionsService extends Service
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
-    if (options.setupFunction && options.setupFunction()) {
-      // Do nothing
-    } else {
-      this.setupEmptyCollection();
-    }
-
     const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
     const id: string = uuid();
 
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
     if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
+
+    if (options.setupFunction && options.setupFunction()) {
+      // Do nothing
+    } else {
+      this.setupEmptyCollection();
+    }
+
+    await this.saveCurrentApplicationStateAs(id);
     this.finishLoadingOperation();
   }
 
@@ -280,12 +282,14 @@ export class SceneCollectionsService extends Service
   async loadOverlay(filePath: string, name: string) {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
-    await this.overlaysPersistenceService.loadOverlay(filePath);
-    this.setupDefaultAudio();
 
     const id: string = uuid();
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
+
+    await this.overlaysPersistenceService.loadOverlay(filePath);
+    this.setupDefaultAudio();
+    await this.saveCurrentApplicationStateAs(id);
     this.finishLoadingOperation();
   }
 
