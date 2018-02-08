@@ -12,3 +12,6 @@ test-dist/
 bundles/
 node-obs/
 node-boost/
+electron.sln
+electron.VC.db
+.vs/
