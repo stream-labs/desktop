@@ -346,16 +346,6 @@ th {
   padding-bottom: 10px;
 }
 
-// disable user selection (prevent Ctrl+A select the whole application screen)
-// https://github.com/electron/electron/issues/2538
-:not(input):not(textarea),
-:not(input):not(textarea)::after,
-:not(input):not(textarea)::before {
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-
 // Scrolls
 ::-webkit-scrollbar {
   width: 6px;
