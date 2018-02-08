@@ -106,7 +106,8 @@ function patchNavigation() {
     if (
       !linkText.match(/<wbr>api/) ||
       linkText.match(/obs-<wbr>api/) ||
-      linkText.match(/guest-<wbr>api/)
+      linkText.match(/guest-<wbr>api/) ||
+      linkText.match(/service-<wbr>api/)
     ) {
       link.parentElement.style.display = 'none';
     }
