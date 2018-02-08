@@ -120,7 +120,10 @@ export class Scene implements ISceneApi {
 
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
-    if (!sceneItem) throw new Error(`SceneItem ${sceneItemId} not found`);
+    if (!sceneItem) {
+      console.error(`SceneItem ${sceneItemId} not found`);
+      return;
+    }
 
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_SOURCE_FROM_SCENE(sceneItemId);

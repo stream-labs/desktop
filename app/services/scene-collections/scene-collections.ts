@@ -486,18 +486,22 @@ export class SceneCollectionsService extends Service
     await this.save();
 
     // we should remove inactive scenes first to avoid the switching between scenes
-    this.scenesService.scenes.forEach(scene => {
-      if (scene.id === this.scenesService.activeSceneId) return;
-      scene.remove(true);
-    });
+    try {
+      this.scenesService.scenes.forEach(scene => {
+        if (scene.id === this.scenesService.activeSceneId) return;
+        scene.remove(true);
+      });
 
-    if (this.scenesService.activeScene) {
-      this.scenesService.activeScene.remove(true);
+      if (this.scenesService.activeScene) {
+        this.scenesService.activeScene.remove(true);
+      }
+
+      this.sourcesService.sources.forEach(source => {
+        if (source.type !== 'scene') source.remove();
+      });
+    } catch (e) {
+      console.error('Error deloading application state');
     }
-
-    this.sourcesService.sources.forEach(source => {
-      if (source.type !== 'scene') source.remove();
-    });
 
     this.hotkeysService.unregisterAll();
   }
