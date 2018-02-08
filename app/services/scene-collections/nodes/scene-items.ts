@@ -46,18 +46,19 @@ export class SceneItemsNode extends Node<ISchema, {}> {
       return new Promise(resolve => {
         const hotkeys = new HotkeysNode();
         hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
+          const transform = sceneItem.transform;
           resolve({
             id: sceneItem.sceneItemId,
             sourceId: sceneItem.sourceId,
-            x: sceneItem.x,
-            y: sceneItem.y,
-            scaleX: sceneItem.scaleX,
-            scaleY: sceneItem.scaleY,
+            x: transform.position.x,
+            y: transform.position.y,
+            scaleX: transform.scale.x,
+            scaleY: transform.scale.y,
             visible: sceneItem.visible,
-            crop: sceneItem.crop,
+            crop: transform.crop,
             locked: sceneItem.locked,
             hotkeys,
-            rotation: sceneItem.rotation
+            rotation: transform.rotation
           });
         });
       });

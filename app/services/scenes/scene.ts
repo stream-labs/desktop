@@ -13,7 +13,8 @@ import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
-import _ from 'lodash';
+import { SelectionService } from 'services/selection';
+import { uniqBy } from 'lodash';
 
 const { ipcRenderer } = electron;
 
@@ -22,14 +23,11 @@ const { ipcRenderer } = electron;
 export class Scene implements ISceneApi {
   id: string;
   name: string;
-  activeItemIds: string[];
   items: ISceneItem[];
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private selectionService: SelectionService;
 
   private sceneState: IScene;
 
@@ -61,18 +59,8 @@ export class Scene implements ISceneApi {
     });
   }
 
-
-  get inactiveSources(): SceneItem[] {
-    return this.sceneState.items.filter(sourceModel => {
-      return !this.activeItemIds.includes(sourceModel.sceneItemId);
-    }).map(source => {
-      return this.getItem(source.sceneItemId);
-    });
-  }
-
-
-  get activeItems(): SceneItem[] {
-    return this.activeItemIds.map(itemId => this.getItem(itemId));
+  getItemIds(): string[] {
+    return this.sceneState.items.map(item => item.sceneItemId);
   }
 
   setName(newName: string) {
@@ -103,10 +91,10 @@ export class Scene implements ISceneApi {
     this.ADD_SOURCE_TO_SCENE(sceneItemId, source.sourceId, obsSceneItem.id);
     const sceneItem = this.getItem(sceneItemId);
 
-    // Newly added sources are immediately active
-    this.makeItemsActive([sceneItemId]);
-
     sceneItem.loadAttributes();
+
+    // Newly added sources are immediately active
+    this.selectionService.select(sceneItemId);
 
     this.scenesService.itemAdded.next(sceneItem.sceneItemState);
     return sceneItem;
@@ -131,23 +119,8 @@ export class Scene implements ISceneApi {
   }
 
 
-  makeItemsActive(sceneItemIds: string[]) {
-    const activeObsIds = sceneItemIds.map(itemId => this.getItem(itemId).obsSceneItemId);
-
-    this.getObsScene().getItems().forEach(obsSceneItem => {
-      if (activeObsIds.includes(obsSceneItem.id)) {
-        obsSceneItem.selected = true;
-      } else {
-        obsSceneItem.selected = false;
-      }
-    });
-
-    this.MAKE_SOURCES_ACTIVE(sceneItemIds);
-  }
-
-
   setLockOnAllItems(locked: boolean) {
-    this.getItems().forEach(item => item.setLocked(locked));
+    this.getItems().forEach(item => item.setSettings({ locked }));
   }
 
 
@@ -233,7 +206,7 @@ export class Scene implements ISceneApi {
         result = result.concat(sceneItems);
       });
     if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
-    return _.uniqBy(result, 'sceneItemId');
+    return uniqBy(result, 'sceneItemId');
   }
 
 
@@ -243,18 +216,12 @@ export class Scene implements ISceneApi {
    */
   getNestedSources(options = { excludeScenes: false }): Source[] {
     const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
-    return _.uniqBy(sources, 'sourceId');
+    return uniqBy(sources, 'sourceId');
   }
 
   @mutation()
   private SET_NAME(newName: string) {
     this.sceneState.name = newName;
-  }
-
-
-  @mutation()
-  private MAKE_SOURCES_ACTIVE(sceneItemIds: string[]) {
-    this.sceneState.activeItemIds = sceneItemIds;
   }
 
   @mutation()
@@ -267,25 +234,25 @@ export class Scene implements ISceneApi {
       sourceId,
       obsSceneItemId,
 
-      // Position in video space
-      x: 0,
-      y: 0,
+      transform: {
+        // Position in video space
+        position: { x: 0, y: 0 },
 
-      // Scale between 0 and 1
-      scaleX: 1.0,
-      scaleY: 1.0,
+        // Scale between 0 and 1
+        scale: { x: 1.0, y: 1.0 },
 
-      visible: true,
+        crop: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        },
 
-      crop: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0
+        rotation: 0,
+
       },
 
-      rotation: 0,
-
+      visible: true,
       locked: false
     });
   }
@@ -293,8 +260,8 @@ export class Scene implements ISceneApi {
   @mutation()
   private REMOVE_SOURCE_FROM_SCENE(sceneItemId: string) {
 
-    if (this.sceneState.activeItemIds.includes(sceneItemId)) {
-      this.sceneState.activeItemIds = _.without(this.sceneState.activeItemIds, sceneItemId);
+    if (this.selectionService.isSelected(sceneItemId)) {
+      this.selectionService.deselect(sceneItemId);
     }
 
     this.sceneState.items = this.sceneState.items.filter(source => {

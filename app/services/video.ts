@@ -5,6 +5,7 @@ import electron from 'electron';
 import { Inject } from '../util/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
+import { ScalableRectangle } from '../util/ScalableRectangle';
 
 const { remote } = electron;
 
@@ -170,6 +171,15 @@ export class VideoService extends Service {
   getRandomDisplayId() {
     return Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15);
+  }
+
+  getScreenRectangle() {
+    return new ScalableRectangle({
+      x: 0,
+      y: 0,
+      width: this.baseWidth,
+      height: this.baseHeight
+    });
   }
 
   get baseWidth() {

@@ -2,6 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
+import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -152,5 +153,41 @@ test('Creating nested scenes', async t => {
   itemsANames = sceneAItems.map(item => item['name']);
 
   t.deepEqual(itemsANames, ['SceneB']);
+
+});
+
+
+test('SceneItem.setSettings()', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
+
+  sceneItem.setTransform({ rotation: 90 });
+
+  t.is(sceneItem.getModel().transform.rotation, 90);
+
+  // rotation must be between 0 and 360
+  sceneItem.setTransform({ rotation: 360 + 90 });
+  t.is(sceneItem.getModel().transform.rotation, 90);
+
+  sceneItem.setTransform({
+    crop: {
+      top: 1.2,
+      bottom: 5.6,
+      left: 7.1,
+      right: 10,
+    }
+  });
+
+  // crop values must be rounded
+  t.deepEqual(sceneItem.getModel().transform.crop, {
+    top: 1,
+    bottom: 6,
+    left: 7,
+    right: 10,
+  });
+
 
 });

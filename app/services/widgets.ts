@@ -393,17 +393,17 @@ export class WidgetsService extends Service {
       const source = scene.getItem(sceneItem.sceneItemId);
 
       // Set the default transform
-      const rect = new ScalableRectangle(source);
+      const rect = new ScalableRectangle(source.getRectangle());
 
       rect.withAnchor(widget.anchor, () => {
         rect.x = widget.x * this.videoService.baseWidth;
         rect.y = widget.y * this.videoService.baseHeight;
       });
 
-      source.setPosition({
+      source.setTransform({ position: {
         x: rect.x,
         y: rect.y
-      });
+      }});
     }, 1500);
 
     return sceneItem;
@@ -474,10 +474,10 @@ export class WidgetsService extends Service {
       name: source.name,
       type: source.getPropertiesManagerSettings().widgetType,
       settings,
-      x: widgetItem.x / this.videoService.baseWidth,
-      y: widgetItem.y / this.videoService.baseHeight,
-      scaleX: widgetItem.scaleX / this.videoService.baseWidth,
-      scaleY: widgetItem.scaleY / this.videoService.baseHeight
+      x: widgetItem.transform.position.x / this.videoService.baseWidth,
+      y: widgetItem.transform.position.y / this.videoService.baseHeight,
+      scaleX: widgetItem.transform.scale.x / this.videoService.baseWidth,
+      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight
     };
   }
 
@@ -528,11 +528,15 @@ export class WidgetsService extends Service {
     source.setName(widget.name);
     source.updateSettings(widget.settings);
     source.replacePropertiesManager('widget', { widgetType: widget.type });
-    widgetItem.setPositionAndScale(
-      widget.x * this.videoService.baseWidth,
-      widget.y * this.videoService.baseHeight,
-      widget.scaleX * this.videoService.baseWidth,
-      widget.scaleY * this.videoService.baseHeight
-    );
+    widgetItem.setTransform({
+      position: {
+        x: widget.x * this.videoService.baseWidth,
+        y: widget.y * this.videoService.baseHeight,
+      },
+      scale: {
+        x: widget.scaleX * this.videoService.baseWidth,
+        y: widget.scaleY * this.videoService.baseHeight
+      }
+    });
   }
 }

@@ -218,9 +218,13 @@ export class ObsImporterService extends Service {
                 const pos = item.pos;
                 const scale = item.scale;
 
-                sceneItem.setCrop(crop);
-                sceneItem.setPositionAndScale(pos.x, pos.y, scale.x, scale.y);
-                sceneItem.setVisibility(item.visible);
+                sceneItem.setSettings({
+                  crop,
+                  scaleX: scale.x,
+                  scaleY: scale.y,
+                  visible: item.visible,
+                  ...pos
+                });
               }
             });
           }

@@ -50,6 +50,7 @@ import { DismissablesService } from 'services/dismissables';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
+import { SelectionService } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import {
@@ -119,7 +120,8 @@ export class ServicesManager extends Service {
     SceneCollectionsService,
     SceneCollectionsStateService,
     TroubleshooterService,
-    JsonrpcService
+    JsonrpcService,
+    SelectionService
   };
 
   private instances: Dictionary<Service> = {};

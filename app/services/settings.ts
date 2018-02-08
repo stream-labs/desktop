@@ -122,7 +122,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       .concat(['Overlays','Notifications', 'Appearance']);
 
     // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['API']);
+    if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);
 
     return categories;
   }

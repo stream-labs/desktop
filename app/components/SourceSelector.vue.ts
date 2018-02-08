@@ -2,8 +2,9 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { SourcesService } from '../services/sources';
-import { ScenesService, SceneItem } from '../services/scenes';
+import { SourcesService } from 'services/sources';
+import { ScenesService, SceneItem } from 'services/scenes';
+import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 
 @Component({
@@ -11,11 +12,9 @@ import { EditMenu } from '../util/menus/EditMenu';
 })
 export default class SourceSelector extends Vue {
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private selectionService: SelectionService;
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -28,7 +27,7 @@ export default class SourceSelector extends Vue {
     const menuOptions = sceneItem ?
       ({
         selectedSceneId: this.scene.id,
-        selectedSceneItemId: sceneItemId,
+        showSceneItemMenu: true,
         selectedSourceId: sceneItem.sourceId
       }) :
       ({ selectedSceneId: this.scene.id });
@@ -40,19 +39,19 @@ export default class SourceSelector extends Vue {
 
   removeItems() {
     // We can only remove a source if at least one is selected
-    if (this.scene.activeItemIds.length > 0) {
-      this.scene.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
+    if (this.activeItemIds.length > 0) {
+      this.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
     }
   }
 
   sourceProperties() {
     if (!this.canShowProperties()) return;
-    this.sourcesService.showSourceProperties(this.scene.activeItems[0].sourceId);
+    this.sourcesService.showSourceProperties(this.activeItems[0].sourceId);
   }
 
   canShowProperties(): boolean {
-    if (this.scene.activeItemIds.length === 0) return false;
-    return this.scene.activeItems[0].getSource().hasProps();
+    if (this.activeItemIds.length === 0) return false;
+    return this.activeItems[0].getSource().hasProps();
   }
 
   handleSort(data: any) {
@@ -65,8 +64,24 @@ export default class SourceSelector extends Vue {
     );
   }
 
-  makeActive(sceneItemId: string) {
-    this.scene.makeItemsActive([sceneItemId]);
+  makeActive(sceneItemId: string, ev: MouseEvent) {
+    if (ev.ctrlKey) {
+      if (this.selectionService.isSelected(sceneItemId)) {
+        this.selectionService.deselect(sceneItemId);
+      } else {
+        this.selectionService.add(sceneItemId);
+      }
+    } else {
+      this.selectionService.select(sceneItemId);
+    }
+  }
+
+  get activeItemIds() {
+    return this.selectionService.getIds();
+  }
+
+  get activeItems() {
+    return this.selectionService.getItems();
   }
 
   toggleVisibility(sceneItemId: string) {
@@ -95,7 +110,7 @@ export default class SourceSelector extends Vue {
 
   toggleLock(sceneItemId: string) {
     const item = this.scene.getItem(sceneItemId);
-    item.setLocked(!item.locked);
+    item.setSettings({ locked: !item.locked });
   }
 
   get scene() {

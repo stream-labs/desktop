@@ -15,6 +15,7 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
+import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 
 interface IAppState {
