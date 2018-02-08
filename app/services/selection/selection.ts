@@ -133,7 +133,6 @@ export class SelectionService
     return this.getIds().includes(itemId);
   }
 
-  @shortcut('Ctrl+A')
   selectAll() {
     this.select(this.getScene().getItems().map(item => item.sceneItemId));
     return this;
