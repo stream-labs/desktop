@@ -18,8 +18,8 @@ export class TroubleshooterService
 
   static defaultState: ITroubleshooterState = {
     settings: {
-      skippedThreshold: 0.3,
-      laggedThreshold: 0.3,
+      skippedThreshold: 0.15,
+      laggedThreshold: 0.15,
       droppedThreshold: 0.1,
     }
   };
