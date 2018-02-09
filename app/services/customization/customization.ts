@@ -34,7 +34,7 @@ export class CustomizationService
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     experimental: {
-      multiselect: false
+      // put experimental features here
     }
   };
 
@@ -156,17 +156,7 @@ export class CustomizationService
   }
 
   getExperimentalSettingsFormData(): TFormData {
-    const settings = this.getSettings();
-    return [
-      <IFormInput<boolean>> {
-        value: settings.experimental.multiselect,
-        name: 'multiselect',
-        description: 'Multiple Selection',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      }
-    ];
+    return [];
   }
 
   restoreDefaults() {
