@@ -287,8 +287,14 @@ export class SceneCollectionsService extends Service
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
 
-    await this.overlaysPersistenceService.loadOverlay(filePath);
-    this.setupDefaultAudio();
+    try {
+      await this.overlaysPersistenceService.loadOverlay(filePath);
+      this.setupDefaultAudio();
+    } catch (e) {
+      // We tried really really hard :(
+      console.error('Overlay installation failed');
+    }
+
     await this.saveCurrentApplicationStateAs(id);
     this.finishLoadingOperation();
   }
