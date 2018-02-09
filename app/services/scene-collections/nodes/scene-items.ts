@@ -88,6 +88,8 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   }
 
   load(context: IContext): Promise<void> {
+    this.sanitizeIds();
+
     context.scene.addSources(this.data.items);
 
     const promises: Promise<void>[] = [];
