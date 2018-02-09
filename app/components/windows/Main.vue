@@ -14,7 +14,8 @@
       <component
         v-if="!shouldLockContent"
         class="main-page-container"
-        :is="page"/>
+        :is="page"
+        :params="params"/>
       <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
     </div>
 

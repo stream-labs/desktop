@@ -35,7 +35,7 @@ const { remote } = electron;
     Onboarding,
     LiveDock,
     StudioFooter,
-    CustomLoader
+    CustomLoader,
   }
 })
 export default class Main extends Vue {
@@ -49,6 +49,10 @@ export default class Main extends Vue {
 
   get page() {
     return this.navigationService.state.currentPage;
+  }
+
+  get params() {
+    return this.navigationService.state.params;
   }
 
   get nightTheme() {

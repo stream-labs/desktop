@@ -4,6 +4,8 @@ import ListInput from 'components/shared/forms/ListInput.vue';
 import { ISourceApi } from 'services/sources';
 import { IListInput } from 'components/shared/forms/Input';
 import { WidgetDefinitions, IWidget } from 'services/widgets';
+import { NavigationService } from 'services/navigation';
+import { Inject } from 'util/injector';
 
 @Component({
   components: {
@@ -13,6 +15,9 @@ import { WidgetDefinitions, IWidget } from 'services/widgets';
 export default class WidgetProperties extends Vue {
 
   @Prop() source: ISourceApi;
+
+  @Inject()
+  navigationService: NavigationService;
 
   widgetModel: IListInput<string> = null;
 
@@ -46,4 +51,7 @@ export default class WidgetProperties extends Vue {
     };
   }
 
+  navigateDashboard() {
+    console.log(this.widgetModel.type)
+  }
 }

@@ -139,7 +139,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
           nightMode
         }&show_recent_events=0`;
       }
+
+      if (type === 'alertbox') {
+        return `https://${host}/slobs/dashboard/alertbox/${token}?mode=${
+          nightMode
+        }`;
+      }
     }
+  }
+
+  dashboardUrl(subPage: string) {
+    const host = this.hostsService.streamlabs;
+    const token = this.widgetToken;
+    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+
+    return `https://${host}/slobs/dashboard/${subPage}/${token}?mode=${
+      nightMode
+    }`;
   }
 
   overlaysUrl() {
