@@ -23,6 +23,7 @@ class Updater {
     this.bindListeners();
 
     this.browserWindow = this.initWindow();
+    this.browserWindow.webContents.openDevTools();
 
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
@@ -42,8 +43,11 @@ class Updater {
     });
 
     autoUpdater.on('update-not-available', () => {
-      this.startApp();
-      this.browserWindow.close();
+      // this.startApp();
+      // this.browserWindow.close();
+      this.updateState.version = '1.2.3';
+      this.updateState.percent = 35;
+      this.pushState();
     });
 
     autoUpdater.on('download-progress', (progress) => {
