@@ -681,8 +681,11 @@ export class SceneCollectionsService extends Service
         ) {
           promises.push(
             this.stateService
-              .readCollectionFile(inManifest.id)
-              .then(data => {
+              .collectionFileExists(inManifest.id).then(exists => {
+                if (exists) return this.stateService.readCollectionFile(inManifest.id);
+                return Promise.resolve(null);
+              })
+              .then((data: string) => {
                 return this.serverApi.updateSceneCollection({
                   id: inManifest.serverId,
                   name: inManifest.name,
