@@ -42,8 +42,11 @@ class Updater {
     });
 
     autoUpdater.on('update-not-available', () => {
-      this.startApp();
-      this.browserWindow.close();
+      // this.startApp();
+      // this.browserWindow.close();
+      this.updateState.version = '1.2.3';
+      this.updateState.percent = 35;
+      this.pushState();
     });
 
     autoUpdater.on('download-progress', (progress) => {
