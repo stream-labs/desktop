@@ -64,10 +64,8 @@ export class SceneCollectionsStateService extends StatefulService<
     await this.ensureDirectory();
 
     try {
-      const exists = await new Promise(resolve => {
-        fs.exists(this.manifestFilePath, exists => resolve(exists));
-      });
-      const data = await this.readCollectionFile(this.manifestFilePath);
+      const exists = await this.collectionFileExists('manifest');
+      const data = await this.readCollectionFile('manifest');
 
       if (data) {
         const parsed = JSON.parse(data);
@@ -118,25 +116,28 @@ export class SceneCollectionsStateService extends StatefulService<
    * The manifest file is simply a copy of the Vuex state of this
    * service, persisted to disk.
    */
-  flushManifestFile() {
-    return new Promise((resolve, reject) => {
-      const data = JSON.stringify(this.state, null, 2);
-      fs.writeFile(this.manifestFilePath, data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
+  async flushManifestFile() {
+    const data = JSON.stringify(this.state, null, 2);
+    await this.writeDataToCollectionFile('manifest', data);
+  }
 
-        resolve();
-      });
+  /**
+   * Checks if a collection file exists
+   * @param id the id of the collection
+   */
+  collectionFileExists(id: string): Promise<boolean> {
+    return new Promise(resolve => {
+      const filePath = this.getCollectionFilePath(id);
+      fs.exists(filePath, exists => resolve(exists));
     });
   }
 
   /**
    * Reads the contents of the file into a string
-   * @param filePath The path to the file
+   * @param id The id of the collection
    */
-  readCollectionFile(filePath: string): Promise<string> {
+  readCollectionFile(id: string): Promise<string> {
+    const filePath = this.getCollectionFilePath(id);
     return new Promise((resolve, reject) => {
       fs.readFile(filePath, (err, data) => {
         if (err) {
@@ -154,7 +155,7 @@ export class SceneCollectionsStateService extends StatefulService<
    * @param id The id of the file
    * @param data The data to write
    */
-  writeDataToCollectionFile(id: string, data: string) {
+  writeDataToCollectionFile(id: string, data: string): Promise<void> {
     const collectionPath = this.getCollectionFilePath(id);
     return new Promise((resolve, reject) => {
       fs.writeFile(collectionPath, data, err => {
@@ -233,10 +234,6 @@ export class SceneCollectionsStateService extends StatefulService<
 
   getCollectionFilePath(id: string) {
     return path.join(this.collectionsDirectory, `${id}.json`);
-  }
-
-  get manifestFilePath() {
-    return path.join(this.collectionsDirectory, 'manifest.json');
   }
 
   @mutation()
