@@ -366,8 +366,7 @@ export class SceneCollectionsService extends Service
     this.collections.forEach(collection => {
       promises.push(
         new Promise<ISceneCollectionSchema>(resolve => {
-          const file = this.stateService.getCollectionFilePath(collection.id);
-          this.stateService.readCollectionFile(file).then(data => {
+          this.stateService.readCollectionFile(collection.id).then(data => {
             const root = parse(data, NODE_TYPES);
             const collectionSchema: ISceneCollectionSchema = {
               id: collection.id,
@@ -427,16 +426,19 @@ export class SceneCollectionsService extends Service
    * @param id The id of the collection to load
    */
   private async loadCollectionIntoApplicationState(id: string): Promise<void> {
-    const filePath = this.stateService.getCollectionFilePath(id);
-    const data = await this.stateService.readCollectionFile(filePath);
-    if (data == null) throw new Error('Got blank data from collection file');
+    const exists = await this.stateService.collectionFileExists(id);
 
-    const root = parse(data, NODE_TYPES);
-    await root.load();
+    if (exists) {
+      const data = await this.stateService.readCollectionFile(id);
+      if (data == null) throw new Error('Got blank data from collection file');
 
-    this.hotkeysService.bindHotkeys();
+      const root = parse(data, NODE_TYPES);
+      await root.load();
 
-    // Make sure we actually loaded something that works
+      this.hotkeysService.bindHotkeys();
+    }
+
+    // If we didn't actually load something, fall back to creating an empty collection
     if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
   }
 
@@ -643,17 +645,24 @@ export class SceneCollectionsService extends Service
         const id: string = uuid();
         promises.push(
           this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-            return this.stateService
-              .writeDataToCollectionFile(id, response.scene_collection.data)
-              .then(() => {
-                // Only do this after we know we successfully wrote the file
-                this.stateService.ADD_COLLECTION(
-                  id,
-                  onServer.name,
-                  new Date().toISOString()
-                );
-                this.stateService.SET_SERVER_ID(id, onServer.id);
-              });
+            // Empty data means that the collection was created from the Streamlabs
+            // dashboard and does not currently have any scenes assoicated with it.
+            // The first time we try to load this collection, we will initialize it
+            // with some scenes.
+
+            const promise = response.scene_collection.data == null ?
+              Promise.resolve() :
+              this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
+
+            promise.then(() => {
+              // Only do this after we know we successfully wrote the file
+              this.stateService.ADD_COLLECTION(
+                id,
+                onServer.name,
+                new Date().toISOString()
+              );
+              this.stateService.SET_SERVER_ID(id, onServer.id);
+            });
           })
         );
       } else {
@@ -672,10 +681,11 @@ export class SceneCollectionsService extends Service
         ) {
           promises.push(
             this.stateService
-              .readCollectionFile(
-                this.stateService.getCollectionFilePath(inManifest.id)
-              )
-              .then(data => {
+              .collectionFileExists(inManifest.id).then(exists => {
+                if (exists) return this.stateService.readCollectionFile(inManifest.id);
+                return Promise.resolve(null);
+              })
+              .then((data: string) => {
                 return this.serverApi.updateSceneCollection({
                   id: inManifest.serverId,
                   name: inManifest.name,
@@ -720,9 +730,7 @@ export class SceneCollectionsService extends Service
         if (!inManifest.serverId) {
           promises.push(
             this.stateService
-              .readCollectionFile(
-                this.stateService.getCollectionFilePath(inManifest.id)
-              )
+              .readCollectionFile(inManifest.id)
               .then(data => {
                 return this.serverApi
                   .createSceneCollection({
