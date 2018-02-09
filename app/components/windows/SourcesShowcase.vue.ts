@@ -10,6 +10,7 @@ import { ScenesService } from '../../services/scenes';
 import { UserService } from '../../services/user';
 import { WidgetsService, WidgetType } from '../../services/widgets';
 
+
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
 
 @Component({

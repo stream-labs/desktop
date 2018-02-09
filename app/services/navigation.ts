@@ -4,19 +4,22 @@ type TAppPage = 'Studio' | 'Dashboard' | 'Live' | 'Onboarding' | 'BrowseOverlays
 
 interface INavigationState {
   currentPage: TAppPage;
+  params: Dictionary<string>;
 }
 
 export class NavigationService extends StatefulService<INavigationState> {
   static initialState: INavigationState = {
-    currentPage: 'Studio'
+    currentPage: 'Studio',
+    params: {}
   };
 
-  navigate(page: TAppPage) {
-    this.NAVINGATE(page);
+  navigate(page: TAppPage, params: Dictionary<string> = {}) {
+    this.NAVIGATE(page, params);
   }
 
   @mutation()
-  private NAVINGATE(page: TAppPage) {
+  private NAVIGATE(page: TAppPage, params: Dictionary<string>) {
     this.state.currentPage = page;
+    this.state.params = params;
   }
 }
