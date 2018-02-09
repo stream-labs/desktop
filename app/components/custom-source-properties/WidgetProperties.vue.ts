@@ -14,7 +14,6 @@ import { Inject } from 'util/injector';
   }
 })
 export default class WidgetProperties extends Vue {
-
   @Prop() source: ISourceApi;
 
   @Inject() navigationService: NavigationService;
@@ -35,7 +34,9 @@ export default class WidgetProperties extends Vue {
   }
 
   refreshWidgetModel() {
-    const value = this.source.getPropertiesManagerSettings().widgetType.toString();
+    const value = this.source
+      .getPropertiesManagerSettings()
+      .widgetType.toString();
 
     this.widgetModel = {
       value,
@@ -53,7 +54,6 @@ export default class WidgetProperties extends Vue {
   }
 
   navigateDashboard() {
-
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',
       [WidgetType.DonationGoal]: 'donationgoal',

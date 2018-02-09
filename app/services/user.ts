@@ -6,7 +6,12 @@ import { Inject } from '../util/injector';
 import { mutation } from './stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { getPlatformService, IPlatformAuth, TPlatform, IPlatformService } from './platforms';
+import {
+  getPlatformService,
+  IPlatformAuth,
+  TPlatform,
+  IPlatformService
+} from './platforms';
 import { CustomizationService } from './customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
@@ -129,21 +134,15 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
       if (type === 'recent-events') {
-        return `https://${host}/dashboard/recent-events?token=${token}&mode=${
-          nightMode
-        }&electron`;
+        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
       }
 
       if (type === 'dashboard') {
-        return `https://${host}/slobs/dashboard/${token}?mode=${
-          nightMode
-        }&show_recent_events=0`;
+        return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&show_recent_events=0`;
       }
 
       if (type === 'alertbox') {
-        return `https://${host}/slobs/dashboard/alertbox/${token}?mode=${
-          nightMode
-        }`;
+        return `https://${host}/slobs/dashboard/alertbox/${token}?mode=${nightMode}`;
       }
     }
   }
