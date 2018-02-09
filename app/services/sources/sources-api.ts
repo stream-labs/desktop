@@ -18,7 +18,6 @@ export interface ISource {
 
 
 export interface ISourceApi extends ISource {
-  displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
   getPropertiesManagerType(): TPropertiesManager;
