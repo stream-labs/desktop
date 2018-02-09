@@ -153,9 +153,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const token = this.widgetToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    return `https://${host}/slobs/dashboard/${subPage}/${token}?mode=${
-      nightMode
-    }`;
+    return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&r=${subPage}`;
   }
 
   overlaysUrl() {

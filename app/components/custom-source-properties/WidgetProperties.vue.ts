@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import ListInput from 'components/shared/forms/ListInput.vue';
 import { ISourceApi } from 'services/sources';
 import { IListInput } from 'components/shared/forms/Input';
-import { WidgetDefinitions, IWidget } from 'services/widgets';
+import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
 import { Inject } from 'util/injector';
 
@@ -52,6 +52,23 @@ export default class WidgetProperties extends Vue {
   }
 
   navigateDashboard() {
-    console.log(this.widgetModel.type)
+
+    const subPage = {
+      [WidgetType.AlertBox]: 'alertbox',
+      [WidgetType.DonationGoal]: 'donationgoal',
+      [WidgetType.FollowerGoal]: 'followergoal',
+      [WidgetType.SubscriberGoal]: 'followergoal',
+      [WidgetType.BitGoal]: 'bitgoal',
+      [WidgetType.DonationTicker]: 'donationticker',
+      [WidgetType.ChatBox]: 'chatbox',
+      [WidgetType.EventList]: 'eventlist',
+      [WidgetType.TheJar]: 'jar',
+      [WidgetType.ViewerCount]: 'viewercount',
+      [WidgetType.StreamBoss]: 'streamboss',
+      [WidgetType.Credits]: 'credits',
+      [WidgetType.SpinWheel]: 'wheel'
+    }[this.widgetModel.value]
+
+    this.navigationService.navigate('Dashboard', {subPage});
   }
 }

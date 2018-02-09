@@ -13,7 +13,10 @@ export default class Dashboard extends Vue {
     return this.userService.isLoggedIn();
   }
 
+  subPage: String = '';
+
   get dashboardUrl() {
-    return this.userService.dashboardUrl(this.params.subPage);
+    const url = this.userService.dashboardUrl(this.params.subPage);
+    return url;
   }
 }

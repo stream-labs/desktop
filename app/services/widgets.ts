@@ -303,7 +303,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.StreamBoss]: {
-    name: 'Bit Boss',
+    name: 'Stream Boss',
     url(host, token) {
       return `https://${host}/widgets/streamboss?token=${token}`;
     },
@@ -323,13 +323,13 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
       return `https://${host}/widgets/end-credits?token=${token}`;
     },
 
-    width: 600,
-    height: 200,
+    width: 1280,
+    height: 720,
 
-    x: 0,
-    y: 1,
+    x: 0.5,
+    y: 0.5,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.Center
   },
 
   [WidgetType.SpinWheel]: {
