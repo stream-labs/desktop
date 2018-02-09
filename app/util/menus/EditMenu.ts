@@ -78,14 +78,6 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
-      if (!isMultipleSelection) {
-        this.append({
-          label: 'Rename',
-          click: () =>
-            this.sourcesService.showRenameSource(selectedItem.sourceId)
-        });
-      }
-
       this.append({
         label: 'Remove',
         accelerator: 'Delete',
@@ -139,6 +131,13 @@ export class EditMenu extends Menu {
     }
 
     if (this.source && !isMultipleSelection) {
+
+      this.append({
+        label: 'Rename',
+        click: () =>
+          this.sourcesService.showRenameSource(this.source.sourceId)
+      });
+
       this.append({ type: 'separator' });
 
       this.append({
