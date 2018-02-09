@@ -97,7 +97,7 @@ export class OverlaysPersistenceService extends Service {
     const configPath = path.join(assetsPath, 'config.json');
     const data = fs.readFileSync(configPath).toString();
     const root = parse(data, NODE_TYPES);
-    root.load({ assetsPath });
+    await root.load({ assetsPath });
 
     this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
     this.selectionService.reset();

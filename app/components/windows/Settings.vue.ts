@@ -40,7 +40,6 @@ export default class SceneTransitions extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  categoryName = 'General';
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
     General: 'th-large',
@@ -56,6 +55,14 @@ export default class SceneTransitions extends Vue {
     Appearance: 'television',
     Experimental: 'flask'
   };
+
+  get categoryName() {
+    return this.windowsService.state.child.queryParams.categoryName || 'General';
+  }
+
+  set categoryName(name) {
+    this.settingsService.showSettings(name);
+  }
 
   get categoryNames() {
     return this.settingsService.getCategories();

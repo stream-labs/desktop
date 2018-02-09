@@ -35,6 +35,7 @@ export async function focusChild(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
+  afterStartCb?  (t: any): Promise<any>;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
@@ -88,6 +89,10 @@ export function useSpectron(options: ITestRunnerOptions) {
 
     context = t.context;
     appIsRunning = true;
+
+    if (options.afterStartCb) {
+      await options.afterStartCb(t);
+    }
   }
 
   async function stopApp() {

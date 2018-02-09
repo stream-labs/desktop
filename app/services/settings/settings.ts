@@ -1,27 +1,23 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from 'services/stateful-service';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
   TFormData
-} from '../components/shared/forms/Input';
-import { nodeObs } from './obs-api';
-import { SourcesService } from './sources';
-import { Inject } from '../util/injector';
-import { AudioService, E_AUDIO_CHANNELS } from './audio';
-import { WindowsService } from './windows';
-import Utils from './utils';
-import { AppService } from './app';
+} from '../../components/shared/forms/Input';
+import { nodeObs } from '../obs-api';
+import { SourcesService } from 'services/sources';
+import { Inject } from '../../util/injector';
+import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
+import { WindowsService } from 'services/windows';
+import Utils from '../utils';
+import { AppService } from 'services/app';
 import {
   VideoEncodingOptimizationService,
   IOutputSettings
-} from './video-encoding-optimizations';
+} from '../video-encoding-optimizations';
+import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 
-export interface ISettingsSubCategory {
-  nameSubCategory: string;
-  codeSubCategory?: string;
-  parameters: TFormData;
-}
 
 export interface ISettingsState {
   General: {
@@ -49,12 +45,6 @@ export interface ISettingsState {
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
-export interface ISettingsServiceApi {
-  getCategories(): string[];
-  getSettingsFormData(categoryName: string): ISettingsSubCategory[];
-  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
-  showSettings(): void;
-}
 
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi {
@@ -100,9 +90,10 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
   }
 
-  showSettings() {
+  showSettings(categoryName?: string) {
     this.windowsService.showWindow({
       componentName: 'Settings',
+      queryParams: { categoryName },
       size: {
         width: 800,
         height: 800
