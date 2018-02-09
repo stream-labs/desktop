@@ -55,11 +55,6 @@ export class SelectionService
     const scene = this.getScene();
     const activeObsIds: number[] = [];
 
-    // multiselection is experimental feature
-    if (!this.customizationService.state.experimental.multiselect) {
-      ids = [ids[ids.length - 1]];
-    }
-
     // omit ids that are not presented on the activeScene
     ids = ids.filter(id => {
       const item = scene.getItem(id);
