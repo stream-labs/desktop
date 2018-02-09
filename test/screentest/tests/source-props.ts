@@ -1,7 +1,7 @@
 import test from 'ava';
 import { useSpectron } from '../../helpers/spectron';
 import { ApiClient, getClient } from '../../helpers/api-client';
-import { ISourcesServiceApi } from '../../../app/services/sources/sources-api';
+import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
 import { ISettingsServiceApi } from '../../../app/services/settings';
 import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
@@ -10,13 +10,10 @@ import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 useSpectron({ restartAppAfterEachTest: false });
 useScreentest({ window: 'child' });
 
-const client: ApiClient;
-const sourcesService: ISourcesServiceApi;
-const showSourceProps: (name) => void;
+let showSourceProps: (name: string) => void;
 
-test.before.always(async t => {
-  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
-  const types = [
+test.before(async t => {
+  const types: TSourceType[] = [
     'image_source',
     'color_source',
     'browser_source',
@@ -33,16 +30,17 @@ test.before.always(async t => {
   ];
 
 
-  client = await getClient();
-  sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const sourcesService = client.getResource<ISourcesServiceApi>('SourcesService');
 
   types.forEach(type => {
     scenesService.activeScene.createAndAddSource(type, type);
   });
 
-  showSourceProps = (name) => {
-    const sourceId = this.sourcesService.getSourcesByName(name)[0].sourceId;
-    this.sourcesService.showSourceProperties(sourceId);
+  showSourceProps = (name: string) => {
+    const sourceId = sourcesService.getSourcesByName(name)[0].sourceId;
+    sourcesService.showSourceProperties(sourceId);
   };
 
 
