@@ -1,18 +1,14 @@
 import test from 'ava';
 import { useSpectron } from '../../helpers/spectron';
-import { ApiClient, getClient } from '../../helpers/api-client';
+import { getClient } from '../../helpers/api-client';
 import { ISourcesServiceApi, TSourceType } from '../../../app/services/sources/sources-api';
 import { useScreentest } from '../screenshoter';
-import { ISettingsServiceApi } from '../../../app/services/settings';
 import { IScenesServiceApi } from '../../../app/services/scenes/scenes-api';
 
 
-useSpectron({ restartAppAfterEachTest: false });
-useScreentest({ window: 'child' });
-
 let showSourceProps: (name: string) => void;
 
-test.before(async t => {
+useSpectron({ restartAppAfterEachTest: false, afterStartCb: async t => {
   const types: TSourceType[] = [
     'image_source',
     'color_source',
@@ -42,11 +38,68 @@ test.before(async t => {
     const sourceId = sourcesService.getSourcesByName(name)[0].sourceId;
     sourcesService.showSourceProperties(sourceId);
   };
+}});
 
 
-});
+useScreentest({ window: 'child' });
+
 
 test('image_source', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('color_source', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('browser_source', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('slideshow', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('ffmpeg_source', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('text_gdiplus', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('text_ft2_source', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('monitor_capture', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('game_capture', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('dshow_input', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('wasapi_input_capture', async t => {
+  showSourceProps('image_source')
+  t.pass();
+});
+
+test('wasapi_output_capture', async t => {
   showSourceProps('image_source')
   t.pass();
 });
