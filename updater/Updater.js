@@ -23,6 +23,7 @@ class Updater {
     this.bindListeners();
 
     this.browserWindow = this.initWindow();
+    this.browserWindow.webContents.openDevTools();
 
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
