@@ -5,6 +5,7 @@ import { ISourceApi } from 'services/sources';
 import { IListInput } from 'components/shared/forms/Input';
 import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
+import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 
 @Component({
@@ -16,8 +17,8 @@ export default class WidgetProperties extends Vue {
 
   @Prop() source: ISourceApi;
 
-  @Inject()
-  navigationService: NavigationService;
+  @Inject() navigationService: NavigationService;
+  @Inject() windowsService: WindowsService;
 
   widgetModel: IListInput<string> = null;
 
@@ -67,8 +68,9 @@ export default class WidgetProperties extends Vue {
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',
       [WidgetType.SpinWheel]: 'wheel'
-    }[this.widgetModel.value]
+    }[this.widgetModel.value];
 
-    this.navigationService.navigate('Dashboard', {subPage});
+    this.navigationService.navigate('Dashboard', { subPage });
+    this.windowsService.closeChildWindow();
   }
 }
