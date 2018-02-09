@@ -3,7 +3,6 @@
   <div class="source-info">
     <div class="source-info__text">
       <h3>{{ name }}</h3>
-      <slot name="settings-link"></slot>
       <div class="desc">{{ description }}</div>
 
       <div class="source-support">
@@ -40,11 +39,6 @@
   h3,
   .desc {
     margin-bottom: 12px;
-  }
-
-  h3 {
-    display: inline-block;
-    margin-right: 20px;
   }
 }
 
