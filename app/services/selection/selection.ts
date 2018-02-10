@@ -135,7 +135,6 @@ export class SelectionService
 
   selectAll() {
     this.select(this.getScene().getItems().map(item => item.sceneItemId));
-    return this;
   }
 
 
