@@ -131,7 +131,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
 
     if (this.powerSaveId) electron.remote.powerSaveBlocker.stop(this.powerSaveId);
 
-    nodeObs.OBS_service_stopStreaming();
+    nodeObs.OBS_service_stopStreaming(false);
     this.STOP_STREAMING();
     this.SET_STREAM_STATUS(null);
 
