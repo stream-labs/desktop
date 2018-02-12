@@ -290,7 +290,7 @@ const shouldQuit = app.makeSingleInstance(() => {
 });
 
 if (shouldQuit) {
-  app.quit();
+  app.exit();
 }
 
 app.on('ready', () => {
