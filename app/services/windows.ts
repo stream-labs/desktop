@@ -34,6 +34,7 @@ export interface IWindowOptions {
     height: number;
   };
   scaleFactor: number;
+  title?: string;
 }
 
 interface IWindowsState {
@@ -47,6 +48,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
     },
     child: {
       componentName: 'Blank',
@@ -126,6 +128,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.UPDATE_CHILD_WINDOW_OPTIONS(options);
   }
 
+  updateMainWindowOptions(options: Partial<IWindowOptions>) {
+    this.UPDATE_MAIN_WINDOW_OPTIONS(options);
+  }
+
 
   private getWindow(windowId: TWindowId): Electron.BrowserWindow {
     return windowId === 'child' ? this.windows[1] : this.windows[0];
@@ -135,6 +141,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
     this.state.child = { ...this.state.child, ...options };
+  }
+
+  @mutation()
+  private UPDATE_MAIN_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
+    this.state.main = { ...this.state.main, ...options };
   }
 
   @mutation()
