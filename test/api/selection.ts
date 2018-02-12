@@ -7,12 +7,6 @@ import { ICustomizationServiceApi } from '../../app/services/customization';
 
 useSpectron({ restartAppAfterEachTest: false });
 
-test.beforeEach(async t => {
-  const client = await getClient();
-  const customizationService = client.getResource<ICustomizationServiceApi>('CustomizationService');
-  customizationService.setSettings({ experimental: { multiselect: true } });
-});
-
 test('Selection', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');

@@ -3,7 +3,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import ListInput from 'components/shared/forms/ListInput.vue';
 import { ISourceApi } from 'services/sources';
 import { IListInput } from 'components/shared/forms/Input';
-import { WidgetDefinitions, IWidget } from 'services/widgets';
+import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
+import { NavigationService } from 'services/navigation';
+import { WindowsService } from 'services/windows';
+import { Inject } from 'util/injector';
 
 @Component({
   components: {
@@ -11,8 +14,10 @@ import { WidgetDefinitions, IWidget } from 'services/widgets';
   }
 })
 export default class WidgetProperties extends Vue {
-
   @Prop() source: ISourceApi;
+
+  @Inject() navigationService: NavigationService;
+  @Inject() windowsService: WindowsService;
 
   widgetModel: IListInput<string> = null;
 
@@ -29,7 +34,9 @@ export default class WidgetProperties extends Vue {
   }
 
   refreshWidgetModel() {
-    const value = this.source.getPropertiesManagerSettings().widgetType.toString();
+    const value = this.source
+      .getPropertiesManagerSettings()
+      .widgetType.toString();
 
     this.widgetModel = {
       value,
@@ -46,4 +53,24 @@ export default class WidgetProperties extends Vue {
     };
   }
 
+  navigateDashboard() {
+    const subPage = {
+      [WidgetType.AlertBox]: 'alertbox',
+      [WidgetType.DonationGoal]: 'donationgoal',
+      [WidgetType.FollowerGoal]: 'followergoal',
+      [WidgetType.SubscriberGoal]: 'followergoal',
+      [WidgetType.BitGoal]: 'bitgoal',
+      [WidgetType.DonationTicker]: 'donationticker',
+      [WidgetType.ChatBox]: 'chatbox',
+      [WidgetType.EventList]: 'eventlist',
+      [WidgetType.TheJar]: 'jar',
+      [WidgetType.ViewerCount]: 'viewercount',
+      [WidgetType.StreamBoss]: 'streamboss',
+      [WidgetType.Credits]: 'credits',
+      [WidgetType.SpinWheel]: 'wheel'
+    }[this.widgetModel.value];
+
+    this.navigationService.navigate('Dashboard', { subPage });
+    this.windowsService.closeChildWindow();
+  }
 }

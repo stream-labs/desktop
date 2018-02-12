@@ -41,8 +41,6 @@
   <div class="top-nav-right">
     <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
-        <!--<i class="fa fa-sun-o"/>
-        <i class="fa fa-moon-o"/>-->
         <div class="theme-toggle__bg"></div>
         <img class="theme-toggle__icon theme-toggle__icon--moon" src="../../media/images/moon.png"/>
         <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>

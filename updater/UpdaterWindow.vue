@@ -47,11 +47,10 @@ export default {
 .UpdaterWindow {
   height: 100%;
   padding: 40px;
-
-  color: #444;
+  background-color: #2b383f;
+  color: #f3f3f4;
   font-size: 18px;
   text-align: center;
-
   -webkit-app-region: drag
 }
 
@@ -62,10 +61,13 @@ export default {
 .UpdaterWindow-progressBarContainer {
   position: relative;
   margin-top: 40px;
+  background-color: #13242d;
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .UpdaterWindow-progressBar {
-  height: 40px;
+  height: 30px;
   background-color: #31c3a2;
 }
 
@@ -73,10 +75,9 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-
   width: 100%;
-
   text-align: center;
-  line-height: 40px;
+  line-height: 30px;
+  font-size: 15px;
 }
 </style>

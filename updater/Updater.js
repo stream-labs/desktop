@@ -5,7 +5,6 @@ const { autoUpdater } = require('electron-updater');
 const { BrowserWindow, ipcMain } = require('electron');
 
 class Updater {
-
   // startApp is a callback that will start the app.  Ideally this
   // would have been done with a promise, but electron tries to quit
   // when the last window is closed, so the hand-off has to be
@@ -35,7 +34,7 @@ class Updater {
   // PRIVATE
 
   bindListeners() {
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', info => {
       this.updateState.version = info.version;
       this.updateState.percent = 0;
       this.pushState();
@@ -46,7 +45,7 @@ class Updater {
       this.browserWindow.close();
     });
 
-    autoUpdater.on('download-progress', (progress) => {
+    autoUpdater.on('download-progress', progress => {
       this.updateState.percent = progress.percent;
       this.updateState.bytesPerSecond = progress.percent;
       this.pushState();
@@ -64,7 +63,7 @@ class Updater {
   initWindow() {
     const browserWindow = new BrowserWindow({
       width: 400,
-      height: 200,
+      height: 180,
       frame: false,
       resizable: false,
       show: false
@@ -84,7 +83,6 @@ class Updater {
       this.browserWindow.send('autoUpdate-pushState', this.updateState);
     }
   }
-
 }
 
 exports.Updater = Updater;

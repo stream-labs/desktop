@@ -6,6 +6,8 @@ import { Inject } from '../util/injector';
 import Utils from './utils';
 import { WindowsService } from './windows';
 import { ScalableRectangle } from '../util/ScalableRectangle';
+import { Subscription } from 'rxjs/Subscription';
+import { SelectionService } from 'services/selection';
 
 const { remote } = electron;
 
@@ -15,6 +17,7 @@ export class Display {
   @Inject() settingsService: SettingsService;
   @Inject() videoService: VideoService;
   @Inject() windowsService: WindowsService;
+  @Inject() selectionService: SelectionService;
 
   outputRegionCallbacks: Function[];
   outputRegion: IRectangle;
@@ -29,6 +32,8 @@ export class Display {
 
   windowId: string;
 
+  private selectionSubscription: Subscription;
+
   constructor(public name: string) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
 
@@ -40,6 +45,10 @@ export class Display {
 
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
     this.videoService.registerDisplay(this);
+
+    this.selectionSubscription = this.selectionService.updated.subscribe(() => {
+      this.switchGridlines(this.selectionService.getSize() <= 1);
+    });
   }
 
   /**
@@ -94,6 +103,7 @@ export class Display {
     this.videoService.unregisterDisplay(this);
     nodeObs.OBS_content_destroyDisplay(this.name);
     if (this.trackingInterval) clearInterval(this.trackingInterval);
+    this.selectionSubscription.unsubscribe();
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -118,6 +128,9 @@ export class Display {
     nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
   }
 
+  switchGridlines(enabled: boolean) {
+    nodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
+  }
 }
 
 export class VideoService extends Service {
