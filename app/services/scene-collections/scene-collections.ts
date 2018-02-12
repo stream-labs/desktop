@@ -686,12 +686,16 @@ export class SceneCollectionsService extends Service
                 return Promise.resolve(null);
               })
               .then((data: string) => {
-                return this.serverApi.updateSceneCollection({
-                  id: inManifest.serverId,
-                  name: inManifest.name,
-                  data,
-                  last_updated_at: inManifest.modified
-                });
+                if (data) {
+                  return this.serverApi.updateSceneCollection({
+                    id: inManifest.serverId,
+                    name: inManifest.name,
+                    data,
+                    last_updated_at: inManifest.modified
+                  });
+                }
+
+                return Promise.resolve();
               })
           );
         } else if (
