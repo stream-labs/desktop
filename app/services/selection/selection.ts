@@ -1,25 +1,28 @@
 import { uniq } from 'lodash';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { mutation, StatefulService, ServiceHelper } from 'services/stateful-service';
 import {
   Scene,
   SceneItem,
   ScenesService,
   ISceneItem,
   ISceneItemSettings,
-  IPartialTransform
+  IPartialTransform,
+  ISceneItemActions
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelectionServiceApi } from './selection-api';
-import { CustomizationService } from 'services/customization';
 import { Subject } from 'rxjs/Subject';
-
+import { Subscription } from 'rxjs/Subscription';
 interface ISelectionServiceState {
   lastSelectedId: string;
   selectedIds: string[];
 
 }
 
+/**
+ * represents selection of active scene and provide shortcuts
+ */
 export class SelectionService
   extends StatefulService<ISelectionServiceState>
   implements ISelectionServiceApi
@@ -33,20 +36,210 @@ export class SelectionService
   updated = new Subject<ISelectionServiceState>();
 
   @Inject() private scenesService: ScenesService;
-  @Inject() private customizationService: CustomizationService;
+  private selection: Selection;
+  private selectionSubscription: Subscription;
 
   init() {
+    this.setSelection(this.getScene().getSelection());
     this.scenesService.sceneSwitched.subscribe(() => {
-      this.reset();
+      this.setSelection(this.getScene().getSelection());
     });
   }
 
   // SELECTION METHODS
 
   add(itemIds: string | string[]) {
+    return this.selection.add(itemIds);
+  }
+
+  select(itemIds: string | string[]) {
+    return this.selection.select(itemIds);
+  }
+
+  deselect(itemIds: string | string[]) {
+    return this.selection.deselect(itemIds);
+  }
+
+  reset() {
+    return this.selection.reset();
+  }
+
+  getItems(): SceneItem[] {
+    return this.selection.getItems();
+  }
+
+  getIds(): string[] {
+    return this.selection.getIds();
+  }
+
+  getInvertedIds(): string[] {
+    return this.selection.getInvertedIds();
+  }
+
+  getInverted(): SceneItem[] {
+    return this.selection.getInverted();
+  }
+
+  invert(): SceneItem[] {
+    return this.selection.invert();
+  }
+
+  getLastSelected(): SceneItem {
+    return this.selection.getLastSelected();
+  }
+
+  getSize(): number {
+    return this.selection.getSize();
+  }
+
+  isSelected(item: string | ISceneItem) {
+    return this.selection.isSelected(item);
+  }
+
+  selectAll() {
+    return this.selection.selectAll();
+  }
+
+
+  // SCENE_ITEM METHODS
+
+  setSettings(settings: Partial<ISceneItemSettings>) {
+    return this.selection.setSettings(settings);
+  }
+
+  setVisibility(isVisible: boolean) {
+    return this.selection.setVisibility(isVisible);
+  }
+
+  setTransform(transform: IPartialTransform) {
+    return this.selection.setTransform(transform);
+  }
+
+  resetTransform() {
+    return this.selection.resetTransform();
+  }
+
+  flipY() {
+    return this.selection.flipY();
+  }
+
+  flipX() {
+    return this.selection.flipX();
+  }
+
+  stretchToScreen() {
+    return this.selection.stretchToScreen();
+  }
+
+  fitToScreen() {
+    return this.selection.fitToScreen();
+  }
+
+  centerOnScreen() {
+    return this.selection.centerOnScreen();
+  }
+
+  rotate(deg: number) {
+    return this.selection.rotate(deg);
+  }
+
+  @shortcut('Delete')
+  remove() {
+    return this.selection.remove();
+  }
+
+  @shortcut('ArrowLeft')
+  nudgeActiveItemsLeft() {
+    return this.selection.nudgeActiveItemsLeft();
+  }
+
+  @shortcut('ArrowRight')
+  nudgeActiveItemRight() {
+    return this.selection.nudgeActiveItemRight();
+  }
+
+  @shortcut('ArrowUp')
+  nudgeActiveItemsUp() {
+    return this.selection.nudgeActiveItemsUp();
+  }
+
+  @shortcut('ArrowDown')
+  nudgeActiveItemsDown() {
+    return this.selection.nudgeActiveItemsDown();
+  }
+
+  private getScene(): Scene {
+    return this.scenesService.activeScene;
+  }
+
+  private setSelection(selection: Selection) {
+    if (this.selection) {
+      this.selectionSubscription.unsubscribe();
+    }
+
+    this.selectionSubscription = selection.updated.subscribe(state => {
+
+      const scene = this.getScene();
+      const activeObsIds = this.selection
+        .getItems()
+        .map(sceneItem => sceneItem.obsSceneItemId);
+
+      // tell OBS which sceneItems are selected
+      scene.getObsScene().getItems().forEach(obsSceneItem => {
+        if (activeObsIds.includes(obsSceneItem.id)) {
+          obsSceneItem.selected = true;
+        } else {
+          obsSceneItem.selected = false;
+        }
+      });
+
+      this.SET_SELECTED(state.selectedIds);
+      this.SET_LAST_SELECTED_ID(state.lastSelectedId);
+
+      this.updated.next(this.state);
+    });
+
+    this.selection = selection;
+  }
+
+  @mutation()
+  private SET_LAST_SELECTED_ID(id: string) {
+    this.state.lastSelectedId = id;
+  }
+
+  @mutation()
+  private SET_SELECTED(ids: string[]) {
+    this.state.selectedIds = ids;
+  }
+
+}
+
+/**
+ * Helper for working with multiple sceneItems
+ */
+@ServiceHelper()
+export class Selection  {
+
+  updated = new Subject<{selectedIds: string[], lastSelectedId: string}>();
+
+  @Inject() private scenesService: ScenesService;
+
+  private selectedIds: string[] = [];
+  private lastSelectedId: string;
+
+  constructor(public sceneId: string, itemsIds: string[] = []) {
+    this.select(itemsIds);
+  }
+
+  // SELECTION METHODS
+
+  getScene(): Scene {
+    return this.scenesService.getScene(this.sceneId);
+  }
+
+  add(itemIds: string | string[]) {
     const ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
-    this.select(this.state.selectedIds.concat(ids));
-    this.SET_LAST_SELECTED_ID(ids[ids.length - 1]);
+    this.select(this.selectedIds.concat(ids));
   }
 
   select(itemIds: string | string[]) {
@@ -55,7 +248,7 @@ export class SelectionService
     const scene = this.getScene();
     const activeObsIds: number[] = [];
 
-    // omit ids that are not presented on the activeScene
+    // omit ids that are not presented on the scene
     ids = ids.filter(id => {
       const item = scene.getItem(id);
       if (!item) return false;
@@ -63,28 +256,21 @@ export class SelectionService
       return true;
     });
 
+    this.selectedIds = ids;
 
-    // tell OBS which sceneItems are selected
-    scene.getObsScene().getItems().forEach(obsSceneItem => {
-      if (activeObsIds.includes(obsSceneItem.id)) {
-        obsSceneItem.selected = true;
-      } else {
-        obsSceneItem.selected = false;
-      }
-    });
-
-    this.SET_SELECTED(ids);
-
-    if (!this.state.selectedIds.includes(this.state.lastSelectedId)) {
-      this.SET_LAST_SELECTED_ID(ids[ids.length - 1]);
+    if (!this.selectedIds.includes(this.lastSelectedId)) {
+      this.lastSelectedId = ids[ids.length - 1];
     }
 
-    this.updated.next(this.state);
+    this.updated.next({
+      selectedIds: this.selectedIds,
+      lastSelectedId: this.lastSelectedId
+    });
   }
 
   deselect(itemIds: string | string[]) {
     const ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
-    this.select(this.state.selectedIds.filter(id => !ids.includes(id)));
+    this.select(this.selectedIds.filter(id => !ids.includes(id)));
   }
 
   reset() {
@@ -97,7 +283,7 @@ export class SelectionService
   }
 
   getIds(): string[] {
-    return this.state.selectedIds;
+    return this.selectedIds;
   }
 
   getInvertedIds(): string[] {
@@ -119,11 +305,11 @@ export class SelectionService
   }
 
   getLastSelected(): SceneItem {
-    return this.getScene().getItem(this.state.lastSelectedId);
+    return this.getScene().getItem(this.lastSelectedId);
   }
 
   getSize(): number {
-    return this.state.selectedIds.length;
+    return this.selectedIds.length;
   }
 
   isSelected(item: string | ISceneItem) {
@@ -135,6 +321,12 @@ export class SelectionService
 
   selectAll() {
     this.select(this.getScene().getItems().map(item => item.sceneItemId));
+  }
+
+  groupIntoScene(newSceneName: string): Scene {
+    if (!this.getSize()) return null;
+    const scene = this.scenesService.createScene(newSceneName);
+
   }
 
 
@@ -180,44 +372,24 @@ export class SelectionService
     this.getItems().forEach(item => item.rotate(deg));
   }
 
-  @shortcut('Delete')
   remove() {
     this.getItems().forEach(item => item.remove());
   }
 
-  @shortcut('ArrowLeft')
   nudgeActiveItemsLeft() {
     this.getItems().forEach(item => item.nudgeLeft());
   }
 
-  @shortcut('ArrowRight')
   nudgeActiveItemRight() {
     this.getItems().forEach(item => item.nudgeRight());
   }
 
-  @shortcut('ArrowUp')
   nudgeActiveItemsUp() {
     this.getItems().forEach(item => item.nudgeUp());
   }
 
-  @shortcut('ArrowDown')
   nudgeActiveItemsDown() {
     this.getItems().forEach(item => item.nudgeDown());
   }
-
-  private getScene(): Scene {
-    return this.scenesService.activeScene;
-  }
-
-  @mutation()
-  private SET_LAST_SELECTED_ID(id: string) {
-    this.state.lastSelectedId = id;
-  }
-
-  @mutation()
-  private SET_SELECTED(ids: string[]) {
-    this.state.selectedIds = ids;
-  }
-
 }
 

@@ -12,11 +12,10 @@ import {
   ISceneCreateOptions,
   IScenesServiceApi
 } from './index';
-import { SourcesService } from '../sources';
+import { SourcesService } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
-import { shortcut } from '../shortcuts';
 import * as obs from '../obs-api';
 
 const { ipcRenderer } = electron;
