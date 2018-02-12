@@ -46,7 +46,7 @@ export default class Main extends Vue {
   @Inject() windowsService: WindowsService;
 
   get title() {
-    this.windowsService.state.main.title;
+    return this.windowsService.state.main.title;
   }
 
   get page() {
