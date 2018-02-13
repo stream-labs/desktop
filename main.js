@@ -126,13 +126,15 @@ function startApp() {
   });
 
   mainWindow = new BrowserWindow({
+    minWidth: 800,
+    minHeight: 600,
     width: mainWindowState.width,
     height: mainWindowState.height,
     x: mainWindowState.x,
     y: mainWindowState.y,
     show: false,
     frame: false,
-    title: "Streamlabs OBS",
+    title: 'Streamlabs OBS',
   });
 
   mainWindowState.manage(mainWindow);
