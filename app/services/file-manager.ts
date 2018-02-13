@@ -6,6 +6,7 @@ interface IFile {
   data: string;
   locked: boolean;
   version: number;
+  dirty: boolean;
 }
 
 /**
@@ -21,32 +22,6 @@ interface IFile {
 export class FileManagerService extends Service {
   private files: Dictionary<IFile> = {};
 
-  /**
-   * Registers existing files with the manager.  Any files that were
-   * not created during this session should be registered before reading
-   * to avoid synchronous reads.
-   * @param filePaths An array of paths
-   */
-  async registerFiles(filePaths: string[]) {
-    const promises = filePaths.map(async filePath => {
-      const truePath = path.resolve(filePath);
-      const exists = await this.fileExists(truePath);
-
-      if (exists) {
-        const data = await this.readFile(truePath);
-        if (!this.files[truePath]) {
-          this.files[truePath] = {
-            data,
-            locked: false,
-            version: 0
-          };
-        }
-      }
-    });
-
-    return Promise.all(promises);
-  }
-
   async exists(filePath: string): Promise<boolean> {
     const truePath = path.resolve(filePath);
 
@@ -61,11 +36,13 @@ export class FileManagerService extends Service {
     if (file) {
       file.data = data;
       file.version += 1;
+      file.dirty = true;
     } else {
       this.files[truePath] = {
         data,
         locked: false,
-        version: 0
+        version: 0,
+        dirty: true
       };
     }
 
@@ -76,13 +53,13 @@ export class FileManagerService extends Service {
     const truePath = path.resolve(filePath);
     let file = this.files[truePath];
 
-    // In the event a file wasn't pre-registered, we will fall back to a
-    // synchronous read.
+    // If this is the first read of this file, do a blocking synchronous read
     if (!file) {
       file = this.files[truePath] = {
         data: fs.readFileSync(truePath).toString(),
         locked: false,
-        version: 0
+        version: 0,
+        dirty: false
       };
     }
 
@@ -96,13 +73,29 @@ export class FileManagerService extends Service {
     this.files[trueDest] = {
       data: this.read(trueSource),
       locked: false,
-      version: 0
+      version: 0,
+      dirty: true
     };
 
     this.flush(trueDest);
   }
 
-  private async flush(filePath: string) {
+  /**
+   * Ensures that all dirty files have been flushed.  Should only
+   * be called before shutdown.
+   */
+  async flushAll() {
+    const promises = Object.keys(this.files).filter(filePath => {
+      return this.files[filePath].dirty;
+    })
+    .map(filePath => {
+      return this.flush(filePath);
+    });
+
+    await promises;
+  }
+
+  private async flush(filePath: string, tries = 10) {
     const file = this.files[filePath];
 
     // Current flush attempt will realize it wrote out
@@ -120,9 +113,15 @@ export class FileManagerService extends Service {
       }
 
       file.locked = false;
+      file.dirty = false;
+      console.debug(`Wrote file ${filePath} version ${version}`);
     } catch (e) {
-      file.locked = false;
-      this.flush(filePath);
+      if (tries > 0) {
+        file.locked = false;
+        await this.flush(filePath, tries - 1);
+      } else {
+        console.error(`Ran out of retries writing ${filePath}`);
+      }
     }
   }
 
@@ -133,23 +132,6 @@ export class FileManagerService extends Service {
   private fileExists(filePath: string): Promise<boolean> {
     return new Promise(resolve => {
       fs.exists(filePath, exists => resolve(exists));
-    });
-  }
-
-  /**
-   * Reads the contents of the file into a string
-   * @param string a path to the file
-   */
-  private readFile(filePath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(data.toString());
-      });
     });
   }
 
