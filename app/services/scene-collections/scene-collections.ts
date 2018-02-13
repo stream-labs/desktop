@@ -223,6 +223,7 @@ export class SceneCollectionsService extends Service
       name,
       new Date().toISOString()
     );
+    this.safeSync();
     this.collectionUpdated.next(this.getCollection(id));
   }
 
@@ -364,45 +365,45 @@ export class SceneCollectionsService extends Service
     const promises: Promise<ISceneCollectionSchema>[] = [];
 
     this.collections.forEach(collection => {
+      const data = this.stateService.readCollectionFile(collection.id);
+
       promises.push(
         new Promise<ISceneCollectionSchema>(resolve => {
-          this.stateService.readCollectionFile(collection.id).then(data => {
-            const root = parse(data, NODE_TYPES);
-            const collectionSchema: ISceneCollectionSchema = {
-              id: collection.id,
-              name: collection.name,
+          const root = parse(data, NODE_TYPES);
+          const collectionSchema: ISceneCollectionSchema = {
+            id: collection.id,
+            name: collection.name,
 
-              scenes: root.data.scenes.data.items.map(
-                (sceneData: ISceneSchema) => {
-                  return {
-                    id: sceneData.id,
-                    name: sceneData.name,
-                    sceneItems: sceneData.sceneItems.data.items.map(
-                      (sceneItemData: ISceneItemInfo) => {
-                        return {
-                          sceneItemId: sceneItemData.id,
-                          sourceId: sceneItemData.sourceId
-                        };
-                      }
-                    )
-                  };
-                }
-              ),
+            scenes: root.data.scenes.data.items.map(
+              (sceneData: ISceneSchema) => {
+                return {
+                  id: sceneData.id,
+                  name: sceneData.name,
+                  sceneItems: sceneData.sceneItems.data.items.map(
+                    (sceneItemData: ISceneItemInfo) => {
+                      return {
+                        sceneItemId: sceneItemData.id,
+                        sourceId: sceneItemData.sourceId
+                      };
+                    }
+                  )
+                };
+              }
+            ),
 
-              sources: root.data.sources.data.items.map(
-                (sourceData: ISourceInfo) => {
-                  return {
-                    id: sourceData.id,
-                    name: sourceData.name,
-                    type: sourceData.type,
-                    channel: sourceData.channel
-                  };
-                }
-              )
-            };
+            sources: root.data.sources.data.items.map(
+              (sourceData: ISourceInfo) => {
+                return {
+                  id: sourceData.id,
+                  name: sourceData.name,
+                  type: sourceData.type,
+                  channel: sourceData.channel
+                };
+              }
+            )
+          };
 
-            resolve(collectionSchema);
-          });
+          resolve(collectionSchema);
         })
       );
     });
@@ -429,7 +430,7 @@ export class SceneCollectionsService extends Service
     const exists = await this.stateService.collectionFileExists(id);
 
     if (exists) {
-      const data = await this.stateService.readCollectionFile(id);
+      const data = this.stateService.readCollectionFile(id);
       if (data == null) throw new Error('Got blank data from collection file');
 
       const root = parse(data, NODE_TYPES);
@@ -451,7 +452,7 @@ export class SceneCollectionsService extends Service
     await root.save();
     const data = JSON.stringify(root, null, 2);
 
-    await this.stateService.writeDataToCollectionFile(id, data);
+    this.stateService.writeDataToCollectionFile(id, data);
   }
 
   /**
@@ -568,6 +569,7 @@ export class SceneCollectionsService extends Service
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
+    this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
 
@@ -577,6 +579,7 @@ export class SceneCollectionsService extends Service
   private removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
+    this.safeSync();
 
     // Currently we don't remove files on disk in case we need to recover them
     // manually at a later point in time.  Once we are more comfortable with
@@ -650,19 +653,16 @@ export class SceneCollectionsService extends Service
             // The first time we try to load this collection, we will initialize it
             // with some scenes.
 
-            const promise = response.scene_collection.data == null ?
-              Promise.resolve() :
+            if (response.scene_collection.data != null) {
               this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
+            }
 
-            promise.then(() => {
-              // Only do this after we know we successfully wrote the file
-              this.stateService.ADD_COLLECTION(
-                id,
-                onServer.name,
-                new Date().toISOString()
-              );
-              this.stateService.SET_SERVER_ID(id, onServer.id);
-            });
+            this.stateService.ADD_COLLECTION(
+              id,
+              onServer.name,
+              new Date().toISOString()
+            );
+            this.stateService.SET_SERVER_ID(id, onServer.id);
           })
         );
       } else {
@@ -681,11 +681,10 @@ export class SceneCollectionsService extends Service
         ) {
           promises.push(
             this.stateService
-              .collectionFileExists(inManifest.id).then(exists => {
-                if (exists) return this.stateService.readCollectionFile(inManifest.id);
-                return Promise.resolve(null);
-              })
-              .then((data: string) => {
+              .collectionFileExists(inManifest.id)
+              .then(exists => {
+                const data = this.stateService.readCollectionFile(inManifest.id);
+
                 if (data) {
                   return this.serverApi.updateSceneCollection({
                     id: inManifest.serverId,
@@ -703,19 +702,16 @@ export class SceneCollectionsService extends Service
         ) {
           promises.push(
             this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-              return this.stateService
-                .writeDataToCollectionFile(
-                  inManifest.id,
-                  response.scene_collection.data
-                )
-                .then(() => {
-                  // Only do this once we know we have written successfully
-                  this.stateService.RENAME_COLLECTION(
-                    inManifest.id,
-                    onServer.name,
-                    onServer.last_updated_at
-                  );
-                });
+              this.stateService.writeDataToCollectionFile(
+                inManifest.id,
+                response.scene_collection.data
+              );
+
+              this.stateService.RENAME_COLLECTION(
+                inManifest.id,
+                onServer.name,
+                onServer.last_updated_at
+              );
             })
           );
         } else {
@@ -732,19 +728,17 @@ export class SceneCollectionsService extends Service
       // We already dealt with the overlap above
       if (!onServer) {
         if (!inManifest.serverId) {
+          const data = this.stateService.readCollectionFile(inManifest.id);
+
           promises.push(
-            this.stateService
-              .readCollectionFile(inManifest.id)
-              .then(data => {
-                return this.serverApi
-                  .createSceneCollection({
-                    name: inManifest.name,
-                    data,
-                    last_updated_at: inManifest.modified
-                  })
-                  .then(response => {
-                    this.stateService.SET_SERVER_ID(inManifest.id, response.id);
-                  });
+            this.serverApi
+              .createSceneCollection({
+                name: inManifest.name,
+                data,
+                last_updated_at: inManifest.modified
+              })
+              .then(response => {
+                this.stateService.SET_SERVER_ID(inManifest.id, response.id);
               })
           );
         } else {
