@@ -157,25 +157,28 @@ export class YoutubeService extends Service implements IPlatformService {
   }
 
   @requiresToken()
-  putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
+  putChannelInfo(streamTitle: string, streamDescription: string): Promise<boolean> {
+    return this.fetchDescriptionString().then(autopublishString => {
+      const headers = new Headers();
+      headers.append('Content-Type', 'application/json');
 
-    const data = { snippet: { title: streamTitle }, id: this.liveStreamId };
-    const endpoint = 'liveBroadcasts?part=snippet';
+      const fullDescription = autopublishString.concat(streamDescription);
+      const data = { snippet: { title: streamTitle, description: fullDescription }, id: this.liveStreamId };
+      const endpoint = 'liveBroadcasts?part=snippet';
 
-    const request = new Request(
-      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
-      {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify(data)
-      }
-    );
+      const request = new Request(
+        `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`,
+        {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(data)
+        }
+      );
 
-    return fetch(request)
-      .then(handleErrors)
-      .then(() => true);
+      return fetch(request)
+        .then(handleErrors)
+        .then(() => true);
+    });
   }
 
   searchGames(searchString: string) {
@@ -197,6 +200,7 @@ export class YoutubeService extends Service implements IPlatformService {
       .then(json => {
         const youtubeDomain =
           mode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
+        this.liveStreamId = json.items[0].id;
         return `${youtubeDomain}/live_chat?v=${json.items[0].id}&is_popout=1`;
       });
   }
