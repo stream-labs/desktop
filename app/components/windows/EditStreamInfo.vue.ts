@@ -5,7 +5,7 @@ import windowMixin from '../mixins/window';
 import TextInput from '../shared/forms/TextInput.vue';
 import ListInput from '../shared/forms/ListInput.vue';
 import BoolInput from '../shared/forms/BoolInput.vue';
-import { IFormInput, IListInput } from '../shared/forms/Input';
+import { IFormInput, IListInput, ITextInputValue } from '../shared/forms/Input';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
@@ -60,6 +60,13 @@ export default class EditStreamInfo extends Vue {
     name: 'stream_title',
     description: 'Title',
     value: ''
+  };
+
+  streamDescriptionModel: ITextInputValue = {
+    name: 'stream_description',
+    description: 'Description',
+    value: '',
+    multiline: true
   };
 
   gameModel: IListInput<string> = {
@@ -180,7 +187,7 @@ export default class EditStreamInfo extends Vue {
     }
 
     this.streamInfoService
-      .setStreamInfo(this.streamTitleModel.value, this.gameModel.value)
+      .setStreamInfo(this.streamTitleModel.value, this.streamDescriptionModel.value, this.gameModel.value)
       .then(success => {
         if (success) {
           if (this.midStreamMode) {
@@ -220,6 +227,10 @@ export default class EditStreamInfo extends Vue {
 
   get isTwitch() {
     return this.userService.platform.type === 'twitch';
+  }
+
+  get isYoutube() {
+    return this.userService.platform.type === 'youtube';
   }
 
   get submitText() {
