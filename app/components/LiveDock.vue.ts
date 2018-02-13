@@ -8,6 +8,10 @@ import { UserService } from '../services/user';
 import { Subscription } from 'rxjs/Subscription';
 import { CustomizationService } from 'services/customization';
 import Slider from './shared/Slider.vue';
+import electron from 'electron';
+import { getPlatformService } from 'services/platforms';
+import { YoutubeService } from 'services/platforms/youtube';
+
 
 @Component({
   components: {
@@ -88,6 +92,21 @@ export default class LiveDock extends Vue {
 
   showEditStreamInfo() {
     this.streamingService.showEditStreamInfo();
+  }
+
+  openYoutubeStreamUrl() {
+    const platform = this.userService.platform.type;
+    const service = getPlatformService(platform);
+    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+    const youtubeDomain = nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
+    if (service instanceof YoutubeService) {
+      const url = `${youtubeDomain}/channel/${service.youtubeId}/live`;
+      electron.remote.shell.openExternal(url);
+    }
+  }
+
+  openYoutubeControlRoom() {
+    electron.remote.shell.openExternal('https://www.youtube.com/live_dashboard');
   }
 
   get isTwitch() {
