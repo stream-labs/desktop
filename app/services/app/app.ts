@@ -17,6 +17,7 @@ import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { FileManagerService } from 'services/file-manager';
 
 interface IAppState {
   loading: boolean;
@@ -50,6 +51,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
+  @Inject() private fileManagerService: FileManagerService;
 
   @track('app_start')
   load() {
@@ -102,6 +104,7 @@ export class AppService extends StatefulService<IAppState> {
       this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.reset();
+      await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
