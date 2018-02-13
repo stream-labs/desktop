@@ -57,6 +57,13 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
+  fetchDescriptionString(): Promise<string> {
+    return this.userService.getDonationSettings().then(json => {
+      if (json.settings.autopublish) return `Support the stream: ${json.donation_url} \n`;
+      return '';
+    });
+  }
+
   @requiresToken()
   fetchBoundStreamId(): Promise<string> {
     const endpoint =
