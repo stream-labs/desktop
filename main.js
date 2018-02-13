@@ -321,6 +321,7 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
       childWindow.restore();
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setBounds({
         x: childX,
         y: childY,
@@ -330,6 +331,7 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
     } catch (err) {
       log('Recovering from error:', err);
 
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.center();
     }
