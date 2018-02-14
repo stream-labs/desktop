@@ -107,7 +107,7 @@ export default class Utils {
           derivedDescriptor && derivedDescriptor.get
         ) return;
 
-        // ignore the property if already exist
+        // ignore the property already exist
         if (derivedCtor.prototype[name]) return;
         derivedCtor.prototype[name] = baseCtor.prototype[name];
       });
