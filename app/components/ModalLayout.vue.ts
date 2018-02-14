@@ -4,7 +4,8 @@ import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import TitleBar from './TitleBar.vue';
-import { AppService } from 'services/app'
+import { AppService } from 'services/app';
+import electron from 'electron';
 
 @Component({
   components: { TitleBar }
@@ -19,36 +20,29 @@ export default class ModalLayout extends Vue {
   @Inject() appService: AppService;
 
   // The title shown at the top of the window
-  @Prop()
-  title: string;
+  @Prop() title: string;
 
   // Whether the "cancel" and "done" controls should be
   // shown at the bottom of the modal.
-  @Prop({ default: true })
-  showControls: boolean;
+  @Prop({ default: true }) showControls: boolean;
 
   // If controls are shown, whether or not to show the
   // cancel button.
-  @Prop({ default: true })
-  showCancel: boolean;
+  @Prop({ default: true }) showCancel: boolean;
 
   // Will be called when "done" is clicked if controls
   // are enabled
-  @Prop()
-  doneHandler: Function;
+  @Prop() doneHandler: Function;
 
   // Will be called when "cancel" is clicked.  By default
   // this will just close the window.
-  @Prop()
-  cancelHandler: Function;
+  @Prop() cancelHandler: Function;
 
   // Additional CSS styles for the content section
-  @Prop()
-  contentStyles: Dictionary<string>;
+  @Prop() contentStyles: Dictionary<string>;
 
   // The height of the fixed section
-  @Prop()
-  fixedSectionHeight: number;
+  @Prop() fixedSectionHeight: number;
 
   /**
    * Set to true when using custom controls.
@@ -72,6 +66,8 @@ export default class ModalLayout extends Vue {
 
     this.contentStyle = contentStyle;
     this.fixedStyle = fixedStyle;
+
+    electron.remote.getCurrentWindow().setTitle(this.title);
   }
 
   get nightTheme() {

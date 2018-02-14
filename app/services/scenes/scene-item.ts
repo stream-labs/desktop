@@ -236,7 +236,7 @@ export class SceneItem implements ISceneItemApi {
   resetTransform() {
     this.setTransform({
       position: { x: 0, y: 0 },
-      scale: { x: 0, y: 0 },
+      scale: { x: 1, y: 1 },
       rotation: 0,
       crop: {
         top: 0,

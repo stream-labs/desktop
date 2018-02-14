@@ -2,7 +2,7 @@
 <div class="mixer-item" :class="{ muted: audioSource.muted}">
 
   <div class="flex">
-    <div class="source-name">{{ audioSource.source.displayName }}</div>
+    <div class="source-name">{{ audioSource.source.name }}</div>
     <div class="db-value">
       <div v-if="audioSource.fader.deflection == 0">-Inf dB</div>
       <div v-if="audioSource.fader.deflection !== 0">{{ audioSource.fader.db.toFixed(1) }} dB</div>

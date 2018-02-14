@@ -6,6 +6,7 @@ import { sleep } from '../helpers/sleep';
 import { focusChild } from '../helpers/spectron/index';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio/audio-api';
+import { WindowsService } from "../../app/services/windows";
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -35,12 +36,15 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
   const api = await getClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
+  const windowService = api.getResource<WindowsService>('WindowService');
 
   // tune services to have the same screenshots in any environment
   // PerformanceService causes different cpu usage
   performanceService.stop();
   // AudioSources causes a different volmeter level
   audioService.getSources().forEach(audioSource => audioSource.setMuted(true));
+  // main window title may contain different project version
+  windowService.updateMainWindowOptions({ title: 'Streamlabs OBS - screentest' });
 
 
   if (options.window === 'child') {

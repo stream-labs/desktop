@@ -279,10 +279,6 @@ export class AudioSource implements IAudioSourceApi {
     Utils.applyProxy(this, sourceState);
   }
 
-  get displayName() {
-    return this.source.displayName;
-  }
-
   getModel(): IAudioSource & ISource {
     return { ...this.audioSourceState, ...this.source.sourceState };
   }

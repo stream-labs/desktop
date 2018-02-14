@@ -136,19 +136,30 @@ export class FileManagerService extends Service {
   }
 
   /**
-   * Writes data to a file
+   * Writes data to a file atomically
    * @param filePath a path to the file
    * @param data The data to write
    */
   private writeFile(filePath: string, data: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, data, err => {
+      const tmpPath = `${filePath}.tmp`;
+
+      fs.writeFile(tmpPath, data, err => {
         if (err) {
+          console.error(err);
           reject(err);
           return;
         }
 
-        resolve();
+        fs.rename(tmpPath, filePath, err => {
+          if (err) {
+            console.error(err);
+            reject(err);
+            return;
+          }
+
+          resolve();
+        });
       });
     });
   }
