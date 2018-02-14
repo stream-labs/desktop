@@ -9,6 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { ISceneCollectionsResponse } from './server-api';
+import { FileManagerService } from 'services/file-manager';
+import { Inject } from 'util/injector';
 
 interface ISceneCollectionsManifest {
   activeId: string;
@@ -26,6 +28,8 @@ interface ISceneCollectionsManifest {
 export class SceneCollectionsStateService extends StatefulService<
   ISceneCollectionsManifest
 > {
+  @Inject() fileManagerService: FileManagerService;
+
   static initialState: ISceneCollectionsManifest = {
     activeId: null,
     collections: []
@@ -125,29 +129,18 @@ export class SceneCollectionsStateService extends StatefulService<
    * Checks if a collection file exists
    * @param id the id of the collection
    */
-  collectionFileExists(id: string): Promise<boolean> {
-    return new Promise(resolve => {
-      const filePath = this.getCollectionFilePath(id);
-      fs.exists(filePath, exists => resolve(exists));
-    });
+  async collectionFileExists(id: string) {
+    const filePath = this.getCollectionFilePath(id);
+    return this.fileManagerService.exists(filePath);
   }
 
   /**
    * Reads the contents of the file into a string
    * @param id The id of the collection
    */
-  readCollectionFile(id: string): Promise<string> {
+  readCollectionFile(id: string) {
     const filePath = this.getCollectionFilePath(id);
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(data.toString());
-      });
-    });
+    return this.fileManagerService.read(filePath);
   }
 
   /**
@@ -155,18 +148,9 @@ export class SceneCollectionsStateService extends StatefulService<
    * @param id The id of the file
    * @param data The data to write
    */
-  writeDataToCollectionFile(id: string, data: string): Promise<void> {
+  writeDataToCollectionFile(id: string, data: string) {
     const collectionPath = this.getCollectionFilePath(id);
-    return new Promise((resolve, reject) => {
-      fs.writeFile(collectionPath, data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve();
-      });
-    });
+    this.fileManagerService.write(collectionPath, data);
   }
 
   /**
@@ -174,17 +158,11 @@ export class SceneCollectionsStateService extends StatefulService<
    * @param sourceId the scene collection to copy
    * @param destId the scene collection to copy to
    */
-  copyCollectionFile(sourceId: string, destId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const rd = fs.createReadStream(this.getCollectionFilePath(sourceId));
-      const wr = fs.createWriteStream(this.getCollectionFilePath(destId));
-
-      rd.on('error', err => reject(err));
-      wr.on('error', err => reject(err));
-      wr.on('close', () => resolve());
-
-      rd.pipe(wr);
-    });
+  copyCollectionFile(sourceId: string, destId: string) {
+    this.fileManagerService.copy(
+      this.getCollectionFilePath(sourceId),
+      this.getCollectionFilePath(destId)
+    );
   }
 
   /**

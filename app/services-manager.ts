@@ -61,6 +61,7 @@ import {
   IMutation
 } from 'services/jsonrpc';
 import { JsonrpcService } from './services/jsonrpc/jsonrpc';
+import { FileManagerService } from 'services/file-manager';
 
 const { ipcRenderer } = electron;
 
@@ -122,7 +123,8 @@ export class ServicesManager extends Service {
     TroubleshooterService,
     JsonrpcService,
     SelectionService,
-    Selection
+    Selection,
+    FileManagerService
   };
 
   private instances: Dictionary<Service> = {};
