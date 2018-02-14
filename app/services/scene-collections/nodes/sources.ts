@@ -49,7 +49,7 @@ export interface ISourceInfo {
 
 export class SourcesNode extends Node<ISchema, {}> {
 
-  schemaVersion = 2;
+  schemaVersion = 3;
 
   @Inject() private fontLibraryService: FontLibraryService;
   @Inject() private sourcesService: SourcesService;
@@ -239,5 +239,32 @@ export class SourcesNode extends Node<ISchema, {}> {
     return new Promise(resolve => {
       Promise.all(promises).then(() => resolve());
     });
+  }
+
+
+  migrate(version: number) {
+
+    // migrate audio sources names
+    if (version < 3) {
+
+      this.data.items.forEach(source => {
+
+        const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(source.name);
+        if (desktopDeviceMatch) {
+          const index = parseInt(desktopDeviceMatch[1], 10);
+          source.name = 'Desktop Audio' + (index > 1 ? ' ' + index : '');
+          return;
+        }
+
+        const auxDeviceMatch = /^AuxAudioDevice(\d)$/.exec(source.name);
+        if (auxDeviceMatch) {
+          const index = parseInt(auxDeviceMatch[1], 10);
+          source.name = 'Mic/Aux' + (index > 1 ? ' ' + index : '');
+          return;
+        }
+
+      });
+
+    }
   }
 }

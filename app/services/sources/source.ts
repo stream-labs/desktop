@@ -33,29 +33,6 @@ export class Source implements ISourceApi {
   @Inject()
   scenesService: ScenesService;
 
-  /**
-   * displayName can be localized in future releases
-   */
-  get displayName() {
-    if (this.name === 'AuxAudioDevice1') return 'Mic/Aux';
-    if (this.name === 'DesktopAudioDevice1') return 'Desktop Audio';
-    const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(this.name);
-    const auxDeviceMatch = /^AuxAudioDevice(\d)$/.exec(this.name);
-
-    if (desktopDeviceMatch) {
-      const index = parseInt(desktopDeviceMatch[1], 10);
-      return 'Desktop Audio' + (index > 1 ? ' ' + index : '');
-    }
-
-    if (auxDeviceMatch) {
-      const index = parseInt(auxDeviceMatch[1], 10);
-      return 'Mic/Aux' + (index > 1 ? ' ' + index : '');
-    }
-
-    return this.name;
-  }
-
-
   getObsInput(): obs.IInput {
     return obs.InputFactory.fromName(this.sourceId);
   }
@@ -140,7 +117,6 @@ export class Source implements ISourceApi {
   }
 
   setName(newName: string) {
-    debugger;
     this.SET_NAME(newName);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }

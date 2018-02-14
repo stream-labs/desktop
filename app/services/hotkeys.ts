@@ -99,7 +99,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Show '${sceneItem.source.displayName}'`;
+        return `Show '${sceneItem.source.name}'`;
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
@@ -110,7 +110,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Hide '${sceneItem.source.displayName}'`;
+        return `Hide '${sceneItem.source.name}'`;
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,

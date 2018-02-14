@@ -213,7 +213,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `Desktop Audio Device ${deviceInd}`,
-        name: `DesktopAudioDevice${deviceInd}`,
+        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -241,7 +241,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `Mic/Auxiliary device ${deviceInd}`,
-        name: `AuxAudioDevice${deviceInd}`,
+        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -282,33 +282,41 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
+    const audioDevices = this.audioService.getDevices();
+
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [
         E_AUDIO_CHANNELS.OUTPUT_1,
         E_AUDIO_CHANNELS.OUTPUT_2
       ].includes(channel);
-      let source = this.sourcesService
+      const source = this.sourcesService
         .getSources()
         .find(source => source.channel === channel);
 
-      if (source) {
+
+      if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {
           this.sourcesService.removeSource(source.sourceId);
           return;
         }
       } else if (deviceForm.value !== null) {
-        source = this.sourcesService.createSource(
-          deviceForm.name,
-          isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
-          {},
-          { channel }
-        );
+
+        const device = audioDevices.find(device => device.id === deviceForm.value);
+        const displayName = device.id === 'default' ? deviceForm.name : device.description;
+
+        if (!source) {
+          this.sourcesService.createSource(
+            displayName,
+            isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
+            {},
+            { channel }
+          );
+        } else {
+          source.updateSettings({ device_id: deviceForm.value, name: displayName });
+        }
       }
 
-      if (source && deviceForm.value !== null) {
-        source.updateSettings({ device_id: deviceForm.value });
-      }
     });
   }
 
