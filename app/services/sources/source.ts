@@ -136,7 +136,6 @@ export class Source implements ISourceApi {
   }
 
   setName(newName: string) {
-    debugger;
     this.SET_NAME(newName);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }

@@ -227,10 +227,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
-  showNameScene(rename?: string) {
+  showNameScene(options: {rename?: string, itemsToGroup?: string[] } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
-      queryParams: { rename },
+      queryParams: options,
       size: {
         width: 400,
         height: 250

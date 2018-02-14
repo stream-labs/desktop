@@ -63,8 +63,8 @@ export class Scene implements ISceneApi {
     return this.sceneState.items.map(item => item.sceneItemId);
   }
 
-  getSelection(): Selection {
-    return new Selection(this.id);
+  getSelection(itemsIds?: string[]): Selection {
+    return new Selection(this.id, itemsIds);
   }
 
   setName(newName: string) {
@@ -211,6 +211,11 @@ export class Scene implements ISceneApi {
       });
     if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
     return uniqBy(result, 'sceneItemId');
+  }
+
+
+  makeActive() {
+    this.scenesService.makeSceneActive(this.id);
   }
 
 

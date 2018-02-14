@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs/Observable';
-import { ISourceApi, TSourceType, ISource } from '../sources';
+import { ISourceApi, TSourceType, ISource } from 'services/sources';
+import { ISelection, TItemsList } from 'services/selection';
 
 /**
  * Api for scenes management
@@ -40,6 +41,8 @@ export interface ISceneApi extends IScene {
   canAddSource(sourceId: string): boolean;
   setName(newName: string): void;
   getModel(): IScene;
+  makeActive(): void;
+  getSelection(itemsList: TItemsList): ISelection;
 }
 
 
@@ -120,6 +123,11 @@ export interface ISceneItemActions {
   centerOnScreen(): void;
   rotate(deg: number): void;
   remove(): void;
+
+  /**
+   * only for scene sources
+   */
+  setContentCrop(): void;
 }
 
 export interface ISceneItemApi extends ISceneItem, ISceneItemActions {

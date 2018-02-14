@@ -6,226 +6,160 @@ import {
   ScenesService,
   ISceneItem,
   ISceneItemSettings,
-  IPartialTransform,
-  ISceneItemActions
+  IPartialTransform
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
-import { ISelectionServiceApi } from './selection-api';
+import { ISelection, ISelectionServiceApi, ISelectionState, TItemsList } from './selection-api';
 import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-interface ISelectionServiceState {
-  lastSelectedId: string;
-  selectedIds: string[];
+import Utils from '../utils';
 
-}
 
 /**
  * represents selection of active scene and provide shortcuts
  */
 export class SelectionService
-  extends StatefulService<ISelectionServiceState>
+  extends StatefulService<ISelectionState>
   implements ISelectionServiceApi
 {
 
-  static initialState: ISelectionServiceState = {
+  static initialState: ISelectionState = {
     selectedIds: [],
     lastSelectedId: ''
   };
 
-  updated = new Subject<ISelectionServiceState>();
+  updated = new Subject<ISelectionState>();
+  private sceneId: string;
 
   @Inject() private scenesService: ScenesService;
-  private selection: Selection;
-  private selectionSubscription: Subscription;
 
   init() {
-    this.setSelection(this.getScene().getSelection());
     this.scenesService.sceneSwitched.subscribe(() => {
-      this.setSelection(this.getScene().getSelection());
+      this.reset();
     });
   }
 
   // SELECTION METHODS
 
-  add(itemIds: string | string[]) {
-    return this.selection.add(itemIds);
-  }
-
-  select(itemIds: string | string[]) {
-    return this.selection.select(itemIds);
-  }
-
-  deselect(itemIds: string | string[]) {
-    return this.selection.deselect(itemIds);
-  }
-
-  reset() {
-    return this.selection.reset();
-  }
-
-  getItems(): SceneItem[] {
-    return this.selection.getItems();
-  }
-
-  getIds(): string[] {
-    return this.selection.getIds();
-  }
-
-  getInvertedIds(): string[] {
-    return this.selection.getInvertedIds();
-  }
-
-  getInverted(): SceneItem[] {
-    return this.selection.getInverted();
-  }
-
-  invert(): SceneItem[] {
-    return this.selection.invert();
-  }
-
-  getLastSelected(): SceneItem {
-    return this.selection.getLastSelected();
-  }
-
-  getSize(): number {
-    return this.selection.getSize();
-  }
-
-  isSelected(item: string | ISceneItem) {
-    return this.selection.isSelected(item);
-  }
-
-  selectAll() {
-    return this.selection.selectAll();
-  }
+  add: (items: TItemsList) => ISelection;
+  deselect: (items: TItemsList) => ISelection;
+  reset: () => ISelection;
+  selectAll: () => ISelection;
+  invert: () => ISelection;
+  getItems: () => SceneItem[];
+  getVisualItems: () => SceneItem[];
+  getIds: () => string[];
+  getInvertedIds: () => string[];
+  getInverted: () => SceneItem[];
+  getBoundingRect: () => IRectangle;
+  getLastSelected: () => SceneItem;
+  getSize: () => number;
+  isSelected: (item: string | ISceneItem) => boolean;
+  copyReferenceTo: (sceneId: string) => SceneItem[];
+  copyTo: (sceneId: string) => SceneItem[];
+  moveTo: (sceneId: string) => SceneItem[];
 
 
   // SCENE_ITEM METHODS
 
-  setSettings(settings: Partial<ISceneItemSettings>) {
-    return this.selection.setSettings(settings);
-  }
+  setSettings: (settings: Partial<ISceneItemSettings>) => void;
+  setVisibility: (isVisible: boolean) => void;
+  setTransform: (transform: IPartialTransform) => void;
+  resetTransform: () => void;
+  flipY: () => void;
+  flipX: () => void;
+  stretchToScreen: () => void;
+  fitToScreen: () => void;
+  centerOnScreen: () => void;
+  rotate: (deg: number) => void;
+  setContentCrop: () => void;
 
-  setVisibility(isVisible: boolean) {
-    return this.selection.setVisibility(isVisible);
-  }
-
-  setTransform(transform: IPartialTransform) {
-    return this.selection.setTransform(transform);
-  }
-
-  resetTransform() {
-    return this.selection.resetTransform();
-  }
-
-  flipY() {
-    return this.selection.flipY();
-  }
-
-  flipX() {
-    return this.selection.flipX();
-  }
-
-  stretchToScreen() {
-    return this.selection.stretchToScreen();
-  }
-
-  fitToScreen() {
-    return this.selection.fitToScreen();
-  }
-
-  centerOnScreen() {
-    return this.selection.centerOnScreen();
-  }
-
-  rotate(deg: number) {
-    return this.selection.rotate(deg);
-  }
 
   @shortcut('Delete')
   remove() {
-    return this.selection.remove();
+    return this.getSelection().remove.call(this);
   }
 
   @shortcut('ArrowLeft')
   nudgeActiveItemsLeft() {
-    return this.selection.nudgeActiveItemsLeft();
+    return this.getSelection().nudgeActiveItemsLeft.call(this);
   }
 
   @shortcut('ArrowRight')
   nudgeActiveItemRight() {
-    return this.selection.nudgeActiveItemRight();
+    return this.getSelection().nudgeActiveItemRight.call(this);
   }
 
   @shortcut('ArrowUp')
   nudgeActiveItemsUp() {
-    return this.selection.nudgeActiveItemsUp();
+    return this.getSelection().nudgeActiveItemsUp.call(this);
   }
 
   @shortcut('ArrowDown')
   nudgeActiveItemsDown() {
-    return this.selection.nudgeActiveItemsDown();
+    return this.getSelection().nudgeActiveItemsDown.call(this);
   }
 
+  /**
+   * @override Selection.select
+   */
+  select(items: TItemsList): ISelection {
+    this.getSelection().select.call(this, items);
+
+    const scene = this.getScene();
+    const activeObsIds = this.getItems()
+      .map(sceneItem => sceneItem.obsSceneItemId);
+
+    // tell OBS which sceneItems are selected
+    scene.getObsScene().getItems().forEach(obsSceneItem => {
+      if (activeObsIds.includes(obsSceneItem.id)) {
+        obsSceneItem.selected = true;
+      } else {
+        obsSceneItem.selected = false;
+      }
+    });
+
+    this.updated.next(this.state);
+    return this;
+  }
+
+
+  /**
+   * @override Selection.getScene
+   */
   private getScene(): Scene {
     return this.scenesService.activeScene;
   }
 
-  private setSelection(selection: Selection) {
-    if (this.selection) {
-      this.selectionSubscription.unsubscribe();
-    }
+  private getSelection(): Selection {
+    return Selection.prototype;
+  }
 
-    this.selectionSubscription = selection.updated.subscribe(state => {
-
-      const scene = this.getScene();
-      const activeObsIds = this.selection
-        .getItems()
-        .map(sceneItem => sceneItem.obsSceneItemId);
-
-      // tell OBS which sceneItems are selected
-      scene.getObsScene().getItems().forEach(obsSceneItem => {
-        if (activeObsIds.includes(obsSceneItem.id)) {
-          obsSceneItem.selected = true;
-        } else {
-          obsSceneItem.selected = false;
-        }
-      });
-
-      this.SET_SELECTED(state.selectedIds);
-      this.SET_LAST_SELECTED_ID(state.lastSelectedId);
-
-      this.updated.next(this.state);
-    });
-
-    this.selection = selection;
+  /**
+   * @override Selection.setState
+   */
+  private setState(state: Partial<ISelectionState>) {
+    this.SET_STATE(state);
   }
 
   @mutation()
-  private SET_LAST_SELECTED_ID(id: string) {
-    this.state.lastSelectedId = id;
+  private SET_STATE(state: Partial<ISelectionState>) {
+    Object.assign(this.state, state);
   }
-
-  @mutation()
-  private SET_SELECTED(ids: string[]) {
-    this.state.selectedIds = ids;
-  }
-
 }
 
 /**
  * Helper for working with multiple sceneItems
  */
 @ServiceHelper()
-export class Selection  {
-
-  updated = new Subject<{selectedIds: string[], lastSelectedId: string}>();
+export class Selection implements ISelection {
 
   @Inject() private scenesService: ScenesService;
 
-  private selectedIds: string[] = [];
-  private lastSelectedId: string;
+  private state: ISelectionState = {
+    selectedIds: [],
+    lastSelectedId: ''
+  };
 
   constructor(public sceneId: string, itemsIds: string[] = []) {
     this.select(itemsIds);
@@ -237,13 +171,14 @@ export class Selection  {
     return this.scenesService.getScene(this.sceneId);
   }
 
-  add(itemIds: string | string[]) {
-    const ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
-    this.select(this.selectedIds.concat(ids));
+  add(itemsList: TItemsList): Selection {
+    const ids = this.resolveItemsList(itemsList);
+    this.select(this.state.selectedIds.concat(ids));
+    return this;
   }
 
-  select(itemIds: string | string[]) {
-    let ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
+  select(itemsList: TItemsList): Selection {
+    let ids = this.resolveItemsList(itemsList);
     ids = uniq(ids);
     const scene = this.getScene();
     const activeObsIds: number[] = [];
@@ -256,25 +191,24 @@ export class Selection  {
       return true;
     });
 
-    this.selectedIds = ids;
+    this.setState({ selectedIds: ids });
 
-    if (!this.selectedIds.includes(this.lastSelectedId)) {
-      this.lastSelectedId = ids[ids.length - 1];
+    if (!this.state.selectedIds.includes(this.state.lastSelectedId)) {
+      this.setState({ lastSelectedId: ids[ids.length - 1] });
     }
 
-    this.updated.next({
-      selectedIds: this.selectedIds,
-      lastSelectedId: this.lastSelectedId
-    });
+    return this;
   }
 
-  deselect(itemIds: string | string[]) {
-    const ids: string[] = Array.isArray(itemIds) ? itemIds : [itemIds];
-    this.select(this.selectedIds.filter(id => !ids.includes(id)));
+  deselect(itemsList: TItemsList): Selection {
+    const ids = this.resolveItemsList(itemsList);
+    this.select(this.state.selectedIds.filter(id => !ids.includes(id)));
+    return this;
   }
 
-  reset() {
+  reset(): Selection {
     this.select([]);
+    return this;
   }
 
   getItems(): SceneItem[] {
@@ -282,8 +216,12 @@ export class Selection  {
     return this.getIds().map(id => scene.getItem(id));
   }
 
+  getVisualItems(): SceneItem[] {
+    return this.getItems().filter(item => item.isVisualSource);
+  }
+
   getIds(): string[] {
-    return this.selectedIds;
+    return this.state.selectedIds;
   }
 
   getInvertedIds(): string[] {
@@ -293,23 +231,49 @@ export class Selection  {
     });
   }
 
+  getLastSelected(): SceneItem {
+    return this.getScene().getItem(this.state.lastSelectedId);
+  }
+
+  getSize(): number {
+    return this.state.selectedIds.length;
+  }
+
+  getBoundingRect(): IRectangle {
+    const items = this.getVisualItems();
+    if (!items.length) return null;
+
+    let minTop = Infinity;
+    let minLeft = Infinity;
+    let maxRight = -Infinity;
+    let maxBottom = -Infinity;
+
+    items.forEach(item => {
+      const rect = item.getRectangle();
+      rect.normalize();
+      minTop = Math.min(minTop, rect.y);
+      minLeft = Math.min(minLeft, rect.x);
+      maxRight = Math.max(maxRight, rect.x + rect.width);
+      maxBottom = Math.max(maxBottom, rect.y + rect.height);
+    });
+
+    return {
+      x: minLeft,
+      y: minTop,
+      width: maxRight - minLeft,
+      height: maxBottom - minTop
+    };
+  }
+
   getInverted(): SceneItem[] {
     const scene = this.getScene();
     return this.getInvertedIds().map(id => scene.getItem(id));
   }
 
-  invert(): SceneItem[] {
+  invert(): Selection {
     const items = this.getInverted();
     this.select(items.map(item => item.sceneItemId));
-    return items;
-  }
-
-  getLastSelected(): SceneItem {
-    return this.getScene().getItem(this.lastSelectedId);
-  }
-
-  getSize(): number {
-    return this.selectedIds.length;
+    return this;
   }
 
   isSelected(item: string | ISceneItem) {
@@ -319,16 +283,48 @@ export class Selection  {
     return this.getIds().includes(itemId);
   }
 
-  selectAll() {
+  selectAll(): Selection {
     this.select(this.getScene().getItems().map(item => item.sceneItemId));
+    return this;
   }
 
-  groupIntoScene(newSceneName: string): Scene {
-    if (!this.getSize()) return null;
-    const scene = this.scenesService.createScene(newSceneName);
-
+  copyReferenceTo(sceneId: string): SceneItem[] {
+    const insertedItems: SceneItem[] = [];
+    const scene = this.scenesService.getScene(sceneId);
+    this.state.selectedIds.forEach(sceneItemId => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+      const insertedItem = scene.addSource(sceneItem.sourceId);
+      insertedItem.setSettings(sceneItem.getSettings());
+      insertedItems.push(insertedItem);
+    });
+    return insertedItems;
   }
 
+  copyTo(sceneId: string): SceneItem[] {
+    const insertedItems: SceneItem[] = [];
+    const scene = this.scenesService.getScene(sceneId);
+    this.state.selectedIds.forEach(sceneItemId => {
+      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+      const duplicatedSource = sceneItem.getSource().duplicate();
+
+      if (!duplicatedSource) {
+        alert(`Unable to duplicate ${sceneItem.name}`);
+        return;
+      }
+
+      const insertedItem = scene.addSource(duplicatedSource.sourceId);
+      insertedItem.setSettings(sceneItem.getSettings());
+      insertedItems.push(insertedItem);
+    });
+    return insertedItems;
+  }
+
+  moveTo(sceneId: string): SceneItem[] {
+    if (this.sceneId === sceneId) return;
+    const insertedItems = this.copyReferenceTo(sceneId);
+    this.remove();
+    return insertedItems;
+  }
 
   // SCENE_ITEM METHODS
 
@@ -372,6 +368,11 @@ export class Selection  {
     this.getItems().forEach(item => item.rotate(deg));
   }
 
+  setContentCrop() {
+    this.getItems().forEach(item => item.setContentCrop());
+  }
+
+
   remove() {
     this.getItems().forEach(item => item.remove());
   }
@@ -391,5 +392,32 @@ export class Selection  {
   nudgeActiveItemsDown() {
     this.getItems().forEach(item => item.nudgeDown());
   }
+
+  private resolveItemsList(itemsList: TItemsList): string[] {
+    if (Array.isArray(itemsList)) {
+
+      if (!itemsList.length) {
+        return [];
+      }
+
+      if (typeof itemsList[0] === 'string') {
+        return itemsList as string[];
+      }
+      return (itemsList as ISceneItem[]).map(item => item.sceneItemId);
+
+    }
+
+    if (typeof itemsList === 'string') {
+      return [itemsList];
+    }
+
+    return [itemsList.sceneItemId];
+  }
+
+  private setState(state: Partial<ISelectionState>) {
+    Object.assign(this.state, state);
+  }
 }
 
+// Apply a mixin to selection service to have a reactive state
+Utils.applyMixins(SelectionService, [Selection]);

@@ -5,6 +5,7 @@ import { SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
+import { GroupMenu } from './GroupMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { WidgetsService } from 'services/widgets';
 import { CustomizationService } from 'services/customization';
@@ -95,6 +96,13 @@ export class EditMenu extends Menu {
         label: 'Transform',
         submenu: this.transformSubmenu().menu
       });
+
+      if (this.customizationService.state.experimental.sceneItemsGrouping) {
+        this.append({
+          label: 'Group',
+          submenu: this.groupSubmenu().menu
+        });
+      }
 
       const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
 
@@ -204,6 +212,10 @@ export class EditMenu extends Menu {
   }
 
   private transformSubmenu() {
-    return new SourceTransformMenu(this.scene.id);
+    return new SourceTransformMenu();
+  }
+
+  private groupSubmenu() {
+    return new GroupMenu();
   }
 }
