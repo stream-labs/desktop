@@ -135,8 +135,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       options.sourceId ||
       (type + '_' + ipcRenderer.sendSync('getUniqueId'));
 
-    if ((type === 'browser_source') && (settings.shutdown === void 0)) {
-      settings.shutdown = true;
+    if (type === 'browser_source') {
+      if (settings.shutdown === void 0) settings.shutdown = true;
+      if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
     }
 
     const obsInput = obs.InputFactory.create(type, id, settings);
