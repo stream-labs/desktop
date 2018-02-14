@@ -191,3 +191,30 @@ test('SceneItem.setSettings()', async t => {
 
 
 });
+
+
+test('SceneItem.resetTransform()', async t => {
+  const client = await getClient();
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  const sceneItem = scene.createAndAddSource('MyColorSource', 'color_source');
+
+  sceneItem.setTransform({
+    position: { x: 100, y: 100 },
+    scale: { x: 100, y: 100 },
+    crop: { top: 100, right: 100, bottom: 100, left: 100 },
+    rotation: 100,
+  });
+
+  sceneItem.resetTransform();
+
+  t.deepEqual(sceneItem.getModel().transform, {
+    position: { x: 0, y: 0 },
+    scale: { x: 1, y: 1 },
+    crop: { top: 0, right: 0, bottom: 0, left: 0 },
+    rotation: 0,
+  });
+
+
+});
