@@ -4,11 +4,19 @@ import { PerformanceService } from '../services/performance';
 import { Inject } from '../util/injector';
 import { Component } from 'vue-property-decorator';
 import { compact } from 'lodash';
+import { VTooltip, VPopover, VClosePopover } from 'v-tooltip';
+
+Vue.directive('tooltip', VTooltip)
+Vue.directive('close-popover', VClosePopover)
+Vue.component('v-popover', VPopover)
 
 @Component({})
 export default class PerformanceMetrics extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
+
+  droppedFramesTooltip = "When your capture card does not take in all the information it is given"
+  fpsTooltip = "Frames Per Second"
 
   get frameRate() {
     return this.performanceService.state.frameRate.toFixed(2);

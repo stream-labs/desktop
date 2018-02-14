@@ -72,7 +72,8 @@
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.16/streamlabs-x86_64-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "v-tooltip": "^2.0.0-rc.31"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",

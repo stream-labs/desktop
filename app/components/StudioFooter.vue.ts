@@ -7,13 +7,18 @@ import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
+import { VTooltip, VPopover, VClosePopover } from 'v-tooltip';
+
+Vue.directive('tooltip', VTooltip)
+Vue.directive('close-popover', VClosePopover)
+Vue.component('v-popover', VPopover)
 
 @Component({
   components: {
     StartStreamingButton,
     TestWidgets,
     PerformanceMetrics,
-    NotificationsArea
+    NotificationsArea,
   }
 })
 export default class StudioFooterComponent extends Vue {
@@ -21,6 +26,8 @@ export default class StudioFooterComponent extends Vue {
   @Inject() userService: UserService;
 
   @Prop() locked: boolean;
+
+  recordButtonTooltip = "The record feature can be used while you are live or on it's own. Find your recordings in Settings -> Output";
 
   toggleRecording() {
     if (this.recording) {
