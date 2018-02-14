@@ -236,7 +236,7 @@ export class ApiClient {
         let subject = this.subscriptions[result.resourceId];
         if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
         return subject;
-      } else if (result && result._type === 'HELPER') {
+      } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
       } else {
 

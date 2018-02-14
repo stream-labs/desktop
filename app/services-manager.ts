@@ -345,6 +345,12 @@ export class ServicesManager extends Service {
         resourceId: helper.resourceId,
         ...!compactMode ? this.getHelperModel(helper) : {}
       });
+    } else if (responsePayload && responsePayload instanceof Service) {
+      response = this.jsonrpc.createResponse(request, {
+        _type: 'SERVICE',
+        resourceId: responsePayload.serviceName,
+        ...!compactMode ? this.getHelperModel(responsePayload) : {}
+      });
     } else {
       // payload can contain helpers-objects
       // we have to wrap them in IpcProxy too

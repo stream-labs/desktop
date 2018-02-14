@@ -393,6 +393,10 @@ export class Selection implements ISelection {
     this.getItems().forEach(item => item.nudgeDown());
   }
 
+  getModel() {
+    return { sceneId: this.sceneId, ...this.state };
+  }
+
   /**
    * returns an array of sceneItem ids
    */
