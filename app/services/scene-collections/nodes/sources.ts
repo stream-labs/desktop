@@ -249,17 +249,6 @@ export class SourcesNode extends Node<ISchema, {}> {
 
       this.data.items.forEach(source => {
 
-        if (source.name === 'AuxAudioDevice1') {
-          source.name =  'Mic/Aux';
-          return;
-        }
-
-        if (source.name === 'DesktopAudioDevice1') {
-          source.name = 'Desktop Audio';
-          return;
-
-        }
-
         const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(source.name);
         if (desktopDeviceMatch) {
           const index = parseInt(desktopDeviceMatch[1], 10);
