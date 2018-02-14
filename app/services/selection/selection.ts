@@ -393,6 +393,9 @@ export class Selection implements ISelection {
     this.getItems().forEach(item => item.nudgeDown());
   }
 
+  /**
+   * returns an array of sceneItem ids
+   */
   private resolveItemsList(itemsList: TItemsList): string[] {
     if (Array.isArray(itemsList)) {
 
