@@ -126,7 +126,11 @@ export class Source implements ISourceApi {
     return this.sourcesService.createSource(
       this.sourcesService.suggestName(this.name),
       this.type,
-      this.getSettings()
+      this.getSettings(),
+      {
+        propertiesManager: this.getPropertiesManagerType(),
+        propertiesManagerSettings: this.getPropertiesManagerSettings()
+      }
     );
   }
 
