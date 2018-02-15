@@ -20,6 +20,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   static initialState = {
     isStreaming: false,
     streamStartTime: null,
+    streamEndTime: null,
     isRecording: false,
     recordStartTime: null,
     streamOk: null
@@ -29,12 +30,19 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   START_STREAMING(startTime: string) {
     this.state.isStreaming = true;
     this.state.streamStartTime = startTime;
+    this.state.streamEndTime = null;
   }
 
   @mutation()
-  STOP_STREAMING() {
+  STOP_STREAMING(endTime: string) {
     this.state.isStreaming = false;
     this.state.streamStartTime = null;
+    this.state.streamEndTime = endTime;
+  }
+
+  @mutation()
+  DISCARD_STREAM_DELAY() {
+    this.state.streamEndTime = null;
   }
 
   @mutation()
@@ -132,7 +140,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     if (this.powerSaveId) electron.remote.powerSaveBlocker.stop(this.powerSaveId);
 
     nodeObs.OBS_service_stopStreaming(false);
-    this.STOP_STREAMING();
+    this.STOP_STREAMING((new Date()).toISOString());
     this.SET_STREAM_STATUS(null);
 
     const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
@@ -142,6 +150,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     }
 
     this.emitStateIfChanged();
+  }
+
+  discardStreamDelay() {
+    if (this.state.isStreaming) return;
+    if (!this.delaySecondsRemaining) return;
+
+    nodeObs.OBS_service_stopStreaming(true);
+    this.DISCARD_STREAM_DELAY();
   }
 
   startRecording() {
@@ -181,6 +197,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     return moment(this.state.streamStartTime);
   }
 
+  get streamEndTime() {
+    return moment(this.state.streamEndTime);
+  }
+
   get formattedElapsedStreamTime() {
     return this.formattedDurationSince(this.streamStartTime);
   }
@@ -217,4 +237,27 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     this.emittedState = stateToEmit;
   }
 
+  get delayEnabled() {
+    return this.settingsService.state.Advanced.DelayEnable;
+  }
+
+  get delaySeconds() {
+    return this.settingsService.state.Advanced.DelaySec;
+  }
+
+  get delaySecondsRemaining() {
+    if (!this.delayEnabled) return 0;
+
+    if (this.isStreaming) {
+      const streamingTime = moment().unix() - this.streamStartTime.unix();
+      return Math.max(this.delaySeconds - streamingTime, 0);
+    }
+
+    if (this.streamEndTime) {
+      const endedTime = moment().unix() - this.streamEndTime.unix();
+      return Math.max(this.delaySeconds - endedTime, 0);
+    }
+
+    return 0;
+  }
 }

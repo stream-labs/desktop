@@ -40,7 +40,10 @@ export interface ISettingsState {
     Base: string;
   };
   Audio: Dictionary<TObsValue>;
-  Advanced: Dictionary<TObsValue>;
+  Advanced: {
+    DelayEnable: boolean;
+    DelaySec: number;
+  };
 }
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;

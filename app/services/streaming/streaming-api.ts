@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 export interface IStreamingServiceState {
   isStreaming: boolean;
   streamStartTime: string;
+  streamEndTime: string;
   isRecording: boolean;
   recordStartTime: string;
   streamOk: boolean;
