@@ -32,7 +32,7 @@ export default class Chat extends Vue {
 
     if (service instanceof YoutubeService) {
       service.getChatUrl(nightMode).then(chatUrl => {
-        this.chatUrl = `https://youtube.com/signin`;
+        this.chatUrl = 'https://youtube.com/signin';
 
         webview.addEventListener('did-navigate', () => {
           this.chatUrl = chatUrl;
