@@ -211,15 +211,22 @@ export class Selection implements ISelection {
     return this;
   }
 
+  /**
+   * return items with the order as in the scene
+   */
   getItems(): SceneItem[] {
     const scene = this.getScene();
-    return this.getIds().map(id => scene.getItem(id));
+    if (!this.getSize()) return [];
+    return scene.getItems().filter(item => this.state.selectedIds.includes(item.sceneItemId));
   }
 
   getVisualItems(): SceneItem[] {
     return this.getItems().filter(item => item.isVisualSource);
   }
 
+  /**
+   * the right order is not guaranteed
+   */
   getIds(): string[] {
     return this.state.selectedIds;
   }
@@ -291,8 +298,7 @@ export class Selection implements ISelection {
   copyReferenceTo(sceneId: string): SceneItem[] {
     const insertedItems: SceneItem[] = [];
     const scene = this.scenesService.getScene(sceneId);
-    this.state.selectedIds.forEach(sceneItemId => {
-      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+    this.getItems().reverse().forEach(sceneItem => {
       const insertedItem = scene.addSource(sceneItem.sourceId);
       insertedItem.setSettings(sceneItem.getSettings());
       insertedItems.push(insertedItem);
@@ -303,8 +309,7 @@ export class Selection implements ISelection {
   copyTo(sceneId: string): SceneItem[] {
     const insertedItems: SceneItem[] = [];
     const scene = this.scenesService.getScene(sceneId);
-    this.state.selectedIds.forEach(sceneItemId => {
-      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
+    this.getItems().reverse().forEach(sceneItem => {
       const duplicatedSource = sceneItem.getSource().duplicate();
 
       if (!duplicatedSource) {

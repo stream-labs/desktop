@@ -1,7 +1,7 @@
 import { Inject } from '../../util/injector';
 import { Menu } from './Menu';
 import { WindowsService } from '../../services/window';
-import { SourcesService } from '../../services/sources';
+import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
@@ -27,11 +27,17 @@ export class EditMenu extends Menu {
   @Inject() private customizationService: CustomizationService;
   @Inject() private selectionService: SelectionService;
 
-  private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
+  private source: Source;
 
   constructor(private options: IEditMenuOptions) {
     super();
+
+    if (this.options.selectedSourceId) {
+      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+    } else if (this.options.showSceneItemMenu && this.selectionService.getSize() === 1) {
+      this.source = this.selectionService.getItems()[0].getSource();
+    }
 
     this.appendEditMenuItems();
   }
@@ -129,7 +135,7 @@ export class EditMenu extends Menu {
       }
 
 
-      if (this.source.getPropertiesManagerType() === 'widget') {
+      if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
           label: 'Export Widget',
           click: () => {

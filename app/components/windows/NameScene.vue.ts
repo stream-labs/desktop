@@ -36,12 +36,19 @@ export default class NameScene extends Vue {
   } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
-    this.name = this.options.rename ?
-      this.options.rename :
-      this.sourcesService.suggestName(
-        this.options.sceneToDuplicate ||
-        this.options.itemsToGroup ? 'Group' : 'NewScene'
-      );
+    let name = '';
+
+    if (this.options.rename) {
+      name = this.options.rename;
+    } else if (this.options.sceneToDuplicate) {
+      name = this.options.sceneToDuplicate;
+    } else if (this.options.itemsToGroup) {
+      name = `${this.scenesService.activeScene.name} Group`;
+    } else {
+      name = 'New Scene';
+    }
+
+    this.name = this.sourcesService.suggestName(name);
   }
 
   submit() {
