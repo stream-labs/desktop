@@ -48,7 +48,7 @@
       </div>
 
       <div class="live-dock-info">
-        <div class="platform-tools">
+        <div class="live-dock-platform-tools">
           <a title="Edit Stream Info" @click="showEditStreamInfo" v-if="isTwitch || (isYoutube && isStreaming)"><i class="fa fa-pencil" /></a>
           <a title="View Stream" @click="openYoutubeStreamUrl" v-if="isYoutube && isStreaming"><i class="fa fa-video-camera" /></a>
           <a title="Live Dashboard" @click="openYoutubeControlRoom" v-if="isYoutube && isStreaming"><i class="fa fa-cogs" /></a>
@@ -146,7 +146,7 @@
   justify-content: space-between;
   margin-bottom: 10px;
 
-  .platform-tools {
+  .live-dock-platform-tools {
     a {
       padding: 0 10px;
     }
