@@ -161,12 +161,12 @@ export class EditMenu extends Menu {
       });
 
       this.append({
-        label: 'Copy filters',
+        label: 'Copy Filters',
         click: () => this.clipboardService.copyFilters()
       });
 
       this.append({
-        label: 'Paste filters',
+        label: 'Paste Filters',
         click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters()
       });
@@ -186,12 +186,12 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Lock sources',
+        label: 'Lock Sources',
         click: () => this.scenesService.setLockOnAllScenes(true)
       });
 
       this.append({
-        label: 'Unlock sources',
+        label: 'Unlock Sources',
         click: () => this.scenesService.setLockOnAllScenes(false)
       });
 

@@ -61,21 +61,21 @@ export class SourceTransformMenu extends Menu {
     });
 
     this.append({
-      label: 'Rotate 90 degrees CW',
+      label: 'Rotate 90 Degrees CW',
       click: () => {
         this.selectionService.rotate(90);
       }
     });
 
     this.append({
-      label: 'Rotate 90 degrees CCW',
+      label: 'Rotate 90 Degrees CCW',
       click: () => {
         this.selectionService.rotate(-90);
       }
     });
 
     this.append({
-      label: 'Rotate 180 degrees',
+      label: 'Rotate 180 Degrees',
       click: () => {
         this.selectionService.rotate(180);
       }
