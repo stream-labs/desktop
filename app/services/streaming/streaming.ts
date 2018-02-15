@@ -18,7 +18,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   @Inject() windowsService: WindowsService;
 
   static initialState = {
-    isStreaming: false,
+    isStreaming: false, // Doesn't account for delay
+    isLive: false, // Accounts for delay
+    usingDelay: false,
     streamStartTime: null,
     streamEndTime: null,
     isRecording: false,
@@ -27,22 +29,28 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   } as IStreamingServiceState;
 
   @mutation()
-  START_STREAMING(startTime: string) {
+  START_STREAMING(startTime: string, usingDelay: boolean) {
     this.state.isStreaming = true;
     this.state.streamStartTime = startTime;
     this.state.streamEndTime = null;
+    this.state.usingDelay = usingDelay;
   }
 
   @mutation()
   STOP_STREAMING(endTime: string) {
     this.state.isStreaming = false;
-    this.state.streamStartTime = null;
     this.state.streamEndTime = endTime;
+  }
+
+  @mutation()
+  SET_IS_LIVE(isLive: boolean) {
+    this.state.isLive = isLive;
   }
 
   @mutation()
   DISCARD_STREAM_DELAY() {
     this.state.streamEndTime = null;
+    this.state.isLive = false;
   }
 
   @mutation()
@@ -62,6 +70,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     this.state.streamOk = streamOk;
   }
 
+  delayTimeout: number = null;
 
   streamingStateChange = new Subject<IStreamingServiceState>();
 
@@ -117,8 +126,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
 
     nodeObs.OBS_service_startStreaming();
-    this.START_STREAMING((new Date()).toISOString());
+    this.START_STREAMING((new Date()).toISOString(), this.delayEnabled);
 
+    if (this.state.usingDelay) {
+      this.delayTimeout = window.setTimeout(() => {
+        this.SET_IS_LIVE(true);
+      }, this.delaySeconds * 1000);
+    } else {
+      this.SET_IS_LIVE(true);
+    }
 
     const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
 
@@ -143,6 +159,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     this.STOP_STREAMING((new Date()).toISOString());
     this.SET_STREAM_STATUS(null);
 
+    if (this.state.usingDelay) {
+      this.delayTimeout = window.setTimeout(() => {
+        this.SET_IS_LIVE(false);
+      }, this.delaySeconds * 1000);
+    } else {
+      this.SET_IS_LIVE(false);
+    }
+
     const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
 
     if (!keepRecording && this.state.isRecording) {
@@ -157,6 +181,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     if (!this.delaySecondsRemaining) return;
 
     nodeObs.OBS_service_stopStreaming(true);
+    if (this.delayTimeout) clearTimeout(this.delayTimeout);
     this.DISCARD_STREAM_DELAY();
   }
 
@@ -193,6 +218,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
     return this.state.isStreaming;
   }
 
+  get isLive() {
+    return this.state.isLive;
+  }
+
   get streamStartTime() {
     return moment(this.state.streamStartTime);
   }
@@ -202,7 +231,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   }
 
   get formattedElapsedStreamTime() {
-    return this.formattedDurationSince(this.streamStartTime);
+    const startTime = this.streamStartTime;
+
+    if (this.state.usingDelay) {
+      startTime.add(this.delaySeconds, 'seconds');
+    }
+
+    return this.formattedDurationSince(startTime);
   }
 
   get streamOk() {
@@ -246,7 +281,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> im
   }
 
   get delaySecondsRemaining() {
-    if (!this.delayEnabled) return 0;
+    if (!this.state.usingDelay) return 0;
 
     if (this.isStreaming) {
       const streamingTime = moment().unix() - this.streamStartTime.unix();

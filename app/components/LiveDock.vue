@@ -26,7 +26,7 @@
         @click="collapse" />
       <div class="live-dock-header">
         <div class="flex flex--center">
-          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
+          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isLive  }" />
           <span class="live-dock-text">
             {{ liveText }}
           </span>

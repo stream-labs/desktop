@@ -56,7 +56,7 @@ export default class StartStreamingButton extends Vue {
     return 'GO LIVE';
   }
 
-  getIsLive() {
+  getIsRedButton() {
     return this.isStreaming || this.streamingService.delaySecondsRemaining;
   }
 

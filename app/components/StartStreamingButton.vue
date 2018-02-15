@@ -1,7 +1,7 @@
 <template>
 <button
   class="button button--go-live button--action"
-  :class="{ 'button--soft-warning': getIsLive() }"
+  :class="{ 'button--soft-warning': getIsRedButton() }"
   :disabled="disabled"
   @click="toggleStreaming">{{getStreamButtonLabel()}}</button>
 </template>
