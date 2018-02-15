@@ -7,6 +7,7 @@ import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IDownloadProgress } from 'services/scene-collections/overlays';
 import urlLib from 'url';
+import electron from 'electron';
 
 @Component({})
 export default class BrowseOverlays extends Vue {
@@ -22,6 +23,14 @@ export default class BrowseOverlays extends Vue {
   mounted() {
     this.guestApiService.exposeApi(this.$refs.overlaysWebview, {
       installOverlay: this.installOverlay
+    });
+
+    this.$refs.overlaysWebview.addEventListener('new-window', e => {
+      const protocol = urlLib.parse(e.url).protocol;
+
+      if (protocol === 'http:' || protocol === 'https:') {
+        electron.remote.shell.openExternal(e.url);
+      }
     });
   }
 
