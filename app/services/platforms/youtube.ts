@@ -57,7 +57,7 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
-  fetchDescriptionString(): Promise<string> {
+  fetchDescription(): Promise<string> {
     return this.userService.getDonationSettings().then(json => {
       if (json.settings.autopublish) return `Support the stream: ${json.donation_url} \n`;
       return '';
@@ -158,7 +158,7 @@ export class YoutubeService extends Service implements IPlatformService {
 
   @requiresToken()
   putChannelInfo(streamTitle: string, streamDescription: string): Promise<boolean> {
-    return this.fetchDescriptionString().then(autopublishString => {
+    return this.fetchDescription().then(autopublishString => {
       const headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
