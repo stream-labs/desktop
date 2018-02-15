@@ -28,7 +28,7 @@ type TWindowId = 'main' | 'child';
 
 export interface IWindowOptions {
   componentName: string;
-  queryParams?: Dictionary<string>;
+  queryParams?: Dictionary<any>;
   size?: {
     width: number;
     height: number;

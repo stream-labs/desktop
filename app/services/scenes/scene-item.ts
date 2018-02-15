@@ -289,6 +289,29 @@ export class SceneItem implements ISceneItemApi {
     });
   }
 
+  /**
+   * only for scene sources
+   */
+  setContentCrop() {
+    const source = this.getSource();
+    if (source.type !== 'scene') return;
+    const scene = this.scenesService.getScene(source.sourceId);
+    const rect = scene.getSelection().selectAll().getBoundingRect();
+    const { width, height } = this.source.getObsInput();
+    this.setTransform({
+      position: {
+        x: rect.x,
+        y: rect.y
+      },
+      crop: {
+        top: rect.y,
+        right: width - (rect.x + rect.width),
+        bottom: height - (rect.y + rect.height),
+        left: rect.x
+      }
+    });
+  }
+
   private setRect(rect: IScalableRectangle) {
     this.setTransform({
       position: { x: rect.x, y: rect.y },

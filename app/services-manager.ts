@@ -50,7 +50,7 @@ import { DismissablesService } from 'services/dismissables';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
-import { SelectionService } from 'services/selection';
+import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import {
@@ -123,6 +123,7 @@ export class ServicesManager extends Service {
     TroubleshooterService,
     JsonrpcService,
     SelectionService,
+    Selection,
     FileManagerService
   };
 
@@ -343,6 +344,12 @@ export class ServicesManager extends Service {
         _type: 'HELPER',
         resourceId: helper.resourceId,
         ...!compactMode ? this.getHelperModel(helper) : {}
+      });
+    } else if (responsePayload && responsePayload instanceof Service) {
+      response = this.jsonrpc.createResponse(request, {
+        _type: 'SERVICE',
+        resourceId: responsePayload.serviceName,
+        ...!compactMode ? this.getHelperModel(responsePayload) : {}
       });
     } else {
       // payload can contain helpers-objects
