@@ -347,9 +347,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     // send event to subscribed clients
     Object.keys(this.clients).forEach(clientId => {
       const client = this.clients[clientId];
-      const needToSendEvent =
-        (client.listenAllSubscriptions && event.result.emitter === 'STREAM') ||
-        client.subscriptions.includes(event.result.resourceId);
+      const needToSendEvent = client.listenAllSubscriptions || client.subscriptions.includes(event.result.resourceId);
       if (needToSendEvent) this.sendResponse(client, event);
     });
   }
