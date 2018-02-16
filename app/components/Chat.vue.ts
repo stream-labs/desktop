@@ -8,6 +8,7 @@ import { CustomizationService } from 'services/customization';
 import url from 'url';
 import electron from 'electron';
 import { ICustomizationSettings } from 'services/customization/customization-api';
+import { YoutubeService } from 'services/platforms/youtube';
 
 @Component({})
 export default class Chat extends Vue {
@@ -29,7 +30,18 @@ export default class Chat extends Vue {
     const webview = this.$refs.chat;
     const settings = this.customizationService.getSettings();
 
-    service.getChatUrl(nightMode).then(chatUrl => this.chatUrl = chatUrl);
+    if (service instanceof YoutubeService) {
+      service.getChatUrl(nightMode).then(chatUrl => {
+        this.chatUrl = 'https://youtube.com/signin';
+
+        webview.addEventListener('did-navigate', () => {
+          this.chatUrl = chatUrl;
+        });
+      });
+    } else {
+      service.getChatUrl(nightMode).then(chatUrl => this.chatUrl = chatUrl);
+    }
+
 
     webview.addEventListener('new-window', e => {
       const protocol = url.parse(e.url).protocol;

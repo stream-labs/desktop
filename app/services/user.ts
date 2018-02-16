@@ -3,6 +3,7 @@ import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from '../util/injector';
+import { handleErrors } from '../util/requests';
 import { mutation } from './stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
@@ -165,6 +166,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
 
     return url;
+  }
+
+  getDonationSettings() {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/donation/settings/${this.widgetToken}`;
+    const request = new Request(url);
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
   }
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {

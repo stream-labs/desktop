@@ -48,8 +48,12 @@
       </div>
 
       <div class="live-dock-info">
-        <a @click="showEditStreamInfo" v-if="isTwitch">Edit Stream Info</a>
-        <a @click="refreshChat">Refresh Chat</a>
+        <div class="live-dock-platform-tools">
+          <a title="Edit Stream Info" @click="showEditStreamInfo" v-if="isTwitch || (isYoutube && isStreaming)"><i class="fa fa-pencil" /></a>
+          <a title="View Stream" @click="openYoutubeStreamUrl" v-if="isYoutube && isStreaming"><i class="fa fa-video-camera" /></a>
+          <a title="Live Dashboard" @click="openYoutubeControlRoom" v-if="isYoutube && isStreaming"><i class="fa fa-cogs" /></a>
+        </div>
+        <a @click="refreshChat" v-if="isTwitch || (isYoutube && isStreaming)">Refresh Chat</a>
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || (isYoutube && isStreaming)">
@@ -141,6 +145,12 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
+
+  .live-dock-platform-tools {
+    a {
+      padding: 0 10px;
+    }
+  }
 
   @media (max-width: 1200px) {
     font-size: 12px;
