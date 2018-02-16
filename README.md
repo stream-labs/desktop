@@ -2,7 +2,9 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
 
-Electron client for the Streamlabs OBS streaming software.
+Simple, powerful, and efficient live streaming software built on Electron.
+
+![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
 
 This application currently only supports 64-bit Windows.
 

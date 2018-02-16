@@ -6,6 +6,7 @@ import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
+import { ISelectionServiceApi } from '../../services/selection';
 
 @Component({
   components: { ModalLayout },
@@ -25,28 +26,54 @@ export default class NameScene extends Vue {
   @Inject()
   windowsService: WindowsService;
 
-  options: { sceneToDuplicate?: string, rename?: string } = this.windowsService.getChildWindowQueryParams();
+  @Inject()
+  selectionService: ISelectionServiceApi;
+
+  options: {
+    sceneToDuplicate?: string,
+    rename?: string,
+    itemsToGroup?: string[]
+  } = this.windowsService.getChildWindowQueryParams();
 
   mounted() {
-    this.name = this.options.rename ?
-      this.options.rename :
-      this.sourcesService.suggestName(this.options.sceneToDuplicate || 'NewScene');
+    let name = '';
+
+    if (this.options.rename) {
+      name = this.options.rename;
+    } else if (this.options.sceneToDuplicate) {
+      name = this.options.sceneToDuplicate;
+    } else if (this.options.itemsToGroup) {
+      name = `${this.scenesService.activeScene.name} Group`;
+    } else {
+      name = 'New Scene';
+    }
+
+    this.name = this.sourcesService.suggestName(name);
   }
 
   submit() {
+    const activeScene = this.scenesService.activeScene;
+
     if (!this.name) {
       this.error = 'The scene name is required';
     } else if (this.options.rename) {
       this.scenesService.getSceneByName(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
-      this.scenesService.createScene(
+      const newScene = this.scenesService.createScene(
         this.name,
         {
           duplicateSourcesFromScene: this.options.sceneToDuplicate,
-          makeActive: true
         }
       );
+      if (this.options.itemsToGroup) {
+        activeScene.getSelection(this.options.itemsToGroup).moveTo(newScene.id);
+        const sceneItem = activeScene.addSource(newScene.id);
+        this.selectionService.select(sceneItem.sceneItemId);
+        sceneItem.setContentCrop();
+      } else {
+        newScene.makeActive();
+      }
       this.windowsService.closeChildWindow();
     }
   }

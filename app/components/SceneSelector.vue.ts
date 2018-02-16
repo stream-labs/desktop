@@ -31,7 +31,9 @@ export default class SceneSelector extends Vue {
     });
     menu.append({
       label: 'Rename',
-      click: () => this.scenesService.showNameScene(this.scenesService.activeScene.name)
+      click: () => this.scenesService.showNameScene({
+        rename: this.scenesService.activeScene.name
+      })
     });
     menu.append({
       label: 'Remove',

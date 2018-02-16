@@ -92,4 +92,25 @@ export default class Utils {
     });
     return result as Partial<T>;
   }
+
+  /**
+   * @see https://www.typescriptlang.org/docs/handbook/mixins.html
+   */
+  static applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        const baseDescriptor = Object.getOwnPropertyDescriptor(baseCtor.prototype, name);
+        const derivedDescriptor = Object.getOwnPropertyDescriptor(derivedCtor.prototype, name);
+        // ignore getters
+        if (
+          baseDescriptor && baseDescriptor.get ||
+          derivedDescriptor && derivedDescriptor.get
+        ) return;
+
+        // ignore the property already exist
+        if (derivedCtor.prototype[name]) return;
+        derivedCtor.prototype[name] = baseCtor.prototype[name];
+      });
+    });
+  }
 }
