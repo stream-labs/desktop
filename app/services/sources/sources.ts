@@ -140,6 +140,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
     }
 
+    if (type === 'text_gdiplus') {
+      if (settings.text === void 0) settings.text = name;
+    }
+
     const obsInput = obs.InputFactory.create(type, id, settings);
 
     this.addSource(obsInput, name, options);
