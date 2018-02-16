@@ -4,7 +4,7 @@ import { setFormInput } from './helpers/spectron/forms';
 
 useSpectron();
 
-test.only('Streaming to Twitch', async t => {
+test('Streaming to Twitch', async t => {
   const app = t.context.app;
 
   await focusMain(t);
