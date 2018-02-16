@@ -5092,7 +5092,7 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@2.8.0, nan@^2.8.0:
+nan@2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 
@@ -5305,11 +5305,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.16/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.17/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.16/streamlabs-x86_64-signed.tar.gz#c23c36410c772dd75d5a68d2e0d451dfe34f692a"
-  dependencies:
-    nan "^2.8.0"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.17/streamlabs-x86_64-signed.tar.gz#4d31f4b2d6af3e0a38b8d2f0470ad2e81da7f401"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
