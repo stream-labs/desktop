@@ -198,7 +198,7 @@ export class ApiClient {
         } else if (result.emitter === 'PROMISE') {
 
           // case when listenAllSubscriptions = true
-          if (this.promises[result.resourceId]) return;
+          if (!this.promises[result.resourceId]) return;
 
           const [resolve, reject] = this.promises[result.resourceId];
           if (result.isRejected) {
