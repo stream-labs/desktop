@@ -71,7 +71,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
           const obsInput = source.getObsInput();
 
-          /* Signal to the source that it needs to save settings as 
+          /* Signal to the source that it needs to save settings as
            * we're about to cache them to disk. */
           obsInput.save();
 
@@ -86,7 +86,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             muted: obsInput.muted,
             filters: {
               items: obsInput.filters.map(filter => {
-                /* Remember that filters are also sources. 
+                /* Remember that filters are also sources.
                  * We should eventually do this for transitions
                  * as well. Scenes can be ignored. */
                 filter.save();
@@ -150,7 +150,7 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     const fontInfo = fi.getFontInfo(settings.custom_font);
 
-    if (!fontInfo) { 
+    if (!fontInfo) {
       const source = this.sourcesService.getSource(item.id);
       source.updateSettings({ font: settings.font });
       return;
@@ -158,8 +158,8 @@ export class SourcesNode extends Node<ISchema, {}> {
 
     settings['font']['face'] = fontInfo.family_name;
 
-    settings['font']['flags'] = 
-      (fontInfo.italic ? obs.EFontStyle.Italic : 0) | 
+    settings['font']['flags'] =
+      (fontInfo.italic ? obs.EFontStyle.Italic : 0) |
       (fontInfo.bold ? obs.EFontStyle.Bold : 0);
 
     const source = this.sourcesService.getSource(item.id);
@@ -169,20 +169,26 @@ export class SourcesNode extends Node<ISchema, {}> {
   /**
    * Do some data sanitizing
    */
-  sanitizeIds() {
-    // Look for duplicate ids
-    const ids: Dictionary<boolean> = {};
+  sanitizeSources() {
+    // Look for duplicate ids and channels
+    const ids: Set<string> = new Set();
+    const channels: Set<number> = new Set();
 
     this.data.items = this.data.items.filter(item => {
-      if (ids[item.id]) return false;
+      if (ids.has(item.id)) return false;
+      ids.add(item.id);
 
-      ids[item.id] = true;
+      if (item.channel != null) {
+        if (channels.has(item.channel)) return false;
+        channels.add(item.channel);
+      }
+
       return true;
     });
   }
 
   load(context: {}): Promise<void> {
-    this.sanitizeIds();
+    this.sanitizeSources();
 
     // This shit is complicated, IPC sucks
     const sourceCreateData = this.data.items.map(source => {
