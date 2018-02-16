@@ -196,6 +196,10 @@ export class ApiClient {
           if (eventSubject) eventSubject.next(result.data);
 
         } else if (result.emitter === 'PROMISE') {
+
+          // case when listenAllSubscriptions = true
+          if (!this.promises[result.resourceId]) return;
+
           const [resolve, reject] = this.promises[result.resourceId];
           if (result.isRejected) {
             reject(result.data);
