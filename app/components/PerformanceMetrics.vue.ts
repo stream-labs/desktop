@@ -10,6 +10,10 @@ export default class PerformanceMetrics extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
 
+  get cpuPercent() {
+    return this.performanceService.state.CPU.toFixed(1);
+  }
+
   get frameRate() {
     return this.performanceService.state.frameRate.toFixed(2);
   }
