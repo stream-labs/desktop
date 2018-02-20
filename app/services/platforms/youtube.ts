@@ -22,7 +22,7 @@ export class YoutubeService extends Service implements IPlatformService {
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    return `https://${host}/login?_=${Date.now()}&skip_splash=true&external=electron&youtube&force_verify`;
+    return `https://${host}/login?_=${Date.now()}&skip_splash=true&external=electron&youtube&force_verify&origin=slobs`;
   }
 
   get oauthToken() {

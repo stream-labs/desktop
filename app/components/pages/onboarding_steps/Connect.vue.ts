@@ -4,6 +4,7 @@ import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { Inject } from 'util/injector';
 import { OnboardingService } from 'services/onboarding';
+import electron from 'electron';
 
 @Component({})
 export default class Connect extends Vue {
@@ -39,6 +40,14 @@ export default class Connect extends Vue {
 
   skipOnboarding() {
     this.onboardingService.skip();
+  }
+
+  get isSecurityUpgrade() {
+    return this.onboardingService.options.isSecurityUpgrade;
+  }
+
+  contactSupport() {
+    electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
 }
