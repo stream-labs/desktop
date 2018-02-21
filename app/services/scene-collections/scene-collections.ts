@@ -464,7 +464,7 @@ export class SceneCollectionsService extends Service
     // Check if the server has a copy
     const collection = this.collections.find(coll => coll.id === id);
 
-    if (collection.serverId) {
+    if (collection.serverId && this.userService.isLoggedIn()) {
       // A local hard delete without notifying the server
       // will force a fresh download from the server on next sync
       this.stateService.HARD_DELETE_COLLECTION(id);

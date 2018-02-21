@@ -104,6 +104,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return userId;
   }
 
+  get apiToken() {
+    if (this.isLoggedIn()) return this.state.auth.apiToken;
+  }
+
   get widgetToken() {
     if (this.isLoggedIn()) {
       return this.state.auth.widgetToken;
@@ -250,10 +254,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       query.token &&
       query.platform_username &&
       query.platform_token &&
-      query.platform_id
+      query.platform_id &&
+      query.oauth_token
     ) {
       return {
         widgetToken: query.token,
+        apiToken: query.oauth_token,
         platform: {
           type: query.platform,
           username: query.platform_username,
