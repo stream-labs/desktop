@@ -31,10 +31,6 @@ export default class BrowseOverlays extends Vue {
       installWidget: this.installWidget
     });
 
-    this.$refs.overlaysWebview.addEventListener('dom-ready', () => {
-      this.$refs.overlaysWebview.openDevTools();
-    });
-
     this.$refs.overlaysWebview.addEventListener('new-window', e => {
       const protocol = urlLib.parse(e.url).protocol;
 
