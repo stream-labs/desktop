@@ -144,9 +144,11 @@ export class SceneCollectionsService extends Service
     await this.deloadCurrentApplicationState();
 
     try {
-      await this.loadCollectionIntoApplicationState(id);
       await this.setActiveCollection(id);
+      await this.loadCollectionIntoApplicationState(id);
     } catch (e) {
+      console.error('Error loading collection!', e);
+
       if (shouldAttemptRecovery) {
         await this.attemptRecovery(id);
       } else {
@@ -157,6 +159,9 @@ export class SceneCollectionsService extends Service
         await this.create();
       }
     }
+
+    // Fall back to an empty collection
+    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
 
     this.finishLoadingOperation();
   }
@@ -438,10 +443,9 @@ export class SceneCollectionsService extends Service
       await root.load();
 
       this.hotkeysService.bindHotkeys();
+    } else {
+      await this.attemptRecovery(id);
     }
-
-    // If we didn't actually load something, fall back to creating an empty collection
-    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
   }
 
   /**
@@ -466,24 +470,25 @@ export class SceneCollectionsService extends Service
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection.serverId && this.userService.isLoggedIn()) {
-      // A local hard delete without notifying the server
-      // will force a fresh download from the server on next sync
-      this.stateService.HARD_DELETE_COLLECTION(id);
-      await this.safeSync();
+      const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
 
-      // Find the newly downloaded collection and load it
-      const newCollection = this.collections.find(
-        coll => coll.serverId === collection.serverId
-      );
+      if (coll.scene_collection.data) {
+        // A local hard delete without notifying the server
+        // will force a fresh download from the server on next sync
+        this.stateService.HARD_DELETE_COLLECTION(id);
+        await this.safeSync();
 
-      if (newCollection) {
-        await this.load(newCollection.id, false);
-        return;
+        // Find the newly downloaded collection and load it
+        const newCollection = this.collections.find(
+          coll => coll.serverId === collection.serverId
+        );
+
+        if (newCollection) {
+          await this.load(newCollection.id, false);
+          return;
+        }
       }
     }
-
-    // Fall back to creating a new collection
-    await this.create();
   }
 
   /**
@@ -686,15 +691,17 @@ export class SceneCollectionsService extends Service
             this.stateService
               .collectionFileExists(inManifest.id)
               .then(exists => {
-                const data = this.stateService.readCollectionFile(inManifest.id);
+                if (exists) {
+                  const data = this.stateService.readCollectionFile(inManifest.id);
 
-                if (data) {
-                  return this.serverApi.updateSceneCollection({
-                    id: inManifest.serverId,
-                    name: inManifest.name,
-                    data,
-                    last_updated_at: inManifest.modified
-                  });
+                  if (data) {
+                    return this.serverApi.updateSceneCollection({
+                      id: inManifest.serverId,
+                      name: inManifest.name,
+                      data,
+                      last_updated_at: inManifest.modified
+                    });
+                  }
                 }
 
                 return Promise.resolve();
