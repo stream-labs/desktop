@@ -5305,9 +5305,9 @@ object.omit@^2.0.0:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.17/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.18/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.17/streamlabs-x86_64-signed.tar.gz#4d31f4b2d6af3e0a38b8d2f0470ad2e81da7f401"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.18/streamlabs-x86_64-signed.tar.gz#d883540d5d388bb86094edf744ea2235b6935fd3"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
