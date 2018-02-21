@@ -112,6 +112,7 @@ export class SceneCollectionsService extends Service
    */
   async deinitialize() {
     this.disableAutoSave();
+    await this.save();
     await this.deloadCurrentApplicationState();
     await this.safeSync();
     await this.stateService.flushManifestFile();
@@ -589,6 +590,7 @@ export class SceneCollectionsService extends Service
   private autoSaveInterval: number;
 
   private enableAutoSave() {
+    if (this.autoSaveInterval) return;
     this.autoSaveInterval = window.setInterval(() => {
       this.save();
       this.stateService.flushManifestFile();
@@ -597,6 +599,7 @@ export class SceneCollectionsService extends Service
 
   private disableAutoSave() {
     if (this.autoSaveInterval) clearInterval(this.autoSaveInterval);
+    this.autoSaveInterval = null;
   }
 
   private async setActiveCollection(id: string) {
