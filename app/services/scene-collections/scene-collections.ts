@@ -522,7 +522,7 @@ export class SceneCollectionsService extends Service
       console.error('Error deloading application state');
     }
 
-    this.hotkeysService.unregisterAll();
+    this.hotkeysService.clearAllHotkeys();
   }
 
   /**
