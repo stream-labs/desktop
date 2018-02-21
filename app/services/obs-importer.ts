@@ -219,11 +219,12 @@ export class ObsImporterService extends Service {
                 const scale = item.scale;
 
                 sceneItem.setSettings({
-                  crop,
-                  scaleX: scale.x,
-                  scaleY: scale.y,
                   visible: item.visible,
-                  ...pos
+                  transform: {
+                    crop,
+                    scale,
+                    position: pos
+                  }
                 });
               }
             });
