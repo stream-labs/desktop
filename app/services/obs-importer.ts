@@ -4,7 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
-import { SourceFiltersService } from 'services/source-filters';
+import { TSourceType } from 'services/sources/sources-api';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
 import { ScenesTransitionsService } from 'services/scenes-transitions';
 import { AudioService } from 'services/audio';
 import { Inject } from 'util/injector';
@@ -19,6 +20,49 @@ interface Source {
 interface ISceneCollection {
   filename: string;
   name: string;
+}
+
+interface IOBSConfigFilter {
+  id: TSourceFilterType;
+  name: string;
+  enabled: boolean;
+  settings: Dictionary<any>;
+}
+
+interface IOBSConfigSceneItem {
+  name: string;
+  crop_top: number;
+  crop_right: number;
+  crop_bottom: number;
+  crop_left: number;
+  pos: IVec2;
+  scale: IVec2;
+  visible: boolean;
+}
+
+interface IOBSConfigSource {
+  id: TSourceType;
+  name: string;
+  settings: {
+    shutdown?: boolean;
+    items?: IOBSConfigSceneItem[];
+  };
+  channel?: number;
+  muted: boolean;
+  volume: number;
+  filters:IOBSConfigFilter[];
+}
+
+interface IOBSConfigTransition {
+  id: string;
+}
+
+interface IOBSConfigJSON {
+  sources: IOBSConfigSource[];
+  current_scene: string;
+  scene_order: { name: string }[];
+  transitions: IOBSConfigTransition[];
+  transition_duration: number;
 }
 
 export class ObsImporterService extends Service {
@@ -63,7 +107,7 @@ export class ObsImporterService extends Service {
       this.sceneCollectionsDirectory,
       collection.filename
     );
-    const configJSON = JSON.parse(
+    const configJSON: IOBSConfigJSON = JSON.parse(
       fs.readFileSync(sceneCollectionPath).toString()
     );
 
@@ -85,7 +129,7 @@ export class ObsImporterService extends Service {
     });
   }
 
-  importFilters(filtersJSON: any, source: Source) {
+  importFilters(filtersJSON: IOBSConfigFilter[], source: Source) {
     if (Array.isArray(filtersJSON)) {
       filtersJSON.forEach(filterJSON => {
         const isFilterAvailable = this.filtersService
@@ -132,7 +176,7 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importSources(configJSON: any) {
+  importSources(configJSON: IOBSConfigJSON) {
     const sourcesJSON = configJSON.sources;
 
     if (Array.isArray(sourcesJSON)) {
@@ -177,7 +221,7 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importScenes(configJSON: any) {
+  importScenes(configJSON: IOBSConfigJSON) {
     const sourcesJSON = configJSON.sources;
     const currentScene = configJSON.current_scene;
 
@@ -234,7 +278,7 @@ export class ObsImporterService extends Service {
     }
   }
 
-  importSceneOrder(configJSON: any) {
+  importSceneOrder(configJSON: IOBSConfigJSON) {
     const sceneNames: string[] = [];
     const sceneOrderJSON = configJSON.scene_order;
     const listScene = this.scenesService.scenes;
@@ -251,7 +295,7 @@ export class ObsImporterService extends Service {
     this.scenesService.setSceneOrder(sceneNames);
   }
 
-  importMixerSources(configJSON: any) {
+  importMixerSources(configJSON: IOBSConfigJSON) {
     const channelNames = [
       'DesktopAudioDevice1',
       'DesktopAudioDevice2',
@@ -279,7 +323,7 @@ export class ObsImporterService extends Service {
     });
   }
 
-  importTransitions(configJSON: any) {
+  importTransitions(configJSON: IOBSConfigJSON) {
     // Only import the first transition found in obs as slobs only
     // uses one global transition
     if (configJSON.transitions && configJSON.transitions.length > 0) {
