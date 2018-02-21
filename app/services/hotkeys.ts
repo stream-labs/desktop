@@ -322,6 +322,15 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
 
+  clearAllHotkeys() {
+    this.applyHotkeySet({
+      general: [],
+      sources: {},
+      scenes: {}
+    });
+  }
+
+
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
