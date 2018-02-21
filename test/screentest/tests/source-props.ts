@@ -44,12 +44,12 @@ useSpectron({ restartAppAfterEachTest: false, afterStartCb: async t => {
 useScreentest({ window: 'child' });
 
 
-test.only('image_source', async t => {
+test('image_source', async t => {
   showSourceProps('image_source')
   t.pass();
 });
 
-test.only('color_source', async t => {
+test('color_source', async t => {
   showSourceProps('image_source')
   t.pass();
 });
