@@ -50,56 +50,56 @@ test('image_source', async t => {
 });
 
 test('color_source', async t => {
-  showSourceProps('image_source')
+  showSourceProps('color_source')
   t.pass();
 });
 
 test('browser_source', async t => {
-  showSourceProps('image_source')
+  showSourceProps('browser_source')
   t.pass();
 });
 
 test('slideshow', async t => {
-  showSourceProps('image_source')
+  showSourceProps('slideshow')
   t.pass();
 });
 
 test('ffmpeg_source', async t => {
-  showSourceProps('image_source')
+  showSourceProps('ffmpeg_source')
   t.pass();
 });
 
 test('text_gdiplus', async t => {
-  showSourceProps('image_source')
+  showSourceProps('text_gdiplus')
   t.pass();
 });
 
 test('text_ft2_source', async t => {
-  showSourceProps('image_source')
+  showSourceProps('text_ft2_source')
   t.pass();
 });
 
 test('monitor_capture', async t => {
-  showSourceProps('image_source')
+  showSourceProps('monitor_capture')
   t.pass();
 });
 
 test('game_capture', async t => {
-  showSourceProps('image_source')
+  showSourceProps('game_capture')
   t.pass();
 });
 
 test('dshow_input', async t => {
-  showSourceProps('image_source')
+  showSourceProps('dshow_input')
   t.pass();
 });
 
 test('wasapi_input_capture', async t => {
-  showSourceProps('image_source')
+  showSourceProps('wasapi_input_capture')
   t.pass();
 });
 
 test('wasapi_output_capture', async t => {
-  showSourceProps('image_source')
+  showSourceProps('wasapi_output_capture')
   t.pass();
 });

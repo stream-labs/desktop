@@ -36,7 +36,7 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
   const api = await getClient();
   const performanceService = api.getResource<PerformanceService>('PerformanceService');
   const audioService = api.getResource<IAudioServiceApi>('AudioService');
-  const windowService = api.getResource<WindowsService>('WindowService');
+  const windowService = api.getResource<WindowsService>('WindowsService');
 
   // tune services to have the same screenshots in any environment
   // PerformanceService causes different cpu usage

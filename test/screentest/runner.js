@@ -9,7 +9,7 @@ const branches = [
   CONFIG.baseBranch
 ];
 
-(function main() {
+const returnCode = (function main() {
 
   log('use branches', branches);
 
@@ -36,7 +36,7 @@ const branches = [
       execSync('yarn compile');
     } catch (e) {
       err('compilation failed', e);
-      return;
+      return 1;
     }
 
     log('tests compilation');
@@ -45,7 +45,7 @@ const branches = [
       execSync('yarn compile-tests');
     } catch (e) {
       err('compilation failed', e);
-      return;
+      return 1;
     }
 
     log('creating screenshots');
@@ -53,7 +53,7 @@ const branches = [
       execSync(`yarn ava test-dist/test/screentest/tests`);
     } catch (e) {
       err('creating screenshots failed');
-      return;
+      return 1;
     }
 
   }
@@ -66,10 +66,15 @@ const branches = [
     execSync(`node test-dist/test/screentest/comparator.js ${branches[0]} ${branches[1]}`);
   } catch (e) {
     err('comparing screenshots failed');
-    return;
+    return 1;
   }
 
+  return 0;
 })();
+
+if (returnCode !== 0) {
+  process.exit(1);
+}
 
 checkoutBranch(branches[0]);
 
