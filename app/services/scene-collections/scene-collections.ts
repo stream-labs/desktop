@@ -237,11 +237,12 @@ export class SceneCollectionsService extends Service
    * Calls sync, but will never cause a rejected promise.
    * Instead, it will log an error and continue.
    */
-  async safeSync() {
+  async safeSync(retries = 2) {
     try {
       await this.sync();
     } catch (e) {
-      console.error('Scene collection sync failed: ', e);
+      console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
+      if (retries > 0) await this.safeSync(retries - 1);
     }
   }
 
