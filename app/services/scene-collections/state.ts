@@ -68,7 +68,7 @@ export class SceneCollectionsStateService extends StatefulService<
     await this.ensureDirectory();
 
     try {
-      const data = await this.readCollectionFile('manifest');
+      const data = this.readCollectionFile('manifest');
 
       if (data) {
         const parsed = JSON.parse(data);
