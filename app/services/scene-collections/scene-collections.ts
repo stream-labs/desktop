@@ -644,9 +644,8 @@ export class SceneCollectionsService extends Service
 
     const serverCollections = (await this.serverApi.fetchSceneCollections())
       .data;
-    const promises: Promise<any>[] = [];
 
-    serverCollections.forEach(onServer => {
+    for (const onServer of serverCollections) {
       const inManifest = this.stateService.state.collections.find(
         coll => coll.serverId === onServer.id
       );
@@ -654,83 +653,66 @@ export class SceneCollectionsService extends Service
       if (!inManifest) {
         // Insert from server
         const id: string = uuid();
-        promises.push(
-          this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-            // Empty data means that the collection was created from the Streamlabs
-            // dashboard and does not currently have any scenes assoicated with it.
-            // The first time we try to load this collection, we will initialize it
-            // with some scenes.
+        const response = await this.serverApi.fetchSceneCollection(onServer.id);
 
-            if (response.scene_collection.data != null) {
-              this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
-            }
+        // Empty data means that the collection was created from the Streamlabs
+        // dashboard and does not currently have any scenes assoicated with it.
+        // The first time we try to load this collection, we will initialize it
+        // with some scenes.
 
-            this.stateService.ADD_COLLECTION(
-              id,
-              onServer.name,
-              new Date().toISOString()
-            );
-            this.stateService.SET_SERVER_ID(id, onServer.id);
-          })
+        if (response.scene_collection.data != null) {
+          this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
+        }
+
+        this.stateService.ADD_COLLECTION(
+          id,
+          onServer.name,
+          new Date().toISOString()
         );
+        this.stateService.SET_SERVER_ID(id, onServer.id);
       } else {
         if (inManifest.deleted) {
           // We need to tell the server this was deleted
-          promises.push(
-            this.serverApi
-              .deleteSceneCollection(inManifest.serverId)
-              .then(() => {
-                // We can hard delete once we know it has been removed from the server
-                this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
-              })
-          );
+          await this.serverApi.deleteSceneCollection(inManifest.serverId);
+          this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
         } else if (
           new Date(inManifest.modified) > new Date(onServer.last_updated_at)
         ) {
-          promises.push(
-            this.stateService
-              .collectionFileExists(inManifest.id)
-              .then(exists => {
-                if (exists) {
-                  const data = this.stateService.readCollectionFile(inManifest.id);
+          const exists = await this.stateService.collectionFileExists(inManifest.id);
 
-                  if (data) {
-                    return this.serverApi.updateSceneCollection({
-                      id: inManifest.serverId,
-                      name: inManifest.name,
-                      data,
-                      last_updated_at: inManifest.modified
-                    });
-                  }
-                }
+          if (exists) {
+            const data = this.stateService.readCollectionFile(inManifest.id);
 
-                return Promise.resolve();
-              })
-          );
+            if (data) {
+              await this.serverApi.updateSceneCollection({
+                id: inManifest.serverId,
+                name: inManifest.name,
+                data,
+                last_updated_at: inManifest.modified
+              });
+            }
+          }
         } else if (
           new Date(inManifest.modified) < new Date(onServer.last_updated_at)
         ) {
-          promises.push(
-            this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-              this.stateService.writeDataToCollectionFile(
-                inManifest.id,
-                response.scene_collection.data
-              );
+          const response = await this.serverApi.fetchSceneCollection(onServer.id);
+          this.stateService.writeDataToCollectionFile(
+            inManifest.id,
+            response.scene_collection.data
+          );
 
-              this.stateService.RENAME_COLLECTION(
-                inManifest.id,
-                onServer.name,
-                onServer.last_updated_at
-              );
-            })
+          this.stateService.RENAME_COLLECTION(
+            inManifest.id,
+            onServer.name,
+            onServer.last_updated_at
           );
         } else {
           console.log('Up to date file: ', inManifest.id);
         }
       }
-    });
+    }
 
-    this.stateService.state.collections.forEach(inManifest => {
+    for (const inManifest of this.stateService.state.collections) {
       const onServer = serverCollections.find(
         coll => coll.id === inManifest.serverId
       );
@@ -740,24 +722,19 @@ export class SceneCollectionsService extends Service
         if (!inManifest.serverId) {
           const data = this.stateService.readCollectionFile(inManifest.id);
 
-          promises.push(
-            this.serverApi
-              .createSceneCollection({
-                name: inManifest.name,
-                data,
-                last_updated_at: inManifest.modified
-              })
-              .then(response => {
-                this.stateService.SET_SERVER_ID(inManifest.id, response.id);
-              })
-          );
+          const response = await this.serverApi.createSceneCollection({
+            name: inManifest.name,
+            data,
+            last_updated_at: inManifest.modified
+          });
+
+          this.stateService.SET_SERVER_ID(inManifest.id, response.id);
         } else {
           this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
         }
       }
-    });
+    }
 
-    await Promise.all(promises);
     await this.stateService.flushManifestFile();
   }
 
