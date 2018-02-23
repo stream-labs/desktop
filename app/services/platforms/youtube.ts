@@ -1,4 +1,5 @@
 import { Service } from '../service';
+import { StatefulService, mutation } from './../stateful-service';
 import { IPlatformService, IChannelInfo, IPlatformAuth } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
@@ -6,11 +7,19 @@ import { Inject } from '../../util/injector';
 import { handleErrors } from '../../util/requests';
 import { UserService } from '../user';
 
-export class YoutubeService extends Service implements IPlatformService {
+interface IYoutubeServiceState {
+  liveStreamingEnabled: boolean;
+}
+
+export class YoutubeService extends StatefulService<IYoutubeServiceState> implements IPlatformService {
 
   @Inject() hostsService: HostsService;
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
+
+  static initialState: IYoutubeServiceState = {
+    liveStreamingEnabled: true,
+  };
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 1000,
@@ -35,6 +44,11 @@ export class YoutubeService extends Service implements IPlatformService {
 
   get youtubeId() {
     return this.userService.platform.id;
+  }
+
+  @mutation()
+  private SET_ENABLED_STATUS(enabled: boolean) {
+    this.state.liveStreamingEnabled = enabled;
   }
 
   setupStreamSettings(auth: IPlatformAuth) {
@@ -64,6 +78,23 @@ export class YoutubeService extends Service implements IPlatformService {
     });
   }
 
+  ableToStream(): Promise<void> {
+    const endpoint =
+      'liveBroadcasts?part=contentDetails&mine=true&broadcastType=persistent';
+    const request = new Request(
+      `${this.apiBase}/${endpoint}&access_token=${this.oauthToken}`
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => {
+        this.SET_ENABLED_STATUS(true);
+      })
+      .catch(err => {
+        this.handleForbidden(err);
+      });
+  }
+
   @requiresToken()
   fetchBoundStreamId(): Promise<string> {
     const endpoint =
@@ -76,6 +107,16 @@ export class YoutubeService extends Service implements IPlatformService {
       .then(handleErrors)
       .then(response => response.json())
       .then(json => json.items[0].contentDetails.boundStreamId);
+  }
+
+  handleForbidden(response: Response): void {
+    if (response.status === 403) {
+      response.json().then((json:any) => {
+        if (json.error && json.error.errors && json.error.errors[0].reason === 'liveStreamingNotEnabled') {
+          this.SET_ENABLED_STATUS(false);
+        }
+      });
+    }
   }
 
   @requiresToken()
@@ -203,6 +244,12 @@ export class YoutubeService extends Service implements IPlatformService {
         this.liveStreamId = json.items[0].id;
         return `${youtubeDomain}/live_chat?v=${json.items[0].id}&is_popout=1`;
       });
+  }
+
+  verifyAbleToStream(): void {
+    this.fetchNewToken().then(() => {
+      this.ableToStream();
+    });
   }
 }
 
