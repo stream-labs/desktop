@@ -48,7 +48,7 @@
             </div>
           </div>
         </div>
-        <div class="input-container select">
+        <div class="input-container select" v-show="useOptimizedProfile">
           <div class="input-label">
             <label>Profile</label>
           </div>
