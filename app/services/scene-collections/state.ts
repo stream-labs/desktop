@@ -44,31 +44,13 @@ export class SceneCollectionsStateService extends StatefulService<
   }
 
   /**
-   * Handle a new user login
-   * @param serverCollections the collections loaded from the server
-   */
-  async setupNewUser(serverCollections: ISceneCollectionsResponse) {
-    if (serverCollections.data.length > 0) {
-      this.LOAD_STATE({
-        activeId: null,
-        collections: []
-      });
-      await this.ensureDirectory();
-      await this.flushManifestFile();
-    } else {
-      // Do nothing.
-      // Local files will be synced up to the server
-    }
-  }
-
-  /**
    * Loads the manifest file into the state for this service.
    */
   async loadManifestFile() {
     await this.ensureDirectory();
 
     try {
-      const data = await this.readCollectionFile('manifest');
+      const data = this.readCollectionFile('manifest');
 
       if (data) {
         const parsed = JSON.parse(data);
