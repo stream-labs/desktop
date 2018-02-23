@@ -116,6 +116,7 @@ export class SourceFiltersService extends Service {
     const source = this.sourcesService.getSource(sourceId);
     const obsFilter = obs.FilterFactory.create(filterType, filterName);
     source.getObsInput().addFilter(obsFilter);
+    obsFilter.release();
     if (settings) obsFilter.update(settings);
     return obsFilter;
   }
