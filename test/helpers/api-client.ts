@@ -196,6 +196,10 @@ export class ApiClient {
           if (eventSubject) eventSubject.next(result.data);
 
         } else if (result.emitter === 'PROMISE') {
+
+          // case when listenAllSubscriptions = true
+          if (!this.promises[result.resourceId]) return;
+
           const [resolve, reject] = this.promises[result.resourceId];
           if (result.isRejected) {
             reject(result.data);
@@ -236,7 +240,7 @@ export class ApiClient {
         let subject = this.subscriptions[result.resourceId];
         if (!subject) subject = this.subscriptions[result.resourceId] = new Subject();
         return subject;
-      } else if (result && result._type === 'HELPER') {
+      } else if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
         return this.getResource(result.resourceId, result);
       } else {
 

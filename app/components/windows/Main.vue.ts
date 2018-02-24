@@ -11,17 +11,15 @@ import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
 import windowMixin from '../mixins/window';
 import { Inject } from '../../util/injector';
-import { CustomizationService } from '../../services/customization';
-import { NavigationService } from '../../services/navigation';
-import { AppService } from '../../services/app';
-import { UserService } from '../../services/user';
-import electron from 'electron';
-import { StreamingService } from '../../services/streaming';
+import { CustomizationService } from 'services/customization';
+import { NavigationService } from 'services/navigation';
+import { AppService } from 'services/app';
+import { UserService } from 'services/user';
+import { WindowsService } from 'services/windows';
+import { StreamingService } from 'services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
-
-const { remote } = electron;
 
 @Component({
   mixins: [windowMixin],
@@ -39,13 +37,17 @@ const { remote } = electron;
   }
 })
 export default class Main extends Vue {
-  title = `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`;
 
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
   @Inject() appService: AppService;
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
+  @Inject() windowsService: WindowsService;
+
+  get title() {
+    return this.windowsService.state.main.title;
+  }
 
   get page() {
     return this.navigationService.state.currentPage;

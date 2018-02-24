@@ -1,10 +1,11 @@
 import { Inject } from '../../util/injector';
 import { Menu } from './Menu';
 import { WindowsService } from '../../services/window';
-import { SourcesService } from '../../services/sources';
+import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
+import { GroupMenu } from './GroupMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { WidgetsService } from 'services/widgets';
 import { CustomizationService } from 'services/customization';
@@ -26,11 +27,17 @@ export class EditMenu extends Menu {
   @Inject() private customizationService: CustomizationService;
   @Inject() private selectionService: SelectionService;
 
-  private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
+  private source: Source;
 
   constructor(private options: IEditMenuOptions) {
     super();
+
+    if (this.options.selectedSourceId) {
+      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+    } else if (this.options.showSceneItemMenu && this.selectionService.getSize() === 1) {
+      this.source = this.selectionService.getItems()[0].getSource();
+    }
 
     this.appendEditMenuItems();
   }
@@ -77,14 +84,6 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
-      if (!isMultipleSelection) {
-        this.append({
-          label: 'Rename',
-          click: () =>
-            this.sourcesService.showRenameSource(selectedItem.sourceId)
-        });
-      }
-
       this.append({
         label: 'Remove',
         accelerator: 'Delete',
@@ -95,6 +94,13 @@ export class EditMenu extends Menu {
         label: 'Transform',
         submenu: this.transformSubmenu().menu
       });
+
+      if (this.customizationService.state.experimental.sceneItemsGrouping) {
+        this.append({
+          label: 'Group',
+          submenu: this.groupSubmenu().menu
+        });
+      }
 
       const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
 
@@ -121,7 +127,7 @@ export class EditMenu extends Menu {
       }
 
 
-      if (this.source.getPropertiesManagerType() === 'widget') {
+      if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
           label: 'Export Widget',
           click: () => {
@@ -138,6 +144,13 @@ export class EditMenu extends Menu {
     }
 
     if (this.source && !isMultipleSelection) {
+
+      this.append({
+        label: 'Rename',
+        click: () =>
+          this.sourcesService.showRenameSource(this.source.sourceId)
+      });
+
       this.append({ type: 'separator' });
 
       this.append({
@@ -148,12 +161,12 @@ export class EditMenu extends Menu {
       });
 
       this.append({
-        label: 'Copy filters',
+        label: 'Copy Filters',
         click: () => this.clipboardService.copyFilters()
       });
 
       this.append({
-        label: 'Paste filters',
+        label: 'Paste Filters',
         click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters()
       });
@@ -173,12 +186,12 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Lock sources',
+        label: 'Lock Sources',
         click: () => this.scenesService.setLockOnAllScenes(true)
       });
 
       this.append({
-        label: 'Unlock sources',
+        label: 'Unlock Sources',
         click: () => this.scenesService.setLockOnAllScenes(false)
       });
 
@@ -204,6 +217,10 @@ export class EditMenu extends Menu {
   }
 
   private transformSubmenu() {
-    return new SourceTransformMenu(this.scene.id);
+    return new SourceTransformMenu();
+  }
+
+  private groupSubmenu() {
+    return new GroupMenu();
   }
 }

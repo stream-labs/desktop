@@ -10,7 +10,7 @@
   <hotkey-group
     v-for="(sourceHotkeys, sourceId) in hotkeySet.sources"
     :key="sourceId"
-    :title="sourcesService.getSource(sourceId).displayName"
+    :title="sourcesService.getSource(sourceId).name"
     :hotkeys="sourceHotkeys"/>
 </div>
 </template>

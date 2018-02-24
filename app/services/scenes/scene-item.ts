@@ -236,7 +236,7 @@ export class SceneItem implements ISceneItemApi {
   resetTransform() {
     this.setTransform({
       position: { x: 0, y: 0 },
-      scale: { x: 0, y: 0 },
+      scale: { x: 1, y: 1 },
       rotation: 0,
       crop: {
         top: 0,
@@ -286,6 +286,29 @@ export class SceneItem implements ISceneItemApi {
   rotate(deltaRotation: number) {
     this.preservePosition(() => {
       this.setTransform({ rotation: this.transform.rotation + deltaRotation });
+    });
+  }
+
+  /**
+   * only for scene sources
+   */
+  setContentCrop() {
+    const source = this.getSource();
+    if (source.type !== 'scene') return;
+    const scene = this.scenesService.getScene(source.sourceId);
+    const rect = scene.getSelection().selectAll().getBoundingRect();
+    const { width, height } = this.source.getObsInput();
+    this.setTransform({
+      position: {
+        x: rect.x,
+        y: rect.y
+      },
+      crop: {
+        top: rect.y,
+        right: width - (rect.x + rect.width),
+        bottom: height - (rect.y + rect.height),
+        left: rect.x
+      }
     });
   }
 

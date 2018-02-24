@@ -66,7 +66,7 @@ export default class SourceFilters extends Vue {
   }
 
   get sourceDisplayName() {
-    return this.sourcesService.getSource(this.sourceId).displayName;
+    return this.sourcesService.getSource(this.sourceId).name;
   }
 
   removeFilter() {

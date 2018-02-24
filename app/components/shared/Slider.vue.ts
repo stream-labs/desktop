@@ -1,42 +1,31 @@
 import Vue from 'vue';
-import vueSlider from 'vue-slider-component';
+import VueSlider from 'vue-slider-component';
 import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
-  components: { vueSlider }
+  components: { VueSlider }
 })
 export default class SliderInput extends Vue {
+  @Prop() value: number;
+  @Prop() min: number;
+  @Prop() max: number;
+  @Prop() interval: number;
+  @Prop() disabled: boolean;
+  @Prop() tooltip: string;
+  @Prop() valueBox: boolean;
+  @Prop() dotSize: number;
+  @Prop() sliderStyle: object;
+  @Prop() usePercentages: boolean;
 
-  @Prop()
-  value: number;
+  $refs: { slider: any };
 
-  @Prop()
-  min: number;
-
-  @Prop()
-  max: number;
-
-  @Prop()
-  interval: number;
-
-  @Prop()
-  disabled: boolean;
-
-  @Prop()
-  tooltip: string;
-
-  @Prop()
-  valueBox: boolean;
-
-  @Prop()
-  dotSize: number;
-
-  @Prop()
-  sliderStyle: object;
-
-  @Prop()
-  usePercentages: boolean;
+  mounted() {
+    // Hack to prevent transitions from messing up slider width
+    setTimeout(() => {
+      if (this.$refs.slider) this.$refs.slider.refresh();
+    }, 500);
+  }
 
   @throttle(500)
   updateValue(value: number) {

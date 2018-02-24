@@ -15,6 +15,7 @@ import Utils from './services/utils';
 import electron from 'electron';
 import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
+import RavenConsole from 'raven-js/plugins/console';
 
 const { ipcRenderer, remote } = electron;
 
@@ -57,16 +58,19 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
           return splitArray[splitArray.length - 1];
         };
 
-        data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
-          frame.filename = normalize(frame.filename);
-        });
+        if (data.exception) {
+          data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
+            frame.filename = normalize(frame.filename);
+          });
 
-        data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
+          data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
+        }
 
         return data;
       }
     })
     .addPlugin(RavenVue, Vue)
+    .addPlugin(RavenConsole, console, { levels: ['error'] })
     .install();
 }
 

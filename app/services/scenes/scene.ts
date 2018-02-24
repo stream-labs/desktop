@@ -13,7 +13,7 @@ import Utils from '../utils';
 import * as obs from '../obs-api';
 import electron from 'electron';
 import { Inject } from '../../util/injector';
-import { SelectionService } from 'services/selection';
+import { SelectionService, Selection } from 'services/selection';
 import { uniqBy } from 'lodash';
 
 const { ipcRenderer } = electron;
@@ -61,6 +61,10 @@ export class Scene implements ISceneApi {
 
   getItemIds(): string[] {
     return this.sceneState.items.map(item => item.sceneItemId);
+  }
+
+  getSelection(itemsIds?: string[]): Selection {
+    return new Selection(this.id, itemsIds);
   }
 
   setName(newName: string) {
@@ -207,6 +211,11 @@ export class Scene implements ISceneApi {
       });
     if (options.excludeScenes) result = result.filter(sceneItem => sceneItem.type !== 'scene');
     return uniqBy(result, 'sceneItemId');
+  }
+
+
+  makeActive() {
+    this.scenesService.makeSceneActive(this.id);
   }
 
 

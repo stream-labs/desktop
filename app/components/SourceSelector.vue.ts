@@ -27,8 +27,7 @@ export default class SourceSelector extends Vue {
     const menuOptions = sceneItem ?
       ({
         selectedSceneId: this.scene.id,
-        showSceneItemMenu: true,
-        selectedSourceId: sceneItem.sourceId
+        showSceneItemMenu: true
       }) :
       ({ selectedSceneId: this.scene.id });
 
@@ -66,12 +65,12 @@ export default class SourceSelector extends Vue {
 
   makeActive(sceneItemId: string, ev: MouseEvent) {
     if (ev.ctrlKey) {
-      if (this.selectionService.isSelected(sceneItemId)) {
+      if (this.selectionService.isSelected(sceneItemId) && ev.button !== 2) {
         this.selectionService.deselect(sceneItemId);
       } else {
         this.selectionService.add(sceneItemId);
       }
-    } else {
+    } else if (!(ev.button === 2 && this.selectionService.isSelected(sceneItemId))) {
       this.selectionService.select(sceneItemId);
     }
   }

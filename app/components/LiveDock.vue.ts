@@ -39,7 +39,7 @@ export default class LiveDock extends Vue {
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
-      if (this.streamingService.isStreaming) {
+      if (this.streamingService.isLive) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
@@ -78,8 +78,14 @@ export default class LiveDock extends Vue {
     return this.streamingService.isStreaming;
   }
 
+  get isLive() {
+    return this.streamingService.isLive;
+  }
+
   get liveText() {
-    return this.isStreaming ? 'LIVE' : 'OFFLINE';
+    if (this.isLive) return 'LIVE';
+    if (this.isStreaming) return 'STARTING';
+    return 'OFFLINE';
   }
 
   get viewerCount() {
