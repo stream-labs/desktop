@@ -90,6 +90,9 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseDblClick(event: MouseEvent) {
+
+    // select single source in the folder on dblclick
+
     const overSource = this.sceneItems.find(source => {
       return this.isOverSource(event, source);
     });
@@ -208,6 +211,7 @@ export default class StudioEditor extends Vue {
       };
 
       if (this.isCropping) {
+        this.crop(converted.x, converted.y, options);
         this.crop(converted.x, converted.y, options);
       } else {
         this.resize(converted.x, converted.y, options);

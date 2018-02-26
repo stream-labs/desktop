@@ -72,7 +72,6 @@ export class SceneItem extends SceneNode implements ISceneItemApi {
   @Inject() protected scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
-  // @Inject() private selectionService: SelectionService;
 
   constructor(protected sceneId: string, sceneItemId: string, sourceId: string) {
     super();
