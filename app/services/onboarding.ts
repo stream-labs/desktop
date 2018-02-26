@@ -16,6 +16,8 @@ type TOnboardingStep =
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
   isOptimize: boolean; // When re-running the optimizer after onboarding
+  isSecurityUpgrade: boolean; // When logging in, display a special message
+                              // about our security upgrade.
 }
 
 interface IOnboardingServiceState {
@@ -43,6 +45,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
 
   SceneCollectionsImport: {
     isEligible: service => {
+      if (service.options.isSecurityUpgrade) return false;
       return service.userService.isLoggedIn();
     },
     next: 'ObsImport'
@@ -85,7 +88,8 @@ export class OnboardingService extends StatefulService<
   static initialState: IOnboardingServiceState = {
     options: {
       isLogin: false,
-      isOptimize: false
+      isOptimize: false,
+      isSecurityUpgrade: false
     },
     currentStep: null,
     completedSteps: []
@@ -157,6 +161,7 @@ export class OnboardingService extends StatefulService<
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
       isOptimize: false,
+      isSecurityUpgrade: false,
       ...options
     };
 
@@ -197,9 +202,20 @@ export class OnboardingService extends StatefulService<
   }
 
   startOnboardingIfRequired() {
-    if (localStorage.getItem(this.localStorageKey)) return false;
+    if (localStorage.getItem(this.localStorageKey)) {
+      this.forceLoginForSecurityUpgradeIfRequired();
+      return false;
+    }
 
     this.start();
     return true;
+  }
+
+  forceLoginForSecurityUpgradeIfRequired() {
+    if (!this.userService.isLoggedIn()) return;
+
+    if (!this.userService.apiToken) {
+      this.start({ isLogin: true, isSecurityUpgrade: true });
+    }
   }
 }

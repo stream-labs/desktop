@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { StreamingService } from '../services/streaming';
 import { Inject } from '../util/injector';
 import { NavigationService } from '../services/navigation';
@@ -18,6 +18,8 @@ export default class StartStreamingButton extends Vue {
   toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.stopStreaming();
+    } else if (this.streamingService.delaySecondsRemaining) {
+      this.streamingService.discardStreamDelay();
     } else {
       if (
         this.userService.isLoggedIn() &&
@@ -34,11 +36,41 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
-  get streamButtonLabel() {
+  getStreamButtonLabel() {
     if (this.streamingService.isStreaming) {
-      return 'End Stream';
+      const delaySeconds = this.streamingService.delaySecondsRemaining;
+
+      if (delaySeconds) {
+        return `STARTING ${delaySeconds}s`;
+      }
+
+      return 'END STREAM';
     }
 
-    return 'Go Live';
+    const delaySeconds = this.streamingService.delaySecondsRemaining;
+
+    if (delaySeconds) {
+      return `DISCARD ${delaySeconds}s`;
+    }
+
+    return 'GO LIVE';
+  }
+
+  getIsRedButton() {
+    return this.isStreaming || this.streamingService.delaySecondsRemaining;
+  }
+
+  get isStreaming() {
+    return this.streamingService.isStreaming;
+  }
+
+  @Watch('isStreaming')
+  setDelayUpdate() {
+    console.log('force update');
+    this.$forceUpdate();
+
+    if (this.streamingService.delaySecondsRemaining) {
+      setTimeout(() => this.setDelayUpdate(), 100);
+    }
   }
 }

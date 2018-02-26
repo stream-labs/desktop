@@ -3,6 +3,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { StatefulService, mutation } from './stateful-service';
 import { nodeObs } from './obs-api';
+import electron from 'electron';
 
 interface IPerformanceState {
   CPU: number;
@@ -41,6 +42,11 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
       if (stats.percentageDroppedFrames) {
         this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
       }
+
+      stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
+        return proc.cpu.percentCPUUsage;
+      }).reduce((sum, usage) => sum + usage);
+
       this.SET_PERFORMANCE_STATS(stats);
     }, 2 * 1000);
   }

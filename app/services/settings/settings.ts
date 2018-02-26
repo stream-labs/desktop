@@ -40,7 +40,10 @@ export interface ISettingsState {
     Base: string;
   };
   Audio: Dictionary<TObsValue>;
-  Advanced: Dictionary<TObsValue>;
+  Advanced: {
+    DelayEnable: boolean;
+    DelaySec: number;
+  };
 }
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
@@ -138,9 +141,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       'LowLatencyEnable',
       'BindIP',
       'FilenameFormatting',
-      'DelayPreserve',
-      'DelaySec',
-      'DelayEnable',
       'MaxRetries',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
