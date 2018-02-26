@@ -6,39 +6,53 @@ export * from './service';
 
 export function mutation(options = { vuexSyncIgnore: false }) {
   return function (target: any, methodName: string, descriptor: PropertyDescriptor) {
-    const serviceName = target.constructor.name;
-    const mutationName = `${serviceName}.${methodName}`;
-
-    target.mutations = target.mutations || {};
-    target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
-      const targetIsSingleton = !!target.constructor.instance;
-      let context = null;
-
-      if (targetIsSingleton) {
-        context = target.constructor.instance;
-      } else {
-        context = new target.constructor(...payload.constructorArgs);
-      }
-
-      descriptor.value.call(context, ...payload.args);
-    };
-
-    return {
-      ...descriptor,
-
-      value(...args: any[]) {
-        const constructorArgs = this['constructorArgs'];
-        const store = StatefulService.getStore();
-        store.commit(
-          mutationName, {
-            args,
-            constructorArgs,
-            __vuexSyncIgnore: options.vuexSyncIgnore
-          });
-      }
-    };
+    return registerMutation(target, methodName, descriptor, options);
   };
 
+}
+
+function registerMutation(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor,
+  options = { vuexSyncIgnore: false }
+) {
+  const serviceName = target.constructor.name;
+  const mutationName = `${serviceName}.${methodName}`;
+
+  target.originalMethods = target.originalMethods || {};
+  target.originalMethods[methodName] = target[methodName];
+  target.mutations = target.mutations || {};
+  target.mutations[mutationName] = function (localState: any, payload: {args: any, constructorArgs: any}) {
+    const targetIsSingleton = !!target.constructor.instance;
+    let context = null;
+
+    if (targetIsSingleton) {
+      context = target.constructor.instance;
+    } else {
+      context = new target.constructor(...payload.constructorArgs);
+    }
+
+    descriptor.value.call(context, ...payload.args);
+  };
+
+
+  Object.defineProperty(target, methodName, {
+    ...descriptor,
+
+    value(...args: any[]) {
+      const constructorArgs = this['constructorArgs'];
+      const store = StatefulService.getStore();
+      store.commit(
+        mutationName, {
+          args,
+          constructorArgs,
+          __vuexSyncIgnore: options.vuexSyncIgnore
+        });
+    }
+  });
+
+  return Object.getOwnPropertyDescriptor(target, methodName);
 }
 
 /**
@@ -113,6 +127,17 @@ export function ServiceHelper(): ClassDecorator {
     // vuex modules names related to constructor name
     // so we need to save the name
     Object.defineProperty(f, 'name', { value: target.name });
+
+    // inherit mutations
+    const baseClassMutations = Object.getPrototypeOf(target.prototype)
+      .constructor
+      .prototype
+      .originalMethods;
+    if (baseClassMutations) Object.keys(baseClassMutations).forEach(methodName => {
+      if (Object.getOwnPropertyDescriptor(f.prototype, methodName)) return; // mutation is overridden
+      f.prototype[methodName] = baseClassMutations[methodName];
+      registerMutation(f.prototype, methodName, Object.getOwnPropertyDescriptor(f.prototype, methodName));
+    });
 
     // return new constructor (will override original)
     return f;
