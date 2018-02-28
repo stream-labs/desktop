@@ -358,7 +358,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
-    const sceneItemsIds = scene.items.map(item => item.sceneItemId);
+    const sceneItemsIds = scene.nodes.map(item => item.id);
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 
