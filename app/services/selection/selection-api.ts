@@ -34,7 +34,7 @@ export interface ISelection extends ISceneItemActions {
   isSceneItem(): boolean;
   isSceneFolder(): boolean;
   copyTo(sceneId: string): ISceneItem[];
-  copyReferenceTo(sceneId: string): ISceneItem[];
+  copyReferenceTo(sceneId: string, folderId?: string): ISceneItem[];
   moveTo(sceneId: string, folderId?: string): ISceneItem[];
 }
 

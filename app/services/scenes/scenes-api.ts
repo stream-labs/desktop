@@ -41,7 +41,7 @@ export interface ISceneApi extends IScene {
   getNodes(): (ISceneItemApi | ISceneFolderApi)[];
   getItems(): ISceneItemApi[];
   getFolders(): ISceneFolderApi[];
-  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
+  addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   createFolder(name: string): ISceneFolderApi;
   removeFolder(folderId: string): void;
@@ -55,9 +55,8 @@ export interface ISceneApi extends IScene {
 }
 
 
-export interface ISceneItemAddOptions {
-  sceneItemId?: string; // A new ID will be assigned if one is not provided
-  parentId?: string;
+export interface ISceneNodeAddOptions {
+  id?: string; // A new ID will be assigned if one is not provided
 }
 
 
@@ -150,7 +149,7 @@ export type TSceneNodeType = 'item' | 'folder';
 
 export interface ISceneNode {
   id: string;
-  nodeType: TSceneNodeType;
+  sceneNodeType: TSceneNodeType;
   parentId?: string;
   childrenIds?: string[];
 }

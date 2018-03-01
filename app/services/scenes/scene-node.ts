@@ -13,7 +13,7 @@ export abstract class SceneNode implements ISceneNode {
   id: string;
   parentId: string;
   childrenIds: string[];
-  nodeType: TSceneNodeType;
+  sceneNodeType: TSceneNodeType;
 
   protected sceneId: string;
 
@@ -63,6 +63,24 @@ export abstract class SceneNode implements ISceneNode {
     return this.getScene().getNodes()[nodeInd + 1];
   }
 
+  getPrevItem(): SceneItem {
+    let nodeInd = this.getNodeIndex();
+    const nodes = this.getScene().getNodes();
+    while (nodeInd--) {
+      if (nodes[nodeInd].isItem()) return nodes[nodeInd] as SceneItem;
+    }
+    return null;
+  }
+
+  getNextItem(): SceneItem {
+    let nodeInd = this.getNodeIndex();
+    const nodes = this.getScene().getNodes();
+    while (nodeInd++) {
+      if (!nodes[nodeInd]) return null;
+      if (nodes[nodeInd].isItem()) return nodes[nodeInd] as SceneItem;
+    }
+  }
+
   isSelected() {
     return this.selectionService.isSelected(this.id);
   }
@@ -80,11 +98,11 @@ export abstract class SceneNode implements ISceneNode {
   }
 
   isFolder(): this is SceneFolder {
-    return this.nodeType === 'folder';
+    return this.sceneNodeType === 'folder';
   }
 
   isItem(): this is SceneItem {
-    return this.nodeType === 'item';
+    return this.sceneNodeType === 'item';
   }
 
   protected abstract getState(): ISceneNode;

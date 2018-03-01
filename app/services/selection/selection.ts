@@ -60,9 +60,9 @@ export class SelectionService
   getLastSelectedId: () => string;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
-  copyReferenceTo: (sceneId: string) => SceneItem[];
+  copyReferenceTo: (sceneId: string, folderId?: string) => SceneItem[];
   copyTo: (sceneId: string) => SceneItem[];
-  moveTo: (sceneId: string) => SceneItem[];
+  moveTo: (sceneId: string, folderId?: string) => SceneItem[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
 
@@ -197,7 +197,7 @@ export class Selection implements ISelection {
       const node = scene.getNode(id);
       if (!node) return;
       selectedIds.push(id);
-      if (node.nodeType !== 'folder') return;
+      if (node.sceneNodeType !== 'folder') return;
       selectedIds.push(...((node as SceneFolder).getNestedNodesIds()));
     });
 
@@ -386,10 +386,15 @@ export class Selection implements ISelection {
   }
 
   moveTo(sceneId: string, folderId?: string): SceneItem[] {
-    if (this.sceneId === sceneId && !folderId) return;
-    const insertedItems = this.copyReferenceTo(sceneId, folderId);
-    this.remove();
-    return insertedItems;
+
+    if (this.sceneId === sceneId) {
+      if (!folderId) return;
+      this.getNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
+    } else {
+      const insertedItems = this.copyReferenceTo(sceneId, folderId);
+      this.remove();
+      return insertedItems;
+    }
   }
 
   isVisible() {
@@ -448,7 +453,7 @@ export class Selection implements ISelection {
 
 
   remove() {
-    this.getItems().forEach(item => item.remove());
+    this.getNodes().forEach(node => node.remove());
   }
 
   nudgeActiveItemsLeft() {

@@ -21,14 +21,14 @@ import { ISceneFolder } from './scenes-api';
 export class SceneFolder extends SceneNode implements ISceneFolderApi {
 
   // ISceneNode attributes
-  nodeType: TSceneNodeType;
+  sceneNodeType: TSceneNodeType;
   id: string;
   parentId: string;
   childrenIds: string[];
 
   name: string;
 
-  private sceneFolderState: ISceneNode;
+  private sceneFolderState: ISceneFolder;
   protected sceneId: string;
 
   @Inject() protected scenesService: ScenesService;
@@ -46,7 +46,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     });
 
     Utils.applyProxy(this, state);
-    this.sceneFolderState = state;
+    this.sceneFolderState = state as ISceneFolder;
   }
 
   add(sceneNodeId: string) {
@@ -69,7 +69,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
   }
 
   getItems(): SceneItem[] {
-    return this.getNodes().filter(node => node.nodeType === 'item') as SceneItem[];
+    return this.getNodes().filter(node => node.sceneNodeType === 'item') as SceneItem[];
   }
 
   getScene(): Scene {
@@ -87,7 +87,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     return nodes.map(node => {
       return {
         ...node.getModel(),
-        children: node.nodeType === 'folder' ?
+        children: node.sceneNodeType === 'folder' ?
           (node as SceneFolder).getHierarchy() :
           []
       };
@@ -98,7 +98,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     const nodes: TSceneNode[] = [];
     this.getNodes().forEach(node => {
       nodes.push(node);
-      if (node.nodeType !== 'folder') return;
+      if (node.sceneNodeType !== 'folder') return;
       nodes.push(...((node as SceneFolder).getNestedNodes()));
     });
     return nodes;
@@ -106,7 +106,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
 
   getNestedItems(): SceneItem[] {
     return this.getNestedNodes()
-      .filter(node => node.nodeType === 'item') as SceneItem[];
+      .filter(node => node.sceneNodeType === 'item') as SceneItem[];
   }
 
   getNestedNodesIds(): string[] {
@@ -125,7 +125,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     this.getScene().removeFolder(this.id);
   }
 
-  getModel() {
+  getModel(): ISceneFolder {
     return this.sceneFolderState;
   }
 

@@ -88,11 +88,7 @@ export class EditMenu extends Menu {
         label: 'Remove',
         accelerator: 'Delete',
         click: () => {
-          if (this.selectionService.isSceneFolder()) {
-            this.selectionService.getFolders()[0].remove();
-          } else {
-            this.selectionService.remove();
-          }
+          this.selectionService.remove();
         }
       });
 

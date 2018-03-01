@@ -50,7 +50,7 @@ export class SceneItem extends SceneNode implements ISceneItemApi {
   id: string;
   parentId: string;
   childrenIds: string[];
-  nodeType: TSceneNodeType;
+  sceneNodeType: TSceneNodeType;
 
   // Some computed attributes
 

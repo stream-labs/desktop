@@ -51,7 +51,7 @@ export default class SourceSelector extends Vue {
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
     const sceneNode = this.selectionService.getLastSelected();
-    return (sceneNode && sceneNode.nodeType === 'item') ?
+    return (sceneNode && sceneNode.sceneNodeType === 'item') ?
       sceneNode.getSource().hasProps() :
       false;
   }
@@ -61,7 +61,7 @@ export default class SourceSelector extends Vue {
     const nodeToMove = rootNodes[data.change.moved.oldIndex];
     const destNode = this.scene.getRootNodes()[data.change.moved.newIndex];
 
-    if (destNode.getNodeIndex() === 0) {
+    if (destNode.getNodeIndex() < nodeToMove.getNodeIndex()) {
       nodeToMove.placeBefore(destNode.id);
     } else {
       nodeToMove.placeAfter(destNode.id);
