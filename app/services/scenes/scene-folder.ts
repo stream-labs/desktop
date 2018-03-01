@@ -76,6 +76,20 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     return this.scenesService.getScene(this.sceneId);
   }
 
+  /**
+   * itemIndex for SceneFolder is itemIndex of previous SceneItem
+   *
+   * nodeInd | itemInd | nodes tree
+   *  0      |    0    | Folder1
+   *  1      |    0    |   |_Folder2
+   *  2      |    0    |   |_ Item1
+   *  3      |    1    |   \_ Item2
+   *  4      |    2    | Item3
+   *  5      |    2    | Folder3
+   *  6      |    3    |   |_Item4
+   *  7      |    4    |   \_Item5
+   *
+   */
   getItemIndex(): number {
     const nodeInd = this.getNodeIndex();
     if (nodeInd === 0) return 0;
