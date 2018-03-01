@@ -5,8 +5,8 @@ import Utils from '../utils';
 import { Inject } from 'util/injector';
 import { Selection, SelectionService } from 'services/selection';
 import {
-  ISceneFolderApi,
-  ISceneNode,
+  ISceneItemFolderApi,
+  ISceneItemNode,
   TSceneNodeType,
   SceneItem,
   ISceneHierarchy,
@@ -14,11 +14,11 @@ import {
 } from 'services/scenes';
 
 
-import { SceneNode } from './scene-node';
-import { ISceneFolder } from './scenes-api';
+import { SceneItemNode } from './scene-node';
+import { ISceneItemFolder } from './scenes-api';
 
 @ServiceHelper()
-export class SceneFolder extends SceneNode implements ISceneFolderApi {
+export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
 
   // ISceneNode attributes
   sceneNodeType: TSceneNodeType;
@@ -28,7 +28,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
 
   name: string;
 
-  private sceneFolderState: ISceneFolder;
+  private sceneFolderState: ISceneItemFolder;
   protected sceneId: string;
 
   @Inject() protected scenesService: ScenesService;
@@ -46,7 +46,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     });
 
     Utils.applyProxy(this, state);
-    this.sceneFolderState = state as ISceneFolder;
+    this.sceneFolderState = state as ISceneItemFolder;
   }
 
   add(sceneNodeId: string) {
@@ -102,7 +102,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
       return {
         ...node.getModel(),
         children: node.sceneNodeType === 'folder' ?
-          (node as SceneFolder).getHierarchy() :
+          (node as SceneItemFolder).getHierarchy() :
           []
       };
     });
@@ -113,7 +113,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     this.getNodes().forEach(node => {
       nodes.push(node);
       if (node.sceneNodeType !== 'folder') return;
-      nodes.push(...((node as SceneFolder).getNestedNodes()));
+      nodes.push(...((node as SceneItemFolder).getNestedNodes()));
     });
     return nodes;
   }
@@ -139,7 +139,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
     this.getScene().removeFolder(this.id);
   }
 
-  getModel(): ISceneFolder {
+  getModel(): ISceneItemFolder {
     return this.sceneFolderState;
   }
 
@@ -148,7 +148,7 @@ export class SceneFolder extends SceneNode implements ISceneFolderApi {
   }
 
   @mutation()
-  private UPDATE(patch: TPatch<ISceneFolder>) {
+  private UPDATE(patch: TPatch<ISceneItemFolder>) {
     merge(this.sceneFolderState, patch);
   }
 

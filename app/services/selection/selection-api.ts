@@ -3,8 +3,8 @@ import {
   ISceneItemApi,
   ISceneItem,
   TSceneNodeApi,
-  ISceneNode,
-  ISceneFolderApi
+  ISceneItemNode,
+  ISceneItemFolderApi
 } from 'services/scenes';
 
 
@@ -21,7 +21,7 @@ export interface ISelection extends ISceneItemActions {
   selectAll(): ISelection;
   clone(): ISelection;
   getItems(): ISceneItemApi[];
-  getFolders(): ISceneFolderApi[];
+  getFolders(): ISceneItemFolderApi[];
   getVisualItems(): ISceneItemApi[];
   getIds(): string[];
   getInvertedIds(): string[];
@@ -46,4 +46,4 @@ export interface ISelectionState {
 /**
  * list of ISceneNode.id or ISceneNode
  */
-export type TNodesList = string | string[] | ISceneNode | ISceneNode[];
+export type TNodesList = string | string[] | ISceneItemNode | ISceneItemNode[];

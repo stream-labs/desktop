@@ -7,7 +7,7 @@ import {
   ISceneItem,
   ISceneItemSettings,
   IPartialTransform,
-  TSceneNode, ISceneNode, SceneFolder
+  TSceneNode, ISceneItemNode, SceneItemFolder
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
@@ -50,7 +50,7 @@ export class SelectionService
   invert: () => Selection;
   getItems: () => SceneItem[];
   getNodes: () => TSceneNode[];
-  getFolders: () => SceneFolder[];
+  getFolders: () => SceneItemFolder[];
   getVisualItems: () => SceneItem[];
   getIds: () => string[];
   getInvertedIds: () => string[];
@@ -198,7 +198,7 @@ export class Selection implements ISelection {
       if (!node) return;
       selectedIds.push(id);
       if (node.sceneNodeType !== 'folder') return;
-      selectedIds.push(...((node as SceneFolder).getNestedNodesIds()));
+      selectedIds.push(...((node as SceneItemFolder).getNestedNodesIds()));
     });
 
     this.setState({ selectedIds });
@@ -246,7 +246,7 @@ export class Selection implements ISelection {
   /**
    * return folders with the order as in the scene
    */
-  getFolders(): SceneFolder[] {
+  getFolders(): SceneItemFolder[] {
     const scene = this.getScene();
     if (!this.getSize()) return [];
     return scene.getFolders().filter(folder => this.state.selectedIds.includes(folder.id));
@@ -338,7 +338,7 @@ export class Selection implements ISelection {
     return this;
   }
 
-  isSelected(sceneNode: string | ISceneNode) {
+  isSelected(sceneNode: string | ISceneItemNode) {
     const itemId = (typeof sceneNode === 'string') ?
       sceneNode :
       (sceneNode as ISceneItem).sceneItemId;
@@ -489,7 +489,7 @@ export class Selection implements ISelection {
       if (typeof itemsList[0] === 'string') {
         return itemsList as string[];
       }
-      return (itemsList as ISceneNode[]).map(item => item.id);
+      return (itemsList as ISceneItemNode[]).map(item => item.id);
 
     }
 

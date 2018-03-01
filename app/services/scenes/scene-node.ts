@@ -4,11 +4,11 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { TSceneNodeType } from './scenes-api';
 import { Inject } from '../../util/injector';
-import { ScenesService, Scene, ISceneNode, SceneFolder, SceneItem } from './index';
+import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem } from './index';
 import { SelectionService } from 'services/selection';
 
 @ServiceHelper()
-export abstract class SceneNode implements ISceneNode {
+export abstract class SceneItemNode implements ISceneItemNode {
 
   id: string;
   parentId: string;
@@ -33,7 +33,7 @@ export abstract class SceneNode implements ISceneNode {
     this.SET_PARENT(null);
   }
 
-  getParent(): SceneFolder {
+  getParent(): SceneItemFolder {
     return this.getScene().getFolder(this.parentId);
   }
 
@@ -97,7 +97,7 @@ export abstract class SceneNode implements ISceneNode {
     this.selectionService.deselect(this.id);
   }
 
-  isFolder(): this is SceneFolder {
+  isFolder(): this is SceneItemFolder {
     return this.sceneNodeType === 'folder';
   }
 
@@ -105,7 +105,7 @@ export abstract class SceneNode implements ISceneNode {
     return this.sceneNodeType === 'item';
   }
 
-  protected abstract getState(): ISceneNode;
+  protected abstract getState(): ISceneItemNode;
   protected abstract remove(): void;
 
 

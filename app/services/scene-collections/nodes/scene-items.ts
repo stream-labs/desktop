@@ -2,7 +2,7 @@ import { Node } from './node';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
-import { ISceneFolder, ScenesService, TSceneNodeType } from '../../scenes';
+import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';
 import { Inject } from '../../../util/injector';
 
 interface ISchema {
@@ -27,7 +27,7 @@ export interface ISceneItemInfo {
 
 }
 
-export type TSceneNodeInfo =  ISceneItemInfo | ISceneFolder;
+export type TSceneNodeInfo =  ISceneItemInfo | ISceneItemFolder;
 
 interface IContext {
   scene: Scene;

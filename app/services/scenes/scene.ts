@@ -8,9 +8,9 @@ import {
   ISceneApi,
   ISceneNodeAddOptions,
   ISceneItemInfo,
-  ISceneFolder,
-  SceneFolder,
-  ISceneNode
+  ISceneItemFolder,
+  SceneItemFolder,
+  ISceneItemNode
 } from './index';
 import Utils from '../utils';
 import * as obs from '../obs-api';
@@ -22,9 +22,9 @@ import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 const { ipcRenderer } = electron;
 
 
-export type TSceneNode = SceneItem | SceneFolder;
+export type TSceneNode = SceneItem | SceneItemFolder;
 
-export interface ISceneHierarchy extends ISceneNode {
+export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
 }
 
@@ -32,7 +32,7 @@ export interface ISceneHierarchy extends ISceneNode {
 export class Scene implements ISceneApi {
   id: string;
   name: string;
-  nodes: (ISceneItem | ISceneFolder)[];
+  nodes: (ISceneItem | ISceneItemFolder)[];
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -66,7 +66,7 @@ export class Scene implements ISceneApi {
 
     return nodeModel.sceneNodeType === 'item' ?
       new SceneItem(this.id, nodeModel.id, nodeModel.sourceId) :
-      new SceneFolder(this.id, nodeModel.id);
+      new SceneItemFolder(this.id, nodeModel.id);
   }
 
   getItem(sceneItemId: string): SceneItem {
@@ -74,9 +74,9 @@ export class Scene implements ISceneApi {
     return (node && node.sceneNodeType === 'item') ? node as SceneItem : null;
   }
 
-  getFolder(sceneFolderId: string): SceneFolder {
+  getFolder(sceneFolderId: string): SceneItemFolder {
     const node = this.getNode(sceneFolderId);
-    return (node && node.sceneNodeType === 'folder') ? node as SceneFolder : null;
+    return (node && node.sceneNodeType === 'folder') ? node as SceneItemFolder : null;
   }
 
   getItems(): SceneItem[] {
@@ -85,7 +85,7 @@ export class Scene implements ISceneApi {
       .map(item => this.getItem(item.id));
   }
 
-  getFolders(): SceneFolder[] {
+  getFolders(): SceneItemFolder[] {
     return this.sceneState.nodes
       .filter(node => node.sceneNodeType === 'folder')
       .map(item => this.getFolder(item.id));
@@ -250,7 +250,7 @@ export class Scene implements ISceneApi {
 
     const sceneNodesIds = this.getNodesIds();
     const nodesToMoveIds: string[] = sourceNode.sceneNodeType === 'folder' ?
-      [sourceNode.id].concat((sourceNode as SceneFolder).getNestedNodesIds()) :
+      [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds()) :
       [sourceNode.id];
     const firstNodeIndex = this.getNode(nodesToMoveIds[0]).getNodeIndex();
 
@@ -312,7 +312,7 @@ export class Scene implements ISceneApi {
     let itemIndex = 0;
     nodes.forEach((nodeModel) => {
       if (nodeModel.sceneNodeType === 'folder') {
-        const folderModel = nodeModel as ISceneFolder;
+        const folderModel = nodeModel as ISceneItemFolder;
         this.createFolder(folderModel.name, { id: folderModel.id });
       } else {
         const itemModel = nodeModel as ISceneItemInfo;
@@ -325,7 +325,7 @@ export class Scene implements ISceneApi {
     // add items to folders
     nodes.forEach(nodeModel => {
       if (nodeModel.sceneNodeType !== 'folder') return;
-      const folder = nodeModel as ISceneFolder;
+      const folder = nodeModel as ISceneItemFolder;
       this.getSelection(folder.childrenIds).moveTo(this.id, folder.id);
     });
   }
@@ -435,7 +435,7 @@ export class Scene implements ISceneApi {
   }
 
   @mutation()
-  private ADD_FOLDER_TO_SCENE(folderModel: ISceneFolder) {
+  private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.sceneState.nodes.unshift(folderModel);
   }
 

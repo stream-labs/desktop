@@ -24,26 +24,26 @@ export interface IScenesServiceApi {
   itemUpdated: Observable<ISceneItem>;
 }
 
-export type TSceneNodeModel = ISceneItem | ISceneFolder;
-export type TSceneNodeApi = ISceneItemApi | ISceneFolderApi;
+export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
+export type TSceneNodeApi = ISceneItemApi | ISceneItemFolderApi;
 
 export interface IScene {
   id: string;
   name: string;
-  nodes: (ISceneItem | ISceneFolder)[];
+  nodes: (ISceneItem | ISceneItemFolder)[];
 }
 
 
 export interface ISceneApi extends IScene {
-  getNode(sceneNodeId: string): ISceneItemApi | ISceneFolderApi;
+  getNode(sceneNodeId: string): ISceneItemApi | ISceneItemFolderApi;
   getItem(sceneItemId: string): ISceneItemApi;
-  getFolder(sceneFolderId: string): ISceneFolderApi;
-  getNodes(): (ISceneItemApi | ISceneFolderApi)[];
+  getFolder(sceneFolderId: string): ISceneItemFolderApi;
+  getNodes(): (ISceneItemApi | ISceneItemFolderApi)[];
   getItems(): ISceneItemApi[];
-  getFolders(): ISceneFolderApi[];
+  getFolders(): ISceneItemFolderApi[];
   addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
-  createFolder(name: string): ISceneFolderApi;
+  createFolder(name: string): ISceneItemFolderApi;
   removeFolder(folderId: string): void;
   removeItem(sceneItemId: string): void;
   remove(): void;
@@ -114,7 +114,7 @@ export interface IPartialSettings {
 }
 
 
-export interface ISceneItem extends ISceneItemSettings, ISceneNode {
+export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sceneItemId: string;
   sourceId: string;
   obsSceneItemId: number;
@@ -147,27 +147,27 @@ export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
 
 export type TSceneNodeType = 'item' | 'folder';
 
-export interface ISceneNode {
+export interface ISceneItemNode {
   id: string;
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   childrenIds?: string[];
 }
 
-export interface ISceneNodeApi extends ISceneNode {
+export interface ISceneNodeApi extends ISceneItemNode {
   getScene(): ISceneApi;
   getSelection(): ISelection;
-  getParent(): ISceneFolder;
+  getParent(): ISceneItemFolder;
 }
 
-export interface ISceneFolder extends ISceneNode {
+export interface ISceneItemFolder extends ISceneItemNode {
   name: string;
 }
 
-export interface ISceneFolderApi extends ISceneFolder {
+export interface ISceneItemFolderApi extends ISceneItemFolder {
   getScene(): ISceneApi;
   getSelection(): ISelection;
-  getParent(): ISceneFolder;
+  getParent(): ISceneItemFolder;
   getItems(): ISceneItemApi[];
   setName(newName: string): void;
   select(): void;

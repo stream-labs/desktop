@@ -20,14 +20,14 @@ import {
   ISceneItemInfo,
   TSceneNodeType
 } from './index';
-import { SceneNode } from './scene-node';
+import { SceneItemNode } from './scene-node';
 /**
  * A SceneItem is a source that contains
  * all of the information about that source, and
  * how it fits in to the given scene
  */
 @ServiceHelper()
-export class SceneItem extends SceneNode implements ISceneItemApi {
+export class SceneItem extends SceneItemNode implements ISceneItemApi {
 
   sourceId: string;
   name: string;
