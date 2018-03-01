@@ -15,7 +15,6 @@ import { IpcServerService } from '../ipc-server';
 import { TcpServerService } from '../tcp-server';
 import { StreamlabelsService } from '../streamlabels';
 import { PerformanceMonitorService } from '../performance-monitor';
-import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 
@@ -95,12 +94,11 @@ export class AppService extends StatefulService<IAppState> {
   private shutdownHandler() {
     this.START_LOADING();
 
+    this.ipcServerService.stopListening();
+    this.tcpServerService.stopListening();
+
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
-
-      this.ipcServerService.stopListening();
-      this.tcpServerService.stopListening();
-
       this.performanceMonitorService.stop();
       this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.reset();
