@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { ISourceApi, TSourceType, ISource } from 'services/sources';
-import { ISelection, TItemsList } from 'services/selection';
+import { ISelection, TNodesList } from 'services/selection';
 
 /**
  * Api for scenes management
@@ -15,6 +15,7 @@ export interface IScenesServiceApi {
   getSceneByName(name: string): ISceneApi;
   getScenes(): ISceneApi[];
   getModel(): IScenesState;
+  suggestName(name: string): string;
   sceneSwitched: Observable<IScene>;
   sceneAdded: Observable<IScene>;
   sceneRemoved: Observable<IScene>;
@@ -23,31 +24,39 @@ export interface IScenesServiceApi {
   itemUpdated: Observable<ISceneItem>;
 }
 
+export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
+export type TSceneNodeApi = ISceneItemApi | ISceneItemFolderApi;
 
 export interface IScene {
   id: string;
   name: string;
-  items: ISceneItem[];
+  nodes: (ISceneItem | ISceneItemFolder)[];
 }
 
 
 export interface ISceneApi extends IScene {
+  getNode(sceneNodeId: string): ISceneItemApi | ISceneItemFolderApi;
   getItem(sceneItemId: string): ISceneItemApi;
+  getFolder(sceneFolderId: string): ISceneItemFolderApi;
+  getNodes(): (ISceneItemApi | ISceneItemFolderApi)[];
   getItems(): ISceneItemApi[];
-  addSource(sourceId: string, options?: ISceneItemAddOptions): ISceneItemApi;
+  getFolders(): ISceneItemFolderApi[];
+  addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
+  createFolder(name: string): ISceneItemFolderApi;
+  removeFolder(folderId: string): void;
   removeItem(sceneItemId: string): void;
   remove(): void;
   canAddSource(sourceId: string): boolean;
   setName(newName: string): void;
   getModel(): IScene;
   makeActive(): void;
-  getSelection(itemsList: TItemsList): ISelection;
+  getSelection(itemsList: TNodesList): ISelection;
 }
 
 
-export interface ISceneItemAddOptions {
-  sceneItemId?: string; // A new ID will be assigned if one is not provided
+export interface ISceneNodeAddOptions {
+  id?: string; // A new ID will be assigned if one is not provided
 }
 
 
@@ -105,7 +114,7 @@ export interface IPartialSettings {
 }
 
 
-export interface ISceneItem extends ISceneItemSettings {
+export interface ISceneItem extends ISceneItemSettings, ISceneItemNode {
   sceneItemId: string;
   sourceId: string;
   obsSceneItemId: number;
@@ -131,7 +140,35 @@ export interface ISceneItemActions {
 }
 
 export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
-  getScene(): ISceneApi;
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
+  select(): void;
+}
+
+export type TSceneNodeType = 'item' | 'folder';
+
+export interface ISceneItemNode {
+  id: string;
+  sceneNodeType: TSceneNodeType;
+  parentId?: string;
+  childrenIds?: string[];
+}
+
+export interface ISceneNodeApi extends ISceneItemNode {
+  getScene(): ISceneApi;
+  getSelection(): ISelection;
+  getParent(): ISceneItemFolder;
+}
+
+export interface ISceneItemFolder extends ISceneItemNode {
+  name: string;
+}
+
+export interface ISceneItemFolderApi extends ISceneItemFolder {
+  getScene(): ISceneApi;
+  getSelection(): ISelection;
+  getParent(): ISceneItemFolder;
+  getItems(): ISceneItemApi[];
+  setName(newName: string): void;
+  select(): void;
 }
