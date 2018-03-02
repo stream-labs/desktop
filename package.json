@@ -47,7 +47,8 @@
       "license": "AGREEMENT",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": true
+      "perMachine": true,
+      "include": "installer.nsh"
     }
   },
   "ava": {
