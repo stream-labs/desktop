@@ -45,6 +45,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.state.auth.platform.token = token;
   }
 
+  @mutation()
+  private SET_CHANNEL_ID(id: string) {
+    this.state.auth.platform.channelId = id;
+  }
+
   userLogin = new Subject<IPlatformAuth>();
 
   init() {
@@ -129,6 +134,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   get platformId() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.id;
+    }
+  }
+
+  get channelId() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.channelId;
     }
   }
 
@@ -244,6 +255,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   updatePlatformToken(token: string) {
     this.SET_PLATFORM_TOKEN(token);
+  }
+
+  updatePlatformChannelId(id: string) {
+    this.SET_CHANNEL_ID(id);
   }
 
   /**
