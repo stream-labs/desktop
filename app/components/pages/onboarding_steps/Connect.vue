@@ -22,6 +22,12 @@
           @click="authPlatform('youtube')">
           <i class="fa" :class="iconForPlatform('youtube')" /> Youtube
         </button>
+        <button
+          class="button button--mixer"
+          :disabled="loadingState"
+          @click="authPlatform('mixer')">
+          <i class="fa" :class="iconForPlatform('mixer')" /> Mixer
+        </button>
       </div>
       <div class="setup-later" v-if="!isSecurityUpgrade">
         <a @click="skipOnboarding">Setup later</a>
@@ -35,7 +41,12 @@
 <style lang="less" scoped>
   .signup-buttons {
     display: flex;
+    flex-direction: column;
     width: 100%;
-    justify-content: space-between;
+    align-items: center;
+
+    button {
+      margin: 5px 0;
+    }
   }
 </style>
