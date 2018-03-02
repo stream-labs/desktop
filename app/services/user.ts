@@ -213,10 +213,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
-      alwaysOnTop: true,
+      alwaysOnTop: false,
       show: false,
       webPreferences: {
-        nodeIntegration: false
+        nodeIntegration: false,
+        nativeWindowOpen: true,
+        sandbox: true,
       }
     });
 
