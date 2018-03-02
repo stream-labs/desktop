@@ -194,7 +194,7 @@ async function runScript() {
   executeCmd('yarn install-plugins');
 
   info('Compiling assets...');
-  executeCmd('yarn compile');
+  executeCmd('yarn compile:production');
 
   info('Running tests...');
   executeCmd('yarn test');

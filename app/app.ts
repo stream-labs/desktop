@@ -20,7 +20,7 @@ import RavenConsole from 'raven-js/plugins/console';
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = remote.process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';

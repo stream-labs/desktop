@@ -5,7 +5,7 @@ install:
   - git submodule update --init --recursive
   - yarn install
   - yarn install-plugins
-  - yarn ci:compile
+  - yarn compile:ci
 
 test_script:
   - yarn test
