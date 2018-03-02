@@ -5,7 +5,7 @@ import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
 import { MixerService } from './services/platforms/mixer';
-import { ScenesService, SceneItem, Scene } from './services/scenes';
+import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
 import { CustomizationService } from './services/customization';
@@ -78,7 +78,9 @@ export class ServicesManager extends Service {
     TwitchService,
     MixerService,
     ScenesService,
+    SceneItemNode,
     SceneItem,
+    SceneItemFolder,
     Scene,
     ClipboardService,
     AudioService,

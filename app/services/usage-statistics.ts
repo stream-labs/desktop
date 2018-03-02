@@ -2,7 +2,6 @@ import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
-import electron from 'electron';
 
 export type TUsageEvent =
   'stream_start' |
@@ -40,16 +39,8 @@ export class UsageStatisticsService extends Service {
   @Inject()
   hostsService: HostsService;
 
-
-  // We memoize this to reduce IPC overhead
-  private _isProduction: boolean;
-
   get isProduction() {
-    if (this._isProduction === void 0) {
-      this._isProduction = electron.remote.process.env.NODE_ENV === 'production';
-    }
-
-    return this._isProduction;
+    return process.env.NODE_ENV === 'production';
   }
 
 

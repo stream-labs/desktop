@@ -9,6 +9,7 @@ import AddSource from '../components/windows/AddSource.vue';
 import NameSceneCollection from '../components/windows/NameSceneCollection.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
+import NameFolder from '../components/windows/NameFolder.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
@@ -67,6 +68,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AddSource,
     NameScene,
     NameSceneCollection,
+    NameFolder,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,

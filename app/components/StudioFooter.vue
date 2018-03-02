@@ -1,6 +1,14 @@
 <template>
 <div class="footer">
   <div class="flex flex--center flex--grow flex--justify-start">
+    <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
+      <div class="platform-error">
+        <i class="fa fa-exclamation-triangle" />
+        <span>YouTube account not enabled for live streaming</span>
+        <button class="button alert-button" @click="openYoutubeEnable">Fix</button>
+        <button class="button alert-button" @click="confirmYoutubeEnabled">I'm set up</button>
+      </div>
+    </div>
     <performance-metrics />
     <notifications-area class="notifications-area flex--grow"/>
   </div>
@@ -57,6 +65,38 @@
   }
 }
 
+.error-wrapper {
+  background-color: @day-secondary;
+  position: absolute;
+  z-index: 2;
+}
+
+.platform-error {
+  background: rgba(251,72,76,.28);
+  padding: 5px;
+  border-radius: 3px;
+
+  i {
+    margin-left: 5px;
+    color: @red;
+  }
+
+  span {
+    padding-left: 5px;
+    margin-right: 10px;
+    color: @red;
+  }
+
+  .alert-button {
+    height: 18px;
+    line-height: 12px;
+    background: rgba(251,72,76,.36);
+    margin: 0 5px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+}
+
 .record-button {
   position: relative;
   width: 30px;
@@ -106,6 +146,10 @@
   .footer {
     background-color: @night-primary;
     border-color: @night-border;
+  }
+
+  .error-wrapper {
+    background-color: @night-primary;
   }
 
   .record-button {

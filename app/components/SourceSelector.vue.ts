@@ -22,9 +22,9 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sceneItemId?: string) {
-    const sceneItem = this.scene.getItem(sceneItemId);
-    const menuOptions = sceneItem ?
+  showContextMenu(sceneNodeId?: string) {
+    const sceneNode = this.scene.getNode(sceneNodeId);
+    const menuOptions = sceneNode ?
       ({
         selectedSceneId: this.scene.id,
         showSceneItemMenu: true
@@ -50,17 +50,22 @@ export default class SourceSelector extends Vue {
 
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
-    return this.activeItems[0].getSource().hasProps();
+    const sceneNode = this.selectionService.getLastSelected();
+    return (sceneNode && sceneNode.sceneNodeType === 'item') ?
+      sceneNode.getSource().hasProps() :
+      false;
   }
 
   handleSort(data: any) {
-    const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
+    const rootNodes = this.scene.getRootNodes();
+    const nodeToMove = rootNodes[data.change.moved.oldIndex];
+    const destNode = this.scene.getRootNodes()[data.change.moved.newIndex];
 
-    this.scenesService.activeScene.setSourceOrder(
-      data.change.moved.element.value,
-      positionDelta,
-      data.order
-    );
+    if (destNode.getNodeIndex() < nodeToMove.getNodeIndex()) {
+      nodeToMove.placeBefore(destNode.id);
+    } else {
+      nodeToMove.placeAfter(destNode.id);
+    }
   }
 
   makeActive(sceneItemId: string, ev: MouseEvent) {
@@ -83,14 +88,15 @@ export default class SourceSelector extends Vue {
     return this.selectionService.getItems();
   }
 
-  toggleVisibility(sceneItemId: string) {
-    const source = this.scene.getItem(sceneItemId);
-
-    source.setVisibility(!source.visible);
+  toggleVisibility(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const visible = !selection.isVisible();
+    selection.setSettings({ visible });
   }
 
-  visibilityClassesForSource(sceneItemId: string) {
-    const visible = this.scene.getItem(sceneItemId).visible;
+  visibilityClassesForSource(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const visible = selection.isVisible();
 
     return {
       'fa-eye': visible,
@@ -98,8 +104,9 @@ export default class SourceSelector extends Vue {
     };
   }
 
-  lockClassesForSource(sceneItemId: string) {
-    const locked = this.scene.getItem(sceneItemId).locked;
+  lockClassesForSource(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const locked = selection.isLocked();
 
     return {
       'fa-lock': locked,
@@ -107,9 +114,10 @@ export default class SourceSelector extends Vue {
     };
   }
 
-  toggleLock(sceneItemId: string) {
-    const item = this.scene.getItem(sceneItemId);
-    item.setSettings({ locked: !item.locked });
+  toggleLock(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const locked = !selection.isLocked();
+    selection.setSettings({ locked });
   }
 
   get scene() {
@@ -117,10 +125,10 @@ export default class SourceSelector extends Vue {
   }
 
   get sources() {
-    return this.scene.getItems().map((sceneItem: SceneItem) => {
+    return this.scene.getRootNodes().map(sceneNode => {
       return {
-        name: sceneItem.name,
-        value: sceneItem.sceneItemId
+        name: sceneNode.name,
+        value: sceneNode.id
       };
     });
   }

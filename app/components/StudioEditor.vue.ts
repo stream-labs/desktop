@@ -46,6 +46,8 @@ export default class StudioEditor extends Vue {
   currentX: number;
   currentY: number;
   isCropping: boolean;
+  canDrag = false;
+
 
   $refs: {
     display: HTMLElement
@@ -87,6 +89,25 @@ export default class StudioEditor extends Vue {
     this.updateCursor(event);
   }
 
+  handleMouseDblClick(event: MouseEvent) {
+
+    // select single source in the folder on dblclick
+
+    const overSource = this.sceneItems.find(source => {
+      return this.isOverSource(event, source);
+    });
+
+    if (!overSource) return;
+
+    const parent = overSource.getParent();
+
+    if (!parent || parent && parent.isSelected()) {
+      this.selectionService.select(overSource.id);
+    } else if (parent) {
+      this.selectionService.select(parent.id);
+    }
+  }
+
   startDragging(event: MouseEvent) {
     this.dragHandler = new DragHandler(event, this.obsDisplay);
   }
@@ -100,6 +121,9 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseUp(event: MouseEvent) {
+
+    this.canDrag = true;
+
     // If neither a drag or resize was initiated, it must have been
     // an attempted selection or right click.
     if (!this.dragHandler && !this.resizeRegion) {
@@ -109,14 +133,17 @@ export default class StudioEditor extends Vue {
 
       // Either select a new source, or deselect all sources
       if (overSource) {
+        // if sceneItem is in the folder - select the folder
+        // individual source selection is in doubleclick handler
+        const overNode = overSource.hasParent() ? overSource.getParent() : overSource;
         if (event.ctrlKey) {
-          if (this.selectionService.isSelected(overSource.sceneItemId)) {
-            this.selectionService.deselect(overSource.sceneItemId);
+          if (overNode.isSelected()) {
+            overNode.deselect();
           } else {
-            this.selectionService.add(overSource.sceneItemId);
+            overNode.addToSelection();
           }
         } else if (event.button === 0) {
-          this.selectionService.select([overSource.sceneItemId]);
+          overNode.select();
         }
       } else if (event.button === 0) {
         this.selectionService.reset();
@@ -185,6 +212,7 @@ export default class StudioEditor extends Vue {
 
       if (this.isCropping) {
         this.crop(converted.x, converted.y, options);
+        this.crop(converted.x, converted.y, options);
       } else {
         this.resize(converted.x, converted.y, options);
       }
@@ -198,16 +226,23 @@ export default class StudioEditor extends Vue {
         return this.isOverSource(event, source);
       });
 
-      if (overSource) {
+      if (overSource && this.canDrag) {
+
+        const overNode = !overSource.isSelected() && overSource.hasParent() ?
+          overSource.getParent() :
+          overSource;
+
         // Make this source active
-        if (event.ctrlKey || this.selectionService.isSelected(overSource)) {
-          this.selectionService.add(overSource.sceneItemId);
+        if (event.ctrlKey || overNode.isSelected()) {
+          overNode.addToSelection();
         } else {
-          this.selectionService.select(overSource.sceneItemId);
+          overNode.select();
         }
 
         // Start dragging it
         this.startDragging(event);
+      } else {
+        this.canDrag = false;
       }
     }
 

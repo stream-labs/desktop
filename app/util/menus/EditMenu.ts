@@ -35,7 +35,7 @@ export class EditMenu extends Menu {
 
     if (this.options.selectedSourceId) {
       this.source = this.sourcesService.getSource(this.options.selectedSourceId);
-    } else if (this.options.showSceneItemMenu && this.selectionService.getSize() === 1) {
+    } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
       this.source = this.selectionService.getItems()[0].getSource();
     }
 
@@ -87,7 +87,9 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Remove',
         accelerator: 'Delete',
-        click: () => this.selectionService.remove()
+        click: () => {
+          this.selectionService.remove();
+        }
       });
 
       this.append({
@@ -142,6 +144,17 @@ export class EditMenu extends Menu {
         });
       }
     }
+
+    if (this.selectionService.isSceneFolder()) {
+      this.append({
+        label: 'Rename',
+        click: () =>
+          this.scenesService.showNameFolder({
+            renameId:  this.selectionService.getFolders()[0].id
+          })
+      });
+    }
+
 
     if (this.source && !isMultipleSelection) {
 
@@ -206,6 +219,7 @@ export class EditMenu extends Menu {
         })
       });
     }
+
   }
 
   private showFilters() {

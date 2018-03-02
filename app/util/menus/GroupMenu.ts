@@ -19,6 +19,27 @@ export class GroupMenu extends Menu {
 
     const selectionSize = this.selectionService.getSize();
     const selectedItem = this.selectionService.getItems()[0];
+    const itemInFolder = this.selectionService.getItems().find(item => !!item.parentId);
+    const canGroupIntoFolder = selectionSize > 1 && !itemInFolder;
+
+    this.append({
+      label: 'Group into Folder',
+      click: () => {
+        this.scenesService.showNameFolder({
+          itemsToGroup: this.selectionService.getIds()
+        });
+      },
+      enabled: canGroupIntoFolder
+    });
+
+    this.append({
+      label: 'Ungroup Folder',
+      click: () => {
+        this.selectionService.getFolders()[0].ungroup();
+      },
+      enabled: this.selectionService.isSceneFolder()
+    });
+
 
     this.append({
       label: 'Group into Scene',
@@ -47,6 +68,8 @@ export class GroupMenu extends Menu {
         return selectionSize === 1 && selectedItem.getSource().type === 'scene';
       })()
     });
+
+
   }
 
 }
