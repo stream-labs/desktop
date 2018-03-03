@@ -473,7 +473,7 @@ export class ServicesManager extends Service {
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(
-              isHelper ? target['resourceId'] : serviceName,
+              isHelper ? target['_resourceId'] : serviceName,
               methodName as string,
               { compactMode: true, fetchMutations: true },
               ...args

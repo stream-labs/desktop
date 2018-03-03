@@ -33,6 +33,9 @@ export class Scene implements ISceneApi {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
+  resourceId: string;
+
+  private _resourceId: string;
 
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
@@ -161,6 +164,8 @@ export class Scene implements ISceneApi {
       id,
       name,
       sceneNodeType: 'folder',
+      sceneId: this.id,
+      resourceId: '',
       parentId: '',
       childrenIds: []
     });
@@ -389,6 +394,10 @@ export class Scene implements ISceneApi {
     return uniqBy(sources, 'sourceId');
   }
 
+  getResourceId() {
+    return this._resourceId;
+  }
+
   @mutation()
   private SET_NAME(newName: string) {
     this.sceneState.name = newName;
@@ -410,6 +419,8 @@ export class Scene implements ISceneApi {
       id: sceneItemId,
       parentId: '',
       sceneNodeType: 'item',
+      sceneId: this.id,
+      resourceId: '',
 
       transform: {
         // Position in video space
@@ -432,11 +443,15 @@ export class Scene implements ISceneApi {
       visible: true,
       locked: false
     });
+    const item = this.getItem(sceneItemId);
+    this.sceneState.nodes[0].resourceId = item.getResourceId();
   }
 
   @mutation()
   private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.sceneState.nodes.unshift(folderModel);
+    const folder = this.getFolder(folderModel.id);
+    this.sceneState.nodes[0].resourceId = folder.getResourceId();
   }
 
 
