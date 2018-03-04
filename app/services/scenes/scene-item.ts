@@ -289,6 +289,20 @@ export class SceneItem implements ISceneItemApi {
     });
   }
 
+
+
+  deinterlaceOn(){
+  const source = this.sourcesService.getSource(this.sourceId).getObsInput();
+  source.deinterlaceMode = 1;
+  source.deinterlaceFieldOrder = 1;
+}
+
+deinterlaceOff(){
+  const source = this.sourcesService.getSource(this.sourceId).getObsInput();
+  source.deinterlaceMode = 0;
+  source.deinterlaceFieldOrder = 0;
+}
+
   /**
    * only for scene sources
    */

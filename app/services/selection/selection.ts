@@ -73,6 +73,8 @@ export class SelectionService
   centerOnScreen: () => void;
   rotate: (deg: number) => void;
   setContentCrop: () => void;
+  deinterlaceOn: () => void;
+  deinterlaceOff: () => void;
 
 
   @shortcut('Delete')
@@ -400,6 +402,13 @@ export class Selection implements ISelection {
 
   getModel() {
     return { sceneId: this.sceneId, ...this.state };
+  }
+  deinterlaceOn() {
+    this.getItems().forEach(item => item.deinterlaceOn());
+  }
+
+  deinterlaceOff() {
+    this.getItems().forEach(item => item.deinterlaceOff());
   }
 
   /**
