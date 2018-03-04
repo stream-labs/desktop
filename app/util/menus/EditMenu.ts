@@ -5,6 +5,7 @@ import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
+import { DeinterlaceMenu } from './DeinterlaceMenu';
 import { GroupMenu } from './GroupMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { WidgetsService } from 'services/widgets';
@@ -93,6 +94,11 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Transform',
         submenu: this.transformSubmenu().menu
+      });
+
+      this.append({
+        label: 'Deinterlace',
+        submenu:  this.deinterlaceSubmenu().menu
       });
 
       if (this.customizationService.state.experimental.sceneItemsGrouping) {
@@ -218,6 +224,10 @@ export class EditMenu extends Menu {
 
   private transformSubmenu() {
     return new SourceTransformMenu();
+  }
+
+  private deinterlaceSubmenu() {
+    return new DeinterlaceMenu();
   }
 
   private groupSubmenu() {
