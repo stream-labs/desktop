@@ -2,11 +2,11 @@ import { Node } from './node';
 import { Scene } from '../../scenes/scene';
 import { HotkeysNode } from './hotkeys';
 import { SourcesService } from '../../sources';
-import { ScenesService } from '../../scenes';
+import { ISceneItemFolder, ScenesService, TSceneNodeType } from '../../scenes';
 import { Inject } from '../../../util/injector';
 
 interface ISchema {
-  items: ISceneItemInfo[];
+  items: TSceneNodeInfo[];
 }
 
 export interface ISceneItemInfo {
@@ -21,7 +21,13 @@ export interface ISceneItemInfo {
   hotkeys?: HotkeysNode;
   locked?: boolean;
   rotation?: number;
+
+  sceneNodeType?: TSceneNodeType;
+  parentId?: string;
+
 }
+
+export type TSceneNodeInfo =  ISceneItemInfo | ISceneItemFolder;
 
 interface IContext {
   scene: Scene;
@@ -38,29 +44,35 @@ export class SceneItemsNode extends Node<ISchema, {}> {
   scenesService: ScenesService;
 
   getItems(context: IContext) {
-    return context.scene.getItems().slice().reverse();
+    return context.scene.getNodes().slice().reverse();
   }
 
   save(context: IContext): Promise<void> {
-    const promises: Promise<ISceneItemInfo>[] = this.getItems(context).map(sceneItem => {
+    const promises: Promise<TSceneNodeInfo>[] = this.getItems(context).map(sceneItem => {
       return new Promise(resolve => {
         const hotkeys = new HotkeysNode();
-        hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
-          const transform = sceneItem.transform;
-          resolve({
-            id: sceneItem.sceneItemId,
-            sourceId: sceneItem.sourceId,
-            x: transform.position.x,
-            y: transform.position.y,
-            scaleX: transform.scale.x,
-            scaleY: transform.scale.y,
-            visible: sceneItem.visible,
-            crop: transform.crop,
-            locked: sceneItem.locked,
-            hotkeys,
-            rotation: transform.rotation
+
+        if (sceneItem.isItem()) {
+          hotkeys.save({ sceneItemId: sceneItem.sceneItemId }).then(() => {
+            const transform = sceneItem.transform;
+            resolve({
+              id: sceneItem.sceneItemId,
+              sourceId: sceneItem.sourceId,
+              x: transform.position.x,
+              y: transform.position.y,
+              scaleX: transform.scale.x,
+              scaleY: transform.scale.y,
+              visible: sceneItem.visible,
+              crop: transform.crop,
+              locked: sceneItem.locked,
+              hotkeys,
+              rotation: transform.rotation
+            });
           });
-        });
+        } else {
+          resolve(sceneItem.getModel());
+        }
+
       });
     });
 
@@ -95,7 +107,9 @@ export class SceneItemsNode extends Node<ISchema, {}> {
     const promises: Promise<void>[] = [];
 
     this.data.items.forEach(item => {
-      if (item.hotkeys) promises.push(item.hotkeys.load({ sceneItemId: item.id }));
+      if (item.sceneNodeType === 'folder') return;
+      const hotkeys = (item as ISceneItemInfo).hotkeys;
+      if (hotkeys) promises.push(hotkeys.load({ sceneItemId: item.id }));
     });
 
     return new Promise(resolve => {

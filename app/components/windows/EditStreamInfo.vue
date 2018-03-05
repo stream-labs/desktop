@@ -16,6 +16,7 @@
     </div>
     <div v-if="!infoLoading && !infoError">
       <TextInput v-model="streamTitleModel" />
+      <TextInput  v-if="isYoutube" v-model="streamDescriptionModel" />
       <ListInput
         v-if="isTwitch"
         :value="gameModel"
@@ -47,7 +48,7 @@
             </div>
           </div>
         </div>
-        <div class="input-container select">
+        <div class="input-container select" v-show="useOptimizedProfile">
           <div class="input-label">
             <label>Profile</label>
           </div>

@@ -12,16 +12,14 @@ import {
   ISceneCreateOptions,
   IScenesServiceApi
 } from './index';
-import { SourcesService } from '../sources';
+import { SourcesService } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
-import { shortcut } from '../shortcuts';
 import * as obs from '../obs-api';
+import namingHelpers from '../../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
-
-
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
@@ -54,7 +52,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      items: []
+      nodes: []
     });
     this.state.displayOrder.push(id);
     this.state.activeSceneId = this.state.activeSceneId || id;
@@ -227,11 +225,32 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return this.getScene(this.state.activeSceneId);
   }
 
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name: string) => {
+      const ind = this.activeScene
+        .getNodes()
+        .findIndex(node => node.name === name);
+      return ind !== -1;
+    });
+  }
 
-  showNameScene(rename?: string) {
+
+  showNameScene(options: {rename?: string, itemsToGroup?: string[] } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
-      queryParams: { rename },
+      queryParams: options,
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showNameFolder(options: { renameId?: string, itemsToGroup?: string[] } = {}) {
+    this.windowsService.showWindow({
+      componentName: 'NameFolder',
+      queryParams: options,
       size: {
         width: 400,
         height: 250

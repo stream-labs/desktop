@@ -135,8 +135,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       options.sourceId ||
       (type + '_' + ipcRenderer.sendSync('getUniqueId'));
 
-    if ((type === 'browser_source') && (settings.shutdown === void 0)) {
-      settings.shutdown = true;
+    if (type === 'browser_source') {
+      if (settings.shutdown === void 0) settings.shutdown = true;
+      if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
+    }
+
+    if (type === 'text_gdiplus') {
+      if (settings.text === void 0) settings.text = name;
     }
 
     const obsInput = obs.InputFactory.create(type, id, settings);
@@ -325,6 +330,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   showSourceProperties(sourceId: string) {
+    this.windowsService.closeChildWindow();
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
       queryParams: { sourceId },

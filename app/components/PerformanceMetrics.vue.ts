@@ -14,6 +14,10 @@ export default class PerformanceMetrics extends Vue {
   fpsTooltip = "Frames Per Second"
   kbsTooltip = "Kilobits Per Second"
 
+  get cpuPercent() {
+    return this.performanceService.state.CPU.toFixed(1);
+  }
+
   get frameRate() {
     return this.performanceService.state.frameRate.toFixed(2);
   }

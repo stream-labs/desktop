@@ -1,11 +1,12 @@
 <template>
 <div
-  class="studio-editor-display"
+  class="studio-editor-display noselect"
   ref="display"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
   @mousemove="handleMouseMove"
-  @mouseenter="handleMouseEnter"/>
+  @mouseenter="handleMouseEnter"
+  @dblclick="handleMouseDblClick"/>
 </template>
 
 <script lang="ts" src="./StudioEditor.vue.ts"></script>

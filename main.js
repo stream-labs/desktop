@@ -323,8 +323,8 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       childWindow.restore();
       childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setBounds({
-        x: childX,
-        y: childY,
+        x: Math.floor(childX),
+        y: Math.floor(childY),
         width: windowOptions.size.width,
         height: windowOptions.size.height
       });

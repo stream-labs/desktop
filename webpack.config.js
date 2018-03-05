@@ -98,7 +98,7 @@ module.exports = {
         options: {
           name: '[name]-[hash].[ext]',
           outputPath: 'media/',
-          publicPath: 'bundles/'
+          publicPath: 'bundles/media/'
         }
       },
       // Handles custom fonts. Currently used for icons.
@@ -108,10 +108,14 @@ module.exports = {
         options: {
           name: '[name].[ext]',
           outputPath: 'fonts/',
-          publicPath: 'bundles/'
+          publicPath: 'bundles/fonts/'
         }
       }
     ]
+  },
+
+  optimization: {
+    minimize: false
   },
 
   plugins

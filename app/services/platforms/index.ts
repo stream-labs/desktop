@@ -37,6 +37,7 @@ export interface IPlatformService {
 
 export interface IPlatformAuth {
   widgetToken: string;
+  apiToken: string; // Streamlabs API Token
   platform: {
     type: TPlatform;
     username: string;

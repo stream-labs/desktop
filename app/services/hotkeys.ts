@@ -64,13 +64,27 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_START_STREAMING',
       description: () => 'Start Streaming',
       down: () => getStreamingService().startStreaming(),
-      isActive: () => getStreamingService().isStreaming
+      isActive: () => {
+        const streamingService = getStreamingService();
+        return streamingService.isStreaming || !!streamingService.delaySecondsRemaining;
+      }
     },
     {
       name: 'TOGGLE_STOP_STREAMING',
       description: () => 'Stop Streaming',
-      down: () => getStreamingService().stopStreaming(),
-      isActive: () => !getStreamingService().isStreaming
+      down: () => {
+        const streamingService = getStreamingService();
+
+        if (streamingService.isStreaming) {
+          streamingService.stopStreaming();
+        } else {
+          streamingService.discardStreamDelay();
+        }
+      },
+      isActive: () => {
+        const streamingService = getStreamingService();
+        return !streamingService.isStreaming && !streamingService.delaySecondsRemaining;
+      }
     },
     {
       name: 'TOGGLE_START_RECORDING',
@@ -308,6 +322,15 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
   }
 
 
+  clearAllHotkeys() {
+    this.applyHotkeySet({
+      general: [],
+      sources: {},
+      scenes: {}
+    });
+  }
+
+
   applyHotkeySet(hotkeySet: IHotkeysSet) {
     const hotkeys: IHotkey[] = [];
     hotkeys.push(...hotkeySet.general);
@@ -335,7 +358,7 @@ export class HotkeysService extends StatefulService<IHotkeysServiceState> {
 
   getSceneItemsHotkeys(sceneId: string): Hotkey[] {
     const scene = this.scenesService.getScene(sceneId);
-    const sceneItemsIds = scene.items.map(item => item.sceneItemId);
+    const sceneItemsIds = scene.nodes.map(item => item.id);
     return this.getHotkeys().filter(hotkey => sceneItemsIds.includes(hotkey.sceneItemId));
   }
 

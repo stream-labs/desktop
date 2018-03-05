@@ -11,7 +11,7 @@ Vue.use(Vuex);
 
 const { ipcRenderer, remote } = electron;
 
-const debug = remote.process.env.NODE_ENV !== 'production';
+const debug = process.env.NODE_ENV !== 'production';
 
 const mutations = {
   BULK_LOAD_STATE(state: any, data: any) {

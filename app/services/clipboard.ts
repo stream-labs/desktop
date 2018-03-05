@@ -8,6 +8,7 @@ import { SelectionService } from 'services/selection';
 
 
 interface IClipboardState {
+  itemsSceneId: string;
   sceneItemIds: string[];
   filterIds: string[];
 }
@@ -15,6 +16,7 @@ interface IClipboardState {
 export class ClipboardService extends StatefulService<IClipboardState> {
 
   static initialState: IClipboardState = {
+    itemsSceneId: '',
     sceneItemIds: [],
     filterIds: []
   };
@@ -27,40 +29,26 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   @shortcut('Ctrl+C')
   copy() {
     this.SET_SCENE_ITEMS_IDS(this.selectionService.getIds());
+    this.SET_SCENE_ITEMS_SCENE(this.scenesService.activeScene.id);
   }
 
 
   @shortcut('Ctrl+V')
   pasteReference() {
-    const insertedIds: string[] = [];
-    const scene = this.scenesService.activeScene;
-    this.state.sceneItemIds.forEach(sceneItemId => {
-      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
-      if (!sceneItem) return;
-      const insertedItem = scene.addSource(sceneItem.sourceId);
-      insertedItem.setSettings(sceneItem.getSettings());
-      insertedIds.push(insertedItem.sceneItemId);
-    });
-    if (insertedIds.length) this.selectionService.select(insertedIds);
+    const insertedItems = this.scenesService
+      .getScene(this.state.itemsSceneId)
+      .getSelection(this.state.sceneItemIds)
+      .copyReferenceTo(this.scenesService.activeSceneId);
+    if (insertedItems.length) this.selectionService.select(insertedItems);
   }
 
 
   pasteDuplicate() {
-    const insertedIds: string[] = [];
-    const scene = this.scenesService.activeScene;
-    this.state.sceneItemIds.forEach(sceneItemId => {
-      const sceneItem = this.scenesService.getSceneItem(sceneItemId);
-      if (!sceneItem) return;
-      const duplicatedSource = sceneItem.getSource().duplicate();
-      if (!duplicatedSource) {
-        alert(`Unable to duplicate ${sceneItem.name}`);
-        return;
-      }
-      const insertedItem = scene.addSource(duplicatedSource.sourceId);
-      insertedItem.setSettings(sceneItem.getSettings());
-      insertedIds.push(insertedItem.sceneItemId);
-    });
-    if (insertedIds.length) this.selectionService.select(insertedIds);
+    const insertedItems = this.scenesService
+      .getScene(this.state.itemsSceneId)
+      .getSelection(this.state.sceneItemIds)
+      .copyTo(this.scenesService.activeSceneId);
+    if (insertedItems.length) this.selectionService.select(insertedItems);
   }
 
 
@@ -98,5 +86,10 @@ export class ClipboardService extends StatefulService<IClipboardState> {
   @mutation()
   private SET_FILTERS_IDS(filtersIds: string[]) {
     this.state.filterIds = filtersIds;
+  }
+
+  @mutation()
+  private SET_SCENE_ITEMS_SCENE(sceneId: string) {
+    this.state.itemsSceneId = sceneId;
   }
 }

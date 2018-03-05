@@ -11,6 +11,10 @@ import VTooltip from 'v-tooltip'
 
 Vue.use(VTooltip)
 VTooltip.options.defaultContainer = '#mainWrapper'
+import { getPlatformService } from 'services/platforms';
+import { YoutubeService } from 'services/platforms/youtube';
+import electron from 'electron';
+
 
 @Component({
   components: {
@@ -28,6 +32,10 @@ export default class StudioFooterComponent extends Vue {
 
   recordButtonTooltip = "The record feature can be used while you are live or on it's own. Find your recordings in Settings -> Output";
 
+  mounted() {
+    this.confirmYoutubeEnabled();
+  }
+
   toggleRecording() {
     if (this.recording) {
       this.streamingService.stopRecording();
@@ -42,5 +50,28 @@ export default class StudioFooterComponent extends Vue {
 
   get loggedIn() {
     return this.userService.isLoggedIn();
+  }
+
+  get youtubeEnabled() {
+    if (this.userService.platform) {
+      const platform = this.userService.platform.type;
+      const service = getPlatformService(platform);
+      if (service instanceof YoutubeService) {
+        return service.state.liveStreamingEnabled;
+      }
+    }
+    return true;
+  }
+
+  openYoutubeEnable() {
+    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+  }
+
+  confirmYoutubeEnabled() {
+    const platform = this.userService.platform.type;
+    const service = getPlatformService(platform);
+    if (service instanceof YoutubeService) {
+      service.verifyAbleToStream();
+    }
   }
 }
