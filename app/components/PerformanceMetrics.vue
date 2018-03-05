@@ -1,6 +1,10 @@
 <template>
 <div class="performance-metrics flex flex--center">
-  <span class="performance-metric-wrapper" v-tooltip="fpsTooltip">
+  <span class="performance-metric-wrapper"
+    v-tooltip="{
+      content: fpsTooltip,
+      container: '#mainWrapper'
+    }">
     <img class="performance-metric-icon" src="../../media/images/icons/fps.png">
     <span class="performance-metric">
       <span class="performance-metric__value">{{ frameRate }}</span> FPS
@@ -14,7 +18,7 @@
     </span>
   </span>
 
-  <span class="performance-metric-wrapper">
+  <span class="performance-metric-wrapper" v-tooltip="kbsTooltip">
     <img class="performance-metric-icon" src="../../media/images/icons/speed.png">
     <span class="performance-metric">
       <span class="performance-metric__value">{{ bandwidth }}</span> kb/s
