@@ -16,6 +16,9 @@ class ListInput extends Input<IListInput<TObsValue>> {
   @Prop({ default: false })
   allowEmpty: boolean;
 
+  @Prop({ default: false })
+  internalSearch: boolean;
+
   @Prop({ default: 'Select Option' })
   placeholder: string;
 

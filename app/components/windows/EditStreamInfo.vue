@@ -18,7 +18,7 @@
       <TextInput v-model="streamTitleModel" />
       <TextInput  v-if="isYoutube" v-model="streamDescriptionModel" />
       <ListInput
-        v-if="isTwitch"
+        v-if="isTwitch || isMixer"
         :value="gameModel"
         :allowEmpty="true"
         placeholder="Search"

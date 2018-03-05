@@ -4,6 +4,7 @@ import { AutoConfigService } from './services/auto-config';
 import { ObsImporterService } from './services/obs-importer';
 import { YoutubeService } from './services/platforms/youtube';
 import { TwitchService } from './services/platforms/twitch';
+import { MixerService } from './services/platforms/mixer';
 import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
@@ -75,6 +76,7 @@ export class ServicesManager extends Service {
     AutoConfigService,
     YoutubeService,
     TwitchService,
+    MixerService,
     ScenesService,
     SceneItemNode,
     SceneItem,
