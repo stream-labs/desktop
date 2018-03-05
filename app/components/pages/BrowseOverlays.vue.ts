@@ -69,10 +69,10 @@ export default class BrowseOverlays extends Vue {
       const host = (new urlLib.URL(url)).hostname;
       const trustedHosts = ['cdn.streamlabs.com'];
 
-      // if (!trustedHosts.includes(host)) {
-      //   console.error(`Ignoring widget install from untrusted host: ${host}`);
-      //   return;
-      // }
+      if (!trustedHosts.includes(host)) {
+        console.error(`Ignoring widget install from untrusted host: ${host}`);
+        return;
+      }
 
       const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
       await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
