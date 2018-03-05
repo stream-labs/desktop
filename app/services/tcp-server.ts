@@ -63,7 +63,7 @@ export interface ITcpServerServiceAPI {
   stopListening(): void;
 }
 
-const TCP_PORT = 59651;
+const TCP_PORT = 28194;
 
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceAPI {
 
