@@ -42,8 +42,6 @@ interface IServer {
 
 export interface ITcpServersSettings {
   tcp: {
-    enabled: boolean;
-    port: number;
     allowRemote: boolean;
   };
   namedPipe: {
@@ -65,13 +63,12 @@ export interface ITcpServerServiceAPI {
   stopListening(): void;
 }
 
+const TCP_PORT = 59651;
 
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceAPI {
 
   static defaultState: ITcpServersSettings = {
     tcp: {
-      enabled: false,
-      port: 59651,
       allowRemote: false
     },
     namedPipe: {
@@ -102,8 +99,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
 
   listen() {
+    this.listenConnections(this.createTcpServer());
     if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
-    if (this.state.tcp.enabled) this.listenConnections(this.createTcpServer());
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
@@ -131,14 +128,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         nameSubCategory: 'TCP',
         codeSubCategory: 'tcp',
         parameters: [
-          <IFormInput<boolean>> {
-            value: settings.tcp.enabled,
-            name: 'enabled',
-            description: 'Enabled',
-            type: 'OBS_PROPERTY_BOOL',
-            visible: true,
-            enabled: true,
-          },
 
           <IFormInput<boolean>> {
             value: settings.tcp.allowRemote,
@@ -146,18 +135,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             description: 'Allow Remote Connections',
             type: 'OBS_PROPERTY_BOOL',
             visible: true,
-            enabled: settings.tcp.enabled,
-          },
-
-          <IFormInput<number>> {
-            value: settings.tcp.port,
-            name: 'port',
-            description: 'Port',
-            type: 'OBS_PROPERTY_INT',
-            minVal: 0,
-            maxVal: 65535,
-            visible: true,
-            enabled: settings.tcp.enabled,
+            enabled: true
           }
         ]
       },
@@ -248,7 +226,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private createTcpServer(): IServer {
     const server = net.createServer();
     const settings = this.state.tcp;
-    server.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
+    server.listen(TCP_PORT, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
     return {
       nativeServer: server,
       close() {
