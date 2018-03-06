@@ -24,13 +24,11 @@ export class StreamlabelsManager extends PropertiesManager {
 
   normalizeSettings() {
     const youtubeKeys = {
-      total_follower_count: '',
       most_recent_follower: 'most_recent_youtube_subscriber',
       session_followers: 'session_youtube_subscribers',
       session_follower_count: 'session_youtube_subscriber_count',
       session_most_recent_follower: 'session_most_recent_youtube_subscriber',
       total_subscriber_count: 'total_youtube_sponsor_count',
-      total_subscriber_score: '',
       most_recent_subscriber: 'most_recent_youtube_sponsor',
       session_subscribers: 'session_youtube_sponsors',
       session_subscriber_count: 'session_youtube_sponsor_count',
@@ -38,13 +36,10 @@ export class StreamlabelsManager extends PropertiesManager {
     };
 
     const mixerKeys = {
-      total_follower_count: '',
       most_recent_follower: 'most_recent_mixer_follower',
       session_followers: 'session_mixer_followers',
       session_follower_count: 'session_mixer_follower_count',
       session_most_recent_follower: 'session_most_recent_mixer_follower',
-      total_subscriber_count: '',
-      total_subscriber_score: '',
       most_recent_subscriber: 'most_recent_mixer_subscriber',
       session_subscribers: 'session_mixer_subscribers',
       session_subscriber_count: 'session_mixer_subscriber_count',
