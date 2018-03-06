@@ -41,9 +41,6 @@ interface IServer {
 
 
 export interface ITcpServersSettings {
-  tcp: {
-    allowRemote: boolean;
-  };
   namedPipe: {
     enabled: boolean;
     pipeName: string;
@@ -68,9 +65,6 @@ const TCP_PORT = 28194;
 export class TcpServerService extends PersistentStatefulService<ITcpServersSettings> implements ITcpServerServiceAPI {
 
   static defaultState: ITcpServersSettings = {
-    tcp: {
-      allowRemote: false
-    },
     namedPipe: {
       enabled: true,
       pipeName: 'slobs'
@@ -124,21 +118,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   getApiSettingsFormData(): ISettingsSubCategory[] {
     const settings = this.state;
     return [
-      {
-        nameSubCategory: 'TCP',
-        codeSubCategory: 'tcp',
-        parameters: [
-
-          <IFormInput<boolean>> {
-            value: settings.tcp.allowRemote,
-            name: 'allowRemote',
-            description: 'Allow Remote Connections',
-            type: 'OBS_PROPERTY_BOOL',
-            visible: true,
-            enabled: true
-          }
-        ]
-      },
       {
         nameSubCategory: 'Named Pipe',
         codeSubCategory: 'namedPipe',
@@ -225,8 +204,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private createTcpServer(): IServer {
     const server = net.createServer();
-    const settings = this.state.tcp;
-    server.listen(TCP_PORT, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
+    server.listen(TCP_PORT, LOCAL_HOST_NAME);
     return {
       nativeServer: server,
       close() {
