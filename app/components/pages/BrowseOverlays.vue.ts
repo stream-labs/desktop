@@ -38,10 +38,6 @@ export default class BrowseOverlays extends Vue {
         electron.remote.shell.openExternal(e.url);
       }
     });
-
-    this.$refs.overlaysWebview.addEventListener('dom-ready', () => {
-      this.$refs.overlaysWebview.openDevTools();
-    });
   }
 
   async installOverlay(
