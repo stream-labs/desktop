@@ -80,7 +80,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   }
 
   getModel(): ISceneItem & ISource {
-    return { ...this.sceneItemState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.sceneItemState };
   }
 
   getScene(): Scene {
