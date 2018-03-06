@@ -24,11 +24,15 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
   async load(context: TContext): Promise<void> {
     await this.beforeLoad(context);
 
-    const afterLoadItemsCallbacks = await Promise.all(this.data.items.map(item => {
-      return this.loadItem(item, context);
-    }));
+    const afterLoadItemsCallbacks: (void | (() => Promise<void>))[] = [];
 
-    await Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()));
+    for (const item of this.data.items) {
+      afterLoadItemsCallbacks.push(await this.loadItem(item, context));
+    }
+
+    for (const cb of afterLoadItemsCallbacks) {
+      if (cb) await cb();
+    }
   }
 
   /**
