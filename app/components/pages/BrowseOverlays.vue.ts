@@ -28,7 +28,7 @@ export default class BrowseOverlays extends Vue {
   mounted() {
     this.guestApiService.exposeApi(this.$refs.overlaysWebview, {
       installOverlay: this.installOverlay,
-      installWidget: this.installWidget
+      installWidgets: this.installWidgets
     });
 
     this.$refs.overlaysWebview.addEventListener('new-window', e => {
@@ -37,6 +37,10 @@ export default class BrowseOverlays extends Vue {
       if (protocol === 'http:' || protocol === 'https:') {
         electron.remote.shell.openExternal(e.url);
       }
+    });
+
+    this.$refs.overlaysWebview.addEventListener('dom-ready', () => {
+      this.$refs.overlaysWebview.openDevTools();
     });
   }
 
@@ -57,20 +61,22 @@ export default class BrowseOverlays extends Vue {
     this.navigationService.navigate('Studio');
   }
 
-  async installWidget(
-    url: string,
+  async installWidgets(
+    urls: string[],
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
-    const host = (new urlLib.URL(url)).hostname;
-    const trustedHosts = ['cdn.streamlabs.com'];
+    for (const url of urls) {
+      const host = (new urlLib.URL(url)).hostname;
+      const trustedHosts = ['cdn.streamlabs.com'];
 
-    if (!trustedHosts.includes(host)) {
-      console.error(`Ignoring widget install from untrusted host: ${host}`);
-      return;
+      if (!trustedHosts.includes(host)) {
+        console.error(`Ignoring widget install from untrusted host: ${host}`);
+        return;
+      }
+
+      const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
+      await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
     }
-
-    const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
-    await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
 
     this.navigationService.navigate('Studio');
   }
