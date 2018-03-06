@@ -299,7 +299,7 @@ export class SceneCollectionsService extends Service
       this.setupDefaultAudio();
     } catch (e) {
       // We tried really really hard :(
-      console.error('Overlay installation failed');
+      console.error('Overlay installation failed', e);
     }
 
     await this.saveCurrentApplicationStateAs(id);

@@ -68,6 +68,13 @@ const WidgetTesters: IWidgetTester[] = [
     platforms: ['youtube']
   },
   {
+    name: 'Follow',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    },
+    platforms: ['mixer']
+  },
+  {
     name: 'Subscription',
     url(host, token, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
@@ -82,11 +89,18 @@ const WidgetTesters: IWidgetTester[] = [
     platforms: ['youtube']
   },
   {
+    name: 'Subscription',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    },
+    platforms: ['mixer']
+  },
+  {
     name: 'Donation',
     url(host, token) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation/${token}`;
     },
-    platforms: ['twitch', 'youtube']
+    platforms: ['twitch', 'youtube', 'mixer']
   },
   {
     name: 'Bits',

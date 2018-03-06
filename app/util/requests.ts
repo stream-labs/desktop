@@ -11,3 +11,23 @@ export function handleErrors(response: Response): Promise<Response> {
   if (response.ok) return Promise.resolve(response);
   return Promise.reject(response);
 }
+
+export function requiresToken() {
+  return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
+    const original = descriptor.value;
+    return {
+      ...descriptor,
+      value(...args: any[]) {
+        return original.apply(target.constructor.instance, args)
+        .catch((error: Response) => {
+          if (error.status === 401) {
+            return target.fetchNewToken().then(() => {
+              return original.apply(target.constructor.instance, args);
+            });
+          }
+          return Promise.reject(error);
+        });
+      }
+    };
+  };
+}
