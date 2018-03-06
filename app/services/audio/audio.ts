@@ -280,7 +280,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.audioSourceState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
   getSettingsForm(): TFormData {
