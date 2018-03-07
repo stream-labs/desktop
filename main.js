@@ -17,25 +17,8 @@ const bt = require('backtrace-node');
 
 app.disableHardwareAcceleration();
 
-function handleFinishedReport() {
-  dialog.showErrorBox(`Unhandled Exception`,
-  'An unexpected error occured and the application must be shut down.\n' +
-  'Information concerning this occasion has been sent for debugging purposes.\n' +
-  'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
-  'Please restart the application.');
-
-  if (app) {
-    app.quit();
-  }
-}
-
-function handleUnhandledException(err) {
-  bt.report(err, {}, handleFinishedReport);
-}
-
 if (pjson.env === 'production') {
   bt.initialize({
-    disableGlobalHandler: true,
     endpoint: 'https://streamlabs.sp.backtrace.io:6098',
     token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
     attributes: {
@@ -43,8 +26,6 @@ if (pjson.env === 'production') {
       processType: 'main'
     }
   });
-
-  process.on("uncaughtException", handleUnhandledException);
 
   crashReporter.start({
     productName: 'streamlabs-obs',
