@@ -27,11 +27,21 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
     const afterLoadItemsCallbacks: (void | (() => Promise<void>))[] = [];
 
     for (const item of this.data.items) {
-      afterLoadItemsCallbacks.push(await this.loadItem(item, context));
+      try {
+        afterLoadItemsCallbacks.push(await this.loadItem(item, context));
+      } catch (e) {
+        console.error('Array node step failed', e);
+      }
     }
 
     for (const cb of afterLoadItemsCallbacks) {
-      if (cb) await cb();
+      if (cb) {
+        try {
+          await cb();
+        } catch (e) {
+          console.error('Array node callback failed', e);
+        }
+      }
     }
   }
 
