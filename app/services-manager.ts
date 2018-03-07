@@ -346,7 +346,7 @@ export class ServicesManager extends Service {
 
       response = this.jsonrpc.createResponse(request, {
         _type: 'HELPER',
-        resourceId: helper.resourceId,
+        resourceId: helper._resourceId,
         ...!compactMode ? this.getHelperModel(helper) : {}
       });
     } else if (responsePayload && responsePayload instanceof Service) {
@@ -363,7 +363,7 @@ export class ServicesManager extends Service {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
             _type: 'HELPER',
-            resourceId: helper.resourceId,
+            resourceId: helper._resourceId,
             ...!compactMode ? this.getHelperModel(helper) : {}
           };
         }
