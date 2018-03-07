@@ -20,16 +20,9 @@ import { ISceneItemFolder } from './scenes-api';
 @ServiceHelper()
 export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderApi {
 
-  // ISceneNode attributes
-  sceneNodeType: TSceneNodeType;
-  id: string;
-  parentId: string;
-  childrenIds: string[];
-
   name: string;
 
   private sceneFolderState: ISceneItemFolder;
-  protected sceneId: string;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
@@ -38,7 +31,6 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
 
     super();
 
-    this.sceneId = sceneId;
     this.id = id;
 
     const state = this.scenesService.state.scenes[sceneId].nodes.find(item => {

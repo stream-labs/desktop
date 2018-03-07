@@ -346,7 +346,7 @@ export class ServicesManager extends Service {
 
       response = this.jsonrpc.createResponse(request, {
         _type: 'HELPER',
-        resourceId: helper.resourceId,
+        resourceId: helper._resourceId,
         ...!compactMode ? this.getHelperModel(helper) : {}
       });
     } else if (responsePayload && responsePayload instanceof Service) {
@@ -363,7 +363,7 @@ export class ServicesManager extends Service {
           const helper = this.getHelper(item.helperName, item.constructorArgs);
           return {
             _type: 'HELPER',
-            resourceId: helper.resourceId,
+            resourceId: helper._resourceId,
             ...!compactMode ? this.getHelperModel(helper) : {}
           };
         }
@@ -475,7 +475,7 @@ export class ServicesManager extends Service {
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
             this.jsonrpc.createRequestWithOptions(
-              isHelper ? target['resourceId'] : serviceName,
+              isHelper ? target['_resourceId'] : serviceName,
               methodName as string,
               { compactMode: true, fetchMutations: true },
               ...args
