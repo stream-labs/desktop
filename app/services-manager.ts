@@ -213,6 +213,7 @@ export class ServicesManager extends Service {
           return;
         const promisePayload = message.result;
         if (promisePayload) {
+          if (!promises[promisePayload.resourceId]) return; // this promise created from another API client
           const [resolve, reject] = promises[promisePayload.resourceId];
           const callback = promisePayload.isRejected ? reject : resolve;
           callback(promisePayload.data);
