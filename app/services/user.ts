@@ -18,6 +18,7 @@ import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
+import Util from 'services/utils';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -172,7 +173,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl() {
-    const host = this.hostsService.beta2;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
