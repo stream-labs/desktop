@@ -183,6 +183,13 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === 'ndi_source'"
+      @clickAdd="selectSource('ndi_source')"
+      name="NDI source"
+      description="Allow you to capture NDI output streams.">
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'wasapi_input_capture'"
       @clickAdd="selectSource('wasapi_input_capture')"
       name="Audio Input Capture"
