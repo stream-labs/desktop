@@ -30,7 +30,7 @@ export class ClipboardService extends StatefulService<IClipboardState> {
 
   init() {
     this.sceneCollectionsService.collectionSwitched.subscribe(() => {
-      this.clear(); // it is not possible to copy/past between scene collections yet
+      this.clear(); // it is not possible to copy/paste between scene collections yet
     });
   }
 
