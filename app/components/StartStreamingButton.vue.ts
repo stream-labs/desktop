@@ -67,7 +67,6 @@ export default class StartStreamingButton extends Vue {
 
   @Watch('isStreaming')
   setDelayUpdate() {
-    console.log('force update');
     this.$forceUpdate();
 
     if (this.streamingService.delaySecondsRemaining) {
