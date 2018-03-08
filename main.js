@@ -7,6 +7,9 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
+if (pjson.name === 'slobs-client-preview') {
+  process.env.SLOBS_PREVIEW = true;
+}
 process.env.SLOBS_VERSION = pjson.version;
 
 ////////////////////////////////////////////////////////////////////////////////
