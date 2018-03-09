@@ -360,6 +360,7 @@ export class ObsImporterService extends Service {
 
   getSceneCollections(): ISceneCollection[] {
     if (!this.isOBSinstalled()) return [];
+    if (!fs.existsSync(this.sceneCollectionsDirectory)) return [];
 
     let files = fs.readdirSync(this.sceneCollectionsDirectory);
 
