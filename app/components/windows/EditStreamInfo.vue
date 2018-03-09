@@ -43,7 +43,7 @@
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use optimized encoder settings</span></label>
+                <label><span>Use optimized encoder settings</span></label> <label><span><i class="tooltip-trigger fa fa-question-circle has-tooltip"></i></span></label>
               </div>
             </div>
           </div>
