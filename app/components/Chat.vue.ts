@@ -71,6 +71,30 @@ export default class Chat extends Vue {
         `, true);
       }
     });
+    webview.addEventListener('new-window', e => {
+      const protocol = url.parse(e.url).protocol;
+
+      if (protocol === 'http:' || protocol === 'https:') {
+        electron.remote.shell.openExternal(e.url);
+      }
+    });
+
+    webview.addEventListener('dom-ready', () => {
+      webview.setZoomFactor(settings.chatZoomFactor);
+
+      if (settings.enableFFZEmotes && this.isTwitch) {
+        webview.executeJavaScript(`
+          
+          localStorage.setItem('ffz_clickTwitchEmotes', true);
+          localStorage.setItem('ffz_darkenedMode', ${ settings.nightMode ? 'true' : 'false' });
+          
+          var ffzscript1 = document.createElement('script');
+          ffzscript1.setAttribute('src','https://cdn.frankerfacez.com/script/script.min.js');
+          document.head.appendChild(ffzscript1);
+        `, true);
+      }
+    });
+
 
     this.settingsSubscr = this.customizationService.settingsChanged.subscribe(
       (changedSettings) => this.onSettingsChangedHandler(changedSettings)
@@ -95,6 +119,9 @@ export default class Chat extends Vue {
     }
 
     if (changedSettings.enableBTTVEmotes !== void 0) {
+      this.refresh();
+    }
+    if (changedSettings.enableFFZEmotes !== void 0) {
       this.refresh();
     }
   }
