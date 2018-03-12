@@ -2,8 +2,9 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { SourcesService } from '../services/sources';
-import { ScenesService, SceneItem } from '../services/scenes';
+import { SourcesService } from 'services/sources';
+import { ScenesService, SceneItem } from 'services/scenes';
+import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 
 @Component({
@@ -11,11 +12,9 @@ import { EditMenu } from '../util/menus/EditMenu';
 })
 export default class SourceSelector extends Vue {
 
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  sourcesService: SourcesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private selectionService: SelectionService;
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -23,13 +22,12 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sceneItemId?: string) {
-    const sceneItem = this.scene.getItem(sceneItemId);
-    const menuOptions = sceneItem ?
+  showContextMenu(sceneNodeId?: string) {
+    const sceneNode = this.scene.getNode(sceneNodeId);
+    const menuOptions = sceneNode ?
       ({
         selectedSceneId: this.scene.id,
-        selectedSceneItemId: sceneItemId,
-        selectedSourceId: sceneItem.sourceId
+        showSceneItemMenu: true
       }) :
       ({ selectedSceneId: this.scene.id });
 
@@ -40,43 +38,65 @@ export default class SourceSelector extends Vue {
 
   removeItems() {
     // We can only remove a source if at least one is selected
-    if (this.scene.activeItemIds.length > 0) {
-      this.scene.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
+    if (this.activeItemIds.length > 0) {
+      this.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
     }
   }
 
   sourceProperties() {
     if (!this.canShowProperties()) return;
-    this.sourcesService.showSourceProperties(this.scene.activeItems[0].sourceId);
+    this.sourcesService.showSourceProperties(this.activeItems[0].sourceId);
   }
 
   canShowProperties(): boolean {
-    if (this.scene.activeItemIds.length === 0) return false;
-    return this.scene.activeItems[0].getSource().hasProps();
+    if (this.activeItemIds.length === 0) return false;
+    const sceneNode = this.selectionService.getLastSelected();
+    return (sceneNode && sceneNode.sceneNodeType === 'item') ?
+      sceneNode.getSource().hasProps() :
+      false;
   }
 
   handleSort(data: any) {
-    const positionDelta = data.change.moved.newIndex - data.change.moved.oldIndex;
+    const rootNodes = this.scene.getRootNodes();
+    const nodeToMove = rootNodes[data.change.moved.oldIndex];
+    const destNode = this.scene.getRootNodes()[data.change.moved.newIndex];
 
-    this.scenesService.activeScene.setSourceOrder(
-      data.change.moved.element.value,
-      positionDelta,
-      data.order
-    );
+    if (destNode.getNodeIndex() < nodeToMove.getNodeIndex()) {
+      nodeToMove.placeBefore(destNode.id);
+    } else {
+      nodeToMove.placeAfter(destNode.id);
+    }
   }
 
-  makeActive(sceneItemId: string) {
-    this.scene.makeItemsActive([sceneItemId]);
+  makeActive(sceneItemId: string, ev: MouseEvent) {
+    if (ev.ctrlKey) {
+      if (this.selectionService.isSelected(sceneItemId) && ev.button !== 2) {
+        this.selectionService.deselect(sceneItemId);
+      } else {
+        this.selectionService.add(sceneItemId);
+      }
+    } else if (!(ev.button === 2 && this.selectionService.isSelected(sceneItemId))) {
+      this.selectionService.select(sceneItemId);
+    }
   }
 
-  toggleVisibility(sceneItemId: string) {
-    const source = this.scene.getItem(sceneItemId);
-
-    source.setVisibility(!source.visible);
+  get activeItemIds() {
+    return this.selectionService.getIds();
   }
 
-  visibilityClassesForSource(sceneItemId: string) {
-    const visible = this.scene.getItem(sceneItemId).visible;
+  get activeItems() {
+    return this.selectionService.getItems();
+  }
+
+  toggleVisibility(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const visible = !selection.isVisible();
+    selection.setSettings({ visible });
+  }
+
+  visibilityClassesForSource(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const visible = selection.isVisible();
 
     return {
       'fa-eye': visible,
@@ -84,8 +104,9 @@ export default class SourceSelector extends Vue {
     };
   }
 
-  lockClassesForSource(sceneItemId: string) {
-    const locked = this.scene.getItem(sceneItemId).locked;
+  lockClassesForSource(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const locked = selection.isLocked();
 
     return {
       'fa-lock': locked,
@@ -93,9 +114,10 @@ export default class SourceSelector extends Vue {
     };
   }
 
-  toggleLock(sceneItemId: string) {
-    const item = this.scene.getItem(sceneItemId);
-    item.setLocked(!item.locked);
+  toggleLock(sceneNodeId: string) {
+    const selection = this.scene.getSelection(sceneNodeId);
+    const locked = !selection.isLocked();
+    selection.setSettings({ locked });
   }
 
   get scene() {
@@ -103,10 +125,10 @@ export default class SourceSelector extends Vue {
   }
 
   get sources() {
-    return this.scene.getItems().map((sceneItem: SceneItem) => {
+    return this.scene.getRootNodes().map(sceneNode => {
       return {
-        name: sceneItem.name,
-        value: sceneItem.sceneItemId
+        name: sceneNode.name,
+        value: sceneNode.id
       };
     });
   }

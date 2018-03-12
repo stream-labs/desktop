@@ -1,5 +1,7 @@
 import { TwitchService } from './twitch';
 import { YoutubeService } from './youtube';
+import { MixerService } from './mixer';
+import { integer } from 'aws-sdk/clients/lightsail';
 
 export interface IChannelInfo {
   title: string;
@@ -37,19 +39,22 @@ export interface IPlatformService {
 
 export interface IPlatformAuth {
   widgetToken: string;
+  apiToken: string; // Streamlabs API Token
   platform: {
     type: TPlatform;
     username: string;
     token: string;
     id: string;
+    channelId?: string;
   };
 }
 
-export type TPlatform = 'twitch' | 'youtube';
+export type TPlatform = 'twitch' | 'youtube' | 'mixer';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
     twitch: TwitchService.instance,
-    youtube: YoutubeService.instance
+    youtube: YoutubeService.instance,
+    mixer: MixerService.instance
   }[platform];
 }

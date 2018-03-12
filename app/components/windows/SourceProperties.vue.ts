@@ -32,7 +32,11 @@ export default class SourceProperties extends Vue {
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  properties = this.source ? this.source.getPropertiesFormData() : [];
+  properties: TFormData = [];
+
+  mounted() {
+    this.properties = this.source ? this.source.getPropertiesFormData() : [];
+  }
 
 
   get propertiesManagerUI() {
@@ -67,7 +71,7 @@ export default class SourceProperties extends Vue {
 
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
-    return source ? `Properties for '${source.displayName}'` : '';
+    return source ? `Properties for '${source.name}'` : '';
   }
 
 }

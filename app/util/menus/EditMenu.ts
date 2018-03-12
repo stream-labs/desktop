@@ -1,18 +1,20 @@
 import { Inject } from '../../util/injector';
 import { Menu } from './Menu';
 import { WindowsService } from '../../services/window';
-import { SourcesService } from '../../services/sources';
+import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
+import { GroupMenu } from './GroupMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { WidgetsService } from 'services/widgets';
 import { CustomizationService } from 'services/customization';
+import { SelectionService } from 'services/selection/selection';
 import electron from 'electron';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
-  selectedSceneItemId?: string;
+  showSceneItemMenu?: boolean;
   selectedSceneId?: string;
 }
 
@@ -23,15 +25,19 @@ export class EditMenu extends Menu {
   @Inject() private clipboardService: ClipboardService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() private customizationService: CustomizationService;
+  @Inject() private selectionService: SelectionService;
 
-  private source = this.sourcesService.getSource(this.options.selectedSourceId);
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
-  private sceneItem = this.scene
-    ? this.scene.getItem(this.options.selectedSceneItemId)
-    : null;
+  private source: Source;
 
   constructor(private options: IEditMenuOptions) {
     super();
+
+    if (this.options.selectedSourceId) {
+      this.source = this.sourcesService.getSource(this.options.selectedSourceId);
+    } else if (this.options.showSceneItemMenu && this.selectionService.isSceneItem()) {
+      this.source = this.selectionService.getItems()[0].getSource();
+    }
 
     this.appendEditMenuItems();
   }
@@ -40,37 +46,50 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: 'Paste (Reference)',
-        enabled: this.clipboardService.hasSources(),
+        enabled: this.clipboardService.hasItems(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.pasteReference()
       });
 
       this.append({
         label: 'Paste (Duplicate)',
-        enabled: this.clipboardService.hasSources(),
+        enabled: this.clipboardService.hasItems(),
         click: () => this.clipboardService.pasteDuplicate()
       });
     }
 
-    if (this.sceneItem) {
+    const isMultipleSelection = this.selectionService.getSize() > 1;
+
+    if (this.options.showSceneItemMenu) {
+
+      const selectedItem = this.selectionService.getLastSelected();
+
       this.append({
         label: 'Copy',
         accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
       });
 
-      this.append({ type: 'separator' });
 
       this.append({
-        label: 'Rename',
-        click: () =>
-          this.sourcesService.showRenameSource(this.sceneItem.sourceId)
+        label: 'Select All',
+        accelerator: 'CommandOrControl+A',
+        click: () => this.selectionService.selectAll()
       });
+      this.append({
+        label: 'Invert Selection',
+        click: () => this.selectionService.invert()
+      });
+
+
+      this.append({ type: 'separator' });
 
       this.append({
         label: 'Remove',
         accelerator: 'Delete',
-        click: () => this.scene.removeItem(this.sceneItem.sceneItemId)
+        click: () => {
+          this.selectionService.remove();
+        }
       });
 
       this.append({
@@ -78,16 +97,39 @@ export class EditMenu extends Menu {
         submenu: this.transformSubmenu().menu
       });
 
-      const visibilityLabel = this.sceneItem.visible ? 'Hide' : 'Show';
+      if (this.customizationService.state.experimental.sceneItemsGrouping) {
+        this.append({
+          label: 'Group',
+          submenu: this.groupSubmenu().menu
+        });
+      }
 
-      this.append({
-        label: visibilityLabel,
-        click: () => {
-          this.sceneItem.setVisibility(!this.sceneItem.visible);
-        }
-      });
+      const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
 
-      if (this.source.getPropertiesManagerType() === 'widget') {
+      if (!isMultipleSelection) {
+        this.append({
+          label: visibilityLabel,
+          click: () => {
+            selectedItem.setVisibility(!selectedItem.visible);
+          }
+        });
+      } else {
+        this.append({
+          label: 'Show',
+          click: () => {
+            this.selectionService.setVisibility(true);
+          }
+        });
+        this.append({
+          label: 'Hide',
+          click: () => {
+            this.selectionService.setVisibility(false);
+          }
+        });
+      }
+
+
+      if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
           label: 'Export Widget',
           click: () => {
@@ -97,13 +139,31 @@ export class EditMenu extends Menu {
 
             if (!chosenPath) return;
 
-            this.widgetsService.saveWidgetFile(chosenPath, this.sceneItem.sceneItemId);
+            this.widgetsService.saveWidgetFile(chosenPath, selectedItem.sceneItemId);
           }
         });
       }
     }
 
-    if (this.source) {
+    if (this.selectionService.isSceneFolder()) {
+      this.append({
+        label: 'Rename',
+        click: () =>
+          this.scenesService.showNameFolder({
+            renameId:  this.selectionService.getFolders()[0].id
+          })
+      });
+    }
+
+
+    if (this.source && !isMultipleSelection) {
+
+      this.append({
+        label: 'Rename',
+        click: () =>
+          this.sourcesService.showRenameSource(this.source.sourceId)
+      });
+
       this.append({ type: 'separator' });
 
       this.append({
@@ -114,12 +174,12 @@ export class EditMenu extends Menu {
       });
 
       this.append({
-        label: 'Copy filters',
+        label: 'Copy Filters',
         click: () => this.clipboardService.copyFilters()
       });
 
       this.append({
-        label: 'Paste filters',
+        label: 'Paste Filters',
         click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters()
       });
@@ -135,16 +195,16 @@ export class EditMenu extends Menu {
       });
     }
 
-    if (!this.sceneItem && !this.source) {
+    if (!this.options.showSceneItemMenu && !this.source) {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Lock all sources',
+        label: 'Lock Sources',
         click: () => this.scenesService.setLockOnAllScenes(true)
       });
 
       this.append({
-        label: 'Unlock all sources',
+        label: 'Unlock Sources',
         click: () => this.scenesService.setLockOnAllScenes(false)
       });
 
@@ -159,6 +219,7 @@ export class EditMenu extends Menu {
         })
       });
     }
+
   }
 
   private showFilters() {
@@ -170,6 +231,10 @@ export class EditMenu extends Menu {
   }
 
   private transformSubmenu() {
-    return new SourceTransformMenu(this.scene.id, this.sceneItem.sceneItemId);
+    return new SourceTransformMenu();
+  }
+
+  private groupSubmenu() {
+    return new GroupMenu();
   }
 }

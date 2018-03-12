@@ -18,6 +18,7 @@ import unzip from 'unzip-stream';
 import archiver from 'archiver';
 import https from 'https';
 import { ScenesService } from 'services/scenes';
+import { SelectionService } from 'services/selection';
 
 const NODE_TYPES = {
   RootNode,
@@ -38,7 +39,8 @@ export interface IDownloadProgress {
 }
 
 export class OverlaysPersistenceService extends Service {
-  @Inject() scenesService: ScenesService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private selectionService: SelectionService;
 
   /**
    * Downloads the requested overlay into a temporary directory
@@ -95,10 +97,10 @@ export class OverlaysPersistenceService extends Service {
     const configPath = path.join(assetsPath, 'config.json');
     const data = fs.readFileSync(configPath).toString();
     const root = parse(data, NODE_TYPES);
-    root.load({ assetsPath });
+    await root.load({ assetsPath });
 
     this.scenesService.makeSceneActive(this.scenesService.scenes[0].id);
-    this.scenesService.activeScene.makeItemsActive([]);
+    this.selectionService.reset();
   }
 
   async saveOverlay(overlayFilePath: string) {

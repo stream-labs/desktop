@@ -13,6 +13,7 @@
     :tooltip="tooltip"
     :sliderStyle="sliderStyle"
     :formatter="formatter"
+    ref="slider"
   />
   <input
     v-if="valueBox && !usePercentages"

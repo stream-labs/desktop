@@ -1,6 +1,6 @@
 import URI from 'urijs';
-import electron from 'electron';
 import { isEqual } from 'lodash';
+import electron from 'electron';
 
 export const enum EBit { ZERO, ONE }
 
@@ -34,7 +34,11 @@ export default class Utils {
   }
 
   static isDevMode() {
-    return electron.remote.process.env.NODE_ENV !== 'production';
+    return process.env.NODE_ENV !== 'production';
+  }
+
+  static isPreview(): boolean {
+    return electron.remote.process.env.SLOBS_PREVIEW;
   }
 
   /**
@@ -91,5 +95,26 @@ export default class Utils {
       if (!isEqual(obj[key], patch[key])) result[key] = patch[key];
     });
     return result as Partial<T>;
+  }
+
+  /**
+   * @see https://www.typescriptlang.org/docs/handbook/mixins.html
+   */
+  static applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+      Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+        const baseDescriptor = Object.getOwnPropertyDescriptor(baseCtor.prototype, name);
+        const derivedDescriptor = Object.getOwnPropertyDescriptor(derivedCtor.prototype, name);
+        // ignore getters
+        if (
+          baseDescriptor && baseDescriptor.get ||
+          derivedDescriptor && derivedDescriptor.get
+        ) return;
+
+        // ignore the property already exist
+        if (derivedCtor.prototype[name]) return;
+        derivedCtor.prototype[name] = baseCtor.prototype[name];
+      });
+    });
   }
 }

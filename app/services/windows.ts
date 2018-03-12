@@ -9,6 +9,7 @@ import AddSource from '../components/windows/AddSource.vue';
 import NameSceneCollection from '../components/windows/NameSceneCollection.vue';
 import NameSource from '../components/windows/NameSource.vue';
 import NameScene from '../components/windows/NameScene.vue';
+import NameFolder from '../components/windows/NameFolder.vue';
 import SourceProperties from '../components/windows/SourceProperties.vue';
 import SourceFilters from '../components/windows/SourceFilters.vue';
 import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
@@ -17,6 +18,7 @@ import AdvancedAudio from '../components/windows/AdvancedAudio.vue';
 import Notifications from '../components/windows/Notifications.vue';
 import Troubleshooter from '../components/windows/Troubleshooter.vue';
 import Blank from '../components/windows/Blank.vue';
+import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
 
@@ -27,12 +29,13 @@ type TWindowId = 'main' | 'child';
 
 export interface IWindowOptions {
   componentName: string;
-  queryParams?: Dictionary<string>;
+  queryParams?: Dictionary<any>;
   size?: {
     width: number;
     height: number;
   };
   scaleFactor: number;
+  title?: string;
 }
 
 interface IWindowsState {
@@ -46,6 +49,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
     },
     child: {
       componentName: 'Blank',
@@ -64,6 +68,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AddSource,
     NameScene,
     NameSceneCollection,
+    NameFolder,
     SourceProperties,
     SourceFilters,
     AddSourceFilter,
@@ -71,7 +76,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     EditStreamInfo,
     AdvancedAudio,
     Notifications,
-    Troubleshooter
+    Troubleshooter,
+    ManageSceneCollections
   };
 
   private windows: Electron.BrowserWindow[] = BrowserWindow.getAllWindows();
@@ -124,6 +130,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.UPDATE_CHILD_WINDOW_OPTIONS(options);
   }
 
+  updateMainWindowOptions(options: Partial<IWindowOptions>) {
+    this.UPDATE_MAIN_WINDOW_OPTIONS(options);
+  }
+
 
   private getWindow(windowId: TWindowId): Electron.BrowserWindow {
     return windowId === 'child' ? this.windows[1] : this.windows[0];
@@ -133,6 +143,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
   @mutation()
   private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
     this.state.child = { ...this.state.child, ...options };
+  }
+
+  @mutation()
+  private UPDATE_MAIN_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
+    this.state.main = { ...this.state.main, ...options };
   }
 
   @mutation()

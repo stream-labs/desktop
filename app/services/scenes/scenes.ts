@@ -12,16 +12,14 @@ import {
   ISceneCreateOptions,
   IScenesServiceApi
 } from './index';
-import { SourcesService } from '../sources';
+import { SourcesService } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
-import { shortcut } from '../shortcuts';
 import * as obs from '../obs-api';
+import namingHelpers from '../../util/NamingHelpers';
 
 const { ipcRenderer } = electron;
-
-
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
@@ -54,11 +52,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      activeItemIds: [],
-      items: []
+      resourceId: '',
+      nodes: []
     });
     this.state.displayOrder.push(id);
     this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.scenes[id].resourceId = this.getScene(id).getResourceId();
   }
 
   @mutation()
@@ -92,14 +91,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
       oldScene.getItems().slice().reverse().forEach(item => {
         const newItem = newScene.addSource(item.sourceId);
-        newItem.setPositionAndScale(
-          item.x,
-          item.y,
-          item.scaleX,
-          item.scaleY
-        );
-        newItem.setVisibility(item.visible);
-        newItem.setCrop(item.crop);
+        newItem.setSettings(item.getSettings());
       });
     }
 
@@ -215,35 +207,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return sceneItems;
   }
 
-  @shortcut('ArrowLeft')
-  nudgeActiveItemsLeft() {
-    this.activeScene.activeItems.forEach(item => item.nudgeLeft());
-  }
-
-
-  @shortcut('ArrowRight')
-  nudgeActiveItemRight() {
-    this.activeScene.activeItems.forEach(item => item.nudgeRight());
-  }
-
-
-  @shortcut('ArrowUp')
-  nudgeActiveItemsUp() {
-    this.activeScene.activeItems.forEach(item => item.nudgeUp());
-  }
-
-
-  @shortcut('ArrowDown')
-  nudgeActiveItemsDown() {
-    this.activeScene.activeItems.forEach(item => item.nudgeDown());
-  }
-
-
-  @shortcut('Delete')
-  removeActiveItems() {
-    this.activeScene.activeItems.forEach(item => this.activeScene.removeItem(item.sceneItemId));
-  }
-
   getScenes(): Scene[] {
     return this.scenes;
   }
@@ -264,11 +227,32 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     return this.getScene(this.state.activeSceneId);
   }
 
+  suggestName(name: string): string {
+    return namingHelpers.suggestName(name, (name: string) => {
+      const ind = this.activeScene
+        .getNodes()
+        .findIndex(node => node.name === name);
+      return ind !== -1;
+    });
+  }
 
-  showNameScene(rename?: string) {
+
+  showNameScene(options: {rename?: string, itemsToGroup?: string[] } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
-      queryParams: { rename },
+      queryParams: options,
+      size: {
+        width: 400,
+        height: 250
+      }
+    });
+  }
+
+
+  showNameFolder(options: { renameId?: string, itemsToGroup?: string[] } = {}) {
+    this.windowsService.showWindow({
+      componentName: 'NameFolder',
+      queryParams: options,
       size: {
         width: 400,
         height: 250

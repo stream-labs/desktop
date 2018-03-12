@@ -29,8 +29,6 @@ export enum E_AUDIO_CHANNELS {
   INPUT_3 = 5,
 }
 
-const VOLMETER_UPDATE_INTERVAL = 50;
-
 interface IAudioSourceData {
   fader?: obs.IFader;
   volmeter?: obs.IVolmeter;
@@ -139,7 +137,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       monitoringType: obsSource.monitoringType,
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
-      muted: obsSource.muted
+      muted: obsSource.muted,
+      resourceId: ''
     };
   }
 
@@ -204,15 +203,9 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     let gotEvent = false;
     let lastVolmeterValue: IVolmeter;
     let volmeterCheckTimeoutId: number;
-    this.sourceData[sourceId].volmeter.updateInterval = VOLMETER_UPDATE_INTERVAL;
     this.sourceData[sourceId].callbackInfo = this.sourceData[sourceId].volmeter.addCallback(
-      (level: number, magnitude: number, peak: number, muted: boolean) => {
-        const volmeter: IVolmeter = { level, magnitude, peak, muted };
-
-        if (muted) {
-          volmeter.level = 0;
-          volmeter.peak = 0;
-        }
+      (magnitude: number[], peak: number[], inputPeak: number[]) => {
+        const volmeter: IVolmeter = { magnitude, peak, inputPeak };
 
         volmeterStream.next(volmeter);
         lastVolmeterValue = volmeter;
@@ -220,13 +213,21 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       }
     );
 
+    /* This is useful for media sources since the volmeter will abruptly stop
+     * sending events in the case of hiding the source. It might be better
+     * to eventually just hide the mixer item as well though */
     function volmeterCheck() {
       if (!gotEvent) {
-        volmeterStream.next({ ...lastVolmeterValue, level: 0, peak: 0 });
+        volmeterStream.next({ 
+          ...lastVolmeterValue, 
+          magnitude: [-Infinity], 
+          peak: [-Infinity], 
+          inputPeak: [-Infinity] 
+        });
       }
 
       gotEvent = false;
-      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, VOLMETER_UPDATE_INTERVAL * 2);
+      volmeterCheckTimeoutId = window.setTimeout(volmeterCheck, 100);
     }
 
     volmeterCheck();
@@ -244,6 +245,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     Vue.set(this.state.audioSources, source.sourceId, source);
+    const addedSource = this.getSource(source.sourceId);
+    this.state.audioSources[source.sourceId].resourceId = addedSource.getResourceId();
   }
 
 
@@ -263,6 +266,9 @@ export class AudioSource implements IAudioSourceApi {
   audioMixers: number;
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
+  resourceId: string;
+
+  private _resourceId: string;
 
   @Inject()
   private audioService: AudioService;
@@ -279,12 +285,8 @@ export class AudioSource implements IAudioSourceApi {
     Utils.applyProxy(this, sourceState);
   }
 
-  get displayName() {
-    return this.source.displayName;
-  }
-
   getModel(): IAudioSource & ISource {
-    return { ...this.audioSourceState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
   getSettingsForm(): TFormData {
@@ -406,9 +408,14 @@ export class AudioSource implements IAudioSourceApi {
     return stream.subscribe(cb);
   }
 
+  getResourceId() {
+    return this._resourceId;
+  }
+
 
   @mutation()
   private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
+    delete patch.resourceId; // resourceId is not changeable
     Object.assign(this.audioSourceState, patch);
   }
 

@@ -24,7 +24,8 @@ import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
   ISceneCollectionSchema,
-  ISceneCollectionsServiceApi
+  ISceneCollectionsServiceApi,
+  ISceneCollectionCreateOptions
 } from '.';
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
@@ -69,6 +70,8 @@ export class SceneCollectionsService extends Service
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
   collectionSwitched = new Subject<ISceneCollectionsManifestEntry>();
+  collectionWillSwitch = new Subject<void>();
+  collectionUpdated = new Subject<ISceneCollectionsManifestEntry>();
 
   /**
    * Whether the service has been initialized
@@ -100,7 +103,6 @@ export class SceneCollectionsService extends Service
    */
   async setupNewUser() {
     const serverCollections = await this.serverApi.fetchSceneCollections();
-    await this.stateService.setupNewUser(serverCollections);
     await this.initialize();
   }
 
@@ -109,6 +111,7 @@ export class SceneCollectionsService extends Service
    */
   async deinitialize() {
     this.disableAutoSave();
+    await this.save();
     await this.deloadCurrentApplicationState();
     await this.safeSync();
     await this.stateService.flushManifestFile();
@@ -140,96 +143,120 @@ export class SceneCollectionsService extends Service
     await this.deloadCurrentApplicationState();
 
     try {
-      await this.loadCollectionIntoApplicationState(id);
       await this.setActiveCollection(id);
+      await this.loadCollectionIntoApplicationState(id);
     } catch (e) {
+      console.error('Error loading collection!', e);
+
       if (shouldAttemptRecovery) {
         await this.attemptRecovery(id);
       } else {
         console.warn(
           `Unsuccessful recovery of scene collection ${id} attempted`
         );
+        alert('Failed to load scene collection.  A new one will be created instead.');
         await this.create();
       }
     }
+
+    // Fall back to an empty collection
+    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
 
     this.finishLoadingOperation();
   }
 
   /**
    * Creates and switches to a new blank scene collection
-   * @param name the name of the collection
    * @param setupFunction a function that can be used to set
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(name?: string, setupFunction?: () => void): Promise<void> {
+  async create(options: ISceneCollectionCreateOptions = {}): Promise<void> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
-    if (setupFunction && setupFunction()) {
+    const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
+    const id: string = uuid();
+
+    await this.insertCollection(id, name);
+    await this.setActiveCollection(id);
+    if (options.needsRename) this.stateService.SET_NEEDS_RENAME(id);
+
+    if (options.setupFunction && options.setupFunction()) {
       // Do nothing
     } else {
       this.setupEmptyCollection();
     }
 
-    name = name || this.suggestName(DEFAULT_COLLECTION_NAME);
-    const id: string = uuid();
-
-    await this.insertCollection(id, name);
-    await this.setActiveCollection(id);
+    await this.saveCurrentApplicationStateAs(id);
     this.finishLoadingOperation();
   }
 
   /**
-   * Deletes the current scene collection
+   * Deletes a scene collection.  If no id is specified, it
+   * will delete the current collection.
+   * @param id the id of the collection to delete
    */
-  async delete(): Promise<void> {
-    this.startLoadingOperation();
-    await this.deloadCurrentApplicationState();
-    await this.removeCollection(this.activeCollection.id);
+  async delete(id?: string): Promise<void> {
+    id = id || this.activeCollection.id;
 
-    if (this.collections.length > 0) {
-      this.load(this.collections[0].id);
-    } else {
-      this.create();
+    const removingActiveCollection = id === this.activeCollection.id;
+
+    this.removeCollection(id);
+
+    if (removingActiveCollection) {
+      this.startLoadingOperation();
+      await this.deloadCurrentApplicationState();
+
+      if (this.collections.length > 0) {
+        this.load(this.collections[0].id);
+      } else {
+        this.create();
+      }
     }
   }
 
   /**
-   * Renames the current scene collection
+   * Renames a scene collection.
    * @param name the name of the new scene collection
+   * @param id if not present, will operate on the current collection
    */
-  rename(name: string) {
+  rename(name: string, id?: string) {
     this.stateService.RENAME_COLLECTION(
-      this.activeCollection.id,
+      id || this.activeCollection.id,
       name,
       new Date().toISOString()
     );
+    this.safeSync();
+    this.collectionUpdated.next(this.getCollection(id));
   }
 
   /**
    * Calls sync, but will never cause a rejected promise.
    * Instead, it will log an error and continue.
    */
-  async safeSync() {
+  async safeSync(retries = 2) {
     try {
       await this.sync();
     } catch (e) {
-      console.error('Scene collection sync failed: ', e);
+      console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
+      if (retries > 0) await this.safeSync(retries - 1);
     }
   }
 
   /**
-   * Duplicates the current scene collection and switch
-   * to it.
+   * Duplicates a scene collection.
    * @param name the name of the new scene collection
    */
-  async duplicate(name: string) {
-    await this.save();
-    const id = uuid();
-    await this.insertCollection(id, name);
-    await this.setActiveCollection(id);
+  async duplicate(name: string, id?: string) {
+    this.disableAutoSave();
+
+    id = id || this.activeCollection.id;
+    const newId = uuid();
+    await this.stateService.copyCollectionFile(id, newId);
+    await this.insertCollection(newId, name);
+    this.stateService.SET_NEEDS_RENAME(newId);
+    this.enableAutoSave();
   }
 
   /**
@@ -261,12 +288,20 @@ export class SceneCollectionsService extends Service
   async loadOverlay(filePath: string, name: string) {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
-    await this.overlaysPersistenceService.loadOverlay(filePath);
-    this.setupDefaultAudio();
 
     const id: string = uuid();
     await this.insertCollection(id, name);
     await this.setActiveCollection(id);
+
+    try {
+      await this.overlaysPersistenceService.loadOverlay(filePath);
+      this.setupDefaultAudio();
+    } catch (e) {
+      // We tried really really hard :(
+      console.error('Overlay installation failed', e);
+    }
+
+    await this.saveCurrentApplicationStateAs(id);
     this.finishLoadingOperation();
   }
 
@@ -308,52 +343,72 @@ export class SceneCollectionsService extends Service
   }
 
   /**
+   * Show the window to manage scene collections
+   */
+  showManageWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ManageSceneCollections',
+      size: {
+        width: 700,
+        height: 800
+      }
+    });
+  }
+
+  /**
+   * Returns the collection with the specified id
+   * @param id the id of the collection
+   */
+  getCollection(id: string) {
+    return this.collections.find(coll => coll.id === id);
+  }
+
+  /**
    * Used by StreamDeck
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     const promises: Promise<ISceneCollectionSchema>[] = [];
 
     this.collections.forEach(collection => {
+      const data = this.stateService.readCollectionFile(collection.id);
+
       promises.push(
         new Promise<ISceneCollectionSchema>(resolve => {
-          const file = this.stateService.getCollectionFilePath(collection.id);
-          this.stateService.readCollectionFile(file).then(data => {
-            const root = parse(data, NODE_TYPES);
-            const collectionSchema: ISceneCollectionSchema = {
-              id: collection.id,
-              name: collection.name,
+          const root = parse(data, NODE_TYPES);
+          const collectionSchema: ISceneCollectionSchema = {
+            id: collection.id,
+            name: collection.name,
 
-              scenes: root.data.scenes.data.items.map(
-                (sceneData: ISceneSchema) => {
-                  return {
-                    id: sceneData.id,
-                    name: sceneData.name,
-                    sceneItems: sceneData.sceneItems.data.items.map(
-                      (sceneItemData: ISceneItemInfo) => {
-                        return {
-                          sceneItemId: sceneItemData.id,
-                          sourceId: sceneItemData.sourceId
-                        };
-                      }
-                    )
-                  };
-                }
-              ),
+            scenes: root.data.scenes.data.items.map(
+              (sceneData: ISceneSchema) => {
+                return {
+                  id: sceneData.id,
+                  name: sceneData.name,
+                  sceneItems: sceneData.sceneItems.data.items.map(
+                    (sceneItemData: ISceneItemInfo) => {
+                      return {
+                        sceneItemId: sceneItemData.id,
+                        sourceId: sceneItemData.sourceId
+                      };
+                    }
+                  )
+                };
+              }
+            ),
 
-              sources: root.data.sources.data.items.map(
-                (sourceData: ISourceInfo) => {
-                  return {
-                    id: sourceData.id,
-                    name: sourceData.name,
-                    type: sourceData.type,
-                    channel: sourceData.channel
-                  };
-                }
-              )
-            };
+            sources: root.data.sources.data.items.map(
+              (sourceData: ISourceInfo) => {
+                return {
+                  id: sourceData.id,
+                  name: sourceData.name,
+                  type: sourceData.type,
+                  channel: sourceData.channel
+                };
+              }
+            )
+          };
 
-            resolve(collectionSchema);
-          });
+          resolve(collectionSchema);
         })
       );
     });
@@ -377,17 +432,19 @@ export class SceneCollectionsService extends Service
    * @param id The id of the collection to load
    */
   private async loadCollectionIntoApplicationState(id: string): Promise<void> {
-    const filePath = this.stateService.getCollectionFilePath(id);
-    const data = await this.stateService.readCollectionFile(filePath);
-    if (data == null) throw new Error('Got blank data from collection file');
+    const exists = await this.stateService.collectionFileExists(id);
 
-    const root = parse(data, NODE_TYPES);
-    await root.load();
+    if (exists) {
+      const data = this.stateService.readCollectionFile(id);
+      if (data == null) throw new Error('Got blank data from collection file');
 
-    this.hotkeysService.bindHotkeys();
+      const root = parse(data, NODE_TYPES);
+      await root.load();
 
-    // Make sure we actually loaded something that works
-    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
+      this.hotkeysService.bindHotkeys();
+    } else {
+      await this.attemptRecovery(id);
+    }
   }
 
   /**
@@ -399,7 +456,7 @@ export class SceneCollectionsService extends Service
     await root.save();
     const data = JSON.stringify(root, null, 2);
 
-    await this.stateService.writeDataToCollectionFile(id, data);
+    this.stateService.writeDataToCollectionFile(id, data);
   }
 
   /**
@@ -411,25 +468,26 @@ export class SceneCollectionsService extends Service
     // Check if the server has a copy
     const collection = this.collections.find(coll => coll.id === id);
 
-    if (collection.serverId) {
-      // A local hard delete without notifying the server
-      // will force a fresh download from the server on next sync
-      this.stateService.HARD_DELETE_COLLECTION(id);
-      await this.safeSync();
+    if (collection.serverId && this.userService.isLoggedIn()) {
+      const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
 
-      // Find the newly downloaded collection and load it
-      const newCollection = this.collections.find(
-        coll => coll.serverId === collection.serverId
-      );
+      if (coll.scene_collection.data) {
+        // A local hard delete without notifying the server
+        // will force a fresh download from the server on next sync
+        this.stateService.HARD_DELETE_COLLECTION(id);
+        await this.safeSync();
 
-      if (newCollection) {
-        await this.load(newCollection.id, false);
-        return;
+        // Find the newly downloaded collection and load it
+        const newCollection = this.collections.find(
+          coll => coll.serverId === collection.serverId
+        );
+
+        if (newCollection) {
+          await this.load(newCollection.id, false);
+          return;
+        }
       }
     }
-
-    // Fall back to creating a new collection
-    await this.create();
   }
 
   /**
@@ -440,24 +498,30 @@ export class SceneCollectionsService extends Service
   private async deloadCurrentApplicationState() {
     if (!this.initialized) return;
 
+    this.collectionWillSwitch.next();
+
     this.disableAutoSave();
     await this.save();
 
     // we should remove inactive scenes first to avoid the switching between scenes
-    this.scenesService.scenes.forEach(scene => {
-      if (scene.id === this.scenesService.activeSceneId) return;
-      scene.remove(true);
-    });
+    try {
+      this.scenesService.scenes.forEach(scene => {
+        if (scene.id === this.scenesService.activeSceneId) return;
+        scene.remove(true);
+      });
 
-    if (this.scenesService.activeScene) {
-      this.scenesService.activeScene.remove(true);
+      if (this.scenesService.activeScene) {
+        this.scenesService.activeScene.remove(true);
+      }
+
+      this.sourcesService.sources.forEach(source => {
+        if (source.type !== 'scene') source.remove();
+      });
+    } catch (e) {
+      console.error('Error deloading application state');
     }
 
-    this.sourcesService.sources.forEach(source => {
-      if (source.type !== 'scene') source.remove();
-    });
-
-    this.hotkeysService.unregisterAll();
+    this.hotkeysService.clearAllHotkeys();
   }
 
   /**
@@ -490,14 +554,14 @@ export class SceneCollectionsService extends Service
    */
   private setupDefaultAudio() {
     this.sourcesService.createSource(
-      'DesktopAudioDevice1',
+      'Desktop Audio',
       'wasapi_output_capture',
       {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 }
     );
 
     this.sourcesService.createSource(
-      'AuxAudioDevice1',
+      'Mic/Aux',
       'wasapi_input_capture',
       {},
       { channel: E_AUDIO_CHANNELS.INPUT_1 }
@@ -510,15 +574,17 @@ export class SceneCollectionsService extends Service
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
+    await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
 
   /**
    * Deletes on the server and removes from the store
    */
-  private async removeCollection(id: string) {
+  private removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
+    this.safeSync();
 
     // Currently we don't remove files on disk in case we need to recover them
     // manually at a later point in time.  Once we are more comfortable with
@@ -528,6 +594,7 @@ export class SceneCollectionsService extends Service
   private autoSaveInterval: number;
 
   private enableAutoSave() {
+    if (this.autoSaveInterval) return;
     this.autoSaveInterval = window.setInterval(() => {
       this.save();
       this.stateService.flushManifestFile();
@@ -536,14 +603,20 @@ export class SceneCollectionsService extends Service
 
   private disableAutoSave() {
     if (this.autoSaveInterval) clearInterval(this.autoSaveInterval);
+    this.autoSaveInterval = null;
   }
 
   private async setActiveCollection(id: string) {
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (collection.serverId)
-        await this.serverApi.makeSceneCollectionActive(collection.serverId);
+      if (collection.serverId && this.userService.isLoggedIn()) {
+        try {
+          await this.serverApi.makeSceneCollectionActive(collection.serverId);
+        } catch (e) {
+          console.warn('Failed setting active collection');
+        }
+      }
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
     }
@@ -575,86 +648,91 @@ export class SceneCollectionsService extends Service
 
     const serverCollections = (await this.serverApi.fetchSceneCollections())
       .data;
-    const promises: Promise<any>[] = [];
 
-    serverCollections.forEach(onServer => {
+    let failed = false;
+
+    for (const onServer of serverCollections) {
       const inManifest = this.stateService.state.collections.find(
         coll => coll.serverId === onServer.id
       );
 
-      if (!inManifest) {
-        // Insert from server
-        const id: string = uuid();
-        promises.push(
-          this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-            return this.stateService
-              .writeDataToCollectionFile(id, response.scene_collection.data)
-              .then(() => {
-                // Only do this after we know we successfully wrote the file
-                this.stateService.ADD_COLLECTION(
-                  id,
-                  onServer.name,
-                  new Date().toISOString()
-                );
-                this.stateService.SET_SERVER_ID(id, onServer.id);
-              });
-          })
-        );
-      } else {
+      if (inManifest) {
         if (inManifest.deleted) {
-          // We need to tell the server this was deleted
-          promises.push(
-            this.serverApi
-              .deleteSceneCollection(inManifest.serverId)
-              .then(() => {
-                // We can hard delete once we know it has been removed from the server
-                this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
-              })
-          );
+          const success = await this.performSyncStep('Delete on server', async () => {
+            await this.serverApi.deleteSceneCollection(inManifest.serverId);
+            this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
+          });
+
+          if (!success) failed = true;
         } else if (
           new Date(inManifest.modified) > new Date(onServer.last_updated_at)
         ) {
-          promises.push(
-            this.stateService
-              .readCollectionFile(
-                this.stateService.getCollectionFilePath(inManifest.id)
-              )
-              .then(data => {
-                return this.serverApi.updateSceneCollection({
+          const success = await this.performSyncStep('Update on server', async () => {
+            const exists = await this.stateService.collectionFileExists(inManifest.id);
+
+            if (exists) {
+              const data = this.stateService.readCollectionFile(inManifest.id);
+
+              if (data) {
+                await this.serverApi.updateSceneCollection({
                   id: inManifest.serverId,
                   name: inManifest.name,
                   data,
                   last_updated_at: inManifest.modified
                 });
-              })
-          );
+              }
+            }
+          });
+
+          if (!success) failed = true;
         } else if (
           new Date(inManifest.modified) < new Date(onServer.last_updated_at)
         ) {
-          promises.push(
-            this.serverApi.fetchSceneCollection(onServer.id).then(response => {
-              return this.stateService
-                .writeDataToCollectionFile(
-                  inManifest.id,
-                  response.scene_collection.data
-                )
-                .then(() => {
-                  // Only do this once we know we have written successfully
-                  this.stateService.RENAME_COLLECTION(
-                    inManifest.id,
-                    onServer.name,
-                    onServer.last_updated_at
-                  );
-                });
-            })
-          );
+          const success = await this.performSyncStep('Update from server', async () => {
+            const response = await this.serverApi.fetchSceneCollection(onServer.id);
+            this.stateService.writeDataToCollectionFile(
+              inManifest.id,
+              response.scene_collection.data
+            );
+
+            this.stateService.RENAME_COLLECTION(
+              inManifest.id,
+              onServer.name,
+              onServer.last_updated_at
+            );
+          });
+
+          if (!success) failed = true;
         } else {
           console.log('Up to date file: ', inManifest.id);
         }
-      }
-    });
+      } else {
+        const success = await this.performSyncStep('Insert from server', async () => {
+          const id: string = uuid();
+          const response = await this.serverApi.fetchSceneCollection(onServer.id);
 
-    this.stateService.state.collections.forEach(inManifest => {
+          // Empty data means that the collection was created from the Streamlabs
+          // dashboard and does not currently have any scenes assoicated with it.
+          // The first time we try to load this collection, we will initialize it
+          // with some scenes.
+
+          if (response.scene_collection.data != null) {
+            this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
+          }
+
+          this.stateService.ADD_COLLECTION(
+            id,
+            onServer.name,
+            new Date().toISOString()
+          );
+          this.stateService.SET_SERVER_ID(id, onServer.id);
+        });
+
+        if (!success) failed = true;
+      }
+    }
+
+    for (const inManifest of this.stateService.state.collections) {
       const onServer = serverCollections.find(
         coll => coll.id === inManifest.serverId
       );
@@ -662,31 +740,47 @@ export class SceneCollectionsService extends Service
       // We already dealt with the overlap above
       if (!onServer) {
         if (!inManifest.serverId) {
-          promises.push(
-            this.stateService
-              .readCollectionFile(
-                this.stateService.getCollectionFilePath(inManifest.id)
-              )
-              .then(data => {
-                return this.serverApi
-                  .createSceneCollection({
-                    name: inManifest.name,
-                    data,
-                    last_updated_at: inManifest.modified
-                  })
-                  .then(response => {
-                    this.stateService.SET_SERVER_ID(inManifest.id, response.id);
-                  });
-              })
-          );
+          const success = await this.performSyncStep('Insert on server', async () => {
+            const data = this.stateService.readCollectionFile(inManifest.id);
+
+            const response = await this.serverApi.createSceneCollection({
+              name: inManifest.name,
+              data,
+              last_updated_at: inManifest.modified
+            });
+
+            this.stateService.SET_SERVER_ID(inManifest.id, response.id);
+          });
+
+          if (!success) failed = true;
         } else {
-          this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
+          const success = this.performSyncStep('Delete from server', async () => {
+            this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
+          });
+
+          if (!success) failed = true;
         }
       }
-    });
+    }
 
-    await Promise.all(promises);
     await this.stateService.flushManifestFile();
+
+    if (failed) throw new Error('Sync failed!');
+  }
+
+  /**
+   * Performs a sync step, catches any errors, and returns
+   * true/false depending on whether the step succeeded
+   */
+  private async performSyncStep(name: string, stepRunner: () => Promise<void>): Promise<boolean> {
+    try {
+      await stepRunner();
+      console.debug(`Sync step succeeded: ${name}`);
+      return true;
+    } catch (e) {
+      console.error(`Sync step failed: ${name}`, e);
+      return false;
+    }
   }
 
   /**
@@ -758,7 +852,7 @@ export class SceneCollectionsService extends Service
           const name = parsed['activeCollection'];
           const collection = this.collections.find(coll => coll.name === name);
 
-          await this.setActiveCollection(collection.id);
+          if (collection) await this.setActiveCollection(collection.id);
         }
       }
     }

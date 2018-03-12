@@ -32,7 +32,11 @@ export class CustomizationService
     livedockSize: 0.28,
     performanceMode: false,
     chatZoomFactor: 1,
-    enableBTTVEmotes: false
+    enableBTTVEmotes: false,
+    experimental: {
+      // put experimental features here
+      sceneItemsGrouping: false
+    }
   };
 
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
@@ -149,6 +153,19 @@ export class CustomizationService
         enabled: true,
       }
 
+    ];
+  }
+
+  getExperimentalSettingsFormData(): TFormData {
+    return [
+      <IFormInput<boolean>>  {
+        value: this.state.experimental.sceneItemsGrouping,
+        name: 'sceneItemsGrouping',
+        description: 'Scene Items Grouping',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      }
     ];
   }
 

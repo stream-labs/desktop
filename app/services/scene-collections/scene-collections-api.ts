@@ -9,9 +9,9 @@ export interface ISceneCollectionsServiceApi {
 
   /**
    * Create and load a new empty scene collection
-   * @param name the name of the new collection
+   * @param options an optional options object
    */
-  create(name?: string): Promise<void>;
+  create(options?: ISceneCollectionCreateOptions): Promise<void>;
 
   /**
    * Fetch a list of all scene collections and information
@@ -43,6 +43,22 @@ export interface ISceneCollectionsServiceApi {
    * Subscribe to receive notifications when a collection is switched to
    */
   collectionSwitched: Observable<ISceneCollectionsManifestEntry>;
+
+  /**
+   * Subscribe to receive notifications when attempting to switch to a new collection
+   */
+  collectionWillSwitch: Observable<void>;
+
+  /**
+   * Subscribe to receive notifications when a collection is updated (renamed)
+   */
+  collectionUpdated: Observable<ISceneCollectionsManifestEntry>;
+}
+
+export interface ISceneCollectionCreateOptions {
+  setupFunction?: () => boolean;
+  needsRename?: boolean;
+  name?: string;
 }
 
 export interface ISceneCollectionSchema {
@@ -69,4 +85,5 @@ export interface ISceneCollectionsManifestEntry {
   serverId?: number;
   deleted: boolean;
   modified: string;
+  needsRename: boolean;
 }

@@ -9,6 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
 import { ISceneCollectionsResponse } from './server-api';
+import { FileManagerService } from 'services/file-manager';
+import { Inject } from 'util/injector';
 
 interface ISceneCollectionsManifest {
   activeId: string;
@@ -26,6 +28,8 @@ interface ISceneCollectionsManifest {
 export class SceneCollectionsStateService extends StatefulService<
   ISceneCollectionsManifest
 > {
+  @Inject() fileManagerService: FileManagerService;
+
   static initialState: ISceneCollectionsManifest = {
     activeId: null,
     collections: []
@@ -40,76 +44,77 @@ export class SceneCollectionsStateService extends StatefulService<
   }
 
   /**
-   * Handle a new user login
-   * @param serverCollections the collections loaded from the server
-   */
-  async setupNewUser(serverCollections: ISceneCollectionsResponse) {
-    if (serverCollections.data.length > 0) {
-      this.LOAD_STATE({
-        activeId: null,
-        collections: []
-      });
-      await this.ensureDirectory();
-      this.flushManifestFile();
-    } else {
-      // Do nothing.
-      // Local files will be synced up to the server
-    }
-  }
-
-  /**
    * Loads the manifest file into the state for this service.
    */
   async loadManifestFile() {
     await this.ensureDirectory();
 
-    const exists = await new Promise(resolve => {
-      fs.exists(this.manifestFilePath, exists => resolve(exists));
+    try {
+      const data = this.readCollectionFile('manifest');
+
+      if (data) {
+        const parsed = JSON.parse(data);
+        const recovered = await this.checkAndRecoverManifest(parsed);
+
+        if (recovered) this.LOAD_STATE(recovered);
+      }
+    } catch (e) {
+      console.warn('Error loading manifest file from disk');
+    }
+
+    await this.flushManifestFile();
+  }
+
+  /**
+   * Takes a parsed manifest and checks it for data integrity
+   * errors.  If possible, it will attempt to recover it.
+   * Otherwise, it will return undefined.
+   */
+  async checkAndRecoverManifest(obj: ISceneCollectionsManifest): Promise<ISceneCollectionsManifest> {
+    // If there is no collections array, this is unrecoverable
+    if (!Array.isArray(obj.collections)) return;
+
+    // Filter out collections we can't recover, and fix ones we can
+    const filtered = obj.collections.filter(coll => {
+      // If there is no id, this is unrecoverable
+      if (coll.id == null) return false;
+
+      // We can recover these
+      if (coll.deleted == null) coll.deleted = false;
+      if (coll.modified == null) coll.modified = (new Date()).toISOString();
+
+      return true;
     });
 
-    if (exists) {
-      const data = await this.readCollectionFile(this.manifestFilePath);
-      if (data) {
-        this.LOAD_STATE(JSON.parse(data));
-      }
-    } else {
-      await this.flushManifestFile();
-    }
+    obj.collections = filtered;
+    return obj;
   }
 
   /**
    * The manifest file is simply a copy of the Vuex state of this
    * service, persisted to disk.
    */
-  flushManifestFile() {
-    return new Promise((resolve, reject) => {
-      const data = JSON.stringify(this.state, null, 2);
-      fs.writeFile(this.manifestFilePath, data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
+  async flushManifestFile() {
+    const data = JSON.stringify(this.state, null, 2);
+    await this.writeDataToCollectionFile('manifest', data);
+  }
 
-        resolve();
-      });
-    });
+  /**
+   * Checks if a collection file exists
+   * @param id the id of the collection
+   */
+  async collectionFileExists(id: string) {
+    const filePath = this.getCollectionFilePath(id);
+    return this.fileManagerService.exists(filePath);
   }
 
   /**
    * Reads the contents of the file into a string
-   * @param filePath The path to the file
+   * @param id The id of the collection
    */
-  readCollectionFile(filePath: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(data.toString());
-      });
-    });
+  readCollectionFile(id: string) {
+    const filePath = this.getCollectionFilePath(id);
+    return this.fileManagerService.read(filePath);
   }
 
   /**
@@ -119,16 +124,19 @@ export class SceneCollectionsStateService extends StatefulService<
    */
   writeDataToCollectionFile(id: string, data: string) {
     const collectionPath = this.getCollectionFilePath(id);
-    return new Promise((resolve, reject) => {
-      fs.writeFile(collectionPath, data, err => {
-        if (err) {
-          reject(err);
-          return;
-        }
+    this.fileManagerService.write(collectionPath, data);
+  }
 
-        resolve();
-      });
-    });
+  /**
+   * Copies a collection file
+   * @param sourceId the scene collection to copy
+   * @param destId the scene collection to copy to
+   */
+  copyCollectionFile(sourceId: string, destId: string) {
+    this.fileManagerService.copy(
+      this.getCollectionFilePath(sourceId),
+      this.getCollectionFilePath(destId)
+    );
   }
 
   /**
@@ -164,10 +172,6 @@ export class SceneCollectionsStateService extends StatefulService<
     return path.join(this.collectionsDirectory, `${id}.json`);
   }
 
-  get manifestFilePath() {
-    return path.join(this.collectionsDirectory, 'manifest.json');
-  }
-
   @mutation()
   SET_ACTIVE_COLLECTION(id: string) {
     this.state.activeId = id;
@@ -175,12 +179,18 @@ export class SceneCollectionsStateService extends StatefulService<
 
   @mutation()
   ADD_COLLECTION(id: string, name: string, modified: string) {
-    this.state.collections.push({
+    this.state.collections.unshift({
       id,
       name,
       deleted: false,
-      modified
+      modified,
+      needsRename: false
     });
+  }
+
+  @mutation()
+  SET_NEEDS_RENAME(id: string) {
+    this.state.collections.find(coll => coll.id === id).needsRename = true;
   }
 
   @mutation()
@@ -198,6 +208,7 @@ export class SceneCollectionsStateService extends StatefulService<
     const coll = this.state.collections.find(coll => coll.id === id);
     coll.name = name;
     coll.modified = modified;
+    coll.needsRename = false;
   }
 
   @mutation()

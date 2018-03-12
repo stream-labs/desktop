@@ -30,9 +30,8 @@ export default class ObsImport extends Vue {
   selectedProfile = this.profiles[0] || '';
 
   created() {
-    if (this.sceneCollections.length < 1) {
-      this.startFresh();
-    }
+    if (this.sceneCollections && (this.sceneCollections.length > 0)) return;
+    this.startFresh();
   }
 
   get title() {

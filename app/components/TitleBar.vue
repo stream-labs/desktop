@@ -22,7 +22,6 @@
   flex-direction: row;
   align-items: center;
   height: 30px;
-  -webkit-app-region: drag;
   border-bottom: 1px solid @day-border;
 }
 
@@ -34,6 +33,7 @@
 .titlebar-title {
   flex-grow: 1;
   padding-left: 10px;
+  -webkit-app-region: drag;
 }
 
 .titlebar-actions {

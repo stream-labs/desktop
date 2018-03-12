@@ -56,70 +56,70 @@ const WidgetTesters: IWidgetTester[] = [
   {
     name: 'Follow',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${
-        token
-      }`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Subscriber',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${
-        token
-      }`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
     },
     platforms: ['youtube']
   },
   {
+    name: 'Follow',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    },
+    platforms: ['mixer']
+  },
+  {
     name: 'Subscription',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${
-        platform
-      }_account/subscription/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Sponsor',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${
-        platform
-      }_account/subscription/${token}`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
     },
     platforms: ['youtube']
+  },
+  {
+    name: 'Subscription',
+    url(host, token, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    },
+    platforms: ['mixer']
   },
   {
     name: 'Donation',
     url(host, token) {
       return `https://${host}/api/v5/slobs/test/streamlabs/donation/${token}`;
     },
-    platforms: ['twitch', 'youtube']
+    platforms: ['twitch', 'youtube', 'mixer']
   },
   {
     name: 'Bits',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${
-        token
-      }`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${token}`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Host',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${
-        token
-      }`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${token}`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Super Chat',
     url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${
-        token
-      }`;
+      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${token}`;
     },
     platforms: ['youtube']
   }
@@ -303,7 +303,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   },
 
   [WidgetType.StreamBoss]: {
-    name: 'Bit Boss',
+    name: 'Stream Boss',
     url(host, token) {
       return `https://${host}/widgets/streamboss?token=${token}`;
     },
@@ -323,13 +323,13 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
       return `https://${host}/widgets/end-credits?token=${token}`;
     },
 
-    width: 600,
-    height: 200,
+    width: 1280,
+    height: 720,
 
-    x: 0,
-    y: 1,
+    x: 0.5,
+    y: 0.5,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.Center
   },
 
   [WidgetType.SpinWheel]: {
@@ -393,16 +393,18 @@ export class WidgetsService extends Service {
       const source = scene.getItem(sceneItem.sceneItemId);
 
       // Set the default transform
-      const rect = new ScalableRectangle(source);
+      const rect = new ScalableRectangle(source.getRectangle());
 
       rect.withAnchor(widget.anchor, () => {
         rect.x = widget.x * this.videoService.baseWidth;
         rect.y = widget.y * this.videoService.baseHeight;
       });
 
-      source.setPosition({
-        x: rect.x,
-        y: rect.y
+      source.setTransform({
+        position: {
+          x: rect.x,
+          y: rect.y
+        }
       });
     }, 1500);
 
@@ -445,7 +447,7 @@ export class WidgetsService extends Service {
     const json = JSON.stringify(data, null, 2);
 
     await new Promise((resolve, reject) => {
-      fs.writeFile(path, json, (err) => {
+      fs.writeFile(path, json, err => {
         if (err) {
           reject(err);
         } else {
@@ -474,10 +476,10 @@ export class WidgetsService extends Service {
       name: source.name,
       type: source.getPropertiesManagerSettings().widgetType,
       settings,
-      x: widgetItem.x / this.videoService.baseWidth,
-      y: widgetItem.y / this.videoService.baseHeight,
-      scaleX: widgetItem.scaleX / this.videoService.baseWidth,
-      scaleY: widgetItem.scaleY / this.videoService.baseHeight
+      x: widgetItem.transform.position.x / this.videoService.baseWidth,
+      y: widgetItem.transform.position.y / this.videoService.baseHeight,
+      scaleX: widgetItem.transform.scale.x / this.videoService.baseWidth,
+      scaleY: widgetItem.transform.scale.y / this.videoService.baseHeight
     };
   }
 
@@ -514,7 +516,8 @@ export class WidgetsService extends Service {
     widgetItem = scene.getItems().find(item => {
       const source = item.getSource();
       if (source.getPropertiesManagerType() !== 'widget') return false;
-      if (source.getPropertiesManagerSettings().widgetType !== widget.type) return false;
+      if (source.getPropertiesManagerSettings().widgetType !== widget.type)
+        return false;
       return true;
     });
 
@@ -528,11 +531,15 @@ export class WidgetsService extends Service {
     source.setName(widget.name);
     source.updateSettings(widget.settings);
     source.replacePropertiesManager('widget', { widgetType: widget.type });
-    widgetItem.setPositionAndScale(
-      widget.x * this.videoService.baseWidth,
-      widget.y * this.videoService.baseHeight,
-      widget.scaleX * this.videoService.baseWidth,
-      widget.scaleY * this.videoService.baseHeight
-    );
+    widgetItem.setTransform({
+      position: {
+        x: widget.x * this.videoService.baseWidth,
+        y: widget.y * this.videoService.baseHeight
+      },
+      scale: {
+        x: widget.scaleX * this.videoService.baseWidth,
+        y: widget.scaleY * this.videoService.baseHeight
+      }
+    });
   }
 }

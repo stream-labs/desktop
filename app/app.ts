@@ -15,11 +15,12 @@ import Utils from './services/utils';
 import electron from 'electron';
 import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
+import RavenConsole from 'raven-js/plugins/console';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
-const isProduction = remote.process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -57,16 +58,19 @@ if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
           return splitArray[splitArray.length - 1];
         };
 
-        data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
-          frame.filename = normalize(frame.filename);
-        });
+        if (data.exception) {
+          data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
+            frame.filename = normalize(frame.filename);
+          });
 
-        data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
+          data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
+        }
 
         return data;
       }
     })
     .addPlugin(RavenVue, Vue)
+    .addPlugin(RavenConsole, console, { levels: ['error'] })
     .install();
 }
 

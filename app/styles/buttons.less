@@ -94,7 +94,9 @@ button,
   align-content: center;
 }
 
-.button--twitch, .button--yt {
+.button--twitch,
+.button--yt,
+.button--mixer {
   width: 48%;
 }
 
@@ -110,7 +112,8 @@ button,
   font-size: 16px;
 }
 
-.square-button--twitch, .button--twitch {
+.square-button--twitch,
+.button--twitch {
   background: #6441A4;
 
   &:hover {
@@ -142,6 +145,7 @@ button,
     background: lighten(#3B5998, 4%);
   }
 }
+
 .square-button--twitter {
   background: #1DA1F2;
 
@@ -168,11 +172,12 @@ button,
   }
 }
 
-.square-button--mixer {
-  background: #00BBF2;
+.square-button--mixer,
+.button--mixer {
+  background: #0078d7;
 
   &:hover {
-    background: lighten(#00BBF2,4%)
+    background: lighten(#0078d7,4%)
   }
 }
 

@@ -2,6 +2,8 @@ import { Service } from './service';
 import { Inject } from '../util/injector';
 import { UserService } from './user';
 import { HostsService } from './hosts';
+import fs from 'fs';
+import path from 'path';
 import electron from 'electron';
 
 export type TUsageEvent =
@@ -12,6 +14,7 @@ export type TUsageEvent =
 
 interface IUsageApiData {
   token?: string;
+  installer_id?: string;
   slobs_user_id: string;
   event: TUsageEvent;
   data: object;
@@ -33,25 +36,45 @@ export function track(event: TUsageEvent) {
 
 
 export class UsageStatisticsService extends Service {
+  @Inject() userService: UserService;
+  @Inject() hostsService: HostsService;
 
-  @Inject()
-  userService: UserService;
+  installerId: string;
 
-  @Inject()
-  hostsService: HostsService;
-
-
-  // We memoize this to reduce IPC overhead
-  private _isProduction: boolean;
-
-  get isProduction() {
-    if (this._isProduction === void 0) {
-      this._isProduction = electron.remote.process.env.NODE_ENV === 'production';
-    }
-
-    return this._isProduction;
+  init() {
+    this.loadInstallerId();
   }
 
+  loadInstallerId() {
+    let installerId = localStorage.getItem('installerId');
+
+    if (!installerId) {
+      const exePath = electron.remote.app.getPath('exe');
+      const installerNamePath = path.join(path.dirname(exePath), 'installername');
+
+      if (fs.existsSync(installerNamePath)) {
+        try {
+          const installerName = fs.readFileSync(installerNamePath).toString();
+
+          if (installerName) {
+            const matches = installerName.match(/\-([A-Za-z0-9]+)\.exe/);
+            if (matches) {
+              installerId = matches[1];
+              localStorage.setItem('installerId', installerId);
+            }
+          }
+        } catch (e) {
+          console.error('Error loading installer id', e);
+        }
+      }
+    }
+
+    this.installerId = installerId;
+  }
+
+  get isProduction() {
+    return process.env.NODE_ENV === 'production';
+  }
 
   /**
    * Record a usage event on our server.
@@ -72,6 +95,10 @@ export class UsageStatisticsService extends Service {
 
     if (this.userService.isLoggedIn()) {
       bodyData.token = this.userService.widgetToken;
+    }
+
+    if (this.installerId) {
+      bodyData.installer_id = this.installerId;
     }
 
     const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {

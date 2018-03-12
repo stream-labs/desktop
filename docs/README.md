@@ -86,12 +86,12 @@ in the new request.
             "sceneItemId": "68b413a288c8",
             "sourceId": "5687af55058c",
             "obsSceneItemId": 1,
-            "x": 0,
-            "y": 25.955074875208084,
-            "scaleX": 1.2462070119820023,
-            "scaleY": 1.2462070119820023,
+            "transform": {
+                "position": { "x": 0, "y": 25 },
+                "scale": { "x": 1, "y": 1 },
+                "rotation": 0
+            },
             "visible": true,
-            "rotation": 0,
             "locked": false
         }
     ]
@@ -307,7 +307,7 @@ First get the list of audio sources for the current scene
             "sourceId": "wasapi_input_capture_d497319b",
             "muted": false,
             "name": "AuxAudioDevice1",
-            "type": "wasapi_input_capture"
+            "type": "wasapi_input_capture",
             "id": "wasapi_input_capture_d497319b"
         }
     ]
@@ -360,15 +360,21 @@ First get the active scene
            {
                 "sceneItemId": "b18ee2b0",
                 "sourceId": "color_source_61221191",
-                "x": 975.2116452561818,
-                "y": 392.0672268907563,
+                "transform": {
+                    "position": { "x": 0, "y": 25},
+                    "scale": { "x": 1, "y": 1},
+                    "rotation": 0
+                },
                 "visible": true
             },
            {
                 "sceneItemId": "fffadcdd",
                 "sourceId": "image_source_21071a85",
-                "x": 331.0344827586205,
-                "y": 174.25210084033603,
+                "transform": {
+                    "position": { "x": 0, "y": 25 },
+                    "scale": { "x": 1, "y": 1 },
+                    "rotation": 0
+                },
                 "visible": true
             }
         ]
@@ -403,10 +409,11 @@ Use `ISceneApi.getSceneItem(sceneItemId)`.
         "resourceId": "SceneItem[\"scene_02da7db7\",\"b18ee2b0-6ff7\",\"color_source_61221191\"]",
         "sceneItemId": "b18ee2b0",
         "sourceId": "color_source_61221191",
-        "x": 975.2116452561818,
-        "y": 392.0672268907563,
-        "scaleX": 1,
-        "scaleY": 1,
+        "transform": {
+            "position" : { "x": 0, "y": 25 },
+            "scale": { "x": 1, "y": 1 },
+            "rotation": 0
+        },
         "visible": true
     }
 }

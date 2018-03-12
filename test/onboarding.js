@@ -30,8 +30,7 @@ test('Adding some starter widgets', async t => {
   }
 
   // Select and deselect some widgets
-
-  await app.client.click('div=Event List');
+  await app.client.click('div=Alertbox');
   await app.client.click('button=Remove Widget');
 
   await app.client.click('div=Chatbox');
@@ -40,17 +39,17 @@ test('Adding some starter widgets', async t => {
   await app.client.click('div=Donation Goal');
   await app.client.click('button=Add Widget');
 
-  await app.client.click('button=Add 4 Widgets');
+  await app.client.click('button=Add 2 Widgets');
   await app.client.click('a=Setup later');
 
-  t.true(await app.client.isExisting('li=Alert Box'));
+  t.false(await app.client.isExisting('li=Alert Box'));
   t.false(await app.client.isExisting('li=Event List'));
-  t.true(await app.client.isExisting('li=The Jar'));
+  t.false(await app.client.isExisting('li=The Jar'));
   t.true(await app.client.isExisting('li=Chat Box'));
   t.false(await app.client.isExisting('li=Donation Ticker'));
   t.true(await app.client.isExisting('li=Donation Goal'));
 
-  await selectSource(t, 'Alert Box');
+  await selectSource(t, 'Chat Box');
   await clickSourceProperties(t);
   await focusChild(t);
 

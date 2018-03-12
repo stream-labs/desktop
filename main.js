@@ -7,6 +7,9 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
+if (pjson.name === 'slobs-client-preview') {
+  process.env.SLOBS_PREVIEW = true;
+}
 process.env.SLOBS_VERSION = pjson.version;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,13 +129,15 @@ function startApp() {
   });
 
   mainWindow = new BrowserWindow({
+    minWidth: 800,
+    minHeight: 600,
     width: mainWindowState.width,
     height: mainWindowState.height,
     x: mainWindowState.x,
     y: mainWindowState.y,
     show: false,
     frame: false,
-    title: "Streamlabs OBS",
+    title: 'Streamlabs OBS',
   });
 
   mainWindowState.manage(mainWindow);
@@ -257,10 +262,17 @@ function startApp() {
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    openDevTools();
+    setTimeout(() => {
+      openDevTools();
+    }, 10 * 1000);
+
   }
 
   // Initialize various OBS services
+  getObs().SetWorkingDirectory(
+    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
+              '/node_modules/obs-studio-node'));
+
   getObs().OBS_API_initAPI(app.getPath('userData'));
 }
 
@@ -283,7 +295,7 @@ const shouldQuit = app.makeSingleInstance(() => {
 });
 
 if (shouldQuit) {
-  app.quit();
+  app.exit();
 }
 
 app.on('ready', () => {
@@ -312,15 +324,17 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
       childWindow.restore();
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setBounds({
-        x: childX,
-        y: childY,
+        x: Math.floor(childX),
+        y: Math.floor(childY),
         width: windowOptions.size.width,
         height: windowOptions.size.height
       });
     } catch (err) {
       log('Recovering from error:', err);
 
+      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
       childWindow.center();
     }

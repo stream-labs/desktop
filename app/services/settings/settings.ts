@@ -1,27 +1,23 @@
-import { StatefulService, mutation } from './stateful-service';
+import { StatefulService, mutation } from 'services/stateful-service';
 import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
   TFormData
-} from '../components/shared/forms/Input';
-import { nodeObs } from './obs-api';
-import { SourcesService } from './sources';
-import { Inject } from '../util/injector';
-import { AudioService, E_AUDIO_CHANNELS } from './audio';
-import { WindowsService } from './windows';
-import Utils from './utils';
-import { AppService } from './app';
+} from '../../components/shared/forms/Input';
+import { nodeObs } from '../obs-api';
+import { SourcesService } from 'services/sources';
+import { Inject } from '../../util/injector';
+import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
+import { WindowsService } from 'services/windows';
+import Utils from '../utils';
+import { AppService } from 'services/app';
 import {
   VideoEncodingOptimizationService,
   IOutputSettings
-} from './video-encoding-optimizations';
+} from '../video-encoding-optimizations';
+import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 
-export interface ISettingsSubCategory {
-  nameSubCategory: string;
-  codeSubCategory?: string;
-  parameters: TFormData;
-}
 
 export interface ISettingsState {
   General: {
@@ -44,17 +40,14 @@ export interface ISettingsState {
     Base: string;
   };
   Audio: Dictionary<TObsValue>;
-  Advanced: Dictionary<TObsValue>;
+  Advanced: {
+    DelayEnable: boolean;
+    DelaySec: number;
+  };
 }
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
-export interface ISettingsServiceApi {
-  getCategories(): string[];
-  getSettingsFormData(categoryName: string): ISettingsSubCategory[];
-  setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
-  showSettings(): void;
-}
 
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi {
@@ -100,9 +93,10 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
   }
 
-  showSettings() {
+  showSettings(categoryName?: string) {
     this.windowsService.showWindow({
       componentName: 'Settings',
+      queryParams: { categoryName },
       size: {
         width: 800,
         height: 800
@@ -122,7 +116,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       .concat(['Overlays','Notifications', 'Appearance']);
 
     // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['API']);
+    if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);
 
     return categories;
   }
@@ -147,9 +141,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       'LowLatencyEnable',
       'BindIP',
       'FilenameFormatting',
-      'DelayPreserve',
-      'DelaySec',
-      'DelayEnable',
       'MaxRetries',
       'NewSocketLoopEnable',
       'OverwriteIfExists',
@@ -222,7 +213,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `Desktop Audio Device ${deviceInd}`,
-        name: `DesktopAudioDevice${deviceInd}`,
+        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -250,7 +241,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `Mic/Auxiliary device ${deviceInd}`,
-        name: `AuxAudioDevice${deviceInd}`,
+        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -291,33 +282,41 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   private setAudioSettings(settingsData: ISettingsSubCategory[]) {
+    const audioDevices = this.audioService.getDevices();
+
     settingsData[0].parameters.forEach((deviceForm, ind) => {
       const channel = ind + 1;
       const isOutput = [
         E_AUDIO_CHANNELS.OUTPUT_1,
         E_AUDIO_CHANNELS.OUTPUT_2
       ].includes(channel);
-      let source = this.sourcesService
+      const source = this.sourcesService
         .getSources()
         .find(source => source.channel === channel);
 
-      if (source) {
+
+      if (source && deviceForm.value === null) {
         if (deviceForm.value === null) {
           this.sourcesService.removeSource(source.sourceId);
           return;
         }
       } else if (deviceForm.value !== null) {
-        source = this.sourcesService.createSource(
-          deviceForm.name,
-          isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
-          {},
-          { channel }
-        );
+
+        const device = audioDevices.find(device => device.id === deviceForm.value);
+        const displayName = device.id === 'default' ? deviceForm.name : device.description;
+
+        if (!source) {
+          this.sourcesService.createSource(
+            displayName,
+            isOutput ? 'wasapi_output_capture' : 'wasapi_input_capture',
+            {},
+            { channel }
+          );
+        } else {
+          source.updateSettings({ device_id: deviceForm.value, name: displayName });
+        }
       }
 
-      if (source && deviceForm.value !== null) {
-        source.updateSettings({ device_id: deviceForm.value });
-      }
     });
   }
 

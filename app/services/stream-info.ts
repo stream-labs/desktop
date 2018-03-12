@@ -3,6 +3,9 @@ import { IChannelInfo, getPlatformService } from './platforms';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
 import { StreamingService } from '../services/streaming';
+import { TwitchService } from 'services/platforms/twitch';
+import { YoutubeService } from 'services/platforms/youtube';
+import { MixerService } from 'services/platforms/mixer';
 
 
 interface IStreamInfoServiceState {
@@ -70,16 +73,28 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
   }
 
 
-  setStreamInfo(title: string, game: string): Promise<boolean> {
+  setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
 
-    return platform.putChannelInfo(title, game).then(success => {
-      this.refreshStreamInfo();
-      return success;
-    }).catch(() => {
-      this.refreshStreamInfo();
-      return false;
-    });
+    if (platform instanceof TwitchService || MixerService) {
+      return platform.putChannelInfo(title, game).then(success => {
+        this.refreshStreamInfo();
+        return success;
+      }).catch(() => {
+        this.refreshStreamInfo();
+        return false;
+      });
+    }
+
+    if (platform instanceof YoutubeService) {
+      return platform.putChannelInfo(title, description).then(success => {
+        this.refreshStreamInfo();
+        return success;
+      }).catch(() => {
+        this.refreshStreamInfo();
+        return false;
+      });
+    }
   }
 
 

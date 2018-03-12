@@ -3,7 +3,7 @@ import { IListOption, TFormData } from '../../components/shared/forms/Input';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 
-export interface ISource {
+export interface ISource extends IResource {
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -18,7 +18,6 @@ export interface ISource {
 
 
 export interface ISourceApi extends ISource {
-  displayName: string;
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
   getPropertiesManagerType(): TPropertiesManager;

@@ -53,10 +53,10 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   async saveItem(sceneItem: SceneItem, context: IContext): Promise<ISchema> {
     const details = {
       name: sceneItem.name,
-      x: sceneItem.x / this.videoService.baseWidth,
-      y: sceneItem.y / this.videoService.baseHeight,
-      scaleX: sceneItem.scaleX / this.videoService.baseWidth,
-      scaleY: sceneItem.scaleY / this.videoService.baseHeight
+      x: sceneItem.transform.position.x / this.videoService.baseWidth,
+      y: sceneItem.transform.position.y / this.videoService.baseHeight,
+      scaleX: sceneItem.transform.scale.x / this.videoService.baseWidth,
+      scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight
     };
 
     const manager = sceneItem.source.getPropertiesManagerType();
@@ -140,12 +140,16 @@ export class SlotsNode extends ArrayNode<ISchema, IContext, SceneItem> {
   }
 
   adjustPositionAndScale(item: SceneItem, obj: ISchema) {
-    item.setPositionAndScale(
-      obj.x * this.videoService.baseWidth,
-      obj.y * this.videoService.baseHeight,
-      obj.scaleX * this.videoService.baseWidth,
-      obj.scaleY * this.videoService.baseHeight
-    );
+    item.setTransform({
+      position: {
+        x: obj.x * this.videoService.baseWidth,
+        y: obj.y * this.videoService.baseHeight,
+      },
+      scale: {
+        x: obj.scaleX * this.videoService.baseWidth,
+        y: obj.scaleY * this.videoService.baseHeight
+      }
+    });
   }
 
   normalizedScale(scale: number) {

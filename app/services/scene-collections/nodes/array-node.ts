@@ -13,26 +13,43 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
 
   abstract getItems(context: TContext): TItem[];
 
-  save(context: TContext): Promise<void> {
-    return new Promise(resolve => {
-      Promise.all(this.getItems(context).map(item => {
-        return this.saveItem(item, context);
-      })).then(values => {
-        this.data = { items: compact(values) };
-        resolve();
-      });
-    });
+  async save(context: TContext): Promise<void> {
+    const values = await Promise.all(this.getItems(context).map(item => {
+      return this.saveItem(item, context);
+    }));
+
+    this.data = { items: compact(values) };
   }
 
-  load(context: TContext): Promise<void> {
-    return new Promise(resolve => {
-      Promise.all(this.data.items.map(item => {
-        return this.loadItem(item, context);
-      })).then((afterLoadItemsCallbacks) => {
-        Promise.all(afterLoadItemsCallbacks.map(callback => callback && callback()))
-          .then(() => resolve());
-      });
-    });
+  async load(context: TContext): Promise<void> {
+    await this.beforeLoad(context);
+
+    const afterLoadItemsCallbacks: (void | (() => Promise<void>))[] = [];
+
+    for (const item of this.data.items) {
+      try {
+        afterLoadItemsCallbacks.push(await this.loadItem(item, context));
+      } catch (e) {
+        console.error('Array node step failed', e);
+      }
+    }
+
+    for (const cb of afterLoadItemsCallbacks) {
+      if (cb) {
+        try {
+          await cb();
+        } catch (e) {
+          console.error('Array node callback failed', e);
+        }
+      }
+    }
+  }
+
+  /**
+   * Can be called before loading to do some data munging
+   * @param context the context
+   */
+  async beforeLoad(context: TContext): Promise<void> {
   }
 
 }
