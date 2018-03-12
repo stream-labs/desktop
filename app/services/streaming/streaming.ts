@@ -181,6 +181,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
   }
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
+    console.log(info);
     if (info.type === EOBSOutputType.Streaming) {
       const time = new Date().toISOString();
 

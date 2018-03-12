@@ -71,6 +71,12 @@ export default class StartStreamingButton extends Vue {
     return this.streamingService.isStreaming;
   }
 
+  get isDisabled() {
+    return this.disabled ||
+      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
+      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+  }
+
   @Watch('streamingStatus')
   setDelayUpdate() {
     this.$forceUpdate();
