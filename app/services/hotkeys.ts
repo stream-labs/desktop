@@ -84,13 +84,13 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     {
       name: 'TOGGLE_START_RECORDING',
       description: () => 'Start Recording',
-      down: () => getStreamingService().startRecording(),
+      down: () => getStreamingService().toggleRecordingState(),
       isActive: () => getStreamingService().isRecording
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
       description: () => 'Stop Recording',
-      down: () => getStreamingService().stopRecording(),
+      down: () => getStreamingService().toggleRecordingState(),
       isActive: () => !getStreamingService().isRecording
     }
   ],

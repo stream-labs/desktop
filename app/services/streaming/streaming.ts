@@ -6,6 +6,7 @@ import { padStart } from 'lodash';
 import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs/Subject';
+import electron from 'electron';
 
 interface IStreamingServiceState {
   streamingStatus: EStreamingState;
@@ -57,6 +58,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
 
+  powerSaveId: number;
+
   static initialState = {
     streamingStatus: EStreamingState.Offline,
     streamingStatusTime: new Date().toISOString(),
@@ -96,8 +99,20 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
 
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      console.log('Calling start streaming');
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+      const confirmText = 'Are you sure you want to start streaming?';
+
+      if (shouldConfirm && !confirm(confirmText)) return;
+
+      this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
       this.obsApiService.nodeObs.OBS_service_startStreaming();
+
+      const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+
+      if (recordWhenStreaming && (this.state.recordingStatus === ERecordingState.Offline)) {
+        this.toggleRecordingState();
+      }
+
       return;
     }
 
@@ -105,24 +120,39 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
       this.state.streamingStatus === EStreamingState.Starting ||
       this.state.streamingStatus === EStreamingState.Live
     ) {
-      console.log('Calling stop streaming');
+      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const confirmText = 'Are you sure you want to stop streaming?';
+
+      if (shouldConfirm && !confirm(confirmText)) return;
+
+      if (this.powerSaveId) electron.remote.powerSaveBlocker.stop(this.powerSaveId);
+
       this.obsApiService.nodeObs.OBS_service_stopStreaming(false);
+
+      const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
+      if (!keepRecording && (this.state.recordingStatus === ERecordingState.Recording)) {
+        this.toggleRecordingState();
+      }
+
       return;
     }
 
     if (this.state.streamingStatus === EStreamingState.Ending) {
-      console.log('Calling discard delay');
       this.obsApiService.nodeObs.OBS_service_stopStreaming(true);
       return;
     }
   }
 
-  startRecording() {
-    // TODO
-  }
+  toggleRecordingState() {
+    if (this.state.recordingStatus === ERecordingState.Recording) {
+      this.obsApiService.nodeObs.OBS_service_stopRecording();
+      return;
+    }
 
-  stopRecording() {
-    // TODO
+    if (this.state.recordingStatus === ERecordingState.Offline) {
+      this.obsApiService.nodeObs.OBS_service_startRecording();
+      return;
+    }
   }
 
   showEditStreamInfo() {
