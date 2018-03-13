@@ -137,7 +137,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       monitoringType: obsSource.monitoringType,
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
-      muted: obsSource.muted
+      muted: obsSource.muted,
+      resourceId: ''
     };
   }
 
@@ -244,6 +245,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     Vue.set(this.state.audioSources, source.sourceId, source);
+    const addedSource = this.getSource(source.sourceId);
+    this.state.audioSources[source.sourceId].resourceId = addedSource.getResourceId();
   }
 
 
@@ -263,6 +266,9 @@ export class AudioSource implements IAudioSourceApi {
   audioMixers: number;
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
+  resourceId: string;
+
+  private _resourceId: string;
 
   @Inject()
   private audioService: AudioService;
@@ -280,7 +286,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.audioSourceState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
   getSettingsForm(): TFormData {
@@ -402,9 +408,14 @@ export class AudioSource implements IAudioSourceApi {
     return stream.subscribe(cb);
   }
 
+  getResourceId() {
+    return this._resourceId;
+  }
+
 
   @mutation()
   private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
+    delete patch.resourceId; // resourceId is not changeable
     Object.assign(this.audioSourceState, patch);
   }
 

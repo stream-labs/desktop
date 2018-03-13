@@ -117,7 +117,7 @@ export function ServiceHelper(): ClassDecorator {
       this.constructorArgs = args;
       this.isHelper = true;
       this.helperName = target.name;
-      this.resourceId = this.helperName + JSON.stringify(this.constructorArgs);
+      this._resourceId = this.helperName + JSON.stringify(this.constructorArgs);
       return this;
     };
 

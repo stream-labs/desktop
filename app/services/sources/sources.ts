@@ -107,10 +107,12 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       height: 0,
 
       muted: false,
+      resourceId: '',
       channel
     };
 
     Vue.set(this.state.sources, id, sourceModel);
+    this.state.sources[id].resourceId = this.getSource(id).getResourceId();
   }
 
   @mutation()
