@@ -33,6 +33,7 @@ export class CustomizationService
     performanceMode: false,
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
+    enableFFZEmotes: false,
     experimental: {
       // put experimental features here
       sceneItemsGrouping: false
@@ -148,6 +149,15 @@ export class CustomizationService
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
         description: 'Enable BetterTTV emotes for Twitch',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IFormInput<boolean>>  {
+        value: settings.enableFFZEmotes,
+        name: 'enableFFZEmotes',
+        description: 'Enable FrankerFaceZ emotes for Twitch',
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
