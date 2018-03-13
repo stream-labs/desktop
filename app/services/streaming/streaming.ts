@@ -217,12 +217,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
+        this.streamingStatusChange.next(EStreamingState.Live);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
+        this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
+        this.streamingStatusChange.next(EStreamingState.Offline);
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
+        this.streamingStatusChange.next(EStreamingState.Ending);
       } else {
         console.log('Ignoring streaming output signal: ', info.signal);
       }
