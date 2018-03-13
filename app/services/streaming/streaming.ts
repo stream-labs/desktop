@@ -7,13 +7,12 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import { Subject } from 'rxjs/Subject';
 import electron from 'electron';
-
-interface IStreamingServiceState {
-  streamingStatus: EStreamingState;
-  streamingStatusTime: string;
-  recordingStatus: ERecordingState;
-  recordingStatusTime: string;
-}
+import {
+  IStreamingServiceApi,
+  IStreamingServiceState,
+  EStreamingState,
+  ERecordingState
+} from './streaming-api';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -27,20 +26,6 @@ enum EOBSOutputSignal {
   Stop = 'stop'
 }
 
-export enum EStreamingState {
-  Offline = 'offline',
-  Starting = 'starting',
-  Live = 'live',
-  Ending = 'ending'
-}
-
-export enum ERecordingState {
-  Offline = 'offline',
-  Starting = 'starting',
-  Recording = 'recording',
-  Stopping = 'stopping'
-}
-
 interface IOBSOutputSignalInfo {
   type: EOBSOutputType;
   signal: EOBSOutputSignal;
@@ -48,7 +33,8 @@ interface IOBSOutputSignalInfo {
   error: string;
 }
 
-export class StreamingService extends StatefulService<IStreamingServiceState> {
+export class StreamingService extends StatefulService<IStreamingServiceState>
+  implements IStreamingServiceApi {
   @Inject() obsApiService: ObsApiService;
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
@@ -75,6 +61,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
     );
   }
 
+  getModel() {
+    return this.state;
+  }
+
   get isStreaming() {
     return this.state.streamingStatus !== EStreamingState.Offline;
   }
@@ -99,18 +89,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
 
   toggleStreaming() {
     if (this.state.streamingStatus === EStreamingState.Offline) {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStartingStream;
+      const shouldConfirm = this.settingsService.state.General
+        .WarnBeforeStartingStream;
       const confirmText = 'Are you sure you want to start streaming?';
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
-      this.powerSaveId = electron.remote.powerSaveBlocker.start('prevent-display-sleep');
+      this.powerSaveId = electron.remote.powerSaveBlocker.start(
+        'prevent-display-sleep'
+      );
       this.obsApiService.nodeObs.OBS_service_startStreaming();
 
-      const recordWhenStreaming = this.settingsService.state.General.RecordWhenStreaming;
+      const recordWhenStreaming = this.settingsService.state.General
+        .RecordWhenStreaming;
 
-      if (recordWhenStreaming && (this.state.recordingStatus === ERecordingState.Offline)) {
-        this.toggleRecordingState();
+      if (
+        recordWhenStreaming &&
+        this.state.recordingStatus === ERecordingState.Offline
+      ) {
+        this.toggleRecording();
       }
 
       return;
@@ -120,18 +117,24 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
       this.state.streamingStatus === EStreamingState.Starting ||
       this.state.streamingStatus === EStreamingState.Live
     ) {
-      const shouldConfirm = this.settingsService.state.General.WarnBeforeStoppingStream;
+      const shouldConfirm = this.settingsService.state.General
+        .WarnBeforeStoppingStream;
       const confirmText = 'Are you sure you want to stop streaming?';
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
-      if (this.powerSaveId) electron.remote.powerSaveBlocker.stop(this.powerSaveId);
+      if (this.powerSaveId)
+        electron.remote.powerSaveBlocker.stop(this.powerSaveId);
 
       this.obsApiService.nodeObs.OBS_service_stopStreaming(false);
 
-      const keepRecording = this.settingsService.state.General.KeepRecordingWhenStreamStops;
-      if (!keepRecording && (this.state.recordingStatus === ERecordingState.Recording)) {
-        this.toggleRecordingState();
+      const keepRecording = this.settingsService.state.General
+        .KeepRecordingWhenStreamStops;
+      if (
+        !keepRecording &&
+        this.state.recordingStatus === ERecordingState.Recording
+      ) {
+        this.toggleRecording();
       }
 
       return;
@@ -143,7 +146,21 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
     }
   }
 
-  toggleRecordingState() {
+  /**
+   * @deprecated Use toggleRecording instead
+   */
+  startRecording() {
+    this.toggleRecording();
+  }
+
+  /**
+   * @deprecated Use toggleRecording instead
+   */
+  stopRecording() {
+    this.toggleRecording();
+  }
+
+  toggleRecording() {
     if (this.state.recordingStatus === ERecordingState.Recording) {
       this.obsApiService.nodeObs.OBS_service_stopRecording();
       return;
@@ -211,7 +228,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
   }
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
-    console.log(info);
+    console.debug('OBS Output sigal: ', info);
     if (info.type === EOBSOutputType.Streaming) {
       const time = new Date().toISOString();
 
@@ -227,8 +244,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
-      } else {
-        console.log('Ignoring streaming output signal: ', info.signal);
       }
     } else if (info.type === EOBSOutputType.Recording) {
       const time = new Date().toISOString();
@@ -241,8 +256,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState> {
         this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
-      } else {
-        console.log('Ignoring recording output signal: ', info.signal);
       }
     }
 
