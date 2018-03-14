@@ -18,16 +18,16 @@ test('Streaming to Twitch via API', async t => {
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
 
-  const streamSettings = await settingsService.getSettingsFormData('Stream');
+  const streamSettings = settingsService.getSettingsFormData('Stream');
   streamSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
       if (setting.name === 'service') setting.value = 'Twitch';
       if (setting.name === 'key') setting.value = process.env.SLOBS_TEST_STREAM_KEY;
     });
   });
-  await settingsService.setSettings('Stream', streamSettings);
+  settingsService.setSettings('Stream', streamSettings);
 
-  let streamingStatus = await streamingService.getModel().streamingStatus;
+  let streamingStatus = streamingService.getModel().streamingStatus;
 
   streamingService.streamingStatusChange.subscribe(() => void 0);
 
