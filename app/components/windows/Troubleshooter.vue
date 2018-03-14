@@ -89,6 +89,7 @@
         <li>Enable VSync in your game</li>
         <li>Disable FreeSync or GSync in your Driver</li>
         <li>Lower graphics settings until you stop lagging frames</li>
+        <li>Disable hardware decoding under any media sources(This will slightly increase cpu over gpu) </li>
       </ul>
 
     </div>

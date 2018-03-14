@@ -43,7 +43,9 @@
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use optimized encoder settings</span></label>
+                <label><span>Use optimized encoder settings</span>  <span><i class="tooltip-trigger fa fa-question-circle has-tooltip" style="font-size:15px;whitespace: nowrap;" title="Optimized encoder gives equivalent quality while reducing usage.
+Game specific encoders for Fortnite,PUBG,Destiny 2, and League Of Legends"></i></span></label>
+                
               </div>
             </div>
           </div>

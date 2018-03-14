@@ -1,5 +1,6 @@
 import URI from 'urijs';
 import { isEqual } from 'lodash';
+import electron from 'electron';
 
 export const enum EBit { ZERO, ONE }
 
@@ -34,6 +35,10 @@ export default class Utils {
 
   static isDevMode() {
     return process.env.NODE_ENV !== 'production';
+  }
+
+  static isPreview(): boolean {
+    return electron.remote.process.env.SLOBS_PREVIEW;
   }
 
   /**

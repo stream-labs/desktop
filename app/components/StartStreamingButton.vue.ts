@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { StreamingService } from '../services/streaming';
+import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from '../util/injector';
 import { NavigationService } from '../services/navigation';
 import { UserService } from '../services/user';
@@ -17,9 +17,7 @@ export default class StartStreamingButton extends Vue {
 
   toggleStreaming() {
     if (this.streamingService.isStreaming) {
-      this.streamingService.stopStreaming();
-    } else if (this.streamingService.delaySecondsRemaining) {
-      this.streamingService.discardStreamDelay();
+      this.streamingService.toggleStreaming();
     } else {
       if (
         this.userService.isLoggedIn() &&
@@ -29,7 +27,7 @@ export default class StartStreamingButton extends Vue {
       ) {
         this.streamingService.showEditStreamInfo();
       } else {
-        this.streamingService.startStreaming();
+        this.streamingService.toggleStreaming();
         if (this.userService.isLoggedIn()) {
           this.navigationService.navigate('Live');
         }
@@ -37,37 +35,50 @@ export default class StartStreamingButton extends Vue {
     }
   }
 
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
+  }
+
   getStreamButtonLabel() {
-    if (this.streamingService.isStreaming) {
-      const delaySeconds = this.streamingService.delaySecondsRemaining;
-
-      if (delaySeconds) {
-        return `STARTING ${delaySeconds}s`;
-      }
-
+    if (this.streamingStatus === EStreamingState.Live) {
       return 'END STREAM';
     }
 
-    const delaySeconds = this.streamingService.delaySecondsRemaining;
+    if (this.streamingStatus === EStreamingState.Starting) {
+      if (this.streamingService.delayEnabled) {
+        return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
+      }
 
-    if (delaySeconds) {
-      return `DISCARD ${delaySeconds}s`;
+      return 'STARTING';
+    }
+
+    if (this.streamingStatus === EStreamingState.Ending) {
+      if (this.streamingService.delayEnabled) {
+        return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
+      }
+
+      return 'ENDING';
     }
 
     return 'GO LIVE';
   }
 
   getIsRedButton() {
-    return this.isStreaming || this.streamingService.delaySecondsRemaining;
+    return this.streamingStatus !== EStreamingState.Offline;
   }
 
   get isStreaming() {
     return this.streamingService.isStreaming;
   }
 
-  @Watch('isStreaming')
+  get isDisabled() {
+    return this.disabled ||
+      ((this.streamingStatus === EStreamingState.Starting) && (this.streamingService.delaySecondsRemaining === 0)) ||
+      ((this.streamingStatus === EStreamingState.Ending) && (this.streamingService.delaySecondsRemaining === 0));
+  }
+
+  @Watch('streamingStatus')
   setDelayUpdate() {
-    console.log('force update');
     this.$forceUpdate();
 
     if (this.streamingService.delaySecondsRemaining) {

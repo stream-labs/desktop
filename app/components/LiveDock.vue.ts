@@ -1,11 +1,10 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import Chat from './Chat.vue';
-import { StreamingService } from '../services/streaming';
+import { StreamingService, EStreamingState } from '../services/streaming';
 import { Inject } from '../util/injector';
 import { StreamInfoService } from '../services/stream-info';
 import { UserService } from '../services/user';
-import { Subscription } from 'rxjs/Subscription';
 import { CustomizationService } from 'services/customization';
 import Slider from './shared/Slider.vue';
 import electron from 'electron';
@@ -31,35 +30,37 @@ export default class LiveDock extends Vue {
   elapsedStreamTime = '';
   elapsedInterval: number;
 
-  subscription: Subscription;
-
   $refs: {
     chat: Chat;
   };
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
-      if (this.streamingService.isLive) {
+      if (this.streamingStatus === EStreamingState.Live) {
         this.elapsedStreamTime = this.getElapsedStreamTime();
       } else {
         this.elapsedStreamTime = '';
       }
     }, 100);
-
-    this.subscription = this.streamingService.streamingStateChange.subscribe(
-      status => {
-        if (status.isStreaming) this.expand();
-      }
-    );
   }
 
   beforeDestroy() {
     clearInterval(this.elapsedInterval);
-    this.subscription.unsubscribe();
+  }
+
+  get streamingStatus() {
+    return this.streamingService.state.streamingStatus;
+  }
+
+  @Watch('streamingStatus')
+  onStreamingStatusChange() {
+    if (this.streamingStatus === EStreamingState.Starting) {
+      this.expand();
+    }
   }
 
   getElapsedStreamTime() {
-    return this.streamingService.formattedElapsedStreamTime;
+    return this.streamingService.formattedDurationInCurrentStreamingState;
   }
 
   get collapsed() {
@@ -78,13 +79,10 @@ export default class LiveDock extends Vue {
     return this.streamingService.isStreaming;
   }
 
-  get isLive() {
-    return this.streamingService.isLive;
-  }
-
   get liveText() {
-    if (this.isLive) return 'LIVE';
-    if (this.isStreaming) return 'STARTING';
+    if (this.streamingStatus === EStreamingState.Live) return 'LIVE';
+    if (this.streamingStatus === EStreamingState.Starting) return 'STARTING';
+    if (this.streamingStatus === EStreamingState.Ending) return 'ENDING';
     return 'OFFLINE';
   }
 

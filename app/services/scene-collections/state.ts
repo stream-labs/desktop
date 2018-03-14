@@ -59,7 +59,7 @@ export class SceneCollectionsStateService extends StatefulService<
         if (recovered) this.LOAD_STATE(recovered);
       }
     } catch (e) {
-      console.error('Error loading manifest file from disk');
+      console.warn('Error loading manifest file from disk');
     }
 
     await this.flushManifestFile();

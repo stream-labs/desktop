@@ -14,8 +14,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   parentId: string;
   childrenIds: string[];
   sceneNodeType: TSceneNodeType;
+  resourceId: string;
+  sceneId: string;
 
-  protected sceneId: string;
+  private _resourceId: string;
 
   @Inject() protected scenesService: ScenesService;
   @Inject() protected selectionService: SelectionService;
@@ -103,6 +105,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
 
   isItem(): this is SceneItem {
     return this.sceneNodeType === 'item';
+  }
+
+  getResourceId() {
+    return this._resourceId;
   }
 
   protected abstract getState(): ISceneItemNode;
