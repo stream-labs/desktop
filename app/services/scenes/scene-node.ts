@@ -71,7 +71,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
       this.getScene().getRootNodesIds();
 
     const childInd = siblingsIds.indexOf(this.id);
-    if (childInd !== 0) return this.getScene().getFolder(siblingsIds[childInd - 1]);
+    if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
   }
 
   getPrevItem(): SceneItem {
