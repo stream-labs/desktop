@@ -183,8 +183,10 @@
     </add-source-info>
 
     <add-source-info
+      class='ndi-source'
       v-if="inspectedSource === 'ndi_source'"
       @clickAdd="selectSource('ndi_source')"
+      showSupport="false"
       name="NDI source"
       description="Allow you to capture NDI output streams.">
     </add-source-info>
@@ -806,5 +808,7 @@ h4 {
   .source__demo--night {
     display: block;
   }
+
 }
+
 </style>
