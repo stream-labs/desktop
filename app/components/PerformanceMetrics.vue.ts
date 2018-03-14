@@ -31,20 +31,4 @@ export default class PerformanceMetrics extends Vue {
   get bandwidth() {
     return this.performanceService.state.bandwidth.toFixed(0);
   }
-
-  get streamOk() {
-    return this.streamingService.streamOk;
-  }
-
-  get streamStatusMsg() {
-    if (this.streamingService.isStreaming && this.streamOk !== null) {
-      if (this.streamOk) {
-        return 'Stream OK';
-      }
-
-      return 'Stream Error';
-    }
-
-    return null;
-  }
 }

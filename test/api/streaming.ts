@@ -1,26 +1,51 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IStreamingServiceApi, IStreamingServiceState } from '../../app/services/streaming';
+import { IStreamingServiceApi, EStreamingState } from '../../app/services/streaming/streaming-api';
+import { ISettingsServiceApi } from '../../app/services/settings';
 
 useSpectron({ restartAppAfterEachTest: false });
 
 
-test('Streaming state change event', async t => {
+test('Streaming to Twitch via API', async t => {
+  if (!process.env.SLOBS_TEST_STREAM_KEY) {
+    console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
+    t.pass();
+    return;
+  }
+
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
-  let streamingState: IStreamingServiceState;
+  const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
 
-  streamingService.streamingStateChange.subscribe(() => void 0);
+  const streamSettings = settingsService.getSettingsFormData('Stream');
+  streamSettings.forEach(subcategory => {
+    subcategory.parameters.forEach(setting => {
+      if (setting.name === 'service') setting.value = 'Twitch';
+      if (setting.name === 'key') setting.value = process.env.SLOBS_TEST_STREAM_KEY;
+    });
+  });
+  settingsService.setSettings('Stream', streamSettings);
 
-  streamingService.startRecording();
-  streamingState = await client.fetchNextEvent();
+  let streamingStatus = streamingService.getModel().streamingStatus;
 
-  t.is(streamingState.isRecording, true);
+  streamingService.streamingStatusChange.subscribe(() => void 0);
 
-  streamingService.stopRecording();
-  streamingState = await client.fetchNextEvent();
+  t.is(streamingStatus, EStreamingState.Offline);
 
-  t.is(streamingState.isRecording, false);
+  streamingService.toggleStreaming();
 
+  streamingStatus = await client.fetchNextEvent();
+  t.is(streamingStatus, EStreamingState.Starting);
+
+  streamingStatus = await client.fetchNextEvent();
+  t.is(streamingStatus, EStreamingState.Live);
+
+  streamingService.toggleStreaming();
+
+  streamingStatus = await client.fetchNextEvent();
+  t.is(streamingStatus, EStreamingState.Ending);
+
+  streamingStatus = await client.fetchNextEvent();
+  t.is(streamingStatus, EStreamingState.Offline);
 });

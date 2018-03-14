@@ -63,10 +63,10 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     {
       name: 'TOGGLE_START_STREAMING',
       description: () => 'Start Streaming',
-      down: () => getStreamingService().startStreaming(),
+      down: () => getStreamingService().toggleStreaming(),
       isActive: () => {
         const streamingService = getStreamingService();
-        return streamingService.isStreaming || !!streamingService.delaySecondsRemaining;
+        return streamingService.isStreaming;
       }
     },
     {
@@ -74,28 +74,23 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       description: () => 'Stop Streaming',
       down: () => {
         const streamingService = getStreamingService();
-
-        if (streamingService.isStreaming) {
-          streamingService.stopStreaming();
-        } else {
-          streamingService.discardStreamDelay();
-        }
+        streamingService.toggleStreaming();
       },
       isActive: () => {
         const streamingService = getStreamingService();
-        return !streamingService.isStreaming && !streamingService.delaySecondsRemaining;
+        return !streamingService.isStreaming;
       }
     },
     {
       name: 'TOGGLE_START_RECORDING',
       description: () => 'Start Recording',
-      down: () => getStreamingService().startRecording(),
+      down: () => getStreamingService().toggleRecording(),
       isActive: () => getStreamingService().isRecording
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
       description: () => 'Stop Recording',
-      down: () => getStreamingService().stopRecording(),
+      down: () => getStreamingService().toggleRecording(),
       isActive: () => !getStreamingService().isRecording
     }
   ],
