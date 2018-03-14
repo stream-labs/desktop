@@ -5,7 +5,7 @@
       <h3>{{ name }}</h3>
       <div class="desc">{{ description }}</div>
 
-      <div class="source-support">
+      <div class="source-support" v-if="showSupport">
         <div class="source-support__label">Supports</div>
         <slot name="support-list"></slot>
       </div>
