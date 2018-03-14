@@ -24,6 +24,7 @@ const { ipcRenderer } = electron;
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
+
 export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
 }
@@ -105,6 +106,10 @@ export class Scene implements ISceneApi {
 
   getRootNodes(): TSceneNode[] {
     return this.getNodes().filter(node => !node.parentId);
+  }
+
+  getRootNodesIds(): string[] {
+    return this.getRootNodes().map(node => node.id);
   }
 
   getNodesIds(): string[] {
@@ -212,6 +217,25 @@ export class Scene implements ISceneApi {
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
 
+    let destFolderId: string;
+
+    if (destNode) {
+      if (destNode.isItem()) {
+        destFolderId = destNode.parentId;
+      } else {
+        if (destNode.id === sourceNode.parentId) {
+          destFolderId = destNode.id;
+        } else {
+          destFolderId = destNode.parentId;
+        }
+      }
+    }
+
+    if (sourceNode.parentId !== destFolderId) {
+      sourceNode.setParent(destFolderId);
+    }
+
+
     // move obs items
     const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
     const firstItemIndex = itemsToMove[0].getItemIndex();
@@ -239,8 +263,9 @@ export class Scene implements ISceneApi {
       }
     }
 
-    const obsScene = this.getObsScene();
+    // move obs items
 
+    const obsScene = this.getObsScene();
     if (newItemIndex !== firstItemIndex) {
       for (let i = 0; i < itemsToMove.length; i++) {
         if (isForwardDirection) {
@@ -258,8 +283,6 @@ export class Scene implements ISceneApi {
       [sourceNode.id].concat((sourceNode as SceneItemFolder).getNestedNodesIds()) :
       [sourceNode.id];
     const firstNodeIndex = this.getNode(nodesToMoveIds[0]).getNodeIndex();
-
-
 
     let newNodeIndex = 0;
 
@@ -279,11 +302,30 @@ export class Scene implements ISceneApi {
     sceneNodesIds.splice(newNodeIndex, 0, ...nodesToMoveIds);
 
     this.SET_NODES_ORDER(sceneNodesIds);
+
+
+    // recalculate children order in dest and source folder
+
+    if (destFolderId) {
+      this.getFolder(destFolderId).recalculateChildrenOrder();
+    }
+
+    if (sourceNode.parentId !== destFolderId) {
+      const sourceFolder = sourceNode.getParent();
+      if (sourceFolder) sourceFolder.recalculateChildrenOrder();
+    }
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
-    const destNode = this.getNode(destNodeId).getPrevNode();
-    this.placeAfter(sourceNodeId, destNode && destNode.id);
+    const destNode = this.getNode(destNodeId);
+    const newDestNode = destNode.getPrevSiblingNode();
+    if (newDestNode) {
+      this.placeAfter(sourceNodeId, newDestNode.id);
+    } else if (destNode.parentId) {
+      this.getNode(sourceNodeId).setParent(destNode.parentId); // place to the top of folder
+    } else {
+      this.placeAfter(sourceNodeId); // place to the top of scene
+    }
   }
 
 
@@ -477,5 +519,7 @@ export class Scene implements ISceneApi {
       });
     });
   }
+
+
 
 }

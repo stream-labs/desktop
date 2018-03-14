@@ -18,27 +18,61 @@
         @click="sourceProperties"/>
     </div>
   </div>
-  <selector
-    class="studio-controls-selector"
-    @contextmenu="showContextMenu"
-    @dblclick="sourceProperties"
-    :items="sources"
-    :activeItems="activeItemIds"
-    @select="makeActive"
-    @sort="handleSort">
-    <template slot="actions" slot-scope="props">
-      <i
-        class="fa fa-lock icon-btn source-selector-action"
-        :class="lockClassesForSource(props.item.value)"
-        @click.stop="toggleLock(props.item.value)"
-        @dblclick.stop="() => {}" />
-      <i
-        class="fa fa-eye icon-btn source-selector-action"
-        :class="visibilityClassesForSource(props.item.value)"
-        @click.stop="toggleVisibility(props.item.value)"
-        @dblclick.stop="() => {}" />
-    </template>
-  </selector>
+
+    <sl-vue-tree
+        :value="nodes"
+        @select="makeActive"
+        @drop="handleSort"
+        @toggle="toggleFolder"
+    >
+
+      <template slot="title" slot-scope="{ node }">
+        <div
+            class="title-container"
+            @contextmenu="showContextMenu(node.data.id)"
+            @dblclick="sourceProperties(node.data.id)"
+        >
+          <span class="item-icon">
+            <i v-if="!node.isLeaf" class="fa fa-folder" ></i>
+            <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
+            <i v-else-if="node.data.type === 'image_source'" class="fa fa-image"></i>
+            <i v-else-if="node.data.type === 'slideshow'" class="fa fa-images"></i>
+            <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="fa fa-microphone"></i>
+            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="fa fa-volume-up"></i>
+            <i v-else class="fa fa-file"></i>
+          </span>
+          {{ node.title }}
+        </div>
+      </template>
+
+
+      <template slot="toggle" slot-scope="{ node }">
+        <span v-if="!node.isLeaf">
+          <i v-if="node.isExpanded" class="fa fa-chevron-down"></i>
+          <i v-if="!node.isExpanded" class="fa fa-chevron-right"></i>
+        </span>
+      </template>
+
+
+      <template slot="sidebar" slot-scope="{ node }">
+        <i
+            class="fa fa-lock icon-btn source-selector-action"
+            :class="lockClassesForSource(node.data.id)"
+            @click.stop="toggleLock(node.data.id)"
+            @dblclick.stop="() => {}" ></i>
+        <i
+            class="fa fa-eye icon-btn source-selector-action"
+            :class="visibilityClassesForSource(node.data.id)"
+            @click.stop="toggleVisibility(node.data.id)"
+            @dblclick.stop="() => {}" ></i>
+      </template>
+
+
+    </sl-vue-tree>
+
 </div>
 </template>
 
@@ -58,4 +92,32 @@
     opacity: inherit;
   }
 }
+
+.sl-vue-tree {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+.source-selector-action {
+  display: none;
+}
+
+.sl-vue-tree-node-item:hover {
+
+  .source-selector-action {
+    display: inline-block;
+  }
+}
+
+.title-container {
+  display: inline-block;
+  color: @grey;
+}
+
+.item-icon {
+  display: inline-block;
+  text-align: left;
+  width: 20px;
+}
+
 </style>

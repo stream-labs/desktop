@@ -135,6 +135,24 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.sceneFolderState;
   }
 
+  /**
+   * for internal usage only
+   */
+  recalculateChildrenOrder() {
+    this.sceneFolderState.childrenIds = this.childrenIds;
+    const childrenCount = this.childrenIds.length;
+    const nodeInd = this.getNodeIndex();
+    const foundChildren: TSceneNode[] = [];
+    const sceneNodes = this.getScene().getNodes();
+
+    for (let i = nodeInd + 1; foundChildren.length < childrenCount; i++) {
+      const sceneNode = sceneNodes[i];
+      if (sceneNode.parentId === this.id) foundChildren.push(sceneNode);
+    }
+
+    this.SET_CHILDREN_ORDER(foundChildren.map(child => child.id));
+  }
+
   protected getState() {
     return this.sceneFolderState;
   }
@@ -144,4 +162,8 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     merge(this.sceneFolderState, patch);
   }
 
+  @mutation()
+  private SET_CHILDREN_ORDER(childrenIds: string[]) {
+    this.sceneFolderState.childrenIds = childrenIds;
+  }
 }

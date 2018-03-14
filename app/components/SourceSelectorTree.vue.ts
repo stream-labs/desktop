@@ -3,14 +3,14 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
 import { SourcesService } from 'services/sources';
-import { ScenesService, SceneItem,ISceneItem, ISceneItemNode, TSceneNode, ISceneItemFolder } from 'services/scenes';
+import { ScenesService, SceneItem } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
 import SlVueTree from 'sl-vue-tree';
-import { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
+import { ISlTreeNode } from 'sl-vue-tree';
 
 @Component({
-  components: { SlVueTree }
+  components: { Selector, SlVueTree }
 })
 export default class SourceSelector extends Vue {
 
@@ -18,27 +18,7 @@ export default class SourceSelector extends Vue {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
 
-  private expandedFoldersIds: string[] = [];
-
-  get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
-
-    // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = ((sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneItemNode>[] => {
-      return sceneNodes.map(sceneNode => {
-        return {
-          title: sceneNode.name,
-          isSelected: sceneNode.isSelected(),
-          isLeaf: sceneNode.isItem(),
-          isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
-          data: sceneNode.getModel(),
-          children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null
-        };
-      });
-    });
-
-    return getSlVueTreeNodes(this.scene.getRootNodes());
-  }
-
+  nodes = [{ title: 'node1' }, { title: 'node2' }]
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -80,38 +60,27 @@ export default class SourceSelector extends Vue {
       false;
   }
 
-  handleSort(treeNodeToMove: ISlTreeNode<ISceneItemNode>, position: ICursorPosition<TSceneNode>) {
-    const nodeToMove = this.scene.getNode(treeNodeToMove.data.id);
-    const destNode = this.scene.getNode(position.node.data.id);
+  handleSort(data: any) {
+    const rootNodes = this.scene.getRootNodes();
+    const nodeToMove = rootNodes[data.change.moved.oldIndex];
+    const destNode = this.scene.getRootNodes()[data.change.moved.newIndex];
 
-    if (position.placement === 'before') {
+    if (destNode.getNodeIndex() < nodeToMove.getNodeIndex()) {
       nodeToMove.placeBefore(destNode.id);
-    } else if (position.placement === 'after') {
-      nodeToMove.placeAfter(destNode.id);
-    } else if (position.placement === 'inside') {
-      nodeToMove.setParent(destNode.id);
-    }
-  }
-
-  makeActive(treeNode: ISlTreeNode<ISceneItemNode>, ev: MouseEvent) {
-    const sceneNode = this.scene.getNode(treeNode.data.id);
-    if (ev.ctrlKey) {
-      if (sceneNode.isSelected() && ev.button !== 2) {
-        sceneNode.deselect();
-      } else {
-        sceneNode.addToSelection();
-      }
-    } else if (!(ev.button === 2 && sceneNode.isSelected())) {
-      sceneNode.select();
-    }
-  }
-
-  toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
-    const nodeId = treeNode.data.id;
-    if (treeNode.isExpanded) {
-      this.expandedFoldersIds.splice(this.expandedFoldersIds.indexOf(nodeId), 1);
     } else {
-      this.expandedFoldersIds.push(nodeId);
+      nodeToMove.placeAfter(destNode.id);
+    }
+  }
+
+  makeActive(sceneItemId: string, ev: MouseEvent) {
+    if (ev.ctrlKey) {
+      if (this.selectionService.isSelected(sceneItemId) && ev.button !== 2) {
+        this.selectionService.deselect(sceneItemId);
+      } else {
+        this.selectionService.add(sceneItemId);
+      }
+    } else if (!(ev.button === 2 && this.selectionService.isSelected(sceneItemId))) {
+      this.selectionService.select(sceneItemId);
     }
   }
 

@@ -27,8 +27,8 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   setParent(parentId: string) {
-    this.placeAfter(parentId);
     this.SET_PARENT(parentId);
+    this.placeAfter(parentId);
   }
 
   detachParent() {
@@ -63,6 +63,15 @@ export abstract class SceneItemNode implements ISceneItemNode {
   getNextNode() {
     const nodeInd = this.getNodeIndex();
     return this.getScene().getNodes()[nodeInd + 1];
+  }
+
+  getPrevSiblingNode() {
+    const siblingsIds = this.parentId ?
+      this.getParent().getNestedNodesIds() :
+      this.getScene().getRootNodesIds();
+
+    const childInd = siblingsIds.indexOf(this.id);
+    if (childInd !== 0) return this.getScene().getFolder(siblingsIds[childInd - 1]);
   }
 
   getPrevItem(): SceneItem {
