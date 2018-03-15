@@ -160,13 +160,4 @@ export default class SourceSelector extends Vue {
     return this.scenesService.activeScene;
   }
 
-  get sources() {
-    return this.scene.getRootNodes().map(sceneNode => {
-      return {
-        name: sceneNode.name,
-        value: sceneNode.id
-      };
-    });
-  }
-
 }
