@@ -31,11 +31,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   toggleRecording() {
-    if (this.recording) {
-      this.streamingService.stopRecording();
-    } else {
-      this.streamingService.startRecording();
-    }
+    this.streamingService.toggleRecording();
   }
 
   get recording() {

@@ -1,6 +1,6 @@
 import { Service } from 'services/service';
 import { SettingsService, ISettingsSubCategory } from 'services/settings';
-import { StreamingService } from 'services/streaming';
+import { StreamingService, EStreamingState } from 'services/streaming';
 import { Inject } from '../../util/injector';
 import { IProfile, IEncoderPreset, Presets } from './definitions';
 import { cloneDeep } from 'lodash';
@@ -43,8 +43,8 @@ export class VideoEncodingOptimizationService extends Service {
   @Inject() streamingService: StreamingService;
 
   init() {
-    this.streamingService.streamingStateChange.subscribe(status => {
-      if (!status.isStreaming && this.isUsingEncodingOptimizations) {
+    this.streamingService.streamingStatusChange.subscribe(status => {
+      if ((status === EStreamingState.Offline) && this.isUsingEncodingOptimizations) {
         this.isUsingEncodingOptimizations = false;
         this.restorePreviousValues();
       }

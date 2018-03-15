@@ -22,7 +22,8 @@ useSpectron({ restartAppAfterEachTest: false, afterStartCb: async t => {
     'game_capture',
     'dshow_input',
     'wasapi_input_capture',
-    'wasapi_output_capture'
+    'wasapi_output_capture',
+    'ndi_source'
   ];
 
 
@@ -101,5 +102,10 @@ test('wasapi_input_capture', async t => {
 
 test('wasapi_output_capture', async t => {
   showSourceProps('wasapi_output_capture')
+  t.pass();
+});
+
+test('ndi_source', async t => {
+  showSourceProps('ndi_source')
   t.pass();
 });

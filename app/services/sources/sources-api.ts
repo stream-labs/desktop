@@ -77,7 +77,8 @@ export type TSourceType =
   'wasapi_input_capture' |
   'wasapi_output_capture' |
   'decklink-input' |
-  'scene'
+  'scene' |
+  'ndi_source'
   ;
 
 // Register new properties manager here
