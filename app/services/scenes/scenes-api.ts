@@ -169,6 +169,7 @@ export interface ISceneItemFolderApi extends ISceneItemFolder {
   getScene(): ISceneApi;
   getSelection(): ISelection;
   getParent(): ISceneItemFolder;
+  setParent(parentId: string): void;
   getItems(): ISceneItemApi[];
   setName(newName: string): void;
   select(): void;

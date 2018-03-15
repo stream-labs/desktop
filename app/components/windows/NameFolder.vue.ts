@@ -20,6 +20,7 @@ export default class NameFolder extends Vue {
   options: {
     renameId?: string,
     itemsToGroup?: string[]
+    parentId?: string
   }  = this.windowsService.getChildWindowQueryParams();
 
   name = '';
@@ -56,6 +57,9 @@ export default class NameFolder extends Vue {
         this.scenesService.activeScene
           .getSelection(this.options.itemsToGroup)
           .moveTo(scene.id, newFolder.id);
+        if (this.options.parentId) {
+          newFolder.setParent(this.options.parentId);
+        }
       }
       newFolder.select();
 

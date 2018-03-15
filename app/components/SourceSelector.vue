@@ -39,9 +39,14 @@
             <i v-else-if="node.data.type === 'slideshow'" class="fa fa-images"></i>
             <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
             <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
-            <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-camera"></i>
             <i v-else-if="node.data.type === 'wasapi_input_capture'" class="fa fa-microphone"></i>
             <i v-else-if="node.data.type === 'wasapi_output_capture'" class="fa fa-volume-up"></i>
+            <i v-else-if="node.data.type === 'monitor_capture'" class="fa fa-desktop"></i>
+            <i v-else-if="node.data.type === 'game_capture'" class="fa fa-gamepad"></i>
+            <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>
+            <i v-else-if="node.data.type === 'scene'" class="fa fa-sitemap"></i>
+            <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
             <i v-else class="fa fa-file"></i>
           </span>
           {{ node.title }}

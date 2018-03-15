@@ -1,3 +1,4 @@
+import { uniq } from 'lodash';
 import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
@@ -19,14 +20,17 @@ export class GroupMenu extends Menu {
 
     const selectionSize = this.selectionService.getSize();
     const selectedItem = this.selectionService.getItems()[0];
-    const itemInFolder = this.selectionService.getItems().find(item => !!item.parentId);
-    const canGroupIntoFolder = selectionSize > 1 && !itemInFolder;
+    const selectedNodes = this.selectionService.getNodes();
+    const nodesFolders = selectedNodes.map(node => node.parentId || null);
+    const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
+    const canGroupIntoFolder = selectionSize > 1 && nodesHaveTheSameParent;
 
     this.append({
       label: 'Group into Folder',
       click: () => {
         this.scenesService.showNameFolder({
-          itemsToGroup: this.selectionService.getIds()
+          itemsToGroup: this.selectionService.getIds(),
+          parentId: nodesFolders[0]
         });
       },
       enabled: canGroupIntoFolder
