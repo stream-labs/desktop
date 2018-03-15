@@ -120,7 +120,7 @@
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.1.4",
     "spectron": "^3.6.4",
-    "sl-vue-tree": "git@github.com:stream-labs/sl-vue-tree.git",
+    "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "style-loader": "^0.19.1",
     "traverse": "^0.6.6",
     "ts-loader": "^4.0.0",
