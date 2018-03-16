@@ -1,13 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import Selector from './Selector.vue';
 import { SourcesService } from 'services/sources';
 import { ScenesService, SceneItem,ISceneItem, ISceneItemNode, TSceneNode, ISceneItemFolder } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
-import SlVueTree from 'sl-vue-tree';
-import { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
+import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 
 @Component({
   components: { SlVueTree }
