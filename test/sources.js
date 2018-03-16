@@ -73,5 +73,5 @@ test('Rename source', async t => {
 
 
   await focusMain(t);
-  t.true(await sourceIsExisting(t, sourceName));
+  t.true(await sourceIsExisting(t, newSourceName));
 });

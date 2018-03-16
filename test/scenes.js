@@ -45,7 +45,7 @@ test('Scene switching with sources', async t => {
   await addSource(t, 'Color Source', sourceName);
 
   await focusMain(t);
-  t.true(await app.client.isExisting(`li=${sourceName}`));
+  t.true(await sourceIsExisting(t, sourceName));
 
   // Adding a new scene will make that scene active, so we can't see
   // the source we just added.
