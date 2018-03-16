@@ -8,7 +8,6 @@ import {
   openRenameWindow,
   sourceIsExisting
 } from './helpers/spectron/sources';
-import { sleep } from './helpers/sleep';
 
 useSpectron();
 
@@ -74,6 +73,5 @@ test('Rename source', async t => {
 
 
   await focusMain(t);
-  const sourceSelector = `li=${newSourceName}`;
-  t.true(await app.client.isExisting(sourceSelector));
+  t.true(await sourceIsExisting(t, sourceName));
 });

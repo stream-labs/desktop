@@ -1,6 +1,6 @@
 import test from 'ava';
 import { useSpectron, focusMain } from './helpers/spectron/index';
-import { addSource } from './helpers/spectron/sources';
+import { addSource, sourceIsExisting } from './helpers/spectron/sources';
 import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
 import { getClient } from './helpers/api-client';
 
@@ -51,11 +51,11 @@ test('Scene switching with sources', async t => {
   // the source we just added.
   await addScene(t, sceneName);
   await focusMain(t);
-  t.false(await app.client.isExisting(`li=${sourceName}`));
+  t.false(await sourceIsExisting(t, sourceName));
 
   // Switch back to the default scene
   await selectScene(t, 'Scene');
-  t.true(await app.client.isExisting(`li=${sourceName}`));
+  t.true(await sourceIsExisting(t, sourceName));
 });
 
 test('Restarting the app preserves the default sources', async t => {
