@@ -60,6 +60,10 @@ export default class StartStreamingButton extends Vue {
       return 'ENDING';
     }
 
+    if (this.streamingStatus === EStreamingState.Reconnecting) {
+      return 'RECONNECTING';
+    }
+
     return 'GO LIVE';
   }
 

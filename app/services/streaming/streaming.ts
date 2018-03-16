@@ -23,7 +23,9 @@ enum EOBSOutputSignal {
   Starting = 'starting',
   Start = 'start',
   Stopping = 'stopping',
-  Stop = 'stop'
+  Stop = 'stop',
+  Reconnect = 'reconnect',
+  ReconnectSuccess = 'reconnect_success'
 }
 
 interface IOBSOutputSignalInfo {
@@ -228,7 +230,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private handleOBSOutputSignal(info: IOBSOutputSignalInfo) {
-    console.debug('OBS Output sigal: ', info);
+    console.debug('OBS Output signal: ', info);
     if (info.type === EOBSOutputType.Streaming) {
       const time = new Date().toISOString();
 
@@ -244,6 +246,12 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
+      } else if (info.signal === EOBSOutputSignal.Reconnect) {
+        this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
+        this.streamingStatusChange.next(EStreamingState.Reconnecting);
+      } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
+        this.SET_STREAMING_STATUS(EStreamingState.Live);
+        this.streamingStatusChange.next(EStreamingState.Live);
       }
     } else if (info.type === EOBSOutputType.Recording) {
       const time = new Date().toISOString();
@@ -292,9 +300,9 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   @mutation()
-  private SET_STREAMING_STATUS(status: EStreamingState, time: string) {
+  private SET_STREAMING_STATUS(status: EStreamingState, time?: string) {
     this.state.streamingStatus = status;
-    this.state.streamingStatusTime = time;
+    if (time) this.state.streamingStatusTime = time;
   }
 
   @mutation()

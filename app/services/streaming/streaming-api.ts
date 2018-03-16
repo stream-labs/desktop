@@ -4,7 +4,8 @@ export enum EStreamingState {
   Offline = 'offline',
   Starting = 'starting',
   Live = 'live',
-  Ending = 'ending'
+  Ending = 'ending',
+  Reconnecting = 'reconnecting'
 }
 
 export enum ERecordingState {

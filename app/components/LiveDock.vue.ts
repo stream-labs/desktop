@@ -83,6 +83,7 @@ export default class LiveDock extends Vue {
     if (this.streamingStatus === EStreamingState.Live) return 'LIVE';
     if (this.streamingStatus === EStreamingState.Starting) return 'STARTING';
     if (this.streamingStatus === EStreamingState.Ending) return 'ENDING';
+    if (this.streamingStatus === EStreamingState.Reconnecting) return 'RECONNECTING';
     return 'OFFLINE';
   }
 
