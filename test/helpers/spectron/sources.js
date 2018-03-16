@@ -22,7 +22,7 @@ export async function clickSourceProperties(t) {
 }
 
 export async function selectSource(t, name) {
-  await t.context.app.client.click(`li=${name}`);
+  await t.context.app.client.click(`.item-title=${name}`);
 }
 
 export async function rightClickSource(t, name) {
@@ -71,4 +71,9 @@ export async function openRenameWindow(t, sourceName) {
   await rightClickSource(t, sourceName);
   await contextMenuClick(t, 'Rename');
   await focusChild(t);
+}
+
+export async function sourceIsExisting(t, sourceName) {
+  const app = t.context.app;
+  return app.client.isExisting(`.item-title=${sourceName}`);
 }

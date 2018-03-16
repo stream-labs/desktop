@@ -5,8 +5,10 @@ import {
   clickRemoveSource,
   clickSourceProperties,
   selectSource,
-  openRenameWindow
+  openRenameWindow,
+  sourceIsExisting
 } from './helpers/spectron/sources';
+import { sleep } from './helpers/sleep';
 
 useSpectron();
 
@@ -31,17 +33,16 @@ test('Adding and removing some sources', async t => {
 
   for (const sourceType of sourceTypes) {
     const sourceName = `Example ${sourceType}`;
-    const sourceSelector = `li=${sourceName}`;
 
     await addSource(t, sourceType, sourceName);
     await focusMain(t);
 
-    t.true(await app.client.isExisting(sourceSelector));
+    t.true(await sourceIsExisting(t, sourceName));
 
     await selectSource(t, sourceName);
     await clickRemoveSource(t);
 
-    t.false(await app.client.isExisting(sourceSelector));
+    t.false(await sourceIsExisting(t, sourceName));
   }
 });
 

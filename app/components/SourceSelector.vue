@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="source-selector">
   <div class="studio-controls-top">
     <h4 class="studio-controls__label">
       Sources
@@ -20,17 +20,17 @@
   </div>
 
     <sl-vue-tree
-        :value="nodes"
-        @select="makeActive"
-        @drop="handleSort"
-        @toggle="toggleFolder"
+      :value="nodes"
+      @select="makeActive"
+      @drop="handleSort"
+      @toggle="toggleFolder"
     >
 
       <template slot="title" slot-scope="{ node }">
         <div
-            class="title-container"
-            @contextmenu="showContextMenu(node.data.id)"
-            @dblclick="sourceProperties(node.data.id)"
+          class="title-container"
+          @contextmenu="showContextMenu(node.data.id)"
+          @dblclick="sourceProperties(node.data.id)"
         >
           <span class="item-icon">
             <i v-if="!node.isLeaf" class="fa fa-folder" ></i>
@@ -49,7 +49,7 @@
             <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
             <i v-else class="fa fa-file"></i>
           </span>
-          {{ node.title }}
+          <span class="item-title">{{ node.title }}</span>
         </div>
       </template>
 
