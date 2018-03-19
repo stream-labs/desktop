@@ -14,14 +14,14 @@
     </span>
   </span>
 
-  <span class="performance-metric-wrapper" v-tooltip="droppedFramesTooltip">
+  <span class="performance-metric-wrapper">
     <img class="performance-metric-icon" src="../../media/images/icons/dropped-frames.png">
     <span class="performance-metric">
       <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span> Dropped Frames
     </span>
   </span>
 
-  <span class="performance-metric-wrapper" v-tooltip="kbsTooltip">
+  <span class="performance-metric-wrapper">
     <img class="performance-metric-icon" src="../../media/images/icons/speed.png">
     <span class="performance-metric">
       <span class="performance-metric__value">{{ bandwidth }}</span> kb/s

@@ -7,7 +7,7 @@ import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
-import VTooltip from 'v-tooltip'
+import VTooltip from 'v-tooltip';
 
 Vue.use(VTooltip)
 VTooltip.options.defaultContainer = '#mainWrapper'

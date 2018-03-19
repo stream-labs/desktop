@@ -9096,7 +9096,6 @@ uuid@^3.0.0, uuid@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
 
-<<<<<<< HEAD
 v-tooltip@^2.0.0-rc.31:
   version "2.0.0-rc.31"
   resolved "https://registry.yarnpkg.com/v-tooltip/-/v-tooltip-2.0.0-rc.31.tgz#be3b1ed847e8309518d41dc9915b3bfdff0c0482"
@@ -9104,11 +9103,10 @@ v-tooltip@^2.0.0-rc.31:
     lodash.merge "^4.6.0"
     popper.js "^1.12.9"
     vue-resize "^0.4.3"
-=======
+
 v8-compile-cache@^1.1.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-1.1.2.tgz#8d32e4f16974654657e676e0e467a348e89b0dc4"
->>>>>>> origin
 
 validate-npm-package-license@^3.0.1:
   version "3.0.1"

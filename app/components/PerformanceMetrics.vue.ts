@@ -10,10 +10,6 @@ export default class PerformanceMetrics extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() performanceService: PerformanceService;
 
-  droppedFramesTooltip = "When your capture card does not take in all the information it is given"
-  fpsTooltip = "Frames Per Second"
-  kbsTooltip = "Kilobits Per Second"
-
   get cpuPercent() {
     return this.performanceService.state.CPU.toFixed(1);
   }
