@@ -19,21 +19,31 @@ async function runScript() {
   const zipExe = path.resolve(__dirname, 'node_modules', '7zip-bin-win', 'x64', '7za.exe');
   const slobsDir = path.resolve(__dirname, '..');
   const nodeObsPath = path.join(slobsDir, 'node_modules', 'obs-studio-node', 'libobs');
+  const pluginsPath = path.join(slobsDir, 'plugins');
 
   /* INSTALL FACEMASK PLUGIN */
-  const faceMaskArchivePath = path.join(os.tmpdir(), `facemask-plugin-${FACE_MASK_VERSION}.zip`);
-  const faceMaskArchive = fs.createWriteStream(faceMaskArchivePath);
-  const faceMaskArchiveFinishPromise = new Promise(resolve => faceMaskArchive.on('finish', resolve));
-  const faceMaskReleaseUrl = `https://github.com/stream-labs/facemask-plugin/releases/download/${FACE_MASK_VERSION}/` +
-    `facemask-plugin-${FACE_MASK_VERSION}.zip`;
+  const faceMaskArchivePath = path.join(pluginsPath, `facemask-plugin-${FACE_MASK_VERSION}.zip`);
 
-  sh.echo(`Downloading facemask-plugin version ${FACE_MASK_VERSION}...`);
-  https.get(faceMaskReleaseUrl, response => {
-    // Follow redirect
-    https.get(response.headers.location, response => response.pipe(faceMaskArchive));
-  });
+  if (!fs.existsSync(faceMaskArchivePath)) {
+    sh.rm('-rf', pluginsPath);
+    sh.mkdir('-p', pluginsPath);
 
-  await faceMaskArchiveFinishPromise;
+    const faceMaskArchive = fs.createWriteStream(faceMaskArchivePath);
+    const faceMaskArchiveFinishPromise = new Promise(resolve => faceMaskArchive.on('finish', resolve));
+    const faceMaskReleaseUrl = `https://github.com/stream-labs/facemask-plugin/releases/download/${FACE_MASK_VERSION}/` +
+      `facemask-plugin-${FACE_MASK_VERSION}.zip`;
+
+    sh.echo(`Downloading facemask-plugin version ${FACE_MASK_VERSION}...`);
+    https.get(faceMaskReleaseUrl, response => {
+      // Follow redirect
+      https.get(response.headers.location, response => response.pipe(faceMaskArchive));
+    });
+
+    await faceMaskArchiveFinishPromise;
+
+    // Attempt to deal with some annoyingness on Appveyor
+    await new Promise(r => setTimeout(r, 2000));
+  }
 
   sh.echo('Extracting facemask-plugin archive...');
   result = sh.exec(`"${zipExe}" x "${faceMaskArchivePath}" -o"${nodeObsPath}" -aos`);
@@ -42,9 +52,6 @@ async function runScript() {
     sh.echo(colors.red('ERROR: Extraction failed!'));
     sh.exit(1);
   }
-
-  sh.echo('Cleaning up archives...');
-  sh.rm(faceMaskArchivePath);
 }
 
 runScript().then(() => sh.exit(0));

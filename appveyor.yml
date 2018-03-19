@@ -24,3 +24,6 @@ artifacts:
 notifications:
   - provider: GitHubPullRequest
     template: "{{#failed}}:x: build failed{{/failed}} {{#jobs}} {{#messages}} {{message}} {{/messages}} {{/jobs}}"
+
+cache:
+  - plugins
