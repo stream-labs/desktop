@@ -3,6 +3,7 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { handleErrors } from 'util/requests';
 import { UserService } from 'services/user';
+import Util from 'services/utils';
 
 export interface IServerSceneCollection {
   id?: number;
@@ -115,6 +116,10 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   private get overlaysHost() {
+    if (Util.isPreview()) {
+      return this.hostsService.betaOverlays;
+    }
+
     return this.hostsService.overlays;
   }
 
