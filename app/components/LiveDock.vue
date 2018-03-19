@@ -26,7 +26,7 @@
         @click="collapse" />
       <div class="live-dock-header">
         <div class="flex flex--center">
-          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isLive  }" />
+          <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
           <span class="live-dock-text">
             {{ liveText }}
           </span>
@@ -49,24 +49,30 @@
 
       <div class="live-dock-info">
         <div class="live-dock-platform-tools">
+          <!-- STAGING -->
           <a
             @click="showEditStreamInfo"
-            v-if="isTwitch || (isYoutube && isStreaming)"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
             v-tooltip="editStreamInfoTooltip">
-            <i class="fa fa-pencil" /></a>
+            <i class="fa fa-pencil" />
+          </a>
           <a
             @click="openYoutubeStreamUrl"
             v-if="isYoutube && isStreaming"
-            v-tooltip="viewStreamTooltip"><i class="fa fa-video-camera" /></a>
+            v-tooltip="viewStreamTooltip">
+            <i class="fa fa-video-camera" />
+          </a>
           <a
             @click="openYoutubeControlRoom"
             v-if="isYoutube && isStreaming"
-             v-tooltip="controlRoomTooltip"><i class="fa fa-cogs" /></a>
+            v-tooltip="controlRoomTooltip">
+            <i class="fa fa-cogs" />
+          </a>
         </div>
-        <a @click="refreshChat" v-if="isTwitch || (isYoutube && isStreaming)">Refresh Chat</a>
+        <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">Refresh Chat</a>
       </div>
 
-      <div class="live-dock-chat" v-if="isTwitch || (isYoutube && isStreaming)">
+      <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
         <chat ref="chat" />
       </div>
 

@@ -20,17 +20,6 @@ async function runScript() {
   const slobsDir = path.resolve(__dirname, '..');
   const nodeObsPath = path.join(slobsDir, 'node_modules', 'obs-studio-node', 'libobs');
 
-  /* EXTRACT BROWSER PLUGIN */
-  const browserPluginArchivePath = path.join(slobsDir, 'plugins', 'obs-browser-2987-old.7z');
-
-  sh.echo('Extracting obs-browser archive...');
-  let result = sh.exec(`"${zipExe}" x "${browserPluginArchivePath}" -o"${nodeObsPath}" -aos`);
-
-  if (result.code !== 0) {
-    sh.echo(colors.red('ERROR: Extraction failed!'));
-    sh.exit(1);
-  }
-
   /* INSTALL FACEMASK PLUGIN */
   const faceMaskArchivePath = path.join(os.tmpdir(), `facemask-plugin-${FACE_MASK_VERSION}.zip`);
   const faceMaskArchive = fs.createWriteStream(faceMaskArchivePath);

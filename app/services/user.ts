@@ -18,6 +18,7 @@ import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
+import Util from 'services/utils';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -43,6 +44,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @mutation()
   private SET_PLATFORM_TOKEN(token: string) {
     this.state.auth.platform.token = token;
+  }
+
+  @mutation()
+  private SET_CHANNEL_ID(id: string) {
+    this.state.auth.platform.channelId = id;
   }
 
   userLogin = new Subject<IPlatformAuth>();
@@ -132,6 +138,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
+  get channelId() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.channelId;
+    }
+  }
+
   widgetUrl(type: string) {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
@@ -161,7 +173,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl() {
-    const host = this.hostsService.beta2;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
@@ -213,10 +225,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
-      alwaysOnTop: true,
+      alwaysOnTop: false,
       show: false,
       webPreferences: {
-        nodeIntegration: false
+        nodeIntegration: false,
+        nativeWindowOpen: true,
+        sandbox: true,
       }
     });
 
@@ -242,6 +256,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   updatePlatformToken(token: string) {
     this.SET_PLATFORM_TOKEN(token);
+  }
+
+  updatePlatformChannelId(id: string) {
+    this.SET_CHANNEL_ID(id);
   }
 
   /**

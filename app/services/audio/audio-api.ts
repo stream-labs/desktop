@@ -15,6 +15,7 @@ export interface IAudioSource {
   forceMono: boolean;
   syncOffset: number;
   muted: boolean;
+  resourceId: string;
 }
 
 

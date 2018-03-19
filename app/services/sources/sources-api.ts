@@ -3,7 +3,7 @@ import { IListOption, TFormData } from '../../components/shared/forms/Input';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 
-export interface ISource {
+export interface ISource extends IResource {
   sourceId: string;
   name: string;
   type: TSourceType;
@@ -77,7 +77,8 @@ export type TSourceType =
   'wasapi_input_capture' |
   'wasapi_output_capture' |
   'decklink-input' |
-  'scene'
+  'scene' |
+  'ndi_source'
   ;
 
 // Register new properties manager here

@@ -47,11 +47,6 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   visible: boolean;
   locked: boolean;
 
-  id: string;
-  parentId: string;
-  childrenIds: string[];
-  sceneNodeType: TSceneNodeType;
-
   // Some computed attributes
 
   get scaledWidth(): number {
@@ -73,20 +68,19 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   @Inject() private sourcesService: SourcesService;
   @Inject() private videoService: VideoService;
 
-  constructor(protected sceneId: string, sceneItemId: string, sourceId: string) {
+  constructor(sceneId: string, sceneItemId: string, sourceId: string) {
     super();
     const sceneItemState = this.scenesService.state.scenes[sceneId].nodes.find(item => {
       return item.id === sceneItemId;
     }) as ISceneItem;
     const sourceState = this.sourcesService.state.sources[sourceId];
     this.sceneItemState = sceneItemState;
-    this.sceneId = sceneId;
     Utils.applyProxy(this, sourceState);
     Utils.applyProxy(this, this.sceneItemState);
   }
 
   getModel(): ISceneItem & ISource {
-    return { ...this.sceneItemState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.sceneItemState };
   }
 
   getScene(): Scene {

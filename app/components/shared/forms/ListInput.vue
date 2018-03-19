@@ -8,6 +8,7 @@
       :value="currentValue"
       :disabled="value.enabled === false"
       :options="value.options"
+      :internal-search="internalSearch"
       track-by="value"
       :close-on-select="true"
       :allow-empty="allowEmpty"

@@ -167,7 +167,6 @@ export class SceneCollectionsService extends Service
 
   /**
    * Creates and switches to a new blank scene collection
-   * @param name the name of the collection
    * @param setupFunction a function that can be used to set
    * up some state.  This should really only be used by the OBS
    * importer.
@@ -299,7 +298,7 @@ export class SceneCollectionsService extends Service
       this.setupDefaultAudio();
     } catch (e) {
       // We tried really really hard :(
-      console.error('Overlay installation failed');
+      console.error('Overlay installation failed', e);
     }
 
     await this.saveCurrentApplicationStateAs(id);
@@ -575,7 +574,7 @@ export class SceneCollectionsService extends Service
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
-    this.safeSync();
+    await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
 

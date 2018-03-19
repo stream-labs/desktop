@@ -233,6 +233,10 @@ export default class EditStreamInfo extends Vue {
     return this.userService.platform.type === 'youtube';
   }
 
+  get isMixer() {
+    return this.userService.platform.type === 'mixer';
+  }
+
   get submitText() {
     if (this.midStreamMode) return 'Update';
 
