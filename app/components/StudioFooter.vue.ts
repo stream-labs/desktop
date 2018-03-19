@@ -9,19 +9,18 @@ import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
 import VTooltip from 'v-tooltip';
 
-Vue.use(VTooltip)
-VTooltip.options.defaultContainer = '#mainWrapper'
+Vue.use(VTooltip);
+VTooltip.options.defaultContainer = '#mainWrapper';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
-
 
 @Component({
   components: {
     StartStreamingButton,
     TestWidgets,
     PerformanceMetrics,
-    NotificationsArea,
+    NotificationsArea
   }
 })
 export default class StudioFooterComponent extends Vue {
@@ -60,7 +59,9 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    electron.remote.shell.openExternal(
+      'https://youtube.com/live_dashboard_splash'
+    );
   }
 
   confirmYoutubeEnabled() {

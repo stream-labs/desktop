@@ -6,8 +6,9 @@
     </h4>
     <div>
       <i
-          class="fa fa-cog icon-btn"
-          @click="showAdvancedSettings()"/>
+        class="fa fa-cog icon-btn"
+        @click="showAdvancedSettings()"
+        v-tooltip.left="advancedSettingsTooltip"/>
     </div>
   </div>
   <div class="studio-controls-selector mixer-panel">
