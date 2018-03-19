@@ -12,6 +12,7 @@
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
     "install-plugins": "yarn install --cwd bin && node bin/install-plugins.js",
+    "clear-plugins": "rm -rf plugins",
     "package": "rm -rf dist && build -w --x64 --em.env=production",
     "package:preview": "rm -rf dist && build -w --x64 --em.env=production --em.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
     "release": "yarn install --cwd bin && node bin/release.js",
