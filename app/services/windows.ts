@@ -49,7 +49,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION} - DELTA UPDATES`
     },
     child: {
       componentName: 'Blank',
