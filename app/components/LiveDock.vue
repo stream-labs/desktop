@@ -49,7 +49,6 @@
 
       <div class="live-dock-info">
         <div class="live-dock-platform-tools">
-          <!-- STAGING -->
           <a
             @click="showEditStreamInfo"
             v-if="isTwitch || isMixer || (isYoutube && isStreaming)"

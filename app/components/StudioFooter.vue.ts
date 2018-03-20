@@ -7,10 +7,6 @@ import TestWidgets from './TestWidgets.vue';
 import PerformanceMetrics from './PerformanceMetrics.vue';
 import NotificationsArea from './NotificationsArea.vue';
 import { UserService } from '../services/user';
-import VTooltip from 'v-tooltip';
-
-Vue.use(VTooltip);
-VTooltip.options.defaultContainer = '#mainWrapper';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';

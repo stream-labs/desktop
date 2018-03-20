@@ -10,10 +10,6 @@ import Slider from './shared/Slider.vue';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
-import VTooltip from 'v-tooltip';
-
-Vue.use(VTooltip);
-VTooltip.options.defaultContainer = '#mainWrapper';
 
 @Component({
   components: {
