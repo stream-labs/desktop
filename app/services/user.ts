@@ -173,7 +173,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl() {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
+    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.beta3;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
