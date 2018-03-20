@@ -196,8 +196,8 @@ async function runScript() {
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
-  info('Running tests...');
-  executeCmd('yarn test');
+  // info('Running tests...');
+  // executeCmd('yarn test');
 
   info('The current revision has passed testing and is ready to be');
   info('packaged and released');
