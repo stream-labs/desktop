@@ -42,7 +42,8 @@
     ],
     "publish": {
       "provider": "generic",
-      "url": "https://dsimwd4lkhuqh.cloudfront.net"
+      "url": "https://dsimwd4lkhuqh.cloudfront.net",
+      "useMultipleRangeRequest": false
     },
     "win": {
       "target": "nsis-web"
