@@ -211,7 +211,7 @@ export class Scene implements ISceneApi {
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
 
-    let destFolderId: string;
+    let destFolderId = '';
 
     if (destNode) {
       if (destNode.isItem()) {
@@ -267,7 +267,7 @@ export class Scene implements ISceneApi {
           if (isForwardDirection) {
             obsScene.moveItem(firstItemIndex, newItemIndex);
           } else {
-            obsScene.moveItem(firstItemIndex + i, newItemIndex);
+            obsScene.moveItem(firstItemIndex + i, newItemIndex + i);
           }
         }
       }

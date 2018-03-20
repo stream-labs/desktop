@@ -32,7 +32,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   detachParent() {
-    if (this.parentId) this.SET_PARENT(null);
+    if (this.parentId) this.SET_PARENT('');
   }
 
   getParent(): SceneItemFolder {
