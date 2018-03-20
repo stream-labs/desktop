@@ -15,9 +15,9 @@ const yml = require('js-yaml');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs';
+const s3Bucket = 'streamlabs-obs-dev';
 const sentryOrg = 'streamlabs-obs';
-const sentryProject = 'streamlabs-obs';
+const sentryProject = 'streamlabs-obs-dev';
 
 
 function info(msg) {
