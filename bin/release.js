@@ -275,7 +275,7 @@ async function runScript() {
   // sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
   info('Discovering publishing artifacts...');
-  const distDir = path.resolve('.', 'dist', 'nsis-web');
+  const distDir = path.resolve('.', 'dist');
   const channelFileName = path.parse(sh.ls(path.join(distDir, '*.yml'))[0]).base;
   const channelFilePath = path.join(distDir, channelFileName);
 
@@ -292,16 +292,7 @@ async function runScript() {
 
   info(`Disovered ${installerFileName}`);
 
-  const packageFileName = parsedChannel.packages.x64.path;
-  const packageFilePath = path.join(distDir, packageFileName);
-
-  if (!fs.existsSync(packageFilePath)) {
-    error(`Could not find ${path.resolve(packageFilePath)}`);
-    sh.exit(1);
-  }
-
   info('Uploading publishing artifacts...');
-  await uploadS3File(packageFileName, packageFilePath);
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 

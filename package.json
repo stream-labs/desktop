@@ -45,15 +45,11 @@
       "url": "https://dsimwd4lkhuqh.cloudfront.net",
       "useMultipleRangeRequest": false
     },
-    "win": {
-      "target": "nsis-web"
-    },
-    "nsisWeb": {
+    "nsis": {
       "license": "AGREEMENT",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "include": "installer.nsh",
-      "differentialPackage": true
+      "include": "installer.nsh"
     }
   },
   "ava": {
