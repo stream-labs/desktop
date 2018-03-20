@@ -60,9 +60,9 @@ export default class ObsImport extends Vue {
 
   startImport() {
     this.status = 'importing';
-    defer(() => {
+    defer(async () => {
       try {
-        this.obsImporterService.load(this.selectedProfile);
+        await this.obsImporterService.load(this.selectedProfile);
         this.status = 'done';
       } catch (e) {
         // I suppose let's pretend we succeeded for now.
