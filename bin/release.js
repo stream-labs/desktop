@@ -196,8 +196,8 @@ async function runScript() {
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
-  info('Running tests...');
-  executeCmd('yarn test');
+  // info('Running tests...');
+  // executeCmd('yarn test');
 
   info('The current revision has passed testing and is ready to be');
   info('packaged and released');
@@ -263,16 +263,16 @@ async function runScript() {
   executeCmd(`git tag -f v${newVersion}`);
   executeCmd('git push --tags');
 
-  info(`Registering ${newVersion} with sentry...`);
-  sentryCli(`new "${newVersion}"`);
-  sentryCli(`set-commits --auto "${newVersion}"`);
+  // info(`Registering ${newVersion} with sentry...`);
+  // sentryCli(`new "${newVersion}"`);
+  // sentryCli(`set-commits --auto "${newVersion}"`);
 
-  info('Uploading compiled source to sentry...');
-  const sourcePath = path.join('bundles', 'renderer.js');
-  const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  sentryCli(`files "${newVersion}" delete --all`);
-  sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
-  sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
+  // info('Uploading compiled source to sentry...');
+  // const sourcePath = path.join('bundles', 'renderer.js');
+  // const sourceMapPath = path.join('bundles', 'renderer.js.map');
+  // sentryCli(`files "${newVersion}" delete --all`);
+  // sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
+  // sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
   info('Discovering publishing artifacts...');
   const distDir = path.resolve('.', 'dist');
@@ -296,8 +296,8 @@ async function runScript() {
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  info('Finalizing release with sentry...');
-  sentryCli(`finalize "${newVersion}`);
+  // info('Finalizing release with sentry...');
+  // sentryCli(`finalize "${newVersion}`);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`);
