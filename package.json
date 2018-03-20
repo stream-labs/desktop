@@ -52,7 +52,6 @@
       "license": "AGREEMENT",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": true,
       "include": "installer.nsh",
       "differentialPackage": true
     }
