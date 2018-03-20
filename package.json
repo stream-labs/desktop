@@ -13,8 +13,8 @@
     "start": "electron .",
     "install-plugins": "yarn install --cwd bin && node bin/install-plugins.js",
     "clear-plugins": "rm -rf plugins",
-    "package": "rm -rf dist && build -w --x64 --em.env=production",
-    "package:preview": "rm -rf dist && build -w --x64 --em.env=production --em.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
+    "package": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
+    "package:preview": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava -v",
     "clear": "rm -rf bundles/media",
@@ -48,7 +48,6 @@
       "license": "AGREEMENT",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": true,
       "include": "installer.nsh"
     }
   },
@@ -67,7 +66,7 @@
   "dependencies": {
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^2.20.1",
+    "electron-updater": "^2.21.1",
     "electron-window-state": "^4.1.1",
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
@@ -97,7 +96,7 @@
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
     "electron": "1.7.12",
-    "electron-builder": "19.56.0",
+    "electron-builder": "20.5.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",

@@ -281,8 +281,8 @@ async function runScript() {
 
   info(`Discovered ${channelFileName}`);
 
-  const parsedLatest = yml.safeLoad(fs.readFileSync(channelFilePath));
-  const installerFileName = parsedLatest.path;
+  const parsedChannel = yml.safeLoad(fs.readFileSync(channelFilePath));
+  const installerFileName = parsedChannel.path;
   const installerFilePath = path.join(distDir, installerFileName);
 
   if (!fs.existsSync(installerFilePath)) {
