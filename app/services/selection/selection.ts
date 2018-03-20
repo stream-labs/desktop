@@ -256,7 +256,7 @@ export class Selection implements ISelection {
    * true if selections has only one SceneItem
    */
   isSceneItem(): boolean {
-    return this.getSize() === 1 && this.getItems()[0].isItem();
+    return this.getSize() === 1 && this.getNodes()[0].isItem();
   }
 
   /**

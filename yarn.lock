@@ -7970,7 +7970,7 @@ single-line-log@^1.1.2:
 
 "sl-vue-tree@https://github.com/stream-labs/sl-vue-tree.git":
   version "1.0.0"
-  resolved "https://github.com/stream-labs/sl-vue-tree.git#d5492dc888a912e16e0d9ca5885e25adc5d69761"
+  resolved "https://github.com/stream-labs/sl-vue-tree.git#183eedad199f1684d20f658a180754a492bf2821"
 
 slash@^1.0.0:
   version "1.0.0"

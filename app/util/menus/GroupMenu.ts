@@ -69,7 +69,7 @@ export class GroupMenu extends Menu {
       }
       ,
       enabled: (() => {
-        return selectionSize === 1 && selectedItem.getSource().type === 'scene';
+        return !!(selectionSize === 1 && selectedItem && selectedItem.getSource().type === 'scene');
       })()
     });
 

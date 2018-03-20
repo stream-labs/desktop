@@ -46,7 +46,7 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
   }
 
   ungroup() {
-    this.getItems().forEach(item => item.detachParent());
+    this.getItems().forEach(item => item.setParent(this.parentId));
     this.remove();
   }
 

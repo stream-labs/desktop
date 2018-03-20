@@ -17,6 +17,12 @@ export default class SourceSelector extends Vue {
   @Inject() private selectionService: SelectionService;
 
   private expandedFoldersIds: string[] = [];
+  private scrollIntervalId: number = null;
+
+  $refs: {
+    treeContainer: HTMLDivElement;
+    slVueTree: SlVueTree<ISceneItemNode>;
+  };
 
   get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
 
@@ -92,6 +98,23 @@ export default class SourceSelector extends Vue {
     nodeToMove.select();
   }
 
+  startScroll(direction: 'top' | 'bottom') {
+    // const slVueTree = this.$refs.slVueTree;
+    // const treeContaier = this.$refs.treeContainer;
+    // this.scrollIntervalId = window.setInterval(() => {
+    //   if (!slVueTree.draggingNode) {
+    //     this.stopScroll();
+    //     return;
+    //   }
+    //   const deltaScroll = direction === 'top' ? -2 : +2;
+    //   treeContaier.scrollTop += deltaScroll;
+    // }, 500);
+  }
+
+  stopScroll() {
+    clearInterval(this.scrollIntervalId);
+  }
+
   makeActive(treeNode: ISlTreeNode<ISceneItemNode>, ev: MouseEvent) {
     const sceneNode = this.scene.getNode(treeNode.data.id);
     if (ev.ctrlKey) {
@@ -152,6 +175,14 @@ export default class SourceSelector extends Vue {
     const selection = this.scene.getSelection(sceneNodeId);
     const locked = !selection.isLocked();
     selection.setSettings({ locked });
+  }
+
+
+  handleDragleave(node: ISlTreeNode<ISceneItemNode>, direction: 'top' | 'bottom', event: MouseEvent) {
+    const slVueTree = this.$refs.slVueTree;
+    if (!slVueTree.draggingNode) return;
+
+    this.startScroll(direction);
   }
 
   get scene() {

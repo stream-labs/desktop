@@ -104,29 +104,32 @@ export class EditMenu extends Menu {
         });
       }
 
-      const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
+      if (selectedItem) {
+        const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
 
-      if (!isMultipleSelection) {
-        this.append({
-          label: visibilityLabel,
-          click: () => {
-            selectedItem.setVisibility(!selectedItem.visible);
-          }
-        });
-      } else {
-        this.append({
-          label: 'Show',
-          click: () => {
-            this.selectionService.setVisibility(true);
-          }
-        });
-        this.append({
-          label: 'Hide',
-          click: () => {
-            this.selectionService.setVisibility(false);
-          }
-        });
+        if (!isMultipleSelection) {
+          this.append({
+            label: visibilityLabel,
+            click: () => {
+              selectedItem.setVisibility(!selectedItem.visible);
+            }
+          });
+        } else {
+          this.append({
+            label: 'Show',
+            click: () => {
+              this.selectionService.setVisibility(true);
+            }
+          });
+          this.append({
+            label: 'Hide',
+            click: () => {
+              this.selectionService.setVisibility(false);
+            }
+          });
+        }
       }
+
 
 
       if (this.source && this.source.getPropertiesManagerType() === 'widget') {

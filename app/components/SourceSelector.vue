@@ -5,6 +5,7 @@
       Sources
     </h4>
     <div>
+
       <i
         class="fa fa-plus icon-btn icon-btn--lg"
         @click="addSource"/>
@@ -19,19 +20,20 @@
     </div>
   </div>
 
+
     <sl-vue-tree
       :value="nodes"
+      ref="slVueTree"
       @select="makeActive"
       @drop="handleSort"
       @toggle="toggleFolder"
+      @dragleave="handleDragleave"
+      @nodecontextmenu="node => showContextMenu(node.data.id)"
+      @nodedblclick="node => sourceProperties(node.data.id)"
     >
 
       <template slot="title" slot-scope="{ node }">
-        <div
-          class="title-container"
-          @contextmenu="showContextMenu(node.data.id)"
-          @dblclick="sourceProperties(node.data.id)"
-        >
+        <div class="title-container">
           <span class="item-icon">
             <i v-if="!node.isLeaf" class="fa fa-folder" ></i>
             <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
@@ -77,13 +79,14 @@
 
 
     </sl-vue-tree>
+  </div>
 
-</div>
+
 </template>
 
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
 
-<style lang="less" scoped>
+<style lang="less" >
 @import "../styles/index";
 
 .source-selector-action {
@@ -98,13 +101,23 @@
   }
 }
 
-.sl-vue-tree {
+/*.tree-container {*/
+  /*flex-grow: 1;*/
+  /*overflow: auto;*/
+  /*background-color: rgb(9, 22, 29);*/
+/*}*/
+
+.sl-vue-tree.sl-vue-tree-root {
   flex-grow: 1;
   overflow: auto;
 }
 
 .source-selector-action {
   display: none;
+}
+
+.sl-vue-tree-node-item {
+  cursor: pointer;
 }
 
 .sl-vue-tree-node-item:hover {
