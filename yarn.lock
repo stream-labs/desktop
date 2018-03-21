@@ -6423,9 +6423,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.23/streamlabs-x86_64-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.24/streamlabs-x86_64-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.23/streamlabs-x86_64-signed.tar.gz#57e2b50e2f7212e08ba7c431c39c7cb388434efc"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.24/streamlabs-x86_64-signed.tar.gz#c62eaa76525f8719edb16f769326f4452d7b4c96"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
