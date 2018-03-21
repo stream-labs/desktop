@@ -25,8 +25,6 @@ export default class StudioFooterComponent extends Vue {
 
   @Prop() locked: boolean;
 
-  recordButtonTooltip = "The record feature can be used while you are live or on it's own. Find your recordings in Settings -> Output";
-
   mounted() {
     this.confirmYoutubeEnabled();
   }
