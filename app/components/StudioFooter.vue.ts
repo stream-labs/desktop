@@ -11,7 +11,6 @@ import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 
-
 @Component({
   components: {
     StartStreamingButton,
@@ -25,6 +24,8 @@ export default class StudioFooterComponent extends Vue {
   @Inject() userService: UserService;
 
   @Prop() locked: boolean;
+
+  recordButtonTooltip = "The record feature can be used while you are live or on it's own. Find your recordings in Settings -> Output";
 
   mounted() {
     this.confirmYoutubeEnabled();
@@ -54,7 +55,9 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    electron.remote.shell.openExternal(
+      'https://youtube.com/live_dashboard_splash'
+    );
   }
 
   confirmYoutubeEnabled() {

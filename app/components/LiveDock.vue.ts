@@ -11,7 +11,6 @@ import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 
-
 @Component({
   components: {
     Chat,
@@ -33,6 +32,10 @@ export default class LiveDock extends Vue {
   $refs: {
     chat: Chat;
   };
+
+  viewStreamTooltip = 'Go to Youtube to view your live stream';
+  editStreamInfoTooltip = 'Edit your stream title and description';
+  controlRoomTooltip = 'Go to Youtube Live Dashboard to control your stream';
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
@@ -83,7 +86,8 @@ export default class LiveDock extends Vue {
     if (this.streamingStatus === EStreamingState.Live) return 'LIVE';
     if (this.streamingStatus === EStreamingState.Starting) return 'STARTING';
     if (this.streamingStatus === EStreamingState.Ending) return 'ENDING';
-    if (this.streamingStatus === EStreamingState.Reconnecting) return 'RECONNECTING';
+    if (this.streamingStatus === EStreamingState.Reconnecting)
+      return 'RECONNECTING';
     return 'OFFLINE';
   }
 
@@ -103,7 +107,10 @@ export default class LiveDock extends Vue {
     const platform = this.userService.platform.type;
     const service = getPlatformService(platform);
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
-    const youtubeDomain = nightMode === 'day' ? 'https://youtube.com' : 'https://gaming.youtube.com';
+    const youtubeDomain =
+      nightMode === 'day'
+        ? 'https://youtube.com'
+        : 'https://gaming.youtube.com';
     if (service instanceof YoutubeService) {
       const url = `${youtubeDomain}/channel/${service.youtubeId}/live`;
       electron.remote.shell.openExternal(url);
@@ -111,7 +118,9 @@ export default class LiveDock extends Vue {
   }
 
   openYoutubeControlRoom() {
-    electron.remote.shell.openExternal('https://www.youtube.com/live_dashboard');
+    electron.remote.shell.openExternal(
+      'https://www.youtube.com/live_dashboard'
+    );
   }
 
   get isTwitch() {
@@ -130,7 +139,7 @@ export default class LiveDock extends Vue {
     return this.customizationService.state.hideViewerCount;
   }
 
-  get liveDockSize () {
+  get liveDockSize() {
     return this.customizationService.state.livedockSize;
   }
 
