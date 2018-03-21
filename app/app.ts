@@ -1,4 +1,4 @@
-window['eval'] = global.eval = function () {
+window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
 
@@ -16,6 +16,7 @@ import electron from 'electron';
 import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
+import VTooltip from 'v-tooltip';
 
 const { ipcRenderer, remote } = electron;
 
@@ -44,37 +45,40 @@ if (isProduction) {
 }
 
 if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
-  Raven
-    .config(sentryDsn, {
-      release: slobsVersion,
-      dataCallback: data => {
-        // Because our URLs are local files and not publicly
-        // accessible URLs, we simply truncate and send only
-        // the filename.  Unfortunately sentry's electron support
-        // isn't that great, so we do this hack.
-        // Some discussion here: https://github.com/getsentry/sentry/issues/2708
-        const normalize = (filename: string) => {
-          const splitArray = filename.split('/');
-          return splitArray[splitArray.length - 1];
-        };
+  Raven.config(sentryDsn, {
+    release: slobsVersion,
+    dataCallback: data => {
+      // Because our URLs are local files and not publicly
+      // accessible URLs, we simply truncate and send only
+      // the filename.  Unfortunately sentry's electron support
+      // isn't that great, so we do this hack.
+      // Some discussion here: https://github.com/getsentry/sentry/issues/2708
+      const normalize = (filename: string) => {
+        const splitArray = filename.split('/');
+        return splitArray[splitArray.length - 1];
+      };
 
-        if (data.exception) {
-          data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
-            frame.filename = normalize(frame.filename);
-          });
+      if (data.exception) {
+        data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
+          frame.filename = normalize(frame.filename);
+        });
 
-          data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
-        }
-
-        return data;
+        data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
       }
-    })
+
+      return data;
+    }
+  })
     .addPlugin(RavenVue, Vue)
     .addPlugin(RavenConsole, console, { levels: ['error'] })
     .install();
 }
 
 require('./app.less');
+
+// Initiates tooltips and sets their parent wrapper
+Vue.use(VTooltip);
+VTooltip.options.defaultContainer = '#mainWrapper';
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
@@ -101,9 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
     el: '#app',
     store,
     render: h => {
-      const componentName = isChild ?
-          windowsService.state.child.componentName :
-          windowsService.state.main.componentName;
+      const componentName = isChild
+        ? windowsService.state.child.componentName
+        : windowsService.state.main.componentName;
 
       return h(windowsService.components[componentName]);
     }
@@ -111,16 +115,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Used for replacing the contents of this window with
   // a new top level component
-  ipcRenderer.on('window-setContents', (event: Electron.Event, options: IWindowOptions) => {
-    windowsService.updateChildWindowOptions(options);
+  ipcRenderer.on(
+    'window-setContents',
+    (event: Electron.Event, options: IWindowOptions) => {
+      windowsService.updateChildWindowOptions(options);
 
-    // This is purely for developer convencience.  Changing the URL
-    // to match the current contents, as well as pulling the options
-    // from the URL, allows child windows to be refreshed without
-    // losing their contents.
-    const newOptions: any = Object.assign({ child: isChild }, options);
-    const newURL: string = URI(window.location.href).query(newOptions).toString();
+      // This is purely for developer convencience.  Changing the URL
+      // to match the current contents, as well as pulling the options
+      // from the URL, allows child windows to be refreshed without
+      // losing their contents.
+      const newOptions: any = Object.assign({ child: isChild }, options);
+      const newURL: string = URI(window.location.href)
+        .query(newOptions)
+        .toString();
 
-    window.history.replaceState({}, '', newURL);
-  });
+      window.history.replaceState({}, '', newURL);
+    }
+  );
 });

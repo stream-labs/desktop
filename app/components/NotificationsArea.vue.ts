@@ -32,6 +32,9 @@ export default class NotificationsArea extends Vue {
     notificationsContainer: HTMLDivElement;
   };
 
+  showNotificationsTooltip = 'Click to open your Notifications window';
+  showUnreadNotificationsTooltip = 'Click to read your unread Notifications';
+
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
 
@@ -78,7 +81,6 @@ export default class NotificationsArea extends Vue {
   }
 
   private checkQueue() {
-
     this.$forceUpdate(); // update time labels
     this.hideOutdated();
 

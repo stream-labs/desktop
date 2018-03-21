@@ -130,6 +130,7 @@
     "typescript": "^2.6.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
+    "v-tooltip": "^2.0.0-rc.31",
     "vue": "^2.5.12",
     "vue-color": "^2.4.3",
     "vue-loader": "^14.1.1",

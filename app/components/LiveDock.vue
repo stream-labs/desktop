@@ -49,9 +49,24 @@
 
       <div class="live-dock-info">
         <div class="live-dock-platform-tools">
-          <a title="Edit Stream Info" @click="showEditStreamInfo" v-if="isTwitch || isMixer || (isYoutube && isStreaming)"><i class="fa fa-pencil" /></a>
-          <a title="View Stream" @click="openYoutubeStreamUrl" v-if="isYoutube && isStreaming"><i class="fa fa-video-camera" /></a>
-          <a title="Live Dashboard" @click="openYoutubeControlRoom" v-if="isYoutube && isStreaming"><i class="fa fa-cogs" /></a>
+          <a
+            @click="showEditStreamInfo"
+            v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
+            v-tooltip="editStreamInfoTooltip">
+            <i class="fa fa-pencil" />
+          </a>
+          <a
+            @click="openYoutubeStreamUrl"
+            v-if="isYoutube && isStreaming"
+            v-tooltip="viewStreamTooltip">
+            <i class="fa fa-video-camera" />
+          </a>
+          <a
+            @click="openYoutubeControlRoom"
+            v-if="isYoutube && isStreaming"
+            v-tooltip="controlRoomTooltip">
+            <i class="fa fa-cogs" />
+          </a>
         </div>
         <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">Refresh Chat</a>
       </div>
