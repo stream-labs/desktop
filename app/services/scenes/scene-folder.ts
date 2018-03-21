@@ -153,7 +153,7 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     this.SET_CHILDREN_ORDER(foundChildren.map(child => child.id));
   }
 
-  protected getState() {
+  protected get state() {
     return this.sceneFolderState;
   }
 
