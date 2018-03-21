@@ -5,9 +5,18 @@ import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { NavigationService } from 'services/navigation';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { IDownloadProgress, OverlaysPersistenceService } from 'services/scene-collections/overlays';
+import {
+  IDownloadProgress,
+  OverlaysPersistenceService
+} from 'services/scene-collections/overlays';
 import { ScenesService } from 'services/scenes';
 import { WidgetsService } from 'services/widgets';
+import { Service } from 'services/stateful-service';
+import {
+  NotificationsService,
+  ENotificationType
+} from 'services/notifications';
+import { JsonrpcService } from 'services/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
 
@@ -20,6 +29,8 @@ export default class BrowseOverlays extends Vue {
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
+  @Inject() private notificationsService: NotificationsService;
+  @Inject() private jsonrpcService: JsonrpcService;
 
   $refs: {
     overlaysWebview: Electron.WebviewTag;
@@ -45,7 +56,7 @@ export default class BrowseOverlays extends Vue {
     name: string,
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
-    const host = (new urlLib.URL(url)).hostname;
+    const host = new urlLib.URL(url).hostname;
     const trustedHosts = ['cdn.streamlabs.com'];
 
     if (!trustedHosts.includes(host)) {
@@ -53,7 +64,11 @@ export default class BrowseOverlays extends Vue {
       return;
     }
 
-    await this.sceneCollectionsService.installOverlay(url, name, progressCallback);
+    await this.sceneCollectionsService.installOverlay(
+      url,
+      name,
+      progressCallback
+    );
     this.navigationService.navigate('Studio');
   }
 
@@ -62,7 +77,7 @@ export default class BrowseOverlays extends Vue {
     progressCallback?: (progress: IDownloadProgress) => void
   ) {
     for (const url of urls) {
-      const host = (new urlLib.URL(url)).hostname;
+      const host = new urlLib.URL(url).hostname;
       const trustedHosts = ['cdn.streamlabs.com'];
 
       if (!trustedHosts.includes(host)) {
@@ -70,11 +85,30 @@ export default class BrowseOverlays extends Vue {
         return;
       }
 
-      const path = await this.overlaysPersistenceService.downloadOverlay(url, progressCallback);
-      await this.widgetsService.loadWidgetFile(path, this.scenesService.activeSceneId);
+      const path = await this.overlaysPersistenceService.downloadOverlay(
+        url,
+        progressCallback
+      );
+      await this.widgetsService.loadWidgetFile(
+        path,
+        this.scenesService.activeSceneId
+      );
     }
 
     this.navigationService.navigate('Studio');
+
+    this.notificationsService.push({
+      type: ENotificationType.SUCCESS,
+      lifeTime: 8000,
+      showTime: false,
+      message: `Widget Theme installed & activated. Click here to manage your Widget Profiles.`,
+      action: this.jsonrpcService.createRequest(
+        Service.getResourceId(this.navigationService),
+        'navigate',
+        'Dashboard',
+        { subPage: 'widgetprofiles' }
+      )
+    });
   }
 
   get overlaysUrl() {

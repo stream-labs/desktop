@@ -27,7 +27,8 @@
         'info': notify.type == 'INFO',
         'warning': notify.type == 'WARNING',
         'has-action': notify.action && !notify.outdated,
-        'outdated': notify.outdated
+        'outdated': notify.outdated,
+        'success': notify.type == 'SUCCESS',
       }"
     >
       {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
@@ -77,6 +78,11 @@
   &.warning {
     background-color: fade(@red, 20%);
     color: @red;
+  }
+
+  &.success {
+    background-color: fade(@teal, 20%);
+    color: @teal;
   }
 
   &.has-action {

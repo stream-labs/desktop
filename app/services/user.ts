@@ -173,7 +173,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl() {
-    const host = Util.isPreview() ? this.hostsService.beta3 : this.hostsService.streamlabs;
+    const host = Util.isPreview()
+      ? this.hostsService.beta3
+      : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
@@ -186,7 +188,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/donation/settings/${this.widgetToken}`;
+    const url = `https://${host}/api/v5/slobs/donation/settings/${this
+      .widgetToken}`;
     const request = new Request(url);
 
     return fetch(request)
@@ -230,7 +233,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       webPreferences: {
         nodeIntegration: false,
         nativeWindowOpen: true,
-        sandbox: true,
+        sandbox: true
       }
     });
 
