@@ -75,8 +75,7 @@
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.23/streamlabs-x86_64-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "uuid": "^3.0.1",
-    "v-tooltip": "^2.0.0-rc.31"
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
@@ -132,6 +131,7 @@
     "typescript": "^2.6.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
+    "v-tooltip": "^2.0.0-rc.31",
     "vue": "^2.5.12",
     "vue-color": "^2.4.3",
     "vue-loader": "^14.1.1",

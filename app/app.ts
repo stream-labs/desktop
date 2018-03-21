@@ -1,4 +1,4 @@
-window['eval'] = global.eval = function() {
+window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
 
