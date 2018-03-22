@@ -138,7 +138,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
       muted: obsSource.muted,
-      resourceId: ''
+      resourceId: 'AudioSource' + JSON.stringify([sourceId])
     };
   }
 
@@ -245,8 +245,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
   @mutation()
   private ADD_AUDIO_SOURCE(source: IAudioSource) {
     Vue.set(this.state.audioSources, source.sourceId, source);
-    const addedSource = this.getSource(source.sourceId);
-    this.state.audioSources[source.sourceId].resourceId = addedSource.getResourceId();
   }
 
 
@@ -267,8 +265,6 @@ export class AudioSource implements IAudioSourceApi {
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
   resourceId: string;
-
-  private _resourceId: string;
 
   @Inject()
   private audioService: AudioService;
@@ -408,14 +404,9 @@ export class AudioSource implements IAudioSourceApi {
     return stream.subscribe(cb);
   }
 
-  getResourceId() {
-    return this._resourceId;
-  }
-
 
   @mutation()
   private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
-    delete patch.resourceId; // resourceId is not changeable
     Object.assign(this.audioSourceState, patch);
   }
 
