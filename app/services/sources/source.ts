@@ -29,8 +29,6 @@ export class Source implements ISourceApi {
   channel?: number;
   resourceId: string;
 
-  private _resourceId: string;
-
   sourceState: ISource;
 
   @Inject()
@@ -128,9 +126,6 @@ export class Source implements ISourceApi {
     return this.getObsInput().configurable;
   }
 
-  getResourceId() {
-    return this._resourceId;
-  }
 
   @Inject()
   protected sourcesService: SourcesService;
