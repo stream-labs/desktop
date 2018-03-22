@@ -106,7 +106,7 @@ export default class BrowseOverlays extends Vue {
         Service.getResourceId(this.navigationService),
         'navigate',
         'Dashboard',
-        { subPage: 'widgetprofiles' }
+        { subPage: 'widgetthemes' }
       )
     });
   }
