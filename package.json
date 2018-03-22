@@ -47,6 +47,7 @@
     "nsis": {
       "license": "AGREEMENT",
       "oneClick": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "include": "installer.nsh"
     }
