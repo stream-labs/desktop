@@ -7,6 +7,11 @@ import { Inject } from '../../util/injector';
 import Display from '../Display.vue';
 import { CustomizationService } from '../../services/customization';
 import Slider from '../shared/Slider.vue';
+import VTooltip from 'v-tooltip';
+
+
+Vue.use(VTooltip)
+VTooltip.options.defaultContainer = '#mainWrapper'
 
 @Component({
   components: {
@@ -19,6 +24,9 @@ import Slider from '../shared/Slider.vue';
 export default class Live extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+
+  enablePreviewTooltip= "Enable the preview stream";
+  disablePreviewTooltip= "Disable the preview stream, can help with CPU";
 
   get previewSize() {
     return this.customizationService.state.previewSize;

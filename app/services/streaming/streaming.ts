@@ -290,7 +290,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           'The output format is either unsupported or does not support more than one audio track.  ' +
           'Please check your settings and try again.';
       } else if (info.code === EOutputCode.Error) {
-        errorText = `An unexpected error occurred when trying to connect to the server: ${
+        errorText = `An unexpected error occurred: ${
           info.error
         }`;
       }

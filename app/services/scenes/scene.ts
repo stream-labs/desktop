@@ -165,7 +165,7 @@ export class Scene implements ISceneApi {
       name,
       sceneNodeType: 'folder',
       sceneId: this.id,
-      resourceId: '',
+      resourceId: 'SceneFolder' + JSON.stringify([this.id, id]),
       parentId: '',
       childrenIds: []
     });
@@ -420,7 +420,7 @@ export class Scene implements ISceneApi {
       parentId: '',
       sceneNodeType: 'item',
       sceneId: this.id,
-      resourceId: '',
+      resourceId: 'SceneItem' + JSON.stringify([this.id, sceneItemId, sourceId]),
 
       transform: {
         // Position in video space
@@ -443,15 +443,11 @@ export class Scene implements ISceneApi {
       visible: true,
       locked: false
     });
-    const item = this.getItem(sceneItemId);
-    this.sceneState.nodes[0].resourceId = item.getResourceId();
   }
 
   @mutation()
   private ADD_FOLDER_TO_SCENE(folderModel: ISceneItemFolder) {
     this.sceneState.nodes.unshift(folderModel);
-    const folder = this.getFolder(folderModel.id);
-    this.sceneState.nodes[0].resourceId = folder.getResourceId();
   }
 
 
