@@ -58,9 +58,9 @@
 
 
       <template slot="toggle" slot-scope="{ node }">
-        <span v-if="!node.isLeaf">
-          <i v-if="node.isExpanded" class="fa fa-chevron-down"></i>
-          <i v-if="!node.isExpanded" class="fa fa-chevron-right"></i>
+        <span v-if="!node.isLeaf" >
+          <i v-if="node.isExpanded" class="fa fa-chevron-down icon-btn"></i>
+          <i v-if="!node.isExpanded" class="fa fa-chevron-right icon-btn"></i>
         </span>
       </template>
 
@@ -89,6 +89,7 @@
 
 <style lang="less" >
 @import "../styles/index";
+@import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .source-selector-action {
   font-size: 16px;
@@ -101,12 +102,6 @@
     opacity: inherit;
   }
 }
-
-/*.tree-container {*/
-  /*flex-grow: 1;*/
-  /*overflow: auto;*/
-  /*background-color: rgb(9, 22, 29);*/
-/*}*/
 
 .sl-vue-tree.sl-vue-tree-root {
   flex-grow: 1;
@@ -137,6 +132,43 @@
   display: inline-block;
   text-align: left;
   width: 20px;
+}
+
+.day-theme {
+
+  .title-container {
+    color: @navy
+  }
+
+  .sl-vue-tree.sl-vue-tree-root {
+    background-color: @day-secondary;
+    border-color: @day-border;
+    color: @navy-secondary;
+  }
+
+  .sl-vue-tree-node-item {
+
+  }
+
+  .sl-vue-tree-selected > .sl-vue-tree-node-item {
+    border-color: @day-border;
+    border-left: none;
+    border-right: none;
+    background-color: @white;
+  }
+
+  .sl-vue-tree-node-item:hover {
+    color: white;
+  }
+
+  .sl-vue-tree-cursor {
+    border-color: @navy;
+  }
+
+  .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+    border-color: @navy;
+  }
+
 }
 
 </style>
