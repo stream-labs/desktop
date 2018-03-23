@@ -30,6 +30,7 @@
       @dragleave="handleDragleave"
       @nodecontextmenu="node => showContextMenu(node.data.id)"
       @nodedblclick="node => sourceProperties(node.data.id)"
+      :scrollAreaHeight="50"
     >
 
       <template slot="title" slot-scope="{ node }">
