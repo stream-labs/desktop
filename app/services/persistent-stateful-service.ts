@@ -26,12 +26,12 @@ export abstract class PersistentStatefulService<TState extends object> extends S
   init() {
     this.store.watch(
       () => {
-        return this.state;
+        return JSON.stringify(this.state);
       },
       val => {
         // save only non-default values to the localStorage
         const PersistentService = (this.constructor as typeof PersistentStatefulService);
-        const valueToSave = Utils.getDeepChangedParams(PersistentService.defaultState, val);
+        const valueToSave = Utils.getDeepChangedParams(PersistentService.defaultState, JSON.parse(val));
         localStorage.setItem(PersistentService.localStorageKey, JSON.stringify(valueToSave));
       }
     );
