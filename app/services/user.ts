@@ -18,6 +18,7 @@ import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
+import Util from 'services/utils';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -164,7 +165,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   dashboardUrl(subPage: string) {
-    const host = this.hostsService.streamlabs;
+    const host = Util.isPreview()
+      ? this.hostsService.beta3
+      : this.hostsService.streamlabs;
     const token = this.widgetToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
@@ -172,7 +175,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   overlaysUrl() {
-    const host = this.hostsService.beta2;
+    const host = Util.isPreview()
+      ? this.hostsService.beta3
+      : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
@@ -185,7 +190,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/donation/settings/${this.widgetToken}`;
+    const url = `https://${host}/api/v5/slobs/donation/settings/${this
+      .widgetToken}`;
     const request = new Request(url);
 
     return fetch(request)
@@ -229,7 +235,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       webPreferences: {
         nodeIntegration: false,
         nativeWindowOpen: true,
-        sandbox: true,
+        sandbox: true
       }
     });
 

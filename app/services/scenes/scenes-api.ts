@@ -27,7 +27,7 @@ export interface IScenesServiceApi {
 export type TSceneNodeModel = ISceneItem | ISceneItemFolder;
 export type TSceneNodeApi = ISceneItemApi | ISceneItemFolderApi;
 
-export interface IScene {
+export interface IScene extends IResource {
   id: string;
   name: string;
   nodes: (ISceneItem | ISceneItemFolder)[];
@@ -147,8 +147,9 @@ export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
 
 export type TSceneNodeType = 'item' | 'folder';
 
-export interface ISceneItemNode {
+export interface ISceneItemNode extends IResource {
   id: string;
+  sceneId: string;
   sceneNodeType: TSceneNodeType;
   parentId?: string;
   childrenIds?: string[];

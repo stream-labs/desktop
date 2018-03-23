@@ -16,7 +16,6 @@ import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { WindowsService } from 'services/windows';
-import { StreamingService } from 'services/streaming';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
@@ -41,7 +40,6 @@ export default class Main extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
   @Inject() appService: AppService;
-  @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
 
@@ -63,10 +61,6 @@ export default class Main extends Vue {
 
   get applicationLoading() {
     return this.appService.state.loading;
-  }
-
-  get isStreaming() {
-    return this.streamingService.isStreaming;
   }
 
   get isLoggedIn() {

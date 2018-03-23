@@ -107,6 +107,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       height: 0,
 
       muted: false,
+      resourceId: 'Source' + JSON.stringify([id]),
       channel
     };
 
@@ -226,7 +227,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Video Capture Device', value: 'dshow_input' },
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
-      { description: 'Blackmagic Device', value: 'decklink-input' }
+      { description: 'Blackmagic Device', value: 'decklink-input' },
+      { description: 'NDI Source', value: 'ndi_source' }
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));

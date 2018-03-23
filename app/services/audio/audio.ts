@@ -137,7 +137,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       monitoringType: obsSource.monitoringType,
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
-      muted: obsSource.muted
+      muted: obsSource.muted,
+      resourceId: 'AudioSource' + JSON.stringify([sourceId])
     };
   }
 
@@ -263,6 +264,7 @@ export class AudioSource implements IAudioSourceApi {
   audioMixers: number;
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
+  resourceId: string;
 
   @Inject()
   private audioService: AudioService;
@@ -280,7 +282,7 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   getModel(): IAudioSource & ISource {
-    return { ...this.audioSourceState, ...this.source.sourceState };
+    return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
   getSettingsForm(): TFormData {

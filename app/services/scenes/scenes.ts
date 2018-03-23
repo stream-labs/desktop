@@ -52,10 +52,12 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
+      resourceId: '',
       nodes: []
     });
     this.state.displayOrder.push(id);
     this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.scenes[id].resourceId = this.getScene(id).getResourceId();
   }
 
   @mutation()

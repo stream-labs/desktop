@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.8.13-preview.2",
+  "version": "0.8.15",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -12,8 +12,9 @@
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
     "install-plugins": "yarn install --cwd bin && node bin/install-plugins.js",
-    "package": "rm -rf dist && build -w --x64 --em.env=production",
-    "package:preview": "rm -rf dist && build -w --x64 --em.env=production --em.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
+    "clear-plugins": "rm -rf plugins",
+    "package": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
+    "package:preview": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava -v",
     "clear": "rm -rf bundles/media",
@@ -46,8 +47,8 @@
     "nsis": {
       "license": "AGREEMENT",
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
       "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
       "include": "installer.nsh"
     }
   },
@@ -66,12 +67,12 @@
   "dependencies": {
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^2.20.1",
+    "electron-updater": "^2.21.1",
     "electron-window-state": "^4.1.1",
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.18/streamlabs-x86_64-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.25/streamlabs-x86_64-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"
@@ -96,7 +97,7 @@
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
     "electron": "1.7.12",
-    "electron-builder": "19.56.0",
+    "electron-builder": "20.6.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
@@ -130,6 +131,7 @@
     "typescript": "^2.6.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
+    "v-tooltip": "^2.0.0-rc.31",
     "vue": "^2.5.12",
     "vue-color": "^2.4.3",
     "vue-loader": "^14.1.1",

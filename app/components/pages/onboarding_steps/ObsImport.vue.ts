@@ -30,9 +30,8 @@ export default class ObsImport extends Vue {
   selectedProfile = this.profiles[0] || '';
 
   created() {
-    if (this.sceneCollections.length < 1) {
-      this.startFresh();
-    }
+    if (this.sceneCollections && (this.sceneCollections.length > 0)) return;
+    this.startFresh();
   }
 
   get title() {
@@ -61,9 +60,9 @@ export default class ObsImport extends Vue {
 
   startImport() {
     this.status = 'importing';
-    defer(() => {
+    defer(async () => {
       try {
-        this.obsImporterService.load(this.selectedProfile);
+        await this.obsImporterService.load(this.selectedProfile);
         this.status = 'done';
       } catch (e) {
         // I suppose let's pretend we succeeded for now.

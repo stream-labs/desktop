@@ -28,7 +28,7 @@ interface IMonitorState {
 export class PerformanceMonitorService extends StatefulService<IMonitorState> {
 
   static initialState: IMonitorState = {
-    framesLagged: 0, 
+    framesLagged: 0,
     framesRendered: 0,
     framesSkipped: 0,
     framesEncoded: 0

@@ -11,7 +11,6 @@ import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 
-
 @Component({
   components: {
     StartStreamingButton,
@@ -31,11 +30,7 @@ export default class StudioFooterComponent extends Vue {
   }
 
   toggleRecording() {
-    if (this.recording) {
-      this.streamingService.stopRecording();
-    } else {
-      this.streamingService.startRecording();
-    }
+    this.streamingService.toggleRecording();
   }
 
   get recording() {
@@ -58,7 +53,9 @@ export default class StudioFooterComponent extends Vue {
   }
 
   openYoutubeEnable() {
-    electron.remote.shell.openExternal('https://youtube.com/live_dashboard_splash');
+    electron.remote.shell.openExternal(
+      'https://youtube.com/live_dashboard_splash'
+    );
   }
 
   confirmYoutubeEnabled() {

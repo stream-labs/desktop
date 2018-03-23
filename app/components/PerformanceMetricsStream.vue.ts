@@ -26,8 +26,4 @@ export default class PerformanceMetrics extends Vue {
     return this.performanceService.state.bandwidth.toFixed(0);
   }
 
-  get streamOk() {
-    return this.streamingService.streamOk;
-  }
-
 }

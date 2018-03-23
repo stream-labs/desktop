@@ -27,6 +27,7 @@ export class Source implements ISourceApi {
   height: number;
   doNotDuplicate: boolean;
   channel?: number;
+  resourceId: string;
 
   sourceState: ISource;
 

@@ -13,6 +13,7 @@ export interface ICustomizationServiceState {
   performanceMode: boolean;
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
+  enableFFZEmotes: boolean;
   experimental: any;
 }
 
