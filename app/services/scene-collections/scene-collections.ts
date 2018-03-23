@@ -20,6 +20,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { TcpServerService } from 'services/tcp-server';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
@@ -66,6 +67,7 @@ export class SceneCollectionsService extends Service
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
+  @Inject() tcpServerService: TcpServerService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -529,6 +531,7 @@ export class SceneCollectionsService extends Service
    */
   private startLoadingOperation() {
     this.appService.startLoading();
+    this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
   }
 
@@ -537,6 +540,7 @@ export class SceneCollectionsService extends Service
    */
   private finishLoadingOperation() {
     this.appService.finishLoading();
+    this.tcpServerService.startRequestsHandling();
     this.enableAutoSave();
   }
 

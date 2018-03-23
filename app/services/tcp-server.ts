@@ -81,6 +81,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private clients: Dictionary<IClient> = {};
   private nextClientId = 1;
   private servers: IServer[] = [];
+  private isRequestsHandlingStopped = false;
 
   // enable to debug
   private enableLogs = false;
@@ -98,6 +99,19 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
+
+  /**
+   * stop handle any requests
+   * each API request will be responded with "API is busy" error
+   * this method doesn't stop event emitting
+   */
+  stopRequestsHandling() {
+    this.isRequestsHandlingStopped = true;
+  }
+
+  startRequestsHandling() {
+    this.isRequestsHandlingStopped = false;
+  }
 
 
   stopListening() {
@@ -254,6 +268,17 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private onRequestHandler(client: IClient, data: string) {
     this.log('tcp request', data);
+
+    if (this.isRequestsHandlingStopped) {
+
+      this.sendResponse(client, this.jsonrpcService.createError(null, {
+        code: E_JSON_RPC_ERROR.INTERNAL_JSON_RPC_ERROR,
+        message: 'API server is busy. Try again later'
+      }));
+
+      return;
+    }
+
     const requests = data.split('\n');
     requests.forEach(requestString => {
       if (!requestString) return;
