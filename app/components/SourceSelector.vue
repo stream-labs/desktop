@@ -5,18 +5,29 @@
       Sources
     </h4>
     <div>
+      <i
+        class="fa fa-folder-open icon-btn icon-btn--lg"
+        @click="addFolder"
+        title="Add Folder"
+      />
 
       <i
         class="fa fa-plus icon-btn icon-btn--lg"
-        @click="addSource"/>
+        @click="addSource"
+        title="Add Source"
+      />
       <i
         class="fa fa-minus icon-btn icon-btn--lg"
         :class="{ disabled: activeItemIds.length === 0}"
-        @click="removeItems"/>
+        @click="removeItems"
+        title="Remove Sources"
+      />
       <i
         :class="{ disabled: !canShowProperties()}"
         class="fa fa-cog icon-btn"
-        @click="sourceProperties"/>
+        @click="sourceProperties"
+        title="Setup Source Properties"
+      />
     </div>
   </div>
 

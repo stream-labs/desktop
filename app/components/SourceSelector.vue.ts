@@ -49,6 +49,12 @@ export default class SourceSelector extends Vue {
     }
   }
 
+  addFolder() {
+    if (this.scenesService.activeScene) {
+      this.scenesService.showNameFolder();
+    }
+  }
+
   showContextMenu(sceneNodeId?: string) {
     const sceneNode = this.scene.getNode(sceneNodeId);
     const menuOptions = sceneNode ?
