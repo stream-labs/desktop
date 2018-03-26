@@ -27,7 +27,6 @@
       @select="makeActive"
       @drop="handleSort"
       @toggle="toggleFolder"
-      @dragleave="handleDragleave"
       @nodecontextmenu="node => showContextMenu(node.data.id)"
       @nodedblclick="node => sourceProperties(node.data.id)"
       :scrollAreaHeight="50"
