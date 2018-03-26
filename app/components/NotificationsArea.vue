@@ -3,7 +3,7 @@
   <div
     class="notifications__counter notifications__counter--warning"
     v-if="unreadCount"
-    title="New Notifications"
+    v-tooltip="showUnreadNotificationsTooltip"
     @click="showNotifications">
     <span class="fa fa-exclamation-triangle"></span>
     {{ unreadCount }}
@@ -12,8 +12,8 @@
   <div
     class="notifications__counter"
     v-if="!unreadCount"
-    title="Show Notifications"
-    @click="showNotifications">
+    @click="showNotifications"
+    v-tooltip="showNotificationsTooltip">
     <span class="fa fa-info-circle"></span>
   </div>
 
@@ -27,7 +27,8 @@
         'info': notify.type == 'INFO',
         'warning': notify.type == 'WARNING',
         'has-action': notify.action && !notify.outdated,
-        'outdated': notify.outdated
+        'outdated': notify.outdated,
+        'success': notify.type == 'SUCCESS',
       }"
     >
       {{ notify.message }} <span v-if="notify.showTime"> {{ moment(notify.date) }} </span>
@@ -77,6 +78,11 @@
   &.warning {
     background-color: fade(@red, 20%);
     color: @red;
+  }
+
+  &.success {
+    background-color: fade(@teal, 20%);
+    color: @teal;
   }
 
   &.has-action {

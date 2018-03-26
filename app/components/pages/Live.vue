@@ -24,11 +24,13 @@
               <i
                 v-if="previewEnabled"
                 class="fa fa-eye icon-btn icon-btn--lg"
-                @click="previewEnabled = false"/>
+                @click="previewEnabled = false"
+                v-tooltip="disablePreviewTooltip"/>
               <i
                 v-if="!previewEnabled"
                 class="fa fa-eye-slash icon-btn icon-btn--lg"
-                @click="previewEnabled = true"/>
+                @click="previewEnabled = true"
+                v-tooltip="enablePreviewTooltip"/>
             </div>
           </div>
 

@@ -16,54 +16,6 @@ process.env.SLOBS_VERSION = pjson.version;
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
-const bt = require('backtrace-node');
-
-app.disableHardwareAcceleration();
-
-function handleFinishedReport() {
-  dialog.showErrorBox(`Unhandled Exception`,
-  'An unexpected error occured and the application must be shut down.\n' +
-  'Information concerning this occasion has been sent for debugging purposes.\n' +
-  'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
-  'Please restart the application.');
-
-  if (app) {
-    app.quit();
-  }
-}
-
-function handleUnhandledException(err) {
-  bt.report(err, {}, handleFinishedReport);
-}
-
-if (pjson.env === 'production') {
-  bt.initialize({
-    disableGlobalHandler: true,
-    endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-    token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    attributes: {
-      version: pjson.version,
-      processType: 'main'
-    }
-  });
-
-  process.on("uncaughtException", handleUnhandledException);
-
-  crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
-    submitURL: 
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
-      'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
-    extra: {
-      version: pjson.version,
-      processType: 'main'
-    }
-  });
-}
-
-const inAsar = process.mainModule.filename.indexOf('app.asar') !== -1;
 const fs = require('fs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
@@ -71,12 +23,11 @@ const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 
+app.disableHardwareAcceleration();
+
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
-
-// Initialize the keylistener
-require('node-libuiohook').startHook();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -122,6 +73,51 @@ function getObs() {
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
+
+  const bt = require('backtrace-node');
+
+  function handleFinishedReport() {
+    dialog.showErrorBox(`Unhandled Exception`,
+    'An unexpected error occured and the application must be shut down.\n' +
+    'Information concerning this occasion has been sent for debugging purposes.\n' +
+    'Sorry for the inconvenience and thanks for your patience as we work out the bugs!\n' +
+    'Please restart the application.');
+
+    if (app) {
+      app.quit();
+    }
+  }
+
+  function handleUnhandledException(err) {
+    bt.report(err, {}, handleFinishedReport);
+  }
+
+  if (pjson.env === 'production') {
+    bt.initialize({
+      disableGlobalHandler: true,
+      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
+      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      attributes: {
+        version: pjson.version,
+        processType: 'main'
+      }
+    });
+
+    process.on('uncaughtException', handleUnhandledException);
+
+    crashReporter.start({
+      productName: 'streamlabs-obs',
+      companyName: 'streamlabs',
+      submitURL:
+        'https://streamlabs.sp.backtrace.io:6098/post?' +
+        'format=minidump&' +
+        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      extra: {
+        version: pjson.version,
+        processType: 'main'
+      }
+    });
+  }
 
   const mainWindowState = windowStateKeeper({
     defaultWidth: 1600,
@@ -177,6 +173,9 @@ function startApp() {
     allowMainWindowClose = true;
     mainWindow.close();
   });
+
+  // Initialize the keylistener
+  require('node-libuiohook').startHook();
 
   mainWindow.on('closed', () => {
     require('node-libuiohook').stopHook();

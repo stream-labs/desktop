@@ -5,7 +5,8 @@ import { TFormData } from '../../components/shared/forms/Input';
 
 export enum ENotificationType {
   INFO = 'INFO',
-  WARNING = 'WARNING'
+  WARNING = 'WARNING',
+  SUCCESS = 'SUCCESS'
 }
 
 export interface INotificationsSettings {

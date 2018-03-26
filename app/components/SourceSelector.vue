@@ -98,6 +98,7 @@
 .fa.disabled {
   opacity: 0.15;
   cursor: inherit;
+
   :hover {
     opacity: inherit;
   }
