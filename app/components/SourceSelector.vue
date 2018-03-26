@@ -41,6 +41,7 @@
       @nodecontextmenu="node => showContextMenu(node.data.id)"
       @nodedblclick="node => sourceProperties(node.data.id)"
       :scrollAreaHeight="50"
+      :maxScrollSpeed="15"
     >
 
       <template slot="title" slot-scope="{ node }">
