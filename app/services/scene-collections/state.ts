@@ -118,7 +118,10 @@ export class SceneCollectionsStateService extends StatefulService<
   readCollectionFile(id: string, backup?: boolean) {
     let filePath = this.getCollectionFilePath(id);
     if (backup) filePath = `${filePath}.bak`;
-    return this.fileManagerService.read(filePath);
+    return this.fileManagerService.read(filePath, {
+      validateJSON: true,
+      retries: 2
+    });
   }
 
   /**

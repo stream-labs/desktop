@@ -9,6 +9,15 @@ interface IFile {
   dirty: boolean;
 }
 
+export interface IFileReadOptions {
+  // If true, will attempt to validate that valid
+  // JSON was read, and will retry/fail if not.
+  validateJSON?: boolean;
+
+  // The number of times to retry
+  retries?: number;
+}
+
 /**
  * This service provides an atomic, race-condition-free
  * file I/O system.  It supports instaneous synchronous
@@ -49,14 +58,39 @@ export class FileManagerService extends Service {
     this.flush(truePath);
   }
 
-  read(filePath: string) {
+  read(filePath: string, options: IFileReadOptions = {}) {
     const truePath = path.resolve(filePath);
     let file = this.files[truePath];
 
+    const opts = {
+      validateJSON: false,
+      retries: 0,
+      ...options
+    };
+
     // If this is the first read of this file, do a blocking synchronous read
     if (!file) {
+      let data: string;
+
+      try {
+        data = fs.readFileSync(truePath).toString();
+
+        if (opts.validateJSON) {
+          JSON.parse(data);
+        }
+      } catch (e) {
+        if (opts.retries > 0) {
+          this.read(filePath, {
+            ...opts,
+            retries: opts.retries - 1
+          });
+        } else {
+          throw e;
+        }
+      }
+
       file = this.files[truePath] = {
-        data: fs.readFileSync(truePath).toString(),
+        data,
         locked: false,
         version: 0,
         dirty: false
