@@ -391,7 +391,7 @@ export class Selection implements ISelection {
 
     if (this.sceneId === sceneId) {
       if (!folderId) return;
-      this.getNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
+      this.getRootNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
     } else {
       const insertedItems = this.copyReferenceTo(sceneId, folderId);
       this.remove();
@@ -460,7 +460,7 @@ export class Selection implements ISelection {
   }
 
   canGroupIntoFolder(): boolean {
-    const selectedNodes = this.getNodes();
+    const selectedNodes = this.getRootNodes();
     const nodesFolders = selectedNodes.map(node => node.parentId || null);
     const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
     const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
