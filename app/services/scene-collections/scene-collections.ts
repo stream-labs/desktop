@@ -161,9 +161,6 @@ export class SceneCollectionsService extends Service
       }
     }
 
-    // Fall back to an empty collection
-    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
-
     this.finishLoadingOperation();
   }
 
@@ -450,6 +447,10 @@ export class SceneCollectionsService extends Service
 
         data = this.stateService.readCollectionFile(id, true);
         await this.loadDataIntoApplicationState(data);
+      }
+
+      if (this.scenesService.scenes.length === 0) {
+        throw new Error('Scene collection was loaded but there were no scenes.');
       }
 
       // Everything was successful, write a backup
