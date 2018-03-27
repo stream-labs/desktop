@@ -13,6 +13,7 @@ import {
   EStreamingState,
   ERecordingState
 } from './streaming-api';
+import { UsageStatisticsService } from 'services/usage-statistics';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -40,6 +41,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() obsApiService: ObsApiService;
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
 
@@ -237,12 +239,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.usageStatisticsService.recordEvent('stream_start');
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
+        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);

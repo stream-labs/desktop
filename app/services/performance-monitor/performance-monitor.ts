@@ -75,12 +75,15 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
     };
 
     const {
+      skippedEnabled,
       skippedThreshold,
+      laggedEnabled,
       laggedThreshold,
+      droppedEnabled,
       droppedThreshold
     } = this.troubleshooterService.getSettings();
 
-    if (currentStats.framesEncoded !== 0) {
+    if (skippedEnabled && currentStats.framesEncoded !== 0) {
       const framesSkipped = currentStats.framesSkipped - this.state.framesSkipped;
       const framesEncoded = currentStats.framesEncoded - this.state.framesEncoded;
       const skippedFactor = framesSkipped / framesEncoded;
@@ -91,7 +94,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       }
     }
 
-    if (currentStats.framesRendered !== 0) {
+    if (laggedEnabled && currentStats.framesRendered !== 0) {
       const framesLagged = currentStats.framesLagged - this.state.framesLagged;
       const framesRendered = currentStats.framesRendered - this.state.framesRendered;
       const laggedFactor = framesLagged / framesRendered;
@@ -101,7 +104,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       }
     }
 
-    if (this.droppedFramesRecords.length) {
+    if (droppedEnabled && this.droppedFramesRecords.length) {
       const droppedFramesFactor =
         this.droppedFramesRecords.reduce((a, b) => a + b) /
         this.droppedFramesRecords.length;

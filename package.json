@@ -61,7 +61,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "1.7.12",
+    "runtimeVersion": "1.8.4",
     "arch": "x64"
   },
   "dependencies": {
@@ -72,7 +72,7 @@
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.25/streamlabs-x86_64-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.26/streamlabs-x86_64-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"
@@ -96,7 +96,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "1.7.12",
+    "electron": "1.8.4",
     "electron-builder": "20.6.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
