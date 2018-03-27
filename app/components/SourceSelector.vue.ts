@@ -62,7 +62,7 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sceneNodeId?: string) {
+  showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
     const sceneNode = this.scene.getNode(sceneNodeId);
     const menuOptions = sceneNode ?
       ({
@@ -74,6 +74,7 @@ export default class SourceSelector extends Vue {
     const menu = new EditMenu(menuOptions);
     menu.popup();
     menu.destroy();
+    event && event.stopPropagation();
   }
 
   removeItems() {

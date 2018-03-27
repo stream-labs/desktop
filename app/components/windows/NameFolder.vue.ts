@@ -5,8 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
-import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
+
 
 @Component({
   components: { ModalLayout },
