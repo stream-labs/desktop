@@ -70,10 +70,7 @@ export default class SourceSelector extends Vue {
   }
 
   removeItems() {
-    // We can only remove a source if at least one is selected
-    if (this.activeItemIds.length > 0) {
-      this.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
-    }
+    this.selectionService.remove();
   }
 
   sourceProperties() {
