@@ -33,7 +33,6 @@ export default class SourceSelector extends Vue {
 
     const menu = new EditMenu(menuOptions);
     menu.popup();
-    menu.destroy();
   }
 
   removeItems() {

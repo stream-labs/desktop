@@ -40,7 +40,6 @@ export default class SceneSelector extends Vue {
       click: () => this.scenesService.removeScene(this.scenesService.activeScene.id)
     });
     menu.popup();
-    menu.destroy();
   }
 
   makeActive(id: string) {
