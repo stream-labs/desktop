@@ -69,14 +69,14 @@
 
 
       <template slot="toggle" slot-scope="{ node }">
-        <span v-if="!node.isLeaf" >
+        <span v-if="!node.isLeaf && node.children.length" >
           <i v-if="node.isExpanded" class="fa fa-chevron-down icon-btn"></i>
           <i v-if="!node.isExpanded" class="fa fa-chevron-right icon-btn"></i>
         </span>
       </template>
 
 
-      <template slot="sidebar" slot-scope="{ node }">
+      <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
         <i
             class="fa fa-lock icon-btn source-selector-action"
             :class="lockClassesForSource(node.data.id)"

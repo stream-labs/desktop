@@ -92,6 +92,14 @@ export abstract class SceneItemNode implements ISceneItemNode {
     }
   }
 
+  /**
+   * @returns all parent Ids
+   */
+  getPath(): string[] {
+    const parent = this.getParent();
+    return parent ? parent.getPath().concat([this.id]) : [this.id];
+  }
+
   isSelected() {
     return this.selectionService.isSelected(this.id);
   }

@@ -97,12 +97,10 @@ export class EditMenu extends Menu {
         submenu: this.transformSubmenu().menu
       });
 
-      if (this.customizationService.state.experimental.sceneItemsGrouping) {
-        this.append({
-          label: 'Group',
-          submenu: this.groupSubmenu().menu
-        });
-      }
+      this.append({
+        label: 'Group',
+        submenu: this.groupSubmenu().menu
+      });
 
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';

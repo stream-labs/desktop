@@ -65,6 +65,8 @@ export class SelectionService
   moveTo: (sceneId: string, folderId?: string) => SceneItem[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
+  canGroupIntoFolder: () => boolean;
+  getClosestParent: () => SceneItemFolder;
 
 
   // SCENE_ITEM METHODS
@@ -403,6 +405,66 @@ export class Selection implements ISelection {
 
   isLocked() {
     return !this.getItems().find(item => !item.locked);
+  }
+
+  /**
+   * Returns a minimal representation of selection
+   * for selection list like this:
+   *
+   * Folder1      <- selected
+   *  |_ Item1    <- selected
+   *  \_ Folder2  <- selected
+   * Item3        <- selected
+   * Folder3
+   *  |_ Item3
+   *  \_ Item4    <- selected
+   *
+   *  returns Folder1, Item3, Item4
+   */
+  getRootNodes(): TSceneNode[] {
+    const rootNodes: TSceneNode[] = [];
+    const foldersIds: string[] = [];
+    this.getNodes().forEach(node => {
+      if (foldersIds.includes(node.parentId)) return;
+      rootNodes.push(node);
+      if (node.isFolder()) foldersIds.push(node.id);
+    });
+    return rootNodes;
+  }
+
+  /**
+   * Returns the closest common parent folder for selection if exists
+   */
+  getClosestParent(): SceneItemFolder {
+    const rootNodes = this.getRootNodes();
+    const paths: string[][] = [];
+
+    for (const node of rootNodes) {
+      if (!node.parentId) return null;
+      paths.push(node.getPath());
+    }
+
+    const minPathLength = Math.min(...paths.map(path => path.length));
+    let closestParentId = '';
+
+    for (let ind = 0; ind < minPathLength; ind++) {
+      const parents = paths.map(path => path[ind]);
+      console.log('parents', parents);
+      if (uniq(parents).length === 1) {
+        closestParentId = parents[0];
+      } else {
+        return this.getScene().getFolder(closestParentId);
+      }
+    }
+
+  }
+
+  canGroupIntoFolder(): boolean {
+    const selectedNodes = this.getNodes();
+    const nodesFolders = selectedNodes.map(node => node.parentId || null);
+    const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
+    const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
+    return canGroupIntoFolder;
   }
 
   // SCENE_ITEM METHODS

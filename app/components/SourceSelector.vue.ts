@@ -51,7 +51,14 @@ export default class SourceSelector extends Vue {
 
   addFolder() {
     if (this.scenesService.activeScene) {
-      this.scenesService.showNameFolder();
+      let itemsToGroup: string[] = [];
+      let parentId: string;
+      if (this.selectionService.canGroupIntoFolder()) {
+        itemsToGroup = this.selectionService.getIds();
+        const parent = this.selectionService.getClosestParent();
+        if (parent) parentId = parent.id;
+      }
+      this.scenesService.showNameFolder({ itemsToGroup, parentId });
     }
   }
 
@@ -120,6 +127,11 @@ export default class SourceSelector extends Vue {
     } else {
       this.expandedFoldersIds.push(nodeId);
     }
+  }
+
+  canShowActions(sceneNodeId: string) {
+    const node = this.scene.getNode(sceneNodeId);
+    return node.isItem() || node.getNestedItems().length;
   }
 
   get activeItemIds() {

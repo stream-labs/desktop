@@ -22,8 +22,7 @@ export class GroupMenu extends Menu {
     const selectedItem = this.selectionService.getItems()[0];
     const selectedNodes = this.selectionService.getNodes();
     const nodesFolders = selectedNodes.map(node => node.parentId || null);
-    const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
-    const canGroupIntoFolder = selectionSize > 1 && nodesHaveTheSameParent;
+
 
     this.append({
       label: 'Group into Folder',
@@ -33,7 +32,7 @@ export class GroupMenu extends Menu {
           parentId: nodesFolders[0]
         });
       },
-      enabled: canGroupIntoFolder
+      enabled: this.selectionService.canGroupIntoFolder()
     });
 
     this.append({

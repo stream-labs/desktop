@@ -54,7 +54,10 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.getScene().getSelection(this.childrenIds);
   }
 
-
+  /**
+   * returns only child nodes
+   * use getNestedNodes() to get the all nested nodes
+   */
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
     return this.childrenIds.map(nodeId => scene.getNode(nodeId));
