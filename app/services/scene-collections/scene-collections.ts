@@ -20,6 +20,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { TcpServerService } from 'services/tcp-server';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
@@ -66,6 +67,7 @@ export class SceneCollectionsService extends Service
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
+  @Inject() tcpServerService: TcpServerService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -144,7 +146,7 @@ export class SceneCollectionsService extends Service
 
     try {
       await this.setActiveCollection(id);
-      await this.loadCollectionIntoApplicationState(id);
+      await this.readCollectionDataAndLoadIntoApplicationState(id);
     } catch (e) {
       console.error('Error loading collection!', e);
 
@@ -205,9 +207,6 @@ export class SceneCollectionsService extends Service
     this.removeCollection(id);
 
     if (removingActiveCollection) {
-      this.startLoadingOperation();
-      await this.deloadCurrentApplicationState();
-
       if (this.collections.length > 0) {
         this.load(this.collections[0].id);
       } else {
@@ -428,23 +427,46 @@ export class SceneCollectionsService extends Service
 
   /**
    * Loads the scenes/sources/etc associated with a scene collection
-   * into the current application state.
+   * from disk into the current application state.
    * @param id The id of the collection to load
    */
-  private async loadCollectionIntoApplicationState(id: string): Promise<void> {
+  private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
 
     if (exists) {
-      const data = this.stateService.readCollectionFile(id);
-      if (data == null) throw new Error('Got blank data from collection file');
+      let data: string;
 
-      const root = parse(data, NODE_TYPES);
-      await root.load();
+      try {
+        data = this.stateService.readCollectionFile(id);
+        if (data == null) throw new Error('Got blank data from collection file');
 
-      this.hotkeysService.bindHotkeys();
+        await this.loadDataIntoApplicationState(data);
+      } catch (e) {
+        // Check for a backup and load it
+        const exists = await this.stateService.collectionFileExists(id, true);
+
+        // If there's no backup, throw the original error
+        if (!exists) throw e;
+
+        data = this.stateService.readCollectionFile(id, true);
+        await this.loadDataIntoApplicationState(data);
+      }
+
+      // Everything was successful, write a backup
+      this.stateService.writeDataToCollectionFile(id, data, true);
     } else {
       await this.attemptRecovery(id);
     }
+  }
+
+  /**
+   * Parses and loads the given JSON string into application state
+   * @param data Scene collection JSON data
+   */
+  private async loadDataIntoApplicationState(data: string) {
+    const root = parse(data, NODE_TYPES);
+    await root.load();
+    this.hotkeysService.bindHotkeys();
   }
 
   /**
@@ -529,6 +551,7 @@ export class SceneCollectionsService extends Service
    */
   private startLoadingOperation() {
     this.appService.startLoading();
+    this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
   }
 
@@ -537,6 +560,7 @@ export class SceneCollectionsService extends Service
    */
   private finishLoadingOperation() {
     this.appService.finishLoading();
+    this.tcpServerService.startRequestsHandling();
     this.enableAutoSave();
   }
 

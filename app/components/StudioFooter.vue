@@ -22,8 +22,7 @@
         :disabled="locked"
         class="record-button"
         @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }"
-        v-tooltip="recordButtonTooltip">
+        :class="{ active: streamingService.isRecording }">
         <span>REC</span>
       </button>
     </div>

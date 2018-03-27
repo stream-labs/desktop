@@ -102,18 +102,22 @@ export class SceneCollectionsStateService extends StatefulService<
   /**
    * Checks if a collection file exists
    * @param id the id of the collection
+   * @param backup Whether to look for the backup version
    */
-  async collectionFileExists(id: string) {
-    const filePath = this.getCollectionFilePath(id);
+  async collectionFileExists(id: string, backup?: boolean) {
+    let filePath = this.getCollectionFilePath(id);
+    if (backup) filePath = `${filePath}.bak`;
     return this.fileManagerService.exists(filePath);
   }
 
   /**
    * Reads the contents of the file into a string
    * @param id The id of the collection
+   * @param backup Whether the read the backup version
    */
-  readCollectionFile(id: string) {
-    const filePath = this.getCollectionFilePath(id);
+  readCollectionFile(id: string, backup?: boolean) {
+    let filePath = this.getCollectionFilePath(id);
+    if (backup) filePath = `${filePath}.bak`;
     return this.fileManagerService.read(filePath);
   }
 
@@ -121,9 +125,11 @@ export class SceneCollectionsStateService extends StatefulService<
    * Writes data to a collection file
    * @param id The id of the file
    * @param data The data to write
+   * @param backup Whether to write to the backup version
    */
-  writeDataToCollectionFile(id: string, data: string) {
-    const collectionPath = this.getCollectionFilePath(id);
+  writeDataToCollectionFile(id: string, data: string, backup?: boolean) {
+    let collectionPath = this.getCollectionFilePath(id);
+    if (backup) collectionPath = `${collectionPath}.bak`;
     this.fileManagerService.write(collectionPath, data);
   }
 
