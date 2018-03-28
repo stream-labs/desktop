@@ -81,6 +81,12 @@ export class SceneCollectionsService extends Service
   private initialized = false;
 
   /**
+   * Whether a valid collection is currently loaded.
+   * Is used to decide whether we should save.
+   */
+  private collectionLoaded = false;
+
+  /**
    * Does not use the standard init function so we can have asynchronous
    * initialization.
    */
@@ -123,6 +129,7 @@ export class SceneCollectionsService extends Service
    * Saves the current scene collection
    */
   async save(): Promise<void> {
+    if (!this.collectionLoaded) return;
     if (!this.activeCollection) return;
     await this.saveCurrentApplicationStateAs(this.activeCollection.id);
     this.stateService.SET_MODIFIED(
@@ -161,9 +168,6 @@ export class SceneCollectionsService extends Service
       }
     }
 
-    // Fall back to an empty collection
-    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
-
     this.finishLoadingOperation();
   }
 
@@ -190,7 +194,8 @@ export class SceneCollectionsService extends Service
       this.setupEmptyCollection();
     }
 
-    await this.saveCurrentApplicationStateAs(id);
+    this.collectionLoaded = true;
+    await this.save();
     this.finishLoadingOperation();
   }
 
@@ -300,7 +305,8 @@ export class SceneCollectionsService extends Service
       console.error('Overlay installation failed', e);
     }
 
-    await this.saveCurrentApplicationStateAs(id);
+    this.collectionLoaded = true;
+    await this.save();
     this.finishLoadingOperation();
   }
 
@@ -452,8 +458,13 @@ export class SceneCollectionsService extends Service
         await this.loadDataIntoApplicationState(data);
       }
 
+      if (this.scenesService.scenes.length === 0) {
+        throw new Error('Scene collection was loaded but there were no scenes.');
+      }
+
       // Everything was successful, write a backup
       this.stateService.writeDataToCollectionFile(id, data, true);
+      this.collectionLoaded = true;
     } else {
       await this.attemptRecovery(id);
     }
@@ -544,6 +555,7 @@ export class SceneCollectionsService extends Service
     }
 
     this.hotkeysService.clearAllHotkeys();
+    this.collectionLoaded = false;
   }
 
   /**

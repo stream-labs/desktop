@@ -30,6 +30,5 @@ export default class MixerItem extends Vue {
   showSourceMenu(sourceId: string) {
     const menu = new EditMenu({ selectedSourceId: sourceId });
     menu.popup();
-    menu.destroy();
   }
 }
