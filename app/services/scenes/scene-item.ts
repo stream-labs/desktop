@@ -303,7 +303,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
   }
 
-  protected getState() {
+  protected get state() {
     return this.sceneItemState;
   }
 

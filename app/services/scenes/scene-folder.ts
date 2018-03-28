@@ -46,7 +46,7 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
   }
 
   ungroup() {
-    this.getItems().forEach(item => item.detachParent());
+    this.getItems().forEach(item => item.setParent(this.parentId));
     this.remove();
   }
 
@@ -54,7 +54,10 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.getScene().getSelection(this.childrenIds);
   }
 
-
+  /**
+   * returns only child nodes
+   * use getNestedNodes() to get the all nested nodes
+   */
   getNodes(): TSceneNode[] {
     const scene = this.getScene();
     return this.childrenIds.map(nodeId => scene.getNode(nodeId));
@@ -135,7 +138,25 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.sceneFolderState;
   }
 
-  protected getState() {
+  /**
+   * for internal usage only
+   */
+  recalculateChildrenOrder() {
+    this.sceneFolderState.childrenIds = this.childrenIds;
+    const childrenCount = this.childrenIds.length;
+    const nodeInd = this.getNodeIndex();
+    const foundChildren: TSceneNode[] = [];
+    const sceneNodes = this.getScene().getNodes();
+
+    for (let i = nodeInd + 1; foundChildren.length < childrenCount; i++) {
+      const sceneNode = sceneNodes[i];
+      if (sceneNode.parentId === this.id) foundChildren.push(sceneNode);
+    }
+
+    this.SET_CHILDREN_ORDER(foundChildren.map(child => child.id));
+  }
+
+  protected get state() {
     return this.sceneFolderState;
   }
 
@@ -144,4 +165,8 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     merge(this.sceneFolderState, patch);
   }
 
+  @mutation()
+  private SET_CHILDREN_ORDER(childrenIds: string[]) {
+    this.sceneFolderState.childrenIds = childrenIds;
+  }
 }

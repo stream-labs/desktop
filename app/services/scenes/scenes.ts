@@ -248,7 +248,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
-  showNameFolder(options: { renameId?: string, itemsToGroup?: string[] } = {}) {
+  showNameFolder(options: { renameId?: string, itemsToGroup?: string[], parentId?: string } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
       queryParams: options,

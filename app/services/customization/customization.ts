@@ -36,7 +36,6 @@ export class CustomizationService
     enableFFZEmotes: false,
     experimental: {
       // put experimental features here
-      sceneItemsGrouping: false
     }
   };
 
@@ -167,16 +166,7 @@ export class CustomizationService
   }
 
   getExperimentalSettingsFormData(): TFormData {
-    return [
-      <IFormInput<boolean>>  {
-        value: this.state.experimental.sceneItemsGrouping,
-        name: 'sceneItemsGrouping',
-        description: 'Scene Items Grouping',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      }
-    ];
+    return [];
   }
 
   restoreDefaults() {
