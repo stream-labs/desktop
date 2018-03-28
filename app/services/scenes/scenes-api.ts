@@ -35,7 +35,7 @@ export interface IScene extends IResource {
 
 
 export interface ISceneApi extends IScene {
-  getNode(sceneNodeId: string): ISceneItemApi | ISceneItemFolderApi;
+  getNode(sceneNodeId: string): TSceneNodeApi;
   getItem(sceneItemId: string): ISceneItemApi;
   getFolder(sceneFolderId: string): ISceneItemFolderApi;
   getNodes(): (ISceneItemApi | ISceneItemFolderApi)[];

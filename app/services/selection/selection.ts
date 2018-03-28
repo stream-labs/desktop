@@ -60,9 +60,9 @@ export class SelectionService
   getLastSelectedId: () => string;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
-  copyReferenceTo: (sceneId: string, folderId?: string) => SceneItem[];
+  copyReferenceTo: (sceneId: string, folderId?: string) => TSceneNode[];
   copyTo: (sceneId: string) => SceneItem[];
-  moveTo: (sceneId: string, folderId?: string) => SceneItem[];
+  moveTo: (sceneId: string, folderId?: string) => TSceneNode[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
   canGroupIntoFolder: () => boolean;
@@ -352,21 +352,39 @@ export class Selection implements ISelection {
     return this;
   }
 
-  copyReferenceTo(sceneId: string, folderId?: string): SceneItem[] {
-    const insertedItems: SceneItem[] = [];
+  copyReferenceTo(sceneId: string, folderId?: string): TSceneNode[] {
+    const insertedNodes: TSceneNode[] = [];
     const scene = this.scenesService.getScene(sceneId);
-    const folder = scene.getFolder(folderId);
+    const foldersMap: Dictionary<string> = {};
 
-    this.getItems().reverse().forEach(sceneItem => {
-      const insertedItem = scene.addSource(
-        sceneItem.sourceId
-      );
-      insertedItem.setSettings(sceneItem.getSettings());
-      if (folder) insertedItem.setParent(folder.id);
-      insertedItems.push(insertedItem);
+    // copy items and folders structure
+    this.getNodes().forEach(sceneNode => {
+      if (sceneNode.isFolder()) {
+        const newFolder = scene.createFolder(sceneNode.name);
+        foldersMap[sceneNode.id] = newFolder.id;
+        insertedNodes.push(newFolder);
+      } else if (sceneNode.isItem()) {
+        const insertedItem = scene.addSource(
+          sceneNode.sourceId
+        );
+        insertedItem.setSettings(sceneNode.getSettings());
+        insertedNodes.push(insertedItem);
+        const newParentId = foldersMap[sceneNode.parentId];
+        if (newParentId) {
+          insertedItem.setParent(newParentId);
+        }
+      }
     });
 
-    return insertedItems;
+    // insert the all copied items in folder if it's defined
+    const folder = scene.getFolder(folderId);
+    if (folder) {
+      scene.getSelection(insertedNodes.map(node => node.id)).getRootNodes().forEach(sceneNode => {
+        sceneNode.setParent(folderId);
+      });
+    }
+
+    return insertedNodes;
   }
 
   copyTo(sceneId: string): SceneItem[] {
@@ -387,7 +405,7 @@ export class Selection implements ISelection {
     return insertedItems;
   }
 
-  moveTo(sceneId: string, folderId?: string): SceneItem[] {
+  moveTo(sceneId: string, folderId?: string): TSceneNode[] {
 
     if (this.sceneId === sceneId) {
       if (!folderId) return;
