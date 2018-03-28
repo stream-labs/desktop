@@ -60,11 +60,13 @@ export class SelectionService
   getLastSelectedId: () => string;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
-  copyReferenceTo: (sceneId: string, folderId?: string) => SceneItem[];
+  copyReferenceTo: (sceneId: string, folderId?: string) => TSceneNode[];
   copyTo: (sceneId: string) => SceneItem[];
-  moveTo: (sceneId: string, folderId?: string) => SceneItem[];
+  moveTo: (sceneId: string, folderId?: string) => TSceneNode[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
+  canGroupIntoFolder: () => boolean;
+  getClosestParent: () => SceneItemFolder;
 
 
   // SCENE_ITEM METHODS
@@ -256,7 +258,7 @@ export class Selection implements ISelection {
    * true if selections has only one SceneItem
    */
   isSceneItem(): boolean {
-    return this.getSize() === 1 && this.getItems()[0].isItem();
+    return this.getSize() === 1 && this.getNodes()[0].isItem();
   }
 
   /**
@@ -350,21 +352,39 @@ export class Selection implements ISelection {
     return this;
   }
 
-  copyReferenceTo(sceneId: string, folderId?: string): SceneItem[] {
-    const insertedItems: SceneItem[] = [];
+  copyReferenceTo(sceneId: string, folderId?: string): TSceneNode[] {
+    const insertedNodes: TSceneNode[] = [];
     const scene = this.scenesService.getScene(sceneId);
-    const folder = scene.getFolder(folderId);
+    const foldersMap: Dictionary<string> = {};
 
-    this.getItems().reverse().forEach(sceneItem => {
-      const insertedItem = scene.addSource(
-        sceneItem.sourceId
-      );
-      insertedItem.setSettings(sceneItem.getSettings());
-      if (folder) insertedItem.setParent(folder.id);
-      insertedItems.push(insertedItem);
+    // copy items and folders structure
+    this.getNodes().forEach(sceneNode => {
+      if (sceneNode.isFolder()) {
+        const newFolder = scene.createFolder(sceneNode.name);
+        foldersMap[sceneNode.id] = newFolder.id;
+        insertedNodes.push(newFolder);
+      } else if (sceneNode.isItem()) {
+        const insertedItem = scene.addSource(
+          sceneNode.sourceId
+        );
+        insertedItem.setSettings(sceneNode.getSettings());
+        insertedNodes.push(insertedItem);
+        const newParentId = foldersMap[sceneNode.parentId];
+        if (newParentId) {
+          insertedItem.setParent(newParentId);
+        }
+      }
     });
 
-    return insertedItems;
+    // insert the all copied items in folder if it's defined
+    const folder = scene.getFolder(folderId);
+    if (folder) {
+      scene.getSelection(insertedNodes.map(node => node.id)).getRootNodes().forEach(sceneNode => {
+        sceneNode.setParent(folderId);
+      });
+    }
+
+    return insertedNodes;
   }
 
   copyTo(sceneId: string): SceneItem[] {
@@ -385,11 +405,11 @@ export class Selection implements ISelection {
     return insertedItems;
   }
 
-  moveTo(sceneId: string, folderId?: string): SceneItem[] {
+  moveTo(sceneId: string, folderId?: string): TSceneNode[] {
 
     if (this.sceneId === sceneId) {
       if (!folderId) return;
-      this.getNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
+      this.getRootNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
     } else {
       const insertedItems = this.copyReferenceTo(sceneId, folderId);
       this.remove();
@@ -403,6 +423,66 @@ export class Selection implements ISelection {
 
   isLocked() {
     return !this.getItems().find(item => !item.locked);
+  }
+
+  /**
+   * Returns a minimal representation of selection
+   * for selection list like this:
+   *
+   * Folder1      <- selected
+   *  |_ Item1    <- selected
+   *  \_ Folder2  <- selected
+   * Item3        <- selected
+   * Folder3
+   *  |_ Item3
+   *  \_ Item4    <- selected
+   *
+   *  returns Folder1, Item3, Item4
+   */
+  getRootNodes(): TSceneNode[] {
+    const rootNodes: TSceneNode[] = [];
+    const foldersIds: string[] = [];
+    this.getNodes().forEach(node => {
+      if (foldersIds.includes(node.parentId)) return;
+      rootNodes.push(node);
+      if (node.isFolder()) foldersIds.push(node.id);
+    });
+    return rootNodes;
+  }
+
+  /**
+   * Returns the closest common parent folder for selection if exists
+   */
+  getClosestParent(): SceneItemFolder {
+    const rootNodes = this.getRootNodes();
+    const paths: string[][] = [];
+
+    for (const node of rootNodes) {
+      if (!node.parentId) return null;
+      paths.push(node.getPath());
+    }
+
+    const minPathLength = Math.min(...paths.map(path => path.length));
+    let closestParentId = '';
+
+    for (let ind = 0; ind < minPathLength; ind++) {
+      const parents = paths.map(path => path[ind]);
+      console.log('parents', parents);
+      if (uniq(parents).length === 1) {
+        closestParentId = parents[0];
+      } else {
+        return this.getScene().getFolder(closestParentId);
+      }
+    }
+
+  }
+
+  canGroupIntoFolder(): boolean {
+    const selectedNodes = this.getRootNodes();
+    const nodesFolders = selectedNodes.map(node => node.parentId || null);
+    const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
+    const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
+    return canGroupIntoFolder;
   }
 
   // SCENE_ITEM METHODS

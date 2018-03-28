@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.8.15",
+  "version": "0.8.16-preview.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -118,6 +118,7 @@
     "progress": "^2.0.0",
     "raven-js": "^3.20.1",
     "rxjs": "^5.4.3",
+    "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.1.4",
     "spectron": "^3.6.4",

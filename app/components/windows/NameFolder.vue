@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameSource-label">
-      Please enter the name of the source
+      Please enter the name of the folder
     </p>
     <p
       v-if="error"

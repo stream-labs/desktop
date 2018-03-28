@@ -1,6 +1,6 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
-import { selectSource, clickSourceProperties } from './helpers/spectron/sources';
+import {selectSource, clickSourceProperties, sourceIsExisting} from './helpers/spectron/sources';
 
 useSpectron({ skipOnboarding: false });
 
@@ -42,12 +42,12 @@ test('Adding some starter widgets', async t => {
   await app.client.click('button=Add 2 Widgets');
   await app.client.click('a=Setup later');
 
-  t.false(await app.client.isExisting('li=Alert Box'));
-  t.false(await app.client.isExisting('li=Event List'));
-  t.false(await app.client.isExisting('li=The Jar'));
-  t.true(await app.client.isExisting('li=Chat Box'));
-  t.false(await app.client.isExisting('li=Donation Ticker'));
-  t.true(await app.client.isExisting('li=Donation Goal'));
+  t.false(await sourceIsExisting(t, 'Alert Box'));
+  t.false(await sourceIsExisting(t, 'Event List'));
+  t.false(await sourceIsExisting(t, 'The Jar'));
+  t.true(await sourceIsExisting(t, 'Chat Box'));
+  t.false(await sourceIsExisting(t, 'Donation Ticker'));
+  t.true(await sourceIsExisting(t, 'Donation Goal'));
 
   await selectSource(t, 'Chat Box');
   await clickSourceProperties(t);

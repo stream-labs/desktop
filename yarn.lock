@@ -8171,6 +8171,10 @@ single-line-log@^1.1.2:
   dependencies:
     string-width "^1.0.1"
 
+"sl-vue-tree@https://github.com/stream-labs/sl-vue-tree.git":
+  version "1.0.0"
+  resolved "https://github.com/stream-labs/sl-vue-tree.git#cc9dc0c143d57d3c8391635e89681867bd9b4c31"
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"

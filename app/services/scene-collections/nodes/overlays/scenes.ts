@@ -1,6 +1,6 @@
 import { ArrayNode } from '../array-node';
 import { ScenesService, Scene } from '../../../scenes';
-import { SlotsNode } from './slots';
+import { IFolderSchema, SlotsNode, TSlotSchema } from './slots';
 
 interface ISchema {
   name: string;
@@ -35,5 +35,16 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
       makeActive: true
     });
     await obj.slots.load({ scene, assetsPath: context.assetsPath });
+
+    // append children to folders
+    const foldersSchemas = (obj.slots.data.items as TSlotSchema[])
+      .filter(item => item.sceneNodeType === 'folder')
+      .reverse();
+
+    const folders = scene.getFolders();
+    folders.forEach((folder, ind) => {
+      const childrenIds = (foldersSchemas[ind] as IFolderSchema).childrenIds;
+      scene.getSelection(childrenIds).moveTo(scene.id, folder.id);
+    });
   }
 }
