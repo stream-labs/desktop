@@ -2,13 +2,16 @@
 <div class="UpdaterWindow">
   <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
   {{ message }}
-  <div v-if="percentComplete !== null" class="UpdaterWindow-progressBarContainer">
+  <div v-if="(percentComplete !== null) && !installing" class="UpdaterWindow-progressBarContainer">
     <div
       class="UpdaterWindow-progressBar"
       :style="{ width: percentComplete + '%' }"/>
     <div class="UpdaterWindow-progressPercent">
       {{ percentComplete }}%
     </div>
+  </div>
+  <div v-if="installing">
+    Having issues? ...
   </div>
 </div>
 </template>
@@ -21,19 +24,24 @@ export default {
   data() {
     return {
       message: 'Checking for updates',
-
+      installing: false,
       percentComplete: null
-    }
+    };
   },
 
   mounted() {
     ipcRenderer.on('autoUpdate-pushState', (event, data) => {
       if (data.version) {
-        this.message = `Downloading version ${data.version}`
+        this.message = `Downloading version ${data.version}`;
       }
 
       if (data.percent) {
-        this.percentComplete = Math.round(data.percent);
+        this.percentComplete = Math.floor(data.percent);
+      }
+
+      if (data.installing) {
+        this.installing = true;
+        this.message = `Installing version ${data.version}`;
       }
     });
 
