@@ -19,6 +19,7 @@ import { WindowsService } from 'services/windows';
 import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
+import PatchNotes from '../pages/PatchNotes.vue';
 
 @Component({
   mixins: [windowMixin],
@@ -33,6 +34,7 @@ import CustomLoader from '../CustomLoader.vue';
     LiveDock,
     StudioFooter,
     CustomLoader,
+    PatchNotes
   }
 })
 export default class Main extends Vue {
