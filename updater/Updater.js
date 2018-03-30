@@ -50,6 +50,11 @@ class Updater {
     autoUpdater.on('download-progress', progress => {
       this.updateState.percent = progress.percent;
       this.updateState.bytesPerSecond = progress.percent;
+
+      if (progress.percent === 100) {
+        this.updateState.installing = true;
+      }
+
       this.pushState();
     });
 
@@ -57,6 +62,11 @@ class Updater {
       this.updateState.installing = true;
       this.pushState();
       // autoUpdater.quitAndInstall();
+    });
+
+    autoUpdater.on('error', () => {
+      this.updateState.error = true;
+      this.pushState();
     });
 
     ipcMain.on('autoUpdate-getState', () => {
@@ -83,6 +93,8 @@ class Updater {
     });
 
     browserWindow.loadURL('file://' + __dirname + '/index.html');
+
+    browserWindow.webContents.openDevTools({ mode: 'detach' });
 
     return browserWindow;
   }

@@ -2,7 +2,7 @@
 <div class="UpdaterWindow">
   <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
   {{ message }}
-  <div v-if="(percentComplete !== null) && !installing" class="UpdaterWindow-progressBarContainer">
+  <div v-if="(percentComplete !== null) && !installing && !error" class="UpdaterWindow-progressBarContainer">
     <div
       class="UpdaterWindow-progressBar"
       :style="{ width: percentComplete + '%' }"/>
@@ -10,14 +10,23 @@
       {{ percentComplete }}%
     </div>
   </div>
-  <div v-if="installing">
-    Having issues? ...
+  <div class="UpdaterWindow-issues" v-if="installing">
+    This may take a few minutes.  If you are having issues updating, please
+    <span class="UpdaterWindow-link" @click="download">
+      download a fresh installer.
+    </span>
+  </div>
+  <div class="UpdaterWindow-issues" v-if="error">
+    There was an error updating. Please
+    <span class="UpdaterWindow-link" @click="download">
+      download a fresh installer.
+    </span>
   </div>
 </div>
 </template>
 
 <script>
-const { ipcRenderer } = window.require('electron');
+const { remote, ipcRenderer } = window.require('electron');
 
 export default {
 
@@ -25,6 +34,7 @@ export default {
     return {
       message: 'Checking for updates',
       installing: false,
+      error: false,
       percentComplete: null
     };
   },
@@ -43,9 +53,21 @@ export default {
         this.installing = true;
         this.message = `Installing version ${data.version}`;
       }
+
+      if (data.error) {
+        this.error = true;
+        this.message = 'Something went wrong';
+      }
     });
 
     ipcRenderer.send('autoUpdate-getState');
+  },
+
+  methods: {
+    download() {
+      remote.shell.openExternal('https://streamlabs.com/streamlabs-obs');
+      remote.app.quit();
+    }
   }
 
 };
@@ -87,5 +109,21 @@ export default {
   text-align: center;
   line-height: 30px;
   font-size: 15px;
+}
+
+.UpdaterWindow-issues {
+  font-size: 13px;
+  font-weight: 300;
+  padding-top: 25px;
+  -webkit-app-region: no-drag;
+}
+
+.UpdaterWindow-link {
+  color: #bbb;
+  cursor: pointer;
+
+  &:hover {
+    color: #eee;
+  }
 }
 </style>
