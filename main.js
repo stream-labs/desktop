@@ -298,7 +298,7 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
-  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE || true) {
+  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
     (new Updater(startApp)).run();
   } else {
     startApp();

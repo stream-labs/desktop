@@ -61,7 +61,7 @@ class Updater {
     autoUpdater.on('update-downloaded', () => {
       this.updateState.installing = true;
       this.pushState();
-      // autoUpdater.quitAndInstall();
+      autoUpdater.quitAndInstall();
     });
 
     autoUpdater.on('error', () => {
@@ -93,8 +93,6 @@ class Updater {
     });
 
     browserWindow.loadURL('file://' + __dirname + '/index.html');
-
-    browserWindow.webContents.openDevTools({ mode: 'detach' });
 
     return browserWindow;
   }
