@@ -560,6 +560,8 @@ export class Selection implements ISelection {
    * returns an array of sceneItem ids
    */
   private resolveItemsList(itemsList: TNodesList): string[] {
+    if (!itemsList) return [];
+
     if (Array.isArray(itemsList)) {
 
       if (!itemsList.length) {

@@ -36,6 +36,7 @@ export interface IScene extends IResource {
 
 export interface ISceneApi extends IScene {
   getNode(sceneNodeId: string): TSceneNodeApi;
+  getNodeByName(name: string): TSceneNodeApi;
   getItem(sceneItemId: string): ISceneItemApi;
   getFolder(sceneFolderId: string): ISceneItemFolderApi;
   getNodes(): (ISceneItemApi | ISceneItemFolderApi)[];
@@ -51,7 +52,7 @@ export interface ISceneApi extends IScene {
   setName(newName: string): void;
   getModel(): IScene;
   makeActive(): void;
-  getSelection(itemsList: TNodesList): ISelection;
+  getSelection(itemsList?: TNodesList): ISelection;
 }
 
 
@@ -139,7 +140,7 @@ export interface ISceneItemActions {
   setContentCrop(): void;
 }
 
-export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
+export interface ISceneItemApi extends ISceneItem, ISceneItemActions, ISceneNodeApi {
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
   select(): void;
@@ -159,6 +160,7 @@ export interface ISceneNodeApi extends ISceneItemNode {
   getScene(): ISceneApi;
   getSelection(): ISelection;
   getParent(): ISceneItemFolder;
+  setParent(parentId: string): void;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
