@@ -2,7 +2,7 @@
 // be required by the main electron process.
 
 const { autoUpdater } = require('electron-updater');
-const { BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -27,6 +27,7 @@ class Updater {
       // This usually means there is no internet connection.
       // In this case, we shouldn't prevent starting the app.
       this.startApp();
+      this.finished = true;
       this.browserWindow.close();
     });
   }
@@ -42,17 +43,30 @@ class Updater {
 
     autoUpdater.on('update-not-available', () => {
       this.startApp();
+      this.finished = true;
       this.browserWindow.close();
     });
 
     autoUpdater.on('download-progress', progress => {
       this.updateState.percent = progress.percent;
       this.updateState.bytesPerSecond = progress.percent;
+
+      if (progress.percent === 100) {
+        this.updateState.installing = true;
+      }
+
       this.pushState();
     });
 
     autoUpdater.on('update-downloaded', () => {
+      this.updateState.installing = true;
+      this.pushState();
       autoUpdater.quitAndInstall();
+    });
+
+    autoUpdater.on('error', () => {
+      this.updateState.error = true;
+      this.pushState();
     });
 
     ipcMain.on('autoUpdate-getState', () => {
@@ -71,6 +85,11 @@ class Updater {
 
     browserWindow.on('ready-to-show', () => {
       browserWindow.show();
+    });
+
+    browserWindow.on('closed', () => {
+      // Prevent leaving a zombie process
+      if (!this.finished) app.quit();
     });
 
     browserWindow.loadURL('file://' + __dirname + '/index.html');
