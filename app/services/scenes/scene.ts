@@ -215,6 +215,10 @@ export class Scene implements ISceneApi {
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
 
+    if (destNode && destNode.id === sourceNode.id) return;
+
+    const destNodeIsParentForSourceNode = destNode && destNode.id === sourceNode.parentId;
+
     let destFolderId = '';
 
     if (destNode) {
@@ -257,7 +261,7 @@ export class Scene implements ISceneApi {
         if (destIsFolderWithoutItemsBefore) {
           newItemIndex = 0;
         } else if (isForwardDirection) {
-          newItemIndex = destNode.isFolder() ?
+          newItemIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
             destItemIndex + destNode.getNestedItems().length :
             destItemIndex;
         } else {
@@ -291,7 +295,7 @@ export class Scene implements ISceneApi {
       const destNodeIndex = destNode.getNodeIndex();
 
       if (destNodeIndex > firstNodeIndex) {
-        newNodeIndex = destNode.isFolder() ?
+        newNodeIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
           destNodeIndex + destNode.getNestedNodes().length - nodesToMoveIds.length + 1 :
           destNodeIndex - nodesToMoveIds.length + 1;
       } else {

@@ -99,6 +99,9 @@ export default class Utils {
 
   static getDeepChangedParams<T>(obj: T, patch: T): Partial<T> {
     const result: Dictionary<any> = {};
+
+    if (obj == null) return patch;
+
     Object.keys(patch).forEach(key => {
       if (!isEqual(obj[key], patch[key])) {
         if (patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])) {
