@@ -27,6 +27,10 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   setParent(parentId: string) {
+    // prevent to set a child folder as parent
+    if (this.isFolder() && this.getNestedNodesIds().indexOf(parentId) !== -1) {
+      return;
+    }
     this.SET_PARENT(parentId);
     this.placeAfter(parentId);
   }

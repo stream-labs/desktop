@@ -1,5 +1,8 @@
 import { ApiClient } from './api-client';
-import { ISceneApi, IScenesServiceApi, TSceneNode, TSceneNodeApi } from '../../app/services/scenes';
+import {
+  ISceneApi, ISceneItemApi, IScenesServiceApi, TSceneNode, TSceneNodeApi,
+  TSceneNodeType
+} from '../../app/services/scenes';
 import { TSourceType } from '../../app/services/sources';
 
 interface ISceneBuilderNode {
@@ -10,6 +13,30 @@ interface ISceneBuilderNode {
   children?: ISceneBuilderNode[];
 }
 
+/**
+ * SceneBuilder helps to create and compare the scene hierarchy via visual sketches
+ * @example
+ *
+ * sceneBuilder.build(`
+ *  Folder1
+ *  Folder2
+ *    Item1: image
+ *    Item2: browser_source
+ *  Folder3
+ *    Item3:
+ * `);
+ *
+ * sceneBuilder.scene.getNodeByName('Item3').remove();
+ *
+ * sceneBuilder.isEqualTo(`
+ *  Folder1
+ *  Folder2
+ *    Item1: image
+ *    Item2: browser_source
+ *  Folder3
+ * `);
+ *
+ */
 export class SceneBuilder {
 
   scene: ISceneApi;
@@ -30,8 +57,8 @@ export class SceneBuilder {
     this.scene = this.scenesService.activeScene;
   }
 
-  parse(scetch: string): ISceneBuilderNode[] {
-    let strings = scetch.split('\n');
+  parse(sketch: string): ISceneBuilderNode[] {
+    let strings = sketch.split('\n');
     let offset = -1;
 
     for (const str of strings) {
@@ -81,7 +108,6 @@ export class SceneBuilder {
   }
 
   private parseLine(line: string): ISceneBuilderNode {
-    console.log('parse line', line);
     if (!line.trim()) return null;
     const isItem = line.indexOf(':') !== -1;
     if (isItem) {
@@ -105,21 +131,68 @@ export class SceneBuilder {
     this.scene.getSelection().selectAll().remove();
   }
 
-
-
   build(scetch: string): ISceneBuilderNode[] {
     this.clearScene();
     const nodes = this.parse(scetch);
     return this.buildNodes(nodes);
   }
 
-  isEqualTo(scetch: string): boolean {
-
+  isEqualTo(sketch: string): boolean {
+    // normalize sketch
+    sketch = this.getSketch(this.parse(sketch));
+    const sceneSketch = this.getSceneScketch();
+    if (sketch === sceneSketch) return true;
+    console.log(`Scene sketch:  \n\n${sceneSketch} \n is not equal to \n\n${sketch}`);
+    return false;
   }
 
-  getSceneSchema(): ISceneBuilderNode[] {
+  getSceneSchema(folderId?: string): ISceneBuilderNode[] {
+    const nodes = folderId ?
+      this.scene.getFolder(folderId).getNodes() :
+      this.scene.getRootNodes();
 
+
+    return nodes.map(sceneNode => {
+      if (sceneNode.isFolder()) {
+        return {
+          name: sceneNode.name,
+          id: sceneNode.id,
+          type: 'folder' as TSceneNodeType,
+          children: this.getSceneSchema(sceneNode.id)
+        };
+      }
+
+      return {
+        name: sceneNode.name,
+        id: sceneNode.id,
+        type: 'item' as TSceneNodeType,
+        sourceType: (sceneNode as ISceneItemApi).getSource().type
+      };
+
+    });
   }
+
+  getSceneScketch(): string {
+    return this.getSketch(this.getSceneSchema());
+  }
+
+  getSketch(nodes: ISceneBuilderNode[], sketch?: string, level?: number): string {
+    sketch = sketch || '';
+    level = level || 0;
+    nodes.forEach(node => {
+      sketch += ' '.repeat(level);
+
+      if (node.type === 'item') {
+        sketch += `${node.name}: ${node.sourceType}\n`;
+      } else if (node.type === 'folder') {
+        sketch += `${node.name}\n`;
+        sketch = this.getSketch(node.children, sketch, level + 1);
+      }
+    });
+
+    return sketch;
+  }
+
 
   private buildNodes(nodes: ISceneBuilderNode[], parentId?: string): ISceneBuilderNode[] {
     nodes.reverse().forEach(node => {

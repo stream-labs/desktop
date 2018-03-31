@@ -181,7 +181,7 @@ export class Scene implements ISceneApi {
       name,
       sceneNodeType: 'folder',
       sceneId: this.id,
-      resourceId: 'SceneFolder' + JSON.stringify([this.id, id]),
+      resourceId: 'SceneItemFolder' + JSON.stringify([this.id, id]),
       parentId: '',
       childrenIds: []
     });
