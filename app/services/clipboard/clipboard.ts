@@ -1,11 +1,12 @@
-import { mutation, StatefulService } from './stateful-service';
-import { ScenesService } from './scenes';
-import { SourcesService } from './sources';
-import { shortcut } from './shortcuts';
-import { Inject } from '../util/injector';
-import { SourceFiltersService } from './source-filters';
+import { mutation, StatefulService } from 'services/stateful-service';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from 'services/sources';
+import { shortcut } from 'services/shortcuts';
+import { Inject } from '../../util/injector';
+import { SourceFiltersService } from 'services/source-filters';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { IClipboardServiceApi } from './clipboard-api';
 
 
 interface IClipboardState {
@@ -14,7 +15,7 @@ interface IClipboardState {
   filterIds: string[];
 }
 
-export class ClipboardService extends StatefulService<IClipboardState> {
+export class ClipboardService extends StatefulService<IClipboardState> implements IClipboardServiceApi {
 
   static initialState: IClipboardState = {
     itemsSceneId: '',

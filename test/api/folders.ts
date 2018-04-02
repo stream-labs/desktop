@@ -1,13 +1,8 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { ISelectionServiceApi } from '../../app/services/selection';
-import { ICustomizationServiceApi } from '../../app/services/customization';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { sleep } from '../helpers/sleep';
-import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
-import { name } from "aws-sdk/clients/importexport";
+import { ISceneApi, ISceneNodeApi } from '../../app/services/scenes';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -43,7 +38,6 @@ test('Place after and place before', async t => {
     Item2:
   `));
 
-  t.pass();
 });
 
 
