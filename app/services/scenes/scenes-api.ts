@@ -36,9 +36,11 @@ export interface IScene extends IResource {
 
 export interface ISceneApi extends IScene {
   getNode(sceneNodeId: string): TSceneNodeApi;
+  getNodeByName(name: string): TSceneNodeApi;
   getItem(sceneItemId: string): ISceneItemApi;
   getFolder(sceneFolderId: string): ISceneItemFolderApi;
-  getNodes(): (ISceneItemApi | ISceneItemFolderApi)[];
+  getNodes(): TSceneNodeApi[];
+  getRootNodes(): TSceneNodeApi[];
   getItems(): ISceneItemApi[];
   getFolders(): ISceneItemFolderApi[];
   addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
@@ -51,7 +53,7 @@ export interface ISceneApi extends IScene {
   setName(newName: string): void;
   getModel(): IScene;
   makeActive(): void;
-  getSelection(itemsList: TNodesList): ISelection;
+  getSelection(itemsList?: TNodesList): ISelection;
 }
 
 
@@ -139,7 +141,8 @@ export interface ISceneItemActions {
   setContentCrop(): void;
 }
 
-export interface ISceneItemApi extends ISceneItem, ISceneItemActions {
+export interface ISceneItemApi extends ISceneItem, ISceneItemActions, ISceneNodeApi {
+  name: string;
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
   select(): void;
@@ -159,18 +162,26 @@ export interface ISceneNodeApi extends ISceneItemNode {
   getScene(): ISceneApi;
   getSelection(): ISelection;
   getParent(): ISceneItemFolder;
+  setParent(parentId: string): void;
+  placeBefore(nodeId: string): void;
+  placeAfter(nodeId: string): void;
+  isItem(): boolean;
+  isFolder(): boolean;
+  remove(): void;
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
   name: string;
 }
 
-export interface ISceneItemFolderApi extends ISceneItemFolder {
+export interface ISceneItemFolderApi extends ISceneItemFolder, ISceneNodeApi {
   getScene(): ISceneApi;
   getSelection(): ISelection;
   getParent(): ISceneItemFolder;
   setParent(parentId: string): void;
   getItems(): ISceneItemApi[];
+  getNodes(): TSceneNodeApi[];
+  getFolders(): ISceneItemFolderApi[];
   setName(newName: string): void;
   select(): void;
 }

@@ -338,6 +338,11 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   }
 
 
+  getSelection() {
+    return this.getScene().getSelection(this.id);
+  }
+
+
   /**
    * A rectangle representing this sceneItem
    */

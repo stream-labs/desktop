@@ -417,11 +417,18 @@ export class ServicesManager extends Service {
     }
     const resourceScheme = {};
 
-    Object.keys(Object.getPrototypeOf(resource))
-      .concat(Object.keys(resource))
-      .forEach(key => {
-        resourceScheme[key] = typeof resource[key];
-      });
+    // collect resource keys from the whole prototype chain
+    const keys: string[] = [];
+    let proto = resource;
+    do {
+      keys.push(...Object.keys(proto));
+      proto = Object.getPrototypeOf(proto);
+    } while (proto.constructor.name !== 'Object');
+
+    keys.forEach(key => {
+      resourceScheme[key] = typeof resource[key];
+    });
+
 
     return resourceScheme;
   }
