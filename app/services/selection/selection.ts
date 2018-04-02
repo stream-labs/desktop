@@ -165,6 +165,8 @@ export class Selection implements ISelection {
 
   @Inject() private scenesService: ScenesService;
 
+  _resourceId: string;
+
   private state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: ''
@@ -208,6 +210,8 @@ export class Selection implements ISelection {
     if (!this.state.selectedIds.includes(this.state.lastSelectedId)) {
       this.setState({ lastSelectedId: selectedIds[selectedIds.length - 1] });
     }
+
+    this._resourceId = 'Selection' + JSON.stringify([this.sceneId, this.state.selectedIds]);
 
     return this;
   }
@@ -348,7 +352,7 @@ export class Selection implements ISelection {
   }
 
   selectAll(): Selection {
-    this.select(this.getScene().getItems().map(item => item.sceneItemId));
+    this.select(this.getScene().getNodes().map(node => node.id));
     return this;
   }
 
@@ -560,6 +564,8 @@ export class Selection implements ISelection {
    * returns an array of sceneItem ids
    */
   private resolveItemsList(itemsList: TNodesList): string[] {
+    if (!itemsList) return [];
+
     if (Array.isArray(itemsList)) {
 
       if (!itemsList.length) {

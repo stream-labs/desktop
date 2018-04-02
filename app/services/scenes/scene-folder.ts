@@ -67,6 +67,11 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
     return this.getNodes().filter(node => node.sceneNodeType === 'item') as SceneItem[];
   }
 
+  getFolders(): SceneItemFolder[] {
+    return this.getNodes().filter(node => node.sceneNodeType === 'folder') as SceneItemFolder[];
+  }
+
+
   getScene(): Scene {
     return this.scenesService.getScene(this.sceneId);
   }

@@ -83,6 +83,13 @@ export class Scene implements ISceneApi {
     return (node && node.sceneNodeType === 'folder') ? node as SceneItemFolder : null;
   }
 
+  /**
+   * returns first node with selected name
+   */
+  getNodeByName(name: string): TSceneNode {
+    return this.getNodes().find(node => node.name === name);
+  }
+
   getItems(): SceneItem[] {
     return this.sceneState.nodes
       .filter(node => node.sceneNodeType === 'item')
@@ -174,7 +181,7 @@ export class Scene implements ISceneApi {
       name,
       sceneNodeType: 'folder',
       sceneId: this.id,
-      resourceId: 'SceneFolder' + JSON.stringify([this.id, id]),
+      resourceId: 'SceneItemFolder' + JSON.stringify([this.id, id]),
       parentId: '',
       childrenIds: []
     });
