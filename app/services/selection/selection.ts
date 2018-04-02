@@ -360,33 +360,37 @@ export class Selection implements ISelection {
     const insertedNodes: TSceneNode[] = [];
     const scene = this.scenesService.getScene(sceneId);
     const foldersMap: Dictionary<string> = {};
+    let prevInsertedNode: TSceneNode;
+    let insertedNode: TSceneNode;
 
     // copy items and folders structure
     this.getNodes().forEach(sceneNode => {
       if (sceneNode.isFolder()) {
-        const newFolder = scene.createFolder(sceneNode.name);
-        foldersMap[sceneNode.id] = newFolder.id;
-        insertedNodes.push(newFolder);
+        insertedNode = scene.createFolder(sceneNode.name);
+        foldersMap[sceneNode.id] = insertedNode.id;
+        insertedNodes.push(insertedNode);
       } else if (sceneNode.isItem()) {
-        const insertedItem = scene.addSource(
+        insertedNode = scene.addSource(
           sceneNode.sourceId
         );
-        insertedItem.setSettings(sceneNode.getSettings());
-        insertedNodes.push(insertedItem);
-        const newParentId = foldersMap[sceneNode.parentId];
-        if (newParentId) {
-          insertedItem.setParent(newParentId);
-        }
+        insertedNode.setSettings(sceneNode.getSettings());
+        insertedNodes.push(insertedNode);
       }
-    });
 
-    // insert the all copied items in folder if it's defined
-    const folder = scene.getFolder(folderId);
-    if (folder) {
-      scene.getSelection(insertedNodes.map(node => node.id)).getRootNodes().forEach(sceneNode => {
-        sceneNode.setParent(folderId);
-      });
-    }
+      const newParentId = foldersMap[sceneNode.parentId] || '';
+      if (newParentId) {
+        insertedNode.setParent(newParentId);
+      }
+
+      if (
+        prevInsertedNode &&
+        (prevInsertedNode.parentId === newParentId)
+      ) {
+        insertedNode.placeAfter(prevInsertedNode.id);
+      }
+
+      prevInsertedNode = insertedNode;
+    });
 
     return insertedNodes;
   }
