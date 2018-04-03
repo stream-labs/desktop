@@ -27,7 +27,7 @@
         @search-change="debouncedGameSearch"
         @input="onGameInput"/>
       <div v-if="areAvailableProfiles">
-        <div class="input-container">
+        <div class="input-container" v-if="isTwitch || isYoutube">
           <div class="input-label"/>
           <div class="input-wrapper">
             <div class="checkbox">
