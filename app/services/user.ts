@@ -147,10 +147,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   recentEventsUrl() {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
-      const token = this.apiToken;
+      const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-      return `https://${host}/dashboard/recent-events?oauth_token=${token}&mode=${nightMode}&electron`;
+      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
     }
   }
 
