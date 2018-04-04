@@ -8,10 +8,6 @@ export default class Dashboard extends Vue {
   @Inject() userService: UserService;
   @Prop() params: Dictionary<string>;
 
-  // mounted() {
-  //   (this.$refs.foo as any).webContents.openDevTools({ mode: 'detach' });
-  // }
-
   get loggedIn() {
     return this.userService.isLoggedIn();
   }
