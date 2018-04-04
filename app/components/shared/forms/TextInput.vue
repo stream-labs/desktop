@@ -23,6 +23,7 @@
       @click="toggleVisible">
       {{ textVisible ? 'Hide' : 'Show' }}
     </button>
+    <slot></slot>
   </div>
 </div>
 </template>

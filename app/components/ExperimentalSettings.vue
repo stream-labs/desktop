@@ -1,8 +1,14 @@
 <template>
   <div>
     <div class="section">
-      <GenericForm v-model="settingsFormData" @input="saveSettings" />
+      <RemoteControlQRCode/>
+      <br/><br/>
     </div>
+
+    <!--<div class="section">-->
+      <!--<GenericForm v-model="settingsFormData" @input="saveSettings" />-->
+    <!--</div>-->
+
   </div>
 </template>
 
