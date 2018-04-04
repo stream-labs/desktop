@@ -6,7 +6,7 @@
       <span v-if="!qrcodeIsVisible">Click to show</span>
     </div>
     <div class="description">
-      You can now control SLOBS from your mobile phone. <br/>
+      You can now control Streamlabs OBS from your mobile phone. <br/>
       To begin, scan this QR code with your phone.
     </div>
   </div>
