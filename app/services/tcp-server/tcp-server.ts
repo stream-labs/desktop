@@ -69,7 +69,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   private isRequestsHandlingStopped = false;
 
   // enable to debug
-  private enableLogs = true;
+  private enableLogs = false;
 
 
   init() {
