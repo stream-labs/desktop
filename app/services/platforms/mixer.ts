@@ -4,7 +4,7 @@ import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, requiresToken } from '../../util/requests';
+import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 import { integer } from 'aws-sdk/clients/cloudfront';
 
@@ -48,10 +48,6 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
     return this.userService.platform.username;
   }
 
-  get widgetToken() {
-    return this.userService.widgetToken;
-  }
-
   get mixerId() {
     return this.userService.platform.id;
   }
@@ -92,8 +88,9 @@ export class MixerService extends StatefulService<IMixerServiceState> implements
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/mixer/refresh?token=${this.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${host}/api/v5/slobs/mixer/refresh`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     return fetch(request)
       .then(handleErrors)

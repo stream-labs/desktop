@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="dashboard-container">
-    <webview class="dashboard" v-show="loggedIn" id="dashboardWebview" :src="dashboardUrl"></webview>
+    <webview ref="foo" class="dashboard" v-show="loggedIn" id="dashboardWebview" :src="dashboardUrl"></webview>
     <!-- <p v-else>User Not Logged In, Display something here????</p> -->
   </div>
 </div>
