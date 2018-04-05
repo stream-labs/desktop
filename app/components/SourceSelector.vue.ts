@@ -107,17 +107,9 @@ export default class SourceSelector extends Vue {
     nodeToMove.select();
   }
 
-  makeActive(treeNode: ISlTreeNode<ISceneItemNode>, ev: MouseEvent) {
-    const sceneNode = this.scene.getNode(treeNode.data.id);
-    if (ev.ctrlKey) {
-      if (sceneNode.isSelected() && ev.button !== 2) {
-        sceneNode.deselect();
-      } else {
-        sceneNode.addToSelection();
-      }
-    } else if (!(ev.button === 2 && sceneNode.isSelected())) {
-      sceneNode.select();
-    }
+  makeActive(treeNodes: ISlTreeNode<ISceneItemNode>[], ev: MouseEvent) {
+    const ids = treeNodes.map(treeNode => treeNode.data.id);
+    this.selectionService.select(ids);
   }
 
   toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
