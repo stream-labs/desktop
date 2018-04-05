@@ -258,6 +258,30 @@ To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 }
 ```
 
+# Remote connections
+Streamlabs OBS allows remote connection via websokets protocol powered by [Sockjs](https://github.com/sockjs).
+To enable remote connections run Streamlabs OBS with `--adv-settings` parameter, go to `Settings->API`,
+enable Websokets and check `Allow Remote Connections`.
+Use API token from this window to authorize you connection:
+
+
+### Request
+```
+{
+    "jsonrpc": "2.0",
+    "id": 8,
+    "method": "auth",
+    "params": {
+        "resource": "TcpServerService",
+        "args": ["your_secret_token_here"]
+    }
+}
+```
+
+Local connections to '127.0.0.1' don't require authorization.
+
+
+
 # FAQ
 
 ## What is the difference between Sources and SceneItems?
