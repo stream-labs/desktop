@@ -2,7 +2,7 @@
 <div>
   <div class="flex">
     <div class="fader" @click="showQrcode">
-      <qrcode :value="qrcodeVal" :options="{ size: 200 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
+      <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
       <span v-if="!qrcodeIsVisible">Click to show</span>
     </div>
     <div class="description">
@@ -41,11 +41,12 @@
      position: relative;
      overflow: hidden;
      cursor: pointer;
+     width: 320px;
 
      span {
        position: absolute;
-       top: 85px;
-       left: 45px;
+       top: 100px;
+       left: 70px;
        display: block;
        color: white;
        font-size: 16px;
