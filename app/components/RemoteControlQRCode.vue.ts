@@ -39,7 +39,7 @@ export default class RemoteControlQRCodeVue extends Vue {
   get qrcodeVal(): string {
     if (!this.qrcodeIsVisible) return 'nothing to show yet';
     const encodedData = encodeURIComponent(JSON.stringify(this.qrcodeData));
-    return `http://${this.hostsService.streamlabs}/slobsremote?data=${encodedData}`;
+    return `http://${this.hostsService.streamlabs}/api/v1/remotecontrol?data=${encodedData}`;
   }
 
   showQrcode() {
