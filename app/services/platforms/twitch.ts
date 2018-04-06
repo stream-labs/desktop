@@ -134,7 +134,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   getChatUrl(mode: string) {
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    return Promise.resolve(`https://twitch.tv/embed/${this.userService.platform.username}/chat?${nightMode}`);
+    return Promise.resolve(`https://twitch.tv/popout/${this.userService.platform.username}/chat?${nightMode}`);
   }
 
   searchCommunities(searchString: string) {
