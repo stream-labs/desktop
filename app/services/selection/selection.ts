@@ -7,7 +7,7 @@ import {
   ISceneItem,
   ISceneItemSettings,
   IPartialTransform,
-  TSceneNode, ISceneItemNode, SceneItemFolder
+  TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
@@ -295,8 +295,8 @@ export class Selection implements ISelection {
     });
   }
 
-  getLastSelected(): SceneItem {
-    return this.getScene().getItem(this.state.lastSelectedId);
+  getLastSelected(): TSceneNode {
+    return this.getScene().getNode(this.state.lastSelectedId);
   }
 
   getLastSelectedId(): string {
@@ -344,7 +344,7 @@ export class Selection implements ISelection {
     return this;
   }
 
-  isSelected(sceneNode: string | ISceneItemNode) {
+  isSelected(sceneNode: string | TSceneNodeModel) {
     const itemId = (typeof sceneNode === 'string') ?
       sceneNode :
       (sceneNode as ISceneItem).sceneItemId;
