@@ -3,7 +3,7 @@ import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from '../util/injector';
-import { handleErrors } from '../util/requests';
+import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
@@ -76,9 +76,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.isLoggedIn()) return;
 
     const host = this.hostsService.streamlabs;
-    const token = this.widgetToken;
-    const url = `https://${host}/api/v5/slobs/validate/${token}`;
-    const request = new Request(url);
+    const headers = authorizedHeaders(this.apiToken);
+    const url = `https://${host}/api/v5/slobs/validate`;
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(res => {
@@ -144,23 +144,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }
   }
 
-  widgetUrl(type: string) {
+  recentEventsUrl() {
     if (this.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-      if (type === 'recent-events') {
-        return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
-      }
-
-      if (type === 'dashboard') {
-        return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&show_recent_events=0`;
-      }
-
-      if (type === 'alertbox') {
-        return `https://${host}/slobs/dashboard/alertbox/${token}?mode=${nightMode}`;
-      }
+      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
     }
   }
 
@@ -168,10 +158,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const host = Util.isPreview()
       ? this.hostsService.beta3
       : this.hostsService.streamlabs;
-    const token = this.widgetToken;
+    const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    return `https://${host}/slobs/dashboard/${token}?mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
   overlaysUrl() {
@@ -182,7 +172,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
-      url = url + `&token=${this.widgetToken}`;
+      url = url + `&oauth_token=${this.apiToken}`;
     }
 
     return url;
@@ -190,9 +180,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/donation/settings/${this
-      .widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${host}/api/v5/slobs/donation/settings`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
 
     return fetch(request)
       .then(handleErrors)

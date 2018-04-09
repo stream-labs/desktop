@@ -2,7 +2,7 @@ import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors } from 'util/requests';
+import { handleErrors, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import uuid from 'uuid/v4';
 import fs from 'fs';
@@ -255,11 +255,10 @@ export class StreamlabelsService extends Service {
       this.outputAllTrains();
     }
 
-    const headers = new Headers();
+    const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-    `/settings?token=${this.userService.widgetToken}`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const request = new Request(url, {
       method: 'POST',
       headers,
@@ -274,9 +273,9 @@ export class StreamlabelsService extends Service {
   restartSession(): Promise<Boolean> {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/stream-labels` +
-      `/restart-session?token=${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/stream-labels/restart-session`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     return fetch(request)
       .then(handleErrors)
@@ -296,9 +295,9 @@ export class StreamlabelsService extends Service {
   private fetchInitialData(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-      `/files?token=${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(handleErrors)
@@ -310,9 +309,9 @@ export class StreamlabelsService extends Service {
   private fetchSettings(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels` +
-      `/settings?token=${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(handleErrors)
@@ -331,8 +330,9 @@ export class StreamlabelsService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token/${this.userService.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     fetch(request)
       .then(handleErrors)

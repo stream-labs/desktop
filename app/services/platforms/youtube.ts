@@ -4,7 +4,7 @@ import { IPlatformService, IChannelInfo, IPlatformAuth } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
-import { handleErrors, requiresToken } from '../../util/requests';
+import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
 
 interface IYoutubeServiceState {
@@ -36,10 +36,6 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
 
   get oauthToken() {
     return this.userService.platform.token;
-  }
-
-  get widgetToken() {
-    return this.userService.widgetToken;
   }
 
   get youtubeId() {
@@ -186,8 +182,9 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/youtube/token/${this.widgetToken}`;
-    const request = new Request(url);
+    const url = `https://${host}/api/v5/slobs/youtube/token`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
     return fetch(request)
       .then(handleErrors)

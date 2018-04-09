@@ -49,6 +49,6 @@ export default class Live extends Vue {
   }
 
   get recenteventsUrl() {
-    return this.userService.widgetUrl('recent-events');
+    return this.userService.recentEventsUrl();
   }
 }
