@@ -94,7 +94,7 @@ export default class Chat extends Vue {
   }
 
   refresh() {
-    this.$refs.chat.reload();
+    this.$refs.chat.loadURL(this.chatUrl);
   }
 
   private onSettingsChangedHandler(changedSettings: Partial<ICustomizationSettings>) {
