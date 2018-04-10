@@ -123,12 +123,21 @@ export class SceneItemFolder extends SceneItemNode implements ISceneItemFolderAp
       .filter(node => node.sceneNodeType === 'item') as SceneItem[];
   }
 
+  getNestedFolders(): SceneItemFolder[] {
+    return this.getNestedNodes()
+      .filter(node => node.sceneNodeType === 'folder') as SceneItemFolder[];
+  }
+
   getNestedNodesIds(): string[] {
     return this.getNestedNodes().map(node => node.id);
   }
 
   getNestedItemsIds(): string[] {
     return this.getNestedItems().map(item => item.id);
+  }
+
+  getNestedFoldersIds(): string[] {
+    return this.getNestedFolders().map(folder => folder.id);
   }
 
   setName(name: string) {

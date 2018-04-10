@@ -143,9 +143,12 @@ export interface ISceneItemActions {
 
 export interface ISceneItemApi extends ISceneItem, ISceneItemActions, ISceneNodeApi {
   name: string;
+
+  /**
+   * Returns the related source for the current item
+   */
   getSource(): ISourceApi;
   getModel(): ISceneItem & ISource;
-  select(): void;
 }
 
 export type TSceneNodeType = 'item' | 'folder';
@@ -158,30 +161,211 @@ export interface ISceneItemNode extends IResource {
   childrenIds?: string[];
 }
 
+/**
+ * API for scene items and folders
+ */
 export interface ISceneNodeApi extends ISceneItemNode {
   getScene(): ISceneApi;
+
+  /**
+   * For a source folder, returns an ISelection with the all items and folders in the folder
+   * For a scene item, returns an ISelection with only one item
+   */
   getSelection(): ISelection;
+
+  /**
+   * Returns parent folder
+   */
   getParent(): ISceneItemFolder;
+
+  /**
+   * Sets parent folder
+   */
   setParent(parentId: string): void;
+
+  /**
+   * Returns true if the node is inside the folder
+   */
+  hasParent(): void;
+
+  /**
+   * After detaching the parent the current node will be a first-level-nesting node
+   */
+  detachParent(): void;
+
+  /**
+   * Place the current node before provided node
+   * This method can change the parent of current node
+   */
   placeBefore(nodeId: string): void;
+  /**
+   * Place the current node after provided node
+   * This method can change the parent of current node
+   */
   placeAfter(nodeId: string): void;
+
+  /**
+   * Check the node is scene item
+   */
   isItem(): boolean;
+
+  /**
+   * Check the node is scene folder
+   */
   isFolder(): boolean;
+
+  /**
+   * Removes the node.
+   * For folders, all nested folders and items also will be removed.
+   * To remove a folder without removing the nested nodes, use the ISceneItemFolderApi.ungroup() method
+   * @see ISceneItemFolderApi.ungroup()
+   */
   remove(): void;
+
+  /**
+   * Shortcut for SelectionService.isSelected(id)
+   */
+  isSelected(): boolean;
+
+  /**
+   * Shortcut for SelectionService.select(id)
+   */
+  select(): void;
+
+  /**
+   * Shortcut for SelectionService.add(id)
+   */
+  addToSelection(): void;
+
+  /**
+   * Shortcut for SelectionService.deselect(id)
+   */
+  deselect(): void;
+
+  /**
+   * Returns the node index in the list of all nodes
+   */
+  getNodeIndex(): number;
+
+  /**
+   * Returns the item index in the list of all nodes.
+   * itemIndex defines the draw order of the node
+   * itemIndex for a SceneFolder is the itemIndex of the previous SceneItem
+   *
+   * nodeInd | itemInd | nodes tree
+   *  0      |    0    | Folder1
+   *  1      |    0    |   |_Folder2
+   *  2      |    0    |   |_ Item1
+   *  3      |    1    |   \_ Item2
+   *  4      |    2    | Item3
+   *  5      |    2    | Folder3
+   *  6      |    3    |   |_Item4
+   *  7      |    4    |   \_Item5
+   */
+  getItemIndex(): number;
+
+  /**
+   * Returns a node with the previous nodeIndex
+   */
+  getPrevNode(): TSceneNodeApi;
+
+  /**
+   * Returns a node with the next nodeIndex
+   */
+  getNextNode(): TSceneNodeApi;
+
+  /**
+   * Returns the closest next item from the nodes list
+   */
+  getNextItem(): ISceneItemApi;
+
+  /**
+   * Returns the closest previous item from the nodes list
+   */
+  getPrevItem(): ISceneItemApi;
+
+  /**
+   * Returns the next sibling node if it exists
+   */
+  getNextSiblingNode(): TSceneNodeApi;
+
+  /**
+   * Returns the previous sibling node if it exists
+   */
+  getPrevSiblingNode(): TSceneNodeApi;
+
+
+  /**
+   * Returns a node path - the chain of all parent ids for the node
+   */
+  getPath(): string[];
 }
 
 export interface ISceneItemFolder extends ISceneItemNode {
   name: string;
 }
 
+/**
+ * API for scene folders
+ */
 export interface ISceneItemFolderApi extends ISceneItemFolder, ISceneNodeApi {
-  getScene(): ISceneApi;
-  getSelection(): ISelection;
-  getParent(): ISceneItemFolder;
-  setParent(parentId: string): void;
-  getItems(): ISceneItemApi[];
+
+  /**
+   * Returns all direct children items and folders
+   * To get all nested children
+   * @see getNestedNodes
+   */
   getNodes(): TSceneNodeApi[];
+
+  /**
+   * Returns all direct children items
+   */
+  getItems(): ISceneItemApi[];
+
+  /**
+   * Returns all direct children folders
+   */
   getFolders(): ISceneItemFolderApi[];
+
+
+  /**
+   * Returns all nested nodes.
+   * To get only direct children nodes
+   * @see getNodes
+   */
+  getNestedNodes(): TSceneNodeApi[];
+
+  /**
+   * Returns all nested items
+   */
+  getNestedItems(): ISceneItemApi[];
+
+  /**
+   * Returns all nested folders
+   */
+  getNestedFolders(): ISceneItemFolderApi[];
+
+  getNestedNodesIds(): string[];
+  getNestedItemsIds(): string[];
+  getNestedFoldersIds(): string[];
+
+  /**
+   * Renames the folder
+   */
   setName(newName: string): void;
-  select(): void;
+
+  /**
+   * Add an item or folder to the current folder
+   * Shortcut for `ISceneNodeApi.setParent()`
+   */
+  add(sceneNodeId: string): void;
+
+  /**
+   * Removes folder, but keep the all nested nodes untouched
+   */
+  ungroup(): void;
+
+
+  getModel(): ISceneItemFolder;
+
 }
