@@ -37,6 +37,9 @@ interface IItemSchema {
   scaleX: number;
   scaleY: number;
 
+  crop?: ICrop;
+  rotation?: number;
+
   content: TContent;
 
   filters?: IFilterInfo[];
@@ -91,6 +94,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       y: sceneItem.transform.position.y / this.videoService.baseHeight,
       scaleX: sceneItem.transform.scale.x / this.videoService.baseWidth,
       scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight,
+      crop: sceneItem.transform.crop,
+      rotation: sceneItem.transform.rotation,
       filters: sceneItem.getObsInput().filters.map(filter => {
         filter.save();
 
@@ -164,7 +169,10 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         sceneItem = context.scene.createAndAddSource(sceneItemObj.name, 'dshow_input', {}, { id });
       }
 
-      this.adjustPositionAndScale(sceneItem, sceneItemObj);
+      // Avoid overwriting the crop for webcams
+      delete sceneItemObj.crop;
+
+      this.adjustTransform(sceneItem, sceneItemObj);
 
       await sceneItemObj.content.load({
         sceneItem,
@@ -187,7 +195,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       sceneItem = context.scene.createAndAddSource(sceneItemObj.name, 'browser_source', {}, { id });
     }
 
-    this.adjustPositionAndScale(sceneItem, sceneItemObj);
+    this.adjustTransform(sceneItem, sceneItemObj);
     await sceneItemObj.content.load({ sceneItem, assetsPath: context.assetsPath });
 
     if (sceneItemObj.filters) {
@@ -202,7 +210,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     }
   }
 
-  adjustPositionAndScale(item: SceneItem, obj: IItemSchema) {
+  adjustTransform(item: SceneItem, obj: IItemSchema) {
     item.setTransform({
       position: {
         x: obj.x * this.videoService.baseWidth,
@@ -211,15 +219,9 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       scale: {
         x: obj.scaleX * this.videoService.baseWidth,
         y: obj.scaleY * this.videoService.baseHeight
-      }
+      },
+      crop: obj.crop,
+      rotation: obj.rotation
     });
-  }
-
-  normalizedScale(scale: number) {
-    return scale * (1920 / this.videoService.baseWidth);
-  }
-
-  denormalizedScale(scale: number) {
-    return scale / (1920 / this.videoService.baseWidth);
   }
 }
