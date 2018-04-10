@@ -176,7 +176,7 @@ export interface ISceneNodeApi extends ISceneItemNode {
   /**
    * Returns parent folder
    */
-  getParent(): ISceneItemFolder;
+  getParent(): ISceneItemFolderApi;
 
   /**
    * Sets parent folder
@@ -217,33 +217,34 @@ export interface ISceneNodeApi extends ISceneItemNode {
   /**
    * Removes the node.
    * For folders, all nested folders and items also will be removed.
-   * To remove a folder without removing the nested nodes, use the ISceneItemFolderApi.ungroup() method
+   * To remove a folder without removing the nested nodes, use the `ISceneItemFolderApi.ungroup()` method
    * @see ISceneItemFolderApi.ungroup()
    */
   remove(): void;
 
   /**
-   * Shortcut for SelectionService.isSelected(id)
+   * Shortcut for `SelectionService.isSelected(id)`
    */
   isSelected(): boolean;
 
   /**
-   * Shortcut for SelectionService.select(id)
+   * Shortcut for `SelectionService.select(id)`
    */
   select(): void;
 
   /**
-   * Shortcut for SelectionService.add(id)
+   * Shortcut for `SelectionService.add(id)`
    */
   addToSelection(): void;
 
   /**
-   * Shortcut for SelectionService.deselect(id)
+   * Shortcut for `SelectionService.deselect(id)`
    */
   deselect(): void;
 
   /**
    * Returns the node index in the list of all nodes
+   * To change node index use `placeBefore` and `placeAfter` methods
    */
   getNodeIndex(): number;
 
@@ -252,6 +253,9 @@ export interface ISceneNodeApi extends ISceneItemNode {
    * itemIndex defines the draw order of the node
    * itemIndex for a SceneFolder is the itemIndex of the previous SceneItem
    *
+   * To change itemIndex use `placeBefore` and `placeAfter` methods
+   *
+   * <pre>
    * nodeInd | itemInd | nodes tree
    *  0      |    0    | Folder1
    *  1      |    0    |   |_Folder2
@@ -261,6 +265,7 @@ export interface ISceneNodeApi extends ISceneItemNode {
    *  5      |    2    | Folder3
    *  6      |    3    |   |_Item4
    *  7      |    4    |   \_Item5
+   *  </pre>
    */
   getItemIndex(): number;
 
