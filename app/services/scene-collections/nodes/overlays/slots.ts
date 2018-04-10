@@ -40,7 +40,7 @@ interface IItemSchema {
 
   content: TContent;
 
-  filters: IFilterInfo[];
+  filters?: IFilterInfo[];
 }
 
 export interface IFolderSchema {
