@@ -34,7 +34,6 @@ interface IItemSchema {
   x: number;
   y: number;
 
-  // These values are normalized for a 1920x1080 base resolution
   scaleX: number;
   scaleY: number;
 
