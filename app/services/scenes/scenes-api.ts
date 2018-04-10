@@ -249,7 +249,7 @@ export interface ISceneNodeApi extends ISceneItemNode {
 
   /**
    * Returns the item index in the list of all nodes.
-   * itemIndex defines the draw order of node
+   * itemIndex defines the draw order of the node
    * itemIndex for SceneFolder is itemIndex of previous SceneItem
    *
    * nodeInd | itemInd | nodes tree
