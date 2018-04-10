@@ -1,14 +1,16 @@
 import { ArrayNode } from '../array-node';
-import { SceneItem, Scene, TSceneNode, TSceneNodeType } from '../../../scenes';
-import { VideoService } from '../../../video';
-import { SourcesService } from '../../../sources';
-import { Inject } from '../../../../util/injector';
+import { SceneItem, Scene, TSceneNode, TSceneNodeType } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { SourcesService } from 'services/sources';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
+import { Inject } from 'util/injector';
 import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
 import { StreamlabelNode } from './streamlabel';
 import { WidgetNode } from './widget';
+import * as obs from '../../../../../obs-api';
 
 type TContent =
   | ImageNode
@@ -17,6 +19,12 @@ type TContent =
   | VideoNode
   | StreamlabelNode
   | WidgetNode;
+
+interface IFilterInfo {
+  name: string;
+  type: string;
+  settings: obs.ISettings;
+}
 
 interface IItemSchema {
   id: string;
@@ -31,6 +39,8 @@ interface IItemSchema {
   scaleY: number;
 
   content: TContent;
+
+  filters: IFilterInfo[];
 }
 
 export interface IFolderSchema {
@@ -51,7 +61,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   schemaVersion = 1;
 
   @Inject() videoService: VideoService;
-
+  @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
 
   getItems(context: IContext) {
@@ -81,7 +91,16 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       x: sceneItem.transform.position.x / this.videoService.baseWidth,
       y: sceneItem.transform.position.y / this.videoService.baseHeight,
       scaleX: sceneItem.transform.scale.x / this.videoService.baseWidth,
-      scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight
+      scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight,
+      filters: sceneItem.getObsInput().filters.map(filter => {
+        filter.save();
+
+        return {
+          name: filter.name,
+          type: filter.id,
+          settings: filter.settings
+        };
+      })
     };
 
     const manager = sceneItem.source.getPropertiesManagerType();
@@ -171,6 +190,15 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     this.adjustPositionAndScale(sceneItem, sceneItemObj);
     await sceneItemObj.content.load({ sceneItem, assetsPath: context.assetsPath });
+
+    sceneItemObj.filters.forEach(filter => {
+      this.sourceFiltersService.add(
+        sceneItem.sourceId,
+        filter.type as TSourceFilterType,
+        filter.name,
+        filter.settings
+      );
+    });
   }
 
   adjustPositionAndScale(item: SceneItem, obj: IItemSchema) {
