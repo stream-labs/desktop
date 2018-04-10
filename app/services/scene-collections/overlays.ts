@@ -6,6 +6,7 @@ import { ImageNode } from './nodes/overlays/image';
 import { TextNode } from './nodes/overlays/text';
 import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
+import { TransitionNode } from './nodes/overlays/transition';
 import { parse } from './parse';
 import { StreamlabelNode } from './nodes/overlays/streamlabel';
 import { WidgetNode } from './nodes/overlays/widget';
@@ -29,7 +30,8 @@ const NODE_TYPES = {
   WebcamNode,
   VideoNode,
   StreamlabelNode,
-  WidgetNode
+  WidgetNode,
+  TransitionNode
 };
 
 export interface IDownloadProgress {
