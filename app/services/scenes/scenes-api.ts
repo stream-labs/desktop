@@ -168,8 +168,8 @@ export interface ISceneNodeApi extends ISceneItemNode {
   getScene(): ISceneApi;
 
   /**
-   * For scene folder returns ISelection with the all items and folders of folder
-   * For scene item returns ISelection with only one item
+   * For a source folder, returns an ISelection with the all items and folders in the folder
+   * For a scene item, returns an ISelection with only one item
    */
   getSelection(): ISelection;
 
@@ -215,9 +215,9 @@ export interface ISceneNodeApi extends ISceneItemNode {
   isFolder(): boolean;
 
   /**
-   * Remove the node.
-   * For folders the all nested folders and items also will be removed.
-   * To remove folder without removing the nested nodes use `ISceneItemFolderApi.ungroup()` method
+   * Removes the node.
+   * For folders, all nested folders and items also will be removed.
+   * To remove a folder without removing the nested nodes, use the ISceneItemFolderApi.ungroup() method
    * @see ISceneItemFolderApi.ungroup()
    */
   remove(): void;
@@ -250,7 +250,7 @@ export interface ISceneNodeApi extends ISceneItemNode {
   /**
    * Returns the item index in the list of all nodes.
    * itemIndex defines the draw order of the node
-   * itemIndex for SceneFolder is itemIndex of previous SceneItem
+   * itemIndex for a SceneFolder is the itemIndex of the previous SceneItem
    *
    * nodeInd | itemInd | nodes tree
    *  0      |    0    | Folder1
@@ -275,28 +275,28 @@ export interface ISceneNodeApi extends ISceneItemNode {
   getNextNode(): TSceneNodeApi;
 
   /**
-   * Returns a closest next item from the nodes list
+   * Returns the closest next item from the nodes list
    */
   getNextItem(): ISceneItemApi;
 
   /**
-   * Returns a closest previous item from the nodes list
+   * Returns the closest previous item from the nodes list
    */
   getPrevItem(): ISceneItemApi;
 
   /**
-   * Returns a next sibling node if exist
+   * Returns the next sibling node if it exists
    */
   getNextSiblingNode(): TSceneNodeApi;
 
   /**
-   * Returns a previous sibling node if exist
+   * Returns the previous sibling node if it exists
    */
   getPrevSiblingNode(): TSceneNodeApi;
 
 
   /**
-   * Returns a node path - the chain of the all parent ids for the node
+   * Returns a node path - the chain of all parent ids for the node
    */
   getPath(): string[];
 }
@@ -311,37 +311,37 @@ export interface ISceneItemFolder extends ISceneItemNode {
 export interface ISceneItemFolderApi extends ISceneItemFolder, ISceneNodeApi {
 
   /**
-   * Returns the all direct children items and folders
-   * To get the all nested children
+   * Returns all direct children items and folders
+   * To get all nested children
    * @see getNestedNodes
    */
   getNodes(): TSceneNodeApi[];
 
   /**
-   * Returns the all direct children items
+   * Returns all direct children items
    */
   getItems(): ISceneItemApi[];
 
   /**
-   * Returns the all direct children folders
+   * Returns all direct children folders
    */
   getFolders(): ISceneItemFolderApi[];
 
 
   /**
-   * Returns the all nested nodes.
+   * Returns all nested nodes.
    * To get only direct children nodes
    * @see getNodes
    */
   getNestedNodes(): TSceneNodeApi[];
 
   /**
-   * Returns the all nested items
+   * Returns all nested items
    */
   getNestedItems(): ISceneItemApi[];
 
   /**
-   * Returns the all nested folders
+   * Returns all nested folders
    */
   getNestedFolders(): ISceneItemFolderApi[];
 
