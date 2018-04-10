@@ -4,7 +4,7 @@ import { TransitionNode } from './transition';
 
 interface ISchema {
   scenes: ScenesNode;
-  transition: TransitionNode;
+  transition?: TransitionNode;
 }
 
 interface IContext {
@@ -26,6 +26,6 @@ export class RootNode extends Node<ISchema, IContext> {
 
   async load(context: IContext): Promise<void> {
     await this.data.scenes.load(context);
-    await this.data.transition.load(context);
+    if (this.data.transition) await this.data.transition.load(context);
   }
 }

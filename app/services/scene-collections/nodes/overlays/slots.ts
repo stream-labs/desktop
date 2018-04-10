@@ -191,14 +191,16 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     this.adjustPositionAndScale(sceneItem, sceneItemObj);
     await sceneItemObj.content.load({ sceneItem, assetsPath: context.assetsPath });
 
-    sceneItemObj.filters.forEach(filter => {
-      this.sourceFiltersService.add(
-        sceneItem.sourceId,
-        filter.type as TSourceFilterType,
-        filter.name,
-        filter.settings
-      );
-    });
+    if (sceneItemObj.filters) {
+      sceneItemObj.filters.forEach(filter => {
+        this.sourceFiltersService.add(
+          sceneItem.sourceId,
+          filter.type as TSourceFilterType,
+          filter.name,
+          filter.settings
+        );
+      });
+    }
   }
 
   adjustPositionAndScale(item: SceneItem, obj: IItemSchema) {
