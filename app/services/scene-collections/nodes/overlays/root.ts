@@ -1,8 +1,10 @@
 import { Node } from '../node';
 import { ScenesNode } from './scenes';
+import { TransitionNode } from './transition';
 
 interface ISchema {
   scenes: ScenesNode;
+  transition?: TransitionNode;
 }
 
 interface IContext {
@@ -15,10 +17,15 @@ export class RootNode extends Node<ISchema, IContext> {
   async save(context: IContext): Promise<void> {
     const scenes = new ScenesNode();
     await scenes.save(context);
-    this.data = { scenes };
+
+    const transition = new TransitionNode();
+    await transition.save(context);
+
+    this.data = { scenes, transition };
   }
 
   async load(context: IContext): Promise<void> {
     await this.data.scenes.load(context);
+    if (this.data.transition) await this.data.transition.load(context);
   }
 }

@@ -1,14 +1,16 @@
 import { ArrayNode } from '../array-node';
-import { SceneItem, Scene, TSceneNode, TSceneNodeType } from '../../../scenes';
-import { VideoService } from '../../../video';
-import { SourcesService } from '../../../sources';
-import { Inject } from '../../../../util/injector';
+import { SceneItem, Scene, TSceneNode, TSceneNodeType } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { SourcesService } from 'services/sources';
+import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
+import { Inject } from 'util/injector';
 import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
 import { StreamlabelNode } from './streamlabel';
 import { WidgetNode } from './widget';
+import * as obs from '../../../../../obs-api';
 
 type TContent =
   | ImageNode
@@ -18,6 +20,12 @@ type TContent =
   | StreamlabelNode
   | WidgetNode;
 
+interface IFilterInfo {
+  name: string;
+  type: string;
+  settings: obs.ISettings;
+}
+
 interface IItemSchema {
   id: string;
   name: string;
@@ -26,11 +34,15 @@ interface IItemSchema {
   x: number;
   y: number;
 
-  // These values are normalized for a 1920x1080 base resolution
   scaleX: number;
   scaleY: number;
 
+  crop?: ICrop;
+  rotation?: number;
+
   content: TContent;
+
+  filters?: IFilterInfo[];
 }
 
 export interface IFolderSchema {
@@ -51,7 +63,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   schemaVersion = 1;
 
   @Inject() videoService: VideoService;
-
+  @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
 
   getItems(context: IContext) {
@@ -81,7 +93,18 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       x: sceneItem.transform.position.x / this.videoService.baseWidth,
       y: sceneItem.transform.position.y / this.videoService.baseHeight,
       scaleX: sceneItem.transform.scale.x / this.videoService.baseWidth,
-      scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight
+      scaleY: sceneItem.transform.scale.y / this.videoService.baseHeight,
+      crop: sceneItem.transform.crop,
+      rotation: sceneItem.transform.rotation,
+      filters: sceneItem.getObsInput().filters.map(filter => {
+        filter.save();
+
+        return {
+          name: filter.name,
+          type: filter.id,
+          settings: filter.settings
+        };
+      })
     };
 
     const manager = sceneItem.source.getPropertiesManagerType();
@@ -146,7 +169,10 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
         sceneItem = context.scene.createAndAddSource(sceneItemObj.name, 'dshow_input', {}, { id });
       }
 
-      this.adjustPositionAndScale(sceneItem, sceneItemObj);
+      // Avoid overwriting the crop for webcams
+      delete sceneItemObj.crop;
+
+      this.adjustTransform(sceneItem, sceneItemObj);
 
       await sceneItemObj.content.load({
         sceneItem,
@@ -169,11 +195,22 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       sceneItem = context.scene.createAndAddSource(sceneItemObj.name, 'browser_source', {}, { id });
     }
 
-    this.adjustPositionAndScale(sceneItem, sceneItemObj);
+    this.adjustTransform(sceneItem, sceneItemObj);
     await sceneItemObj.content.load({ sceneItem, assetsPath: context.assetsPath });
+
+    if (sceneItemObj.filters) {
+      sceneItemObj.filters.forEach(filter => {
+        this.sourceFiltersService.add(
+          sceneItem.sourceId,
+          filter.type as TSourceFilterType,
+          filter.name,
+          filter.settings
+        );
+      });
+    }
   }
 
-  adjustPositionAndScale(item: SceneItem, obj: IItemSchema) {
+  adjustTransform(item: SceneItem, obj: IItemSchema) {
     item.setTransform({
       position: {
         x: obj.x * this.videoService.baseWidth,
@@ -182,15 +219,9 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       scale: {
         x: obj.scaleX * this.videoService.baseWidth,
         y: obj.scaleY * this.videoService.baseHeight
-      }
+      },
+      crop: obj.crop,
+      rotation: obj.rotation
     });
-  }
-
-  normalizedScale(scale: number) {
-    return scale * (1920 / this.videoService.baseWidth);
-  }
-
-  denormalizedScale(scale: number) {
-    return scale / (1920 / this.videoService.baseWidth);
   }
 }
