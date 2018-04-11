@@ -74,6 +74,11 @@
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
         <chat ref="chat" />
       </div>
+      <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
+        <img class="flex flex--center flex--column margin-bot--20" src="../../media/images/sleeping-kevin-night.png">
+        <span>Your chat is currently offline</span>
+      </div>
+
 
 
     </div>
@@ -188,6 +193,14 @@
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
+}
+
+.live-dock-chat--offline {
+  height: 100%;
+
+  img{ 
+    width: 75%;
+  }
 }
 
 .live-dock-pulse {
