@@ -324,12 +324,15 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
 
       childWindow.restore();
       childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-      childWindow.setBounds({
-        x: Math.floor(childX),
-        y: Math.floor(childY),
-        width: windowOptions.size.width,
-        height: windowOptions.size.height
-      });
+
+      if (windowOptions.center) {
+        childWindow.setBounds({
+          x: Math.floor(childX),
+          y: Math.floor(childY),
+          width: windowOptions.size.width,
+          height: windowOptions.size.height
+        });
+      }
     } catch (err) {
       log('Recovering from error:', err);
 

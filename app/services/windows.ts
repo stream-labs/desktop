@@ -36,6 +36,7 @@ export interface IWindowOptions {
   };
   scaleFactor: number;
   title?: string;
+  center?: boolean;
 }
 
 interface IWindowsState {
@@ -98,6 +99,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   showWindow(options: Partial<IWindowOptions>) {
+    // Don't center the window if it's the same component
+    // This prevents "snapping" behavior when navigating settings
+    if (options.componentName !== this.state.child.componentName) options.center = true;
+
     ipcRenderer.send('window-showChildWindow', options);
   }
 
