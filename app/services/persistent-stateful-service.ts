@@ -1,3 +1,4 @@
+import { merge } from 'lodash';
 import { StatefulService } from './stateful-service';
 import Utils from './utils';
 
@@ -15,10 +16,7 @@ export abstract class PersistentStatefulService<
     const persisted =
       JSON.parse(localStorage.getItem(this.localStorageKey)) || {};
 
-    return {
-      ...this.defaultState,
-      ...persisted
-    };
+    return merge({}, this.defaultState, persisted);
   }
 
   static get localStorageKey() {
