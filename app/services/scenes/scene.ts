@@ -168,7 +168,7 @@ export class Scene implements ISceneApi {
     // Newly added sources are immediately active
     this.selectionService.select(sceneItemId);
 
-    this.scenesService.itemAdded.next(sceneItem.sceneItemState);
+    this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
   }
 
@@ -204,10 +204,11 @@ export class Scene implements ISceneApi {
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
     if (!sceneItem) return;
+    const sceneItemModel = sceneItem.getModel();
     sceneItem.detachParent();
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_NODE_FROM_SCENE(sceneItemId);
-    this.scenesService.itemRemoved.next(sceneItem.sceneItemState);
+    this.scenesService.itemRemoved.next(sceneItemModel);
   }
 
 
