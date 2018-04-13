@@ -83,6 +83,9 @@ export class SelectionService
   rotate: (deg: number) => void;
   setContentCrop: () => void;
 
+  // SCENE NODES METHODS
+  placeAfter: (sceneNodeId: string) => void;
+  placeBefore: (sceneNodeId: string) => void;
 
   @shortcut('Delete')
   remove() {
@@ -562,6 +565,18 @@ export class Selection implements ISelection {
 
   getModel() {
     return { sceneId: this.sceneId, ...this.state };
+  }
+
+  placeAfter(sceneNodeId: string) {
+    this.getNodes().reverse().forEach(node => node.placeAfter(sceneNodeId));
+  }
+
+  placeBefore(sceneNodeId: string) {
+    this.getNodes().reverse().forEach(node => node.placeBefore(sceneNodeId));
+  }
+
+  setParent(sceneNodeId: string) {
+    this.getNodes().reverse().forEach(node => node.setParent(sceneNodeId));
   }
 
   /**

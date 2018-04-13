@@ -129,6 +129,18 @@ export interface ISelection extends ISceneItemActions {
    * Do the same as `.copyReferenceTo()` and remove copied items
    */
   moveTo(sceneId: string, folderId?: string): TSceneNodeApi[];
+
+  /**
+   * Bulk version of `SceneNodeApi.placeAfter()`
+   * @see `SceneNodeApi.placeAfter()`
+   */
+  placeAfter(sceneNodeId: string): void;
+
+  /**
+   * Bulk version of `SceneNodeApi.placeBefore()`
+   * @see `SceneNodeApi.placeBefore()`
+   */
+  placeBefore(sceneNodeId: string): void;
 }
 
 export interface ISelectionState {
