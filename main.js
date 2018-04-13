@@ -281,8 +281,17 @@ if (process.env.SLOBS_CACHE_DIR) {
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
+app.setAsDefaultProtocolClient('slobs');
+
 // This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(() => {
+const shouldQuit = app.makeSingleInstance(argv => {
+  // Check for protocol links in the argv of the other process
+  argv.forEach(arg => {
+    if (arg.match(/^slobs:\/\//)) {
+      mainWindow.send('protocolLink', arg);
+    }
+  });
+
   // Someone tried to run a second instance, we should focus our window.
   if (mainWindow) {
     if (mainWindow.isMinimized()) {

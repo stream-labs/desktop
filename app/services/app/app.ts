@@ -18,6 +18,7 @@ import { PerformanceMonitorService } from '../performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
+import { ProtocolLinksService } from 'services/protocol-links';
 
 interface IAppState {
   loading: boolean;
@@ -53,6 +54,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
   @Inject() private fileManagerService: FileManagerService;
+  @Inject() private protocolLinksService: ProtocolLinksService;
 
   @track('app_start')
   load() {
@@ -93,6 +95,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   setArgv(argv: string[]) {
     this.SET_ARGV(argv);
+    this.protocolLinksService.start(argv);
   }
 
   @track('app_close')

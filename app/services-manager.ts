@@ -64,6 +64,7 @@ import {
 import { JsonrpcService } from './services/jsonrpc/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
+import { ProtocolLinksService } from 'services/protocol-links';
 
 const { ipcRenderer } = electron;
 
@@ -130,7 +131,8 @@ export class ServicesManager extends Service {
     SelectionService,
     Selection,
     FileManagerService,
-    PatchNotesService
+    PatchNotesService,
+    ProtocolLinksService
   };
 
   private instances: Dictionary<Service> = {};
