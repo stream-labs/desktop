@@ -116,10 +116,6 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   private get overlaysHost() {
-    if (Util.isPreview()) {
-      return this.hostsService.betaOverlays;
-    }
-
     return this.hostsService.overlays;
   }
 
