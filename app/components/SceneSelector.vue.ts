@@ -11,6 +11,7 @@ import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
+import { SourceFiltersService } from "../services/source-filters";
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -20,6 +21,7 @@ export default class SceneSelector extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
   @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() sourceFiltersService: SourceFiltersService;
 
   searchQuery = '';
 
@@ -38,6 +40,12 @@ export default class SceneSelector extends Vue {
     menu.append({
       label: 'Remove',
       click: () => this.scenesService.removeScene(this.scenesService.activeScene.id)
+    });
+    menu.append({
+      label: 'Filters',
+      click: () => this.sourceFiltersService.showSourceFilters(
+        this.scenesService.activeScene.id
+      )
     });
     menu.popup();
   }
