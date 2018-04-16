@@ -168,7 +168,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
-    this.scenesService.itemUpdated.next(this.sceneItemState);
+
+    this.scenesService.itemUpdated.next(this.getModel());
   }
 
   remove() {

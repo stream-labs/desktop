@@ -12,13 +12,12 @@ import {
   ISceneCreateOptions,
   IScenesServiceApi
 } from './index';
-import { SourcesService } from 'services/sources';
+import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import * as obs from '../obs-api';
 import namingHelpers from '../../util/NamingHelpers';
-
 const { ipcRenderer } = electron;
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
@@ -31,10 +30,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   sceneAdded = new Subject<IScene>();
   sceneRemoved = new Subject<IScene>();
-  itemAdded = new Subject<ISceneItem>();
-  itemRemoved = new Subject<ISceneItem>();
-  itemUpdated = new Subject<ISceneItem>();
   sceneSwitched = new Subject<IScene>();
+  itemAdded = new Subject<ISceneItem & ISource>();
+  itemRemoved = new Subject<ISceneItem & ISource>();
+  itemUpdated = new Subject<ISceneItem & ISource>();
 
 
   @Inject()
