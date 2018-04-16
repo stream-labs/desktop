@@ -196,12 +196,6 @@ async function runScript() {
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
-  info('Running tests...');
-  executeCmd('yarn test');
-
-  info('The current revision has passed testing and is ready to be');
-  info('packaged and released');
-
   const pjson = JSON.parse(fs.readFileSync('package.json'));
   const currentVersion = pjson.version;
 
