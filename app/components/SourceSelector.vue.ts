@@ -93,18 +93,19 @@ export default class SourceSelector extends Vue {
       false;
   }
 
-  handleSort(treeNodeToMove: ISlTreeNode<ISceneItemNode>, position: ICursorPosition<TSceneNode>) {
-    const nodeToMove = this.scene.getNode(treeNodeToMove.data.id);
+  handleSort(treeNodesToMove: ISlTreeNode<ISceneItemNode>[], position: ICursorPosition<TSceneNode>) {
+    const nodesToMove = this.scene.getSelection(treeNodesToMove.map(node => node.data.id))
+
     const destNode = this.scene.getNode(position.node.data.id);
 
     if (position.placement === 'before') {
-      nodeToMove.placeBefore(destNode.id);
+      nodesToMove.placeBefore(destNode.id);
     } else if (position.placement === 'after') {
-      nodeToMove.placeAfter(destNode.id);
+      nodesToMove.placeAfter(destNode.id);
     } else if (position.placement === 'inside') {
-      nodeToMove.setParent(destNode.id);
+      nodesToMove.setParent(destNode.id);
     }
-    nodeToMove.select();
+    this.selectionService.select(nodesToMove.getIds());
   }
 
   makeActive(treeNodes: ISlTreeNode<ISceneItemNode>[], ev: MouseEvent) {

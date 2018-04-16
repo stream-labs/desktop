@@ -128,3 +128,26 @@ test('Try to insert a folder inside itself', async t => {
   `));
 });
 
+
+test('Move multiple items', async t => {
+
+  sceneBuilder.build(`
+    Folder1
+      Item1
+    Folder2
+      Item2
+    Folder3
+  `);
+
+  const selection = scene.getSelection([getNodeId('Item1'), getNodeId('Item2')]);
+  selection.placeAfter(getNodeId('Folder3'));
+
+  t.true(sceneBuilder.isEqualTo(`
+    Folder1
+    Folder2
+    Folder3
+    Item1
+    Item2
+  `));
+});
+
