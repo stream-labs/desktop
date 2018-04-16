@@ -50,6 +50,9 @@
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "include": "installer.nsh"
+    },
+    "win": {
+      "rfc3161TimeStampServer": "http://timestamp.digicert.com"
     }
   },
   "ava": {
