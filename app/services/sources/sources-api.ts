@@ -16,10 +16,21 @@ export interface ISource extends IResource {
   channel?: number;
 }
 
+/**
+ * Used to compare whether 2 sources are functionally
+ * equivalent and should be created as a reference.
+ */
+export interface ISourceComparison {
+  type: TSourceType;
+  propertiesManager: TPropertiesManager;
+  widgetType?: WidgetType;
+}
+
 
 export interface ISourceApi extends ISource {
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
+  isSameType(comparison: ISourceComparison): boolean;
   getPropertiesManagerType(): TPropertiesManager;
   getPropertiesManagerSettings(): Dictionary<any>;
   getPropertiesManagerUI(): string;

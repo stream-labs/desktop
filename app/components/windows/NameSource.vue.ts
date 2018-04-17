@@ -13,18 +13,10 @@ import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/wi
   mixins: [windowMixin]
 })
 export default class NameSource extends Vue {
-
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  scenesService: IScenesServiceApi;
-
-  @Inject()
-  widgetsService: WidgetsService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() scenesService: IScenesServiceApi;
+  @Inject() widgetsService: WidgetsService;
+  @Inject() windowsService: WindowsService;
 
   options: {
     sourceType?: TSourceType,
