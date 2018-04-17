@@ -229,7 +229,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     return token;
   }
 
-  private getGatewayForIP(ip: string, ipconfig: string) {
+  private getGatewayForIP(ip: string, ipconfig: string): string {
     const ipconfigStrings = ipconfig.split('\n');
     for (let strInd = 0; strInd < ipconfigStrings.length; strInd++) {
       let ipString = ipconfigStrings[strInd];
