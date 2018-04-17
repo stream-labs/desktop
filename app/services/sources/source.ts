@@ -60,7 +60,7 @@ export class Source implements ISourceApi {
    * @param comparison the comparison details of the other source
    */
   isSameType(comparison: ISourceComparison): boolean {
-    if (this.channel) return;
+    if (this.channel) return false;
 
     return isEqual(this.getComparisonDetails(), comparison);
   }
