@@ -355,10 +355,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
+  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager, widgetType?: WidgetType) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
-      queryParams: { sourceType, propertiesManager },
+      queryParams: { sourceType, propertiesManager, widgetType },
       size: {
         width: 600,
         height: 540

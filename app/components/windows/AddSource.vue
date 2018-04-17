@@ -30,7 +30,14 @@
 
     <div class="row">
       <div class="columns small-12">
-        <h4>Add Existing Source</h4>
+        <h4>
+          Add Existing Source
+          <span
+            v-if="propertiesManager === 'widget'"
+            class="recommended-label">
+            Recommended
+          </span>
+        </h4>
       </div>
     </div>
     <div class="sources-browser row">
@@ -98,6 +105,16 @@
   text-align: right;
   padding-top: 20px;
   padding-bottom: 20px;
+}
+
+.recommended-label {
+  color: @teal;
+  margin-left: 10px;
+  text-transform: none;
+}
+
+.studio-controls-selector {
+  width: 100%;
 }
 
 </style>
