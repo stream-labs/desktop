@@ -1,4 +1,5 @@
 import { Service } from './service';
+import Util from 'services/utils';
 
 // Hands out hostnames to the rest of the app. Eventually
 // we should allow overriding this value. But for now we
@@ -10,6 +11,9 @@ export class HostsService extends Service {
   }
 
   get overlays() {
+    if (Util.isPreview()) {
+      return 'beta-overlays.streamlabs.com';
+    }
     return 'overlays.streamlabs.com';
   }
 
@@ -19,10 +23,6 @@ export class HostsService extends Service {
 
   get beta3() {
     return 'beta3.streamlabs.com';
-  }
-
-  get betaOverlays() {
-    return 'beta-overlays.streamlabs.com';
   }
 
 }
