@@ -7,26 +7,25 @@ import {
   SceneItemFolder,
   ISceneItemSettings
 } from 'services/scenes';
-import { ISource, SourcesService } from 'services/sources';
+import { ISource, SourcesService, TPropertiesManager } from 'services/sources';
 import { shortcut } from 'services/shortcuts';
 import { Inject } from '../../util/injector';
 import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IClipboardServiceApi } from './clipboard-api';
-
 interface ISceneNodeInfo {
   folder?: ISceneItemFolder;
   item?: ISceneItem & ISource;
-  sourceSettings?: Dictionary<any>;
-  itemSettings?: ISceneItemSettings;
-  filters?: any;
+  settings?: ISceneItemSettings;
 }
 
 interface ISourceInfo {
   source: ISource;
   settings:  Dictionary<any>;
   filters: ISourceFilter[];
+  propertiesManagerType: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 }
 
 interface IUnloadedCollectionClipboard {
@@ -143,7 +142,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     const folderIdMap: Dictionary<string> = {};
     const insertedNodesIds: string[] = [];
     const sources = this.state.unloadedCollectionClipboard.sources;
-    const nodes = this.state.unloadedCollectionClipboard.sceneNodes.concat([]);
+    const nodes = this.state.unloadedCollectionClipboard.sceneNodes.concat([]).reverse();
     const scene = this.scenesService.activeScene;
 
     // create sources
@@ -151,7 +150,11 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
       const sourceInfo = sources[sourceId];
       const sourceModel = sourceInfo.source;
       const createdSource = this.sourcesService.createSource(
-        sourceModel.name, sourceModel.type, sourceInfo.settings
+        sourceModel.name, sourceModel.type, sourceInfo.settings,
+        {
+          propertiesManager: sourceInfo.propertiesManagerType,
+          propertiesManagerSettings: sourceInfo.propertiesManagerSettings
+        }
       );
       sourceIdMap[sourceModel.sourceId] = createdSource.sourceId;
 
@@ -176,7 +179,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
       });
 
     // create sceneItems and set parent nodes for folders and items
-    nodes.reverse().forEach(node => {
+    nodes.forEach(node => {
 
       // set parent for folders
       if (node.folder) {
@@ -192,7 +195,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
       // add sceneItem and apply settings
       const sceneItem = scene.addSource(sourceIdMap[itemModel.sourceId]);
-      sceneItem.setSettings(node.itemSettings);
+      sceneItem.setSettings(node.settings);
 
       // set parent for item
       if (itemModel.parentId) sceneItem.setParent(folderIdMap[itemModel.parentId]);
@@ -238,6 +241,8 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
         sourcesInfo[item.sourceId] = {
           source: item.getModel(),
           settings: source.getSettings(),
+          propertiesManagerType: source.getPropertiesManagerType(),
+          propertiesManagerSettings: source.getPropertiesManagerSettings(),
           filters: this.sourceFiltersService.getFilters(source.sourceId)
         };
       }

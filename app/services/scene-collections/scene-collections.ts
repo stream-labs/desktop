@@ -49,6 +49,10 @@ interface ISceneCollectionsManifest {
   collections: ISceneCollectionsManifestEntry[];
 }
 
+interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {
+  setupFunction?: () => boolean;
+}
+
 /**
  * V2 of the scene collections service:
  * - Completely asynchronous
@@ -177,7 +181,7 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(options: ISceneCollectionCreateOptions = {}): Promise<void> {
+  async create(options: ISceneCollectionInternalCreateOptions = {}): Promise<ISceneCollectionsManifestEntry> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
@@ -197,6 +201,7 @@ export class SceneCollectionsService extends Service
     this.collectionLoaded = true;
     await this.save();
     this.finishLoadingOperation();
+    return this.getCollection(id);
   }
 
   /**
@@ -364,7 +369,7 @@ export class SceneCollectionsService extends Service
    * Returns the collection with the specified id
    * @param id the id of the collection
    */
-  getCollection(id: string) {
+  getCollection(id: string): ISceneCollectionsManifestEntry {
     return this.collections.find(coll => coll.id === id);
   }
 
