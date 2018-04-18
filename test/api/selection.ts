@@ -4,8 +4,25 @@ import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { ISelectionServiceApi } from '../../app/services/selection';
 import { ICustomizationServiceApi } from '../../app/services/customization';
+import { SceneBuilder } from "../helpers/scene-builder";
+import { ISceneApi, ISceneNodeApi } from "../../app/services/scenes";
 
-useSpectron({ restartAppAfterEachTest: false });
+useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
+
+let sceneBuilder: SceneBuilder;
+let scene: ISceneApi;
+let getNode: (name: string) => ISceneNodeApi;
+let getNodeId: (name: string) => string;
+let selectionService: ISelectionServiceApi;
+
+async function afterStart() {
+  const client = await getClient();
+  selectionService = client.getResource('SelectionService');
+  sceneBuilder = new SceneBuilder(client);
+  scene = sceneBuilder.scene;
+  getNode = (name) => scene.getNodeByName(name);
+  getNodeId = (name) => scene.getNodeByName(name).id;
+}
 
 test('Selection', async t => {
   const client = await getClient();
@@ -89,3 +106,72 @@ test('Invalid selection', async t => {
 
 
 });
+
+test('Place after', async t => {
+  sceneBuilder.build(`
+    Item1:
+    Folder1
+      Item2:
+      Item3:
+    Item4:
+  `);
+
+  selectionService.select([getNodeId('Item1'), getNodeId('Folder1')]);
+  selectionService.placeAfter(getNodeId('Item4'));
+
+  t.true(sceneBuilder.isEqualTo(`
+    Item4:
+    Item1:
+    Folder1
+      Item2:
+      Item3:
+  `));
+
+});
+
+
+test('Place before', async t => {
+  sceneBuilder.build(`
+    Item1:
+    Item2:
+    Folder1
+      Item3:
+      Item4:
+  `);
+
+  selectionService.select([getNodeId('Item2'), getNodeId('Folder1')]);
+  selectionService.placeBefore(getNodeId('Item1'));
+
+  t.true(sceneBuilder.isEqualTo(`
+    Item2:
+    Folder1
+      Item3:
+      Item4:
+    Item1:
+  `));
+
+});
+
+
+test('Set parent', async t => {
+  sceneBuilder.build(`
+    Folder1
+    Folder2
+      Item1:
+      Item2:
+    Item3:
+  `);
+
+  selectionService.select([getNodeId('Folder2'), getNodeId('Item3')]);
+  selectionService.setParent(getNodeId('Folder1'));
+
+  t.true(sceneBuilder.isEqualTo(`
+    Folder1
+      Folder2
+        Item1:
+        Item2:
+      Item3:
+  `));
+
+});
+

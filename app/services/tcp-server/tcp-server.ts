@@ -1,6 +1,7 @@
 import WritableStream = NodeJS.WritableStream;
 import os from 'os';
 import crypto from 'crypto';
+import { execSync } from 'child_process';
 import { ServicesManager } from '../../services-manager';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { IFormInput } from '../../components/shared/forms/Input';
@@ -201,6 +202,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   }
 
   getIPAddresses(): IIPAddressDescription[] {
+    const ipconfig = execSync('ipconfig').toString();
     const ifaces = os.networkInterfaces();
     const addresses: IIPAddressDescription[] = [];
     Object.keys(ifaces).forEach(ifaceName => {
@@ -210,7 +212,8 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
           interface: ifaceName,
           address: interfaceInfo.address,
           family: interfaceInfo.family,
-          internal: interfaceInfo.internal
+          internal: interfaceInfo.internal,
+          gateway: this.getGatewayForIP(interfaceInfo.address, ipconfig)
         });
       });
     });
@@ -224,6 +227,21 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     buf.forEach(val => token += val.toString(16));
     this.setSettings({ token });
     return token;
+  }
+
+  private getGatewayForIP(ip: string, ipconfig: string): string {
+    const ipconfigStrings = ipconfig.split('\n');
+    for (let strInd = 0; strInd < ipconfigStrings.length; strInd++) {
+      let ipString = ipconfigStrings[strInd];
+      if (ipString.indexOf(ip) === -1) continue;
+      do {
+        strInd++;
+        ipString = ipconfigStrings[strInd];
+        if (ipString.indexOf('Default Gateway') === -1) continue;
+        return ipString.split(':')[1].trim();
+      } while (!ipString || strInd < ipconfigStrings.length);
+    }
+    return '';
   }
 
   private listenConnections(server: IServer) {

@@ -5,14 +5,17 @@ import {
   ISource,
   SourcesService,
   TPropertiesManager,
+  ISourceComparison,
   PROPERTIES_MANAGER_TYPES
 } from './index';
-import { mutation, ServiceHelper } from '../stateful-service';
-import { Inject } from '../../util/injector';
-import { ScenesService } from '../scenes';
-import { TFormData } from '../../components/shared/forms/Input';
-import Utils from '../utils';
+import { mutation, ServiceHelper } from 'services/stateful-service';
+import { Inject } from 'util/injector';
+import { ScenesService } from 'services/scenes';
+import { TFormData } from 'components/shared/forms/Input';
+import Utils from 'services/utils';
+import { WidgetType } from 'services/widgets';
 import * as obs from '../../../obs-api';
+import { isEqual } from 'lodash';
 
 
 @ServiceHelper()
@@ -49,6 +52,30 @@ export class Source implements ISourceApi {
 
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
+  }
+
+  /**
+   * Compares the details of this source to another, to determine
+   * whether adding as a reference makes sense.
+   * @param comparison the comparison details of the other source
+   */
+  isSameType(comparison: ISourceComparison): boolean {
+    if (this.channel) return false;
+
+    return isEqual(this.getComparisonDetails(), comparison);
+  }
+
+  getComparisonDetails(): ISourceComparison {
+    const details: ISourceComparison = {
+      type: this.type,
+      propertiesManager: this.getPropertiesManagerType()
+    };
+
+    if (this.getPropertiesManagerType() === 'widget') {
+      details.widgetType = this.getPropertiesManagerSettings().widgetType;
+    }
+
+    return details;
   }
 
 
