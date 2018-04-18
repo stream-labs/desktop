@@ -6,6 +6,6 @@ export class ProjectorService extends Service {
   @Inject() windowsService: WindowsService;
 
   createProjector() {
-    this.windowsService.createOneOffWindow({ componentName: 'Troubleshooter' });
+    this.windowsService.createOneOffWindow({ componentName: 'Projector' });
   }
 }

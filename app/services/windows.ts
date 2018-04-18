@@ -19,6 +19,7 @@ import Notifications from '../components/windows/Notifications.vue';
 import Troubleshooter from '../components/windows/Troubleshooter.vue';
 import Blank from '../components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
+import Projector from 'components/windows/Projector.vue';
 import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -83,7 +84,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AdvancedAudio,
     Notifications,
     Troubleshooter,
-    ManageSceneCollections
+    ManageSceneCollections,
+    Projector
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};
@@ -142,19 +144,24 @@ export class WindowsService extends StatefulService<IWindowsState> {
     const windowId = uuid();
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
-    this.windows[windowId] = new BrowserWindow({
+    const newWindow = this.windows[windowId] = new BrowserWindow({
+      frame: false,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
       title: options.title || 'New Window'
     });
 
+    newWindow.setMenu(null);
+    newWindow.on('closed', () => {
+      delete this.windows[windowId];
+    });
+
     if (Util.isDevMode()) {
-      this.windows[windowId].webContents.openDevTools({ mode: 'detach' });
+      newWindow.webContents.openDevTools({ mode: 'detach' });
     }
 
     const indexUrl = remote.getGlobal('indexUrl');
-
-    this.windows[windowId].loadURL(`${indexUrl}?windowId=${windowId}`);
+    newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
 
     return windowId;
   }
@@ -201,5 +208,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     };
 
     Vue.set(this.state, windowId, opts);
+  }
+
+  @mutation()
+  private DELETE_ONE_OFF_WINDOW(windowId: string) {
+    Vue.delete(this.state, windowId);
   }
 }
