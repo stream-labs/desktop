@@ -1,13 +1,20 @@
 import { ArrayNode } from './array-node';
 import { Inject } from '../../../util/injector';
-import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
-
+import { ISourceFilter, SourceFiltersService, TSourceFilterType } from 'services/source-filters';
+import { TObsValue } from 'components/shared/forms/Input';
 
 interface IContext {
   sceneId: string;
 }
 
-export class SceneFiltersNode extends ArrayNode<ISourceFilter, IContext, ISourceFilter> {
+export interface ISourceFilterSchema {
+  name: string;
+  type: TSourceFilterType;
+  visible: boolean;
+  settings: Dictionary<TObsValue>;
+}
+
+export class SceneFiltersNode extends ArrayNode<ISourceFilterSchema, IContext, ISourceFilter> {
 
   schemaVersion = 1;
 
@@ -18,12 +25,12 @@ export class SceneFiltersNode extends ArrayNode<ISourceFilter, IContext, ISource
   }
 
 
-  saveItem(filter: ISourceFilter, context: IContext): Promise<ISourceFilter> {
+  saveItem(filter: ISourceFilter, context: IContext): Promise<ISourceFilterSchema> {
     return Promise.resolve(filter);
   }
 
 
-  loadItem(filter: ISourceFilter, context: IContext): Promise<void> {
+  loadItem(filter: ISourceFilterSchema, context: IContext): Promise<void> {
     this.sourceFiltersService.add(context.sceneId, filter.type, filter.name, filter.settings);
     this.sourceFiltersService.setVisibility(context.sceneId, filter.name, filter.visible);
     return Promise.resolve();
