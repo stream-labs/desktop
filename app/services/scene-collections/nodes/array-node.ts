@@ -26,6 +26,8 @@ export abstract class ArrayNode<TSchema, TContext, TItem> extends Node<IArraySch
 
     const afterLoadItemsCallbacks: (void | (() => Promise<void>))[] = [];
 
+    if (!this.data.items) return;
+
     for (const item of this.data.items) {
       try {
         afterLoadItemsCallbacks.push(await this.loadItem(item, context));

@@ -1,13 +1,13 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
-import Vue from 'vue';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
 import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { HotkeysNode } from './nodes/hotkeys';
+import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import electron from 'electron';
 import fs from 'fs';
@@ -39,7 +39,8 @@ export const NODE_TYPES = {
   ScenesNode,
   SceneItemsNode,
   TransitionNode,
-  HotkeysNode
+  HotkeysNode,
+  SceneFiltersNode
 };
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';

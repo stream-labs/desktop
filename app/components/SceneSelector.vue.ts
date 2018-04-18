@@ -2,16 +2,16 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { ScenesService } from '../services/scenes';
+import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { ScenesTransitionsService } from '../services/scenes-transitions';
-import { SceneCollectionsService } from '../services/scene-collections';
-import { AppService } from '../services/app';
+import { ScenesTransitionsService } from 'services/scenes-transitions';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
-import { SourceFiltersService } from "../services/source-filters";
+import { SourceFiltersService } from 'services/source-filters';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
