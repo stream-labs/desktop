@@ -141,6 +141,12 @@ export interface ISelection extends ISceneItemActions {
    * @see `SceneNodeApi.placeBefore()`
    */
   placeBefore(sceneNodeId: string): void;
+
+  /**
+   * Bulk version of `SceneNodeApi.setParent()`
+   * @see `SceneNodeApi.setParent()`
+   */
+  setParent(folderId: string): void;
 }
 
 export interface ISelectionState {
