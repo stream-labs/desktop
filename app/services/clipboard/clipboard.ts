@@ -218,7 +218,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
     if (this.hasItemsInUnloadedClipboard()) return;
 
-    // safe nodes from clipboard in memory
+    // save nodes from clipboard in memory
     const nodes = this.scenesService
       .getScene(this.state.itemsSceneId)
       .getSelection(this.state.sceneNodesIds)
