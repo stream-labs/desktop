@@ -154,6 +154,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     newWindow.setMenu(null);
     newWindow.on('closed', () => {
       delete this.windows[windowId];
+      this.DELETE_ONE_OFF_WINDOW(windowId);
     });
 
     if (Util.isDevMode()) {
