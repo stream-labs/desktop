@@ -5,7 +5,10 @@ import { WindowsService } from 'services/windows';
 export class ProjectorService extends Service {
   @Inject() windowsService: WindowsService;
 
-  createProjector() {
-    this.windowsService.createOneOffWindow({ componentName: 'Projector' });
+  createProjector(sourceId: string) {
+    this.windowsService.createOneOffWindow({
+      componentName: 'Projector',
+      queryParams: { sourceId }
+    });
   }
 }

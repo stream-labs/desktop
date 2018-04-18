@@ -55,7 +55,8 @@ export default class StudioEditor extends Vue {
 
 
   mounted() {
-    this.obsDisplay = this.videoService.createDisplay();
+    const displayId = this.videoService.getRandomDisplayId();
+    this.obsDisplay = new Display(displayId);
 
     this.obsDisplay.onOutputResize(outputRegion => {
       this.renderedWidth = outputRegion.width;

@@ -176,6 +176,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
+  getCurrentWindowOptions() {
+    const windowId = Util.getCurrentUrlParams().windowId;
+    return this.state[windowId].queryParams || {};
+  }
+
 
   updateChildWindowOptions(options: Partial<IWindowOptions>) {
     this.UPDATE_CHILD_WINDOW_OPTIONS(options);

@@ -17,7 +17,8 @@ export default class Display extends Vue {
   };
 
   mounted() {
-    this.obsDisplay = this.videoService.createDisplay();
+    const displayId = this.videoService.getRandomDisplayId();
+    this.obsDisplay = new ObsDisplay(displayId);
     this.obsDisplay.onOutputResize(outputRegion => this.$emit('outputResize', outputRegion));
     this.obsDisplay.trackElement(this.$refs.display);
     this.obsDisplay.setShoulddrawUI(this.drawUI);

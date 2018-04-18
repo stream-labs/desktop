@@ -107,7 +107,7 @@ export class EditMenu extends Menu {
       this.append({
         label: 'Create Projector',
         click: () => {
-          this.projectorService.createProjector();
+          this.projectorService.createProjector(selectedItem.sourceId);
         }
       });
 

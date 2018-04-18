@@ -34,21 +34,29 @@ export class Display {
 
   private selectionSubscription: Subscription;
 
-  constructor(public name: string) {
+  constructor(public name: string, public sourceId?: string) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
 
-    nodeObs.OBS_content_createDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
-      name
-    );
+    if (this.sourceId) {
+      nodeObs.OBS_content_createSourcePreviewDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        sourceId,
+        name
+      );
+    } else {
+      nodeObs.OBS_content_createDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        name
+      );
+      nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+      this.selectionSubscription = this.selectionService.updated.subscribe(() => {
+        this.switchGridlines(this.selectionService.getSize() <= 1);
+      });
+    }
+
     this.outputRegionCallbacks = [];
 
-    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
     this.videoService.registerDisplay(this);
-
-    this.selectionSubscription = this.selectionService.updated.subscribe(() => {
-      this.switchGridlines(this.selectionService.getSize() <= 1);
-    });
   }
 
   /**
@@ -96,14 +104,14 @@ export class Display {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
-    this.refreshOutputRegion();
+    if (!this.sourceId) this.refreshOutputRegion();
   }
 
   destroy() {
     this.videoService.unregisterDisplay(this);
     nodeObs.OBS_content_destroyDisplay(this.name);
     if (this.trackingInterval) clearInterval(this.trackingInterval);
-    this.selectionSubscription.unsubscribe();
+    if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -156,11 +164,6 @@ export class VideoService extends Service {
       }, 1000);
     });
   }
-
-  createDisplay() {
-    return new Display(this.getRandomDisplayId());
-  }
-
 
   registerDisplay(display: Display) {
     this.activeDisplays[display.name] = display;
