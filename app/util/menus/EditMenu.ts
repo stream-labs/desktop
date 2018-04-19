@@ -104,13 +104,6 @@ export class EditMenu extends Menu {
         submenu: this.groupSubmenu().menu
       });
 
-      this.append({
-        label: 'Create Projector',
-        click: () => {
-          this.projectorService.createProjector(selectedItem.sourceId);
-        }
-      });
-
       if (selectedItem) {
         const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
 
@@ -119,6 +112,12 @@ export class EditMenu extends Menu {
             label: visibilityLabel,
             click: () => {
               selectedItem.setVisibility(!selectedItem.visible);
+            }
+          });
+          this.append({
+            label: 'Create Projector',
+            click: () => {
+              this.projectorService.createProjector(selectedItem.sourceId);
             }
           });
         } else {
@@ -227,6 +226,11 @@ export class EditMenu extends Menu {
         click: () => this.customizationService.setSettings({
           performanceMode: !this.customizationService.state.performanceMode
         })
+      });
+
+      this.append({
+        label: 'Create Output Projector',
+        click: () => this.projectorService.createProjector()
       });
     }
 

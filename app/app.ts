@@ -104,9 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window['obs'] = obsApiService.nodeObs;
 
   storePromise.then(store => {
-    console.log(windowId);
-    console.log(windowsService.state[windowId]);
-
     const vm = new Vue({
       el: '#app',
       store,

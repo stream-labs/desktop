@@ -56,8 +56,12 @@ export class Display {
 
     this.outputRegionCallbacks = [];
 
-    this.videoService.registerDisplay(this);
+    this.boundDestroy = this.destroy.bind(this);
+
+    remote.getCurrentWindow().on('close', this.boundDestroy);
   }
+
+  boundDestroy: any;
 
   /**
    * Will keep the display positioned on top of the passed HTML element
@@ -108,7 +112,7 @@ export class Display {
   }
 
   destroy() {
-    this.videoService.unregisterDisplay(this);
+    remote.getCurrentWindow().removeListener('close', this.boundDestroy);
     nodeObs.OBS_content_destroyDisplay(this.name);
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
@@ -163,23 +167,6 @@ export class VideoService extends Service {
         });
       }, 1000);
     });
-  }
-
-  registerDisplay(display: Display) {
-    this.activeDisplays[display.name] = display;
-  }
-
-
-  unregisterDisplay(display: Display) {
-    delete this.activeDisplays[display.name];
-  }
-
-
-  /**
-   * Destroy all active displays.  This is useful on shutdown.
-   */
-  destroyAllDisplays() {
-    Object.values(this.activeDisplays).forEach(display => display.destroy());
   }
 
   // Generates a random string:

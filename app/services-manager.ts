@@ -160,7 +160,7 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
-    if (Utils.isChildWindow()) {
+    if (!Utils.isMainWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
         return true;

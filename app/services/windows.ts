@@ -167,6 +167,21 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return windowId;
   }
 
+  /**
+   * Closes all one-off windows
+   */
+  closeAllOneOffs() {
+    Object.keys(this.windows).forEach(windowId => {
+      if (windowId === 'main') return;
+      if (windowId === 'child') return;
+      if (this.windows[windowId]) {
+        if (!this.windows[windowId].isDestroyed()) {
+          this.windows[windowId].destroy();
+        }
+      }
+    });
+  }
+
 
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
