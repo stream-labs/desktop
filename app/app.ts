@@ -85,32 +85,34 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
-  const store = createStore();
+  const storePromise = createStore();
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const obsApiService = ObsApiService.instance;
-  const isChild = Utils.isChildWindow();
+  const windowId = Utils.getCurrentUrlParams().windowId;
 
-  if (isChild) {
-    ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
-    servicesManager.listenMessages();
-  } else {
+  if (Utils.isMainWindow()) {
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
     AppService.instance.load();
+  } else {
+    if (Utils.isChildWindow()) {
+      ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+    }
+    servicesManager.listenMessages();
   }
 
   window['obs'] = obsApiService.nodeObs;
 
-  const vm = new Vue({
-    el: '#app',
-    store,
-    render: h => {
-      const componentName = isChild
-        ? windowsService.state.child.componentName
-        : windowsService.state.main.componentName;
+  storePromise.then(store => {
+    const vm = new Vue({
+      el: '#app',
+      store,
+      render: h => {
+        const componentName = windowsService.state[windowId].componentName;
 
-      return h(windowsService.components[componentName]);
-    }
+        return h(windowsService.components[componentName]);
+      }
+    });
   });
 
   // Used for replacing the contents of this window with
@@ -124,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // to match the current contents, as well as pulling the options
       // from the URL, allows child windows to be refreshed without
       // losing their contents.
-      const newOptions: any = Object.assign({ child: isChild }, options);
+      const newOptions: any = Object.assign({ windowId: 'child' }, options);
       const newURL: string = URI(window.location.href)
         .query(newOptions)
         .toString();

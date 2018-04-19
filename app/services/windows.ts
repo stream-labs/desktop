@@ -19,13 +19,15 @@ import Notifications from '../components/windows/Notifications.vue';
 import Troubleshooter from '../components/windows/Troubleshooter.vue';
 import Blank from '../components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
+import Projector from 'components/windows/Projector.vue';
 import { mutation, StatefulService } from './stateful-service';
 import electron from 'electron';
+import Vue from 'vue';
+import Util from 'services/utils';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
-
-type TWindowId = 'main' | 'child';
+const uuid = window['require']('uuid/v4');
 
 export interface IWindowOptions {
   componentName: string;
@@ -40,12 +42,16 @@ export interface IWindowOptions {
 }
 
 interface IWindowsState {
-  main: IWindowOptions;
-  child: IWindowOptions;
+  [windowId: string]: IWindowOptions;
 }
 
 export class WindowsService extends StatefulService<IWindowsState> {
 
+  /**
+   * 'main' and 'child' are special window ids that always exist
+   * and have special purposes.  All other windows ids are considered
+   * 'one-off' windows and can be freely created and destroyed.
+   */
   static initialState: IWindowsState = {
     main: {
       componentName: 'Main',
@@ -78,21 +84,27 @@ export class WindowsService extends StatefulService<IWindowsState> {
     AdvancedAudio,
     Notifications,
     Troubleshooter,
-    ManageSceneCollections
+    ManageSceneCollections,
+    Projector
   };
 
-  private windows: Electron.BrowserWindow[] = BrowserWindow.getAllWindows();
+  private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
   init() {
+    const windows = BrowserWindow.getAllWindows();
+
+    this.windows.main = windows[0];
+    this.windows.child = windows[1];
+
     this.updateScaleFactor('main');
     this.updateScaleFactor('child');
-    this.getWindow('main').on('move', () => this.updateScaleFactor('main'));
-    this.getWindow('child').on('move', () => this.updateScaleFactor('child'));
+    this.windows.main.on('move', () => this.updateScaleFactor('main'));
+    this.windows.child.on('move', () => this.updateScaleFactor('child'));
   }
 
-  private updateScaleFactor(windowId: TWindowId) {
-    const window = this.getWindow(windowId);
+  private updateScaleFactor(windowId: string) {
+    const window = this.windows[windowId];
     const bounds = window.getBounds();
     const currentDisplay = electron.screen.getDisplayMatching(bounds);
     this.UPDATE_SCALE_FACTOR(windowId, currentDisplay.scaleFactor);
@@ -122,12 +134,65 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  /**
+   * Creates a one-off window that will not impact or close
+   * any existing windows, and will cease to exist when closed.
+   * @param options window options
+   * @return the window id of the created window
+   */
+  createOneOffWindow(options: Partial<IWindowOptions>): string {
+    const windowId = uuid();
+    this.CREATE_ONE_OFF_WINDOW(windowId, options);
+
+    const newWindow = this.windows[windowId] = new BrowserWindow({
+      frame: false,
+      width: (options.size && options.size.width) || 400,
+      height: (options.size && options.size.height) || 400,
+      title: options.title || 'New Window'
+    });
+
+    newWindow.setMenu(null);
+    newWindow.on('closed', () => {
+      delete this.windows[windowId];
+      this.DELETE_ONE_OFF_WINDOW(windowId);
+    });
+
+    if (Util.isDevMode()) {
+      newWindow.webContents.openDevTools({ mode: 'detach' });
+    }
+
+    const indexUrl = remote.getGlobal('indexUrl');
+    newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
+
+    return windowId;
+  }
+
+  /**
+   * Closes all one-off windows
+   */
+  closeAllOneOffs() {
+    Object.keys(this.windows).forEach(windowId => {
+      if (windowId === 'main') return;
+      if (windowId === 'child') return;
+      if (this.windows[windowId]) {
+        if (!this.windows[windowId].isDestroyed()) {
+          this.windows[windowId].destroy();
+        }
+      }
+    });
+  }
+
+
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
   getChildWindowQueryParams(): Dictionary<string> {
     return this.getChildWindowOptions().queryParams || {};
+  }
+
+  getWindowOptions(windowId: string) {
+    return this.state[windowId].queryParams || {};
   }
 
 
@@ -138,12 +203,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
   updateMainWindowOptions(options: Partial<IWindowOptions>) {
     this.UPDATE_MAIN_WINDOW_OPTIONS(options);
   }
-
-
-  private getWindow(windowId: TWindowId): Electron.BrowserWindow {
-    return windowId === 'child' ? this.windows[1] : this.windows[0];
-  }
-
 
   @mutation()
   private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
@@ -156,7 +215,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   @mutation()
-  private UPDATE_SCALE_FACTOR(windowId: TWindowId, scaleFactor: number) {
+  private UPDATE_SCALE_FACTOR(windowId: string, scaleFactor: number) {
     this.state[windowId].scaleFactor = scaleFactor;
+  }
+
+  @mutation()
+  private CREATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
+    const opts = {
+      componentName: 'Blank',
+      scaleFactor: 1,
+      ...options
+    };
+
+    Vue.set(this.state, windowId, opts);
+  }
+
+  @mutation()
+  private DELETE_ONE_OFF_WINDOW(windowId: string) {
+    Vue.delete(this.state, windowId);
   }
 }

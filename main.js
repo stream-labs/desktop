@@ -51,7 +51,7 @@ let allowMainWindowClose = false;
 let shutdownStarted = false;
 let appShutdownTimeout;
 
-const indexUrl = 'file://' + __dirname + '/index.html';
+global.indexUrl = 'file://' + __dirname + '/index.html';
 
 
 function openDevTools() {
@@ -145,7 +145,7 @@ function startApp() {
   // and handle breakpoints on startup
   const LOAD_DELAY = 2000;
   setTimeout(() => {
-    mainWindow.loadURL(indexUrl);
+    mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
   }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
@@ -229,7 +229,7 @@ function startApp() {
 
   ipcMain.on('services-ready', () => {
     callService('AppService', 'setArgv', process.argv);
-    childWindow.loadURL(indexUrl + '?child=true');
+    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 
   ipcMain.on('window-childWindowIsReadyToShow', () => {
@@ -261,9 +261,9 @@ function startApp() {
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    setTimeout(() => {
-      openDevTools();
-    }, 10 * 1000);
+    // setTimeout(() => {
+    //   openDevTools();
+    // }, 10 * 1000);
 
   }
 
