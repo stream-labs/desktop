@@ -19,7 +19,7 @@
           v-for="(display, index) in allDisplays"
           :key="display.id"
           @click="enterFullscreen(display)">
-          Fullscreen Display {{ index }}: {{ display.size.width }}x{{ display.size.height }}
+          Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
         </button>
       </div>
       <source-preview v-if="sourceId" :source-id="sourceId" />
