@@ -64,7 +64,6 @@ export class Display {
     }
 
     if (options.paddingSize != null) {
-      // TODO: This function seems to have no effect
       nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
     }
 
