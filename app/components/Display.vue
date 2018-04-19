@@ -7,6 +7,6 @@
 
 <style lang="less" scoped>
 .display {
-  height: 100%;
+  flex-grow: 1;
 }
 </style>
