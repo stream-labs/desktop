@@ -42,7 +42,6 @@ export class CustomizationService
   settingsChanged = new Subject<Partial<ICustomizationSettings>>();
 
   init() {
-    console.log('init');
     super.init();
     this.setLiveDockCollapsed(true);// livedock is always collapsed on app start
 
