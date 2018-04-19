@@ -25,7 +25,7 @@ export default class RemoteControlQRCodeVue extends Vue {
   get qrcodeData(): IQRCodeData {
     const settings = this.tcpServerService.state;
     const addresses = this.tcpServerService.getIPAddresses()
-      .filter(address => !address.internal)
+      .filter(address => !address.internal && address.gateway)
       .map(address => address.address);
 
 

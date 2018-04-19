@@ -1,17 +1,22 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
-import ModalLayout from '../ModalLayout.vue';
-import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
+import { Inject } from 'util/injector';
+import ModalLayout from 'components/ModalLayout.vue';
+import { WindowsService } from 'services/windows';
+import windowMixin from 'components/mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
-import { SourcesService, TSourceType, TPropertiesManager } from '../../services/sources';
-import { ScenesService } from '../../services/scenes';
-import { UserService } from '../../services/user';
-import { WidgetsService, WidgetType } from '../../services/widgets';
+import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
+import { ScenesService } from 'services/scenes';
+import { UserService } from 'services/user';
+import { WidgetsService, WidgetType } from 'services/widgets';
 
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
+
+interface ISelectSourceOptions {
+  propertiesManager?: TPropertiesManager;
+  widgetType?: WidgetType;
+}
 
 @Component({
   components: {
@@ -21,42 +26,43 @@ type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
   mixins: [windowMixin],
 })
 export default class SourcesShowcase extends Vue {
-
-  @Inject()
-  sourcesService: SourcesService;
-
-  @Inject()
-  userService: UserService;
-
-  @Inject()
-  widgetsService: WidgetsService;
-
-  @Inject()
-  scenesService: ScenesService;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() sourcesService: SourcesService;
+  @Inject() userService: UserService;
+  @Inject() widgetsService: WidgetsService;
+  @Inject() scenesService: ScenesService;
+  @Inject() windowsService: WindowsService;
 
   widgetTypes = WidgetType;
 
-  selectSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
+  selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
+    const managerType = options.propertiesManager || 'default';
+
     const sameTypeCount = this.sourcesService.getSources()
       .filter((source) => {
-        return (source.type === sourceType) &&
-        (source.getPropertiesManagerType() === (propertiesManager || 'default')) &&
-        !source.channel;
+        return source.isSameType({
+          type: sourceType,
+          propertiesManager: managerType,
+          widgetType: options.widgetType
+        });
       })
       .length;
 
     if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType, propertiesManager);
+      this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
     } else {
-      this.sourcesService.showNameSource(sourceType, propertiesManager);
+      if (managerType === 'widget') {
+        this.sourcesService.showNameWidget(options.widgetType);
+      } else {
+        this.sourcesService.showNameSource(sourceType, managerType);
+      }
     }
   }
 
   selectWidget(type: WidgetType) {
-    this.sourcesService.showNameWidget(type);
+    this.selectSource('browser_source', {
+      propertiesManager: 'widget',
+      widgetType: type
+    });
   }
 
   inspectedSource: TInspectableSource = null;
@@ -77,7 +83,7 @@ export default class SourcesShowcase extends Vue {
     if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
       this.selectSource(this.inspectedSource as TSourceType);
     } else if (this.inspectedSource === 'streamlabel') {
-      this.selectSource('text_gdiplus', 'streamlabels');
+      this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
     } else {
       this.selectWidget(this.inspectedSource as WidgetType);
     }

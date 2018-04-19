@@ -26,11 +26,11 @@ export default class Utils {
   }
 
   static isMainWindow(): boolean {
-    return !this.getCurrentUrlParams().child;
+    return this.getCurrentUrlParams().windowId === 'main';
   }
 
   static isChildWindow(): boolean {
-    return !!this.getCurrentUrlParams().child;
+    return this.getCurrentUrlParams().windowId === 'child';
   }
 
   static isDevMode() {

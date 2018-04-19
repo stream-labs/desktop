@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.8.17-preview.0",
+  "version": "0.8.17-preview.3",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -75,7 +75,7 @@
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.26/streamlabs-x86_64-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.29/iojs-v1.8.4-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"

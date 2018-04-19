@@ -86,6 +86,7 @@ export class SelectionService
   // SCENE NODES METHODS
   placeAfter: (sceneNodeId: string) => void;
   placeBefore: (sceneNodeId: string) => void;
+  setParent: (folderId: string) => void;
 
   @shortcut('Delete')
   remove() {
@@ -568,15 +569,15 @@ export class Selection implements ISelection {
   }
 
   placeAfter(sceneNodeId: string) {
-    this.getNodes().reverse().forEach(node => node.placeAfter(sceneNodeId));
+    this.getRootNodes().reverse().forEach(node => node.placeAfter(sceneNodeId));
   }
 
   placeBefore(sceneNodeId: string) {
-    this.getNodes().reverse().forEach(node => node.placeBefore(sceneNodeId));
+    this.getRootNodes().forEach(node => node.placeBefore(sceneNodeId));
   }
 
   setParent(sceneNodeId: string) {
-    this.getNodes().reverse().forEach(node => node.setParent(sceneNodeId));
+    this.getRootNodes().reverse().forEach(node => node.setParent(sceneNodeId));
   }
 
   /**

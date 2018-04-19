@@ -19,6 +19,7 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
+import { WindowsService } from 'services/windows';
 
 interface IAppState {
   loading: boolean;
@@ -37,6 +38,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() shortcutsService: ShortcutsService;
   @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
+  @Inject() windowsService: WindowsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -108,8 +110,8 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
-      this.videoService.destroyAllDisplays();
       this.scenesTransitionsService.reset();
+      this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);

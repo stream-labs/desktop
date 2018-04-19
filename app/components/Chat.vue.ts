@@ -56,18 +56,25 @@ export default class Chat extends Vue {
 
       if (settings.enableBTTVEmotes && this.isTwitch) {
         webview.executeJavaScript(`
-          
           localStorage.setItem('bttv_clickTwitchEmotes', true);
           localStorage.setItem('bttv_darkenedMode', ${ settings.nightMode ? 'true' : 'false' });
-          
-          var bbtvscript1 = document.createElement('script');
-          bbtvscript1.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
-          document.head.appendChild(bbtvscript1);
-          
-          var bbtvscript2 = document.createElement('script');
-          bbtvscript2.setAttribute('src','https://legacy.betterttv.net/betterttv.js');
-          document.head.appendChild(bbtvscript2);
-          
+
+          var bttvscript = document.createElement('script');
+          bttvscript.setAttribute('src','https://cdn.betterttv.net/betterttv.js');
+          document.head.appendChild(bttvscript);
+
+          function loadLazyEmotes() {
+            var els = document.getElementsByClassName('lazy-emote');
+
+            Array.prototype.forEach.call(els, el => {
+              const src = el.getAttribute('data-src');
+              if (el.src !== 'https:' + src) el.src = src;
+            });
+
+            setTimeout(loadLazyEmotes, 1000);
+          }
+
+          loadLazyEmotes();
         `, true);
       }
       if (settings.enableFFZEmotes && this.isTwitch) {
