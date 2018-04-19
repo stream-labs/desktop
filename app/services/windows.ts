@@ -191,8 +191,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
-  getCurrentWindowOptions() {
-    const windowId = Util.getCurrentUrlParams().windowId;
+  getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }
 

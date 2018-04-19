@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { SourcesService } from 'services/sources';
 import electron from 'electron';
+import Util from 'services/utils';
 
 @Component({
   components: {
@@ -23,7 +24,8 @@ export default class Projector extends Vue {
   oldBounds: electron.Rectangle;
 
   get sourceId() {
-    return this.windowsService.getCurrentWindowOptions().sourceId;
+    const windowId = Util.getCurrentUrlParams().windowId;
+    return this.windowsService.getWindowOptions(windowId).sourceId;
   }
 
   get allDisplays() {

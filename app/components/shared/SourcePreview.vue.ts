@@ -26,7 +26,7 @@ export default class SourcePreview extends Vue {
 
   createDisplay() {
     const displayId = this.videoService.getRandomDisplayId();
-    this.display = new Display(displayId, this.sourceId);
+    this.display = new Display(displayId, { sourceId: this.sourceId });
     this.display.trackElement(this.$refs.preview);
   }
 

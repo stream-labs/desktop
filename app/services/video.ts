@@ -13,6 +13,11 @@ const { remote } = electron;
 
 const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 
+export interface IDisplayOptions {
+  sourceId?: string;
+  paddingSize?: number;
+}
+
 export class Display {
   @Inject() settingsService: SettingsService;
   @Inject() videoService: VideoService;
@@ -34,13 +39,17 @@ export class Display {
 
   private selectionSubscription: Subscription;
 
-  constructor(public name: string, public sourceId?: string) {
+  sourceId: string;
+
+  constructor(public name: string, options: IDisplayOptions = {}) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
+
+    this.sourceId = options.sourceId;
 
     if (this.sourceId) {
       nodeObs.OBS_content_createSourcePreviewDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
-        sourceId,
+        this.sourceId,
         name
       );
     } else {
@@ -52,6 +61,11 @@ export class Display {
       this.selectionSubscription = this.selectionService.updated.subscribe(() => {
         this.switchGridlines(this.selectionService.getSize() <= 1);
       });
+    }
+
+    if (options.paddingSize != null) {
+      // TODO: This function seems to have no effect
+      nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
     }
 
     this.outputRegionCallbacks = [];

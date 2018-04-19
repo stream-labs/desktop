@@ -5,7 +5,7 @@
     @keydown="exitFullscreen"
     v-if="fullscreen">
     <source-preview v-if="sourceId" :source-id="sourceId" />
-    <display v-else :drawUI="false" />
+    <display v-else :drawUI="false" :padding-size="0" />
   </div>
   <modal-layout
     v-else
@@ -13,14 +13,17 @@
     :content-styles="{ padding: 0 }"
     :showControls="false">
     <div slot="content" class="projector-windowed">
-      <button
-        v-for="(display, index) in allDisplays"
-        :key="display.id"
-        @click="enterFullscreen(display)">
-        Fullscreen Display {{ index }}: {{ display.size.width }}x{{ display.size.height }}
-      </button>
+      <div class="projector-buttons">
+        <button
+          class="button button--trans"
+          v-for="(display, index) in allDisplays"
+          :key="display.id"
+          @click="enterFullscreen(display)">
+          Fullscreen Display {{ index }}: {{ display.size.width }}x{{ display.size.height }}
+        </button>
+      </div>
       <source-preview v-if="sourceId" :source-id="sourceId" />
-      <display v-else :drawUI="false" />
+      <display v-else :drawUI="false" :padding-size="0" />
     </div>
   </modal-layout>
 </div>
@@ -45,5 +48,10 @@
 
 .projector-display {
   flex-grow: 1;
+}
+
+.projector-buttons {
+  display: flex;
+  justify-content: center;
 }
 </style>
