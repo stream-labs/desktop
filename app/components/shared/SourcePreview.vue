@@ -8,5 +8,6 @@
 .SourcePreview {
   height: 100%;
   background-color: black;
+  flex-grow: 1;
 }
 </style>
