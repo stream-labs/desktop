@@ -1,9 +1,9 @@
 import { ArrayNode } from './array-node';
 import { SceneItemsNode } from './scene-items';
 import { ScenesService, Scene } from '../../scenes';
-import { SourcesService, Source, TSourceType } from '../../sources';
+import { SourcesService } from '../../sources';
 import { HotkeysNode } from './hotkeys';
-import * as obs from '../../../../obs-api';
+import { SceneFiltersNode } from './scene-filters';
 
 export interface ISceneSchema {
   id: string;
@@ -11,6 +11,7 @@ export interface ISceneSchema {
   sceneItems: SceneItemsNode;
   active: boolean;
   hotkeys?: HotkeysNode;
+  filters?: SceneFiltersNode;
 }
 
 export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
@@ -28,15 +29,19 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
     return new Promise(resolve => {
       const sceneItems = new SceneItemsNode();
       const hotkeys = new HotkeysNode();
+      const filters = new SceneFiltersNode();
 
       sceneItems.save({ scene }).then(() => {
         return hotkeys.save({ sceneId: scene.id });
+      }).then(() => {
+        return filters.save({ sceneId: scene.id });
       }).then(() => {
         resolve({
           id: scene.id,
           name: scene.name,
           sceneItems,
           hotkeys,
+          filters,
           active: this.scenesService.activeSceneId === scene.id
         });
       });
@@ -64,6 +69,8 @@ export class ScenesNode extends ArrayNode<ISceneSchema, {}, Scene> {
         obj.name,
         { sceneId: obj.id }
       );
+
+      if (obj.filters) obj.filters.load({ sceneId: scene.id });
 
       resolve(() => {
         return new Promise(resolve => {
