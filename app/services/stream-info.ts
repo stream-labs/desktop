@@ -1,12 +1,13 @@
-import { StatefulService, mutation } from './stateful-service';
-import { IChannelInfo, getPlatformService } from './platforms';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { IChannelInfo, getPlatformService } from 'services/platforms';
 import { UserService } from './user';
-import { Inject } from '../util/injector';
+import { Inject } from 'util/injector';
 import { StreamingService } from '../services/streaming';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';
 import { MixerService } from 'services/platforms/mixer';
 import { HostsService } from 'services/hosts';
+import { authorizedHeaders } from 'util/requests';
 
 
 interface IStreamInfoServiceState {
@@ -104,10 +105,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
    */
   createGameAssociation(game: string) {
     const url = `https://${this.hostsService.overlays}/api/overlay-games-association`;
-    const headers = new Headers();
 
-    // TODO: Switch to proper OAuth token when ready
-    headers.append('token', this.userService.widgetToken);
+    const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
     const body = `game=${encodeURIComponent(game)}`;
