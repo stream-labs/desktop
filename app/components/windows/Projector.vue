@@ -38,6 +38,7 @@
 
 .projector-fullscreen {
   height: 100%;
+  display: flex;
 }
 
 .projector-windowed {
