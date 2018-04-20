@@ -115,7 +115,7 @@ export class EditMenu extends Menu {
             }
           });
           this.append({
-            label: 'Create Projector',
+            label: 'Create Source Projector',
             click: () => {
               this.projectorService.createProjector(selectedItem.sourceId);
             }
@@ -217,8 +217,6 @@ export class EditMenu extends Menu {
         click: () => this.scenesService.setLockOnAllScenes(false)
       });
 
-      this.append({ type: 'separator' });
-
       this.append({
         label: 'Performance Mode',
         type: 'checkbox',
@@ -227,12 +225,14 @@ export class EditMenu extends Menu {
           performanceMode: !this.customizationService.state.performanceMode
         })
       });
-
-      this.append({
-        label: 'Create Output Projector',
-        click: () => this.projectorService.createProjector()
-      });
     }
+
+    this.append({ type: 'separator' });
+
+    this.append({
+      label: 'Create Output Projector',
+      click: () => this.projectorService.createProjector()
+    });
 
   }
 
