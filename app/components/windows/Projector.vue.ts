@@ -5,10 +5,9 @@ import SourcePreview from 'components/shared/SourcePreview.vue';
 import Display from 'components/Display.vue';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import { ISourcesServiceApi, SourcesService } from 'services/sources';
+import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
-import { ScenesService } from 'services/scenes';
 
 @Component({
   components: {
