@@ -62,6 +62,8 @@
   </div>
 </template>
 
+<script lang="ts" src="./CustomLoader.vue.ts"></script>
+
 <style lang="less" scoped>
 .loader {
   width: 100px;

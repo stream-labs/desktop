@@ -261,7 +261,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    * Parses tokens out of the auth URL
    */
   private parseAuthFromUrl(url: string) {
-    const query = URI.parseQuery(URI.parse(url).query);
+    const query = URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
 
     if (
       query.token &&

@@ -68,6 +68,7 @@
     "arch": "x64"
   },
   "dependencies": {
+    "@types/urijs": "^1.15.37",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
     "electron-updater": "^2.21.1",

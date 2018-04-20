@@ -157,6 +157,10 @@
   version "9.1.8"
   resolved "https://registry.yarnpkg.com/@types/highlight.js/-/highlight.js-9.1.8.tgz#d227f18bcb8f3f187e16965f2444859a04689758"
 
+"@types/jquery@*":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.1.tgz#55758d44d422756d6329cbf54e6d41931d7ba28f"
+
 "@types/lodash@4.14.74":
   version "4.14.74"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.74.tgz#ac3bd8db988e7f7038e5d22bd76a7ba13f876168"
@@ -198,6 +202,12 @@
 "@types/socket.io-client@^1.4.31":
   version "1.4.31"
   resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.31.tgz#86b8986409384a9ee1a74993a70822c36114dc79"
+
+"@types/urijs@^1.15.37":
+  version "1.15.37"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.37.tgz#42cd9d5af585053e9af5d009d77bfeb6b0b4cfe6"
+  dependencies:
+    "@types/jquery" "*"
 
 "@types/webdriverio@^4.8.6":
   version "4.8.6"

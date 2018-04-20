@@ -1,6 +1,5 @@
 import { Inject } from '../../util/injector';
 import { Menu } from './Menu';
-import { WindowsService } from '../../services/window';
 import { Source, SourcesService } from '../../services/sources';
 import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';

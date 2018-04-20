@@ -7,7 +7,7 @@ import {
   NotificationsService,
   INotification
 } from 'services/notifications';
-import notificationAudio from '../../media/sound/ding.wav';
+const notificationAudio = require('../../media/sound/ding.wav');
 const QUEUE_TIME = 5000;
 
 interface IUiNotification extends INotification {
