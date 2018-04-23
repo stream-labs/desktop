@@ -1,6 +1,6 @@
 import { Service } from './service';
-import { Inject } from '../util/injector';
-import { UserService } from './user';
+import { Inject } from 'util/injector';
+import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';

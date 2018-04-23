@@ -4,7 +4,6 @@ import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
-// import io from 'socket.io-client';
 import uuid from 'uuid/v4';
 import fs from 'fs';
 import path from 'path';
