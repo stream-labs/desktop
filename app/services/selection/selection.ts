@@ -67,6 +67,7 @@ export class SelectionService
   isSceneFolder: () => boolean;
   canGroupIntoFolder: () => boolean;
   getClosestParent: () => SceneItemFolder;
+  getRootNodes: () => TSceneNode[];
 
 
   // SCENE_ITEM METHODS
@@ -455,8 +456,9 @@ export class Selection implements ISelection {
     const rootNodes: TSceneNode[] = [];
     const foldersIds: string[] = [];
     this.getNodes().forEach(node => {
-      if (foldersIds.includes(node.parentId)) return;
-      rootNodes.push(node);
+      if (!foldersIds.includes(node.parentId)) {
+        rootNodes.push(node);
+      }
       if (node.isFolder()) foldersIds.push(node.id);
     });
     return rootNodes;
