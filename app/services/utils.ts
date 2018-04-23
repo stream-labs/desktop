@@ -22,7 +22,7 @@ export default class Utils {
 
 
   static getUrlParams(url: string) {
-    return URI.parseQuery(URI.parse(url).query);
+    return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
   static isMainWindow(): boolean {

@@ -86,6 +86,7 @@
     "@types/lodash": "^4.14.64",
     "@types/node": "^8.0.0",
     "@types/socket.io-client": "^1.4.31",
+    "@types/urijs": "^1.15.37",
     "@types/webdriverio": "^4.8.6",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "archiver": "^2.0.3",
