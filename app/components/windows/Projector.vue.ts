@@ -5,7 +5,7 @@ import SourcePreview from 'components/shared/SourcePreview.vue';
 import Display from 'components/Display.vue';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import { SourcesService } from 'services/sources';
+import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 
@@ -18,7 +18,7 @@ import Util from 'services/utils';
 })
 export default class Projector extends Vue {
   @Inject() windowsService: WindowsService;
-  @Inject() sourcesService: SourcesService;
+  @Inject() sourcesService: ISourcesServiceApi;
 
   fullscreen = false;
   oldBounds: electron.Rectangle;
@@ -55,7 +55,7 @@ export default class Projector extends Vue {
 
   get title() {
     if (this.sourceId) {
-      const name = this.sourcesService.getSourceById(this.sourceId).name;
+      const name = this.sourcesService.getSource(this.sourceId).name;
       return `Projector: ${name}`;
     }
     return 'Projector: Output';
