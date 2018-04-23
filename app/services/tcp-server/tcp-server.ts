@@ -237,6 +237,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       do {
         strInd++;
         ipString = ipconfigStrings[strInd];
+        if (ipString === void 0) return '';
         if (ipString.indexOf('Default Gateway') === -1) continue;
         return ipString.split(':')[1].trim();
       } while (!ipString || strInd < ipconfigStrings.length);
