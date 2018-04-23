@@ -28,6 +28,8 @@ export default class NameSource extends Vue {
   name = '';
   error = '';
 
+  disabled = false;
+
   mounted() {
 
     if (this.options.renameId) {
@@ -54,6 +56,9 @@ export default class NameSource extends Vue {
       this.windowsService.closeChildWindow();
     } else {
       let sourceId: string;
+
+      if (this.disabled) return;
+      this.disabled = true;
 
       if (this.sourceType != null) {
         const source = this.sourcesService.createSource(

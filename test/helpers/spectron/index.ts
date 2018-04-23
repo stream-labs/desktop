@@ -23,13 +23,13 @@ async function focusWindow(t: any, regex: RegExp) {
 
 // Focuses the main window
 export async function focusMain(t: any) {
-  await focusWindow(t, /index\.html$/);
+  await focusWindow(t, /windowId=main$/);
 }
 
 
 // Focuses the child window
 export async function focusChild(t: any) {
-  await focusWindow(t, /child=true/);
+  await focusWindow(t, /windowId=child/);
 }
 
 interface ITestRunnerOptions {

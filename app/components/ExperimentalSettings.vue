@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="section">
-      <RemoteControlQRCode/>
       <br/><br/>
     </div>
 

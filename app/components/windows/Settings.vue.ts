@@ -15,6 +15,7 @@ import OverlaySettings from 'components/OverlaySettings.vue';
 import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
+import RemoteControlSettings from 'components/RemoteControlSettings.vue';
 
 @Component({
   components: {
@@ -28,17 +29,14 @@ import ExperimentalSettings from 'components/ExperimentalSettings.vue';
     OverlaySettings,
     NotificationsSettings,
     AppearanceSettings,
+    RemoteControlSettings,
     ExperimentalSettings
   },
   mixins: [windowMixin]
 })
 export default class SceneTransitions extends Vue {
-
-  @Inject()
-  settingsService: ISettingsServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() settingsService: ISettingsServiceApi;
+  @Inject() windowsService: WindowsService;
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
@@ -53,6 +51,7 @@ export default class SceneTransitions extends Vue {
     Overlays: 'picture-o',
     Notifications: 'warning',
     Appearance: 'television',
+    'Remote Control': 'play-circle',
     Experimental: 'flask'
   };
 

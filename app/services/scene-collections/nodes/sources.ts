@@ -1,5 +1,4 @@
 import { Node } from './node';
-import { FiltersNode } from './filters';
 import { HotkeysNode } from './hotkeys';
 import { 
   SourcesService,
@@ -11,7 +10,6 @@ import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
-import path from 'path';
 
 interface ISchema {
   items: ISourceInfo[];

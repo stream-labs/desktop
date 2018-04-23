@@ -1,11 +1,13 @@
-import { StatefulService, mutation } from './stateful-service';
-import { IChannelInfo, getPlatformService } from './platforms';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { IChannelInfo, getPlatformService } from 'services/platforms';
 import { UserService } from './user';
-import { Inject } from '../util/injector';
+import { Inject } from 'util/injector';
 import { StreamingService } from '../services/streaming';
 import { TwitchService } from 'services/platforms/twitch';
 import { YoutubeService } from 'services/platforms/youtube';
 import { MixerService } from 'services/platforms/mixer';
+import { HostsService } from 'services/hosts';
+import { authorizedHeaders } from 'util/requests';
 
 
 interface IStreamInfoServiceState {
@@ -26,9 +28,9 @@ const VIEWER_COUNT_UPDATE_INTERVAL = 60 * 1000;
  * components to make use of.
  */
 export class StreamInfoService extends StatefulService<IStreamInfoServiceState> {
-
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
+  @Inject() hostsService: HostsService;
 
   static initialState: IStreamInfoServiceState = {
     fetching: false,
@@ -75,26 +77,43 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   setStreamInfo(title: string, description: string, game: string): Promise<boolean> {
     const platform = getPlatformService(this.userService.platform.type);
+    let promise: Promise<boolean>;
 
     if (platform instanceof TwitchService || MixerService) {
-      return platform.putChannelInfo(title, game).then(success => {
-        this.refreshStreamInfo();
-        return success;
-      }).catch(() => {
-        this.refreshStreamInfo();
-        return false;
-      });
+      promise = platform.putChannelInfo(title, game);
     }
 
     if (platform instanceof YoutubeService) {
-      return platform.putChannelInfo(title, description).then(success => {
-        this.refreshStreamInfo();
-        return success;
-      }).catch(() => {
-        this.refreshStreamInfo();
-        return false;
-      });
+      promise = platform.putChannelInfo(title, description);
     }
+
+    return promise.then(success => {
+      this.refreshStreamInfo();
+      this.createGameAssociation(game);
+      return success;
+    }).catch(() => {
+      this.refreshStreamInfo();
+      return false;
+    });
+  }
+
+  /**
+   * Used to track in aggregate which overlays streamers are using
+   * most often for which games, in order to offer a better search
+   * experience in the overlay library.
+   * @param game the name of the game
+   */
+  createGameAssociation(game: string) {
+    const url = `https://${this.hostsService.overlays}/api/overlay-games-association`;
+
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const body = `game=${encodeURIComponent(game)}`;
+    const request = new Request(url, { headers, body, method: 'POST' });
+
+    // This is best effort data gathering, don't explicitly handle errors
+    return fetch(request);
   }
 
 

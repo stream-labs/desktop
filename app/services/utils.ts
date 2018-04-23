@@ -22,15 +22,15 @@ export default class Utils {
 
 
   static getUrlParams(url: string) {
-    return URI.parseQuery(URI.parse(url).query);
+    return URI.parseQuery(URI.parse(url).query) as Dictionary<string>;
   }
 
   static isMainWindow(): boolean {
-    return !this.getCurrentUrlParams().child;
+    return this.getCurrentUrlParams().windowId === 'main';
   }
 
   static isChildWindow(): boolean {
-    return !!this.getCurrentUrlParams().child;
+    return this.getCurrentUrlParams().windowId === 'child';
   }
 
   static isDevMode() {

@@ -2,12 +2,11 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericForm from './shared/forms/GenericForm.vue';
-import RemoteControlQRCode from './RemoteControlQRCode.vue';
 import { TFormData, TObsValue } from './shared/forms/Input';
 import { ICustomizationServiceApi } from 'services/customization';
 
 @Component({
-  components: { GenericForm, RemoteControlQRCode }
+  components: { GenericForm }
 })
 export default class ExperimentalSettings extends Vue {
 
