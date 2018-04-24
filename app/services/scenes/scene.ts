@@ -295,7 +295,7 @@ export class Scene implements ISceneApi {
 
     // Avoid changing old indexes while moving
     let iterationOrder = itemsToMove;
-    if (destNode.getNodeIndex() > firstNodeIndex) {
+    if (destNode && (destNode.getNodeIndex() > firstNodeIndex)) {
       iterationOrder = itemsToMove.reverse();
     }
 
