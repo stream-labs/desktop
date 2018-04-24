@@ -219,7 +219,6 @@ export class Scene implements ISceneApi {
 
   // TODO write tests for this method
   placeAfter(sourceNodeId: string, destNodeId?: string) {
-
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
 
@@ -249,45 +248,11 @@ export class Scene implements ISceneApi {
     // move obs items
     const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
 
-    if (itemsToMove.length) {
+    const oldIndexMap: Dictionary<number> = {};
 
-
-      const firstItemIndex = itemsToMove[0].getItemIndex();
-
-      const isForwardDirection = destNode && destNode.getNodeIndex() > sourceNode.getNodeIndex();
-      let newItemIndex = 0;
-
-
-      if (destNode) {
-        const destItemIndex = destNode.getItemIndex();
-        const destIsFolderWithoutItemsBefore = (
-          destNode.isFolder() &&
-          destItemIndex === 0 &&
-          !destNode.getPrevItem()
-        );
-
-        if (destIsFolderWithoutItemsBefore) {
-          newItemIndex = 0;
-        } else if (isForwardDirection) {
-          newItemIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
-            destItemIndex + destNode.getNestedItems().length :
-            destItemIndex;
-        } else {
-          newItemIndex = destItemIndex + 1;
-        }
-      }
-
-      const obsScene = this.getObsScene();
-      if (newItemIndex !== firstItemIndex) {
-        for (let i = 0; i < itemsToMove.length; i++) {
-          if (isForwardDirection) {
-            obsScene.moveItem(firstItemIndex, newItemIndex);
-          } else {
-            obsScene.moveItem(firstItemIndex + i, newItemIndex + i);
-          }
-        }
-      }
-    }
+    itemsToMove.forEach(item => {
+      oldIndexMap[item.sceneItemId] = item.getItemIndex();
+    });
 
     // move nodes
 
@@ -302,12 +267,13 @@ export class Scene implements ISceneApi {
     if (destNode) {
       const destNodeIndex = destNode.getNodeIndex();
 
+      newNodeIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
+        destNodeIndex + destNode.getNestedNodes().length + 1 :
+        destNodeIndex + 1;
+
       if (destNodeIndex > firstNodeIndex) {
-        newNodeIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
-          destNodeIndex + destNode.getNestedNodes().length - nodesToMoveIds.length + 1 :
-          destNodeIndex - nodesToMoveIds.length + 1;
-      } else {
-        newNodeIndex = destNodeIndex + 1;
+        // Adjust for moved items
+        newNodeIndex -= nodesToMoveIds.length;
       }
     }
 
@@ -315,7 +281,6 @@ export class Scene implements ISceneApi {
     sceneNodesIds.splice(newNodeIndex, 0, ...nodesToMoveIds);
 
     this.SET_NODES_ORDER(sceneNodesIds);
-
 
     // recalculate children order in dest and source folder
 
@@ -327,6 +292,17 @@ export class Scene implements ISceneApi {
       const sourceFolder = sourceNode.getParent();
       if (sourceFolder) sourceFolder.recalculateChildrenOrder();
     }
+
+    // Avoid changing old indexes while moving
+    let iterationOrder = itemsToMove;
+    if (destNode.getNodeIndex() > firstNodeIndex) {
+      iterationOrder = itemsToMove.reverse();
+    }
+
+    iterationOrder.forEach(item => {
+      const oldIndex = oldIndexMap[item.sceneItemId];
+      this.getObsScene().moveItem(oldIndex, item.getItemIndex());
+    });
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
