@@ -245,14 +245,7 @@ export class Scene implements ISceneApi {
     }
 
 
-    // move obs items
     const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
-
-    const oldIndexMap: Dictionary<number> = {};
-
-    itemsToMove.forEach(item => {
-      oldIndexMap[item.sceneItemId] = item.getItemIndex();
-    });
 
     // move nodes
 
@@ -293,15 +286,12 @@ export class Scene implements ISceneApi {
       if (sourceFolder) sourceFolder.recalculateChildrenOrder();
     }
 
-    // Avoid changing old indexes while moving
-    let iterationOrder = itemsToMove;
-    if (destNode && (destNode.getNodeIndex() > firstNodeIndex)) {
-      iterationOrder = itemsToMove.reverse();
-    }
-
-    iterationOrder.forEach(item => {
-      const oldIndex = oldIndexMap[item.sceneItemId];
-      this.getObsScene().moveItem(oldIndex, item.getItemIndex());
+    itemsToMove.forEach(item => {
+      let currentIdx: number;
+      this.getObsScene().getItems().reverse().forEach((obsItem, idx) => {
+        if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
+      });
+      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
     });
   }
 
