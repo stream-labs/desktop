@@ -6,8 +6,10 @@
       <span v-if="!qrcodeIsVisible">Click to show</span>
     </div>
     <div class="description">
-      You can now control Streamlabs OBS from your mobile phone. <br/>
-      To begin, scan this QR code with your phone.
+      You can now control Streamlabs OBS from your <strong>Android</strong> phone. <br/>
+      To begin, Scan this QR code with your phone.<br/>
+      This feature will only work with the most recent version of the Streamlabs mobile app.<br/>
+      NOTE: For IOS users, this feature is coming soon.<br/>
     </div>
   </div>
 
@@ -22,6 +24,7 @@
       API token: {{ qrcodeData.token }} <a href="" @click.prevent="generateToken">Generate new</a><br/>
       Address: {{ qrcodeData.addresses.map(address => address + ':' + qrcodeData.port).join(', ')}}
     </div>
+    <br/>
   </div>
 </div>
 </template>
@@ -29,34 +32,38 @@
 <script lang="ts" src="./RemoteControlQRCode.vue.ts"></script>
 
 <style lang="less" scoped>
-   .remote-control-qr-code {
-     display: flex;
-   }
+@import "../styles/index";
 
-   .description {
-     padding-left: 10px;
-   }
 
-   .fader {
-     position: relative;
-     overflow: hidden;
-     cursor: pointer;
-     width: 320px;
+.description {
+ padding-left: 10px;
+}
 
-     span {
-       position: absolute;
-       top: 100px;
-       left: 70px;
-       display: block;
-       color: white;
-       font-size: 16px;
-       background: rgba(0,0,0,0.7);
-       padding: 10px;
-       box-shadow: 0 0 10px 6px rgba(0,0,0,0.7);
-     }
-   }
+.error {
+  color: @red;
+}
 
-  .blur {
-    filter: blur(5px);
-  }
+.fader {
+ position: relative;
+ overflow: hidden;
+ cursor: pointer;
+ width: 320px;
+
+
+ span {
+   position: absolute;
+   top: 100px;
+   left: 70px;
+   display: block;
+   color: white;
+   font-size: 16px;
+   background: rgba(0,0,0,0.7);
+   padding: 10px;
+   box-shadow: 0 0 10px 6px rgba(0,0,0,0.7);
+ }
+}
+
+.blur {
+  filter: blur(5px);
+}
 </style>
