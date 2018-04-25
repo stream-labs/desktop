@@ -1,3 +1,4 @@
+import { remote } from 'electron';
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import qrcode from '@xkeshi/vue-qrcode';
@@ -9,6 +10,7 @@ interface IQRCodeData {
   addresses: string[];
   port: number;
   token: string;
+  version: string;
 }
 
 @Component({
@@ -26,7 +28,8 @@ export default class RemoteControlQRCodeVue extends Vue {
   qrcodeData: IQRCodeData = {
     token: '',
     port: 0,
-    addresses: []
+    addresses: [],
+    version: ''
   };
 
   mounted() {
@@ -48,7 +51,8 @@ export default class RemoteControlQRCodeVue extends Vue {
     this.qrcodeData = {
       token: settings.token,
       port: settings.websockets.port,
-      addresses
+      addresses,
+      version: remote.process.env.SLOBS_VERSION
     };
   }
 
