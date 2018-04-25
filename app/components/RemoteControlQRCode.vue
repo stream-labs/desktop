@@ -25,9 +25,6 @@
     </div>
     <br/>
   </div>
-  <span class="error" v-if="qrcodeData.token && !qrcodeData.addresses.length">
-      No valid IP address found. Please check your network connection. Retrying...
-  </span>
 </div>
 </template>
 

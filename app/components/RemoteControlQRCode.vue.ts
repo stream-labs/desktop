@@ -30,6 +30,7 @@ export default class RemoteControlQRCodeVue extends Vue {
   };
 
   mounted() {
+    this.updateQrcodeData();
     this.updateNetworkInterval = window.setInterval(() => this.updateQrcodeData(), 1000);
   }
 
@@ -40,7 +41,7 @@ export default class RemoteControlQRCodeVue extends Vue {
   updateQrcodeData() {
     const settings = this.tcpServerService.state;
     const addresses = this.tcpServerService.getIPAddresses()
-      .filter(address => !address.internal && address.gateway)
+      .filter(address => !address.internal)
       .map(address => address.address);
 
 

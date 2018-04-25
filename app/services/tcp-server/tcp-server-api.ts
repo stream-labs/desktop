@@ -32,5 +32,4 @@ export interface IIPAddressDescription {
   interface: string;
   family: 'IPv4' | 'IPv6';
   internal: boolean;
-  gateway: string;
 }
