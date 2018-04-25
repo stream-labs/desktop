@@ -8,7 +8,7 @@
     <div class="description">
       You can now control Streamlabs OBS from your <strong>Android</strong> phone. <br/>
       To begin, Scan this QR code with your phone.<br/>
-      Make sure your mobile application is up to date.<br/>
+      This feature will only work with the most recent version of the Streamlabs mobile app.<br/>
       NOTE: For IOS users, this feature is coming soon.<br/>
     </div>
   </div>
