@@ -12,6 +12,7 @@ import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
+import { ProjectorService } from 'services/projector';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -22,6 +23,7 @@ export default class SceneSelector extends Vue {
   @Inject() appService: AppService;
   @Inject() scenesTransitionsService: ScenesTransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() projectorService: ProjectorService;
 
   searchQuery = '';
 
@@ -46,6 +48,10 @@ export default class SceneSelector extends Vue {
       click: () => this.sourceFiltersService.showSourceFilters(
         this.scenesService.activeScene.id
       )
+    });
+    menu.append({
+      label: 'Create Scene Projector',
+      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
     });
     menu.popup();
   }
