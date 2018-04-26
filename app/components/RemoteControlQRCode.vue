@@ -1,16 +1,9 @@
 <template>
 <div>
-  <div class="flex">
-    <div class="fader" @click="showQrcode">
-      <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
-      <span v-if="!qrcodeIsVisible">Click to show</span>
-    </div>
-    <div class="description">
-      You can now control Streamlabs OBS from your <strong>Android</strong> phone. <br/>
-      To begin, Scan this QR code with your phone.<br/>
-      This feature will only work with the most recent version of the Streamlabs mobile app.<br/>
-      NOTE: For IOS users, this feature is coming soon.<br/>
-    </div>
+
+  <div class="fader" @click="showQrcode">
+    <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
+    <span v-if="!qrcodeIsVisible">Click to show</span>
   </div>
 
   <div v-if="qrcodeIsVisible">
@@ -26,6 +19,13 @@
     </div>
     <br/>
   </div>
+
+  <div>
+    You can now control Streamlabs OBS from your <strong>Android</strong> phone. <br/>
+    To begin, Scan this QR code with your phone.<br/>
+    This feature will only work with the most recent version of the Streamlabs mobile app.<br/>
+    NOTE: For IOS users, this feature is coming soon.<br/>
+  </div>
 </div>
 </template>
 
@@ -35,19 +35,10 @@
 @import "../styles/index";
 
 
-.description {
- padding-left: 10px;
-}
-
-.error {
-  color: @red;
-}
-
 .fader {
  position: relative;
  overflow: hidden;
  cursor: pointer;
- width: 320px;
 
 
  span {
