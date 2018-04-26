@@ -39,7 +39,6 @@ interface ISceneBuilderNode {
  */
 export class SceneBuilder {
 
-  scene: ISceneApi;
   private scenesService: IScenesServiceApi;
 
   /**
@@ -54,7 +53,10 @@ export class SceneBuilder {
 
   constructor (api: ApiClient) {
     this.scenesService = api.getResource<IScenesServiceApi>('ScenesService');
-    this.scene = this.scenesService.activeScene;
+  }
+
+  get scene(): ISceneApi {
+    return this.scenesService.activeScene;
   }
 
   parse(sketch: string): ISceneBuilderNode[] {

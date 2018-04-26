@@ -11,7 +11,7 @@ export interface ISceneCollectionsServiceApi {
    * Create and load a new empty scene collection
    * @param options an optional options object
    */
-  create(options?: ISceneCollectionCreateOptions): Promise<void>;
+  create(options?: ISceneCollectionCreateOptions): Promise<ISceneCollectionsManifestEntry>;
 
   /**
    * Fetch a list of all scene collections and information
@@ -56,7 +56,6 @@ export interface ISceneCollectionsServiceApi {
 }
 
 export interface ISceneCollectionCreateOptions {
-  setupFunction?: () => boolean;
   needsRename?: boolean;
   name?: string;
 }

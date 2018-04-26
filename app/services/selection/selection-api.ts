@@ -6,6 +6,7 @@ import {
   ISceneItemNode,
   ISceneItemFolderApi, TSceneNodeModel
 } from 'services/scenes';
+import { TSceneNode } from "../scenes";
 
 /**
  * Represents active items and folders for current scene
@@ -147,6 +148,23 @@ export interface ISelection extends ISceneItemActions {
    * @see `SceneNodeApi.setParent()`
    */
   setParent(folderId: string): void;
+
+
+  /**
+   * Returns a minimal representation of selection
+   * for selection list like this:
+   *
+   * Folder1      <- selected
+   *  |_ Item1    <- selected
+   *  \_ Folder2  <- selected
+   * Item3        <- selected
+   * Folder3
+   *  |_ Item3
+   *  \_ Item4    <- selected
+   *
+   *  returns Folder1, Item3, Item4
+   */
+  getRootNodes(): TSceneNodeApi[];
 }
 
 export interface ISelectionState {
