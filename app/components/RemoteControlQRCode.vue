@@ -14,8 +14,20 @@
       Hide details
     </a>
     <div class="details" v-if="detailsIsVisible">
-      API token: {{ qrcodeData.token }} <a href="" @click.prevent="generateToken">Generate new</a><br/>
-      Address: {{ qrcodeData.addresses.map(address => address + ':' + qrcodeData.port).join(', ')}}
+      <label>
+        API token <br/>
+        <input type="text" readonly :value="qrcodeData.token">
+        <a href="" @click.prevent="generateToken">Generate new</a><br/>
+        <br/>
+      </label>
+      <label>
+        Port<br/>
+        <input type="text" readonly :value="qrcodeData.port">
+      </label>
+      <label>
+        IP addresses<br/>
+        <input type="text" readonly :value="qrcodeData.addresses.join(', ')">
+      </label>
     </div>
     <br/>
   </div>
@@ -34,6 +46,9 @@
 <style lang="less" scoped>
 @import "../styles/index";
 
+input {
+  cursor: text;
+}
 
 .fader {
  position: relative;
