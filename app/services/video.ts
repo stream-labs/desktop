@@ -57,11 +57,12 @@ export class Display {
         remote.getCurrentWindow().getNativeWindowHandle(),
         name
       );
-      nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
       this.selectionSubscription = this.selectionService.updated.subscribe(() => {
         this.switchGridlines(this.selectionService.getSize() <= 1);
       });
     }
+
+    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
 
     if (options.paddingSize != null) {
       nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
