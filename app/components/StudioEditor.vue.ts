@@ -56,7 +56,6 @@ export default class StudioEditor extends Vue {
 
 
   onOutputResize(region: IRectangle) {
-    console.log('receive', region);
     this.renderedWidth = region.width;
     this.renderedHeight = region.height;
     this.renderedOffsetX = region.x;
