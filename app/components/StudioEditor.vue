@@ -6,7 +6,13 @@
   @mouseup="handleMouseUp"
   @mousemove="handleMouseMove"
   @mouseenter="handleMouseEnter"
-  @dblclick="handleMouseDblClick"/>
+  @dblclick="handleMouseDblClick"
+  >
+  <display
+    :drawUI="true"
+    :paddingSize="10"
+    @outputResize="onOutputResize"/>
+</div>
 </template>
 
 <script lang="ts" src="./StudioEditor.vue.ts"></script>

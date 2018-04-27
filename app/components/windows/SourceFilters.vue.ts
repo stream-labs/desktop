@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
-import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
-import { SourceFiltersService } from '../../services/source-filters';
-import { ISourcesServiceApi } from '../../services/sources';
+import { Inject } from 'util/injector';
+import { WindowsService } from 'services/windows';
+import windowMixin from 'components/mixins/window';
+import { SourceFiltersService } from 'services/source-filters';
+import { ISourcesServiceApi } from 'services/sources';
 
-import ModalLayout from '../ModalLayout.vue';
-import NavMenu from '../shared/NavMenu.vue';
-import NavItem from '../shared/NavItem.vue';
-import SourcePreview from '../shared/SourcePreview.vue';
+import ModalLayout from 'components/ModalLayout.vue';
+import NavMenu from 'components/shared/NavMenu.vue';
+import NavItem from 'components/shared/NavItem.vue';
+import Display from 'components/shared/Display.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
 
 @Component({
@@ -18,20 +18,14 @@ import GenericForm from '../shared/forms/GenericForm.vue';
     NavMenu,
     NavItem,
     GenericForm,
-    SourcePreview,
+    Display,
   },
   mixins: [windowMixin]
 })
 export default class SourceFilters extends Vue {
-
-  @Inject()
-  sourceFiltersService: SourceFiltersService;
-
-  @Inject()
-  sourcesService: ISourcesServiceApi;
-
-  @Inject()
-  windowsService: WindowsService;
+  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() sourcesService: ISourcesServiceApi;
+  @Inject() windowsService: WindowsService;
 
   windowOptions = this.windowsService.getChildWindowQueryParams() as { sourceId: string, selectedFilterName: string };
   sourceId = this.windowOptions.sourceId;
