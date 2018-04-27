@@ -4,7 +4,7 @@
   :done-handler="done"
   :cancel-handler="cancel"
   :fixedSectionHeight="200">
-  <SourcePreview slot="fixed" v-if="source" :sourceId="source.id"></SourcePreview>
+  <display slot="fixed" v-if="source" :sourceId="source.id" />
   <div slot="content">
     <component
       v-if="propertiesManagerUI"

@@ -52,7 +52,7 @@
         </selector>
       </div>
       <div class="small-6 columns">
-        <SourcePreview :sourceId="selectedSource.id"/>
+        <display :sourceId="selectedSource.id" />
       </div>
     </div>
 
