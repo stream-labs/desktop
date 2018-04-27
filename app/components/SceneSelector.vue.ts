@@ -69,6 +69,8 @@ export default class SceneSelector extends Vue {
   }
 
   removeScene() {
+    const name = this.scenesService.activeScene.name;
+    if (!confirm(`Are you sure you want to remove ${name}?`)) return;
     this.scenesService.removeScene(this.activeSceneId);
   }
 
