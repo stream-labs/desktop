@@ -11,6 +11,7 @@ import {
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
+import { SceneCollectionsService } from 'services/scene-collections';
 
 export enum ETransitionType {
   Cut = 'cut_transition',
@@ -47,13 +48,21 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
+  @Inject() sceneCollectionsService: SceneCollectionsService;
 
+  // Used to render the "EDIT" (left) display in studio mode
   studioModeTransition: obs.ITransition;
-  sceneDup: obs.IScene;
+
+  // Is a duplicate of a scene that is currently live in studio mode
+  sceneDuplicate: obs.IScene;
 
   init() {
     // Set the default transition type
     this.setType(ETransitionType.Cut);
+
+    this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
+      this.disableStudioMode();
+    });
   }
 
   enableStudioMode() {
@@ -62,10 +71,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(true);
     if (!this.studioModeTransition) this.createStudioModeTransition();
     const currentScene = this.scenesService.activeScene.getObsScene();
-    this.sceneDup = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
+    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
 
     // Immediately switch to the duplicated scene
-    this.getCurrentTransition().set(this.sceneDup);
+    this.getCurrentTransition().set(this.sceneDuplicate);
 
     this.studioModeTransition.start(300, currentScene);
   }
@@ -82,11 +91,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   executeStudioModeTransition() {
     const currentScene = this.scenesService.activeScene.getObsScene();
 
-    const oldDup = this.sceneDup;
-    this.sceneDup = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
-    this.getCurrentTransition().start(this.state.duration, this.sceneDup);
+    const oldDuplicate = this.sceneDuplicate;
+    this.sceneDuplicate = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
+    this.getCurrentTransition().start(this.state.duration, this.sceneDuplicate);
 
-    oldDup.release();
+    oldDuplicate.release();
   }
 
   /**
@@ -104,9 +113,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       this.studioModeTransition.release();
       this.studioModeTransition = null;
     }
-    if (this.sceneDup) {
-      this.sceneDup.release();
-      this.sceneDup = null;
+    if (this.sceneDuplicate) {
+      this.sceneDuplicate.release();
+      this.sceneDuplicate = null;
     }
   }
 
