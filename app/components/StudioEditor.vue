@@ -11,6 +11,7 @@
   <display
     :drawUI="true"
     :paddingSize="10"
+    :sourceId="studioMode ? 'Studio Transition' : void 0"
     @outputResize="onOutputResize"/>
 </div>
 </template>

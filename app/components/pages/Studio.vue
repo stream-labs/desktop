@@ -1,7 +1,13 @@
 <template>
 <div class="studio-page">
+  <div v-if="studioMode" class="studio-mode-controls">
+    Studio Mode Controls Go Here
+  </div>
   <div class="studio-display-container">
     <studio-editor v-if="previewEnabled" />
+    <div v-if="studioMode" class="studio-output-display">
+      <display :paddingSize="10" />
+    </div>
   </div>
   <div v-if="!previewEnabled" class="no-preview">
     <div class="message">
@@ -24,9 +30,17 @@
   flex-direction: column;
 }
 
+.studio-mode-controls {
+  height: 100px;
+}
+
 .studio-display-container {
   flex-grow: 1;
   display: flex;
+}
+
+.studio-output-display {
+  flex-grow: 1;
 }
 
 .no-preview {

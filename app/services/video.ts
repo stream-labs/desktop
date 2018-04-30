@@ -57,10 +57,11 @@ export class Display {
         remote.getCurrentWindow().getNativeWindowHandle(),
         name
       );
-      this.selectionSubscription = this.selectionService.updated.subscribe(() => {
-        this.switchGridlines(this.selectionService.getSize() <= 1);
-      });
     }
+
+    this.selectionSubscription = this.selectionService.updated.subscribe(() => {
+      this.switchGridlines(this.selectionService.getSize() <= 1);
+    });
 
     nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
 
@@ -122,7 +123,7 @@ export class Display {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
-    if (!this.sourceId) this.refreshOutputRegion();
+    if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
   destroy() {
