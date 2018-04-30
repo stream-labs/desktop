@@ -1,7 +1,16 @@
 <template>
 <div class="studio-page">
   <div v-if="studioMode" class="studio-mode-controls">
-    Studio Mode Controls Go Here
+    <span class="studio-mode-control">
+      Edit
+    </span>
+    <button class="button button--action">
+      Transition
+      <i class="fa fa-arrow-right" />
+    </button>
+    <span class="studio-mode-control">
+      Live
+    </span>
   </div>
   <div class="studio-display-container">
     <studio-editor v-if="previewEnabled" />
@@ -14,7 +23,6 @@
       Preview is disabled in performance mode
       <div class="button button--action button--sm" @click="enablePreview">Disable Performance Mode</div>
     </div>
-
   </div>
   <studio-controls />
 </div>
@@ -31,7 +39,18 @@
 }
 
 .studio-mode-controls {
-  height: 100px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.studio-mode-control {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.8px;
 }
 
 .studio-display-container {
