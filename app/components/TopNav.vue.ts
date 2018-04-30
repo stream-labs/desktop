@@ -46,7 +46,11 @@ export default class TopNav extends Vue {
   }
 
   studioMode() {
-    this.transitionsService.enableStudioMode();
+    if (this.transitionsService.state.studioMode) {
+      this.transitionsService.disableStudioMode();
+    } else {
+      this.transitionsService.enableStudioMode();
+    }
   }
 
   openSettingsWindow() {

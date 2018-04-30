@@ -26,6 +26,10 @@ export default class Studio extends Vue {
     return this.transitionsService.state.studioMode;
   }
 
+  studioModeTransition() {
+    this.transitionsService.executeStudioModeTransition();
+  }
+
   enablePreview() {
     this.customizationService.setSettings({ performanceMode: false });
   }

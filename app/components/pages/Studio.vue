@@ -4,7 +4,9 @@
     <span class="studio-mode-control">
       Edit
     </span>
-    <button class="button button--action">
+    <button
+      class="button button--action"
+      @click="studioModeTransition">
       Transition
       <i class="fa fa-arrow-right" />
     </button>

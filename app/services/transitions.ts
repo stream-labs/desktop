@@ -10,6 +10,7 @@ import {
 } from 'components/shared/forms/Input';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
+import uuid from 'uuid/v4';
 
 export enum ETransitionType {
   Cut = 'cut_transition',
@@ -48,6 +49,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() scenesService: ScenesService;
 
   studioModeTransition: obs.ITransition;
+  sceneDup: obs.IScene;
 
   init() {
     // Set the default transition type
@@ -60,17 +62,31 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.SET_STUDIO_MODE(true);
     if (!this.studioModeTransition) this.createStudioModeTransition();
     const currentScene = this.scenesService.activeScene.getObsScene();
-    const sceneDup = currentScene.duplicate('Come up with a better name', obs.ESceneDupType.Refs);
+    this.sceneDup = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
 
-    // Immediately switch to the duplicated scene with a cut transition
-    const tempTransition = obs.TransitionFactory.create(
-      ETransitionType.Cut,
-      'Temp Transition'
-    );
-    tempTransition.start(300, sceneDup);
-    obs.Global.setOutputSource(0, tempTransition);
+    // Immediately switch to the duplicated scene
+    this.getCurrentTransition().set(this.sceneDup);
 
     this.studioModeTransition.start(300, currentScene);
+  }
+
+  disableStudioMode() {
+    if (!this.state.studioMode) return;
+
+    this.SET_STUDIO_MODE(false);
+
+    this.getCurrentTransition().set(this.scenesService.activeScene.getObsScene());
+    this.releaseStudioModeObjects();
+  }
+
+  executeStudioModeTransition() {
+    const currentScene = this.scenesService.activeScene.getObsScene();
+
+    const oldDup = this.sceneDup;
+    this.sceneDup = currentScene.duplicate(uuid(), obs.ESceneDupType.Refs);
+    this.getCurrentTransition().start(this.state.duration, this.sceneDup);
+
+    oldDup.release();
   }
 
   /**
@@ -81,6 +97,17 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       ETransitionType.Cut,
       'Studio Transition'
     );
+  }
+
+  releaseStudioModeObjects() {
+    if (this.studioModeTransition) {
+      this.studioModeTransition.release();
+      this.studioModeTransition = null;
+    }
+    if (this.sceneDup) {
+      this.sceneDup.release();
+      this.sceneDup = null;
+    }
   }
 
   transitionTo(scene: obs.IScene) {
@@ -95,6 +122,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   release() {
     this.getCurrentTransition().release();
+    this.releaseStudioModeObjects();
   }
 
   reset() {
