@@ -1,3 +1,5 @@
+import { I18nService } from "./services/i18n";
+
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
@@ -17,6 +19,7 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import VueI18n from "vue-i18n";
 
 const { ipcRenderer, remote } = electron;
 
@@ -88,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const storePromise = createStore();
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
+  const i18nService: I18nService = I18nService.instance;
   const obsApiService = ObsApiService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
 
@@ -104,14 +108,48 @@ document.addEventListener('DOMContentLoaded', () => {
   window['obs'] = obsApiService.nodeObs;
 
   storePromise.then(store => {
+
+    Vue.use(VueI18n);
+
+    const i18n = new VueI18n({
+      locale: i18nService.state.locale,
+      fallbackLocale: 'en-US',
+      messages: {
+        'en-Us': {
+          "Scene": "Scene",
+          "Scenes": "Scenes",
+          "Source": "Source",
+          "Sources": "Sources",
+
+          "General": "General"
+        },
+        'ru-Ru': {
+          "Scene": "Сцена",
+          "Scenes": "Сцены",
+          "Source": "Источник",
+          "Sources": "Источники",
+
+          "General": "Общие"
+        }
+      }
+    });
+
+    I18nService.setVuei18nInstance(i18n);
+
     const vm = new Vue({
       el: '#app',
+      i18n,
       store,
       render: h => {
         const componentName = windowsService.state[windowId].componentName;
 
         return h(windowsService.components[componentName]);
       }
+    });
+
+    // synchronize the locale for all windows
+    i18nService.localeChanged.subscribe(locale => {
+      i18n.locale = locale;
     });
   });
 

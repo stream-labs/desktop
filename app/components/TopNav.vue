@@ -13,7 +13,7 @@
       class="tab-button"
       :class="{ active: page === 'Dashboard' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="fa fa-tachometer"/> Dashboard
+      <i class="fa fa-tachometer"/> {{ $t('Dashboard') }}
     </button>
     <button
       @click="navigateOverlays"

@@ -12,7 +12,7 @@
         :to="category"
         :ico="icons[category]"
       >
-        {{ category }}
+        {{ $t(category) }}
       </NavItem>
     </NavMenu>
     <div class="settings-container">

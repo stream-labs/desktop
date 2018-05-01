@@ -2,31 +2,31 @@
 <div class="source-selector">
   <div class="studio-controls-top">
     <h4 class="studio-controls__label">
-      Sources
+      {{ $t('Sources') }}
     </h4>
     <div>
       <i
         class="fa fa-folder-open icon-btn icon-btn--lg"
         @click="addFolder"
-        title="Add Folder"
+        :title="$t('Add Folder')"
       />
 
       <i
         class="fa fa-plus icon-btn icon-btn--lg"
         @click="addSource"
-        title="Add Source"
+        :title="$t('Add Source')"
       />
       <i
         class="fa fa-minus icon-btn icon-btn--lg"
         :class="{ disabled: activeItemIds.length === 0}"
         @click="removeItems"
-        title="Remove Sources"
+        :title="$t('Remove Sources')"
       />
       <i
         :class="{ disabled: !canShowProperties()}"
         class="fa fa-cog icon-btn"
         @click="sourceProperties"
-        title="Setup Source Properties"
+        :title="$t('Setup Source Properties')"
       />
     </div>
   </div>
