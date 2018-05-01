@@ -76,7 +76,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     // Immediately switch to the duplicated scene
     this.getCurrentTransition().set(this.sceneDuplicate);
 
-    this.studioModeTransition.start(300, currentScene);
+    this.studioModeTransition.set(currentScene);
   }
 
   disableStudioMode() {
@@ -121,7 +121,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   transitionTo(scene: obs.IScene) {
     if (this.state.studioMode) {
-      this.studioModeTransition.start(300, scene);
+      this.studioModeTransition.set(scene);
       return;
     }
 
