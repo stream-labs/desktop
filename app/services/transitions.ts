@@ -50,11 +50,23 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
-  // Used to render the "EDIT" (left) display in studio mode
+  /**
+   * This transition is used to render the left (EDIT) display
+   * while in studio mode
+   */
   studioModeTransition: obs.ITransition;
 
-  // Is a duplicate of a scene that is currently live in studio mode
+  /**
+   * This is a duplicate of the current scene that is rendered
+   * to the output while editing is taking place in studio mode.
+   */
   sceneDuplicate: obs.IScene;
+
+  /**
+   * Used to prevent studio mode transitions before the current
+   * one is complete.
+   */
+  studioModeLocked = false;
 
   init() {
     // Set the default transition type
@@ -88,7 +100,15 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.releaseStudioModeObjects();
   }
 
+  /**
+   * While in studio mode, will execute a studio mode transition
+   */
   executeStudioModeTransition() {
+    if (!this.state.studioMode) return;
+    if (this.studioModeLocked) return;
+
+    this.studioModeLocked = true;
+
     const currentScene = this.scenesService.activeScene.getObsScene();
 
     const oldDuplicate = this.sceneDuplicate;
@@ -96,6 +116,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.getCurrentTransition().start(this.state.duration, this.sceneDuplicate);
 
     oldDuplicate.release();
+
+    setTimeout(() => this.studioModeLocked = false, this.state.duration);
   }
 
   /**

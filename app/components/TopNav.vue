@@ -46,15 +46,15 @@
         <img class="theme-toggle__icon theme-toggle__icon--sun" src="../../media/images/sun.png"/>
       </button>
     </div>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a class="link" @click="openDevTools">Dev Tools</a>
+    </div>
     <div class="top-nav-item">
       <a
         @click="studioMode"
         class="link link--uppercase">
-        <span>Studio Mode</span>
+        <i class="fa fa-object-ungroup"/><span>Studio Mode</span>
       </a>
-    </div>
-    <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item">
       <a class="link link--uppercase" @click="bugReport">
