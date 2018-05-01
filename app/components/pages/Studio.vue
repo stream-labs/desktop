@@ -1,23 +1,14 @@
 <template>
 <div class="studio-page">
-  <div v-if="studioMode" class="studio-mode-controls">
-    <span class="studio-mode-control">
-      Edit
-    </span>
-    <button
-      class="button button--action"
-      @click="studioModeTransition">
-      Transition
-      <i class="fa fa-arrow-right" />
-    </button>
-    <span class="studio-mode-control">
-      Live
-    </span>
-  </div>
-  <div class="studio-display-container">
-    <studio-editor v-if="previewEnabled" />
-    <div v-if="studioMode" class="studio-output-display">
-      <display :paddingSize="10" />
+  <div class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
+    <studio-mode-controls v-if="studioMode" :stacked="stacked" />
+    <div
+      class="studio-display-container"
+      :class="{ stacked }">
+      <studio-editor v-if="previewEnabled" class="studio-output-display" />
+      <div v-if="studioMode" class="studio-mode-display-container">
+        <display class="studio-mode-display" :paddingSize="10" />
+      </div>
     </div>
   </div>
   <div v-if="!previewEnabled" class="no-preview">
@@ -40,28 +31,34 @@
   flex-direction: column;
 }
 
-.studio-mode-controls {
-  height: 60px;
-  display: flex;
-  align-items: center;
-}
-
-.studio-mode-control {
+.studio-mode-container {
   flex-grow: 1;
-  text-align: center;
-  font-size: 16px;
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.8px;
+  display: flex;
+  flex-direction: column;
+
+  &.stacked {
+    flex-direction: row;
+  }
 }
 
 .studio-display-container {
   flex-grow: 1;
   display: flex;
+
+  &.stacked {
+    flex-direction: column;
+  }
 }
 
-.studio-output-display {
+.studio-mode-display-container {
   flex-grow: 1;
+  position: relative;
+}
+
+.studio-mode-display {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .no-preview {

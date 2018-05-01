@@ -6,17 +6,45 @@ import StudioControls from 'components/StudioControls.vue';
 import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
+import StudioModeControls from 'components/StudioModeControls.vue';
 
 @Component({
   components: {
     StudioEditor,
     StudioControls,
-    Display
+    Display,
+    StudioModeControls
   }
 })
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
+
+  $refs: {
+    studioModeContainer: HTMLDivElement;
+  };
+
+  stacked = false;
+
+  sizeCheckInterval: number;
+
+  mounted() {
+    this.sizeCheckInterval = window.setInterval(() => {
+      if (this.studioMode) {
+        const rect = this.$refs.studioModeContainer.getBoundingClientRect();
+
+        if ((rect.width / rect.height) > (16 / 9)) {
+          this.stacked = false;
+        } else {
+          this.stacked = true;
+        }
+      }
+    }, 1000);
+  }
+
+  destroyed() {
+    clearInterval(this.sizeCheckInterval);
+  }
 
   get previewEnabled() {
     return !this.customizationService.state.performanceMode;
