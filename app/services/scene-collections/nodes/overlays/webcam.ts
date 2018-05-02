@@ -3,7 +3,7 @@ import { SceneItem } from '../../../scenes';
 import { VideoService } from '../../../video';
 import { SourcesService } from '../../../sources';
 import { sortBy } from 'lodash';
-import { IListProperty } from '../../../obs-api';
+import { IListProperty } from '../../../../../obs-api';
 import { ScalableRectangle } from '../../../../util/ScalableRectangle';
 
 interface ISchema {

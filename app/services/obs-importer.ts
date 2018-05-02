@@ -10,7 +10,7 @@ import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
 import { Inject } from 'util/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
-import { nodeObs } from 'services/obs-api';
+import * as obs from '../../obs-api';
 import { SettingsService } from 'services/settings';
 
 interface Source {
@@ -100,8 +100,8 @@ export class ObsImporterService extends Service {
       }
     }
 
-    nodeObs.OBS_service_resetVideoContext();
-    nodeObs.OBS_service_resetAudioContext();
+    obs.NodeObs.OBS_service_resetVideoContext();
+    obs.NodeObs.OBS_service_resetAudioContext();
 
     // Ensure we reload any updated settings
     this.settingsService.loadSettingsIntoStore();

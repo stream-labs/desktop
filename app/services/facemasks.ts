@@ -9,7 +9,7 @@ import { SourceFiltersService } from './source-filters';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
-import * as obs from './obs-api';
+import * as obs from '../../obs-api';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';

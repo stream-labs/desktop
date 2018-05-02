@@ -6,7 +6,7 @@ import { VideoService } from 'services/video';
 import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
-import * as obs from '../obs-api';
+import * as obs from '../../../obs-api';
 
 import {
   IPartialSettings,

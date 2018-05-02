@@ -1,6 +1,6 @@
 import { Service } from './service';
 import { SettingsService } from './settings';
-import { nodeObs } from './obs-api';
+import * as obs from '../../obs-api';
 import electron from 'electron';
 import { Inject } from '../util/injector';
 import Utils from './utils';
@@ -52,13 +52,13 @@ export class Display {
     this.sourceId = options.sourceId;
 
     if (this.sourceId) {
-      nodeObs.OBS_content_createSourcePreviewDisplay(
+      obs.NodeObs.OBS_content_createSourcePreviewDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
         this.sourceId,
         name
       );
     } else {
-      nodeObs.OBS_content_createDisplay(
+      obs.NodeObs.OBS_content_createDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
         name
       );
@@ -69,10 +69,10 @@ export class Display {
       this.switchGridlines(state.selectedIds.length <= 1);
     });
 
-    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+    obs.NodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
 
     if (options.paddingSize != null) {
-      nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
+      obs.NodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
     }
 
     this.outputRegionCallbacks = [];
@@ -120,13 +120,13 @@ export class Display {
   move(x: number, y: number) {
     this.currentPosition.x = x;
     this.currentPosition.y = y;
-    nodeObs.OBS_content_moveDisplay(this.name, x, y);
+    obs.NodeObs.OBS_content_moveDisplay(this.name, x, y);
   }
 
   resize(width: number, height: number) {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
-    nodeObs.OBS_content_resizeDisplay(this.name, width, height);
+    obs.NodeObs.OBS_content_resizeDisplay(this.name, width, height);
     if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
@@ -134,7 +134,7 @@ export class Display {
     if (this.trackingInterval) clearInterval(this.trackingInterval);
     if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
     if (!this.displayDestroyed) {
-      nodeObs.OBS_content_destroyDisplay(this.name);
+      obs.NodeObs.OBS_content_destroyDisplay(this.name);
       this.displayDestroyed = true;
     }
   }
@@ -149,8 +149,8 @@ export class Display {
   }
 
   refreshOutputRegion() {
-    const position = nodeObs.OBS_content_getDisplayPreviewOffset(this.name);
-    const size = nodeObs.OBS_content_getDisplayPreviewSize(this.name);
+    const position = obs.NodeObs.OBS_content_getDisplayPreviewOffset(this.name);
+    const size = obs.NodeObs.OBS_content_getDisplayPreviewSize(this.name);
 
     this.outputRegion = {
       ...position,
@@ -166,13 +166,13 @@ export class Display {
 
   setShoulddrawUI(drawUI: boolean) {
     this.drawingUI = drawUI;
-    nodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
+    obs.NodeObs.OBS_content_setShouldDrawUI(this.name, drawUI);
   }
 
   switchGridlines(enabled: boolean) {
     // This function does nothing if we aren't drawing the UI
     if (!this.drawingUI) return;
-    nodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
+    obs.NodeObs.OBS_content_setDrawGuideLines(this.name, enabled);
   }
 }
 

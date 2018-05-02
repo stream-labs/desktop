@@ -9,7 +9,6 @@ import Vue from 'vue';
 import URI from 'urijs';
 
 import { createStore } from './store';
-import { ObsApiService } from './services/obs-api';
 import { IWindowOptions, WindowsService } from './services/windows';
 import { AppService } from './services/app';
 import { ServicesManager } from './services-manager';
@@ -26,10 +25,18 @@ import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
 
 const { ipcRenderer, remote } = electron;
-
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
+window['obs'] = window['require']('obs-studio-node');
+
+{ // Set up things for IPC
+  // Connect to the IPC Server
+  window['obs'].IPC.connect(process.env.SLOBS_IPC_PATH);
+  document.addEventListener('close', (e) => {
+    window['obs'].IPC.disconnect();
+  });
+}
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -101,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
   const i18nService: I18nService = I18nService.instance;
-  const obsApiService = ObsApiService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
 
   if (Utils.isMainWindow()) {
@@ -113,8 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     servicesManager.listenMessages();
   }
-
-  window['obs'] = obsApiService.nodeObs;
 
   storePromise.then(async store => {
 
