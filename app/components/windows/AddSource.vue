@@ -1,18 +1,18 @@
 <template>
 <modal-layout
   :showControls="false"
-  title="Add Source">
+  title="Add Layer">
 
   <div slot="content">
 
     <div v-if="sourceType != 'scene'">
       <div class="row">
         <div class="column small-12">
-          <h4>Add New Source</h4>
+          <h4>Add New Layer</h4>
           <p
             v-if="!error"
             class="NameSource-label">
-            Please enter the name of the source
+            Please enter the name of the layer
           </p>
           <p v-if="error"
             class="NameSource-label NameSource-label__error">
@@ -23,7 +23,7 @@
       </div>
       <div class="row">
         <div class="columns small-12 buttons">
-          <button @click="addNew" class="button button--action">Add New Source</button>
+          <button @click="addNew" class="button button--action">Add New Layer</button>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
     <div class="row">
       <div class="columns small-12">
         <h4>
-          Add Existing Source
+          Add Existing Layer
           <span
             v-if="propertiesManager === 'widget'"
             class="recommended-label">
@@ -58,7 +58,7 @@
 
     <div class="row">
       <div class="columns small-12 buttons">
-        <button @click="addExisting" class="button button--action">Add Existing Source</button>
+        <button @click="addExisting" class="button button--action">Add Existing Layer</button>
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@
 }
 
 .NameSource-label__error {
-  color: red;
+  color: @red;
 }
 
 .sources-container {

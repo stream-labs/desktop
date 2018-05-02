@@ -67,4 +67,6 @@ export default class StudioFooterComponent extends Vue {
       }
     }
   }
+
+  recordTooltip = 'Saves to computer at Videos > Slobs_recoding.';
 }

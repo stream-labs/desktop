@@ -1,6 +1,6 @@
 <template>
   <modal-layout
-    :title="'Source filters (' + sourceDisplayName + ')'"
+    :title="'Layer filters (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"

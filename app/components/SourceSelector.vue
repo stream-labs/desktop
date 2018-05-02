@@ -1,101 +1,69 @@
 <template>
-<div class="source-selector">
-  <div class="studio-controls-top">
-    <h4
-      class="studio-controls__label"
-      v-tooltip.bottom="layersTooltip">
-      Layers
-    </h4>
-    <div>
-      <i
-        class="icon-add-folder icon-btn icon-btn--lg"
-        @click="addFolder"
-        title="Add Folder"
-      />
-
-      <i
-        class="icon-add icon-btn icon-btn--lg"
-        @click="addSource"
-        title="Add Source"
-      />
-      <i
-        class="icon-subtract icon-btn icon-btn--lg"
-        :class="{ disabled: activeItemIds.length === 0}"
-        @click="removeItems"
-        title="Remove Sources"
-      />
-      <i
-        :class="{ disabled: !canShowProperties()}"
-        class="icon-settings icon-btn"
-        @click="sourceProperties"
-        title="Setup Source Properties"
-      />
-    </div>
-  </div>
-
-  <sl-vue-tree
-    :value="nodes"
-    ref="slVueTree"
-    @select="makeActive"
-    @drop="handleSort"
-    @toggle="toggleFolder"
-    @contextmenu.native="showContextMenu()"
-    @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)"
-    @nodedblclick="node => sourceProperties(node.data.id)"
-    :scrollAreaHeight="50"
-    :maxScrollSpeed="15"
-  >
-
-    <template slot="title" slot-scope="{ node }">
-      <div class="title-container">
-        <span class="layer-icon">
-          <i v-if="!node.isLeaf" class="fa fa-folder" ></i>
-          <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
-          <i v-else-if="node.data.type === 'image_source'" class="fa fa-image"></i>
-          <i v-else-if="node.data.type === 'slideshow'" class="fa fa-images"></i>
-          <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
-          <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
-          <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-camera"></i>
-          <i v-else-if="node.data.type === 'wasapi_input_capture'" class="fa fa-microphone"></i>
-          <i v-else-if="node.data.type === 'wasapi_output_capture'" class="fa fa-volume-up"></i>
-          <i v-else-if="node.data.type === 'monitor_capture'" class="fa fa-desktop"></i>
-          <i v-else-if="node.data.type === 'game_capture'" class="fa fa-gamepad"></i>
-          <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>
-          <i v-else-if="node.data.type === 'scene'" class="fa fa-sitemap"></i>
-          <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
-          <i v-else class="fa fa-file"></i>
-        </span>
-        <span class="item-title">{{ node.title }}</span>
+  <div class="source-selector">
+    <div class="studio-controls-top">
+      <h4 class="studio-controls__label" v-tooltip.bottom="layersTooltip">
+        Layers
+      </h4>
+      <div>
+        <i
+          class="icon-add-folder icon-btn icon-btn--lg"
+          @click="addFolder"
+          v-tooltip.bottom="addGroupTooltip" />
+        <i
+          class="icon-add icon-btn icon-btn--lg"
+          @click="addSource"
+          v-tooltip.bottom="addLayerTooltip" />
+        <i
+          class="icon-subtract icon-btn icon-btn--lg"
+          :class="{ disabled: activeItemIds.length === 0}" @click="removeItems"
+          v-tooltip.bottom="removeLayersTooltip" />
+        <i
+          :class="{ disabled: !canShowProperties()}"
+          class="icon-settings icon-btn"
+          @click="sourceProperties"
+          v-tooltip.bottom="openLayerPropertiesTooltip" />
       </div>
-    </template>
+    </div>
 
+    <sl-vue-tree :value="nodes" ref="slVueTree" @select="makeActive" @drop="handleSort" @toggle="toggleFolder" @contextmenu.native="showContextMenu()" @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)" @nodedblclick="node => sourceProperties(node.data.id)" :scrollAreaHeight="50" :maxScrollSpeed="15">
 
-    <template slot="toggle" slot-scope="{ node }">
-      <span v-if="!node.isLeaf && node.children.length" >
-        <i v-if="node.isExpanded" class="icon-down"></i>
-        <i v-if="!node.isExpanded" class="icon-down icon-right"></i>
-      </span>
-    </template>
+      <template slot="title" slot-scope="{ node }">
+        <div class="title-container">
+          <span class="layer-icon">
+            <i v-if="!node.isLeaf" class="fa fa-folder"></i>
+            <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
+            <i v-else-if="node.data.type === 'image_source'" class="fa fa-image"></i>
+            <i v-else-if="node.data.type === 'slideshow'" class="fa fa-images"></i>
+            <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
+            <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-camera"></i>
+            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="fa fa-microphone"></i>
+            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="fa fa-volume-up"></i>
+            <i v-else-if="node.data.type === 'monitor_capture'" class="fa fa-desktop"></i>
+            <i v-else-if="node.data.type === 'game_capture'" class="fa fa-gamepad"></i>
+            <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>
+            <i v-else-if="node.data.type === 'scene'" class="fa fa-sitemap"></i>
+            <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
+            <i v-else class="fa fa-file"></i>
+          </span>
+          <span class="item-title">{{ node.title }}</span>
+        </div>
+      </template>
 
+      <template slot="toggle" slot-scope="{ node }">
+        <span v-if="!node.isLeaf && node.children.length">
+          <i v-if="node.isExpanded" class="icon-down"></i>
+          <i v-if="!node.isExpanded" class="icon-down icon-right"></i>
+        </span>
+      </template>
 
-    <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
-      <i
-        class="source-selector-action"
-        :class="lockClassesForSource(node.data.id)"
-        @click.stop="toggleLock(node.data.id)"
-        @dblclick.stop="() => {}" ></i>
-      <i
-        class="source-selector-action"
-        :class="visibilityClassesForSource(node.data.id)"
-        @click.stop="toggleVisibility(node.data.id)"
-        @dblclick.stop="() => {}" ></i>
-    </template>
+      <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
+        <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
+        <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
+      </template>
 
-
-  </sl-vue-tree>
-</div>
-
-
+    </sl-vue-tree>
+  </div>
 </template>
 
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
@@ -118,7 +86,7 @@ i.disabled {
   opacity: 0.26;
   cursor: inherit;
 
-  :hover {
+   :hover {
     opacity: inherit;
   }
 }
@@ -190,7 +158,7 @@ i.disabled {
   color: @day-title;
 }
 
-.sl-vue-tree-selected > .sl-vue-tree-node-item {
+.sl-vue-tree-selected>.sl-vue-tree-node-item {
   border-color: @day-border;
   border-left: none;
   border-right: none;
@@ -220,7 +188,7 @@ i.disabled {
     color: @grey;
   }
 
-  .sl-vue-tree-selected > .sl-vue-tree-node-item {
+  .sl-vue-tree-selected>.sl-vue-tree-node-item {
     background-color: @night-hover;
     border-color: transparent;
     color: @white;
@@ -232,5 +200,4 @@ i.disabled {
     }
   }
 }
-
 </style>
