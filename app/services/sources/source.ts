@@ -129,7 +129,7 @@ export class Source implements ISourceApi {
   duplicate(): Source {
     if (this.doNotDuplicate) return null;
     return this.sourcesService.createSource(
-      this.sourcesService.suggestName(this.name),
+      this.name,
       this.type,
       this.getSettings(),
       {

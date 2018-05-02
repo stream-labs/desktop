@@ -6,7 +6,7 @@ import {
   ISceneItemNode,
   ISceneItemFolderApi, TSceneNodeModel
 } from 'services/scenes';
-import { TSceneNode } from "../scenes";
+import { ISourceApi } from 'services/sources';
 
 /**
  * Represents active items and folders for current scene
@@ -113,21 +113,14 @@ export interface ISelection extends ISceneItemActions {
   isSceneFolder(): boolean;
 
   /**
-   * Copy selected items to any scene. The sources for each item will be also duplicated.
-   * For the most cases use `.copyReferenceTo()` to avoid sources duplication.
-   * @see ISelection.copyReferenceTo()
-   */
-  copyTo(sceneId: string): ISceneItem[];
-
-  /**
-   * Copy selected item and folders to specific scene or folder. The sources will not be duplicated.
+   * Copy selected item and folders to specific scene or folder
    * For sources duplication use `.copyTo()` method.
    * @see ISelection.copyTo()
    */
-  copyReferenceTo(sceneId: string, folderId?: string): TSceneNodeApi[];
+  copyTo(sceneId: string, folderId?: string, duplicateSources?: boolean): TSceneNodeApi[];
 
   /**
-   * Do the same as `.copyReferenceTo()` and remove copied items
+   * Do the same as `.copyTo()` and remove copied items
    */
   moveTo(sceneId: string, folderId?: string): TSceneNodeApi[];
 
@@ -165,6 +158,11 @@ export interface ISelection extends ISceneItemActions {
    *  returns Folder1, Item3, Item4
    */
   getRootNodes(): TSceneNodeApi[];
+
+  /**
+   * Returns the linked to selection sources
+   */
+  getSources(): ISourceApi[];
 }
 
 export interface ISelectionState {
