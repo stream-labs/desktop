@@ -1,10 +1,10 @@
 import { Node } from './node';
-import { ScenesTransitionsService } from '../../scenes-transitions';
-import { Inject } from '../../../util/injector';
-import { TObsValue } from '../../../components/shared/forms/Input';
+import { TransitionsService, ETransitionType } from 'services/transitions';
+import { Inject } from 'util/injector';
+import { TObsValue } from 'components/shared/forms/Input';
 
 interface ISchema {
-  type: string;
+  type: ETransitionType;
   duration: number;
   settings?: Dictionary<TObsValue>;
 }
@@ -13,8 +13,7 @@ export class TransitionNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
 
-  @Inject('ScenesTransitionsService')
-  transitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
 
   save() {
     this.data = {

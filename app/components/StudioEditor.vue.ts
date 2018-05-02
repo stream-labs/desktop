@@ -10,6 +10,7 @@ import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService } from 'services/selection/selection';
 import Display from 'components/shared/Display.vue';
+import { TransitionsService } from 'services/transitions';
 
 interface IResizeRegion {
   name: string;
@@ -37,6 +38,7 @@ export default class StudioEditor extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private videoService: VideoService;
   @Inject() private selectionService: SelectionService;
+  @Inject() private transitionsService: TransitionsService;
 
   renderedWidth = 0;
   renderedHeight = 0;
@@ -60,6 +62,10 @@ export default class StudioEditor extends Vue {
     this.renderedHeight = region.height;
     this.renderedOffsetX = region.x;
     this.renderedOffsetY = region.y;
+  }
+
+  get studioMode() {
+    return this.transitionsService.state.studioMode;
   }
 
 
