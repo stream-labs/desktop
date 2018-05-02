@@ -1,6 +1,6 @@
 <template>
 <div
-  class="studio-editor-display noselect"
+  class="studio-editor-display-container noselect"
   ref="display"
   @mousedown="handleMouseDown"
   @mouseup="handleMouseUp"
@@ -9,8 +9,10 @@
   @dblclick="handleMouseDblClick"
   >
   <display
+    class="studio-editor-display"
     :drawUI="true"
     :paddingSize="10"
+    :sourceId="studioMode ? 'Studio Transition' : void 0"
     @outputResize="onOutputResize"/>
 </div>
 </template>
@@ -20,9 +22,15 @@
 <style lang="less" scoped>
 @import "../styles/index";
 
-.studio-editor-display {
+.studio-editor-display-container {
   position: relative;
   flex-grow: 1;
   background-color: @navy-secondary;
+}
+
+.studio-editor-display {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 </style>

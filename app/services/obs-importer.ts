@@ -6,7 +6,7 @@ import { ScenesService } from 'services/scenes';
 import { SourcesService } from 'services/sources';
 import { TSourceType } from 'services/sources/sources-api';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
-import { ScenesTransitionsService } from 'services/scenes-transitions';
+import { TransitionsService, ETransitionType } from 'services/transitions';
 import { AudioService } from 'services/audio';
 import { Inject } from 'util/injector';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -70,7 +70,7 @@ export class ObsImporterService extends Service {
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject('SourceFiltersService') filtersService: SourceFiltersService;
-  @Inject('ScenesTransitionsService') transitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() audioService: AudioService;
   @Inject() settingsService: SettingsService;
@@ -332,7 +332,7 @@ export class ObsImporterService extends Service {
     // Only import the first transition found in obs as slobs only
     // uses one global transition
     if (configJSON.transitions && configJSON.transitions.length > 0) {
-      this.transitionsService.setType(configJSON.transitions[0].id);
+      this.transitionsService.setType(configJSON.transitions[0].id as ETransitionType);
       this.transitionsService.setDuration(configJSON.transition_duration);
     }
   }
