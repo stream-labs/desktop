@@ -1,4 +1,4 @@
-import { I18nService } from "./services/i18n";
+import { I18nService } from './services/i18n';
 
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
@@ -19,12 +19,13 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
-import VueI18n from "vue-i18n";
+import VueI18n from 'vue-i18n';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -114,24 +115,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
       fallbackLocale: 'en-US',
-      messages: {
-        'en-Us': {
-          "Scene": "Scene",
-          "Scenes": "Scenes",
-          "Source": "Source",
-          "Sources": "Sources",
-
-          "General": "General"
-        },
-        'ru-Ru': {
-          "Scene": "Сцена",
-          "Scenes": "Сцены",
-          "Source": "Источник",
-          "Sources": "Источники",
-
-          "General": "Общие"
-        }
-      }
+      // messages: {
+      //   'en-Us': {
+      //     "Scene": "Scene",
+      //     "Scenes": "Scenes",
+      //     "Source": "Source",
+      //     "Sources": "Sources",
+      //
+      //     "General": "General"
+      //   },
+      //   'ru-Ru': {
+      //     "Scene": "Сцена",
+      //     "Scenes": "Сцены",
+      //     "Source": "Источник",
+      //     "Sources": "Источники",
+      //
+      //     "General": "Общие"
+      //   }
+      // }
     });
 
     I18nService.setVuei18nInstance(i18n);
@@ -147,9 +148,23 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // synchronize the locale for all windows
+    console.log('vue instance created');
+
+    if (!Utils.isMainWindow()) {
+      i18nService.loadDictionary(i18nService.state.locale).then(dictionary => {
+        i18n.setLocaleMessage(i18nService.state.locale, dictionary);
+      });
+    }
+
+    // synchronize the locale and dictionary for all windows
     i18nService.localeChanged.subscribe(locale => {
+      console.log('locale changed', locale);
       i18n.locale = locale;
+    });
+
+    i18nService.dictionariesLoaded.subscribe(({ locale, dictionary }) => {
+      console.log('dictionary loaded', locale, dictionary);
+      i18n.setLocaleMessage(locale, dictionary);
     });
   });
 

@@ -30,6 +30,7 @@
       "bundles",
       "node_modules",
       "vendor",
+      "i18n",
       "updater/index.html",
       "updater/Updater.js",
       "index.html",

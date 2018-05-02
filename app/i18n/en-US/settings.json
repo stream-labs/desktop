@@ -1,3 +1,21 @@
 {
-  "Night mode": "Night mode"
+  "General": "General",
+  "Stream": "Stream",
+  "Output": "Output",
+  "Audio": "Audio",
+  "Video": "Video",
+  "Hotkeys": "Hotkeys",
+  "Advanced": "Advanced",
+  "Overlays": "Overlays",
+  "Notifications": "Notifications",
+  "Appearance": "Appearance",
+  "Remote Control": "Remote Control",
+  "Night mode": "Night mode",
+  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
+  "Show Cache Directory": "Show Cache Directory",
+  "Delete Cache and Restart": "Delete Cache and Restart",
+  "Upload Cache to Developers": "Upload Cache to Developers",
+  "Restart Streamlabels Session": "Restart Streamlabels Session",
+  "Run Auto Optimizer": "Run Auto Optimizer"
+
 }

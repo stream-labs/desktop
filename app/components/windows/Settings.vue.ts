@@ -16,6 +16,7 @@ import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import RemoteControlSettings from 'components/RemoteControlSettings.vue';
+import LanguageSettings from 'components/LanguageSettings.vue';
 
 @Component({
   components: {
@@ -30,7 +31,8 @@ import RemoteControlSettings from 'components/RemoteControlSettings.vue';
     NotificationsSettings,
     AppearanceSettings,
     RemoteControlSettings,
-    ExperimentalSettings
+    ExperimentalSettings,
+    LanguageSettings
   },
   mixins: [windowMixin]
 })

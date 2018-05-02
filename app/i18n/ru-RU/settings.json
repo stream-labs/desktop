@@ -1,3 +1,14 @@
 {
+  "General": "Общие",
+  "Stream": "Вещание",
+  "Output": "Вывод",
+  "Audio": "Звук",
+  "Video": "Видео",
+  "Hotkeys": "Горячие клавиши",
+  "Advanced": "Расширенные",
+  "Overlays": "Темы",
+  "Notifications": "Уведомления",
+  "Appearance": "Внешний вид",
+  "Remote Control": "Дистанционное управление",
   "Night mode": "Ночной режим"
 }
