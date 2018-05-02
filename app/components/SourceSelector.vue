@@ -1,30 +1,32 @@
 <template>
 <div class="source-selector">
   <div class="studio-controls-top">
-    <h4 class="studio-controls__label">
-      Sources
+    <h4
+      class="studio-controls__label"
+      v-tooltip.bottom="layersTooltip">
+      Layers
     </h4>
     <div>
       <i
-        class="fa fa-folder-open icon-btn icon-btn--lg"
+        class="icon-add-folder icon-btn icon-btn--lg"
         @click="addFolder"
         title="Add Folder"
       />
 
       <i
-        class="fa fa-plus icon-btn icon-btn--lg"
+        class="icon-add icon-btn icon-btn--lg"
         @click="addSource"
         title="Add Source"
       />
       <i
-        class="fa fa-minus icon-btn icon-btn--lg"
+        class="icon-subtract icon-btn icon-btn--lg"
         :class="{ disabled: activeItemIds.length === 0}"
         @click="removeItems"
         title="Remove Sources"
       />
       <i
         :class="{ disabled: !canShowProperties()}"
-        class="fa fa-cog icon-btn"
+        class="icon-settings icon-btn"
         @click="sourceProperties"
         title="Setup Source Properties"
       />
@@ -46,7 +48,7 @@
 
     <template slot="title" slot-scope="{ node }">
       <div class="title-container">
-        <span class="item-icon">
+        <span class="layer-icon">
           <i v-if="!node.isLeaf" class="fa fa-folder" ></i>
           <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
           <i v-else-if="node.data.type === 'image_source'" class="fa fa-image"></i>
@@ -70,23 +72,23 @@
 
     <template slot="toggle" slot-scope="{ node }">
       <span v-if="!node.isLeaf && node.children.length" >
-        <i v-if="node.isExpanded" class="fa fa-chevron-down icon-btn"></i>
-        <i v-if="!node.isExpanded" class="fa fa-chevron-right icon-btn"></i>
+        <i v-if="node.isExpanded" class="icon-down"></i>
+        <i v-if="!node.isExpanded" class="icon-down icon-right"></i>
       </span>
     </template>
 
 
     <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
       <i
-          class="fa fa-lock icon-btn source-selector-action"
-          :class="lockClassesForSource(node.data.id)"
-          @click.stop="toggleLock(node.data.id)"
-          @dblclick.stop="() => {}" ></i>
+        class="source-selector-action"
+        :class="lockClassesForSource(node.data.id)"
+        @click.stop="toggleLock(node.data.id)"
+        @dblclick.stop="() => {}" ></i>
       <i
-          class="fa fa-eye icon-btn source-selector-action"
-          :class="visibilityClassesForSource(node.data.id)"
-          @click.stop="toggleVisibility(node.data.id)"
-          @dblclick.stop="() => {}" ></i>
+        class="source-selector-action"
+        :class="visibilityClassesForSource(node.data.id)"
+        @click.stop="toggleVisibility(node.data.id)"
+        @dblclick.stop="() => {}" ></i>
     </template>
 
 
@@ -103,11 +105,17 @@
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .source-selector-action {
-  font-size: 16px;
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  opacity: .26;
+  margin-left: 8px;
+  color: @grey;
 }
 
-.fa.disabled {
-  opacity: 0.15;
+.fa.disabled,
+i.disabled {
+  opacity: 0.26;
   cursor: inherit;
 
   :hover {
@@ -120,19 +128,25 @@
   overflow: auto;
 }
 
-.source-selector-action {
-  display: none;
+.sl-vue-tree-node {
+  &:hover,
+  &.sl-vue-tree-selected {
+    .transition;
+
+    .source-selector-action {
+      .transition;
+      opacity: 1;
+      color: @grey;
+    }
+  }
 }
 
 .sl-vue-tree-node-item {
   cursor: pointer;
-}
-
-.sl-vue-tree-node-item:hover {
-
-  .source-selector-action {
-    display: inline-block;
-  }
+  border: 1px solid transparent;
+  border-right: 0;
+  border-left: 0;
+  margin-top: -1px;
 }
 
 .title-container {
@@ -140,47 +154,83 @@
   color: @grey;
 }
 
-.item-icon {
+.layer-icon {
   display: inline-block;
   text-align: left;
-  width: 20px;
+  width: 16px;
+  margin-right: 8px;
+
+  i,
+  .fa {
+    font-size: 12px;
+    font-weight: 700;
+  }
 }
 
-.day-theme {
+.title-container {
+  color: @day-title
+}
 
+.sl-vue-tree-toggle {
+  width: 16px;
+  margin-right: 8px;
+  display: inline-block;
+
+  i {
+    font-size: 7px;
+    font-weight: 700;
+    color: @day-title;
+    text-align: center;
+  }
+}
+
+.sl-vue-tree.sl-vue-tree-root {
+  background-color: @day-secondary;
+  border-color: @day-border;
+  color: @day-title;
+}
+
+.sl-vue-tree-selected > .sl-vue-tree-node-item {
+  border-color: @day-border;
+  border-left: none;
+  border-right: none;
+  background-color: @white;
+}
+
+.sl-vue-tree-node-item:hover {
+  color: white;
+}
+
+.sl-vue-tree-cursor {
+  border-color: @navy;
+}
+
+.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+  border-color: @navy;
+}
+
+.night-theme {
   .title-container {
-    color: @navy
+    color: @grey;
   }
 
   .sl-vue-tree.sl-vue-tree-root {
-    background-color: @day-secondary;
-    border-color: @day-border;
-    color: @navy-secondary;
-  }
-
-  .sl-vue-tree-node-item {
-
+    background-color: @night-secondary;
+    border-color: @night-secondary;
+    color: @grey;
   }
 
   .sl-vue-tree-selected > .sl-vue-tree-node-item {
-    border-color: @day-border;
-    border-left: none;
-    border-right: none;
-    background-color: @white;
+    background-color: @night-hover;
+    border-color: transparent;
+    color: @white;
   }
 
-  .sl-vue-tree-node-item:hover {
-    color: white;
+  .sl-vue-tree-toggle {
+    i {
+      color: @grey;
+    }
   }
-
-  .sl-vue-tree-cursor {
-    border-color: @navy;
-  }
-
-  .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-    border-color: @navy;
-  }
-
 }
 
 </style>

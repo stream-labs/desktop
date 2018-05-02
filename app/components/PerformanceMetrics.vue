@@ -1,7 +1,7 @@
 <template>
 <div class="performance-metrics flex flex--center">
   <span class="performance-metric-wrapper">
-    <img class="performance-metric-icon" src="../../media/images/icons/cpu.png">
+    <i class="performance-metric-icon icon-cpu"></i>
     <span class="performance-metric">
       <span class="performance-metric__value">{{ cpuPercent }}%</span> CPU
     </span>
