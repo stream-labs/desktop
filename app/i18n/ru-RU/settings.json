@@ -11,10 +11,10 @@
   "Appearance": "Внешний вид",
   "Remote Control": "Дистанционное управление",
   "Night mode": "Ночной режим",
-  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
-  "Show Cache Directory": "Show Cache Directory",
-  "Delete Cache and Restart": "Delete Cache and Restart",
-  "Upload Cache to Developers": "Upload Cache to Developers",
-  "Restart Streamlabels Session": "Restart Streamlabels Session",
-  "Run Auto Optimizer": "Run Auto Optimizer"
+  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "Если вы заметили странное и неисправное поведение приложения, вы можете попробовать удалить вашу кэш дирректорию. Как результат, вы потеряете свои настройки и конфигурации сцен, но это может восстановить нормальное поведение приложения.",
+  "Show Cache Directory": "Открыть кэш-дирректорию",
+  "Delete Cache and Restart": "Удалить кэш и перезапустить",
+  "Upload Cache to Developers": "Отправить кэш разработчикам",
+  "Restart Streamlabels Session": "Перезапустить сессию Streamlabels",
+  "Run Auto Optimizer": "Запустить автоматический оптимизатор"
 }
