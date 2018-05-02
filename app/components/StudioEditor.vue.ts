@@ -1,14 +1,15 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
-import DragHandler from '../util/DragHandler';
-import { Inject } from '../util/injector';
-import { ScenesService, SceneItem, Scene } from '../services/scenes';
-import { Display, VideoService } from '../services/video';
-import { EditMenu } from '../util/menus/EditMenu';
-import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
-import { WindowsService } from '../services/windows';
-import { SelectionService } from "../services/selection/selection";
+import DragHandler from 'util/DragHandler';
+import { Inject } from 'util/injector';
+import { ScenesService, SceneItem, Scene } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { EditMenu } from 'util/menus/EditMenu';
+import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
+import { WindowsService } from 'services/windows';
+import { SelectionService } from 'services/selection/selection';
+import Display from 'components/shared/Display.vue';
 
 interface IResizeRegion {
   name: string;
@@ -27,7 +28,9 @@ interface IResizeOptions {
   anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
 }
 
-@Component({})
+@Component({
+  components: { Display }
+})
 export default class StudioEditor extends Vue {
 
   @Inject() private scenesService: ScenesService;
@@ -40,7 +43,6 @@ export default class StudioEditor extends Vue {
   renderedOffsetX = 0;
   renderedOffsetY = 0;
 
-  obsDisplay: Display;
   dragHandler: DragHandler;
   resizeRegion: IResizeRegion;
   currentX: number;
@@ -48,28 +50,16 @@ export default class StudioEditor extends Vue {
   isCropping: boolean;
   canDrag = false;
 
-
   $refs: {
-    display: HTMLElement
+    display: HTMLDivElement;
   };
 
 
-  mounted() {
-    const displayId = this.videoService.getRandomDisplayId();
-    this.obsDisplay = new Display(displayId);
-
-    this.obsDisplay.onOutputResize(outputRegion => {
-      this.renderedWidth = outputRegion.width;
-      this.renderedHeight = outputRegion.height;
-      this.renderedOffsetX = outputRegion.x;
-      this.renderedOffsetY = outputRegion.y;
-    });
-
-    this.obsDisplay.trackElement(this.$refs.display);
-  }
-
-  beforeDestroy() {
-    this.obsDisplay.destroy();
+  onOutputResize(region: IRectangle) {
+    this.renderedWidth = region.width;
+    this.renderedHeight = region.height;
+    this.renderedOffsetX = region.x;
+    this.renderedOffsetY = region.y;
   }
 
 
@@ -110,7 +100,10 @@ export default class StudioEditor extends Vue {
   }
 
   startDragging(event: MouseEvent) {
-    this.dragHandler = new DragHandler(event, this.obsDisplay);
+    this.dragHandler = new DragHandler(event, {
+      renderedWidth: this.renderedWidth,
+      renderedHeight: this.renderedHeight
+    });
   }
 
   startResizing(event: MouseEvent, region: IResizeRegion) {

@@ -1,6 +1,8 @@
 <template>
 <div class="studio-page">
-  <studio-editor v-if="previewEnabled" />
+  <div class="studio-display-container">
+    <studio-editor v-if="previewEnabled" />
+  </div>
   <div v-if="!previewEnabled" class="no-preview">
     <div class="message">
       Preview is disabled in performance mode
@@ -20,6 +22,11 @@
 .studio-page {
   display: flex;
   flex-direction: column;
+}
+
+.studio-display-container {
+  flex-grow: 1;
+  display: flex;
 }
 
 .no-preview {
