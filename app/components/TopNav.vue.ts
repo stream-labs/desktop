@@ -53,6 +53,10 @@ export default class TopNav extends Vue {
     }
   }
 
+  get studioModeEnabled() {
+    return this.transitionsService.state.studioMode;
+  }
+
   openSettingsWindow() {
     this.settingsService.showSettings();
   }

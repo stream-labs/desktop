@@ -49,7 +49,7 @@
     <div class="top-nav-item" v-if="isDevMode">
       <a class="link" @click="openDevTools">Dev Tools</a>
     </div>
-    <div class="top-nav-item">
+    <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
         @click="studioMode"
         class="link link--uppercase">
@@ -111,6 +111,14 @@
   margin-left: 20px;
   display: flex;
   align-items: center;
+
+  &.top-nav-item--active {
+    >a {
+      >i, >span {
+        color: @teal;
+      }
+    }
+  }
 
   @media(max-width: 1200px) {
     font-size: 12px;
