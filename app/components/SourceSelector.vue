@@ -2,7 +2,7 @@
   <div class="source-selector">
     <div class="studio-controls-top">
       <h4 class="studio-controls__label" v-tooltip.bottom="layersTooltip">
-        Layers
+        Sources
       </h4>
       <div>
         <i
