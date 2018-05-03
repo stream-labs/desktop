@@ -41,7 +41,7 @@ test('Simple copy/paste', async t => {
 
   selectionService.select([getNodeId('Folder1'), getNodeId('Item2')]);
   clipboardService.copy();
-  clipboardService.pasteReference();
+  clipboardService.paste();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder1
@@ -67,7 +67,7 @@ test('Copy/paste folder with items', async t => {
 
   selectionService.select(getNodeId('Folder2'));
   clipboardService.copy();
-  clipboardService.pasteReference();
+  clipboardService.paste();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder2
@@ -94,7 +94,7 @@ test('Clear clipboard', async t => {
   selectionService.selectAll();
   clipboardService.copy();
   clipboardService.clear();
-  clipboardService.pasteReference();
+  clipboardService.paste();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder1
@@ -115,7 +115,7 @@ test('Copy/paste between scene collections', async t => {
 
   await sceneCollectionsService.create({ name: 'New Collection' });
 
-  clipboardService.pasteReference();
+  clipboardService.paste();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder1
@@ -125,7 +125,7 @@ test('Copy/paste between scene collections', async t => {
 
   const sourcesCount = sourcesService.getSources().length;
 
-  clipboardService.pasteReference();
+  clipboardService.paste();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder1
@@ -140,3 +140,34 @@ test('Copy/paste between scene collections', async t => {
   t.is(sourcesService.getSources().length, sourcesCount);
 
 });
+
+
+test('Copy/paste duplicate sources', async t => {
+
+  sceneBuilder.build(`
+    Folder1
+      Item1: color_source
+      Item2: image_source
+  `);
+
+  selectionService.selectAll();
+  clipboardService.copy();
+  const sourcesCount = selectionService.getSources().length;
+
+  clipboardService.paste(true);
+
+  t.true(sceneBuilder.isEqualTo(`
+    Folder1
+      Item1: color_source
+      Item2: image_source
+    Folder1
+      Item1: color_source
+      Item2: image_source
+  `));
+
+  // check that sources also have been duplicated
+  selectionService.selectAll();
+  t.is(selectionService.getSources().length, sourcesCount * 2);
+
+});
+
