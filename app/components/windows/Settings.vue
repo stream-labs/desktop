@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Settings"
+  :title="$t('Settings')"
   :show-cancel="false"
   :done-handler="done">
 

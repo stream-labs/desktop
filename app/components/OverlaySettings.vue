@@ -1,21 +1,21 @@
 <template>
 <div>
   <div class="section">
-    This is an experimental feature.  Use at your own risk.
+    {{ $t('This is an experimental feature.  Use at your own risk.') }}
     <br/>
     <br/>
     <button
       class="button button--sm button--action margin-right--20"
       :disabled="busy"
       @click="saveOverlay">
-      Export Overlay
+      {{ $t('Export Overlay') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <button
       class="button button--sm button--action"
       :disabled="busy"
       @click="loadOverlay">
-      Import Overlay
+      {{ $t('Import Overlay') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <br/>
@@ -26,7 +26,7 @@
       class="button button--sm button--action"
       :disabled="busy"
       @click="loadWidget">
-      Import Widget in Current Scene
+      {{ $t('Import Widget in Current Scene') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
   </div>

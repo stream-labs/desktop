@@ -8,6 +8,7 @@ import path from 'path';
 import { AppService } from 'services/app';
 import { WidgetsService } from 'services/widgets';
 import { ScenesService } from 'services/scenes';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class OverlaySettings extends Vue {
@@ -33,7 +34,7 @@ export default class OverlaySettings extends Vue {
     // TODO: Expose progress to the user
     this.overlaysPersistenceService.saveOverlay(chosenPath).then(() => {
       this.busy = false;
-      this.message = `Successfully saved ${path.parse(chosenPath).base}`;
+      this.message = $t('Successfully saved %filename%', { filename: path.parse(chosenPath).base });
     });
   }
 
@@ -52,7 +53,7 @@ export default class OverlaySettings extends Vue {
 
     this.sceneCollectionsService.loadOverlay(chosenPath[0], configName).then(() => {
       this.busy = false;
-      this.message = `Successfully loaded ${filename}.overlay`;
+      this.message = $t('Successfully loaded %filename%.overlay', { filename });
     });
   }
 

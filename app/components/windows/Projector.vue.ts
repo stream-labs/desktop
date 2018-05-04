@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -56,9 +57,9 @@ export default class Projector extends Vue {
   get title() {
     if (this.sourceId) {
       const name = this.sourcesService.getSource(this.sourceId).name;
-      return `Projector: ${name}`;
+      return $t('Projector:') + name;
     }
-    return 'Projector: Output';
+    return $t('Projector: Output');
   }
 
 }

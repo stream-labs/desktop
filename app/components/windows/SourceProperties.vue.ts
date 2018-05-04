@@ -11,6 +11,7 @@ import SourcePreview from '../shared/SourcePreview.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -71,7 +72,7 @@ export default class SourceProperties extends Vue {
 
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
-    return source ? `Properties for '${source.name}'` : '';
+    return source ? $t('Properties for %sourceName%', { sourceName: source.name }) : '';
   }
 
 }

@@ -5,6 +5,7 @@ import { KeyListenerService } from './key-listener';
 import { Inject } from '../util/injector';
 import { StatefulService, mutation, ServiceHelper } from './stateful-service';
 import { defer } from 'lodash';
+import { $t } from 'services/i18n';
 
 function getScenesService(): ScenesService {
   return ScenesService.instance;
@@ -62,7 +63,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   GENERAL: [
     {
       name: 'TOGGLE_START_STREAMING',
-      description: () => 'Start Streaming',
+      description: () => $t('Start Streaming'),
       down: () => getStreamingService().toggleStreaming(),
       isActive: () => {
         const streamingService = getStreamingService();
@@ -71,7 +72,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     },
     {
       name: 'TOGGLE_STOP_STREAMING',
-      description: () => 'Stop Streaming',
+      description: () => $t('Stop Streaming'),
       down: () => {
         const streamingService = getStreamingService();
         streamingService.toggleStreaming();
@@ -83,13 +84,13 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     },
     {
       name: 'TOGGLE_START_RECORDING',
-      description: () => 'Start Recording',
+      description: () => $t('Start Recording'),
       down: () => getStreamingService().toggleRecording(),
       isActive: () => getStreamingService().isRecording
     },
     {
       name: 'TOGGLE_STOP_RECORDING',
-      description: () => 'Stop Recording',
+      description: () => $t('Stop Recording'),
       down: () => getStreamingService().toggleRecording(),
       isActive: () => !getStreamingService().isRecording
     }
@@ -98,7 +99,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   SCENE: [
     {
       name: 'SWITCH_TO_SCENE',
-      description: () => 'Switch to scene',
+      description: () => $t('Switch to scene'),
       down: (sceneId) => getScenesService().makeSceneActive(sceneId)
     }
   ],
@@ -108,7 +109,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_SHOW',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Show '${sceneItem.source.name}'`;
+        return $t('Show %sourcename%', { sourcename: sceneItem.source.name });
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).visible,
@@ -119,7 +120,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       name: 'TOGGLE_SOURCE_VISIBILITY_HIDE',
       description: (sceneItemId) => {
         const sceneItem = getScenesService().getSceneItem(sceneItemId);
-        return `Hide '${sceneItem.source.name}'`;
+        return $t('Hide %sourcename%', { sourcename: sceneItem.source.name });;
       },
       shouldApply: (sceneItemId) => getScenesService().getSceneItem(sceneItemId).video,
       isActive: (sceneItemId) => !getScenesService().getSceneItem(sceneItemId).visible,
@@ -130,28 +131,28 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
   SOURCE: [
     {
       name: 'TOGGLE_MUTE',
-      description: () => 'Mute',
+      description: () => $t('Mute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, true),
       isActive: (sourceId) => getSourcesService().getSource(sourceId).muted,
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'TOGGLE_UNMUTE',
-      description: () => 'Unmute',
+      description: () => $t('Unmute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       isActive: (sourceId) => !getSourcesService().getSource(sourceId).muted,
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'PUSH_TO_MUTE',
-      description: () => 'Push to Mute',
+      description: () => $t('Push to Mute'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, true),
       up: (sourceId) => getSourcesService().setMuted(sourceId, false),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio
     },
     {
       name: 'PUSH_TO_TALK',
-      description: () => 'Push to Talk',
+      description: () => $t('Push to Talk'),
       down: (sourceId) => getSourcesService().setMuted(sourceId, false),
       up: (sourceId) => getSourcesService().setMuted(sourceId, true),
       shouldApply: (sourceId) => getSourcesService().getSource(sourceId).audio

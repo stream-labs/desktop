@@ -10,7 +10,14 @@ const recursive = require('recursive-readdir');
   // load dictionary
   const dictionaryFiles = await recursive('./app/i18n/en-US', ['*.txt']);
   dictionaryFiles.forEach(filePath => {
-    const fileDictionary = JSON.parse(fs.readFileSync(filePath).toString());
+    let fileDictionary;
+    try {
+      fileDictionary = JSON.parse(fs.readFileSync(filePath).toString());
+    } catch (e) {
+      console.log('parse error for', filePath);
+      process.exit(1);
+    }
+
     Object.assign(dictionary, fileDictionary);
   });
 
@@ -24,7 +31,8 @@ const recursive = require('recursive-readdir');
     const fileContent = fs.readFileSync(filePath).toString();
     let match;
     while (match = searchExp.exec(fileContent)) {
-      const string = match[1];
+      let string = match[1];
+      string = string.replace('\\', '');
       if (!foundStrings.includes(string)) foundStrings.push(string);
     }
 

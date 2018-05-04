@@ -13,6 +13,7 @@ import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -30,27 +31,27 @@ export default class SceneSelector extends Vue {
   showContextMenu() {
     const menu = new Menu();
     menu.append({
-      label: 'Duplicate',
+      label: $t('Duplicate'),
       click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
     menu.append({
-      label: 'Rename',
+      label: $t('Rename'),
       click: () => this.scenesService.showNameScene({
         rename: this.scenesService.activeScene.name
       })
     });
     menu.append({
-      label: 'Remove',
+      label: $t('Remove'),
       click: () => this.scenesService.removeScene(this.scenesService.activeScene.id)
     });
     menu.append({
-      label: 'Filters',
+      label: $t('Filters'),
       click: () => this.sourceFiltersService.showSourceFilters(
         this.scenesService.activeScene.id
       )
     });
     menu.append({
-      label: 'Create Scene Projector',
+      label: $t('Create Scene Projector'),
       click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
     });
     menu.popup();

@@ -9,11 +9,11 @@
     </div>
     <div class="margin-bot--20">
       <a class="link link--underlined" @click="deleteCacheDir">
-        <i class="fa fa-trash" /> <span>$t('Delete Cache and Restart')</span></a>
+        <i class="fa fa-trash" /> <span>{{ $t('Delete Cache and Restart') }}</span></a>
     </div>
     <div class="margin-bot--20">
       <a class="link link--underlined" @click="uploadCacheDir" :disabled="cacheUploading">
-        <i class="fa fa-upload" /> <span>$t('Upload Cache to Developers')</span>
+        <i class="fa fa-upload" /> <span>{{ $t('Upload Cache to Developers') }}</span>
         <i class="fa fa-spinner fa-spin" v-if="cacheUploading" />
       </a>
     </div>
@@ -21,11 +21,11 @@
   <div class="section">
     <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
     <button class="button button--action" @click="restartStreamlabelsSession">
-      $t('Restart Streamlabels Session')
+      {{ $t('Restart Streamlabels Session') }}
     </button>
     <br/>
     <button class="button button--action" @click="runAutoOptimizer" v-if="isTwitch && !isRecordingOrStreaming">
-      $t('Run Auto Optimizer')
+      {{ $t('Run Auto Optimizer') }}
     </button>
   </div>
 </div>

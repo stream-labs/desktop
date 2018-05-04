@@ -5,6 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { $t } from 'services/i18n';
 
 interface INameSceneCollectionOptions {
   rename?: string;
@@ -32,7 +33,7 @@ export default class NameSceneCollection extends Vue {
 
   submit() {
     if (this.isTaken(this.name)) {
-      this.error = 'That name is already taken';
+      this.error = $t('That name is already taken');
     } else if (this.options.rename) {
       this.sceneCollectionsService.rename(this.name);
       this.windowsService.closeChildWindow();
