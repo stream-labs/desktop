@@ -4,7 +4,7 @@ import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
 import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { ScenesTransitionsService } from 'services/scenes-transitions';
+import { TransitionsService } from 'services/transitions';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
@@ -12,6 +12,7 @@ import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
+import { ProjectorService } from 'services/projector';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -20,8 +21,9 @@ export default class SceneSelector extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
-  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() projectorService: ProjectorService;
 
   searchQuery = '';
 
@@ -47,6 +49,10 @@ export default class SceneSelector extends Vue {
         this.scenesService.activeScene.id
       )
     });
+    menu.append({
+      label: 'Create Scene Projector',
+      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
+    });
     menu.popup();
   }
 
@@ -67,7 +73,7 @@ export default class SceneSelector extends Vue {
   }
 
   showTransitions() {
-    this.scenesTransitionsService.showSceneTransitions();
+    this.transitionsService.showSceneTransitions();
   }
 
   get scenes() {

@@ -129,6 +129,28 @@ test('Place after', async t => {
 
 });
 
+test('Place after folder with deep nesting', async t => {
+  sceneBuilder.build(`
+    Folder1
+      Item1:
+      Folder2
+        Item2:
+    Item4:
+  `);
+
+  selectionService.select(getNodeId('Folder1'));
+  selectionService.placeAfter(getNodeId('Item4'));
+
+  t.true(sceneBuilder.isEqualTo(`
+    Item4:
+    Folder1
+      Item1:
+      Folder2
+        Item2:
+  `));
+
+});
+
 
 test('Place before', async t => {
   sceneBuilder.build(`

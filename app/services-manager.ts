@@ -26,7 +26,7 @@ import { VideoService } from './services/video';
 import { WidgetsService } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
-import { ScenesTransitionsService } from './services/scenes-transitions';
+import { TransitionsService } from 'services/transitions';
 import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from './services/source-filters';
 import { AppService } from './services/app';
@@ -101,7 +101,6 @@ export class ServicesManager extends Service {
     PerformanceService,
     PerformanceMonitorService,
     PersistentStatefulService,
-    ScenesTransitionsService,
     SettingsService,
     SourceFiltersService,
     SourcesService,
@@ -136,7 +135,8 @@ export class ServicesManager extends Service {
     PatchNotesService,
     ProtocolLinksService,
     WebsocketService,
-    ProjectorService
+    ProjectorService,
+    TransitionsService
   };
 
   private instances: Dictionary<Service> = {};
@@ -154,10 +154,14 @@ export class ServicesManager extends Service {
    * we create a linked promise in the child window and keep it callbacks here until
    * the promise in the main window will be resolved or rejected
    */
-  private promises: Dictionary<Function[]> = {};
+  private windowPromises: Dictionary<Function[]> = {};
+  /**
+   * almost the same as windowPromises but for keeping subscriptions
+   */
+  private windowSubscriptions: Dictionary<Subject<any>> = {};
 
   /**
-   * keep created subscriptions to not allow to subscribe to the channel twice
+   * keep created subscriptions in main window to not allow to subscribe to the channel twice
    */
   subscriptions: Dictionary<Subscription> = {};
 
@@ -208,24 +212,28 @@ export class ServicesManager extends Service {
    * start listen messages from main window
    */
   listenMessages() {
-    const promises = this.promises;
+    const promises = this.windowPromises;
 
     ipcRenderer.on(
       'services-message',
       (event: Electron.Event, message: IJsonRpcResponse<IJsonRpcEvent>) => {
+
+        if (message.result._type !== 'EVENT') return;
+
         // handle promise reject/resolve
-        if (
-          message.result._type !== 'EVENT' ||
-          message.result.emitter !== 'PROMISE'
-        )
-          return;
-        const promisePayload = message.result;
-        if (promisePayload) {
-          if (!promises[promisePayload.resourceId]) return; // this promise created from another API client
-          const [resolve, reject] = promises[promisePayload.resourceId];
-          const callback = promisePayload.isRejected ? reject : resolve;
-          callback(promisePayload.data);
-          delete promises[promisePayload.resourceId];
+        if (message.result.emitter === 'PROMISE') {
+          const promisePayload = message.result;
+          if (promisePayload) {
+            if (!promises[promisePayload.resourceId]) return; // this promise created from another API client
+            const [resolve, reject] = promises[promisePayload.resourceId];
+            const callback = promisePayload.isRejected ? reject : resolve;
+            callback(promisePayload.data);
+            delete promises[promisePayload.resourceId];
+          }
+        } else if (message.result.emitter === 'STREAM') {
+          const resourceId = message.result.resourceId;
+          if (!this.windowSubscriptions[resourceId]) return;
+          this.windowSubscriptions[resourceId].next(message.result.data);
         }
       }
     );
@@ -472,6 +480,7 @@ export class ServicesManager extends Service {
     const availableServices = Object.keys(this.services);
     if (!availableServices.includes(service.constructor.name)) return service;
 
+
     return new Proxy(service, {
       get: (target, property, receiver) => {
         if (!target[property]) return target[property];
@@ -480,13 +489,14 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
-        if (typeof target[property] !== 'function') return target[property];
+        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable))
+          return target[property];
 
         const serviceName = target.constructor.name;
         const methodName = property;
         const isHelper = target['isHelper'];
 
-        return (...args: any[]) => {
+        const handler = (...args: any[]) => {
 
           const response: IJsonRpcResponse<any> = electron.ipcRenderer.sendSync(
             'services-request',
@@ -506,10 +516,18 @@ export class ServicesManager extends Service {
           response.mutations.forEach(mutation => commitMutation(mutation));
 
           if (result && result._type === 'SUBSCRIPTION') {
-            return new Promise((resolve, reject) => {
-              const promiseId = result.resourceId;
-              this.promises[promiseId] = [resolve, reject];
-            });
+            if (result.emitter === 'PROMISE') {
+              return new Promise((resolve, reject) => {
+                const promiseId = result.resourceId;
+                this.windowPromises[promiseId] = [resolve, reject];
+              });
+            }
+
+            if (result.emitter === 'STREAM') {
+              const subject = new Subject<any>();
+              this.windowSubscriptions[result.resourceId] = subject;
+              return subject;
+            }
           }
 
           if (result && result._type === 'HELPER') {
@@ -527,6 +545,9 @@ export class ServicesManager extends Service {
           });
           return result;
         };
+
+        if (typeof target[property] === 'function') return handler;
+        if (target[property] instanceof Observable) return handler();
       }
     });
   }

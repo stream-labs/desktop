@@ -5,7 +5,7 @@
     :done-handler="done"
     :fixedSectionHeight="250"
   >
-    <SourcePreview slot="fixed" :sourceId="sourceId"></SourcePreview>
+    <display slot="fixed" :sourceId="sourceId" />
 
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName" class="side-menu">

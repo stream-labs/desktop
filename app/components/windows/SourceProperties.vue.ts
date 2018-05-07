@@ -1,21 +1,21 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../../util/injector';
-import { TFormData } from '../shared/forms/Input';
-import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
-import { ISourcesServiceApi } from '../../services/sources';
+import { Inject } from 'util/injector';
+import { TFormData } from 'components/shared/forms/Input';
+import { WindowsService } from 'services/windows';
+import windowMixin from 'components/mixins/window';
+import { ISourcesServiceApi } from 'services/sources';
 
-import ModalLayout from '../ModalLayout.vue';
-import SourcePreview from '../shared/SourcePreview.vue';
-import GenericForm from '../shared/forms/GenericForm.vue';
+import ModalLayout from 'components/ModalLayout.vue';
+import Display from 'components/shared/Display.vue';
+import GenericForm from 'components/shared/forms/GenericForm.vue';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
 
 @Component({
   components: {
     ModalLayout,
-    SourcePreview,
+    Display,
     GenericForm,
     WidgetProperties,
     StreamlabelProperties

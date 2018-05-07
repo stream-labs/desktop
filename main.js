@@ -247,7 +247,11 @@ function startApp() {
   });
 
   ipcMain.on('services-message', (event, payload) => {
-    if (!childWindow.isDestroyed()) childWindow.webContents.send('services-message', payload);
+    const windows = BrowserWindow.getAllWindows();
+    windows.forEach(window => {
+      if (window.id === mainWindow.id || window.isDestroyed()) return;
+      window.webContents.send('services-message', payload);
+    });
   });
 
 

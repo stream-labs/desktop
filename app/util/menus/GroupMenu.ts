@@ -62,7 +62,7 @@ export class GroupMenu extends Menu {
         );
         scene.getSelection()
           .selectAll()
-          .copyReferenceTo(this.scenesService.activeSceneId);
+          .copyTo(this.scenesService.activeSceneId);
         selectedItem.remove();
         scene.remove();
       }

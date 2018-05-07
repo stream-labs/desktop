@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { without } from 'lodash';
-import { StatefulService, mutation } from '../stateful-service';
-import { ScenesTransitionsService } from '../scenes-transitions';
-import { WindowsService } from '../windows';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { TransitionsService } from 'services/transitions';
+import { WindowsService } from 'services/windows';
 import {
   IScene,
   Scene,
@@ -35,16 +35,9 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   itemRemoved = new Subject<ISceneItem & ISource>();
   itemUpdated = new Subject<ISceneItem & ISource>();
 
-
-  @Inject()
-  private windowsService: WindowsService;
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-
-  @Inject('ScenesTransitionsService')
-  private transitionsService: ScenesTransitionsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private transitionsService: TransitionsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
