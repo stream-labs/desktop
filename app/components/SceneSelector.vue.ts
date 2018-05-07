@@ -13,6 +13,7 @@ import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
 import { SourceFiltersService } from 'services/source-filters';
 import { ProjectorService } from 'services/projector';
+import electron from 'electron';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -70,8 +71,17 @@ export default class SceneSelector extends Vue {
 
   removeScene() {
     const name = this.scenesService.activeScene.name;
-    if (!confirm(`Are you sure you want to remove ${name}?`)) return;
-    this.scenesService.removeScene(this.activeSceneId);
+    const ok = electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: `Are you sure you want to remove ${name}?`,
+        buttons: ['Cancel', 'OK']
+      },
+      ok => {
+        if (ok) this.scenesService.removeScene(this.activeSceneId);
+      }
+    );
   }
 
   showTransitions() {

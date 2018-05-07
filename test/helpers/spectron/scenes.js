@@ -1,6 +1,7 @@
 // Scene helper functions
 import { focusMain, focusChild } from '.';
 import { contextMenuClick } from './context-menu';
+import { dialogDismiss } from './dialog';
 
 async function clickSceneAction(t, selector) {
   await t.context.app.client
@@ -14,6 +15,7 @@ export async function clickAddScene(t) {
 
 export async function clickRemoveScene(t) {
   await clickSceneAction(t, '.fa-minus');
+  await dialogDismiss(t, 'OK');
 }
 
 export async function clickSceneTransitions(t) {
