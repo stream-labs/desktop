@@ -11,5 +11,7 @@
   "This is where your ": "This is where your ",
   " live. Clicking the title will dropdown a menu where you can view & manage.": " live. Clicking the title will dropdown a menu where you can view & manage.",
   "Are you sure you want to remove %collectionName%?": "Are you sure you want to remove %collectionName%?",
-  "Create Scene Projector": "Create Scene Projector"
+  "Create Scene Projector": "Create Scene Projector",
+  "Preview is disabled in performance mode": "Preview is disabled in performance mode",
+  "Your preview is currently disabled": "Your preview is currently disabled"
 }
