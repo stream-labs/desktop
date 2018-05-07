@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class SelectableWidget extends Vue {
@@ -17,7 +18,7 @@ export default class SelectableWidget extends Vue {
   description: string;
 
   buttonTextForWidget() {
-    return this.selected ? 'Remove Widget' : 'Add Widget';
+    return this.selected ? $t('Remove Widget') : $t('Add Widget');
   }
 
 }

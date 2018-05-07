@@ -18,7 +18,7 @@
         <div class="content">
           <div class="studio-controls-top">
             <h4 class="studio-controls__label">
-              Preview
+              $t('Preview')
             </h4>
             <div v-if="!performanceModeEnabled">
               <i
@@ -44,8 +44,8 @@
                 <div class="live-display-placeholder">
                   <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
                   <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-                  <span v-if="!performanceModeEnabled">Your preview is currently disabled</span>
-                  <span v-if="performanceModeEnabled">Preview is disabled in performance mode</span>
+                  <span v-if="!performanceModeEnabled">$t('Your preview is currently disabled')</span>
+                  <span v-if="performanceModeEnabled">$t('Preview is disabled in performance mode')</span>
                 </div>
               </div>
             </div>

@@ -8,6 +8,7 @@ import Display from '../Display.vue';
 import { CustomizationService } from '../../services/customization';
 import Slider from '../shared/Slider.vue';
 import VTooltip from 'v-tooltip';
+import { $t } from 'services/i18n';
 
 
 Vue.use(VTooltip)
@@ -25,8 +26,8 @@ export default class Live extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
 
-  enablePreviewTooltip= "Enable the preview stream";
-  disablePreviewTooltip= "Disable the preview stream, can help with CPU";
+  enablePreviewTooltip= $t('Enable the preview stream');
+  disablePreviewTooltip= $t('Disable the preview stream, can help with CPU');
 
   get previewSize() {
     return this.customizationService.state.previewSize;
