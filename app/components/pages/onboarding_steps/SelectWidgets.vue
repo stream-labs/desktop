@@ -167,7 +167,7 @@
         :disabled="busy"
         class="button button--lg button--action"
         @click="next">
-        Add {{ selectedWidgets.length }} Widgets
+        {{ $t('Add %widgetscount% Widgets', { widgetscount:  selectedWidgets.length}) }}
       </button>
       <div class="setup-later">
         <span>{{ $t('Rather do this manually?') }}</span>

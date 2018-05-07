@@ -1,3 +1,6 @@
+/**
+ * Run this script to find the strings that missed in localization dictionaries.
+ */
 const searchExp = /\$t\(\'([ a-zA-Z\d\-_`@%;:,'’=&!~#\\\+\*\?\.\}\{\(\)\[\]\$/]+)\'.*?\)/gm;
 const fs = require('fs');
 const recursive = require('recursive-readdir');
