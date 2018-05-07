@@ -75,7 +75,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
 
   @shortcut('Ctrl+V')
-  pasteReference() {
+  paste(duplicateSources = false) {
     if (!this.hasItems()) return;
     if (this.hasItemsInUnloadedClipboard()) {
       this.pasteFromUnloadedClipboard();
@@ -84,21 +84,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     const insertedItems = this.scenesService
       .getScene(this.state.itemsSceneId)
       .getSelection(this.state.sceneNodesIds)
-      .copyReferenceTo(this.scenesService.activeSceneId);
-    if (insertedItems.length) this.selectionService.select(insertedItems);
-  }
-
-
-  pasteDuplicate() {
-    if (!this.hasItems()) return;
-    if (this.hasItemsInUnloadedClipboard()) {
-      this.pasteFromUnloadedClipboard();
-      return;
-    }
-    const insertedItems = this.scenesService
-      .getScene(this.state.itemsSceneId)
-      .getSelection(this.state.sceneNodesIds)
-      .copyTo(this.scenesService.activeSceneId);
+      .copyTo(this.scenesService.activeSceneId, null, duplicateSources);
     if (insertedItems.length) this.selectionService.select(insertedItems);
   }
 

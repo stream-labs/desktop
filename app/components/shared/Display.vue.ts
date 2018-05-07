@@ -1,24 +1,26 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import electron from 'electron';
-import { Inject } from '../../util/injector';
-import { VideoService, Display } from 'services/video';
+import { Inject } from 'util/injector';
+import { VideoService, Display as OBSDisplay } from 'services/video';
 import { WindowsService } from 'services/windows';
 
 const { remote } = electron;
 
 @Component({})
-export default class SourcePreview extends Vue {
+export default class Display extends Vue {
   @Inject() videoService: VideoService;
   @Inject() windowsService: WindowsService;
 
   @Prop() sourceId: string;
+  @Prop({ default: 0 }) paddingSize: number;
+  @Prop({ default: false }) drawUI: boolean;
 
   $refs: {
-    preview: HTMLElement
+    display: HTMLElement
   };
 
-  display: Display;
+  display: OBSDisplay;
 
   mounted() {
     this.createDisplay();
@@ -26,11 +28,17 @@ export default class SourcePreview extends Vue {
 
   createDisplay() {
     const displayId = this.videoService.getRandomDisplayId();
-    this.display = new Display(displayId, {
+    this.display = new OBSDisplay(displayId, {
       sourceId: this.sourceId,
-      paddingSize: 0
+      paddingSize: this.paddingSize
     });
-    this.display.trackElement(this.$refs.preview);
+    this.display.setShoulddrawUI(this.drawUI);
+
+    this.display.onOutputResize(region => {
+      this.$emit('outputResize', region);
+    });
+
+    this.display.trackElement(this.$refs.display);
   }
 
   destroyDisplay() {

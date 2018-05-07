@@ -26,7 +26,7 @@ import { VideoService } from './services/video';
 import { WidgetsService } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
-import { ScenesTransitionsService } from './services/scenes-transitions';
+import { TransitionsService } from 'services/transitions';
 import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from './services/source-filters';
 import { AppService } from './services/app';
@@ -100,7 +100,6 @@ export class ServicesManager extends Service {
     PerformanceService,
     PerformanceMonitorService,
     PersistentStatefulService,
-    ScenesTransitionsService,
     SettingsService,
     SourceFiltersService,
     SourcesService,
@@ -134,7 +133,8 @@ export class ServicesManager extends Service {
     FileManagerService,
     PatchNotesService,
     ProtocolLinksService,
-    ProjectorService
+    ProjectorService,
+    TransitionsService
   };
 
   private instances: Dictionary<Service> = {};

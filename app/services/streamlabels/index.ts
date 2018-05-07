@@ -273,7 +273,7 @@ export class StreamlabelsService extends Service {
   restartSession(): Promise<Boolean> {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/stream-labels/restart-session`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

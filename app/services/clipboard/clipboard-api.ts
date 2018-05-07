@@ -1,8 +1,7 @@
 
 export interface IClipboardServiceApi {
   copy(): void;
-  pasteReference(): void;
-  pasteDuplicate(): void;
+  paste(duplicateSources?: boolean): void;
   copyFilters(): void;
   pasteFilters(toSourceId: string): void;
   hasItems(): boolean;
