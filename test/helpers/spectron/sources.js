@@ -10,15 +10,15 @@ async function clickSourceAction(t, selector) {
 }
 
 export async function clickAddSource(t) {
-  await clickSourceAction(t, '.fa-plus');
+  await clickSourceAction(t, '.icon-add');
 }
 
 export async function clickRemoveSource(t) {
-  await clickSourceAction(t, '.fa-minus');
+  await clickSourceAction(t, '.icon-subtract');
 }
 
 export async function clickSourceProperties(t) {
-  await clickSourceAction(t, '.fa-cog');
+  await clickSourceAction(t, '.icon-settings');
 }
 
 export async function selectSource(t, name) {
