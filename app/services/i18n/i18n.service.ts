@@ -1,12 +1,13 @@
+import electron from 'electron';
 import path from 'path';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
-import { Subject } from 'rxjs/Subject';
 import recursive from 'recursive-readdir';
 import { Inject } from '../../util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
+import { I18nServiceApi } from './i18n.service-api';
 
 
 interface II18nState {
@@ -22,10 +23,33 @@ export function $t(...args: any[]) {
   );
 }
 
-export class I18nService extends PersistentStatefulService<II18nState> {
+/**
+ * @see https://electronjs.org/docs/api/locales
+ */
+const LANG_CODE_MAP = {
+  cs: { lang: 'Czech', locale: 'cs-CZ' },
+  de: { lang: 'German', locale: 'de-DE' },
+  en:	{ lang: 'English', locale: 'en-US' },
+  es: { lang: 'Spanish', locale: 'es-ES' },
+  fr: { lang: 'French', locale: 'fr-FR' },
+  it:	{ lang: 'Italian', locale: 'it-IT' },
+  ja: { lang: 'Japanese', locale: 'ja-JP' },
+  ko:	{ lang: 'Korean', locale: 'ko-KR' },
+  pl: { lang:	'Polish', locale: 'pl-PL' },
+  pt: { lang: 'Portuguese', locale: 'pt-PT' },
+  'pt-BR': { lang: 'Portuguese (Brazil)', locale: 'pt-BR' },
+  ru: { lang: 'Russian', locale: 'ru-RU' },
+  sk: { lang: 'Slovak', locale: 'sk-SK' },
+  th:	{ lang: 'Thai', locale: 'th-TH' },
+  tr:	{ lang: 'Turkish', locale: 'tr-TR' },
+  'zh-CN': { lang: 'Chinese (Simplified)' }
+};
+
+
+export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
 
   static defaultState: II18nState = {
-    locale: 'ru-RU'
+    locale: ''
   };
 
   static vueI18nInstance: VueI18n;
@@ -34,16 +58,16 @@ export class I18nService extends PersistentStatefulService<II18nState> {
     this.vueI18nInstance = instance;
   }
 
-  localeChanged = new Subject<string>();
-  dictionariesLoaded = new Subject<{locale: string, dictionary: Dictionary<string>}>();
-
   private availableLocales: Dictionary<string> = {};
   private loadedDictionaries: Dictionary<Dictionary<string>> = {};
+  private isLoaded = false;
 
   @Inject() fileManagerService: FileManagerService;
 
 
-  async init() {
+  async load() {
+
+    if (this.isLoaded) return;
 
     // load available locales
     const localeFiles = await recursive(`${I18N_PATH}`, ['*.json']);
@@ -52,18 +76,42 @@ export class I18nService extends PersistentStatefulService<II18nState> {
       this.availableLocales[locale] = this.fileManagerService.read(filePath);
     }
 
-    return this.setLocale(this.state.locale);
-  }
-
-  async setLocale(locale: string) {
+    // if locale is not set than use electron's one
+    let locale = this.state.locale;
+    if (!locale) {
+      const electronLocale = electron.remote.app.getLocale();
+      const langDescription = LANG_CODE_MAP[electronLocale];
+      locale = langDescription ? langDescription.locale : 'en-US';
+    }
 
     // load dictionary if not loaded
     if (!this.loadedDictionaries[locale]) {
       await this.loadDictionary(this.state.locale);
     }
 
+    // load fallback dictionary
+    const fallbackLocale = this.getFallbackLocale();
+    if (!this.loadedDictionaries[fallbackLocale]) {
+      await this.loadDictionary(fallbackLocale);
+    }
+
+    await this.SET_LOCALE(locale);
+
+    this.isLoaded = true;
+  }
+
+  getFallbackLocale() {
+    return 'en-Us';
+  }
+
+  getLoadedDictionaries() {
+    return this.loadedDictionaries;
+  }
+
+  setLocale(locale: string) {
     this.SET_LOCALE(locale);
-    this.localeChanged.next(locale);
+    electron.remote.app.relaunch();
+    electron.remote.app.quit();
   }
 
   getLocaleFormData(): TFormData {
@@ -88,7 +136,7 @@ export class I18nService extends PersistentStatefulService<II18nState> {
     ];
   }
 
-  async loadDictionary(locale: string): Promise<Dictionary<string>> {
+  private async loadDictionary(locale: string): Promise<Dictionary<string>> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
     const dictionaryFiles = await recursive(`${I18N_PATH}/${locale}`, ['*.txt']);
@@ -97,7 +145,6 @@ export class I18nService extends PersistentStatefulService<II18nState> {
       Object.assign(dictionary, JSON.parse(this.fileManagerService.read(filePath)));
     }
     this.loadedDictionaries[locale] = dictionary;
-    this.dictionariesLoaded.next({ locale, dictionary });
     return dictionary;
   }
 

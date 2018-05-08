@@ -16,7 +16,6 @@ import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import RemoteControlSettings from 'components/RemoteControlSettings.vue';
-import LanguageSettings from 'components/LanguageSettings.vue';
 
 @Component({
   components: {
@@ -32,7 +31,6 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     AppearanceSettings,
     RemoteControlSettings,
     ExperimentalSettings,
-    LanguageSettings
   },
   mixins: [windowMixin]
 })
@@ -42,19 +40,19 @@ export default class SceneTransitions extends Vue {
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
-    General: 'th-large',
-    Stream: 'globe',
-    Output: 'microchip',
-    Video: 'film',
-    Audio: 'volume-up',
-    Hotkeys: 'keyboard-o',
-    Advanced: 'cogs',
-    API: 'file-code-o',
-    Overlays: 'picture-o',
-    Notifications: 'warning',
-    Appearance: 'television',
-    'Remote Control': 'play-circle',
-    Experimental: 'flask'
+    General: 'fa fa-th-large',
+    Stream: 'fa fa-globe',
+    Output: 'fa fa-microchip',
+    Video: 'fa fa-film',
+    Audio: 'fa fa-volume-up',
+    Hotkeys: 'fa fa-keyboard-o',
+    Advanced: 'fa fa-cogs',
+    API: 'fa fa-file-code-o',
+    Overlays: 'icon-themes',
+    Notifications: 'fa fa-warning',
+    Appearance: 'fa fa-television',
+    'Remote Control': 'fa fa-play-circle',
+    Experimental: 'fa fa-flask'
   };
 
   get categoryName() {

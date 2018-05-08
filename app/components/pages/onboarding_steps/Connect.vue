@@ -5,10 +5,10 @@
       <div class="onboarding-title" v-if="isSecurityUpgrade">Re-Authorize</div>
       <div class="onboarding-title" v-else>Connect</div>
       <div class="onboarding-desc" v-if="isSecurityUpgrade">
-        We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can
-        <a @click="contactSupport">contact support.</a>
+        {{ $t('We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can') }}
+        <a @click="contactSupport">$t('contact support.')</a>
       </div>
-      <div class="onboarding-desc" v-else>Sign in with your Twitch or Youtube account to get started with Streamlabs</div>
+      <div class="onboarding-desc" v-else>{{ $t('Sign in with your Twitch or Youtube account to get started with Streamlabs') }}</div>
       <div class="signup-buttons">
         <button
           class="button button--twitch"
@@ -30,7 +30,7 @@
         </button>
       </div>
       <div class="setup-later" v-if="!isSecurityUpgrade">
-        <a @click="skipOnboarding">Setup later</a>
+        <a @click="skipOnboarding">{{ $t('Setup later')}}</a>
       </div>
     </div>
   </div>

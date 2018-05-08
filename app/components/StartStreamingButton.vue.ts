@@ -5,6 +5,7 @@ import { Inject } from '../util/injector';
 import { NavigationService } from '../services/navigation';
 import { UserService } from '../services/user';
 import { CustomizationService } from '../services/customization';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -41,7 +42,7 @@ export default class StartStreamingButton extends Vue {
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
-      return 'END STREAM';
+      return $t('END STREAM');
     }
 
     if (this.streamingStatus === EStreamingState.Starting) {
@@ -49,7 +50,7 @@ export default class StartStreamingButton extends Vue {
         return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'STARTING';
+      return $t('STARTING');
     }
 
     if (this.streamingStatus === EStreamingState.Ending) {
@@ -57,14 +58,14 @@ export default class StartStreamingButton extends Vue {
         return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'ENDING';
+      return $t('ENDING');
     }
 
     if (this.streamingStatus === EStreamingState.Reconnecting) {
-      return 'RECONNECTING';
+      return $t('RECONNECTING');
     }
 
-    return 'GO LIVE';
+    return $t('GO LIVE');
   }
 
   getIsRedButton() {

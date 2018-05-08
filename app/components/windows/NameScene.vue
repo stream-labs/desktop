@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  :title="options.rename ? 'Rename Scene' : 'Name Scene'"
+  :title="options.rename ? $t('Rename Scene') : $t('Name Scene')"
   :done-handler="submit">
   <form
     slot="content"
@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameScene-label">
-      Please enter the name of the scene
+      {{ $t('Please enter the name of the scene') }}
     </p>
     <p
       v-if="error"

@@ -3,6 +3,7 @@ import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { Inject } from '../../util/injector';
+import { $t } from 'services/i18n';
 
 export class GroupMenu extends Menu {
 
@@ -25,7 +26,7 @@ export class GroupMenu extends Menu {
 
 
     this.append({
-      label: 'Group into Folder',
+      label: $t('Group into Folder'),
       click: () => {
         this.scenesService.showNameFolder({
           itemsToGroup: this.selectionService.getIds(),
@@ -36,7 +37,7 @@ export class GroupMenu extends Menu {
     });
 
     this.append({
-      label: 'Ungroup Folder',
+      label: $t('Ungroup Folder'),
       click: () => {
         this.selectionService.getFolders()[0].ungroup();
       },
@@ -45,7 +46,7 @@ export class GroupMenu extends Menu {
 
 
     this.append({
-      label: 'Group into Scene',
+      label: $t('Group into Scene'),
       click: () => {
         this.scenesService.showNameScene({
           itemsToGroup: this.selectionService.getIds()
@@ -55,14 +56,14 @@ export class GroupMenu extends Menu {
     });
 
     this.append({
-      label: 'Ungroup Scene',
+      label: $t('Ungroup Scene'),
       click: () => {
         const scene = this.scenesService.getScene(
           selectedItem.getSource().sourceId
         );
         scene.getSelection()
           .selectAll()
-          .copyReferenceTo(this.scenesService.activeSceneId);
+          .copyTo(this.scenesService.activeSceneId);
         selectedItem.remove();
         scene.remove();
       }

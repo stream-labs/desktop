@@ -1,9 +1,9 @@
-import { SettingsService } from '../services/settings';
-import { Inject } from '../util/injector';
-import { ScenesService, SceneItem } from '../services/scenes';
-import { VideoService, Display } from '../services/video';
-import { WindowsService } from '../services/windows';
-import { ScalableRectangle } from '../util/ScalableRectangle';
+import { SettingsService } from 'services/settings';
+import { Inject } from 'util/injector';
+import { ScenesService, SceneItem } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { WindowsService } from 'services/windows';
+import { ScalableRectangle } from 'util/ScalableRectangle';
 import { SelectionService } from 'services/selection';
 import electron from 'electron';
 
@@ -42,6 +42,11 @@ interface IEdgeCollection {
   right: IEdge[];
 }
 
+interface IDragHandlerOptions {
+  renderedWidth: number;
+  renderedHeight: number;
+}
+
 // Encapsulates logic for dragging sources in the overlay editor
 class DragHandler {
 
@@ -77,9 +82,11 @@ class DragHandler {
 
   targetEdges: IEdgeCollection;
 
-  // startEvent: The mousedown event that started the drag
-  // display: The OBS display object we are operating on
-  constructor(startEvent: MouseEvent, display: Display) {
+  /**
+   * @param startEvent the mouse event for this drag
+   * @param options drag handler options
+   */
+  constructor(startEvent: MouseEvent, options: IDragHandlerOptions) {
     // Load some settings we care about
     this.snapEnabled = this.settingsService.state.General.SnappingEnabled;
     this.renderedSnapDistance = this.settingsService.state.General.SnapDistance;
@@ -90,8 +97,8 @@ class DragHandler {
     // Load some attributes about the video canvas
     this.baseWidth = this.videoService.baseWidth;
     this.baseHeight = this.videoService.baseHeight;
-    this.renderedWidth = display.outputRegion.width;
-    this.renderedHeight = display.outputRegion.height;
+    this.renderedWidth = options.renderedWidth;
+    this.renderedHeight = options.renderedHeight;
     this.scaleFactor = this.windowsService.state.main.scaleFactor;
     this.snapDistance = (this.renderedSnapDistance * this.scaleFactor * this.baseWidth) /
       this.renderedWidth;

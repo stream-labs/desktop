@@ -22,8 +22,8 @@ export class TwitchService extends Service implements IPlatformService {
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&scope=channel_read,
-      channel_editor&origin=slobs`;
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
+      'scope=channel_read,channel_editor&origin=slobs';
     return `https://${host}/slobs/login?${query}`;
   }
 

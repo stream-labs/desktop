@@ -6,7 +6,7 @@
       <div class="desc">{{ description }}</div>
 
       <div class="source-support" v-if="showSupport">
-        <div class="source-support__label">Supports</div>
+        <div class="source-support__label">{{ $t('Supports') }}</div>
         <slot name="support-list"></slot>
       </div>
     </div>

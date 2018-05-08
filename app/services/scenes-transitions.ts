@@ -7,6 +7,7 @@ import {
 } from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { WindowsService } from './windows';
+import { $t } from 'services/i18n';
 
 interface ISceneTransitionsState {
   availableTransitions: IListOption<string>[];
@@ -14,16 +15,6 @@ interface ISceneTransitionsState {
   properties: TFormData;
   type: string;
 }
-
-const TRANSITION_TYPES: IListOption<string>[] = [
-  { description: 'Cut', value: 'cut_transition' },
-  { description: 'Fade', value: 'fade_transition' },
-  { description: 'Swipe', value: 'swipe_transition' },
-  { description: 'Slide', value: 'slide_transition' },
-  { description: 'Fade to Color', value: 'fade_to_color_transition' },
-  { description: 'Luma Wipe', value: 'wipe_transition' },
-  { description: 'Stinger', value: 'obs_stinger_transition' }
-];
 
 export class ScenesTransitionsService extends StatefulService<ISceneTransitionsState> {
 
@@ -49,10 +40,21 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
 
 
   @mutation()
-  SET_DURATION(duration: number) {
+  private SET_DURATION(duration: number) {
     this.state.duration = duration;
   }
 
+  getTypes(): IListOption<string>[] {
+    return [
+      { description: $t('Cut'), value: 'cut_transition' },
+      { description: $t('Fade'), value: 'fade_transition' },
+      { description: $t('Swipe'), value: 'swipe_transition' },
+      { description: $t('Slide'), value: 'slide_transition' },
+      { description: $t('Fade to Color'), value: 'fade_to_color_transition' },
+      { description: $t('Luma Wipe'), value: 'wipe_transition' },
+      { description: $t('Stinger'), value: 'obs_stinger_transition' }
+    ];
+  }
 
   transitionTo(scene: obs.IScene) {
     const transition = this.getCurrentTransition();
@@ -93,7 +95,7 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   setType(type: string) {
     const oldTransition = this.getCurrentTransition() as obs.ITransition;
 
-    const transition = TRANSITION_TYPES.find(transition => {
+    const transition = this.getTypes().find(transition => {
       return transition.value === type;
     });
 
@@ -119,13 +121,13 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   getFormData() {
     return {
       type: {
-        description: 'Transition',
+        description: $t('Transition'),
         name: 'type',
         value: this.state.type,
-        options: TRANSITION_TYPES
+        options: this.getTypes()
       },
       duration: {
-        description: 'Duration',
+        description: $t('Duration'),
         name: 'duration',
         value: this.state.duration
       }

@@ -1,7 +1,7 @@
 <template>
   <div class="help-tip" v-if="shouldShow">
     <div class="help-tip__arrow"></div>
-    <i @click="closeHelpTip" class="help-tip__close fa fa-times" />
+    <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
       <i class="fa fa-info-circle" />
       <slot name="title"></slot>

@@ -14,6 +14,7 @@ import { shortcut } from '../shortcuts';
 import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
 import { Subject } from 'rxjs/Subject';
 import Utils from '../utils';
+import { Source } from '../sources';
 
 
 /**
@@ -60,14 +61,14 @@ export class SelectionService
   getLastSelectedId: () => string;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
-  copyReferenceTo: (sceneId: string, folderId?: string) => TSceneNode[];
-  copyTo: (sceneId: string) => SceneItem[];
+  copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
   moveTo: (sceneId: string, folderId?: string) => TSceneNode[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
   canGroupIntoFolder: () => boolean;
   getClosestParent: () => SceneItemFolder;
   getRootNodes: () => TSceneNode[];
+  getSources: () => Source[];
 
 
   // SCENE_ITEM METHODS
@@ -361,12 +362,26 @@ export class Selection implements ISelection {
     return this;
   }
 
-  copyReferenceTo(sceneId: string, folderId?: string): TSceneNode[] {
+  copyTo(sceneId: string, folderId?: string, duplicateSources = false): TSceneNode[] {
     const insertedNodes: TSceneNode[] = [];
     const scene = this.scenesService.getScene(sceneId);
     const foldersMap: Dictionary<string> = {};
     let prevInsertedNode: TSceneNode;
     let insertedNode: TSceneNode;
+
+    const sourcesMap: Dictionary<Source> = {};
+    const notDuplicatedSources: Source[] = [];
+    if (duplicateSources) {
+      this.getSources().forEach(source => {
+        const duplicatedSource = source.duplicate();
+        if (!duplicatedSource) {
+          notDuplicatedSources.push(source);
+          return;
+        }
+        sourcesMap[source.sourceId] = duplicatedSource;
+      });
+    }
+
 
     // copy items and folders structure
     this.getNodes().forEach(sceneNode => {
@@ -376,7 +391,9 @@ export class Selection implements ISelection {
         insertedNodes.push(insertedNode);
       } else if (sceneNode.isItem()) {
         insertedNode = scene.addSource(
-          sceneNode.sourceId
+          sourcesMap[sceneNode.sourceId] ?
+            sourcesMap[sceneNode.sourceId].sourceId :
+            sceneNode.sourceId
         );
         insertedNode.setSettings(sceneNode.getSettings());
         insertedNodes.push(insertedNode);
@@ -400,31 +417,13 @@ export class Selection implements ISelection {
     return insertedNodes;
   }
 
-  copyTo(sceneId: string): SceneItem[] {
-    const insertedItems: SceneItem[] = [];
-    const scene = this.scenesService.getScene(sceneId);
-    this.getItems().reverse().forEach(sceneItem => {
-      const duplicatedSource = sceneItem.getSource().duplicate();
-
-      if (!duplicatedSource) {
-        alert(`Unable to duplicate ${sceneItem.name}`);
-        return;
-      }
-
-      const insertedItem = scene.addSource(duplicatedSource.sourceId);
-      insertedItem.setSettings(sceneItem.getSettings());
-      insertedItems.push(insertedItem);
-    });
-    return insertedItems;
-  }
-
   moveTo(sceneId: string, folderId?: string): TSceneNode[] {
 
     if (this.sceneId === sceneId) {
       if (!folderId) return;
       this.getRootNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
     } else {
-      const insertedItems = this.copyReferenceTo(sceneId, folderId);
+      const insertedItems = this.copyTo(sceneId, folderId);
       this.remove();
       return insertedItems;
     }
@@ -497,6 +496,18 @@ export class Selection implements ISelection {
     const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
     const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
     return canGroupIntoFolder;
+  }
+
+
+  getSources(): Source[] {
+    const sourcesIds: string[] = [];
+    const sources: Source[] = [];
+    this.getItems().forEach(item => {
+      const source = item.getSource();
+      if (sourcesIds.includes(source.sourceId)) return;
+      sources.push(source);
+    });
+    return sources;
   }
 
   // SCENE_ITEM METHODS

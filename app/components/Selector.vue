@@ -16,7 +16,6 @@
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
-        <i v-if="draggable" class="icon-btn fa fa-bars fa-rotate-90 selector-drag-handle"/>
       </div>
     </li>
   </draggable>
@@ -47,12 +46,6 @@
   list-style-type: none;
   margin: 0;
   overflow: auto;
-
-  .selector-item {
-    &:first-child {
-      border-top-color: transparent;
-    }
-  }
 }
 
 .selector-item {
@@ -66,6 +59,7 @@
   border-bottom: 1px solid transparent;
   color: @navy;
   .transition;
+  margin-top: -1px;
 
   &.selector-item--active {
     background-color: @white;
@@ -97,7 +91,7 @@
   display: flex;
   flex-direction: row;
   font-size: 13px;
-  opacity: 0;
+  opacity: .2;
 }
 
 .selector-drag-handle {
@@ -106,7 +100,8 @@
 }
 
 .night-theme {
-  .sortable-ghost, .sortable-chosen {
+  .sortable-ghost,
+  .sortable-chosen {
     background: @night-accent-light;
   }
 

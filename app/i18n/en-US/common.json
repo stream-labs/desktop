@@ -24,5 +24,16 @@
   "Done": "Done",
   "Are you sure you want to log out?": "Are you sure you want to log out?",
   "Name": "Name",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "Continue": "Continue",
+  "Login": "Login",
+  "Yes": "Yes",
+  "No": "No",
+  "OK": "OK",
+  "Confirm": "Confirm",
+  "Themes": "Themes",
+  "Show": "Show",
+  "Hide": "Hide",
+  "Copy": "Copy",
+  "Select All": "Select All"
 }

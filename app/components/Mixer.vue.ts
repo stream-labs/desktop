@@ -4,6 +4,7 @@ import { AudioService } from '../services/audio';
 import { Inject } from '../util/injector';
 import MixerItem from './MixerItem.vue';
 import VTooltip from 'v-tooltip';
+import { $t } from 'services/i18n';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -13,8 +14,9 @@ VTooltip.options.defaultContainer = '#mainWrapper';
 })
 export default class Mixer extends Vue {
   @Inject() audioService: AudioService;
-
-  advancedSettingsTooltip = 'Open advanced audio settings';
+  
+  advancedSettingsTooltip = $t('Open advanced audio settings');
+  mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
 
   showAdvancedSettings() {
     this.audioService.showAdvancedSettings();

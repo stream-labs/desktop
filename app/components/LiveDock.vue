@@ -7,9 +7,9 @@
     class="live-dock-chevron icon-btn"
     v-if="collapsed"
     @click="expand">
-    <i class="fa" :class="{
-      'fa-chevron-left': !onLeft,
-      'fa-chevron-right': onLeft
+    <i :class="{
+      'icon-down icon-left': !onLeft,
+      'icon-down icon-right': onLeft
     }" />
   </div>
 
@@ -17,13 +17,15 @@
     <div
       v-show="!collapsed"
       class="live-dock-expanded-contents">
-      <i
-        class="fa live-dock-chevron icon-btn"
-        :class="{
-          'fa-chevron-left': onLeft,
-          'fa-chevron-right': !onLeft
-        }"
-        @click="collapse" />
+      <div
+        class="live-dock-chevron icon-btn"
+        @click="collapse">
+        <i
+          :class="{
+          'icon-down icon-left': onLeft,
+          'icon-down icon-right': !onLeft
+          }" />
+      </div>
       <div class="live-dock-header">
         <div class="flex flex--center">
           <div :class="{ 'live-dock-pulse': true, 'live-dock-offline': !isStreaming  }" />
@@ -127,10 +129,14 @@
   align-items: center;
   height: 100%;
   left: 0px;
-  padding-left: 5px;
+  padding-left: 4px;
 
   &:hover {
     opacity: 1;
+  }
+
+  i {
+    font-size: 6px;
   }
 }
 

@@ -1,18 +1,17 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
-import SourcePreview from 'components/shared/SourcePreview.vue';
-import Display from 'components/Display.vue';
+import Display from 'components/shared/Display.vue';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
     ModalLayout,
-    SourcePreview,
     Display
   }
 })
@@ -56,9 +55,9 @@ export default class Projector extends Vue {
   get title() {
     if (this.sourceId) {
       const name = this.sourcesService.getSource(this.sourceId).name;
-      return `Projector: ${name}`;
+      return $t('Projector:') + name;
     }
-    return 'Projector: Output';
+    return $t('Projector: Output');
   }
 
 }

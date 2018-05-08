@@ -14,7 +14,7 @@
     v-if="!unreadCount"
     @click="showNotifications"
     v-tooltip="showNotificationsTooltip">
-    <span class="fa fa-info-circle"></span>
+    <span class="icon-information"></span>
   </div>
 
   <div class="notifications__container flex--grow" ref="notificationsContainer">

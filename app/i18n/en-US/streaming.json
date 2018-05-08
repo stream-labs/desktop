@@ -39,5 +39,8 @@
   "Go to Youtube to view your live stream": "Go to Youtube to view your live stream",
   "Edit your stream title and description": "Edit your stream title and description",
   "Go to Youtube Live Dashboard to control your stream": "Go to Youtube Live Dashboard to control your stream",
-  "Are you sure you want to exit while live?": "Are you sure you want to exit while live?"
+  "Are you sure you want to exit while live?": "Are you sure you want to exit while live?",
+  "Enable the preview stream": "Enable the preview stream",
+  "Disable the preview stream, can help with CPU": "Disable the preview stream, can help with CPU"
+
 }

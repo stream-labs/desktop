@@ -7,11 +7,12 @@ import { IScenesServiceApi } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
-import SourcePreview from 'components/shared/SourcePreview.vue';
+import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
+import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout, Selector, SourcePreview },
+  components: { ModalLayout, Selector, Display },
   mixins: [windowMixin]
 })
 export default class AddSource extends Vue {
@@ -64,7 +65,7 @@ export default class AddSource extends Vue {
     const scene = this.scenesService.activeScene;
     if (!scene.canAddSource(this.selectedSourceId)) {
       // for now only a scene-source can be a problem
-      alert('Unable to add a source: the scene you are trying to add already contains your current scene');
+      alert($t('Unable to add a source: the scene you are trying to add already contains your current scene'));
       return;
     }
     this.scenesService.activeScene.addSource(this.selectedSourceId);

@@ -9,9 +9,7 @@ interface II18nState {
 export interface I18nServiceApi {
 
   state: II18nState;
-  localeChanged: Observable<string>;
-  dictionariesLoaded: Observable<{locale: string, dictionary: Dictionary<string>}>;
 
-  setLocale(locale: string): Promise<void>;
+  setLocale(locale: string): void;
   getLocaleFormData(): TFormData;
 }
