@@ -1,9 +1,10 @@
-import { StreamingService } from './streaming';
-import { ScenesService } from './scenes';
-import { SourcesService } from './sources';
-import { KeyListenerService } from './key-listener';
-import { Inject } from '../util/injector';
-import { StatefulService, mutation, ServiceHelper } from './stateful-service';
+import { StreamingService } from 'services/streaming';
+import { ScenesService } from 'services/scenes';
+import { SourcesService } from 'services/sources';
+import { TransitionsService } from 'services/transitions';
+import { KeyListenerService } from 'services/key-listener';
+import { Inject } from 'util/injector';
+import { StatefulService, mutation, ServiceHelper } from 'services/stateful-service';
 import { defer } from 'lodash';
 
 function getScenesService(): ScenesService {
@@ -16,6 +17,10 @@ function getSourcesService(): SourcesService {
 
 function getStreamingService(): StreamingService {
   return StreamingService.instance;
+}
+
+function getTransitionsService(): TransitionsService {
+  return TransitionsService.instance;
 }
 
 type THotkeyType = 'GENERAL' | 'SCENE' | 'SCENE_ITEM' | 'SOURCE';
@@ -92,6 +97,23 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       description: () => 'Stop Recording',
       down: () => getStreamingService().toggleRecording(),
       isActive: () => !getStreamingService().isRecording
+    },
+    {
+      name: 'ENABLE_STUDIO_MODE',
+      description: () => 'Enable Studio Mode',
+      down: () => getTransitionsService().enableStudioMode(),
+      isActive: () => getTransitionsService().state.studioMode
+    },
+    {
+      name: 'DISABLE_STUDIO_MODE',
+      description: () => 'Disable Studio Mode',
+      down: () => getTransitionsService().disableStudioMode(),
+      isActive: () => !getTransitionsService().state.studioMode
+    },
+    {
+      name: 'TRANSITION_STUDIO_MODE',
+      description: () => 'Transition (Studio Mode)',
+      down: () => getTransitionsService().executeStudioModeTransition()
     }
   ],
 
