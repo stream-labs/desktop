@@ -53,7 +53,7 @@
       <a
         @click="studioMode"
         class="link link--uppercase">
-        <i class="icon-studio-mode"/><span>Studio Mode</span>
+        <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>Studio Mode</span>
       </a>
     </div>
     <div class="top-nav-item">
