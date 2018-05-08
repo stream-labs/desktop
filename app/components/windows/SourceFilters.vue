@@ -10,18 +10,19 @@
     <div slot="content" class="modal--side-nav">
       <NavMenu v-model="selectedFilterName" class="side-menu">
         <div class="controls">
-          <div class="fa fa-plus icon-btn" @click="addFilter"></div>
-          <div
-            class="fa fa-minus icon-btn"
+          <i
+            class="icon-add icon-btn"
+            @click="addFilter"></i>
+          <i
+            class="icon-subtract icon-btn"
             v-if="selectedFilterName"
-            @click="removeFilter">
-          </div>
+            @click="removeFilter"></i>
         </div>
         <NavItem
           v-for="filter in filters"
           :key="filter.name"
           :to="filter.name"
-          :ico="filter.visible ? 'eye' : 'eye-slash'"
+          :ico="filter.visible ? 'icon-view' : 'icon-hide'"
           @iconClick="toggleVisibility">
           {{ filter.name }}
         </NavItem>
