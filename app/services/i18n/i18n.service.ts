@@ -3,11 +3,11 @@ import path from 'path';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
-import { Subject } from 'rxjs/Subject';
 import recursive from 'recursive-readdir';
 import { Inject } from '../../util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
+import { I18nServiceApi } from './i18n.service-api';
 
 
 interface II18nState {
@@ -46,7 +46,7 @@ const LANG_CODE_MAP = {
 };
 
 
-export class I18nService extends PersistentStatefulService<II18nState> {
+export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
 
   static defaultState: II18nState = {
     locale: ''
@@ -136,7 +136,7 @@ export class I18nService extends PersistentStatefulService<II18nState> {
     ];
   }
 
-  async loadDictionary(locale: string): Promise<Dictionary<string>> {
+  private async loadDictionary(locale: string): Promise<Dictionary<string>> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
     const dictionaryFiles = await recursive(`${I18N_PATH}/${locale}`, ['*.txt']);

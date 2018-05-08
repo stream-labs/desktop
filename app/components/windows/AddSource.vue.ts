@@ -7,12 +7,12 @@ import { IScenesServiceApi } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
-import SourcePreview from 'components/shared/SourcePreview.vue';
+import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout, Selector, SourcePreview },
+  components: { ModalLayout, Selector, Display },
   mixins: [windowMixin]
 })
 export default class AddSource extends Vue {

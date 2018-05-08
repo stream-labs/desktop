@@ -5,16 +5,25 @@ import { SourcesService } from 'services/sources';
 import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
-import SlVueTree, { ISlTreeNode, ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
+import SlVueTree, {
+  ISlTreeNode,
+  ISlTreeNodeModel,
+  ICursorPosition
+} from 'sl-vue-tree';
 
 @Component({
   components: { SlVueTree }
 })
 export default class SourceSelector extends Vue {
-
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+
+  sourcesTooltip = 'The building blocks of your scene. Also contains widgets.';
+  addSourceTooltip = 'Add a new Source to your Scene. Includes widgets.';
+  removeSourcesTooltip = 'Remove Sources from your Scene.';
+  openSourcePropertiesTooltip = 'Open the Source Properties.';
+  addGroupTooltip = 'Add a Group so you can move multiple Sources at the same time.';
 
   private expandedFoldersIds: string[] = [];
 
@@ -24,9 +33,10 @@ export default class SourceSelector extends Vue {
   };
 
   get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
-
     // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
-    const getSlVueTreeNodes = ((sceneNodes: TSceneNode[]): ISlTreeNodeModel<ISceneItemNode>[] => {
+    const getSlVueTreeNodes = (
+      sceneNodes: TSceneNode[]
+    ): ISlTreeNodeModel<ISceneItemNode>[] => {
       return sceneNodes.map(sceneNode => {
         return {
           title: sceneNode.name,
@@ -34,14 +44,15 @@ export default class SourceSelector extends Vue {
           isLeaf: sceneNode.isItem(),
           isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
           data: sceneNode.getModel(),
-          children: sceneNode.isFolder() ? getSlVueTreeNodes(sceneNode.getNodes()) : null
+          children: sceneNode.isFolder()
+            ? getSlVueTreeNodes(sceneNode.getNodes())
+            : null
         };
       });
-    });
+    };
 
     return getSlVueTreeNodes(this.scene.getRootNodes());
   }
-
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -64,12 +75,12 @@ export default class SourceSelector extends Vue {
 
   showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
     const sceneNode = this.scene.getNode(sceneNodeId);
-    const menuOptions = sceneNode ?
-      ({
-        selectedSceneId: this.scene.id,
-        showSceneItemMenu: true
-      }) :
-      ({ selectedSceneId: this.scene.id });
+    const menuOptions = sceneNode
+      ? {
+          selectedSceneId: this.scene.id,
+          showSceneItemMenu: true
+        }
+      : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);
     menu.popup();
@@ -88,13 +99,18 @@ export default class SourceSelector extends Vue {
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
     const sceneNode = this.selectionService.getLastSelected();
-    return (sceneNode && sceneNode.sceneNodeType === 'item') ?
-      sceneNode.getSource().hasProps() :
-      false;
+    return sceneNode && sceneNode.sceneNodeType === 'item'
+      ? sceneNode.getSource().hasProps()
+      : false;
   }
 
-  handleSort(treeNodesToMove: ISlTreeNode<ISceneItemNode>[], position: ICursorPosition<TSceneNode>) {
-    const nodesToMove = this.scene.getSelection(treeNodesToMove.map(node => node.data.id))
+  handleSort(
+    treeNodesToMove: ISlTreeNode<ISceneItemNode>[],
+    position: ICursorPosition<TSceneNode>
+  ) {
+    const nodesToMove = this.scene.getSelection(
+      treeNodesToMove.map(node => node.data.id)
+    );
 
     const destNode = this.scene.getNode(position.node.data.id);
 
@@ -116,7 +132,10 @@ export default class SourceSelector extends Vue {
   toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
     const nodeId = treeNode.data.id;
     if (treeNode.isExpanded) {
-      this.expandedFoldersIds.splice(this.expandedFoldersIds.indexOf(nodeId), 1);
+      this.expandedFoldersIds.splice(
+        this.expandedFoldersIds.indexOf(nodeId),
+        1
+      );
     } else {
       this.expandedFoldersIds.push(nodeId);
     }
@@ -146,8 +165,8 @@ export default class SourceSelector extends Vue {
     const visible = selection.isVisible();
 
     return {
-      'fa-eye': visible,
-      'fa-eye-slash': !visible
+      'icon-view': visible,
+      'icon-hide': !visible
     };
   }
 
@@ -156,8 +175,8 @@ export default class SourceSelector extends Vue {
     const locked = selection.isLocked();
 
     return {
-      'fa-lock': locked,
-      'fa-unlock': !locked
+      'icon-lock': locked,
+      'icon-unlock': !locked
     };
   }
 
@@ -170,5 +189,4 @@ export default class SourceSelector extends Vue {
   get scene() {
     return this.scenesService.activeScene;
   }
-
 }

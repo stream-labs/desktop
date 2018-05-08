@@ -9,7 +9,7 @@
         @keypress="handleKeypress"
         v-model="editableName" />
       <i class="fa fa-check" @click.stop="submitRename" />
-      <i class="fa fa-times" @click.stop="cancelRename" v-if="!needsRename" />
+      <i class="icon-times" @click.stop="cancelRename" v-if="!needsRename" />
     </div>
     <div v-else>
       {{ collection.name }}

@@ -1,20 +1,20 @@
-import { StatefulService, mutation } from '../stateful-service';
-import { OnboardingService } from '../onboarding';
-import { HotkeysService } from '../hotkeys';
-import { UserService } from '../user';
-import { ShortcutsService } from '../shortcuts';
-import { Inject } from '../../util/injector';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { OnboardingService } from 'services/onboarding';
+import { HotkeysService } from 'services/hotkeys';
+import { UserService } from 'services/user';
+import { ShortcutsService } from 'services/shortcuts';
+import { Inject } from 'util/injector';
 import electron from 'electron';
-import { ScenesTransitionsService } from '../scenes-transitions';
-import { SourcesService } from '../sources';
-import { ScenesService } from '../scenes';
-import { VideoService } from '../video';
-import { StreamInfoService } from '../stream-info';
-import { track } from '../usage-statistics';
-import { IpcServerService } from '../ipc-server';
-import { TcpServerService } from '../tcp-server';
-import { StreamlabelsService } from '../streamlabels';
-import { PerformanceMonitorService } from '../performance-monitor';
+import { TransitionsService } from 'services/transitions';
+import { SourcesService } from 'services/sources';
+import { ScenesService } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { StreamInfoService } from 'services/stream-info';
+import { track } from 'services/usage-statistics';
+import { IpcServerService } from 'services/ipc-server';
+import { TcpServerService } from 'services/tcp-server';
+import { StreamlabelsService } from 'services/streamlabels';
+import { PerformanceMonitorService } from 'services/performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
@@ -47,7 +47,7 @@ export class AppService extends StatefulService<IAppState> {
 
   private autosaveInterval: number;
 
-  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() videoService: VideoService;
@@ -110,7 +110,7 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
-      this.scenesTransitionsService.reset();
+      this.transitionsService.reset();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');

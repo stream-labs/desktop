@@ -49,13 +49,13 @@ export class EditMenu extends Menu {
         label: 'Paste (Reference)',
         enabled: this.clipboardService.hasItems(),
         accelerator: 'CommandOrControl+V',
-        click: () => this.clipboardService.pasteReference()
+        click: () => this.clipboardService.paste()
       });
 
       this.append({
         label: 'Paste (Duplicate)',
         enabled: this.clipboardService.hasItems(),
-        click: () => this.clipboardService.pasteDuplicate()
+        click: () => this.clipboardService.paste(true)
       });
     }
 

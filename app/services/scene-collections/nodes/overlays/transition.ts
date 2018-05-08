@@ -1,12 +1,12 @@
 import { Node } from '../node';
-import { ScenesTransitionsService } from 'services/scenes-transitions';
+import { TransitionsService, ETransitionType } from 'services/transitions';
 import { Inject } from 'util/injector';
 import { uniqueId } from 'lodash';
 import path from 'path';
 import fs from 'fs';
 
 interface ISchema {
-  type: string;
+  type: ETransitionType;
   duration: number;
   settings?: Dictionary<any>;
 }
@@ -18,8 +18,7 @@ interface IContext {
 export class TransitionNode extends Node<ISchema, IContext> {
   schemaVersion = 1;
 
-  @Inject('ScenesTransitionsService')
-  transitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
 
   async save(context: IContext) {
     const type = this.transitionsService.state.type;

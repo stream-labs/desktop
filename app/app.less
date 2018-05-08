@@ -39,11 +39,11 @@ h3 {
 h4 {
   font-family: 'Roboto';
   text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: .7px;
+  font-size: 13px;
+  .letter-spacing;
   .semibold;
   margin-bottom: 20px;
-  color: @grey;
+  color: @day-title;
 }
 
 .label--essential {
@@ -72,7 +72,7 @@ h4 {
   }
 
   .fa,
-  .ico {
+  i {
     margin-right: 6px;
     font-size: 15px;
   }
@@ -97,39 +97,6 @@ h4 {
 
 .label--icon {
   margin-right: 4px;
-}
-
-// Wrap classes 'dropdown__toggle' and 'dropdown__menu' in class 'dropdown'
-// On 'dropdown__toggle' use @click="showDropdown = !showDropdown"
-// On 'dropdown__menu' use v-if="showDropdown"
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown__toggle {
-  .semibold;
-  color: @grey;
-  text-transform: uppercase;
-  letter-spacing: .7px;
-
-  .fa {
-    font-size: 8px;
-    vertical-align: middle;
-    margin-bottom: 2px;
-  }
-}
-
-.dropdown__menu {
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: @white;
-  padding: 8px;
-  min-width: 100px;
-  text-align: left;
-  border-radius: 3px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.2);
 }
 
 .select {
@@ -243,7 +210,8 @@ h4 {
 
 .slide-open__open,
 .slide-open__close {
-  .fa {
+  .fa,
+  i {
     font-size: 12px;
   }
 }
@@ -264,7 +232,8 @@ h4 {
   color: @grey;
   .transition;
 
-  .fa {
+  .fa,
+  i {
     margin-right: 4px;
     font-size: 15px;
     vertical-align: middle;
@@ -275,7 +244,8 @@ h4 {
     border-color: @navy;
     color: @navy;
 
-    .fa {
+    .fa,
+    i {
       color: @navy;
     }
   }
@@ -405,6 +375,10 @@ th {
     color: @grey;
   }
 
+  h4 {
+    color: @white;
+  }
+
   .checkbox {
     input:checked~label {
       color: @white;
@@ -424,17 +398,14 @@ th {
     }
   }
 
-  .dropdown__menu {
-    background-color: @night-accent-light;
-  }
-
   .slide-open__menu {
     background-color: @night-primary;
   }
 
   .slide-open__close {
     &:hover {
-      .fa {
+      .fa,
+      i {
         color: @white;
       }
     }
@@ -446,7 +417,8 @@ th {
       color: @white;
       border-bottom-color: @white;
 
-      .fa {
+      .fa,
+      i {
         color: @white;
       }
     }

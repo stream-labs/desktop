@@ -23,7 +23,7 @@ export async function closeFilterProperties(t) {
 
 export async function addFilter(t, sourceName, filterType, filterName) {
   await openFiltersWindow(t, sourceName);
-  await t.context.app.client.click('.fa-plus');
+  await t.context.app.client.click('.icon-add');
   await setFormDropdown(t, 'Filter type', filterType);
   if (filterType !== filterName) {
     await setFormInput(t, 'Filter name', filterName);
@@ -35,6 +35,6 @@ export async function addFilter(t, sourceName, filterType, filterName) {
 export async function removeFilter(t, sourceName, filterName) {
   await openFiltersWindow(t, sourceName);
   await t.context.app.client.click(`li=${filterName}`);
-  await t.context.app.client.click('.fa-minus');
+  await t.context.app.client.click('.icon-subtract');
   await t.context.app.client.click('button=Done');
 }

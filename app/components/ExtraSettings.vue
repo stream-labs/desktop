@@ -4,12 +4,12 @@
     <p>{{ $t('If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.')}}</p>
     <div class="margin-bot--20">
       <a class="link link--underlined" @click="showCacheDir">
-        <i class="fa fa-eye" /> <span>{{ $t('Show Cache Directory')}}</span>
+        <i class="icon-view" /> <span>{{ $t('Show Cache Directory')}}</span>
       </a>
     </div>
     <div class="margin-bot--20">
       <a class="link link--underlined" @click="deleteCacheDir">
-        <i class="fa fa-trash" /> <span>{{ $t('Delete Cache and Restart') }}</span></a>
+        <i class="icon-trash" /> <span>{{ $t('Delete Cache and Restart') }}</span></a>
     </div>
     <div class="margin-bot--20">
       <a class="link link--underlined" @click="uploadCacheDir" :disabled="cacheUploading">

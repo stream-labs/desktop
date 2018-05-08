@@ -4,8 +4,7 @@
     class="projector-fullscreen"
     @keydown="exitFullscreen"
     v-if="fullscreen">
-    <source-preview v-if="sourceId" :source-id="sourceId" />
-    <display v-else :drawUI="false" :padding-size="0" />
+    <display :source-id="sourceId" />
   </div>
   <modal-layout
     v-else
@@ -22,8 +21,7 @@
           Fullscreen Display {{ index + 1 }}: {{ display.size.width }}x{{ display.size.height }}
         </button>
       </div>
-      <source-preview v-if="sourceId" :source-id="sourceId" />
-      <display v-else :drawUI="false" :padding-size="0" />
+      <display :source-id="sourceId" />
     </div>
   </modal-layout>
 </div>
