@@ -13,5 +13,8 @@
   "Are you sure you want to remove %collectionName%?": "Are you sure you want to remove %collectionName%?",
   "Create Scene Projector": "Create Scene Projector",
   "Preview is disabled in performance mode": "Preview is disabled in performance mode",
-  "Your preview is currently disabled": "Your preview is currently disabled"
+  "Your preview is currently disabled": "Your preview is currently disabled",
+  "Are you sure you want to remove %sceneName%?": "Are you sure you want to remove %sceneName%?",
+  "Performance Mode": "Performance Mode",
+  "Create Output Projector": "Create Output Projector"
 }
