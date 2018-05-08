@@ -41,7 +41,7 @@
   .fa,
   i {
     margin-left: 6px;
-    font-size: 7px;
+    font-size: 6px;
   }
 }
 
