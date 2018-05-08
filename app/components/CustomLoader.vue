@@ -1,23 +1,17 @@
 <template>
-  <!-- LOADER 1 -->
   <div class="loader">
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
        viewBox="0 0 189.3 152.1" style="enable-background:new 0 0 189.3 152.1;" xml:space="preserve">
-
     <g id="Layer_2">
       <path class="st0 teal-bg" d="M141.5,21.3c5.1,0,9.3,4.2,9.4,9.3v80.6c0,5.1-4.2,9.3-9.3,9.3H85.5c-1,0-2,0.4-2.7,1.1l-15.5,15.6v-12.9
-        c0-2.1-1.7-3.8-3.8-3.8H49.3c-5.1,0-9.3-4.2-9.3-9.3V30.6c0-5.1,4.2-9.3,9.3-9.3H141.5"> 
+        c0-2.1-1.7-3.8-3.8-3.8H49.3c-5.1,0-9.3-4.2-9.3-9.3V30.6c0-5.1,4.2-9.3,9.3-9.3H141.5">
         <animate
           dur="3s"
-          values="#32C3A2;
-                  #4e86b1;
-                  #7a62e5;
-                  #f475b5;
-                  #ff7c26;
-                  #f7e307;
-                  #36e286;"
-          keyTimes="0; 0.17; 0.32; 0.55; 0.7; 0.85; 1"
-          attributeName="fill"
+          values="0.1;
+                  1;
+                  0.1;"
+          keyTimes="0; 0.5; 1"
+          attributeName="fill-opacity"
           repeatCount="indefinite"/>
       </path>
     </g>

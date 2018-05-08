@@ -51,6 +51,7 @@ declare module 'vue-popperjs';
 declare module 'vue-slider-component';
 declare module 'vuedraggable';
 declare module 'font-manager';
+declare module 'vue-tabs-component'
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

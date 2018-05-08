@@ -7,19 +7,22 @@ import { UserService } from 'services/user';
 import electron from 'electron';
 import Login from 'components/Login.vue';
 import { SettingsService } from 'services/settings';
+import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 
 @Component({
-  components: { Login }
+  components: {
+    Login
+  }
 })
 export default class TopNav extends Vue {
-
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
+  @Inject() windowsService: WindowsService;
 
   slideOpen = false;
 
@@ -61,6 +64,18 @@ export default class TopNav extends Vue {
     this.settingsService.showSettings();
   }
 
+  // Morgan add
+  openWidgetSettingsWindow(widgetName?: string) {
+    this.windowsService.showWindow({
+      componentName: 'WidgetSettings',
+      queryParams: { widgetName },
+      size: {
+        width: 800,
+        height: 800
+      }
+    });
+  }
+
   toggleNightTheme() {
     this.customizationService.nightMode = !this.customizationService.nightMode;
   }
@@ -88,5 +103,4 @@ export default class TopNav extends Vue {
   get isUserLoggedIn() {
     return this.userService.isLoggedIn();
   }
-
 }

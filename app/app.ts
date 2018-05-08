@@ -17,6 +17,8 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import { Tabs, Tab } from 'vue-tabs-component';
+import VeeValidate from 'vee-validate';
 
 const { ipcRenderer, remote } = electron;
 
@@ -79,6 +81,13 @@ require('./app.less');
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
+
+// Initiates tabs
+Vue.component('tabs', Tabs);
+Vue.component('tab', Tab);
+
+// Intiated form validator
+Vue.use(VeeValidate);
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());

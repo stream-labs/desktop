@@ -9,7 +9,6 @@ import { CustomizationService } from 'services/customization';
 import Slider from 'components/shared/Slider.vue';
 import VTooltip from 'v-tooltip';
 
-
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
 
@@ -18,7 +17,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     SceneSelector,
     Mixer,
     Display,
-    Slider
+    Slider,
   }
 })
 export default class Live extends Vue {

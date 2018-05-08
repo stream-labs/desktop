@@ -40,6 +40,14 @@
 
   <div class="top-nav-right">
     <div class="top-nav-item">
+      <a
+        @click="openWidgetSettingsWindow"
+        class="link link--uppercase">
+        <i class="fa fa-times"/><span>Widget Settings</span>
+      </a>
+    </div>
+
+    <div class="top-nav-item">
       <button @click="toggleNightTheme" class="theme-toggle">
         <div class="theme-toggle__bg"></div>
         <img class="theme-toggle__icon theme-toggle__icon--moon" src="../../media/images/moon.png"/>
