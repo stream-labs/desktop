@@ -14,7 +14,6 @@ import { TransitionsService } from 'services/transitions';
   components: { Login }
 })
 export default class TopNav extends Vue {
-
   @Inject() settingsService: SettingsService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
@@ -22,6 +21,8 @@ export default class TopNav extends Vue {
   @Inject() transitionsService: TransitionsService;
 
   slideOpen = false;
+
+  studioModeTooltip = 'Studio Mode';
 
   @Prop() locked: boolean;
 
@@ -88,5 +89,4 @@ export default class TopNav extends Vue {
   get isUserLoggedIn() {
     return this.userService.isLoggedIn();
   }
-
 }
