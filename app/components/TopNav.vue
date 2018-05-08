@@ -20,21 +20,21 @@
       class="tab-button"
       :class="{ active: page === 'BrowseOverlays' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="fa fa-image"/> {{ $t('Library') }}}
+      <i class="fa fa-image"/> {{ $t('Library') }}
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
       :class="{ active: page === 'Studio' }"
       :disabled="locked">
-      <i class="fa fa-object-group"/> {{ $t('Editor') }}}
+      <i class="fa fa-object-group"/> {{ $t('Editor') }}
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
       :class="{ active: page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="fa fa-feed"/> {{ $t('Live') }}}
+      <i class="fa fa-feed"/> {{ $t('Live') }}
     </button>
   </div>
 

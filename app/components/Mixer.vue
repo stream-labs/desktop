@@ -2,7 +2,7 @@
 <div>
   <div class="studio-controls-top">
     <h4 class="studio-controls__label">
-      $t('Mixer')
+      {{ $t('Mixer') }}
     </h4>
     <div>
       <i

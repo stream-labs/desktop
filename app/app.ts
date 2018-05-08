@@ -108,31 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window['obs'] = obsApiService.nodeObs;
 
-  storePromise.then(store => {
+  storePromise.then(async store => {
 
     Vue.use(VueI18n);
 
+    await i18nService.load();
+
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
-      fallbackLocale: 'en-US',
-      // messages: {
-      //   'en-Us': {
-      //     "Scene": "Scene",
-      //     "Scenes": "Scenes",
-      //     "Source": "Source",
-      //     "Sources": "Sources",
-      //
-      //     "General": "General"
-      //   },
-      //   'ru-Ru': {
-      //     "Scene": "Сцена",
-      //     "Scenes": "Сцены",
-      //     "Source": "Источник",
-      //     "Sources": "Источники",
-      //
-      //     "General": "Общие"
-      //   }
-      // }
+      fallbackLocale: i18nService.getFallbackLocale(),
+      messages: i18nService.getLoadedDictionaries()
     });
 
     I18nService.setVuei18nInstance(i18n);
@@ -150,22 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('vue instance created');
 
-    if (!Utils.isMainWindow()) {
-      i18nService.loadDictionary(i18nService.state.locale).then(dictionary => {
-        i18n.setLocaleMessage(i18nService.state.locale, dictionary);
-      });
-    }
-
-    // synchronize the locale and dictionary for all windows
-    i18nService.localeChanged.subscribe(locale => {
-      console.log('locale changed', locale);
-      i18n.locale = locale;
-    });
-
-    i18nService.dictionariesLoaded.subscribe(({ locale, dictionary }) => {
-      console.log('dictionary loaded', locale, dictionary);
-      i18n.setLocaleMessage(locale, dictionary);
-    });
   });
 
   // Used for replacing the contents of this window with

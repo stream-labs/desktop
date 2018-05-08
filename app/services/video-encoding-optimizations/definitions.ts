@@ -36,15 +36,19 @@ export interface IProfile {
 const CPU_profile: IProfile = {
   profile: 'CPU',
   description: 'Medium',
-  longDescription: $t('Optimized profile for average CPUs'),
-  preset: PresetType.veryfast
+  preset: PresetType.veryfast,
+  get longDescription() {
+    return $t('Optimized profile for average CPUs');
+  }
 };
 
 const VQ_profile: IProfile = {
   profile: 'VQ',
   description: 'Low',
-  longDescription: $t('Optimized profile for weak CPUs'),
-  preset: PresetType.ultrafast
+  preset: PresetType.ultrafast,
+  get longDescription() {
+    return $t('Optimized profile for weak CPUs');
+  }
 };
 
 export interface IEncoderPreset {

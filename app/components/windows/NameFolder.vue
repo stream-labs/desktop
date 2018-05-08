@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameSource-label">
-      $t('Please enter the name of the folder')
+      {{ $t('Please enter the name of the folder') }}
     </p>
     <p
       v-if="error"

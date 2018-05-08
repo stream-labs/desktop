@@ -25,5 +25,10 @@
   "Are you sure you want to log out?": "Are you sure you want to log out?",
   "Name": "Name",
   "Delete": "Delete",
-  "Continue": "Continue"
+  "Continue": "Continue",
+  "Login": "Login",
+  "Yes": "Yes",
+  "No": "No",
+  "Confirm": "Confirm"
+
 }

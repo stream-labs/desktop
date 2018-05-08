@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
 import { AutoConfigService, IConfigProgress } from '../../../services/auto-config';
-import { $t } from 'ervices/i18n';
+import { $t } from 'services/i18n';
 
 interface IConfigStepPresentation {
   description: string;
