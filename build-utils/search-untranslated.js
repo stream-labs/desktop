@@ -26,7 +26,7 @@ const recursive = require('recursive-readdir');
 
   const sourceFiles = await recursive('./app', ['*.txt']);
 
-
+  // check missed strings in the sources files
   sourceFiles.forEach(filePath => {
     const foundStrings = [];
     const missedStrings = [];
