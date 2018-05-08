@@ -76,7 +76,7 @@
 }
 
 .NameSource-label__error {
-  color: red;
+  color: @red;
 }
 
 .sources-container {

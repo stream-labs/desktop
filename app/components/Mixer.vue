@@ -1,14 +1,16 @@
 <template>
 <div>
   <div class="studio-controls-top">
-    <h4 class="studio-controls__label">
+    <h4
+      class="studio-controls__label"
+      v-tooltip.bottom="mixerTooltip">
       Mixer
     </h4>
     <div>
       <i
-        class="fa fa-cog icon-btn"
+        class="icon-settings icon-btn"
         @click="showAdvancedSettings()"
-        v-tooltip.left="advancedSettingsTooltip"/>
+        v-tooltip.bottom="advancedSettingsTooltip"/>
     </div>
   </div>
   <div class="studio-controls-selector mixer-panel">

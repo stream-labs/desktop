@@ -28,13 +28,13 @@
 
     <div>
       <i
-        class="fa fa-plus icon-btn icon-btn--lg"
+        class="icon-add icon-btn icon-btn--lg"
         @click="addScene"/>
       <i
-        class="fa fa-minus icon-btn icon-btn--lg"
+        class="icon-subtract icon-btn icon-btn--lg"
         @click="removeScene"/>
       <i
-        class="fa fa-cog icon-btn icon-btn--lg"
+        class="icon-settings icon-btn icon-btn--lg"
         @click="showTransitions"/>
     </div>
   </div>

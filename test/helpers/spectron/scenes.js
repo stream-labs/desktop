@@ -10,16 +10,16 @@ async function clickSceneAction(t, selector) {
 }
 
 export async function clickAddScene(t) {
-  await clickSceneAction(t, '.fa-plus');
+  await clickSceneAction(t, '.icon-add');
 }
 
 export async function clickRemoveScene(t) {
-  await clickSceneAction(t, '.fa-minus');
+  await clickSceneAction(t, '.icon-subtract');
   await dialogDismiss(t, 'OK');
 }
 
 export async function clickSceneTransitions(t) {
-  await clickSceneAction(t, '.fa-cog');
+  await clickSceneAction(t, '.icon-settings');
 }
 
 export async function selectScene(t, name) {

@@ -41,7 +41,7 @@
 .studio-controls__label {
   margin-bottom: 0;
   .semibold;
-  color: @grey;
+  color: @day-title;
 }
 
 .studio-controls-selector {
@@ -56,6 +56,10 @@
   .studio-controls-selector {
     background: @navy-secondary;
     border-color: @navy-secondary;
+  }
+
+  .studio-controls__label {
+    color: @white;
   }
 }
 </style>
