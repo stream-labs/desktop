@@ -133,8 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    console.log('vue instance created');
-
   });
 
   // Used for replacing the contents of this window with
