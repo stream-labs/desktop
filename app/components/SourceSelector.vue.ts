@@ -19,10 +19,10 @@ export default class SourceSelector extends Vue {
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
 
-  layersTooltip = 'The building blocks of your scene. Also contains widgets.';
-  addLayerTooltip = 'Add a new Source to your Scene. Includes widgets.';
-  removeLayersTooltip = 'Remove Sources from your Scene.';
-  openLayerPropertiesTooltip = 'Open the Layer Properties.';
+  sourcesTooltip = 'The building blocks of your scene. Also contains widgets.';
+  addSourceTooltip = 'Add a new Source to your Scene. Includes widgets.';
+  removeSourcesTooltip = 'Remove Sources from your Scene.';
+  openSourcePropertiesTooltip = 'Open the Source Properties.';
   addGroupTooltip = 'Add a Group so you can move multiple Sources at the same time.';
 
   private expandedFoldersIds: string[] = [];

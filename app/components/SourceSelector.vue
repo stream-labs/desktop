@@ -1,7 +1,7 @@
 <template>
   <div class="source-selector">
     <div class="studio-controls-top">
-      <h4 class="studio-controls__label" v-tooltip.bottom="layersTooltip">
+      <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
         Sources
       </h4>
       <div>
@@ -12,20 +12,30 @@
         <i
           class="icon-add icon-btn icon-btn--lg"
           @click="addSource"
-          v-tooltip.bottom="addLayerTooltip" />
+          v-tooltip.bottom="addSourceTooltip" />
         <i
           class="icon-subtract icon-btn icon-btn--lg"
           :class="{ disabled: activeItemIds.length === 0}" @click="removeItems"
-          v-tooltip.bottom="removeLayersTooltip" />
+          v-tooltip.bottom="removeSourcesTooltip" />
         <i
           :class="{ disabled: !canShowProperties()}"
           class="icon-settings icon-btn"
           @click="sourceProperties"
-          v-tooltip.bottom="openLayerPropertiesTooltip" />
+          v-tooltip.bottom="openSourcePropertiesTooltip" />
       </div>
     </div>
 
-    <sl-vue-tree :value="nodes" ref="slVueTree" @select="makeActive" @drop="handleSort" @toggle="toggleFolder" @contextmenu.native="showContextMenu()" @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)" @nodedblclick="node => sourceProperties(node.data.id)" :scrollAreaHeight="50" :maxScrollSpeed="15">
+    <sl-vue-tree
+      :value="nodes"
+      ref="slVueTree"
+      @select="makeActive"
+      @drop="handleSort"
+      @toggle="toggleFolder"
+      @contextmenu.native="showContextMenu()"
+      @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)"
+      @nodedblclick="node => sourceProperties(node.data.id)"
+      :scrollAreaHeight="50"
+      :maxScrollSpeed="15">
 
       <template slot="title" slot-scope="{ node }">
         <div class="title-container">

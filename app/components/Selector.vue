@@ -16,7 +16,6 @@
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
-        <!--<i v-if="draggable" class="icon-btn icon-move selector-drag-handle"/>-->
       </div>
     </li>
   </draggable>
