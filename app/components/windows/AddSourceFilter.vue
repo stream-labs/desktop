@@ -1,6 +1,6 @@
 <template>
   <modal-layout
-    title="Add layer filter"
+    title="Add source filter"
     :done-handler="done"
     :cancel-handler="cancel"
   >

@@ -22,8 +22,8 @@
 
 .night-theme {
   .nav-menu {
-    border-color: @night-secondary;
-    background-color: @night-secondary;
+    border-color: @night-border;
+    background-color: @night-primary;
   }
 }
 </style>
