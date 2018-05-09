@@ -12,7 +12,7 @@
           <p
             v-if="!error"
             class="NameSource-label">
-            $t('Please enter the name of the source')
+            {{ $t('Please enter the name of the source') }}
           </p>
           <p v-if="error"
             class="NameSource-label NameSource-label__error">
@@ -23,7 +23,7 @@
       </div>
       <div class="row">
         <div class="columns small-12 buttons">
-          <button @click="addNew" class="button button--action">$t('Add New Source')</button>
+          <button @click="addNew" class="button button--action">{{ $t('Add New Source') }}</button>
         </div>
       </div>
     </div>
@@ -31,11 +31,11 @@
     <div class="row">
       <div class="columns small-12">
         <h4>
-          $t('Add Existing Source')
+          {{ $t('Add Existing Source') }}
           <span
             v-if="propertiesManager === 'widget'"
             class="recommended-label">
-            $t('Recommended')
+            {{ $t('Recommended') }}
           </span>
         </h4>
       </div>
@@ -58,7 +58,7 @@
 
     <div class="row">
       <div class="columns small-12 buttons">
-        <button @click="addExisting" class="button button--action">$t('Add Existing Source')</button>
+        <button @click="addExisting" class="button button--action">{{ $t('Add Existing Source') }}</button>
       </div>
     </div>
   </div>

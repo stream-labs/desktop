@@ -91,7 +91,7 @@
   "Add Existing Source": "Add Existing Source",
   "Recommended": "Recommended",
   "Please enter the name of the folder": "Please enter the name of the folder",
-  "Properties for %sourceName%": "Properties for %sourceName%",
+  "Properties for %{sourceName}": "Properties for %{sourceName}",
   "Supports": "Supports",
   "Widget Type": "Widget Type",
   "Configure": "Configure",

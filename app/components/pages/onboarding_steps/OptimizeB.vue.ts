@@ -56,7 +56,7 @@ export default class OptimizeB extends Vue {
   summaryForStep(progress: IConfigProgress) {
     return {
       detecting_location: $t('Detecting your location ...'),
-      location_found: $t('Detected %continent%', { continent: progress.continent }),
+      location_found: $t('Detected %{continent}', { continent: progress.continent }),
       bandwidth_test: $t('Performing bandwidth test ...'),
       streamingEncoder_test: $t('Testing streaming encoder ...'),
       recordingEncoder_test: $t('Testing recording encoder ...'),

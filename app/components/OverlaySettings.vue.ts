@@ -34,7 +34,7 @@ export default class OverlaySettings extends Vue {
     // TODO: Expose progress to the user
     this.overlaysPersistenceService.saveOverlay(chosenPath).then(() => {
       this.busy = false;
-      this.message = $t('Successfully saved %filename%', { filename: path.parse(chosenPath).base });
+      this.message = $t('Successfully saved %{filename}', { filename: path.parse(chosenPath).base });
     });
   }
 
@@ -53,7 +53,7 @@ export default class OverlaySettings extends Vue {
 
     this.sceneCollectionsService.loadOverlay(chosenPath[0], configName).then(() => {
       this.busy = false;
-      this.message = $t('Successfully loaded %filename%.overlay', { filename });
+      this.message = $t('Successfully loaded %{filename}.overlay', { filename });
     });
   }
 

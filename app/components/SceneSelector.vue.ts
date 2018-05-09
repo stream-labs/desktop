@@ -76,7 +76,7 @@ export default class SceneSelector extends Vue {
       electron.remote.getCurrentWindow(),
       {
         type: 'warning',
-        message: $t('Are you sure you want to remove %sceneName%?', { sceneName: name }),
+        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
         buttons: [$t('Cancel'), $t('OK')]
       },
       ok => {

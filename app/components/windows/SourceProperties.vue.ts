@@ -72,7 +72,7 @@ export default class SourceProperties extends Vue {
 
   get windowTitle() {
     const source = this.sourcesService.getSource(this.sourceId);
-    return source ? $t('Properties for %sourceName%', { sourceName: source.name }) : '';
+    return source ? $t('Properties for %{sourceName}', { sourceName: source.name }) : '';
   }
 
 }

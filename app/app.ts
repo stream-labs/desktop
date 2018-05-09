@@ -112,7 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Vue.use(VueI18n);
 
+    console.log('start loading i18n');
     await i18nService.load();
+    console.log('finish loading i18n');
 
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
@@ -120,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
       messages: i18nService.getLoadedDictionaries()
     });
 
+    console.log('set instance');
     I18nService.setVuei18nInstance(i18n);
 
     const vm = new Vue({

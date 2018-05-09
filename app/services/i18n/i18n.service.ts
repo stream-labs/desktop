@@ -17,7 +17,12 @@ interface II18nState {
 const I18N_PATH = path.resolve('app/i18n');
 
 export function $t(...args: any[]) {
-  return I18nService.vueI18nInstance.t.call(
+  const vueI18nInstance = I18nService.vueI18nInstance;
+
+  // some tests try to call this function before dictionaries have been loaded
+  if (!vueI18nInstance) return args[0];
+
+  return vueI18nInstance.t.call(
     I18nService.vueI18nInstance,
     ...args
   );
@@ -55,7 +60,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   static vueI18nInstance: VueI18n;
 
   static setVuei18nInstance(instance: VueI18n) {
-    this.vueI18nInstance = instance;
+    I18nService.vueI18nInstance = instance;
   }
 
   private availableLocales: Dictionary<string> = {};

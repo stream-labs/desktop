@@ -4,6 +4,7 @@ import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { sleep } from '../sleep';
 
 const path = require('path');
 const fs = require('fs');
@@ -72,6 +73,8 @@ export function useSpectron(options: ITestRunnerOptions) {
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
+
+    // await sleep(100000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
