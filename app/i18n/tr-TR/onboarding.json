@@ -15,7 +15,7 @@
   "Rather do this manually?": "Rather do this manually?",
   "Setup later": "Setup later",
   "Detecting your location ...": "Detecting your location ...",
-  "Detected %continent%": "Detected %continent%",
+  "Detected %{continent}": "Detected %{continent}",
   "Performing bandwidth test ...": "Performing bandwidth test ...",
   "Testing streaming encoder ...": "Testing streaming encoder ...",
   "Testing recording encoder ...": "Testing recording encoder ...",
