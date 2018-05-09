@@ -476,11 +476,11 @@
       v-if="inspectedSource === null">
       <div class="source-welcome">
         <div class="source-info__text">
-          <h3>Welcome to sources!</h3>
+          <h3>Welcome to Sources!</h3>
           <ol>
-            <li>Browse through our Standard and Widget sources</li>
-            <li>Click a source to get more details about it</li>
-            <li>Click 'Add Source' when you're ready to add it to your scene</li>
+            <li>Browse through our Standard and Widget Sources</li>
+            <li>Click a Source to get more details about it</li>
+            <li>Click 'Add Source' when you're ready to add it to your Scene</li>
           </ol>
         </div>
         <div class="source-info__media">

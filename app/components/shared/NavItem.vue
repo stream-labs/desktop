@@ -4,7 +4,7 @@
   :class="{ active: to === value, disabled: enabled == false }"
   @click="onClickHandler"
 >
-  <i v-if="ico" :class="'fa fa-' + ico" @click="onIconClickHandler"></i>
+  <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
   <slot></slot>
 </li>
 </template>
@@ -29,7 +29,8 @@
     border-color: @navy;
     color: @navy;
 
-    .fa {
+    .fa,
+    i {
       color: @navy;
     }
   }
@@ -43,7 +44,8 @@
     cursor: default;
   }
 
-  .fa {
+  .fa,
+  i {
     color: #999;
     position: relative;
     margin-right: -15px;
@@ -56,7 +58,8 @@
       border-color: @white;
       color: @white;
 
-      .fa {
+      .fa,
+      i {
         color: @white;
       }
     }

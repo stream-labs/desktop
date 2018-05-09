@@ -6,7 +6,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i class="fa fa-chevron-down"/>
+      {{ title }} <i class="icon-down"/>
     </button>
 
   </popper>
@@ -33,15 +33,15 @@
   display: flex;
   align-items: center;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 13px;
   .semibold;
-  color: @grey;
+  color: @day-title;
   letter-spacing: .7px;
 
-  .fa {
+  .fa,
+  i {
     margin-left: 6px;
-    font-size: 9px;
-    margin-top: -2px;
+    font-size: 6px;
   }
 }
 
@@ -75,6 +75,10 @@
     &.active {
       color: @white;
     }
+  }
+
+  .dropdown-menu__toggle {
+    color: @white;
   }
 }
 </style>

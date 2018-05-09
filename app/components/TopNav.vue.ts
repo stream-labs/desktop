@@ -26,6 +26,8 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
+  studioModeTooltip = 'Studio Mode';
+
   @Prop() locked: boolean;
 
   navigateStudio() {

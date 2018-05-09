@@ -53,7 +53,13 @@ export function useSpectron(options: ITestRunnerOptions) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: ['--require', path.join(__dirname, 'context-menu-injected.js'), '.'],
+      args: [
+        '--require',
+        path.join(__dirname, 'context-menu-injected.js'),
+        '--require',
+        path.join(__dirname, 'dialog-injected.js'),
+        '.'
+      ],
       env: {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir
