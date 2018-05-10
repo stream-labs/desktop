@@ -69,6 +69,7 @@
     "arch": "x64"
   },
   "dependencies": {
+    "@streamlabs/obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
     "electron-updater": "^2.21.1",
@@ -76,8 +77,8 @@
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz",
     "recursive-readdir": "^2.2.2",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.30/iojs-v1.8.4-signed.tar.gz",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"

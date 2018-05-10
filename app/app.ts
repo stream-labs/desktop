@@ -1,4 +1,4 @@
-import { I18nService } from './services/i18n';
+import { I18nService } from 'services/i18n';
 
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');

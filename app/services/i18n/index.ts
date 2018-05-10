@@ -1,2 +1,2 @@
-export * from './i18n.service';
-export * from './i18n.service-api';
+export * from './i18n';
+export * from './i18n-api';

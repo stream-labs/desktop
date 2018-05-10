@@ -7,7 +7,8 @@ import recursive from 'recursive-readdir';
 import { Inject } from '../../util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
-import { I18nServiceApi } from './i18n.service-api';
+import { I18nServiceApi } from './i18n-api';
+import * as obs from '../../../obs-api';
 
 
 interface II18nState {
@@ -100,13 +101,16 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       await this.loadDictionary(fallbackLocale);
     }
 
-    await this.SET_LOCALE(locale);
+    // setup locale in libobs
+    obs.Global.locale = locale;
+
+    this.SET_LOCALE(locale);2
 
     this.isLoaded = true;
   }
 
   getFallbackLocale() {
-    return 'en-Us';
+    return 'en-US';
   }
 
   getLoadedDictionaries() {
