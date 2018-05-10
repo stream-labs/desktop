@@ -55,8 +55,8 @@ export default class BitGoal extends Vue {
 
 
   // Comes from the data object on Streamlabs
-  // This is data that is not included in the returned settings
-  // Here is where I define defaults
+  // This is data that IS NOT included in the returned settings
+  // Where we define defaults
   settings: object = {};
   goal: string[] = [];
   has_goal: boolean = false;
