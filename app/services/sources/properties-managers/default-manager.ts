@@ -6,6 +6,7 @@ import * as input from 'components/shared/forms/Input';
 
 interface IDefaultManagerSettings {
   mediaBackup?: {
+    localId?: string;
     serverId?: number;
     originalPath?: string;
   };
@@ -21,7 +22,8 @@ export class DefaultManager extends PropertiesManager {
 
   settings: IDefaultManagerSettings;
 
-  mediaBackupId: string;
+  customUIComponent = 'DefaultManagerProperties';
+
   mediaBackupFileSetting: string;
   currentMediaPath: string;
 
@@ -46,12 +48,12 @@ export class DefaultManager extends PropertiesManager {
       return;
     }
 
-    this.getNewMediaBackupId();
+    this.ensureMediaBackupId();
     this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
 
     if (this.settings.mediaBackup.serverId && this.settings.mediaBackup.originalPath) {
       this.mediaBackupService.syncFile(
-        this.mediaBackupId,
+        this.settings.mediaBackup.localId,
         this.settings.mediaBackup.serverId,
         this.settings.mediaBackup.originalPath
       ).then(file => {
@@ -66,12 +68,10 @@ export class DefaultManager extends PropertiesManager {
   uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
 
-    this.getNewMediaBackupId();
-
     console.log(this.obsSource.settings);
 
     this.mediaBackupService.createNewFile(
-      this.mediaBackupId,
+      this.settings.mediaBackup.localId,
       this.obsSource.settings[this.mediaBackupFileSetting]
     ).then(file => {
       if (file) {
@@ -82,8 +82,9 @@ export class DefaultManager extends PropertiesManager {
     });
   }
 
-  getNewMediaBackupId() {
-    this.mediaBackupId = this.mediaBackupService.getLocalFileId();
+  ensureMediaBackupId() {
+    if (this.settings.mediaBackup.localId) return;
+    this.settings.mediaBackup.localId = this.mediaBackupService.getLocalFileId();
   }
 
   isMediaBackupSource() {

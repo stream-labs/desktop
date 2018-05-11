@@ -10,7 +10,7 @@ import electron from 'electron';
 
 const uuid = window['require']('uuid/v4');
 
-enum EMediaFileStatus {
+export enum EMediaFileStatus {
   Checking,
   Synced,
   Uploading,
@@ -51,8 +51,10 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
    * Registers a new file
    */
   async createNewFile(localId: string, filePath: string): Promise<IMediaFile> {
+    let name: string;
+
     try {
-      const name = path.parse(filePath).name;
+      name = path.parse(filePath).base;
     } catch (e) {
       console.debug(`Got unparseable path ${filePath}`);
       return null;
@@ -88,7 +90,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
    * the media from.
    */
   async syncFile(localId: string, serverId: number, originalFilePath: string): Promise<IMediaFile> {
-    const name = path.parse(originalFilePath).name;
+    const name = path.parse(originalFilePath).base;
 
     const file: IMediaFile = {
       id: localId,
@@ -225,6 +227,11 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
   @mutation()
   INSERT_FILE(file: IMediaFile) {
+    // First remove the existing one, if it is exists
+    this.state.files = this.state.files.filter(storeFile => {
+      return storeFile.id !== file.id;
+    });
+
     this.state.files.push({ ...file });
   }
 

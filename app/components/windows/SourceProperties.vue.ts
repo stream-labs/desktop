@@ -11,6 +11,7 @@ import Display from 'components/shared/Display.vue';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
+import DefaultManagerProperties from 'components/custom-source-properties/DefaultManagerProperties.vue';
 
 @Component({
   components: {
@@ -18,7 +19,8 @@ import StreamlabelProperties from 'components/custom-source-properties/Streamlab
     Display,
     GenericForm,
     WidgetProperties,
-    StreamlabelProperties
+    StreamlabelProperties,
+    DefaultManagerProperties
   },
   mixins: [windowMixin]
 })
