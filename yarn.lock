@@ -176,10 +176,6 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
-"@streamlabs/obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz", "obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz":
-  version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz#adf2fe4b40b046fa02e84b462acae5c6bab60682"
-
 "@types/archiver@^2.0.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@types/archiver/-/archiver-2.1.1.tgz#41eb1b57929a417be1ea83f884e79856e4870e19"
@@ -6341,6 +6337,10 @@ object.pick@^1.3.0:
   resolved "https://registry.yarnpkg.com/object.pick/-/object.pick-1.3.0.tgz#87a10ac4c1694bd2e1cbf53591a66141fb5dd747"
   dependencies:
     isobject "^3.0.1"
+
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.33/iojs-v1.8.4-signed.tar.gz":
+  version "0.0.1"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.33/iojs-v1.8.4-signed.tar.gz#cf4726a316da1c612ff2ea216ed6c6ede1de9295"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
