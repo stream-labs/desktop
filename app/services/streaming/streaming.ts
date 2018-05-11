@@ -226,7 +226,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = padStart(duration.seconds().toString(), 2, '0');
     const minutes = padStart(duration.minutes().toString(), 2, '0');
-    const hours = padStart(duration.hours().toString(), 2, '0');
+    const dayHours = duration.days() * 24;
+    const hours = padStart((dayHours + duration.hours()).toString(), 2, '0');
 
     return `${hours}:${minutes}:${seconds}`;
   }
