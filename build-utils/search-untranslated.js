@@ -11,7 +11,7 @@ const recursive = require('recursive-readdir');
   const dictionary = {};
 
   // load dictionary
-  const dictionaryFiles = await recursive('./app/i18n/en-US', ['*.txt']);
+  const dictionaryFiles = await recursive('./i18n/en-US', ['*.txt']);
   dictionaryFiles.forEach(filePath => {
     let fileDictionary;
     try {

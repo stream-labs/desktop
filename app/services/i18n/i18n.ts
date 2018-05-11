@@ -15,7 +15,7 @@ interface II18nState {
   locale: string;
 }
 
-const I18N_PATH = path.resolve('app/i18n');
+const I18N_PATH = path.resolve('i18n');
 
 export function $t(...args: any[]) {
   const vueI18nInstance = I18nService.vueI18nInstance;
@@ -104,7 +104,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     // setup locale in libobs
     obs.Global.locale = locale;
 
-    this.SET_LOCALE(locale);2
+    this.SET_LOCALE(locale);
 
     this.isLoaded = true;
   }

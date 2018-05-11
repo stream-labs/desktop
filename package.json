@@ -69,7 +69,6 @@
     "arch": "x64"
   },
   "dependencies": {
-    "@streamlabs/obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.32/iojs-v1.8.4-signed.tar.gz",
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
     "electron-updater": "^2.21.1",
