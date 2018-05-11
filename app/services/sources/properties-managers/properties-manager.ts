@@ -37,8 +37,8 @@ export abstract class PropertiesManager implements IPropertyManager {
    */
   constructor(public obsSource: obs.ISource, settings: Dictionary<any>) {
     this.settings = {};
-    this.init();
     this.applySettings(settings);
+    this.init();
   }
 
 

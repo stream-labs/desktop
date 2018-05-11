@@ -76,6 +76,7 @@
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.30/iojs-v1.8.4-signed.tar.gz",
+    "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
     "uuid": "^3.0.1"
@@ -85,6 +86,7 @@
     "@types/archiver": "^2.0.1",
     "@types/lodash": "^4.14.64",
     "@types/node": "^8.0.0",
+    "@types/request": "^2.47.0",
     "@types/socket.io-client": "^1.4.31",
     "@types/urijs": "^1.15.37",
     "@types/webdriverio": "^4.8.6",
