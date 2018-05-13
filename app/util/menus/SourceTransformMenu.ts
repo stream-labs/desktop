@@ -25,19 +25,7 @@ export class SourceTransformMenu extends Menu {
       }
     });
 
-    this.append({
-      label: 'Flip Vertical',
-      click: () => {
-        this.selectionService.flipY();
-      }
-    });
-
-    this.append({
-      label: 'Flip Horizontal',
-      click: () => {
-        this.selectionService.flipX();
-      }
-    });
+    this.append({ type: 'separator' });
 
     this.append({
       label: 'Stretch to Screen',
@@ -53,12 +41,46 @@ export class SourceTransformMenu extends Menu {
       }
     });
 
+    this.append({ type: 'separator' });
+
     this.append({
       label: 'Center on Screen',
       click: () => {
         this.selectionService.centerOnScreen();
       }
     });
+
+    this.append({
+      label: 'Center Horizontal',
+      click: () => {
+        this.selectionService.centerOnHorizontal();
+      }
+    });
+
+    this.append({
+      label: 'Center Vertical',
+      click: () => {
+        this.selectionService.centerOnVertical();
+      }
+    });
+
+    this.append({ type: 'separator' });
+
+    this.append({
+      label: 'Flip Vertical',
+      click: () => {
+        this.selectionService.flipY();
+      }
+    });
+
+    this.append({
+      label: 'Flip Horizontal',
+      click: () => {
+        this.selectionService.flipX();
+      }
+    });
+
+    this.append({ type: 'separator' });
 
     this.append({
       label: 'Rotate 90 Degrees CW',
@@ -80,6 +102,7 @@ export class SourceTransformMenu extends Menu {
         this.selectionService.rotate(180);
       }
     });
+
   }
 
 }
