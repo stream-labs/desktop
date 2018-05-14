@@ -22,8 +22,6 @@ export class DefaultManager extends PropertiesManager {
 
   settings: IDefaultManagerSettings;
 
-  customUIComponent = 'DefaultManagerProperties';
-
   mediaBackupFileSetting: string;
   currentMediaPath: string;
 

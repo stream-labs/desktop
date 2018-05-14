@@ -10,6 +10,7 @@
       </div>
     </div>
     <performance-metrics />
+    <global-sync-status />
     <notifications-area class="notifications-area flex--grow"/>
   </div>
 

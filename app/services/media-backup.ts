@@ -17,6 +17,11 @@ export enum EMediaFileStatus {
   Downloading
 }
 
+export enum EGlobalSyncStatus {
+  Syncing,
+  Synced
+}
+
 interface IMediaFile {
   id: string; // SLOBS ID
   serverId?: number; // Server ID
@@ -46,6 +51,19 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
    * Gets a string suitable to act as a local file id
    */
   getLocalFileId() { return uuid(); }
+
+  /**
+   * Fetches the global sync status.
+   * Will be "synced" if all files are synced
+   * Will be "syncing" if at least 1 file is syncing
+   */
+  get globalSyncStatus(): EGlobalSyncStatus {
+    const syncing = this.state.files.find(file => file.status !== EMediaFileStatus.Synced);
+
+    if (syncing) return EGlobalSyncStatus.Syncing;
+
+    return EGlobalSyncStatus.Synced;
+  }
 
   /**
    * Registers a new file

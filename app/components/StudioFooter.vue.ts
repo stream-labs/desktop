@@ -10,13 +10,15 @@ import { UserService } from '../services/user';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
+import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 
 @Component({
   components: {
     StartStreamingButton,
     TestWidgets,
     PerformanceMetrics,
-    NotificationsArea
+    NotificationsArea,
+    GlobalSyncStatus
   }
 })
 export default class StudioFooterComponent extends Vue {
