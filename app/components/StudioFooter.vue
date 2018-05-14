@@ -10,7 +10,7 @@
       </div>
     </div>
     <performance-metrics />
-    <global-sync-status />
+    <global-sync-status v-if="loggedIn" />
     <notifications-area class="notifications-area flex--grow"/>
   </div>
 

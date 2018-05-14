@@ -159,8 +159,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
 
   private async uploadFile(filePath: string) {
-    console.log('UPLOAD');
-
     const checksum = await this.getChecksum(filePath);
     const file = fs.createReadStream(filePath);
 
@@ -209,7 +207,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   }
 
   private downloadFile(url: string, serverId: number) {
-    console.log('DOWNLOAD');
     this.ensureMediaDirectory();
     const filePath = this.getMediaFilePath(serverId);
 
