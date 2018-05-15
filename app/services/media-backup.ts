@@ -28,6 +28,7 @@ interface IMediaFile {
   name: string;
   status: EMediaFileStatus;
   filePath: string;
+  syncLock: string;
 }
 
 interface IMediaBackupState {
@@ -78,11 +79,14 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       return null;
     }
 
+    const syncLock = uuid();
+
     const file: IMediaFile = {
       id: localId,
       name,
       filePath,
-      status: EMediaFileStatus.Uploading
+      status: EMediaFileStatus.Uploading,
+      syncLock
     };
 
     if (!fs.existsSync(filePath)) return null;
@@ -97,15 +101,22 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       console.error(`[Media Backup] Error uploading file: ${e}`);
 
       // We don't surface errors to the user currently
-      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      if (this.validateSyncLock(localId, syncLock)) {
+        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      }
+
       return null;
     }
 
-    const serverId = data.id;
-    file.serverId = serverId;
-    file.status = EMediaFileStatus.Synced;
-    this.UPDATE_FILE(localId, file);
-    return file;
+    if (this.validateSyncLock(localId, syncLock)) {
+      const serverId = data.id;
+      file.serverId = serverId;
+      file.status = EMediaFileStatus.Synced;
+      this.UPDATE_FILE(localId, file);
+      return file;
+    }
+
+    return null;
   }
 
   /**
@@ -120,12 +131,15 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   async syncFile(localId: string, serverId: number, originalFilePath: string): Promise<IMediaFile> {
     const name = path.parse(originalFilePath).base;
 
+    const syncLock = uuid();
+
     const file: IMediaFile = {
       id: localId,
       name,
       filePath: originalFilePath,
       serverId,
-      status: EMediaFileStatus.Checking
+      status: EMediaFileStatus.Checking,
+      syncLock
     };
 
     this.INSERT_FILE(file);
@@ -138,7 +152,9 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       console.error(`[Media Backup] Ran out of retries fetching data ${e.body}`);
 
       // At the moment, we don't surface sync errors to the user
-      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      if (this.validateSyncLock(localId, syncLock)) {
+        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      }
       return null;
     }
 
@@ -160,10 +176,12 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         }
 
         if (checksum && (checksum === data.checksum)) {
-          file.filePath = fileToCheck;
-          file.status = EMediaFileStatus.Synced;
-          this.UPDATE_FILE(localId, file);
-          return file;
+          if (this.validateSyncLock(localId, syncLock)) {
+            file.filePath = fileToCheck;
+            file.status = EMediaFileStatus.Synced;
+            this.UPDATE_FILE(localId, file);
+            return file;
+          }
         }
 
         console.debug(`[Media Backup] Got checksum mismatch: ${checksum} =/= ${data.checksum}`);
@@ -171,6 +189,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     }
 
     // We need to download a new copy of this file from the server
+    if (!this.validateSyncLock(localId, syncLock)) return null;
     this.UPDATE_FILE(localId, { status: EMediaFileStatus.Downloading });
     let downloadedPath: string;
 
@@ -180,15 +199,19 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       console.error(`[Media Backup] Error downloading file: ${e.body}`);
 
       // At the moment, we don't surface sync errors to the user
-      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      if (this.validateSyncLock(localId, syncLock)) {
+        this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      }
       return null;
     }
 
-    file.status = EMediaFileStatus.Synced;
-    file.filePath = downloadedPath;
-    this.UPDATE_FILE(localId, file);
+    if (this.validateSyncLock(localId, syncLock)) {
+      file.status = EMediaFileStatus.Synced;
+      file.filePath = downloadedPath;
+      this.UPDATE_FILE(localId, file);
 
-    return file;
+      return file;
+    }
   }
 
 
@@ -271,6 +294,16 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
         retries -= 1;
       }
     }
+  }
+
+  /**
+   * Validates that no other file has started uploading or
+   * downloading more recently for this source
+   */
+  private validateSyncLock(id: string, syncLock: string) {
+    return !!this.state.files.find(file => {
+      return ((file.id === id) && (file.syncLock === syncLock));
+    });
   }
 
   private getMediaFilePath(serverId: number) {
