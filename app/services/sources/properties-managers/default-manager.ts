@@ -84,8 +84,6 @@ export class DefaultManager extends PropertiesManager {
   uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
 
-    console.log(this.obsSource.settings);
-
     this.mediaBackupService.createNewFile(
       this.settings.mediaBackup.localId,
       this.obsSource.settings[this.mediaBackupFileSetting]

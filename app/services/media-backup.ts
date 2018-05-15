@@ -85,9 +85,9 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       status: EMediaFileStatus.Uploading
     };
 
-    this.INSERT_FILE(file);
-
     if (!fs.existsSync(filePath)) return null;
+
+    this.INSERT_FILE(file);
 
     let data: { id: number };
 
@@ -95,6 +95,10 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       data = await this.withRetry(() => this.uploadFile(filePath));
     } catch (e) {
       console.error(`[Media Backup] Error uploading file: ${e}`);
+
+      // We don't surface errors to the user currently
+      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      return null;
     }
 
     const serverId = data.id;
@@ -218,7 +222,6 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
   private getFileData(id: number) {
     return new Promise<IMediaFileDataResponse>((resolve, reject) => {
-      console.log('request');
       request({
         url: `${this.apiBase}/${id}`,
         headers: this.authedHeaders
@@ -275,7 +278,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   }
 
   private get apiBase() {
-    return `https://${this.hostsService.streamlabs}/api/v5/slobs/media`;
+    return `https://${this.hostsService.media}/api/v5/slobs/media`;
   }
 
   private get authedHeaders() {
