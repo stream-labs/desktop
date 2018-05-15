@@ -11,6 +11,7 @@ import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -24,6 +25,7 @@ import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 export default class StudioFooterComponent extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
   @Prop() locked: boolean;
 
@@ -33,6 +35,10 @@ export default class StudioFooterComponent extends Vue {
 
   toggleRecording() {
     this.streamingService.toggleRecording();
+  }
+
+  get mediaBackupOptOut() {
+    return this.customizationService.state.mediaBackupOptOut;
   }
 
   get recording() {

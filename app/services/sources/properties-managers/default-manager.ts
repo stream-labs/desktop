@@ -8,6 +8,7 @@ import { EFontStyle } from 'obs-studio-node';
 import fs from 'fs';
 import path from 'path';
 import { UserService } from 'services/user';
+import { CustomizationService } from 'services/customization';
 
 export interface IDefaultManagerSettings {
   mediaBackup?: {
@@ -25,6 +26,7 @@ export class DefaultManager extends PropertiesManager {
   @Inject() mediaBackupService: MediaBackupService;
   @Inject() fontLibraryService: FontLibraryService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
   settings: IDefaultManagerSettings;
 
@@ -45,6 +47,11 @@ export class DefaultManager extends PropertiesManager {
   }
 
   initializeMediaBackup() {
+    if (this.customizationService.state.mediaBackupOptOut) {
+      this.settings.mediaBackup = {};
+      return;
+    }
+
     if (!this.userService.isLoggedIn()) return;
 
     if (this.obsSource.id === 'ffmpeg_source') {
