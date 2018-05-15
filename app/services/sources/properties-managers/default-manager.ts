@@ -64,8 +64,10 @@ export class DefaultManager extends PropertiesManager {
         this.settings.mediaBackup.serverId,
         this.settings.mediaBackup.originalPath
       ).then(file => {
-        this.currentMediaPath = file.filePath;
-        this.obsSource.update({ [this.mediaBackupFileSetting]: file.filePath });
+        if (file) {
+          this.currentMediaPath = file.filePath;
+          this.obsSource.update({ [this.mediaBackupFileSetting]: file.filePath });
+        }
       });
     } else {
       this.uploadNewMediaFile();
@@ -82,7 +84,6 @@ export class DefaultManager extends PropertiesManager {
       this.obsSource.settings[this.mediaBackupFileSetting]
     ).then(file => {
       if (file) {
-        // debugger;
         this.settings.mediaBackup.serverId = file.serverId;
         this.settings.mediaBackup.originalPath = this.obsSource.settings[this.mediaBackupFileSetting];
       }

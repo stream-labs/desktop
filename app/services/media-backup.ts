@@ -74,7 +74,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     try {
       name = path.parse(filePath).base;
     } catch (e) {
-      console.debug(`Got unparseable path ${filePath}`);
+      console.warn(`[Media Backup] Got unparseable path ${filePath}`);
       return null;
     }
 
@@ -87,11 +87,17 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     this.INSERT_FILE(file);
 
-    // TODO: Async
     if (!fs.existsSync(filePath)) return null;
 
-    // TODO: Error handling
-    const serverId = (await this.uploadFile(filePath)).id;
+    let data: { id: number };
+
+    try {
+      data = await this.withRetry(() => this.uploadFile(filePath));
+    } catch (e) {
+      console.error(`[Media Backup] Error uploading file: ${e}`);
+    }
+
+    const serverId = data.id;
     file.serverId = serverId;
     file.status = EMediaFileStatus.Synced;
     this.UPDATE_FILE(localId, file);
@@ -120,9 +126,17 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
 
     this.INSERT_FILE(file);
 
-    const data = await this.getFileData(serverId);
+    let data: IMediaFileDataResponse;
 
-    // TODO: Handle data does not exist on server
+    try {
+      data = await this.withRetry(() => this.getFileData(serverId));
+    } catch (e) {
+      console.error(`[Media Backup] Ran out of retries fetching data ${e.body}`);
+
+      // At the moment, we don't surface sync errors to the user
+      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      return null;
+    }
 
     // These are the 2 locations that will be checked for valid media files
     const filesToCheck = [
@@ -131,24 +145,40 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     ];
 
     for (const fileToCheck of filesToCheck) {
-      // TODO: Async
       if (fs.existsSync(fileToCheck)) {
-        const checksum = await this.getChecksum(fileToCheck);
+        let checksum: string;
 
-        if (checksum === data.checksum) {
+        try {
+          checksum = await this.withRetry(() => this.getChecksum(fileToCheck));
+        } catch (e) {
+          // This is not a fatal error, we can download a new copy
+          console.warn(`[Media Backup] Error calculating checksum: ${e}`);
+        }
+
+        if (checksum && (checksum === data.checksum)) {
           file.filePath = fileToCheck;
           file.status = EMediaFileStatus.Synced;
           this.UPDATE_FILE(localId, file);
           return file;
         }
 
-        console.debug(`Got checksum mismatch: ${checksum} =/= ${data.checksum}`);
+        console.debug(`[Media Backup] Got checksum mismatch: ${checksum} =/= ${data.checksum}`);
       }
     }
 
     // We need to download a new copy of this file from the server
     this.UPDATE_FILE(localId, { status: EMediaFileStatus.Downloading });
-    const downloadedPath = await this.downloadFile(data.url, serverId);
+    let downloadedPath: string;
+
+    try {
+      downloadedPath = await this.withRetry(() => this.downloadFile(data.url, serverId));
+    } catch (e) {
+      console.error(`[Media Backup] Error downloading file: ${e.body}`);
+
+      // At the moment, we don't surface sync errors to the user
+      this.UPDATE_FILE(localId, { status: EMediaFileStatus.Synced });
+      return null;
+    }
 
     file.status = EMediaFileStatus.Synced;
     file.filePath = downloadedPath;
@@ -168,15 +198,18 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       file
     };
 
-    const data = await new Promise<{ id: number }>(resolve => {
+    const data = await new Promise<{ id: number }>((resolve, reject) => {
       const req = request.post({
         url: `${this.apiBase}/upload`,
         headers: this.authedHeaders,
         formData
       },
       (err, res, body) => {
-        // TODO: Error handling?
-        resolve(JSON.parse(body));
+        if (Math.floor(res.statusCode / 100) === 2) {
+          resolve(JSON.parse(body));
+        } else {
+          reject(res);
+        }
       });
     });
 
@@ -184,25 +217,30 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
   }
 
   private getFileData(id: number) {
-    return new Promise<IMediaFileDataResponse>(resolve => {
+    return new Promise<IMediaFileDataResponse>((resolve, reject) => {
+      console.log('request');
       request({
         url: `${this.apiBase}/${id}`,
         headers: this.authedHeaders
       },
       (err, res, body) => {
-        // TODO: Error handling?
-        resolve(JSON.parse(body));
+        if (Math.floor(res.statusCode / 100) === 2) {
+          resolve(JSON.parse(body));
+        } else {
+          reject(res);
+        }
       });
     });
   }
 
   private getChecksum(filePath: string) {
-    return new Promise<string>(resolve => {
+    return new Promise<string>((resolve, reject) => {
       const file = fs.createReadStream(filePath);
       const hash = crypto.createHash('md5');
 
       file.on('data', data => hash.update(data));
       file.on('end', () => resolve(hash.digest('hex')));
+      file.on('error', e => reject(e));
     });
   }
 
@@ -210,12 +248,26 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     this.ensureMediaDirectory();
     const filePath = this.getMediaFilePath(serverId);
 
-    return new Promise<string>(resolve => {
+    return new Promise<string>((resolve, reject) => {
       const stream = fs.createWriteStream(filePath);
       request(url).pipe(stream);
 
       stream.on('finish', () => resolve(filePath));
+      stream.on('error', e => reject(e));
     });
+  }
+
+  private async withRetry<T>(executor: () => Promise<T>): Promise<T> {
+    let retries = 2;
+
+    while (true) {
+      try {
+        return await executor();
+      } catch (e) {
+        if (retries <= 0) throw e;
+        retries -= 1;
+      }
+    }
   }
 
   private getMediaFilePath(serverId: number) {
