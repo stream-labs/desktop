@@ -44,7 +44,7 @@ class ColorInput extends Input<IFormInput<number>> {
         parseInt(hex.substr(1, 2), 16),
         parseInt(hex.substr(3, 2), 16),
         parseInt(hex.substr(5, 2), 16),
-        Math.round(255 / a),
+        Math.round(255 * a),
       );
       this.emitInput({ ...this.value, value: intColor });
     }
@@ -97,7 +97,7 @@ class ColorInput extends Input<IFormInput<number>> {
 
     return {
       hex: '#' + intTo2hexDigit(rgba.r) + intTo2hexDigit(rgba.g) + intTo2hexDigit(rgba.b),
-      a: rgba.a / 255
+      a: Number((rgba.a / 255).toFixed(2))
     };
   }
 
