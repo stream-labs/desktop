@@ -70,10 +70,10 @@ test('Settings Hotkeys', async t => {
   t.pass();
 });
 
-test('Settings Overlays', async t => {
+test('Settings Scene Collections', async t => {
   const client = await getClient();
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
-  settingsService.showSettings('Overlays');
+  settingsService.showSettings('Scene Collections');
   t.pass();
 });
 
