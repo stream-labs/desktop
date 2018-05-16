@@ -27,10 +27,6 @@ class ColorInput extends Input<IFormInput<number>> {
 
   pickerVisible = false;
 
-  mounted() {
-    console.log(this.value);
-  }
-
   onChange(color: IColor) {
     this.color = color;
   }
