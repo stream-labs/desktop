@@ -27,6 +27,10 @@ class ColorInput extends Input<IFormInput<number>> {
 
   pickerVisible = false;
 
+  mounted() {
+    console.log(this.value);
+  }
+
   onChange(color: IColor) {
     this.color = color;
   }
@@ -89,8 +93,14 @@ class ColorInput extends Input<IFormInput<number>> {
   get obsColor(): IColor {
     const rgba = Utils.intToRgba(this.value.value);
 
+    const intTo2hexDigit = (int: number) => {
+      let result = int.toString(16);
+      if (result.length === 1) result = '0' + result;
+      return result;
+    };
+
     return {
-      hex: '#' + ((rgba.r << 16) + (rgba.g << 8) + (rgba.b)).toString(16),
+      hex: '#' + intTo2hexDigit(rgba.r) + intTo2hexDigit(rgba.g) + intTo2hexDigit(rgba.b),
       a: rgba.a / 255
     };
   }
