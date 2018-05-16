@@ -67,6 +67,7 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
+import { MediaBackupService } from 'services/media-backup';
 
 const { ipcRenderer } = electron;
 
@@ -136,7 +137,8 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     WebsocketService,
     ProjectorService,
-    TransitionsService
+    TransitionsService,
+    MediaBackupService
   };
 
   private instances: Dictionary<Service> = {};

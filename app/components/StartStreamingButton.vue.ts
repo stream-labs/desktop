@@ -1,10 +1,12 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { StreamingService, EStreamingState } from '../services/streaming';
-import { Inject } from '../util/injector';
-import { NavigationService } from '../services/navigation';
-import { UserService } from '../services/user';
-import { CustomizationService } from '../services/customization';
+import { StreamingService, EStreamingState } from 'services/streaming';
+import { Inject } from 'util/injector';
+import { NavigationService } from 'services/navigation';
+import { UserService } from 'services/user';
+import { CustomizationService } from 'services/customization';
+import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
+import electron from 'electron';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -12,13 +14,34 @@ export default class StartStreamingButton extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
+  @Inject() mediaBackupService: MediaBackupService;
 
   @Prop() disabled: boolean;
 
-  toggleStreaming() {
+  async toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
     } else {
+      if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
+        const goLive = await new Promise<boolean>(resolve => {
+          electron.remote.dialog.showMessageBox(
+            electron.remote.getCurrentWindow(),
+            {
+              title: 'Cloud Backup',
+              type: 'warning',
+              message: 'Your media files are currently being synced with the cloud. ' +
+                'It is recommended that you wait until this finishes before going live.',
+              buttons: ['Wait', 'Go Live Anyway']
+            },
+            goLive => {
+              resolve(!!goLive);
+            }
+          );
+        });
+
+        if (!goLive) return;
+      }
+
       if (
         this.userService.isLoggedIn() &&
         this.customizationService.state.updateStreamInfoOnLive &&
