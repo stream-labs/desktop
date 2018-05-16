@@ -1,8 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import Vue from 'vue';
 import { Inject } from 'util/injector';
-import { MediaBackupService, EGlobalSyncStatus, EMediaFileStatus } from 'services/media-backup';
-import { stat } from 'fs';
+import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 
 @Component({})
 export default class GlobalSyncStatus extends Vue {
