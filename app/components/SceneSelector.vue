@@ -53,7 +53,7 @@
       {{ $t('Scene Collections') }}
     </div>
     <div slot="content">
-      {{ $t('This is where your ') }} <span class="semibold">{{ $t('Scene Collections') }}</span>{{ $t(' live. Clicking the title will dropdown a menu where you can view & manage.')}}
+      {{ $t('This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.') }}
     </div>
   </help-tip>
 </div>

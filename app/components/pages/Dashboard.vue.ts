@@ -15,18 +15,7 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    // setup language
-    const webview = this.$refs.dashboard;
-    const locale = this.i18nService.state.locale;
-    webview.addEventListener('dom-ready', () => {
-      webview.executeJavaScript(`
-        var langCode = $.cookie('langCode');
-        if (langCode !== '${locale}') {
-           $.cookie('langCode', '${locale}');
-           window.location.reload();
-        }
-      `);
-    });
+    this.i18nService.setWebviewLocale(this.$refs.dashboard);
   }
 
   get loggedIn() {

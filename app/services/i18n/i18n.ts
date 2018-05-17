@@ -123,6 +123,19 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     electron.remote.app.quit();
   }
 
+  setWebviewLocale(webview: Electron.WebviewTag) {
+    const locale = this.state.locale;
+    webview.addEventListener('dom-ready', () => {
+      webview.executeJavaScript(`
+        var langCode = $.cookie('langCode');
+        if (langCode !== '${locale}') {
+           $.cookie('langCode', '${locale}');
+           window.location.reload();
+        }
+      `);
+    });
+  }
+
   getLocaleFormData(): TFormData {
     const options = Object.keys(this.availableLocales)
       .map(locale => {

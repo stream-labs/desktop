@@ -10,7 +10,7 @@
     <add-source-info
       v-if="inspectedSource === 'image_source'"
       @clickAdd="selectSource('image_source')"
-      name="Image"
+      :name="$t('Image')"
       :description="$t('Add images to your scene.')"
       key="1">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image.png"/>
@@ -28,7 +28,7 @@
     <add-source-info
       v-if="inspectedSource === 'slideshow'"
       @clickAdd="selectSource('slideshow')"
-      name="Image Slide Show"
+      :name="$t('Image Slide Show')"
       :description="$t('Add a slideshow of images to your scene.')"
       key="2">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image-slide-show.png"/>
@@ -46,7 +46,7 @@
     <add-source-info
       v-if="inspectedSource === 'ffmpeg_source'"
       @clickAdd="selectSource('ffmpeg_source')"
-      name="Media Source"
+      :name="$t('Media Source')"
       :description="$t('Add videos or sound clips to your scene.')"
       key="3">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/media.png"/>
@@ -70,7 +70,7 @@
     <add-source-info
       v-if="inspectedSource === 'window_capture'"
       @clickAdd="selectSource('window_capture')"
-      name="Window Capture"
+      :name="$t('Window Capture')"
       :description="$t('Capture a specific window that\'s open on your computer.')"
       key="4">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/window-capture.png"/>
@@ -83,7 +83,7 @@
     <add-source-info
       v-if="inspectedSource === 'dshow_input'"
       @clickAdd="selectSource('dshow_input')"
-      name="Video Capture Device"
+      :name="$t('Video Capture Device')"
       :description="$t('Select from your build in USB webcam or an external.')"
       key="5">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/video-capture.png"/>
@@ -98,7 +98,7 @@
     <add-source-info
       v-if="inspectedSource === 'wasapi_output_capture'"
       @clickAdd="selectSource('wasapi_output_capture')"
-      name="Audio Output Capture"
+      :name="$t('Audio Output Capture')"
       :description="$t('Captures your desktop audio for the purpose of playing sound, such as music or speech.')"
       key="6">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-output.png"/>
@@ -111,7 +111,7 @@
     <add-source-info
       v-if="inspectedSource === 'color_source'"
       @clickAdd="selectSource('color_source')"
-      name="Color Source"
+      :name="$t('Color Source')"
       :description="$t('Add a color to the background of your whole scene or just a part.')"
       key="7">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/color-source.png"/>
@@ -126,7 +126,7 @@
     <add-source-info
       v-if="inspectedSource === 'browser_source'"
       @clickAdd="selectSource('browser_source')"
-      name="BrowserSource"
+      :name="$t('BrowserSource')"
       :description="$t('Allows you to add web-based content as a source, such as web pages and Flash SWFs.')"
       key="8">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/browser-source.png"/>
@@ -141,7 +141,7 @@
     <add-source-info
       v-if="inspectedSource === 'text_gdiplus'"
       @clickAdd="selectSource('text_gdiplus')"
-      name="Text (GDI+)"
+      :name="$t('Text (GDI+)')"
       :description="$t('Add text to your scene and adjust its style.')"
       key="9">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/text.png"/>
@@ -158,7 +158,7 @@
     <add-source-info
       v-if="inspectedSource === 'monitor_capture'"
       @clickAdd="selectSource('monitor_capture')"
-      name="Display Capture"
+      :name="$t('Display Capture')"
       :description="$t('Capture your entire computer monitor.')"
       key="10">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/display-capture.png"/>
@@ -172,7 +172,7 @@
     <add-source-info
       v-if="inspectedSource === 'game_capture'"
       @clickAdd="selectSource('game_capture')"
-      name="Game Capture"
+      :name="$t('Game Capture')"
       :description="$t('Capture a game you\'re playing on your computer.')"
       key="11">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/game-capture.png"/>
@@ -187,14 +187,14 @@
       v-if="inspectedSource === 'ndi_source'"
       @clickAdd="selectSource('ndi_source')"
       showSupport="false"
-      name="NDI source"
+      :name="$t('NDI source')"
       :description="$t('Allow you to capture NDI output streams.')">
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'wasapi_input_capture'"
       @clickAdd="selectSource('wasapi_input_capture')"
-      name="Audio Input Capture"
+      :name="$t('Audio Input Capture')"
       :description="$t('Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.')"
       key="12">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-input.png"/>
@@ -209,7 +209,7 @@
     <add-source-info
       v-if="inspectedSource === 'decklink-input'"
       @clickAdd="selectSource('decklink-input')"
-      name="Blackmagic Device"
+      :name="$t('Blackmagic Device')"
       :description="$t('Capture the feed your decklink device is capturing.')"
       key="13">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
@@ -223,7 +223,7 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.AlertBox"
       @clickAdd="selectWidget(widgetTypes.AlertBox)"
-      name="Alertbox"
+      :name="$t('Alertbox')"
       :description="$t('Thanks viewers with notification popups.')"
       key="14">
       <video class="source__demo source__demo--day" autoplay loop slot="media">
@@ -244,7 +244,7 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.DonationTicker"
       @clickAdd="selectWidget(widgetTypes.DonationTicker)"
-      name="Donation Ticker"
+      :name="$t('Donation Ticker')"
       :description="$t('Show off your most recent donations to your viewers.')"
       key="15">
       <video class="source__demo source__demo--day" autoplay loop slot="media">
@@ -261,7 +261,7 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.EventList"
       @clickAdd="selectWidget(widgetTypes.EventList)"
-      name="Event List"
+      :name="$t('Event List')"
       :description="$t('Include your channel\'s most recent events into your stream.')"
       key="16">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
@@ -500,7 +500,7 @@
             :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
             @dblclick="selectSource(source.value)">
-            {{ source.description }}
+            {{ $t(source.description) }}
           </li>
         </ul>
       </div>

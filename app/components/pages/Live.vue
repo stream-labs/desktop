@@ -3,7 +3,7 @@
 <div class="live-container">
   <div class="flex__column">
     <div class="flex__item mission-control-container">
-      <webview class="mission-control" id="recentEventsWebview" :src="recenteventsUrl"></webview>
+      <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
     </div>
 
     <div class="flex__item studio-controls" :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">

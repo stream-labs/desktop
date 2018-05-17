@@ -3,7 +3,7 @@
 
   <div class="fader" @click="showQrcode">
     <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
-    <span v-if="!qrcodeIsVisible">Click to show</span>
+    <span v-if="!qrcodeIsVisible">{{ $t('Click to show')}}</span>
   </div>
 
   <div v-if="qrcodeIsVisible">

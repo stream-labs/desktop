@@ -130,6 +130,9 @@
   "Ungroup Folder": "Ungroup Folder",
   "Group into Scene": "Group into Scene",
   "Ungroup Scene": "Ungroup Scene",
-  "Create Source Projector": "Create Source Projector"
-
+  "Create Source Projector": "Create Source Projector",
+  "Click \"Add Source\" when you're ready to add it to your scene": "Click \"Add Source\" when you're ready to add it to your scene",
+  "BrowserSource": "BrowserSource",
+  "NDI source": "NDI source",
+  "Use Google Font": "Use Google Font"
 }

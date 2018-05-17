@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameSource-label">
-      $t('Please enter the name of the source')
+      {{ $t('Please enter the name of the source') }}
     </p>
     <p
       v-if="error"

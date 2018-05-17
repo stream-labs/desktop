@@ -19,7 +19,7 @@ import {
 import { JsonrpcService } from 'services/jsonrpc/jsonrpc';
 import urlLib from 'url';
 import electron from 'electron';
-import { $t } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 
 @Component({})
 export default class BrowseOverlays extends Vue {
@@ -32,6 +32,7 @@ export default class BrowseOverlays extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
+  @Inject() private i18nService: I18nService;
 
   $refs: {
     overlaysWebview: Electron.WebviewTag;
@@ -50,6 +51,8 @@ export default class BrowseOverlays extends Vue {
         electron.remote.shell.openExternal(e.url);
       }
     });
+
+    this.i18nService.setWebviewLocale(this.$refs.overlaysWebview);
   }
 
   async installOverlay(
