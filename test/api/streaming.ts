@@ -8,8 +8,7 @@ import {
 } from '../../app/services/streaming/streaming-api';
 import { ISettingsServiceApi } from '../../app/services/settings';
 
-useSpectron({});
-
+useSpectron({ restartAppAfterEachTest: true });
 
 test('Streaming to Twitch via API', async t => {
   if (!process.env.SLOBS_TEST_STREAM_KEY) {
