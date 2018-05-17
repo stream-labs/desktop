@@ -15,6 +15,7 @@ import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from '.
 import { Subject } from 'rxjs/Subject';
 import Utils from '../utils';
 import { Source } from '../sources';
+import { CenteringAxis } from 'util/ScalableRectangle';
 
 
 /**
@@ -82,6 +83,8 @@ export class SelectionService
   stretchToScreen: () => void;
   fitToScreen: () => void;
   centerOnScreen: () => void;
+  centerOnHorizontal: () => void;
+  centerOnVertical: () => void;
   rotate: (deg: number) => void;
   setContentCrop: () => void;
 
@@ -546,6 +549,14 @@ export class Selection implements ISelection {
 
   centerOnScreen() {
     this.getItems().forEach(item => item.centerOnScreen());
+  }
+
+  centerOnHorizontal() {
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X));
+  }
+
+  centerOnVertical() {
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y));
   }
 
   rotate(deg: number) {
