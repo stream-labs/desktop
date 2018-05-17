@@ -1,13 +1,13 @@
 {
-  "Start Streaming": "Start Streaming",
-  "Stop Streaming": "Stop Streaming",
-  "Start Recording": "Start Recording",
-  "Stop Recording": "Stop Recording",
-  "Switch to scene": "Switch to scene",
-  "Show %sourcename%": "Show %sourcename%",
-  "Hide %sourcename%": "Hide %sourcename%",
-  "Mute": "Mute",
-  "Unmute": "Unmute",
-  "Push to Mute": "Push to Mute",
-  "Push to Talk": "Push to Talk"
+  "Start Streaming": "Stream starten",
+  "Stop Streaming": "Stream stoppen",
+  "Start Recording": "Aufnahme starten",
+  "Stop Recording": "Aufnahme stoppen",
+  "Switch to scene": "Szene wechseln",
+  "Show %{sourcename}": "Zeige %{sourcename}",
+  "Hide %{sourcename}": "%{sourcename} ausblenden",
+  "Mute": "Stummschalten",
+  "Unmute": "Stummschalten aufheben",
+  "Push to Mute": "Push-to-Mute",
+  "Push to Talk": "Push-to-Talk"
 }

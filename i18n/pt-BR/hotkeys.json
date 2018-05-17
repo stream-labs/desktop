@@ -1,13 +1,13 @@
 {
-  "Start Streaming": "Start Streaming",
-  "Stop Streaming": "Stop Streaming",
-  "Start Recording": "Start Recording",
-  "Stop Recording": "Stop Recording",
-  "Switch to scene": "Switch to scene",
-  "Show %sourcename%": "Show %sourcename%",
-  "Hide %sourcename%": "Hide %sourcename%",
-  "Mute": "Mute",
-  "Unmute": "Unmute",
-  "Push to Mute": "Push to Mute",
-  "Push to Talk": "Push to Talk"
+  "Start Streaming": "Iniciar Transmissão",
+  "Stop Streaming": "Parar Transmissão",
+  "Start Recording": "Iniciar Gravação",
+  "Stop Recording": "Parar Gravação",
+  "Switch to scene": "Trocar para a Cena",
+  "Show %{sourcename}": "Mostrar %{sourcename}",
+  "Hide %{sourcename}": "Ocultar %{sourcename}",
+  "Mute": "Desativar Áudio",
+  "Unmute": "Reativar Áudio",
+  "Push to Mute": "Pressionar para Silenciar",
+  "Push to Talk": "Pressionar para Falar"
 }

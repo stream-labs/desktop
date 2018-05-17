@@ -1,12 +1,12 @@
 {
-  "Scene transition": "Scene transition",
-  "Cut": "Cut",
-  "Fade": "Fade",
-  "Swipe": "Swipe",
-  "Slide": "Slide",
-  "Fade to Color": "Fade to Color",
-  "Luma Wipe": "Luma Wipe",
-  "Stinger": "Stinger",
-  "Transition": "Transition",
-  "Duration": "Duration"
+  "Scene transition": "シーン切り替え",
+  "Cut": "カット",
+  "Fade": "フェード",
+  "Swipe": "スワイプ",
+  "Slide": "スライド",
+  "Fade to Color": "カラーにフェードします。",
+  "Luma Wipe": "ルミナンス ワイプ",
+  "Stinger": "スティンガー",
+  "Transition": "遷移",
+  "Duration": "期間"
 }

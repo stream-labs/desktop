@@ -1,13 +1,13 @@
 {
-  "Start Streaming": "Start Streaming",
-  "Stop Streaming": "Stop Streaming",
-  "Start Recording": "Start Recording",
-  "Stop Recording": "Stop Recording",
-  "Switch to scene": "Switch to scene",
-  "Show %sourcename%": "Show %sourcename%",
-  "Hide %sourcename%": "Hide %sourcename%",
-  "Mute": "Mute",
-  "Unmute": "Unmute",
-  "Push to Mute": "Push to Mute",
-  "Push to Talk": "Push to Talk"
+  "Start Streaming": "Adás indítása",
+  "Stop Streaming": "Adás leállítása",
+  "Start Recording": "Felvétel Indítása",
+  "Stop Recording": "Felvétel Leállítása",
+  "Switch to scene": "Váltás jelenetre",
+  "Show %{sourcename}": "%{sourcename} megjelenítése",
+  "Hide %{sourcename}": "%{sourcename} elrejtése",
+  "Mute": "Némítás",
+  "Unmute": "Némítás kikapcsolása",
+  "Push to Mute": "Némítás Gombnyomásra",
+  "Push to Talk": "Beszéd Gombnyomásra"
 }
