@@ -54,7 +54,7 @@ test('Streaming to Twitch via API', async t => {
   t.is(streamingStatus, EStreamingState.Offline);
 });
 
-test.only('Recording via API', async t => {
+test('Recording via API', async t => {
   const client = await getClient();
   const streamingService = client.getResource<IStreamingServiceApi>('StreamingService');
   const settingsService = client.getResource<ISettingsServiceApi>('SettingsService');
