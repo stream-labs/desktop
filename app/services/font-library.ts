@@ -31,6 +31,9 @@ export class FontLibraryService extends Service {
 
   private manifest: IFontManifest;
 
+  // Used to prevent downloading the same font multiple times
+  fontDownloadPromises: Dictionary<Promise<string>> = {};
+
 
   getManifest(): Promise<IFontManifest> {
     if (!this.manifest) {
@@ -91,12 +94,15 @@ export class FontLibraryService extends Service {
   downloadFont(file: string): Promise<string> {
     const fontPath = this.libraryPath(file);
 
+    if (this.fontDownloadPromises[file]) return this.fontDownloadPromises[file];
+
     // Don't re-download the font if we have already downloaded it
     if (fs.existsSync(fontPath)) {
-      return Promise.resolve(fontPath);
+      this.fontDownloadPromises[file] = Promise.resolve(fontPath);
+      return this.fontDownloadPromises[file];
     }
 
-    return new Promise(resolve => {
+    this.fontDownloadPromises[file] = new Promise(resolve => {
       this.ensureFontsDirectory();
 
       https.get(this.libraryUrl(file), response => {
@@ -106,6 +112,8 @@ export class FontLibraryService extends Service {
         response.pipe(fontFile);
       });
     });
+
+    return this.fontDownloadPromises[file];
   }
 
 

@@ -339,7 +339,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     },
 
     width: 600,
-    height: 600,
+    height: 800,
 
     x: 0,
     y: 1,

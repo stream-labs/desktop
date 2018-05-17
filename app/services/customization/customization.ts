@@ -35,6 +35,7 @@ export class CustomizationService
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
+    mediaBackupOptOut: false,
     experimental: {
       // put experimental features here
     }
@@ -95,6 +96,10 @@ export class CustomizationService
 
   setHiddenViewerCount(hidden: boolean) {
     this.setSettings({ hideViewerCount: hidden });
+  }
+
+  setMediaBackupOptOut(optOut: boolean) {
+    this.setSettings({ mediaBackupOptOut: optOut });
   }
 
   getSettingsFormData(): TFormData {

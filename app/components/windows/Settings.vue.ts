@@ -48,7 +48,7 @@ export default class SceneTransitions extends Vue {
     Hotkeys: 'fa fa-keyboard-o',
     Advanced: 'fa fa-cogs',
     API: 'fa fa-file-code-o',
-    Overlays: 'icon-themes',
+    'Scene Collections': 'icon-themes',
     Notifications: 'fa fa-warning',
     Appearance: 'fa fa-television',
     'Remote Control': 'fa fa-play-circle',

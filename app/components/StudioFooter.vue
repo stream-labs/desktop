@@ -10,6 +10,7 @@
       </div>
     </div>
     <performance-metrics />
+    <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
   </div>
 

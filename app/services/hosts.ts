@@ -17,6 +17,10 @@ export class HostsService extends Service {
     return 'overlays.streamlabs.com';
   }
 
+  get media() {
+    return 'media.streamlabs.com';
+  }
+
   get beta2() {
     return 'beta2.streamlabs.com';
   }

@@ -8,14 +8,14 @@
       class="button button--sm button--action margin-right--20"
       :disabled="busy"
       @click="saveOverlay">
-      {{ $t('Export Overlay') }}
+      {{ $t('Export Overlay File') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <button
       class="button button--sm button--action"
       :disabled="busy"
       @click="loadOverlay">
-      {{ $t('Import Overlay') }}
+      {{ $t('Import Overlay File') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <br/>
@@ -26,9 +26,12 @@
       class="button button--sm button--action"
       :disabled="busy"
       @click="loadWidget">
-      {{ $t('Import Widget in Current Scene') }}
+      {{ $t('Import Widget File in Current Scene') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
+  </div>
+  <div class="section">
+    <BoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
   </div>
 </div>
 </template>

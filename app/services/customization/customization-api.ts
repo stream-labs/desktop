@@ -14,6 +14,7 @@ export interface ICustomizationServiceState {
   chatZoomFactor: number;
   enableBTTVEmotes: boolean;
   enableFFZEmotes: boolean;
+  mediaBackupOptOut: boolean;
   experimental: any;
 }
 
