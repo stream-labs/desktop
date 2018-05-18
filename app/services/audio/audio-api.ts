@@ -16,6 +16,7 @@ export interface IAudioSource {
   syncOffset: number;
   muted: boolean;
   resourceId: string;
+  mixerHidden: boolean;
 }
 
 
