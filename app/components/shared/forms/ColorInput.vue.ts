@@ -6,8 +6,10 @@ import Utils from './../../../services/utils';
 import VueColor from 'vue-color';
 
 interface IColor {
-  hex: string,
-  a: number
+  r: number;
+  g: number;
+  b: number;
+  a: number;
 }
 
 @Component({
@@ -20,57 +22,39 @@ class ColorInput extends Input<IFormInput<number>> {
   @Prop()
   value: IFormInput<number>;
 
-  color: IColor = {
-    hex: '#ffffff',
-    a: 1
-  };
-
   pickerVisible = false;
-
-  onChange(color: IColor) {
-    this.color = color;
-  }
 
   togglePicker() {
     this.pickerVisible = !this.pickerVisible;
   }
 
   @debounce(500)
-  setValue() {
-    const { a, hex } = this.color;
-    if ((a !== this.obsColor.a) || (hex !== this.obsColor.hex)) {
+  setValue(rgba: IColor) {
 
+    if (!_.isEqual(rgba, this.obsColor)) {
       const intColor = Utils.rgbaToInt(
-        parseInt(hex.substr(1, 2), 16),
-        parseInt(hex.substr(3, 2), 16),
-        parseInt(hex.substr(5, 2), 16),
-        Math.round(255 * a),
+        rgba.r,
+        rgba.g,
+        rgba.b,
+        Math.round(255 * rgba.a),
       );
       this.emitInput({ ...this.value, value: intColor });
     }
   }
 
-  @Watch('color')
-  onColorChangeHandler() {
-    this.setValue();
-  }
 
-  @Watch('obsColor')
-  onObsColorChangeHandler() {
-    this.color = this.obsColor;
-  }
-
-  created() {
-    this.color = this.obsColor;
+  mounted() {
+    this.setValue(this.obsColor);
   }
 
   get hexAlpha() {
-    let alpha = this.color.a;
+    let alpha = this.obsColor.a;
     return _.padStart(Math.floor(alpha * 255).toString(16), 2, '0');
   }
 
   get hexColor() {
-    return this.color.hex.substr(1);
+    const rgba = Utils.intToRgba(this.value.value);
+    return this.intTo2hexDigit(rgba.r) + this.intTo2hexDigit(rgba.g) + this.intTo2hexDigit(rgba.b);
   }
 
   // This is displayed to the user
@@ -80,25 +64,26 @@ class ColorInput extends Input<IFormInput<number>> {
 
   get swatchStyle() {
     return {
-      backgroundColor: this.color.hex,
-      opacity: this.color.a || 1
+      backgroundColor: '#' + this.hexColor,
+      opacity: this.obsColor.a || 1
     };
   }
 
 
   get obsColor(): IColor {
     const rgba = Utils.intToRgba(this.value.value);
-
-    const intTo2hexDigit = (int: number) => {
-      let result = int.toString(16);
-      if (result.length === 1) result = '0' + result;
-      return result;
-    };
-
     return {
-      hex: '#' + intTo2hexDigit(rgba.r) + intTo2hexDigit(rgba.g) + intTo2hexDigit(rgba.b),
+      r: rgba.r,
+      g: rgba.g,
+      b: rgba.b,
       a: Number((rgba.a / 255).toFixed(2))
     };
+  }
+
+  private intTo2hexDigit(int: number) {
+    let result = int.toString(16);
+    if (result.length === 1) result = '0' + result;
+    return result;
   }
 
 }
