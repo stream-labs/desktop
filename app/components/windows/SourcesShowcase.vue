@@ -428,7 +428,7 @@
       v-if="inspectedSource === widgetTypes.SpinWheel"
       @clickAdd="selectWidget(widgetTypes.SpinWheel)"
       :name="$t('Spin Wheel')"
-      :description="$t('Rolling credits to play at the end of your stream.')"
+      :description="$t('Spin the wheel to make a decision.')"
       key="26">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-wheel.mp4">
