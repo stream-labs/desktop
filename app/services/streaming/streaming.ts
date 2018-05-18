@@ -44,6 +44,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() usageStatisticsService: UsageStatisticsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
+  recordingStatusChange = new Subject<ERecordingState>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -263,12 +264,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+        this.recordingStatusChange.next(ERecordingState.Recording);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_RECORDING_STATUS(ERecordingState.Starting, time);
+        this.recordingStatusChange.next(ERecordingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+        this.recordingStatusChange.next(ERecordingState.Offline);
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
+        this.recordingStatusChange.next(ERecordingState.Stopping);
       }
     }
 
