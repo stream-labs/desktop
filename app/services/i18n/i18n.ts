@@ -90,10 +90,11 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       locale = langDescription ? langDescription.locale : 'en-US';
     }
 
+    // TODO: uncomment when the all languages will be translated
     // load dictionary if not loaded
-    if (!this.loadedDictionaries[locale]) {
-      await this.loadDictionary(this.state.locale);
-    }
+    // if (!this.loadedDictionaries[locale]) {
+    //   await this.loadDictionary(this.state.locale);
+    // }
 
     // load fallback dictionary
     const fallbackLocale = this.getFallbackLocale();
@@ -101,6 +102,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       await this.loadDictionary(fallbackLocale);
     }
 
+    // TODO: uncomment when the all languages will be translated
     // setup locale in libobs
     obs.Global.locale = locale;
 
@@ -124,16 +126,17 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   setWebviewLocale(webview: Electron.WebviewTag) {
-    const locale = this.state.locale;
-    webview.addEventListener('dom-ready', () => {
-      webview.executeJavaScript(`
-        var langCode = $.cookie('langCode');
-        if (langCode !== '${locale}') {
-           $.cookie('langCode', '${locale}');
-           window.location.reload();
-        }
-      `);
-    });
+    // TODO: uncomment when the all languages will be translated
+    // const locale = this.state.locale;
+    // webview.addEventListener('dom-ready', () => {
+    //   webview.executeJavaScript(`
+    //     var langCode = $.cookie('langCode');
+    //     if (langCode !== '${locale}') {
+    //        $.cookie('langCode', '${locale}');
+    //        window.location.reload();
+    //     }
+    //   `);
+    // });
   }
 
   getLocaleFormData(): TFormData {
