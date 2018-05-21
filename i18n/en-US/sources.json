@@ -135,5 +135,8 @@
   "Click \"Add Source\" when you're ready to add it to your scene": "Click \"Add Source\" when you're ready to add it to your scene",
   "BrowserSource": "BrowserSource",
   "NDI source": "NDI source",
-  "Use Google Font": "Use Google Font"
+  "Use Google Font": "Use Google Font",
+  "Center Horizontal": "Center Horizontal",
+  "Center Vertical": "Center Vertical",
+  "Unhide All": "Unhide All"
 }
