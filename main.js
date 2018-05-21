@@ -262,18 +262,18 @@ function startApp() {
     // interference with certain NodeJS APIs, expecially asynchronous
     // IO from the renderer process.  Enable at your own risk.
 
-    // const devtoolsInstaller = require('electron-devtools-installer');
-    // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
+    const devtoolsInstaller = require('electron-devtools-installer');
+    devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    // setTimeout(() => {
-    //   openDevTools();
-    // }, 10 * 1000);
+    setTimeout(() => {
+      openDevTools();
+    }, 10 * 1000);
 
   }
 
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
-    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
+    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
               '/node_modules/obs-studio-node'));
 
   getObs().OBS_API_initAPI(app.getPath('userData'));

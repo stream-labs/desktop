@@ -1,73 +1,161 @@
 import Vue from 'vue';
-import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from '../../services/persistent-stateful-service';
 import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../../services/stateful-service';
-import electron from 'electron';
-import { HostsService } from '../../services/hosts';
-import {
-  getPlatformService,
-  IPlatformAuth,
-  TPlatform,
-  IPlatformService
-} from '../../services/platforms';
 import { CustomizationService } from '../../services/customization';
-import Raven from 'raven-js';
 import { AppService } from 'services/app';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs/Subject';
-import Util from 'services/utils';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
-import FontInput from '../shared/forms/FontInput.vue';
-import ColorInput from '../shared/forms/ColorInput.vue';
+import WColorInput from '../shared/widget_inputs/WColorInput.vue';
+import WSlider from '../shared/widget_inputs/WSlider.vue';
+import WFontFamily from '../shared/widget_inputs/WFontFamily.vue';
+import WFontSize from '../shared/widget_inputs/WFontSize.vue';
+import WCodeEditor from '../shared/widget_inputs/WCodeEditor.vue';
+import WListInput from '../shared/widget_inputs/WListInput.vue';
+import { IListInput, IFormInput } from '../shared/forms/Input';
+import { WidgetSettingsService } from '../../services/widget-settings/widget-settings';
+import VeeValidate from 'vee-validate';
+import Tabs from 'vue-tabs-component';
+
+Vue.use(VeeValidate);
+Vue.use(Tabs);
 
 @Component({
   components: {
-    FontInput,
-    ColorInput,
-    ModalLayout
+    WColorInput,
+    WFontFamily,
+    WFontSize,
+    WCodeEditor,
+    ModalLayout,
+    WSlider,
+    WListInput
   }
 })
 export default class BitGoal extends Vue {
-  @Inject() hostsService: HostsService;
   @Inject() customizationService: CustomizationService;
   @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() widgetSettingsService: WidgetSettingsService;
 
   mounted() {
-    this.getSettings();
+    this.stringToInt();
+
+    console.log(parseInt(this.widgetData.settings.bar_thickness, 10));
   }
 
-  getSettings() {
-    // const host = this.hostsService.streamlabs;
-    // const url = `https://${host}/api/v5/widget/bitgoal/settings`;
-    // settings = fetch(url);
-
-    var response = {"settings":{"background_color":"#F9F9F9","bar_color":"#46E65A","bar_bg_color":"#DDDDDD","text_color":"#FFFFFF","bar_text_color":"#000000","font":"Open Sans","bar_thickness":"48","custom_enabled":false,"custom_html":"","custom_css":"","custom_js":"","layout":"standard"}, goal:<string[]> [],"widget":{"url":"https:\/\/streamlabs.com\/widgets\/bit-goal?token=52561F7EDC925D58480C"},"demo":{"title":"My Sample Goal","percent":75,"current_amount":36,"to_go":"7 Days To Go","start":0,"amount":48},"has_goal":true,"custom_defaults":{"html":"\n          <!-- All html objects will be wrapped in the #wrap div -->\n          <div class='goal-cont'>\n            <div id='title'><\/div>\n            <div id='goal-bar'>\n              <span id='goal-current'>0<\/span>\/<span id='goal-total'>0<\/span>\n            <\/div>\n            <div id='goal-end-date'>\n            <\/div>\n          <\/div>\n          ","css":"\n          \/* All html objects will be wrapped in the #wrap div *\/\n          .goal-cont {\n          color: white;\n          background: black;\n        }","js":"\n        \/\/ Events will be sent when someone followers\n        \/\/ Please use event listeners to run functions.\n        document.addEventListener('goalLoad', function(obj) {\n        \/\/ obj.detail will contain information about the current goal\n        \/\/ this will fire only once when the widget loads\n        console.log(obj.detail);\n        $('#title').html(obj.detail.title);\n        $('#goal-current').text(obj.detail.amount.current);\n        $('#goal-total').text(obj.detail.amount.target);\n        $('#goal-end-date').text(obj.detail.to_go.ends_at);\n        });\n        document.addEventListener('goalEvent', function(obj) {\n        \/\/ obj.detail will contain information about the goal\n        console.log(obj.detail);\n        $('#goal-current').text(obj.detail.amount.current);\n        });"},"platforms":{"twitch_account":"104340301"},"platforms2":{"twitch_account":"104340301","facebook_account":"10155560531429874","youtube_account":"UCWfSaiZstNd6B3tBVB9lY4Q","periscope_account":"1YLEJOxoLnNQN","mixer_account":"31605237"},"thirdpartyplatforms":{"tiltify":{"id":11,"user_id":16709,"tiltify_id":28396,campaign_id:<string> null,"name":"Streamlabs","email":"devteam@streamlabs.com","access_token":"d75ecee3813b0798f7ad772b22057021ae6e5b5edc3cd54646c24cc7d1899c0b","created_at":"2017-12-01 21:03:03","updated_at":"2017-12-01 21:03:03"},"tipeeestream":{"id":3,"user_id":16709,"tipeeestream_id":321179,"name":"morganleee","access_token":"Y2I0MDJiYzAyZGEzMmM2OGZlMGVmMzE5NWE1NzQ4YjRmNDliOTE0ZmYwNjkxM2E0NTI2YjY0YzhiZGY2OWYxMA","refresh_token":"OTkyOGRkNDY0ZmQ0OTBlOTJmMjQ1YmVhM2I1OGQyZWJhZTM4ODg4OGFhMThmZDlkMGNjYWY0NjQ4YmI1NmJjNQ","created_at":"2018-02-06 22:59:42","updated_at":"2018-02-06 22:59:42"}}}
-
-    this.settings = response.settings;
-    this.goal = response.goal;
-    this.has_goal = response.has_goal;
-  }
-
-
-  // Comes from the data object on Streamlabs
-  // This is data that IS NOT included in the returned settings
-  // Where we define defaults
-  settings: object = {};
-  goal: string[] = [];
-  has_goal: boolean = false;
-  campaign_id:string;
-  data: object = {
-    title: <string> '',
-    goal_amount: <number> null,
-    manual_goal_amount: <number> null,
-    ends_at: <string> '',
+  layout: IListInput<string> = {
+    name: 'layout',
+    description: 'Layout',
+    value: '',
+    options: [
+      { description: 'Standard', value: 'standard' },
+      { description: 'Condensed', value: 'condensed' }
+    ]
   };
 
+  backgroundColorData = {
+    description: 'Background Color',
+    value: this.widgetData.settings.background_color
+  };
+
+  textColorData = {
+    description: 'Text Color',
+    value: this.widgetData.settings.text_color,
+  };
+
+  barTextColorData = {
+    description: 'Bar Text Color',
+    value: this.widgetData.settings.bar_text_color,
+  };
+
+  barColorData = {
+    description: 'Bar Color',
+    value: this.widgetData.settings.bar_color,
+  };
+
+  barBackgroundColorData = {
+    description: 'Bar Background Color',
+    value: this.widgetData.settings.bar_bg_color,
+  };
+
+  fontFamilyData = {
+    description: 'Font Family',
+    value: this.widgetData.settings.font
+  };
+
+  setLayout() {
+    this.layout.value;
+  }
+
+  get widgetUrl() {
+    return this.widgetSettingsService.getWidgetUrl('BitGoal');
+  }
+
+  get widgetData() {
+    return this.widgetSettingsService.getBitGoalSettings();
+  }
+
+  barThickness: number;
+
+  stringToInt() {
+    const barThickness = parseInt(this.widgetData.settings.bar_thickness, 10);
+
+    return barThickness;
+  }
+
+  barThicknessData = {
+    description: 'Bar Thickness',
+    value: this.barThickness
+  };
+
+  // validate() {
+  //   return this.$validator.validateAll().then(() => {
+  //     if (this.errors.any()) {
+  //       throw 'validation error';
+  //     }
+
+  //     return true;
+  //   });
+  // }
+
+  // onGoalSave() {
+  //   const $vm = this;
+
+  //   this.validate().then(() => {
+  //     this.post('widget/bitgoal', this.data).then((response) => {
+  //       $vm.goal = response.goal;
+  //       // $vm.settings = response.settings;
+  //       $vm.success($vm.$t('Goal saved'));
+  //     });
+  //   });
+  // }
+
+  // onSettingsSave() {
+  //   const $vm = this;
+
+  //   this.post('widget/bitgoal/settings', this.settings).then((response) => {
+  //     $vm.success($vm.$t('Settings saved'));
+  //   });
+  // }
+
+  // onGoalSave() {
+  //   this.validate().then(() => {
+  //     this.post('https://streamlabs/.com/api/v5/widget/bitgoal', this.data).then((response) => {
+  //       this.goal = response.goal;
+  //       // this.settings = response.settings;
+  //       this.success(this.$t('Goal saved'));
+  //     });
+  //   });
+  // }
+
+  // onSettingsSave() {
+  //   this.post('https://streamlabs/.com/api/v5/widget/bitgoal/settings', this.settings).then((response) => {
+  //     this.success(this.$t('Settings saved'));
+  //   });
+  // }
+
+  // resetCustom() {
+  //   this.WidgetSettingsService.custom_html = this.bitGoalDefaultHTML;
+  //   this.WidgetSettingsService.custom_css = this.bitGoalDefaultCSS;
+  //   this.WidgetSettingsService.custom_js = this.bitGoalDefaultJS;
+  // }
 
   // Will be function to save settings and close window
   submit() {

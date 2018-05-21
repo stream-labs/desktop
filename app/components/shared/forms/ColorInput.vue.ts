@@ -6,8 +6,8 @@ import Utils from './../../../services/utils';
 import VueColor from 'vue-color';
 
 interface IColor {
-  hex: string,
-  a: number
+  hex: string;
+  a: number;
 }
 
 @Component({
