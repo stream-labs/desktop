@@ -44,7 +44,7 @@ class ColorInput extends Input<IFormInput<number>> {
         parseInt(hex.substr(1, 2), 16),
         parseInt(hex.substr(3, 2), 16),
         parseInt(hex.substr(5, 2), 16),
-        Math.round(255 / a),
+        Math.round(255 * a),
       );
       this.emitInput({ ...this.value, value: intColor });
     }
@@ -89,9 +89,15 @@ class ColorInput extends Input<IFormInput<number>> {
   get obsColor(): IColor {
     const rgba = Utils.intToRgba(this.value.value);
 
+    const intTo2hexDigit = (int: number) => {
+      let result = int.toString(16);
+      if (result.length === 1) result = '0' + result;
+      return result;
+    };
+
     return {
-      hex: '#' + ((rgba.r << 16) + (rgba.g << 8) + (rgba.b)).toString(16),
-      a: rgba.a / 255
+      hex: '#' + intTo2hexDigit(rgba.r) + intTo2hexDigit(rgba.g) + intTo2hexDigit(rgba.b),
+      a: Number((rgba.a / 255).toFixed(2))
     };
   }
 

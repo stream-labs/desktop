@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
-import DragHandler from 'util/DragHandler';
+import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'util/injector';
 import { ScenesService, SceneItem, Scene } from 'services/scenes';
 import { VideoService } from 'services/video';
@@ -107,8 +107,14 @@ export default class StudioEditor extends Vue {
 
   startDragging(event: MouseEvent) {
     this.dragHandler = new DragHandler(event, {
-      renderedWidth: this.renderedWidth,
-      renderedHeight: this.renderedHeight
+      displaySize: {
+        x: this.renderedWidth,
+        y: this.renderedHeight
+      },
+      displayOffset: {
+        x: this.renderedOffsetX,
+        y: this.renderedOffsetY
+      }
     });
   }
 
@@ -121,7 +127,6 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseUp(event: MouseEvent) {
-
     this.canDrag = true;
 
     // If neither a drag or resize was initiated, it must have been
