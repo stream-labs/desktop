@@ -28,7 +28,10 @@ export default class MixerItem extends Vue {
   }
 
   showSourceMenu(sourceId: string) {
-    const menu = new EditMenu({ selectedSourceId: sourceId });
+    const menu = new EditMenu({
+      selectedSourceId: sourceId,
+      showAudioMixerMenu: true
+    });
     menu.popup();
   }
 }

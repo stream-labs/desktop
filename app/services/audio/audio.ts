@@ -119,17 +119,30 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       .filter(item => item);
   }
 
+  unhideAllSourcesForCurrentScene() {
+    this.getSourcesForCurrentScene().forEach(source => {
+      source.setHidden(false);
+    });
+  }
 
-  fetchAudioSource(sourceId: string): IAudioSource {
+  fetchFaderDetails(sourceId: string): IFader {
     const source = this.sourcesService.getSource(sourceId);
     const obsSource = source.getObsInput();
     const obsFader = this.sourceData[source.sourceId].fader;
 
-    const fader: IFader = {
+    return {
       db: obsFader.db || 0,
       deflection: obsFader.deflection,
       mul: obsFader.mul,
     };
+  }
+
+
+  generateAudioSourceData(sourceId: string): IAudioSource {
+    const source = this.sourcesService.getSource(sourceId);
+    const obsSource = source.getObsInput();
+
+    const fader = this.fetchFaderDetails(sourceId);
 
     return {
       sourceId: source.sourceId,
@@ -139,7 +152,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
       muted: obsSource.muted,
-      resourceId: 'AudioSource' + JSON.stringify([sourceId])
+      resourceId: 'AudioSource' + JSON.stringify([sourceId]),
+      mixerHidden: false
     };
   }
 
@@ -195,7 +209,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     this.sourceData[source.sourceId].fader = obsFader;
 
     this.initVolmeterStream(source.sourceId);
-    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.sourceId));
+    this.ADD_AUDIO_SOURCE(this.generateAudioSourceData(source.sourceId));
   }
 
   private initVolmeterStream(sourceId: string) {
@@ -219,11 +233,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
      * to eventually just hide the mixer item as well though */
     function volmeterCheck() {
       if (!gotEvent) {
-        volmeterStream.next({ 
-          ...lastVolmeterValue, 
-          magnitude: [-Infinity], 
-          peak: [-Infinity], 
-          inputPeak: [-Infinity] 
+        volmeterStream.next({
+          ...lastVolmeterValue,
+          magnitude: [-Infinity],
+          peak: [-Infinity],
+          inputPeak: [-Infinity]
         });
       }
 
@@ -266,6 +280,7 @@ export class AudioSource implements IAudioSourceApi {
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
   resourceId: string;
+  mixerHidden: boolean;
 
   @Inject()
   private audioService: AudioService;
@@ -382,16 +397,27 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   setDeflection(deflection: number) {
-    const fader = this.audioService.sourceData[this.sourceId].fader;
-    fader.deflection = deflection;
-    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+    const obsFader = this.audioService.sourceData[this.sourceId].fader;
+    obsFader.deflection = deflection;
+
+    const fader = this.audioService.fetchFaderDetails(this.sourceId);
+
+    this.UPDATE({ sourceId: this.sourceId, fader });
   }
 
 
   setMul(mul: number) {
-    const fader = this.audioService.sourceData[this.sourceId].fader;
-    fader.mul = mul;
-    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+    const obsFader = this.audioService.sourceData[this.sourceId].fader;
+    obsFader.mul = mul;
+
+    const fader = this.audioService.fetchFaderDetails(this.sourceId);
+
+    this.UPDATE({ sourceId: this.sourceId, fader });
+  }
+
+
+  setHidden(hidden: boolean) {
+    this.UPDATE({ sourceId: this.sourceId, mixerHidden: hidden });
   }
 
 
