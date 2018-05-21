@@ -1,5 +1,5 @@
 <template>
-<div>
+<div @contextmenu="handleRightClick">
   <div class="studio-controls-top">
     <h4
       class="studio-controls__label"

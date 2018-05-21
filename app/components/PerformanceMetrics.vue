@@ -32,7 +32,7 @@
 
 <script lang="ts" src="./PerformanceMetrics.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../styles/index";
 
 .performance-metrics {

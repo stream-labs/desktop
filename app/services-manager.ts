@@ -68,6 +68,7 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
 import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { MediaBackupService } from 'services/media-backup';
 
 const { ipcRenderer } = electron;
 
@@ -138,7 +139,8 @@ export class ServicesManager extends Service {
     WebsocketService,
     ProjectorService,
     TransitionsService,
-    WidgetSettingsService
+    WidgetSettingsService,
+    MediaBackupService
   };
 
   private instances: Dictionary<Service> = {};

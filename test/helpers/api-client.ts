@@ -214,6 +214,7 @@ export class ApiClient {
 
 
   unsubscribe(subscriptionId: string) {
+    delete this.subscriptions[subscriptionId];
     return this.request(subscriptionId, 'unsubscribe');
   }
 
