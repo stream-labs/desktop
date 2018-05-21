@@ -1,6 +1,6 @@
 <template>
   <modal-layout
-    :title="'Layer filters (' + sourceDisplayName + ')'"
+    :title="$t('Layer filters') + ' (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"
@@ -33,7 +33,7 @@
           <GenericForm v-model="properties" @input="save"></GenericForm>
         </div>
         <div v-if="!selectedFilterName">
-          No filters applied
+          {{ $t('No filters applied') }}
         </div>
       </div>
     </div>

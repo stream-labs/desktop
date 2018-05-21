@@ -1,0 +1,19 @@
+{
+  "Label Type": "標籤類別",
+  "Label Template": "標籤範本",
+  "Item Template": "物品範本",
+  "Item Separator": "物品分隔符",
+  "Item Limit": "物品限制",
+  "Duration (seconds)": "持續時間 (秒)",
+  "Show Clock": "顯示時鐘",
+  "Always, show 0:00 when inactive": "在無更新時永遠顯示0:00",
+  "Hide when inactive": "不活耀時隱藏",
+  "Show Count": "顯示計數",
+  "Always, show 0 when inactive": "在無更新時永遠顯示0",
+  "Show Latest": "顯示最新的",
+  "Always, show last person when inactive": "在無更新時永遠顯示最後一個人",
+  "Include Resubs": "包含再次訂閱",
+  "Preview": "預覽",
+  "Note:": "筆記：",
+  "Actual label text may take up to 60 seconds to update": "實際的標籤文字可能需要60秒才能完成更新"
+}

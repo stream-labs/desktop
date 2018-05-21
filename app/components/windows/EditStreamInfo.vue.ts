@@ -16,6 +16,7 @@ import { WindowsService } from 'services/windows';
 import { NavigationService } from 'services/navigation';
 import { CustomizationService } from 'services/customization';
 import { Multiselect } from 'vue-multiselect';
+import { $t } from 'services/i18n';
 import {
   VideoEncodingOptimizationService,
   IEncoderPreset
@@ -58,7 +59,7 @@ export default class EditStreamInfo extends Vue {
 
   streamTitleModel: IFormInput<string> = {
     name: 'stream_title',
-    description: 'Title',
+    description: $t('Title'),
     value: ''
   };
 
@@ -71,14 +72,14 @@ export default class EditStreamInfo extends Vue {
 
   gameModel: IListInput<string> = {
     name: 'stream_game',
-    description: 'Game',
+    description: $t('Game'),
     value: '',
     options: []
   };
 
   doNotShowAgainModel: IFormInput<boolean> = {
     name: 'do_not_show_again',
-    description: 'Do not show this message when going live',
+    description: $t('Do not show this message when going live'),
     value: false
   };
 
@@ -179,8 +180,8 @@ export default class EditStreamInfo extends Vue {
 
     if (this.doNotShowAgainModel.value) {
       alert(
-        'You will not be asked again to update your stream info when going live.  ' +
-          'You can re-enable this from the settings.'
+        $t('You will not be asked again to update your stream info when going live.  ') +
+        $t('You can re-enable this from the settings.')
       );
 
       this.customizationService.setUpdateStreamInfoOnLive(false);
@@ -240,7 +241,7 @@ export default class EditStreamInfo extends Vue {
   get submitText() {
     if (this.midStreamMode) return 'Update';
 
-    return 'Confirm & Go Live';
+    return $t('Confirm & Go Live');
   }
 
   get midStreamMode() {

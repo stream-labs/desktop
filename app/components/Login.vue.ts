@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { UserService } from 'services/user';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'util/injector';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class Login extends Vue {
@@ -18,7 +19,7 @@ export default class Login extends Vue {
   }
 
   logout() {
-    if (confirm('Are you sure you want to log out?')) {
+    if (confirm($t('Are you sure you want to log out?'))) {
       this.userService.logOut();
     }
   }

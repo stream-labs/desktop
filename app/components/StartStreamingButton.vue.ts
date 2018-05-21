@@ -7,6 +7,7 @@ import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
 import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -27,11 +28,11 @@ export default class StartStreamingButton extends Vue {
           electron.remote.dialog.showMessageBox(
             electron.remote.getCurrentWindow(),
             {
-              title: 'Cloud Backup',
+              title: $t('Cloud Backup'),
               type: 'warning',
-              message: 'Your media files are currently being synced with the cloud. ' +
-                'It is recommended that you wait until this finishes before going live.',
-              buttons: ['Wait', 'Go Live Anyway']
+              message: $t('Your media files are currently being synced with the cloud. ') +
+                $t('It is recommended that you wait until this finishes before going live.'),
+              buttons: [$t('Wait'), $t('Go Live Anyway')]
             },
             goLive => {
               resolve(!!goLive);
@@ -64,7 +65,7 @@ export default class StartStreamingButton extends Vue {
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
-      return 'END STREAM';
+      return $t('END STREAM');
     }
 
     if (this.streamingStatus === EStreamingState.Starting) {
@@ -72,7 +73,7 @@ export default class StartStreamingButton extends Vue {
         return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'STARTING';
+      return $t('STARTING');
     }
 
     if (this.streamingStatus === EStreamingState.Ending) {
@@ -80,14 +81,14 @@ export default class StartStreamingButton extends Vue {
         return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'ENDING';
+      return $t('ENDING');
     }
 
     if (this.streamingStatus === EStreamingState.Reconnecting) {
-      return 'RECONNECTING';
+      return $t('RECONNECTING');
     }
 
-    return 'GO LIVE';
+    return $t('GO LIVE');
   }
 
   getIsRedButton() {

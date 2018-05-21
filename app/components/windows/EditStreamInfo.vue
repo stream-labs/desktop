@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Update Stream Info"
+  :title="$t('Update Stream Info')"
   :show-controls="false"
   :customControls="true">
   <div slot="content">
@@ -8,11 +8,11 @@
       <i class="fa fa-spinner fa-pulse" />
     </div>
     <div v-if="infoError && !infoLoading" class="warning">
-      There was an error fetching your channel information.  You can try
-      <a @click="refreshStreamInfo">fetching the information again</a>,
-      or you can
-      <a @click="goLive">just go live.</a>
-      If this error persists, you can try logging out and back in.
+      {{ $t('There was an error fetching your channel information.  You can try') }}
+      <a @click="refreshStreamInfo">{{ $t('fetching the information again') }}</a>,
+      {{ $t('or you can') }}
+      <a @click="goLive">{{ $t('just go live.') }}</a>
+      {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
     <div v-if="!infoLoading && !infoError">
       <TextInput v-model="streamTitleModel" />
@@ -43,9 +43,14 @@
                   type="checkbox"
                   v-model="useOptimizedProfile"
                 />
-                <label><span>Use optimized encoder settings</span>  <span><i class="tooltip-trigger fa fa-question-circle has-tooltip" style="font-size:15px;whitespace: nowrap;" title="Optimized encoder gives equivalent quality while reducing usage.
-Game specific encoders for Fortnite,PUBG,Destiny 2, and League Of Legends"></i></span></label>
-                
+                <label><span>{{ $t('Use optimized encoder settings') }}</span>
+                  <span>
+                    <i class="tooltip-trigger fa fa-question-circle has-tooltip"
+                      style="font-size:15px;whitespace: nowrap;"
+                      :title="$t('Optimized encoder gives equivalent quality while reducing usage. Game specific encoders for Fortnite, PUBG, Destiny 2, and League Of Legends')">
+                    </i>
+                  </span>
+                </label>
               </div>
             </div>
           </div>
@@ -73,11 +78,11 @@ Game specific encoders for Fortnite,PUBG,Destiny 2, and League Of Legends"></i><
       <BoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
-          Something went wrong while updating your stream info.  Please try again.
+          {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
         </div>
         <div v-else>
-          Something went wrong while updating your stream info. You can try again, or you can
-          <a @click="goLive">just go live</a>.
+          {{ $t('Something went wrong while updating your stream info. You can try again, or you can') }}
+          <a @click="goLive">{{ $t('just go live') }}</a>.
         </div>
       </div>
     </div>

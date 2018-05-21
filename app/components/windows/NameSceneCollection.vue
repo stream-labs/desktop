@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameScene-label">
-      Please enter the name of the Scenes Collection
+      {{ $t('Please enter the name of the Scenes Collection') }}
     </p>
     <p
       v-if="error"

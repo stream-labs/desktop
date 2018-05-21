@@ -6,6 +6,7 @@ import { Multiselect } from 'vue-multiselect';
 import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { Multiselect }
@@ -36,26 +37,26 @@ export default class ObsImport extends Vue {
 
   get title() {
     if (this.status === 'importing') {
-      return 'Importing';
+      return $t('Importing');
     }
 
     if (this.status === 'done') {
-      return 'Successfully Imported';
+      return $t('Successfully Imported');
     }
 
-    return 'Import from OBS';
+    return $t('Import from OBS');
   }
 
   get description() {
     if (this.status === 'importing') {
-      return 'Importing your scenes and sources';
+      return $t('Importing your scenes and sources');
     }
 
     if (this.status === 'done') {
-      return 'All scenes, sources and settings have been imported.';
+      return $t('All scenes, sources and settings have been imported.');
     }
 
-    return 'Import your scenes and your settings from OBS with a simple click, or start fresh.';
+    return $t('Import your scenes and your settings from OBS with a simple click, or start fresh.');
   }
 
   startImport() {

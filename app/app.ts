@@ -1,3 +1,5 @@
+import { I18nService } from 'services/i18n';
+
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
@@ -17,11 +19,13 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import VueI18n from 'vue-i18n';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -88,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const storePromise = createStore();
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
+  const i18nService: I18nService = I18nService.instance;
   const obsApiService = ObsApiService.instance;
   const windowId = Utils.getCurrentUrlParams().windowId;
 
@@ -103,9 +108,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window['obs'] = obsApiService.nodeObs;
 
-  storePromise.then(store => {
+  storePromise.then(async store => {
+
+    Vue.use(VueI18n);
+
+    await i18nService.load();
+
+    const i18n = new VueI18n({
+      locale: i18nService.state.locale,
+      fallbackLocale: i18nService.getFallbackLocale(),
+      messages: i18nService.getLoadedDictionaries()
+    });
+
+    I18nService.setVuei18nInstance(i18n);
+
     const vm = new Vue({
       el: '#app',
+      i18n,
       store,
       render: h => {
         const componentName = windowsService.state[windowId].componentName;
@@ -113,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return h(windowsService.components[componentName]);
       }
     });
+
   });
 
   // Used for replacing the contents of this window with

@@ -20,7 +20,7 @@
     <button
       @click="done"
       class="patch-notes-button button button--action">
-      Continue
+      $t('Continue')
     </button>
   </div>
 </div>

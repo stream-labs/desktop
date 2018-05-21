@@ -1,8 +1,9 @@
 <template>
+
   <div class="source-selector">
     <div class="studio-controls-top">
       <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
-        Sources
+        {{ $t('Sources') }}
       </h4>
       <div>
         <i

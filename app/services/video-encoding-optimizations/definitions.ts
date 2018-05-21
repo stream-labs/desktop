@@ -1,3 +1,5 @@
+import { $t } from 'services/i18n';
+
 enum EncoderType {
   x264 = 'obs_x264',
   nvenc = 'ffmpeg_nvenc',
@@ -34,15 +36,19 @@ export interface IProfile {
 const CPU_profile: IProfile = {
   profile: 'CPU',
   description: 'Medium',
-  longDescription: 'Optimized profile for average CPUs',
-  preset: PresetType.veryfast
+  preset: PresetType.veryfast,
+  get longDescription() {
+    return $t('Optimized profile for average CPUs');
+  }
 };
 
 const VQ_profile: IProfile = {
   profile: 'VQ',
   description: 'Low',
-  longDescription: 'Optimized profile for weak CPUs',
-  preset: PresetType.ultrafast
+  preset: PresetType.ultrafast,
+  get longDescription() {
+    return $t('Optimized profile for weak CPUs');
+  }
 };
 
 export interface IEncoderPreset {

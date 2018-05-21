@@ -1,0 +1,19 @@
+{
+  "Label Type": "Címke Típusa",
+  "Label Template": "Címke Sablon",
+  "Item Template": "Tétel Sablon",
+  "Item Separator": "Tétel Elválasztó",
+  "Item Limit": "Tétel Korlát",
+  "Duration (seconds)": "Időtartam (másodperc)",
+  "Show Clock": "Óra Megjelenítése",
+  "Always, show 0:00 when inactive": "Mindig, mutasson 0:00-t mikor inaktív",
+  "Hide when inactive": "Inaktivitás esetén elrejtés",
+  "Show Count": "Számláló Mutatása",
+  "Always, show 0 when inactive": "Mindig, mutasson 0-át mikor inaktív",
+  "Show Latest": "Legújabb Megjelenítése",
+  "Always, show last person when inactive": "Mindig, mutassa az utolsó személyt mikor inaktív",
+  "Include Resubs": "Tartalmazza az Újra Feliratkozásokat is",
+  "Preview": "Előnézet",
+  "Note:": "Megjegyzés:",
+  "Actual label text may take up to 60 seconds to update": "A jelenlegi címke szövegének frissülése akár 60 másodpercet is igénybe vehet"
+}

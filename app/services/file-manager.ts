@@ -58,7 +58,7 @@ export class FileManagerService extends Service {
     this.flush(truePath);
   }
 
-  read(filePath: string, options: IFileReadOptions = {}) {
+  read(filePath: string, options: IFileReadOptions = {}): string {
     const truePath = path.resolve(filePath);
     let file = this.files[truePath];
 
