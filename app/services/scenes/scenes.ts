@@ -18,6 +18,7 @@ import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import * as obs from '../obs-api';
 import namingHelpers from '../../util/NamingHelpers';
+import { $t } from 'services/i18n';
 const { ipcRenderer } = electron;
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
@@ -94,7 +95,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   removeScene(id: string, force = false): IScene {
     if (!force && Object.keys(this.state.scenes).length < 2) {
-      alert('There needs to be at least one scene.');
+      alert($t('There needs to be at least one scene.'));
       return;
     }
 

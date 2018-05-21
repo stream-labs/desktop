@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Settings"
+  :title="$t('Settings')"
   :show-cancel="false"
   :done-handler="done">
 
@@ -12,7 +12,7 @@
         :to="category"
         :ico="icons[category]"
       >
-        {{ category }}
+        {{ $t(category) }}
       </NavItem>
     </NavMenu>
     <div class="settings-container">

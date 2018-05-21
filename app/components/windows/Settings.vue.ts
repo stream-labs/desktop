@@ -30,7 +30,7 @@ import RemoteControlSettings from 'components/RemoteControlSettings.vue';
     NotificationsSettings,
     AppearanceSettings,
     RemoteControlSettings,
-    ExperimentalSettings
+    ExperimentalSettings,
   },
   mixins: [windowMixin]
 })

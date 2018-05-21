@@ -12,6 +12,7 @@ import { SelectionService } from 'services/selection/selection';
 import { ProjectorService } from 'services/projector';
 import { AudioService } from 'services/audio';
 import electron from 'electron';
+import { $t } from 'services/i18n';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
@@ -49,14 +50,14 @@ export class EditMenu extends Menu {
   private appendEditMenuItems() {
     if (this.scene) {
       this.append({
-        label: 'Paste (Reference)',
+        label: $t('Paste (Reference)'),
         enabled: this.clipboardService.hasItems(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.paste()
       });
 
       this.append({
-        label: 'Paste (Duplicate)',
+        label: $t('Paste (Duplicate)'),
         enabled: this.clipboardService.hasItems(),
         click: () => this.clipboardService.paste(true)
       });
@@ -69,19 +70,19 @@ export class EditMenu extends Menu {
       const selectedItem = this.selectionService.getLastSelected();
 
       this.append({
-        label: 'Copy',
+        label: $t('Copy'),
         accelerator: 'CommandOrControl+C',
         click: () => this.clipboardService.copy()
       });
 
 
       this.append({
-        label: 'Select All',
+        label: $t('Select All'),
         accelerator: 'CommandOrControl+A',
         click: () => this.selectionService.selectAll()
       });
       this.append({
-        label: 'Invert Selection',
+        label: $t('Invert Selection'),
         click: () => this.selectionService.invert()
       });
 
@@ -89,7 +90,7 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Remove',
+        label: $t('Remove'),
         accelerator: 'Delete',
         click: () => {
           this.selectionService.remove();
@@ -97,7 +98,7 @@ export class EditMenu extends Menu {
       });
 
       this.append({
-        label: 'Transform',
+        label: $t('Transform'),
         submenu: this.transformSubmenu().menu
       });
 
@@ -107,7 +108,7 @@ export class EditMenu extends Menu {
       });
 
       if (selectedItem) {
-        const visibilityLabel = selectedItem.visible ? 'Hide' : 'Show';
+        const visibilityLabel = selectedItem.visible ? $t('Hide') : $t('Show');
 
         if (!isMultipleSelection) {
           this.append({
@@ -117,20 +118,20 @@ export class EditMenu extends Menu {
             }
           });
           this.append({
-            label: 'Create Source Projector',
+            label: $t('Create Source Projector'),
             click: () => {
               this.projectorService.createProjector(selectedItem.sourceId);
             }
           });
         } else {
           this.append({
-            label: 'Show',
+            label: $t('Show'),
             click: () => {
               this.selectionService.setVisibility(true);
             }
           });
           this.append({
-            label: 'Hide',
+            label: $t('Hide'),
             click: () => {
               this.selectionService.setVisibility(false);
             }
@@ -142,7 +143,7 @@ export class EditMenu extends Menu {
 
       if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
-          label: 'Export Widget',
+          label: $t('Export Widget'),
           click: () => {
             const chosenPath = electron.remote.dialog.showSaveDialog({
               filters: [{ name: 'Widget File', extensions: ['widget'] }]
@@ -158,7 +159,7 @@ export class EditMenu extends Menu {
 
     if (this.selectionService.isSceneFolder()) {
       this.append({
-        label: 'Rename',
+        label: $t('Rename'),
         click: () =>
           this.scenesService.showNameFolder({
             renameId:  this.selectionService.getFolders()[0].id
@@ -170,7 +171,7 @@ export class EditMenu extends Menu {
     if (this.source && !isMultipleSelection) {
 
       this.append({
-        label: 'Rename',
+        label: $t('Rename'),
         click: () =>
           this.sourcesService.showRenameSource(this.source.sourceId)
       });
@@ -178,19 +179,19 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Filters',
+        label: $t('Filters'),
         click: () => {
           this.showFilters();
         }
       });
 
       this.append({
-        label: 'Copy Filters',
+        label: $t('Copy Filters'),
         click: () => this.clipboardService.copyFilters()
       });
 
       this.append({
-        label: 'Paste Filters',
+        label: $t('Paste Filters'),
         click: () => this.clipboardService.pasteFilters(this.source.sourceId),
         enabled: this.clipboardService.hasFilters()
       });
@@ -198,7 +199,7 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Properties',
+        label: $t('Properties'),
         click: () => {
           this.showProperties();
         },
@@ -210,17 +211,17 @@ export class EditMenu extends Menu {
       this.append({ type: 'separator' });
 
       this.append({
-        label: 'Lock Sources',
+        label: $t('Lock Sources'),
         click: () => this.scenesService.setLockOnAllScenes(true)
       });
 
       this.append({
-        label: 'Unlock Sources',
+        label: $t('Unlock Sources'),
         click: () => this.scenesService.setLockOnAllScenes(false)
       });
 
       this.append({
-        label: 'Performance Mode',
+        label: $t('Performance Mode'),
         type: 'checkbox',
         checked: this.customizationService.state.performanceMode,
         click: () => this.customizationService.setSettings({
@@ -232,7 +233,7 @@ export class EditMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: 'Create Output Projector',
+      label: $t('Create Output Projector'),
       click: () => this.projectorService.createProjector()
     });
 

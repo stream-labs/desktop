@@ -2,10 +2,12 @@
 <div>
   <div class="input-container">
     <div class="input-label">
-      Configure
+      {{ $t('Configure') }}
     </div>
     <div class="input-wrapper">
-      <button class="button button--default" @click="navigateDashboard">Go To Widget Settings</button>
+      <button class="button button--default" @click="navigateDashboard">
+        {{ $t('Go To Widget Settings') }}
+      </button>
     </div>
   </div>
 

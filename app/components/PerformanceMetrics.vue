@@ -3,7 +3,7 @@
   <span class="performance-metric-wrapper">
     <i class="performance-metric-icon icon-cpu"></i>
     <span class="performance-metric">
-      <span class="performance-metric__value">{{ cpuPercent }}%</span> CPU
+      <span class="performance-metric__value">{{ cpuPercent }}%</span> {{ $t('CPU') }}
     </span>
   </span>
 
@@ -17,7 +17,7 @@
   <span class="performance-metric-wrapper">
     <img class="performance-metric-icon" src="../../media/images/icons/dropped-frames.png">
     <span class="performance-metric">
-      <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span> Dropped Frames
+      <span class="performance-metric__value">{{ droppedFrames }} ({{ percentDropped }}%)</span> {{ $t('Dropped Frames') }}
     </span>
   </span>
 

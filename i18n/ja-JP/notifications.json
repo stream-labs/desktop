@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "通知がありません",
+  "Enable notifications": "通知を有効にします。",
+  "Enable sound": "サウンドを有効にします。",
+  "Skipped frames detected:": "スキップされたフレームは検出しました",
+  "Detect skipped frames": "スキップされたフレームを検出します。",
+  "Skipped frames threshold": "スキップされたフレームの限界",
+  "Detect lagged frames": "時間差フレームを検出します。",
+  "Lagged frames threshold": "時間差フレームの限界",
+  "Detect dropped frames": "捨てられたフレームを検出します",
+  "Dropped frames threshold": "捨てられたフレームの限界",
+  "Show Notifications": "通知を表示します。",
+  "Restore Defaults": "既定値に戻す",
+  "Troubleshooter Notifications": "通知のトラブルシューティング",
+  "Click to open your Notifications window": "通知ウインドウを開くにはクリックします",
+  "Click to read your unread Notifications": "未読通知を読むにはクリックします",
+  "New Notifications": "新しい通知",
+  "Log": "ログ"
+}

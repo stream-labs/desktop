@@ -8,6 +8,7 @@ import { SourcesService } from './sources';
 import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
+import { $t } from 'services/i18n';
 
 
 export type TSourceFilterType =
@@ -56,23 +57,23 @@ export class SourceFiltersService extends Service {
   getTypesList(): IListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
     const whitelistedTypes: IListOption<TSourceFilterType>[] = [
-      { description: 'Image Mask/Blend', value: 'mask_filter' },
-      { description: 'Crop/Pad', value: 'crop_filter' },
-      { description: 'Gain', value: 'gain_filter' },
-      { description: 'Color Correction', value: 'color_filter' },
-      { description: 'Scaling/Aspect Ratio', value: 'scale_filter' },
-      { description: 'Scroll', value: 'scroll_filter' },
-      { description: 'Render Delay', value: 'gpu_delay' },
-      { description: 'Color Key', value: 'color_key_filter' },
-      { description: 'Apply LUT', value: 'clut_filter' },
-      { description: 'Sharpen', value: 'sharpness_filter' },
-      { description: 'Chroma Key', value: 'chroma_key_filter' },
-      { description: 'Video Delay (Async)', value: 'async_delay_filter' },
-      { description: 'Noise Suppression', value: 'noise_suppress_filter' },
-      { description: 'Noise Gate', value: 'noise_gate_filter' },
-      { description: 'Compressor', value: 'compressor_filter' },
-      { description: 'VST 2.x Plugin', value: 'vst_filter' },
-      { description: 'Face Mask Plugin', value: 'face_mask_filter' }
+      { description: $t('Image Mask/Blend'), value: 'mask_filter' },
+      { description: $t('Crop/Pad'), value: 'crop_filter' },
+      { description: $t('Gain'), value: 'gain_filter' },
+      { description: $t('Color Correction'), value: 'color_filter' },
+      { description: $t('Scaling/Aspect Ratio'), value: 'scale_filter' },
+      { description: $t('Scroll'), value: 'scroll_filter' },
+      { description: $t('Render Delay'), value: 'gpu_delay' },
+      { description: $t('Color Key'), value: 'color_key_filter' },
+      { description: $t('Apply LUT'), value: 'clut_filter' },
+      { description: $t('Sharpen'), value: 'sharpness_filter' },
+      { description: $t('Chroma Key'), value: 'chroma_key_filter' },
+      { description: $t('Video Delay (Async)'), value: 'async_delay_filter' },
+      { description: $t('Noise Suppression'), value: 'noise_suppress_filter' },
+      { description: $t('Noise Gate'), value: 'noise_gate_filter' },
+      { description: $t('Compressor'), value: 'compressor_filter' },
+      { description: $t('VST 2.x Plugin'), value: 'vst_filter' },
+      { description: $t('Face Mask Plugin'), value: 'face_mask_filter' }
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -179,13 +180,13 @@ export class SourceFiltersService extends Service {
 
     return {
       type: {
-        description: 'Filter type',
+        description: $t('Filter type'),
         name: 'type',
         value: availableTypesList[0].value,
         options: availableTypesList
       },
       name: {
-        description: 'Filter name',
+        description: $t('Filter name'),
         name: 'name',
         value: 'New filter'
       }

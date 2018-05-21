@@ -7,6 +7,7 @@ import { SourceFiltersService } from '../../services/source-filters';
 
 import * as inputComponents from '../shared/forms';
 import ModalLayout from '../ModalLayout.vue';
+import { $t } from 'services/i18n';
 
 
 @Component({
@@ -49,9 +50,9 @@ export default class AddSourceFilter extends Vue {
   }
 
   validateName(name: string) {
-    if (!name) return 'Name is required';
+    if (!name) return $t('Name is required');
     if (this.filtersService.getFilters(this.sourceId).find(filter => filter.name === name)) {
-      return 'That name is already taken';
+      return $t('That name is already taken');
     }
     return '';
   }
