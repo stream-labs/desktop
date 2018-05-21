@@ -30,7 +30,6 @@
       "bundles",
       "node_modules",
       "vendor",
-      "i18n",
       "updater/index.html",
       "updater/Updater.js",
       "index.html",
@@ -38,6 +37,7 @@
       "obs-api"
     ],
     "extraFiles": [
+      "i18n",
       "LICENSE",
       "AGREEMENT"
     ],
