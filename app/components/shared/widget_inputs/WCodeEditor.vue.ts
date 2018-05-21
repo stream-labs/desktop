@@ -2,8 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
 import Tabs from 'vue-tabs-component';
-// require styles
-// import 'codemirror/lib/codemirror.css';
+// codemirror has required styles that are imported in index.less
 
 Vue.use(Tabs);
 

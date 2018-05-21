@@ -36,8 +36,9 @@ export default class BitGoal extends Vue {
 
   mounted() {
     this.stringToInt();
-
-    console.log(parseInt(this.widgetData.settings.bar_thickness, 10));
+    this.widgetSettingsService.getBitGoalSettings().then(settings => {
+      const setting = settings;
+    });
   }
 
   layout: IListInput<string> = {
@@ -89,7 +90,9 @@ export default class BitGoal extends Vue {
   }
 
   get widgetData() {
-    return this.widgetSettingsService.getBitGoalSettings();
+    return this.widgetSettingsService.getBitGoalSettings().then(settings => {
+      return settings;
+    });
   }
 
   barThickness: number;
