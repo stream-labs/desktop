@@ -89,7 +89,8 @@ export type TSourceType =
   'wasapi_output_capture' |
   'decklink-input' |
   'scene' |
-  'ndi_source'
+  'ndi_source' |
+  'openvr_capture'
   ;
 
 // Register new properties manager here

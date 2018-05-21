@@ -228,7 +228,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
       { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
       { description: 'Blackmagic Device', value: 'decklink-input' },
-      { description: 'NDI Source', value: 'ndi_source' }
+      { description: 'NDI Source', value: 'ndi_source' },
+      { description: 'OpenVR Capture', value: 'openvr_capture'}
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));

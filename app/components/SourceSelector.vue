@@ -54,6 +54,7 @@
             <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>
             <i v-else-if="node.data.type === 'scene'" class="fa fa-sitemap"></i>
             <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
+            <i v-else-if="node.data.type === 'openvr_capture'" class="fa fa-simplybuilt fa-rotate-180"></i>
             <i v-else class="fa fa-file"></i>
           </span>
           <span class="item-title">{{ node.title }}</span>
