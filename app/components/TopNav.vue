@@ -57,11 +57,6 @@
       </a>
     </div>
     <div class="top-nav-item">
-      <a class="link link--uppercase" @click="bugReport">
-        <i class="fa fa-bug"/><span>{{ $t('Bug Report') }}</span>
-      </a>
-    </div>
-    <div class="top-nav-item">
       <a
         @click="openDiscord"
         class="link link--uppercase">
