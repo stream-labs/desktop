@@ -75,6 +75,7 @@
     "electron-window-state": "^4.1.1",
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
+    "node-gyp": "^3.6.2",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.33/iojs-v1.8.4-signed.tar.gz",
     "recursive-readdir": "^2.2.2",

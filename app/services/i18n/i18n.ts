@@ -73,12 +73,19 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   async load() {
 
+    const WHITE_LIST = [
+      'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
+      'hu-HU', 'it-IT', 'ja-JP', 'pl-PL',
+      'pt-PT', 'pt-BR', 'es-ES', 'tr-TR'
+    ];
+
     if (this.isLoaded) return;
 
     // load available locales
     const localeFiles = await recursive(`${I18N_PATH}`, ['*.json']);
     for (const filePath of localeFiles) {
       const locale = filePath.split('\\').slice(-2)[0];
+      if (!WHITE_LIST.includes(locale)) continue;
       this.availableLocales[locale] = this.fileManagerService.read(filePath);
     }
 
