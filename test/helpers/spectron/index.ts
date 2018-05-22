@@ -36,7 +36,15 @@ export async function focusChild(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
-  afterStartCb?  (t: any): Promise<any>;
+  afterStartCb?(t: any): Promise<any>;
+
+  /**
+   * Called after cache directory is created but before
+   * the app is started.  This is useful for setting up
+   * some known state in the cache directory before the
+   * app starts up and loads it.
+   */
+  beforeAppStartCb?(t: any): Promise<any>;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
@@ -66,6 +74,8 @@ export function useSpectron(options: ITestRunnerOptions) {
         SLOBS_CACHE_DIR: t.context.cacheDir
       }
     });
+
+    if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
     await t.context.app.start();
 
