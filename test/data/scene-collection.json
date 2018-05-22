@@ -1,0 +1,1639 @@
+{
+  "schemaVersion": 1,
+  "nodeType": "RootNode",
+  "sources": {
+    "schemaVersion": 3,
+    "nodeType": "SourcesNode",
+    "items": [
+      {
+        "id": "ffmpeg_source_77d1498e-98b4-4075-affb-476c42321aa0",
+        "name": "Stream Starting Soon",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\44.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "a88883c3-6c93-4f4c-ae5a-f787a7a5baed",
+            "serverId": 3653,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\44.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "image_source_ed1abc40-a809-4b76-b50e-35ba16383b98",
+        "name": "Background (Delete me)",
+        "type": "image_source",
+        "settings": {
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\45.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "9e1fc029-1488-4e0e-afcf-c6a7f85d92b4",
+            "serverId": 3651,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\45.png"
+          }
+        }
+      },
+      {
+        "id": "dshow_input_d27204f6-e72a-40f4-889b-9a007886bae6",
+        "name": "Webcam",
+        "type": "dshow_input",
+        "settings": {
+          "active": true,
+          "audio_device_id": "Microphone (Realtek High Definition Audio):",
+          "audio_output_mode": 0,
+          "buffering": 0,
+          "color_range": "partial",
+          "color_space": "default",
+          "frame_interval": -1,
+          "last_video_device_id": "USB Camera:\\\\?\\usb#22vid_0bda&pid_579f&mi_00#226&1d7df95a&0&0000#22{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global",
+          "res_type": 1,
+          "resolution": "1280x720",
+          "video_device_id": "USB Camera:\\\\?\\usb#22vid_0bda&pid_579f&mi_00#226&1d7df95a&0&0000#22{65e8773d-8f56-11d0-a3b9-00a0c9223196}\\global",
+          "video_format": 0
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0,
+        "mixerHidden": false
+      },
+      {
+        "id": "ffmpeg_source_b973bdc2-0ecb-4b5a-80e9-a67648c8d000",
+        "name": "Webcam Frame",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\46.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "2a9d9f72-ccba-42b2-8877-7085515ad7da",
+            "serverId": 3649,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\46.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "ffmpeg_source_6891d057-88df-4b15-bf99-feb72dc368e8",
+        "name": "Live bar",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\47.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "3017264f-e621-4b88-a1f2-e34c31968ab1",
+            "serverId": 3650,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\47.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "text_gdiplus_5947d94a-b4e9-4043-b08b-a9fa04735865",
+        "name": "Recent Donation",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "RECENT DONATION",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_69f38a58-6e9a-441a-9363-29cf28795ecf",
+        "name": "Recent Follower",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "RECENT FOLLOWER",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_39335ad2-e9ae-4ff5-bdca-f32786d90f46",
+        "name": "Top Donation",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "TOP DONATION",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_c7ab0e93-8411-4060-8851-7b806868a496",
+        "name": "Recent Donation (Stream Label)",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": 16777215,
+          "custom_font": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Fonts\\Roboto-Medium.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Streamlabels\\e3d81673-d246-4a1a-9635-6dd0cdc97253.txt",
+          "font": {
+            "face": "Roboto Medium",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline_color": 16777215,
+          "outline_opacity": 100,
+          "outline_size": 2,
+          "read_from_file": true,
+          "text": "Recent Donation (Stream Label)",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "streamlabels",
+        "propertiesManagerSettings": {
+          "statname": "most_recent_donator",
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_f8ddeb9c-9d06-4d97-a46c-687d903525db",
+        "name": "Recent Follower (Stream Label)",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "right",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": 16777215,
+          "custom_font": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Fonts\\Roboto-Medium.ttf",
+          "extents": true,
+          "extents_cx": 800,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Streamlabels\\96c087e2-75e3-470d-8abb-9b154216c94a.txt",
+          "font": {
+            "face": "Roboto Medium",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline_color": 16777215,
+          "outline_opacity": 100,
+          "outline_size": 2,
+          "read_from_file": true,
+          "text": "Recent Donation (Stream Label)",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "streamlabels",
+        "propertiesManagerSettings": {
+          "statname": "most_recent_follower",
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_0b4a8ba7-795e-4705-8bf6-8565026694de",
+        "name": "Top Donation (Stream Label)",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "center",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog": false,
+          "chatlog_lines": 6,
+          "color": 16777215,
+          "custom_font": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Fonts\\Roboto-Medium.ttf",
+          "extents": true,
+          "extents_cx": 1000,
+          "extents_cy": 170,
+          "extents_wrap": true,
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Streamlabels\\bfd6e210-4600-4051-970c-4e7902a8672a.txt",
+          "font": {
+            "face": "Roboto Medium",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": 16777215,
+          "outline_opacity": 100,
+          "outline_size": 2,
+          "read_from_file": true,
+          "text": "Recent Donation (Stream Label)",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "streamlabels",
+        "propertiesManagerSettings": {
+          "statname": "all_time_top_donator",
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "ffmpeg_source_5a8200c9-e096-481b-bc8e-baa272df1751",
+        "name": "Intermission",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\48.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "af3671dc-2f30-4cb4-b302-f1d3ee5f56d2",
+            "serverId": 3655,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\48.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "image_source_42438554-5ca7-4fec-85ed-3c1a4b0776cb",
+        "name": "YouTube",
+        "type": "image_source",
+        "settings": {
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\49.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "5ab61095-9ac5-406e-8148-e58975e3444e",
+            "serverId": 3647,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\49.png"
+          }
+        }
+      },
+      {
+        "id": "image_source_5c4b3d02-bc56-4a44-af9b-c45a1db19c14",
+        "name": "Twitter",
+        "type": "image_source",
+        "settings": {
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\50.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "dcf9a0b1-dbdf-40e1-b6d6-e99ab3a03697",
+            "serverId": 3645,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\50.png"
+          }
+        }
+      },
+      {
+        "id": "image_source_7ddbef98-3341-4fae-bb75-3e2c6d220e14",
+        "name": "Instagram",
+        "type": "image_source",
+        "settings": {
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\51.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "a9f27929-e180-4f52-bdda-4023e43f0054",
+            "serverId": 3648,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\51.png"
+          }
+        }
+      },
+      {
+        "id": "image_source_4d7191a2-507a-4fda-be74-d1db9f6b3405",
+        "name": "Facebook",
+        "type": "image_source",
+        "settings": {
+          "file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\52.png",
+          "unload": false
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "d937530d-bfc1-4f10-8fdf-7c277477b60d",
+            "serverId": 3646,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\52.png"
+          }
+        }
+      },
+      {
+        "id": "text_gdiplus_b4797cf6-0db8-4476-94af-895c55aed04f",
+        "name": "Your Name",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "YOUR NAME",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_8f16bfa4-5d3d-4a8f-a63d-f18b1751ae3a",
+        "name": "Your Name",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "YOUR NAME",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_d0c30d74-04a2-429f-9793-87206d4a0f16",
+        "name": "Your Name",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "YOUR NAME",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "text_gdiplus_a1b91ff2-7511-41dd-83da-dd6d2703e76a",
+        "name": "Your Name",
+        "type": "text_gdiplus",
+        "settings": {
+          "align": "left",
+          "bk_color": 0,
+          "bk_opacity": 0,
+          "chatlog_lines": 6,
+          "color": -1,
+          "custom_font": "Roboto-Black.ttf",
+          "extents_cx": 100,
+          "extents_cy": 100,
+          "extents_wrap": true,
+          "file": "",
+          "font": {
+            "face": "Roboto Black",
+            "flags": 0,
+            "size": 64
+          },
+          "gradient_color": 16777215,
+          "gradient_dir": 90,
+          "gradient_opacity": 100,
+          "opacity": 100,
+          "outline": false,
+          "outline_color": -16777216,
+          "outline_opacity": 100,
+          "outline_size": 6,
+          "text": "YOUR NAME",
+          "valign": "top"
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        }
+      },
+      {
+        "id": "ffmpeg_source_c3c00e86-554c-4fcd-ad8e-a20328bf5631",
+        "name": "Be Right Back",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\53.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "1cbfbf07-4e44-404d-a6d6-1cd041d60fc9",
+            "serverId": 3652,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\53.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "ffmpeg_source_f5a4ae03-4943-47d7-b50f-90c4391f46aa",
+        "name": "Stream Ending Soon",
+        "type": "ffmpeg_source",
+        "settings": {
+          "buffering_mb": 2,
+          "clear_on_media_end": true,
+          "color_range": 0,
+          "hw_decode": true,
+          "is_local_file": true,
+          "local_file": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\54.webm",
+          "looping": true,
+          "restart_on_activate": true,
+          "speed_percent": 100
+        },
+        "volume": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {
+            "localId": "64ecebe3-7ba7-4be4-834d-585343b8db86",
+            "serverId": 3654,
+            "originalPath": "C:\\Users\\acree\\AppData\\Roaming\\slobs-client\\Overlays\\00ce2015-bf9c-4605-80fd-b90c48d33278\\54.webm"
+          }
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0
+      },
+      {
+        "id": "wasapi_output_capture_54154e47-4e9b-41de-bfe8-af0e2b4e3370",
+        "name": "Desktop Audio",
+        "type": "wasapi_output_capture",
+        "settings": {
+          "device_id": "default",
+          "use_device_timing": true
+        },
+        "volume": 1,
+        "channel": 1,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0,
+        "mixerHidden": false
+      },
+      {
+        "id": "wasapi_input_capture_5ab90502-af1d-48b1-90b5-a435e9a0b86c",
+        "name": "Mic/Aux",
+        "type": "wasapi_input_capture",
+        "settings": {
+          "device_id": "default",
+          "use_device_timing": false
+        },
+        "volume": 1,
+        "channel": 3,
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "muted": false,
+        "filters": {
+          "items": []
+        },
+        "propertiesManager": "default",
+        "propertiesManagerSettings": {
+          "mediaBackup": {}
+        },
+        "forceMono": false,
+        "syncOffset": {
+          "sec": 0,
+          "nsec": 0
+        },
+        "audioMixers": 255,
+        "monitoringType": 0,
+        "mixerHidden": false
+      }
+    ]
+  },
+  "scenes": {
+    "schemaVersion": 1,
+    "nodeType": "ScenesNode",
+    "items": [
+      {
+        "id": "scene_ef21a78a-a3f9-4751-90e5-e3791643e22e",
+        "name": "Stream Starting Soon",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "cb03a7a8-8f73-4d5f-b5a9-bc8bcb686ad5",
+              "sourceId": "ffmpeg_source_77d1498e-98b4-4075-affb-476c42321aa0",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": false
+      },
+      {
+        "id": "scene_495db9c9-ecf4-49c9-8a8c-58829f9fcb41",
+        "name": "Live Screen",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "be802bc3-5d4f-4d0e-8d24-35b9b3c57051",
+              "sourceId": "image_source_ed1abc40-a809-4b76-b50e-35ba16383b98",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "0b9fe5b2-432c-480f-a332-a6e0bde40e17",
+              "sourceId": "dshow_input_d27204f6-e72a-40f4-889b-9a007886bae6",
+              "x": 92.12392426850266,
+              "y": 738.603039227315,
+              "scaleX": 0.5318416523235799,
+              "scaleY": 0.5318416523235799,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "a151fe5b-b28f-47ac-8030-aa16647c0269",
+              "sourceId": "ffmpeg_source_b973bdc2-0ecb-4b5a-80e9-a67648c8d000",
+              "x": 0,
+              "y": 669.3937369017347,
+              "scaleX": 1.0333459098358742,
+              "scaleY": 1.0333459098358742,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "fd4f3c17-4e4b-4f0e-92ce-2f5e31205422",
+              "name": "Webcam",
+              "sceneNodeType": "folder",
+              "sceneId": "scene_495db9c9-ecf4-49c9-8a8c-58829f9fcb41",
+              "resourceId": "SceneItemFolder[\"scene_495db9c9-ecf4-49c9-8a8c-58829f9fcb41\",\"fd4f3c17-4e4b-4f0e-92ce-2f5e31205422\"]",
+              "parentId": "",
+              "childrenIds": [
+                "a151fe5b-b28f-47ac-8030-aa16647c0269",
+                "0b9fe5b2-432c-480f-a332-a6e0bde40e17"
+              ]
+            },
+            {
+              "id": "ad2b9fad-17a3-4603-98b9-40b4357eaed0",
+              "sourceId": "ffmpeg_source_6891d057-88df-4b15-bf99-feb72dc368e8",
+              "x": 486.10135781220197,
+              "y": 38.40000000000002,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "42096194-d12c-43ea-a060-b8755e2abfc7",
+              "sourceId": "text_gdiplus_5947d94a-b4e9-4043-b08b-a9fa04735865",
+              "x": 620.2845668387831,
+              "y": 164.35848573598764,
+              "scaleX": 0.408567070671937,
+              "scaleY": 0.408567070671937,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "8481545a-1010-479d-8235-3dab73dd8225",
+              "sourceId": "text_gdiplus_69f38a58-6e9a-441a-9363-29cf28795ecf",
+              "x": 1707.4010327022374,
+              "y": 164.25480136181187,
+              "scaleX": 0.401380112640379,
+              "scaleY": 0.401380112640379,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "b817c674-ff05-4cc3-864a-040d1bb6d40d",
+              "sourceId": "text_gdiplus_39335ad2-e9ae-4ff5-bdca-f32786d90f46",
+              "x": 1159.8095238095261,
+              "y": 175.14665201864383,
+              "scaleX": 0.5367113535704855,
+              "scaleY": 0.5367113535704855,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "0c421e1d-3e3e-47af-b63f-a9aa13f4879a",
+              "sourceId": "text_gdiplus_c7ab0e93-8411-4060-8851-7b806868a496",
+              "x": 685.2499521897106,
+              "y": 118.53253551841114,
+              "scaleX": 0.49770987128390154,
+              "scaleY": 0.49770987128390154,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "cda84a5c-7988-4449-8cd4-0f0d25282382",
+              "sourceId": "text_gdiplus_f8ddeb9c-9d06-4d97-a46c-687d903525db",
+              "x": 1490.725487617293,
+              "y": 118.48381423342171,
+              "scaleX": 0.49770987128390154,
+              "scaleY": 0.49770987128390154,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "6401d505-bb58-4830-ae16-f256dbc996cf",
+              "sourceId": "text_gdiplus_0b4a8ba7-795e-4705-8bf6-8565026694de",
+              "x": 1067.871485943775,
+              "y": 119.86586885174448,
+              "scaleX": 0.4275224867195401,
+              "scaleY": 0.42752248671954,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "4a81a1cb-baa7-449b-a55a-91115338df1c",
+              "name": "Header",
+              "sceneNodeType": "folder",
+              "sceneId": "scene_495db9c9-ecf4-49c9-8a8c-58829f9fcb41",
+              "resourceId": "SceneItemFolder[\"scene_495db9c9-ecf4-49c9-8a8c-58829f9fcb41\",\"4a81a1cb-baa7-449b-a55a-91115338df1c\"]",
+              "parentId": "",
+              "childrenIds": [
+                "6401d505-bb58-4830-ae16-f256dbc996cf",
+                "cda84a5c-7988-4449-8cd4-0f0d25282382",
+                "0c421e1d-3e3e-47af-b63f-a9aa13f4879a",
+                "b817c674-ff05-4cc3-864a-040d1bb6d40d",
+                "8481545a-1010-479d-8235-3dab73dd8225",
+                "42096194-d12c-43ea-a060-b8755e2abfc7",
+                "ad2b9fad-17a3-4603-98b9-40b4357eaed0"
+              ]
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": true
+      },
+      {
+        "id": "scene_15786fa7-343e-4202-9eba-9e1dfce8b49e",
+        "name": "Intermission",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "a1f2e8e8-8e56-46b6-b489-5d4776de3576",
+              "sourceId": "dshow_input_d27204f6-e72a-40f4-889b-9a007886bae6",
+              "x": 131.18301778542937,
+              "y": 402.68689375441875,
+              "scaleX": 1.0826161790017212,
+              "scaleY": 1.0826161790017212,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "6c504516-6151-4004-b673-17cdc3dcb1a5",
+              "sourceId": "ffmpeg_source_5a8200c9-e096-481b-bc8e-baa272df1751",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "73ec9e9e-6962-4659-b14d-a223ca808883",
+              "sourceId": "image_source_42438554-5ca7-4fec-85ed-3c1a4b0776cb",
+              "x": 1607.69707401033,
+              "y": 1034.3565891472858,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "667e3160-fe34-49d8-a112-6024a86170fe",
+              "sourceId": "image_source_5c4b3d02-bc56-4a44-af9b-c45a1db19c14",
+              "x": 1608.376362593231,
+              "y": 815.906976744185,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "3168bcea-4275-4207-8ffc-c20284226a12",
+              "sourceId": "image_source_7ddbef98-3341-4fae-bb75-3e2c6d220e14",
+              "x": 1606.3316121629377,
+              "y": 584.9302325581392,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "c3194a0f-bbcf-45e6-b86f-fefc6e3e9f49",
+              "sourceId": "image_source_4d7191a2-507a-4fda-be74-d1db9f6b3405",
+              "x": 1604.5347102696521,
+              "y": 375.56589147286815,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "00e4da87-8361-45c9-95dd-51a4c52fdf78",
+              "sourceId": "text_gdiplus_b4797cf6-0db8-4476-94af-895c55aed04f",
+              "x": 1830.6850258175582,
+              "y": 418.9916132589542,
+              "scaleX": 1.0149002335368165,
+              "scaleY": 1.0149002335368165,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "99272288-0d7d-4ff2-ac6e-65266b1181a5",
+              "sourceId": "text_gdiplus_8f16bfa4-5d3d-4a8f-a63d-f18b1751ae3a",
+              "x": 1831.846242111304,
+              "y": 630.077519379846,
+              "scaleX": 1.0149002335368165,
+              "scaleY": 1.0149002335368165,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "b404a52a-0a30-42b9-9601-ef37fba444b5",
+              "sourceId": "text_gdiplus_d0c30d74-04a2-429f-9793-87206d4a0f16",
+              "x": 1831.0338496844543,
+              "y": 867.5200146480242,
+              "scaleX": 1.0149002335368165,
+              "scaleY": 1.0149002335368165,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "d9b31461-e2cc-4c88-844e-01134503b77e",
+              "sourceId": "text_gdiplus_a1b91ff2-7511-41dd-83da-dd6d2703e76a",
+              "x": 1831.7888697647759,
+              "y": 1082.6679362727914,
+              "scaleX": 1.0149002335368165,
+              "scaleY": 1.0149002335368165,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            },
+            {
+              "id": "fcaf3f54-8d13-44b4-8b00-3fac49328eb4",
+              "name": "Social",
+              "sceneNodeType": "folder",
+              "sceneId": "scene_15786fa7-343e-4202-9eba-9e1dfce8b49e",
+              "resourceId": "SceneItemFolder[\"scene_15786fa7-343e-4202-9eba-9e1dfce8b49e\",\"fcaf3f54-8d13-44b4-8b00-3fac49328eb4\"]",
+              "parentId": "",
+              "childrenIds": [
+                "d9b31461-e2cc-4c88-844e-01134503b77e",
+                "b404a52a-0a30-42b9-9601-ef37fba444b5",
+                "99272288-0d7d-4ff2-ac6e-65266b1181a5",
+                "00e4da87-8361-45c9-95dd-51a4c52fdf78",
+                "c3194a0f-bbcf-45e6-b86f-fefc6e3e9f49",
+                "3168bcea-4275-4207-8ffc-c20284226a12",
+                "667e3160-fe34-49d8-a112-6024a86170fe",
+                "73ec9e9e-6962-4659-b14d-a223ca808883"
+              ]
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": false
+      },
+      {
+        "id": "scene_85e4bc8e-0c9b-4e12-8886-278e923f557b",
+        "name": "Be Right Back",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "7d003715-d21e-40e4-955b-debe5a343887",
+              "sourceId": "ffmpeg_source_c3c00e86-554c-4fcd-ad8e-a20328bf5631",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": false
+      },
+      {
+        "id": "scene_2968818c-50d2-41ea-bbfb-a15c622b2ce3",
+        "name": "Stream Ending Soon",
+        "sceneItems": {
+          "schemaVersion": 1,
+          "nodeType": "SceneItemsNode",
+          "items": [
+            {
+              "id": "f96c05e9-e15c-447d-82f2-98dfca9627ae",
+              "sourceId": "ffmpeg_source_f5a4ae03-4943-47d7-b50f-90c4391f46aa",
+              "x": 0,
+              "y": 0,
+              "scaleX": 1.3333333333333333,
+              "scaleY": 1.3333333333333335,
+              "visible": true,
+              "crop": {
+                "top": 0,
+                "bottom": 0,
+                "left": 0,
+                "right": 0
+              },
+              "locked": false,
+              "hotkeys": {
+                "schemaVersion": 2,
+                "nodeType": "HotkeysNode",
+                "items": []
+              },
+              "rotation": 0
+            }
+          ]
+        },
+        "hotkeys": {
+          "schemaVersion": 2,
+          "nodeType": "HotkeysNode",
+          "items": []
+        },
+        "filters": {
+          "schemaVersion": 1,
+          "nodeType": "SceneFiltersNode",
+          "items": []
+        },
+        "active": false
+      }
+    ]
+  },
+  "transition": {
+    "schemaVersion": 1,
+    "nodeType": "TransitionNode",
+    "type": "cut_transition",
+    "duration": 300,
+    "settings": {}
+  },
+  "hotkeys": {
+    "schemaVersion": 2,
+    "nodeType": "HotkeysNode",
+    "items": []
+  }
+}
