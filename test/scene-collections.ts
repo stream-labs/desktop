@@ -42,7 +42,7 @@ useSpectron({
  * with old scene collection formats.  This current snapshot of
  * a valid scene collection schema was taken on 5/22/18.
  */
-test.only('Loading an old scene collection', async t => {
+test('Loading an old scene collection', async t => {
   // Make sure we loaded the scenes
   t.true(await t.context.app.client.isExisting('li=Stream Starting Soon'));
   t.true(await t.context.app.client.isExisting('li=Live Screen'));
