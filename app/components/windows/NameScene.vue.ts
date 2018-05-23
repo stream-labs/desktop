@@ -7,6 +7,7 @@ import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi } from '../../services/sources';
 import { ISelectionServiceApi } from '../../services/selection';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { ModalLayout },
@@ -55,7 +56,7 @@ export default class NameScene extends Vue {
     const activeScene = this.scenesService.activeScene;
 
     if (!this.name) {
-      this.error = 'The scene name is required';
+      this.error = $t('The scene name is required');
     } else if (this.options.rename) {
       this.scenesService.getSceneByName(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();

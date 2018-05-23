@@ -10,7 +10,7 @@
           :checked="isGoogleFont"
           @change="setFontType"
         />
-        <label>Use Google Font</label>
+        <label>{{ $t('Use Google Font') }}</label>
       </div>
     </div>
   </div>

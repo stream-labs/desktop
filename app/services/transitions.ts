@@ -12,6 +12,7 @@ import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { $t } from 'services/i18n';
 
 export enum ETransitionType {
   Cut = 'cut_transition',
@@ -29,15 +30,7 @@ interface ITransitionsState {
   studioMode: boolean;
 }
 
-const TRANSITION_TYPES: IListOption<string>[] = [
-  { description: 'Cut', value: ETransitionType.Cut },
-  { description: 'Fade', value: ETransitionType.Fade },
-  { description: 'Swipe', value: ETransitionType.Swipe },
-  { description: 'Slide', value: ETransitionType.Slide },
-  { description: 'Fade to Color', value: ETransitionType.FadeToColor },
-  { description: 'Luma Wipe', value: ETransitionType.LumaWipe },
-  { description: 'Stinger', value: ETransitionType.Stinger }
-];
+
 
 export class TransitionsService extends StatefulService<ITransitionsState> {
   static initialState = {
@@ -75,6 +68,18 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
       this.disableStudioMode();
     });
+  }
+
+  getTypes(): IListOption<string>[] {
+    return [
+      { description: $t('Cut'), value: 'cut_transition' },
+      { description: $t('Fade'), value: 'fade_transition' },
+      { description: $t('Swipe'), value: 'swipe_transition' },
+      { description: $t('Slide'), value: 'slide_transition' },
+      { description: $t('Fade to Color'), value: 'fade_to_color_transition' },
+      { description: $t('Luma Wipe'), value: 'wipe_transition' },
+      { description: $t('Stinger'), value: 'obs_stinger_transition' }
+    ];
   }
 
   enableStudioMode() {
@@ -185,7 +190,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   setType(type: ETransitionType) {
     const oldTransition = this.getCurrentTransition() as obs.ITransition;
 
-    const transition = TRANSITION_TYPES.find(transition => {
+    const transition = this.getTypes().find(transition => {
       return transition.value === type;
     });
 
@@ -212,7 +217,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
         description: 'Transition',
         name: 'type',
         value: this.state.type,
-        options: TRANSITION_TYPES
+        options: this.getTypes()
       },
       duration: {
         description: 'Duration',

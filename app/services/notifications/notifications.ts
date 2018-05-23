@@ -12,6 +12,7 @@ import {
   INotificationsServiceApi,
   INotificationsSettings
 } from './notifications-api';
+import { $t } from 'services/i18n';
 
 interface INotificationsState {
   settings: INotificationsSettings;
@@ -106,7 +107,7 @@ export class NotificationsService extends PersistentStatefulService<
       <IFormInput<boolean>>{
         value: settings.enabled,
         name: 'enabled',
-        description: 'Enable notifications',
+        description: $t('Enable notifications'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true
@@ -115,7 +116,7 @@ export class NotificationsService extends PersistentStatefulService<
       <IFormInput<boolean>>{
         value: settings.playSound,
         name: 'playSound',
-        description: 'Enable sound',
+        description: $t('Enable sound'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: settings.enabled

@@ -1,0 +1,17 @@
+{
+    "Image": "Görüntü",
+    "Color Source": "Renk Kaynağı",
+    "Browser Source": "Tarayıcı Kaynağı",
+    "Media Source": "Medya Kaynağı",
+    "Image Slide Show": "Görüntü Slayt Gösterisi",
+    "Text (GDI+)": "Yazı (GDI+)",
+    "Text (FreeType 2)": "Yazı (FreeType 2)",
+    "Display Capture": "Ekran Yakala",
+    "Window Capture": "Pencere Yakala",
+    "Game Capture": "Oyun Yakala",
+    "Video Capture Device": "Kamera Yakala",
+    "Audio Input Capture": "Ses Girişi Yakala",
+    "Audio Output Capture": "Ses Çıkışı Yakala",
+    "Blackmagic Device": "Blackmagic Aygıtı",
+    "NDI Source": "NDI Kaynağı"
+}

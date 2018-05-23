@@ -7,6 +7,7 @@ import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -40,7 +41,7 @@ export default class WidgetProperties extends Vue {
 
     this.widgetModel = {
       value,
-      description: 'Widget Type',
+      description: $t('Widget Type'),
       name: 'widgetType',
       options: Object.keys(WidgetDefinitions).map(type => {
         const widget = WidgetDefinitions[type] as IWidget;

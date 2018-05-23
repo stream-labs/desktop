@@ -1,6 +1,6 @@
 <template>
   <modal-layout
-    title="Add layer filter"
+    :title="$t('Add layer filter')"
     :done-handler="done"
     :cancel-handler="cancel"
   >

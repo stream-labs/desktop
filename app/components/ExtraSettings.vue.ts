@@ -11,6 +11,7 @@ import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { BoolInput }
@@ -29,7 +30,7 @@ export default class ExtraSettings extends Vue {
   get streamInfoUpdateModel(): IFormInput<boolean> {
     return {
       name: 'stream_info_udpate',
-      description: 'Confirm stream title and game before going live',
+      description: $t('Confirm stream title and game before going live'),
       value: this.customizationService.state.updateStreamInfoOnLive
     };
   }
@@ -47,7 +48,7 @@ export default class ExtraSettings extends Vue {
   deleteCacheDir() {
     if (
       confirm(
-        'WARNING! You will lose all scenes, sources, and settings. This cannot be undone!'
+        $t('WARNING! You will lose all scenes, sources, and settings. This cannot be undone!')
       )
     ) {
       electron.remote.app.relaunch({ args: ['--clearCacheDir'] });
@@ -60,7 +61,7 @@ export default class ExtraSettings extends Vue {
     this.cacheUploaderService.uploadCache().then(file => {
       electron.remote.clipboard.writeText(file);
       alert(
-        `Your cache directory has been successfully uploaded.  The file name ${file} has been copied to your clipboard.  Please paste it into discord and tag a developer.`
+        $t('Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.', { file })
       );
       this.cacheUploading = false;
     });
@@ -68,7 +69,7 @@ export default class ExtraSettings extends Vue {
 
   restartStreamlabelsSession() {
     this.streamlabelsService.restartSession().then(result => {
-      if (result) alert('Streamlabels session has been succesfully restarted!');
+      if (result) alert($t('Streamlabels session has been succesfully restarted!'));
     });
   }
 

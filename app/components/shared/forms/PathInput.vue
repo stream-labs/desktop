@@ -14,7 +14,7 @@
       <button
         @click="showFileDialog"
         class="path__browse-button button button--dark">
-        Browse
+        {{ $t('Browse') }}
       </button>
     </div>
   </div>

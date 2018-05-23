@@ -5,6 +5,7 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
+import { $t } from 'services/i18n';
 
 
 @Component({
@@ -40,7 +41,7 @@ export default class NameFolder extends Vue {
 
   submit() {
     if (!this.name) {
-      this.error = 'The source name is required';
+      this.error = $t('The source name is required');
     } else if (this.options.renameId) {
       const folder = this.scenesService
         .activeScene

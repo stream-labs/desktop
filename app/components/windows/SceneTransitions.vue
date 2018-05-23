@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Scene transition"
+  :title="$t('Scene transition')"
   :done-handler="done">
 
   <div slot="content">

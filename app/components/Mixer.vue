@@ -4,7 +4,7 @@
     <h4
       class="studio-controls__label"
       v-tooltip.bottom="mixerTooltip">
-      Mixer
+      {{ $t('Mixer') }}
     </h4>
     <div>
       <i

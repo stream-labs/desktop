@@ -19,9 +19,9 @@
             :style="swatchStyle"/>
         </div>
         <color-picker
-          v-model="color"
+          :value="obsColor"
+          @input="(value) => setValue(value.rgba)"
           v-if="pickerVisible"
-          @change-color="onChange"
           class="colorpicker-menu"/>
       </div>
     </div>

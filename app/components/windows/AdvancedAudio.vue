@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   :showControls="false"
-  title="Advanced Audio Settings">
+  :title="$t('Advanced Audio Settings')">
 
   <div slot="content">
 
@@ -9,12 +9,12 @@
     <table>
 
       <tr>
-        <th>Name</th>
-        <th>Volume ( % )</th>
-        <th>Downmix to Mono</th>
-        <th>Sync Offset ( ms )</th>
-        <th>Audio Monitoring</th>
-        <th>Tracks</th>
+        <th>{{ $t('Name') }}</th>
+        <th>{{ $t('Volume ( % )') }}</th>
+        <th>{{ $t('Downmix to Mono') }}</th>
+        <th>{{ $t('Sync Offset ( ms )') }}</th>
+        <th>{{ $t('Audio Monitoring') }}</th>
+        <th>{{ $t('Tracks') }}</th>
       </tr>
 
       <tr v-for="audioSource in audioSources">

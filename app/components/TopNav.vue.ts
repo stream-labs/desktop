@@ -66,10 +66,6 @@ export default class TopNav extends Vue {
     this.customizationService.nightMode = !this.customizationService.nightMode;
   }
 
-  bugReport() {
-    electron.remote.shell.openExternal('https://tracker.streamlabs.com');
-  }
-
   openDiscord() {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }

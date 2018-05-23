@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "開啟進階音訊設置",
+  "Volume (%)": "音量（%）",
+  "Downmix to Mono": "混合多聲道為單聲道",
+  "Sync Offset (ms)": "同步位移（ms）",
+  "Audio Monitoring": "音訊監測",
+  "Monitor Off": "關閉監測",
+  "Monitor Only (mute output)": "僅監測 ( 無輸出 )",
+  "Monitor and Output": "監測並輸出",
+  "Tracks": "音軌",
+  "Advanced Audio Settings": "進階音訊設置",
+  "Volume ( % )": "音量（%）",
+  "Sync Offset ( ms )": "同步位移（ms）",
+  "Mixer": "混音器",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "監測音訊大小。若音量調產生位移表示正在輸出音源。"
+}
