@@ -74,6 +74,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   async load() {
 
     const WHITE_LIST = [
+      'en-US',
       'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
       'hu-HU', 'it-IT', 'ja-JP', 'pl-PL',
       'pt-PT', 'pt-BR', 'es-ES', 'tr-TR'
