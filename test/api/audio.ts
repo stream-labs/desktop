@@ -1,7 +1,6 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
-import { sleep } from '../helpers/sleep';
 import { IAudioServiceApi } from 'services/audio';
 import { IScenesServiceApi } from 'services/scenes';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';

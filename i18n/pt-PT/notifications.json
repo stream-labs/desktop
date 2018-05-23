@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "Não tem quaisquer notificações",
+  "Enable notifications": "Activar notificações",
+  "Enable sound": "Activar som",
+  "Skipped frames detected:": "Frames ignorados detectados:",
+  "Detect skipped frames": "Detectar frames ignorados",
+  "Skipped frames threshold": "Limite de frames ignorados",
+  "Detect lagged frames": "Detectar frames atrasados",
+  "Lagged frames threshold": "Limite de frames atrasados",
+  "Detect dropped frames": "Detectar frames perdidos",
+  "Dropped frames threshold": "Limite de frames perdidos",
+  "Show Notifications": "Mostrar notificações",
+  "Restore Defaults": "Restaurar padrão",
+  "Troubleshooter Notifications": "Notificações de solução de problemas",
+  "Click to open your Notifications window": "Clique para abrir a sua janela de notificações",
+  "Click to read your unread Notifications": "Pressione para ler as suas notificações não lidas",
+  "New Notifications": "Novas notificações",
+  "Log": "Registo"
+}

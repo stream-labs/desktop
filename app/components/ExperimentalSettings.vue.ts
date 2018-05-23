@@ -4,9 +4,10 @@ import { Inject } from '../util/injector';
 import GenericForm from './shared/forms/GenericForm.vue';
 import { TFormData, TObsValue } from './shared/forms/Input';
 import { ICustomizationServiceApi } from 'services/customization';
+import LanguageSettings from 'components/LanguageSettings.vue';
 
 @Component({
-  components: { GenericForm }
+  components: { GenericForm, LanguageSettings }
 })
 export default class ExperimentalSettings extends Vue {
 

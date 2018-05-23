@@ -18,6 +18,7 @@ import {
   IVolmeter
 } from './audio-api';
 import { Observable } from 'rxjs/Observable';
+import { $t } from 'services/i18n';
 
 const { ipcRenderer } = electron;
 
@@ -306,7 +307,7 @@ export class AudioSource implements IAudioSourceApi {
       <INumberInputValue>{
         name: 'deflection',
         value: Math.round(this.fader.deflection * 100),
-        description: 'Volume (%)',
+        description: $t('Volume (%)'),
         showDescription: false,
         visible: true,
         enabled: true,
@@ -318,7 +319,7 @@ export class AudioSource implements IAudioSourceApi {
       <IFormInput<boolean>> {
         value: this.forceMono,
         name: 'forceMono',
-        description: 'Downmix to Mono',
+        description: $t('Downmix to Mono'),
         showDescription: false,
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
@@ -328,7 +329,7 @@ export class AudioSource implements IAudioSourceApi {
       <IFormInput<number>> {
         value: this.syncOffset,
         name: 'syncOffset',
-        description: 'Sync Offset (ms)',
+        description: $t('Sync Offset (ms)'),
         showDescription: false,
         type: 'OBS_PROPERTY_INT',
         visible: true,
@@ -338,15 +339,15 @@ export class AudioSource implements IAudioSourceApi {
       <IListInput<obs.EMonitoringType>> {
         value: this.monitoringType,
         name: 'monitoringType',
-        description: 'Audio Monitoring',
+        description: $t('Audio Monitoring'),
         showDescription: false,
         type: 'OBS_PROPERTY_LIST',
         visible: true,
         enabled: true,
         options: [
-          { value: obs.EMonitoringType.None, description: 'Monitor Off' },
-          { value: obs.EMonitoringType.MonitoringOnly, description: 'Monitor Only (mute output)' },
-          { value: obs.EMonitoringType.MonitoringAndOutput, description: 'Monitor and Output' }
+          { value: obs.EMonitoringType.None, description: $t('Monitor Off') },
+          { value: obs.EMonitoringType.MonitoringOnly, description: $t('Monitor Only (mute output)') },
+          { value: obs.EMonitoringType.MonitoringAndOutput, description: $t('Monitor and Output') }
         ]
       },
 
@@ -354,7 +355,7 @@ export class AudioSource implements IAudioSourceApi {
       <IBitmaskInput> {
         value: this.audioMixers,
         name: 'audioMixers',
-        description: 'Tracks',
+        description: $t('Tracks'),
         showDescription: false,
         type: 'OBS_PROPERTY_BITMASK',
         visible: true,

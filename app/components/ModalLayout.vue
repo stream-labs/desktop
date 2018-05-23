@@ -17,12 +17,12 @@
       v-if="showCancel"
       class="button button--default"
       @click="cancel">
-      Cancel
+      {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
       @click="doneHandler">
-      Done
+      {{ $t('Done') }}
     </button>
   </div>
   <div v-if="customControls" class="modal-layout-controls">

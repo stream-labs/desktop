@@ -1,0 +1,3 @@
+files:
+  - source: /app/i18n/en-US
+    translation: /app/i18n/%locale%/%original_file_name%

@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.9.1-preview.1",
+  "version": "0.9.1",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -37,6 +37,7 @@
       "obs-api"
     ],
     "extraFiles": [
+      "i18n",
       "LICENSE",
       "AGREEMENT"
     ],
@@ -64,7 +65,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "1.8.4",
+    "runtimeVersion": "2.0.1",
     "arch": "x64"
   },
   "dependencies": {
@@ -75,7 +76,8 @@
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.30/iojs-v1.8.4-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.35/iojs-v2.0.1-signed.tar.gz",
+    "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
@@ -95,7 +97,7 @@
     "@types/webdriverio": "^4.8.6",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "archiver": "^2.0.3",
-    "ava": "^0.19.1",
+    "ava": "^0.25.0",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
     "babel-loader": "^7.1.3",
@@ -106,7 +108,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "1.8.4",
+    "electron": "2.0.1",
     "electron-builder": "20.6.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",
@@ -143,17 +145,18 @@
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "v-tooltip": "^2.0.0-rc.31",
-    "vue": "^2.5.12",
+    "vue": "^2.5.16",
     "vue-color": "^2.4.3",
+    "vue-i18n": "^7.6.0",
     "vue-loader": "^14.1.1",
     "vue-multiselect": "https://github.com/stream-labs/vue-multiselect.git",
     "vue-popperjs": "^1.2.2",
     "vue-property-decorator": "^5.0.1",
     "vue-slider-component": "^2.2.7",
-    "vue-template-compiler": "^2.5.12",
+    "vue-template-compiler": "^2.5.16",
     "vuedraggable": "^2.8.5",
     "vuex": "^3.0.1",
-    "webpack": "^4.0.1",
-    "webpack-cli": "^2.0.9"
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.3"
   }
 }

@@ -59,15 +59,16 @@ import {
   IJsonRpcEvent,
   IJsonRpcRequest,
   E_JSON_RPC_ERROR,
-  IMutation
+  IMutation,
+  JsonrpcService
 } from 'services/jsonrpc';
-import { JsonrpcService } from './services/jsonrpc/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
 import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 
 const { ipcRenderer } = electron;
@@ -136,11 +137,12 @@ export class ServicesManager extends Service {
     FileManagerService,
     PatchNotesService,
     ProtocolLinksService,
-    WebsocketService,
     ProjectorService,
+    I18nService,
     TransitionsService,
     WidgetSettingsService,
-    MediaBackupService
+    MediaBackupService,
+    WebsocketService
   };
 
   private instances: Dictionary<Service> = {};
