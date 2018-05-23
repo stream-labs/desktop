@@ -41,5 +41,8 @@
   "Go to Youtube Live Dashboard to control your stream": "前往Youtube實況儀表板控制後台",
   "Are you sure you want to exit while live?": "您是否確定要在串流時離開？",
   "Enable the preview stream": "啟用預視實況串流",
-  "Disable the preview stream, can help with CPU": "關閉預視實況串流，可以有效降低CPU使用率。"
+  "Disable the preview stream, can help with CPU": "關閉預視實況串流，可以有效降低CPU使用率。",
+  "viewers": "觀眾",
+  "Refresh Chat": "重整聊天室",
+  "Your chat is currently offline": "聊天室目前離線中"
 }

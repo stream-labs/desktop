@@ -65,6 +65,7 @@
   "New Subscribers": "Yeni Aboneler",
   "Cheers": "Cheers",
   "Spin Wheel": "Çarkı Döndür",
+  "Spin the wheel to make a decision.": "Bir karar vermek için çarkı çevirin.",
   "The streamer manually triggers a spin anytime while they are live.": "Yayıncı, yayında iken, istediği zaman çarkı çevirmeyi tetikler.",
   "Allows you to add existing scene as a source": "Kaynak bölgesine oluşturduğunuz sahneyi eklemenizi sağlar",
   "Stream Label": "Yayın Etiketi",
@@ -130,5 +131,12 @@
   "Ungroup Folder": "Klasör Grubunu Kaldır",
   "Group into Scene": "Sahne içine Grupla",
   "Ungroup Scene": "Sahne Grubunu Kaldır",
-  "Create Source Projector": "Sahne Projektörü Oluştur"
+  "Create Source Projector": "Sahne Projektörü Oluştur",
+  "Click \"Add Source\" when you're ready to add it to your scene": "Bunu, sahnene eklemeye hazır olduğunda, \"Kaynak Ekle\" ye tıkla",
+  "BrowserSource": "KaynağıGözdenGeçir",
+  "NDI source": "NDI kaynağı",
+  "Use Google Font": "Google yazı tipini kullanın",
+  "Center Horizontal": "Merkezi Yatay",
+  "Center Vertical": "Merkezi Dikey",
+  "Unhide All": "Hepsini Göster"
 }

@@ -65,6 +65,7 @@
   "New Subscribers": "New Subscribers",
   "Cheers": "Cheers",
   "Spin Wheel": "Spin Wheel",
+  "Spin the wheel to make a decision.": "Spin the wheel to make a decision.",
   "The streamer manually triggers a spin anytime while they are live.": "The streamer manually triggers a spin anytime while they are live.",
   "Allows you to add existing scene as a source": "Allows you to add existing scene as a source",
   "Stream Label": "Stream Label",
@@ -130,5 +131,12 @@
   "Ungroup Folder": "Ungroup Folder",
   "Group into Scene": "Group into Scene",
   "Ungroup Scene": "Ungroup Scene",
-  "Create Source Projector": "Create Source Projector"
+  "Create Source Projector": "Create Source Projector",
+  "Click \"Add Source\" when you're ready to add it to your scene": "Click \"Add Source\" when you're ready to add it to your scene",
+  "BrowserSource": "BrowserSource",
+  "NDI source": "NDI source",
+  "Use Google Font": "Use Google Font",
+  "Center Horizontal": "Center Horizontal",
+  "Center Vertical": "Center Vertical",
+  "Unhide All": "Unhide All"
 }

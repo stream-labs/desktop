@@ -65,6 +65,7 @@
   "New Subscribers": "新訂閱者",
   "Cheers": "小奇點支持者",
   "Spin Wheel": "旋轉輪盤",
+  "Spin the wheel to make a decision.": "轉動輪盤讓它做一個決定。",
   "The streamer manually triggers a spin anytime while they are live.": "實況主可以在直播中隨時手動轉動輪盤。",
   "Allows you to add existing scene as a source": "允許您將現有的場景當作一個來源",
   "Stream Label": "實況標籤",
@@ -130,5 +131,12 @@
   "Ungroup Folder": "解除資料夾分群",
   "Group into Scene": "分群入場景內",
   "Ungroup Scene": "解除場景分群",
-  "Create Source Projector": "創建來源投影視窗"
+  "Create Source Projector": "創建來源投影視窗",
+  "Click \"Add Source\" when you're ready to add it to your scene": "當你確認要加它進入當前場景，點擊「新增來源」",
+  "BrowserSource": "瀏覽器來源",
+  "NDI source": "NDI 來源",
+  "Use Google Font": "使用Google字型",
+  "Center Horizontal": "水平對齊",
+  "Center Vertical": "垂直對齊",
+  "Unhide All": "全部取消隱藏"
 }

@@ -3,8 +3,8 @@
   "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.": "Érvénytelen Útvonal vagy Kapcsolati URL. Kérjük, ellenőrizd a beállításokat és erősítsd meg, hogy érvényesek-e.",
   "Failed to connect to the streaming server.  Please check your internet connection.": "Nem tudtunk csatlakozni a stream szerverre. Ellenőrizd az internetkapcsolatod.",
   "Disconnected from the streaming server.  Please check your internet connection.": "Lecsatlakoztál a stream szerverről. Kérünk ellenőrizd az internetkapcsolatod.",
-  "Could not access the specified channel or stream key, please double-check your stream key.  ": "Nem tudtunk hozzáférni a megadott csatornához vagy stream kulcshoz. Kérünk ellenőrizd a stream kulcsod.  ",
-  "If it is correct, there may be a problem connecting to the server.": "Amennyiben helyes, úgy probléma lehet a szerverre való csatlakozással.",
+  "Could not access the specified channel or stream key, please double-check your stream key.  ": "Nem tudtunk hozzáférni a megadott csatornához vagy stream kulcshoz. Kérjük, ellenőrizd a stream kulcsod.  ",
+  "If it is correct, there may be a problem connecting to the server.": "Amennyiben az információk helyesek, úgy probléma lehet a szerverre való csatlakozással.",
   "There is not sufficient disk space to continue recording.": "Nincs elég lemezterület a felvétel folytatásához.",
   "The output format is either unsupported or does not support more than one audio track.  ": "A kimeneti formátum nem támogatott, vagy az nem támogat egynél több hangsávot.  ",
   "Please check your settings and try again.": "Kérünk ellenőrizd a beállításokat és próbáld újra.",
@@ -36,10 +36,13 @@
   "ENDING": "BEFEJEZÉS",
   "RECONNECTING": "ÚJRACSATLAKOZÁS",
   "GO LIVE": "ADÁS KEZDÉSE",
-  "Go to Youtube to view your live stream": "Az élő adásod megtekintéséhez látogass el a YouTube-ra",
+  "Go to Youtube to view your live stream": "Az élő adásod megtekintéséhez, látogass el a YouTube-ra",
   "Edit your stream title and description": "Szerkeszd az adás címét és leírását",
-  "Go to Youtube Live Dashboard to control your stream": "A streamed irányításához látogasd meg a YouTube Élő Irányítópultot",
+  "Go to Youtube Live Dashboard to control your stream": "A streamed irányításához, látogasd meg a YouTube Élő Irányítópultot",
   "Are you sure you want to exit while live?": "Biztosan kilépsz miközben megy az adás?",
   "Enable the preview stream": "Adás előnézetének bekapcsolása",
-  "Disable the preview stream, can help with CPU": "Adás előnézetének kikapcsolása, leveszi a terhet a processzorról"
+  "Disable the preview stream, can help with CPU": "Adás előnézetének kikapcsolása, leveszi a terhet a processzorról",
+  "viewers": "néző",
+  "Refresh Chat": "Chat Frissítése",
+  "Your chat is currently offline": "A chated jelenleg nem elérhető"
 }

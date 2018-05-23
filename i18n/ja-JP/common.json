@@ -25,7 +25,7 @@
   "Are you sure you want to log out?": "ログアウトしてもよろしいですか？",
   "Name": "名前",
   "Delete": "削除",
-  "Continue": "続く",
+  "Continue": "続きます",
   "Login": "ログイン",
   "Yes": "はい",
   "No": "いいえ",
@@ -35,5 +35,7 @@
   "Show": "表示",
   "Hide": "非表示",
   "Copy": "コピー",
-  "Select All": "すべてを選択する"
+  "Select All": "すべてを選択する",
+  "Select Option": "オプションを選択します。",
+  "Browse": "参照"
 }

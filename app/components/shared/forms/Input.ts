@@ -335,7 +335,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     const formItem: IFormInput<TObsValue> = {
       value: obsSettings[obsProp.name],
       name: obsProp.name,
-      description: obsProp.description,
+      description: $t(obsProp.description),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
       type: obsType

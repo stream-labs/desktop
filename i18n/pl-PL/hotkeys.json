@@ -9,5 +9,8 @@
   "Mute": "Wycisz",
   "Unmute": "Wyłącz wyciszenie",
   "Push to Mute": "Naciśnij, aby wyciszyć",
-  "Push to Talk": "Naciśnij, aby mówić"
+  "Push to Talk": "Naciśnij, aby mówić",
+  "Enable Studio Mode": "Włącz tryb studia",
+  "Disable Studio Mode": "Wyłącz tryb studia",
+  "Transition (Studio Mode)": "Przejście (tryb Studia)"
 }

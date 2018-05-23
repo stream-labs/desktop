@@ -65,6 +65,7 @@
   "New Subscribers": "Nowi Subskrybenci",
   "Cheers": "Cheers",
   "Spin Wheel": "Koło fortuny",
+  "Spin the wheel to make a decision.": "Zakręć kołem, aby podjąć decyzję.",
   "The streamer manually triggers a spin anytime while they are live.": "Streamer może manualnie zakręcić kołem, gdy tylko będzie na żywo.",
   "Allows you to add existing scene as a source": "Pozwala na dodawanie sceny jako źródło",
   "Stream Label": "Etykieta streamu",
@@ -130,5 +131,12 @@
   "Ungroup Folder": "Rozgrupuj folder",
   "Group into Scene": "Zgrupuj do sceny",
   "Ungroup Scene": "Rozgrupuj scene",
-  "Create Source Projector": "Tworzenie źródła projektora"
+  "Create Source Projector": "Tworzenie źródła projektora",
+  "Click \"Add Source\" when you're ready to add it to your scene": "Kiedy będziesz gotowy, kliknij \"Dodaj Źródło\" aby dodaj je do sceny",
+  "BrowserSource": "Źródło przeglądarki",
+  "NDI source": "Źródło NDI",
+  "Use Google Font": "Użyj czcionki google",
+  "Center Horizontal": "Wyśrodkuj w poziomie",
+  "Center Vertical": "Wyśrodkuj w pionie",
+  "Unhide All": "Odkryj wszystkie"
 }

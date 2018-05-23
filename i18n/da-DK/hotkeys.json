@@ -1,13 +1,16 @@
 {
-  "Start Streaming": "Start Streaming",
-  "Stop Streaming": "Stop Streaming",
-  "Start Recording": "Start Recording",
-  "Stop Recording": "Stop Recording",
-  "Switch to scene": "Switch to scene",
-  "Show %{sourcename}": "Show %{sourcename}",
-  "Hide %{sourcename}": "Hide %{sourcename}",
-  "Mute": "Mute",
-  "Unmute": "Unmute",
-  "Push to Mute": "Push to Mute",
-  "Push to Talk": "Push to Talk"
+  "Start Streaming": "Påbegynd stream",
+  "Stop Streaming": "Afslut stream",
+  "Start Recording": "Påbegynd optagelse",
+  "Stop Recording": "Afslut optagelse",
+  "Switch to scene": "Skift til scene",
+  "Show %{sourcename}": "Vis %{sourcename}",
+  "Hide %{sourcename}": "Skjul %{sourcename}",
+  "Mute": "Gør stum",
+  "Unmute": "Fjern stum",
+  "Push to Mute": "Tryk for at gøre stum",
+  "Push to Talk": "Tryk for at tale",
+  "Enable Studio Mode": "Enable Studio Mode",
+  "Disable Studio Mode": "Disable Studio Mode",
+  "Transition (Studio Mode)": "Transition (Studio Mode)"
 }
