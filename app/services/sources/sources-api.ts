@@ -90,7 +90,8 @@ export type TSourceType =
   'decklink-input' |
   'scene' |
   'ndi_source' |
-  'openvr_capture'
+  'openvr_capture' |
+  'liv_capture'
   ;
 
 // Register new properties manager here
