@@ -12,8 +12,6 @@
   width: 100%;
   overflow: hidden;
   margin: 10px 0;
-  height: 4px;
-  border-radius: 4px;
   background-color: @slider-background-color;
 }
 

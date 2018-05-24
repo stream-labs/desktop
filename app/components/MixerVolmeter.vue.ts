@@ -3,62 +3,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
 import { AudioSource } from '../services/audio';
 
-// From Qt OBS
-const minimumLevel = -60.0;                               // -60 dB
-const warningLevel = -20.0;                               // -20 dB
-const errorLevel = -9.0;                                  //  -9 dB
-const clipLevel = -0.5;                                   //  -0.5 dB
-const minimumInputLevel = -50.0;                          // -50 dB
-const peakDecayRate = 11.76;                              //  20 dB / 1.7 sec
-const magnitudeIntegrationTime = 0.3;                     //  99% in 300 ms
-const peakHoldDuration = 20.0;                            //  20 seconds
-const inputPeakHoldDuration = 1.0; //  1 second
-
-/* Javascript doesn't have a native clamp function...? */
-// function clamp(value: number, min: number, max: number) {
-//   return (value < min) ? (min) : ((value > max) ? (max) : (value));
-// }
-
-// // This class manages animating the volmeter.  If this needs to
-// // be used elsewhere in the future it can be extracted to
-// // another file.
-// class Volmeter {
-//   data: {
-//     level: number;
-//     peak: number;
-//   };
-
-//   constructor(
-//     private levelElement: HTMLElement,
-//     private peakElement: HTMLElement,
-//     private interval: number
-//   ) {
-//     this.data = { level: 0, peak: 0 };
-//   }
-
-//   setData(level: number, peak: number) {
-//     this.data.level = level;
-//     this.data.peak = peak;
-//     this.draw();
-//   }
-
-//   draw() {
-//     let magScale = 0.0;
-//     let peakScale = 0.0;
-
-//     if (isFinite(this.data.level))
-//       magScale =  clamp(((-60 - this.data.level) / -60), 0.0, 1.0);
-
-//     if (isFinite(this.data.peak))
-//       peakScale = clamp(((-60 - this.data.peak) / -60), 0.0, 1.0);
-
-//     this.levelElement.style.transform = `scale(${peakScale}, 60.0)`;
-//     this.peakElement.style.left = `${100 * magScale}%`;
-//   }
-// }
-
 // Configuration
-const CANVAS_HEIGHT = 1;
+const CHANNEL_HEIGHT = 3;
+const PADDING_HEIGHT = 2;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -84,21 +31,38 @@ export default class MixerVolmeter extends Vue {
 
   ctx: CanvasRenderingContext2D;
 
-  peakHoldCounter: number;
-  peakHold: number;
+  peakHoldCounters: number[];
+  peakHolds: number[];
   canvasWidth: number;
   canvasWidthInterval: number;
+  channelCount: number;
+  canvasHeight: number;
 
   mounted() {
     this.subscribeVolmeter();
-    this.$refs.canvas.height = CANVAS_HEIGHT;
+    this.peakHoldCounters = [];
+    this.peakHolds = [];
+    this.setChannelCount(1);
     this.ctx = this.$refs.canvas.getContext('2d');
-    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
+    this.canvasWidthInterval = window.setInterval(
+      () => this.setCanvasWidth(),
+      500
+    );
   }
 
   destroyed() {
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
+  }
+
+  setChannelCount(channels: number) {
+    if (channels !== this.channelCount) {
+      this.channelCount = channels;
+      this.canvasHeight =
+        channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
+      this.$refs.canvas.height = this.canvasHeight;
+      this.$refs.canvas.style.height = `${this.canvasHeight}px`;
+    }
   }
 
   setCanvasWidth() {
@@ -111,61 +75,95 @@ export default class MixerVolmeter extends Vue {
     }
   }
 
-  drawVolmeter(peak: number) {
-    this.updatePeakHold(peak);
+  drawVolmeter(peaks: number[]) {
+    this.ctx.fillStyle = '#09161d';
+    this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    this.ctx.clearRect(0, 0, this.canvasWidth, CANVAS_HEIGHT);
+    peaks.forEach((peak, channel) => {
+      this.drawVolmeterChannel(peak, channel);
+    });
+  }
 
+  drawVolmeterChannel(peak: number, channel: number) {
+    this.updatePeakHold(peak, channel);
+
+    const heightOffset = channel * (CHANNEL_HEIGHT + PADDING_HEIGHT);
     const warningPx = this.dbToPx(WARNING_LEVEL);
     const dangerPx = this.dbToPx(DANGER_LEVEL);
 
     this.ctx.fillStyle = GREEN_BG;
-    this.ctx.fillRect(0, 0, warningPx, CANVAS_HEIGHT);
+    this.ctx.fillRect(0, heightOffset, warningPx, CHANNEL_HEIGHT);
     this.ctx.fillStyle = YELLOW_BG;
-    this.ctx.fillRect(warningPx, 0, dangerPx - warningPx, CANVAS_HEIGHT);
+    this.ctx.fillRect(
+      warningPx,
+      heightOffset,
+      dangerPx - warningPx,
+      CHANNEL_HEIGHT
+    );
     this.ctx.fillStyle = RED_BG;
-    this.ctx.fillRect(dangerPx, 0, this.canvasWidth - dangerPx, CANVAS_HEIGHT);
+    this.ctx.fillRect(
+      dangerPx,
+      heightOffset,
+      this.canvasWidth - dangerPx,
+      CHANNEL_HEIGHT
+    );
 
     const peakPx = this.dbToPx(peak);
 
     const greenLevel = Math.min(peakPx, warningPx);
     this.ctx.fillStyle = GREEN;
-    this.ctx.fillRect(0, 0, greenLevel, CANVAS_HEIGHT);
+    this.ctx.fillRect(0, heightOffset, greenLevel, CHANNEL_HEIGHT);
 
     if (peak > WARNING_LEVEL) {
       const yellowLevel = Math.min(peakPx, dangerPx);
       this.ctx.fillStyle = YELLOW;
-      this.ctx.fillRect(warningPx, 0, yellowLevel - warningPx, CANVAS_HEIGHT);
+      this.ctx.fillRect(
+        warningPx,
+        heightOffset,
+        yellowLevel - warningPx,
+        CHANNEL_HEIGHT
+      );
     }
 
     if (peak > DANGER_LEVEL) {
       this.ctx.fillStyle = RED;
-      this.ctx.fillRect(dangerPx, 0, peakPx - dangerPx, CANVAS_HEIGHT);
+      this.ctx.fillRect(
+        dangerPx,
+        heightOffset,
+        peakPx - dangerPx,
+        CHANNEL_HEIGHT
+      );
     }
 
     this.ctx.fillStyle = GREEN;
-    if (this.peakHold > WARNING_LEVEL) this.ctx.fillStyle = YELLOW;
-    if (this.peakHold > DANGER_LEVEL) this.ctx.fillStyle = RED;
-    this.ctx.fillRect(this.dbToPx(this.peakHold) - (PEAK_WIDTH / 2), 0, PEAK_WIDTH, CANVAS_HEIGHT);
+    if (this.peakHolds[channel] > WARNING_LEVEL) this.ctx.fillStyle = YELLOW;
+    if (this.peakHolds[channel] > DANGER_LEVEL) this.ctx.fillStyle = RED;
+    this.ctx.fillRect(
+      this.dbToPx(this.peakHolds[channel]) - PEAK_WIDTH / 2,
+      heightOffset,
+      PEAK_WIDTH,
+      CHANNEL_HEIGHT
+    );
   }
 
   dbToPx(db: number) {
     return Math.round((db + 60) * (this.canvasWidth / 60));
   }
 
-  updatePeakHold(peak: number) {
-    if (!this.peakHoldCounter || (peak > this.peakHold)) {
-      this.peakHold = peak;
-      this.peakHoldCounter = PEAK_HOLD_CYCLES;
+  updatePeakHold(peak: number, channel: number) {
+    if (!this.peakHoldCounters[channel] || peak > this.peakHolds[channel]) {
+      this.peakHolds[channel] = peak;
+      this.peakHoldCounters[channel] = PEAK_HOLD_CYCLES;
       return;
     }
 
-    this.peakHoldCounter -= 1;
+    this.peakHoldCounters[channel] -= 1;
   }
 
   subscribeVolmeter() {
     this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
-      this.drawVolmeter(Math.max(...volmeter.peak));
+      this.setChannelCount(volmeter.peak.length);
+      this.drawVolmeter(volmeter.peak);
     });
   }
 
