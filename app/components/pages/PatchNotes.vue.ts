@@ -16,4 +16,14 @@ export default class Dashboard extends Vue {
   done() {
     this.navigationService.navigate('Studio');
   }
+
+  patchNotesClosing = false;
+  patchNotesOpening = false;
+
+  show() {
+    const vid = <HTMLVideoElement>this.$refs.patchNotesVideo;
+    vid.play();
+    this.patchNotesClosing = true;
+    this.patchNotesOpening = true;
+  }
 }
