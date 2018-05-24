@@ -58,7 +58,7 @@ const inputPeakHoldDuration = 1.0; //  1 second
 // }
 
 // Configuration
-const CANVAS_RESOLUTION = 600;
+const CANVAS_HEIGHT = 1;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
@@ -86,58 +86,73 @@ export default class MixerVolmeter extends Vue {
 
   peakHoldCounter: number;
   peakHold: number;
+  canvasWidth: number;
+  canvasWidthInterval: number;
 
   mounted() {
     this.subscribeVolmeter();
-    this.$refs.canvas.width = CANVAS_RESOLUTION;
+    // this.$refs.canvas.width = CANVAS_RESOLUTION;
     this.$refs.canvas.height = 1;
     this.ctx = this.$refs.canvas.getContext('2d');
+
+    this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
   }
 
   destroyed() {
+    clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
+  }
+
+  setCanvasWidth() {
+    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth - 24);
+
+    if (width !== this.canvasWidth) {
+      this.canvasWidth = width;
+      this.$refs.canvas.width = width;
+      this.$refs.canvas.style.width = `${width}px`;
+    }
   }
 
   drawVolmeter(peak: number) {
     this.updatePeakHold(peak);
 
-    this.ctx.clearRect(0, 0, CANVAS_RESOLUTION, 1);
+    this.ctx.clearRect(0, 0, this.canvasWidth, CANVAS_HEIGHT);
 
     const warningPx = this.dbToPx(WARNING_LEVEL);
     const dangerPx = this.dbToPx(DANGER_LEVEL);
 
     this.ctx.fillStyle = GREEN_BG;
-    this.ctx.fillRect(0, 0, warningPx, 1);
+    this.ctx.fillRect(0, 0, warningPx, CANVAS_HEIGHT);
     this.ctx.fillStyle = YELLOW_BG;
-    this.ctx.fillRect(warningPx, 0, dangerPx - warningPx, 1);
+    this.ctx.fillRect(warningPx, 0, dangerPx - warningPx, CANVAS_HEIGHT);
     this.ctx.fillStyle = RED_BG;
-    this.ctx.fillRect(dangerPx, 0, CANVAS_RESOLUTION - dangerPx, 1);
+    this.ctx.fillRect(dangerPx, 0, this.canvasWidth - dangerPx, CANVAS_HEIGHT);
 
     const peakPx = this.dbToPx(peak);
 
     const greenLevel = Math.min(peakPx, warningPx);
     this.ctx.fillStyle = GREEN;
-    this.ctx.fillRect(0, 0, greenLevel, 1);
+    this.ctx.fillRect(0, 0, greenLevel, CANVAS_HEIGHT);
 
     if (peak > WARNING_LEVEL) {
       const yellowLevel = Math.min(peakPx, dangerPx);
       this.ctx.fillStyle = YELLOW;
-      this.ctx.fillRect(warningPx, 0, yellowLevel - warningPx, 1);
+      this.ctx.fillRect(warningPx, 0, yellowLevel - warningPx, CANVAS_HEIGHT);
     }
 
     if (peak > DANGER_LEVEL) {
       this.ctx.fillStyle = RED;
-      this.ctx.fillRect(dangerPx, 0, peakPx - dangerPx, 1);
+      this.ctx.fillRect(dangerPx, 0, peakPx - dangerPx, CANVAS_HEIGHT);
     }
 
     this.ctx.fillStyle = GREEN;
     if (this.peakHold > WARNING_LEVEL) this.ctx.fillStyle = YELLOW;
     if (this.peakHold > DANGER_LEVEL) this.ctx.fillStyle = RED;
-    this.ctx.fillRect(this.dbToPx(this.peakHold) - (PEAK_WIDTH / 2), 0, PEAK_WIDTH, 1);
+    this.ctx.fillRect(this.dbToPx(this.peakHold) - (PEAK_WIDTH / 2), 0, PEAK_WIDTH, CANVAS_HEIGHT);
   }
 
   dbToPx(db: number) {
-    return (db + 60) * (CANVAS_RESOLUTION / 60);
+    return Math.round((db + 60) * (this.canvasWidth / 60));
   }
 
   updatePeakHold(peak: number) {
