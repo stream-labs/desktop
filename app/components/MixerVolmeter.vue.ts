@@ -91,10 +91,8 @@ export default class MixerVolmeter extends Vue {
 
   mounted() {
     this.subscribeVolmeter();
-    // this.$refs.canvas.width = CANVAS_RESOLUTION;
-    this.$refs.canvas.height = 1;
+    this.$refs.canvas.height = CANVAS_HEIGHT;
     this.ctx = this.$refs.canvas.getContext('2d');
-
     this.canvasWidthInterval = window.setInterval(() => this.setCanvasWidth(), 500);
   }
 
@@ -167,8 +165,7 @@ export default class MixerVolmeter extends Vue {
 
   subscribeVolmeter() {
     this.volmeterSubscription = this.audioSource.subscribeVolmeter(volmeter => {
-      // console.log(volmeter);
-      this.drawVolmeter(volmeter.peak[0]);
+      this.drawVolmeter(Math.max(...volmeter.peak));
     });
   }
 
