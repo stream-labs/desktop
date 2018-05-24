@@ -9,7 +9,7 @@
         @keypress="handleKeypress"
         v-model="editableName" />
       <i class="fa fa-check" @click.stop="submitRename" />
-      <i class="fa fa-times" @click.stop="cancelRename" v-if="!needsRename" />
+      <i class="icon-times" @click.stop="cancelRename" v-if="!needsRename" />
     </div>
     <div v-else>
       {{ collection.name }}
@@ -24,14 +24,14 @@
     Updated {{ modified }}
   </span>
   <a class="editable-scene-collection--action link link--underlined">
-    <span @click.stop="startRenaming">Rename</span>
+    <span @click.stop="startRenaming">{{ $t('Rename') }}</span>
   </a>
   <a v-if="!duplicating" class="editable-scene-collection--action link link--underlined">
-    <span @click.stop="duplicate">Duplicate</span>
+    <span @click.stop="duplicate">{{ $t('Duplicate') }}</span>
   </a>
   <i class="fa fa-spinner fa-pulse" v-else />
   <a class="editable-scene-collection--action editable-scene-collection--action-delete link link--underlined">
-    <span @click.stop="remove">Delete</span>
+    <span @click.stop="remove">{{ $t('Delete') }}</span>
   </a>
 </div>
 </template>

@@ -1,20 +1,59 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import Selector from './Selector.vue';
 import { SourcesService } from 'services/sources';
-import { ScenesService, SceneItem } from 'services/scenes';
+import { ScenesService, ISceneItemNode, TSceneNode } from 'services/scenes';
 import { SelectionService } from 'services/selection/selection';
 import { EditMenu } from '../util/menus/EditMenu';
+import SlVueTree, {
+  ISlTreeNode,
+  ISlTreeNodeModel,
+  ICursorPosition
+} from 'sl-vue-tree';
+import { $t } from 'services/i18n';
 
 @Component({
-  components: { Selector }
+  components: { SlVueTree }
 })
 export default class SourceSelector extends Vue {
-
   @Inject() private scenesService: ScenesService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private selectionService: SelectionService;
+
+  sourcesTooltip = $t('The building blocks of your scene. Also contains widgets.');
+  addSourceTooltip = $t('Add a new Source to your Scene. Includes widgets.');
+  removeSourcesTooltip = $t('Remove Sources from your Scene.');
+  openSourcePropertiesTooltip = $t('Open the Source Properties.');
+  addGroupTooltip = $t('Add a Group so you can move multiple Sources at the same time.');
+
+  private expandedFoldersIds: string[] = [];
+
+  $refs: {
+    treeContainer: HTMLDivElement;
+    slVueTree: SlVueTree<ISceneItemNode>;
+  };
+
+  get nodes(): ISlTreeNodeModel<ISceneItemNode>[] {
+    // recursive function for transform SceneNode[] to ISlTreeNodeModel[]
+    const getSlVueTreeNodes = (
+      sceneNodes: TSceneNode[]
+    ): ISlTreeNodeModel<ISceneItemNode>[] => {
+      return sceneNodes.map(sceneNode => {
+        return {
+          title: sceneNode.name,
+          isSelected: sceneNode.isSelected(),
+          isLeaf: sceneNode.isItem(),
+          isExpanded: this.expandedFoldersIds.indexOf(sceneNode.id) !== -1,
+          data: sceneNode.getModel(),
+          children: sceneNode.isFolder()
+            ? getSlVueTreeNodes(sceneNode.getNodes())
+            : null
+        };
+      });
+    };
+
+    return getSlVueTreeNodes(this.scene.getRootNodes());
+  }
 
   addSource() {
     if (this.scenesService.activeScene) {
@@ -22,25 +61,35 @@ export default class SourceSelector extends Vue {
     }
   }
 
-  showContextMenu(sceneNodeId?: string) {
+  addFolder() {
+    if (this.scenesService.activeScene) {
+      let itemsToGroup: string[] = [];
+      let parentId: string;
+      if (this.selectionService.canGroupIntoFolder()) {
+        itemsToGroup = this.selectionService.getIds();
+        const parent = this.selectionService.getClosestParent();
+        if (parent) parentId = parent.id;
+      }
+      this.scenesService.showNameFolder({ itemsToGroup, parentId });
+    }
+  }
+
+  showContextMenu(sceneNodeId?: string, event?: MouseEvent) {
     const sceneNode = this.scene.getNode(sceneNodeId);
-    const menuOptions = sceneNode ?
-      ({
-        selectedSceneId: this.scene.id,
-        showSceneItemMenu: true
-      }) :
-      ({ selectedSceneId: this.scene.id });
+    const menuOptions = sceneNode
+      ? {
+          selectedSceneId: this.scene.id,
+          showSceneItemMenu: true
+        }
+      : { selectedSceneId: this.scene.id };
 
     const menu = new EditMenu(menuOptions);
     menu.popup();
-    menu.destroy();
+    event && event.stopPropagation();
   }
 
   removeItems() {
-    // We can only remove a source if at least one is selected
-    if (this.activeItemIds.length > 0) {
-      this.activeItemIds.forEach(itemId => this.scene.removeItem(itemId));
-    }
+    this.selectionService.remove();
   }
 
   sourceProperties() {
@@ -51,33 +100,51 @@ export default class SourceSelector extends Vue {
   canShowProperties(): boolean {
     if (this.activeItemIds.length === 0) return false;
     const sceneNode = this.selectionService.getLastSelected();
-    return (sceneNode && sceneNode.sceneNodeType === 'item') ?
-      sceneNode.getSource().hasProps() :
-      false;
+    return sceneNode && sceneNode.sceneNodeType === 'item'
+      ? sceneNode.getSource().hasProps()
+      : false;
   }
 
-  handleSort(data: any) {
-    const rootNodes = this.scene.getRootNodes();
-    const nodeToMove = rootNodes[data.change.moved.oldIndex];
-    const destNode = this.scene.getRootNodes()[data.change.moved.newIndex];
+  handleSort(
+    treeNodesToMove: ISlTreeNode<ISceneItemNode>[],
+    position: ICursorPosition<TSceneNode>
+  ) {
+    const nodesToMove = this.scene.getSelection(
+      treeNodesToMove.map(node => node.data.id)
+    );
 
-    if (destNode.getNodeIndex() < nodeToMove.getNodeIndex()) {
-      nodeToMove.placeBefore(destNode.id);
+    const destNode = this.scene.getNode(position.node.data.id);
+
+    if (position.placement === 'before') {
+      nodesToMove.placeBefore(destNode.id);
+    } else if (position.placement === 'after') {
+      nodesToMove.placeAfter(destNode.id);
+    } else if (position.placement === 'inside') {
+      nodesToMove.setParent(destNode.id);
+    }
+    this.selectionService.select(nodesToMove.getIds());
+  }
+
+  makeActive(treeNodes: ISlTreeNode<ISceneItemNode>[], ev: MouseEvent) {
+    const ids = treeNodes.map(treeNode => treeNode.data.id);
+    this.selectionService.select(ids);
+  }
+
+  toggleFolder(treeNode: ISlTreeNode<ISceneItemNode>) {
+    const nodeId = treeNode.data.id;
+    if (treeNode.isExpanded) {
+      this.expandedFoldersIds.splice(
+        this.expandedFoldersIds.indexOf(nodeId),
+        1
+      );
     } else {
-      nodeToMove.placeAfter(destNode.id);
+      this.expandedFoldersIds.push(nodeId);
     }
   }
 
-  makeActive(sceneItemId: string, ev: MouseEvent) {
-    if (ev.ctrlKey) {
-      if (this.selectionService.isSelected(sceneItemId) && ev.button !== 2) {
-        this.selectionService.deselect(sceneItemId);
-      } else {
-        this.selectionService.add(sceneItemId);
-      }
-    } else if (!(ev.button === 2 && this.selectionService.isSelected(sceneItemId))) {
-      this.selectionService.select(sceneItemId);
-    }
+  canShowActions(sceneNodeId: string) {
+    const node = this.scene.getNode(sceneNodeId);
+    return node.isItem() || node.getNestedItems().length;
   }
 
   get activeItemIds() {
@@ -99,8 +166,8 @@ export default class SourceSelector extends Vue {
     const visible = selection.isVisible();
 
     return {
-      'fa-eye': visible,
-      'fa-eye-slash': !visible
+      'icon-view': visible,
+      'icon-hide': !visible
     };
   }
 
@@ -109,8 +176,8 @@ export default class SourceSelector extends Vue {
     const locked = selection.isLocked();
 
     return {
-      'fa-lock': locked,
-      'fa-unlock': !locked
+      'icon-lock': locked,
+      'icon-unlock': !locked
     };
   }
 
@@ -123,14 +190,4 @@ export default class SourceSelector extends Vue {
   get scene() {
     return this.scenesService.activeScene;
   }
-
-  get sources() {
-    return this.scene.getRootNodes().map(sceneNode => {
-      return {
-        name: sceneNode.name,
-        value: sceneNode.id
-      };
-    });
-  }
-
 }

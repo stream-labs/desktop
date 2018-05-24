@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  :title="options.renameId ? 'Rename Folder' : 'Name Folder'"
+  :title="options.renameId ? $t('Rename Folder') : $t('Name Folder')"
   :done-handler="submit">
   <form
     slot="content"
@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameSource-label">
-      Please enter the name of the source
+      {{ $t('Please enter the name of the folder') }}
     </p>
     <p
       v-if="error"

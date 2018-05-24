@@ -26,10 +26,21 @@ export interface IStreamingServiceApi {
 
   getModel(): IStreamingServiceState;
 
+  /**
+   * Subscribe to be notified when the state
+   * of the streaming output changes.
+   */
   streamingStatusChange: Observable<EStreamingState>;
 
   /**
-   * Dummy subscription for stream deck
+   * Subscribe to be notified when the state
+   * of the streaming output changes.
+   */
+  recordingStatusChange: Observable<ERecordingState>;
+
+  /**
+   * This subscription receives no events and
+   * will be removed in a future version.
    * @deprecated
    */
   streamingStateChange: Observable<void>;

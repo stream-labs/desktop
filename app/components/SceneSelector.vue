@@ -6,11 +6,11 @@
 
       <DropdownMenu class="scene-collections__dropdown" :title="activeCollection.name">
         <div class="input-wrapper input-wrapper--search">
-          <input class="input--search" type="text" placeholder="Search" v-model="searchQuery" />
+          <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
         </div>
 
         <div class="link link--pointer" @click="manageCollections">
-          Manage All
+          {{ $t('Manage All') }}
         </div>
         <div class="dropdown-menu__separator"></div>
         <div
@@ -28,13 +28,13 @@
 
     <div>
       <i
-        class="fa fa-plus icon-btn icon-btn--lg"
+        class="icon-add icon-btn icon-btn--lg"
         @click="addScene"/>
       <i
-        class="fa fa-minus icon-btn icon-btn--lg"
+        class="icon-subtract icon-btn icon-btn--lg"
         @click="removeScene"/>
       <i
-        class="fa fa-cog icon-btn icon-btn--lg"
+        class="icon-settings icon-btn icon-btn--lg"
         @click="showTransitions"/>
     </div>
   </div>
@@ -50,10 +50,10 @@
 
   <help-tip :dismissable-key="helpTipDismissable">
     <div slot="title">
-      Scene Collections
+      {{ $t('Scene Collections') }}
     </div>
     <div slot="content">
-      This is where your <span class="semibold">Scene Collections</span> live. Clicking the title will dropdown a menu where you can view & manage.
+      {{ $t('This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.') }}
     </div>
   </help-tip>
 </div>

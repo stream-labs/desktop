@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { without } from 'lodash';
-import { StatefulService, mutation } from '../stateful-service';
-import { ScenesTransitionsService } from '../scenes-transitions';
-import { WindowsService } from '../windows';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { TransitionsService } from 'services/transitions';
+import { WindowsService } from 'services/windows';
 import {
   IScene,
   Scene,
@@ -12,13 +12,13 @@ import {
   ISceneCreateOptions,
   IScenesServiceApi
 } from './index';
-import { SourcesService } from 'services/sources';
+import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from '../../util/injector';
 import * as obs from '../obs-api';
 import namingHelpers from '../../util/NamingHelpers';
-
+import { $t } from 'services/i18n';
 const { ipcRenderer } = electron;
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
@@ -31,33 +31,25 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   sceneAdded = new Subject<IScene>();
   sceneRemoved = new Subject<IScene>();
-  itemAdded = new Subject<ISceneItem>();
-  itemRemoved = new Subject<ISceneItem>();
-  itemUpdated = new Subject<ISceneItem>();
   sceneSwitched = new Subject<IScene>();
+  itemAdded = new Subject<ISceneItem & ISource>();
+  itemRemoved = new Subject<ISceneItem & ISource>();
+  itemUpdated = new Subject<ISceneItem & ISource>();
 
-
-  @Inject()
-  private windowsService: WindowsService;
-
-  @Inject()
-  private sourcesService: SourcesService;
-
-
-  @Inject('ScenesTransitionsService')
-  private transitionsService: ScenesTransitionsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private sourcesService: SourcesService;
+  @Inject() private transitionsService: TransitionsService;
 
   @mutation()
   private ADD_SCENE(id: string, name: string) {
     Vue.set<IScene>(this.state.scenes, id, {
       id,
       name,
-      resourceId: '',
+      resourceId: 'Scene' + JSON.stringify([id]),
       nodes: []
     });
     this.state.displayOrder.push(id);
     this.state.activeSceneId = this.state.activeSceneId || id;
-    this.state.scenes[id].resourceId = this.getScene(id).getResourceId();
   }
 
   @mutation()
@@ -103,7 +95,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   removeScene(id: string, force = false): IScene {
     if (!force && Object.keys(this.state.scenes).length < 2) {
-      alert('There needs to be at least one scene.');
+      alert($t('There needs to be at least one scene.'));
       return;
     }
 
@@ -249,7 +241,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   }
 
 
-  showNameFolder(options: { renameId?: string, itemsToGroup?: string[] } = {}) {
+  showNameFolder(options: { renameId?: string, itemsToGroup?: string[], parentId?: string } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
       queryParams: options,

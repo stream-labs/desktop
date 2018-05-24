@@ -33,7 +33,7 @@ const returnCode = (function main() {
 
     log('project compilation');
     try {
-      execSync('yarn compile');
+      execSync('yarn compile:ci');
     } catch (e) {
       err('compilation failed', e);
       return 1;

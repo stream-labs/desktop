@@ -24,6 +24,7 @@ const { ipcRenderer } = electron;
 
 export type TSceneNode = SceneItem | SceneItemFolder;
 
+
 export interface ISceneHierarchy extends ISceneItemNode {
   children: ISceneHierarchy[];
 }
@@ -82,6 +83,13 @@ export class Scene implements ISceneApi {
     return (node && node.sceneNodeType === 'folder') ? node as SceneItemFolder : null;
   }
 
+  /**
+   * returns first node with selected name
+   */
+  getNodeByName(name: string): TSceneNode {
+    return this.getNodes().find(node => node.name === name);
+  }
+
   getItems(): SceneItem[] {
     return this.sceneState.nodes
       .filter(node => node.sceneNodeType === 'item')
@@ -107,6 +115,10 @@ export class Scene implements ISceneApi {
     return this.getNodes().filter(node => !node.parentId);
   }
 
+  getRootNodesIds(): string[] {
+    return this.getRootNodes().map(node => node.id);
+  }
+
   getNodesIds(): string[] {
     return this.sceneState.nodes.map(item => item.id);
   }
@@ -121,9 +133,13 @@ export class Scene implements ISceneApi {
     this.SET_NAME(newName);
   }
 
-  createAndAddSource(sourceName: string, type: TSourceType, settings?: Dictionary<any>): SceneItem {
+  createAndAddSource(
+    sourceName: string,
+    type: TSourceType, settings?: Dictionary<any>,
+    options: ISceneNodeAddOptions = {}
+  ): SceneItem {
     const source = this.sourcesService.createSource(sourceName, type, settings);
-    return this.addSource(source.sourceId);
+    return this.addSource(source.sourceId, options);
   }
 
 
@@ -152,7 +168,7 @@ export class Scene implements ISceneApi {
     // Newly added sources are immediately active
     this.selectionService.select(sceneItemId);
 
-    this.scenesService.itemAdded.next(sceneItem.sceneItemState);
+    this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
   }
 
@@ -165,7 +181,7 @@ export class Scene implements ISceneApi {
       name,
       sceneNodeType: 'folder',
       sceneId: this.id,
-      resourceId: 'SceneFolder' + JSON.stringify([this.id, id]),
+      resourceId: 'SceneItemFolder' + JSON.stringify([this.id, id]),
       parentId: '',
       childrenIds: []
     });
@@ -174,10 +190,7 @@ export class Scene implements ISceneApi {
 
   removeFolder(folderId: string) {
     const sceneFolder = this.getFolder(folderId);
-    if (!sceneFolder) {
-      console.error(`SceneFolder ${folderId} not found`);
-      return;
-    }
+    if (!sceneFolder) return;
     sceneFolder.getSelection().remove();
     sceneFolder.detachParent();
     this.REMOVE_NODE_FROM_SCENE(folderId);
@@ -190,14 +203,12 @@ export class Scene implements ISceneApi {
 
   removeItem(sceneItemId: string) {
     const sceneItem = this.getItem(sceneItemId);
-    if (!sceneItem) {
-      console.error(`SceneItem ${sceneItemId} not found`);
-      return;
-    }
+    if (!sceneItem) return;
+    const sceneItemModel = sceneItem.getModel();
     sceneItem.detachParent();
     sceneItem.getObsSceneItem().remove();
     this.REMOVE_NODE_FROM_SCENE(sceneItemId);
-    this.scenesService.itemRemoved.next(sceneItem.sceneItemState);
+    this.scenesService.itemRemoved.next(sceneItemModel);
   }
 
 
@@ -208,48 +219,33 @@ export class Scene implements ISceneApi {
 
   // TODO write tests for this method
   placeAfter(sourceNodeId: string, destNodeId?: string) {
-
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);
 
-    // move obs items
-    const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
-    const firstItemIndex = itemsToMove[0].getItemIndex();
+    if (destNode && destNode.id === sourceNode.id) return;
 
-    const isForwardDirection = destNode && destNode.getNodeIndex() > sourceNode.getNodeIndex();
-    let newItemIndex = 0;
+    const destNodeIsParentForSourceNode = destNode && destNode.id === sourceNode.parentId;
 
+    let destFolderId = '';
 
     if (destNode) {
-      const destItemIndex = destNode.getItemIndex();
-      const destIsFolderWithoutItemsBefore = (
-        destNode.isFolder() &&
-        destItemIndex === 0 &&
-        !destNode.getPrevItem()
-      );
-
-      if (destIsFolderWithoutItemsBefore) {
-        newItemIndex = 0;
-      } else if (isForwardDirection) {
-        newItemIndex = destNode.isFolder() ?
-          destItemIndex + destNode.getNestedItems().length :
-          destItemIndex;
+      if (destNode.isItem()) {
+        destFolderId = destNode.parentId;
       } else {
-        newItemIndex = destItemIndex + 1;
-      }
-    }
-
-    const obsScene = this.getObsScene();
-
-    if (newItemIndex !== firstItemIndex) {
-      for (let i = 0; i < itemsToMove.length; i++) {
-        if (isForwardDirection) {
-          obsScene.moveItem(firstItemIndex, newItemIndex);
+        if (destNode.id === sourceNode.parentId) {
+          destFolderId = destNode.id;
         } else {
-          obsScene.moveItem(firstItemIndex + i, newItemIndex);
+          destFolderId = destNode.parentId;
         }
       }
     }
+
+    if (sourceNode.parentId !== destFolderId) {
+      sourceNode.setParent(destFolderId);
+    }
+
+
+    const itemsToMove: SceneItem[] = sourceNode.isFolder() ? sourceNode.getNestedItems() : [sourceNode];
 
     // move nodes
 
@@ -259,19 +255,18 @@ export class Scene implements ISceneApi {
       [sourceNode.id];
     const firstNodeIndex = this.getNode(nodesToMoveIds[0]).getNodeIndex();
 
-
-
     let newNodeIndex = 0;
 
     if (destNode) {
       const destNodeIndex = destNode.getNodeIndex();
 
+      newNodeIndex = destNode.isFolder() && !destNodeIsParentForSourceNode ?
+        destNodeIndex + destNode.getNestedNodes().length + 1 :
+        destNodeIndex + 1;
+
       if (destNodeIndex > firstNodeIndex) {
-        newNodeIndex = destNode.isFolder() ?
-          destNodeIndex + destNode.getNestedNodes().length - nodesToMoveIds.length + 1 :
-          destNodeIndex - nodesToMoveIds.length + 1;
-      } else {
-        newNodeIndex = destNodeIndex + 1;
+        // Adjust for moved items
+        newNodeIndex -= nodesToMoveIds.length;
       }
     }
 
@@ -279,11 +274,37 @@ export class Scene implements ISceneApi {
     sceneNodesIds.splice(newNodeIndex, 0, ...nodesToMoveIds);
 
     this.SET_NODES_ORDER(sceneNodesIds);
+
+    // recalculate children order in dest and source folder
+
+    if (destFolderId) {
+      this.getFolder(destFolderId).recalculateChildrenOrder();
+    }
+
+    if (sourceNode.parentId !== destFolderId) {
+      const sourceFolder = sourceNode.getParent();
+      if (sourceFolder) sourceFolder.recalculateChildrenOrder();
+    }
+
+    itemsToMove.forEach(item => {
+      let currentIdx: number;
+      this.getObsScene().getItems().reverse().forEach((obsItem, idx) => {
+        if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
+      });
+      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
+    });
   }
 
   placeBefore(sourceNodeId: string, destNodeId: string) {
-    const destNode = this.getNode(destNodeId).getPrevNode();
-    this.placeAfter(sourceNodeId, destNode && destNode.id);
+    const destNode = this.getNode(destNodeId);
+    const newDestNode = destNode.getPrevSiblingNode();
+    if (newDestNode) {
+      this.placeAfter(sourceNodeId, newDestNode.id);
+    } else if (destNode.parentId) {
+      this.getNode(sourceNodeId).setParent(destNode.parentId); // place to the top of folder
+    } else {
+      this.placeAfter(sourceNodeId); // place to the top of scene
+    }
   }
 
 
@@ -328,7 +349,7 @@ export class Scene implements ISceneApi {
     });
 
     // add items to folders
-    nodes.forEach(nodeModel => {
+    nodes.reverse().forEach(nodeModel => {
       if (nodeModel.sceneNodeType !== 'folder') return;
       const folder = nodeModel as ISceneItemFolder;
       this.getSelection(folder.childrenIds).moveTo(this.id, folder.id);
@@ -473,5 +494,7 @@ export class Scene implements ISceneApi {
       });
     });
   }
+
+
 
 }

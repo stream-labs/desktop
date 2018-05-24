@@ -3,7 +3,7 @@
 <div class="live-container">
   <div class="flex__column">
     <div class="flex__item mission-control-container">
-      <webview class="mission-control" id="recentEventsWebview" :src="recenteventsUrl"></webview>
+      <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
     </div>
 
     <div class="flex__item studio-controls" :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
@@ -18,17 +18,17 @@
         <div class="content">
           <div class="studio-controls-top">
             <h4 class="studio-controls__label">
-              Preview
+              {{ $t('Preview') }}
             </h4>
             <div v-if="!performanceModeEnabled">
               <i
                 v-if="previewEnabled"
-                class="fa fa-eye icon-btn icon-btn--lg"
+                class="icon-view icon-btn icon-btn--lg"
                 @click="previewEnabled = false"
                 v-tooltip="disablePreviewTooltip"/>
               <i
                 v-if="!previewEnabled"
-                class="fa fa-eye-slash icon-btn icon-btn--lg"
+                class="icon-hide icon-btn icon-btn--lg"
                 @click="previewEnabled = true"
                 v-tooltip="enablePreviewTooltip"/>
             </div>
@@ -44,8 +44,8 @@
                 <div class="live-display-placeholder">
                   <img class="live-display-placeholder__img live-display-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
                   <img class="live-display-placeholder__img live-display-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-                  <span v-if="!performanceModeEnabled">Your preview is currently disabled</span>
-                  <span v-if="performanceModeEnabled">Preview is disabled in performance mode</span>
+                  <span v-if="!performanceModeEnabled">{{ $t('Your preview is currently disabled') }}</span>
+                  <span v-if="performanceModeEnabled">{{ $t('Preview is disabled in performance mode') }}</span>
                 </div>
               </div>
             </div>

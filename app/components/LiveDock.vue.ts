@@ -10,6 +10,7 @@ import Slider from './shared/Slider.vue';
 import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -33,9 +34,9 @@ export default class LiveDock extends Vue {
     chat: Chat;
   };
 
-  viewStreamTooltip = 'Go to Youtube to view your live stream';
-  editStreamInfoTooltip = 'Edit your stream title and description';
-  controlRoomTooltip = 'Go to Youtube Live Dashboard to control your stream';
+  viewStreamTooltip = $t('Go to Youtube to view your live stream');
+  editStreamInfoTooltip = $t('Edit your stream title and description');
+  controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
 
   mounted() {
     this.elapsedInterval = window.setInterval(() => {

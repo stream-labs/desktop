@@ -1,8 +1,11 @@
 import { TFormData } from '../../components/shared/forms/Input';
 
 export interface ITroubleshooterSettings {
+  skippedEnabled: boolean;
   skippedThreshold: number;
+  laggedEnabled: boolean;
   laggedThreshold: number;
+  droppedEnabled: boolean;
   droppedThreshold: number;
 }
 

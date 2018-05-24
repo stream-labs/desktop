@@ -3,9 +3,9 @@ import Vuex, { Store } from 'vuex';
 import _ from 'lodash';
 import electron from 'electron';
 import { getModule, StatefulService } from '../services/stateful-service';
-import { WindowsService } from '../services/window';
 import { ServicesManager } from '../services-manager';
 import { IMutation } from 'services/jsonrpc';
+import Util from 'services/utils';
 
 Vue.use(Vuex);
 
@@ -25,6 +25,12 @@ const actions = {
 };
 
 const plugins: any[] = [];
+
+let makeStoreReady: Function;
+
+const storeReady = new Promise<Store<any>>(resolve => {
+  makeStoreReady = resolve;
+});
 
 // This plugin will keep all vuex stores in sync via
 // IPC with the main process.
@@ -59,6 +65,7 @@ plugins.push((store: Store<any>) => {
       __vuexSyncIgnore: true
     });
     ipcRenderer.send('window-childWindowIsReadyToShow');
+    makeStoreReady(store);
   });
 
   // All windows can receive this
@@ -72,8 +79,7 @@ plugins.push((store: Store<any>) => {
 
 let store: Store<any> = null;
 
-export function createStore() {
-
+export function createStore(): Promise<Store<any>> {
   const statefulServiceModules = {};
   const servicesManager: ServicesManager = ServicesManager.instance;
   const statefulServices = servicesManager.getStatefulServicesAndMutators();
@@ -92,7 +98,10 @@ export function createStore() {
   });
 
   StatefulService.setupVuexStore(store);
-  return store;
+
+  if (Util.isMainWindow()) makeStoreReady(store);
+
+  return storeReady;
 }
 
 export function commitMutation(mutation: IMutation) {

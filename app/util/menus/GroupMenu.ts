@@ -1,7 +1,9 @@
+import { uniq } from 'lodash';
 import { Menu } from './Menu';
 import { ScenesService } from 'services/scenes';
 import { SelectionService } from 'services/selection';
 import { Inject } from '../../util/injector';
+import { $t } from 'services/i18n';
 
 export class GroupMenu extends Menu {
 
@@ -19,21 +21,23 @@ export class GroupMenu extends Menu {
 
     const selectionSize = this.selectionService.getSize();
     const selectedItem = this.selectionService.getItems()[0];
-    const itemInFolder = this.selectionService.getItems().find(item => !!item.parentId);
-    const canGroupIntoFolder = selectionSize > 1 && !itemInFolder;
+    const selectedNodes = this.selectionService.getNodes();
+    const nodesFolders = selectedNodes.map(node => node.parentId || null);
+
 
     this.append({
-      label: 'Group into Folder',
+      label: $t('Group into Folder'),
       click: () => {
         this.scenesService.showNameFolder({
-          itemsToGroup: this.selectionService.getIds()
+          itemsToGroup: this.selectionService.getIds(),
+          parentId: nodesFolders[0]
         });
       },
-      enabled: canGroupIntoFolder
+      enabled: this.selectionService.canGroupIntoFolder()
     });
 
     this.append({
-      label: 'Ungroup Folder',
+      label: $t('Ungroup Folder'),
       click: () => {
         this.selectionService.getFolders()[0].ungroup();
       },
@@ -42,7 +46,7 @@ export class GroupMenu extends Menu {
 
 
     this.append({
-      label: 'Group into Scene',
+      label: $t('Group into Scene'),
       click: () => {
         this.scenesService.showNameScene({
           itemsToGroup: this.selectionService.getIds()
@@ -52,20 +56,20 @@ export class GroupMenu extends Menu {
     });
 
     this.append({
-      label: 'Ungroup Scene',
+      label: $t('Ungroup Scene'),
       click: () => {
         const scene = this.scenesService.getScene(
           selectedItem.getSource().sourceId
         );
         scene.getSelection()
           .selectAll()
-          .copyReferenceTo(this.scenesService.activeSceneId);
+          .copyTo(this.scenesService.activeSceneId);
         selectedItem.remove();
         scene.remove();
       }
       ,
       enabled: (() => {
-        return selectionSize === 1 && selectedItem.getSource().type === 'scene';
+        return !!(selectionSize === 1 && selectedItem && selectedItem.getSource().type === 'scene');
       })()
     });
 

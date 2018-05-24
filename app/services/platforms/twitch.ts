@@ -1,10 +1,10 @@
-import { Service } from '../service';
+import { Service } from 'services/service';
 import { IPlatformService, IPlatformAuth, IChannelInfo, IGame } from '.';
-import { HostsService } from '../hosts';
-import { SettingsService } from '../settings';
-import { Inject } from '../../util/injector';
-import { handleErrors } from '../../util/requests';
-import { UserService } from '../user';
+import { HostsService } from 'services/hosts';
+import { SettingsService } from 'services/settings';
+import { Inject } from 'util/injector';
+import { handleErrors, requiresToken, authorizedHeaders } from 'util/requests';
+import { UserService } from 'services/user';
 
 export class TwitchService extends Service implements IPlatformService {
 
@@ -22,8 +22,8 @@ export class TwitchService extends Service implements IPlatformService {
 
   get authUrl() {
     const host = this.hostsService.streamlabs;
-    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&scope=channel_read,
-      channel_editor&origin=slobs`;
+    const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
+      'scope=channel_read,channel_editor&origin=slobs';
     return `https://${host}/slobs/login?${query}`;
   }
 
@@ -71,7 +71,21 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
+  fetchNewToken(): Promise<void> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/twitch/refresh`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
 
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(response =>
+        this.userService.updatePlatformToken(response.access_token)
+      );
+  }
+
+  @requiresToken()
   fetchRawChannelInfo() {
     const headers = this.getHeaders(true);
     const request = new Request('https://api.twitch.tv/kraken/channel', { headers });
@@ -107,7 +121,7 @@ export class TwitchService extends Service implements IPlatformService {
       .then(json => json.stream.viewers);
   }
 
-
+  @requiresToken()
   putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
     const headers = this.getHeaders(true);
     const data = { channel: { status : streamTitle, game : streamGame } };
@@ -134,7 +148,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   getChatUrl(mode: string) {
     const nightMode = mode === 'day' ? 'popout' : 'darkpopout';
-    return Promise.resolve(`https://twitch.tv/${this.userService.platform.username}/chat?${nightMode}`);
+    return Promise.resolve(`https://twitch.tv/popout/${this.userService.platform.username}/chat?${nightMode}`);
   }
 
   searchCommunities(searchString: string) {

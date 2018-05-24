@@ -1,17 +1,15 @@
 import { Node } from './node';
-import { FiltersNode } from './filters';
 import { HotkeysNode } from './hotkeys';
-import { 
+import {
   SourcesService,
-  TSourceType, 
-  TPropertiesManager 
+  TSourceType,
+  TPropertiesManager
 } from 'services/sources';
 import { FontLibraryService } from 'services/font-library';
 import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
-import path from 'path';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -35,6 +33,7 @@ export interface ISourceInfo {
   syncOffset?: obs.ITimeSpec;
   audioMixers?: number;
   monitoringType?: obs.EMonitoringType;
+  mixerHidden?: boolean;
 
   filters: {
     items: IFilterInfo[];
@@ -109,6 +108,7 @@ export class SourcesNode extends Node<ISchema, {}> {
             syncOffset: AudioService.msToTimeSpec(audioSource.syncOffset),
             audioMixers: audioSource.audioMixers,
             monitoringType: audioSource.monitoringType,
+            mixerHidden: audioSource.mixerHidden
           };
 
           resolve(data);
@@ -233,6 +233,7 @@ export class SourcesNode extends Node<ISchema, {}> {
           audioMixers: sourceInfo.audioMixers,
           monitoringType: sourceInfo.monitoringType
         });
+        this.audioService.getSource(sourceInfo.id).setHidden(!!sourceInfo.mixerHidden);
       }
 
       this.checkTextSourceValidity(sourceInfo);

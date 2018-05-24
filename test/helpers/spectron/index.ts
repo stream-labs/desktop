@@ -4,6 +4,7 @@ import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { sleep } from '../sleep';
 
 const path = require('path');
 const fs = require('fs');
@@ -23,19 +24,27 @@ async function focusWindow(t: any, regex: RegExp) {
 
 // Focuses the main window
 export async function focusMain(t: any) {
-  await focusWindow(t, /index\.html$/);
+  await focusWindow(t, /windowId=main$/);
 }
 
 
 // Focuses the child window
 export async function focusChild(t: any) {
-  await focusWindow(t, /child=true/);
+  await focusWindow(t, /windowId=child/);
 }
 
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
-  afterStartCb?  (t: any): Promise<any>;
+  afterStartCb?(t: any): Promise<any>;
+
+  /**
+   * Called after cache directory is created but before
+   * the app is started.  This is useful for setting up
+   * some known state in the cache directory before the
+   * app starts up and loads it.
+   */
+  beforeAppStartCb?(t: any): Promise<any>;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
@@ -53,12 +62,20 @@ export function useSpectron(options: ITestRunnerOptions) {
     t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
-      args: ['--require', path.join(__dirname, 'context-menu-injected.js'), '.'],
+      args: [
+        '--require',
+        path.join(__dirname, 'context-menu-injected.js'),
+        '--require',
+        path.join(__dirname, 'dialog-injected.js'),
+        '.'
+      ],
       env: {
         NODE_ENV: 'test',
         SLOBS_CACHE_DIR: t.context.cacheDir
       }
     });
+
+    if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
 
     await t.context.app.start();
 
@@ -66,6 +83,8 @@ export function useSpectron(options: ITestRunnerOptions) {
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
+
+    // await sleep(100000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.

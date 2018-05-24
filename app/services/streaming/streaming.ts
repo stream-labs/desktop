@@ -13,6 +13,8 @@ import {
   EStreamingState,
   ERecordingState
 } from './streaming-api';
+import { UsageStatisticsService } from 'services/usage-statistics';
+import { $t } from 'services/i18n';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -40,8 +42,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() obsApiService: ObsApiService;
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
+  @Inject() usageStatisticsService: UsageStatisticsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
+  recordingStatusChange = new Subject<ERecordingState>();
 
   // Dummy subscription for stream deck
   streamingStateChange = new Subject<void>();
@@ -121,7 +125,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     ) {
       const shouldConfirm = this.settingsService.state.General
         .WarnBeforeStoppingStream;
-      const confirmText = 'Are you sure you want to stop streaming?';
+      const confirmText = $t('Are you sure you want to stop streaming?');
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
@@ -224,7 +228,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = padStart(duration.seconds().toString(), 2, '0');
     const minutes = padStart(duration.minutes().toString(), 2, '0');
-    const hours = padStart(duration.hours().toString(), 2, '0');
+    const dayHours = duration.days() * 24;
+    const hours = padStart((dayHours + duration.hours()).toString(), 2, '0');
 
     return `${hours}:${minutes}:${seconds}`;
   }
@@ -237,12 +242,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.usageStatisticsService.recordEvent('stream_start');
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_STREAMING_STATUS(EStreamingState.Offline, time);
         this.streamingStatusChange.next(EStreamingState.Offline);
+        this.usageStatisticsService.recordEvent('stream_end');
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_STREAMING_STATUS(EStreamingState.Ending, time);
         this.streamingStatusChange.next(EStreamingState.Ending);
@@ -258,12 +265,16 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_RECORDING_STATUS(ERecordingState.Recording, time);
+        this.recordingStatusChange.next(ERecordingState.Recording);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_RECORDING_STATUS(ERecordingState.Starting, time);
+        this.recordingStatusChange.next(ERecordingState.Starting);
       } else if (info.signal === EOBSOutputSignal.Stop) {
         this.SET_RECORDING_STATUS(ERecordingState.Offline, time);
+        this.recordingStatusChange.next(ERecordingState.Offline);
       } else if (info.signal === EOBSOutputSignal.Stopping) {
         this.SET_RECORDING_STATUS(ERecordingState.Stopping, time);
+        this.recordingStatusChange.next(ERecordingState.Stopping);
       }
     }
 
@@ -272,27 +283,25 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       if (info.code === EOutputCode.BadPath) {
         errorText =
-          'Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.';
+          $t('Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.');
       } else if (info.code === EOutputCode.ConnectFailed) {
         errorText =
-          'Failed to connect to the streaming server.  Please check your internet connection.';
+          $t('Failed to connect to the streaming server.  Please check your internet connection.');
       } else if (info.code === EOutputCode.Disconnected) {
         errorText =
-          'Disconnected from the streaming server.  Please check your internet connection.';
+          $t('Disconnected from the streaming server.  Please check your internet connection.');
       } else if (info.code === EOutputCode.InvalidStream) {
         errorText =
-          'Could not access the specified channel or stream key, please double-check your stream key.  ' +
-          'If it is correct, there may be a problem connecting to the server.';
+          $t('Could not access the specified channel or stream key, please double-check your stream key.  ') +
+          $t('If it is correct, there may be a problem connecting to the server.');
       } else if (info.code === EOutputCode.NoSpace) {
-        errorText = 'There is not sufficient disk space to continue recording.';
+        errorText = $t('There is not sufficient disk space to continue recording.');
       } else if (info.code === EOutputCode.Unsupported) {
         errorText =
-          'The output format is either unsupported or does not support more than one audio track.  ' +
-          'Please check your settings and try again.';
+          $t('The output format is either unsupported or does not support more than one audio track.  ') +
+          $t('Please check your settings and try again.');
       } else if (info.code === EOutputCode.Error) {
-        errorText = `An unexpected error occurred: ${
-          info.error
-        }`;
+        errorText = $t('An unexpected error occurred:') + info.error;
       }
 
       alert(errorText);

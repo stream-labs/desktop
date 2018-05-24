@@ -13,6 +13,11 @@ const { remote } = electron;
 
 const DISPLAY_ELEMENT_POLLING_INTERVAL = 500;
 
+export interface IDisplayOptions {
+  sourceId?: string;
+  paddingSize?: number;
+}
+
 export class Display {
   @Inject() settingsService: SettingsService;
   @Inject() videoService: VideoService;
@@ -34,22 +39,44 @@ export class Display {
 
   private selectionSubscription: Subscription;
 
-  constructor(public name: string) {
+  sourceId: string;
+
+  constructor(public name: string, options: IDisplayOptions = {}) {
     this.windowId = Utils.isChildWindow() ? 'child' : 'main';
 
-    nodeObs.OBS_content_createDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
-      name
-    );
-    this.outputRegionCallbacks = [];
+    this.sourceId = options.sourceId;
 
-    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
-    this.videoService.registerDisplay(this);
+    if (this.sourceId) {
+      nodeObs.OBS_content_createSourcePreviewDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        this.sourceId,
+        name
+      );
+    } else {
+      nodeObs.OBS_content_createDisplay(
+        remote.getCurrentWindow().getNativeWindowHandle(),
+        name
+      );
+    }
 
     this.selectionSubscription = this.selectionService.updated.subscribe(() => {
       this.switchGridlines(this.selectionService.getSize() <= 1);
     });
+
+    nodeObs.OBS_content_setPaddingColor(name, 11, 22, 28);
+
+    if (options.paddingSize != null) {
+      nodeObs.OBS_content_setPaddingSize(name, options.paddingSize);
+    }
+
+    this.outputRegionCallbacks = [];
+
+    this.boundDestroy = this.destroy.bind(this);
+
+    remote.getCurrentWindow().on('close', this.boundDestroy);
   }
+
+  boundDestroy: any;
 
   /**
    * Will keep the display positioned on top of the passed HTML element
@@ -96,14 +123,14 @@ export class Display {
     this.currentPosition.width = width;
     this.currentPosition.height = height;
     nodeObs.OBS_content_resizeDisplay(this.name, width, height);
-    this.refreshOutputRegion();
+    if (this.outputRegionCallbacks.length) this.refreshOutputRegion();
   }
 
   destroy() {
-    this.videoService.unregisterDisplay(this);
+    remote.getCurrentWindow().removeListener('close', this.boundDestroy);
     nodeObs.OBS_content_destroyDisplay(this.name);
     if (this.trackingInterval) clearInterval(this.trackingInterval);
-    this.selectionSubscription.unsubscribe();
+    if (this.selectionSubscription) this.selectionSubscription.unsubscribe();
   }
 
   onOutputResize(cb: (region: IRectangle) => void) {
@@ -155,28 +182,6 @@ export class VideoService extends Service {
         });
       }, 1000);
     });
-  }
-
-  createDisplay() {
-    return new Display(this.getRandomDisplayId());
-  }
-
-
-  registerDisplay(display: Display) {
-    this.activeDisplays[display.name] = display;
-  }
-
-
-  unregisterDisplay(display: Display) {
-    delete this.activeDisplays[display.name];
-  }
-
-
-  /**
-   * Destroy all active displays.  This is useful on shutdown.
-   */
-  destroyAllDisplays() {
-    Object.values(this.activeDisplays).forEach(display => display.destroy());
   }
 
   // Generates a random string:

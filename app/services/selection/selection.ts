@@ -7,13 +7,15 @@ import {
   ISceneItem,
   ISceneItemSettings,
   IPartialTransform,
-  TSceneNode, ISceneItemNode, SceneItemFolder
+  TSceneNode, ISceneItemNode, SceneItemFolder, TSceneNodeModel
 } from 'services/scenes';
 import { Inject } from '../../util/injector';
 import { shortcut } from '../shortcuts';
 import { ISelection, ISelectionServiceApi, ISelectionState, TNodesList } from './selection-api';
 import { Subject } from 'rxjs/Subject';
 import Utils from '../utils';
+import { Source } from '../sources';
+import { CenteringAxis } from 'util/ScalableRectangle';
 
 
 /**
@@ -60,11 +62,14 @@ export class SelectionService
   getLastSelectedId: () => string;
   getSize: () => number;
   isSelected: (item: string | ISceneItem) => boolean;
-  copyReferenceTo: (sceneId: string, folderId?: string) => SceneItem[];
-  copyTo: (sceneId: string) => SceneItem[];
-  moveTo: (sceneId: string, folderId?: string) => SceneItem[];
+  copyTo: (sceneId: string, folderId?: string, duplicateSources?: boolean) => TSceneNode[];
+  moveTo: (sceneId: string, folderId?: string) => TSceneNode[];
   isSceneItem: () => boolean;
   isSceneFolder: () => boolean;
+  canGroupIntoFolder: () => boolean;
+  getClosestParent: () => SceneItemFolder;
+  getRootNodes: () => TSceneNode[];
+  getSources: () => Source[];
 
 
   // SCENE_ITEM METHODS
@@ -78,9 +83,15 @@ export class SelectionService
   stretchToScreen: () => void;
   fitToScreen: () => void;
   centerOnScreen: () => void;
+  centerOnHorizontal: () => void;
+  centerOnVertical: () => void;
   rotate: (deg: number) => void;
   setContentCrop: () => void;
 
+  // SCENE NODES METHODS
+  placeAfter: (sceneNodeId: string) => void;
+  placeBefore: (sceneNodeId: string) => void;
+  setParent: (folderId: string) => void;
 
   @shortcut('Delete')
   remove() {
@@ -163,6 +174,8 @@ export class Selection implements ISelection {
 
   @Inject() private scenesService: ScenesService;
 
+  _resourceId: string;
+
   private state: ISelectionState = {
     selectedIds: [],
     lastSelectedId: ''
@@ -206,6 +219,8 @@ export class Selection implements ISelection {
     if (!this.state.selectedIds.includes(this.state.lastSelectedId)) {
       this.setState({ lastSelectedId: selectedIds[selectedIds.length - 1] });
     }
+
+    this._resourceId = 'Selection' + JSON.stringify([this.sceneId, this.state.selectedIds]);
 
     return this;
   }
@@ -256,7 +271,7 @@ export class Selection implements ISelection {
    * true if selections has only one SceneItem
    */
   isSceneItem(): boolean {
-    return this.getSize() === 1 && this.getItems()[0].isItem();
+    return this.getSize() === 1 && this.getNodes()[0].isItem();
   }
 
   /**
@@ -289,8 +304,8 @@ export class Selection implements ISelection {
     });
   }
 
-  getLastSelected(): SceneItem {
-    return this.getScene().getItem(this.state.lastSelectedId);
+  getLastSelected(): TSceneNode {
+    return this.getScene().getNode(this.state.lastSelectedId);
   }
 
   getLastSelectedId(): string {
@@ -338,7 +353,7 @@ export class Selection implements ISelection {
     return this;
   }
 
-  isSelected(sceneNode: string | ISceneItemNode) {
+  isSelected(sceneNode: string | TSceneNodeModel) {
     const itemId = (typeof sceneNode === 'string') ?
       sceneNode :
       (sceneNode as ISceneItem).sceneItemId;
@@ -346,52 +361,72 @@ export class Selection implements ISelection {
   }
 
   selectAll(): Selection {
-    this.select(this.getScene().getItems().map(item => item.sceneItemId));
+    this.select(this.getScene().getNodes().map(node => node.id));
     return this;
   }
 
-  copyReferenceTo(sceneId: string, folderId?: string): SceneItem[] {
-    const insertedItems: SceneItem[] = [];
+  copyTo(sceneId: string, folderId?: string, duplicateSources = false): TSceneNode[] {
+    const insertedNodes: TSceneNode[] = [];
     const scene = this.scenesService.getScene(sceneId);
-    const folder = scene.getFolder(folderId);
+    const foldersMap: Dictionary<string> = {};
+    let prevInsertedNode: TSceneNode;
+    let insertedNode: TSceneNode;
 
-    this.getItems().reverse().forEach(sceneItem => {
-      const insertedItem = scene.addSource(
-        sceneItem.sourceId
-      );
-      insertedItem.setSettings(sceneItem.getSettings());
-      if (folder) insertedItem.setParent(folder.id);
-      insertedItems.push(insertedItem);
-    });
+    const sourcesMap: Dictionary<Source> = {};
+    const notDuplicatedSources: Source[] = [];
+    if (duplicateSources) {
+      this.getSources().forEach(source => {
+        const duplicatedSource = source.duplicate();
+        if (!duplicatedSource) {
+          notDuplicatedSources.push(source);
+          return;
+        }
+        sourcesMap[source.sourceId] = duplicatedSource;
+      });
+    }
 
-    return insertedItems;
-  }
 
-  copyTo(sceneId: string): SceneItem[] {
-    const insertedItems: SceneItem[] = [];
-    const scene = this.scenesService.getScene(sceneId);
-    this.getItems().reverse().forEach(sceneItem => {
-      const duplicatedSource = sceneItem.getSource().duplicate();
-
-      if (!duplicatedSource) {
-        alert(`Unable to duplicate ${sceneItem.name}`);
-        return;
+    // copy items and folders structure
+    this.getNodes().forEach(sceneNode => {
+      if (sceneNode.isFolder()) {
+        insertedNode = scene.createFolder(sceneNode.name);
+        foldersMap[sceneNode.id] = insertedNode.id;
+        insertedNodes.push(insertedNode);
+      } else if (sceneNode.isItem()) {
+        insertedNode = scene.addSource(
+          sourcesMap[sceneNode.sourceId] ?
+            sourcesMap[sceneNode.sourceId].sourceId :
+            sceneNode.sourceId
+        );
+        insertedNode.setSettings(sceneNode.getSettings());
+        insertedNodes.push(insertedNode);
       }
 
-      const insertedItem = scene.addSource(duplicatedSource.sourceId);
-      insertedItem.setSettings(sceneItem.getSettings());
-      insertedItems.push(insertedItem);
+      const newParentId = foldersMap[sceneNode.parentId] || '';
+      if (newParentId) {
+        insertedNode.setParent(newParentId);
+      }
+
+      if (
+        prevInsertedNode &&
+        (prevInsertedNode.parentId === newParentId)
+      ) {
+        insertedNode.placeAfter(prevInsertedNode.id);
+      }
+
+      prevInsertedNode = insertedNode;
     });
-    return insertedItems;
+
+    return insertedNodes;
   }
 
-  moveTo(sceneId: string, folderId?: string): SceneItem[] {
+  moveTo(sceneId: string, folderId?: string): TSceneNode[] {
 
     if (this.sceneId === sceneId) {
       if (!folderId) return;
-      this.getNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
+      this.getRootNodes().reverse().forEach(sceneNode => sceneNode.setParent(folderId));
     } else {
-      const insertedItems = this.copyReferenceTo(sceneId, folderId);
+      const insertedItems = this.copyTo(sceneId, folderId);
       this.remove();
       return insertedItems;
     }
@@ -403,6 +438,79 @@ export class Selection implements ISelection {
 
   isLocked() {
     return !this.getItems().find(item => !item.locked);
+  }
+
+  /**
+   * Returns a minimal representation of selection
+   * for selection list like this:
+   *
+   * Folder1      <- selected
+   *  |_ Item1    <- selected
+   *  \_ Folder2  <- selected
+   * Item3        <- selected
+   * Folder3
+   *  |_ Item3
+   *  \_ Item4    <- selected
+   *
+   *  returns Folder1, Item3, Item4
+   */
+  getRootNodes(): TSceneNode[] {
+    const rootNodes: TSceneNode[] = [];
+    const foldersIds: string[] = [];
+    this.getNodes().forEach(node => {
+      if (!foldersIds.includes(node.parentId)) {
+        rootNodes.push(node);
+      }
+      if (node.isFolder()) foldersIds.push(node.id);
+    });
+    return rootNodes;
+  }
+
+  /**
+   * Returns the closest common parent folder for selection if exists
+   */
+  getClosestParent(): SceneItemFolder {
+    const rootNodes = this.getRootNodes();
+    const paths: string[][] = [];
+
+    for (const node of rootNodes) {
+      if (!node.parentId) return null;
+      paths.push(node.getPath());
+    }
+
+    const minPathLength = Math.min(...paths.map(path => path.length));
+    let closestParentId = '';
+
+    for (let ind = 0; ind < minPathLength; ind++) {
+      const parents = paths.map(path => path[ind]);
+      console.log('parents', parents);
+      if (uniq(parents).length === 1) {
+        closestParentId = parents[0];
+      } else {
+        return this.getScene().getFolder(closestParentId);
+      }
+    }
+
+  }
+
+  canGroupIntoFolder(): boolean {
+    const selectedNodes = this.getRootNodes();
+    const nodesFolders = selectedNodes.map(node => node.parentId || null);
+    const nodesHaveTheSameParent = uniq(nodesFolders).length === 1;
+    const canGroupIntoFolder = selectedNodes.length > 1 && nodesHaveTheSameParent;
+    return canGroupIntoFolder;
+  }
+
+
+  getSources(): Source[] {
+    const sourcesIds: string[] = [];
+    const sources: Source[] = [];
+    this.getItems().forEach(item => {
+      const source = item.getSource();
+      if (sourcesIds.includes(source.sourceId)) return;
+      sources.push(source);
+    });
+    return sources;
   }
 
   // SCENE_ITEM METHODS
@@ -443,6 +551,14 @@ export class Selection implements ISelection {
     this.getItems().forEach(item => item.centerOnScreen());
   }
 
+  centerOnHorizontal() {
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.X));
+  }
+
+  centerOnVertical() {
+    this.getItems().forEach(item => item.centerOnAxis(CenteringAxis.Y));
+  }
+
   rotate(deg: number) {
     this.getItems().forEach(item => item.rotate(deg));
   }
@@ -476,10 +592,24 @@ export class Selection implements ISelection {
     return { sceneId: this.sceneId, ...this.state };
   }
 
+  placeAfter(sceneNodeId: string) {
+    this.getRootNodes().reverse().forEach(node => node.placeAfter(sceneNodeId));
+  }
+
+  placeBefore(sceneNodeId: string) {
+    this.getRootNodes().forEach(node => node.placeBefore(sceneNodeId));
+  }
+
+  setParent(sceneNodeId: string) {
+    this.getRootNodes().reverse().forEach(node => node.setParent(sceneNodeId));
+  }
+
   /**
    * returns an array of sceneItem ids
    */
   private resolveItemsList(itemsList: TNodesList): string[] {
+    if (!itemsList) return [];
+
     if (Array.isArray(itemsList)) {
 
       if (!itemsList.length) {

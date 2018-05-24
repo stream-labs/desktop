@@ -14,6 +14,7 @@
           :interval="value.stepVal"
           tooltip="always"
           :valueBox="true"
+          :enabled="value.enabled"
           :usePercentages="value.usePercentages"
         />
       </div>

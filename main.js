@@ -51,7 +51,7 @@ let allowMainWindowClose = false;
 let shutdownStarted = false;
 let appShutdownTimeout;
 
-const indexUrl = 'file://' + __dirname + '/index.html';
+global.indexUrl = 'file://' + __dirname + '/index.html';
 
 
 function openDevTools() {
@@ -145,7 +145,7 @@ function startApp() {
   // and handle breakpoints on startup
   const LOAD_DELAY = 2000;
   setTimeout(() => {
-    mainWindow.loadURL(indexUrl);
+    mainWindow.loadURL(`${global.indexUrl}?windowId=main`);
   }, isDevMode ? LOAD_DELAY : 0);
 
   mainWindow.on('close', e => {
@@ -229,7 +229,7 @@ function startApp() {
 
   ipcMain.on('services-ready', () => {
     callService('AppService', 'setArgv', process.argv);
-    childWindow.loadURL(indexUrl + '?child=true');
+    childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 
   ipcMain.on('window-childWindowIsReadyToShow', () => {
@@ -247,7 +247,11 @@ function startApp() {
   });
 
   ipcMain.on('services-message', (event, payload) => {
-    if (!childWindow.isDestroyed()) childWindow.webContents.send('services-message', payload);
+    const windows = BrowserWindow.getAllWindows();
+    windows.forEach(window => {
+      if (window.id === mainWindow.id || window.isDestroyed()) return;
+      window.webContents.send('services-message', payload);
+    });
   });
 
 
@@ -261,9 +265,9 @@ function startApp() {
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
 
-    setTimeout(() => {
-      openDevTools();
-    }, 10 * 1000);
+    // setTimeout(() => {
+    //   openDevTools();
+    // }, 10 * 1000);
 
   }
 
@@ -272,7 +276,7 @@ function startApp() {
     path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
               '/node_modules/obs-studio-node'));
 
-  getObs().OBS_API_initAPI(app.getPath('userData'));
+  getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
 }
 
 // We use a special cache directory for running tests
@@ -281,8 +285,17 @@ if (process.env.SLOBS_CACHE_DIR) {
 }
 app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
 
+app.setAsDefaultProtocolClient('slobs');
+
 // This ensures that only one copy of our app can run at once.
-const shouldQuit = app.makeSingleInstance(() => {
+const shouldQuit = app.makeSingleInstance(argv => {
+  // Check for protocol links in the argv of the other process
+  argv.forEach(arg => {
+    if (arg.match(/^slobs:\/\//)) {
+      mainWindow.send('protocolLink', arg);
+    }
+  });
+
   // Someone tried to run a second instance, we should focus our window.
   if (mainWindow) {
     if (mainWindow.isMinimized()) {
@@ -324,12 +337,15 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
 
       childWindow.restore();
       childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-      childWindow.setBounds({
-        x: Math.floor(childX),
-        y: Math.floor(childY),
-        width: windowOptions.size.width,
-        height: windowOptions.size.height
-      });
+
+      if (windowOptions.center) {
+        childWindow.setBounds({
+          x: Math.floor(childX),
+          y: Math.floor(childY),
+          width: windowOptions.size.width,
+          height: windowOptions.size.height
+        });
+      }
     } catch (err) {
       log('Recovering from error:', err);
 

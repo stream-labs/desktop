@@ -7,7 +7,8 @@ import {
   NotificationsService,
   INotification
 } from 'services/notifications';
-import notificationAudio from '../../media/sound/ding.wav';
+import { $t } from 'services/i18n';
+const notificationAudio = require('../../media/sound/ding.wav');
 const QUEUE_TIME = 5000;
 
 interface IUiNotification extends INotification {
@@ -32,8 +33,8 @@ export default class NotificationsArea extends Vue {
     notificationsContainer: HTMLDivElement;
   };
 
-  showNotificationsTooltip = 'Click to open your Notifications window';
-  showUnreadNotificationsTooltip = 'Click to read your unread Notifications';
+  showNotificationsTooltip = $t('Click to open your Notifications window');
+  showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);

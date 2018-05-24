@@ -3,7 +3,7 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
-import { ScalableRectangle } from 'util/ScalableRectangle';
+import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
@@ -168,7 +168,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
-    this.scenesService.itemUpdated.next(this.sceneItemState);
+
+    this.scenesService.itemUpdated.next(this.getModel());
   }
 
   remove() {
@@ -291,6 +292,12 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     this.setRect(rect);
   }
 
+  centerOnAxis(axis: CenteringAxis) {
+    const rect = this.getRectangle();
+    rect.centerOn(this.videoService.getScreenRectangle(), axis);
+    this.setRect(rect);
+  }
+
   rotate(deltaRotation: number) {
     this.preservePosition(() => {
       this.setTransform({ rotation: this.transform.rotation + deltaRotation });
@@ -303,7 +310,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       .findIndex(sceneItemModel => sceneItemModel.id === this.id);
   }
 
-  protected getState() {
+  protected get state() {
     return this.sceneItemState;
   }
 
@@ -335,6 +342,11 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
       position: { x: rect.x, y: rect.y },
       scale: { x: rect.scaleX, y: rect.scaleY }
     });
+  }
+
+
+  getSelection() {
+    return this.getScene().getSelection(this.id);
   }
 
 

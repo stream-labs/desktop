@@ -1,17 +1,18 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import SceneSelector from '../SceneSelector.vue';
-import Mixer from '../Mixer.vue';
-import { UserService } from '../../services/user';
-import { Inject } from '../../util/injector';
-import Display from '../Display.vue';
-import { CustomizationService } from '../../services/customization';
-import Slider from '../shared/Slider.vue';
+import SceneSelector from 'components/SceneSelector.vue';
+import Mixer from 'components/Mixer.vue';
+import { UserService } from 'services/user';
+import { Inject } from 'util/injector';
+import Display from 'components/shared/Display.vue';
+import { CustomizationService } from 'services/customization';
+import Slider from 'components/shared/Slider.vue';
 import VTooltip from 'v-tooltip';
+import { $t, I18nService } from 'services/i18n';
 
 
-Vue.use(VTooltip)
-VTooltip.options.defaultContainer = '#mainWrapper'
+Vue.use(VTooltip);
+VTooltip.options.defaultContainer = '#mainWrapper';
 
 @Component({
   components: {
@@ -24,9 +25,18 @@ VTooltip.options.defaultContainer = '#mainWrapper'
 export default class Live extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() i18nService: I18nService;
 
-  enablePreviewTooltip= "Enable the preview stream";
-  disablePreviewTooltip= "Disable the preview stream, can help with CPU";
+  $refs: {
+    webview: Electron.WebviewTag;
+  };
+  
+  enablePreviewTooltip = $t('Enable the preview stream');
+  disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
+
+  mounted() {
+    this.i18nService.setWebviewLocale(this.$refs.webview);
+  }
 
   get previewSize() {
     return this.customizationService.state.previewSize;
@@ -49,6 +59,6 @@ export default class Live extends Vue {
   }
 
   get recenteventsUrl() {
-    return this.userService.widgetUrl('recent-events');
+    return this.userService.recentEventsUrl();
   }
 }

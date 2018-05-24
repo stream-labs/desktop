@@ -1,10 +1,13 @@
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { StreamingService, EStreamingState } from '../services/streaming';
-import { Inject } from '../util/injector';
-import { NavigationService } from '../services/navigation';
-import { UserService } from '../services/user';
-import { CustomizationService } from '../services/customization';
+import { StreamingService, EStreamingState } from 'services/streaming';
+import { Inject } from 'util/injector';
+import { NavigationService } from 'services/navigation';
+import { UserService } from 'services/user';
+import { CustomizationService } from 'services/customization';
+import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
+import electron from 'electron';
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class StartStreamingButton extends Vue {
@@ -12,13 +15,34 @@ export default class StartStreamingButton extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
+  @Inject() mediaBackupService: MediaBackupService;
 
   @Prop() disabled: boolean;
 
-  toggleStreaming() {
+  async toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
     } else {
+      if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
+        const goLive = await new Promise<boolean>(resolve => {
+          electron.remote.dialog.showMessageBox(
+            electron.remote.getCurrentWindow(),
+            {
+              title: $t('Cloud Backup'),
+              type: 'warning',
+              message: $t('Your media files are currently being synced with the cloud. ') +
+                $t('It is recommended that you wait until this finishes before going live.'),
+              buttons: [$t('Wait'), $t('Go Live Anyway')]
+            },
+            goLive => {
+              resolve(!!goLive);
+            }
+          );
+        });
+
+        if (!goLive) return;
+      }
+
       if (
         this.userService.isLoggedIn() &&
         this.customizationService.state.updateStreamInfoOnLive &&
@@ -41,7 +65,7 @@ export default class StartStreamingButton extends Vue {
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
-      return 'END STREAM';
+      return $t('END STREAM');
     }
 
     if (this.streamingStatus === EStreamingState.Starting) {
@@ -49,7 +73,7 @@ export default class StartStreamingButton extends Vue {
         return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'STARTING';
+      return $t('STARTING');
     }
 
     if (this.streamingStatus === EStreamingState.Ending) {
@@ -57,14 +81,14 @@ export default class StartStreamingButton extends Vue {
         return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return 'ENDING';
+      return $t('ENDING');
     }
 
     if (this.streamingStatus === EStreamingState.Reconnecting) {
-      return 'RECONNECTING';
+      return $t('RECONNECTING');
     }
 
-    return 'GO LIVE';
+    return $t('GO LIVE');
   }
 
   getIsRedButton() {

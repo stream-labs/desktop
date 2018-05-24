@@ -6,6 +6,17 @@
       </button>
     </div>
 
+    <div class="section">
+      <TextInput :value="tokenInput">
+        <button
+            class="button button--default button--input"
+            @click="generateToken">
+          Update
+        </button>
+      </TextInput>
+    </div>
+
+
     <GenericFormGroups
       v-model="settingsFormData"
       @input="save" />

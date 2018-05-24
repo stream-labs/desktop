@@ -1,3 +1,5 @@
+import { I18nService } from 'services/i18n';
+
 window['eval'] = global.eval = () => {
   throw new Error('window.eval() is disabled for security');
 };
@@ -17,11 +19,13 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import VueI18n from 'vue-i18n';
 
 const { ipcRenderer, remote } = electron;
 
 const slobsVersion = remote.process.env.SLOBS_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
+
 
 // This is the development DSN
 let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
@@ -85,32 +89,50 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 document.addEventListener('DOMContentLoaded', () => {
-  const store = createStore();
+  const storePromise = createStore();
   const servicesManager: ServicesManager = ServicesManager.instance;
   const windowsService: WindowsService = WindowsService.instance;
+  const i18nService: I18nService = I18nService.instance;
   const obsApiService = ObsApiService.instance;
-  const isChild = Utils.isChildWindow();
+  const windowId = Utils.getCurrentUrlParams().windowId;
 
-  if (isChild) {
-    ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
-    servicesManager.listenMessages();
-  } else {
+  if (Utils.isMainWindow()) {
     ipcRenderer.on('closeWindow', () => windowsService.closeMainWindow());
     AppService.instance.load();
+  } else {
+    if (Utils.isChildWindow()) {
+      ipcRenderer.on('closeWindow', () => windowsService.closeChildWindow());
+    }
+    servicesManager.listenMessages();
   }
 
   window['obs'] = obsApiService.nodeObs;
 
-  const vm = new Vue({
-    el: '#app',
-    store,
-    render: h => {
-      const componentName = isChild
-        ? windowsService.state.child.componentName
-        : windowsService.state.main.componentName;
+  storePromise.then(async store => {
 
-      return h(windowsService.components[componentName]);
-    }
+    Vue.use(VueI18n);
+
+    await i18nService.load();
+
+    const i18n = new VueI18n({
+      locale: i18nService.state.locale,
+      fallbackLocale: i18nService.getFallbackLocale(),
+      messages: i18nService.getLoadedDictionaries()
+    });
+
+    I18nService.setVuei18nInstance(i18n);
+
+    const vm = new Vue({
+      el: '#app',
+      i18n,
+      store,
+      render: h => {
+        const componentName = windowsService.state[windowId].componentName;
+
+        return h(windowsService.components[componentName]);
+      }
+    });
+
   });
 
   // Used for replacing the contents of this window with
@@ -124,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // to match the current contents, as well as pulling the options
       // from the URL, allows child windows to be refreshed without
       // losing their contents.
-      const newOptions: any = Object.assign({ child: isChild }, options);
+      const newOptions: any = Object.assign({ windowId: 'child' }, options);
       const newURL: string = URI(window.location.href)
         .query(newOptions)
         .toString();

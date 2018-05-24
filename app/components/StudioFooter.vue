@@ -4,12 +4,13 @@
     <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
       <div class="platform-error">
         <i class="fa fa-exclamation-triangle" />
-        <span>YouTube account not enabled for live streaming</span>
-        <button class="button alert-button" @click="openYoutubeEnable">Fix</button>
-        <button class="button alert-button" @click="confirmYoutubeEnabled">I'm set up</button>
+        <span>{{ $t('YouTube account not enabled for live streaming') }}</span>
+        <button class="button alert-button" @click="openYoutubeEnable">{{ $t('Fix') }}</button>
+        <button class="button alert-button" @click="confirmYoutubeEnabled">{{ $t('I\'m set up') }}</button>
       </div>
     </div>
     <performance-metrics />
+    <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
     <notifications-area class="notifications-area flex--grow"/>
   </div>
 
@@ -22,7 +23,8 @@
         :disabled="locked"
         class="record-button"
         @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }">
+        :class="{ active: streamingService.isRecording }"
+        v-tooltip.left="recordTooltip">
         <span>REC</span>
       </button>
     </div>

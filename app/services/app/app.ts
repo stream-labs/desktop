@@ -1,22 +1,25 @@
-import { StatefulService, mutation } from '../stateful-service';
-import { OnboardingService } from '../onboarding';
-import { HotkeysService } from '../hotkeys';
-import { UserService } from '../user';
-import { ShortcutsService } from '../shortcuts';
-import { Inject } from '../../util/injector';
+import { StatefulService, mutation } from 'services/stateful-service';
+import { OnboardingService } from 'services/onboarding';
+import { HotkeysService } from 'services/hotkeys';
+import { UserService } from 'services/user';
+import { ShortcutsService } from 'services/shortcuts';
+import { Inject } from 'util/injector';
 import electron from 'electron';
-import { ScenesTransitionsService } from '../scenes-transitions';
-import { SourcesService } from '../sources';
-import { ScenesService } from '../scenes';
-import { VideoService } from '../video';
-import { StreamInfoService } from '../stream-info';
-import { track } from '../usage-statistics';
-import { IpcServerService } from '../ipc-server';
-import { TcpServerService } from '../tcp-server';
-import { StreamlabelsService } from '../streamlabels';
-import { PerformanceMonitorService } from '../performance-monitor';
+import { TransitionsService } from 'services/transitions';
+import { SourcesService } from 'services/sources';
+import { ScenesService } from 'services/scenes';
+import { VideoService } from 'services/video';
+import { StreamInfoService } from 'services/stream-info';
+import { track } from 'services/usage-statistics';
+import { IpcServerService } from 'services/ipc-server';
+import { TcpServerService } from 'services/tcp-server';
+import { StreamlabelsService } from 'services/streamlabels';
+import { PerformanceMonitorService } from 'services/performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
+import { PatchNotesService } from 'services/patch-notes';
+import { ProtocolLinksService } from 'services/protocol-links';
+import { WindowsService } from 'services/windows';
 
 interface IAppState {
   loading: boolean;
@@ -34,6 +37,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() userService: UserService;
   @Inject() shortcutsService: ShortcutsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() patchNotesService: PatchNotesService;
+  @Inject() windowsService: WindowsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -42,7 +47,7 @@ export class AppService extends StatefulService<IAppState> {
 
   private autosaveInterval: number;
 
-  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() videoService: VideoService;
@@ -51,6 +56,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
   @Inject() private fileManagerService: FileManagerService;
+  @Inject() private protocolLinksService: ProtocolLinksService;
 
   @track('app_start')
   load() {
@@ -62,7 +68,7 @@ export class AppService extends StatefulService<IAppState> {
     this.userService;
 
     this.sceneCollectionsService.initialize().then(() => {
-      this.onboardingService.startOnboardingIfRequired();
+      const onboarded = this.onboardingService.startOnboardingIfRequired();
 
       electron.ipcRenderer.on('shutdown', () => {
         electron.ipcRenderer.send('acknowledgeShutdown');
@@ -79,6 +85,9 @@ export class AppService extends StatefulService<IAppState> {
 
       this.ipcServerService.listen();
       this.tcpServerService.listen();
+
+      this.patchNotesService.showPatchNotesIfRequired(onboarded);
+
       this.FINISH_LOADING();
     });
   }
@@ -88,6 +97,7 @@ export class AppService extends StatefulService<IAppState> {
    */
   setArgv(argv: string[]) {
     this.SET_ARGV(argv);
+    this.protocolLinksService.start(argv);
   }
 
   @track('app_close')
@@ -100,8 +110,8 @@ export class AppService extends StatefulService<IAppState> {
     window.setTimeout(async () => {
       await this.sceneCollectionsService.deinitialize();
       this.performanceMonitorService.stop();
-      this.videoService.destroyAllDisplays();
-      this.scenesTransitionsService.reset();
+      this.transitionsService.reset();
+      this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);

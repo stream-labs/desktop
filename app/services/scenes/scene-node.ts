@@ -4,7 +4,7 @@
 import { ServiceHelper, mutation } from '../stateful-service';
 import { TSceneNodeType } from './scenes-api';
 import { Inject } from '../../util/injector';
-import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem } from './index';
+import { ScenesService, Scene, ISceneItemNode, SceneItemFolder, SceneItem, TSceneNode } from './index';
 import { SelectionService } from 'services/selection';
 
 @ServiceHelper()
@@ -27,12 +27,16 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   setParent(parentId: string) {
-    this.placeAfter(parentId);
+    // prevent to set a child folder as parent
+    if (this.isFolder() && this.getNestedNodesIds().indexOf(parentId) !== -1) {
+      return;
+    }
     this.SET_PARENT(parentId);
+    this.placeAfter(parentId);
   }
 
   detachParent() {
-    if (this.parentId) this.SET_PARENT(null);
+    if (this.parentId) this.SET_PARENT('');
   }
 
   getParent(): SceneItemFolder {
@@ -40,7 +44,7 @@ export abstract class SceneItemNode implements ISceneItemNode {
   }
 
   hasParent(): boolean {
-    return !!this.getState().parentId;
+    return !!this.state.parentId;
   }
 
   getNodeIndex(): number {
@@ -55,14 +59,33 @@ export abstract class SceneItemNode implements ISceneItemNode {
     this.getScene().placeBefore(this.id, nodeId);
   }
 
-  getPrevNode() {
+  getPrevNode(): TSceneNode {
     const nodeInd = this.getNodeIndex();
     return this.getScene().getNodes()[nodeInd - 1];
   }
 
-  getNextNode() {
+  getNextNode(): TSceneNode {
     const nodeInd = this.getNodeIndex();
     return this.getScene().getNodes()[nodeInd + 1];
+  }
+
+  getPrevSiblingNode(): TSceneNode {
+    const siblingsIds = this.parentId ?
+      this.getParent().getNestedNodesIds() :
+      this.getScene().getRootNodesIds();
+
+    const childInd = siblingsIds.indexOf(this.id);
+    if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd - 1]);
+  }
+
+
+  getNextSiblingNode(): TSceneNode {
+    const siblingsIds = this.parentId ?
+      this.getParent().getNestedNodesIds() :
+      this.getScene().getRootNodesIds();
+
+    const childInd = siblingsIds.indexOf(this.id);
+    if (childInd !== 0) return this.getScene().getNode(siblingsIds[childInd + 1]);
   }
 
   getPrevItem(): SceneItem {
@@ -81,6 +104,14 @@ export abstract class SceneItemNode implements ISceneItemNode {
       if (!nodes[nodeInd]) return null;
       if (nodes[nodeInd].isItem()) return nodes[nodeInd] as SceneItem;
     }
+  }
+
+  /**
+   * @returns all parent Ids
+   */
+  getPath(): string[] {
+    const parent = this.getParent();
+    return parent ? parent.getPath().concat([this.id]) : [this.id];
   }
 
   isSelected() {
@@ -111,21 +142,23 @@ export abstract class SceneItemNode implements ISceneItemNode {
     return this._resourceId;
   }
 
-  protected abstract getState(): ISceneItemNode;
+  protected abstract get state(): ISceneItemNode;
   protected abstract remove(): void;
 
 
   @mutation()
   protected SET_PARENT(parentId?: string) {
-    const state = this.getState();
-    const currentParent = this.getScene().getFolder(state.parentId);
+    const nodeState = this.state;
+    const sceneState = this.scenesService.state.scenes[nodeState.sceneId];
+
+    const currentParent = sceneState.nodes.find(node => node.id === nodeState.parentId);
     if (currentParent) {
       const childInd = currentParent.childrenIds.indexOf(this.id);
       currentParent.childrenIds.splice(childInd, 1);
     }
-    state.parentId = parentId;
+    nodeState.parentId = parentId;
     if (!parentId) return;
-    const newParent = this.getScene().getFolder(parentId);
+    const newParent = sceneState.nodes.find(node => node.id === parentId);
     newParent.childrenIds.unshift(this.id);
   }
 

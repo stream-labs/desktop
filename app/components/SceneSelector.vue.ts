@@ -2,15 +2,19 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import Selector from './Selector.vue';
-import { ScenesService } from '../services/scenes';
+import { ScenesService } from 'services/scenes';
 import { Menu } from '../util/menus/Menu';
-import { ScenesTransitionsService } from '../services/scenes-transitions';
-import { SceneCollectionsService } from '../services/scene-collections';
-import { AppService } from '../services/app';
+import { TransitionsService } from 'services/transitions';
+import { SceneCollectionsService } from 'services/scene-collections';
+import { AppService } from 'services/app';
 import DropdownMenu from './shared/DropdownMenu.vue';
 import HelpTip from './shared/HelpTip.vue';
 import { EDismissable } from 'services/dismissables';
 import Fuse from 'fuse.js';
+import { SourceFiltersService } from 'services/source-filters';
+import { ProjectorService } from 'services/projector';
+import { $t } from 'services/i18n';
+import electron from 'electron';
 
 @Component({
   components: { Selector, DropdownMenu, HelpTip },
@@ -19,28 +23,39 @@ export default class SceneSelector extends Vue {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() appService: AppService;
-  @Inject() scenesTransitionsService: ScenesTransitionsService;
+  @Inject() transitionsService: TransitionsService;
+  @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() projectorService: ProjectorService;
 
   searchQuery = '';
 
   showContextMenu() {
     const menu = new Menu();
     menu.append({
-      label: 'Duplicate',
+      label: $t('Duplicate'),
       click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
     menu.append({
-      label: 'Rename',
+      label: $t('Rename'),
       click: () => this.scenesService.showNameScene({
         rename: this.scenesService.activeScene.name
       })
     });
     menu.append({
-      label: 'Remove',
+      label: $t('Remove'),
       click: () => this.scenesService.removeScene(this.scenesService.activeScene.id)
     });
+    menu.append({
+      label: $t('Filters'),
+      click: () => this.sourceFiltersService.showSourceFilters(
+        this.scenesService.activeScene.id
+      )
+    });
+    menu.append({
+      label: $t('Create Scene Projector'),
+      click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
+    });
     menu.popup();
-    menu.destroy();
   }
 
   makeActive(id: string) {
@@ -56,11 +71,22 @@ export default class SceneSelector extends Vue {
   }
 
   removeScene() {
-    this.scenesService.removeScene(this.activeSceneId);
+    const name = this.scenesService.activeScene.name;
+    const ok = electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
+        buttons: [$t('Cancel'), $t('OK')]
+      },
+      ok => {
+        if (ok) this.scenesService.removeScene(this.activeSceneId);
+      }
+    );
   }
 
   showTransitions() {
-    this.scenesTransitionsService.showSceneTransitions();
+    this.transitionsService.showSceneTransitions();
   }
 
   get scenes() {

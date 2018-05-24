@@ -1,13 +1,13 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
-import Vue from 'vue';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
 import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
 import { TransitionNode } from './nodes/transition';
 import { HotkeysNode } from './nodes/hotkeys';
+import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
 import electron from 'electron';
 import fs from 'fs';
@@ -20,6 +20,7 @@ import { HotkeysService } from 'services/hotkeys';
 import namingHelpers from '../../util/NamingHelpers';
 import { WindowsService } from 'services/windows';
 import { UserService } from 'services/user';
+import { TcpServerService } from 'services/tcp-server';
 import { OverlaysPersistenceService, IDownloadProgress } from './overlays';
 import {
   ISceneCollectionsManifestEntry,
@@ -38,7 +39,8 @@ export const NODE_TYPES = {
   ScenesNode,
   SceneItemsNode,
   TransitionNode,
-  HotkeysNode
+  HotkeysNode,
+  SceneFiltersNode
 };
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';
@@ -46,6 +48,10 @@ const DEFAULT_COLLECTION_NAME = 'Scenes';
 interface ISceneCollectionsManifest {
   activeId: string;
   collections: ISceneCollectionsManifestEntry[];
+}
+
+interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {
+  setupFunction?: () => boolean;
 }
 
 /**
@@ -66,6 +72,7 @@ export class SceneCollectionsService extends Service
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
+  @Inject() tcpServerService: TcpServerService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -77,6 +84,12 @@ export class SceneCollectionsService extends Service
    * Whether the service has been initialized
    */
   private initialized = false;
+
+  /**
+   * Whether a valid collection is currently loaded.
+   * Is used to decide whether we should save.
+   */
+  private collectionLoaded = false;
 
   /**
    * Does not use the standard init function so we can have asynchronous
@@ -121,6 +134,7 @@ export class SceneCollectionsService extends Service
    * Saves the current scene collection
    */
   async save(): Promise<void> {
+    if (!this.collectionLoaded) return;
     if (!this.activeCollection) return;
     await this.saveCurrentApplicationStateAs(this.activeCollection.id);
     this.stateService.SET_MODIFIED(
@@ -144,7 +158,7 @@ export class SceneCollectionsService extends Service
 
     try {
       await this.setActiveCollection(id);
-      await this.loadCollectionIntoApplicationState(id);
+      await this.readCollectionDataAndLoadIntoApplicationState(id);
     } catch (e) {
       console.error('Error loading collection!', e);
 
@@ -159,9 +173,6 @@ export class SceneCollectionsService extends Service
       }
     }
 
-    // Fall back to an empty collection
-    if (this.scenesService.scenes.length === 0) this.setupEmptyCollection();
-
     this.finishLoadingOperation();
   }
 
@@ -171,7 +182,7 @@ export class SceneCollectionsService extends Service
    * up some state.  This should really only be used by the OBS
    * importer.
    */
-  async create(options: ISceneCollectionCreateOptions = {}): Promise<void> {
+  async create(options: ISceneCollectionInternalCreateOptions = {}): Promise<ISceneCollectionsManifestEntry> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
@@ -188,8 +199,10 @@ export class SceneCollectionsService extends Service
       this.setupEmptyCollection();
     }
 
-    await this.saveCurrentApplicationStateAs(id);
+    this.collectionLoaded = true;
+    await this.save();
     this.finishLoadingOperation();
+    return this.getCollection(id);
   }
 
   /**
@@ -205,9 +218,6 @@ export class SceneCollectionsService extends Service
     this.removeCollection(id);
 
     if (removingActiveCollection) {
-      this.startLoadingOperation();
-      await this.deloadCurrentApplicationState();
-
       if (this.collections.length > 0) {
         this.load(this.collections[0].id);
       } else {
@@ -301,7 +311,8 @@ export class SceneCollectionsService extends Service
       console.error('Overlay installation failed', e);
     }
 
-    await this.saveCurrentApplicationStateAs(id);
+    this.collectionLoaded = true;
+    await this.save();
     this.finishLoadingOperation();
   }
 
@@ -359,7 +370,7 @@ export class SceneCollectionsService extends Service
    * Returns the collection with the specified id
    * @param id the id of the collection
    */
-  getCollection(id: string) {
+  getCollection(id: string): ISceneCollectionsManifestEntry {
     return this.collections.find(coll => coll.id === id);
   }
 
@@ -428,23 +439,51 @@ export class SceneCollectionsService extends Service
 
   /**
    * Loads the scenes/sources/etc associated with a scene collection
-   * into the current application state.
+   * from disk into the current application state.
    * @param id The id of the collection to load
    */
-  private async loadCollectionIntoApplicationState(id: string): Promise<void> {
+  private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
 
     if (exists) {
-      const data = this.stateService.readCollectionFile(id);
-      if (data == null) throw new Error('Got blank data from collection file');
+      let data: string;
 
-      const root = parse(data, NODE_TYPES);
-      await root.load();
+      try {
+        data = this.stateService.readCollectionFile(id);
+        if (data == null) throw new Error('Got blank data from collection file');
 
-      this.hotkeysService.bindHotkeys();
+        await this.loadDataIntoApplicationState(data);
+      } catch (e) {
+        // Check for a backup and load it
+        const exists = await this.stateService.collectionFileExists(id, true);
+
+        // If there's no backup, throw the original error
+        if (!exists) throw e;
+
+        data = this.stateService.readCollectionFile(id, true);
+        await this.loadDataIntoApplicationState(data);
+      }
+
+      if (this.scenesService.scenes.length === 0) {
+        throw new Error('Scene collection was loaded but there were no scenes.');
+      }
+
+      // Everything was successful, write a backup
+      this.stateService.writeDataToCollectionFile(id, data, true);
+      this.collectionLoaded = true;
     } else {
       await this.attemptRecovery(id);
     }
+  }
+
+  /**
+   * Parses and loads the given JSON string into application state
+   * @param data Scene collection JSON data
+   */
+  private async loadDataIntoApplicationState(data: string) {
+    const root = parse(data, NODE_TYPES);
+    await root.load();
+    this.hotkeysService.bindHotkeys();
   }
 
   /**
@@ -522,6 +561,7 @@ export class SceneCollectionsService extends Service
     }
 
     this.hotkeysService.clearAllHotkeys();
+    this.collectionLoaded = false;
   }
 
   /**
@@ -529,6 +569,7 @@ export class SceneCollectionsService extends Service
    */
   private startLoadingOperation() {
     this.appService.startLoading();
+    this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
   }
 
@@ -537,6 +578,7 @@ export class SceneCollectionsService extends Service
    */
   private finishLoadingOperation() {
     this.appService.finishLoading();
+    this.tcpServerService.startRequestsHandling();
     this.enableAutoSave();
   }
 

@@ -2,10 +2,10 @@
   <div>
     <div class="section">
       <button class="button button--action button--sm" @click="showNotifications">
-        Show Notifications
+        {{ $t('Show Notifications') }}
       </button>
       <button class="button button--sm button--soft-warning" @click="restoreDefaults">
-        Restore Defaults
+        {{ $t('Restore Defaults') }}
       </button>
     </div>
     <div class="section">
@@ -13,7 +13,7 @@
     </div>
     <div class="section">
       <h4>
-        Troubleshooter Notifications
+        {{ $t('Troubleshooter Notifications') }}
       </h4>
 
       <GenericForm v-model="troubleshooterFormData"  @input="saveTroubleshooterSettings"/>

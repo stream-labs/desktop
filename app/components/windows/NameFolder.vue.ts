@@ -5,8 +5,8 @@ import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
-import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
-import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
+import { $t } from 'services/i18n';
+
 
 @Component({
   components: { ModalLayout },
@@ -20,6 +20,7 @@ export default class NameFolder extends Vue {
   options: {
     renameId?: string,
     itemsToGroup?: string[]
+    parentId?: string
   }  = this.windowsService.getChildWindowQueryParams();
 
   name = '';
@@ -40,7 +41,7 @@ export default class NameFolder extends Vue {
 
   submit() {
     if (!this.name) {
-      this.error = 'The source name is required';
+      this.error = $t('The source name is required');
     } else if (this.options.renameId) {
       const folder = this.scenesService
         .activeScene
@@ -56,6 +57,9 @@ export default class NameFolder extends Vue {
         this.scenesService.activeScene
           .getSelection(this.options.itemsToGroup)
           .moveTo(scene.id, newFolder.id);
+        if (this.options.parentId) {
+          newFolder.setParent(this.options.parentId);
+        }
       }
       newFolder.select();
 

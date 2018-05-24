@@ -1,7 +1,7 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
 import { HostsService } from 'services/hosts';
-import { handleErrors } from 'util/requests';
+import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import Util from 'services/utils';
 
@@ -110,24 +110,10 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   private get headers() {
-    const headers = new Headers();
-    headers.append('token', this.authToken);
-    return headers;
-  }
-
-  private get overlaysHost() {
-    if (Util.isPreview()) {
-      return this.hostsService.betaOverlays;
-    }
-
-    return this.hostsService.overlays;
+    return authorizedHeaders(this.userService.apiToken);
   }
 
   private get baseUrl() {
-    return `https://${this.overlaysHost}/api`;
-  }
-
-  private get authToken() {
-    return this.userService.widgetToken;
+    return `https://${this.hostsService.overlays}/api`;
   }
 }

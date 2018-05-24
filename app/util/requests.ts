@@ -31,3 +31,14 @@ export function requiresToken() {
     };
   };
 }
+
+/**
+ * Generates authorized headers per the OAuth standard.  If headers
+ * are not passed, new headers will be generated.
+ * @param token the OAuth access token
+ * @param headers headers to append to
+ */
+export function authorizedHeaders(token: string, headers = new Headers()): Headers {
+  headers.append('Authorization', `Bearer ${token}`);
+  return headers;
+}

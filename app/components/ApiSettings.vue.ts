@@ -2,16 +2,17 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericFormGroups from './shared/forms/GenericFormGroups.vue';
-import { ITcpServerServiceAPI, ITcpServersSettings } from '../services/tcp-server';
+import TextInput from './shared/forms/TextInput.vue';
+import { ITcpServerServiceApi, ITcpServersSettings } from '../services/tcp-server';
 import { ISettingsSubCategory } from '../services/settings';
 
 @Component({
-  components: { GenericFormGroups }
+  components: { GenericFormGroups, TextInput }
 })
 export default class ApiSettings extends Vue {
 
   @Inject()
-  tcpServerService: ITcpServerServiceAPI;
+  tcpServerService: ITcpServerServiceApi;
 
   settingsFormData: ISettingsSubCategory[] = null;
 
@@ -21,6 +22,17 @@ export default class ApiSettings extends Vue {
     this.settingsFormData = this.getApiSettingsFormData();
   }
 
+  get tokenInput() {
+    return {
+      description: 'API Token',
+      value: this.tcpServerService.state.token,
+      masked: true
+    };
+  }
+
+  generateToken() {
+    this.tcpServerService.generateToken();
+  }
 
   destroyed() {
     this.tcpServerService.listen();

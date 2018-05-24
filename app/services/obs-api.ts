@@ -50,33 +50,6 @@ export class ObsApiService extends Service {
     return nodeObs.OBS_API_isOBS_installed();
   }
 
-  createDisplay(key: string) {
-    nodeObs.OBS_content_createDisplay(
-      remote.getCurrentWindow().getNativeWindowHandle(),
-      key
-    );
-  }
-
-  resizeDisplay(key: string, width: number, height: number) {
-    nodeObs.OBS_content_resizeDisplay(key, width, height);
-  }
-
-  moveDisplay(key: string, x: number, y: number) {
-    nodeObs.OBS_content_moveDisplay(key, x, y);
-  }
-
-  createSourceDisplay(sourceId: string, key: string, nativeWindowHandle: Buffer) {
-    return nodeObs.OBS_content_createSourcePreviewDisplay(
-      nativeWindowHandle,
-      sourceId,
-      key
-    );
-  }
-
-  removeSourceDisplay(key: string) {
-    nodeObs.OBS_content_destroyDisplay(key);
-  }
-
   selectSource(x: number, y: number) {
     nodeObs.OBS_content_selectSource(x, y);
   }
