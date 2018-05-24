@@ -23,13 +23,17 @@ class Updater {
 
     this.browserWindow = this.initWindow();
 
-    autoUpdater.checkForUpdates().catch(() => {
-      // This usually means there is no internet connection.
-      // In this case, we shouldn't prevent starting the app.
-      this.startApp();
-      this.finished = true;
-      this.browserWindow.close();
-    });
+    this.startApp();
+    this.finished = true;
+    this.browserWindow.close();
+
+    // autoUpdater.checkForUpdates().catch(() => {
+    //   // This usually means there is no internet connection.
+    //   // In this case, we shouldn't prevent starting the app.
+    //   this.startApp();
+    //   this.finished = true;
+    //   this.browserWindow.close();
+    //});
   }
 
   // PRIVATE
