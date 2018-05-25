@@ -21,14 +21,25 @@ interface IUserServiceState {
   auth?: IPlatformAuth;
 }
 
-interface IBitGoalSettings {
+export interface IBitGoalSettings {
   goal: {
     title: string;
+    goal_amount: number;
+    manual_goal_amount: number;
+    ends_at: string;
   };
   settings: {
     custom_html?: string;
     custom_css?: string;
     custom_js?: string;
+    bar_color: string,
+    bar_bg_color: string,
+    text_color: string,
+    bar_text_color: string,
+    font: string,
+    bar_thickness: string,
+    custom_enabled: boolean,
+    layout: string
   };
   has_goal: boolean;
   widget: object;
@@ -38,15 +49,6 @@ interface IBitGoalSettings {
     html?: string;
     css?: string;
     js?: string;
-  };
-  custom_html?: string;
-  custom_css?: string;
-  custom_js?: string;
-  data: {
-    title: string;
-    goal_amount: number;
-    manual_goal_amount: number;
-    ends_at: string;
   };
 }
 
@@ -119,7 +121,7 @@ export class WidgetSettingsService extends Service {
   // Bit Goal
   getBitGoalSettings(): Promise<IBitGoalSettings> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/widget/bitgoal/settings`;
+    const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -129,6 +131,58 @@ export class WidgetSettingsService extends Service {
       .then(response => {
         return this.fetchBitGoalSettings(response);
       });
+  }
+
+  postBitGoal(widgetData: IBitGoalSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/bitgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+
+    const bodyBitGoal = {
+      ends_at: widgetData.goal['ends_at'],
+      goal_amount: widgetData.goal['goal_amount'],
+      manual_goal_amount: widgetData.goal['manual_goal_amount'],
+      title: widgetData.goal['title']
+    };
+
+    console.log(bodyBitGoal);
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(bodyBitGoal)
+    });
+
+    return fetch(request)
+      .then(response => { return response.json();});
+  }
+
+  postBitGoalSettings(widgetData: IBitGoalSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(widgetData)
+    });
+
+    return fetch(request);
+  }
+
+  deleteBitGoal() {
+    const host = this.hostsService.streamlabs;
+    const token = this.userService.widgetToken;
+    const url = `https://${host}/api/v5/slobs/widget/bitgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, {
+      headers,
+      method: 'DELETE'
+    });
+
+    return fetch(request);
   }
 
   // Some defaults we will have to fetch from server to see if they exist
@@ -146,20 +200,29 @@ export class WidgetSettingsService extends Service {
 
   defaultBitGoalSettings: IBitGoalSettings = {
     goal: {
-      title: 'My Bit Goal'
+      title: 'My Bit Goal',
+      goal_amount: 100,
+      manual_goal_amount: 0,
+      ends_at: ''
     },
-    settings: {},
+    settings: {
+      bar_color: '#46E65A',
+      bar_bg_color: '#DDDDDD',
+      text_color: '#FFFFFF',
+      bar_text_color: '#000000',
+      font: 'Open Sans',
+      bar_thickness: '48',
+      custom_enabled: false,
+      custom_html: '',
+      custom_css: '',
+      custom_js: '',
+      layout: 'standard'
+    },
     has_goal: false,
     widget: {},
     demo: {},
     show_bar: '',
     custom_defaults: {},
-    data: {
-      title: 'My Bit Goal',
-      goal_amount: 100,
-      manual_goal_amount: 0,
-      ends_at: ''
-    }
   };
 
   // defaultDonationGoalSettings: IDonationGoalSettings = {
