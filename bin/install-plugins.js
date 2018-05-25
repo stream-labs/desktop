@@ -12,7 +12,7 @@ const os = require('os');
 const colors = require('colors/safe');
 
 // CONFIGURATION
-const FACE_MASK_VERSION = '0.6.4';
+const FACE_MASK_VERSION = '0.7.0';
 
 // This is the main function
 async function runScript() {
@@ -22,7 +22,7 @@ async function runScript() {
   const pluginsPath = path.join(slobsDir, 'plugins');
 
   /* INSTALL FACEMASK PLUGIN */
-  const faceMaskArchivePath = path.join(pluginsPath, `facemask-plugin-${FACE_MASK_VERSION}.zip`);
+  const faceMaskArchivePath = path.join(pluginsPath, `facemask-plugin-${FACE_MASK_VERSION}-preview.zip`);
 
   if (!fs.existsSync(faceMaskArchivePath)) {
     sh.rm('-rf', pluginsPath);
@@ -31,7 +31,7 @@ async function runScript() {
     const faceMaskArchive = fs.createWriteStream(faceMaskArchivePath);
     const faceMaskArchiveFinishPromise = new Promise(resolve => faceMaskArchive.on('finish', resolve));
     const faceMaskReleaseUrl = `https://github.com/stream-labs/facemask-plugin/releases/download/${FACE_MASK_VERSION}/` +
-      `facemask-plugin-${FACE_MASK_VERSION}.zip`;
+      `facemask-plugin-${FACE_MASK_VERSION}-preview.zip`;
 
     sh.echo(`Downloading facemask-plugin version ${FACE_MASK_VERSION}...`);
     https.get(faceMaskReleaseUrl, response => {
