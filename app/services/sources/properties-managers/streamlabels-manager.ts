@@ -1,14 +1,14 @@
-import { PropertiesManager } from './properties-manager';
+import { DefaultManager, IDefaultManagerSettings } from './default-manager';
 import { Inject } from 'util/injector';
 import { StreamlabelsService, IStreamlabelSubscription } from 'services/streamlabels';
 import { getDefinitions } from 'services/streamlabels/definitions';
 import { UserService } from 'services/user';
 
-export interface IStreamlabelsManagerSettings {
+export interface IStreamlabelsManagerSettings extends IDefaultManagerSettings {
   statname: string;
 }
 
-export class StreamlabelsManager extends PropertiesManager {
+export class StreamlabelsManager extends DefaultManager {
 
   @Inject() streamlabelsService: StreamlabelsService;
   @Inject() userService: UserService;

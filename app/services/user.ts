@@ -212,9 +212,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   startAuth(
     platform: TPlatform,
-    onWindowShow: Function,
-    onAuthStart: Function,
-    onAuthFinish: Function
+    onWindowShow: (...args: any[]) => any,
+    onAuthStart: (...args: any[]) => any,
+    onAuthFinish: (...args: any[]) => any
   ) {
     const service = getPlatformService(platform);
 

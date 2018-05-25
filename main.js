@@ -276,7 +276,7 @@ function startApp() {
     path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
               '/node_modules/obs-studio-node'));
 
-  getObs().OBS_API_initAPI(app.getPath('userData'));
+  getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
 }
 
 // We use a special cache directory for running tests

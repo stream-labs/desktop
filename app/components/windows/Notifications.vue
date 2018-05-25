@@ -1,17 +1,17 @@
 <template>
 <modal-layout
-    title="Notifications"
+    :title="$t('Notifications')"
     :showControls="false"
 >
   <div slot="content">
 
     <h4 v-if="!notificationsCount">
-      You don't have any notifications
+      {{ $t('You don\'t have any notifications') }}
     </h4>
 
     <div v-for="(notificationsService, groupName) in notificationGroups">
       <h4 v-if="notificationsService.length">
-        {{ groupName == 'unread' ? 'New Notifications' : 'Log' }}
+        {{ groupName == 'unread' ? $t('New Notifications') : $('Log') }}
       </h4>
       <div
         class="notification"

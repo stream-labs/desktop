@@ -7,6 +7,7 @@ import { PerformanceService } from 'services/performance';
 import { Subscription } from 'rxjs/Subscription';
 import { JsonrpcService } from '../jsonrpc/jsonrpc';
 import { TroubleshooterService, TIssueCode } from 'services/troubleshooter';
+import { $t } from 'services/i18n';
 
 const INTERVAL = 2 * 60 * 1000;
 
@@ -125,7 +126,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       data: factor,
       lifeTime: -1,
       showTime: true,
-      message: `Skipped frames detected: ${ Math.round(factor * 100)}%`,
+      message: $t('Skipped frames detected:') +  Math.round(factor * 100) + '%',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',

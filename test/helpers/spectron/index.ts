@@ -4,6 +4,7 @@ import test from 'ava';
 import { Application } from 'spectron';
 import { getClient } from '../api-client';
 import { DismissablesService } from 'services/dismissables';
+import { sleep } from '../sleep';
 
 const path = require('path');
 const fs = require('fs');
@@ -35,7 +36,15 @@ export async function focusChild(t: any) {
 interface ITestRunnerOptions {
   skipOnboarding?: boolean;
   restartAppAfterEachTest?: boolean;
-  afterStartCb?  (t: any): Promise<any>;
+  afterStartCb?(t: any): Promise<any>;
+
+  /**
+   * Called after cache directory is created but before
+   * the app is started.  This is useful for setting up
+   * some known state in the cache directory before the
+   * app starts up and loads it.
+   */
+  beforeAppStartCb?(t: any): Promise<any>;
 }
 
 const DEFAULT_OPTIONS: ITestRunnerOptions = {
@@ -66,12 +75,16 @@ export function useSpectron(options: ITestRunnerOptions) {
       }
     });
 
+    if (options.beforeAppStartCb) await options.beforeAppStartCb(t);
+
     await t.context.app.start();
 
     // Wait up to 2 seconds before giving up looking for an element.
     // This will slightly slow down negative assertions, but makes
     // the tests much more stable, especially on slow systems.
     t.context.app.client.timeouts('implicit', 2000);
+
+    // await sleep(100000);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.

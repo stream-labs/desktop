@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "當前並沒有任何通知",
+  "Enable notifications": "啟用通知",
+  "Enable sound": "啟用通知聲音",
+  "Skipped frames detected:": "偵測到編碼省略影格：",
+  "Detect skipped frames": "偵測編碼省略影格",
+  "Skipped frames threshold": "編碼省略影格偵測門檻",
+  "Detect lagged frames": "偵測到延遲影格",
+  "Lagged frames threshold": "延遲影格偵測門檻",
+  "Detect dropped frames": "偵測到網路丟失影格",
+  "Dropped frames threshold": "網路丟失影格偵測門檻",
+  "Show Notifications": "顯示通知",
+  "Restore Defaults": "還原預設值",
+  "Troubleshooter Notifications": "故障檢測通知",
+  "Click to open your Notifications window": "點擊開啟通知視窗",
+  "Click to read your unread Notifications": "點擊閱讀未讀通知",
+  "New Notifications": "新通知",
+  "Log": "紀錄"
+}

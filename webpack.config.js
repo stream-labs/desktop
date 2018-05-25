@@ -46,7 +46,8 @@ module.exports = {
     'node-fontinfo': 'require("node-fontinfo")',
     'socket.io-client': 'require("socket.io-client")',
     'rimraf': 'require("rimraf")',
-    'backtrace-js': 'require("backtrace-js")'
+    'backtrace-js': 'require("backtrace-js")',
+    'request': 'require("request")'
   },
 
   module: {
@@ -93,7 +94,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',

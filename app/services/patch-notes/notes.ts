@@ -1,18 +1,18 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.8.17',
-  title: 'Projectors and Bugfixes',
+  version: '0.9.1',
+  title: 'Introducing the Cloud',
   notes: [
-    'Projectors: Right click on a source to pop out a preview of that source.  '
-      + 'You can also pop out a preview of your streaming output.  All projectors can be made fullscreen.',
-    'Filters can now be added to scenes, and they will be saved properly',
-    'Switched from legacy to current Twitch chat.  Dark mode is not enabled by default in this chat.  If you ' +
-      'want to use dark mode chat, you can click the gear in the lower left of the chat pane.',
-    'The shift button can be used to select a range of sources',
-    'Clicking the "Refresh Chat" button will now navigate back to the chat for your channel',
-    'Navigating to a different tab in settings no longer moves the window',
-    'Notifications settings will now save properly when exiting',
-    'Allow reordering multiple sources at once'
+    'Cloud Backups: Streamlabs OBS now backs up all of your scenes, sources, media, ' +
+      "and overlay assets to the cloud.  Got a new computer?  Hard drive died?  Don't " +
+      'worry, just log into Streamlabs OBS and your entire setup will be just as you left it.',
+    'Added the ability to hide sources in the audio mixer',
+    'Added horizontal and vertical centering options in the source transform menu',
+    'Fixed a bug where the color picker would switch to a different color than what was selected',
+    "Increased the height of the wheel widget so the bottom isn't cut off",
+    'Fixed a bug where dragging sources would sometimes cause the source to drift away from the mouse cursor',
+    'Fixed a bug where streaming for 24 hours caused the streaming clock to reset to 0',
+    'Fixed an issue where game capture would cause performance issues with some games on the latest Windows 10 version'
   ]
 };

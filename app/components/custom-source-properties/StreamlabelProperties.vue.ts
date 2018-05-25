@@ -47,7 +47,7 @@ export default class StreamlabelProperties extends Vue {
           this.labelSettings = this.streamlabelsService.getSettingsForStat(settingsStat);
 
           if (file.settings.settingsWhitelist) {
-            this.labelSettings = pick(this.labelSettings, file.settings.settingsWhitelist);
+            this.labelSettings = pick(this.labelSettings, file.settings.settingsWhitelist) as IStreamlabelSettings;
           }
         }
       });
@@ -131,7 +131,7 @@ export default class StreamlabelProperties extends Vue {
     { name: 'Fishstickslol', months: '5', amount: '$4.98', message: 'I love you!', bits_amount: '498 Bits' },
     { name: 'ChocoPie', months: '2', amount: '$5', message: 'I love you!', bits_amount: '500 Bits' },
     { name: 'Beecreative', months: '3', amount: '$1.43', message: 'I love you!', bits_amount: '143 Bits' },
-    { name: 'ActionBa5tard', months: '1', amount: '$13.37', message: 'Love your stream!', bits_amount: '1337 Bits'}
+    { name: 'ActionBa5tard', months: '1', amount: '$13.37', message: 'Love your stream!', bits_amount: '1337 Bits' }
   ];
 
 }

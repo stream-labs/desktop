@@ -2,7 +2,7 @@
 <modal-layout
   :show-controls="false"
   :content-styles="{ padding: 0 }"
-  title="Add Source">
+  :title="$t('Add Source')">
 
   <div slot="content"
     class="add-source">
@@ -10,8 +10,8 @@
     <add-source-info
       v-if="inspectedSource === 'image_source'"
       @clickAdd="selectSource('image_source')"
-      name="Image"
-      description="Add images to your scene."
+      :name="$t('Image')"
+      :description="$t('Add images to your scene.')"
       key="1">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/image.png"/>
@@ -28,8 +28,8 @@
     <add-source-info
       v-if="inspectedSource === 'slideshow'"
       @clickAdd="selectSource('slideshow')"
-      name="Image Slide Show"
-      description="Add a slideshow of images to your scene."
+      :name="$t('Image Slide Show')"
+      :description="$t('Add a slideshow of images to your scene.')"
       key="2">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/image-slide-show.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/image-slide-show.png"/>
@@ -46,8 +46,8 @@
     <add-source-info
       v-if="inspectedSource === 'ffmpeg_source'"
       @clickAdd="selectSource('ffmpeg_source')"
-      name="Media Source"
-      description="Add videos or sound clips to your scene."
+      :name="$t('Media Source')"
+      :description="$t('Add videos or sound clips to your scene.')"
       key="3">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/media.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/media.png"/>
@@ -70,49 +70,49 @@
     <add-source-info
       v-if="inspectedSource === 'window_capture'"
       @clickAdd="selectSource('window_capture')"
-      name="Window Capture"
-      description="Capture a specific window that's open on your computer."
+      :name="$t('Window Capture')"
+      :description="$t('Capture a specific window that\'s open on your computer.')"
       key="4">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/window-capture.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/window-capture.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Compatible with most modern browsers and programs</li>
+        <li>{{ $t('Compatible with most modern browsers and programs') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'dshow_input'"
       @clickAdd="selectSource('dshow_input')"
-      name="Video Capture Device"
-      description="Select from your build in USB webcam or an external."
+      :name="$t('Video Capture Device')"
+      :description="$t('Select from your build in USB webcam or an external.')"
       key="5">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/video-capture.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/video-capture.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Built in webcam</li>
-        <li>Logitech webcam</li>
-        <li>Capture cards (Elgato, Avermedia, BlackMagic)</li>
+        <li>{{ $t('Built in webcam') }}</li>
+        <li>{{ $t('Logitech webcam') }}</li>
+        <li>{{ $t('Capture cards (Elgato, Avermedia, BlackMagic)') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'wasapi_output_capture'"
       @clickAdd="selectSource('wasapi_output_capture')"
-      name="Audio Output Capture"
-      description="Captures your desktop audio for the purpose of playing sound, such as music or speech."
+      :name="$t('Audio Output Capture')"
+      :description="$t('Captures your desktop audio for the purpose of playing sound, such as music or speech.')"
       key="6">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-output.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/audio-output.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Desktop audio</li>
+        <li>{{ $t('Desktop audio') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'color_source'"
       @clickAdd="selectSource('color_source')"
-      name="Color Source"
-      description="Add a color to the background of your whole scene or just a part."
+      :name="$t('Color Source')"
+      :description="$t('Add a color to the background of your whole scene or just a part.')"
       key="7">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/color-source.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/color-source.png"/>
@@ -126,14 +126,14 @@
     <add-source-info
       v-if="inspectedSource === 'browser_source'"
       @clickAdd="selectSource('browser_source')"
-      name="BrowserSource"
-      description="Allows you to add web-based content as a source, such as web pages and Flash SWFs."
+      :name="$t('BrowserSource')"
+      :description="$t('Allows you to add web-based content as a source, such as web pages and Flash SWFs.')"
       key="8">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/browser-source.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/browser-source.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Websites</li>
-        <li>Third party widgets</li>
+        <li>{{ $t('Websites') }}</li>
+        <li>{{ $t('Third party widget') }}s</li>
         <li>HTML</li>
       </ul>
     </add-source-info>
@@ -141,8 +141,8 @@
     <add-source-info
       v-if="inspectedSource === 'text_gdiplus'"
       @clickAdd="selectSource('text_gdiplus')"
-      name="Text (GDI+)"
-      description="Add text to your scene and adjust its style."
+      :name="$t('Text (GDI+)')"
+      :description="$t('Add text to your scene and adjust its style.')"
       key="9">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/text.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/text.png"/>
@@ -150,35 +150,35 @@
         <li>Hex</li>
         <li>RGBA</li>
         <li>HSV</li>
-        <li>System Fonts</li>
-        <li>System Sizes</li>
+        <li>{{ $t('System Fonts') }}</li>
+        <li>{{ $t('System Sizes') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'monitor_capture'"
       @clickAdd="selectSource('monitor_capture')"
-      name="Display Capture"
-      description="Capture your entire computer monitor."
+      :name="$t('Display Capture')"
+      :description="$t('Capture your entire computer monitor.')"
       key="10">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/display-capture.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/display-capture.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Primary monitor</li>
-        <li>Secondary monitor</li>
+        <li>{{ $t('Primary monitor') }}</li>
+        <li>{{ $t('Secondary monitor') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'game_capture'"
       @clickAdd="selectSource('game_capture')"
-      name="Game Capture"
-      description="Capture a game you're playing on your computer."
+      :name="$t('Game Capture')"
+      :description="$t('Capture a game you\'re playing on your computer.')"
       key="11">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/game-capture.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/game-capture.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Built in works with most modern computer games</li>
+        <li>{{ $t('Built in works with most modern computer games') }}</li>
       </ul>
     </add-source-info>
 
@@ -187,35 +187,35 @@
       v-if="inspectedSource === 'ndi_source'"
       @clickAdd="selectSource('ndi_source')"
       showSupport="false"
-      name="NDI source"
-      description="Allow you to capture NDI output streams.">
+      :name="$t('NDI source')"
+      :description="$t('Allow you to capture NDI output streams.')">
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'wasapi_input_capture'"
       @clickAdd="selectSource('wasapi_input_capture')"
-      name="Audio Input Capture"
-      description="Any device that attaches to a computer for the purpose of capturing sound, such as music or speech."
+      :name="$t('Audio Input Capture')"
+      :description="$t('Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.')"
       key="12">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/audio-input.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/audio-input.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Built in microphones</li>
-        <li>USB microphones</li>
-        <li>Other USB devices</li>
+        <li>{{ $t('Built in microphones') }}</li>
+        <li>{{ $t('USB microphones') }}</li>
+        <li>{{ $t('Other USB devices') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'decklink-input'"
       @clickAdd="selectSource('decklink-input')"
-      name="Blackmagic Device"
-      description="Capture the feed your decklink device is capturing."
+      :name="$t('Blackmagic Device')"
+      :description="$t('Capture the feed your decklink device is capturing.')"
       key="13">
       <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/sources.png"/>
       <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/sources.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Works with most of the recent Blackmagic cards.</li>
+        <li>{{ $t('Works with most of the recent Blackmagic cards.') }}</li>
       </ul>
     </add-source-info>
 
@@ -223,8 +223,8 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.AlertBox"
       @clickAdd="selectWidget(widgetTypes.AlertBox)"
-      name="Alertbox"
-      description="Thanks viewers with notification popups."
+      :name="$t('Alertbox')"
+      :description="$t('Thanks viewers with notification popups.')"
       key="14">
       <video class="source__demo source__demo--day" autoplay loop slot="media">
         <source src="../../../media/source-demos/day/source-alertbox.mp4">
@@ -233,19 +233,19 @@
         <source src="../../../media/source-demos/night/source-alertbox.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
+        <li>{{ $t('Donations') }}</li>
+        <li>{{ $t('Subscriptions') }}</li>
+        <li>{{ $t('Follows') }}</li>
+        <li>{{ $t('Bits') }}</li>
+        <li>{{ $t('Hosts') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.DonationTicker"
       @clickAdd="selectWidget(widgetTypes.DonationTicker)"
-      name="Donation Ticker"
-      description="Show off your most recent donations to your viewers."
+      :name="$t('Donation Ticker')"
+      :description="$t('Show off your most recent donations to your viewers.')"
       key="15">
       <video class="source__demo source__demo--day" autoplay loop slot="media">
         <source src="../../../media/source-demos/day/source-donation-ticker.mp4">
@@ -254,15 +254,15 @@
         <source src="../../../media/source-demos/night/source-donation-ticker.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
+        <li>{{ $t('Donations') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.EventList"
       @clickAdd="selectWidget(widgetTypes.EventList)"
-      name="Event List"
-      description="Include your channel's most recent events into your stream."
+      :name="$t('Event List')"
+      :description="$t('Include your channel\'s most recent events into your stream.')"
       key="16">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-eventlist.mp4">
@@ -271,20 +271,20 @@
         <source src="../../../media/source-demos/night/source-eventlist.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
-        <li>Redemptions</li>
+        <li>{{ $t('Donations') }}</li>
+        <li>{{ $t('Subscriptions') }}</li>
+        <li>{{ $t('Follows') }}</li>
+        <li>{{ $t('Bits') }}</li>
+        <li>{{ $t('Hosts') }}</li>
+        <li>{{ $t('Redemptions') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.DonationGoal"
       @clickAdd="selectWidget(widgetTypes.DonationGoal)"
-      name="Donation Goal"
-      description="Set a goal for your viewers to help you reach."
+      :name="$t('Donation Goal')"
+      :description="$t('Set a goal for your viewers to help you reach.')"
       key="17">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-donation-goal.mp4">
@@ -293,56 +293,56 @@
         <source src="../../../media/source-demos/night/source-donation-goal.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
+        <li>{{ $t('Donations') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.FollowerGoal"
       @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
-      name="Follower Goal"
-      description="Set a goal for your viewers to help you reach."
+      :name="$t('Follower Goal')"
+      :description="$t('Set a goal for your viewers to help you reach.')"
       key="18">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Twitch Follows</li>
-        <li>Youtube Follows</li>
-        <li>Mixer Follows</li>
+        <li>{{ $t('Twitch Follows') }}</li>
+        <li>{{ $t('Youtube Follows') }}</li>
+        <li>{{ $t('Mixer Follows') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.BitGoal"
       @clickAdd="selectWidget(widgetTypes.BitGoal)"
-      name="Bit Goal"
-      description="Set a goal for your viewers to help you reach."
+      :name="$t('Bit Goal')"
+      :description="$t('Set a goal for your viewers to help you reach.')"
       key="19">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-bit-goal.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-bit-goal.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Twitch Bits</li>
+        <li>{{ $t('Twitch Bits') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.SubscriptionGoal"
       @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
-      name="Subscription Goal"
-      description="Set a goal for your viewers to help you reach."
+      :name="$t('Subscription Goal')"
+      :description="$t('Set a goal for your viewers to help you reach.')"
       key="20">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>Youtube Subscribers</li>
+        <li>{{ $t('Youtube Subscribers') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.ChatBox"
       @clickAdd="selectWidget(widgetTypes.ChatBox)"
-      name="Chatbox"
-      description="Include your channel's chat into your stream."
+      :name="$t('Chatbox')"
+      :description="$t('Include your channel\'s chat into your stream.')"
       key="21">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-chatbox.mp4">
@@ -351,16 +351,16 @@
         <source src="../../../media/source-demos/night/source-chatbox.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Twitch chat</li>
-        <li>Youtube chat</li>
+        <li>{{ $t('Twitch chat') }}</li>
+        <li>{{ $t('Youtube chat') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.TheJar"
       @clickAdd="selectWidget(widgetTypes.TheJar)"
-      name="The Jar"
-      description="The jar that catches bits, tips, and more."
+      :name="$t('The Jar')"
+      :description="$t('The jar that catches bits, tips, and more.')"
       key="22">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-jar.mp4">
@@ -369,19 +369,19 @@
         <source src="../../../media/source-demos/night/source-jar.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>Donations</li>
-        <li>Subscriptions</li>
-        <li>Follows</li>
-        <li>Bits</li>
-        <li>Hosts</li>
+        <li>{{ $t('Donations') }}</li>
+        <li>{{ $t('Subscriptions') }}</li>
+        <li>{{ $t('Follows') }}</li>
+        <li>{{ $t('Bits') }}</li>
+        <li>{{ $t('Hosts') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.ViewerCount"
       @clickAdd="selectWidget(widgetTypes.ViewerCount)"
-      name="Viewer Count"
-      description="Show off your viewers from multiple platforms."
+      :name="$t('Viewer Count')"
+      :description="$t('Show off your viewers from multiple platforms.')"
       key="23">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-viewer-count.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-viewer-count.png"/>
@@ -395,8 +395,8 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.StreamBoss"
       @clickAdd="selectWidget(widgetTypes.StreamBoss)"
-      name="Stream Boss"
-      description="Battle with bits to be the boss of the stream!"
+      :name="$t('Stream Boss')"
+      :description="$t('Battle with bits to be the boss of the stream!')"
       key="24">
       <img slot="media" src="../../../media/source-demos/streamboss-source.png"/>
       <ul slot="support-list" class="source-support__list">
@@ -407,8 +407,8 @@
     <add-source-info
       v-if="inspectedSource === widgetTypes.Credits"
       @clickAdd="selectWidget(widgetTypes.Credits)"
-      name="Credits"
-      description="Rolling credits to play at the end of your stream."
+      :name="$t('Credits')"
+      :description="$t('Rolling credits to play at the end of your stream.')"
       key="25">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-credits.mp4">
@@ -417,18 +417,18 @@
         <source src="../../../media/source-demos/night/source-credits.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>New Followers</li>
-        <li>New Subscribers</li>
-        <li>Cheers</li>
-        <li>Donations</li>
+        <li>{{ $t('New Followers') }}</li>
+        <li>{{ $t('New Subscribers') }}</li>
+        <li>{{ $t('Cheers') }}</li>
+        <li>{{ $t('Donations') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === widgetTypes.SpinWheel"
       @clickAdd="selectWidget(widgetTypes.SpinWheel)"
-      name="Spin Wheel"
-      description="Rolling credits to play at the end of your stream."
+      :name="$t('Spin Wheel')"
+      :description="$t('Spin the wheel to make a decision.')"
       key="26">
       <video class="source__demo source__demo--day" slot="media" autoplay loop>
         <source src="../../../media/source-demos/day/source-wheel.mp4">
@@ -437,15 +437,15 @@
         <source src="../../../media/source-demos/night/source-wheel.mp4">
       </video>
       <ul slot="support-list" class="source-support__list">
-        <li>The streamer manually triggers a spin anytime while they are live.</li>
+        <li>{{ $t('The streamer manually triggers a spin anytime while they are live.') }}</li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
-      name="Scene"
-      description="Allows you to add existing scene as a source"
+      :name="$t('Scene')"
+      :description="$t('Allows you to add existing scene as a source')"
       key="27">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/scene.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/scene.png"/>
@@ -454,20 +454,20 @@
     <add-source-info
       v-if="inspectedSource === 'streamlabel'"
       @clickAdd="selectWidget(widgetTypes.StreamLabel)"
-      name="Stream Label"
-      description="This is a placeholder description for streamlabels."
+      :name="$t('Stream Label')"
+      :description="$t('This is a placeholder description for streamlabels.')"
       key="28">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
       <ul slot="support-list" class="source-support__list">
-        <li>New Followers</li>
-        <li>New Subscribers</li>
-        <li>New Cheers</li>
-        <li>New Donations</li>
-        <li>All-Time Top Donator</li>
-        <li>Weekly Top Donator</li>
-        <li>Monthly Follows</li>
-        <li>Many more</li>
+        <li>{{ $t('New Followers') }}</li>
+        <li>{{ $t('New Subscribers') }}</li>
+        <li>{{ $t('New Cheers') }}</li>
+        <li>{{ $t('New Donations') }}</li>
+        <li>{{ $t('All-Time Top Donator') }}</li>
+        <li>{{ $t('Weekly Top Donator') }}</li>
+        <li>{{ $t('Monthly Follows') }}</li>
+        <li>{{ $t('Many more') }}</li>
       </ul>
     </add-source-info>
 
@@ -476,11 +476,11 @@
       v-if="inspectedSource === null">
       <div class="source-welcome">
         <div class="source-info__text">
-          <h3>Welcome to Sources!</h3>
+          <h3>{{ $t('Welcome to sources!') }}</h3>
           <ol>
-            <li>Browse through our Standard and Widget Sources</li>
-            <li>Click a Source to get more details about it</li>
-            <li>Click 'Add Source' when you're ready to add it to your Scene</li>
+            <li>{{ $t('Browse through our Standard and Widget sources') }}</li>
+            <li>{{ $t('Click a source to get more details about it') }}</li>
+            <li>{{ $t('Click "Add Source" when you\'re ready to add it to your scene') }}</li>
           </ol>
         </div>
         <div class="source-info__media">
@@ -492,7 +492,7 @@
 
     <div class="sources">
       <div class="source-group">
-        <h4>Standard</h4>
+        <h4>{{ $t('Standard') }}</h4>
         <ul class="source-list">
           <li
             v-for="source in availableSources"
@@ -500,20 +500,20 @@
             :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
             @dblclick="selectSource(source.value)">
-            {{ source.description }}
+            {{ $t(source.description) }}
           </li>
         </ul>
       </div>
 
       <div class="source-group" v-if="loggedIn">
-        <h4>Widgets</h4>
+        <h4>{{ $t('Widgets') }}</h4>
         <div class="source-list">
           <div
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.Alertbox}"
             @click="inspectSource(widgetTypes.AlertBox)"
             @dblclick="selectWidget(widgetTypes.AlertBox)">
-            <div>Alertbox</div><span class="label--essential">Essential</span>
+            <div>{{ $t('Alertbox') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div
@@ -521,7 +521,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.EventList}"
             @click="inspectSource(widgetTypes.EventList)"
             @dblclick="selectWidget(widgetTypes.EventList)">
-            <div>Event List</div><span class="label--essential">Essential</span>
+            <div>{{ $t('Event List') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div
@@ -529,7 +529,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
             @click="inspectSource(widgetTypes.TheJar)"
             @dblclick="selectWidget(widgetTypes.TheJar)">
-            <div>The Jar</div><span class="label--essential">Essential</span>
+            <div>{{ $t('The Jar') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div
@@ -537,7 +537,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.DonationGoal}"
             @click="inspectSource(widgetTypes.DonationGoal)"
             @dblclick="selectWidget(widgetTypes.DonationGoal)">
-            <div>Donation Goal</div>
+            <div>{{ $t('Donation Goal') }}</div>
           </div>
 
           <div
@@ -545,7 +545,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
             @click="inspectSource(widgetTypes.FollowerGoal)"
             @dblclick="selectWidget(widgetTypes.FollowerGoal)">
-            <div>Follower Goal</div>
+            <div>{{ $t('Follower Goal') }}</div>
           </div>
 
           <div
@@ -554,7 +554,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.BitGoal}"
             @click="inspectSource(widgetTypes.BitGoal)"
             @dblclick="selectWidget(widgetTypes.BitGoal)">
-            <div>Bit Goal</div>
+            <div>{{ $t('Bit Goal') }}</div>
           </div>
 
           <div
@@ -563,7 +563,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.SubscriptionGoal}"
             @click="inspectSource(widgetTypes.SubscriptionGoal)"
             @dblclick="selectWidget(widgetTypes.SubscriptionGoal)">
-            <div>Subscription Goal</div>
+            <div>{{ $t('Subscription Goal') }}</div>
           </div>
 
           <div
@@ -571,7 +571,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.DonationTicker}"
             @click="inspectSource(widgetTypes.DonationTicker)"
             @dblclick="selectWidget(widgetTypes.DonationTicker)">
-            <div>Donation Ticker</div>
+            <div>{{ $t('Donation Ticker') }}</div>
           </div>
 
           <div
@@ -579,7 +579,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
             @click="inspectSource(widgetTypes.ChatBox)"
             @dblclick="selectWidget(widgetTypes.ChatBox)">
-            <div>Chatbox</div>
+            <div>{{ $t('Chatbox') }}</div>
           </div>
 
           <div
@@ -587,7 +587,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.StreamBoss}"
             @click="inspectSource(widgetTypes.StreamBoss)"
             @dblclick="selectWidget(widgetTypes.StreamBoss)">
-            <div>Stream Boss</div>
+            <div>{{ $t('Stream Boss') }}</div>
           </div>
 
           <div
@@ -595,7 +595,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.Credits}"
             @click="inspectSource(widgetTypes.Credits)"
             @dblclick="selectWidget(widgetTypes.Credits)">
-            <div>Credits</div>
+            <div>{{ $t('Credits') }}</div>
           </div>
 
           <div
@@ -603,7 +603,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.ViewerCount}"
             @click="inspectSource(widgetTypes.ViewerCount)"
             @dblclick="selectWidget(widgetTypes.ViewerCount)">
-            <div>Viewer Count</div>
+            <div>{{ $t('Viewer Count') }}</div>
           </div>
 
           <div
@@ -611,7 +611,7 @@
             :class="{'source--active': inspectedSource === widgetTypes.SpinWheel}"
             @click="inspectSource(widgetTypes.SpinWheel)"
             @dblclick="selectWidget(widgetTypes.SpinWheel)">
-            <div>Spin Wheel</div>
+            <div>{{ $t('Spin Wheel') }}</div>
           </div>
 
           <div
@@ -619,7 +619,7 @@
             :class="{'source--active': inspectedSource === 'streamlabel'}"
             @click="inspectSource('streamlabel')"
             @dblclick="selectSource('text_gdiplus', { propertiesManager: 'streamlabels' })">
-            <div>Stream Label</div>
+            <div>{{ $t('Stream Label') }}</div>
           </div>
         </div>
       </div>
@@ -629,7 +629,7 @@
         @click="selectInspectedSource()"
         class="button button--action"
         :disabled="inspectedSource === null">
-          Add Source
+        {{ $t('Add Source') }}
       </button>
     </div>
   </div>

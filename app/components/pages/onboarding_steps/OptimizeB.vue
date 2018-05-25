@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="onboarding-step">
-      <div class="onboarding-title">Optimize</div>
-      <div class="onboarding-desc">We're analyzing your internet speed and computer hardware to give you the best settings possible.</div>
+      <div class="onboarding-title">{{ $t('Optimize') }} </div>
+      <div class="onboarding-desc">{{ $t('We\'re analyzing your internet speed and computer hardware to give you the best settings possible.') }} </div>
 
       <div class="running-setup-container optimizing">
         <div class="running-setup__deco running-setup__deco--right">
@@ -24,14 +24,14 @@
         </div>
 
         <div v-if="done" class="running-setup-row">
-          <div class="running-setup-title">Done!</div>
+          <div class="running-setup-title">{{ $t('Done!') }}</div>
         </div>
       </div>
       <button
         class="button button--action button--lg"
         @click="next"
         :disabled="!done">
-        Next
+        {{ $t('Next') }}
       </button>
     </div>
   </div>

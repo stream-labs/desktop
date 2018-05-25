@@ -3,29 +3,29 @@
 
   <div class="fader" @click="showQrcode">
     <qrcode :value="qrcodeVal" :options="{ size: 250 }" :class="{ blur: !qrcodeIsVisible }"></qrcode>
-    <span v-if="!qrcodeIsVisible">Click to show</span>
+    <span v-if="!qrcodeIsVisible">{{ $t('Click to show')}}</span>
   </div>
 
   <div v-if="qrcodeIsVisible">
     <a href="" @click.prevent="detailsIsVisible = true" v-if="!detailsIsVisible">
-      Show details
+      {{ $t('Show details') }}
     </a>
     <a href="" @click.prevent="detailsIsVisible = false" v-if="detailsIsVisible">
-      Hide details
+      {{ $t('Hide details') }}
     </a>
     <div class="details" v-if="detailsIsVisible">
       <label>
-        API token <br/>
+        {{ $t('API token') }} <br/>
         <input type="text" readonly :value="qrcodeData.token">
-        <a href="" @click.prevent="generateToken">Generate new</a><br/>
+        <a href="" @click.prevent="generateToken">{{ $t('Generate new') }}</a><br/>
         <br/>
       </label>
       <label>
-        Port<br/>
+        {{ $t('Port') }}<br/>
         <input type="text" readonly :value="qrcodeData.port">
       </label>
       <label>
-        IP addresses<br/>
+        {{ $t('IP addresses') }}<br/>
         <input type="text" readonly :value="qrcodeData.addresses.join(', ')">
       </label>
     </div>
@@ -33,10 +33,9 @@
   </div>
 
   <div>
-    You can now control Streamlabs OBS from your <strong>Android</strong> phone. <br/>
-    To begin, Scan this QR code with your phone.<br/>
-    This feature will only work with the most recent version of the Streamlabs mobile app.<br/>
-    NOTE: For IOS users, this feature is coming soon.<br/>
+    {{ $t('You can now control Streamlabs OBS from your phone.') }} <br/>
+    {{ $t('To begin, Scan this QR code with your phone.') }}<br/>
+    {{ $t('This feature will only work with the most recent version of the Streamlabs mobile app.') }}<br/>
   </div>
 </div>
 </template>

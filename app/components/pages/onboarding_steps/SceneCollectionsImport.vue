@@ -1,8 +1,8 @@
 <template>
 <div>
   <div class="onboarding-step">
-    <div class="onboarding-title">Scene Collections Import</div>
-    <div class="onboarding-desc">The following scene collections have been imported from your Streamlabs account</div>
+    <div class="onboarding-title">{{ $t('Scene Collections Import') }}</div>
+    <div class="onboarding-desc">{{ $t('The following scene collections have been imported from your Streamlabs account') }}</div>
     <ul class="scene-collections-list">
       <li v-for="collection in sceneCollections" :key="collection.id">
         {{ collection.name }}
@@ -11,7 +11,7 @@
     <button
       class="button button--action button--lg"
       @click="next">
-      Continue
+      {{ $t('Continue') }}
     </button>
   </div>
 </div>

@@ -7,6 +7,7 @@ import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
 import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
+import { $t } from 'services/i18n';
 
 @Component({
   components: { ModalLayout },
@@ -50,7 +51,7 @@ export default class NameSource extends Vue {
 
   submit() {
     if (!this.name) {
-      this.error = 'The source name is required';
+      this.error = $t('The source name is required');
     } else if (this.options.renameId) {
       this.sourcesService.getSource(this.options.renameId).setName(this.name);
       this.windowsService.closeChildWindow();

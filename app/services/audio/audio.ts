@@ -18,6 +18,7 @@ import {
   IVolmeter
 } from './audio-api';
 import { Observable } from 'rxjs/Observable';
+import { $t } from 'services/i18n';
 
 const { ipcRenderer } = electron;
 
@@ -118,17 +119,30 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       .filter(item => item);
   }
 
+  unhideAllSourcesForCurrentScene() {
+    this.getSourcesForCurrentScene().forEach(source => {
+      source.setHidden(false);
+    });
+  }
 
-  fetchAudioSource(sourceId: string): IAudioSource {
+  fetchFaderDetails(sourceId: string): IFader {
     const source = this.sourcesService.getSource(sourceId);
     const obsSource = source.getObsInput();
     const obsFader = this.sourceData[source.sourceId].fader;
 
-    const fader: IFader = {
+    return {
       db: obsFader.db || 0,
       deflection: obsFader.deflection,
       mul: obsFader.mul,
     };
+  }
+
+
+  generateAudioSourceData(sourceId: string): IAudioSource {
+    const source = this.sourcesService.getSource(sourceId);
+    const obsSource = source.getObsInput();
+
+    const fader = this.fetchFaderDetails(sourceId);
 
     return {
       sourceId: source.sourceId,
@@ -138,7 +152,8 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
       forceMono: !!(obsSource.flags & obs.ESourceFlags.ForceMono),
       syncOffset: AudioService.timeSpecToMs(obsSource.syncOffset),
       muted: obsSource.muted,
-      resourceId: 'AudioSource' + JSON.stringify([sourceId])
+      resourceId: 'AudioSource' + JSON.stringify([sourceId]),
+      mixerHidden: false
     };
   }
 
@@ -194,7 +209,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     this.sourceData[source.sourceId].fader = obsFader;
 
     this.initVolmeterStream(source.sourceId);
-    this.ADD_AUDIO_SOURCE(this.fetchAudioSource(source.sourceId));
+    this.ADD_AUDIO_SOURCE(this.generateAudioSourceData(source.sourceId));
   }
 
   private initVolmeterStream(sourceId: string) {
@@ -218,11 +233,11 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
      * to eventually just hide the mixer item as well though */
     function volmeterCheck() {
       if (!gotEvent) {
-        volmeterStream.next({ 
-          ...lastVolmeterValue, 
-          magnitude: [-Infinity], 
-          peak: [-Infinity], 
-          inputPeak: [-Infinity] 
+        volmeterStream.next({
+          ...lastVolmeterValue,
+          magnitude: [-Infinity],
+          peak: [-Infinity],
+          inputPeak: [-Infinity]
         });
       }
 
@@ -265,6 +280,7 @@ export class AudioSource implements IAudioSourceApi {
   monitoringType: obs.EMonitoringType;
   syncOffset: number;
   resourceId: string;
+  mixerHidden: boolean;
 
   @Inject()
   private audioService: AudioService;
@@ -291,7 +307,7 @@ export class AudioSource implements IAudioSourceApi {
       <INumberInputValue>{
         name: 'deflection',
         value: Math.round(this.fader.deflection * 100),
-        description: 'Volume (%)',
+        description: $t('Volume (%)'),
         showDescription: false,
         visible: true,
         enabled: true,
@@ -303,7 +319,7 @@ export class AudioSource implements IAudioSourceApi {
       <IFormInput<boolean>> {
         value: this.forceMono,
         name: 'forceMono',
-        description: 'Downmix to Mono',
+        description: $t('Downmix to Mono'),
         showDescription: false,
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
@@ -313,7 +329,7 @@ export class AudioSource implements IAudioSourceApi {
       <IFormInput<number>> {
         value: this.syncOffset,
         name: 'syncOffset',
-        description: 'Sync Offset (ms)',
+        description: $t('Sync Offset (ms)'),
         showDescription: false,
         type: 'OBS_PROPERTY_INT',
         visible: true,
@@ -323,15 +339,15 @@ export class AudioSource implements IAudioSourceApi {
       <IListInput<obs.EMonitoringType>> {
         value: this.monitoringType,
         name: 'monitoringType',
-        description: 'Audio Monitoring',
+        description: $t('Audio Monitoring'),
         showDescription: false,
         type: 'OBS_PROPERTY_LIST',
         visible: true,
         enabled: true,
         options: [
-          { value: obs.EMonitoringType.None, description: 'Monitor Off' },
-          { value: obs.EMonitoringType.MonitoringOnly, description: 'Monitor Only (mute output)' },
-          { value: obs.EMonitoringType.MonitoringAndOutput, description: 'Monitor and Output' }
+          { value: obs.EMonitoringType.None, description: $t('Monitor Off') },
+          { value: obs.EMonitoringType.MonitoringOnly, description: $t('Monitor Only (mute output)') },
+          { value: obs.EMonitoringType.MonitoringAndOutput, description: $t('Monitor and Output') }
         ]
       },
 
@@ -339,7 +355,7 @@ export class AudioSource implements IAudioSourceApi {
       <IBitmaskInput> {
         value: this.audioMixers,
         name: 'audioMixers',
-        description: 'Tracks',
+        description: $t('Tracks'),
         showDescription: false,
         type: 'OBS_PROPERTY_BITMASK',
         visible: true,
@@ -381,16 +397,27 @@ export class AudioSource implements IAudioSourceApi {
   }
 
   setDeflection(deflection: number) {
-    const fader = this.audioService.sourceData[this.sourceId].fader;
-    fader.deflection = deflection;
-    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+    const obsFader = this.audioService.sourceData[this.sourceId].fader;
+    obsFader.deflection = deflection;
+
+    const fader = this.audioService.fetchFaderDetails(this.sourceId);
+
+    this.UPDATE({ sourceId: this.sourceId, fader });
   }
 
 
   setMul(mul: number) {
-    const fader = this.audioService.sourceData[this.sourceId].fader;
-    fader.mul = mul;
-    this.UPDATE(this.audioService.fetchAudioSource(this.sourceId));
+    const obsFader = this.audioService.sourceData[this.sourceId].fader;
+    obsFader.mul = mul;
+
+    const fader = this.audioService.fetchFaderDetails(this.sourceId);
+
+    this.UPDATE({ sourceId: this.sourceId, fader });
+  }
+
+
+  setHidden(hidden: boolean) {
+    this.UPDATE({ sourceId: this.sourceId, mixerHidden: hidden });
   }
 
 

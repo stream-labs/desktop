@@ -1,8 +1,9 @@
 <template>
+
   <div class="source-selector">
     <div class="studio-controls-top">
       <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
-        Sources
+        {{ $t('Sources') }}
       </h4>
       <div>
         <i
@@ -41,14 +42,14 @@
         <div class="title-container">
           <span class="layer-icon">
             <i v-if="!node.isLeaf" class="fa fa-folder"></i>
-            <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-film"></i>
-            <i v-else-if="node.data.type === 'image_source'" class="fa fa-image"></i>
-            <i v-else-if="node.data.type === 'slideshow'" class="fa fa-images"></i>
+            <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-file-video-o"></i>
+            <i v-else-if="node.data.type === 'image_source'" class="icon-image"></i>
+            <i v-else-if="node.data.type === 'slideshow'" class="icon-image"></i>
             <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
             <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
-            <i v-else-if="node.data.type === 'dshow_input'" class="fa fa-camera"></i>
-            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="fa fa-microphone"></i>
-            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="fa fa-volume-up"></i>
+            <i v-else-if="node.data.type === 'dshow_input'" class="icon-webcam"></i>
+            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"></i>
+            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-audio"></i>
             <i v-else-if="node.data.type === 'monitor_capture'" class="fa fa-desktop"></i>
             <i v-else-if="node.data.type === 'game_capture'" class="fa fa-gamepad"></i>
             <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>

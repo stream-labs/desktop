@@ -3,7 +3,7 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import Utils from '../utils';
 import { SourcesService, TSourceType, ISource } from 'services/sources';
 import { VideoService } from 'services/video';
-import { ScalableRectangle } from 'util/ScalableRectangle';
+import { ScalableRectangle, CenteringAxis } from 'util/ScalableRectangle';
 import { Inject } from 'util/injector';
 import { TFormData } from '../../components/shared/forms/Input';
 import * as obs from '../obs-api';
@@ -289,6 +289,12 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   centerOnScreen() {
     const rect = this.getRectangle();
     rect.centerOn(this.videoService.getScreenRectangle());
+    this.setRect(rect);
+  }
+
+  centerOnAxis(axis: CenteringAxis) {
+    const rect = this.getRectangle();
+    rect.centerOn(this.videoService.getScreenRectangle(), axis);
     this.setRect(rect);
   }
 

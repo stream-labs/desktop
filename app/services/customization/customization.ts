@@ -8,6 +8,7 @@ import {
 } from './customization-api';
 import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
 import Utils from 'services/utils';
+import { $t } from 'services/i18n';
 
 const LIVEDOCK_MIN_SIZE = 0.15;
 const LIVEDOCK_MAX_SIZE = 0.5;
@@ -34,6 +35,7 @@ export class CustomizationService
     chatZoomFactor: 1,
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
+    mediaBackupOptOut: false,
     experimental: {
       // put experimental features here
     }
@@ -96,6 +98,10 @@ export class CustomizationService
     this.setSettings({ hideViewerCount: hidden });
   }
 
+  setMediaBackupOptOut(optOut: boolean) {
+    this.setSettings({ mediaBackupOptOut: optOut });
+  }
+
   getSettingsFormData(): TFormData {
     const settings = this.getSettings();
 
@@ -103,7 +109,7 @@ export class CustomizationService
       <IFormInput<boolean>> {
         value: settings.nightMode,
         name: 'nightMode',
-        description: 'Night mode',
+        description: $t('Night mode'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -112,7 +118,7 @@ export class CustomizationService
       <IFormInput<boolean>>{
         value: settings.leftDock,
         name: 'leftDock',
-        description: 'Show the live dock (chat) on the left side',
+        description: $t('Show the live dock (chat) on the left side'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -121,7 +127,7 @@ export class CustomizationService
       <INumberInputValue> {
         value: settings.chatZoomFactor,
         name: 'chatZoomFactor',
-        description: 'Chat Text Size',
+        description: $t('Chat Text Size'),
         type: 'OBS_PROPERTY_SLIDER',
         minVal: 0.25,
         maxVal: 2,
@@ -134,7 +140,7 @@ export class CustomizationService
       <INumberInputValue> {
         value: settings.livedockSize,
         name: 'livedockSize',
-        description: 'Chat Width',
+        description: $t('Chat Width'),
         type: 'OBS_PROPERTY_SLIDER',
         minVal: LIVEDOCK_MIN_SIZE,
         maxVal: LIVEDOCK_MAX_SIZE,
@@ -147,7 +153,7 @@ export class CustomizationService
       <IFormInput<boolean>>  {
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
-        description: 'Enable BetterTTV emotes for Twitch',
+        description: $t('Enable BetterTTV emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -156,7 +162,7 @@ export class CustomizationService
       <IFormInput<boolean>>  {
         value: settings.enableFFZEmotes,
         name: 'enableFFZEmotes',
-        description: 'Enable FrankerFaceZ emotes for Twitch',
+        description: $t('Enable FrankerFaceZ emotes for Twitch'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,

@@ -12,7 +12,7 @@ export class Menu {
   }
 
   popup() {
-    this.menu.popup(remote.getCurrentWindow());
+    this.menu.popup({ window: remote.getCurrentWindow() });
   }
 
   append(options: Electron.MenuItemConstructorOptions) {
