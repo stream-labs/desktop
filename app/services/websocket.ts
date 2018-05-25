@@ -9,6 +9,7 @@ import { Subject } from 'rxjs/Subject';
 export type TSocketEvent =
   IStreamlabelsSocketEvent |
   IDonationSocketEvent |
+  IFacemaskSocketEvent |
   IFollowSocketEvent |
   ISubscriptionSocketEvent;
 
@@ -21,6 +22,14 @@ interface IStreamlabelsSocketEvent {
 
 interface IDonationSocketEvent {
   type: 'donation';
+  message: {
+    name: string;
+    amount: string;
+  }[];
+}
+
+interface IFacemaskSocketEvent {
+  type: 'facemask';
   message: {
     name: string;
     amount: string;
@@ -67,7 +76,7 @@ export class WebsocketService extends Service {
       this.socket.disconnect();
     }
 
-    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/socket-token`;
+    const url = `${this.hostsService.streamlabs}/api/v5/slobs/socket-token`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -76,8 +85,10 @@ export class WebsocketService extends Service {
       .then(response => response.json())
       .then(json => json.socket_token)
       .then(token => {
-        const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
+        const url = `http://io.streamlabs.site:4567?token=${token}`;
+        console.log(url);
         this.socket = io(url, { transports: ['websocket'] });
+        console.log(this.socket);
 
         // These are useful for debugging
         this.socket.on('connect', () => this.log('Connection Opened'));
@@ -86,7 +97,9 @@ export class WebsocketService extends Service {
         this.socket.on('error', () => this.log('Error'));
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
-        this.socket.on('event', (e: any) => this.socketEvent.next(e));
+        this.socket.on('event', (e: any) => {
+          this.socketEvent.next(e);
+        });
       });
   }
 

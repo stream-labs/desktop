@@ -37,6 +37,10 @@ export default class Utils {
     return process.env.NODE_ENV !== 'production';
   }
 
+  static useLocalhost() {
+    return true;
+  }
+
   static isPreview(): boolean {
     return electron.remote.process.env.SLOBS_PREVIEW;
   }

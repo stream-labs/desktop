@@ -24,7 +24,7 @@ export class TwitchService extends Service implements IPlatformService {
     const host = this.hostsService.streamlabs;
     const query = `_=${Date.now()}&skip_splash=true&external=electron&twitch&force_verify&` +
       'scope=channel_read,channel_editor&origin=slobs';
-    return `https://${host}/slobs/login?${query}`;
+    return `${host}/slobs/login?${query}`;
   }
 
   get oauthToken() {
@@ -73,7 +73,7 @@ export class TwitchService extends Service implements IPlatformService {
 
   fetchNewToken(): Promise<void> {
     const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/twitch/refresh`;
+    const url = `${host}/api/v5/slobs/twitch/refresh`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

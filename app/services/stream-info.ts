@@ -104,7 +104,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
    * @param game the name of the game
    */
   createGameAssociation(game: string) {
-    const url = `https://${this.hostsService.overlays}/api/overlay-games-association`;
+    const url = `${this.hostsService.overlays}/api/overlay-games-association`;
 
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/x-www-form-urlencoded');
