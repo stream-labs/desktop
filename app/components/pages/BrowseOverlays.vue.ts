@@ -101,7 +101,7 @@ export default class BrowseOverlays extends Vue {
       type: ENotificationType.SUCCESS,
       lifeTime: 8000,
       showTime: false,
-      message: `Widget Theme installed & activated. Click here to manage your Widget Profiles.`,
+      message: 'Widget Theme installed & activated. Click here to manage your Widget Profiles.',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.navigationService),
         'navigate',
