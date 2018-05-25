@@ -101,7 +101,7 @@ export class UsageStatisticsService extends Service {
       bodyData.installer_id = this.installerId;
     }
 
-    const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {
+    const request = new Request(`${this.hostsService.streamlabs}/api/v5/slobs/log`, {
       method: 'POST',
       headers,
       body: JSON.stringify(bodyData)
