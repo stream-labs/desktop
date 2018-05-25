@@ -18,9 +18,9 @@
   "Some frames took too long to get rendered.": "Néhány képkocka renderelése túl sok időt vett igénybe.",
   "Usually the problem is related to your game using up too many GPU resources.": "A problémát általában az olyan játékok okozzák, amelyek túl sok grafikus erőforrást használnak.",
   "When this happens, Streamlabs OBS does not have any resources left over to render frames.": "Mikor ez történik, a Streamlabs OBS számára nem marad elég erőforrás, hogy megrajzolja a képkockákat.",
-  "Cap your in-game framerate": "Állíts be egy felső framarate határértéket játékon belül",
+  "Cap your in-game framerate": "Állíts be egy felső framerate határértéket játékon belül",
   "Enable VSync in your game": "Kapcsold be a játékon belül a VSync-et",
-  "Disable FreeSync or GSync in your Driver": "Kapcsold ki a videókártya driverben a FreeSync-et vagy a GSync-et",
+  "Disable FreeSync or GSync in your Driver": "Kapcsold ki a videokártya driverben a FreeSync-et vagy a GSync-et",
   "Lower graphics settings until you stop lagging frames": "Csökkentsd a grafikai beállításokat, amíg már nem jelentkezik késő képkocka",
   "Disable hardware decoding under any media sources(This will slightly increase cpu over gpu)": "A média forrásoknál kapcsold ki a hardveres dekódolást (Ez átteszi a terhet a videokártyáról a processzorra)"
 }

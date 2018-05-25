@@ -44,5 +44,6 @@
   "Disable the preview stream, can help with CPU": "關閉預視實況串流，可以有效降低CPU使用率。",
   "viewers": "觀眾",
   "Refresh Chat": "重整聊天室",
-  "Your chat is currently offline": "聊天室目前離線中"
+  "Your chat is currently offline": "聊天室目前離線中",
+  "Set path in Settings > Output.": "Set path in Settings > Output."
 }

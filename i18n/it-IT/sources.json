@@ -138,5 +138,7 @@
   "Use Google Font": "Utilizzare Font di google",
   "Center Horizontal": "Centra orizzontalmente",
   "Center Vertical": "Centra verticalmente",
-  "Unhide All": "Mostra tutto"
+  "Unhide All": "Mostra tutto",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Backup sul Cloud: Tutte le risorse multimediali e le fonti sono sincronizzate sul cloud",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Backup sul Cloud: Le tue risorse multimediali e le tue fonti si stanno sincronizzando sul cloud"
 }

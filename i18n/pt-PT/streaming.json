@@ -44,5 +44,6 @@
   "Disable the preview stream, can help with CPU": "Desactivar a pré-visualização da transmissão, poderá ajudar o processador",
   "viewers": "espectadores",
   "Refresh Chat": "Actualizar o chat",
-  "Your chat is currently offline": "O seu chat está actualmente offline"
+  "Your chat is currently offline": "O seu chat está actualmente offline",
+  "Set path in Settings > Output.": "Set path in Settings > Output."
 }

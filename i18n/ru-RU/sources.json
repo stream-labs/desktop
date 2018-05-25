@@ -138,5 +138,7 @@
   "Use Google Font": "Использовать шрифт Google",
   "Center Horizontal": "Центрировать по горизонтали",
   "Center Vertical": "Центрировать по вертикали",
-  "Unhide All": "Показать все"
+  "Unhide All": "Показать все",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Облачный резерв: Все носители и источники сохранены в облаке",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Облачный резерв: Все носители и источники синхронизируются с облаком"
 }

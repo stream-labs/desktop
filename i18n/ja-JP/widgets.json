@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "%{widgetscount} のウィジェットを追加します。",
   "Rather do this manually?": "手動による行いますか？",
   "Setup later": "後でセットアップします",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "ウィジェットのテーマがインストールされ、有効化されました。 ウィジェットプロファイルを管理するには、ここをクリックしてください。"
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "ウィジェットのテーマがインストールされ、有効化されました。 ウィジェットプロファイルを管理するには、ここをクリックしてください。",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "ビット",
+  "Host": "Host"
 }

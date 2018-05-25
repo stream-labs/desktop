@@ -3,7 +3,7 @@
   "Select the Streamlabs widgets you would like to activate for your stream. These will get automatically added to your scene.": "Seleccione os widgets do Streamlabs que quiser activar para sua transmissão. Estes serão automaticamente adicionados à sua cena.",
   "Thanks viewers with notification popups": "Agradeça aos espectadores com popups de notificação",
   "Most recent events into your stream": "Eventos mais recentes na sua transmissão",
-  "A jar that catches bits, tips, and more": "Um frasco que recebe bits, doações, e muito mais",
+  "A jar that catches bits, tips, and more": "Um pote que recebe bits, doações, e muito mais",
   "Your channel's chat in your stream": "O chat do seu canal na sua transmissão",
   "Show off most recent donations to viewers": "Exibe suas doações mais recentes para seus espectadores",
   "Give your viewers a donation target to help you reach": "Mostre aos espectadores uma meta de doação para que eles o ajudem a alcançar",
@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "Adicionar %{widgetscount} Widgets",
   "Rather do this manually?": "Prefere fazer isto manualmente?",
   "Setup later": "Configurar mais tarde",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Tema de Widget instalado e activado. Clique aqui para gerir os seus Perfis de Widget."
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Tema de Widget instalado e activado. Clique aqui para gerir os seus Perfis de Widget.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bits",
+  "Host": "Host"
 }

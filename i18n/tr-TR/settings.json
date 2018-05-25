@@ -31,11 +31,12 @@
   "Snap Sources to other sources": "Kaynakları başka kaynaklara yasla",
   "Stream Type": "Yayın Türü",
   "Output Mode": "Çıkış Modu",
-  "Streaming": "Yayın",
+  "Streaming": "Streaming",
   "Enable Advanced Encoder Settings": "Gelişmiş Kodlayıcı Ayarlarını Etkinleştir",
   "Enforce streaming service bitrate limits": "Yayın servisi bitrate sınırlarını zorla",
   "Encoder Preset (Higher = Less CPU)": "Kodlayıcı Ön Ayarı (Yükseldikçe = Daha az CPU)",
   "Generate File Name without Space": "Boşluk kullanmadan dosya ismi oluştur",
+  "Recording": "Recording",
   "Recording Quality": "Kayıt Kalitesi",
   "Recording Format": "Kayıt Biçimi",
   "Custom Muxer Settings": "Özel Muxer Ayarları",
@@ -63,5 +64,10 @@
   "Preserved cutoff point (increase delay) when reconnecting": "Yeniden bağlanırken korunan kesme noktası (gecikme arttır)",
   "Desktop Audio Device": "Masaüstü Ses Aygıtı",
   "Mic/Auxiliary Device": "Mik/yardımcı Aygıtı",
-  "Recording Path": "Kayıt Kalitesi"
+  "Recording Path": "Kayıt Kalitesi",
+  "Enable": "Enable",
+  "Default": "Default",
+  "Custom Encoder Settings": "Custom Encoder Settings",
+  "Audio Bitrate": "Audio Bitrate",
+  "Video Bitrate": "Video Bitrate"
 }

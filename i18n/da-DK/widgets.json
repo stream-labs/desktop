@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "Tilføj %{widgetscount} widgets",
   "Rather do this manually?": "Vil du hellere gøre dette manuelt?",
   "Setup later": "Indstil senere",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Widget tema installeret og aktiveret. Klik her for at styre dine widget profiler."
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Widget tema installeret og aktiveret. Klik her for at styre dine widget profiler.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bits",
+  "Host": "Host"
 }

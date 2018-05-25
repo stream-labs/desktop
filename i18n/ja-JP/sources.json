@@ -138,5 +138,7 @@
   "Use Google Font": "Google のフォントを使う",
   "Center Horizontal": "横方向中央揃え",
   "Center Vertical": "縦方向中央揃え",
-  "Unhide All": "すべて再表示します。"
+  "Unhide All": "すべて再表示します。",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud"
 }

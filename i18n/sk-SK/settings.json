@@ -31,11 +31,12 @@
   "Snap Sources to other sources": "Snap Sources to other sources",
   "Stream Type": "Stream Type",
   "Output Mode": "Output Mode",
-  "Streaming": "Steaming",
+  "Streaming": "Streaming",
   "Enable Advanced Encoder Settings": "Enable Advanced Encoder Settings",
   "Enforce streaming service bitrate limits": "Enforce streaming service bitrate limits",
   "Encoder Preset (Higher = Less CPU)": "Encoder Preset (Higher = Less CPU)",
   "Generate File Name without Space": "Generate File Name without Space",
+  "Recording": "Recording",
   "Recording Quality": "Recording Quality",
   "Recording Format": "Recording Format",
   "Custom Muxer Settings": "Custom Muxer Settings",
@@ -63,5 +64,10 @@
   "Preserved cutoff point (increase delay) when reconnecting": "Preserved cutoff point (increase delay) when reconnecting",
   "Desktop Audio Device": "Desktop Audio Device",
   "Mic/Auxiliary Device": "Mic/Auxiliary Device",
-  "Recording Path": "Recording Path"
+  "Recording Path": "Recording Path",
+  "Enable": "Enable",
+  "Default": "Default",
+  "Custom Encoder Settings": "Custom Encoder Settings",
+  "Audio Bitrate": "Audio Bitrate",
+  "Video Bitrate": "Video Bitrate"
 }

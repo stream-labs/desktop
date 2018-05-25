@@ -44,5 +44,6 @@
   "Disable the preview stream, can help with CPU": "Отключить предварительный просмотр трансляции, может уменьшить нагрузку на ЦП",
   "viewers": "зрители",
   "Refresh Chat": "Обновить чат",
-  "Your chat is currently offline": "В данный момент ваш чат недоступен"
+  "Your chat is currently offline": "В данный момент ваш чат недоступен",
+  "Set path in Settings > Output.": "Задать путь в Настройки > Вывод."
 }

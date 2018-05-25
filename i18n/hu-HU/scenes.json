@@ -7,7 +7,7 @@
   "Projector:": "Kivetítő:",
   "Projector: Output": "Kivetítő: Kimenet",
   "Manage All": "Összes Kezelése",
-  "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Ez az a hely ahol a Jelenet Gyűjteményeid élnek. A címre kattintva lenyílik egy menü, ahol megnézheted és kezelheted őket.",
+  "This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.": "Ez az a hely, ahol a Jelenet Gyűjteményeid élnek. A címre kattintva lenyílik egy menü, ahol megnézheted és kezelheted őket.",
   "Are you sure you want to remove %{collectionName}?": "Biztosan eltávolítod a %{collectionName} gyűjteményt?",
   "Create Scene Projector": "Jelenet Kivetítő Létrehozása",
   "Preview is disabled in performance mode": "Teljesítmény módban az előnézet nem érhető el",
@@ -19,7 +19,7 @@
   "Are you sure you want to remove %{sceneName}?": "Biztosan eltávolítod a %{sceneName} jelenetet?",
   "Disable Performance Mode": "Teljesítmény Mód Kikapcsolása",
   "Scene Collections": "Jelenet Gyűjtemények",
-  "The building blocks of your scene. Also contains widgets.": "A jeleneted építő kövei. Többek között a Widgeteket is tartalmazza.",
+  "The building blocks of your scene. Also contains widgets.": "A jeleneted építőkövei. Többek között a Widgeteket is tartalmazza.",
   "Add a new Source to your Scene. Includes widgets.": "Új forrás hozzáadása a jelenethez. Widgeteket is tartalmaz.",
   "Remove Sources from your Scene.": "Forrás eltávolítása a Jelenetedből.",
   "Open the Source Properties.": "Forrás Tulajdonságok Megnyitása.",
@@ -27,6 +27,6 @@
   "Cloud Backup": "Felhőalapú Biztonsági Mentés",
   "Your media files are currently being synced with the cloud. ": "A média fájljaid jelenleg szinkronizáció alatt vannak a felhővel. ",
   "It is recommended that you wait until this finishes before going live.": "Az adás indítása előtt ajánlott megvárni, míg ez a művelet befejeződik.",
-  "Go Live Anyway": "Stream Indítása Mindenképpen",
+  "Go Live Anyway": "Adás Indítása Mindenképpen",
   "Wait": "Várj"
 }

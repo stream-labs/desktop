@@ -77,7 +77,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       'en-US',
       'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
       'hu-HU', 'it-IT', 'ja-JP', 'pl-PL',
-      'pt-PT', 'pt-BR', 'es-ES', 'tr-TR'
+      'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
     ];
 
     if (this.isLoaded) return;

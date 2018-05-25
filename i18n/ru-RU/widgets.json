@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "Добавить %{widgetscount} виджетов",
   "Rather do this manually?": "Предпочитаете сделать это вручную?",
   "Setup later": "Настроить позже",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Тема виджета установлена и активирована. Нажмите здесь для управления вашими профилями виджетов."
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Тема виджета установлена и активирована. Нажмите здесь для управления вашими профилями виджетов.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bits",
+  "Host": "Host"
 }

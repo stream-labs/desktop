@@ -44,5 +44,6 @@
   "Disable the preview stream, can help with CPU": "ストリーム・プリビュウーを非表示する。CPUに負担がかからない",
   "viewers": "視聴者",
   "Refresh Chat": "チャットを更新します。",
-  "Your chat is currently offline": "チャットは今オフラインになっています"
+  "Your chat is currently offline": "チャットは今オフラインになっています",
+  "Set path in Settings > Output.": "Set path in Settings > Output."
 }

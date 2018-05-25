@@ -42,7 +42,8 @@
   "Are you sure you want to exit while live?": "Sind Sie sicher, dass Sie das Programm beenden möchten, während Sie live sind?",
   "Enable the preview stream": "Vorschau-Stream aktivieren",
   "Disable the preview stream, can help with CPU": "Vorschau-Stream deaktivieren, kann CPU Auslastung verringern",
-  "viewers": "viewers",
-  "Refresh Chat": "Refresh Chat",
-  "Your chat is currently offline": "Your chat is currently offline"
+  "viewers": "Zuschauer",
+  "Refresh Chat": "Chat aktualisieren",
+  "Your chat is currently offline": "Ihr Chat ist derzeit offline",
+  "Set path in Settings > Output.": "Set path in Settings > Output."
 }

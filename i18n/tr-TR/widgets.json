@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "%{widgetscount} kadar eklenti ekleyin",
   "Rather do this manually?": "El ile yapmak ister misin?",
   "Setup later": "Sonra Kur",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Eklenti teması yüklendi & aktif edildi. Eklenti profilllerinizi kontrol etmek için buraya tıklayabilirsiniz."
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Eklenti teması yüklendi & aktif edildi. Eklenti profilllerinizi kontrol etmek için buraya tıklayabilirsiniz.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bitler",
+  "Host": "Host"
 }

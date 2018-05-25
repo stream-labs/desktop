@@ -53,8 +53,8 @@
   "Include your channel's chat into your stream.": "Inclui o chat do teu canal na tua stream.",
   "Twitch chat": "Chat da Twitch",
   "Youtube chat": "Chat do YouTube",
-  "The Jar": "O jarro",
-  "The jar that catches bits, tips, and more.": "O jarro que recebe bits, doações, e muito mais.",
+  "The Jar": "O pote",
+  "The jar that catches bits, tips, and more.": "O pote que recebe bits, doações, e muito mais.",
   "Viewer Count": "Contador de espectadores",
   "Show off your viewers from multiple platforms.": "Exibir os seus espectadores de múltiplas plataformas.",
   "Stream Boss": "Stream Boss",
@@ -138,5 +138,7 @@
   "Use Google Font": "Usar Fonte do Google",
   "Center Horizontal": "Centrar horizontalmente",
   "Center Vertical": "Centrar verticalmente",
-  "Unhide All": "Mostrar todos"
+  "Unhide All": "Mostrar todos",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud"
 }

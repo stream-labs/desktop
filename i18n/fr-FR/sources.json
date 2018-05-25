@@ -16,13 +16,13 @@
   "Websites": "Sites Web",
   "Third party widget": "Third party widget",
   "Add text to your scene and adjust its style.": "Ajouter du texte à votre scène et ajuster son style.",
-  "System Fonts": "System Fonts",
-  "System Sizes": "System Sizes",
+  "System Fonts": "Police système",
+  "System Sizes": "Taille de la police système",
   "Capture your entire computer monitor.": "Capturez votre écran d’ordinateur en entier.",
   "Primary monitor": "Moniteur principal",
   "Secondary monitor": "Moniteur secondaire",
   "Capture a game you're playing on your computer.": "Capturer un jeu auquel vous jouez sur votre ordinateur.",
-  "Built in works with most modern computer games": "Built in works with most modern computer games",
+  "Built in works with most modern computer games": "Construit pour fonctionner avec la plupart des jeux informatiques modernes",
   "Allow you to capture NDI output streams.": "Vous permet de capturer le flux de sortie NDI.",
   "Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.": "N’importe quel périphérique qui se connecte à un ordinateur dans le but de capturer le son, comme la musique ou de la parole.",
   "Built in microphones": "Microphones intégré",
@@ -138,5 +138,7 @@
   "Use Google Font": "Use Google Font",
   "Center Horizontal": "Center Horizontal",
   "Center Vertical": "Center Vertical",
-  "Unhide All": "Unhide All"
+  "Unhide All": "Unhide All",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud"
 }

@@ -16,5 +16,10 @@
   "Add %{widgetscount} Widgets": "Adicionar %{widgetscount} Widgets",
   "Rather do this manually?": "Prefere fazer isto manualmente?",
   "Setup later": "Configurar mais tarde",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Tema de Widget instalado e ativado. Clique aqui para gerenciar seus Perfis de Widget."
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Tema de Widget instalado e ativado. Clique aqui para gerenciar seus Perfis de Widget.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bits",
+  "Host": "Host"
 }

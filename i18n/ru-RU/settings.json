@@ -36,6 +36,7 @@
   "Enforce streaming service bitrate limits": "Принудительно использовать настройки кодировщика службы потоковой передачи",
   "Encoder Preset (Higher = Less CPU)": "Режим кодировщика (Выше = меньше нагрузка на ЦП)",
   "Generate File Name without Space": "Генерировать имя файла без пробелов",
+  "Recording": "Идет Запись",
   "Recording Quality": "Качество записи",
   "Recording Format": "Формат записи",
   "Custom Muxer Settings": "Пользовательские настройки мультиплексора",
@@ -63,5 +64,10 @@
   "Preserved cutoff point (increase delay) when reconnecting": "Сохранять точку останова при повторном подключении (увеличивает задержку)",
   "Desktop Audio Device": "Основное звуковое устройство",
   "Mic/Auxiliary Device": "Микрофон/дополнительное устройство",
-  "Recording Path": "Путь для сохранения записи"
+  "Recording Path": "Путь для сохранения записи",
+  "Enable": "Включить",
+  "Default": "По умолчанию",
+  "Custom Encoder Settings": "Пользовательские настройки кодировщика",
+  "Audio Bitrate": "Битрейт Аудио",
+  "Video Bitrate": "Битрейт Видео"
 }
