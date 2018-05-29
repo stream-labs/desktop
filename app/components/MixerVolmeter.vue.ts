@@ -12,12 +12,12 @@ const WARNING_LEVEL = -20;
 const DANGER_LEVEL = -9;
 
 // Colors
-const GREEN = '#31c3a2';
-const GREEN_BG = '#186151';
-const YELLOW = '#ffcd47';
-const YELLOW_BG = '#7f6623';
-const RED = '#fc3e3f';
-const RED_BG = '#7e1f1f';
+const GREEN = 'rgba(49,195,162,.7)';
+const GREEN_BG = 'rgba(49,195,162,.1)';
+const YELLOW = 'rgba(255,205,71,.7)';
+const YELLOW_BG = 'rgba(255,205,71,.1)';
+const RED = 'rgba(252,62,63,.7)';
+const RED_BG = 'rgba(252,62,63,.1)';
 
 @Component({})
 export default class MixerVolmeter extends Vue {
@@ -76,7 +76,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   drawVolmeter(peaks: number[]) {
-    this.ctx.fillStyle = '#09161d';
+    this.ctx.fillStyle = 'rgba(255,255,255,.2)';
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     peaks.forEach((peak, channel) => {
