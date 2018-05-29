@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Subscription } from 'rxjs/subscription';
-import { AudioSource } from '../services/audio';
+import { AudioSource } from 'services/audio';
+import { Inject } from 'util/injector';
+import { CustomizationService } from 'services/customization';
 
 // Configuration
 const CHANNEL_HEIGHT = 3;
@@ -18,10 +20,14 @@ const YELLOW = 'rgba(255,205,71,.7)';
 const YELLOW_BG = 'rgba(255,205,71,.1)';
 const RED = 'rgba(252,62,63,.7)';
 const RED_BG = 'rgba(252,62,63,.1)';
+const NIGHT_BG = '#09161d';
+const DAY_BG = '#f7f9f9';
 
 @Component({})
 export default class MixerVolmeter extends Vue {
   @Prop() audioSource: AudioSource;
+
+  @Inject() customizationService: CustomizationService;
 
   volmeterSubscription: Subscription;
 
@@ -50,6 +56,10 @@ export default class MixerVolmeter extends Vue {
     );
   }
 
+  get backgroundColor() {
+    return this.customizationService.nightMode ? NIGHT_BG : DAY_BG;
+  }
+
   destroyed() {
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
@@ -76,7 +86,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   drawVolmeter(peaks: number[]) {
-    this.ctx.fillStyle = 'rgba(255,255,255,.2)';
+    this.ctx.fillStyle = this.backgroundColor;
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     peaks.forEach((peak, channel) => {
