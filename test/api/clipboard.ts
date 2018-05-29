@@ -159,7 +159,7 @@ test('Copy/paste filters between scene collections', async t => {
   selectionService.selectAll();
   clipboardService.copyFilters();
 
-  await sceneCollectionsService.create({ name: 'New Collection' });
+  await sceneCollectionsService.create({ name: 'Collection 2' });
 
   sceneBuilder.build(`
       Item1: image_source
