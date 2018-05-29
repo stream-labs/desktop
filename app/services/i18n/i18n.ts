@@ -104,7 +104,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     // TODO: uncomment when the all languages will be translated
     // setup locale in libobs
-    obs.Global.locale = locale;
+    // obs.Global.locale = locale;
 
     this.SET_LOCALE(locale);
 
