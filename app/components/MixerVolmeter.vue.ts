@@ -14,12 +14,12 @@ const WARNING_LEVEL = -20;
 const DANGER_LEVEL = -9;
 
 // Colors
-const GREEN = 'rgba(49,195,162,.7)';
-const GREEN_BG = 'rgba(49,195,162,.1)';
-const YELLOW = 'rgba(255,205,71,.7)';
-const YELLOW_BG = 'rgba(255,205,71,.1)';
-const RED = 'rgba(252,62,63,.7)';
-const RED_BG = 'rgba(252,62,63,.1)';
+const GREEN = 'rgba(49,195,162,.6)';
+const GREEN_BG = 'rgba(49,195,162,.16)';
+const YELLOW = 'rgba(255,205,71,.6)';
+const YELLOW_BG = 'rgba(255,205,71,.16)';
+const RED = 'rgba(252,62,63,.6)';
+const RED_BG = 'rgba(252,62,63,.16)';
 const NIGHT_BG = '#09161d';
 const DAY_BG = '#f7f9f9';
 
