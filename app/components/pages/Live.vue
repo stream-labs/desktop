@@ -2,6 +2,7 @@
 <template>
 <div class="live-container">
   <div class="flex__column">
+    <div @click="popout">Popout</div>
     <div class="flex__item mission-control-container">
       <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
     </div>

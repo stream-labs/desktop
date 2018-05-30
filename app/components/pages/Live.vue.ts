@@ -30,12 +30,16 @@ export default class Live extends Vue {
   $refs: {
     webview: Electron.WebviewTag;
   };
-  
+
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
   mounted() {
     this.i18nService.setWebviewLocale(this.$refs.webview);
+  }
+
+  popout() {
+    this.userService.popoutRecentEvents();
   }
 
   get previewSize() {
