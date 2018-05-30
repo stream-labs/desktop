@@ -12,5 +12,5 @@
   "Volume ( % )": "Głośność ( % )",
   "Sync Offset ( ms )": "Przesunięcie synchronizacji (ms)",
   "Mixer": "Mikser audio",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorowanie poziomów audio. Jeśli słupki są ruchome emituje dźwięk."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitorowanie poziomów audio. Jeśli słupki są ruchome, wydawany jest dźwięk."
 }

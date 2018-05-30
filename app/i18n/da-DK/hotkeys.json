@@ -10,7 +10,7 @@
   "Unmute": "Fjern stum",
   "Push to Mute": "Tryk for at gøre stum",
   "Push to Talk": "Tryk for at tale",
-  "Enable Studio Mode": "Enable Studio Mode",
-  "Disable Studio Mode": "Disable Studio Mode",
-  "Transition (Studio Mode)": "Transition (Studio Mode)"
+  "Enable Studio Mode": "Aktiver Studio tilstand",
+  "Disable Studio Mode": "Deaktiver Studio tilstand",
+  "Transition (Studio Mode)": "Skift over (Studio tilstand)"
 }

@@ -14,12 +14,12 @@
   "Give your viewers an opportunity of becoming a boss": "あなたの視聴者にボスになる機会を与える",
   "Rolling credits at the end of your stream": "ストリームの終わりにクレジットをロールする",
   "Add %{widgetscount} Widgets": "%{widgetscount} のウィジェットを追加します。",
-  "Rather do this manually?": "手動による行いますか？",
-  "Setup later": "後でセットアップします",
+  "Rather do this manually?": "手動で行いますか？",
+  "Setup later": "後でセットアップをする",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "ウィジェットのテーマがインストールされ、有効化されました。 ウィジェットプロファイルを管理するには、ここをクリックしてください。",
-  "Follow": "Follow",
-  "Subscription": "Subscription",
-  "Donation": "Donation",
+  "Follow": "フォロー",
+  "Subscription": "サブスクリプション",
+  "Donation": "寄付金",
   "Bits": "ビット",
-  "Host": "Host"
+  "Host": "ホスト"
 }

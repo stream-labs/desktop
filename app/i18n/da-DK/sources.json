@@ -139,6 +139,6 @@
   "Center Horizontal": "Centre vandret",
   "Center Vertical": "Centre lodret",
   "Unhide All": "Vis alle",
-  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
-  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud"
+  "Cloud Backup: All media and sources are backed up in the cloud": "CloudBackup: Alle medier og kilder er der backup af op af i skyen",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "CloudBackup: Dine medier og kilder er ved at blive synkroniseret med skyen"
 }

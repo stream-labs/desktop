@@ -1,12 +1,12 @@
 {
-  "Scene transition": "場景轉場",
-  "Cut": "直接切換",
-  "Fade": "淡入淡出",
-  "Swipe": "滑出",
-  "Slide": "推出",
-  "Fade to Color": "淡化至指定色彩",
-  "Luma Wipe": "Luma 劃接",
+  "Scene transition": "Scene transition",
+  "Cut": "Cut",
+  "Fade": "Fade",
+  "Swipe": "Swipe",
+  "Slide": "Slide",
+  "Fade to Color": "Fade to Color",
+  "Luma Wipe": "Luma Wipe",
   "Stinger": "Stinger",
-  "Transition": "轉場",
-  "Duration": "持續時間"
+  "Transition": "Transition",
+  "Duration": "Duration"
 }

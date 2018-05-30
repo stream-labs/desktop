@@ -5,7 +5,7 @@
   "Most recent events into your stream": "Najnowsze wydarzenia Twojej transmisji",
   "A jar that catches bits, tips, and more": "Słoik, który łapie bitsy, napiwki i więcej",
   "Your channel's chat in your stream": "Czat Twojego kanału na transmisji",
-  "Show off most recent donations to viewers": "Pochwal się przed widzami, swoimi najnowszymi dotacjami",
+  "Show off most recent donations to viewers": "Pochwal się przed widzami swoimi najnowszymi dotacjami",
   "Give your viewers a donation target to help you reach": "Daj swoim widzom cel dotacji, który pomoże Ci osiągnąć",
   "Give your viewers a follower target to help you reach": "Daj swoim widzom cel, który pomogą Ci osiągnąć",
   "Give your viewers a bit target to help you reach": "Daj swoim widzom cel bitsów, który pomoże Ci osiągnąć",
@@ -17,9 +17,9 @@
   "Rather do this manually?": "Chciałbyś zrobić to manualnie?",
   "Setup later": "Ustaw później",
   "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Motyw Widżetów zainstalowany i aktywowany. Kliknij tutaj, aby zarządzać swoimi profilami Widżetów.",
-  "Follow": "Follow",
-  "Subscription": "Subscription",
-  "Donation": "Donation",
-  "Bits": "Bitsy",
+  "Follow": "Obserwacja",
+  "Subscription": "Subskrypcja",
+  "Donation": "Dotacja",
+  "Bits": "Bitsów",
   "Host": "Host"
 }

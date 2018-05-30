@@ -1,6 +1,6 @@
 {
-  "Image Mask/Blend": "Bild Maske/Blend",
-  "Crop/Pad": "Zuschneiden/Pad",
+  "Image Mask/Blend": "Bild Maske/Verhältnis",
+  "Crop/Pad": "Zuschneiden/Ausdehnen",
   "Gain": "Audio-Verstärkung",
   "Color Correction": "Farbkorrektur",
   "Scaling/Aspect Ratio": "Skalierung/Seitenverhältnis",

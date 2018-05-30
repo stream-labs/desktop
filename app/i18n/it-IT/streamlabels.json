@@ -1,5 +1,5 @@
 {
-  "Label Type": "Tipo di Etichetta",
+  "Label Type": "Tipo Etichetta",
   "Label Template": "Modello Etichetta",
   "Item Template": "Modello Elemento",
   "Item Separator": "Elemento Separatore",
@@ -7,7 +7,7 @@
   "Duration (seconds)": "Durata (secondi)",
   "Show Clock": "Mostra Tempo",
   "Always, show 0:00 when inactive": "Sempre, visualizza 0:00 quando inattivo",
-  "Hide when inactive": "Nascondi quando inattivo",
+  "Hide when inactive": "Nascondi quanto inattivo",
   "Show Count": "Mostra Conteggio",
   "Always, show 0 when inactive": "Sempre, visualizza 0 quando inattivo",
   "Show Latest": "Mostra Ultimo",

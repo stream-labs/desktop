@@ -10,7 +10,7 @@
   "Unmute": "음소거 해제",
   "Push to Mute": "눌러서 음소거",
   "Push to Talk": "눌러서 말하기",
-  "Enable Studio Mode": "Enable Studio Mode",
-  "Disable Studio Mode": "Disable Studio Mode",
-  "Transition (Studio Mode)": "Transition (Studio Mode)"
+  "Enable Studio Mode": "스튜디오 모드 활성화",
+  "Disable Studio Mode": "스튜디오 모드 비활성화",
+  "Transition (Studio Mode)": "전환 (Studio Mode)"
 }

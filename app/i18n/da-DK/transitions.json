@@ -1,12 +1,12 @@
 {
-  "Scene transition": "Scene overgang",
-  "Cut": "Klip",
-  "Fade": "Falm",
-  "Swipe": "Stryg",
-  "Slide": "Glid",
-  "Fade to Color": "Falm til farve",
-  "Luma Wipe": "Luma wipe",
+  "Scene transition": "Scene transition",
+  "Cut": "Cut",
+  "Fade": "Fade",
+  "Swipe": "Swipe",
+  "Slide": "Slide",
+  "Fade to Color": "Fade to Color",
+  "Luma Wipe": "Luma Wipe",
   "Stinger": "Stinger",
-  "Transition": "Overgang",
-  "Duration": "Varighed"
+  "Transition": "Transition",
+  "Duration": "Duration"
 }
