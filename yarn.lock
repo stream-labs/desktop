@@ -6944,9 +6944,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.35/iojs-v2.0.1-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.36/iojs-v2.0.1-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.35/iojs-v2.0.1-signed.tar.gz#629db37711482c95e52556733dac4fcba99c44fd"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.36/iojs-v2.0.1-signed.tar.gz#7dd5c29b493904b8ed93526cc826503a8dd6f3e6"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
