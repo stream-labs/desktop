@@ -8,7 +8,7 @@
     <div v-if="sourceType != 'scene'">
       <div class="row">
         <div class="column small-12">
-          <h4>$t('Add New Source')</h4>
+          <h4>{{ $t('Add New Source') }}</h4>
           <p
             v-if="!error"
             class="NameSource-label">

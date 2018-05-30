@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "Speciális hangbeállítások megnyitása",
+  "Volume (%)": "Hangerő (%)",
+  "Downmix to Mono": "Csatorna lekeverése Monóra",
+  "Sync Offset (ms)": "Szinkron Eltolás (ms)",
+  "Audio Monitoring": "Hangfigyelés",
+  "Monitor Off": "Figyelés kikapcsolása",
+  "Monitor Only (mute output)": "Csak figyelés (kimenet némítása)",
+  "Monitor and Output": "Figyelés és Kimenet",
+  "Tracks": "Sávok",
+  "Advanced Audio Settings": "Speciális Hangbeállítások",
+  "Volume ( % )": "Hangerő ( % )",
+  "Sync Offset ( ms )": "Szinkron Eltolás ( ms )",
+  "Mixer": "Keverő",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Hangszintek Figyelése. Ha a sávok mozognak, van hangkimenet."
+}

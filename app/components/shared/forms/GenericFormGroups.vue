@@ -8,7 +8,7 @@
         <h4 class="section-title" @click="toggleGroup(groupIndex)">
           <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
           <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
-          {{ formGroup.nameSubCategory }}
+          {{ $t(formGroup.nameSubCategory) }}
         </h4>
       </div>
 

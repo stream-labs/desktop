@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "%{filename} を保存しました。",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay を読み込みしました。",
+  "This is an experimental feature.  Use at your own risk.": "試験的な機能です。自己責任で使用してご注意下さい。",
+  "Export Overlay File": "オーバーレイを輸出します。",
+  "Import Overlay File": "オーバーレイを導入します。",
+  "Import Widget File in Current Scene": "選択したシーンにウイジェットを導入します。"
+}

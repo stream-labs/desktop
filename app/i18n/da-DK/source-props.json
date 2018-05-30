@@ -1,0 +1,17 @@
+{
+    "Image": "Billede",
+    "Color Source": "Farvekilde",
+    "Browser Source": "Browserkilde",
+    "Media Source": "Mediekilde",
+    "Image Slide Show": "Diasshow af billeder",
+    "Text (GDI+)": "Tekst (GDI +)",
+    "Text (FreeType 2)": "Tekst (FreeType 2)",
+    "Display Capture": "Optagelse af skærm",
+    "Window Capture": "Optagelse af vindue",
+    "Game Capture": "Optagelse af spil",
+    "Video Capture Device": "Videooptagelsesenhed",
+    "Audio Input Capture": "Lydinput optagelse",
+    "Audio Output Capture": "Lydoutput optagelse",
+    "Blackmagic Device": "Blackmagic enhed",
+    "NDI Source": "NDI kilde"
+}

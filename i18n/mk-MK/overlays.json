@@ -1,8 +1,0 @@
-{
-  "Successfully saved %{filename}": "Successfully saved %{filename}",
-  "Successfully loaded %{filename}.overlay": "Successfully loaded %{filename}.overlay",
-  "This is an experimental feature.  Use at your own risk.": "This is an experimental feature.  Use at your own risk.",
-  "Export Overlay": "Export Overlay",
-  "Import Overlay": "Import Overlay",
-  "Import Widget in Current Scene": "Import Widget in Current Scene"
-}

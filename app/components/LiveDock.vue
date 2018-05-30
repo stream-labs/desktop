@@ -45,7 +45,7 @@
             }"
             @click="toggleViewerCount"/>
           <i class="fa fa-user label--icon" />
-          <span class="semibold">{{ viewerCount }}</span> viewers
+          <span class="semibold">{{ viewerCount }}</span> {{ $t('viewers')}}
         </div>
       </div>
 
@@ -70,7 +70,7 @@
             <i class="fa fa-cogs" />
           </a>
         </div>
-        <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">Refresh Chat</a>
+        <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
@@ -78,7 +78,7 @@
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="flex flex--center flex--column margin-bot--20" src="../../media/images/sleeping-kevin-night.png">
-        <span>Your chat is currently offline</span>
+        <span>{{ $t('Your chat is currently offline') }}</span>
       </div>
 
 
