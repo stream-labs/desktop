@@ -162,7 +162,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
-    this.updateSourceFlags(source.sourceState, obsInput.outputFlags);
+    this.updateSourceFlags(source.sourceState, obsInput.outputFlags, true);
 
     const managerType = options.propertiesManager || 'default';
     const managerKlass = PROPERTIES_MANAGER_TYPES[managerType];
@@ -277,14 +277,15 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
   }
 
-  private updateSourceFlags(source: ISource, flags: number) {
+  private updateSourceFlags(source: ISource, flags: number, doNotEmit? : boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
       this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
-      this.sourceUpdated.next(source);
+
+      if (!doNotEmit) this.sourceUpdated.next(source);
     }
   }
 

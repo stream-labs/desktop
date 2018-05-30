@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="section">
-      <language-settings/>
     </div>
 
     <!--<div class="section">-->
