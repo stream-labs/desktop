@@ -1,7 +1,7 @@
 import { Service } from 'services/service';
 import path from 'path';
 import fs from 'fs';
-import Utils from "./utils";
+import Utils from './utils';
 
 interface IFile {
   data: string;
