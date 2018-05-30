@@ -33,6 +33,7 @@ export default class MixerVolmeter extends Vue {
 
   $refs: {
     canvas: HTMLCanvasElement;
+    spacer: HTMLDivElement;
   };
 
   ctx: CanvasRenderingContext2D;
@@ -72,11 +73,12 @@ export default class MixerVolmeter extends Vue {
         channels * (CHANNEL_HEIGHT + PADDING_HEIGHT) - PADDING_HEIGHT;
       this.$refs.canvas.height = this.canvasHeight;
       this.$refs.canvas.style.height = `${this.canvasHeight}px`;
+      this.$refs.spacer.style.height = `${this.canvasHeight}px`;
     }
   }
 
   setCanvasWidth() {
-    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth - 24);
+    const width = Math.floor(this.$refs.canvas.parentElement.offsetWidth);
 
     if (width !== this.canvasWidth) {
       this.canvasWidth = width;
