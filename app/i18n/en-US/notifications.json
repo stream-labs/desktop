@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "You don't have any notifications",
+  "Enable notifications": "Enable notifications",
+  "Enable sound": "Enable sound",
+  "Skipped frames detected:": "Skipped frames detected:",
+  "Detect skipped frames": "Detect skipped frames",
+  "Skipped frames threshold": "Skipped frames threshold",
+  "Detect lagged frames": "Detect lagged frames",
+  "Lagged frames threshold": "Lagged frames threshold",
+  "Detect dropped frames": "Detect dropped frames",
+  "Dropped frames threshold": "Dropped frames threshold",
+  "Show Notifications": "Show Notifications",
+  "Restore Defaults": "Restore Defaults",
+  "Troubleshooter Notifications": "Troubleshooter Notifications",
+  "Click to open your Notifications window": "Click to open your Notifications window",
+  "Click to read your unread Notifications": "Click to read your unread Notifications",
+  "New Notifications": "New Notifications",
+  "Log": "Log"
+}
