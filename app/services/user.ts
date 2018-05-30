@@ -301,10 +301,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.windowsService.createOneOffWindow({
       componentName: 'RecentEvents',
       size: {
-        width: 600,
+        width: 800,
         height: 600
       }
-    });
+    }, 'RecentEvents');
   }
 }
 

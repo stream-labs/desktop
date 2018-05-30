@@ -140,10 +140,19 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * Creates a one-off window that will not impact or close
    * any existing windows, and will cease to exist when closed.
    * @param options window options
+   * @param windowId A unique window id.  If a window with that id
+   * already exists, this function will focus the existing window instead.
    * @return the window id of the created window
    */
-  createOneOffWindow(options: Partial<IWindowOptions>): string {
-    const windowId = uuid();
+  createOneOffWindow(options: Partial<IWindowOptions>, windowId?: string): string {
+    windowId = windowId || uuid();
+
+    if (this.windows[windowId]) {
+      this.windows[windowId].restore();
+      this.windows[windowId].focus();
+      return windowId;
+    }
+
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
     const newWindow = this.windows[windowId] = new BrowserWindow({
