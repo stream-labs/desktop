@@ -348,7 +348,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.windowsService.showWindow({
       componentName: 'SourcesShowcase',
       size: {
-        width: 800,
+        width: 1000,
         height: 630
       }
     });
