@@ -34,7 +34,7 @@ export default class Utils {
   }
 
   static isDevMode() {
-    return process.env.NODE_ENV !== 'production';
+    return electron.remote.process.env.NODE_ENV !== 'production';
   }
 
   static isPreview(): boolean {
