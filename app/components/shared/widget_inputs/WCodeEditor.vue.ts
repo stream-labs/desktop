@@ -23,6 +23,56 @@ export default class CodeEditorInput extends Vue{
     js: ''
   };
 
+  editorOptionsHTML: {
+    // codemirror options
+    mode: 'htmlmixed',
+    keyMap: 'sublime',
+    lineNumbers: true,
+    autofocus: true,
+    tabSize: 2,
+    theme: 'material',
+    autoRefresh: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    autoCloseTags: true,
+    extraKeys: {
+      'Tab': 'emmetExpandAbbreviation',
+      'Enter': 'emmetInsertLineBreak'
+    }
+  };
+
+  editorOptionsCSS: {
+    // codemirror options
+    mode: 'text/css',
+    keyMap: 'sublime',
+    lineNumbers: true,
+    autofocus: true,
+    tabSize: 2,
+    theme: 'material',
+    autoRefresh: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    autoCloseTags: true,
+    extraKeys: {
+      'Tab': 'emmetExpandAbbreviation',
+      'Enter': 'emmetInsertLineBreak'
+    }
+  };
+
+  editorOptionsJS: {
+    // codemirror options
+    mode: 'javascript',
+    keyMap: 'sublime',
+    lineNumbers: true,
+    autofocus: true,
+    tabSize: 2,
+    theme: 'material',
+    autoRefresh: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    autoCloseTags: true,
+  };
+
   custom_code_view = 'html';
   editCustomFields = false;
   customEditableJson = '';

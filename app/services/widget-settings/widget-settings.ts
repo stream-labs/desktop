@@ -53,7 +53,7 @@ export interface IBitGoalSettings {
 }
 
 // Donation Goal
-interface IDonationGoalSettings {
+export interface IDonationGoalSettings {
   donationGoalSettings: object;
   goal: {
     title: string;
@@ -118,6 +118,18 @@ export class WidgetSettingsService extends Service {
 
   // AJAX requests and calls to server live inside the class
 
+  // Some defaults we will have to fetch from server to see if they exist
+  // Here we check to see if user has custom code - if not they get default
+  fetchBitGoalSettings(response: IBitGoalSettings): IBitGoalSettings {
+    response.settings.custom_html =
+      response.settings.custom_html || response.custom_defaults.html;
+    response.settings.custom_css =
+      response.settings.custom_css || response.custom_defaults.css;
+    response.settings.custom_js =
+      response.settings.custom_js || response.custom_defaults.js;
+
+    return response;
+  }
   // Bit Goal
   getBitGoalSettings(): Promise<IBitGoalSettings> {
     const host = this.hostsService.streamlabs;
@@ -138,15 +150,12 @@ export class WidgetSettingsService extends Service {
     const url = `https://${host}/api/v5/slobs/widget/bitgoal`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
-
     const bodyBitGoal = {
       ends_at: widgetData.goal['ends_at'],
       goal_amount: widgetData.goal['goal_amount'],
       manual_goal_amount: widgetData.goal['manual_goal_amount'],
       title: widgetData.goal['title']
     };
-
-    console.log(bodyBitGoal);
 
     const request = new Request(url, {
       headers,
@@ -163,13 +172,27 @@ export class WidgetSettingsService extends Service {
     const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
+    const bodyBitGoalSettings = {
+      custom_enabled: widgetData.settings['custom_enabled'],
+      custom_html: widgetData.settings['custom_html'],
+      custom_css: widgetData.settings['custom_css'],
+      custom_js: widgetData.settings['custom_js'],
+      bar_color: widgetData.settings['bar_color'],
+      text_color: widgetData.settings['text_color'],
+      bar_text_color: widgetData.settings['bar_text_color'],
+      font: widgetData.settings['font'],
+      bar_thickness: widgetData.settings['bar_thickness'],
+      layout: widgetData.settings['layout']
+    };
+
     const request = new Request(url, {
       headers,
       method: 'POST',
-      body: JSON.stringify(widgetData)
+      body: JSON.stringify(bodyBitGoalSettings)
     });
 
-    return fetch(request);
+    return fetch(request)
+      .then(response => { return response.json();});
   }
 
   deleteBitGoal() {
@@ -183,19 +206,6 @@ export class WidgetSettingsService extends Service {
     });
 
     return fetch(request);
-  }
-
-  // Some defaults we will have to fetch from server to see if they exist
-  // Here we check to see if user has custom code - if not they get default
-  fetchBitGoalSettings(response: IBitGoalSettings): IBitGoalSettings {
-    response.settings.custom_html =
-      response.settings.custom_html || response.custom_defaults.html;
-    response.settings.custom_css =
-      response.settings.custom_css || response.custom_defaults.css;
-    response.settings.custom_js =
-      response.settings.custom_js || response.custom_defaults.js;
-
-    return response;
   }
 
   defaultBitGoalSettings: IBitGoalSettings = {

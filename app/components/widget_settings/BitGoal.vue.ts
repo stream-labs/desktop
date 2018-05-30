@@ -52,16 +52,17 @@ export default class BitGoal extends Vue {
           ends_at: ''
         };
       }
+
+      if (this.widgetData.goal.title) {
+        this.has_goal = true;
+      }
+
       this.barColorData.value = this.widgetData.settings.bar_color;
       this.textColorData.value = this.widgetData.settings.text_color;
       this.barTextColorData.value = this.widgetData.settings.bar_text_color;
       this.barBackgroundColorData.value = this.widgetData.settings.bar_bg_color;
       this.fontFamilyData.value = this.widgetData.settings.font;
       this.layout.value = this.widgetData.settings.layout;
-
-      if (this.widgetData.goal.title) {
-        this.has_goal = true;
-      }
     });
   }
 
@@ -139,13 +140,14 @@ export default class BitGoal extends Vue {
   }
 
   onGoalSave(widgetData: IBitGoalSettings) {
-    console.log(widgetData);
-    this.widgetSettingsService.postBitGoal(widgetData).then(response => { this.widgetData.goal = response.goal; });
+    this.widgetSettingsService.postBitGoal(widgetData)
+      .then(response => { this.widgetData.goal = response.goal; });
     this.has_goal = true;
   }
 
-  onSettingsSave() {
-    this.widgetSettingsService.postBitGoalSettings(this.widgetData);
+  onSettingsSave(widgetData: IBitGoalSettings) {
+    this.widgetSettingsService.postBitGoalSettings(widgetData)
+      .then(response => { this.widgetData.settings = response.settings; });
   }
 
   cancel() {

@@ -174,17 +174,20 @@
                 <!-- <i class="tooltip-trigger fas fa-question-circle" v-tooltip.right='Tooltips.fontFamily'></i> -->
               </div>
             </div>
-          </div>
 
+            <div class="row">
+              <div class="col-xs-12">
+                <w-code-editor
+                  :settings="widgetData.settings"
+                  :defaults="widgetData.custom_defaults" />
+              </div>
+            </div>
+          </div>
 
         </tab>
       </tabs>
 
       <div>
-        <input
-          type="button"
-          class="button button--warn"
-          @click="resetCustom" value="Reset" />
         <button
           class="button button--default"
           @click="cancel">
