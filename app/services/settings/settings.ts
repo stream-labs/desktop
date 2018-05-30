@@ -17,6 +17,7 @@ import {
   IOutputSettings
 } from '../video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
+import { $t } from 'services/i18n';
 
 
 export interface ISettingsState {
@@ -212,7 +213,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `Desktop Audio Device ${deviceInd}`,
+        description: `${$t('Desktop Audio Device')} ${deviceInd}`,
         name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
@@ -240,7 +241,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `Mic/Auxiliary device ${deviceInd}`,
+        description: `${$t('Mic/Auxiliary Device')} ${deviceInd}`,
         name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,

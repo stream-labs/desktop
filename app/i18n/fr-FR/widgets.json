@@ -14,7 +14,12 @@
   "Give your viewers an opportunity of becoming a boss": "Give your viewers an opportunity of becoming a boss",
   "Rolling credits at the end of your stream": "Rolling credits at the end of your stream",
   "Add %{widgetscount} Widgets": "Add %{widgetscount} Widgets",
-  "Rather do this manually?": "Rather do this manually?",
-  "Setup later": "Setup later",
-  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Widget Theme installed & activated. Click here to manage your Widget Profiles."
+  "Rather do this manually?": "Plutôt le faire manuellement?",
+  "Setup later": "Configurer plus tard",
+  "Widget Theme installed & activated. Click here to manage your Widget Profiles.": "Widget Theme installed & activated. Click here to manage your Widget Profiles.",
+  "Follow": "Follow",
+  "Subscription": "Subscription",
+  "Donation": "Donation",
+  "Bits": "Bits",
+  "Host": "Host"
 }

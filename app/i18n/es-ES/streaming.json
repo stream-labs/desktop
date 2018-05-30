@@ -41,5 +41,9 @@
   "Go to Youtube Live Dashboard to control your stream": "Ir al Panel de Control de Youtube para gestionar tu emisión",
   "Are you sure you want to exit while live?": "Seguro que quieres salir con la emisión aún activa?",
   "Enable the preview stream": "Habilitar visualización de emisión",
-  "Disable the preview stream, can help with CPU": "Deshabilitar visualización de emisión"
+  "Disable the preview stream, can help with CPU": "Deshabilitar visualización de emisión",
+  "viewers": "espectadores",
+  "Refresh Chat": "Actualizar Chat",
+  "Your chat is currently offline": "Tu chat está actualmente offline",
+  "Set path in Settings > Output.": "Selecciona la ruta en Ajustes > Salida."
 }

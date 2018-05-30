@@ -8,7 +8,7 @@
   "Check the health of your Internet connection": "Verifique o estado da sua conexão com a Internet",
   "Change your ingest server": "Escolha outro servidor",
   "If none of these worked, lower your bitrate": "Se nenhuma das alternativas funcionou, diminua a sua bitrate",
-  "Streamlabs OBS has detected skipped frames": "O Streamlabs OBS detectou salto de quadros",
+  "Streamlabs OBS has detected skipped frames": "O Streamlabs OBS detectou quadros omitidos",
   "Some frames have not been encoded.": "Alguns quadros não foram codificados.",
   "This problem is usually due to high CPU usage or unsuitable encoder settings.": "Este problema é, usualmente, devido ao uso elevado da CPU ou de configurações inadequadas do codificador.",
   "Lower your encoder settings (preset)": "Reduza as definições do codificador (predefinido)",

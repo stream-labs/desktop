@@ -11,10 +11,10 @@
   "Settings": "Configurações",
   "That name is already taken": "Esse nome já existe",
   "Search": "Procurar",
-  "Create New": "Criar uma nova",
+  "Create New": "Criar nova",
   "Language": "Idioma",
   "Name is required": "É obrigatório escolher um nome",
-  "Duplicate": "Duplicado",
+  "Duplicate": "Duplicar",
   "Rename": "Renomear",
   "Remove": "Remover",
   "Filters": "Filtros",
@@ -35,5 +35,7 @@
   "Show": "Mostrar",
   "Hide": "Esconder",
   "Copy": "Copiar",
-  "Select All": "Selecionar tudo"
+  "Select All": "Selecionar tudo",
+  "Select Option": "Selecione a opção",
+  "Browse": "Procurar"
 }

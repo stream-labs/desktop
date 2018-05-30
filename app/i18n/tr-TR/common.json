@@ -13,7 +13,7 @@
   "Search": "Ara",
   "Create New": "Yeni Oluştur",
   "Language": "Dil",
-  "Name is required": "İsim gereklidir",
+  "Name is required": "İsim Zorunlu",
   "Duplicate": "Çoğalt",
   "Rename": "Yeniden Adlandır",
   "Remove": "Sil",
@@ -35,5 +35,7 @@
   "Show": "Göster",
   "Hide": "Gizle",
   "Copy": "Kopyala",
-  "Select All": "Hepsini Seç"
+  "Select All": "Hepsini Seç",
+  "Select Option": "Seçeneğinizi Seçin",
+  "Browse": "Gözden geçir"
 }

@@ -10,6 +10,7 @@ import {
   isFontProperty,
   isPathProperty
 } from '../../../util/properties-type-guards';
+import { $t } from 'services/i18n';
 
 /**
  * all possible OBS properties types
@@ -174,6 +175,7 @@ export function obsValuesToInputValues(
       obsValue = obsValue.value;
     }
 
+    prop.description = $t(prop.description);
     prop.value = obsValue;
     prop.masked = !!obsProp.masked;
     prop.enabled = !!obsProp.enabled;
@@ -189,7 +191,7 @@ export function obsValuesToInputValues(
       if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
         listOptions.push({
           value: listOption[Object.keys(listOption)[0]],
-          description: Object.keys(listOption)[0]
+          description: $t(Object.keys(listOption)[0])
         });
       }
 
@@ -334,7 +336,7 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     const formItem: IFormInput<TObsValue> = {
       value: obsSettings[obsProp.name],
       name: obsProp.name,
-      description: obsProp.description,
+      description: $t(obsProp.description),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
       type: obsType

@@ -1,7 +1,7 @@
 {
   "Image Mask/Blend": "Maschera per l'Immagine/Unisci",
   "Crop/Pad": "Ritaglia / Margine",
-  "Gain": "Guadagno",
+  "Gain": "Gain",
   "Color Correction": "Correzione del colore",
   "Scaling/Aspect Ratio": "Ridimensionamento/Proporzioni",
   "Scroll": "Scorrimento",
@@ -15,10 +15,10 @@
   "Noise Gate": "Noise Gate",
   "Compressor": "Compressione",
   "VST 2.x Plugin": "Plugin VST 2.x",
-  "Face Mask Plugin": "Plugin per maschere in faccia",
+  "Face Mask Plugin": "Plugin per maschere da faccia",
   "Filter type": "Tipo di filtro",
   "Filter name": "Nome del filtro",
   "Add source filter": "Aggiungi sorgente filtro",
   "No filters applied": "Nessun filtro applicato",
-  "Source filters": "Fonte filtri"
+  "Source filters": "Filtri Fonte"
 }
