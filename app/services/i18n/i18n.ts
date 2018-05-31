@@ -32,7 +32,7 @@ export function $t(...args: any[]) {
 const LANG_CODE_MAP = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
-  en:	{ lang: 'English', locale: 'en-US' },
+  'en-US':	{ lang: 'English', locale: 'en-US' },
   es: { lang: 'Spanish', locale: 'es-ES' },
   fr: { lang: 'French', locale: 'fr-FR' },
   it:	{ lang: 'Italian', locale: 'it-IT' },
@@ -98,7 +98,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     // load dictionary if not loaded
     if (!this.loadedDictionaries[locale]) {
-      await this.loadDictionary(this.state.locale);
+      await this.loadDictionary(locale);
     }
 
     // load fallback dictionary
