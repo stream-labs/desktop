@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
 import { Inject } from 'util/injector';
 import { UserService } from 'services/user';
-import { I18nService } from 'services/i18n';
+import { $t, I18nService } from 'services/i18n';
 
 @Component({
   components: { ModalLayout }
