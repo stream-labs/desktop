@@ -3,7 +3,9 @@ import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
-  TFormData
+  TFormData,
+  IListOption,
+  IListInput
 } from '../../components/shared/forms/Input';
 import { nodeObs } from '../obs-api';
 import { SourcesService } from 'services/sources';
@@ -190,6 +192,58 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     return settings;
+  }
+
+  /**
+   * Returns some information about the user's streaming settings.
+   * This is used in aggregate to improve our optimized video encoding.
+   *
+   * P.S. Settings needs a refactor... badly
+   */
+  getStreamEncoderSettings() {
+    const output = this.getSettingsFormData('Output');
+    // let encoder: string;
+    // let preset: string;
+    // let bitrate: string;
+    // let baseResolution: string;
+    // let outputResolution: string;
+
+    console.log(output);
+
+    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
+      this.findSettingValue(output, 'Streaming', 'StreamEncoder');
+    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
+      this.findSettingValue(output, 'Streaming', 'Preset') ||
+      this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
+      this.findSettingValue(output, 'Streaming', 'target_usage') ||
+      this.findSettingValue(output, 'Streaming', 'QualityPreset');
+    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
+    this.findSettingValue(output, 'Streaming', 'VBitrate');
+
+    return  {
+      encoder,
+      preset,
+      bitrate
+    };
+  }
+
+  private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    let settingValue: any;
+
+    settings.find(subCategory => {
+      if (subCategory.nameSubCategory === category) {
+        subCategory.parameters.find(param => {
+          if (param.name === setting) {
+            settingValue = param.value || (param as IListInput<string>).options[0].value;
+            return true;
+          }
+        });
+
+        return true;
+      }
+    });
+
+    return settingValue;
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
