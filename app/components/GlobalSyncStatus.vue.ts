@@ -12,7 +12,7 @@ export default class GlobalSyncStatus extends Vue {
     const status = this.mediaBackupService.globalSyncStatus;
 
     return {
-      'fa-cloud': status === EGlobalSyncStatus.Synced,
+      'icon-cloud-backup-2': status === EGlobalSyncStatus.Synced,
       'fa-refresh': status === EGlobalSyncStatus.Syncing,
       'fa-spin': status === EGlobalSyncStatus.Syncing
     };
