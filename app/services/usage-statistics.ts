@@ -18,7 +18,7 @@ interface IUsageApiData {
   version: string;
   slobs_user_id: string;
   event: TUsageEvent;
-  data: object;
+  data: string;
 }
 
 
@@ -93,7 +93,7 @@ export class UsageStatisticsService extends Service {
       slobs_user_id: this.userService.getLocalUserId(),
       version: this.version,
       event,
-      data: metadata
+      data: JSON.stringify(metadata)
     };
 
     if (this.userService.isLoggedIn()) {
