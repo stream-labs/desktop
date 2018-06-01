@@ -202,28 +202,28 @@ export class SettingsService extends StatefulService<ISettingsState>
    */
   getStreamEncoderSettings() {
     const output = this.getSettingsFormData('Output');
-    // let encoder: string;
-    // let preset: string;
-    // let bitrate: string;
-    // let baseResolution: string;
-    // let outputResolution: string;
-
-    console.log(output);
+    const video = this.getSettingsFormData('Video');
 
     const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
       this.findSettingValue(output, 'Streaming', 'StreamEncoder');
     const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
       this.findSettingValue(output, 'Streaming', 'Preset') ||
+      this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
       this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
       this.findSettingValue(output, 'Streaming', 'target_usage') ||
-      this.findSettingValue(output, 'Streaming', 'QualityPreset');
+      this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
+      this.findSettingValue(output, 'Streaming', 'AMDPreset');
     const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
-    this.findSettingValue(output, 'Streaming', 'VBitrate');
+      this.findSettingValue(output, 'Streaming', 'VBitrate');
+    const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
+    const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
 
     return  {
       encoder,
       preset,
-      bitrate
+      bitrate,
+      baseResolution,
+      outputResolution
     };
   }
 

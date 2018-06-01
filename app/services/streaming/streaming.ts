@@ -15,6 +15,7 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
+import { StreamInfoService }from 'services/stream-info';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -43,6 +44,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
+  @Inject() streamInfoService: StreamInfoService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -242,8 +244,23 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       if (info.signal === EOBSOutputSignal.Start) {
         this.SET_STREAMING_STATUS(EStreamingState.Live, time);
         this.streamingStatusChange.next(EStreamingState.Live);
-        this.usageStatisticsService.recordEvent('stream_start');
-        console.log(this.settingsService.getStreamEncoderSettings());
+
+        let streamEncoderInfo: Dictionary<string> = {};
+        let game: string = null;
+
+        try {
+          streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
+          if (this.streamInfoService.state.channelInfo) {
+            game = this.streamInfoService.state.channelInfo.game;
+          }
+        } catch (e) {
+          console.error('Error fetching stream encoder info: ', e);
+        }
+
+        this.usageStatisticsService.recordEvent('stream_start', {
+          ...streamEncoderInfo,
+          game
+        });
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
