@@ -1,26 +1,27 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
 
-import Main from '../components/windows/Main.vue';
-import Settings from '../components/windows/Settings.vue';
-import SourcesShowcase from '../components/windows/SourcesShowcase.vue';
-import SceneTransitions from '../components/windows/SceneTransitions.vue';
-import AddSource from '../components/windows/AddSource.vue';
-import NameSceneCollection from '../components/windows/NameSceneCollection.vue';
-import NameSource from '../components/windows/NameSource.vue';
-import NameScene from '../components/windows/NameScene.vue';
-import NameFolder from '../components/windows/NameFolder.vue';
-import SourceProperties from '../components/windows/SourceProperties.vue';
-import SourceFilters from '../components/windows/SourceFilters.vue';
-import AddSourceFilter from '../components/windows/AddSourceFilter.vue';
-import EditStreamInfo from '../components/windows/EditStreamInfo.vue';
-import AdvancedAudio from '../components/windows/AdvancedAudio.vue';
-import Notifications from '../components/windows/Notifications.vue';
-import Troubleshooter from '../components/windows/Troubleshooter.vue';
-import Blank from '../components/windows/Blank.vue';
+import Main from 'components/windows/Main.vue';
+import Settings from 'components/windows/Settings.vue';
+import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
+import SceneTransitions from 'components/windows/SceneTransitions.vue';
+import AddSource from 'components/windows/AddSource.vue';
+import NameSceneCollection from 'components/windows/NameSceneCollection.vue';
+import NameSource from 'components/windows/NameSource.vue';
+import NameScene from 'components/windows/NameScene.vue';
+import NameFolder from 'components/windows/NameFolder.vue';
+import SourceProperties from 'components/windows/SourceProperties.vue';
+import SourceFilters from 'components/windows/SourceFilters.vue';
+import AddSourceFilter from 'components/windows/AddSourceFilter.vue';
+import EditStreamInfo from 'components/windows/EditStreamInfo.vue';
+import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
+import Notifications from 'components/windows/Notifications.vue';
+import Troubleshooter from 'components/windows/Troubleshooter.vue';
+import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
+import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
-import { mutation, StatefulService } from './stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
@@ -85,7 +86,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     Notifications,
     Troubleshooter,
     ManageSceneCollections,
-    Projector
+    Projector,
+    RecentEvents
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};
@@ -138,10 +140,19 @@ export class WindowsService extends StatefulService<IWindowsState> {
    * Creates a one-off window that will not impact or close
    * any existing windows, and will cease to exist when closed.
    * @param options window options
+   * @param windowId A unique window id.  If a window with that id
+   * already exists, this function will focus the existing window instead.
    * @return the window id of the created window
    */
-  createOneOffWindow(options: Partial<IWindowOptions>): string {
-    const windowId = uuid();
+  createOneOffWindow(options: Partial<IWindowOptions>, windowId?: string): string {
+    windowId = windowId || uuid();
+
+    if (this.windows[windowId]) {
+      this.windows[windowId].restore();
+      this.windows[windowId].focus();
+      return windowId;
+    }
+
     this.CREATE_ONE_OFF_WINDOW(windowId, options);
 
     const newWindow = this.windows[windowId] = new BrowserWindow({

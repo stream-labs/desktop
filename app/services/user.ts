@@ -19,6 +19,7 @@ import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
+import { WindowsService } from 'services/windows';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -30,6 +31,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() customizationService: CustomizationService;
   @Inject() appService: AppService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
+  @Inject() windowsService: WindowsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -293,6 +295,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (!this.isLoggedIn()) return;
     Raven.setUserContext({ username: this.username });
     Raven.setExtraContext({ platform: this.platform.type });
+  }
+
+  popoutRecentEvents() {
+    this.windowsService.createOneOffWindow({
+      componentName: 'RecentEvents',
+      size: {
+        width: 800,
+        height: 600
+      }
+    }, 'RecentEvents');
   }
 }
 
