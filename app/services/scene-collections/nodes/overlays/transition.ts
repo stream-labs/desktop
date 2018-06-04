@@ -48,14 +48,12 @@ export class TransitionNode extends Node<ISchema, IContext> {
   }
 
   async load(context: IContext) {
-    this.transitionsService.setType(this.data.type);
+    this.transitionsService.setType(this.data.type, this.data.settings || {});
     this.transitionsService.setDuration(this.data.duration);
 
     if (this.data.type === 'obs_stinger_transition') {
       const filePath = path.join(context.assetsPath, this.data.settings.path);
       this.data.settings.path = filePath;
     }
-
-    if (this.data.settings) this.transitionsService.setSettings(this.data.settings);
   }
 }

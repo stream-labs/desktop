@@ -58,6 +58,9 @@ export class DefaultManager extends PropertiesManager {
       this.mediaBackupFileSetting = 'local_file';
     } else if (this.obsSource.id === 'image_source') {
       this.mediaBackupFileSetting = 'file';
+    } else if (this.obsSource.id === 'obs_stinger_transition') {
+      this.mediaBackupFileSetting = 'path';
+      console.log(JSON.stringify(this.obsSource.settings));
     } else {
       return;
     }
