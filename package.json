@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.9.1",
+  "version": "0.9.2-preview.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -75,6 +75,7 @@
     "electron-window-state": "^4.1.1",
     "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
     "node-fontinfo": "^0.0.2",
+    "node-gyp": "^3.6.2",
     "node-libuiohook": "file:./node-libuiohook",
     "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.36/iojs-v2.0.1-signed.tar.gz",
     "recursive-readdir": "^2.2.2",

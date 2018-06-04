@@ -117,7 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const i18n = new VueI18n({
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
-      messages: i18nService.getLoadedDictionaries()
+      messages: i18nService.getLoadedDictionaries(),
+      silentTranslationWarn: true
     });
 
     I18nService.setVuei18nInstance(i18n);

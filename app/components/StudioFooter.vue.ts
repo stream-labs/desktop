@@ -12,6 +12,7 @@ import { YoutubeService } from 'services/platforms/youtube';
 import electron from 'electron';
 import GlobalSyncStatus from 'components/GlobalSyncStatus.vue';
 import { CustomizationService } from 'services/customization';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -76,5 +77,5 @@ export default class StudioFooterComponent extends Vue {
     }
   }
 
-  recordTooltip = 'Set path in Settings > Output.';
+  recordTooltip = $t('Set path in Settings > Output.');
 }

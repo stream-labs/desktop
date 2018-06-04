@@ -26,7 +26,7 @@ class ListInput extends Input<IListInput<TObsValue>> {
   loading: boolean;
 
   onInputHandler(option: IListOption<string>) {
-    this.emitInput({ ...this.value, value: option.value });
+    this.emitInput({ ...this.value, value: option ? option.value : null });
   }
 
   onSearchChange(value: string) {

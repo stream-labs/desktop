@@ -3,7 +3,9 @@ import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
-  TFormData
+  TFormData,
+  IListOption,
+  IListInput
 } from '../../components/shared/forms/Input';
 import { nodeObs } from '../obs-api';
 import { SourcesService } from 'services/sources';
@@ -17,6 +19,7 @@ import {
   IOutputSettings
 } from '../video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
+import { $t } from 'services/i18n';
 
 
 export interface ISettingsState {
@@ -191,6 +194,58 @@ export class SettingsService extends StatefulService<ISettingsState>
     return settings;
   }
 
+  /**
+   * Returns some information about the user's streaming settings.
+   * This is used in aggregate to improve our optimized video encoding.
+   *
+   * P.S. Settings needs a refactor... badly
+   */
+  getStreamEncoderSettings() {
+    const output = this.getSettingsFormData('Output');
+    const video = this.getSettingsFormData('Video');
+
+    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
+      this.findSettingValue(output, 'Streaming', 'StreamEncoder');
+    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
+      this.findSettingValue(output, 'Streaming', 'Preset') ||
+      this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
+      this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
+      this.findSettingValue(output, 'Streaming', 'target_usage') ||
+      this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
+      this.findSettingValue(output, 'Streaming', 'AMDPreset');
+    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
+      this.findSettingValue(output, 'Streaming', 'VBitrate');
+    const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
+    const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
+
+    return  {
+      encoder,
+      preset,
+      bitrate,
+      baseResolution,
+      outputResolution
+    };
+  }
+
+  private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+    let settingValue: any;
+
+    settings.find(subCategory => {
+      if (subCategory.nameSubCategory === category) {
+        subCategory.parameters.find(param => {
+          if (param.name === setting) {
+            settingValue = param.value || (param as IListInput<string>).options[0].value;
+            return true;
+          }
+        });
+
+        return true;
+      }
+    });
+
+    return settingValue;
+  }
+
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
     const audioDevices = this.audioService.getDevices();
     const sourcesInChannels = this.sourcesService
@@ -212,7 +267,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `Desktop Audio Device ${deviceInd}`,
+        description: `${$t('Desktop Audio Device')} ${deviceInd}`,
         name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
@@ -240,7 +295,7 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `Mic/Auxiliary device ${deviceInd}`,
+        description: `${$t('Mic/Auxiliary Device')} ${deviceInd}`,
         name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,

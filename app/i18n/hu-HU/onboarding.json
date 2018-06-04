@@ -19,7 +19,7 @@
   "Performing bandwidth test ...": "Sávszélesség teszt végrehajtása ...",
   "Testing streaming encoder ...": "Stream kódoló tesztelése ...",
   "Testing recording encoder ...": "Felvevő kódoló tesztelése ...",
-  "Attempting stream ...": "Adás megkísérlése ...",
+  "Attempting stream ...": "Stream indításának megkísérlése ...",
   "Reverting to defaults ...": "Visszaállítás alapértelmezett beállításokra ...",
   "Applying stream settings ...": "Stream beállítások alkalmazása...",
   "Applying general settings ...": "Általános beállítások alkalmazása...",

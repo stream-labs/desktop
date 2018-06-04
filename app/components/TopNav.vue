@@ -123,13 +123,13 @@
     }
   }
 
-  @media(max-width: 1200px) {
+  @media(max-width: 1600px) {
     font-size: 12px;
   }
 }
 
 .link {
-  @media(max-width: 1450px) {
+  @media(max-width: 1600px) {
     span {
       display: none;
     }

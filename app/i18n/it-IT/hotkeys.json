@@ -9,5 +9,8 @@
   "Mute": "Muta",
   "Unmute": "Riattiva Audio",
   "Push to Mute": "Premi per Mutare",
-  "Push to Talk": "Premi per Parlare"
+  "Push to Talk": "Premi per Parlare",
+  "Enable Studio Mode": "Attiva Modalità Studio",
+  "Disable Studio Mode": "Disattiva Modalità Studio",
+  "Transition (Studio Mode)": "Transizione (Modalità Studio)"
 }

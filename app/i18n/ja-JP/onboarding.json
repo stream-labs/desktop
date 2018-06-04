@@ -1,7 +1,7 @@
 {
   "We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can": "バックエンドのシステムを改善しています。データの移動のプロセスには、またログインをしなくてはならないことになりました。質問はあれば、",
   "contact support.": "サポートにお問い合わせをしてください。",
-  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "StreamLabsを使い始めるにはTwitchまたはYouTubeアカウントでログインします",
+  "Sign in with your Twitch or Youtube account to get started with Streamlabs": "StreamLabsを使い始めるにはTwitch、またはYouTubeアカウントでログインします",
   "Select an OBS profile to import": "導入したいOBSプロファイルを選択します",
   "Import from OBS": "OBSから導入します",
   "Start Fresh": "改めて開始します",
@@ -10,10 +10,10 @@
   "Importing your scenes and sources": "シーンとソースを導入しています。",
   "All scenes, sources and settings have been imported.": "シーンとソースと設定は導入しました。",
   "Import your scenes and your settings from OBS with a simple click, or start fresh.": "シーンと決定をOBSから導入し、クリックするだけで改めて使い始めます。",
-  "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.": "下記をクリックするとインタネット速度やコンピューターハッドウェアを検査し、一番適当な決定をお勧めします。",
+  "Click below and we'll analyze your internet speed and computer hardware to give you the best settings possible.": "下記をクリックするとインタネット速度やコンピューターハードウェアを検査し、一番適当な決定をお勧めします。",
   "Start": "スタート",
-  "Rather do this manually?": "手動による行いますか？",
-  "Setup later": "後でセットアップします",
+  "Rather do this manually?": "手動で行いますか？",
+  "Setup later": "後でセットアップをする",
   "Detecting your location ...": "場所を検出しています。",
   "Detected %{continent}": "%{continent} を検出しました",
   "Performing bandwidth test ...": "帯域の検査を行っています。",
@@ -33,7 +33,7 @@
   "We're analyzing your internet speed and computer hardware to give you the best settings possible.": "一番適当な設定をお勧めするため、インタネット速度やコンピューターハッドウェアを検査しています。",
   "Done!": "完成!",
   "Next": "次へ",
-  "Scene Collections Import": "シーンコレクションの導入",
+  "Scene Collections Import": "シーン コレクションのインポート",
   "The following scene collections have been imported from your Streamlabs account": "下記のシーンコレクションはStreamlabsアカウントから導入されました。",
   "Continue": "続きます"
 }

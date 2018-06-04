@@ -648,7 +648,7 @@
   flex-direction: row;
   flex: 0 0 190px;
   height: 190px;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .night-theme {
@@ -731,6 +731,14 @@ h4 {
     .semibold;
     border-color: @day-border;
     background-color: @day-secondary;
+  }
+
+  >div {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
   }
 }
 

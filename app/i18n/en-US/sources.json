@@ -135,5 +135,10 @@
   "Click \"Add Source\" when you're ready to add it to your scene": "Click \"Add Source\" when you're ready to add it to your scene",
   "BrowserSource": "BrowserSource",
   "NDI source": "NDI source",
-  "Use Google Font": "Use Google Font"
+  "Use Google Font": "Use Google Font",
+  "Center Horizontal": "Center Horizontal",
+  "Center Vertical": "Center Vertical",
+  "Unhide All": "Unhide All",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: All media and sources are backed up in the cloud",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Your media and sources are being synced with the cloud"
 }

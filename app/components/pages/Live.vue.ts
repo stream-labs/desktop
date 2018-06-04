@@ -9,6 +9,7 @@ import { CustomizationService } from 'services/customization';
 import Slider from 'components/shared/Slider.vue';
 import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
+import { NavigationService } from 'services/navigation';
 
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
@@ -25,16 +26,33 @@ export default class Live extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() i18nService: I18nService;
+  @Inject() navigationService: NavigationService;
 
   $refs: {
     webview: Electron.WebviewTag;
   };
-  
+
   enablePreviewTooltip = $t('Enable the preview stream');
   disablePreviewTooltip = $t('Disable the preview stream, can help with CPU');
 
   mounted() {
     this.i18nService.setWebviewLocale(this.$refs.webview);
+
+    this.$refs.webview.addEventListener('new-window', e => {
+      const match = e.url.match(/dashboard\/([^\/^\?]*)/);
+
+      if (match && match[1] === 'recent-events') {
+        this.popout();
+      } else if (match) {
+        this.navigationService.navigate('Dashboard', {
+          subPage: match[1]
+        });
+      }
+    });
+  }
+
+  popout() {
+    this.userService.popoutRecentEvents();
   }
 
   get previewSize() {

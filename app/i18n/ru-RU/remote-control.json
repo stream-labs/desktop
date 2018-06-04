@@ -5,8 +5,8 @@
   "Generate new": "Создать новый",
   "Port": "Порт",
   "IP addresses": "IP-адреса",
-  "You can now control Streamlabs OBS from your Android phone.": "Теперь вы можете управлять Streamlabs OBS с вашего телефона с ОС Android.",
+  "You can now control Streamlabs OBS from your phone.": "Теперь вы можете управлять Streamlabs OBS с вашего телефона.",
   "To begin, Scan this QR code with your phone.": "Чтобы начать, просканируйте этот QR-код своим телефоном.",
   "This feature will only work with the most recent version of the Streamlabs mobile app.": "Эта функция будет работать только с самой последней версией мобильного приложения Streamlabs.",
-  "NOTE: For IOS users, this feature is coming soon.": "ПРИМЕЧАНИЕ: Эта функция скоро появится для пользователей IOS."
+  "Click to show": "Нажмите, чтобы показать"
 }

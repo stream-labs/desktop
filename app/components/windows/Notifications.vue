@@ -11,7 +11,7 @@
 
     <div v-for="(notificationsService, groupName) in notificationGroups">
       <h4 v-if="notificationsService.length">
-        {{ groupName == 'unread' ? $t('New Notifications') : $('Log') }}
+        {{ groupName == 'unread' ? $t('New Notifications') : $t('Log') }}
       </h4>
       <div
         class="notification"

@@ -1,10 +1,10 @@
 {
-  "Are you sure you want to stop streaming?": "Are you sure you want to stop streaming?",
-  "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.": "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.",
-  "Failed to connect to the streaming server.  Please check your internet connection.": "Failed to connect to the streaming server.  Please check your internet connection.",
-  "Disconnected from the streaming server.  Please check your internet connection.": "Disconnected from the streaming server.  Please check your internet connection.",
-  "Could not access the specified channel or stream key, please double-check your stream key.  ": "Could not access the specified channel or stream key, please double-check your stream key.  ",
-  "If it is correct, there may be a problem connecting to the server.": "If it is correct, there may be a problem connecting to the server.",
+  "Are you sure you want to stop streaming?": "Er du sikker på du vil stoppe streamen?",
+  "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.": "Ugyldig sti eller forbindelses URL. Kontroller indstillinger for at bekræfte, at de er gyldige.",
+  "Failed to connect to the streaming server.  Please check your internet connection.": "Der kunne ikke oprettes forbindelse til streaming-server.  Kontroller din internetforbindelse.",
+  "Disconnected from the streaming server.  Please check your internet connection.": "Forbindelsen til streaming serveren blev afbrudt.  Kontroller din internetforbindelse.",
+  "Could not access the specified channel or stream key, please double-check your stream key.  ": "Kunne ikke få adgang til den angivne kanal eller streamnøgle, dobbelttjek at din stream nøgle er korrekt.  ",
+  "If it is correct, there may be a problem connecting to the server.": "Hvis den er korrekt, så kan der være et problem med at forbinde til serveren.",
   "There is not sufficient disk space to continue recording.": "There is not sufficient disk space to continue recording.",
   "The output format is either unsupported or does not support more than one audio track.  ": "The output format is either unsupported or does not support more than one audio track.  ",
   "Please check your settings and try again.": "Please check your settings and try again.",
@@ -41,5 +41,9 @@
   "Go to Youtube Live Dashboard to control your stream": "Go to Youtube Live Dashboard to control your stream",
   "Are you sure you want to exit while live?": "Are you sure you want to exit while live?",
   "Enable the preview stream": "Enable the preview stream",
-  "Disable the preview stream, can help with CPU": "Disable the preview stream, can help with CPU"
+  "Disable the preview stream, can help with CPU": "Disable the preview stream, can help with CPU",
+  "viewers": "viewers",
+  "Refresh Chat": "Refresh Chat",
+  "Your chat is currently offline": "Your chat is currently offline",
+  "Set path in Settings > Output.": "Set path in Settings > Output."
 }

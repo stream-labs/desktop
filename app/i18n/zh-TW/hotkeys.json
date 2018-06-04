@@ -9,5 +9,8 @@
   "Mute": "靜音",
   "Unmute": "取消靜音",
   "Push to Mute": "按壓時靜音",
-  "Push to Talk": "按壓時說話"
+  "Push to Talk": "按壓時說話",
+  "Enable Studio Mode": "啟用工作室模式",
+  "Disable Studio Mode": "關閉工作室模式",
+  "Transition (Studio Mode)": "轉場 （工作室模式）"
 }

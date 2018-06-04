@@ -65,6 +65,7 @@
   "New Subscribers": "Nuevos Suscriptores",
   "Cheers": "Cheers",
   "Spin Wheel": "Ruleta",
+  "Spin the wheel to make a decision.": "Gira la rueda para tomar una decisión.",
   "The streamer manually triggers a spin anytime while they are live.": "El streamer gira manualmente una ruleta en cualquier momento mientras está en directo.",
   "Allows you to add existing scene as a source": "Te permite añadir una escena existente como fuente",
   "Stream Label": "Stream Label",
@@ -130,5 +131,14 @@
   "Ungroup Folder": "Desagrupar Carpeta",
   "Group into Scene": "Agrupar en una Escena",
   "Ungroup Scene": "Desagrupar Escena",
-  "Create Source Projector": "Crear Proyector de Fuente"
+  "Create Source Projector": "Crear Proyector de Fuente",
+  "Click \"Add Source\" when you're ready to add it to your scene": "Haz Click en \"Añadir Fuente\" cuando estés listo para añadirla a tu escena",
+  "BrowserSource": "Fuente Navegador",
+  "NDI source": "Fuente NDI",
+  "Use Google Font": "Usar Fuente de Google",
+  "Center Horizontal": "Centrar Horizontalmente",
+  "Center Vertical": "Centrar Verticalmente",
+  "Unhide All": "Mostrar Todas",
+  "Cloud Backup: All media and sources are backed up in the cloud": "Cloud Backup: Una copia de seguridad de todos archivos multimedia y fuentes es almacenada en la nube",
+  "Cloud Backup: Your media and sources are being synced with the cloud": "Cloud Backup: Tus archivos multimedia y fuentes se están sincronizando con la nube"
 }

@@ -6,7 +6,7 @@
   "Dashboard": "Irányítópult",
   "Library": "Könyvtár",
   "Editor": "Szerkesztő",
-  "Live": "Elő adás",
+  "Live": "Élő adás",
   "Bug Report": "Hibajelentés",
   "Settings": "Beállítások",
   "That name is already taken": "Ez a név már foglalt",
@@ -35,5 +35,7 @@
   "Show": "Megjelenítés",
   "Hide": "Elrejtés",
   "Copy": "Másolás",
-  "Select All": "Összes Kijelölése"
+  "Select All": "Összes Kijelölése",
+  "Select Option": "Beállítás kiválasztása",
+  "Browse": "Tallózás"
 }

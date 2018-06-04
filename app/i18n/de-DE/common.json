@@ -14,7 +14,7 @@
   "Create New": "Neu erstellen",
   "Language": "Sprache",
   "Name is required": "Der Name ist erforderlich",
-  "Duplicate": "Duplikat",
+  "Duplicate": "Duplizieren",
   "Rename": "Umbenennen",
   "Remove": "Entfernen",
   "Filters": "Filter",
@@ -29,11 +29,13 @@
   "Login": "Anmelden",
   "Yes": "Ja",
   "No": "Nein",
-  "OK": "Okay",
+  "OK": "OK",
   "Confirm": "Bestätigen",
   "Themes": "Themes",
-  "Show": "Zeigen",
+  "Show": "Anzeigen",
   "Hide": "Ausblenden",
   "Copy": "Kopie",
-  "Select All": "Alle auswählen"
+  "Select All": "Alle auswählen",
+  "Select Option": "Option auswählen",
+  "Browse": "Durchsuchen"
 }

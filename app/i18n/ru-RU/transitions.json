@@ -1,12 +1,12 @@
 {
   "Scene transition": "Переход сцены",
-  "Cut": "Обрез",
+  "Cut": "Обрезание",
   "Fade": "Затухание",
-  "Swipe": "Размах",
-  "Slide": "Скольжение",
-  "Fade to Color": "Затухание цвета",
-  "Luma Wipe": "Вытеснение Яркости",
-  "Stinger": "Stinger",
+  "Swipe": "Смахивание",
+  "Slide": "Сдвиг",
+  "Fade to Color": "Переход в цвет",
+  "Luma Wipe": "Вытеснение",
+  "Stinger": "Файл перехода",
   "Transition": "Переход",
   "Duration": "Продолжительность"
 }

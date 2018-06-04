@@ -1,5 +1,8 @@
 <template>
-<canvas class="volmeter" ref="canvas" />
+<div class="volmeter-container">
+  <canvas class="volmeter" ref="canvas" />
+  <div class="volmeter-spacer" ref="spacer" />
+</div>
 </template>
 
 <script lang="ts" src="./MixerVolmeter.vue.ts"></script>
@@ -8,11 +11,13 @@
 @import "../styles/index";
 
 .volmeter {
-  position: relative;
-  width: 100%;
+  position: absolute;
   overflow: hidden;
-  margin: 10px 0;
   background-color: @slider-background-color;
+}
+
+.volmeter-spacer {
+  margin: 10px 0;
 }
 
 .night-theme {

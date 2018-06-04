@@ -41,5 +41,9 @@
   "Go to Youtube Live Dashboard to control your stream": "Vá para o seu Painel Ao Vivo do Youtube para controlar sua transmissão",
   "Are you sure you want to exit while live?": "Você tem certeza que deseja sair enquanto está ao vivo?",
   "Enable the preview stream": "Habilitar a prévia da stream",
-  "Disable the preview stream, can help with CPU": "Desativar a prévia de stream, pode ajudar com a CPU"
+  "Disable the preview stream, can help with CPU": "Desativar a prévia de stream, pode ajudar com a CPU",
+  "viewers": "espectadores",
+  "Refresh Chat": "Atualizar o bate-papo",
+  "Your chat is currently offline": "Seu bate-papo está atualmente offline",
+  "Set path in Settings > Output.": "Defina o caminho em Configurações > Saída."
 }
