@@ -10,6 +10,7 @@ import { UserService } from 'services/user';
 import { WidgetsService, WidgetType } from 'services/widgets';
 // Widget setting components
 import BitGoal from 'components/widget_settings/BitGoal.vue';
+import DonationGoal from 'components/widget_settings/DonationGoal.vue';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
 
@@ -21,7 +22,8 @@ interface ISelectSourceOptions {
 @Component({
   components: {
     ModalLayout,
-    BitGoal
+    BitGoal,
+    DonationGoal
   },
   mixins: [windowMixin],
 })

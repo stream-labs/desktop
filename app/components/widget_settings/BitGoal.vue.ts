@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Inject } from '../../util/injector';
 import { CustomizationService } from '../../services/customization';
-import { AppService } from 'services/app';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import ModalLayout from 'components/ModalLayout.vue';
 import WColorInput from '../shared/widget_inputs/WColorInput.vue';
@@ -32,12 +31,11 @@ Vue.use(Tabs);
     WCodeEditor,
     ModalLayout,
     WSlider,
-    WListInput
+    WListInput,
   }
 })
 export default class BitGoal extends Vue {
   @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
   @Inject() widgetSettingsService: WidgetSettingsService;
   @Inject() windowsService: WindowsService;
 
@@ -57,16 +55,23 @@ export default class BitGoal extends Vue {
         this.has_goal = true;
       }
 
+      this.backgroundColorData.value = this.widgetData.settings.background_color;
       this.barColorData.value = this.widgetData.settings.bar_color;
       this.textColorData.value = this.widgetData.settings.text_color;
       this.barTextColorData.value = this.widgetData.settings.bar_text_color;
       this.barBackgroundColorData.value = this.widgetData.settings.bar_bg_color;
       this.fontFamilyData.value = this.widgetData.settings.font;
       this.layout.value = this.widgetData.settings.layout;
+      this.barThicknessData.value = this.widgetData.settings.bar_thickness;
     });
   }
 
+  get widgetUrl() {
+    return this.widgetSettingsService.getWidgetUrl('BitGoal');
+  }
+
   widgetData: IBitGoalSettings = null;
+
   barThickness: number;
 
   layout: IListInput<string> = {
@@ -77,6 +82,11 @@ export default class BitGoal extends Vue {
       { description: 'Standard', value: 'standard' },
       { description: 'Condensed', value: 'condensed' }
     ]
+  };
+
+  backgroundColorData = {
+    description: 'Background Color',
+    value: ''
   };
 
   textColorData = {
@@ -106,22 +116,17 @@ export default class BitGoal extends Vue {
 
   barThicknessData = {
     description: 'Bar Thickness',
-    value: this.barThickness
+    value: '',
   };
 
+  // @Watch('widgetData')
+  // update() {
+  //   this.updateEditor();
+  // }
 
-  get widgetUrl() {
-    return this.widgetSettingsService.getWidgetUrl('BitGoal');
-  }
+  // updateEditor() {
 
-  @Watch('widgetData')
-  update() {
-    this.updateEditor();
-  }
-
-  updateEditor() {
-
-  }
+  // }
 
   resetCustom() {
     this.widgetSettingsService.defaultBitGoalSettings.settings.custom_html

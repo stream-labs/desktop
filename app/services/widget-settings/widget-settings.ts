@@ -29,17 +29,18 @@ export interface IBitGoalSettings {
     ends_at: string;
   };
   settings: {
-    custom_html?: string;
-    custom_css?: string;
-    custom_js?: string;
+    background_color: string,
     bar_color: string,
     bar_bg_color: string,
     text_color: string,
     bar_text_color: string,
     font: string,
     bar_thickness: string,
-    custom_enabled: boolean,
     layout: string
+    custom_enabled: boolean,
+    custom_html?: string;
+    custom_css?: string;
+    custom_js?: string;
   };
   has_goal: boolean;
   widget: object;
@@ -54,18 +55,35 @@ export interface IBitGoalSettings {
 
 // Donation Goal
 export interface IDonationGoalSettings {
-  donationGoalSettings: object;
   goal: {
-    title: string;
+    title: string,
+    ends_at?: string,
+    goal_amount?: string,
+    manual_goal_amount?: string,
   };
   widget: object;
   has_goal: boolean;
   demo: object;
   show_bar: string;
-  custom_defaults: {};
-  custom_html?: string;
-  custom_css?: string;
-  custom_js?: string;
+  settings: {
+    custom_html?: string;
+    custom_css?: string;
+    custom_js?: string;
+    bar_color: string,
+    bar_bg_color: string,
+    text_color: string,
+    bar_text_color: string,
+    font: string,
+    bar_thickness: string,
+    custom_enabled: boolean,
+    layout: string;
+    background_color: string;
+  };
+  custom_defaults: {
+    html?: string;
+    css?: string;
+    js?: string;
+  };
 }
 
 export class WidgetSettingsService extends Service {
@@ -120,6 +138,8 @@ export class WidgetSettingsService extends Service {
 
   // Some defaults we will have to fetch from server to see if they exist
   // Here we check to see if user has custom code - if not they get default
+
+  // Bit Goal
   fetchBitGoalSettings(response: IBitGoalSettings): IBitGoalSettings {
     response.settings.custom_html =
       response.settings.custom_html || response.custom_defaults.html;
@@ -130,7 +150,7 @@ export class WidgetSettingsService extends Service {
 
     return response;
   }
-  // Bit Goal
+
   getBitGoalSettings(): Promise<IBitGoalSettings> {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
@@ -173,16 +193,18 @@ export class WidgetSettingsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const bodyBitGoalSettings = {
+      background_color: widgetData.settings['background_color'],
+      bar_bg_color: widgetData.settings['bar_bg_color'],
+      bar_color: widgetData.settings['bar_color'],
+      bar_text_color: widgetData.settings['bar_text_color'],
+      bar_thickness: widgetData.settings['bar_thickness'],
       custom_enabled: widgetData.settings['custom_enabled'],
       custom_html: widgetData.settings['custom_html'],
       custom_css: widgetData.settings['custom_css'],
       custom_js: widgetData.settings['custom_js'],
-      bar_color: widgetData.settings['bar_color'],
-      text_color: widgetData.settings['text_color'],
-      bar_text_color: widgetData.settings['bar_text_color'],
       font: widgetData.settings['font'],
-      bar_thickness: widgetData.settings['bar_thickness'],
-      layout: widgetData.settings['layout']
+      layout: widgetData.settings['layout'],
+      text_color: widgetData.settings['text_color'],
     };
 
     const request = new Request(url, {
@@ -216,6 +238,7 @@ export class WidgetSettingsService extends Service {
       ends_at: ''
     },
     settings: {
+      background_color: '#000000',
       bar_color: '#46E65A',
       bar_bg_color: '#DDDDDD',
       text_color: '#FFFFFF',
@@ -235,18 +258,117 @@ export class WidgetSettingsService extends Service {
     custom_defaults: {},
   };
 
-  // defaultDonationGoalSettings: IDonationGoalSettings = {
-  //   donationGoalSettings: {},
-  //   goal: {
-  //     title: 'Donation Goal Title'
-  //   },
-  //   widget: {},
-  //   has_goal: false,
-  //   demo: {},
-  //   show_bar: '',
-  //   custom_defaults: {},
-  //   custom_html: this.donationGoalDefaultHTML,
-  //   custom_css: this.donationGoalDefaultCSS,
-  //   custom_js: this.donationGoalDefaultJS
-  // };
+  // Donation Goal
+  fetchDonationGoalSettings(response: IDonationGoalSettings): IDonationGoalSettings {
+    response.settings.custom_html =
+      response.settings.custom_html || response.custom_defaults.html;
+    response.settings.custom_css =
+      response.settings.custom_css || response.custom_defaults.css;
+    response.settings.custom_js =
+      response.settings.custom_js || response.custom_defaults.js;
+
+    return response;
+  }
+
+  getDonationGoalSettings(): Promise<IDonationGoalSettings> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/donationgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(response => {
+        return this.fetchDonationGoalSettings(response);
+      });
+  }
+
+  postDonationGoal(widgetData: IDonationGoalSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/donationgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const bodyBitGoal = {
+      ends_at: widgetData.goal['ends_at'],
+      goal_amount: widgetData.goal['goal_amount'],
+      manual_goal_amount: widgetData.goal['manual_goal_amount'],
+      title: widgetData.goal['title']
+    };
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(bodyBitGoal)
+    });
+
+    return fetch(request)
+      .then(response => { return response.json();});
+  }
+
+  postDonationGoalSettings(widgetData: IDonationGoalSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/donationgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const bodyDonationGoalSettings = {
+      custom_enabled: widgetData.settings['custom_enabled'],
+      custom_html: widgetData.settings['custom_html'],
+      custom_css: widgetData.settings['custom_css'],
+      custom_js: widgetData.settings['custom_js'],
+      bar_color: widgetData.settings['bar_color'],
+      text_color: widgetData.settings['text_color'],
+      bar_text_color: widgetData.settings['bar_text_color'],
+      font: widgetData.settings['font'],
+      bar_thickness: widgetData.settings['bar_thickness'],
+      layout: widgetData.settings['layout']
+    };
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(bodyDonationGoalSettings)
+    });
+
+    return fetch(request)
+      .then(response => { return response.json();});
+  }
+
+  deleteDonationGoal() {
+    const host = this.hostsService.streamlabs;
+    const token = this.userService.widgetToken;
+    const url = `https://${host}/api/v5/slobs/widget/donationgoal`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, {
+      headers,
+      method: 'DELETE'
+    });
+
+    return fetch(request);
+  }
+
+  defaultDonationGoalSettings: IDonationGoalSettings = {
+    settings: {
+      background_color: '#000000',
+      bar_color: '#46E65A',
+      bar_bg_color: '#DDDDDD',
+      text_color: '#FFFFFF',
+      bar_text_color: '#000000',
+      font: 'Open Sans',
+      bar_thickness: '48',
+      custom_enabled: false,
+      custom_html: '',
+      custom_css: '',
+      custom_js: '',
+      layout: 'standard'
+    },
+    goal: {
+      title: ''
+    },
+    widget: {},
+    has_goal: false,
+    demo: {},
+    show_bar: '',
+    custom_defaults: {}
+  };
 }

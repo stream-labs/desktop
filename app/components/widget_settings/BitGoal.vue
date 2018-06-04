@@ -6,7 +6,9 @@
 
   <div slot="content">
     <div v-if="widgetData">
+
       <webview :src="widgetUrl"></webview>
+
       <tabs>
         <!-- goal setup -->
         <tab name="Setup Goal">
@@ -50,11 +52,12 @@
               </div>
             </div>
           </div>
+
           <div v-show="!has_goal">
             <div class="section__body">
               <div class="row">
                 <div class="col-xs-12">
-                  <label>Title</label>
+                  <label>{{ $t("Title") }}</label>
                   <input
                     name="title"
                     type="text"
@@ -70,7 +73,7 @@
 
               <div class="row">
                 <div class="col-xs-12">
-                  <label>Goal Amount</label>
+                  <label>{{ $t("Goal Amount") }}</label>
                   <input
                     name="goal_amount"
                     type="text"
@@ -87,7 +90,7 @@
 
               <div class="row">
                 <div class="col-xs-12">
-                  <label>Starting Amount</label>
+                  <label>{{ $t("Starting Amount") }}</label>
                   <input
                     name="manual_goal_amount"
                     type="text"
@@ -104,7 +107,7 @@
 
               <div class="row">
                 <div class="col-xs-12">
-                  <label>End After</label>
+                  <label>{{ $t("End After") }}</label>
                   <input
                     type="text"
                     name="ends_at"
@@ -123,6 +126,12 @@
 
         <tab name="Settings">
           <div class="section__body">
+            <div class="row">
+              <div class="col-xs-12">
+                <w-color-input v-model="backgroundColorData" />
+              </div>
+            </div>
+
             <div class="row">
               <div class="col-xs-12">
                 <w-list-input
@@ -177,9 +186,9 @@
 
             <div class="row">
               <div class="col-xs-12">
-                <w-code-editor
+                <!-- <w-code-editor
                   :settings="widgetData.settings"
-                  :defaults="widgetData.custom_defaults" />
+                  :defaults="widgetData.custom_defaults" /> -->
               </div>
             </div>
           </div>
