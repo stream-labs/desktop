@@ -257,7 +257,6 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
           settings: item.getSettings()
         };
       });
-
       this.SET_UNLOADED_CLIPBOARD_NODES(sourcesInfo, nodesInfo);
     }
 
@@ -268,6 +267,9 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
       );
     }
 
+    this.SET_FILTERS_IDS([]);
+    this.SET_SCENE_ITEMS_IDS([]);
+    this.SET_SCENE_ITEMS_SCENE('');
   }
 
   private hasItemsInUnloadedClipboard(): boolean {

@@ -299,7 +299,10 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     }
 
     socket.on('data', (data: any) => {
+
+      console.log(this.servicesManager.serviceEvent.observers.length, 'before request', data.toString());
       this.onRequestHandler(client, data.toString());
+      console.log(this.servicesManager.serviceEvent.observers.length, 'after request', data.toString());
     });
 
     socket.on('end', () => {
@@ -476,7 +479,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
     this.log('send response', response);
-    client.socket.write(JSON.stringify(response) + '\n');
+
+    // unhandled exceptions completely destroy Rx.Observable subscription
+    try {
+      client.socket.write(JSON.stringify(response) + '\n');
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   private disconnectClient(clientId: number) {

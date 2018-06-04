@@ -41,7 +41,7 @@ export class ApiClient {
 
 
   // set to 'true' for debugging
-  logsEnabled = false;
+  logsEnabled = true;
 
   constructor() {
 

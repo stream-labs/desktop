@@ -8,7 +8,6 @@ import { IClipboardServiceApi } from 'services/clipboard';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
 import { ISourcesServiceApi } from 'services/sources';
 import { SourceFiltersService } from 'services/source-filters';
-import { sleep } from '../helpers/sleep';
 
 useSpectron({ restartAppAfterEachTest: false, afterStartCb: afterStart });
 
@@ -144,7 +143,7 @@ test('Copy/paste nodes between scene collections', async t => {
 });
 
 
-test('Copy/paste filters between scene collections', async t => {
+test.only('Copy/paste filters between scene collections', async t => {
 
   sceneBuilder.build(`
       Item1: image_source
@@ -164,6 +163,7 @@ test('Copy/paste filters between scene collections', async t => {
   sceneBuilder.build(`
       Item1: image_source
   `);
+
 
   const sourceId = (getNode('Item1') as ISceneItemApi).sourceId;
 
