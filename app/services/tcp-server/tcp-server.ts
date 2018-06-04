@@ -299,10 +299,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     }
 
     socket.on('data', (data: any) => {
-
-      console.log(this.servicesManager.serviceEvent.observers.length, 'before request', data.toString());
       this.onRequestHandler(client, data.toString());
-      console.log(this.servicesManager.serviceEvent.observers.length, 'after request', data.toString());
     });
 
     socket.on('end', () => {
