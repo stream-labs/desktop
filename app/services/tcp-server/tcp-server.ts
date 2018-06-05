@@ -476,7 +476,13 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
 
   private sendResponse(client: IClient, response: IJsonRpcResponse<any>) {
     this.log('send response', response);
-    client.socket.write(JSON.stringify(response) + '\n');
+
+    // unhandled exceptions completely destroy Rx.Observable subscription
+    try {
+      client.socket.write(JSON.stringify(response) + '\n');
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   private disconnectClient(clientId: number) {
