@@ -2,8 +2,6 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'util/injector';
 import {
-  getPropertiesFormData,
-  setPropertiesFormData,
   IListOption,
   TObsValue,
   TFormData
@@ -13,6 +11,7 @@ import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
+import { DefaultManager } from 'services/sources/properties-managers/default-manager';
 
 export enum ETransitionType {
   Cut = 'cut_transition',
@@ -60,6 +59,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
    * one is complete.
    */
   studioModeLocked = false;
+
+  /**
+   * The properties manager for the currently set global transition
+   */
+  propertiesManager: DefaultManager = null;
 
   init() {
     // Set the default transition type
@@ -170,16 +174,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     return this.getCurrentTransition().settings;
   }
 
-  setSettings(settings: Dictionary<TObsValue>)  {
-    this.getCurrentTransition().update(settings);
-  }
-
   getPropertiesFormData(): TFormData {
-    return getPropertiesFormData(this.getCurrentTransition()) || [];
+    return this.propertiesManager.getPropertiesFormData() || [];
   }
 
   setPropertiesFormData(formData: TFormData) {
-    return setPropertiesFormData(this.getCurrentTransition(), formData);
+    return this.propertiesManager.setPropertiesFormData(formData);
   }
 
   private getCurrentTransition() {
@@ -187,8 +187,9 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
 
-  setType(type: ETransitionType) {
+  setType(type: ETransitionType, settings?: Dictionary<TObsValue>, propertiesManagerSettings?: Dictionary<any>) {
     const oldTransition = this.getCurrentTransition() as obs.ITransition;
+    const oldManager = this.propertiesManager;
 
     const transition = this.getTypes().find(transition => {
       return transition.value === type;
@@ -198,10 +199,16 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       const newTransition = obs.TransitionFactory.create(type, 'Global Transition');
       obs.Global.setOutputSource(0, newTransition);
 
+      if (settings) newTransition.update(settings);
+
+      this.propertiesManager = new DefaultManager(newTransition, propertiesManagerSettings || {});
+
       if (oldTransition && oldTransition.getActiveSource) {
         newTransition.set(oldTransition.getActiveSource());
         oldTransition.release();
       }
+
+      if (oldManager) oldManager.destroy();
 
       this.SET_TYPE(type);
     }
