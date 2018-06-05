@@ -41,9 +41,9 @@ export default class BitGoal extends Vue {
 
   mounted() {
     this.widgetSettingsService.getBitGoalSettings().then(settings => {
-      this.widgetData = settings;
-      if (!this.widgetData.goal.title) {
-        this.widgetData.goal = {
+      this.bitGoalData = settings;
+      if (!this.bitGoalData.goal.title) {
+        this.bitGoalData.goal = {
           title: '',
           goal_amount: null,
           manual_goal_amount: null,
@@ -51,18 +51,18 @@ export default class BitGoal extends Vue {
         };
       }
 
-      if (this.widgetData.goal.title) {
+      if (this.bitGoalData.goal.title) {
         this.has_goal = true;
       }
 
-      this.backgroundColorData.value = this.widgetData.settings.background_color;
-      this.barColorData.value = this.widgetData.settings.bar_color;
-      this.textColorData.value = this.widgetData.settings.text_color;
-      this.barTextColorData.value = this.widgetData.settings.bar_text_color;
-      this.barBackgroundColorData.value = this.widgetData.settings.bar_bg_color;
-      this.fontFamilyData.value = this.widgetData.settings.font;
-      this.layout.value = this.widgetData.settings.layout;
-      this.barThicknessData.value = this.widgetData.settings.bar_thickness;
+      // this.backgroundColorData.value = this.bitGoalData.settings.background_color;
+      // this.barColorData.value = this.bitGoalData.settings.bar_color;
+      // this.textColorData = this.bitGoalData.settings.text_color;
+      // this.barTextColorData.value = this.bitGoalData.settings.bar_text_color;
+      // this.barBackgroundColorData.value = this.bitGoalData.settings.bar_bg_color;
+      this.fontFamilyData.value = this.bitGoalData.settings.font;
+      this.layout.value = this.bitGoalData.settings.layout;
+      this.barThicknessData.value = this.bitGoalData.settings.bar_thickness;
     });
   }
 
@@ -70,7 +70,7 @@ export default class BitGoal extends Vue {
     return this.widgetSettingsService.getWidgetUrl('BitGoal');
   }
 
-  widgetData: IBitGoalSettings = null;
+  bitGoalData: IBitGoalSettings = null;
 
   barThickness: number;
 
@@ -89,10 +89,7 @@ export default class BitGoal extends Vue {
     value: ''
   };
 
-  textColorData = {
-    description: 'Text Color',
-    value: ''
-  };
+  textColorData = '';
 
   barTextColorData = {
     description: 'Bar Text Color',
@@ -119,7 +116,7 @@ export default class BitGoal extends Vue {
     value: '',
   };
 
-  // @Watch('widgetData')
+  // @Watch('bitGoalData')
   // update() {
   //   this.updateEditor();
   // }
@@ -144,15 +141,15 @@ export default class BitGoal extends Vue {
     this.widgetSettingsService.deleteBitGoal();
   }
 
-  onGoalSave(widgetData: IBitGoalSettings) {
-    this.widgetSettingsService.postBitGoal(widgetData)
-      .then(response => { this.widgetData.goal = response.goal; });
+  onGoalSave(bitGoalData: IBitGoalSettings) {
+    this.widgetSettingsService.postBitGoal(bitGoalData)
+      .then(response => { this.bitGoalData.goal = response.goal; });
     this.has_goal = true;
   }
 
-  onSettingsSave(widgetData: IBitGoalSettings) {
-    this.widgetSettingsService.postBitGoalSettings(widgetData)
-      .then(response => { this.widgetData.settings = response.settings; });
+  onSettingsSave(bitGoalData: IBitGoalSettings) {
+    this.widgetSettingsService.postBitGoalSettings(bitGoalData)
+      .then(response => { this.bitGoalData.settings = response.settings; });
   }
 
   cancel() {

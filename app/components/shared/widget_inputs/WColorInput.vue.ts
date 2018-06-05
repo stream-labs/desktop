@@ -1,12 +1,7 @@
 import Vue from 'vue';
 import VueColor from 'vue-color';
 import Component from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
-
-interface IColor {
-  hex: string;
-  a: number;
-}
+import { Prop, Watch } from 'vue-property-decorator';
 
 @Component({
   components: {
@@ -15,35 +10,43 @@ interface IColor {
 })
 export default class WidgetColorInput extends Vue {
   @Prop()
-  value: { value: string };
+  value: string;
 
-  pickerVisible = false;
-
-  togglePicker() {
-    this.pickerVisible = !this.pickerVisible;
-  }
-
-  color: IColor = {
-    hex: '#ffffff',
-    a: 1
+  colors: {
+    hex: string,
+    a?: string;
   };
 
-  onChange(color: IColor) {
-    this.color = color;
+  displayPicker: boolean = false;
+
+  showPicker() {
+    document.addEventListener('click', this.documentClick);
+    this.displayPicker = true;
   }
 
-  get hexColor() {
-    return this.color.hex.substr(1);
+  hidePicker() {
+    document.removeEventListener('click', this.documentClick);
+    this.displayPicker = false;
   }
 
-  // This is displayed to the user
-  get hexARGB() {
-    return ('#' + this.hexColor).toLowerCase();
+  togglePicker() {
+    this.displayPicker ? this.hidePicker() : this.showPicker();
   }
-  get swatchStyle() {
-    return {
-      backgroundColor: this.color.hex,
-      opacity: this.color.a || 1
-    };
+
+  updateFromInput(event: any) {
+    this.$emit('input', event.target.value);
   }
+
+  updateFromPicker(value: any) {
+    this.colors = value;
+  }
+
+  documentClick(e: any) {
+    const el = this.$refs.colorpicker;
+    const target = e.target;
+    if (el !== target) {
+      this.hidePicker();
+    }
+  }
+
 }

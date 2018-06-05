@@ -165,16 +165,16 @@ export class WidgetSettingsService extends Service {
       });
   }
 
-  postBitGoal(widgetData: IBitGoalSettings) {
+  postBitGoal(bitGoalData: IBitGoalSettings) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/widget/bitgoal`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const bodyBitGoal = {
-      ends_at: widgetData.goal['ends_at'],
-      goal_amount: widgetData.goal['goal_amount'],
-      manual_goal_amount: widgetData.goal['manual_goal_amount'],
-      title: widgetData.goal['title']
+      ends_at: bitGoalData.goal['ends_at'],
+      goal_amount: bitGoalData.goal['goal_amount'],
+      manual_goal_amount: bitGoalData.goal['manual_goal_amount'],
+      title: bitGoalData.goal['title']
     };
 
     const request = new Request(url, {
@@ -187,24 +187,25 @@ export class WidgetSettingsService extends Service {
       .then(response => { return response.json();});
   }
 
-  postBitGoalSettings(widgetData: IBitGoalSettings) {
+  postBitGoalSettings(bitGoalData: IBitGoalSettings) {
+    console.log(bitGoalData);
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const bodyBitGoalSettings = {
-      background_color: widgetData.settings['background_color'],
-      bar_bg_color: widgetData.settings['bar_bg_color'],
-      bar_color: widgetData.settings['bar_color'],
-      bar_text_color: widgetData.settings['bar_text_color'],
-      bar_thickness: widgetData.settings['bar_thickness'],
-      custom_enabled: widgetData.settings['custom_enabled'],
-      custom_html: widgetData.settings['custom_html'],
-      custom_css: widgetData.settings['custom_css'],
-      custom_js: widgetData.settings['custom_js'],
-      font: widgetData.settings['font'],
-      layout: widgetData.settings['layout'],
-      text_color: widgetData.settings['text_color'],
+      background_color: bitGoalData.settings['background_color'],
+      bar_bg_color: bitGoalData.settings['bar_bg_color'],
+      bar_color: bitGoalData.settings['bar_color'],
+      bar_text_color: bitGoalData.settings['bar_text_color'],
+      bar_thickness: bitGoalData.settings['bar_thickness'],
+      custom_enabled: bitGoalData.settings['custom_enabled'],
+      custom_html: bitGoalData.settings['custom_html'],
+      custom_css: bitGoalData.settings['custom_css'],
+      custom_js: bitGoalData.settings['custom_js'],
+      font: bitGoalData.settings['font'],
+      layout: bitGoalData.settings['layout'],
+      text_color: bitGoalData.settings['text_color'],
     };
 
     const request = new Request(url, {

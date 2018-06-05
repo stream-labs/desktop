@@ -5,7 +5,7 @@
   :showControls="false">
 
   <div slot="content">
-    <div v-if="widgetData">
+    <div v-if="bitGoalData">
 
       <webview :src="widgetUrl"></webview>
 
@@ -20,7 +20,7 @@
                   <label>{{ $t("Title") }}</label>
                 </div>
                 <div class="small-12 medium-9 columns">
-                  <span>{{ widgetData.goal.title }}</span>
+                  <span>{{ bitGoalData.goal.title }}</span>
                 </div>
               </div>
 
@@ -29,7 +29,7 @@
                   <label>{{ $t("Goal Amount") }}</label>
                 </div>
                 <div class="small-12 medium-9 columns">
-                  <span>{{ widgetData.goal.amount }}</span>
+                  <span>{{ bitGoalData.goal.amount }}</span>
                 </div>
               </div>
 
@@ -38,7 +38,7 @@
                   <label>{{ $t("Current Amount") }}</label>
                 </div>
                 <div class="small-12 medium-9 columns">
-                  <span>{{ widgetData.goal.current_amount }}</span>
+                  <span>{{ bitGoalData.goal.current_amount }}</span>
                 </div>
               </div>
 
@@ -47,7 +47,7 @@
                   <label>{{ $t("Days Remaining") }}</label>
                 </div>
                 <div class="small-12 medium-9 columns">
-                  <span>{{ widgetData.goal.to_go }}</span>
+                  <span>{{ bitGoalData.goal.to_go }}</span>
                 </div>
               </div>
             </div>
@@ -62,7 +62,7 @@
                     name="title"
                     type="text"
                     placeholder="September Bit Goal"
-                    v-model="widgetData.goal.title"
+                    v-model="bitGoalData.goal.title"
                     v-validate="'required|max:60'"
                     :class="{'form__input--error' : errors.has('title')}" />
                   <span
@@ -78,7 +78,7 @@
                     name="goal_amount"
                     type="text"
                     placeholder="100"
-                    v-model="widgetData.goal.goal_amount"
+                    v-model="bitGoalData.goal.goal_amount"
                     v-validate="'required'"
                     :class="{'form__input--error' : errors.has('goal_amount')}" />
                   <span
@@ -95,7 +95,7 @@
                     name="manual_goal_amount"
                     type="text"
                     placeholder="0"
-                    v-model="widgetData.goal.manual_goal_amount"
+                    v-model="bitGoalData.goal.manual_goal_amount"
                     v-validate="'required'"
                     :class="{'form__input--error' : errors.has('manual_goal_amount')}" />
                   <span
@@ -112,7 +112,7 @@
                     type="text"
                     name="ends_at"
                     placeholder="MM/DD/YYYY"
-                    v-model="widgetData.goal.ends_at"
+                    v-model="bitGoalData.goal.ends_at"
                     v-validate="'required|date_format:MM/DD/YYYY'">
                   <span
                     v-show="errors.has('ends_at')"
@@ -128,12 +128,6 @@
           <div class="section__body">
             <div class="row">
               <div class="col-xs-12">
-                <w-color-input v-model="backgroundColorData" />
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-xs-12">
                 <w-list-input
                   v-model="layout"
                   :internal-search="false"/>
@@ -142,25 +136,41 @@
 
             <div class="row">
               <div class="col-xs-12">
-                <w-color-input v-model="textColorData" />
+                <label>Background Color</label>
+                <w-color-input
+                  :color="bitGoalData.settings.background_color"
+                  v-model="bitGoalData.settings.background_color" />
               </div>
             </div>
 
             <div class="row">
               <div class="col-xs-12">
-                <w-color-input v-model="barTextColorData" />
+                <label>Bar Color</label>
+
+                <w-color-input v-model="bitGoalData.settings.bar_color" />
               </div>
             </div>
 
             <div class="row">
               <div class="col-xs-12">
-                <w-color-input v-model="barColorData" />
+                <label>Bar Background Color</label>
+
+                <w-color-input v-model="bitGoalData.settings.bar_bg_color" />
               </div>
             </div>
 
             <div class="row">
               <div class="col-xs-12">
-                <w-color-input v-model="barBackgroundColorData" />
+                <label>Text Color</label>
+
+                <w-color-input v-model="bitGoalData.settings.text_color" />
+              </div>
+            </div>
+
+                        <div class="row">
+              <div class="col-xs-12">
+                <label>Bar Text Color</label>
+                <w-color-input v-model="bitGoalData.settings.bar_text_color" />
               </div>
             </div>
 
@@ -187,8 +197,8 @@
             <div class="row">
               <div class="col-xs-12">
                 <!-- <w-code-editor
-                  :settings="widgetData.settings"
-                  :defaults="widgetData.custom_defaults" /> -->
+                  :settings="bitGoalData.settings"
+                  :defaults="bitGoalData.custom_defaults" /> -->
               </div>
             </div>
           </div>
@@ -209,12 +219,12 @@
         </button>
         <button
           class="button button--default"
-          @click="onSettingsSave">
+          @click="onSettingsSave(bitGoalData)">
           Save Settings
         </button>
         <button
           class="button button--action"
-          @click.prevent="onGoalSave(widgetData)"
+          @click.prevent="onGoalSave(bitGoalData)"
           :class="{'disabled' : this.errors.any() }"
           v-show="!has_goal">
           Start Bit Goal</button>
