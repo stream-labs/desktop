@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 import { TransitionsService } from 'services/transitions';
 import Display from 'components/shared/Display.vue';
 import StudioModeControls from 'components/StudioModeControls.vue';
+import { ScenesService } from 'services/scenes';
 
 @Component({
   components: {
@@ -19,6 +20,7 @@ import StudioModeControls from 'components/StudioModeControls.vue';
 export default class Studio extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private scenesService: ScenesService;
 
   $refs: {
     studioModeContainer: HTMLDivElement;
@@ -40,6 +42,19 @@ export default class Studio extends Vue {
         }
       }
     }, 1000);
+  }
+
+  onDropHandler(event: DragEvent) {
+    const files = event.dataTransfer.files;
+
+    let fi = files.length;
+    while (fi--) {
+      const file = files.item(fi);
+      this.scenesService.activeScene.addFile(file.path);
+    }
+
+    console.log(event.dataTransfer.files[0]);
+    console.log('drop', event);
   }
 
   destroyed() {

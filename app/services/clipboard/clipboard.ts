@@ -1,3 +1,5 @@
+import electron from 'electron';
+import { execSync } from 'child_process';
 import { mutation, StatefulService } from 'services/stateful-service';
 import {
   ScenesService,
@@ -14,6 +16,7 @@ import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
 import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IClipboardServiceApi } from './clipboard-api';
+const { clipboard } = electron;
 interface ISceneNodeInfo {
   folder?: ISceneItemFolder;
   item?: ISceneItem & ISource;
@@ -33,10 +36,16 @@ interface IUnloadedCollectionClipboard {
   sceneNodes: ISceneNodeInfo[];
 }
 
+interface ISystemClipboard {
+  text: string;
+  files: string[];
+}
+
 interface IClipboardState {
   itemsSceneId: string;
   sceneNodesIds: string[];
   filterIds: string[];
+  systemClipboard: ISystemClipboard;
 
   /**
    * stores stand-alone data for copy/paste
@@ -51,7 +60,11 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     itemsSceneId: '',
     sceneNodesIds: [],
     filterIds: [],
-    unloadedCollectionClipboard: null
+    unloadedCollectionClipboard: null,
+    systemClipboard: {
+      text: '',
+      files: []
+    }
   };
 
   @Inject() private scenesService: ScenesService;
@@ -64,6 +77,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     this.sceneCollectionsService.collectionWillSwitch.subscribe(() => {
       this.beforeCollectionSwitchHandler();
     });
+    this.SET_SYSTEM_CLIPBOARD(this.fetchSystemClipboard());
   }
 
 
@@ -76,16 +90,32 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
   @shortcut('Ctrl+V')
   paste(duplicateSources = false) {
-    if (!this.hasItems()) return;
-    if (this.hasItemsInUnloadedClipboard()) {
-      this.pasteFromUnloadedClipboard();
-      return;
+    // console.log(clipboard.availableFormats());
+    // console.log(clipboard.readText());
+    // window['cb'] = clipboard.readText();
+    // console.log('files', this.getFiles());
+    // return;
+
+    const systemClipboard = this.fetchSystemClipboard();
+    if (JSON.stringify(this.state.systemClipboard) !== JSON.stringify(systemClipboard)) {
+      this.clear();
+      this.SET_SYSTEM_CLIPBOARD(systemClipboard);
     }
-    const insertedItems = this.scenesService
-      .getScene(this.state.itemsSceneId)
-      .getSelection(this.state.sceneNodesIds)
-      .copyTo(this.scenesService.activeSceneId, null, duplicateSources);
-    if (insertedItems.length) this.selectionService.select(insertedItems);
+
+    if (this.hasItems()) {
+      if (this.hasItemsInUnloadedClipboard()) {
+        this.pasteFromUnloadedClipboard();
+        return;
+      }
+      const insertedItems = this.scenesService
+        .getScene(this.state.itemsSceneId)
+        .getSelection(this.state.sceneNodesIds)
+        .copyTo(this.scenesService.activeSceneId, null, duplicateSources);
+      if (insertedItems.length) this.selectionService.select(insertedItems);
+    } else if (this.hasSystemClipboard()) {
+      this.pasteFromSystemClipboard();
+    }
+
   }
 
 
@@ -116,11 +146,22 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     return !!this.state.filterIds.length;
   }
 
+  hasSystemClipboard() {
+    return !!(this.state.systemClipboard.text || this.state.systemClipboard.files.length);
+  }
+
   clear() {
     this.SET_FILTERS_IDS([]);
     this.SET_SCENE_ITEMS_IDS([]);
     this.SET_SCENE_ITEMS_SCENE('');
     this.SET_UNLOADED_COLLECTION_CLIPBOARD(null);
+  }
+
+  private fetchSystemClipboard(): ISystemClipboard {
+    let files: string[] = [];
+    const text = clipboard.readText() || '';
+    if (!text) files = this.getFiles();
+    return { text, files };
   }
 
   private pasteFromUnloadedClipboard() {
@@ -196,6 +237,27 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     this.SET_UNLOADED_COLLECTION_CLIPBOARD(null);
   }
 
+  private pasteFromSystemClipboard() {
+    const clipboard = this.state.systemClipboard;
+    const scene = this.scenesService.activeScene;
+    if (clipboard.files.length) {
+      clipboard.files.forEach(filePath => scene.addFile(filePath));
+      return;
+    }
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+    const text = clipboard.text;
+
+
+    if (text.match(urlRegex)) {
+      scene.createAndAddSource(text, 'browser_source', {
+        url: text,
+        is_local_file: false
+      });
+    } else {
+      scene.createAndAddSource(text, 'text_gdiplus', { text });
+    }
+  }
+
   private beforeCollectionSwitchHandler() {
     if (!this.hasItems()) {
       this.clear();
@@ -251,6 +313,20 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
       this.state.unloadedCollectionClipboard.sceneNodes &&
       this.state.unloadedCollectionClipboard.sceneNodes.length
     );
+  }
+
+  private getFiles() {
+    // electron clipboard doesn't support files
+    // use .NET API instead
+    return execSync(
+      'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
+      '[System.Windows.Forms.Clipboard]::GetFileDropList()'
+    ).toString().split('\n').filter(fineName => fineName);
+  }
+
+  @mutation()
+  private SET_SYSTEM_CLIPBOARD(systemClipboard: ISystemClipboard) {
+    this.state.systemClipboard = systemClipboard;
   }
 
   @mutation()

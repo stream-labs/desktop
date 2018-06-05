@@ -19,6 +19,7 @@ import { Inject } from '../../util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import { uniqBy } from 'lodash';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
+import * as fs from 'fs';
 const { ipcRenderer } = electron;
 
 
@@ -170,6 +171,26 @@ export class Scene implements ISceneApi {
 
     this.scenesService.itemAdded.next(sceneItem.getModel());
     return sceneItem;
+  }
+
+  addFile(path: string, folderId?: string): TSceneNode {
+    const fstat = fs.lstatSync(path);
+    if (!fstat) return null;
+    const fname = path.split('\\').slice(-1)[0];
+
+    if (fstat.isDirectory()) {
+      const folder = this.createFolder(fname);
+      if (folderId) folder.setParent(folderId);
+      const files = fs.readdirSync(path).reverse();
+      files.forEach(filePath => this.addFile(`${path}\\${filePath}`, folder.id));
+      return folder;
+    }
+
+    const source = this.sourcesService.addFile(path);
+    if (!source) return null;
+    const item = this.addSource(source.sourceId);
+    if (folderId) item.setParent(folderId);
+    return item;
   }
 
   createFolder(name: string, options: ISceneNodeAddOptions = {}) {
