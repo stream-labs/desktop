@@ -3,6 +3,8 @@ import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
 import { sleep } from '../helpers/sleep';
+import { SceneBuilder } from "../helpers/scene-builder";
+const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
 
@@ -215,6 +217,25 @@ test('SceneItem.resetTransform()', async t => {
     crop: { top: 0, right: 0, bottom: 0, left: 0 },
     rotation: 0,
   });
+
+
+});
+
+test('SceneItem.addFile()', async t => {
+  const dataDir = path.resolve(__dirname, '..', '..', '..', 'test', 'data', 'sources-files');
+
+  const client = await getClient();
+  const sceneBuilder = new SceneBuilder(client);
+  const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
+  const scene = scenesService.activeScene;
+
+  scene.addFile(dataDir);
+
+  t.true(sceneBuilder.isEqualTo(`
+    sources-files
+      html
+        hello.html
+  `));
 
 
 });

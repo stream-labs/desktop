@@ -2,6 +2,7 @@ import { IPropertyManager } from './properties-managers/properties-manager';
 import { IListOption, TFormData } from '../../components/shared/forms/Input';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
+import { Source } from "./index";
 
 export interface ISource extends IResource {
   sourceId: string;
@@ -54,6 +55,12 @@ export interface ISourcesServiceApi {
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];
+
+  /**
+   * creates a source from a file
+   * source type depends on the file extension
+   */
+  addFile(path: string): ISourceApi;
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;

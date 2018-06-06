@@ -232,6 +232,10 @@ export class Scene implements ISceneApi {
     this.scenesService.itemRemoved.next(sceneItemModel);
   }
 
+  clear() {
+    this.getSelection().selectAll().remove();
+  }
+
 
   setLockOnAllItems(locked: boolean) {
     this.getItems().forEach(item => item.setSettings({ locked }));

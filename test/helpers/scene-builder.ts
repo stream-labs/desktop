@@ -129,12 +129,8 @@ export class SceneBuilder {
   }
 
 
-  clearScene() {
-    this.scene.getSelection().selectAll().remove();
-  }
-
   build(scetch: string): ISceneBuilderNode[] {
-    this.clearScene();
+    this.scene.clear();
     const nodes = this.parse(scetch);
     return this.buildNodes(nodes);
   }

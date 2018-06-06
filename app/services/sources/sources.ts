@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
 import { IListOption, setupSourceDefaults, TObsValue } from 'components/shared/forms/Input';
@@ -199,7 +200,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const SUPPORTED_EXT = {
       image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
       ffmpeg_source: ['mp4', 'ts', 'mov', 'flv', 'mkv', 'avi', 'mp3', 'ogg', 'aac', 'wav', 'gif', 'webm'],
-      browser_source: ['html']
+      browser_source: ['html'],
+      text_gdiplus: ['txt']
     };
     let ext = path.split('.').splice(-1)[0];
     if (!ext) return null;
@@ -212,11 +214,19 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       let settings: Dictionary<TObsValue>;
       if (type === 'image_source') {
         settings = { file: path };
-      } else if (type === 'ffmpeg_source' || type === 'browser_source') {
+      } else if (type === 'browser_source') {
         settings = {
           is_local_file: true,
           local_file: path
         };
+      } else if (type === 'ffmpeg_source') {
+        settings = {
+          is_local_file: true,
+          local_file: path,
+          looping: true
+        };
+      } else if (type === 'text_gdiplus') {
+        settings = { text: fs.readFileSync(path).toString() };
       }
       return this.createSource(filename, type as TSourceType, settings);
     }
