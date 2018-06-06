@@ -143,7 +143,7 @@ test('Copy/paste nodes between scene collections', async t => {
 });
 
 
-test.only('Copy/paste filters between scene collections', async t => {
+test('Copy/paste filters between scene collections', async t => {
 
   sceneBuilder.build(`
       Item1: image_source
