@@ -219,6 +219,33 @@
       </ul>
     </add-source-info>
 
+    <add-source-info
+      v-if="inspectedSource === 'openvr_capture'"
+      @clickAdd="selectSource('openvr_capture')"
+      name="OpenVR Capture"
+      description="Directly capture the OpenVR monitoring video buffer of your HMD."
+      key="29">
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/vr-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/vr-capture.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>OpenVR</li>
+        <li>SteamVR</li>
+      </ul>
+    </add-source-info>
+
+    <add-source-info
+      v-if="inspectedSource === 'liv_capture'"
+      @clickAdd="selectSource('liv_capture')"
+      name="LIV Client Capture"
+      description="Directly capture the LIV compositor output, reducing load and simplifying setup for Mixed Reality."
+      key="29">
+      <img slot="media" class="source__demo source__demo--day" src="../../../media/source-demos/day/vr-capture.png"/>
+      <img slot="media" class="source__demo source__demo--night" src="../../../media/source-demos/night/vr-capture.png"/>
+      <ul slot="support-list" class="source-support__list">
+        <li>LIV</li>
+      </ul>
+    </add-source-info>
+
     <!-- Widget Sources -->
     <add-source-info
       v-if="inspectedSource === widgetTypes.AlertBox"

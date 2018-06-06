@@ -192,7 +192,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
+        click: () => this.clipboardService.pasteFilters(),
         enabled: this.clipboardService.hasFilters()
       });
 

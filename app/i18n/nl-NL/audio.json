@@ -1,16 +1,16 @@
 {
-  "Open advanced audio settings": "Open geavanceerde audio-instellingen",
+  "Open advanced audio settings": "Open geavanceerde geluidsinstellingen",
   "Volume (%)": "Volume (%)",
-  "Downmix to Mono": "Downmix naar Mono",
-  "Sync Offset (ms)": "Sync Offset (ms)",
-  "Audio Monitoring": "Audio Monitoring",
-  "Monitor Off": "Monitor Off",
-  "Monitor Only (mute output)": "Monitor Only (mute output)",
-  "Monitor and Output": "Monitor and Output",
-  "Tracks": "Tracks",
-  "Advanced Audio Settings": "Advanced Audio Settings",
+  "Downmix to Mono": "Downmix naar mono",
+  "Sync Offset (ms)": "Sync compensatie (ms)",
+  "Audio Monitoring": "Geluids monitoring",
+  "Monitor Off": "Niet monitoren",
+  "Monitor Only (mute output)": "Alleen monitoren (uitvoer gedempt)",
+  "Monitor and Output": "Monitoren en uitvoeren",
+  "Tracks": "Audio sporen",
+  "Advanced Audio Settings": "Geavanceerde geluidsinstellingen",
   "Volume ( % )": "Volume ( % )",
-  "Sync Offset ( ms )": "Sync Offset ( ms )",
+  "Sync Offset ( ms )": "Sync compensatie (ms)",
   "Mixer": "Mixer",
-  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor audio levels. If the bars are moving you are outputting audio."
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Monitor geluidsniveaus. Als de meters bewegen bent u geluid aan het uitzenden."
 }
