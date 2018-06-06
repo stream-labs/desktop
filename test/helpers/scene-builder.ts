@@ -114,7 +114,7 @@ export class SceneBuilder {
     const isItem = line.indexOf(':') !== -1;
     if (isItem) {
       const [fullMatch, name, delemiter, sourceType] =
-        line.match(/([a-zA-Z_ \d]+)(:)([a-zA-Z_ \d]*)/);
+        line.match(/([a-zA-Z_ .\-\d]+)(:)([a-zA-Z_ \d]*)/);
       return {
         name: name.trim(),
         type: 'item',

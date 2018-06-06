@@ -2,7 +2,6 @@ import { IPropertyManager } from './properties-managers/properties-manager';
 import { IListOption, TFormData } from '../../components/shared/forms/Input';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
-import { Source } from "./index";
 
 export interface ISource extends IResource {
   sourceId: string;

@@ -234,7 +234,15 @@ test('SceneItem.addFile()', async t => {
   t.true(sceneBuilder.isEqualTo(`
     sources-files
       html
-        hello.html
+        hello.html: browser_source
+      images
+        moon.png: image_source
+        sun.png: image_source
+      media
+        alertbox.mp4: ffmpeg_source
+        chatbox.mp4: ffmpeg_source
+      text
+        hello.txt: text_gdiplus
   `));
 
 
