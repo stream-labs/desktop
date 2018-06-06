@@ -7,6 +7,7 @@ interface ISchema {
   type: ETransitionType;
   duration: number;
   settings?: Dictionary<TObsValue>;
+  propertiesManagerSettings?: Dictionary<any>;
 }
 
 export class TransitionNode extends Node<ISchema, {}> {
@@ -15,20 +16,22 @@ export class TransitionNode extends Node<ISchema, {}> {
 
   @Inject() transitionsService: TransitionsService;
 
-  save() {
+  async save() {
     this.data = {
       type: this.transitionsService.state.type,
       duration: this.transitionsService.state.duration,
-      settings: this.transitionsService.getSettings()
+      settings: this.transitionsService.getSettings(),
+      propertiesManagerSettings: this.transitionsService.propertiesManager.settings
     };
-    return Promise.resolve();
   }
 
-  load() {
-    this.transitionsService.setType(this.data.type);
+  async load() {
+    this.transitionsService.setType(
+      this.data.type,
+      this.data.settings || {},
+      this.data.propertiesManagerSettings || {}
+    );
     this.transitionsService.setDuration(this.data.duration);
-    if (this.data.settings) this.transitionsService.setSettings(this.data.settings);
-    return Promise.resolve();
   }
 
 }

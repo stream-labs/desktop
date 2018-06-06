@@ -11,7 +11,7 @@
 
 .nav-menu {
   margin: 0 0 -20px -20px;
-  flex: 0 0 200px;
+  flex: 0 0 220px;
   border-right: 1px solid @day-border;
   display: flex;
   flex-direction: column;
