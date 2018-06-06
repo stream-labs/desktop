@@ -141,6 +141,9 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     });
   }
 
+  hasData(): boolean {
+    return this.hasItems() || this.hasSystemClipboard();
+  }
 
   hasItems(): boolean {
     return !!(
@@ -350,7 +353,10 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     return execSync(
       'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
       '[System.Windows.Forms.Clipboard]::GetFileDropList()'
-    ).toString().split('\n').filter(fineName => fineName);
+    ).toString()
+      .split('\n')
+      .filter(fineName => fineName)
+      .map(fileName => fileName.trim());
   }
 
   @mutation()
