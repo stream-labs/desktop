@@ -28,12 +28,12 @@
   "Initialzing ...": "초기화 중",
   "Connecting to OBS ...": "OBS에 연결중...",
   "Pulling settings ...": "설정 데려오는중...",
-  "Starting import ...": "Starting import ...",
+  "Starting import ...": "임포팅 시작중...",
   "Finalizing ...": "마무리중....",
-  "We're analyzing your internet speed and computer hardware to give you the best settings possible.": "We're analyzing your internet speed and computer hardware to give you the best settings possible.",
+  "We're analyzing your internet speed and computer hardware to give you the best settings possible.": "최적의 설정을 위해 인터넷 속도랑 컴퓨터 하드웨어 를 분석합니다.",
   "Done!": "완료!",
   "Next": "다음",
-  "Scene Collections Import": "Scene Collections Import",
-  "The following scene collections have been imported from your Streamlabs account": "The following scene collections have been imported from your Streamlabs account",
+  "Scene Collections Import": "장면 컬렉션 가져오기",
+  "The following scene collections have been imported from your Streamlabs account": "다음 장면들은 Streamlabs 계정에서 가져온 장면들이에요.",
   "Continue": "계속"
 }

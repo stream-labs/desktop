@@ -1,12 +1,12 @@
 {
-  "Scene transition": "Scene transition",
-  "Cut": "Cut",
-  "Fade": "Fade",
-  "Swipe": "Swipe",
-  "Slide": "Slide",
-  "Fade to Color": "Fade to Color",
-  "Luma Wipe": "Luma Wipe",
+  "Scene transition": "Transition de scène",
+  "Cut": "Coupe",
+  "Fade": "Fondu",
+  "Swipe": "Balayer",
+  "Slide": "Faire glisser",
+  "Fade to Color": "Fondu de couleur",
+  "Luma Wipe": "Dégradé",
   "Stinger": "Stinger",
   "Transition": "Transition",
-  "Duration": "Duration"
+  "Duration": "Durée"
 }
