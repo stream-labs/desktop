@@ -29,8 +29,8 @@
   "Optimized profile for average CPUs": "Profile optimisé pour les CPUs moyennes",
   "Optimized profile for weak CPUs": "Profile optimisé pour les faibles CPUs",
   "YouTube account not enabled for live streaming": "Le compte Youtube n'a pas activé la diffusion en direct",
-  "Fix": "Fix",
-  "I'm set up": "I'm set up",
+  "Fix": "Réparer",
+  "I'm set up": "Je suis installé",
   "END STREAM": "TERMINER LA DIFFUSION",
   "STARTING": "COMMENCEMENT",
   "ENDING": "TERMINAISON",
@@ -44,6 +44,6 @@
   "Disable the preview stream, can help with CPU": "Activer la prévisualisation de la diffusion, peut aider à réduire l'utilisation de la CPU",
   "viewers": "téléspectateurs",
   "Refresh Chat": "Actualiser le Chat",
-  "Your chat is currently offline": "Your chat is currently offline",
-  "Set path in Settings > Output.": "Set path in Settings > Output."
+  "Your chat is currently offline": "Votre chat est actuellement hors ligne",
+  "Set path in Settings > Output.": "Saisir le chemin dans Paramètres > Sortie."
 }
