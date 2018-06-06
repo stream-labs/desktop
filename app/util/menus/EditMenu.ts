@@ -178,8 +178,10 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
+      const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
+
       this.append({
-        label: $t('Filters'),
+        label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
         click: () => {
           this.showFilters();
         }
