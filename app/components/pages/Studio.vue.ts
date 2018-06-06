@@ -52,9 +52,6 @@ export default class Studio extends Vue {
       const file = files.item(fi);
       this.scenesService.activeScene.addFile(file.path);
     }
-
-    console.log(event.dataTransfer.files[0]);
-    console.log('drop', event);
   }
 
   destroyed() {

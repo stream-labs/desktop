@@ -229,6 +229,7 @@ test('SceneItem.addFile()', async t => {
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
   const scene = scenesService.activeScene;
 
+  scene.clear();
   scene.addFile(dataDir);
 
   t.true(sceneBuilder.isEqualTo(`

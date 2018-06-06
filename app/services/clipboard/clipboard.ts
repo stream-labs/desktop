@@ -345,7 +345,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
   }
 
   private getFiles() {
-    // electron clipboard doesn't support files
+    // electron clipboard doesn't support file system
     // use .NET API instead
     return execSync(
       'Powershell -command Add-Type -AssemblyName System.Windows.Forms;' +
