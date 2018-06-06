@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "%{filename} guardado con éxito",
+  "Successfully loaded %{filename}.overlay": "%{filename}.overlay cargado con éxito",
+  "This is an experimental feature.  Use at your own risk.": "Esta es una característica experimental. Úsala bajo tu propio riesgo.",
+  "Export Overlay File": "Exportar Archivo de Overlay",
+  "Import Overlay File": "Importar Archivo de Overlay",
+  "Import Widget File in Current Scene": "Importar Widget en la Escena Actual"
+}

@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "Sie haben keine Benachrichtigungen",
+  "Enable notifications": "Benachrichtigungen aktivieren",
+  "Enable sound": "Sound aktivieren",
+  "Skipped frames detected:": "Übersprungene Frames erkannt:",
+  "Detect skipped frames": "Übersprungene Frames erkennen",
+  "Skipped frames threshold": "Übersprungene Frames Schwellenwert",
+  "Detect lagged frames": "Verzögerte Frames erkennen",
+  "Lagged frames threshold": "Verzögerte Frames Schwellenwert",
+  "Detect dropped frames": "Ausgelassene Frames erkennen",
+  "Dropped frames threshold": "Ausgelassene Frames Schwellenwert",
+  "Show Notifications": "Benachrichtigungen anzeigen",
+  "Restore Defaults": "Wiederherstellen der Standardeinstellungen",
+  "Troubleshooter Notifications": "Fehlerbehebungs-Benachrichtigungen",
+  "Click to open your Notifications window": "Klicken Sie, um das Benachrichtigungsfenster zu öffnen",
+  "Click to read your unread Notifications": "Klicken Sie, um Ihre ungelesenen Benachrichtigungen zu lesen",
+  "New Notifications": "Neue Benachrichtigungen",
+  "Log": "Log"
+}

@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "Start Streaming",
+  "Stop Streaming": "Stop Streaming",
+  "Start Recording": "Start Recording",
+  "Stop Recording": "Stop Recording",
+  "Switch to scene": "Switch to scene",
+  "Show %{sourcename}": "Show %{sourcename}",
+  "Hide %{sourcename}": "Hide %{sourcename}",
+  "Mute": "Mute",
+  "Unmute": "Unmute",
+  "Push to Mute": "Push to Mute",
+  "Push to Talk": "Push to Talk",
+  "Enable Studio Mode": "Enable Studio Mode",
+  "Disable Studio Mode": "Disable Studio Mode",
+  "Transition (Studio Mode)": "Transition (Studio Mode)"
+}
