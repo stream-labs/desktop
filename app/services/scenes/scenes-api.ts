@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { ISourceApi, TSourceType, ISource } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
+import { TSceneNode } from "./scene";
 
 /**
  * Api for scenes management
@@ -46,6 +47,17 @@ export interface ISceneApi extends IScene {
   addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   createFolder(name: string): ISceneItemFolderApi;
+
+  /**
+   * creates sources from file system folders and files
+   * source type depends on the file extension
+   */
+  addFile(path: string, folderId?: string): TSceneNodeApi;
+
+  /**
+   * removes all nodes from the scene
+   */
+  clear(): void;
   removeFolder(folderId: string): void;
   removeItem(sceneItemId: string): void;
   remove(): void;

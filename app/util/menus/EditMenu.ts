@@ -51,7 +51,7 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: $t('Paste (Reference)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.hasData(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.paste()
       });
