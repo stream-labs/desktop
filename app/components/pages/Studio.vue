@@ -1,5 +1,5 @@
 <template>
-<div class="studio-page" @drop="onDropHandler">
+<div class="studio-page">
   <div class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div

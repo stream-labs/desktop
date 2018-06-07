@@ -44,15 +44,6 @@ export default class Studio extends Vue {
     }, 1000);
   }
 
-  onDropHandler(event: DragEvent) {
-    const files = event.dataTransfer.files;
-
-    let fi = files.length;
-    while (fi--) {
-      const file = files.item(fi);
-      this.scenesService.activeScene.addFile(file.path);
-    }
-  }
 
   destroyed() {
     clearInterval(this.sizeCheckInterval);
