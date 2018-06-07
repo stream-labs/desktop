@@ -61,7 +61,7 @@ export default class ExtraSettings extends Vue {
     this.cacheUploaderService.uploadCache().then(file => {
       electron.remote.clipboard.writeText(file);
       alert(
-        $t('Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.', { file })
+        $t('Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.', { file })
       );
       this.cacheUploading = false;
     });
