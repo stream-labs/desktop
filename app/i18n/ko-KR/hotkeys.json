@@ -1,6 +1,6 @@
 {
-  "Start Streaming": "스트리밍 시작",
-  "Stop Streaming": "스트리밍 중지",
+  "Start Streaming": "방송 시작",
+  "Stop Streaming": "방송 중지",
   "Start Recording": "녹음 시작",
   "Stop Recording": "녹음 중지",
   "Switch to scene": "장면 전환",
@@ -12,5 +12,5 @@
   "Push to Talk": "눌러서 말하기",
   "Enable Studio Mode": "스튜디오 모드 활성화",
   "Disable Studio Mode": "스튜디오 모드 비활성화",
-  "Transition (Studio Mode)": "전환 (Studio Mode)"
+  "Transition (Studio Mode)": "전환 (스튜디오 모드)"
 }

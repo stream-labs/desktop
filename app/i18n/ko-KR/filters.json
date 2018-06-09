@@ -1,5 +1,5 @@
 {
-  "Image Mask/Blend": "이미지 마스크/조화",
+  "Image Mask/Blend": "이미지 마스크/블랜드",
   "Crop/Pad": "자르기/패드",
   "Gain": "게인",
   "Color Correction": "색상 보정",
@@ -7,7 +7,7 @@
   "Scroll": "스크롤",
   "Render Delay": "렌더 지연",
   "Color Key": "색상 키",
-  "Apply LUT": "LUT을 적용",
+  "Apply LUT": "LUT 적용",
   "Sharpen": "더 선명하게",
   "Chroma Key": "크로마 키",
   "Video Delay (Async)": "비디오 지연 (Async)",
@@ -19,6 +19,6 @@
   "Filter type": "필터 유형",
   "Filter name": "필터 이름",
   "Add source filter": "소스 필터 추가",
-  "No filters applied": "적용 된 필터 없음",
+  "No filters applied": "적용된 필터 없음",
   "Source filters": "소스 필터"
 }

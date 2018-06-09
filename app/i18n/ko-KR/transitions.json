@@ -1,12 +1,12 @@
 {
-  "Scene transition": "Scene transition",
-  "Cut": "Cut",
-  "Fade": "Fade",
-  "Swipe": "Swipe",
-  "Slide": "Slide",
-  "Fade to Color": "Fade to Color",
-  "Luma Wipe": "Luma Wipe",
-  "Stinger": "Stinger",
-  "Transition": "Transition",
-  "Duration": "Duration"
+  "Scene transition": "장면 전환",
+  "Cut": "자르기",
+  "Fade": "서서히 사라지기",
+  "Swipe": "밀어내기",
+  "Slide": "슬라이드",
+  "Fade to Color": "특정 색상으로 서서히 사라지기",
+  "Luma Wipe": "루마 지우기",
+  "Stinger": "스팅어",
+  "Transition": "전환",
+  "Duration": "지연"
 }
