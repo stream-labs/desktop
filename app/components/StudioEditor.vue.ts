@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import _ from 'lodash';
 import { DragHandler } from 'util/DragHandler';
 import { Inject } from 'util/injector';
-import { ScenesService, SceneItem, Scene } from 'services/scenes';
+import { ScenesService, SceneItem, Scene, TSceneNode } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
 import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
@@ -11,6 +11,7 @@ import { WindowsService } from 'services/windows';
 import { SelectionService } from 'services/selection/selection';
 import Display from 'components/shared/Display.vue';
 import { TransitionsService } from 'services/transitions';
+import { CustomizationService } from 'services/customization';
 
 interface IResizeRegion {
   name: string;
@@ -39,6 +40,7 @@ export default class StudioEditor extends Vue {
   @Inject() private videoService: VideoService;
   @Inject() private selectionService: SelectionService;
   @Inject() private transitionsService: TransitionsService;
+  @Inject() private customizationService: CustomizationService;
 
   renderedWidth = 0;
   renderedHeight = 0;
@@ -88,8 +90,6 @@ export default class StudioEditor extends Vue {
 
   handleMouseDblClick(event: MouseEvent) {
 
-    // select single source in the folder on dblclick
-
     const overSource = this.sceneItems.find(source => {
       return this.isOverSource(event, source);
     });
@@ -98,7 +98,10 @@ export default class StudioEditor extends Vue {
 
     const parent = overSource.getParent();
 
-    if (!parent || parent && parent.isSelected()) {
+    if (
+      (this.customizationService.getSettings().folderSelection) &&
+      (!parent || parent && parent.isSelected())
+    ) {
       this.selectionService.select(overSource.id);
     } else if (parent) {
       this.selectionService.select(parent.id);
@@ -138,9 +141,12 @@ export default class StudioEditor extends Vue {
 
       // Either select a new source, or deselect all sources
       if (overSource) {
-        // if sceneItem is in the folder - select the folder
-        // individual source selection is in doubleclick handler
-        const overNode = overSource.hasParent() ? overSource.getParent() : overSource;
+
+        let overNode: TSceneNode = overSource;
+        if (this.customizationService.getSettings().folderSelection) {
+          overNode = overSource.hasParent() ? overSource.getParent() : overSource;
+        }
+
         if (event.ctrlKey) {
           if (overNode.isSelected()) {
             overNode.deselect();
