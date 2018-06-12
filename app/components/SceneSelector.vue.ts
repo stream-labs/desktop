@@ -55,6 +55,7 @@ export default class SceneSelector extends Vue {
       label: $t('Create Scene Projector'),
       click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
     });
+    menu.append({ type: 'separator' });
     menu.popup();
   }
 
@@ -80,7 +81,10 @@ export default class SceneSelector extends Vue {
         buttons: [$t('Cancel'), $t('OK')]
       },
       ok => {
-        if (ok) this.scenesService.removeScene(this.activeSceneId);
+        if (!ok) return;
+        if (!this.scenesService.removeScene(this.activeSceneId)) {
+          alert($t('There needs to be at least one scene.'));
+        }
       }
     );
   }

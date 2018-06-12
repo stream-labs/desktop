@@ -85,7 +85,7 @@ export class Scene implements ISceneApi {
   }
 
   /**
-   * returns first node with selected name
+   * returns the first node with selected name
    */
   getNodeByName(name: string): TSceneNode {
     return this.getNodes().find(node => node.name === name);
@@ -438,6 +438,32 @@ export class Scene implements ISceneApi {
   getNestedSources(options = { excludeScenes: false }): Source[] {
     const sources = this.getNestedItems(options).map(sceneItem => sceneItem.getSource());
     return uniqBy(sources, 'sourceId');
+  }
+
+  /**
+   * return nested scenes in the safe-to-add order
+   */
+  getNestedScenes(): Scene[] {
+    const scenes = this.getNestedSources()
+      .filter(source => source.type === 'scene')
+      .map(sceneSource => this.scenesService.getScene(sceneSource.sourceId));
+    const resultScenes: Scene[] = [];
+
+    scenes.forEach(scene => {
+      resultScenes.push(...scene.getNestedScenes());
+      if (!resultScenes.find(foundScene => foundScene.id === scene.id)) {
+        resultScenes.push(scene);
+      }
+    });
+
+    return resultScenes;
+  }
+
+  /**
+   * returns the source linked to scene
+   */
+  getSource(): Source {
+    return this.sourcesService.getSource(this.id);
   }
 
   getResourceId() {
