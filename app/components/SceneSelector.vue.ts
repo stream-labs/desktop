@@ -55,7 +55,6 @@ export default class SceneSelector extends Vue {
       label: $t('Create Scene Projector'),
       click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
     });
-    menu.append({ type: 'separator' });
     menu.popup();
   }
 
