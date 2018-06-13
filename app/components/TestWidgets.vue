@@ -1,27 +1,21 @@
 <template>
-  <div>
+  <div class="slide-open">
     <a
       class="slide-open__open link link--uppercase"
       @click="slideOpen = !slideOpen">
-      <i class="fa fa-arrow-left" aria-hidden="true"></i> {{$t('Test Widgets') }}
+      {{$t('Test Widgets') }}
     </a>
     <transition name="slide-fade">
       <div
         v-if="slideOpen"
         class="slide-open__menu">
-        <a class="slide-open__close link link--uppercase"
-          @click="slideOpen = !slideOpen">
-          <i class="fa fa-arrow-right" aria-hidden="true"></i> {{$t('Hide Test Widgets') }}
-        </a>
-        <div class="button-container">
-          <button
-            class="button button--trans"
-            v-for="tester in widgetTesters"
-            :key="tester.name"
-            @click="tester.test()">
-            {{ $t(tester.name) }}
-          </button>
-        </div>
+        <button
+          class="button button--trans"
+          v-for="tester in widgetTesters"
+          :key="tester.name"
+          @click="tester.test()">
+          {{ $t(tester.name) }}
+        </button>
       </div>
     </transition>
   </div>

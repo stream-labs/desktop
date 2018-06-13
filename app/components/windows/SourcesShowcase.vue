@@ -482,7 +482,7 @@
       v-if="inspectedSource === 'streamlabel'"
       @clickAdd="selectWidget(widgetTypes.StreamLabel)"
       :name="$t('Stream Label')"
-      :description="$t('This is a placeholder description for streamlabels.')"
+      :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
       key="28">
       <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-stream-labels.png"/>
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-stream-labels.png"/>
@@ -673,8 +673,8 @@
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
-  flex: 0 0 190px;
-  height: 190px;
+  flex: 0 0 210px;
+  height: 210px;
   align-items: flex-start;
 }
 
