@@ -1,0 +1,16 @@
+{
+  "Open advanced audio settings": "Åbn avancerede indstillinger for lyd",
+  "Volume (%)": "Lydstyrke (%)",
+  "Downmix to Mono": "Nedmix til mono",
+  "Sync Offset (ms)": "Synkroniseringsforskydning (ms)",
+  "Audio Monitoring": "Lydovervågning",
+  "Monitor Off": "Slå overvågning fra",
+  "Monitor Only (mute output)": "Overvåg kun (slå udsendelse af lyd fra)",
+  "Monitor and Output": "Overvåg og udsend lyd",
+  "Tracks": "Spor",
+  "Advanced Audio Settings": "Advancerede lydindstillinger",
+  "Volume ( % )": "Lydstyrke (%)",
+  "Sync Offset ( ms )": "Synkroniseringsforskydning (ms)",
+  "Mixer": "Lydmixer",
+  "Monitor audio levels. If the bars are moving you are outputting audio.": "Overvåg lydniveauer. Hvis søjlerne bevæger sig, udsender du lyd."
+}

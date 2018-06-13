@@ -43,7 +43,7 @@ export default class SceneSelector extends Vue {
     });
     menu.append({
       label: $t('Remove'),
-      click: () => this.scenesService.removeScene(this.scenesService.activeScene.id)
+      click: () => this.removeScene()
     });
     menu.append({
       label: $t('Filters'),
@@ -72,7 +72,7 @@ export default class SceneSelector extends Vue {
 
   removeScene() {
     const name = this.scenesService.activeScene.name;
-    const ok = electron.remote.dialog.showMessageBox(
+    electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {
         type: 'warning',

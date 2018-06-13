@@ -263,7 +263,7 @@ export class ServicesManager extends Service {
         const isChildWindowRequest = request.params && request.params.fetchMutations;
         if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
 
-        if (e.message) this.requestErrors.push(e.message);
+        if (e.message) this.requestErrors.push(e.stack.toString());
       }
 
       response = this.jsonrpc.createError(request,{

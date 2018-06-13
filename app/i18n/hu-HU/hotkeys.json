@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "Stream indítása",
+  "Stop Streaming": "Stream Leállítása",
+  "Start Recording": "Felvétel Indítása",
+  "Stop Recording": "Felvétel Leállítása",
+  "Switch to scene": "Váltás jelenetre",
+  "Show %{sourcename}": "%{sourcename} megjelenítése",
+  "Hide %{sourcename}": "%{sourcename} elrejtése",
+  "Mute": "Némítás",
+  "Unmute": "Némítás kikapcsolása",
+  "Push to Mute": "Némítás Gombnyomásra",
+  "Push to Talk": "Beszéd Gombnyomásra",
+  "Enable Studio Mode": "Stúdió Mód Bekapcsolása",
+  "Disable Studio Mode": "Stúdió Mód Kikapcsolása",
+  "Transition (Studio Mode)": "Átmenet (Stúdió Mód)"
+}

@@ -1,8 +1,0 @@
-{
-  "Successfully saved %{filename}": "%{filename} sikeresen elmentve",
-  "Successfully loaded %{filename}.overlay": "%{filename}.overlay sikeresen betöltve",
-  "This is an experimental feature.  Use at your own risk.": "Ez egy kísérleti funkció. Csak saját felelősségedre használd.",
-  "Export Overlay": "Fedés Exportálása",
-  "Import Overlay": "Fedés Importálása",
-  "Import Widget in Current Scene": "Widget Importálása a Jelenlegi Jelenetbe"
-}

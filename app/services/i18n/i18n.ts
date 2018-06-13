@@ -1,21 +1,18 @@
 import electron from 'electron';
-import path from 'path';
 import VueI18n from 'vue-i18n';
 import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
-import recursive from 'recursive-readdir';
 import { Inject } from '../../util/injector';
 import { FileManagerService } from 'services/file-manager';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
 import { I18nServiceApi } from './i18n-api';
 import * as obs from '../../../obs-api';
+import * as fs from 'fs';
 
 
 interface II18nState {
   locale: string;
 }
-
-const I18N_PATH = path.resolve('i18n');
 
 export function $t(...args: any[]) {
   const vueI18nInstance = I18nService.vueI18nInstance;
@@ -35,7 +32,7 @@ export function $t(...args: any[]) {
 const LANG_CODE_MAP = {
   cs: { lang: 'Czech', locale: 'cs-CZ' },
   de: { lang: 'German', locale: 'de-DE' },
-  en:	{ lang: 'English', locale: 'en-US' },
+  'en-US':	{ lang: 'English', locale: 'en-US' },
   es: { lang: 'Spanish', locale: 'es-ES' },
   fr: { lang: 'French', locale: 'fr-FR' },
   it:	{ lang: 'Italian', locale: 'it-IT' },
@@ -73,13 +70,22 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   async load() {
 
+    const WHITE_LIST = [
+      'en-US',
+      'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
+      'hu-HU', 'it-IT', 'ja-JP', 'pl-PL',
+      'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
+    ];
+
     if (this.isLoaded) return;
+    const i18nPath = this.getI18nPath();
 
     // load available locales
-    const localeFiles = await recursive(`${I18N_PATH}`, ['*.json']);
-    for (const filePath of localeFiles) {
-      const locale = filePath.split('\\').slice(-2)[0];
-      this.availableLocales[locale] = this.fileManagerService.read(filePath);
+    const localeFiles = fs.readdirSync(i18nPath);
+
+    for (const locale of localeFiles) {
+      if (!WHITE_LIST.includes(locale)) continue;
+      this.availableLocales[locale] = this.fileManagerService.read(`${i18nPath}/${locale}/langname.txt`);
     }
 
     // if locale is not set than use electron's one
@@ -90,11 +96,10 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       locale = langDescription ? langDescription.locale : 'en-US';
     }
 
-    // TODO: uncomment when the all languages will be translated
     // load dictionary if not loaded
-    // if (!this.loadedDictionaries[locale]) {
-    //   await this.loadDictionary(this.state.locale);
-    // }
+    if (!this.loadedDictionaries[locale]) {
+      await this.loadDictionary(locale);
+    }
 
     // load fallback dictionary
     const fallbackLocale = this.getFallbackLocale();
@@ -102,7 +107,6 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       await this.loadDictionary(fallbackLocale);
     }
 
-    // TODO: uncomment when the all languages will be translated
     // setup locale in libobs
     obs.Global.locale = locale;
 
@@ -126,17 +130,16 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   setWebviewLocale(webview: Electron.WebviewTag) {
-    // TODO: uncomment when the all languages will be translated
-    // const locale = this.state.locale;
-    // webview.addEventListener('dom-ready', () => {
-    //   webview.executeJavaScript(`
-    //     var langCode = $.cookie('langCode');
-    //     if (langCode !== '${locale}') {
-    //        $.cookie('langCode', '${locale}');
-    //        window.location.reload();
-    //     }
-    //   `);
-    // });
+    const locale = this.state.locale;
+    webview.addEventListener('dom-ready', () => {
+      webview.executeJavaScript(`
+        var langCode = $.cookie('langCode');
+        if (langCode !== '${locale}') {
+           $.cookie('langCode', '${locale}');
+           window.location.reload();
+        }
+      `);
+    });
   }
 
   getLocaleFormData(): TFormData {
@@ -161,13 +164,20 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     ];
   }
 
+  private getI18nPath() {
+    return this.fileManagerService.resolve('app/i18n');
+  }
+
   private async loadDictionary(locale: string): Promise<Dictionary<string>> {
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
-    const dictionaryFiles = await recursive(`${I18N_PATH}/${locale}`, ['*.txt']);
+    const i18nPath = this.getI18nPath();
+    const dictionaryFiles = fs.readdirSync(`${i18nPath}/${locale}`)
+      .filter(fileName => fileName.split('.')[1] === 'json');
+
     const dictionary: Dictionary<string> = {};
-    for (const filePath of dictionaryFiles) {
-      Object.assign(dictionary, JSON.parse(this.fileManagerService.read(filePath)));
+    for (const fileName of dictionaryFiles) {
+      Object.assign(dictionary, JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)));
     }
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;

@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "Du har ikke nogle notifikationer",
+  "Enable notifications": "Aktiver notifikationer",
+  "Enable sound": "Aktiver lyd",
+  "Skipped frames detected:": "Der blev fundet oversprunge frames:",
+  "Detect skipped frames": "Detekter oversprungne frames",
+  "Skipped frames threshold": "Tærskel for oversprungne frames",
+  "Detect lagged frames": "Detekter forsinkede frames",
+  "Lagged frames threshold": "Tærskel for forsinkede frames",
+  "Detect dropped frames": "Detekter tabte frames",
+  "Dropped frames threshold": "Tærskel for tabte frames",
+  "Show Notifications": "Vis notifikationer",
+  "Restore Defaults": "Gendan standardindstillinger",
+  "Troubleshooter Notifications": "Fejlfindingsnotifikationer",
+  "Click to open your Notifications window": "Klik for at åbne dit notifikationsvindue",
+  "Click to read your unread Notifications": "Klik her for at læse dine ulæste notifikationer",
+  "New Notifications": "Nye notifikationer",
+  "Log": "Træstamme"
+}

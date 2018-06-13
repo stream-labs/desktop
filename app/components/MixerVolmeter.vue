@@ -1,10 +1,8 @@
 <template>
-
-<div class="volmeter">
-  <div class="volmeter-level" ref="level"></div>
-  <div class="volmeter-peak" ref="peak"></div>
+<div class="volmeter-container">
+  <canvas class="volmeter" ref="canvas" />
+  <div class="volmeter-spacer" ref="spacer" />
 </div>
-
 </template>
 
 <script lang="ts" src="./MixerVolmeter.vue.ts"></script>
@@ -13,25 +11,13 @@
 @import "../styles/index";
 
 .volmeter {
-  position: relative;
+  position: absolute;
   overflow: hidden;
-  margin: 10px 0;
-  height: 4px;
-  border-radius: 4px;
   background-color: @slider-background-color;
+}
 
-  .volmeter-level {
-    .absolute(0, auto, 0, 0);
-    width: 100%;
-    background-color: @teal;
-    transform-origin: left center;
-  }
-
-  .volmeter-peak {
-    .absolute(0, auto, 0, 0);
-    width: 2px;
-    background-color: @input-border-color;
-  }
+.volmeter-spacer {
+  margin: 10px 0;
 }
 
 .night-theme {

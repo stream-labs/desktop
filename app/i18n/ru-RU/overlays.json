@@ -1,0 +1,8 @@
+{
+  "Successfully saved %{filename}": "Успешно сохранены %{filename}",
+  "Successfully loaded %{filename}.overlay": "Успешно загружены %{filename}.overlay",
+  "This is an experimental feature.  Use at your own risk.": "Это экспериментальная функция. Используйте на свой страх и риск.",
+  "Export Overlay File": "Экспорт файла Наложения",
+  "Import Overlay File": "Импорт файла Наложения",
+  "Import Widget File in Current Scene": "Импортировать Виджет в Текущую Сцену"
+}

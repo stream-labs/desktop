@@ -15,9 +15,10 @@ export type TUsageEvent =
 interface IUsageApiData {
   token?: string;
   installer_id?: string;
+  version: string;
   slobs_user_id: string;
   event: TUsageEvent;
-  data: object;
+  data: string;
 }
 
 
@@ -40,6 +41,7 @@ export class UsageStatisticsService extends Service {
   @Inject() hostsService: HostsService;
 
   installerId: string;
+  version = electron.remote.process.env.SLOBS_VERSION;
 
   init() {
     this.loadInstallerId();
@@ -89,8 +91,9 @@ export class UsageStatisticsService extends Service {
 
     const bodyData: IUsageApiData = {
       slobs_user_id: this.userService.getLocalUserId(),
+      version: this.version,
       event,
-      data: metadata
+      data: JSON.stringify(metadata)
     };
 
     if (this.userService.isLoggedIn()) {

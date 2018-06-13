@@ -40,6 +40,10 @@ export class TextNode extends Node<ISchema, IContext> {
     const settings = this.data.settings;
 
     this.updateInput(context);
+
+    // This is a bit of a hack to force us to immediately download the
+    // google font.
+    context.sceneItem.getSource().replacePropertiesManager('default', {});
   }
 
   updateInput(context: IContext) {

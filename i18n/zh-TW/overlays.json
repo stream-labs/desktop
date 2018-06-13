@@ -1,8 +1,0 @@
-{
-  "Successfully saved %{filename}": "已成功保存 %{filename}",
-  "Successfully loaded %{filename}.overlay": "已成功載入 %{filename}.overlay",
-  "This is an experimental feature.  Use at your own risk.": "當前為實驗性功能。 請斟酌使用。",
-  "Export Overlay": "導出直播面板",
-  "Import Overlay": "導入直播面板",
-  "Import Widget in Current Scene": "導入插件於當前場景"
-}

@@ -14,7 +14,7 @@ electron.Menu.prototype.popup = function popup() {
 
 electron.ipcMain.on('__SPECTRON_FAKE_CONTEXT_MENU', (e, label) => {
   const found = currentMenu.items.find(item => {
-    return item.label === label;
+    return item.label.indexOf(label) !== -1;
   });
 
   found.click();

@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "Påbegynd stream",
+  "Stop Streaming": "Afslut stream",
+  "Start Recording": "Påbegynd optagelse",
+  "Stop Recording": "Afslut optagelse",
+  "Switch to scene": "Skift til scene",
+  "Show %{sourcename}": "Vis %{sourcename}",
+  "Hide %{sourcename}": "Skjul %{sourcename}",
+  "Mute": "Gør stum",
+  "Unmute": "Fjern stum",
+  "Push to Mute": "Tryk for at gøre stum",
+  "Push to Talk": "Tryk for at tale",
+  "Enable Studio Mode": "Aktiver Studio tilstand",
+  "Disable Studio Mode": "Deaktiver Studio tilstand",
+  "Transition (Studio Mode)": "Skift over (Studio tilstand)"
+}

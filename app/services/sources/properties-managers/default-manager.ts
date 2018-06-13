@@ -58,6 +58,8 @@ export class DefaultManager extends PropertiesManager {
       this.mediaBackupFileSetting = 'local_file';
     } else if (this.obsSource.id === 'image_source') {
       this.mediaBackupFileSetting = 'file';
+    } else if (this.obsSource.id === 'obs_stinger_transition') {
+      this.mediaBackupFileSetting = 'path';
     } else {
       return;
     }
@@ -83,6 +85,7 @@ export class DefaultManager extends PropertiesManager {
 
   uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
+    if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
 
     this.mediaBackupService.createNewFile(
       this.settings.mediaBackup.localId,
