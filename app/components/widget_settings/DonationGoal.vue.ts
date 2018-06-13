@@ -55,13 +55,8 @@ export default class DonationGoal extends Vue {
         this.has_goal = true;
       }
 
-      this.backgroundColorData.value = this.widgetData.settings.background_color;
-      this.barColorData.value = this.widgetData.settings.bar_color;
-      this.textColorData.value = this.widgetData.settings.text_color;
-      this.barTextColorData.value = this.widgetData.settings.bar_text_color;
-      this.barBackgroundColorData.value = this.widgetData.settings.bar_bg_color;
       this.fontFamilyData.value = this.widgetData.settings.font;
-      this.layout.value = this.widgetData.settings.layout;
+      this.layoutData.value = this.widgetData.settings.layout;
       this.barThicknessData.value = this.widgetData.settings.bar_thickness;
     });
   }
@@ -72,14 +67,7 @@ export default class DonationGoal extends Vue {
 
   widgetData: IDonationGoalSettings = null;
 
-  barThickness: number;
-
-  backgroundColorData = {
-    description: 'Background Color',
-    value: ''
-  };
-
-  layout: IListInput<string> = {
+  layoutData: IListInput<string> = {
     name: 'layout',
     description: 'Layout',
     value: '',
@@ -89,44 +77,22 @@ export default class DonationGoal extends Vue {
     ]
   };
 
-  textColorData = {
-    description: 'Text Color',
+  backgroundColorData = {
+    description: 'Background Color',
     value: ''
   };
 
-  barTextColorData = {
-    description: 'Bar Text Color',
-    value: ''
-  };
+  barThickness: number;
 
-  barColorData = {
-    description: 'Bar Color',
-    value: ''
-  };
-
-  barBackgroundColorData = {
-    description: 'Bar Background Color',
-    value: ''
+  barThicknessData = {
+    description: 'Bar Thickness',
+    value: '',
   };
 
   fontFamilyData = {
     description: 'Font Family',
     value: ''
   };
-
-  barThicknessData = {
-    description: 'Bar Thickness',
-    value: ''
-  };
-
-  // @Watch('widgetData')
-  // update() {
-  //   this.updateEditor();
-  // }
-
-  // updateEditor() {
-
-  // }
 
   resetCustom() {
     this.widgetSettingsService.defaultDonationGoalSettings.settings.custom_html

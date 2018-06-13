@@ -151,32 +151,53 @@
             <div class="row">
               <div class="small-12 columns">
                 <w-list-input
-                  v-model="layout"
+                  v-model="layoutData"
                   :internal-search="false"/>
               </div>
             </div>
 
             <div class="row">
-              <div class="small-12 columns">
-                <w-color-input v-model="textColorData" />
+              <div class="col-xs-12">
+                <label>Background Color</label>
+                <w-color-input
+                  name="background_color"
+                  v-model="widgetData.settings.background_color" />
               </div>
             </div>
 
             <div class="row">
-              <div class="small-12 columns">
-                <w-color-input v-model="barTextColorData" />
+              <div class="col-xs-12">
+                <label>Bar Color</label>
+                <w-color-input
+                  name="bar_color"
+                  v-model="widgetData.settings.bar_color" />
               </div>
             </div>
 
             <div class="row">
-              <div class="small-12 columns">
-                <w-color-input v-model="barColorData" />
+              <div class="col-xs-12">
+                <label>Bar Background Color</label>
+                <w-color-input
+                  name="bar_bg_color"
+                  v-model="widgetData.settings.bar_bg_color" />
               </div>
             </div>
 
             <div class="row">
-              <div class="small-12 columns">
-                <w-color-input v-model="barBackgroundColorData" />
+              <div class="col-xs-12">
+                <label>Text Color</label>
+                <w-color-input
+                  name="text_color"
+                  v-model="widgetData.settings.text_color" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-12">
+                <label>Bar Text Color</label>
+                <w-color-input
+                  name="bar_text_color"
+                  v-model="widgetData.settings.bar_text_color" />
               </div>
             </div>
 
@@ -210,7 +231,9 @@
         </tab>
       </tabs>
     </div>
-    <div v-else>loading</div>
+    <div v-else>
+      <img src="../../../media/images/loader.svg" />
+    </div>
   </div>
 </modal-layout>
 </template>

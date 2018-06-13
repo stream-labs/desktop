@@ -1,51 +1,54 @@
 <template>
-  <!-- <div>
-    <div class="w-form-group">
-      <div class="w-form-group__wrapper">
-        <div class="w-form-group__input colorpicker">
-
-          <color-picker
-            :value="value"
-            @input="updateValue"
-            class="colorpicker-menu"/>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
-<div class="input-group color-picker" ref="colorpicker">
+<div
+  class="color-picker"
+  ref="colorpicker">
+  <label>{{ value.description }}</label>
 	<input
     type="text"
-    class="form-control"
+    class="color-picker__input"
     :value="value"
-    @focus="showPicker()"
+    @click="displayPicker = !displayPicker"
     @input="updateFromInput" />
 
-	<span class="input-group-addon color-picker-container">
-		<span
-      class="current-color"
-      :style="'background-color: ' + value"
-      @click="togglePicker()"></span>
-		<color-picker
-      :value="colors"
-      @input="updateFromPicker"
-      v-if="displayPicker" />
-	</span>
+  <div
+    class="color-picker__current"
+    :style="'background-color: ' + value"
+    @click="displayPicker = !displayPicker"></div>
+
+  <sketch-picker
+    v-model="colors"
+    @input="updateFromPicker"
+    v-if="displayPicker"
+    :disable-fields="true"
+    :disable-alpha="true"
+    class="color-picker__picker" />
 </div>
 </template>
 
 <script lang="ts" src="./WColorInput.vue.ts"></script>
 
-<style scoped>
+<style lang="less">
+@import "../../../styles/index";
 
-.input-group.color-picker {
+.color-picker {
   position: relative;
+  width: 200px;
 }
 
-.vc-sketch {
+.color-picker__current {
+  width: 20px;
+  height: 20px;
+  .radius;
   position: absolute;
-	top: 35px;
-	right: 0;
-	z-index: 9;
+  right: 8px;
+  top: 8px;
+  z-index: 10;
+}
+
+.color-picker__picker {
+  position: absolute!important;
+  top: 36px;
+  left: 0;
+  z-index: 100;
 }
 </style>

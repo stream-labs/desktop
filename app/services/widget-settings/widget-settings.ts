@@ -57,9 +57,9 @@ export interface IBitGoalSettings {
 export interface IDonationGoalSettings {
   goal: {
     title: string,
-    ends_at?: string,
-    goal_amount?: string,
-    manual_goal_amount?: string,
+    goal_amount: number,
+    manual_goal_amount: number,
+    ends_at: string,
   };
   widget: object;
   has_goal: boolean;
@@ -83,6 +83,75 @@ export interface IDonationGoalSettings {
     html?: string;
     css?: string;
     js?: string;
+  };
+}
+
+export interface IChatBoxSettings {
+  widget: {
+    url: string,
+    simulate: string
+  };
+  settings: {
+    background_color: string,
+    text_color: string,
+    show_moderator_icons: boolean,
+    show_subscriber_icons: boolean,
+    show_turbo_icons: boolean,
+    show_premium_icons: boolean,
+    show_bits_icons: boolean,
+    show_coin_icons: boolean,
+    show_bttv_emotes: boolean,
+    show_franker_emotes: boolean,
+    show_smf_emotes: boolean,
+    always_show_messages: boolean,
+    hide_common_chat_bots: boolean,
+    message_hide_delay: number,
+    text_size: number,
+    muted_chatters: string,
+    hide_commands: boolean,
+    custom_enabled: boolean,
+    custom_html: string,
+    custom_css: string,
+    custom_js: string,
+    custom_json: null
+  };
+  custom: {
+    html: string,
+    css: string,
+    js: string
+  };
+  platforms: {
+    twitch_account: string
+  };
+  platforms2: {
+    twitch_account: string,
+    facebook_account: string,
+    youtube_account: string,
+    periscope_account: string,
+    mixer_account: string
+  };
+  thirdpartyplatforms: {
+    tiltify:{
+      id: number,
+      user_id: number,
+      tiltify_id: number,
+      campaign_id:null,
+      name: string,
+      email: string,
+      access_token: string,
+      created_at: string,
+      updated_at: string
+    },
+    tipeeestream: {
+      id: number,
+      user_id: number,
+      tipeeestream_id: number,
+      name: string,
+      access_token: string,
+      refresh_token: string,
+      created_at: string,
+      updated_at: string
+    }
   };
 }
 
@@ -134,8 +203,6 @@ export class WidgetSettingsService extends Service {
     }
   }
 
-  // AJAX requests and calls to server live inside the class
-
   // Some defaults we will have to fetch from server to see if they exist
   // Here we check to see if user has custom code - if not they get default
 
@@ -165,16 +232,16 @@ export class WidgetSettingsService extends Service {
       });
   }
 
-  postBitGoal(bitGoalData: IBitGoalSettings) {
+  postBitGoal(widgetData: IBitGoalSettings) {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/widget/bitgoal`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const bodyBitGoal = {
-      ends_at: bitGoalData.goal['ends_at'],
-      goal_amount: bitGoalData.goal['goal_amount'],
-      manual_goal_amount: bitGoalData.goal['manual_goal_amount'],
-      title: bitGoalData.goal['title']
+      ends_at: widgetData.goal['ends_at'],
+      goal_amount: widgetData.goal['goal_amount'],
+      manual_goal_amount: widgetData.goal['manual_goal_amount'],
+      title: widgetData.goal['title']
     };
 
     const request = new Request(url, {
@@ -187,25 +254,25 @@ export class WidgetSettingsService extends Service {
       .then(response => { return response.json();});
   }
 
-  postBitGoalSettings(bitGoalData: IBitGoalSettings) {
-    console.log(bitGoalData);
+  postBitGoalSettings(widgetData: IBitGoalSettings) {
+    console.log(widgetData);
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/widget/bitgoal/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
     const bodyBitGoalSettings = {
-      background_color: bitGoalData.settings['background_color'],
-      bar_bg_color: bitGoalData.settings['bar_bg_color'],
-      bar_color: bitGoalData.settings['bar_color'],
-      bar_text_color: bitGoalData.settings['bar_text_color'],
-      bar_thickness: bitGoalData.settings['bar_thickness'],
-      custom_enabled: bitGoalData.settings['custom_enabled'],
-      custom_html: bitGoalData.settings['custom_html'],
-      custom_css: bitGoalData.settings['custom_css'],
-      custom_js: bitGoalData.settings['custom_js'],
-      font: bitGoalData.settings['font'],
-      layout: bitGoalData.settings['layout'],
-      text_color: bitGoalData.settings['text_color'],
+      background_color: widgetData.settings['background_color'],
+      bar_bg_color: widgetData.settings['bar_bg_color'],
+      bar_color: widgetData.settings['bar_color'],
+      bar_text_color: widgetData.settings['bar_text_color'],
+      bar_thickness: widgetData.settings['bar_thickness'],
+      custom_enabled: widgetData.settings['custom_enabled'],
+      custom_html: widgetData.settings['custom_html'],
+      custom_css: widgetData.settings['custom_css'],
+      custom_js: widgetData.settings['custom_js'],
+      font: widgetData.settings['font'],
+      layout: widgetData.settings['layout'],
+      text_color: widgetData.settings['text_color'],
     };
 
     const request = new Request(url, {
@@ -257,6 +324,120 @@ export class WidgetSettingsService extends Service {
     demo: {},
     show_bar: '',
     custom_defaults: {},
+  };
+
+  // Chat Box
+  fetchChatBoxSettings(response: IChatBoxSettings): IChatBoxSettings {
+    response.settings.custom_html =
+      response.settings.custom_html || response.custom.html;
+    response.settings.custom_css =
+      response.settings.custom_css || response.custom.css;
+    response.settings.custom_js =
+      response.settings.custom_js || response.custom.js;
+
+    return response;
+  }
+
+  getChatBoxSettings(): Promise<IChatBoxSettings> {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/chatbox`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(response => {
+        return this.fetchChatBoxSettings(response);
+      });
+  }
+
+  postChatBoxSettings(widgetData: IChatBoxSettings) {
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/widget/chatbox`;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    headers.append('Content-Type', 'application/json');
+    const bodyChatBoxSettings = {
+
+    };
+
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(bodyChatBoxSettings)
+    });
+
+    return fetch(request)
+      .then(response => { return response.json();});
+  }
+
+  defaultChatBoxSettings: IChatBoxSettings = {
+    widget: {
+      url: '',
+      simulate: ''
+    },
+    settings: {
+      background_color: '',
+      text_color: '',
+      show_moderator_icons: true,
+      show_subscriber_icons: true,
+      show_turbo_icons: true,
+      show_premium_icons: true,
+      show_bits_icons: true,
+      show_coin_icons: true,
+      show_bttv_emotes: true,
+      show_franker_emotes: true,
+      show_smf_emotes: true,
+      always_show_messages: true,
+      hide_common_chat_bots: true,
+      message_hide_delay: 1,
+      text_size: 28,
+      muted_chatters: '',
+      hide_commands: true,
+      custom_enabled: true,
+      custom_html: '',
+      custom_css: '',
+      custom_js: '',
+      custom_json: null
+    },
+    custom: {
+      html: '',
+      css: '',
+      js: ''
+    },
+    platforms: {
+      twitch_account: ''
+    },
+    platforms2: {
+      twitch_account: '',
+      facebook_account: '',
+      youtube_account: '',
+      periscope_account: '',
+      mixer_account: ''
+    },
+    thirdpartyplatforms: {
+      tiltify:{
+        id: null,
+        user_id: null,
+        tiltify_id: null,
+        campaign_id:null,
+        name: '',
+        email: '',
+        access_token: '',
+        created_at: '',
+        updated_at: ''
+      },
+      tipeeestream: {
+        id: null,
+        user_id: null,
+        tipeeestream_id: null,
+        name: '',
+        access_token: '',
+        refresh_token: '',
+        created_at: '',
+        updated_at: ''
+      }
+    }
   };
 
   // Donation Goal
@@ -364,7 +545,10 @@ export class WidgetSettingsService extends Service {
       layout: 'standard'
     },
     goal: {
-      title: ''
+      title: 'My Bit Goal',
+      goal_amount: 100,
+      manual_goal_amount: 0,
+      ends_at: ''
     },
     widget: {},
     has_goal: false,
