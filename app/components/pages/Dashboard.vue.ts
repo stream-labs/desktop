@@ -3,6 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { I18nService } from 'services/i18n';
+import electron from 'electron';
 
 @Component({})
 export default class Dashboard extends Vue {
@@ -16,6 +17,9 @@ export default class Dashboard extends Vue {
 
   mounted() {
     this.i18nService.setWebviewLocale(this.$refs.dashboard);
+    this.$refs.dashboard.addEventListener('new-window', e => {
+      electron.remote.shell.openExternal(e.url);
+    });
   }
 
   get loggedIn() {
