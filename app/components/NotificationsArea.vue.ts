@@ -142,6 +142,7 @@ export default class NotificationsArea extends Vue {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
+    this.notificationsService.markAsRead(id);
     notify.outdated = true;
   }
 

@@ -100,9 +100,12 @@ export class OutageNotificationsService extends Service {
 
   async fetchMessageJson(): Promise<IOutageNotification> {
     const req = new Request(this.messageUrl);
+    const headers = new Headers();
+    headers.append('Pragma', 'no-cache');
+    headers.append('Cache-Control', 'no-cache');
 
     try {
-      const response = await fetch(req, { cache: 'no-cache' });
+      const response = await fetch(req, { headers });
 
       if (response.ok) {
         return await response.json();
