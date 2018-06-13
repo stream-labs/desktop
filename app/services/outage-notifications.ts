@@ -22,7 +22,7 @@ interface IOutageNotification {
   url?: string;
 
   /**
-   * This message should be ignored
+   * This message should be ignored if disabled is true
    */
   disabled: boolean;
 }
