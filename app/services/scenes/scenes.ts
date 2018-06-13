@@ -95,8 +95,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   removeScene(id: string, force = false): IScene {
     if (!force && Object.keys(this.state.scenes).length < 2) {
-      alert($t('There needs to be at least one scene.'));
-      return;
+      return null;
     }
 
     const scene = this.getScene(id);

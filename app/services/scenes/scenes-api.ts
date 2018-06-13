@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { ISourceApi, TSourceType, ISource } from 'services/sources';
 import { ISelection, TNodesList } from 'services/selection';
-import { TSceneNode } from "./scene";
 
 /**
  * Api for scenes management
@@ -44,6 +43,28 @@ export interface ISceneApi extends IScene {
   getRootNodes(): TSceneNodeApi[];
   getItems(): ISceneItemApi[];
   getFolders(): ISceneItemFolderApi[];
+
+  /**
+   * returns scene items of scene + scene items of nested scenes
+   */
+  getNestedItems(): ISceneItemApi[];
+
+  /**
+   * returns sources of scene + sources of nested scenes
+   * result also includes nested scenes
+   */
+  getNestedSources(): ISourceApi[];
+
+  /**
+   * return nested scenes in the safe-to-add order
+   */
+  getNestedScenes(): ISceneApi[];
+
+  /**
+   * returns the source linked to scene
+   */
+  getSource(): ISourceApi;
+
   addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   createFolder(name: string): ISceneItemFolderApi;

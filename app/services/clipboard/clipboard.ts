@@ -7,9 +7,9 @@ import {
   ISceneItemFolder,
   SceneItem,
   SceneItemFolder,
-  ISceneItemSettings
+  ISceneItemSettings, Scene
 } from 'services/scenes';
-import { ISource, SourcesService, TPropertiesManager } from 'services/sources';
+import { ISource, Source, SourcesService, TPropertiesManager } from 'services/sources';
 import { shortcut } from 'services/shortcuts';
 import { Inject } from '../../util/injector';
 import { ISourceFilter, SourceFiltersService } from 'services/source-filters';
@@ -17,10 +17,21 @@ import { SelectionService } from 'services/selection';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { IClipboardServiceApi } from './clipboard-api';
 const { clipboard } = electron;
+
 interface ISceneNodeInfo {
   folder?: ISceneItemFolder;
   item?: ISceneItem & ISource;
   settings?: ISceneItemSettings;
+}
+
+interface ISceneInfo {
+  sources: Dictionary<ISourceInfo>;
+  sceneNodes: ISceneNodeInfo[];
+}
+
+interface IScenesNodes {
+  current: ISceneNodeInfo[];
+  [id: string]: ISceneNodeInfo[];
 }
 
 interface ISourceInfo {
@@ -33,7 +44,7 @@ interface ISourceInfo {
 
 interface IUnloadedCollectionClipboard {
   sources: Dictionary<ISourceInfo>;
-  sceneNodes: ISceneNodeInfo[];
+  scenesNodes: IScenesNodes;
   filters: ISourceFilter[];
 }
 
@@ -67,7 +78,9 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     },
     unloadedCollectionClipboard: {
       sources: {},
-      sceneNodes: [],
+      scenesNodes: {
+        current: []
+      },
       filters: []
     }
   };
@@ -167,7 +180,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     this.SET_FILTERS_IDS([]);
     this.SET_SCENE_ITEMS_IDS([]);
     this.SET_SCENE_ITEMS_SCENE('');
-    this.SET_UNLOADED_CLIPBOARD_NODES({}, []);
+    this.SET_UNLOADED_CLIPBOARD_NODES({}, { current: [] });
     this.SET_UNLOADED_CLIPBOARD_FILTERS([]);
   }
 
@@ -180,24 +193,35 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
   private pasteItemsFromUnloadedClipboard() {
     const sourceIdMap: Dictionary<string> = {};
-    const folderIdMap: Dictionary<string> = {};
-    const insertedNodesIds: string[] = [];
     const sources = this.state.unloadedCollectionClipboard.sources;
-    const nodes = this.state.unloadedCollectionClipboard.sceneNodes.concat([]).reverse();
     const scene = this.scenesService.activeScene;
 
     // create sources
     Object.keys(sources).forEach(sourceId => {
       const sourceInfo = sources[sourceId];
       const sourceModel = sourceInfo.source;
-      const createdSource = this.sourcesService.createSource(
-        sourceModel.name, sourceModel.type, sourceInfo.settings,
-        {
-          propertiesManager: sourceInfo.propertiesManagerType,
-          propertiesManagerSettings: sourceInfo.propertiesManagerSettings
-        }
-      );
-      sourceIdMap[sourceModel.sourceId] = createdSource.sourceId;
+      let createdSource: Source;
+
+      if (sourceModel.type === 'scene') {
+        const scene = this.scenesService.createScene(sourceModel.name);
+        createdSource = scene.getSource();
+        sourceIdMap[sourceModel.sourceId] = createdSource.sourceId;
+        this.pasteSceneNodes(
+          sourceModel.sourceId,
+          this.state.unloadedCollectionClipboard.scenesNodes,
+          sourceIdMap
+        );
+      } else {
+        createdSource = this.sourcesService.createSource(
+          sourceModel.name, sourceModel.type, sourceInfo.settings,
+          {
+            propertiesManager: sourceInfo.propertiesManagerType,
+            propertiesManagerSettings: sourceInfo.propertiesManagerSettings
+          }
+        );
+        sourceIdMap[sourceModel.sourceId] = createdSource.sourceId;
+      }
+
 
       // add filters
       sourceInfo.filters.forEach(filter => {
@@ -209,6 +233,34 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
         );
       });
     });
+
+
+    const insertedNodesIds = this.pasteSceneNodes(
+      'current',
+      this.state.unloadedCollectionClipboard.scenesNodes,
+      sourceIdMap
+    );
+
+    // now we can convert unloadedCollectionClipboard to regular clipboard
+    // to avoid duplication of sources
+    this.SET_SCENE_ITEMS_IDS(insertedNodesIds);
+    this.SET_SCENE_ITEMS_SCENE(scene.id);
+    this.SET_UNLOADED_CLIPBOARD_NODES({}, { current: [] });
+  }
+
+  private pasteSceneNodes(
+    sceneId: string | 'current',
+    scenesNodes: Dictionary<ISceneNodeInfo[]>,
+    sourceIdMap: Dictionary<string>
+  ): string[] {
+
+    const scene = sceneId === 'current' ?
+      this.scenesService.activeScene :
+      this.scenesService.getScene(sourceIdMap[sceneId]);
+
+    const insertedNodesIds: string[] = [];
+    const folderIdMap: Dictionary<string> = {};
+    const nodes = scenesNodes[sceneId].concat([]).reverse();
 
     // create folders
     nodes.filter(node => node.folder)
@@ -244,11 +296,7 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
       insertedNodesIds.push(sceneItem.id);
     });
 
-    // now we can convert unloadedCollectionClipboard to regular clipboard
-    // to avoid duplication of sources
-    this.SET_SCENE_ITEMS_IDS(insertedNodesIds);
-    this.SET_SCENE_ITEMS_SCENE(scene.id);
-    this.SET_UNLOADED_CLIPBOARD_NODES({}, []);
+    return insertedNodesIds;
   }
 
   private pasteFromSystemClipboard() {
@@ -281,42 +329,29 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
 
   private beforeCollectionSwitchHandler() {
 
+    // save nodes to unloaded clipboard
     if (!this.hasItemsInUnloadedClipboard() && this.hasItems()) {
-      // save nodes from clipboard in memory
-      const nodes = this.scenesService
-        .getScene(this.state.itemsSceneId)
-        .getSelection(this.state.sceneNodesIds)
-        .getNodes()
-        // TODO: we don't support copy/paste scenes between collections yet
-        .filter(node => !(node.isItem() && node.type === 'scene'));
+      let sourcesInfo: Dictionary<ISourceInfo> = {};
+      const scenes = this.scenesService.activeScene.getNestedScenes();
+      const scenesNodes: IScenesNodes = { current: [] };
 
-      const sourcesInfo: Dictionary<ISourceInfo> = {};
-
-      const nodesInfo: ISceneNodeInfo[] = nodes.map(node => {
-
-        if (node.isFolder()) {
-          return { folder: (node as SceneItemFolder).getModel() };
-        }
-
-        const item = node as SceneItem;
-
-        if (!sourcesInfo[item.sourceId]) {
-          const source = item.getSource();
-          sourcesInfo[item.sourceId] = {
-            source: item.getModel(),
-            settings: source.getSettings(),
-            propertiesManagerType: source.getPropertiesManagerType(),
-            propertiesManagerSettings: source.getPropertiesManagerSettings(),
-            filters: this.sourceFiltersService.getFilters(source.sourceId)
-          };
-        }
-
-        return {
-          item: (node as SceneItem).getModel(),
-          settings: item.getSettings()
-        };
+      scenes.forEach(scene => {
+        const sceneInfo = this.getSceneInfo(scene, sourcesInfo);
+        scenesNodes[scene.id] = sceneInfo.sceneNodes;
+        sourcesInfo = sceneInfo.sources;
       });
-      this.SET_UNLOADED_CLIPBOARD_NODES(sourcesInfo, nodesInfo);
+
+      const sceneInfo = this.getSceneInfo(
+        this.scenesService.getScene(this.state.itemsSceneId),
+        sourcesInfo,
+        this.state.sceneNodesIds
+      );
+
+      scenesNodes.current = sceneInfo.sceneNodes;
+      sourcesInfo = sceneInfo.sources;
+
+
+      this.SET_UNLOADED_CLIPBOARD_NODES(sourcesInfo, scenesNodes);
     }
 
 
@@ -331,11 +366,52 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
     this.SET_SCENE_ITEMS_SCENE('');
   }
 
+  private getSceneInfo(scene: Scene, sourcesInfo: Dictionary<ISourceInfo>, nodesIds: string[] = []): ISceneInfo {
+
+    const selection = nodesIds.length ?
+      scene.getSelection(nodesIds) :
+      scene.getSelection().selectAll();
+
+    const nodes = selection.getNodes();
+
+    const nodesInfo: ISceneNodeInfo[] = nodes.map(node => {
+
+      if (node.isFolder()) {
+        return { folder: (node as SceneItemFolder).getModel() };
+      }
+
+      const item = node as SceneItem;
+
+      if (!sourcesInfo[item.sourceId]) {
+        const source = item.getSource();
+        sourcesInfo[item.sourceId] = {
+          source: item.getModel(),
+          settings: source.getSettings(),
+          propertiesManagerType: source.getPropertiesManagerType(),
+          propertiesManagerSettings: source.getPropertiesManagerSettings(),
+          filters: this.sourceFiltersService.getFilters(source.sourceId)
+        };
+      }
+
+      return {
+        item: (node as SceneItem).getModel(),
+        settings: item.getSettings()
+      };
+    });
+
+    return {
+      sources: sourcesInfo,
+      sceneNodes: nodesInfo
+    };
+  }
+
   private hasItemsInUnloadedClipboard(): boolean {
+    const clipboard = this.state.unloadedCollectionClipboard;
     return !!(
-      this.state.unloadedCollectionClipboard &&
-      this.state.unloadedCollectionClipboard.sceneNodes &&
-      this.state.unloadedCollectionClipboard.sceneNodes.length
+      clipboard &&
+      clipboard.scenesNodes &&
+      clipboard.scenesNodes.current &&
+      clipboard.scenesNodes.current.length
     );
   }
 
@@ -380,9 +456,9 @@ export class ClipboardService extends StatefulService<IClipboardState> implement
   }
 
   @mutation()
-  private SET_UNLOADED_CLIPBOARD_NODES(sources: Dictionary<ISourceInfo>, sceneNodes: ISceneNodeInfo[]) {
+  private SET_UNLOADED_CLIPBOARD_NODES(sources: Dictionary<ISourceInfo>, scenesNodes: IScenesNodes) {
     this.state.unloadedCollectionClipboard.sources = sources;
-    this.state.unloadedCollectionClipboard.sceneNodes = sceneNodes;
+    this.state.unloadedCollectionClipboard.scenesNodes = scenesNodes;
   }
 
   @mutation()
