@@ -44,7 +44,7 @@ export class OutageNotificationsService extends Service {
     setInterval(() => this.checkForNotification(), POLLING_INTERVAL);
   }
 
-  pushNotification(message: string, url?: string) {
+  private pushNotification(message: string, url?: string) {
     let action: IJsonRpcRequest;
 
     action = this.jsonrpcService.createRequest(
@@ -68,11 +68,11 @@ export class OutageNotificationsService extends Service {
     });
   }
 
-  openBrowserWindow(url: string) {
+  private openBrowserWindow(url: string) {
     electron.remote.shell.openExternal(url);
   }
 
-  async checkForNotification() {
+  private async checkForNotification() {
     const msg = await this.fetchMessageJson();
 
     // There are no urgent messages to display to the user
@@ -90,7 +90,7 @@ export class OutageNotificationsService extends Service {
     this.currentNotificationId = notification.id;
   }
 
-  clearNotification() {
+  private clearNotification() {
     if (this.currentMessageId) this.currentMessageId = null;
     if (this.currentNotificationId) {
       this.notificationsService.markAsRead(this.currentNotificationId);
@@ -98,7 +98,7 @@ export class OutageNotificationsService extends Service {
     }
   }
 
-  async fetchMessageJson(): Promise<IOutageNotification> {
+  private async fetchMessageJson(): Promise<IOutageNotification> {
     const req = new Request(this.messageUrl);
     const headers = new Headers();
     headers.append('Pragma', 'no-cache');
@@ -117,7 +117,7 @@ export class OutageNotificationsService extends Service {
     }
   }
 
-  get messageUrl() {
+  private get messageUrl() {
     return `https://s3-us-west-2.amazonaws.com/${S3_BUCKET}/${S3_KEY}`;
   }
 
