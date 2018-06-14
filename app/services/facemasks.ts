@@ -74,7 +74,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
 
-  cdn = this.hostsService.facemaskCDN;
+  cdn = `https://${this.hostsService.facemaskCDN}`;
   queue: IFacemaskAlertMessage[] = [];
   playing = false;
   interval: number = null;
@@ -389,7 +389,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   fetchFacemaskSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `${host}/api/v5/slobs/facemasks/settings`;
+    const url = `https://${host}/api/v5/slobs/facemasks/settings`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
@@ -400,7 +400,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   fetchInstallUpdate(uuid:string) {
     const host = this.hostsService.streamlabs;
-    const url = `${host}/api/v5/slobs/facemasks/install/${uuid}`;
+    const url = `https://${host}/api/v5/slobs/facemasks/install/${uuid}`;
     const request = new Request(url, {});
 
     return fetch(request)
@@ -410,7 +410,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   fetchProfanityFilterSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `${host}/api/v5/slobs/widget/settings?widget=donation_page`;
+    const url = `https://${host}/api/v5/slobs/widget/settings?widget=donation_page`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 

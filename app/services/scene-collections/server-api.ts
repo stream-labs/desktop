@@ -114,6 +114,6 @@ export class SceneCollectionsServerApiService extends Service {
   }
 
   private get baseUrl() {
-    return `${this.hostsService.overlays}/api`;
+    return `https://${this.hostsService.overlays}/api`;
   }
 }

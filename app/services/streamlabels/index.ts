@@ -224,7 +224,7 @@ export class StreamlabelsService extends Service {
     const headers = authorizedHeaders(this.userService.apiToken);
     headers.append('Content-Type', 'application/json');
 
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const request = new Request(url, {
       method: 'POST',
       headers,
@@ -239,7 +239,7 @@ export class StreamlabelsService extends Service {
   restartSession(): Promise<Boolean> {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/restart-session`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -261,7 +261,7 @@ export class StreamlabelsService extends Service {
   private fetchInitialData(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/files`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 
@@ -275,7 +275,7 @@ export class StreamlabelsService extends Service {
   private fetchSettings(): void {
     if (!this.userService.isLoggedIn()) return;
 
-    const url = `${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
+    const url = `https://${this.hostsService.streamlabs}/api/v5/slobs/stream-labels/settings`;
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(url, { headers });
 

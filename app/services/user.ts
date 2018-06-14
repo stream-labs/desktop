@@ -77,7 +77,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.apiToken);
-    const url = `${host}/api/v5/slobs/validate`;
+    const url = `https://${host}/api/v5/slobs/validate`;
     const request = new Request(url, { headers });
 
     fetch(request)
@@ -150,7 +150,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-      return `${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
+      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
     }
   }
 
@@ -161,7 +161,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    return `${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
+    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
   overlaysUrl() {
@@ -169,7 +169,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       ? this.hostsService.beta3
       : this.hostsService.streamlabs;
     const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
-    let url = `${host}/library?mode=${uiTheme}&slobs`;
+    let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
       url = url + `&oauth_token=${this.apiToken}`;
@@ -180,7 +180,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
-    const url = `${host}/api/v5/slobs/donation/settings`;
+    const url = `https://${host}/api/v5/slobs/donation/settings`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
