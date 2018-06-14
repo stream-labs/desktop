@@ -112,7 +112,7 @@ export class ProfanityFilterService extends Service {
   DEFAULT_REGEX = /(?:)/;
 
   init() {
-    const badWordsStringsArray:string[] = [];
+    const badWordsStringsArray: string[] = [];
     this.badWords.forEach(badWord => {
       badWordsStringsArray.push(badWord.source);
     });
@@ -136,7 +136,7 @@ export class ProfanityFilterService extends Service {
   }
 
   testString(str = '', options = {}) {
-    const mergedOptions:IProfanityFilterOptions = Object.assign(
+    const mergedOptions: IProfanityFilterOptions = Object.assign(
       {
         useDefaultRegex: true,
         extraRegex: null
@@ -160,7 +160,7 @@ export class ProfanityFilterService extends Service {
   }
 
   purifyString(str = '', options = {}) {
-    const mergedOptions:IProfanityFilterOptions = Object.assign(
+    const mergedOptions: IProfanityFilterOptions = Object.assign(
       {
         replacementsList: this.DEFAULT_REPLACEMENTS,
         extraRegex: null,

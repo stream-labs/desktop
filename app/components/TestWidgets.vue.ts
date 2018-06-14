@@ -1,16 +1,14 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { WidgetsService } from '../services/widgets';
-import { FacemasksService } from '../services/facemasks';
+import { WidgetsService } from 'services/widgets';
+import { FacemasksService } from 'services/facemasks';
 import { Inject } from '../util/injector';
 
 @Component({})
 export default class TestWidgets extends Vue {
 
-  @Inject()
-  widgetsService:WidgetsService;
-  @Inject()
-  facemasksService:FacemasksService;
+  @Inject() widgetsService: WidgetsService;
+  @Inject() facemasksService: FacemasksService;
 
   slideOpen = false;
 

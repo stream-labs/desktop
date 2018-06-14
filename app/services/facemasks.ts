@@ -4,7 +4,7 @@ import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import { SourcesService } from './sources';
 import { SourceFiltersService } from './source-filters';
-import { Inject } from '../util/injector';
+import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
 import * as obs from './obs-api';
@@ -13,8 +13,8 @@ import fs from 'fs';
 import https from 'https';
 import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
-import { ProfanityFilterService } from '../util/profanity';
-import { TObsValue } from '../components/shared/forms/Input';
+import { ProfanityFilterService } from 'util/profanity';
+import { TObsValue } from 'components/shared/forms/Input';
 const notificationAudio = require('../../media/sound/facemask4.wav');
 
 interface IFacemasksServiceState {
@@ -426,7 +426,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       return source.type === 'dshow_input';
     });
 
-    if (dshowInputs) {
+    if (dshowInputs.length) {
       const matches = dshowInputs.filter(videoInput => {
         return videoInput.getObsInput().settings.video_device_id === this.state.device.value;
       });
