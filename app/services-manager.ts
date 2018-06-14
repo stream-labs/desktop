@@ -69,6 +69,7 @@ import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
+import { OutageNotificationsService } from 'services/outage-notifications';
 
 const { ipcRenderer } = electron;
 
@@ -140,7 +141,8 @@ export class ServicesManager extends Service {
     I18nService,
     TransitionsService,
     MediaBackupService,
-    WebsocketService
+    WebsocketService,
+    OutageNotificationsService
   };
 
   private instances: Dictionary<Service> = {};
