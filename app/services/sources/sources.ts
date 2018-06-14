@@ -389,7 +389,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       componentName: 'SourcesShowcase',
       size: {
         width: 1000,
-        height: 630
+        height: 650
       }
     });
   }

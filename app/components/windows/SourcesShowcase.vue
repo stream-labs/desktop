@@ -673,8 +673,8 @@
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
-  flex: 0 0 190px;
-  height: 190px;
+  flex: 0 0 210px;
+  height: 210px;
   align-items: flex-start;
 }
 
