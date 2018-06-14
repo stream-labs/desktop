@@ -33,6 +33,8 @@ interface IFacemaskSocketEvent {
   message: {
     name: string;
     amount: string;
+    facemask: string;
+    message: string;
   }[];
 }
 
