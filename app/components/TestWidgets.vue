@@ -21,6 +21,12 @@
             @click="tester.test()">
             {{ tester.name }}
           </button>
+          <button
+            class="button button--trans"
+            v-if="facemasksActive"
+            @click="playTestFacemask()">
+            Face Mask
+          </button>
         </div>
       </div>
     </transition>
