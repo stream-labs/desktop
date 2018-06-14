@@ -3,6 +3,7 @@ import { PersistentStatefulService } from './persistent-stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import { SourcesService } from './sources';
+import { SourceFiltersService } from './source-filters';
 import { Inject } from '../util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
@@ -13,10 +14,18 @@ import https from 'https';
 import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { ProfanityFilterService } from '../util/profanity';
+import { TObsValue } from '../components/shared/forms/Input';
+const notificationAudio = require('../../media/sound/facemask4.wav');
 
 interface IFacemasksServiceState {
-  devices: Dictionary<string>;
-  modtimeMap: Dictionary<number>;
+  device: IInputDeviceSelection;
+  modtimeMap: Dictionary<IFacemaskMetadata>;
+  active: boolean;
+}
+
+interface IFacemaskMetadata {
+  modtime: number;
+  intro: boolean;
 }
 
 interface IInputDeviceSelection {
@@ -28,10 +37,7 @@ interface IInputDeviceSelection {
 interface IFacemask {
   modtime: number;
   uuid: string;
-}
-
-interface IFacemaskAlert {
-  uuid: string;
+  is_intro: boolean;
 }
 
 interface IProfanitySettings {
@@ -47,9 +53,17 @@ interface IFacemaskSettings {
   facemasks: Dictionary<number>;
   transitions_enabled: boolean;
   transition: Dictionary<string>;
+  audio_volume: number;
   duration: number;
   data?: IFacemask[];
-  devices?: IInputDeviceSelection[];
+  device?: IInputDeviceSelection;
+}
+
+interface IFacemaskAlertMessage {
+  name: string;
+  amount: string;
+  facemask: string;
+  message: string;
 }
 
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
@@ -58,23 +72,40 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   @Inject() websocketService: WebsocketService;
   @Inject() profanityFilterService: ProfanityFilterService;
   @Inject() sourcesService: SourcesService;
+  @Inject() sourceFiltersService: SourceFiltersService;
 
-  cdn = 'https://facemasks-cdn.streamlabs.com/';
-  active = false;
-  enabled = false;
-  initialized  = false;
-  queue:IFacemaskAlert[] = [];
-  profanitySettings:IProfanitySettings = {
+  cdn = this.hostsService.facemaskCDN;
+  queue: IFacemaskAlertMessage[] = [];
+  playing = false;
+  interval: number = null;
+  facemaskFilter: obs.IFilter = null;
+  socketConnectionActive = false;
+
+  settings: IFacemaskSettings = {
+    enabled: false,
+    initialized: false,
+    facemasks: {},
+    transitions_enabled: false,
+    audio_volume: 50,
+    transition: {},
+    duration: 10,
+  };
+
+  profanitySettings: IProfanitySettings = {
     profanity_custom_words: '',
     profanity_default_words: true,
     profanity_mode: 1,
     profanity_names: true,
   };
 
+  static defaultState:IFacemasksServiceState = {
+    device: { name: null, value: null },
+    modtimeMap: {},
+    active: false
+  };
+
   init() {
     super.init();
-    this.getStatus();
-    this.testSources();
     if (this.userService.isLoggedIn()) {
       this.startup();
     }
@@ -83,42 +114,120 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
+  startup() {
+    this.fetchFacemaskSettings().then(response => {
+      this.checkFacemaskSettings(response);
+    }).catch(err => {
+      this.SET_ACTIVE(false);
+    });
+  }
+
+  activate() {
+    this.SET_ACTIVE(true);
+    this.initSocketConnection();
+  }
+
+  notifyFailure() {
+    this.SET_ACTIVE(false);
+    const ok = electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        message: 'We encountered an issue setting up your Face Mask Library',
+        detail: 'Click Retry to try again',
+        buttons: ['Retry', 'OK']
+      },
+      btnIndex => {
+        if (btnIndex === 0) {
+          this.startup();
+        }
+      }
+    );
+  }
+
   get apiToken() {
     return this.userService.apiToken;
   }
 
-  testSources() {
-    const sources = this.sourcesService.getSources();
-    console.log(this.sourcesService.getSources());
-    let videoInput = null;
-    sources.forEach(source => {
-      if (source.type === 'dshow_input') {
-        videoInput = source;
-      }
-    });
-    console.log(videoInput);
-    const obs = videoInput.getObsInput();
-    const fm = obs.filters[0];
-    fm.update({ demoMode: true });
-    console.log(obs, fm);
-  }
-
   private initSocketConnection(): void {
-    this.websocketService.socketEvent.subscribe(e => this.onSocketEvent(e));
-  }
-
-  startQueueListener() {
-
-  }
-
-  endQueueListener() {
-
+    if (!this.socketConnectionActive) {
+      this.websocketService.socketEvent.subscribe(e => this.onSocketEvent(e));
+      this.socketConnectionActive = true;
+    }
   }
 
   onSocketEvent(event: TSocketEvent) {
-    console.log(event);
     if (event.type === 'facemask') {
-      console.log('yes');
+      this.enqueueAlert(event.message[0]);
+    }
+  }
+
+  playAlerts() {
+    if (!this.playing && this.queue.length) {
+      this.playing = true;
+      this.playQueuedAlert();
+      this.interval = window.setInterval(() => this.playQueuedAlert(), (this.settings.duration * 1000) + 2000);
+    }
+  }
+
+  playQueuedAlert() {
+    if (this.queue.length) {
+      const alert = this.queue.shift();
+      this.trigger(alert.facemask, alert.message, alert.name);
+    } else {
+      this.playing = false;
+      clearInterval(this.interval);
+    }
+  }
+
+  playTestAudio(volume: number) {
+    const alertSound = new Audio(notificationAudio);
+    alertSound.volume = volume / 100;
+
+    alertSound.play();
+  }
+
+  playAudio() {
+    const alertSound = new Audio(notificationAudio);
+    alertSound.volume = this.settings.audio_volume / 100;
+
+    alertSound.play();
+  }
+
+  enqueueAlert(message: IFacemaskAlertMessage) {
+    this.queue.push(message);
+    this.playAlerts();
+  }
+
+  trigger(mask: string, message: string, name: string) {
+    this.updateFilter({
+      Mask: `${mask}.json`,
+      alertText: this.profanitize(message, name)['message'],
+      alertActivate: true
+    });
+    this.playAudio();
+    setTimeout(() => {
+      this.facemaskFilter.update({ alertActivate: false });
+    }, 1000);
+  }
+
+  updateFilter(settings: Dictionary<TObsValue>) {
+    if (this.facemaskFilter) this.facemaskFilter.update(settings);
+  }
+
+  playTestAlert() {
+    if (this.active && this.socketConnectionActive) {
+      const uuids = Object.keys(this.state.modtimeMap).filter(uuid => !this.state.modtimeMap[uuid].intro);
+
+      if (uuids.length) {
+        const testMask = uuids[Math.floor(Math.random() * uuids.length)];
+        this.enqueueAlert({
+          name: 'Streamlabs',
+          amount: '10',
+          facemask: testMask,
+          message: 'This is a test Face Mask donation alert'
+        });
+      }
     }
   }
 
@@ -189,47 +298,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     });
   }
 
-  activate() {
-    this.active = true;
-    this.initSocketConnection();
-  }
-
-  startup() {
-    this.fetchFacemaskSettings().then(response => {
-      this.checkFacemaskSettings(response);
-    }).catch(err => {
-      this.active = false;
-    });
-  }
-
-  notifyFailure() {
-    this.active = false;
-    const ok = electron.remote.dialog.showMessageBox(
-      electron.remote.getCurrentWindow(),
-      {
-        type: 'warning',
-        message: 'We encountered an issue setting up your Face Mask Library',
-        detail: 'Click Retry to try again',
-        buttons: ['Retry', 'OK']
-      },
-      btnIndex => {
-        if (btnIndex === 0) {
-          this.startup();
-        }
-      }
-    );
-  }
-
-  static defaultState:IFacemasksServiceState = {
-    devices: {},
-    modtimeMap: {}
-  };
-
-  @mutation()
-  private ADD_MODTIME(uuid: string, modtime: number) {
-    Vue.set(this.state.modtimeMap, uuid, modtime);
-  }
-
   getInputDevicesList() {
     const dummy = obs.InputFactory.create('dshow_input', 'fake tmp dshow device', {});
     const properties = dummy.properties.get('video_device_id') as obs.IListProperty;
@@ -243,11 +311,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       devices[0].selected = true;
     }
 
-    const enabled = Object.keys(this.state.devices);
+    const enabled = this.state.device.value;
 
-    if (enabled.length) {
+    if (enabled) {
       devices.forEach(device => {
-        if (enabled.includes(device.value as string)) {
+        if (enabled === device.value as string) {
           device.selected = true;
         }
       });
@@ -256,43 +324,67 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return devices;
   }
 
-  getStatus() {
+  getDeviceStatus() {
     const availableDevices = this.getInputDevicesList();
-    const enabledDeviceIds = Object.keys(this.state.devices);
-    const availableDeviceSelected = availableDevices.some(device => {
-      return enabledDeviceIds.includes(device.value as string);
-    });
-    console.log('eyo', this.enabled && availableDeviceSelected);
-    return this.enabled && availableDeviceSelected;
+    const enabledDeviceId = this.state.device ? this.state.device.value : null;
+    const availableDeviceSelected = enabledDeviceId ? availableDevices.some(device => {
+      return enabledDeviceId  === device.value as string;
+    }) : false;
+    return this.settings.enabled && availableDeviceSelected;
   }
 
   updateSettings(settings: IFacemaskSettings) {
-    const promises = Object.keys(settings.facemasks).map(uuid => {
-      return this.downloadAndSaveModtime(uuid, false);
-    });
+    this.settings = settings;
+    if (settings.enabled) {
+      const promises = Object.keys(settings.facemasks).map(uuid => {
+        return this.downloadAndSaveModtime(uuid, false, false);
+      });
 
-    if (settings.transitions_enabled) {
-      promises.push(this.downloadAndSaveModtime(settings.transition.uuid, false));
+      if (settings.transitions_enabled) {
+        promises.push(this.downloadAndSaveModtime(settings.transition.uuid, true, false));
+      }
+
+      Promise.all(promises).then(() => {
+        this.setupFilter(settings);
+        this.activate();
+      }).catch(err => {
+        this.notifyFailure();
+      });
+
+      this.SET_DEVICE(settings.device.name, settings.device.value);
+    } else {
+      this.SET_ACTIVE(false);
     }
-
-    Promise.all(promises).then(() => {
-      this.active = settings.enabled;
-    }).catch(err => {
-      this.notifyFailure();
-    });
-
-    settings.devices.forEach(device => {
-      this.ADD_DEVICE(device.name, device.value);
-    });
   }
 
-  getEnabledDevices() {
-    return this.state.devices;
+  checkFacemaskSettings(settings:IFacemaskSettings) {
+    this.settings = settings;
+    if (settings.enabled) {
+      this.configureProfanityFilter();
+      const uuids = settings.data.map((mask: IFacemask) => {
+        return { uuid: mask.uuid, intro: mask.is_intro };
+      });
+
+      this.setupFilter(settings);
+
+      const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
+      const downloads = missingMasks.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, false));
+
+      Promise.all(downloads).then((responses) => {
+        this.ensureModtimes(settings.data);
+      }).catch(err => {
+        console.log(err);
+        this.notifyFailure();
+      });
+
+    } else {
+      this.SET_ACTIVE(false);
+    }
   }
 
-  @mutation()
-  private ADD_DEVICE(name: string, id: string) {
-    Vue.set(this.state.devices, id, name);
+
+  getEnabledDevice() {
+    return this.state.device;
   }
 
   fetchFacemaskSettings() {
@@ -327,31 +419,54 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       .then(response => response.json());
   }
 
-  checkFacemaskSettings(settings:IFacemaskSettings) {
-    if (settings.enabled) {
-      this.configureProfanityFilter();
-      const uuids = settings.data.map((mask: IFacemask) => {
-        return mask.uuid;
+  setupFilter(settings: IFacemaskSettings) {
+    const sources = this.sourcesService.getSources();
+
+    const dshowInputs = sources.filter(source => {
+      return source.type === 'dshow_input';
+    });
+
+    if (dshowInputs) {
+      const matches = dshowInputs.filter(videoInput => {
+        return videoInput.getObsInput().settings.video_device_id === this.state.device.value;
       });
 
-      this.enabled = settings.enabled;
-      this.initialized = settings.initialized;
+      if (matches.length === 1) {
+        const slobsSource = matches[0];
+        const target = slobsSource.getObsInput();
+        const facemaskFilters = target.filters.filter(filter => filter.id === 'face_mask_filter');
 
-      const missingMasks = uuids.filter(uuid => this.checkDownloaded(uuid));
-      const downloads = missingMasks.map(uuid => this.downloadAndSaveModtime(uuid, false));
-
-      Promise.all(downloads).then((responses) => {
-        this.ensureModtimes(settings.data);
-      }).catch(err => {
-        this.notifyFailure();
-      });
-
+        if (facemaskFilters.length === 0) {
+          this.facemaskFilter = this.sourceFiltersService.add(
+            slobsSource.sourceId,
+            'face_mask_filter',
+            'Face Mask Plugin',
+            {
+              maskFolder: this.facemasksDirectory,
+              alertDuration: settings.duration,
+              alertIntro: `${settings.transition.uuid}.json`,
+              alertOutro: `${settings.transition.uuid}.json`,
+              alertDoIntro: settings.transitions_enabled,
+              alertDoOutro: settings.transitions_enabled
+            });
+        } else {
+          this.facemaskFilter = facemaskFilters[0];
+          this.updateFilter({
+            maskFolder: this.facemasksDirectory,
+            alertDuration: settings.duration,
+            alertIntro: `${settings.transition.uuid}.json`,
+            alertOutro: `${settings.transition.uuid}.json`,
+            alertDoIntro: settings.transitions_enabled,
+            alertDoOutro: settings.transitions_enabled
+          });
+        }
+      }
     } else {
-      this.active = false;
+      this.SET_ACTIVE(false);
     }
   }
 
-  ensureModtimes(data:IFacemask[]) {
+  ensureModtimes(data: IFacemask[]) {
     const requiredModtimes = data.map(mask => mask.uuid);
     const availableModtimes = Object.keys(this.state.modtimeMap);
     const missingModtimes = requiredModtimes.filter(uuid => !availableModtimes.includes(uuid));
@@ -374,17 +489,18 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   updateMasks(data: IFacemask[]) {
     const needsUpdate = data.reduce((result, mask) => {
-      if (this.state.modtimeMap[mask.uuid] < (mask.modtime - 3600)) {
-        result.push(mask.uuid);
+      if (this.state.modtimeMap[mask.uuid].modtime < (mask.modtime - 3600)) {
+        result.push({ uuid: mask.uuid, intro: mask.is_intro });
       }
       return result;
     }, []);
 
-    const downloads = needsUpdate.map(uuid => this.downloadAndSaveModtime(uuid, true));
+    const downloads = needsUpdate.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, true));
 
     Promise.all(downloads).then(responses => {
       this.activate();
     }).catch(err => {
+      console.log(err);
       this.notifyFailure();
     });
   }
@@ -396,7 +512,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         if (readError) reject(readError);
         try {
           const maskData = JSON.parse(data);
-          this.ADD_MODTIME(uuid, maskData.modtime);
+          this.ADD_MODTIME(uuid, maskData.modtime, maskData.is_intro);
           resolve();
         } catch (parseError) {
           fs.unlinkSync(maskPath);
@@ -413,20 +529,20 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   enableMask(uuid:string) {
     this.downloadMask(uuid).then(modtime => {
-      this.ADD_MODTIME(uuid, modtime);
+      this.ADD_MODTIME(uuid, modtime, false);
       this.fetchInstallUpdate(uuid);
     });
   }
 
   // Try to download a mask, resolve whether operation was successful or not
-  downloadAndSaveModtime(uuid: string, update = false): Promise<any> {
+  downloadAndSaveModtime(uuid: string, intro: boolean, update = false): Promise<any> {
     return new Promise((resolve, reject) => {
       this.downloadMask(uuid, update).then(modtime => {
         if (modtime) {
-          this.ADD_MODTIME(uuid, modtime);
+          this.ADD_MODTIME(uuid, modtime, intro);
           this.fetchInstallUpdate(uuid);
-          resolve();
         }
+        resolve();
       }).catch(err => {
         reject(err);
       });
@@ -460,6 +576,25 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         response.pipe(writeStream);
       });
     });
+  }
+
+  get active() {
+    return this.state.active;
+  }
+
+  @mutation()
+  private ADD_MODTIME(uuid: string, modtime: number, intro: boolean) {
+    Vue.set(this.state.modtimeMap, uuid, { modtime, intro });
+  }
+
+  @mutation()
+  private SET_ACTIVE(active: boolean) {
+    this.state.active = active;
+  }
+
+  @mutation()
+  private SET_DEVICE(name: string, value: string) {
+    this.state.device = { name, value };
   }
 
   private ensureFacemasksDirectory() {
