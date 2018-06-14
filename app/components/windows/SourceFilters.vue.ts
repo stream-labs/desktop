@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
+import SlVueTree, { ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
@@ -12,6 +13,10 @@ import NavItem from 'components/shared/NavItem.vue';
 import Display from 'components/shared/Display.vue';
 import GenericForm from '../shared/forms/GenericForm.vue';
 
+interface IFilterNodeData {
+  visible: boolean;
+}
+
 @Component({
   components: {
     ModalLayout,
@@ -19,6 +24,7 @@ import GenericForm from '../shared/forms/GenericForm.vue';
     NavItem,
     GenericForm,
     Display,
+    SlVueTree
   },
   mixins: [windowMixin]
 })
@@ -63,6 +69,19 @@ export default class SourceFilters extends Vue {
     return this.sourcesService.getSource(this.sourceId).name;
   }
 
+  get nodes() {
+    return this.filters.map(filter => {
+      return {
+        title: filter.name,
+        isSelected: filter.name === this.selectedFilterName,
+        isLeaf: true,
+        data: {
+          visible: filter.visible
+        }
+      };
+    });
+  }
+
   removeFilter() {
     this.sourceFiltersService.remove(this.sourceId, this.selectedFilterName);
     this.filters = this.sourceFiltersService.getFilters(this.sourceId);
@@ -75,4 +94,21 @@ export default class SourceFilters extends Vue {
     this.filters = this.sourceFiltersService.getFilters(this.sourceId);
   }
 
+  makeActive(filterDescr: any[]) {
+    this.selectedFilterName = filterDescr[0].title;
+  }
+
+  handleSort(nodes: ISlTreeNodeModel<IFilterNodeData>[], position: ICursorPosition<IFilterNodeData>) {
+    const sourceNode = nodes[0];
+    const sourceInd = this.filters.findIndex(filter => filter.name === sourceNode.title);
+    let targetInd = this.filters.findIndex(filter => filter.name === position.node.title);
+
+    if (sourceInd < targetInd) {
+      targetInd = position.placement === 'before' ? targetInd - 1 : targetInd;
+    } else if (sourceInd > targetInd) {
+      targetInd = position.placement === 'before' ? targetInd : targetInd + 1;
+    }
+    this.sourceFiltersService.setOrder(this.sourceId, this.selectedFilterName, targetInd - sourceInd);
+    this.filters = this.sourceFiltersService.getFilters(this.sourceId);
+  }
 }

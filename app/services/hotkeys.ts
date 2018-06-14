@@ -101,19 +101,19 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     },
     {
       name: 'ENABLE_STUDIO_MODE',
-      description: () => 'Enable Studio Mode',
+      description: () => $t('Enable Studio Mode'),
       down: () => getTransitionsService().enableStudioMode(),
       isActive: () => getTransitionsService().state.studioMode
     },
     {
       name: 'DISABLE_STUDIO_MODE',
-      description: () => 'Disable Studio Mode',
+      description: () => $t('Disable Studio Mode'),
       down: () => getTransitionsService().disableStudioMode(),
       isActive: () => !getTransitionsService().state.studioMode
     },
     {
       name: 'TRANSITION_STUDIO_MODE',
-      description: () => 'Transition (Studio Mode)',
+      description: () => $t('Transition (Studio Mode)'),
       down: () => getTransitionsService().executeStudioModeTransition()
     }
   ],

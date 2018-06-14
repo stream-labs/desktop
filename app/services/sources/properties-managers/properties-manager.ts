@@ -1,5 +1,6 @@
 import * as input from 'components/shared/forms/Input';
 import * as obs from '../../../../obs-api';
+import { compact } from 'lodash';
 
 
 /**
@@ -117,7 +118,7 @@ export abstract class PropertiesManager implements IPropertyManager {
     });
 
     propsArray = propsArray.concat(obsProperties);
-    propsArray = propsArray.filter(prop => !this.blacklist.includes(prop.name));
+    propsArray = compact(propsArray).filter(prop => !this.blacklist.includes(prop.name));
 
     return propsArray;
   }

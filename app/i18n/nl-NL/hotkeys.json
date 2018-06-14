@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "Stream starten",
+  "Stop Streaming": "Stream stoppen",
+  "Start Recording": "Opname starten",
+  "Stop Recording": "Opname stoppen",
+  "Switch to scene": "Wissel naar scène",
+  "Show %{sourcename}": "Toon %{sourcename}",
+  "Hide %{sourcename}": "Verberg %{sourcename}",
+  "Mute": "Mute",
+  "Unmute": "Unmute",
+  "Push to Mute": "Push-to-mute",
+  "Push to Talk": "Push-to-talk",
+  "Enable Studio Mode": "Studio Mode inschakelen",
+  "Disable Studio Mode": "Studio Mode uitschakelen",
+  "Transition (Studio Mode)": "Overgang (Studio Mode)"
+}

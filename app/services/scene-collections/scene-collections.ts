@@ -537,6 +537,8 @@ export class SceneCollectionsService extends Service
   private async deloadCurrentApplicationState() {
     if (!this.initialized) return;
 
+    this.tcpServerService.stopRequestsHandling();
+
     this.collectionWillSwitch.next();
 
     this.disableAutoSave();
@@ -569,7 +571,6 @@ export class SceneCollectionsService extends Service
    */
   private startLoadingOperation() {
     this.appService.startLoading();
-    this.tcpServerService.stopRequestsHandling();
     this.disableAutoSave();
   }
 

@@ -9,6 +9,7 @@ import { WindowsService } from './windows';
 import * as obs from '../../obs-api';
 import namingHelpers from '../util/NamingHelpers';
 import { $t } from 'services/i18n';
+import { EOrderMovement } from 'obs-studio-node';
 
 
 export type TSourceFilterType =
@@ -197,6 +198,17 @@ export class SourceFiltersService extends Service {
   getPropertiesFormData(sourceId: string, filterName: string): TFormData {
     if (!filterName) return [];
     return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+  }
+
+
+  setOrder(sourceId: string, filterName: string, delta: number) {
+    const obsFilter = this.getObsFilter(sourceId, filterName);
+    const obsInput = this.sourcesService.getSource(sourceId).getObsInput();
+    const movement = delta > 0 ? EOrderMovement.Down : EOrderMovement.Up;
+    let i = Math.abs(delta);
+    while (i--) {
+      obsInput.setFilterOrder(obsFilter, movement);
+    }
   }
 
 

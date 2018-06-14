@@ -1,0 +1,19 @@
+{
+  "Label Type": "Label-Typ",
+  "Label Template": "Label-Vorlage",
+  "Item Template": "Element-Template",
+  "Item Separator": "Element-Trennzeichen",
+  "Item Limit": "Element-Grenze",
+  "Duration (seconds)": "Dauer (Sekunden)",
+  "Show Clock": "Uhr anzeigen",
+  "Always, show 0:00 when inactive": "Immer 00:00 anzeigen, wenn nicht aktiviert",
+  "Hide when inactive": "Ausblenden, wenn nicht aktiviert",
+  "Show Count": "Anzahl anzeigen",
+  "Always, show 0 when inactive": "Immer 0 anzeigen, wenn inaktiv",
+  "Show Latest": "Aktuelleste anzeigen",
+  "Always, show last person when inactive": "Immer letzte Person anzeigen, wenn nicht aktiviert",
+  "Include Resubs": "Re-Subs einschließen",
+  "Preview": "Vorschau",
+  "Note:": "Hinweis:",
+  "Actual label text may take up to 60 seconds to update": "Es kann bis zu 60 Sekunden dauern, bis sich der angezeigte Text aktualisiert"
+}

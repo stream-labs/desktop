@@ -71,6 +71,7 @@ import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
+import { OutageNotificationsService } from 'services/outage-notifications';
 
 const { ipcRenderer } = electron;
 
@@ -144,7 +145,8 @@ export class ServicesManager extends Service {
     ProfanityFilterService,
     I18nService,
     MediaBackupService,
-    WebsocketService
+    WebsocketService,
+    OutageNotificationsService
   };
 
   private instances: Dictionary<Service> = {};
@@ -267,7 +269,7 @@ export class ServicesManager extends Service {
         const isChildWindowRequest = request.params && request.params.fetchMutations;
         if (isChildWindowRequest) setTimeout(() => { throw e; }, 0);
 
-        if (e.message) this.requestErrors.push(e.message);
+        if (e.message) this.requestErrors.push(e.stack.toString());
       }
 
       response = this.jsonrpc.createError(request,{

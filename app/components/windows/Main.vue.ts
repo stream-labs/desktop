@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import { ScenesService } from 'services/scenes';
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -44,6 +45,7 @@ export default class Main extends Vue {
   @Inject() appService: AppService;
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
+  @Inject() scenesService: ScenesService;
 
   get title() {
     return this.windowsService.state.main.title;
@@ -87,5 +89,15 @@ export default class Main extends Vue {
       (this.navigationService.state.currentPage === 'Studio' ||
         this.navigationService.state.currentPage === 'Live')
     );
+  }
+
+  onDropHandler(event: DragEvent) {
+    const files = event.dataTransfer.files;
+
+    let fi = files.length;
+    while (fi--) {
+      const file = files.item(fi);
+      this.scenesService.activeScene.addFile(file.path);
+    }
   }
 }

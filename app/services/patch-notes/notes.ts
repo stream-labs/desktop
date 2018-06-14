@@ -1,18 +1,19 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.9.1',
-  title: 'Introducing the Cloud',
+  version: '0.9.2',
+  title: 'Now Streaming in 14 Languages',
   notes: [
-    'Cloud Backups: Streamlabs OBS now backs up all of your scenes, sources, media, ' +
-      "and overlay assets to the cloud.  Got a new computer?  Hard drive died?  Don't " +
-      'worry, just log into Streamlabs OBS and your entire setup will be just as you left it.',
-    'Added the ability to hide sources in the audio mixer',
-    'Added horizontal and vertical centering options in the source transform menu',
-    'Fixed a bug where the color picker would switch to a different color than what was selected',
-    "Increased the height of the wheel widget so the bottom isn't cut off",
-    'Fixed a bug where dragging sources would sometimes cause the source to drift away from the mouse cursor',
-    'Fixed a bug where streaming for 24 hours caused the streaming clock to reset to 0',
-    'Fixed an issue where game capture would cause performance issues with some games on the latest Windows 10 version'
+    "We've been working with a team of international streamers to translate Streamlabs OBS " +
+      'into as many different languages as possible.  Today we are launching with 14 different ' +
+      'languages with more on the way.  You can find a language selector in Settings => General. ' +
+      'Please bear with us as we continue to improve and complete our translations',
+    'Our audio mixer has been given an overhaul with new multi-channel ' +
+      'volume level displays, as well as color coded zones to help you dial in the perfect volume.',
+    'You can now pop out the recent events view on the live page into a separate window',
+    'Video files for stinger transitions will now be backed up in the cloud',
+    'Added a confirmation when removing scenes via right click',
+    'Fixed a bug where text sources would not import properly from the theme library',
+    'Fixed a bug that caused the cloud sync icon to not properly show while syncing in some scenarios'
   ]
 };

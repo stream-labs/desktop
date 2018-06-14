@@ -1,0 +1,16 @@
+{
+  "Start Streaming": "ストリーミングを開始します。",
+  "Stop Streaming": "ストリーミングを停止します。",
+  "Start Recording": "録音を開始します。",
+  "Stop Recording": "録画を停止します。",
+  "Switch to scene": "シーンに切り替える",
+  "Show %{sourcename}": "%{sourcename} を表示します。",
+  "Hide %{sourcename}": "%{sourcename} を非表示に",
+  "Mute": "ミュート",
+  "Unmute": "ミュート解除します。",
+  "Push to Mute": "プッシュしてミュートする。",
+  "Push to Talk": "プッシュして話す。",
+  "Enable Studio Mode": "スタジオ モードを有効にします。",
+  "Disable Studio Mode": "スタジオ モードを無効にします。",
+  "Transition (Studio Mode)": "遷移 (スタジオ モード)"
+}

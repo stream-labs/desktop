@@ -5,6 +5,7 @@ import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import { I18nService } from 'services/i18n';
+import electron from 'electron';
 
 @Component({})
 export default class Dashboard extends Vue {
@@ -27,6 +28,9 @@ export default class Dashboard extends Vue {
       updateSettings: this.updateSettings,
     });
     this.i18nService.setWebviewLocale(this.$refs.dashboard);
+    this.$refs.dashboard.addEventListener('new-window', e => {
+      electron.remote.shell.openExternal(e.url);
+    });
   }
 
   get loggedIn() {

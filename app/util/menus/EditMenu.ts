@@ -51,7 +51,7 @@ export class EditMenu extends Menu {
     if (this.scene) {
       this.append({
         label: $t('Paste (Reference)'),
-        enabled: this.clipboardService.hasItems(),
+        enabled: this.clipboardService.hasData(),
         accelerator: 'CommandOrControl+V',
         click: () => this.clipboardService.paste()
       });
@@ -178,8 +178,10 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
+      const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
+
       this.append({
-        label: $t('Filters'),
+        label: $t('Filters') + (filtersCount > 0 ? ` (${filtersCount})` : ''),
         click: () => {
           this.showFilters();
         }
@@ -192,7 +194,7 @@ export class EditMenu extends Menu {
 
       this.append({
         label: $t('Paste Filters'),
-        click: () => this.clipboardService.pasteFilters(this.source.sourceId),
+        click: () => this.clipboardService.pasteFilters(),
         enabled: this.clipboardService.hasFilters()
       });
 

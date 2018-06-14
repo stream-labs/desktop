@@ -6,7 +6,7 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IFormInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
+import { IFormInput, IListInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
@@ -36,6 +36,7 @@ export class CustomizationService
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
+    folderSelection: true,
     experimental: {
       // put experimental features here
     }
@@ -111,6 +112,19 @@ export class CustomizationService
         name: 'nightMode',
         description: $t('Night mode'),
         type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      },
+
+      <IListInput<boolean>> {
+        value: settings.folderSelection,
+        name: 'folderSelection',
+        description: $t('Scene item selection mode'),
+        type: 'OBS_PROPERTY_LIST',
+        options: [
+          { value: true, description: $t('Single click selects group. Double click selects item') },
+          { value: false, description: $t('Double click selects group. Single click selects item') }
+        ],
         visible: true,
         enabled: true,
       },

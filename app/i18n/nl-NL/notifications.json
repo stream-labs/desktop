@@ -1,0 +1,19 @@
+{
+  "You don't have any notifications": "U heeft geen meldingen",
+  "Enable notifications": "Meldingen inschakelen",
+  "Enable sound": "Geluid inschakelen",
+  "Skipped frames detected:": "Overgeslagen frames gedetecteerd:",
+  "Detect skipped frames": "Detecteer overgeslagen frames",
+  "Skipped frames threshold": "Overgeslagen frames notificatie drempel",
+  "Detect lagged frames": "Detecteer vertraagde frames",
+  "Lagged frames threshold": "Vertraagde frames notificatie drempel",
+  "Detect dropped frames": "Detecteer vervallen frames",
+  "Dropped frames threshold": "Vervallen frames notificatie drempel",
+  "Show Notifications": "Meldingen weergeven",
+  "Restore Defaults": "Standaardinstellingen",
+  "Troubleshooter Notifications": "Probleem Meldingen",
+  "Click to open your Notifications window": "Klik om uw meldingen te tonen",
+  "Click to read your unread Notifications": "Klik om uw ongelezen meldingen te lezen",
+  "New Notifications": "Nieuwe melding",
+  "Log": "Logboek"
+}

@@ -10,12 +10,11 @@
 
 <style lang="less" scoped>
 .button--go-live {
-  width: 130px;
+  min-width: 150px;
   text-transform: none;
 
-  @media(max-width: 1200px) {
-    font-size: 11px;
-    width: 112px;
-  }
+  // @media(max-width: 1200px) {
+  //   font-size: 11px;
+  // }
 }
 </style>

@@ -1,0 +1,19 @@
+{
+  "Label Type": "Type de label",
+  "Label Template": "Modèle de label",
+  "Item Template": "Modèle d'article",
+  "Item Separator": "Séparateur d'article",
+  "Item Limit": "Limite d'article",
+  "Duration (seconds)": "Durée (en secondes)",
+  "Show Clock": "Afficher l'horloge",
+  "Always, show 0:00 when inactive": "Toujours, afficher 0:00 lorsqu'il est inactif",
+  "Hide when inactive": "Masquer lorsqu'il est inactif",
+  "Show Count": "Afficher le nombre",
+  "Always, show 0 when inactive": "Toujours, afficher 0 lorsqu'il est inactif",
+  "Show Latest": "Afficher le dernier",
+  "Always, show last person when inactive": "Toujours, montrez la dernière personne quand il est inactif",
+  "Include Resubs": "Inclure les réabonnements",
+  "Preview": "Aperçu",
+  "Note:": "Remarque:",
+  "Actual label text may take up to 60 seconds to update": "Le texte du label peut prendre jusqu'à 60 secondes pour être mis à jour"
+}

@@ -28,7 +28,7 @@ export default class OverlaySettings extends Vue {
   get mediaBackupOptOut(): IFormInput<boolean> {
     return {
       name: 'media_backup_opt_out',
-      description: 'Do not back up my media files in the cloud (requires app restart)',
+      description: $t('Do not back up my media files in the cloud (requires app restart)'),
       value: this.customizationService.state.mediaBackupOptOut
     };
   }

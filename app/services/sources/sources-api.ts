@@ -54,6 +54,12 @@ export interface ISourcesServiceApi {
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];
+
+  /**
+   * creates a source from a file
+   * source type depends on the file extension
+   */
+  addFile(path: string): ISourceApi;
   suggestName(name: string): string;
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;
@@ -89,7 +95,9 @@ export type TSourceType =
   'wasapi_output_capture' |
   'decklink-input' |
   'scene' |
-  'ndi_source'
+  'ndi_source' |
+  'openvr_capture' |
+  'liv_capture'
   ;
 
 // Register new properties manager here
