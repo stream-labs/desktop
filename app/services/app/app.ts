@@ -20,11 +20,8 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-<<<<<<< HEAD
 import { FacemasksService } from 'services/facemasks';
-=======
 import { OutageNotificationsService } from 'services/outage-notifications';
->>>>>>> staging
 
 interface IAppState {
   loading: boolean;
@@ -44,11 +41,8 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
-<<<<<<< HEAD
   @Inject() facemasksService: FacemasksService;
-=======
   @Inject() outageNotificationsService: OutageNotificationsService;
->>>>>>> staging
 
   static initialState: IAppState = {
     loading: true,
