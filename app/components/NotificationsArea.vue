@@ -58,15 +58,15 @@
 
 .notification {
   height: 30px;
+  max-width: 100%;
   line-height: 30px;
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 3px;
   white-space: nowrap;
   overflow: hidden;
-  margin-left: 10px;
+  text-overflow: ellipsis;
   position: absolute;
-  left: 20px;
   animation: notify-appears 0.3s;
 
 
@@ -97,6 +97,7 @@
 .notifications__counter {
   cursor: pointer;
   white-space: nowrap;
+  margin-right: 10px;
 
   &:before {
     content: '|';
