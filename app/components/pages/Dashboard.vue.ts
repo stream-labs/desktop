@@ -20,7 +20,7 @@ export default class Dashboard extends Vue {
 
   mounted() {
     this.guestApiService.exposeApi(this.$refs.dashboard, {
-      log: this.log,
+      testAudio: this.testAudio,
       getStatus: this.getStatus,
       getDevices: this.getDevices,
       enableMask: this.enableMask,
@@ -38,26 +38,26 @@ export default class Dashboard extends Vue {
   }
 
   async getStatus() {
-    return this.facemasksService.getStatus();
+    return this.facemasksService.getDeviceStatus();
   }
 
   async getDevices() {
     return this.facemasksService.getInputDevicesList();
   }
 
-  async enabledDevices() {
-    return this.facemasksService.getEnabledDevices();
+  async enabledDevice() {
+    return this.facemasksService.getEnabledDevice();
   }
 
-  async enableMask(uuid:string) {
+  async enableMask(uuid: string) {
     return this.facemasksService.enableMask(uuid);
   }
 
-  async updateSettings(settings:any) {
+  async updateSettings(settings: any) {
     return this.facemasksService.updateSettings(settings);
   }
 
-  async log(obj:any) {
-    console.log(obj);
+  async testAudio(volume: number) {
+    return this.facemasksService.playTestAudio(volume);
   }
 }
