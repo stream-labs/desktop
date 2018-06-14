@@ -233,7 +233,6 @@ export class ProfanityFilterService extends Service {
       // clean the word from all special characters
       let wordCleaned = word.replace(/[&\/\\#\-,=+()$~%.'":*?<>{}_]/g, '');
       wordCleaned = wordCleaned.toLowerCase();
-      // console.log(word + ' ~ !' + wordCleaned + '!');
 
       // check for default words
       if (mergedOptions.useDefaultRegex) {
@@ -280,8 +279,6 @@ export class ProfanityFilterService extends Service {
     }
 
     const strNew = wordsNew.join(' ');
-
-    console.log('str:'); console.log(str); console.log('strNew:'); console.log(strNew);
 
     return [strNew, hasBadwords];
   }
