@@ -22,7 +22,7 @@
   "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
   "Streamlabels session has been succesfully restarted!": "Streamlabels session has been succesfully restarted!",
   "This action will restart the application. Continue?": "This action will restart the application. Continue?",
-  "Show confirmation dialog when starting streams": "Show confirmation dialogue when starting streams",
+  "Show confirmation dialog when starting streams": "Show confirmation dialog when starting streams",
   "Show confirmation dialog when stopping streams": "Show confirmation dialogue when stopping streams",
   "Automatically record when streaming": "Automatically record when streaming",
   "Keep recording when stream stops": "Keep recording when stream stops",
