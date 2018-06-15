@@ -5,6 +5,7 @@ import { HostsService } from './hosts';
 import fs from 'fs';
 import path from 'path';
 import electron from 'electron';
+import { authorizedHeaders } from 'util/requests';
 
 export type TUsageEvent =
   'stream_start' |
@@ -13,7 +14,6 @@ export type TUsageEvent =
   'app_close';
 
 interface IUsageApiData {
-  token?: string;
   installer_id?: string;
   version: string;
   slobs_user_id: string;
@@ -84,7 +84,7 @@ export class UsageStatisticsService extends Service {
    * @param metadata arbitrary data to store with the event (must be serializable)
    */
   recordEvent(event: TUsageEvent, metadata: object = {}) {
-    if (!this.isProduction) return;
+    // if (!this.isProduction) return;
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -97,7 +97,7 @@ export class UsageStatisticsService extends Service {
     };
 
     if (this.userService.isLoggedIn()) {
-      bodyData.token = this.userService.widgetToken;
+      authorizedHeaders(this.userService.apiToken, headers);
     }
 
     if (this.installerId) {
