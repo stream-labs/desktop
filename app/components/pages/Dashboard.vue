@@ -6,7 +6,9 @@
       v-show="loggedIn"
       id="dashboardWebview"
       :src="dashboardUrl"
-      ref="dashboard"/>
+      ref="dashboard"
+      preload="bundles/guest-api">
+    </webview>
     <!-- <p v-else>User Not Logged In, Display something here????</p> -->
   </div>
 </div>
