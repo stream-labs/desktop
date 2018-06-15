@@ -84,7 +84,7 @@ export class UsageStatisticsService extends Service {
    * @param metadata arbitrary data to store with the event (must be serializable)
    */
   recordEvent(event: TUsageEvent, metadata: object = {}) {
-    // if (!this.isProduction) return;
+    if (!this.isProduction) return;
 
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
