@@ -12,6 +12,7 @@ import { StreamlabelNode } from './streamlabel';
 import { WidgetNode } from './widget';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
+import { WidgetType } from '../../../widgets';
 
 type TContent =
   | ImageNode
@@ -187,6 +188,8 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       return;
     }
 
+    let existing = false;
+
     if (obj.content instanceof ImageNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'image_source', {}, { id });
     } else if (obj.content instanceof TextNode) {
@@ -196,14 +199,29 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
     } else if (obj.content instanceof StreamlabelNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus', {}, { id });
     } else if (obj.content instanceof WidgetNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source', {}, { id });
+      // Check for already existing widgets of the same type instead
+      const widgetType = obj.content.data.type;
+
+      this.sourcesService.sources.forEach(source => {
+        if (source.getPropertiesManagerType() === 'widget') {
+          const type: WidgetType = source.getPropertiesManagerSettings().widgetType;
+
+          if (widgetType === type) {
+            sceneItem = context.scene.addSource(source.sourceId, { id });
+            existing = true;
+          }
+        }
+      });
+
+      if (!sceneItem) {
+        sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source', {}, { id });
+      }
     }
 
     this.adjustTransform(sceneItem, obj);
-    await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+    if (!existing) await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
 
     if (sceneItem.getObsInput().audioMixers) {
-      console.log('loading mixer hidden');
       this.audioService.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);
     }
 

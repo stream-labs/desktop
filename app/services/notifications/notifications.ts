@@ -87,6 +87,7 @@ export class NotificationsService extends PersistentStatefulService<
   markAsRead(id: number) {
     const notify = this.getNotification(id);
     if (!notify) return;
+    this.MARK_AS_READ(id);
     this.notificationRead.next([id]);
   }
 

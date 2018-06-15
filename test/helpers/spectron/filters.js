@@ -13,7 +13,7 @@ export async function openFiltersWindow(t, sourceName) {
 
 export async function openFilterProperties(t, sourceName, filterName) {
   await openFiltersWindow(t, sourceName);
-  await t.context.app.client.click(`li=${filterName}`);
+  await t.context.app.client.click(`span=${filterName}`);
 }
 
 export async function closeFilterProperties(t) {
@@ -34,7 +34,7 @@ export async function addFilter(t, sourceName, filterType, filterName) {
 
 export async function removeFilter(t, sourceName, filterName) {
   await openFiltersWindow(t, sourceName);
-  await t.context.app.client.click(`li=${filterName}`);
+  await t.context.app.client.click(`span=${filterName}`);
   await t.context.app.client.click('.icon-subtract');
   await t.context.app.client.click('button=Done');
 }

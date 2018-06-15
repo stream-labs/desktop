@@ -94,6 +94,10 @@
   color: @grey;
 }
 
+.sl-vue-tree-node-item {
+  padding: 0 12px;
+}
+
 .fa.disabled,
 i.disabled {
   opacity: 0.26;

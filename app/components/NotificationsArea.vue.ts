@@ -55,7 +55,7 @@ export default class NotificationsArea extends Vue {
     this.sizeCheckIntervalId = window.setInterval(() => {
       if (!this.$refs.notificationsContainer) return;
 
-      if (this.$refs.notificationsContainer.offsetWidth < 300) {
+      if (this.$refs.notificationsContainer.offsetWidth < 150) {
         this.showExtendedNotifications = false;
       } else {
         this.showExtendedNotifications = true;
@@ -142,6 +142,7 @@ export default class NotificationsArea extends Vue {
     const notify = this.notifications.find(notify => notify.id === id);
     if (notify.outdated) return;
     this.notificationsService.applyAction(id);
+    this.notificationsService.markAsRead(id);
     notify.outdated = true;
   }
 

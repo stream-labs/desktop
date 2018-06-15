@@ -9,6 +9,7 @@ import { Subject } from 'rxjs/Subject';
 export type TSocketEvent =
   IStreamlabelsSocketEvent |
   IDonationSocketEvent |
+  IFacemaskSocketEvent |
   IFollowSocketEvent |
   ISubscriptionSocketEvent;
 
@@ -24,6 +25,16 @@ interface IDonationSocketEvent {
   message: {
     name: string;
     amount: string;
+  }[];
+}
+
+interface IFacemaskSocketEvent {
+  type: 'facemask';
+  message: {
+    name: string;
+    amount: string;
+    facemask: string;
+    message: string;
   }[];
 }
 
@@ -86,7 +97,9 @@ export class WebsocketService extends Service {
         this.socket.on('error', () => this.log('Error'));
         this.socket.on('disconnect', () => this.log('Connection Closed'));
 
-        this.socket.on('event', (e: any) => this.socketEvent.next(e));
+        this.socket.on('event', (e: any) => {
+          this.socketEvent.next(e);
+        });
       });
   }
 

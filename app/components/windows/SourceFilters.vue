@@ -18,14 +18,27 @@
             v-if="selectedFilterName"
             @click="removeFilter"></i>
         </div>
-        <NavItem
-          v-for="filter in filters"
-          :key="filter.name"
-          :to="filter.name"
-          :ico="filter.visible ? 'icon-view' : 'icon-hide'"
-          @iconClick="toggleVisibility">
-          {{ filter.name }}
-        </NavItem>
+
+        <sl-vue-tree
+            :value="nodes"
+            ref="slVueTree"
+            @select="makeActive"
+            @drop="handleSort"
+            :allowMultiselect="false"
+        >
+
+          <template slot="title" slot-scope="{ node }">
+            <div class="title-container">
+              <span class="layer-icon">
+                <i @click="toggleVisibility(node.title)" class="icon-view" v-if="node.data.visible"></i>
+                <i @click="toggleVisibility(node.title)" class="icon-hide" v-if="!node.data.visible"></i>
+              </span> &nbsp;
+              <span class="item-title">{{ node.title }}</span>
+            </div>
+          </template>
+
+        </sl-vue-tree>
+
       </NavMenu>
 
       <div class="modal-container--side-nav">
@@ -42,9 +55,15 @@
 
 <script lang="ts" src="./SourceFilters.vue.ts"></script>
 
-<style lang="less" scoped>
+<style scoped>
+@import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
+
 .modal-container--side-nav {
   padding: 20px;
+}
+
+.modal--side-nav >>> .sl-vue-tree-toggle {
+  display: none;
 }
 
 .controls {

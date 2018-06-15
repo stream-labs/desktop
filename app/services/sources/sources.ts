@@ -1,6 +1,7 @@
+import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
-import { IListOption, setupSourceDefaults } from 'components/shared/forms/Input';
+import { IListOption, setupSourceDefaults, TObsValue } from 'components/shared/forms/Input';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -195,6 +196,42 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.sourceRemoved.next(source.sourceState);
   }
 
+  addFile(path: string): Source {
+    const SUPPORTED_EXT = {
+      image_source: ['png', 'jpg', 'jpeg', 'tga', 'bmp'],
+      ffmpeg_source: ['mp4', 'ts', 'mov', 'flv', 'mkv', 'avi', 'mp3', 'ogg', 'aac', 'wav', 'gif', 'webm'],
+      browser_source: ['html'],
+      text_gdiplus: ['txt']
+    };
+    let ext = path.split('.').splice(-1)[0];
+    if (!ext) return null;
+    ext = ext.toLowerCase();
+    const filename = path.split('\\').splice(-1)[0];
+
+    const types = Object.keys(SUPPORTED_EXT);
+    for (const type of types) {
+      if (!SUPPORTED_EXT[type].includes(ext)) continue;
+      let settings: Dictionary<TObsValue>;
+      if (type === 'image_source') {
+        settings = { file: path };
+      } else if (type === 'browser_source') {
+        settings = {
+          is_local_file: true,
+          local_file: path
+        };
+      } else if (type === 'ffmpeg_source') {
+        settings = {
+          is_local_file: true,
+          local_file: path,
+          looping: true
+        };
+      } else if (type === 'text_gdiplus') {
+        settings = { text: fs.readFileSync(path).toString() };
+      }
+      return this.createSource(filename, type as TSourceType, settings);
+    }
+    return null;
+  }
 
   suggestName(name: string): string {
     return namingHelpers.suggestName(name, (name: string) => this.getSourcesByName(name).length);
@@ -352,7 +389,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       componentName: 'SourcesShowcase',
       size: {
         width: 1000,
-        height: 630
+        height: 650
       }
     });
   }
