@@ -11,6 +11,7 @@ import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import namingHelpers from '../util/NamingHelpers';
 import { Dictionary } from 'lodash';
 import fs from 'fs';
+import { authorizedHeaders } from 'util/requests';
 
 export enum WidgetType {
   AlertBox = 0,
@@ -46,7 +47,7 @@ type TUrlGenerator = (
 
 export interface IWidgetTester {
   name: string;
-  url: TUrlGenerator;
+  url: (host: string, platform: TPlatform) => string;
 
   // Which platforms this tester can be used on
   platforms: TPlatform[];
@@ -55,71 +56,71 @@ export interface IWidgetTester {
 const WidgetTesters: IWidgetTester[] = [
   {
     name: 'Follow',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Subscriber',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
     platforms: ['youtube']
   },
   {
     name: 'Follow',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
     platforms: ['mixer']
   },
   {
     name: 'Subscription',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Sponsor',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['youtube']
   },
   {
     name: 'Subscription',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['mixer']
   },
   {
     name: 'Donation',
-    url(host, token) {
-      return `https://${host}/api/v5/slobs/test/streamlabs/donation/${token}`;
+    url(host) {
+      return `https://${host}/api/v5/slobs/test/streamlabs/donation`;
     },
     platforms: ['twitch', 'youtube', 'mixer']
   },
   {
     name: 'Bits',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/bits/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/bits`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Host',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/host/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/host`;
     },
     platforms: ['twitch']
   },
   {
     name: 'Super Chat',
-    url(host, token, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat/${token}`;
+    url(host, platform) {
+      return `https://${host}/api/v5/slobs/test/${platform}_account/superchat`;
     },
     platforms: ['youtube']
   }
@@ -128,9 +129,12 @@ const WidgetTesters: IWidgetTester[] = [
 export class WidgetTester {
   constructor(public name: string, private url: string) {}
 
+  @Inject() userService: UserService;
+
   @throttle(1000)
   test() {
-    fetch(new Request(this.url));
+    const headers = authorizedHeaders(this.userService.apiToken);
+    fetch(new Request(this.url, { headers }));
   }
 }
 
@@ -429,7 +433,6 @@ export class WidgetsService extends Service {
         tester.name,
         tester.url(
           this.hostsService.streamlabs,
-          this.userService.widgetToken,
           this.userService.platform.type
         )
       );

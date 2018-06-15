@@ -20,6 +20,7 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
+import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 
 interface IAppState {
@@ -40,6 +41,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
+  @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
 
   static initialState: IAppState = {
@@ -76,6 +78,8 @@ export class AppService extends StatefulService<IAppState> {
         electron.ipcRenderer.send('acknowledgeShutdown');
         this.shutdownHandler();
       });
+
+      this.facemasksService;
 
       this.shortcutsService;
       this.streamlabelsService;
