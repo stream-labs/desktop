@@ -166,7 +166,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
-  overlaysUrl() {
+  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const host = Util.isPreview()
       ? this.hostsService.beta3
       : this.hostsService.streamlabs;
@@ -174,7 +174,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     let url = `https://${host}/library?mode=${uiTheme}&slobs`;
 
     if (this.isLoggedIn()) {
-      url = url + `&oauth_token=${this.apiToken}`;
+      url += `&oauth_token=${this.apiToken}`;
+    }
+
+    if (type && id) {
+      url += `#/?type=${type}&id=${id}`;
     }
 
     return url;
