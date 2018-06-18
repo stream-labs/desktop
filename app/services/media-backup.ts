@@ -98,7 +98,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     try {
       data = await this.withRetry(() => this.uploadFile(filePath));
     } catch (e) {
-      console.error(`[Media Backup] Error uploading file: ${e}`);
+      console.error('[Media Backup] Error uploading file:', e);
 
       // We don't surface errors to the user currently
       if (this.validateSyncLock(localId, syncLock)) {
