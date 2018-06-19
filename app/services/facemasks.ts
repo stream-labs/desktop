@@ -98,7 +98,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     profanity_names: true,
   };
 
-  static defaultState:IFacemasksServiceState = {
+  static defaultState: IFacemasksServiceState = {
     device: { name: null, value: null },
     modtimeMap: {},
     active: false
