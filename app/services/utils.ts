@@ -41,6 +41,10 @@ export default class Utils {
     return electron.remote.process.env.SLOBS_PREVIEW;
   }
 
+  static isIpc(): boolean {
+    return electron.remote.process.env.SLOBS_IPC;
+  }
+
   /**
    * create an acceptable color value for obs
    */
