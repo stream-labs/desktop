@@ -48,7 +48,7 @@ if (isProduction) {
   });
 }
 
-if (isProduction || process.env.SLOBS_REPORT_TO_SENTRY) {
+if ((isProduction || process.env.SLOBS_REPORT_TO_SENTRY) && !electron.remote.process.env.SLOBS_IPC) {
   Raven.config(sentryDsn, {
     release: slobsVersion,
     dataCallback: data => {
