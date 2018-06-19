@@ -42,6 +42,8 @@ interface IMediaFileDataResponse {
   url: string;
 }
 
+const ONE_GIGABYTE = Math.pow(10, 9);
+
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
@@ -76,6 +78,21 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       name = path.parse(filePath).base;
     } catch (e) {
       console.warn(`[Media Backup] Got unparseable path ${filePath}`);
+      return null;
+    }
+
+    const stats = await new Promise<fs.Stats>((resolve, reject) => {
+      fs.lstat(filePath, (err, stats) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stats);
+        }
+      });
+    });
+
+    if (stats.size > ONE_GIGABYTE) {
+      // We don't upload files larger than 1 gigabyte
       return null;
     }
 
