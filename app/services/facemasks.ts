@@ -217,10 +217,12 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   playTestAlert() {
     if (this.active && this.socketConnectionActive) {
-      const uuids = Object.keys(this.state.modtimeMap).filter(uuid => !this.state.modtimeMap[uuid].intro);
+      const availableMasks = Object.keys(this.state.modtimeMap).filter(uuid  => {
+        return Object.keys(this.settings.facemasks).includes(uuid) && !this.state.modtimeMap[uuid].intro;
+      });
 
-      if (uuids.length) {
-        const testMask = uuids[Math.floor(Math.random() * uuids.length)];
+      if (availableMasks.length) {
+        const testMask = availableMasks[Math.floor(Math.random() * availableMasks.length)];
         this.enqueueAlert({
           name: 'Streamlabs',
           amount: '10',
