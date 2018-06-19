@@ -15,6 +15,7 @@
     "clear-plugins": "rm -rf plugins",
     "package": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
     "package:preview": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
+    "package:ipc": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
     "release": "yarn install --cwd bin && node bin/release.js",
     "test": "tsc -p test && ava -v",
     "clear": "rm -rf bundles/media",
