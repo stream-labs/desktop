@@ -334,7 +334,6 @@
       <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
       <ul slot="support-list" class="source-support__list">
         <li>{{ $t('Twitch Follows') }}</li>
-        <li>{{ $t('Youtube Follows') }}</li>
         <li>{{ $t('Mixer Follows') }}</li>
       </ul>
     </add-source-info>
@@ -568,6 +567,7 @@
           </div>
 
           <div
+            v-if="platform === 'twitch'|| platform === `mixer`"
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
             @click="inspectSource(widgetTypes.FollowerGoal)"
