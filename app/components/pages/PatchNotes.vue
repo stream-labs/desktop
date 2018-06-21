@@ -1,6 +1,6 @@
 <template>
 <div class="patch-notes-page">
-  <div
+  <!-- <div
     class="patch-notes-container patch-notes-container--closed"
     :class="{ 'patch-notes-container--closing': patchNotesClosing }">
     <div class="patch-notes-content">
@@ -24,7 +24,7 @@
         Open Update {{ notes.version }}
       </button>
     </div>
-  </div>
+  </div> -->
 
   <div
     class="patch-notes-container patch-notes-container--opened"
@@ -75,12 +75,12 @@
 }
 
 .patch-notes-container--opened {
-  opacity: 0;
+  // opacity: 0;
   display: none;
 
   &.patch-notes-container--opening {
     display: flex;
-    animation: fadeIn 1s ease-in-out 1.5s 1 forwards;
+    // animation: fadeIn 1s ease-in-out 1.5s 1 forwards;
   }
 }
 
@@ -90,7 +90,7 @@
 
   &.patch-notes-container--closing {
     overflow: visible;
-    animation: fadeOut 1s ease-in .75s forwards;
+    // animation: fadeOut 1s ease-in .75s forwards;
 
     .patch-notes-chest {
       animation: expandChest .5s ease-in .25s 1 forwards;
