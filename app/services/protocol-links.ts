@@ -58,4 +58,15 @@ export class ProtocolLinksService extends Service {
     const subPage = info.path.replace('/', '');
     this.navigationService.navigate('Dashboard', { subPage });
   }
+
+  @protocolHandler('library')
+  private navigateLibrary(info: IProtocolLinkInfo) {
+    const parts = info.path.match(/^\/(.+)\/(.+)$/);
+    if (parts) {
+      this.navigationService.navigate('BrowseOverlays', {
+        type: parts[1],
+        id: parts[2]
+      });
+    }
+  }
 }

@@ -42,6 +42,8 @@ interface IMediaFileDataResponse {
   url: string;
 }
 
+const ONE_GIGABYTE = Math.pow(10, 9);
+
 export class MediaBackupService extends StatefulService<IMediaBackupState> {
   @Inject() hostsService: HostsService;
   @Inject() userService: UserService;
@@ -79,6 +81,21 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       return null;
     }
 
+    const stats = await new Promise<fs.Stats>((resolve, reject) => {
+      fs.lstat(filePath, (err, stats) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stats);
+        }
+      });
+    });
+
+    if (stats.size > ONE_GIGABYTE) {
+      // We don't upload files larger than 1 gigabyte
+      return null;
+    }
+
     const syncLock = uuid();
 
     const file: IMediaFile = {
@@ -98,7 +115,7 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
     try {
       data = await this.withRetry(() => this.uploadFile(filePath));
     } catch (e) {
-      console.error(`[Media Backup] Error uploading file: ${e}`);
+      console.error('[Media Backup] Error uploading file:', e);
 
       // We don't surface errors to the user currently
       if (this.validateSyncLock(localId, syncLock)) {

@@ -26,7 +26,7 @@
   "Show confirmation dialog when stopping streams": "Show confirmation dialog when stopping streams",
   "Automatically record when streaming": "Automatically record when streaming",
   "Keep recording when stream stops": "Keep recording when stream stops",
-  "Source Alignement Snapping": "Source Alignement Snapping",
+  "Source Alignement Snapping": "Source Alignment Snapping",
   "Snap Sources to edge of screen": "Snap Sources to edge of screen",
   "Snap Sources to other sources": "Snap Sources to other sources",
   "Stream Type": "Stream Type",
