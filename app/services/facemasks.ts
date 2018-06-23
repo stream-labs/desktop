@@ -3,6 +3,8 @@ import { PersistentStatefulService } from './persistent-stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 import { SourcesService } from './sources';
+import { ISource } from 'services/sources/sources-api';
+import { Source } from 'services/sources/source';
 import { SourceFiltersService } from './source-filters';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
@@ -98,7 +100,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     profanity_names: true,
   };
 
-  static defaultState:IFacemasksServiceState = {
+  static defaultState: IFacemasksServiceState = {
     device: { name: null, value: null },
     modtimeMap: {},
     active: false
@@ -106,6 +108,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   init() {
     super.init();
+    this.subscribeToSourceAdded();
     if (this.userService.isLoggedIn()) {
       this.startup();
     }
@@ -156,9 +159,19 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
+  private subscribeToSourceAdded(): void {
+    this.sourcesService.sourceAdded.subscribe(e => this.onSourceAdded(e));
+  }
+
   onSocketEvent(event: TSocketEvent) {
     if (event.type === 'facemask') {
       this.enqueueAlert(event.message[0]);
+    }
+  }
+
+  onSourceAdded(event: ISource) {
+    if (event.type === 'dshow_input' && this.active) {
+      this.updateFilterReference([this.sourcesService.getSourceById(event.sourceId)]);
     }
   }
 
@@ -217,10 +230,12 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   playTestAlert() {
     if (this.active && this.socketConnectionActive) {
-      const uuids = Object.keys(this.state.modtimeMap).filter(uuid => !this.state.modtimeMap[uuid].intro);
+      const availableMasks = Object.keys(this.state.modtimeMap).filter(uuid  => {
+        return Object.keys(this.settings.facemasks).includes(uuid) && !this.state.modtimeMap[uuid].intro;
+      });
 
-      if (uuids.length) {
-        const testMask = uuids[Math.floor(Math.random() * uuids.length)];
+      if (availableMasks.length) {
+        const testMask = availableMasks[Math.floor(Math.random() * availableMasks.length)];
         this.enqueueAlert({
           name: 'Streamlabs',
           amount: '10',
@@ -345,7 +360,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       }
 
       Promise.all(promises).then(() => {
-        this.setupFilter(settings);
+        this.setupFilter();
         this.activate();
       }).catch(err => {
         this.notifyFailure();
@@ -365,7 +380,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         return { uuid: mask.uuid, intro: mask.is_intro };
       });
 
-      this.setupFilter(settings);
+      this.setupFilter();
 
       const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
       const downloads = missingMasks.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, false));
@@ -419,13 +434,17 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       .then(response => response.json());
   }
 
-  setupFilter(settings: IFacemaskSettings) {
+  setupFilter() {
     const sources = this.sourcesService.getSources();
 
     const dshowInputs = sources.filter(source => {
       return source.type === 'dshow_input';
     });
 
+    this.updateFilterReference(dshowInputs);
+  }
+
+  updateFilterReference(dshowInputs: Source[]) {
     if (dshowInputs.length) {
       const matches = dshowInputs.filter(videoInput => {
         return videoInput.getObsInput().settings.video_device_id === this.state.device.value;
@@ -443,21 +462,23 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
             'Face Mask Plugin',
             {
               maskFolder: this.facemasksDirectory,
-              alertDuration: settings.duration,
-              alertIntro: `${settings.transition.uuid}.json`,
-              alertOutro: `${settings.transition.uuid}.json`,
-              alertDoIntro: settings.transitions_enabled,
-              alertDoOutro: settings.transitions_enabled
+              alertDuration: this.settings.duration,
+              alertIntro: `${this.settings.transition.uuid}.json`,
+              alertOutro: `${this.settings.transition.uuid}.json`,
+              alertDoIntro: this.settings.transitions_enabled,
+              alertDoOutro: this.settings.transitions_enabled,
+              alertActivate: false
             });
         } else {
           this.facemaskFilter = facemaskFilters[0];
           this.updateFilter({
             maskFolder: this.facemasksDirectory,
-            alertDuration: settings.duration,
-            alertIntro: `${settings.transition.uuid}.json`,
-            alertOutro: `${settings.transition.uuid}.json`,
-            alertDoIntro: settings.transitions_enabled,
-            alertDoOutro: settings.transitions_enabled
+            alertDuration: this.settings.duration,
+            alertIntro: `${this.settings.transition.uuid}.json`,
+            alertOutro: `${this.settings.transition.uuid}.json`,
+            alertDoIntro: this.settings.transitions_enabled,
+            alertDoOutro: this.settings.transitions_enabled,
+            alertActivate: false
           });
         }
       }
