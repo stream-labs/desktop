@@ -144,9 +144,8 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const scene = this.getScene(id);
     if (!scene) return false;
 
-    const obsScene = scene.getObsScene();
+    this.transitionsService.transition(this.activeScene.id, scene.id);
 
-    this.transitionsService.transitionTo(obsScene);
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
     return true;

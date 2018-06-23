@@ -36,9 +36,9 @@ export class RootNode extends Node<ISchema, {}> {
   }
 
   async load(): Promise<void> {
+    await this.data.transition.load();
     await this.data.sources.load({});
     await this.data.scenes.load({});
-    await this.data.transition.load();
 
     if (this.data.hotkeys) {
       await this.data.hotkeys.load({});

@@ -21,20 +21,22 @@ export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
 
-  form = this.transitionsService.getFormData();
-  properties = this.transitionsService.getPropertiesFormData();
+  defaultId = this.transitionsService.getDefaultTransition().id;
+
+  form = this.transitionsService.getFormData(this.defaultId);
+  properties = this.transitionsService.getPropertiesFormData(this.defaultId);
 
   setTransitionType() {
-    this.transitionsService.setType(this.form.type.value);
-    this.properties = this.transitionsService.getPropertiesFormData();
+    this.transitionsService.changeTransitionType(this.defaultId, this.form.type.value);
+    this.properties = this.transitionsService.getPropertiesFormData(this.defaultId);
   }
 
   setTransitionDuration() {
-    this.transitionsService.setDuration(this.form.duration.value);
+    this.transitionsService.setDuration(this.defaultId, this.form.duration.value);
   }
 
   saveProperties(props: TFormData) {
-    this.transitionsService.setPropertiesFormData(props);
+    this.transitionsService.setPropertiesFormData(this.defaultId, props);
   }
 
   done() {

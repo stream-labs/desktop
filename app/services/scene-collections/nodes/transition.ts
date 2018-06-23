@@ -2,6 +2,7 @@ import { Node } from './node';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { Inject } from 'util/injector';
 import { TObsValue } from 'components/shared/forms/Input';
+import { duration } from 'moment';
 
 interface ISchema {
   type: ETransitionType;
@@ -10,6 +11,7 @@ interface ISchema {
   propertiesManagerSettings?: Dictionary<any>;
 }
 
+// TODO: Rewrite this entire node for multiple transitions
 export class TransitionNode extends Node<ISchema, {}> {
 
   schemaVersion = 1;
@@ -17,21 +19,28 @@ export class TransitionNode extends Node<ISchema, {}> {
   @Inject() transitionsService: TransitionsService;
 
   async save() {
+    const transition = this.transitionsService.getDefaultTransition();
+
     this.data = {
-      type: this.transitionsService.state.type,
-      duration: this.transitionsService.state.duration,
-      settings: this.transitionsService.getSettings(),
-      propertiesManagerSettings: this.transitionsService.propertiesManager.settings
+      type: transition.type,
+      duration: transition.duration,
+      settings: this.transitionsService.getSettings(transition.id),
+      propertiesManagerSettings: this.transitionsService.getPropertiesManagerSettings(transition.id)
     };
   }
 
   async load() {
-    this.transitionsService.setType(
+    // TODO: Support for multiple transitions
+    this.transitionsService.deleteAllTransitions();
+    this.transitionsService.createTransition(
       this.data.type,
-      this.data.settings || {},
-      this.data.propertiesManagerSettings || {}
+      'Global Transition',
+      {
+        settings: this.data.settings || {},
+        propertiesManagerSettings: this.data.propertiesManagerSettings || {},
+        duration: this.data.duration
+      }
     );
-    this.transitionsService.setDuration(this.data.duration);
   }
 
 }
