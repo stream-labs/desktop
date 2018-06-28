@@ -6,13 +6,16 @@
         class="Tabs-tab"
         :class="{ 'Tabs-tab__active': tab.value === selected }"
         v-for="tab in tabs"
+        :key="tab.value"
         @click="showTab(tab.value)">
         {{ tab.name }}
       </li>
     </ul>
   </div>
   <div class="Tabs-contentContainer">
-    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === selected"/>
+    <div v-for="tab in tabs" :key="tab.value" v-show="tab.value === selected">
+      <slot :name="tab.value" />
+    </div>
   </div>
 </div>
 </template>

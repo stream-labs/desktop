@@ -7,12 +7,14 @@ import windowMixin from 'components/mixins/window';
 import ModalLayout from 'components/ModalLayout.vue';
 import TransitionSettings from 'components/TransitionSettings.vue';
 import { $t } from 'services/i18n';
+import Tabs, { ITab } from 'components/Tabs.vue';
 
 @Component({
   mixins: [windowMixin],
   components: {
     ModalLayout,
-    TransitionSettings
+    TransitionSettings,
+    Tabs
   }
 })
 export default class SceneTransitions extends Vue {
@@ -20,6 +22,17 @@ export default class SceneTransitions extends Vue {
   @Inject() windowsService: WindowsService;
 
   inspectedId = '';
+
+  tabs: ITab[] = [
+    {
+      name: 'Transitions',
+      value: 'transitions'
+    },
+    {
+      name: 'Connections',
+      value: 'connections'
+    }
+  ];
 
   get transitions() {
     return this.transitionsService.state.transitions;
