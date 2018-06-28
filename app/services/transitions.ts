@@ -322,6 +322,16 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
+  /**
+   * Removes all connections.  This should really only be used when
+   * switching scene collections.
+   */
+  deleteAllConnections() {
+    this.state.connections.forEach(connection => {
+      this.deleteConnection(connection.id);
+    });
+  }
+
   setDefaultTransition(id: string) {
     this.MAKE_DEFAULT(id);
   }

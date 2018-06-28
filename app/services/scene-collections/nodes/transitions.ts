@@ -13,11 +13,14 @@ interface ITransition {
 }
 
 interface IConnection {
+  fromSceneId: string;
+  toSceneId: string;
+  transitionId: string;
 }
 
 interface ISchema {
   transitions: ITransition[];
-  connections: IConnection;
+  connections: IConnection[];
   defaultTransitionId: string;
 }
 
@@ -43,7 +46,13 @@ export class TransitionsNode extends Node<ISchema, {}> {
           propertiesManagerSettings: this.transitionsService.getPropertiesManagerSettings(transition.id)
         };
       }),
-      connections: [], // TODO
+      connections: this.transitionsService.state.connections.map(connection => {
+        return {
+          fromSceneId: connection.fromSceneId,
+          toSceneId: connection.toSceneId,
+          transitionId: connection.transitionId
+        };
+      }),
       defaultTransitionId: this.transitionsService.state.defaultTransitionId
     };
   }
@@ -60,6 +69,15 @@ export class TransitionsNode extends Node<ISchema, {}> {
           settings: transition.settings,
           propertiesManagerSettings: transition.propertiesManagerSettings
         }
+      );
+    });
+
+    this.transitionsService.deleteAllConnections();
+    this.data.connections.forEach(connection => {
+      this.transitionsService.addConnection(
+        connection.fromSceneId,
+        connection.toSceneId,
+        connection.transitionId
       );
     });
 
