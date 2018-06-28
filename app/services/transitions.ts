@@ -38,6 +38,7 @@ interface ITransition {
 }
 
 interface ITransitionConnection {
+  id: string;
   fromSceneId: string;
   toSceneId: string;
   transitionId: string;
@@ -197,14 +198,34 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     //   return;
     // }
 
-    // TODO: Fetch proper transition from connections rather
-    // Than using the default transition
-    // Remember that `sceneAId` can be null for the first ever transition
     const obsScene = this.scenesService.getScene(sceneBId).getObsScene();
-    const transition = this.getDefaultTransition();
+    const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
+
+    console.log('transitioning via', obsTransition);
+
+
+    if (sceneAId) {
+      obsTransition.set(this.scenesService.getScene(sceneAId).getObsScene());
+    }
     obs.Global.setOutputSource(0, obsTransition);
     obsTransition.start(transition.duration, obsScene);
+  }
+
+  /**
+   * Finds the correct transition to use when transitioning
+   * between these 2 scenes, based on the current connections
+   */
+  getConnectedTransition(fromId: string, toId: string): ITransition {
+    const matchedConnection = this.state.connections.find(connection => {
+      return (connection.fromSceneId === fromId) && (connection.toSceneId === toId);
+    });
+
+    if (matchedConnection && this.getTransition(matchedConnection.transitionId)) {
+      return this.getTransition(matchedConnection.transitionId);
+    }
+
+    return this.getDefaultTransition();
   }
 
   shutdown() {
@@ -256,10 +277,13 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   changeTransitionType(id: string, newType: ETransitionType) {
     const transition = this.getTransition(id);
 
-    this.deleteTransition(id);
-    this.createTransition(newType, transition.name, {
-      id: transition.id
-    });
+    this.propertiesManagers[id].destroy();
+    this.obsTransitions[id].release();
+
+    this.obsTransitions[id] = obs.TransitionFactory.create(newType, id);
+    this.propertiesManagers[id] = new DefaultManager(this.obsTransitions[id], {});
+
+    this.UPDATE_TRANSITION(id, { type: newType });
   }
 
   renameTransition(id: string, newName: string) {
@@ -291,6 +315,29 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
   getTransition(id: string) {
     return this.state.transitions.find(tran => tran.id === id);
+  }
+
+  addConnection(fromId: string, toId: string, transitionId: string) {
+    const id = uuid();
+    this.ADD_CONNECTION({
+      id,
+      fromSceneId: fromId,
+      toSceneId: toId,
+      transitionId
+    });
+    return this.getConnection(id);
+  }
+
+  updateConnection(id: string, patch: Partial<ITransitionConnection>) {
+    this.UPDATE_CONNECTION(id, patch);
+  }
+
+  deleteConnection(id: string) {
+    this.DELETE_CONNECTION(id);
+  }
+
+  getConnection(id: string) {
+    return this.state.connections.find(conn => conn.id === id);
   }
 
   // setType(
@@ -383,6 +430,27 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @mutation()
   private MAKE_DEFAULT(id: string) {
     this.state.defaultTransitionId = id;
+  }
+
+  @mutation()
+  private ADD_CONNECTION(connection: ITransitionConnection) {
+    this.state.connections.push(connection);
+  }
+
+  @mutation()
+  private UPDATE_CONNECTION(id: string, patch: Partial<ITransitionConnection>) {
+    const connection = this.state.connections.find(conn => conn.id === id);
+
+    if (connection) {
+      Object.keys(patch).forEach(key => {
+        connection[key] = patch[key];
+      });
+    }
+  }
+
+  @mutation()
+  private DELETE_CONNECTION(id: string) {
+    this.state.connections = this.state.connections.filter(conn => conn.id !== id);
   }
 
   @mutation()

@@ -3,7 +3,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/shared/forms';
-import { WindowsService } from 'services/windows';
 import { TFormData, IListInput, IFormInput } from 'components/shared/forms/Input';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
 
@@ -15,7 +14,6 @@ import GenericForm from 'components/shared/forms/GenericForm.vue';
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
-  @Inject() windowsService: WindowsService;
 
   @Prop() transitionId: string;
 
@@ -67,9 +65,5 @@ export default class SceneTransitions extends Vue {
 
   saveProperties(props: TFormData) {
     this.transitionsService.setPropertiesFormData(this.transitionId, props);
-  }
-
-  done() {
-    this.windowsService.closeChildWindow();
   }
 }

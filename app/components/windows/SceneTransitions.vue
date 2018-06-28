@@ -4,13 +4,16 @@
   :done-handler="done">
 
   <div slot="content">
-    <tabs :tabs="tabs">
+    <div v-if="!transitionsEnabled">
+      You need at least 2 scenes to edit transitions.
+    </div>
+    <tabs :tabs="tabs" v-else>
       <div slot="transitions">
         <button class="button button--action" @click="addTransition">
           {{$t('Add Transition')}}
         </button>
-        <ul v-for="transition in transitions" :key="transition.id">
-          <li>
+        <ul>
+          <li v-for="transition in transitions" :key="transition.id">
             {{ transition.name }}
             <button @click="editTransition(transition.id)">Edit</button>
             <button @click="deleteTransition(transition.id)">Delete</button>
@@ -20,12 +23,28 @@
         </ul>
       </div>
       <div slot="connections">
-        Connections Go Here
+        <button class="button button--action" @click="addConnection">
+          {{$t('Add Connection')}}
+        </button>
+        <ul>
+          <li v-for="connection in connections" :key="connection.id">
+            From: {{ getSceneName(connection.fromSceneId) }}
+            Transition: {{ getTransitionName(connection.transitionId) }}
+            To: {{ getSceneName(connection.toSceneId) }}
+            <button @click="editConnection(connection.id)">Edit</button>
+            <button @click="deleteConnection(connection.id)">Delete</button>
+          </li>
+        </ul>
       </div>
     </tabs>
-    <modal name="settings" :height="550">
+    <modal name="transition-settings" :height="550">
       <div class="transition-settings-modal">
-        <transition-settings :transition-id="inspectedId"/>
+        <transition-settings :transition-id="inspectedTransition"/>
+      </div>
+    </modal>
+    <modal name="connection-settings" :height="550">
+      <div class="connection-settings-modal">
+        <connection-settings :connection-id="inspectedConnection"/>
       </div>
     </modal>
   </div>
@@ -41,6 +60,10 @@
 }
 
 .transition-settings-modal {
+  padding: 20px;
+}
+
+.connection-settings-modal {
   padding: 20px;
 }
 </style>

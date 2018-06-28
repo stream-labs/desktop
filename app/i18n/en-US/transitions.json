@@ -10,5 +10,6 @@
   "Transition": "Transition",
   "Duration": "Duration",
   "Add Transition": "Add Transition",
-  "You need at least 1 transition.": "You need at least 1 transition."
+  "You need at least 1 transition.": "You need at least 1 transition.",
+  "Add Connection": "Add Connection"
 }

@@ -8,20 +8,25 @@ import ModalLayout from 'components/ModalLayout.vue';
 import TransitionSettings from 'components/TransitionSettings.vue';
 import { $t } from 'services/i18n';
 import Tabs, { ITab } from 'components/Tabs.vue';
+import { ScenesService } from 'services/scenes';
+import ConnectionSettings from 'components/ConnectionSettings.vue';
 
 @Component({
   mixins: [windowMixin],
   components: {
     ModalLayout,
     TransitionSettings,
-    Tabs
+    Tabs,
+    ConnectionSettings
   }
 })
 export default class SceneTransitions extends Vue {
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
+  @Inject() scenesService: ScenesService;
 
-  inspectedId = '';
+  inspectedTransition = '';
+  inspectedConnection = '';
 
   tabs: ITab[] = [
     {
@@ -33,6 +38,12 @@ export default class SceneTransitions extends Vue {
       value: 'connections'
     }
   ];
+
+  get transitionsEnabled() {
+    return this.scenesService.scenes.length > 1;
+  }
+
+  // TRANSITIONS
 
   get transitions() {
     return this.transitionsService.state.transitions;
@@ -51,8 +62,8 @@ export default class SceneTransitions extends Vue {
   }
 
   editTransition(id: string) {
-    this.inspectedId = id;
-    this.$modal.show('settings');
+    this.inspectedTransition = id;
+    this.$modal.show('transition-settings');
   }
 
   deleteTransition(id: string) {
@@ -66,6 +77,44 @@ export default class SceneTransitions extends Vue {
 
   makeDefault(id: string) {
     this.transitionsService.setDefaultTransition(id);
+  }
+
+  // CONNECTIONS
+
+  get connections() {
+    return this.transitionsService.state.connections;
+  }
+
+  addConnection() {
+    const connection = this.transitionsService.addConnection(
+      this.scenesService.scenes[0].id,
+      this.scenesService.scenes[1].id,
+      this.transitions[0].id
+    );
+    this.editConnection(connection.id);
+  }
+
+  editConnection(id: string) {
+    this.inspectedConnection = id;
+    this.$modal.show('connection-settings');
+  }
+
+  deleteConnection(id: string) {
+    this.transitionsService.deleteConnection(id);
+  }
+
+  getTransitionName(id: string) {
+    const transition = this.transitionsService.getTransition(id);
+
+    if (transition) return transition.name;
+    return '<deleted>';
+  }
+
+  getSceneName(id: string) {
+    const scene = this.scenesService.getScene(id);
+
+    if (scene) return scene.name;
+    return '<deleted>';
   }
 
   done() {
