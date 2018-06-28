@@ -7,38 +7,38 @@
     <div class="container">
       <h1 class="header bold">Media Gallery</h1>
       <div>
-        <input type="file" accept=".webm,.gif,.jpg,.png,.mp3,.ogg,.wav,.svg,.eps,.ai,.psd" multiple="multiple" style="display: none;">
+        <input type="file" id="media-gallery-input" @change="handleUploadClick($event)" accept=".webm,.gif,.jpg,.png,.mp3,.ogg,.wav,.svg,.eps,.ai,.psd" multiple="multiple" style="display: none;">
         <div class="flex">
           <div class="left-panel">
-            <div class="dropzone">
+            <div class="dropzone" @click="openFilePicker">
               <i class="icon-cloud-backup"></i>Drag &amp; Drop Upload
             </div>
             <ul class="nav-list">
               <div>
                 <div class="bold">My Uploads</div>
-                <li class="list__item"><a class="list__link semibold">
+                <li class="list__item semibold" @click="handleTypeFilter(null, null)">
                   <i class="fa fa-file"></i>All Files
-                </a></li>
-                <li class="list__item"><a class="list__link semibold">
+                </li>
+                <li class="list__item semibold" @click="handleTypeFilter('image', null)">
                   <i class="icon-image"></i>Images
-                </a></li>
-                <li class="list__item"><a class="list__link semibold">
+                </li>
+                <li class="list__item semibold" @click="handleTypeFilter('audio', null)">
                   <i class="icon-music"></i>Sounds
-                </a></li>
+                </li>
               </div>
             </ul>
             <ul class="nav-list">
               <div>
                 <div class="bold">Stock Files</div>
-                <li class="list__item"><a class="list__link semibold">
+                <li class="list__item semibold" @click="handleTypeFilter(null, 'stock')">
                   <i class="fa fa-file"></i>All Files
-                </a></li>
-                <li class="list__item"><a class="list__link semibold">
+                </li>
+                <li class="list__item semibold" @click="handleTypeFilter('image', 'stock')">
                   <i class="icon-image"></i>Images
-                </a></li>
-                <li class="list__item"><a class="list__link semibold">
+                </li>
+                <li class="list__item semibold" @click="handleTypeFilter('audio', 'stock')">
                   <i class="icon-music"></i>Sounds
-                </a></li>
+                </li>
               </div>
             </ul>
             <div>
@@ -47,18 +47,18 @@
             </div>
           </div>
           <div class="right-panel">
-            <h4>Images</h4>
+            <h4>{{ title }}</h4>
             <div class="toolbar">
-              <i class="icon-cloud-backup"></i>
+              <i class="icon-cloud-backup" @click="openFilePicker"></i>
               <i class="icon-trash"></i>
             </div>
             <div>
               <div style="border: 1px solid rgb(255, 200, 0); background: rgba(255, 200, 0, 0.15); z-index: 100000; box-sizing: border-box; position: absolute; border-radius: 3px; top: 0px; left: 0px; height: 100%; width: 100%; display: none;"></div>
               <div style="text-align: center; margin-top: 160px;">
-                <div>You don't have any uploaded images!</div>
+                <div>{{ noFilesCopy }}</div>
                 <div>
-                  <button>Upload An Image</button>
-                  <button>Browse the Gallery</button>
+                  <button @click="openFilePicker">{{ noFilesBtn }}</button>
+                  <button @click="handleBrowseGalleryClick">Browse the Gallery</button>
                 </div>
               </div>
             </div>
@@ -75,7 +75,7 @@
 </modal-layout>
 </template>
 
-<script lang="ts" src="./ManageSceneCollections.vue.ts"></script>
+<script lang="ts" src="./MediaGallery.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../styles/index";
@@ -128,14 +128,15 @@
 
 .list__item {
   padding: 3px 0;
-}
-
-.list__link {
-  text-decoration: none;
   color: @white;
+
   i {
     color: @grey;
     padding-right: 6px;
+  }
+
+  &:hover {
+    cursor: pointer;
   }
 }
 
