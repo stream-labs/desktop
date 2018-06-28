@@ -110,54 +110,65 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   enableStudioMode() {
-    // if (this.state.studioMode) return;
+    if (this.state.studioMode) return;
 
-    // this.SET_STUDIO_MODE(true);
-    // if (!this.studioModeTransition) this.createStudioModeTransition();
-    // const currentScene = this.scenesService.activeScene.getObsScene();
-    // this.sceneDuplicate = currentScene.duplicate(
-    //   uuid(),
-    //   obs.ESceneDupType.Copy
-    // );
+    this.SET_STUDIO_MODE(true);
+    if (!this.studioModeTransition) this.createStudioModeTransition();
+    const currentScene = this.scenesService.activeScene.getObsScene();
+    this.sceneDuplicate = currentScene.duplicate(
+      uuid(),
+      obs.ESceneDupType.Copy
+    );
 
-    // // Immediately switch to the duplicated scene
-    // this.getCurrentTransition().set(this.sceneDuplicate);
+    // Immediately switch to the duplicated scene
+    this.getCurrentTransition().set(this.sceneDuplicate);
 
-    // this.studioModeTransition.set(currentScene);
+    this.studioModeTransition.set(currentScene);
   }
 
   disableStudioMode() {
-    // if (!this.state.studioMode) return;
+    if (!this.state.studioMode) return;
 
-    // this.SET_STUDIO_MODE(false);
+    this.SET_STUDIO_MODE(false);
 
-    // this.getCurrentTransition().set(
-    //   this.scenesService.activeScene.getObsScene()
-    // );
-    // this.releaseStudioModeObjects();
+    this.getCurrentTransition().set(
+      this.scenesService.activeScene.getObsScene()
+    );
+    this.releaseStudioModeObjects();
   }
 
   /**
    * While in studio mode, will execute a studio mode transition
    */
   executeStudioModeTransition() {
-    // if (!this.state.studioMode) return;
-    // if (this.studioModeLocked) return;
+    if (!this.state.studioMode) return;
+    if (this.studioModeLocked) return;
 
-    // this.studioModeLocked = true;
+    this.studioModeLocked = true;
 
-    // const currentScene = this.scenesService.activeScene.getObsScene();
+    const currentScene = this.scenesService.activeScene.getObsScene();
 
-    // const oldDuplicate = this.sceneDuplicate;
-    // this.sceneDuplicate = currentScene.duplicate(
-    //   uuid(),
-    //   obs.ESceneDupType.Copy
-    // );
-    // this.getCurrentTransition().start(this.state.duration, this.sceneDuplicate);
+    const oldDuplicate = this.sceneDuplicate;
+    this.sceneDuplicate = currentScene.duplicate(
+      uuid(),
+      obs.ESceneDupType.Copy
+    );
 
-    // oldDuplicate.release();
+    // TODO: Make this a dropdown box
+    const transition = this.getDefaultTransition();
 
-    // setTimeout(() => (this.studioModeLocked = false), this.state.duration);
+    this.obsTransitions[transition.id].start(transition.duration, this.sceneDuplicate);
+
+    oldDuplicate.release();
+
+    setTimeout(() => (this.studioModeLocked = false), transition.duration);
+  }
+
+  /**
+   * Fetches the transition currently attached to output channel 0
+   */
+  private getCurrentTransition() {
+    return obs.Global.getOutputSource(0) as obs.ITransition;
   }
 
   /**
@@ -181,29 +192,16 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     }
   }
 
-  // transitionTo(scene: obs.IScene) {
-  //   if (this.state.studioMode) {
-  //     this.studioModeTransition.set(scene);
-  //     return;
-  //   }
-
-  //   const transition = this.getCurrentTransition();
-  //   transition.start(this.state.duration, scene);
-  // }
-
   transition(sceneAId: string, sceneBId: string) {
-    // TODO: Studio Mode
-    // if (this.state.studioMode) {
-    //   this.studioModeTransition.set(scene);
-    //   return;
-    // }
+    if (this.state.studioMode) {
+      const scene = this.scenesService.getScene(sceneBId);
+      this.studioModeTransition.set(scene.getObsScene());
+      return;
+    }
 
     const obsScene = this.scenesService.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
-
-    console.log('transitioning via', obsTransition);
-
 
     if (sceneAId) {
       obsTransition.set(this.scenesService.getScene(sceneAId).getObsScene());
@@ -339,43 +337,6 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   getConnection(id: string) {
     return this.state.connections.find(conn => conn.id === id);
   }
-
-  // setType(
-  //   type: ETransitionType,
-  //   settings?: Dictionary<TObsValue>,
-  //   propertiesManagerSettings?: Dictionary<any>
-  // ) {
-  //   const oldTransition = this.getCurrentTransition() as obs.ITransition;
-  //   const oldManager = this.propertiesManager;
-
-  //   const transition = this.getTypes().find(transition => {
-  //     return transition.value === type;
-  //   });
-
-  //   if (transition) {
-  //     const newTransition = obs.TransitionFactory.create(
-  //       type,
-  //       'Global Transition'
-  //     );
-  //     obs.Global.setOutputSource(0, newTransition);
-
-  //     if (settings) newTransition.update(settings);
-
-  //     this.propertiesManager = new DefaultManager(
-  //       newTransition,
-  //       propertiesManagerSettings || {}
-  //     );
-
-  //     if (oldTransition && oldTransition.getActiveSource) {
-  //       newTransition.set(oldTransition.getActiveSource());
-  //       oldTransition.release();
-  //     }
-
-  //     if (oldManager) oldManager.destroy();
-
-  //     this.SET_TYPE(type);
-  //   }
-  // }
 
   setDuration(id: string, duration: number) {
     this.UPDATE_TRANSITION(id, { duration });
