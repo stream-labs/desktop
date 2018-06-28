@@ -343,11 +343,23 @@ th {
   opacity: 0;
 }
 
+.v--modal-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.v--modal {
+  background-color: @day-primary;
+}
+
 // Night theme rules
 .night-theme {
   &.main {
     background: @night-primary;
     color: @night-text;
+  }
+
+  .v--modal {
+    background-color: @night-primary;
   }
 
   a {

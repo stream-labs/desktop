@@ -5,7 +5,7 @@ import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
 import { SceneItemsNode, ISceneItemInfo } from './nodes/scene-items';
-import { TransitionNode } from './nodes/transition';
+import { TransitionsNode } from './nodes/transitions';
 import { HotkeysNode } from './nodes/hotkeys';
 import { SceneFiltersNode } from './nodes/scene-filters';
 import path from 'path';
@@ -38,7 +38,8 @@ export const NODE_TYPES = {
   SourcesNode,
   ScenesNode,
   SceneItemsNode,
-  TransitionNode,
+  TransitionNode: TransitionsNode, // Alias old name to new node
+  TransitionsNode,
   HotkeysNode,
   SceneFiltersNode
 };

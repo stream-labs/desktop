@@ -96,15 +96,15 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
-  getTypes(): IListOption<string>[] {
+  getTypes(): IListOption<ETransitionType>[] {
     return [
-      { description: $t('Cut'), value: 'cut_transition' },
-      { description: $t('Fade'), value: 'fade_transition' },
-      { description: $t('Swipe'), value: 'swipe_transition' },
-      { description: $t('Slide'), value: 'slide_transition' },
-      { description: $t('Fade to Color'), value: 'fade_to_color_transition' },
-      { description: $t('Luma Wipe'), value: 'wipe_transition' },
-      { description: $t('Stinger'), value: 'obs_stinger_transition' }
+      { description: $t('Cut'), value: ETransitionType.Cut },
+      { description: $t('Fade'), value: ETransitionType.Fade },
+      { description: $t('Swipe'), value: ETransitionType.Swipe },
+      { description: $t('Slide'), value: ETransitionType.Slide },
+      { description: $t('Fade to Color'), value: ETransitionType.FadeToColor },
+      { description: $t('Luma Wipe'), value: ETransitionType.LumaWipe },
+      { description: $t('Stinger'), value: ETransitionType.Stinger }
     ];
   }
 
@@ -199,6 +199,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     // TODO: Fetch proper transition from connections rather
     // Than using the default transition
+    // Remember that `sceneAId` can be null for the first ever transition
     const obsScene = this.scenesService.getScene(sceneBId).getObsScene();
     const transition = this.getDefaultTransition();
     const obsTransition = this.obsTransitions[transition.id];
@@ -207,7 +208,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   }
 
   shutdown() {
-    Object.values(this.obsTransitions).forEach(tran => tran.release);
+    Object.values(this.obsTransitions).forEach(tran => tran.release());
     this.releaseStudioModeObjects();
     obs.Global.setOutputSource(0, null);
   }
@@ -232,7 +233,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     return this.propertiesManagers[id].setPropertiesFormData(formData);
   }
 
-  createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions) {
+  createTransition(type: ETransitionType, name: string, options: ITransitionCreateOptions = {}) {
     const id = options.id || uuid();
     const transition = obs.TransitionFactory.create(type, id, options.settings || {});
     const manager = new DefaultManager(transition, options.propertiesManagerSettings || {});
@@ -243,6 +244,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (!this.state.defaultTransitionId) this.MAKE_DEFAULT(id);
 
     this.ADD_TRANSITION(id, name, type, options.duration || 300);
+    return this.getTransition(id);
   }
 
   /**
@@ -260,9 +262,14 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
+  renameTransition(id: string, newName: string) {
+    this.UPDATE_TRANSITION(id, { name: newName });
+  }
+
   deleteTransition(id: string) {
     this.propertiesManagers[id].destroy();
     delete this.propertiesManagers[id];
+
     this.obsTransitions[id].release();
     delete this.obsTransitions[id];
     this.DELETE_TRANSITION(id);
@@ -276,6 +283,10 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.state.transitions.forEach(transition => {
       this.deleteTransition(transition.id);
     });
+  }
+
+  setDefaultTransition(id: string) {
+    this.MAKE_DEFAULT(id);
   }
 
   getTransition(id: string) {
@@ -323,32 +334,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.UPDATE_TRANSITION(id, { duration });
   }
 
-  // TODO: This is a poorly named function
-  // And should possibly be moved to the view
-  getFormData(id: string) {
-    const transition = this.getTransition(id);
-
-    return {
-      type: {
-        description: 'Transition',
-        name: 'type',
-        value: transition.type,
-        options: this.getTypes()
-      },
-      duration: {
-        description: 'Duration',
-        name: 'duration',
-        value: transition.duration
-      }
-    };
-  }
-
   showSceneTransitions() {
     this.windowsService.showWindow({
       componentName: 'SceneTransitions',
       size: {
-        width: 500,
-        height: 600
+        width: 800,
+        height: 650
       }
     });
   }
