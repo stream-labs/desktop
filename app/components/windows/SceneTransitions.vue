@@ -33,6 +33,7 @@
             To: {{ getSceneName(connection.toSceneId) }}
             <button @click="editConnection(connection.id)">Edit</button>
             <button @click="deleteConnection(connection.id)">Delete</button>
+            <span v-if="isConnectionRedundant(connection.id)">[REDUNDANT]</span>
           </li>
         </ul>
       </div>

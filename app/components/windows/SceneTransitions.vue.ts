@@ -117,6 +117,10 @@ export default class SceneTransitions extends Vue {
     return '<deleted>';
   }
 
+  isConnectionRedundant(id: string) {
+    return this.transitionsService.isConnectionRedundant(id);
+  }
+
   done() {
     this.windowsService.closeChildWindow();
   }

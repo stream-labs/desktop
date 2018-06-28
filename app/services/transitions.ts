@@ -359,6 +359,21 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     this.DELETE_CONNECTION(id);
   }
 
+  /**
+   * Returns true if this connection is redundant.  A redundant
+   * connection has the same from/to scene ids as a connection
+   * earlier in the order.
+   */
+  isConnectionRedundant(id: string) {
+    const connection = this.getConnection(id);
+
+    const match = this.state.connections.find(conn => {
+      return (conn.fromSceneId === connection.fromSceneId) && (conn.toSceneId === connection.toSceneId);
+    });
+
+    return match.id !== connection.id;
+  }
+
   getConnection(id: string) {
     return this.state.connections.find(conn => conn.id === id);
   }
