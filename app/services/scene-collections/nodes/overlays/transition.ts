@@ -22,39 +22,51 @@ export class TransitionNode extends Node<ISchema, IContext> {
   @Inject() transitionsService: TransitionsService;
 
   async save(context: IContext) {
-    // const type = this.transitionsService.state.type;
-    // const settings = { ...this.transitionsService.getSettings() };
-    // const filePath = settings.path as string;
+    // For overlays, we only store the default transition for now
+    const transition = this.transitionsService.getDefaultTransition();
+    const type = transition.type;
+    const settings = this.transitionsService.getSettings(transition.id);
+    const duration = transition.duration;
 
-    // if ((type === 'obs_stinger_transition') && filePath) {
-    //   const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
+    const filePath = settings.path as string;
 
-    //   const destination = path.join(context.assetsPath, newFileName);
-    //   const input = fs.createReadStream(filePath);
-    //   const output = fs.createWriteStream(destination);
+    if ((type === 'obs_stinger_transition') && filePath) {
+      const newFileName = `${uniqueId()}${path.parse(filePath).ext}`;
 
-    //   await new Promise(resolve => {
-    //     output.on('close', resolve);
-    //     input.pipe(output);
-    //   });
+      const destination = path.join(context.assetsPath, newFileName);
+      const input = fs.createReadStream(filePath);
+      const output = fs.createWriteStream(destination);
 
-    //   settings.path = newFileName;
-    // }
+      await new Promise(resolve => {
+        output.on('close', resolve);
+        input.pipe(output);
+      });
 
-    // this.data = {
-    //   type,
-    //   settings,
-    //   duration: this.transitionsService.state.duration,
-    // };
+      settings.path = newFileName;
+    }
+
+    this.data = {
+      type,
+      settings,
+      duration,
+    };
   }
 
   async load(context: IContext) {
-    // this.transitionsService.setType(this.data.type, this.data.settings || {});
-    // this.transitionsService.setDuration(this.data.duration);
+    this.transitionsService.deleteAllTransitions();
 
-    // if (this.data.type === 'obs_stinger_transition') {
-    //   const filePath = path.join(context.assetsPath, this.data.settings.path);
-    //   this.data.settings.path = filePath;
-    // }
+    if (this.data.type === 'obs_stinger_transition') {
+      const filePath = path.join(context.assetsPath, this.data.settings.path);
+      this.data.settings.path = filePath;
+    }
+
+    this.transitionsService.createTransition(
+      this.data.type,
+      'Global Transition',
+      {
+        settings: this.data.settings,
+        duration: this.data.duration
+      }
+    );
   }
 }

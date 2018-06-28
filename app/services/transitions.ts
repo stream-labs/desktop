@@ -199,6 +199,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
       return;
     }
 
+    // We should almost always have a valid transition by this point
+    // if the scene collections service has done its job.  However,
+    // this catch all ensure we at least have 1 basic transition in
+    // place when we try to transition.
+    this.ensureTransition();
+
     const obsScene = this.scenesService.getScene(sceneBId).getObsScene();
     const transition = this.getConnectedTransition(sceneAId, sceneBId);
     const obsTransition = this.obsTransitions[transition.id];
@@ -230,6 +236,15 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     Object.values(this.obsTransitions).forEach(tran => tran.release());
     this.releaseStudioModeObjects();
     obs.Global.setOutputSource(0, null);
+  }
+
+  /**
+   * Ensures there is at least 1 valid transition
+   */
+  ensureTransition() {
+    if (this.state.transitions.length === 0) {
+      this.createTransition(ETransitionType.Cut, 'Global Transition');
+    }
   }
 
   getDefaultTransition() {
