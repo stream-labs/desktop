@@ -11,5 +11,10 @@
   "Duration": "Duration",
   "Add Transition": "Add Transition",
   "You need at least 1 transition.": "You need at least 1 transition.",
-  "Add Connection": "Add Connection"
+  "Add Connection": "Add Connection",
+  "Beginning Scene": "Beginning Scene",
+  "Ending Scene": "Ending Scene",
+  "Scene Transition": "Scene Transition",
+  "Type": "Type",
+  "Name": "Name"
 }

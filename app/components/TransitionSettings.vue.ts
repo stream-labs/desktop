@@ -5,6 +5,7 @@ import { TransitionsService, ETransitionType } from 'services/transitions';
 import * as inputComponents from 'components/shared/forms';
 import { TFormData, IListInput, IFormInput } from 'components/shared/forms/Input';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -17,10 +18,9 @@ export default class SceneTransitions extends Vue {
 
   @Prop() transitionId: string;
 
-  // TODO: Localization
   get typeModel(): IListInput<ETransitionType> {
     return {
-      description: 'Type',
+      description: $t('Type'),
       name: 'type',
       value: this.transition.type,
       options: this.transitionsService.getTypes()
@@ -32,10 +32,9 @@ export default class SceneTransitions extends Vue {
     this.properties = this.transitionsService.getPropertiesFormData(this.transitionId);
   }
 
-  // TODO: Localization
   get durationModel(): IFormInput<number> {
     return {
-      description: 'Duration',
+      description: $t('Duration'),
       name: 'duration',
       value: this.transition.duration
     };
@@ -47,7 +46,7 @@ export default class SceneTransitions extends Vue {
 
   get nameModel(): IFormInput<string> {
     return {
-      description: 'Name',
+      description: $t('Name'),
       name: 'name',
       value: this.transition.name
     };

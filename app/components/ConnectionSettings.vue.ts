@@ -5,6 +5,7 @@ import { TransitionsService } from 'services/transitions';
 import * as inputComponents from 'components/shared/forms';
 import { IListInput, IFormInput } from 'components/shared/forms/Input';
 import { ScenesService, Scene } from 'services/scenes';
+import { $t } from 'services/i18n';
 
 @Component({
   components: {
@@ -17,10 +18,9 @@ export default class SceneTransitions extends Vue {
 
   @Prop() connectionId: string;
 
-  // TODO: Localization
   get fromSceneModel(): IListInput<string> {
     return {
-      description: 'Beginning Scene',
+      description: $t('Beginning Scene'),
       name: 'from',
       value: this.connection.fromSceneId,
       options: this.sceneOptions
@@ -33,10 +33,9 @@ export default class SceneTransitions extends Vue {
     });
   }
 
-  // TODO: Localization
   get toSceneModel(): IListInput<string> {
     return {
-      description: 'Ending Scene',
+      description: $t('Ending Scene'),
       name: 'to',
       value: this.connection.toSceneId,
       options: this.sceneOptions
@@ -49,10 +48,9 @@ export default class SceneTransitions extends Vue {
     });
   }
 
-  // TODO: Localization
   get transitionModel(): IListInput<string> {
     return {
-      description: 'Scene Transition',
+      description: $t('Scene Transition'),
       name: 'transition',
       value: this.connection.transitionId,
       options: this.transitionOptions
