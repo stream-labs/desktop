@@ -1,4 +1,8 @@
+import { Inject } from '../util/injector';
+import { authorizedHeaders } from '../util/requests';
 import { StatefulService, mutation } from './stateful-service';
+import { UserService } from './user';
+import { HostsService } from './hosts';
 
 interface IFile {
   href: string;
@@ -14,6 +18,8 @@ interface IMediaGalleryState {
   type: string;
   busy: boolean;
   selectedFile: IFile;
+  maxUsage: number;
+  maxFileSize: number;
 }
 
 const filetypeMap = {
@@ -28,6 +34,9 @@ const filetypeMap = {
   svg: 'image',
 };
 
+const defaultMaxUsage = 1024 * Math.pow(1024, 2);
+const defaultMaxFileSize = 25 * Math.pow(1024, 2);
+
 const union = (arrayA: any[], arrayB: any[]) => (
   Array.from(new Set([...arrayA, ...arrayB]))
 );
@@ -40,14 +49,23 @@ const stockImages = [
 ].map((item: IFile) => { item.type = 'image'; return item; });
 
 export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
+  @Inject() userService: UserService;
+  @Inject() hostsService: HostsService;
+
   static initialState: IMediaGalleryState = {
     uploads: [],
     totalUsage: 0,
     category: null,
     type: null,
     busy: false,
-    selectedFile: null
+    selectedFile: null,
+    maxUsage: null,
+    maxFileSize: null
   };
+
+  init() {
+    this.fetchFileLimits();
+  }
 
   get files() {
     let totalUsage = 0;
@@ -68,7 +86,6 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     if (this.state.category === 'stock') {
       files = stockSounds.concat(stockImages);
     }
-
     if (this.state.type) {
       files = files.filter((file) => file.type === this.state.type);
     }
@@ -76,33 +93,34 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     return files;
   }
 
+  formRequest(endpoint: string, options?: any) {
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const url = `https://${host}/${endpoint}`;
+    return new Request(url, { ...options, headers });
+  }
+
   getUploads() {
-    fetch('/api/uploads')
+    const req = this.formRequest('api/v5/slobs/uploads');
+    fetch(req)
       .then((resp) => resp.json())
       .then(({ body }: { body: IFile[] }) => this.SET_UPLOADS(body));
   }
 
-  isUploading() {
-    this.SET_BUSY(true);
-  }
-
-  isDoneUploading() {
-    this.SET_BUSY(false);
-  }
-
   upload(files: FileList) {
-    this.isUploading();
+    this.SET_BUSY(true);
 
     const formData = new FormData();
     Array.from(files).forEach((file: File) => formData.append('uploads[]', file));
 
-    fetch('/api/uploads', { body: formData, method: 'POST' })
+    const req = this.formRequest('api/v5/slobs/uploads', { body: formData, method: 'POST' });
+    fetch(req)
       .then((resp: Response) => resp.json())
       .then(({ body }: { body: IFile[] }) => {
         this.SET_UPLOADS(union(body, this.state.uploads));
-        this.isDoneUploading();
+        this.SET_BUSY(false);
       })
-      .catch(() => this.isDoneUploading());
+      .catch(() => this.SET_BUSY(false));
   }
 
   setTypeFilter(type: string, category: string) {
@@ -111,6 +129,18 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
       this.SET_SELECTED_FILE(null);
       this.SET_CATEGORY(category);
     }
+  }
+
+  fetchFileLimits() {
+    const req = this.formRequest('api/v5/slobs/user/filelimits');
+    fetch(req)
+      .then((resp) => resp.json())
+      .then(({ body }: { body: any }) => ({
+        maxUsage: body.max_allowed_upload_usage,
+        maxFileSize: body.max_allowed_upload_fize_size
+      }))
+      .then((limits) => this.SET_FILE_LIMITS(limits))
+      .catch(() => this.SET_FILE_LIMITS({ maxUsage: defaultMaxUsage, maxFileSize: defaultMaxFileSize }));
   }
 
   @mutation()
@@ -141,5 +171,11 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   @mutation()
   private SET_SELECTED_FILE(file: IFile) {
     this.state.selectedFile = file;
+  }
+
+  @mutation()
+  private SET_FILE_LIMITS({ maxFileSize, maxUsage }: { maxFileSize: number, maxUsage: number }) {
+    this.state.maxFileSize = maxFileSize;
+    this.state.maxUsage = maxUsage;
   }
 }

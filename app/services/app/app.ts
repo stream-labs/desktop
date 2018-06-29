@@ -98,7 +98,7 @@ export class AppService extends StatefulService<IAppState> {
         componentName: 'MediaGallery',
         size: {
           width: 1100,
-          height: 600
+          height: 720
         }
       });
 
