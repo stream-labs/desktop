@@ -13,30 +13,16 @@
             <div class="dropzone" @click="openFilePicker">
               <i class="icon-cloud-backup"></i>{{ $t('Drag & Drop Upload') }}
             </div>
-            <ul class="nav-list">
+            <ul v-for="(category, i) in [null, 'stock']" :key="i" class="nav-list">
               <div>
-                <div class="bold">{{ $t('My Uploads') }}</div>
-                <li class="list__item semibold" @click="handleTypeFilter(null, null)">
+                <div class="bold">{{ $t(category ? 'Stock Files' : 'My Uploads') }}</div>
+                <li class="list__item semibold" @click="handleTypeFilter(null, category)">
                   <i class="fa fa-file"></i>{{ $t('All Files') }}
                 </li>
-                <li class="list__item semibold" @click="handleTypeFilter('image', null)">
+                <li class="list__item semibold" @click="handleTypeFilter('image', category)">
                   <i class="icon-image"></i>{{ $t('Images') }}
                 </li>
-                <li class="list__item semibold" @click="handleTypeFilter('audio', null)">
-                  <i class="icon-music"></i>{{ $t('Sounds') }}
-                </li>
-              </div>
-            </ul>
-            <ul class="nav-list">
-              <div>
-                <div class="bold">Stock Files</div>
-                <li class="list__item semibold" @click="handleTypeFilter(null, 'stock')">
-                  <i class="fa fa-file"></i>{{ $t('All Files') }}
-                </li>
-                <li class="list__item semibold" @click="handleTypeFilter('image', 'stock')">
-                  <i class="icon-image"></i>{{ $t('Images') }}
-                </li>
-                <li class="list__item semibold" @click="handleTypeFilter('audio', 'stock')">
+                <li class="list__item semibold" @click="handleTypeFilter('audio', category)">
                   <i class="icon-music"></i>{{ $t('Sounds') }}
                 </li>
               </div>
@@ -57,38 +43,20 @@
             <div>
               <div v-if="dragOver" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" class="drag-overlay radius"></div>
               <div v-if="busy" class="busy-overlay"></div>
-              <ul class="uploads-manager__list" v-if="files.length">
+              <ul v-if="files.length" class="uploads-manager__list">
                 <li v-for="(file, i) in files" :key="i" :class="[selectedFile == file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
-                  <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
-                    <div>
+                  <div>
+                    <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
                       <video loop :src="file.href" style="height: 100%; width: 100%"></video>
                     </div>
-                    <button class="copy-button button button--action" :key="i" v-clipboard="file.href" @success="handleSuccess" @error="handleError">
-                      <i class="icon-copy"></i> {{ $t('Copy URL') }}
-                    </button>
-                    <div class="upload__footer image">
-                      <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                      <div class="upload__title">{{ file.filename }}</div>
-                    </div>
-                  </div>
-                  <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)">
-                    <div class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>
-                    <button class="copy-button button button--action" :key="i" v-clipboard="file.href" @success="handleSuccess" @error="handleError">
-                      <i class="icon-copy"></i> {{ $t('Copy URL') }}
-                    </button>
-                    <div class="upload__footer image">
-                      <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                      <div class="upload__title">{{ file.filename }}</div>
-                    </div>
-                  </div>
-                  <div v-if="file.type == 'audio'">
-                    <div style="height: 132">
+                    <div v-if="file.type == 'image' && !/\.webm$/.test(file.href)" class="image-preview" :style="'background-image: url(' + file.href + ')'" ></div>
+                    <div v-if="file.type == 'audio'" style="height: 132">
                       <i class="icon-music" style="line-height: 132px; fontSize: 28px; textAlign: center; display: block"></i>
                     </div>
                     <button class="copy-button button button--action" :key="i" v-clipboard="file.href" @success="handleSuccess" @error="handleError">
                       <i class="icon-copy"></i> {{ $t('Copy URL') }}
                     </button>
-                    <div class="upload__footer">
+                    <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
                       <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
                       <div class="upload__title">{{ file.filename }}</div>
                     </div>
