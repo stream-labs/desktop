@@ -77,6 +77,9 @@ export default class MediaGallery extends Vue {
   get maxUsageLabel() {
     return formatBytes(this.mediaGalleryService.state.maxUsage, 2);
   }
+  get selectedFile() {
+    return this.mediaGalleryService.state.selectedFile;
+  }
 
   onDragOver() {
     this.dragOver = true;

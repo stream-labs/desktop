@@ -4,7 +4,7 @@
   :title="$t('Media Gallery')">
 
   <div slot="content">
-    <div class="container" @dragenter.prevent="" @dragover.prevent="onDragEnter" @dragleave.prevent="onDragLeave" @drop.prevent="handleFileDrop($event)">
+    <div class="container" @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @drop.prevent="handleFileDrop($event)">
       <h1 class="header bold">{{ $t('Media Gallery') }}</h1>
       <div>
         <input type="file" id="media-gallery-input" @change="handleUploadClick($event)" accept=".webm,.gif,.jpg,.png,.mp3,.ogg,.wav,.svg,.eps,.ai,.psd" multiple="multiple" style="display: none;">
@@ -55,7 +55,8 @@
               <i class="icon-trash" :class="[selectedFile ? '': 'disabled']"></i>
             </div>
             <div>
-              <div v-if="busy" class="busy-bar"></div>
+              <div v-if="dragOver" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" class="drag-overlay radius"></div>
+              <div v-if="busy" class="busy-overlay"></div>
               <ul class="uploads-manager__list" v-if="files.length">
                 <li v-for="(file, i) in files" :key="i" :class="[selectedFile == file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                   <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
@@ -211,6 +212,7 @@
   width: 100%;
 
   i {
+    font-size: 20px;
     color: @teal-med-opac;
 
     &:hover {
@@ -218,10 +220,14 @@
       cursor: pointer;
     }
   }
-}
 
-.disabled {
-  color: @night-accent-light;
+  i.disabled {
+    color: @night-accent-light;
+
+    &:hover {
+      cursor: default;
+    }
+  }
 }
 
 .empty-box {
@@ -242,14 +248,26 @@
   }
 }
 
-.busy-bar {
+.drag-overlay {
+  border: 1px solid @yellow;
+  background: rgba(255, 200, 0, 0.15);
+  z-index: 100000;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+}
+
+.busy-overlay {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 100%;
   height: 100%;
-  border: 1px solid @yellow;
-  background: rgba(255, 200, 0, 0.23);
+  border: 1px solid @night-secondary;
+  background: @shadow;
   z-index: 99999;
   border-radius: 3px;
 }
