@@ -68,8 +68,11 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
 import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { FacemasksService } from 'services/facemasks';
+import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
+import { OutageNotificationsService } from 'services/outage-notifications';
 
 import { BitGoalService } from 'services/widget-settings/bit-goal';
 import { ChatBoxService } from 'services/widget-settings/chat-box';
@@ -143,11 +146,14 @@ export class ServicesManager extends Service {
     PatchNotesService,
     ProtocolLinksService,
     ProjectorService,
-    I18nService,
     TransitionsService,
     WidgetSettingsService,
     MediaBackupService,
     WebsocketService,
+    FacemasksService,
+    ProfanityFilterService,
+    I18nService,
+    OutageNotificationsService,
 
     BitGoalService,
     DonationGoalService,

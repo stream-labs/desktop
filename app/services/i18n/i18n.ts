@@ -73,7 +73,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     const WHITE_LIST = [
       'en-US',
       'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
-      'hu-HU', 'it-IT', 'ja-JP', 'pl-PL',
+      'hu-HU', 'it-IT', 'ja-JP', 'Ko-KR', 'pl-PL',
       'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
     ];
 

@@ -4,6 +4,7 @@ import { Multiselect } from 'vue-multiselect';
 import * as comps from 'components/shared/widget-inputs';
 
 
+
 @Component({
   components: { ...comps }
 })
@@ -14,7 +15,7 @@ export default class WFormGroup extends Vue {
   type: string;
 
   @Prop()
-  value: string;
+  value: undefined;
 
   @Prop({ default: () => {} })
   metadata: Dictionary<any>;

@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
 import { GuestApiService } from 'services/guest-api';
@@ -33,6 +33,11 @@ export default class BrowseOverlays extends Vue {
   @Inject() private notificationsService: NotificationsService;
   @Inject() private jsonrpcService: JsonrpcService;
   @Inject() private i18nService: I18nService;
+
+  @Prop() params: {
+    type?: 'overlay' | 'widget-theme';
+    id?: string;
+  };
 
   $refs: {
     overlaysWebview: Electron.WebviewTag;
@@ -116,6 +121,6 @@ export default class BrowseOverlays extends Vue {
   }
 
   get overlaysUrl() {
-    return this.userService.overlaysUrl();
+    return this.userService.overlaysUrl(this.params.type, this.params.id);
   }
 }

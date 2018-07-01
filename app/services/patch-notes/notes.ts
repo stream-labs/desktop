@@ -1,18 +1,16 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.9.1',
-  title: 'Introducing the Cloud',
+  version: '0.9.3',
+  title: 'Fixes and Tweaks',
   notes: [
-    'Cloud Backups: Streamlabs OBS now backs up all of your scenes, sources, media, ' +
-      "and overlay assets to the cloud.  Got a new computer?  Hard drive died?  Don't " +
-      'worry, just log into Streamlabs OBS and your entire setup will be just as you left it.',
-    'Added the ability to hide sources in the audio mixer',
-    'Added horizontal and vertical centering options in the source transform menu',
-    'Fixed a bug where the color picker would switch to a different color than what was selected',
-    "Increased the height of the wheel widget so the bottom isn't cut off",
-    'Fixed a bug where dragging sources would sometimes cause the source to drift away from the mouse cursor',
-    'Fixed a bug where streaming for 24 hours caused the streaming clock to reset to 0',
-    'Fixed an issue where game capture would cause performance issues with some games on the latest Windows 10 version'
+    'You can now copy scenes and filters across scene collections',
+    'Dragging and dropping or copy-pasting media, text, or URLs will now create a source of the appropriate type',
+    'Source filters can now be reordered',
+    'We updated translations for a handful of languages',
+    'Fixed a bug where scene themes would import with multiple widgets of the same type',
+    'Fixed a bug where switching scenes would sometimes end the stream',
+    'Fixed a bug where media sources would sometimes revert to their old backed up media upon restarting the app',
+    'Fixed a bug where streaming and recording at the same time using the QSV encoder was not working'
   ]
 };

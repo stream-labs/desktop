@@ -3654,9 +3654,9 @@ electron-window-state@^4.1.1:
     jsonfile "^2.2.3"
     mkdirp "^0.5.1"
 
-electron@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.1.tgz#d9defcc187862143b9027378be78490eddbfabf4"
+electron@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.3.tgz#8e591e820cae2ccdb0c3fd74c6d07834913fc133"
   dependencies:
     "@types/node" "^8.0.24"
     electron-download "^3.0.1"
@@ -6953,9 +6953,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.37/iojs-v2.0.1-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.41/iojs-v2.0.1-signed.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.37/iojs-v2.0.1-signed.tar.gz#3d14c0fdc4411d046b6987493de3b80376991478"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.41/iojs-v2.0.1-signed.tar.gz#6fb4aac9c721aafcd372316b670ca45464d6d04c"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -8710,8 +8710,8 @@ single-line-log@^1.1.2:
     string-width "^1.0.1"
 
 "sl-vue-tree@https://github.com/stream-labs/sl-vue-tree.git":
-  version "1.4.0"
-  resolved "https://github.com/stream-labs/sl-vue-tree.git#e83355f3669221729ccac5f15dce11008ddbdc64"
+  version "1.5.1"
+  resolved "https://github.com/stream-labs/sl-vue-tree.git#aaa1f528c7ab6f8239a4499bee55e76ea050a65b"
 
 slash@^1.0.0:
   version "1.0.0"

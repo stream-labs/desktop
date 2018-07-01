@@ -29,4 +29,8 @@ export class HostsService extends Service {
     return 'beta3.streamlabs.com';
   }
 
+  get facemaskCDN() {
+    return 'facemasks-cdn.streamlabs.com/';
+  }
+
 }

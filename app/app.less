@@ -188,32 +188,21 @@ h4 {
   }
 }
 
+.slide-open {
+  position: relative;
+}
+
 .slide-open__menu {
   position: absolute;
-  background: @white;
-  right: 0;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  padding: 0 25px;
+  background: @day-primary;
+  right: calc(~'100% + 20px');
+  bottom: -10px;
+  padding: 0px 12px;
   display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 10;
-}
-
-.slide-open__close {
-  position: absolute;
-  left: 25px;
-  .transition;
-}
-
-.slide-open__open,
-.slide-open__close {
-  .fa,
-  i {
-    font-size: 12px;
-  }
+  .radius;
+  .border;
+  .shadow;
 }
 
 .tabs {
@@ -403,7 +392,9 @@ th {
   }
 
   .slide-open__menu {
-    background-color: @night-primary;
+    background-color: @night-secondary;
+    border-color: @night-secondary;
+    .night-shadow;
   }
 
   .slide-open__close {

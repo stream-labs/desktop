@@ -42,6 +42,7 @@ export class DefaultManager extends PropertiesManager {
   setPropertiesFormData(properties: input.TFormData) {
     super.setPropertiesFormData(properties);
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
+      this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
       this.uploadNewMediaFile();
     }
   }
@@ -86,6 +87,9 @@ export class DefaultManager extends PropertiesManager {
   uploadNewMediaFile() {
     if (!this.mediaBackupFileSetting) return;
     if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
+
+    this.settings.mediaBackup.serverId = null;
+    this.settings.mediaBackup.originalPath = null;
 
     this.mediaBackupService.createNewFile(
       this.settings.mediaBackup.localId,

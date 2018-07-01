@@ -1,7 +1,7 @@
 {
-  "Are you sure you want to stop streaming?": "Are you sure you want to stop streaming?",
+  "Are you sure you want to stop streaming?": "Weet u zeker dat u wilt stoppen streamen?",
   "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.": "Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.",
-  "Failed to connect to the streaming server.  Please check your internet connection.": "Failed to connect to the streaming server.  Please check your internet connection.",
+  "Failed to connect to the streaming server.  Please check your internet connection.": "Geen verbinding kunnen maken met de streaming server.  Controleer uw internetverbinding.",
   "Disconnected from the streaming server.  Please check your internet connection.": "Disconnected from the streaming server.  Please check your internet connection.",
   "Could not access the specified channel or stream key, please double-check your stream key.  ": "Could not access the specified channel or stream key, please double-check your stream key.  ",
   "If it is correct, there may be a problem connecting to the server.": "If it is correct, there may be a problem connecting to the server.",

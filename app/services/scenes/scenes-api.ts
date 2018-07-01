@@ -43,9 +43,42 @@ export interface ISceneApi extends IScene {
   getRootNodes(): TSceneNodeApi[];
   getItems(): ISceneItemApi[];
   getFolders(): ISceneItemFolderApi[];
+
+  /**
+   * returns scene items of scene + scene items of nested scenes
+   */
+  getNestedItems(): ISceneItemApi[];
+
+  /**
+   * returns sources of scene + sources of nested scenes
+   * result also includes nested scenes
+   */
+  getNestedSources(): ISourceApi[];
+
+  /**
+   * return nested scenes in the safe-to-add order
+   */
+  getNestedScenes(): ISceneApi[];
+
+  /**
+   * returns the source linked to scene
+   */
+  getSource(): ISourceApi;
+
   addSource(sourceId: string, options?: ISceneNodeAddOptions): ISceneItemApi;
   createAndAddSource(name: string, type: TSourceType): ISceneItemApi;
   createFolder(name: string): ISceneItemFolderApi;
+
+  /**
+   * creates sources from file system folders and files
+   * source type depends on the file extension
+   */
+  addFile(path: string, folderId?: string): TSceneNodeApi;
+
+  /**
+   * removes all nodes from the scene
+   */
+  clear(): void;
   removeFolder(folderId: string): void;
   removeItem(sceneItemId: string): void;
   remove(): void;

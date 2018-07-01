@@ -21,8 +21,8 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   hasGoal: boolean = false;
 
   afterFetch() {
-    this.hasGoal = !!this.data.goal;
-    if (!this.hasGoal && this.loadingState === 'success') this.data.goal = {
+    this.hasGoal = !!this.wData.goal;
+    if (!this.hasGoal && this.loadingState === 'success') this.wData.goal = {
       title: '',
       goal_amount: 100,
       manual_goal_amount: 0,

@@ -1,5 +1,5 @@
 <template>
-<widget-layout v-if="data" v-model="tabName">
+<widget-layout v-if="wData" v-model="tabName">
 
 
   <!-- goal setup -->
@@ -12,7 +12,7 @@
             <label>{{ $t("Title") }}</label>
           </div>
           <div class="small-12 medium-9 columns">
-            <span>{{ data.goal.title }}</span>
+            <span>{{ wData.goal.title }}</span>
           </div>
         </div>
 
@@ -21,7 +21,7 @@
             <label>{{ $t("Goal Amount") }}</label>
           </div>
           <div class="small-12 medium-9 columns">
-            <span>{{ data.goal.amount }}</span>
+            <span>{{ wData.goal.amount }}</span>
           </div>
         </div>
 
@@ -30,7 +30,7 @@
             <label>{{ $t("Current Amount") }}</label>
           </div>
           <div class="small-12 medium-9 columns">
-            <span>{{ data.goal.current_amount }}</span>
+            <span>{{ wData.goal.current_amount }}</span>
           </div>
         </div>
 
@@ -39,7 +39,7 @@
             <label>{{ $t("Days Remaining") }}</label>
           </div>
           <div class="small-12 medium-9 columns">
-            <span>{{ data.goal.to_go }}</span>
+            <span>{{ wData.goal.to_go }}</span>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@
               name="title"
               type="text"
               placeholder="September Bit Goal"
-              v-model="data.goal.title"
+              v-model="wData.goal.title"
               v-validate="'required|max:60'"
               :class="{'form__input--error' : errors.has('title')}" />
             <span
@@ -70,7 +70,7 @@
               name="goal_amount"
               type="text"
               placeholder="100"
-              v-model="data.goal.goal_amount"
+              v-model="wData.goal.goal_amount"
               v-validate="'required'"
               :class="{'form__input--error' : errors.has('goal_amount')}" />
             <span
@@ -87,7 +87,7 @@
               name="manual_goal_amount"
               type="text"
               placeholder="0"
-              v-model="data.goal.manual_goal_amount"
+              v-model="wData.goal.manual_goal_amount"
               v-validate="'required'"
               :class="{'form__input--error' : errors.has('manual_goal_amount')}" />
             <span
@@ -104,7 +104,7 @@
               type="text"
               name="ends_at"
               placeholder="MM/DD/YYYY"
-              v-model="data.goal.ends_at"
+              v-model="wData.goal.ends_at"
               v-validate="'required|date_format:MM/DD/YYYY'">
             <span
               v-show="errors.has('ends_at')"
@@ -139,19 +139,19 @@
   </div>
 
   <div slot="settings">
-    <w-form-group type="list" title="Layout" v-model="data.settings.layout" :metadata="metadata.layout"/>
-    <w-form-group type="color" title="Background Color" v-model="data.settings.background_color"/>
-    <w-form-group type="color" title="Bar Color" v-model="data.settings.bar_color"/>
-    <w-form-group type="color" title="Bar Background Color" v-model="data.settings.bar_bg_color"/>
-    <w-form-group type="color" title="Text Color" v-model="data.settings.text_color"/>
-    <w-form-group type="color" title="Bar Text Color" v-model="data.settings.bar_text_color"/>
+    <w-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
+    <w-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
+    <w-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
+    <w-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
+    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color"/>
+    <w-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
     <w-form-group
         type="slider"
         title="Bar Thickness"
-        v-model="data.settings.bar_thickness"
+        v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
     />
-    <w-form-group type="fontFamily" :value="data.settings.font"/>
+    <w-form-group type="fontFamily" :value="wData.settings.font"/>
   </div>
 
 </widget-layout>

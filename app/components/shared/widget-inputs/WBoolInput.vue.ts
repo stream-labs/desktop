@@ -12,7 +12,7 @@ export default class WBoolInput extends WInput<boolean, {}> {
   title: string;
 
   handleClick() {
-    this.emitInput(this.value);
+    this.emitInput(!this.value);
   }
 
 }

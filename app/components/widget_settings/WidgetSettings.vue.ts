@@ -20,7 +20,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   tabName: string = '';
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  data: TData = null;
+  wData: TData = null;
   metadata = this.service.getMetadata();
   loadingState: 'success' | 'pending' | 'fail' = 'pending';
 
@@ -40,7 +40,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
 
   async refresh() {
     try {
-      this.data = await this.service.fetchData();
+      this.wData = await this.service.fetchData();
       this.loadingState = 'success';
       this.afterFetch();
     } catch (e) {
@@ -49,7 +49,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   }
 
   @debounce(1000)
-  @Watch('data', { deep: true })
+  @Watch('wData', { deep: true })
   async onDataChangeHandler() {
     const tab = this.service.getTab(this.tabName);
     if (!tab) return;
@@ -74,8 +74,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     this.loadingState = 'pending';
 
     try {
-      const data = await this.service.saveData(this.data[tab.name], tab.name);
-      Vue.set(this, 'data', data);
+      this.wData = await this.service.saveData(this.wData[tab.name], tab.name);
       this.loadingState = 'success';
       this.afterFetch();
       this.refreshPreview();
@@ -91,7 +90,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     this.loadingState = 'pending';
 
     try {
-      this.data = await this.service.reset(this.tabName);
+      this.wData = await this.service.reset(this.tabName);
       this.loadingState = 'success';
       this.afterFetch();
       this.refreshPreview();

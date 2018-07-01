@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { SceneBuilder } from '../helpers/scene-builder';
-import { ISceneApi, ISceneItemApi, ISceneNodeApi, SceneItem } from '../../app/services/scenes';
+import { ISceneItemApi, ISceneNodeApi, IScenesServiceApi } from 'services/scenes';
 import { ISelectionServiceApi } from 'services/selection';
 import { IClipboardServiceApi } from 'services/clipboard';
 import { ISceneCollectionsServiceApi } from 'services/scene-collections';
@@ -19,9 +19,11 @@ let clipboardService: IClipboardServiceApi;
 let sourceFiltersService: SourceFiltersService;
 let sceneCollectionsService: ISceneCollectionsServiceApi;
 let sourcesService: ISourcesServiceApi;
+let scenesService: IScenesServiceApi;
 
 async function afterStart() {
   const client = await getClient();
+  scenesService = client.getResource('ScenesService');
   sourcesService = client.getResource('SourcesService');
   selectionService = client.getResource('SelectionService');
   clipboardService = client.getResource('ClipboardService');
@@ -83,26 +85,6 @@ test('Copy/paste folder with items', async t => {
   `));
 });
 
-
-
-test('Clear clipboard', async t => {
-
-  sceneBuilder.build(`
-    Folder1
-    Item1:
-  `);
-
-  selectionService.selectAll();
-  clipboardService.copy();
-  clipboardService.clear();
-  clipboardService.paste();
-
-  t.true(sceneBuilder.isEqualTo(`
-    Folder1
-    Item1:
-  `));
-});
-
 test('Copy/paste nodes between scene collections', async t => {
 
   sceneBuilder.build(`
@@ -143,7 +125,7 @@ test('Copy/paste nodes between scene collections', async t => {
 });
 
 
-test.only('Copy/paste filters between scene collections', async t => {
+test('Copy/paste filters between scene collections', async t => {
 
   sceneBuilder.build(`
       Item1: image_source
@@ -181,6 +163,55 @@ test.only('Copy/paste filters between scene collections', async t => {
 
 });
 
+
+test('Copy/paste scenes between scene collections', async t => {
+
+  // create a scene with nested scene
+
+  await sceneCollectionsService.create({ name: 'Collection1' });
+
+  sceneBuilder.build(`
+    Folder1
+      Item1: color_source
+      Item2: image_source
+  `);
+
+  const scene1 = scenesService.getScenes()[0];
+  const scene2 = scenesService.createScene('Scene2');
+  scene2.makeActive();
+
+  sceneBuilder.build(`
+    Folder2
+      Item3: color_source
+      Item4: image_source
+  `);
+
+  scene1.makeActive();
+  scene1.addSource(scene2.id);
+
+  selectionService.selectAll();
+  clipboardService.copy();
+
+  await sceneCollectionsService.create({ name: 'Collection2' });
+
+  clipboardService.paste();
+
+  t.true(sceneBuilder.isEqualTo(`
+    Scene2: scene
+    Folder1
+      Item1: color_source
+      Item2: image_source
+  `));
+
+  scenesService.getSceneByName('Scene2').makeActive();
+
+  t.true(sceneBuilder.isEqualTo(`
+    Folder2
+      Item3: color_source
+      Item4: image_source
+  `));
+
+});
 
 test('Copy/paste duplicate sources', async t => {
 

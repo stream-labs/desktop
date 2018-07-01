@@ -29,6 +29,10 @@ export default class SceneSelector extends Vue {
 
   searchQuery = '';
 
+  addSceneTooltip = $t('Add a new Scene.');
+  removeSceneTooltip = $t('Remove Scene.');
+  showTransitionsTooltip = $t('Edit Scene Transitions.');
+
   showContextMenu() {
     const menu = new Menu();
     menu.append({
@@ -80,7 +84,10 @@ export default class SceneSelector extends Vue {
         buttons: [$t('Cancel'), $t('OK')]
       },
       ok => {
-        if (ok) this.scenesService.removeScene(this.activeSceneId);
+        if (!ok) return;
+        if (!this.scenesService.removeScene(this.activeSceneId)) {
+          alert($t('There needs to be at least one scene.'));
+        }
       }
     );
   }

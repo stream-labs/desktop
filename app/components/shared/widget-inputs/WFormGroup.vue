@@ -4,7 +4,7 @@
       {{ $t(title || defaultTitle) }}
     </div>
     <div class="col-xs-8">
-      <component v-if="type" :is="componentName" :value="value" :metadata="metadata"/>
+      <component v-if="type" :is="componentName" :value="value" @input="value => $emit('input', value)" :metadata="metadata"/>
       <slot v-if="!type"></slot>
     </div>
   </div>
