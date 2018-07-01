@@ -1,9 +1,5 @@
 <template>
 <div class="google-font-selector">
-  <label>
-    {{ value.description }}
-  </label>
-
   <multiselect
     :value="value"
     :options="fonts">
@@ -11,4 +7,4 @@
 </div>
 </template>
 
-<script lang="ts" src="./WFontFamily.vue.ts"></script>
+<script lang="ts" src="./WFontFamilyInput.vue.ts"></script>

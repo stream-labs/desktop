@@ -38,6 +38,7 @@ export class CustomizationService
     mediaBackupOptOut: false,
     experimental: {
       // put experimental features here
+      newWidgets: false
     }
   };
 
@@ -172,7 +173,16 @@ export class CustomizationService
   }
 
   getExperimentalSettingsFormData(): TFormData {
-    return [];
+    return [
+      <IFormInput<boolean>>  {
+        value: this.state.experimental.newWidgets,
+        name: 'newWidgets',
+        description: 'New Widgets',
+        type: 'OBS_PROPERTY_BOOL',
+        visible: true,
+        enabled: true,
+      }
+    ];
   }
 
   restoreDefaults() {

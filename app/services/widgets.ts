@@ -11,6 +11,8 @@ import { ScalableRectangle, AnchorPoint } from '../util/ScalableRectangle';
 import namingHelpers from '../util/NamingHelpers';
 import { Dictionary } from 'lodash';
 import fs from 'fs';
+import { WidgetSettingsService } from './widget-settings/widget-settings';
+import { ServicesManager } from '../services-manager';
 
 export enum WidgetType {
   AlertBox = 0,
@@ -418,6 +420,16 @@ export class WidgetsService extends Service {
       this.userService.widgetToken,
       this.userService.platform.type
     );
+  }
+
+  getWidgetComponent(type: WidgetType): string {
+    return WidgetType[type];
+  }
+
+  getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
+    const serviceName = this.getWidgetComponent(type) + 'Service';
+    const servicesManager: ServicesManager = ServicesManager.instance;
+    return servicesManager.getService(serviceName).instance;
   }
 
   getTesters() {

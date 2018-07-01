@@ -71,6 +71,11 @@ import { WidgetSettingsService } from 'services/widget-settings/widget-settings'
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 
+import { BitGoalService } from 'services/widget-settings/bit-goal';
+import { ChatBoxService } from 'services/widget-settings/chat-box';
+import { DonationGoalService } from 'services/widget-settings/donation-goal';
+import { FollowerGoalService } from 'services/widget-settings/follower-goal';
+
 const { ipcRenderer } = electron;
 
 export class ServicesManager extends Service {
@@ -142,7 +147,12 @@ export class ServicesManager extends Service {
     TransitionsService,
     WidgetSettingsService,
     MediaBackupService,
-    WebsocketService
+    WebsocketService,
+
+    BitGoalService,
+    DonationGoalService,
+    FollowerGoalService,
+    ChatBoxService
   };
 
   private instances: Dictionary<Service> = {};
@@ -536,7 +546,7 @@ export class ServicesManager extends Service {
             }
           }
 
-          if (result && result._type === 'HELPER') {
+          if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
             const helper = this.getResource(result.resourceId);
             return this.applyIpcProxy(helper);
           }

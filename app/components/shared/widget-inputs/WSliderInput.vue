@@ -3,11 +3,11 @@
   <label class="w-form-group__label">{{ value.description }}</label>
   <div class="w-form-group__wrapper slider-container">
     <vue-slider class="slider w-form-group__input"
-      :value="value.value"
+      :value="value"
       :disabled="disabled"
-      :max="max"
-      :min="min"
-      :interval="interval"
+      :max="metadata.max"
+      :min="metadata.min"
+      :interval="metadata.interval"
       :speed="0"
       :height="4"
       :dotSize="dotSize"
@@ -20,7 +20,7 @@
       v-if="valueBox && !usePercentages"
       class="slider-input"
       type="text"
-      :value="value.value"
+      :value="value"
       @change="updateValue(parseFloat($event.target.value))"
       @keydown="handleKeydown"
     />
@@ -28,7 +28,7 @@
 </div>
 </template>
 
-<script lang="ts" src="./WSlider.vue.ts"></script>
+<script lang="ts" src="./WSliderInput.vue.ts"></script>
 
 <style lang="less">
 @import "../../../styles/index";

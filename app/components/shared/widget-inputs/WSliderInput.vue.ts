@@ -1,46 +1,54 @@
-import Vue from 'vue';
 import VueSlider from 'vue-slider-component';
 import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
+import { WInput } from './WInput';
 
-interface IWSlider {
-  size: number;
+export interface IWSliderMetadata {
+  min: number;
+  max: number;
+  interval?: number;
+  usePercentages?: boolean;
 }
 
 @Component({
   components: { VueSlider }
 })
-export default class SliderInput extends Vue {
-  @Prop() value: { value: number };
-  @Prop() min: number;
-  @Prop() max: number;
-  @Prop() interval: number;
+export default class WSliderInput extends WInput<number, IWSliderMetadata>  {
+  @Prop() value: number;
+  @Prop() metadata: IWSliderMetadata;
+
   @Prop() disabled: boolean;
   @Prop() tooltip: string;
   @Prop() valueBox: boolean;
   @Prop() dotSize: number;
   @Prop() sliderStyle: object;
-  @Prop() usePercentages: boolean;
+
+  usePercentages: boolean;
+  interval: number;
 
   $refs: { slider: any };
 
   mounted() {
-    console.log('wslider state', this);
+
+    // setup defaults
+    this.interval = this.metadata.interval || 1;
+    this.usePercentages = this.metadata.usePercentages || false;
+
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => {
       if (this.$refs.slider) this.$refs.slider.refresh();
     }, 500);
   }
 
-//   @throttle(500)
-//   updateValue(value: number) {
-//     this.$emit('input', this.roundNumber(value));
-//   }
+  @throttle(500)
+  updateValue(value: number) {
+    this.$emit('input', this.roundNumber(value));
+  }
 
-//   handleKeydown(event: KeyboardEvent) {
-//     if (event.code === 'ArrowUp') this.updateValue(this.value + this.interval);
-//     if (event.code === 'ArrowDown') this.updateValue(this.value - this.interval);
-//   }
+  handleKeydown(event: KeyboardEvent) {
+    if (event.code === 'ArrowUp') this.updateValue(this.value + this.interval);
+    if (event.code === 'ArrowDown') this.updateValue(this.value - this.interval);
+  }
 
   // Javascript precision is weird
   roundNumber(num: number) {

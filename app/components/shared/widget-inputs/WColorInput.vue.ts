@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import VueColor from 'vue-color';
-import Component from 'vue-class-component';
-import { Prop, Watch } from 'vue-property-decorator';
-import { Input } from 'aws-sdk/clients/kinesisanalytics';
+import { Prop, Component } from 'vue-property-decorator';
 
 @Component({
   components: {
     SketchPicker: VueColor.Sketch
   }
 })
-export default class WidgetColorInput extends Vue {
+export default class WColorInput extends Vue {
   @Prop()
   value: string;
 

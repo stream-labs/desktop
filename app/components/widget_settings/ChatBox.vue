@@ -1,21 +1,17 @@
 <template>
-<modal-layout
-  title="Bit Goal Settings"
-  :customControls="true"
-  :showControls="false">
+<widget-layout v-if="data" v-model="tabName">
 
-  <div slot="content">
-    <div v-if="widgetData">
 
-      <webview :src="widgetUrl"></webview>
-
-    </div>
-
-    <div v-else>
-      <img src="../../../media/images/loader.svg" />
-    </div>
+  <div slot="settings" >
+    <w-form-group title="Theme" type="list" v-model="data.settings.theme" :metadata="metadata.theme"/>
+    <w-form-group title="Badges">
+      <w-bool-input title="Show Moderator Badges" v-model="data.settings.show_moderator_icons"/>
+      <w-bool-input title="Show Subscriber Badges" v-model="data.settings.show_subscriber_icons"/>
+    </w-form-group>
   </div>
-</modal-layout>
+
+</widget-layout>
+
 </template>
 
 <script lang="ts" src="./ChatBox.vue.ts"></script>

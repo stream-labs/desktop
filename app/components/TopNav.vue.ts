@@ -66,18 +66,6 @@ export default class TopNav extends Vue {
     this.settingsService.showSettings();
   }
 
-  // Morgan add
-  openWidgetSettingsWindow(widgetName?: string) {
-    this.windowsService.showWindow({
-      componentName: 'WidgetSettings',
-      queryParams: { widgetName },
-      size: {
-        width: 800,
-        height: 800
-      }
-    });
-  }
-
   toggleNightTheme() {
     this.customizationService.nightMode = !this.customizationService.nightMode;
   }
