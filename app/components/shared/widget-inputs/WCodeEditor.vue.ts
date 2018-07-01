@@ -1,10 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
-import Tabs from 'vue-tabs-component';
 // codemirror has required styles that are imported in index.less
 
-Vue.use(Tabs);
 
 @Component({
   components: { codemirror }

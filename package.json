@@ -86,8 +86,7 @@
     "uuid": "^3.0.1",
     "vee-validate": "^2.0.9",
     "vue-codemirror": "^4.0.5",
-    "vue-spinner": "^1.0.3",
-    "vue-tabs-component": "^1.4.0"
+    "vue-spinner": "^1.0.3"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",

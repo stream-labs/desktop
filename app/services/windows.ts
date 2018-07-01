@@ -26,10 +26,10 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 
-import BitGoal from 'components/widget_settings/goal/BitGoal.vue';
-import DonationGoal from 'components/widget_settings/goal/DonationGoal.vue';
-import ChatBox from 'components/widget_settings/ChatBox.vue';
-import FollowerGoal from 'components/widget_settings/goal/FollowerGoal.vue';
+import BitGoal from 'components/widget-settings/goal/BitGoal.vue';
+import DonationGoal from 'components/widget-settings/goal/DonationGoal.vue';
+import ChatBox from 'components/widget-settings/ChatBox.vue';
+import FollowerGoal from 'components/widget-settings/goal/FollowerGoal.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;

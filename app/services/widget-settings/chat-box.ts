@@ -66,10 +66,4 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxSettings> {
     };
   }
 
-  // protected patchData(data: IBitGoalData): IBitGoalData {
-  //   // fix bug when API returning an empty array instead of null
-  //   if (Array.isArray(data.goal)) data.goal = null;
-  //   return data;
-  // }
-
 }

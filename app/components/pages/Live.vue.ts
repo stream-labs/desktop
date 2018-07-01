@@ -19,7 +19,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
     SceneSelector,
     Mixer,
     Display,
-    Slider,
+    Slider
   }
 })
 export default class Live extends Vue {

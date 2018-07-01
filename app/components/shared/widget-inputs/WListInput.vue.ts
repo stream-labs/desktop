@@ -26,9 +26,6 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   @Prop({ default: 'Select Option' })
   placeholder: string;
 
-  mounted() {
-    console.log(this.value);
-  }
 
   onInputHandler(option: IListOption<string>) {
     this.emitInput(option.value);

@@ -7,7 +7,6 @@
     </div>
 
     <div class="flex__item studio-controls" :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
-      <alert-box></alert-box>
       <scene-selector class="studio-controls-panel" />
 
       <mixer class="studio-controls-panel" />

@@ -51,7 +51,6 @@ declare module 'vue-popperjs';
 declare module 'vue-slider-component';
 declare module 'vuedraggable';
 declare module 'font-manager';
-declare module 'vue-tabs-component';
 declare module 'vue-codemirror';
 declare module 'recursive-readdir';
 
