@@ -32,10 +32,10 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     return this.widgetsService.getWidgetSettingsService(this.widgetType) as TService;
   }
 
-  protected autosaveIsDisabled = false;
+  protected skipNextDatachangeHandler: boolean;
 
   async mounted() {
-    this.refresh();
+    await this.refresh();
   }
 
   async refresh() {
@@ -43,6 +43,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
       this.wData = await this.service.fetchData();
       this.loadingState = 'success';
       this.afterFetch();
+      this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
     }
@@ -54,15 +55,11 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     const tab = this.service.getTab(this.tabName);
     if (!tab) return;
 
-    const needToSave = tab.autosave && !this.autosaveIsDisabled;
+    const needToSave = tab.autosave && !this.skipNextDatachangeHandler;
+    if (this.skipNextDatachangeHandler) this.skipNextDatachangeHandler = false;
 
-    if (!needToSave) {
-      this.autosaveIsDisabled = false;
-      return;
-    }
-
+    if (!needToSave) return;
     await this.save();
-    this.autosaveIsDisabled = true;
   }
 
   async save() {
@@ -78,6 +75,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
       this.loadingState = 'success';
       this.afterFetch();
       this.refreshPreview();
+      this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
       this.onFailHandler();
@@ -94,6 +92,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
       this.loadingState = 'success';
       this.afterFetch();
       this.refreshPreview();
+      this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
       this.onFailHandler();

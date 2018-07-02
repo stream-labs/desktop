@@ -1,7 +1,7 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   ChatBoxService,
-  IChatBoxSettings
+  IChatBoxData
 } from 'services/widget-settings/chat-box';
 
 import WidgetLayout from '../windows/WidgetLayout.vue';
@@ -17,7 +17,7 @@ import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
     ...comps
   }
 })
-export default class ChatBox extends WidgetSettings<IChatBoxSettings, ChatBoxService> {
+export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService> {
 
 
 }

@@ -4,6 +4,7 @@
   <div class="w-form-group__wrapper slider-container">
     <vue-slider class="slider w-form-group__input"
       :value="value"
+      @input="value => updateValue(value)"
       :disabled="disabled"
       :max="metadata.max"
       :min="metadata.min"
