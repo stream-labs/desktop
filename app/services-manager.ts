@@ -67,11 +67,17 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
+import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
+
+import { BitGoalService } from 'services/widget-settings/bit-goal';
+import { ChatBoxService } from 'services/widget-settings/chat-box';
+import { DonationGoalService } from 'services/widget-settings/donation-goal';
+import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 
 const { ipcRenderer } = electron;
 
@@ -141,12 +147,18 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     ProjectorService,
     TransitionsService,
+    WidgetSettingsService,
+    MediaBackupService,
+    WebsocketService,
     FacemasksService,
     ProfanityFilterService,
     I18nService,
-    MediaBackupService,
-    WebsocketService,
-    OutageNotificationsService
+    OutageNotificationsService,
+
+    BitGoalService,
+    DonationGoalService,
+    FollowerGoalService,
+    ChatBoxService
   };
 
   private instances: Dictionary<Service> = {};
@@ -540,7 +552,7 @@ export class ServicesManager extends Service {
             }
           }
 
-          if (result && result._type === 'HELPER') {
+          if (result && (result._type === 'HELPER' || result._type === 'SERVICE')) {
             const helper = this.getResource(result.resourceId);
             return this.applyIpcProxy(helper);
           }

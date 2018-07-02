@@ -267,7 +267,7 @@ function startApp() {
 
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
-
+    //
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
@@ -276,7 +276,7 @@ function startApp() {
 
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
-    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
+    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
               '/node_modules/obs-studio-node'));
 
   getObs().OBS_API_initAPI('en-US', app.getPath('userData'));

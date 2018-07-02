@@ -3,9 +3,9 @@
     <div class="section">
     </div>
 
-    <!--<div class="section">-->
-      <!--<GenericForm v-model="settingsFormData" @input="saveSettings" />-->
-    <!--</div>-->
+    <div class="section">
+      <GenericForm v-model="settingsFormData" @input="saveSettings" />
+    </div>
 
   </div>
 </template>

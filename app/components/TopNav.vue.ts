@@ -7,11 +7,14 @@ import { UserService } from 'services/user';
 import electron from 'electron';
 import Login from 'components/Login.vue';
 import { SettingsService } from 'services/settings';
+import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 
 @Component({
-  components: { Login }
+  components: {
+    Login
+  }
 })
 export default class TopNav extends Vue {
   @Inject() settingsService: SettingsService;
@@ -19,6 +22,7 @@ export default class TopNav extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
+  @Inject() windowsService: WindowsService;
 
   slideOpen = false;
 

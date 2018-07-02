@@ -4,7 +4,7 @@
     <ul class="Tabs-tabContainer">
       <li
         class="Tabs-tab"
-        :class="{ 'Tabs-tab__active': tab.value === selected }"
+        :class="{ 'Tabs-tab__active': tab.value === value }"
         v-for="tab in tabs"
         @click="showTab(tab.value)">
         {{ tab.name }}
@@ -12,7 +12,7 @@
     </ul>
   </div>
   <div class="Tabs-contentContainer">
-    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === selected"/>
+    <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === value"/>
   </div>
 </div>
 </template>

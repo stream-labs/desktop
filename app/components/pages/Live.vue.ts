@@ -11,7 +11,6 @@ import VTooltip from 'v-tooltip';
 import { $t, I18nService } from 'services/i18n';
 import { NavigationService } from 'services/navigation';
 
-
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
 

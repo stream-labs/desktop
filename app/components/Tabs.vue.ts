@@ -13,10 +13,14 @@ export default class Tabs extends Vue {
   @Prop()
   tabs: ITab[];
 
-  selected: string = this.tabs[0].value || '';
+  @Prop()
+  value: string;
 
   showTab(tab: string) {
-    this.selected = tab;
+    this.$emit('input', tab);
   }
 
+  mounted() {
+    if (!this.value) this.showTab(this.tabs[0].value);
+  }
 }
