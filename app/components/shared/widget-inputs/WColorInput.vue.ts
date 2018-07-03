@@ -1,44 +1,32 @@
-import Vue from 'vue';
+import { Component, Prop } from 'vue-property-decorator';
 import VueColor from 'vue-color';
-import { Prop, Component } from 'vue-property-decorator';
+import { WInput } from './WInput';
+
 
 @Component({
-  components: {
-    SketchPicker: VueColor.Sketch
-  }
+  components: { ColorPicker: VueColor.Sketch }
 })
-export default class WColorInput extends Vue {
+export default class WColorInput extends WInput<string, {}> {
+
+
   @Prop()
   value: string;
 
-  colors = '#194d33';
-  colorValue: '';
-  displayPicker = false;
+  pickerVisible = false;
 
-  showPicker() {
-    document.addEventListener('click', this.documentClick);
-    this.displayPicker = true;
+  togglePicker() {
+    this.pickerVisible = !this.pickerVisible;
   }
 
-  hidePicker() {
-    document.removeEventListener('click', this.documentClick);
-    this.displayPicker = false;
+  mounted() {
+
   }
 
-  updateFromInput(event: any) {
-    this.$emit('input', event.target.value);
+  get swatchStyle() {
+    return {
+      backgroundColor: this.value
+    };
   }
 
-  updateFromPicker(value: any) {
-    this.colors = value.hex;
-    this.$emit('input', this.colors);
-  }
 
-  documentClick(e: Event) {
-    const el = this.$refs.colorpicker;
-    const target = e.target;
-    if (el !== target) {
-      this.hidePicker();
-    }
-  }
 }
