@@ -1,11 +1,10 @@
 <template>
-  <input
+  <textarea
       type="text"
       :placeholder="metadata.placeholder"
       :value="value"
       @input="emitInput($event.target.value)"
-      v-validate="metadata.validate"
   />
 </template>
 
-<script lang="ts" src="./WTextInput.vue.ts"></script>
+<script lang="ts" src="./WTextAreaInput.vue.ts"></script>

@@ -4,7 +4,7 @@ import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
 
 
 
-export interface IChatBoxSettings {
+export interface IChatBoxData {
   widget: {
     url: string,
     simulate: string
@@ -37,7 +37,7 @@ export interface IChatBoxSettings {
   };
 }
 
-export class ChatBoxService extends WidgetSettingsService<IChatBoxSettings> {
+export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
 
 
   getVersion() {
@@ -59,11 +59,22 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxSettings> {
           { description: 'Clean', value: 'standard' },
           { description: 'Boxed', value: 'boxed' },
           { description: 'Twitch', value: 'twitch' },
-          { description: 'Old School', value: 'old_school' },
+          { description: 'Old School', value: 'oldschool' },
           { description: 'Chunky', value: 'chunky' }
         ]
+      },
+      message_hide_delay: <IWSliderMetadata> {
+        min: 0,
+        max: 200
       }
     };
   }
+
+  protected patchData(data: IChatBoxData): IChatBoxData {
+    // backend accepts and returns message_hide_delay in different precision
+    data.settings.message_hide_delay = Math.round(data.settings.message_hide_delay / 1000);
+    return data;
+  }
+
 
 }
