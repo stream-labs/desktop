@@ -3,7 +3,7 @@ import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
-import { MediaGalleryService, IFile } from '../../services/media-gallery';
+import { MediaGalleryService, IFile } from '../../services/media-gallery/index';
 import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
 
