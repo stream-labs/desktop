@@ -5,6 +5,7 @@ import { authorizedHeaders } from '../../util/requests';
 import { StatefulService, mutation } from '../stateful-service';
 import { UserService } from '../user';
 import { HostsService } from '../hosts';
+import { WindowsService } from '../windows';
 
 export interface IFile {
   href: string;
@@ -52,6 +53,7 @@ const concatUint8Arrays = (a: Uint8Array, b: Uint8Array) => {
 export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   @Inject() userService: UserService;
   @Inject() hostsService: HostsService;
+  @Inject() windowsService: WindowsService;
 
   static initialState: IMediaGalleryState = {
     uploads: [],
@@ -101,7 +103,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   formRequest(endpoint: string, options?: any) {
     const host = this.hostsService.streamlabs;
     const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://beta.${host}/${endpoint}`;
+    const url = `https://${host}/${endpoint}`;
     return new Request(url, { ...options, headers });
   }
 
@@ -216,6 +218,16 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     fetch(req)
       .then(() => this.SET_UPLOADS(filteredUploads))
       .then(() => this.SET_SELECTED_FILE(null));
+  }
+
+  showMediaGallery() {
+    this.windowsService.showWindow({
+      componentName: 'MediaGallery',
+      size: {
+        width: 1100,
+        height: 720
+      }
+    });
   }
 
   @mutation()
