@@ -1,10 +1,11 @@
+import fs from 'fs';
 import { Inject } from '../util/injector';
 import { authorizedHeaders } from '../util/requests';
 import { StatefulService, mutation } from './stateful-service';
 import { UserService } from './user';
 import { HostsService } from './hosts';
 
-interface IFile {
+export interface IFile {
   href: string;
   filename: string;
   size?: string;
@@ -41,6 +42,13 @@ const union = (arrayA: any[], arrayB: any[]) => (
   Array.from(new Set([...arrayA, ...arrayB]))
 );
 
+const concatUint8Arrays = (a: Uint8Array, b: Uint8Array) => {
+  const c = new Uint8Array(a.length + b.length);
+  c.set(a, 0);
+  c.set(b, a.length);
+  return c;
+};
+
 const stockSounds = [
   { href: 'http://uploads.twitchalerts.com/sound-defaults/bonus-2.ogg', filename: 'Bonus 2' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/bonus-3.ogg', filename: 'Bonus 3' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/failure.ogg', filename: 'Failure' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/failure-2.ogg', filename: 'Failure 2' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/funny-blunder.ogg', filename: 'Funny Blunder' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/level-up.ogg', filename: 'Level Up' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/magic-coins.ogg', filename: 'Magic Coins' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/new-message.ogg', filename: 'New Message' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/new-message-2.ogg', filename: 'New Message 2' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/new-message-3.ogg', filename: 'New Message 3' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/new-message-4.ogg', filename: 'New Message 4' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/new-message-5.ogg', filename: 'New Message 5' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-win-game-sound-3.ogg', filename: 'Positive Win Game Sound 3' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-win-game-sound-4.ogg', filename: 'Positive Win Game Sound 4' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-win-game-sound-5.ogg', filename: 'Positive Win Game Sound 5' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-game-sound-2.ogg', filename: 'Positive Game Sound 2' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-game-sound-3.ogg', filename: 'Positive Game Sound 3' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/positive-game-sound-4.ogg', filename: 'Positive Game Sound 4' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/success-chime.ogg', filename: 'Success Chime' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/the-award.ogg', filename: 'The Award' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/the-award-2.ogg', filename: 'The Award 2' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/water-success.ogg', filename: 'Water Success' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/8-bit-success.ogg', filename: '8-Bit Success' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/all-right.ogg', filename: 'All Right!' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/oh-yeah.ogg', filename: 'Ohhhh Yeaaah' }, { href: 'http://uploads.twitchalerts.com/sound-defaults/soft-success.ogg', filename: 'Soft Success' }
 ].map((item: IFile) => { item.type = 'audio'; return item; });
@@ -65,6 +73,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
 
   init() {
     this.fetchFileLimits();
+    this.fetchFiles();
   }
 
   get files() {
@@ -100,24 +109,42 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     return new Request(url, { ...options, headers });
   }
 
-  getUploads() {
+  fetchFiles() {
     const req = this.formRequest('api/v5/slobs/uploads');
     fetch(req)
       .then((resp) => resp.json())
-      .then(({ body }: { body: IFile[] }) => this.SET_UPLOADS(body));
+      .then((resp: IFile[]) => this.SET_UPLOADS(resp));
   }
 
-  upload(files: FileList) {
+  fetchFileLimits() {
+    const req = this.formRequest('api/v5/slobs/user/filelimits');
+    fetch(req)
+      .then((resp) => resp.json())
+      .then(({ body }: { body: any }) => ({
+        maxUsage: body.max_allowed_upload_usage,
+        maxFileSize: body.max_allowed_upload_fize_size
+      }))
+      .then((limits) => this.SET_FILE_LIMITS(limits))
+      .catch(() => this.SET_FILE_LIMITS({ maxUsage: defaultMaxUsage, maxFileSize: defaultMaxFileSize }));
+  }
+
+  upload(filePaths: String[]) {
     this.SET_BUSY(true);
 
     const formData = new FormData();
-    Array.from(files).forEach((file: File) => formData.append('uploads[]', file));
+    filePaths.forEach((path: string) => {
+      const contents = fs.readFileSync(path, 'base64');
+      const name = path.split('\\').pop();
+      const ext = name.toLowerCase().split('.').pop();
+      const file = new File([contents], name, { type: `${filetypeMap[ext]}/${ext}` });
+      formData.append('uploads[]', file);
+    });
 
     const req = this.formRequest('api/v5/slobs/uploads', { body: formData, method: 'POST' });
     fetch(req)
       .then((resp: Response) => resp.json())
-      .then(({ body }: { body: IFile[] }) => {
-        this.SET_UPLOADS(union(body, this.state.uploads));
+      .then((resp: IFile[]) => {
+        this.SET_UPLOADS(union(resp, this.state.uploads));
         this.SET_BUSY(false);
       })
       .catch(() => this.SET_BUSY(false));
@@ -131,16 +158,48 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     }
   }
 
-  fetchFileLimits() {
-    const req = this.formRequest('api/v5/slobs/user/filelimits');
+  selectFile(file: IFile) {
+    if (file.type === 'audio') {
+      const audio = new Audio(file.href);
+      audio.play();
+    }
+
+    this.SET_SELECTED_FILE(file);
+  }
+
+  downloadSelectedFile(filename: string) {
+    if (this.state.selectedFile) {
+      fetch(this.state.selectedFile.href)
+        .then(({ body }: { body: ReadableStream }) => {
+          const reader = body.getReader();
+          let result = new Uint8Array(0);
+          const readStream = ({ done, value }: { done: boolean, value: Uint8Array }) => {
+            if (done) {
+              fs.writeFileSync(filename, result);
+            } else {
+              result = concatUint8Arrays(result, value);
+              reader.read().then(readStream);
+            }
+          };
+          return reader.read().then(readStream);
+        });
+    }
+  }
+
+
+
+  deleteSelectedFile() {
+    const a = document.createElement('a');
+    a.href = this.state.selectedFile.href;
+    const path = a.pathname;
+
+    const req = this.formRequest(`api/v5/slobs/uploads${path}`, { method: 'DELETE' });
+    const filteredUploads = this.state.uploads.filter(
+      (upload: IFile) => upload.href !== this.state.selectedFile.href
+    );
     fetch(req)
-      .then((resp) => resp.json())
-      .then(({ body }: { body: any }) => ({
-        maxUsage: body.max_allowed_upload_usage,
-        maxFileSize: body.max_allowed_upload_fize_size
-      }))
-      .then((limits) => this.SET_FILE_LIMITS(limits))
-      .catch(() => this.SET_FILE_LIMITS({ maxUsage: defaultMaxUsage, maxFileSize: defaultMaxFileSize }));
+      .then(() => this.SET_UPLOADS(filteredUploads))
+      .then(() => this.SET_SELECTED_FILE(null));
   }
 
   @mutation()

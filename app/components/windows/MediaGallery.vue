@@ -38,13 +38,14 @@
             <h4>{{ title }}</h4>
             <div class="toolbar">
               <i class="icon-cloud-backup" @click="openFilePicker"></i>
-              <i class="icon-trash" :class="[selectedFile ? '': 'disabled']"></i>
+              <i class="icon-trash" :class="[!selectedFile || category === 'stock' ? 'disabled' : '']" @click="handleDelete"></i>
+              <i class="fa fa-download" :class="[!selectedFile ? 'disabled' : '']" @click="handleDownload"></i>
             </div>
             <div>
               <div v-if="dragOver" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" class="drag-overlay radius"></div>
               <div v-if="busy" class="busy-overlay"></div>
               <ul v-if="files.length" class="uploads-manager__list">
-                <li v-for="(file, i) in files" :key="i" :class="[selectedFile == file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
+                <li v-for="(file, i) in files" :key="i" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                   <div>
                     <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
                       <video loop :src="file.href" style="height: 100%; width: 100%"></video>
@@ -53,7 +54,7 @@
                     <div v-if="file.type == 'audio'" style="height: 132">
                       <i class="icon-music" style="line-height: 132px; fontSize: 28px; textAlign: center; display: block"></i>
                     </div>
-                    <button class="copy-button button button--action" :key="i" v-clipboard="file.href" @success="handleSuccess" @error="handleError">
+                    <button class="copy-button button button--action" :key="i" @success="handleCopySuccess" @error="handleCopyError">
                       <i class="icon-copy"></i> {{ $t('Copy URL') }}
                     </button>
                     <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
