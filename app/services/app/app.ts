@@ -94,13 +94,6 @@ export class AppService extends StatefulService<IAppState> {
 
       this.patchNotesService.showPatchNotesIfRequired(onboarded);
       this.outageNotificationsService;
-      this.windowsService.showWindow({
-        componentName: 'MediaGallery',
-        size: {
-          width: 1100,
-          height: 720
-        }
-      });
 
       this.FINISH_LOADING();
     });
