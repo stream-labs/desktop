@@ -136,7 +136,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
 
     const formData = new FormData();
     filePaths.forEach((path: string) => {
-      const contents = fs.readFileSync(path, 'base64');
+      const contents = fs.readFileSync(path);
       const name = path.split('\\').pop();
       const ext = name
         .toLowerCase()
