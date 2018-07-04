@@ -18,10 +18,6 @@ export default class WColorInput extends WInput<string, {}> {
     this.pickerVisible = !this.pickerVisible;
   }
 
-  mounted() {
-
-  }
-
   get swatchStyle() {
     return {
       backgroundColor: this.value
