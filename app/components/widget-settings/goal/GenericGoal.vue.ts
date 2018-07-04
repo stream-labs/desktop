@@ -1,4 +1,4 @@
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import {
   GenericGoalService,
   IGoalData

@@ -1,6 +1,7 @@
 <template>
 <widget-layout v-if="wData" v-model="tabName">
 
+  <div slot="description">{{ $t('Set a goal for your viewers to help you reach below.') }}</div>
 
   <!-- goal setup -->
   <div slot="goal" >
