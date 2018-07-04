@@ -62,6 +62,15 @@
     box-shadow: none !important;
   }
 
+  // hide alpha input
+  .colorpicker .vc-alpha {
+    display: none;
+  }
+  .colorpicker .vc-sketch-field > div:last-child {
+    display: none;
+  }
+
+
   .night-theme {
     .colorpicker-menu {
       background: @night-secondary !important;
