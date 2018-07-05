@@ -33,18 +33,17 @@ export default class MediaGallery extends Vue {
   @Inject() mediaGalleryService: MediaGalleryService;
 
   dragOver = false;
+  busy = false;
+  selectedFile: IFile = null;
 
   get files() {
-    return this.mediaGalleryService.files;
+    return this.mediaGalleryService.files();
   }
   get type() {
     return this.mediaGalleryService.state.type;
   }
   get category() {
     return this.mediaGalleryService.state.category;
-  }
-  get busy() {
-    return this.mediaGalleryService.state.busy;
   }
 
   get title() {
@@ -65,9 +64,6 @@ export default class MediaGallery extends Vue {
   }
   get maxUsageLabel() {
     return this.formatBytes(this.mediaGalleryService.state.maxUsage, 2);
-  }
-  get selectedFile() {
-    return this.mediaGalleryService.state.selectedFile;
   }
 
   formatBytes(bytes: number, argPlaces: number) {
@@ -96,13 +92,13 @@ export default class MediaGallery extends Vue {
     electron.remote.dialog.showOpenDialog(
       electron.remote.getCurrentWindow(),
       { properties: ['openFile', 'multiSelections'] },
-      this.mediaGalleryService.upload
+      this.upload
     );
   }
 
   handleFileDrop(e: DragEvent) {
     const mappedFiles = Array.from(e.dataTransfer.files).map((file) => file.path);
-    this.mediaGalleryService.upload(mappedFiles);
+    this.upload(mappedFiles);
   }
 
   handleTypeFilter(type: string, category: string) {
@@ -114,14 +110,18 @@ export default class MediaGallery extends Vue {
   }
 
   selectFile(file: IFile, select: boolean) {
-    this.mediaGalleryService.selectFile(file);
+    this.selectedFile = file;
+
+    if (file.type === 'audio') {
+      const audio = new Audio(file.href);
+      audio.play();
+    }
 
     if (select === true) this.handleSelect();
   }
 
   handleSelect() {
     this.$emit('selected-file', this.selectedFile);
-    this.close();
   }
 
   handleDelete() {
@@ -134,19 +134,31 @@ export default class MediaGallery extends Vue {
           buttons: [$t('Cancel'), $t('OK')]
         },
         ok => {
-          if (!ok) return;
-          this.mediaGalleryService.deleteSelectedFile();
+          if (!ok || !this.selectedFile) return;
+          this.mediaGalleryService.deleteFile(this.selectedFile);
+          this.selectedFile = null;
         }
       );
     }
   }
 
-  handleDownload() {
+  async handleDownload() {
     electron.remote.dialog.showSaveDialog(
       electron.remote.getCurrentWindow(),
       { defaultPath: this.selectedFile.filename },
-      this.mediaGalleryService.downloadSelectedFile
+      async (filename) => {
+        if (!this.selectedFile) return;
+        this.busy = true;
+        await this.mediaGalleryService.downloadFile(filename, this.selectedFile);
+        this.busy = false;
+      }
     );
+  }
+
+  async upload(filepaths: string[]) {
+    this.busy = true;
+    await this.mediaGalleryService.upload(filepaths);
+    this.busy = false;
   }
 
   handleCopySuccess() {
@@ -154,14 +166,6 @@ export default class MediaGallery extends Vue {
   }
 
   handleCopyError() {
-    return;
-  }
-
-  close() {
-    return;
-  }
-
-  handleClose() {
     return;
   }
 }

@@ -6,6 +6,7 @@ import { StatefulService, mutation } from '../stateful-service';
 import { UserService } from '../user';
 import { HostsService } from '../hosts';
 import { WindowsService } from '../windows';
+import { ipcRenderer } from 'electron';
 
 export interface IFile {
   href: string;
@@ -19,8 +20,6 @@ interface IMediaGalleryState {
   totalUsage: number;
   category: string;
   type: string;
-  busy: boolean;
-  selectedFile: IFile;
   maxUsage: number;
   maxFileSize: number;
 }
@@ -60,18 +59,18 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     totalUsage: 0,
     category: null,
     type: null,
-    busy: false,
-    selectedFile: null,
     maxUsage: null,
     maxFileSize: null
   };
+
+  private promises: Dictionary<{ resolve: (file: IFile) => IFile, reject: () => void }> = {};
 
   init() {
     this.fetchFileLimits();
     this.fetchFiles();
   }
 
-  get files() {
+  files() {
     let totalUsage = 0;
     let files = this.state.uploads.map((item: IFile) => {
       const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
@@ -100,40 +99,21 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     return files;
   }
 
-  formRequest(endpoint: string, options?: any) {
-    const host = this.hostsService.streamlabs;
-    const headers = authorizedHeaders(this.userService.apiToken);
-    const url = `https://${host}/${endpoint}`;
-    return new Request(url, { ...options, headers });
+  selectFileFromGallery(): Promise<IFile> {
+    const promiseId = ipcRenderer.sendSync('getUniqueId');
+    this.showMediaGallery(promiseId);
+    return new Promise((resolve, reject) => {
+      this.promises[promiseId] = { resolve, reject };
+    });
   }
 
-  fetchFiles() {
-    const req = this.formRequest('api/v5/slobs/uploads');
-    fetch(req)
-      .then(resp => resp.json())
-      .then((resp: IFile[]) => this.SET_UPLOADS(resp));
+  resolveFileSelect(promiseId: string, file: IFile) {
+    this.promises[promiseId].resolve(file);
+    delete this.promises[promiseId];
+    return file;
   }
 
-  fetchFileLimits() {
-    const req = this.formRequest('api/v5/slobs/user/filelimits');
-    fetch(req)
-      .then(resp => resp.json())
-      .then(({ body }: { body: any }) => ({
-        maxUsage: body.max_allowed_upload_usage,
-        maxFileSize: body.max_allowed_upload_fize_size
-      }))
-      .then(limits => this.SET_FILE_LIMITS(limits))
-      .catch(() =>
-        this.SET_FILE_LIMITS({
-          maxUsage: defaultMaxUsage,
-          maxFileSize: defaultMaxFileSize
-        })
-      );
-  }
-
-  upload(filePaths: String[]) {
-    this.SET_BUSY(true);
-
+  async upload(filePaths: string[]): Promise<void> {
     const formData = new FormData();
     filePaths.forEach((path: string) => {
       const contents = fs.readFileSync(path);
@@ -152,82 +132,98 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
       body: formData,
       method: 'POST'
     });
-    fetch(req)
+    return fetch(req)
       .then((resp: Response) => resp.json())
       .then((resp: IFile[]) => {
         this.SET_UPLOADS(union(resp, this.state.uploads));
-        this.SET_BUSY(false);
-      })
-      .catch(() => this.SET_BUSY(false));
+      });
   }
 
   setTypeFilter(type: string, category: string) {
     if (type !== this.state.type || category !== this.state.category) {
       this.SET_TYPE(type);
-      this.SET_SELECTED_FILE(null);
       this.SET_CATEGORY(category);
     }
   }
 
-  selectFile(file: IFile) {
-    if (file.type === 'audio') {
-      const audio = new Audio(file.href);
-      audio.play();
-    }
-
-    this.SET_SELECTED_FILE(file);
+  async downloadFile(filename: string, file: IFile): Promise<void> {
+    return fetch(file.href).then(
+      ({ body }: { body: ReadableStream }) => {
+        const reader = body.getReader();
+        let result = new Uint8Array(0);
+        const readStream = ({
+          done,
+          value
+        }: {
+          done: boolean;
+          value: Uint8Array;
+        }) => {
+          if (done) {
+            fs.writeFileSync(filename, result);
+          } else {
+            result = concatUint8Arrays(result, value);
+            reader.read().then(readStream);
+          }
+        };
+        return reader.read().then(readStream);
+      }
+    );
   }
 
-  downloadSelectedFile(filename: string) {
-    if (this.state.selectedFile) {
-      fetch(this.state.selectedFile.href).then(
-        ({ body }: { body: ReadableStream }) => {
-          const reader = body.getReader();
-          let result = new Uint8Array(0);
-          const readStream = ({
-            done,
-            value
-          }: {
-            done: boolean;
-            value: Uint8Array;
-          }) => {
-            if (done) {
-              fs.writeFileSync(filename, result);
-            } else {
-              result = concatUint8Arrays(result, value);
-              reader.read().then(readStream);
-            }
-          };
-          return reader.read().then(readStream);
-        }
-      );
-    }
-  }
-
-  deleteSelectedFile() {
+  deleteFile(file: IFile) {
     const a = document.createElement('a');
-    a.href = this.state.selectedFile.href;
+    a.href = file.href;
     const path = a.pathname;
 
     const req = this.formRequest(`api/v5/slobs/uploads${path}`, {
       method: 'DELETE'
     });
     const filteredUploads = this.state.uploads.filter(
-      (upload: IFile) => upload.href !== this.state.selectedFile.href
+      (upload: IFile) => upload.href !== file.href
     );
     fetch(req)
       .then(() => this.SET_UPLOADS(filteredUploads))
-      .then(() => this.SET_SELECTED_FILE(null));
   }
 
-  showMediaGallery() {
+  showMediaGallery(promiseId: string) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
       size: {
         width: 1100,
-        height: 720
+        height: 680
       }
     });
+  }
+
+  private formRequest(endpoint: string, options?: any) {
+    const host = this.hostsService.streamlabs;
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const url = `https://${host}/${endpoint}`;
+    return new Request(url, { ...options, headers });
+  }
+
+  private fetchFiles() {
+    const req = this.formRequest('api/v5/slobs/uploads');
+    fetch(req)
+      .then(resp => resp.json())
+      .then((resp: IFile[]) => this.SET_UPLOADS(resp));
+  }
+
+  private fetchFileLimits() {
+    const req = this.formRequest('api/v5/slobs/user/filelimits');
+    fetch(req)
+      .then(resp => resp.json())
+      .then(({ body }: { body: any }) => ({
+        maxUsage: body.max_allowed_upload_usage,
+        maxFileSize: body.max_allowed_upload_fize_size
+      }))
+      .then(limits => this.SET_FILE_LIMITS(limits))
+      .catch(() =>
+        this.SET_FILE_LIMITS({
+          maxUsage: defaultMaxUsage,
+          maxFileSize: defaultMaxFileSize
+        })
+      );
   }
 
   @mutation()
@@ -241,11 +237,6 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   }
 
   @mutation()
-  private SET_BUSY(bool: boolean) {
-    this.state.busy = bool;
-  }
-
-  @mutation()
   private SET_TYPE(type: string) {
     this.state.type = type;
   }
@@ -253,11 +244,6 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   @mutation()
   private SET_CATEGORY(category: string) {
     this.state.category = category;
-  }
-
-  @mutation()
-  private SET_SELECTED_FILE(file: IFile) {
-    this.state.selectedFile = file;
   }
 
   @mutation()
