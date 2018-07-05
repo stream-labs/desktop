@@ -3,10 +3,10 @@
   <div>
     <ul class="tab-container">
       <li
-        v-for="(tab, i) in tabs"
-        :key="i"
+        v-for="tab in tabs"
+        :key="tab.value"
         class="tab"
-        :class="{ 'active': tab.value === value, first: i === 0, last: i === tabs.length - 1 }"
+        :class="{ 'active': tab.value === value }"
         @click="showTab(tab.value)">
         {{ tab.name }}
       </li>
@@ -41,10 +41,10 @@
   &.active {
     border-bottom: none;
   }
-  &.first {
+  &:first-of-type {
     border-left: none;
   }
-  &.last {
+  &:last-of-type {
     border-right: none;
   }
 }
