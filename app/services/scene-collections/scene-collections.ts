@@ -102,7 +102,17 @@ export class SceneCollectionsService extends Service
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
-      await this.load(this.collections[0].id);
+      let latestId = this.collections[0].id;
+      let latestModified = this.collections[0].modified;
+
+      this.collections.forEach(collection => {
+        if (collection.modified > latestModified) {
+          latestModified = collection.modified;
+          latestId = collection.id;
+        }
+      });
+
+      await this.load(latestId);
     } else {
       await this.create();
     }
@@ -766,7 +776,7 @@ export class SceneCollectionsService extends Service
           this.stateService.ADD_COLLECTION(
             id,
             onServer.name,
-            new Date().toISOString()
+            onServer.last_updated_at
           );
           this.stateService.SET_SERVER_ID(id, onServer.id);
         });
