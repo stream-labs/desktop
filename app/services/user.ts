@@ -209,6 +209,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
     this.LOGOUT();
+    electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
   }
 
