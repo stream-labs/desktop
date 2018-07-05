@@ -1,6 +1,9 @@
 <template>
 <widget-layout v-if="wData" v-model="tabName">
 
+  <div slot="description">
+    {{ $t('Include your channel\'s chat into your stream, and make it look pretty while you\'re at it.') }}
+  </div>
 
   <div slot="settings" >
 
@@ -22,7 +25,7 @@
     </w-form-group>
 
 
-    <w-form-group title="Text Color"  type="color" v-model="wData.settings.text_color"/>
+    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color"/>
     <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
 
     <w-form-group title="Hide Message after">

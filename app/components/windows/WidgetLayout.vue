@@ -3,11 +3,14 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
-  :fixedSectionHeight="240">
+  :fixedSectionHeight="300">
 
   <div slot="fixed">
     <display v-if="source" :sourceId="source.id" style="height: 200px"/>
-    <tabs class="tabs-place" ref="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
+    <div class="description">
+      <slot name="description"></slot>
+    </div>
+    <tabs ref="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
   <div slot="content">
@@ -40,3 +43,11 @@
 </template>
 
 <script lang="ts" src="./WidgetLayout.vue.ts"></script>
+
+<style lang="less" scoped>
+
+  .description {
+    padding: 20px;
+  }
+
+</style>
