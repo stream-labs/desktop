@@ -8,11 +8,12 @@ import electron from 'electron';
 import { Inject } from 'util/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import { WidgetType } from 'services/widgets';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
+import { CustomizationService } from 'services/customization';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
@@ -46,11 +47,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   sourceUpdated = new Subject<ISource>();
   sourceRemoved = new Subject<ISource>();
 
-  @Inject()
-  private scenesService: ScenesService;
-
-  @Inject()
-  private windowsService: WindowsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private widgetsService: WidgetsService;
+  @Inject() private customizationService: CustomizationService;
 
   /**
    * Maps a source id to a property manager
@@ -373,6 +373,39 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     this.windowsService.closeChildWindow();
+
+    if (this.customizationService.getSettings().experimental.newWidgets) {
+      const source = this.getSource(sourceId);
+      const isWidget = source.getPropertiesManagerType() === 'widget';
+
+      const widgetsWhitelist = [
+        WidgetType.BitGoal,
+        WidgetType.DonationGoal,
+        WidgetType.FollowerGoal,
+        WidgetType.ChatBox
+      ];
+
+      if (isWidget) {
+        const widgetType = source.getPropertiesManagerSettings().widgetType;
+        if (widgetsWhitelist.includes(widgetType)) {
+          const componentName = this.widgetsService.getWidgetComponent(widgetType);
+
+          this.windowsService.showWindow({
+            componentName,
+            queryParams: { sourceId },
+            size: {
+              width: 600,
+              height: 800
+            }
+          });
+
+          return;
+        }
+      }
+    }
+
+
+
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
       queryParams: { sourceId },

@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.9.3-preview.3",
+  "version": "0.9.4-preview.0",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -83,7 +83,10 @@
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vee-validate": "^2.0.9",
+    "vue-codemirror": "^4.0.5",
+    "vue-spinner": "^1.0.3"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
@@ -107,7 +110,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "2.0.1",
+    "electron": "2.0.3",
     "electron-builder": "20.6.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",

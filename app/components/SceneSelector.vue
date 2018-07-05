@@ -29,13 +29,16 @@
     <div>
       <i
         class="icon-add icon-btn icon-btn--lg"
-        @click="addScene"/>
+        @click="addScene"
+        v-tooltip.bottom="addSceneTooltip" />
       <i
         class="icon-subtract icon-btn icon-btn--lg"
-        @click="removeScene"/>
+        @click="removeScene"
+        v-tooltip.bottom="removeSceneTooltip" />
       <i
         class="icon-settings icon-btn icon-btn--lg"
-        @click="showTransitions"/>
+        @click="showTransitions"
+        v-tooltip.bottom="showTransitionsTooltip"/>
     </div>
   </div>
 

@@ -39,6 +39,8 @@ export default class SceneTransitions extends Vue {
     }
   ];
 
+  selectedTab = 'transitions';
+
   get transitionsEnabled() {
     return this.scenesService.scenes.length > 1;
   }

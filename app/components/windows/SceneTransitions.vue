@@ -7,7 +7,7 @@
     <div v-if="!transitionsEnabled">
       You need at least 2 scenes to edit transitions.
     </div>
-    <tabs :tabs="tabs" v-else>
+    <tabs :tabs="tabs" v-model="selectedTab" v-else>
       <div slot="transitions">
         <button class="button button--action" @click="addTransition">
           {{$t('Add Transition')}}
