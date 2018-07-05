@@ -6,11 +6,12 @@
   :fixedSectionHeight="300">
 
   <div slot="fixed">
-    <display v-if="source" :sourceId="source.id" style="height: 200px"/>
     <div class="description">
       <slot name="description"></slot>
     </div>
-    <tabs ref="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
+    <tabs class="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
+    <display v-if="source && value === 'source' " :sourceId="source.id" style="height: 200px"/>
+    <webview ref="webview" v-show="value !== 'source'" :src="widgetUrl"></webview>
   </div>
 
   <div slot="content">
@@ -49,5 +50,11 @@
   .description {
     padding: 20px;
   }
+
+  webview {
+    height: 200px;
+    background-color: black;
+  }
+
 
 </style>

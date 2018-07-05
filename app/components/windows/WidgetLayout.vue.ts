@@ -34,21 +34,29 @@ export default class WidgetLayout extends Vue {
 
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
+  widgetType = this.source.getPropertiesManagerSettings().widgetType;
+  service = this.widgetsService.getWidgetSettingsService(this.widgetType);
+  widgetUrl = this.service.getWidgetUrl();
 
   properties: TFormData = [];
 
+  $refs: {
+    webview: Electron.WebviewTag;
+  };
+
+
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
+    const webview = this.$refs.webview;
+    webview.addEventListener('dom-ready', () => {
+      webview.insertCSS('html,body{ overflow: hidden !important;}');
+    });
   }
 
   get tabs() {
     const settingsService = this.widgetsService.getWidgetSettingsService(this.widgetType);
     const tabs = settingsService.getTabs().map(tab => ({ name: tab.title, value: tab.name }));
     return tabs.concat([{ name: 'Source', value: 'source' }]);
-  }
-
-  get widgetType(): WidgetType {
-    return this.source.getPropertiesManagerSettings().widgetType;
   }
 
   close() {

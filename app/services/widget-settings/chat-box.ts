@@ -45,7 +45,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
   }
 
   getWidgetUrl() {
-    return `https://${ this.getHost() }/widgets/chat-box/v1?token=${this.getWidgetToken()}`;
+    return `https://${ this.getHost() }/widgets/chat-box/v1?token=${this.getWidgetToken()}&simulate=1`;
   }
 
   getDataUrl() {
