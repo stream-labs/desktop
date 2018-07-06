@@ -15,7 +15,17 @@
       :tooltip="tooltip"
       :sliderStyle="sliderStyle"
       :formatter="formatter"
+      :piecewise="metadata.interval && metadata.interval > 3"
       ref="slider"
+      :piecewiseStyle="{
+          position: 'absolute',
+          'backgroundColor': '#253239',
+          height: '2px',
+          width: '2px',
+          'borderRadius': '1px',
+          top: '12px'
+      }"
+      :piecewiseActiveStyle="{ backgroundColor: '#7d8387' }"
     />
     <input
       v-if="valueBox && !usePercentages"
@@ -37,6 +47,7 @@
 .slider-container {
   width: 100%;
   display: flex;
+  position: relative;
 }
 
 .slider-input {
