@@ -17,6 +17,14 @@
       :formatter="formatter"
       ref="slider"
     />
+    <div v-if="metadata.interval && metadata.interval > 3">
+      <div
+        v-for="n in (metadata.max/metadata.interval + 1)"
+        :key="n"
+        class="slider-pip"
+        :class="[value >= n * interval ? 'active': '']"
+        :style="{ left: `${((n - 1)/(metadata.max/metadata.interval)) * 100}%` }" />
+    </div>
     <input
       v-if="valueBox && !usePercentages"
       class="slider-input"
@@ -37,6 +45,7 @@
 .slider-container {
   width: 100%;
   display: flex;
+  position: relative;
 }
 
 .slider-input {
@@ -55,6 +64,19 @@
     .vue-slider-tooltip {
       color: @navy !important;
     }
+  }
+}
+
+.slider-pip {
+  position: absolute;
+  background-color: @night-slider-bg;
+  height: 2px;
+  width: 2px;
+  border-radius: 1px;
+  bottom: 0;
+
+  &.active {
+    background-color: @night-text;
   }
 }
 
