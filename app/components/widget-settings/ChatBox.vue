@@ -1,5 +1,5 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName" widgetUrl="">
+<widget-window v-if="wData" ref="layout" v-model="tabName">
 
   <div slot="description">
     {{ $t('Include your channel\'s chat into your stream, and make it look pretty while you\'re at it.') }}
