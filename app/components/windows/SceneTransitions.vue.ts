@@ -41,6 +41,9 @@ export default class SceneTransitions extends Vue {
 
   selectedTab = 'transitions';
 
+  redundantConnectionTooltip =
+    $t('This connection is redundant because another connection already connects these scenes.');
+
   get transitionsEnabled() {
     return this.scenesService.scenes.length > 1;
   }
@@ -109,18 +112,22 @@ export default class SceneTransitions extends Vue {
     const transition = this.transitionsService.getTransition(id);
 
     if (transition) return transition.name;
-    return '<deleted>';
+    return `<${$t('Deleted')}>`;
   }
 
   getSceneName(id: string) {
     const scene = this.scenesService.getScene(id);
 
     if (scene) return scene.name;
-    return '<deleted>';
+    return `<${$t('Deleted')}>`;
   }
 
   isConnectionRedundant(id: string) {
     return this.transitionsService.isConnectionRedundant(id);
+  }
+
+  nameForType(type: ETransitionType) {
+    return this.transitionsService.getTypes().find(t => t.value === type).description;
   }
 
   done() {

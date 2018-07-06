@@ -16,5 +16,10 @@
   "Ending Scene": "Ending Scene",
   "Scene Transition": "Scene Transition",
   "Type": "Type",
-  "Name": "Name"
+  "Transition Type": "Transition Type",
+  "Name": "Name",
+  "Transition Name": "Transition Name",
+  "Default": "Default",
+  "Deleted": "Deleted",
+  "This connection is redundant because another connection already connects these scenes.": "This connection is redundant because another connection already connects these scenes."
 }
