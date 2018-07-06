@@ -1,5 +1,5 @@
 <template>
-<widget-layout v-if="wData" v-model="tabName">
+<widget-window v-if="wData" v-model="tabName">
 
   <div slot="description">{{ $t('Set a goal for your viewers to help you reach below.') }}</div>
 
@@ -155,7 +155,7 @@
     <w-form-group type="fontFamily" :value="wData.settings.font"/>
   </div>
 
-</widget-layout>
+</widget-window>
 
 </template>
 

@@ -5,8 +5,7 @@ import { WindowsService } from 'services/windows';
 import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
-import { THttpMethod, WidgetSettingsService } from 'services/widget-settings/widget-settings';
-
+import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
 
 
 @Component({})
@@ -100,6 +99,8 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   }
 
   refreshPreview() {
+
+    // update obs-preview
     // little hack: update some property to trigger preview refreshing
     const height = this.source.height;
     this.source.updateSettings({ height: height + 1 });

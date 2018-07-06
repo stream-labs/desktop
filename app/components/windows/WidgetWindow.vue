@@ -9,9 +9,8 @@
     <div class="description">
       <slot name="description"></slot>
     </div>
+    <display class="display" v-if="previewSource" :sourceId="previewSource.id" @click="createProjector"/>
     <tabs class="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
-    <display v-if="source && value === 'source' " :sourceId="source.id" style="height: 200px"/>
-    <webview ref="webview" v-show="value !== 'source'" :src="widgetUrl"></webview>
   </div>
 
   <div slot="content">
@@ -43,7 +42,7 @@
 </modal-layout>
 </template>
 
-<script lang="ts" src="./WidgetLayout.vue.ts"></script>
+<script lang="ts" src="./WidgetWindow.vue.ts"></script>
 
 <style lang="less" scoped>
 
@@ -51,10 +50,9 @@
     padding: 20px;
   }
 
-  webview {
-    height: 200px;
-    background-color: black;
+  .display {
+    height: 200px !important;
+    cursor: pointer;
   }
-
 
 </style>

@@ -26,7 +26,7 @@ export abstract class WidgetSettingsService<TWidgetData> extends Service {
   @Inject() userService: UserService;
 
 
-  abstract getWidgetUrl(): string;
+  abstract getPreviewUrl(): string;
   abstract getDataUrl(): string;
 
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];

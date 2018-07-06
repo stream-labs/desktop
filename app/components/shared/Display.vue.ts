@@ -15,6 +15,7 @@ export default class Display extends Vue {
   @Prop() sourceId: string;
   @Prop({ default: 0 }) paddingSize: number;
   @Prop({ default: false }) drawUI: boolean;
+  @Prop() clickHandler: boolean;
 
   $refs: {
     display: HTMLElement
@@ -24,6 +25,10 @@ export default class Display extends Vue {
 
   mounted() {
     this.createDisplay();
+  }
+
+  onClickHandler(event: MouseEvent) {
+    this.$emit('click', event);
   }
 
   createDisplay() {
