@@ -15,16 +15,18 @@
       :tooltip="tooltip"
       :sliderStyle="sliderStyle"
       :formatter="formatter"
+      :piecewise="metadata.interval && metadata.interval > 3"
       ref="slider"
+      :piecewiseStyle="{
+          position: 'absolute',
+          'backgroundColor': '#253239',
+          height: '2px',
+          width: '2px',
+          'borderRadius': '1px',
+          top: '12px'
+      }"
+      :piecewiseActiveStyle="{ backgroundColor: '#7d8387' }"
     />
-    <div v-if="metadata.interval && metadata.interval > 3">
-      <div
-        v-for="n in (metadata.max/metadata.interval + 1)"
-        :key="n"
-        class="slider-pip"
-        :class="[value >= n * interval ? 'active': '']"
-        :style="{ left: `${((n - 1)/(metadata.max/metadata.interval)) * 100}%` }" />
-    </div>
     <input
       v-if="valueBox && !usePercentages"
       class="slider-input"
@@ -64,19 +66,6 @@
     .vue-slider-tooltip {
       color: @navy !important;
     }
-  }
-}
-
-.slider-pip {
-  position: absolute;
-  background-color: @night-slider-bg;
-  height: 2px;
-  width: 2px;
-  border-radius: 1px;
-  bottom: 0;
-
-  &.active {
-    background-color: @night-text;
   }
 }
 
