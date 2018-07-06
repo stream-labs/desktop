@@ -19,13 +19,13 @@
       ref="slider"
       :piecewiseStyle="{
           position: 'absolute',
-          'backgroundColor': '#253239',
+          'backgroundColor': nightMode ? '#253239' : '#eaecee',
           height: '2px',
           width: '2px',
           'borderRadius': '1px',
           top: '12px'
       }"
-      :piecewiseActiveStyle="{ backgroundColor: '#7d8387' }"
+      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
     />
     <input
       v-if="valueBox && !usePercentages"
