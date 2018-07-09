@@ -1,17 +1,15 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
-interface ITab {
+export interface ITab {
   name: string;
   value: string;
-  selected: boolean;
 }
 
 @Component({})
 export default class Tabs extends Vue {
 
-  @Prop()
-  tabs: ITab[];
+  @Prop() tabs: ITab[];
 
   @Prop()
   value: string;
