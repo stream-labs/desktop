@@ -19,6 +19,7 @@ import Raven from 'raven-js';
 import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
+import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VeeValidate from 'vee-validate';
 
@@ -87,6 +88,7 @@ VTooltip.options.defaultContainer = '#mainWrapper';
 
 Vue.use(VeeValidate);
 
+Vue.use(Toasted);
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());

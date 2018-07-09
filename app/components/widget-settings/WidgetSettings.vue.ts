@@ -6,6 +6,7 @@ import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
 import { THttpMethod, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { $t } from 'services/i18n';
 
 
 
@@ -111,7 +112,9 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   }
 
   onFailHandler() {
-    // TODO: replace alert with UI component
-    alert('Something went wrong');
+    this.$toasted.show(
+      $t('Save failed, something went wrong.'),
+      { position: 'bottom-center', className: 'toast-alert' }
+    );
   }
 }
