@@ -2,11 +2,12 @@
 <modal-layout
   :title="$t('Scene Transitions')"
   :content-styles="{ padding: 0 }"
+  :show-cancel="false"
   :done-handler="done">
 
   <div slot="content">
-    <div v-if="!transitionsEnabled">
-      You need at least 2 scenes to edit transitions.
+    <div v-if="!transitionsEnabled" class="transition-blank">
+      {{ $t('You need at least 2 scenes to edit transitions.') }}
     </div>
     <tabs :tabs="tabs" v-model="selectedTab" v-else>
       <div slot="transitions" class="transition-tab">
@@ -97,6 +98,11 @@
 
 .controls {
   padding-top: 30px;
+}
+
+.transition-blank {
+  text-align: center;
+  padding: 50px;
 }
 
 .transition-settings-modal {

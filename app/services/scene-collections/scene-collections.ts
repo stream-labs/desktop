@@ -30,6 +30,7 @@ import {
 } from '.';
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
+import { TransitionsService, ETransitionType } from 'services/transitions';
 
 const uuid = window['require']('uuid/v4');
 
@@ -74,6 +75,7 @@ export class SceneCollectionsService extends Service
   @Inject() userService: UserService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
   @Inject() tcpServerService: TcpServerService;
+  @Inject() transitionsService: TransitionsService;
 
   collectionAdded = new Subject<ISceneCollectionsManifestEntry>();
   collectionRemoved = new Subject<ISceneCollectionsManifestEntry>();
@@ -569,6 +571,9 @@ export class SceneCollectionsService extends Service
       this.sourcesService.sources.forEach(source => {
         if (source.type !== 'scene') source.remove();
       });
+
+      this.transitionsService.deleteAllTransitions();
+      this.transitionsService.deleteAllConnections();
     } catch (e) {
       console.error('Error deloading application state');
     }
@@ -601,6 +606,7 @@ export class SceneCollectionsService extends Service
   private setupEmptyCollection() {
     this.scenesService.createScene('Scene', { makeActive: true });
     this.setupDefaultAudio();
+    this.transitionsService.ensureTransition();
   }
 
   /**

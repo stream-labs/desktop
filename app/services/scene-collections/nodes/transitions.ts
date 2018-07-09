@@ -58,6 +58,7 @@ export class TransitionsNode extends Node<ISchema, {}> {
   }
 
   async load() {
+    // Double check we are starting from a blank state
     this.transitionsService.deleteAllTransitions();
     this.data.transitions.forEach(transition => {
       this.transitionsService.createTransition(
@@ -72,6 +73,7 @@ export class TransitionsNode extends Node<ISchema, {}> {
       );
     });
 
+    // Double check we are starting from a blank state
     this.transitionsService.deleteAllConnections();
     this.data.connections.forEach(connection => {
       this.transitionsService.addConnection(
