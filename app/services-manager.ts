@@ -515,6 +515,12 @@ export class ServicesManager extends Service {
           return target[property];
 
         const serviceName = target.constructor.name;
+
+        console.log(serviceName);
+        if (serviceName === 'WidgetSettingsService') {
+          debugger;
+        }
+
         const methodName = property;
         const isHelper = target['isHelper'];
 

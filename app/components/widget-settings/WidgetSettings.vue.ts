@@ -40,6 +40,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.tabName = this.tabName || this.tabs[0].name;
     this.service.dataUpdated.subscribe(newData => {
       this.wData = newData;
+      this.afterFetch();
     });
     await this.refresh();
   }
@@ -48,7 +49,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     try {
       await this.service.fetchData();
       this.loadingState = 'success';
-      this.afterFetch();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
@@ -79,7 +79,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     try {
       await this.service.saveData(this.wData[tab.name], tab.name);
       this.loadingState = 'success';
-      this.afterFetch();
       this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {

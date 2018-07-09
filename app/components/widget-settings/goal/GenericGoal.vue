@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <div v-show="!hasGoal">
+    <div v-show="!hasGoal && wData.goal">
       <div class="section__body" v-if="loadingState !== 'pending'">
         <div class="row">
           <div class="col-xs-12">
