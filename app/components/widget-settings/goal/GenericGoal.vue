@@ -112,7 +112,7 @@
     <w-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <w-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
     <w-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color"/>
+    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
     <w-form-group
         type="slider"
