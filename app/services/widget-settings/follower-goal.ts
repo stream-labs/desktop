@@ -1,8 +1,12 @@
 import { GenericGoalService } from './generic-goal';
+import { WidgetType } from 'services/widgets';
 
 
 export class FollowerGoalService extends GenericGoalService {
 
+  getWidgetType() {
+    return WidgetType.FollowerGoal;
+  }
 
   protected tabs = [
     {

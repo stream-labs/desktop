@@ -5,12 +5,13 @@ import { WindowsService } from 'services/windows';
 import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
-import { THttpMethod, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 
 
 
 @Component({})
-export default class WidgetSettings<TData, TService extends WidgetSettingsService<TData>> extends Vue {
+export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
+  extends Vue {
 
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: SourcesService;
@@ -23,6 +24,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   wData: TData = null;
   metadata = this.service.getMetadata();
   loadingState: 'success' | 'pending' | 'fail' = 'pending';
+  tabs = this.service.getTabs();
 
   get widgetType(): WidgetType {
     return this.source.getPropertiesManagerSettings().widgetType;
@@ -34,13 +36,17 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
 
   protected skipNextDatachangeHandler: boolean;
 
-  async mounted() {
+  async created() {
+    this.tabName = this.tabName || this.tabs[0].name;
+    this.service.dataUpdated.subscribe(newData => {
+      this.wData = newData;
+    });
     await this.refresh();
   }
 
   async refresh() {
     try {
-      this.wData = await this.service.fetchData();
+      await this.service.fetchData();
       this.loadingState = 'success';
       this.afterFetch();
       this.skipNextDatachangeHandler = true;
@@ -71,7 +77,7 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     this.loadingState = 'pending';
 
     try {
-      this.wData = await this.service.saveData(this.wData[tab.name], tab.name);
+      await this.service.saveData(this.wData[tab.name], tab.name);
       this.loadingState = 'success';
       this.afterFetch();
       this.refreshPreview();

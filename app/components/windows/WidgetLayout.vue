@@ -10,7 +10,7 @@
     <div class="description">
       <slot name="description"></slot>
     </div>
-    <tabs ref="tabs" :tabs="tabs" :value="value" @input="value => $emit('input', value)"></tabs>
+    <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
   <div slot="content">
@@ -19,16 +19,16 @@
       <GenericForm v-model="properties" @input="onPropsInputHandler"/>
     </div>
 
-    <div v-for="tab in tabs" >
-      <div v-if="tab.value !== 'source'">
-        <slot :name="tab.value"  v-if="tab.value === value"></slot>
+    <div v-for="tabItem in tabsList" >
+      <div v-if="tabItem.value !== 'source'">
+        <slot :name="tabItem.value" v-if="tabItem.value === value"></slot>
       </div>
     </div>
   </div>
 
-  <div slot="controls">
-    <div v-for="tab in tabs" v-if="tab.value === value">
-      <slot :name="tab.value + '-controls'">
+  <div slot="controls" v-if="tab && tab.showControls">
+    <div v-for="tabItem in tabsList" v-if="tabItem.value === value">
+      <slot :name="tabItem.value + '-controls'">
         <button
             class="button button--action"
             @click="close">

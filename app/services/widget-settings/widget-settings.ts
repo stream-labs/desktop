@@ -1,11 +1,13 @@
-import { Service } from '../service';
 import { HostsService } from '../hosts';
 import { Inject } from '../../util/injector';
-import { UserService } from '../../services/user';
+import { UserService } from 'services/user';
 import {
   handleErrors,
   authorizedHeaders
 } from '../../util/requests';
+import { WidgetType } from 'services/widgets';
+import { mutation, StatefulService } from 'services/stateful-service';
+import { Subject } from 'rxjs/Subject';
 
 
 
@@ -17,17 +19,52 @@ export interface IWidgetTab {
   resetUrl: string;
   resetMethod: THttpMethod;
   autosave: boolean;
+  showControls: boolean;
+}
+
+export interface IWidgetSettings {
+  custom_enabled: boolean;
+  custom_html: string;
+  custom_css: string;
+  custom_js: string;
+}
+
+export interface IWidgetData {
+
+  type: WidgetType;
+
+  settings: IWidgetSettings;
+
+  custom_defaults: {
+    html: string;
+    css: string;
+    js: string;
+  };
 }
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
 
-export abstract class WidgetSettingsService<TWidgetData> extends Service {
-  @Inject() hostsService: HostsService;
-  @Inject() userService: UserService;
+export const CODE_EDITOR_TABS: (Partial<IWidgetTab> & { name: string })[] = [
+  { name: 'HTML', showControls: false, autosave: false },
+  { name: 'CSS', showControls: false, autosave: false },
+  { name: 'JS', showControls: false, autosave: false }
+];
 
+/**
+ * base class for widget settings
+ * TODO: join this service with WidgetsService.ts after widgets rewrite
+ */
+export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends StatefulService<IWidgetData> {
+  static initialState = {};
+
+  @Inject() private hostsService: HostsService;
+  @Inject() private userService: UserService;
+
+  dataUpdated = new Subject<TWidgetData>();
 
   protected abstract getWidgetUrl(): string;
   protected abstract getDataUrl(): string;
+  protected abstract getWidgetType(): WidgetType;
 
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
 
@@ -46,6 +83,7 @@ export abstract class WidgetSettingsService<TWidgetData> extends Service {
         saveUrl,
         resetUrl,
         resetMethod,
+        showControls: true,
         ...tab
       };
     });
@@ -56,10 +94,25 @@ export abstract class WidgetSettingsService<TWidgetData> extends Service {
   }
 
   async fetchData(): Promise<TWidgetData> {
-    const data = await this.request({
+    let data = await this.request({
       url: this.getDataUrl(),
       method: 'GET'
     });
+    data = this.handleDataAfterFetch(data);
+    this.SET_STATE(data);
+    this.dataUpdated.next(data);
+    return data;
+  }
+
+  protected handleDataAfterFetch(data: any): TWidgetData {
+
+    // patch fetched data to have the same data format
+
+    if (data.custom) data.custom_defaults = data.custom;
+    data.type = this.getWidgetType();
+
+
+    // widget-specific patching
     return this.patchData(data);
   }
 
@@ -122,6 +175,11 @@ export abstract class WidgetSettingsService<TWidgetData> extends Service {
 
   protected getApiToken(): string {
     return this.userService.apiToken;
+  }
+
+  @mutation()
+  private SET_STATE(state: TWidgetData) {
+    this.state = state;
   }
 
   //

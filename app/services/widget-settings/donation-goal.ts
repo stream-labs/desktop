@@ -1,8 +1,13 @@
 import { GenericGoalService } from './generic-goal';
 import { THttpMethod } from './widget-settings';
+import { WidgetType } from 'services/widgets';
 
 
 export class DonationGoalService extends GenericGoalService {
+
+  getWidgetType() {
+    return WidgetType.DonationGoal;
+  }
 
   protected tabs = [
     {

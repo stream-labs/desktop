@@ -41,6 +41,19 @@
     <w-form-group title="Muted Chatters" type="textArea" v-model="wData.settings.muted_chatters" />
   </div>
 
+
+  <div slot="HTML" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+  </div>
+
+  <div slot="CSS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+  </div>
+
+  <div slot="JS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
+
 </widget-layout>
 
 </template>
