@@ -23,7 +23,7 @@ export class BitGoalService extends GenericGoalService {
     return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/bitgoal/settings`;
   }
 
-  getWidgetUrl() {
+  getPreviewUrl() {
     return `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`;
   }
 

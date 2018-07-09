@@ -4,7 +4,7 @@ import {
   IChatBoxData
 } from 'services/widget-settings/chat-box';
 
-import WidgetLayout from '../windows/WidgetLayout.vue';
+import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import * as comps from 'components/shared/widget-inputs';
@@ -13,7 +13,7 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    WidgetLayout,
+    WidgetWindow,
     WFormGroup,
     ...comps
   }

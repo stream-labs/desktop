@@ -21,7 +21,7 @@ export class DonationGoalService extends GenericGoalService {
     return 5;
   }
 
-  getWidgetUrl() {
+  getPreviewUrl() {
     return `https://${ this.getHost() }/widgets/donation-goal?token=${this.getWidgetToken()}`;
   }
 
