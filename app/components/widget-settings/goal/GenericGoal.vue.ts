@@ -3,7 +3,7 @@ import {
   GenericGoalService,
   IGoalData
 } from 'services/widget-settings/generic-goal';
-import WidgetLayout from 'components/windows/WidgetLayout.vue';
+import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widget-settings/WidgetSettings.vue';
 
 import * as comps from 'components/shared/widget-inputs';
@@ -12,7 +12,7 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    WidgetLayout,
+    WidgetWindow,
     WFormGroup,
     ...comps
   }
