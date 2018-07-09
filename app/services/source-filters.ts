@@ -109,19 +109,27 @@ export class SourceFiltersService extends Service {
   getTypesForSource(sourceId: string): ISourceFilterType[] {
     const source = this.sourcesService.getSource(sourceId);
     return this.getTypes().filter(filterType => {
-      return (filterType.audio && source.audio) || (filterType.video && source.video);
+      let asyncCompat = true;
+
+      if (filterType.async === true)
+        if (source.async === false)
+          asyncCompat = false;
+
+      return ((filterType.audio && source.audio) ||
+        (filterType.video && source.video)) &&
+        asyncCompat;
     });
   }
 
 
   add(sourceId: string, filterType: TSourceFilterType, filterName: string, settings?: Dictionary<TObsValue>) {
     const source = this.sourcesService.getSource(sourceId);
-    const obsFilter = obs.FilterFactory.create(filterType, filterName);
+    const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
+
     source.getObsInput().addFilter(obsFilter);
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
-    if (settings) obsFilter.update(settings);
     return obsFilter;
   }
 
