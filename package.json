@@ -66,7 +66,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "2.0.1",
+    "runtimeVersion": "2.0.4",
     "arch": "x64"
   },
   "dependencies": {
@@ -110,7 +110,7 @@
     "circular-dependency-plugin": "^3.0.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "2.0.3",
+    "electron": "2.0.4",
     "electron-builder": "20.6.1",
     "electron-devtools-installer": "^2.2.1",
     "eslint": "^3.19.0",

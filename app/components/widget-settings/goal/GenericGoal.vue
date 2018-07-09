@@ -7,42 +7,10 @@
   <div slot="goal" >
     <div v-show="hasGoal">
       <div class="section__body">
-
-        <div class="row">
-          <div class="small-12 medium-3 column">
-            <label>{{ $t("Title") }}</label>
-          </div>
-          <div class="small-12 medium-9 columns">
-            <span>{{ wData.goal.title }}</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-12 medium-3 column">
-            <label>{{ $t("Goal Amount") }}</label>
-          </div>
-          <div class="small-12 medium-9 columns">
-            <span>{{ wData.goal.amount }}</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-12 medium-3 column">
-            <label>{{ $t("Current Amount") }}</label>
-          </div>
-          <div class="small-12 medium-9 columns">
-            <span>{{ wData.goal.current_amount }}</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="small-12 medium-3 column">
-            <label>{{ $t("Days Remaining") }}</label>
-          </div>
-          <div class="small-12 medium-9 columns">
-            <span>{{ wData.goal.to_go }}</span>
-          </div>
-        </div>
+        <w-form-group :title="$t('Title')">{{ wData.goal.title }}</w-form-group>
+        <w-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</w-form-group>
+        <w-form-group :title="$t('Current Amount')">{{ wData.goal.current_amount }}</w-form-group>
+        <w-form-group :title="$t('Days Remaining')">{{ wData.goal.to_go }}</w-form-group>
       </div>
     </div>
 
@@ -114,7 +82,7 @@
           </div>
         </div>
       </div>
-      <div v-else>
+      <div v-else class="loading-spinner">
         <img src="../../../../media/images/loader.svg" />
       </div>
     </div>
@@ -144,7 +112,7 @@
     <w-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <w-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
     <w-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color"/>
+    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
     <w-form-group
         type="slider"
@@ -160,3 +128,18 @@
 </template>
 
 <script lang="ts" src="./GenericGoal.vue.ts"></script>
+
+<style lang="less" scoped>
+.loading-spinner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding-top: 100px;
+
+  img {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+}
+</style>

@@ -2,6 +2,8 @@ import VueSlider from 'vue-slider-component';
 import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 import { WInput } from './WInput';
+import { CustomizationService } from '../../../services/customization';
+import { Inject } from '../../../util/injector';
 
 export interface IWSliderMetadata {
   min: number;
@@ -14,6 +16,8 @@ export interface IWSliderMetadata {
   components: { VueSlider }
 })
 export default class WSliderInput extends WInput<number, IWSliderMetadata>  {
+  @Inject() customizationService: CustomizationService;
+
   @Prop() value: number;
   @Prop() metadata: IWSliderMetadata;
 
@@ -43,6 +47,10 @@ export default class WSliderInput extends WInput<number, IWSliderMetadata>  {
   @throttle(500)
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
+  }
+
+  get nightMode() {
+    return this.customizationService.nightMode;
   }
 
   handleKeydown(event: KeyboardEvent) {

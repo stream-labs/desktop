@@ -24,9 +24,8 @@
       <w-bool-input title="Enable Supermegafan Emotes" v-model="wData.settings.show_smf_emotes"/>
     </w-form-group>
 
-
     <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color"/>
-    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color"/>
+    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
 
     <w-form-group title="Hide Message after">
