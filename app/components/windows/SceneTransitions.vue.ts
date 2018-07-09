@@ -136,4 +136,8 @@ export default class SceneTransitions extends Vue {
   done() {
     this.windowsService.closeChildWindow();
   }
+
+  dismissModal(modal: string) {
+    this.$modal.hide(modal);
+  }
 }

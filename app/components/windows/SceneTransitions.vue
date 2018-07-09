@@ -79,11 +79,21 @@
     <modal name="transition-settings" :height="550">
       <div class="transition-settings-modal">
         <transition-settings :transition-id="inspectedTransition"/>
+        <button
+          class="button button--action transition-done"
+          @click="dismissModal('transition-settings')">
+          {{ $t('Done') }}
+        </button>
       </div>
     </modal>
     <modal name="connection-settings" :height="550">
       <div class="connection-settings-modal">
         <connection-settings :connection-id="inspectedConnection"/>
+        <button
+          class="button button--action transition-done"
+          @click="dismissModal('connection-settings')">
+          {{ $t('Done') }}
+        </button>
       </div>
     </modal>
   </div>
@@ -150,6 +160,12 @@
   line-height: 26px;
   height: 26px;
   float: right;
+}
+
+.transition-done {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
 }
 
 th, td {
