@@ -10,6 +10,9 @@ import { $t } from 'services/i18n';
 import Tabs, { ITab } from 'components/Tabs.vue';
 import { ScenesService } from 'services/scenes';
 import ConnectionSettings from 'components/ConnectionSettings.vue';
+import VModal from 'vue-js-modal';
+
+Vue.use(VModal);
 
 @Component({
   mixins: [windowMixin],
