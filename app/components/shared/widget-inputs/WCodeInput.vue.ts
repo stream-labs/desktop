@@ -73,13 +73,4 @@ export default class WCodeInput extends WInput<string, IWCodeInputMetadata> {
 
   };
 
-  reset() {
-
-  }
-
-
-  // addCustomFields() {
-  //   this.settings.custom_json = JSON.parse('{"customField1":{"label":"Color Picker Example","type":"colorpicker","value":"#000EF0"},"customField2":{"label":"Slider Example","type":"slider","name":"","value":"3","max":200,"min":100,"steps":4},"customField3":{"label":"Textfield Example","type":"textfield","value":"Hi There"},"customField4":{"label":"Font Picker Example","type":"fontpicker","value":"Open Sans"},"customField5":{"label":"Dropdown Example","type":"dropdown","options": {"optionA": "Option A","optionB": "Option B","optionC": "Option C"},"value": "optionB"}}');
-  //   this.custom_code_view = 'json';
-  // }
 }
