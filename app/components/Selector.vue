@@ -8,11 +8,12 @@
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
       v-for="(item, index) in normalizedItems"
+      :key="item.id"
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
       <div class="selector-item-text">
-        {{item.name}}
+        {{truncateItemName(item.name)}}
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
@@ -79,10 +80,7 @@
 }
 
 .selector-item-text {
-  text-overflow: ellipsis;
   max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
   display: flex;
   justify-content: flex-end;
 }

@@ -25,6 +25,27 @@ export default class Selector extends Vue {
 
   draggableSelector: string = this.draggable ? '.selector-item' : 'none';
 
+  truncateLength: number = 50;
+
+  mounted() {
+    window.addEventListener('resize', this.determineTruncateLength);
+  }
+
+  destroyed() {
+    window.removeEventListener('resize', this.determineTruncateLength);
+  }
+
+  determineTruncateLength() {
+    const el = document.getElementsByClassName('selector-list')[0];
+    if (el.clientWidth >= 528) {
+      this.truncateLength = 50;
+    } else if (el.clientWidth >= 352) {
+      this.truncateLength = 32;
+    } else {
+      this.truncateLength = 16;
+    }
+  }
+
   handleChange(change: any) {
     const order = _.map(this.normalizedItems, item => {
       return item.value;
@@ -57,6 +78,11 @@ export default class Selector extends Vue {
     this.$emit('dblclick', value);
   }
 
+  truncateItemName(name: string) {
+    if (name.length <= this.truncateLength) return name;
+    return `${name.slice(0, this.truncateLength)}...`;
+  }
+
   /**
    * Items can be either an array of strings, or an
    * array of objects, so we normalize those here.
@@ -68,9 +94,8 @@ export default class Selector extends Vue {
           name: item,
           value: item
         };
-      } else {
-        return item;
       }
+      return item;
     });
   }
 
