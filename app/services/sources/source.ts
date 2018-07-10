@@ -25,6 +25,7 @@ export class Source implements ISourceApi {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
