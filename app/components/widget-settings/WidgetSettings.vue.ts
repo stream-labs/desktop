@@ -7,7 +7,7 @@ import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { Subscription } from 'rxjs/Subscription';
-
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
@@ -128,7 +128,9 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   onFailHandler() {
-    // TODO: replace alert with UI component
-    alert('Something went wrong');
+    this.$toasted.show(
+      $t('Save failed, something went wrong.'),
+      { position: 'bottom-center', className: 'toast-alert' }
+    );
   }
 }
