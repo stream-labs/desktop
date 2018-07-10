@@ -6,7 +6,7 @@ import {
   authorizedHeaders
 } from '../../util/requests';
 import { WidgetType } from 'services/widgets';
-import { mutation, StatefulService } from 'services/stateful-service';
+import { Service } from 'services/service';
 import { Subject } from 'rxjs/Subject';
 
 
@@ -54,7 +54,7 @@ export const CODE_EDITOR_TABS: (Partial<IWidgetTab> & { name: string })[] = [
  * base class for widget settings
  * TODO: join this service with WidgetsService.ts after widgets rewrite
  */
-export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends StatefulService<IWidgetData> {
+export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends Service {
   static initialState = {};
 
   @Inject() private hostsService: HostsService;
@@ -100,7 +100,6 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
       method: 'GET'
     });
     data = this.handleDataAfterFetch(data);
-    this.SET_STATE(data);
     this.dataUpdated.next(data);
     return data;
   }
@@ -176,11 +175,6 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
 
   protected getApiToken(): string {
     return this.userService.apiToken;
-  }
-
-  @mutation()
-  private SET_STATE(state: TWidgetData) {
-    this.state = state;
   }
 
   //

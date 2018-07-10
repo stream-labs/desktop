@@ -6,6 +6,7 @@ import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { Subscription } from 'rxjs/Subscription';
 
 
 @Component({})
@@ -25,6 +26,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   loadingState: 'success' | 'pending' | 'fail' = 'pending';
   tabs = this.service.getTabs();
 
+  private dataUpdatedSubscr: Subscription;
+
   get widgetType(): WidgetType {
     return this.source.getPropertiesManagerSettings().widgetType;
   }
@@ -37,10 +40,14 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
   async created() {
     this.tabName = this.tabName || this.tabs[0].name;
-    this.service.dataUpdated.subscribe(newData => {
-      this.wData = newData;
+    this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
+      this.onDataUpdatedHandler(newData);
     });
     await this.refresh();
+  }
+
+  destroyed() {
+    this.dataUpdatedSubscr.unsubscribe();
   }
 
   async refresh() {
@@ -67,6 +74,11 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     await this.save();
   }
 
+  private onDataUpdatedHandler(newData: TData) {
+    this.wData = newData;
+    this.refreshPreview();
+  }
+
   async save(dataToSave?: any) {
     if (this.loadingState === 'pending') return;
 
@@ -79,7 +91,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
       this.loadingState = 'success';
       this.afterFetch();
-      this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
@@ -96,7 +107,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       this.wData = await this.service.reset(this.tabName);
       this.loadingState = 'success';
       this.afterFetch();
-      this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';

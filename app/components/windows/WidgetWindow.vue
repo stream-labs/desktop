@@ -3,22 +3,25 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
-  :fixedSectionHeight="300">
+  :fixedSectionHeight="300"
+  v-if="previewSource">
 
   <div slot="fixed">
     <div class="description">
       <slot name="description"></slot>
     </div>
-    <display class="display" v-if="previewSource" :sourceId="previewSource.id" @click="createProjector"/>
+    <display class="display" :sourceId="previewSource.id" @click="createProjector"/>
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
   <div slot="content">
 
+    <!-- browser-source properties tab -->
     <div v-if="value === 'source'">
       <GenericForm v-model="properties" @input="onPropsInputHandler"/>
     </div>
 
+    <!-- other tabs -->
     <div v-for="tabItem in tabsList" >
       <div v-if="tabItem.value !== 'source'">
         <slot :name="tabItem.value" v-if="tabItem.value === value"></slot>
@@ -26,6 +29,7 @@
     </div>
   </div>
 
+  <!-- buttons -->
   <div slot="controls" v-if="tab && tab.showControls">
     <div v-for="tabItem in tabsList" v-if="tabItem.value === value">
       <slot :name="tabItem.value + '-controls'">
@@ -37,7 +41,6 @@
       </slot>
     </div>
   </div>
-
 
 </modal-layout>
 </template>

@@ -123,6 +123,20 @@
     <w-form-group type="fontFamily" :value="wData.settings.font"/>
   </div>
 
+
+  <div slot="HTML" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+  </div>
+
+  <div slot="CSS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+  </div>
+
+  <div slot="JS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
+
+
 </widget-window>
 
 </template>

@@ -39,7 +39,6 @@ export default class WidgetWindow extends Vue {
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
-  service = this.widgetsService.getWidgetSettingsService(this.widgetType);
   widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
   properties: TFormData = [];
@@ -47,6 +46,10 @@ export default class WidgetWindow extends Vue {
   tabsList: { name: string, value: string}[] = [];
 
   sourceUpdatedSubscr: Subscription;
+
+  get service() {
+    return this.widgetsService.getWidgetSettingsService(this.widgetType);
+  }
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
@@ -84,9 +87,12 @@ export default class WidgetWindow extends Vue {
     return this.tabs.find(tab => tab.name === this.value);
   }
 
-  close() {
+  destroyed() {
     this.sourcesService.removeSource(this.previewSource.sourceId);
     this.sourceUpdatedSubscr.unsubscribe();
+  }
+
+  close() {
     this.windowsService.closeChildWindow();
   }
 

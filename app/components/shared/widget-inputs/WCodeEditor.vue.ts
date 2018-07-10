@@ -7,11 +7,13 @@ import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/wid
 import { Inject } from '../../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n';
+import WBoolInput from './WBoolInput.vue';
 
 
 @Component({
   components: {
-    WCodeInput
+    WCodeInput,
+    WBoolInput
   }
 })
 export default class WCodeEditor extends Vue {
@@ -25,8 +27,13 @@ export default class WCodeEditor extends Vue {
   value: IWidgetData;
 
   editorInputValue = this.value.settings['custom_' + this.metadata.type];
-  initialInputValue = this.editorInputValue;
-  serverInputValue = this.editorInputValue;
+  customEnabled =  this.value.settings.custom_enabled;
+
+  private initialInputValue = this.editorInputValue;
+  private serverInputValue = this.editorInputValue;
+  private initialCustomEnabled = this.customEnabled;
+  private serverCustomEnabled = this.initialCustomEnabled;
+
   isLoading = false;
 
   private settingsService: WidgetSettingsService<any>;
@@ -36,7 +43,8 @@ export default class WCodeEditor extends Vue {
   }
 
   get hasChanges() {
-    return this.serverInputValue !== this.editorInputValue;
+    return (this.serverInputValue !== this.editorInputValue) ||
+      this.customEnabled !== this.serverCustomEnabled;
   }
 
   get canSave() {
@@ -50,6 +58,7 @@ export default class WCodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
+    newData.settings.custom_enabled = this.customEnabled;
 
     try {
       await this.settingsService.saveData(newData.settings);
@@ -60,6 +69,7 @@ export default class WCodeEditor extends Vue {
     }
 
     this.serverInputValue = this.editorInputValue;
+    this.serverCustomEnabled = this.customEnabled;
     this.isLoading = false;
   }
 
@@ -67,6 +77,7 @@ export default class WCodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.initialInputValue;
+    newData.settings.custom_enabled = this.customEnabled = this.initialCustomEnabled;
     this.emitInput(newData);
   }
 

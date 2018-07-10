@@ -1,6 +1,7 @@
 <template>
   <div>
-    <w-code-input :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
+    <w-bool-input :title="$t('Enable Custom HTML/CSS/JS')" v-model="customEnabled"/>
+    <w-code-input v-if="customEnabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
 
     <div class="modal-layout-controls">
       <button class="button button--default restore-button" @click="restoreDefaults">
