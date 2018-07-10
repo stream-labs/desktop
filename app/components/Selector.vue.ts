@@ -28,6 +28,7 @@ export default class Selector extends Vue {
   truncateLength: number = 50;
 
   mounted() {
+    this.determineTruncateLength();
     window.addEventListener('resize', this.determineTruncateLength);
   }
 
@@ -37,12 +38,16 @@ export default class Selector extends Vue {
 
   determineTruncateLength() {
     const el = document.getElementsByClassName('selector-list')[0];
-    if (el.clientWidth >= 528) {
+    if (el.clientWidth >= 700) {
+      this.truncateLength = 70;
+    } else if (el.clientWidth >= 600) {
+      this.truncateLength = 60;
+    } else if (el.clientWidth >= 528) {
       this.truncateLength = 50;
     } else if (el.clientWidth >= 352) {
       this.truncateLength = 32;
     } else {
-      this.truncateLength = 16;
+      this.truncateLength = 22;
     }
   }
 
