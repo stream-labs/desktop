@@ -43,7 +43,7 @@ interface ToastAction {
    * @param {ToastObject} toastObject
    * @returns {any}
    */
-  onClick?: (e, toastObject: ToastObject) => any
+  onClick?: (e: Event, toastObject: ToastObject) => any
 }
 
 interface ToastOptions {
@@ -144,12 +144,12 @@ interface Toasted {
    * @param message
    * @param options
    */
-  register (name: string, message: string, options?: ToastOptions)
+  register (name: string, message: string, options?: ToastOptions): void
 
   /**
    * Clear all toasts
    */
-  clear ()
+  clear (): void
 }
 
 declare module 'vue/types/vue' {
