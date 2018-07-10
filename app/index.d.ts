@@ -1,3 +1,5 @@
+/// <reference path="../vendor/toasted.d.ts" />
+
 // all global interfaces here
 
 interface Dictionary<TItemType> {
