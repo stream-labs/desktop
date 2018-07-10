@@ -1,11 +1,11 @@
 <template>
-<widget-layout v-if="wData" v-model="tabName">
+<widget-window v-if="wData" v-model="tabName">
 
   <div slot="description">{{ $t('Set a goal for your viewers to help you reach below.') }}</div>
 
   <!-- goal setup -->
   <div slot="goal" >
-    <div v-show="hasGoal">
+    <div v-if="hasGoal">
       <div class="section__body">
         <w-form-group :title="$t('Title')">{{ wData.goal.title }}</w-form-group>
         <w-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</w-form-group>
@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <div v-show="!hasGoal && wData.goal">
+    <div v-if="!hasGoal">
       <div class="section__body" v-if="loadingState !== 'pending'">
         <div class="row">
           <div class="col-xs-12">
@@ -23,7 +23,7 @@
               name="title"
               type="text"
               placeholder="September Bit Goal"
-              v-model="wData.goal.title"
+              v-model="goalCreateOptions.title"
               v-validate="'required|max:60'"
               :class="{'form__input--error' : errors.has('title')}" />
             <span
@@ -39,7 +39,7 @@
               name="goal_amount"
               type="text"
               placeholder="100"
-              v-model="wData.goal.goal_amount"
+              v-model="goalCreateOptions.goal_amount"
               v-validate="'required'"
               :class="{'form__input--error' : errors.has('goal_amount')}" />
             <span
@@ -56,7 +56,7 @@
               name="manual_goal_amount"
               type="text"
               placeholder="0"
-              v-model="wData.goal.manual_goal_amount"
+              v-model="goalCreateOptions.manual_goal_amount"
               v-validate="'required'"
               :class="{'form__input--error' : errors.has('manual_goal_amount')}" />
             <span
@@ -73,7 +73,7 @@
               type="text"
               name="ends_at"
               placeholder="MM/DD/YYYY"
-              v-model="wData.goal.ends_at"
+              v-model="goalCreateOptions.ends_at"
               v-validate="'required|date_format:MM/DD/YYYY'">
             <span
               v-show="errors.has('ends_at')"
@@ -93,7 +93,7 @@
 
     <button
         class="button button--action"
-        @click.prevent="save()"
+        @click.prevent="saveGoal()"
         :class="{'disabled' : this.errors.any() }"
         v-show="!hasGoal">
       {{ $t("Start Goal") }}
@@ -112,7 +112,7 @@
     <w-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <w-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
     <w-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color"/>
+    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
     <w-form-group
         type="slider"
@@ -123,7 +123,7 @@
     <w-form-group type="fontFamily" :value="wData.settings.font"/>
   </div>
 
-</widget-layout>
+</widget-window>
 
 </template>
 

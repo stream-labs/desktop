@@ -7,8 +7,8 @@ export interface IGoalData extends IWidgetData {
   goal: {
     title: string;
     goal_amount: number;
-    manual_goal_amount: number;
-    ends_at: string;
+    current_amount: number;
+    to_go: string;
   };
   settings: {
     background_color: string,
@@ -53,7 +53,7 @@ export abstract class GenericGoalService extends WidgetSettingsService<IGoalData
   }
 
   protected patchData(data: IGoalData): IGoalData {
-    // fix bug when API returning an empty array instead of null
+    // fix a bug when API returning an empty array instead of null
     if (Array.isArray(data.goal)) data.goal = null;
     return data;
   }

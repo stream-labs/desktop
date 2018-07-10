@@ -62,9 +62,10 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
 
   dataUpdated = new Subject<TWidgetData>();
 
-  protected abstract getWidgetUrl(): string;
-  protected abstract getDataUrl(): string;
-  protected abstract getWidgetType(): WidgetType;
+  abstract getPreviewUrl(): string;
+  abstract getDataUrl(): string;
+  abstract getWidgetType(): WidgetType;
+
 
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
 

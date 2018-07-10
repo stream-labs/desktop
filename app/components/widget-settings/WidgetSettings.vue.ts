@@ -8,7 +8,6 @@ import { WidgetsService, WidgetType } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 
 
-
 @Component({})
 export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
   extends Vue {
@@ -40,7 +39,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.tabName = this.tabName || this.tabs[0].name;
     this.service.dataUpdated.subscribe(newData => {
       this.wData = newData;
-      this.afterFetch();
     });
     await this.refresh();
   }
@@ -50,6 +48,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       await this.service.fetchData();
       this.loadingState = 'success';
       this.skipNextDatachangeHandler = true;
+      this.afterFetch();
     } catch (e) {
       this.loadingState = 'fail';
     }
@@ -68,7 +67,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     await this.save();
   }
 
-  async save() {
+  async save(dataToSave?: any) {
     if (this.loadingState === 'pending') return;
 
     const tab = this.service.getTab(this.tabName);
@@ -77,8 +76,9 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.loadingState = 'pending';
 
     try {
-      await this.service.saveData(this.wData[tab.name], tab.name);
+      await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
       this.loadingState = 'success';
+      this.afterFetch();
       this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
@@ -105,6 +105,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   refreshPreview() {
+
+    // update obs-preview
     // little hack: update some property to trigger preview refreshing
     const height = this.source.height;
     this.source.updateSettings({ height: height + 1 });

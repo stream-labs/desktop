@@ -9,8 +9,8 @@ import { WInput } from './WInput';
 export default class WColorInput extends WInput<string, {}> {
 
 
-  @Prop()
-  value: string;
+  @Prop() value: string;
+  @Prop() metadata: { tooltip: string };
 
   pickerVisible = false;
 

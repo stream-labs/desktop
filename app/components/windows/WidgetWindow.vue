@@ -6,10 +6,10 @@
   :fixedSectionHeight="300">
 
   <div slot="fixed">
-    <display v-if="source" :sourceId="source.id" style="height: 200px"/>
     <div class="description">
       <slot name="description"></slot>
     </div>
+    <display class="display" v-if="previewSource" :sourceId="previewSource.id" @click="createProjector"/>
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
@@ -42,12 +42,17 @@
 </modal-layout>
 </template>
 
-<script lang="ts" src="./WidgetLayout.vue.ts"></script>
+<script lang="ts" src="./WidgetWindow.vue.ts"></script>
 
 <style lang="less" scoped>
 
   .description {
     padding: 20px;
+  }
+
+  .display {
+    height: 200px !important;
+    cursor: pointer;
   }
 
 </style>

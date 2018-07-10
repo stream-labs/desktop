@@ -27,7 +27,7 @@ export class FollowerGoalService extends GenericGoalService {
     return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal/settings`;
   }
 
-  getWidgetUrl() {
+  getPreviewUrl() {
     return `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`;
   }
 

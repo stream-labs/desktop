@@ -67,7 +67,6 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
-import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
@@ -147,7 +146,6 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     ProjectorService,
     TransitionsService,
-    WidgetSettingsService,
     MediaBackupService,
     WebsocketService,
     FacemasksService,
