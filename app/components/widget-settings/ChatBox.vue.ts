@@ -20,4 +20,12 @@ import { $t } from 'services/i18n';
 })
 export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService> {
   textColorTooltip = $t('A hex code for the base text color.');
+
+  backgroundColorTooltip = $t(
+    'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.'
+  );
+
+  backgroundColorDescription = $t(
+    'Note: This background color is for preview purposes only. It will not be shown in your stream.'
+  );
 }
