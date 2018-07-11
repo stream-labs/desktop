@@ -15,39 +15,46 @@
     </div>
 
     <div v-if="!hasGoal">
-      <div class="section__body" v-if="loadingState !== 'pending'">
-        <div class="row">
-          <div class="col-xs-12">
-            <label>{{ $t("Title") }}</label>
-            <input
-              name="title"
-              type="text"
-              placeholder="September Bit Goal"
-              v-model="goalCreateOptions.title"
-              v-validate="'required|max:60'"
-              :class="{'form__input--error' : errors.has('title')}" />
-            <span
-              v-show="errors.has('title')"
-              class="form__error-text">{{ errors.first('title') }}</span>
-          </div>
-        </div>
 
-        <div class="row">
-          <div class="col-xs-12">
-            <label>{{ $t("Goal Amount") }}</label>
-            <input
-              name="goal_amount"
-              type="text"
-              placeholder="100"
-              v-model="goalCreateOptions.goal_amount"
-              v-validate="'required'"
-              :class="{'form__input--error' : errors.has('goal_amount')}" />
-            <span
-              v-show="errors.has('goal_amount')"
-              class="form__error-text">
-              {{ errors.first('goal_amount') }}</span>
+
+      <div class="section__body" v-if="loadingState !== 'pending'">
+
+        <form id="goal-form" @submit="saveGoal()">
+          <div class="row">
+            <div class="col-xs-12">
+              <label>{{ $t("Title") }}</label>
+              <w-text-input v-model="goalCreateOptions.title" :metadata="{required: true, maxlength: 60}"/>
+              <!--<input-->
+                <!--name="title"-->
+                <!--type="text"-->
+                <!--placeholder="September Bit Goal"-->
+                <!--v-model="goalCreateOptions.title"-->
+                <!--v-validate="'required|max:60'"-->
+                <!--:class="{'form__input&#45;&#45;error' : errors.has('title')}" />-->
+              <!--<span-->
+                <!--v-show="errors.has('title')"-->
+                <!--class="form__error-text">{{ errors.first('title') }}</span>-->
+            </div>
           </div>
-        </div>
+
+          <div class="row">
+            <div class="col-xs-12">
+              <label>{{ $t("Goal Amount") }}</label>
+              <w-number-input v-model="goalCreateOptions.goal_amount" :metadata="{required: true}"/>
+              <!--<input-->
+                <!--name="goal_amount"-->
+                <!--type="text"-->
+                <!--placeholder="100"-->
+                <!--v-model="goalCreateOptions.goal_amount"-->
+                <!--v-validate="'required'"-->
+                <!--:class="{'form__input&#45;&#45;error' : errors.has('goal_amount')}" />-->
+              <!--<span-->
+                <!--v-show="errors.has('goal_amount')"-->
+                <!--class="form__error-text">-->
+                <!--{{ errors.first('goal_amount') }}</span>-->
+            </div>
+          </div>
+        </form>
 
         <div class="row">
           <div class="col-xs-12">
@@ -56,13 +63,7 @@
               name="manual_goal_amount"
               type="text"
               placeholder="0"
-              v-model="goalCreateOptions.manual_goal_amount"
-              v-validate="'required'"
-              :class="{'form__input--error' : errors.has('manual_goal_amount')}" />
-            <span
-              v-show="errors.has('manual_goal_amount')"
-              class="form__error-text">
-              {{ errors.first('manual_goal_amount') }}</span>
+              v-model="goalCreateOptions.manual_goal_amount" />
           </div>
         </div>
 
@@ -71,14 +72,9 @@
             <label>{{ $t("End After") }}</label>
             <input
               type="text"
-              name="ends_at"
               placeholder="MM/DD/YYYY"
               v-model="goalCreateOptions.ends_at"
-              v-validate="'required|date_format:MM/DD/YYYY'">
-            <span
-              v-show="errors.has('ends_at')"
-              class="form__error-text">
-              {{ errors.first('ends_at') }}</span>
+            >
           </div>
         </div>
       </div>
@@ -91,13 +87,14 @@
 
   <div slot="goal-controls">
 
-    <button
+    <input
+        type="submit"
+        value="Submit"
+        form="goal-form"
+        v-show="!hasGoal"
+        :value="$t('Start Goal')"
         class="button button--action"
-        @click.prevent="saveGoal()"
-        :class="{'disabled' : this.errors.any() }"
-        v-show="!hasGoal">
-      {{ $t("Start Goal") }}
-    </button>
+    />
     <button
         class="button button--warn"
         v-show="hasGoal"

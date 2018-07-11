@@ -39,8 +39,9 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
     return this.wData.goal && this.wData.goal.title;
   }
 
-  async saveGoal() {
-    await this.save(this.goalCreateOptions);
+  async saveGoal(...args: any[]) {
+    console.log('submited', args);
+    // await this.save(this.goalCreateOptions);
   }
 
 }

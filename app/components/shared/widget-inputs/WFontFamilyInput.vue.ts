@@ -7,7 +7,7 @@ import { $t } from 'services/i18n';
 @Component({
   components: { Multiselect }
 })
-export default class WFontFamilyInput extends WInput<string, void> {
+export default class WFontFamilyInput extends WInput<string, {}> {
   @Prop() value: string;
 
   tooltipText = $t(

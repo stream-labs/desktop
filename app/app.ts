@@ -21,7 +21,7 @@ import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
-import VeeValidate from 'vee-validate';
+import hyperform from 'hyperform';
 
 const { ipcRenderer, remote } = electron;
 
@@ -85,10 +85,8 @@ require('./app.less');
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
-
-Vue.use(VeeValidate);
-
 Vue.use(Toasted);
+// hyperform(window); // bring HTML5 validation to electron
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());

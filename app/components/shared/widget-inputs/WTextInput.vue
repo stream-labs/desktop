@@ -4,7 +4,8 @@
       :placeholder="metadata.placeholder"
       :value="value"
       @input="emitInput($event.target.value)"
-      v-validate="metadata.validate"
+      required
+      :maxlength="metadata.maxlength"
   />
 </template>
 
