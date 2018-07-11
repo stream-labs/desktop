@@ -58,11 +58,15 @@ export class SourcesNode extends Node<ISchema, {}> {
 
   getItems() {
 
-    const linkedSourcesIds = this.scenesService.getSceneItems().map(sceneItem => sceneItem.sourceId);
+    const linkedSourcesIds = this.scenesService.getSceneItems()
+      .map(sceneItem => sceneItem.sourceId);
 
     return this.sourcesService.sources.filter(source => {
+      // we store scenes in separated config
       if (source.type === 'scene') return false;
-      if (!source.channel) return true; // global audio sources must be saved
+
+      // global audio sources must be saved
+      if (source.channel) return true;
 
       // prevent sources without linked sceneItems to be saved
       if (!linkedSourcesIds.includes(source.sourceId)) return false;
