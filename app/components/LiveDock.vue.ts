@@ -38,6 +38,13 @@ export default class LiveDock extends Vue {
   editStreamInfoTooltip = $t('Edit your stream title and description');
   controlRoomTooltip = $t('Go to Youtube Live Dashboard to control your stream');
 
+  get liveDockStyles() {
+    return {
+      position: this.collapsed ? 'absolute' : 'static',
+      left: this.collapsed ? '10000px' : 'auto'
+    };
+  }
+
   mounted() {
     this.elapsedInterval = window.setInterval(() => {
       if (this.streamingStatus === EStreamingState.Live) {
