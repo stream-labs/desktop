@@ -29,7 +29,6 @@ const { ipcRenderer } = electron;
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
-const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
@@ -102,7 +101,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
-      async: false,
       doNotDuplicate: false,
 
       // Unscaled width and height
@@ -322,10 +320,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
-    const async = !!(AsyncFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }
