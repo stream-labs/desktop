@@ -407,6 +407,14 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
     }
   });
 
+  /* Don't fetch properties unless we use it. */
+  if (buttons.length !== 0) properties = obsSource.properties;
+
+  for (const button of buttons) {
+    const obsButtonProp = properties.get(button.name) as obs.IButtonProperty;
+    obsButtonProp.buttonClicked(obsSource);
+  }
+
   const settings: Dictionary<any> = {};
   formInputs.forEach(property => {
     settings[property.name] = property.value;
@@ -417,13 +425,10 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TFormData) {
     }
   });
 
-  obsSource.update(settings);
+  /* Don't update unless we need to. */
+  if (formInputs.length === 0) return;
 
-  buttons.forEach(buttonInput => {
-    if (!buttonInput.value) return;
-    const obsButtonProp = properties.get(buttonInput.name) as obs.IButtonProperty;
-    obsButtonProp.buttonClicked(obsSource);
-  });
+  obsSource.update(settings);
 }
 
 
