@@ -114,7 +114,12 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   onFailHandler() {
     this.$toasted.show(
       $t('Save failed, something went wrong.'),
-      { position: 'bottom-center', className: 'toast-alert' }
+      {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true
+      }
     );
   }
 }
