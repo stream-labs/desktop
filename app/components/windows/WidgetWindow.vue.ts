@@ -15,6 +15,7 @@ import { TFormData } from 'components/shared/forms/Input';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
+import { IWidgetTab } from 'services/widget-settings/widget-settings';
 
 @Component({
   components: {
@@ -38,12 +39,17 @@ export default class WidgetWindow extends Vue {
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
-  service = this.widgetsService.getWidgetSettingsService(this.widgetType);
   widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
   properties: TFormData = [];
+  tabs: IWidgetTab[] = [];
+  tabsList: { name: string, value: string}[] = [];
 
   sourceUpdatedSubscr: Subscription;
+
+  get service() {
+    return this.widgetsService.getWidgetSettingsService(this.widgetType);
+  }
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
@@ -60,25 +66,33 @@ export default class WidgetWindow extends Vue {
     this.sourceUpdatedSubscr = this.sourcesService.sourceUpdated.subscribe(
       sourceModel => this.onSourceUpdatedHandler(sourceModel)
     );
+
+    const widgetType = this.source.getPropertiesManagerSettings().widgetType;
+    const settingsService = this.widgetsService.getWidgetSettingsService(widgetType);
+
+    this.tabs = settingsService.getTabs();
+    this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
+      .concat({ name: 'Source', value: 'source' });
   }
 
   get webview() {
     return this.$refs.webview;
   }
 
-  get tabs() {
-    const settingsService = this.widgetsService.getWidgetSettingsService(this.widgetType);
-    const tabs = settingsService.getTabs().map(tab => ({ name: tab.title, value: tab.name }));
-    return tabs.concat([{ name: 'Source', value: 'source' }]);
-  }
-
   get windowTitle() {
     return this.source ? $t('Properties for %{sourceName}', { sourceName: this.source.name }) : '';
   }
 
-  close() {
+  get tab(): IWidgetTab {
+    return this.tabs.find(tab => tab.name === this.value);
+  }
+
+  destroyed() {
     this.sourcesService.removeSource(this.previewSource.sourceId);
     this.sourceUpdatedSubscr.unsubscribe();
+  }
+
+  close() {
     this.windowsService.closeChildWindow();
   }
 

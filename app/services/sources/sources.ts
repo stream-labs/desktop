@@ -378,6 +378,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const source = this.getSource(sourceId);
       const isWidget = source.getPropertiesManagerType() === 'widget';
 
+      // show a custom component for widgets below
       const widgetsWhitelist = [
         WidgetType.BitGoal,
         WidgetType.DonationGoal,

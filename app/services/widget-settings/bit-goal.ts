@@ -1,8 +1,13 @@
 import { GenericGoalService } from './generic-goal';
+import { WidgetType } from 'services/widgets';
+import { CODE_EDITOR_TABS } from './widget-settings';
 
 
 export class BitGoalService extends GenericGoalService {
 
+  getWidgetType() {
+    return WidgetType.BitGoal;
+  }
 
   protected tabs = [
     {
@@ -12,7 +17,9 @@ export class BitGoalService extends GenericGoalService {
     },
     {
       name: 'settings',
-    }
+    },
+
+    ...CODE_EDITOR_TABS
   ];
 
   getVersion() {

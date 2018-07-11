@@ -67,7 +67,6 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
-import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
@@ -147,7 +146,6 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     ProjectorService,
     TransitionsService,
-    WidgetSettingsService,
     MediaBackupService,
     WebsocketService,
     FacemasksService,
@@ -188,6 +186,12 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
+
+    // this helps to debug services from the console
+    if (Utils.isDevMode()) {
+      window['sm'] = this;
+    }
+
     if (!Utils.isMainWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
@@ -198,10 +202,6 @@ export class ServicesManager extends Service {
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
 
-    // this helps to debug services from console
-    if (Utils.isDevMode()) {
-      window['sm'] = this;
-    }
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -424,7 +424,7 @@ export class ServicesManager extends Service {
    * @example
    * source = getResource('Source[12]')
    */
-  private getResource(resourceId: string) {
+  getResource(resourceId: string) {
     if (resourceId === 'ServicesManager') {
       return this;
     }

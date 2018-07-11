@@ -1,14 +1,14 @@
-import { WidgetSettingsService } from './widget-settings';
+import { IWidgetData, WidgetSettingsService } from './widget-settings';
 import { IWSliderMetadata } from 'components/shared/widget-inputs/WSliderInput.vue';
 import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
 
 
-export interface IGoalData {
+export interface IGoalData extends IWidgetData {
   goal: {
     title: string;
     goal_amount: number;
-    manual_goal_amount: number;
-    ends_at: string;
+    current_amount: number;
+    to_go: string;
   };
   settings: {
     background_color: string,
@@ -20,19 +20,17 @@ export interface IGoalData {
     bar_thickness: string,
     layout: string
     custom_enabled: boolean,
-    custom_html?: string;
-    custom_css?: string;
-    custom_js?: string;
+    custom_html: string,
+    custom_js: string,
+    custom_css: string
+  };
+  custom_defaults: {
+    html: string;
+    js: string;
+    css: string;
   };
   has_goal: boolean;
-  widget: object;
-  demo: object;
   show_bar: string;
-  custom_defaults: {
-    html?: string;
-    css?: string;
-    js?: string;
-  };
 }
 
 export abstract class GenericGoalService extends WidgetSettingsService<IGoalData> {
@@ -55,7 +53,7 @@ export abstract class GenericGoalService extends WidgetSettingsService<IGoalData
   }
 
   protected patchData(data: IGoalData): IGoalData {
-    // fix bug when API returning an empty array instead of null
+    // fix a bug when API returning an empty array instead of null
     if (Array.isArray(data.goal)) data.goal = null;
     return data;
   }

@@ -1,113 +1,96 @@
 import Vue from 'vue';
+import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
-// codemirror has required styles that are imported in index.less
+import WCodeInput, { IWCodeInputMetadata } from './WCodeInput.vue';
+import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { Inject } from '../../../util/injector';
+import { WidgetsService } from 'services/widgets';
+import { $t } from 'services/i18n';
+import WBoolInput from './WBoolInput.vue';
 
 
 @Component({
-  components: { codemirror }
+  components: {
+    WCodeInput,
+    WBoolInput
+  }
 })
-export default class CodeEditorInput extends Vue{
+export default class WCodeEditor extends Vue {
+
+  @Inject() private widgetsService: WidgetsService;
+
+  @Prop({ default: () => ({ type: 'html' }) })
+  metadata: IWCodeInputMetadata;
+
   @Prop()
-  settings: {
-    custom_html: '',
-    custom_css: '',
-    custom_js: '',
-    custom_json: null,
-  };
-  defaults: {
-    html: '',
-    css: '',
-    js: ''
-  };
+  value: IWidgetData;
 
-  editorOptionsHTML: {
-    // codemirror options
-    mode: 'htmlmixed',
-    keyMap: 'sublime',
-    lineNumbers: true,
-    autofocus: true,
-    tabSize: 2,
-    theme: 'material',
-    autoRefresh: true,
-    autoCloseBrackets: true,
-    matchBrackets: true,
-    autoCloseTags: true,
-    extraKeys: {
-      'Tab': 'emmetExpandAbbreviation',
-      'Enter': 'emmetInsertLineBreak'
+  editorInputValue = this.value.settings['custom_' + this.metadata.type];
+  customEnabled =  this.value.settings.custom_enabled;
+
+  private initialInputValue = this.editorInputValue;
+  private serverInputValue = this.editorInputValue;
+  private initialCustomEnabled = this.customEnabled;
+  private serverCustomEnabled = this.initialCustomEnabled;
+
+  isLoading = false;
+
+  private settingsService: WidgetSettingsService<any>;
+
+  created() {
+    this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
+  }
+
+  get hasChanges() {
+    return (this.serverInputValue !== this.editorInputValue) ||
+      this.customEnabled !== this.serverCustomEnabled;
+  }
+
+  get canSave() {
+    return this.hasChanges && !this.isLoading;
+  }
+
+  async save() {
+    if (!this.canSave) return;
+    this.isLoading = true;
+
+    const type = this.metadata.type;
+    const newData = cloneDeep(this.value);
+    newData.settings['custom_' + type] = this.editorInputValue;
+    newData.settings.custom_enabled = this.customEnabled;
+
+    try {
+      await this.settingsService.saveData(newData.settings);
+    } catch (e) {
+      alert($t('Something went wrong'));
+      this.isLoading = false;
+      return;
     }
-  };
 
-  editorOptionsCSS: {
-    // codemirror options
-    mode: 'text/css',
-    keyMap: 'sublime',
-    lineNumbers: true,
-    autofocus: true,
-    tabSize: 2,
-    theme: 'material',
-    autoRefresh: true,
-    autoCloseBrackets: true,
-    matchBrackets: true,
-    autoCloseTags: true,
-    extraKeys: {
-      'Tab': 'emmetExpandAbbreviation',
-      'Enter': 'emmetInsertLineBreak'
-    }
-  };
-
-  editorOptionsJS: {
-    // codemirror options
-    mode: 'javascript',
-    keyMap: 'sublime',
-    lineNumbers: true,
-    autofocus: true,
-    tabSize: 2,
-    theme: 'material',
-    autoRefresh: true,
-    autoCloseBrackets: true,
-    matchBrackets: true,
-    autoCloseTags: true,
-  };
-
-  custom_code_view = 'html';
-  editCustomFields = false;
-  customEditableJson = '';
-
-  showEditor() {
-    this.settings.custom_html = this.settings.custom_html || this.defaults.html;
-    this.settings.custom_js = this.settings.custom_js || this.defaults.js;
-    this.settings.custom_css = this.settings.custom_css || this.defaults.css;
+    this.serverInputValue = this.editorInputValue;
+    this.serverCustomEnabled = this.customEnabled;
+    this.isLoading = false;
   }
 
-  resetCode() {
-    this.settings.custom_html = this.defaults.html;
-    this.settings.custom_js = this.defaults.js;
-    this.settings.custom_css = this.defaults.css;
-    this.settings.custom_json = null;
-    this.custom_code_view = 'html';
+  discardChanges() {
+    const type = this.metadata.type;
+    const newData = cloneDeep(this.value);
+    newData.settings['custom_' + type] = this.initialInputValue;
+    newData.settings.custom_enabled = this.customEnabled = this.initialCustomEnabled;
+    this.emitInput(newData);
   }
 
-  showEditCustomFields() {
-    this.customEditableJson = JSON.stringify(this.settings.custom_json, null, 4);
-    this.editCustomFields = true;
-    this.custom_code_view = 'json_editor';
+  restoreDefaults() {
+    const type = this.metadata.type;
+    const newData = cloneDeep(this.value);
+    newData.settings['custom_' + type] = this.value.custom_defaults[type];
+    this.emitInput(newData);
   }
 
-  onCustomJSONUpdate(value: string) {
-    this.settings.custom_json = JSON.parse(this.customEditableJson);
-    this.editCustomFields = false;
-    this.custom_code_view = 'json';
+  emitInput(newValue: IWidgetData) {
+    this.$emit('input', newValue);
+    this.editorInputValue = newValue.settings['custom_' + this.metadata.type];
   }
 
-  removeCustomFields() {
-    this.settings.custom_json = null;
-    this.custom_code_view = 'html';
-  }
-
-  addCustomFields() {
-    this.settings.custom_json = JSON.parse('{"customField1":{"label":"Color Picker Example","type":"colorpicker","value":"#000EF0"},"customField2":{"label":"Slider Example","type":"slider","name":"","value":"3","max":200,"min":100,"steps":4},"customField3":{"label":"Textfield Example","type":"textfield","value":"Hi There"},"customField4":{"label":"Font Picker Example","type":"fontpicker","value":"Open Sans"},"customField5":{"label":"Dropdown Example","type":"dropdown","options": {"optionA": "Option A","optionB": "Option B","optionC": "Option C"},"value": "optionB"}}');
-    this.custom_code_view = 'json';
-  }
 }
