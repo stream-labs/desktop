@@ -9,6 +9,7 @@ export interface ISource extends IResource {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
