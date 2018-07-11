@@ -156,8 +156,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     // TODO: Make this a dropdown box
     const transition = this.getDefaultTransition();
+    const obsTransition = this.obsTransitions[transition.id];
 
-    this.obsTransitions[transition.id].start(transition.duration, this.sceneDuplicate);
+    obsTransition.set(this.getCurrentTransition().getActiveSource());
+    obs.Global.setOutputSource(0, obsTransition);
+    obsTransition.start(transition.duration, this.sceneDuplicate);
 
     oldDuplicate.release();
 
