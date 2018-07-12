@@ -49,7 +49,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       nodes: []
     });
     this.state.displayOrder.push(id);
-    this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.activeSceneId = this.state.activeSceneId;
   }
 
   @mutation()

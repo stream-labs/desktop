@@ -214,9 +214,15 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
 
     if (sceneAId) {
       obsTransition.set(this.scenesService.getScene(sceneAId).getObsScene());
+      obs.Global.setOutputSource(0, obsTransition);
+      obsTransition.start(transition.duration, obsScene);
+    } else {
+      const defaultTransition = obs.TransitionFactory.create(ETransitionType.Cut, uuid());
+      defaultTransition.set(obsScene);
+      obs.Global.setOutputSource(0, defaultTransition);
+      obsTransition.start(transition.duration, obsScene);
+      defaultTransition.release();
     }
-    obs.Global.setOutputSource(0, obsTransition);
-    obsTransition.start(transition.duration, obsScene);
   }
 
   /**
