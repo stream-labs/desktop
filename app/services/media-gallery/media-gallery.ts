@@ -63,7 +63,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     maxFileSize: null
   };
 
-  private promises: Dictionary<{ resolve: (file: IFile) => IFile, reject: () => void }> = {};
+  private promises: Dictionary<{ resolve: (value?: IFile | PromiseLike<IFile>) => void, reject: () => void }> = {};
 
   init() {
     this.fetchFileLimits();
@@ -122,9 +122,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
         .toLowerCase()
         .split('.')
         .pop();
-      const file = new File([contents], name, {
-        type: `${filetypeMap[ext]}/${ext}`
-      });
+      const file = new File([contents], name, { type: `${filetypeMap[ext]}/${ext}` });
       formData.append('uploads[]', file);
     });
 
@@ -175,19 +173,15 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     a.href = file.href;
     const path = a.pathname;
 
-    const req = this.formRequest(`api/v5/slobs/uploads${path}`, {
-      method: 'DELETE'
-    });
-    const filteredUploads = this.state.uploads.filter(
-      (upload: IFile) => upload.href !== file.href
-    );
-    fetch(req)
-      .then(() => this.SET_UPLOADS(filteredUploads))
+    const req = this.formRequest(`api/v5/slobs/uploads${path}`, { method: 'DELETE' });
+    const filteredUploads = this.state.uploads.filter((upload: IFile) => upload.href !== file.href);
+    fetch(req).then(() => this.SET_UPLOADS(filteredUploads));
   }
 
   showMediaGallery(promiseId: string) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
+      queryParams: { promiseId },
       size: {
         width: 1100,
         height: 680

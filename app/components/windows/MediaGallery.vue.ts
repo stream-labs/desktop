@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
 import { MediaGalleryService, IFile } from '../../services/media-gallery/index';
@@ -32,6 +32,7 @@ export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() mediaGalleryService: MediaGalleryService;
 
+  promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
   dragOver = false;
   busy = false;
   selectedFile: IFile = null;
@@ -121,6 +122,7 @@ export default class MediaGallery extends Vue {
   }
 
   handleSelect() {
+    this.mediaGalleryService.resolveFileSelect(this.promiseId, this.selectedFile);
     this.$emit('selected-file', this.selectedFile);
   }
 
