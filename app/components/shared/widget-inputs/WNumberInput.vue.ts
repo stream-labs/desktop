@@ -17,11 +17,11 @@ export default class WNumberInput extends WInput<number|string, IWNumberMetadata
   @Prop({ default: {} })
   metadata: IWNumberMetadata;
 
-  get min() {
-    return this.options.max !== void 0 ? this.options.max : '';
-  }
-
-  get max() {
-    return this.options.min !== void 0 ? this.options.min : '';
+  getValidations() {
+    return {
+      ...super.getValidations(),
+      max_value: this.options.max,
+      min_value: this.options.min,
+    };
   }
 }

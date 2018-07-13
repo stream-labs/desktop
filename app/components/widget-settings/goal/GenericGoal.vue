@@ -39,11 +39,9 @@
               <label>{{ $t("Starting Amount") }} *</label>
               <w-number-input
                   v-model="goalCreateOptions.manual_goal_amount"
-                  :metadata="{ required: true, min: 0, max: goalCreateOptions.goal_amount}"/>
+                  :metadata="{ required: true, min: 0, max: goalCreateOptions.goal_amount || undefined}"/>
             </div>
           </div>
-
-
 
           <div class="row">
             <div class="col-xs-12">

@@ -17,12 +17,12 @@ export default class WText extends WInput<string, IWTextMetadata> {
   @Prop({ default: {} })
   metadata: IWTextMetadata;
 
-  get dateFormat(): string {
-    return this.options.dateFormat !== void 0 ? this.options.dateFormat : '';
-  }
-
-  get max(): number | string {
-    return this.options.max !== void 0 ? this.options.max : '';
+  getValidations() {
+    return {
+      ...super.getValidations(),
+      date_format:  this.options.dateFormat,
+      max: this.options.max
+    };
   }
 
 }

@@ -43,9 +43,27 @@ export abstract class WInput<TValueType, TMetadataType extends IWInputMetadata> 
     this.$emit('input', eventData);
   }
 
+  getValidations() {
+    return { required: this.options.required };
+  }
+
+  /**
+   * object for vee validate plugin
+   */
+  get validate() {
+    const validations = this.getValidations();
+    Object.keys(validations).forEach(key => {
+      // VeeValidate recognize undefined values as valid constraints
+      // so just remove it
+      if (validations[key] === void 0) delete validations[key];
+    });
+    return validations;
+  }
+
   get options(): TMetadataType {
     return this.metadata || {} as TMetadataType;
   }
+
 
   get required(): boolean {
     return this.options.required === void 0 ? false : this.options.required;
