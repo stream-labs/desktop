@@ -19,64 +19,45 @@
 
       <div class="section__body" v-if="loadingState !== 'pending'">
 
-        <form id="goal-form" @submit="saveGoal()">
+        <w-form ref="form">
           <div class="row">
             <div class="col-xs-12">
-              <label>{{ $t("Title") }}</label>
-              <w-text-input v-model="goalCreateOptions.title" :metadata="{required: true, maxlength: 60}"/>
-              <!--<input-->
-                <!--name="title"-->
-                <!--type="text"-->
-                <!--placeholder="September Bit Goal"-->
-                <!--v-model="goalCreateOptions.title"-->
-                <!--v-validate="'required|max:60'"-->
-                <!--:class="{'form__input&#45;&#45;error' : errors.has('title')}" />-->
-              <!--<span-->
-                <!--v-show="errors.has('title')"-->
-                <!--class="form__error-text">{{ errors.first('title') }}</span>-->
+              <label>{{ $t("Title") }} *</label>
+              <w-text-input v-model="goalCreateOptions.title" :metadata="{required: true, max: 60}"/>
             </div>
           </div>
 
           <div class="row">
             <div class="col-xs-12">
-              <label>{{ $t("Goal Amount") }}</label>
-              <w-number-input v-model="goalCreateOptions.goal_amount" :metadata="{required: true}"/>
-              <!--<input-->
-                <!--name="goal_amount"-->
-                <!--type="text"-->
-                <!--placeholder="100"-->
-                <!--v-model="goalCreateOptions.goal_amount"-->
-                <!--v-validate="'required'"-->
-                <!--:class="{'form__input&#45;&#45;error' : errors.has('goal_amount')}" />-->
-              <!--<span-->
-                <!--v-show="errors.has('goal_amount')"-->
-                <!--class="form__error-text">-->
-                <!--{{ errors.first('goal_amount') }}</span>-->
+              <label>{{ $t("Goal Amount") }} *</label>
+              <w-number-input v-model="goalCreateOptions.goal_amount" :metadata="{required: true, min: 1}"/>
             </div>
           </div>
-        </form>
 
-        <div class="row">
-          <div class="col-xs-12">
-            <label>{{ $t("Starting Amount") }}</label>
-            <input
-              name="manual_goal_amount"
-              type="text"
-              placeholder="0"
-              v-model="goalCreateOptions.manual_goal_amount" />
+          <div class="row">
+            <div class="col-xs-12">
+              <label>{{ $t("Starting Amount") }} *</label>
+              <w-number-input
+                  v-model="goalCreateOptions.manual_goal_amount"
+                  :metadata="{ required: true, min: 0, max: goalCreateOptions.goal_amount}"/>
+            </div>
           </div>
-        </div>
 
-        <div class="row">
-          <div class="col-xs-12">
-            <label>{{ $t("End After") }}</label>
-            <input
-              type="text"
-              placeholder="MM/DD/YYYY"
-              v-model="goalCreateOptions.ends_at"
-            >
+
+
+          <div class="row">
+            <div class="col-xs-12">
+              <label>{{ $t("End After") }} *</label>
+              <w-text-input
+                  v-model="goalCreateOptions.ends_at"
+                  :metadata="{ required: true, dateFormat: 'MM/DD/YYYY', placeholder:'MM/DD/YYYY'}"/>
+            </div>
           </div>
-        </div>
+
+
+        </w-form>
+
+
       </div>
       <div v-else class="loading-spinner">
         <img src="../../../../media/images/loader.svg" />
@@ -87,14 +68,13 @@
 
   <div slot="goal-controls">
 
-    <input
-        type="submit"
-        value="Submit"
-        form="goal-form"
+    <button
         v-show="!hasGoal"
-        :value="$t('Start Goal')"
+        @click="saveGoal()"
         class="button button--action"
-    />
+    >
+      {{ $t('Start Goal') }}
+    </button>
     <button
         class="button button--warn"
         v-show="hasGoal"

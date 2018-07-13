@@ -9,22 +9,21 @@ import WidgetSettings from 'components/widget-settings/WidgetSettings.vue';
 import * as comps from 'components/shared/widget-inputs';
 import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
 import { $t } from 'services/i18n';
-
-interface IGoalCreateOptions {
-  title: string;
-  goal_amount: number;
-  manual_goal_amount: number;
-  ends_at: string;
-}
+import WForm from 'components/shared/widget-inputs/WForm.vue';
 
 @Component({
   components: {
     WidgetWindow,
     WFormGroup,
+    WForm,
     ...comps
   }
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
+
+  $refs: {
+    form: WForm;
+  };
 
   goalCreateOptions = {
     title: '',
@@ -39,9 +38,11 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
     return this.wData.goal && this.wData.goal.title;
   }
 
-  async saveGoal(...args: any[]) {
-    console.log('submited', args);
-    // await this.save(this.goalCreateOptions);
+  async saveGoal() {
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
+
+    await this.save(this.goalCreateOptions);
   }
 
 }

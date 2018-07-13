@@ -9,13 +9,19 @@ interface IWNumberMetadata extends IWInputMetadata {
 
 @Component({
 })
-export default class WNumberInput extends WInput<number, IWNumberMetadata> {
+export default class WNumberInput extends WInput<number|string, IWNumberMetadata> {
 
   @Prop()
-  value: number;
+  value: number | string; // the string type is for empty field
 
   @Prop({ default: {} })
   metadata: IWNumberMetadata;
 
+  get min() {
+    return this.options.max !== void 0 ? this.options.max : '';
+  }
 
+  get max() {
+    return this.options.min !== void 0 ? this.options.min : '';
+  }
 }
