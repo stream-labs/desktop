@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import electron from 'electron';
+import electron, { clipboard } from 'electron';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
@@ -11,7 +11,6 @@ import {
 import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
-import { async } from "rxjs/scheduler/async";
 
 const getTypeMap = () => ({
   title: {
@@ -28,6 +27,12 @@ const getTypeMap = () => ({
   }
 });
 
+interface IToast {
+  el: HTMLElement;
+  text: Function;
+  goAway: Function;
+}
+
 @Component({
   components: { ModalLayout },
   mixins: [windowMixin]
@@ -37,11 +42,11 @@ export default class MediaGallery extends Vue {
   @Inject() mediaGalleryService: MediaGalleryService;
 
   dragOver = false;
-  busy = false;
   selectedFile: IMediaGalleryFile = null;
   type: string = null;
   category: string = null;
   galleryInfo: IMediaGalleryInfo = null;
+  busy: IToast = null;
 
   private promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
   private typeMap = getTypeMap();
@@ -54,7 +59,7 @@ export default class MediaGallery extends Vue {
     if (!this.galleryInfo) return [];
 
     return this.galleryInfo.files.filter(file => {
-      if (this.category === 'stock' && !file.isStock) return false;
+      if (!this.category && file.isStock) return false;
       if (this.type && file.type !== this.type) return false;
       return true;
     });
@@ -67,7 +72,7 @@ export default class MediaGallery extends Vue {
   get noFilesCopy() {
     return (
       this.typeMap.noFilesCopy[this.type] ||
-      $t("You don't have any uploaded files!")
+      $t('You don\'t have any uploaded files!')
     );
   }
 
@@ -191,27 +196,48 @@ export default class MediaGallery extends Vue {
       { defaultPath: this.selectedFile.fileName },
       async filename => {
         if (!this.selectedFile) return;
-        this.busy = true;
+        this.setBusy($t('Downloading...'));
         await this.mediaGalleryService.downloadFile(
           filename,
           this.selectedFile
         );
-        this.busy = false;
+        this.setNotBusy();
       }
     );
   }
 
   async upload(filepaths: string[]) {
-    this.busy = true;
+    this.setBusy($t('Uploading...'));
     this.galleryInfo = await this.mediaGalleryService.upload(filepaths);
-    this.busy = false;
+    this.setNotBusy();
   }
 
-  handleCopySuccess() {
-    return;
+  private setBusy(text: string) {
+    this.busy = this.$toasted.show(text, {
+      position: 'top-center',
+      className: 'toast-busy'
+    });
   }
 
-  handleCopyError() {
-    return;
+  private setNotBusy() {
+    this.busy.goAway();
+    this.busy = null;
+  }
+
+  async handleCopy(href: string) {
+    try {
+      await clipboard.writeText(href);
+      this.$toasted.show($t('URL Copied'), {
+        duration: 1000,
+        position: 'top-right',
+        className: 'toast-success'
+      });
+    } catch (e) {
+      this.$toasted.show($t('Failed to copy URL'), {
+        duration: 1000,
+        position: 'top-right',
+        className: 'toast-alert'
+      });
+    }
   }
 }
