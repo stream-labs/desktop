@@ -16,7 +16,6 @@
 
     <div v-if="!hasGoal">
 
-
       <div class="section__body" v-if="loadingState !== 'pending'">
 
         <w-form ref="form">

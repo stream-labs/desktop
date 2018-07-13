@@ -11,6 +11,13 @@ import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
 import { $t } from 'services/i18n';
 import WForm from 'components/shared/widget-inputs/WForm.vue';
 
+interface IGoalCreateOptions {
+  title: string;
+  goal_amount: number;
+  manual_goal_amount: number;
+  ends_at: string;
+}
+
 @Component({
   components: {
     WidgetWindow,
@@ -41,7 +48,6 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   async saveGoal() {
     const hasErrors = await this.$refs.form.validateAndCheckErrors();
     if (hasErrors) return;
-
     await this.save(this.goalCreateOptions);
   }
 
