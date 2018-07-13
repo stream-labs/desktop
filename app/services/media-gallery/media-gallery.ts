@@ -1,27 +1,33 @@
 import fs from 'fs';
 import { Inject } from '../../util/injector';
 import { authorizedHeaders } from '../../util/requests';
-import { StatefulService, mutation } from '../stateful-service';
-import { UserService } from '../user';
-import { HostsService } from '../hosts';
-import { WindowsService } from '../windows';
-import { ipcRenderer } from 'electron';
+import { Service } from 'services/service';
+import { UserService } from 'services/user';
+import { HostsService } from 'services/hosts';
+import { WindowsService } from 'services/windows';
+import uuid from 'uuid';
+import { stockImages, stockSounds } from './stock-library';
 
-export interface IFile {
+
+export interface IMediaGalleryFile {
   href: string;
-  filename: string;
-  size?: string;
-  type?: string;
+  fileName: string;
+  size: number;
+  type: string;
+  isStock: boolean;
 }
 
-interface IMediaGalleryState {
-  uploads: IFile[];
-  totalUsage: number;
+interface IMediaGalleryLimits {
   maxUsage: number;
   maxFileSize: number;
 }
 
-const filetypeMap = {
+export interface IMediaGalleryInfo extends IMediaGalleryLimits {
+  files: IMediaGalleryFile[];
+  totalUsage: number;
+}
+
+const fileTypeMap = {
   mp3: 'audio',
   wav: 'audio',
   ogg: 'audio',
@@ -33,11 +39,8 @@ const filetypeMap = {
   svg: 'image'
 };
 
-const defaultMaxUsage = 1024 * Math.pow(1024, 2);
-const defaultMaxFileSize = 25 * Math.pow(1024, 2);
-
-const union = (arrayA: any[], arrayB: any[]) =>
-  Array.from(new Set([...arrayA, ...arrayB]));
+const DEFAULT_MAX_USAGE = 1024 * Math.pow(1024, 2);
+const DEFAULT_MAX_FILE_SIZE = 25 * Math.pow(1024, 2);
 
 const concatUint8Arrays = (a: Uint8Array, b: Uint8Array) => {
   const c = new Uint8Array(a.length + b.length);
@@ -46,62 +49,63 @@ const concatUint8Arrays = (a: Uint8Array, b: Uint8Array) => {
   return c;
 };
 
-export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
-  @Inject() userService: UserService;
-  @Inject() hostsService: HostsService;
-  @Inject() windowsService: WindowsService;
+export class MediaGalleryService extends Service {
+  @Inject() private userService: UserService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private windowsService: WindowsService;
 
-  static initialState: IMediaGalleryState = {
-    uploads: [],
+  static initialState: IMediaGalleryInfo = {
+    files: [],
     totalUsage: 0,
     maxUsage: null,
     maxFileSize: null
   };
 
   private promises: Dictionary<{
-    resolve: (value?: IFile | PromiseLike<IFile>) => void;
+    resolve: (value?: IMediaGalleryFile) => void;
     reject: () => void;
   }> = {};
 
-  init() {
-    this.fetchFileLimits();
-    this.fetchFiles();
+  private stockImages = stockImages.map(item => {
+    return {
+      ...item,
+      type: 'image',
+      isStock: true,
+      size: 0
+    };
+  });
+
+  private stockSounds = stockSounds.map(item => {
+    return {
+      ...item,
+      type: 'audio',
+      isStock: true,
+      size: 0
+    };
+  });
+
+  async fetchGalleryInfo(): Promise<IMediaGalleryInfo> {
+    const [files, limits] = await Promise.all([this.fetchFiles(), this.fetchFileLimits()]);
+    const totalUsage = files.reduce((size: number, file: IMediaGalleryFile) => size + file.size, 0);
+    return { files, totalUsage, ...limits };
   }
 
-  files() {
-    let totalUsage = 0;
-    const files = this.state.uploads.map((item: IFile) => {
-      const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
-      const ext = filename
-        .toLowerCase()
-        .split('.')
-        .pop();
-      if (item.size) {
-        totalUsage += parseInt(item.size, 10);
-      }
-
-      item.filename = filename;
-      item.type = filetypeMap[ext];
-      return item;
+  async pickFile(): Promise<IMediaGalleryFile> {
+    const promiseId = uuid();
+    const promise = new Promise<IMediaGalleryFile> ((resolve, reject) => {
+      this.promises[promiseId] = { resolve, reject };
     });
-    this.SET_TOTAL_USAGE(totalUsage);
-
-    return files;
-  }
-
-  selectFileFromGallery(): Promise<IFile> {
-    const promiseId = ipcRenderer.sendSync('getUniqueId');
     this.showMediaGallery(promiseId);
-    return new Promise((resolve, reject) => { this.promises[promiseId] = { resolve, reject }; });
+    return promise;
   }
 
-  resolveFileSelect(promiseId: string, file: IFile) {
+  resolveFileSelect(promiseId: string, file: IMediaGalleryFile) {
     this.promises[promiseId].resolve(file);
     delete this.promises[promiseId];
     return file;
   }
 
-  async upload(filePaths: string[]): Promise<void> {
+  async upload(filePaths: string[]): Promise<IMediaGalleryInfo> {
     const formData = new FormData();
     filePaths.forEach((path: string) => {
       const contents = fs.readFileSync(path);
@@ -110,7 +114,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
         .toLowerCase()
         .split('.')
         .pop();
-      const file = new File([contents], name, { type: `${filetypeMap[ext]}/${ext}` });
+      const file = new File([contents], name, { type: `${fileTypeMap[ext]}/${ext}` });
       formData.append('uploads[]', file);
     });
 
@@ -118,12 +122,12 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
       body: formData,
       method: 'POST'
     });
-    return fetch(req)
-      .then((resp: Response) => resp.json())
-      .then((resp: IFile[]) => { this.SET_UPLOADS(union(resp, this.state.uploads)); });
+
+    await fetch(req);
+    return this.fetchGalleryInfo();
   }
 
-  async downloadFile(filename: string, file: IFile): Promise<void> {
+  async downloadFile(filename: string, file: IMediaGalleryFile): Promise<void> {
     return fetch(file.href).then(({ body }: { body: ReadableStream }) => {
       const reader = body.getReader();
       let result = new Uint8Array(0);
@@ -145,17 +149,17 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     });
   }
 
-  deleteFile(file: IFile) {
+  async deleteFile(file: IMediaGalleryFile): Promise<IMediaGalleryInfo> {
     const a = document.createElement('a');
     a.href = file.href;
     const path = a.pathname;
 
     const req = this.formRequest(`api/v5/slobs/uploads${path}`, { method: 'DELETE' });
-    const filteredUploads = this.state.uploads.filter((upload: IFile) => upload.href !== file.href);
-    fetch(req).then(() => this.SET_UPLOADS(filteredUploads));
+    await fetch(req);
+    return this.fetchGalleryInfo();
   }
 
-  showMediaGallery(promiseId: string) {
+  private showMediaGallery(promiseId: string) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
       queryParams: { promiseId },
@@ -173,49 +177,42 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     return new Request(url, { ...options, headers });
   }
 
-  private fetchFiles() {
+  private async fetchFiles(): Promise<IMediaGalleryFile[]> {
     const req = this.formRequest('api/v5/slobs/uploads');
-    fetch(req)
-      .then(resp => resp.json())
-      .then((resp: IFile[]) => this.SET_UPLOADS(resp));
+    const files: { href: string, size?: number }[] = await fetch(req)
+      .then(resp => resp.json());
+
+    const uploads = files.map(item => {
+      const fileName = decodeURIComponent(item.href.split(/[\\/]/).pop());
+      const ext = fileName
+        .toLowerCase()
+        .split('.')
+        .pop();
+      const type = fileTypeMap[ext];
+      const size = item.size || 0;
+
+      return { ...item, fileName, type, size, isStock: false };
+    });
+
+    return uploads.concat(this.stockImages, this.stockSounds);
   }
 
-  private fetchFileLimits() {
+  private async fetchFileLimits(): Promise<IMediaGalleryLimits> {
     const req = this.formRequest('api/v5/slobs/user/filelimits');
-    fetch(req)
-      .then(resp => resp.json())
-      .then(({ body }: { body: any }) => ({
-        maxUsage: body.max_allowed_upload_usage,
-        maxFileSize: body.max_allowed_upload_fize_size
-      }))
-      .then(limits => this.SET_FILE_LIMITS(limits))
-      .catch(() =>
-        this.SET_FILE_LIMITS({
-          maxUsage: defaultMaxUsage,
-          maxFileSize: defaultMaxFileSize
-        })
-      );
-  }
-
-  @mutation()
-  private SET_UPLOADS(files: IFile[]) {
-    this.state.uploads = files;
-  }
-
-  @mutation()
-  private SET_TOTAL_USAGE(usage: number) {
-    this.state.totalUsage = usage;
-  }
-
-  @mutation()
-  private SET_FILE_LIMITS({
-    maxFileSize,
-    maxUsage
-  }: {
-    maxFileSize: number;
-    maxUsage: number;
-  }) {
-    this.state.maxFileSize = maxFileSize;
-    this.state.maxUsage = maxUsage;
+    try {
+      const fileSize = await fetch(req).then((rawRes: any) => {
+        const resp = rawRes.json();
+        return {
+          maxUsage: resp.body.max_allowed_upload_usage,
+          maxFileSize: resp.body.max_allowed_upload_fize_size
+        };
+      });
+      return fileSize;
+    } catch (e) {
+      return {
+        maxUsage: DEFAULT_MAX_USAGE,
+        maxFileSize: DEFAULT_MAX_FILE_SIZE
+      };
+    }
   }
 }

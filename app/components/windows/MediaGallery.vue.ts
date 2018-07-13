@@ -1,32 +1,32 @@
 import Vue from 'vue';
 import electron from 'electron';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
 import {
   MediaGalleryService,
-  IFile,
-  stockImages,
-  stockSounds
-} from '../../services/media-gallery/index';
+  IMediaGalleryFile,
+  IMediaGalleryInfo
+} from 'services/media-gallery';
 import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
+import { async } from "rxjs/scheduler/async";
 
-const typeMap = {
+const getTypeMap = () => ({
   title: {
-    image: 'Images',
-    audio: 'Sounds'
+    image: $t('Images'),
+    audio: $t('Sounds')
   },
   noFilesCopy: {
-    image: 'You don\'t have any uploaded images!',
-    audio: 'You don\'t have any uploaded sounds!'
+    image: $t('You don\'t have any uploaded images!'),
+    audio: $t('You don\'t have any uploaded sounds!')
   },
   noFilesBtn: {
-    image: 'Upload An Image',
-    audio: 'Upload A Sound'
+    image: $t('Upload An Image'),
+    audio: $t('Upload A Sound')
   }
-};
+});
 
 @Component({
   components: { ModalLayout },
@@ -36,50 +36,63 @@ export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() mediaGalleryService: MediaGalleryService;
 
-  promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
   dragOver = false;
   busy = false;
-  selectedFile: IFile = null;
+  selectedFile: IMediaGalleryFile = null;
   type: string = null;
   category: string = null;
+  galleryInfo: IMediaGalleryInfo = null;
+
+  private promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
+  private typeMap = getTypeMap();
+
+  async mounted() {
+    this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
+  }
 
   get files() {
-    let files = this.mediaGalleryService.files();
+    if (!this.galleryInfo) return [];
 
-    if (this.category === 'stock') {
-      files = stockSounds.concat(stockImages);
-    }
-    if (this.type) {
-      files = files.filter(file => file.type === this.type);
-    }
-
-    return files;
+    return this.galleryInfo.files.filter(file => {
+      if (this.category === 'stock' && !file.isStock) return false;
+      if (this.type && file.type !== this.type) return false;
+      return true;
+    });
   }
 
   get title() {
-    return $t(typeMap.title[this.type]) || $t('All Files');
+    return this.typeMap.title[this.type] || $t('All Files');
   }
+
   get noFilesCopy() {
     return (
-      $t(typeMap.noFilesCopy[this.type]) ||
+      this.typeMap.noFilesCopy[this.type] ||
       $t("You don't have any uploaded files!")
     );
   }
+
   get noFilesBtn() {
-    return $t(typeMap.noFilesBtn[this.type]) || $t('Upload A File');
+    return this.typeMap.noFilesBtn[this.type] || $t('Upload A File');
+  }
+
+  get totalUsage( ) {
+    return this.galleryInfo ? this.galleryInfo.totalUsage : 0;
+  }
+
+  get maxUsage( ) {
+    return this.galleryInfo ? this.galleryInfo.maxUsage : 0;
   }
 
   get usagePct() {
-    return (
-      this.mediaGalleryService.state.totalUsage /
-      this.mediaGalleryService.state.maxUsage
-    );
+    return this.galleryInfo ? this.totalUsage / this.maxUsage : 0;
   }
+
   get totalUsageLabel() {
-    return this.formatBytes(this.mediaGalleryService.state.totalUsage, 2);
+    return this.formatBytes(this.totalUsage, 2);
   }
+
   get maxUsageLabel() {
-    return this.formatBytes(this.mediaGalleryService.state.maxUsage, 2);
+    return this.formatBytes(this.maxUsage, 2);
   }
 
   formatBytes(bytes: number, argPlaces: number) {
@@ -133,7 +146,7 @@ export default class MediaGallery extends Vue {
     this.category = 'stock';
   }
 
-  selectFile(file: IFile, select: boolean) {
+  selectFile(file: IMediaGalleryFile, select: boolean) {
     this.selectedFile = file;
 
     if (file.type === 'audio') {
@@ -149,10 +162,10 @@ export default class MediaGallery extends Vue {
       this.promiseId,
       this.selectedFile
     );
-    this.$emit('selected-file', this.selectedFile);
+    this.windowsService.closeChildWindow();
   }
 
-  handleDelete() {
+  async handleDelete() {
     if (this.selectedFile) {
       electron.remote.dialog.showMessageBox(
         electron.remote.getCurrentWindow(),
@@ -163,9 +176,9 @@ export default class MediaGallery extends Vue {
           ),
           buttons: [$t('Cancel'), $t('OK')]
         },
-        ok => {
+        async ok => {
           if (!ok || !this.selectedFile) return;
-          this.mediaGalleryService.deleteFile(this.selectedFile);
+          this.galleryInfo = await this.mediaGalleryService.deleteFile(this.selectedFile);
           this.selectedFile = null;
         }
       );
@@ -175,7 +188,7 @@ export default class MediaGallery extends Vue {
   async handleDownload() {
     electron.remote.dialog.showSaveDialog(
       electron.remote.getCurrentWindow(),
-      { defaultPath: this.selectedFile.filename },
+      { defaultPath: this.selectedFile.fileName },
       async filename => {
         if (!this.selectedFile) return;
         this.busy = true;
@@ -190,7 +203,7 @@ export default class MediaGallery extends Vue {
 
   async upload(filepaths: string[]) {
     this.busy = true;
-    await this.mediaGalleryService.upload(filepaths);
+    this.galleryInfo = await this.mediaGalleryService.upload(filepaths);
     this.busy = false;
   }
 

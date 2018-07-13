@@ -36,7 +36,10 @@
           <h4>{{ title }}</h4>
           <div class="toolbar">
             <i class="icon-cloud-backup" @click="openFilePicker"></i>
-            <i class="icon-trash" :class="[!selectedFile || category === 'stock' ? 'disabled' : '']" @click="handleDelete"></i>
+            <i class="icon-trash"
+               :class="{ disabled: !selectedFile || selectedFile && selectedFile.isStock }"
+               @click="handleDelete"
+            ></i>
             <i class="fa fa-download" :class="[!selectedFile ? 'disabled' : '']" @click="handleDownload"></i>
           </div>
           <div>
@@ -57,7 +60,7 @@
                   </button>
                   <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">
                     <div class="upload__size">{{ file.size ? formatBytes(file.size) : ' ' }}</div>
-                    <div class="upload__title">{{ file.filename }}</div>
+                    <div class="upload__title">{{ file.fileName }}</div>
                   </div>
                 </div>
               </li>
