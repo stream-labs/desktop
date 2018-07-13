@@ -3,10 +3,14 @@ import electron from 'electron';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
-import { MediaGalleryService, IFile } from '../../services/media-gallery/index';
+import {
+  MediaGalleryService,
+  IFile,
+  stockImages,
+  stockSounds
+} from '../../services/media-gallery/index';
 import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
-
 import ModalLayout from '../ModalLayout.vue';
 
 const typeMap = {
@@ -36,29 +40,40 @@ export default class MediaGallery extends Vue {
   dragOver = false;
   busy = false;
   selectedFile: IFile = null;
+  type: string = null;
+  category: string = null;
 
   get files() {
-    return this.mediaGalleryService.files();
-  }
-  get type() {
-    return this.mediaGalleryService.state.type;
-  }
-  get category() {
-    return this.mediaGalleryService.state.category;
+    let files = this.mediaGalleryService.files();
+
+    if (this.category === 'stock') {
+      files = stockSounds.concat(stockImages);
+    }
+    if (this.type) {
+      files = files.filter(file => file.type === this.type);
+    }
+
+    return files;
   }
 
   get title() {
     return $t(typeMap.title[this.type]) || $t('All Files');
   }
   get noFilesCopy() {
-    return $t(typeMap.noFilesCopy[this.type]) || $t('You don\'t have any uploaded files!');
+    return (
+      $t(typeMap.noFilesCopy[this.type]) ||
+      $t("You don't have any uploaded files!")
+    );
   }
   get noFilesBtn() {
     return $t(typeMap.noFilesBtn[this.type]) || $t('Upload A File');
   }
 
   get usagePct() {
-    return this.mediaGalleryService.state.totalUsage / this.mediaGalleryService.state.maxUsage;
+    return (
+      this.mediaGalleryService.state.totalUsage /
+      this.mediaGalleryService.state.maxUsage
+    );
   }
   get totalUsageLabel() {
     return this.formatBytes(this.mediaGalleryService.state.totalUsage, 2);
@@ -68,13 +83,18 @@ export default class MediaGallery extends Vue {
   }
 
   formatBytes(bytes: number, argPlaces: number) {
-    if (!bytes) { return '0KB'; }
+    if (!bytes) {
+      return '0KB';
+    }
 
     const places = argPlaces || 1;
     const divisor = Math.pow(10, places);
     const base = Math.log(bytes) / Math.log(1024);
     const suffix = ['', 'KB', 'MB', 'GB', 'TB'][Math.floor(base)];
-    return (Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor) + suffix;
+    return (
+      Math.round(Math.pow(1024, base - Math.floor(base)) * divisor) / divisor +
+      suffix
+    );
   }
 
   onDragOver() {
@@ -98,16 +118,19 @@ export default class MediaGallery extends Vue {
   }
 
   handleFileDrop(e: DragEvent) {
-    const mappedFiles = Array.from(e.dataTransfer.files).map((file) => file.path);
+    const mappedFiles = Array.from(e.dataTransfer.files).map(file => file.path);
     this.upload(mappedFiles);
   }
 
   handleTypeFilter(type: string, category: string) {
-    this.mediaGalleryService.setTypeFilter(type, category);
+    if (type !== this.type || category !== this.category) {
+      this.type = type;
+      this.category = category;
+    }
   }
 
   handleBrowseGalleryClick() {
-    this.mediaGalleryService.setTypeFilter(this.type, 'stock');
+    this.category = 'stock';
   }
 
   selectFile(file: IFile, select: boolean) {
@@ -122,7 +145,10 @@ export default class MediaGallery extends Vue {
   }
 
   handleSelect() {
-    this.mediaGalleryService.resolveFileSelect(this.promiseId, this.selectedFile);
+    this.mediaGalleryService.resolveFileSelect(
+      this.promiseId,
+      this.selectedFile
+    );
     this.$emit('selected-file', this.selectedFile);
   }
 
@@ -132,7 +158,9 @@ export default class MediaGallery extends Vue {
         electron.remote.getCurrentWindow(),
         {
           type: 'warning',
-          message: $t('Are you sure you want to delete this file? This action is irreversable.'),
+          message: $t(
+            'Are you sure you want to delete this file? This action is irreversable.'
+          ),
           buttons: [$t('Cancel'), $t('OK')]
         },
         ok => {
@@ -148,10 +176,13 @@ export default class MediaGallery extends Vue {
     electron.remote.dialog.showSaveDialog(
       electron.remote.getCurrentWindow(),
       { defaultPath: this.selectedFile.filename },
-      async (filename) => {
+      async filename => {
         if (!this.selectedFile) return;
         this.busy = true;
-        await this.mediaGalleryService.downloadFile(filename, this.selectedFile);
+        await this.mediaGalleryService.downloadFile(
+          filename,
+          this.selectedFile
+        );
         this.busy = false;
       }
     );

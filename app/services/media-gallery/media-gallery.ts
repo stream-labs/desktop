@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { stockImages, stockSounds } from './stock-library';
 import { Inject } from '../../util/injector';
 import { authorizedHeaders } from '../../util/requests';
 import { StatefulService, mutation } from '../stateful-service';
@@ -18,8 +17,6 @@ export interface IFile {
 interface IMediaGalleryState {
   uploads: IFile[];
   totalUsage: number;
-  category: string;
-  type: string;
   maxUsage: number;
   maxFileSize: number;
 }
@@ -57,13 +54,14 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   static initialState: IMediaGalleryState = {
     uploads: [],
     totalUsage: 0,
-    category: null,
-    type: null,
     maxUsage: null,
     maxFileSize: null
   };
 
-  private promises: Dictionary<{ resolve: (value?: IFile | PromiseLike<IFile>) => void, reject: () => void }> = {};
+  private promises: Dictionary<{
+    resolve: (value?: IFile | PromiseLike<IFile>) => void;
+    reject: () => void;
+  }> = {};
 
   init() {
     this.fetchFileLimits();
@@ -72,7 +70,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
 
   files() {
     let totalUsage = 0;
-    let files = this.state.uploads.map((item: IFile) => {
+    const files = this.state.uploads.map((item: IFile) => {
       const filename = decodeURIComponent(item.href.split(/[\\/]/).pop());
       const ext = filename
         .toLowerCase()
@@ -86,15 +84,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
       item.type = filetypeMap[ext];
       return item;
     });
-
     this.SET_TOTAL_USAGE(totalUsage);
-
-    if (this.state.category === 'stock') {
-      files = stockSounds.concat(stockImages);
-    }
-    if (this.state.type) {
-      files = files.filter(file => file.type === this.state.type);
-    }
 
     return files;
   }
@@ -102,9 +92,7 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   selectFileFromGallery(): Promise<IFile> {
     const promiseId = ipcRenderer.sendSync('getUniqueId');
     this.showMediaGallery(promiseId);
-    return new Promise((resolve, reject) => {
-      this.promises[promiseId] = { resolve, reject };
-    });
+    return new Promise((resolve, reject) => { this.promises[promiseId] = { resolve, reject }; });
   }
 
   resolveFileSelect(promiseId: string, file: IFile) {
@@ -132,40 +120,29 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
     });
     return fetch(req)
       .then((resp: Response) => resp.json())
-      .then((resp: IFile[]) => {
-        this.SET_UPLOADS(union(resp, this.state.uploads));
-      });
-  }
-
-  setTypeFilter(type: string, category: string) {
-    if (type !== this.state.type || category !== this.state.category) {
-      this.SET_TYPE(type);
-      this.SET_CATEGORY(category);
-    }
+      .then((resp: IFile[]) => { this.SET_UPLOADS(union(resp, this.state.uploads)); });
   }
 
   async downloadFile(filename: string, file: IFile): Promise<void> {
-    return fetch(file.href).then(
-      ({ body }: { body: ReadableStream }) => {
-        const reader = body.getReader();
-        let result = new Uint8Array(0);
-        const readStream = ({
-          done,
-          value
-        }: {
-          done: boolean;
-          value: Uint8Array;
-        }) => {
-          if (done) {
-            fs.writeFileSync(filename, result);
-          } else {
-            result = concatUint8Arrays(result, value);
-            reader.read().then(readStream);
-          }
-        };
-        return reader.read().then(readStream);
-      }
-    );
+    return fetch(file.href).then(({ body }: { body: ReadableStream }) => {
+      const reader = body.getReader();
+      let result = new Uint8Array(0);
+      const readStream = ({
+        done,
+        value
+      }: {
+        done: boolean;
+        value: Uint8Array;
+      }) => {
+        if (done) {
+          fs.writeFileSync(filename, result);
+        } else {
+          result = concatUint8Arrays(result, value);
+          reader.read().then(readStream);
+        }
+      };
+      return reader.read().then(readStream);
+    });
   }
 
   deleteFile(file: IFile) {
@@ -228,16 +205,6 @@ export class MediaGalleryService extends StatefulService<IMediaGalleryState> {
   @mutation()
   private SET_TOTAL_USAGE(usage: number) {
     this.state.totalUsage = usage;
-  }
-
-  @mutation()
-  private SET_TYPE(type: string) {
-    this.state.type = type;
-  }
-
-  @mutation()
-  private SET_CATEGORY(category: string) {
-    this.state.category = category;
   }
 
   @mutation()
