@@ -82,9 +82,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   async save(dataToSave?: any) {
     if (this.loadingState === 'pending') return;
 
-    await this.$validator.validate('*');
-    if (this.$validator.errors.items.length) return;
-
     const tab = this.service.getTab(this.tabName);
     if (!tab) return;
 
