@@ -13,6 +13,9 @@
       <w-bool-input title="Twitch Subs" v-model="wData.settings.show_premium_icons"/>
       <w-bool-input title="Twitch Resubs" v-model="wData.settings.show_bits_icons"/>
     </w-form-group>
+    <w-form-group title="Twitch Follows">
+      <w-media-gallery-input />
+    </w-form-group>
   </div>
 </widget-window>
 </template>
