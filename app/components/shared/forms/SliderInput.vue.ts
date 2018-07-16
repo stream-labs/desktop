@@ -10,11 +10,19 @@ class SliderInput extends Input<ISliderInputValue> {
 
   static obsType: TObsType;
 
-  @Prop()
-  value: ISliderInputValue;
+  @Prop() value: ISliderInputValue;
+
+  // Local value is an instaneous value that is updated as the user
+  // moves the slider.  It makes the UI feel more responsive.
+  localValue = this.value.value;
+
+  updateValue(value: number) {
+    this.localValue = value;
+    this.emitValue(value);
+  }
 
   @debounce(100)
-  updateValue(value: number) {
+  emitValue(value: number) {
     this.emitInput({ ...this.value, value });
   }
 

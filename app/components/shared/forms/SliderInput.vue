@@ -7,7 +7,7 @@
       <div class="slider-container">
         <Slider
           @input="value => updateValue(value)"
-          :value="value.value"
+          :value="localValue"
           :disabled="value.enabled == false"
           :max="value.maxVal"
           :min="value.minVal"

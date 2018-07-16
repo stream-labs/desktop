@@ -17,18 +17,13 @@ export default class SliderInput extends Vue {
   @Prop() sliderStyle: object;
   @Prop() usePercentages: boolean;
 
-  $refs: { slider: any, inputbox: any };
+  $refs: { slider: any };
 
   mounted() {
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => {
       if (this.$refs.slider) this.$refs.slider.refresh();
     }, 500);
-  }
-
-  sliderUpdate(value: number) {
-    this.$refs.inputbox.value = value;
-    this.updateValue(value);
   }
 
   updateValue(value: number) {
