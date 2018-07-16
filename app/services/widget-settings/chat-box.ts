@@ -82,7 +82,7 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
     ...CODE_EDITOR_TABS
   ];
 
-  protected patchData(data: IChatBoxData): IChatBoxData {
+  protected patchAfterFetch(data: IChatBoxData): IChatBoxData {
     // backend accepts and returns message_hide_delay in different precision
     data.settings.message_hide_delay = Math.round(data.settings.message_hide_delay / 1000);
     return data;

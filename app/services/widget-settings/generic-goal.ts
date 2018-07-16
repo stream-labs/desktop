@@ -52,7 +52,7 @@ export abstract class GenericGoalService extends WidgetSettingsService<IGoalData
     };
   }
 
-  protected patchData(data: IGoalData): IGoalData {
+  protected patchAfterFetch(data: IGoalData): IGoalData {
     // fix a bug when API returning an empty array instead of null
     if (Array.isArray(data.goal)) data.goal = null;
     return data;

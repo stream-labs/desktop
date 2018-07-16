@@ -30,6 +30,7 @@ import BitGoal from 'components/widget-settings/goal/BitGoal.vue';
 import DonationGoal from 'components/widget-settings/goal/DonationGoal.vue';
 import ChatBox from 'components/widget-settings/ChatBox.vue';
 import FollowerGoal from 'components/widget-settings/goal/FollowerGoal.vue';
+import ViewerCount from 'components/widget-settings/ViewerCount.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -97,7 +98,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     BitGoal,
     DonationGoal,
     FollowerGoal,
-    ChatBox
+    ChatBox,
+    ViewerCount
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

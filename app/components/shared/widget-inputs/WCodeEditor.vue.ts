@@ -51,6 +51,10 @@ export default class WCodeEditor extends Vue {
     return this.hasChanges && !this.isLoading;
   }
 
+  get hasDefaults() {
+    return !!this.value.custom_defaults;
+  }
+
   async save() {
     if (!this.canSave) return;
     this.isLoading = true;
@@ -82,6 +86,7 @@ export default class WCodeEditor extends Vue {
   }
 
   restoreDefaults() {
+    if (!this.hasDefaults) return;
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.value.custom_defaults[type];
