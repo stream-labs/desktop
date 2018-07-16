@@ -5,6 +5,7 @@ export { default as WFontSizeInput } from './WFontSize.vue';
 export { default as WListInput } from './WListInput.vue';
 export { default as WSliderInput } from './WSliderInput.vue';
 export { default as WTextInput } from './WTextInput.vue';
+export { default as WNumberInput } from './WNumberInput.vue';
 export { default as WTextAreaInput } from './WTextAreaInput.vue';
 export { default as WBoolInput } from './WBoolInput.vue';
 export { default as WCodeInput } from './WCodeInput.vue';

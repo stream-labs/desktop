@@ -1,12 +1,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
-import { WInput } from './WInput';
+import { IWInputMetadata, WInput } from './WInput';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/css/css.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/keymap/sublime';
 
-export interface IWCodeInputMetadata {
+export interface IWCodeInputMetadata extends IWInputMetadata {
   type: string;
 }
 

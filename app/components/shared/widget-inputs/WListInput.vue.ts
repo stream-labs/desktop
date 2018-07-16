@@ -1,9 +1,9 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IListOption } from '../forms/Input';
 import { Multiselect } from 'vue-multiselect';
-import { WInput } from './WInput';
+import { IWInputMetadata, WInput } from './WInput';
 
-export interface IWListMetadata<TValueType> {
+export interface IWListMetadata<TValueType> extends IWInputMetadata {
   options: IListOption<TValueType>[];
 }
 

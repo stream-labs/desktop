@@ -1,11 +1,11 @@
 import VueSlider from 'vue-slider-component';
 import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
-import { WInput } from './WInput';
+import { IWInputMetadata, WInput } from './WInput';
 import { CustomizationService } from '../../../services/customization';
 import { Inject } from '../../../util/injector';
 
-export interface IWSliderMetadata {
+export interface IWSliderMetadata extends IWInputMetadata {
   min: number;
   max: number;
   interval?: number;

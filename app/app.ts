@@ -85,10 +85,8 @@ require('./app.less');
 // Initiates tooltips and sets their parent wrapper
 Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
-
-Vue.use(VeeValidate);
-
 Vue.use(Toasted);
+Vue.use(VeeValidate); // form validations
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());

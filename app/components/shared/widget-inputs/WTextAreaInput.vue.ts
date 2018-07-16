@@ -1,7 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { WInput } from './WInput';
+import { IWInputMetadata, WInput } from './WInput';
 
-interface IWTextMetadata {
+interface IWTextMetadata extends IWInputMetadata {
   placeholder: string;
 }
 
