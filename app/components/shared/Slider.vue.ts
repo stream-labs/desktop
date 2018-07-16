@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueSlider from 'vue-slider-component';
-import { throttle } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
@@ -18,7 +17,7 @@ export default class SliderInput extends Vue {
   @Prop() sliderStyle: object;
   @Prop() usePercentages: boolean;
 
-  $refs: { slider: any };
+  $refs: { slider: any, inputbox: any };
 
   mounted() {
     // Hack to prevent transitions from messing up slider width
@@ -27,7 +26,11 @@ export default class SliderInput extends Vue {
     }, 500);
   }
 
-  @throttle(500)
+  sliderUpdate(value: number) {
+    this.$refs.inputbox.value = value;
+    this.updateValue(value);
+  }
+
   updateValue(value: number) {
     this.$emit('input', this.roundNumber(value));
   }

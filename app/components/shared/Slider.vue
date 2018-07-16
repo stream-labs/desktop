@@ -1,7 +1,7 @@
 <template>
 <div class="slider-container">
   <vue-slider class="slider"
-    @input="value => updateValue(value)"
+    @input="value => sliderUpdate(value)"
     :value="value"
     :disabled="disabled"
     :max="max"
@@ -22,6 +22,7 @@
     :value="value"
     @change="updateValue(parseFloat($event.target.value))"
     @keydown="handleKeydown"
+    ref="inputbox"
   />
 </div>
 </template>

@@ -1,4 +1,4 @@
-import { throttle } from 'lodash-decorators';
+import { debounce } from 'lodash-decorators';
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, Input, ISliderInputValue } from './Input';
 import Slider from '../Slider.vue';
@@ -13,7 +13,7 @@ class SliderInput extends Input<ISliderInputValue> {
   @Prop()
   value: ISliderInputValue;
 
-  @throttle(100)
+  @debounce(100)
   updateValue(value: number) {
     this.emitInput({ ...this.value, value });
   }
