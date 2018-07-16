@@ -4,7 +4,7 @@
     <w-code-input v-if="customEnabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
 
     <div class="modal-layout-controls">
-      <button class="button button--default restore-button" @click="restoreDefaults">
+      <button v-if="hasDefaults" class="button button--default restore-button" @click="restoreDefaults">
         {{ $t('Restore Defaults') }}
       </button>
       <button class="button button--default discard-button" @click="discardChanges">

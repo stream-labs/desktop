@@ -1,9 +1,6 @@
 <template>
   <div>
-    <slider
-      :min="8"
-      :max="144"
-      :value="value" />
+    <w-slider-input :metadata="{min: 8, max: 144}" :value="sliderValue" @input="value => updateValue(value)"/>
   </div>
 </template>
 

@@ -3,7 +3,7 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
-  :fixedSectionHeight="300"
+  :fixedSectionHeight="310"
   v-if="previewSource">
 
   <div slot="fixed">
