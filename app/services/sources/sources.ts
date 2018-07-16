@@ -389,7 +389,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.DonationTicker,
         WidgetType.Credits,
         WidgetType.EventList,
-        WidgetType.StreamBoss
+        WidgetType.StreamBoss,
+        WidgetType.TipJar
       ];
 
       if (isWidget) {

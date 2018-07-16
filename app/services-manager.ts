@@ -86,6 +86,7 @@ import { StreamBossService } from 'services/widget-settings/stream-boss';
 import { DonationTickerService } from 'services/widget-settings/donation-ticker';
 import { CreditsService } from 'services/widget-settings/credits';
 import { EventListService } from 'services/widget-settings/event-list';
+import { TipJarService } from 'services/widget-settings/tip-jar';
 
 const { ipcRenderer } = electron;
 
@@ -172,6 +173,7 @@ export class ServicesManager extends Service {
     DonationTickerService,
     CreditsService,
     EventListService,
+    TipJarService,
     MediaGalleryService
   };
 
