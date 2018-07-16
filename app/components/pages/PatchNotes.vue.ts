@@ -17,8 +17,8 @@ export default class Dashboard extends Vue {
     this.navigationService.navigate('Studio');
   }
 
-  patchNotesClosing = true;
-  patchNotesOpening = true;
+  patchNotesClosing = false;
+  patchNotesOpening = false;
 
   show() {
     const vid = <HTMLVideoElement>this.$refs.patchNotesVideo;

@@ -21,6 +21,7 @@ import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
+import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 
 const { ipcRenderer, remote } = electron;
@@ -87,6 +88,8 @@ Vue.use(VTooltip);
 VTooltip.options.defaultContainer = '#mainWrapper';
 Vue.use(Toasted);
 Vue.use(VeeValidate); // form validations
+Vue.use(VModal);
+
 
 // Disable chrome default drag/drop behavior
 document.addEventListener('dragover', event => event.preventDefault());
