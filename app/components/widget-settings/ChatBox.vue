@@ -1,5 +1,5 @@
 <template>
-<widget-layout v-if="wData" v-model="tabName">
+<widget-window v-if="wData" ref="layout" v-model="tabName">
 
   <div slot="description">
     {{ $t('Include your channel\'s chat into your stream, and make it look pretty while you\'re at it.') }}
@@ -24,8 +24,8 @@
       <w-bool-input title="Enable Supermegafan Emotes" v-model="wData.settings.show_smf_emotes"/>
     </w-form-group>
 
-
-    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color"/>
+    <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip, description: backgroundColorDescription }" />
+    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
 
     <w-form-group title="Hide Message after">
@@ -41,7 +41,21 @@
     <w-form-group title="Muted Chatters" type="textArea" v-model="wData.settings.muted_chatters" />
   </div>
 
-</widget-layout>
+
+  <div slot="HTML" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+  </div>
+
+  <div slot="CSS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+  </div>
+
+  <div slot="JS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
+
+
+</widget-window>
 
 </template>
 

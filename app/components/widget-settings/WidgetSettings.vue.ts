@@ -5,12 +5,13 @@ import { WindowsService } from 'services/windows';
 import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources';
 import { WidgetsService, WidgetType } from 'services/widgets';
-import { THttpMethod, WidgetSettingsService } from 'services/widget-settings/widget-settings';
-
-
+import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { Subscription } from 'rxjs/Subscription';
+import { $t } from 'services/i18n';
 
 @Component({})
-export default class WidgetSettings<TData, TService extends WidgetSettingsService<TData>> extends Vue {
+export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
+  extends Vue {
 
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: SourcesService;
@@ -23,6 +24,9 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   wData: TData = null;
   metadata = this.service.getMetadata();
   loadingState: 'success' | 'pending' | 'fail' = 'pending';
+  tabs = this.service.getTabs();
+
+  private dataUpdatedSubscr: Subscription;
 
   get widgetType(): WidgetType {
     return this.source.getPropertiesManagerSettings().widgetType;
@@ -34,16 +38,24 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
 
   protected skipNextDatachangeHandler: boolean;
 
-  async mounted() {
+  async created() {
+    this.tabName = this.tabName || this.tabs[0].name;
+    this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
+      this.onDataUpdatedHandler(newData);
+    });
     await this.refresh();
+  }
+
+  destroyed() {
+    this.dataUpdatedSubscr.unsubscribe();
   }
 
   async refresh() {
     try {
-      this.wData = await this.service.fetchData();
+      await this.service.fetchData();
       this.loadingState = 'success';
-      this.afterFetch();
       this.skipNextDatachangeHandler = true;
+      this.afterFetch();
     } catch (e) {
       this.loadingState = 'fail';
     }
@@ -62,7 +74,12 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     await this.save();
   }
 
-  async save() {
+  private onDataUpdatedHandler(newData: TData) {
+    this.wData = newData;
+    this.refreshPreview();
+  }
+
+  async save(dataToSave?: any) {
     if (this.loadingState === 'pending') return;
 
     const tab = this.service.getTab(this.tabName);
@@ -71,10 +88,9 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
     this.loadingState = 'pending';
 
     try {
-      this.wData = await this.service.saveData(this.wData[tab.name], tab.name);
+      await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
       this.loadingState = 'success';
       this.afterFetch();
-      this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
@@ -91,7 +107,6 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
       this.wData = await this.service.reset(this.tabName);
       this.loadingState = 'success';
       this.afterFetch();
-      this.refreshPreview();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.loadingState = 'fail';
@@ -100,6 +115,8 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   }
 
   refreshPreview() {
+
+    // update obs-preview
     // little hack: update some property to trigger preview refreshing
     const height = this.source.height;
     this.source.updateSettings({ height: height + 1 });
@@ -111,7 +128,14 @@ export default class WidgetSettings<TData, TService extends WidgetSettingsServic
   }
 
   onFailHandler() {
-    // TODO: replace alert with UI component
-    alert('Something went wrong');
+    this.$toasted.show(
+      $t('Save failed, something went wrong.'),
+      {
+        position: 'bottom-center',
+        className: 'toast-alert',
+        duration: 1000,
+        singleton: true
+      }
+    );
   }
 }

@@ -49,6 +49,7 @@ export interface ISourcesServiceApi {
     settings?: Dictionary<any>,
     options?: ISourceCreateOptions
   ): ISourceApi;
+  removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
   getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];

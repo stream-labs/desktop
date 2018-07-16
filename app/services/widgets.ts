@@ -433,7 +433,7 @@ export class WidgetsService extends Service {
   getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
     const serviceName = this.getWidgetComponent(type) + 'Service';
     const servicesManager: ServicesManager = ServicesManager.instance;
-    return servicesManager.getService(serviceName).instance;
+    return servicesManager.getResource(serviceName);
   }
 
   getTesters() {
