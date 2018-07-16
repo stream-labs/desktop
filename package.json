@@ -78,7 +78,7 @@
     "node-fontinfo": "^0.0.2",
     "node-gyp": "^3.6.2",
     "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.41/iojs-v2.0.1-signed.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.42/iojs-v2.0.1-signed.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
