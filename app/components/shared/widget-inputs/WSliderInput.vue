@@ -1,6 +1,5 @@
 <template>
 <div>
-  <label class="w-form-group__label">{{ value.description }}</label>
   <div class="w-form-group__wrapper slider-container">
     <vue-slider class="slider w-form-group__input"
       :value="value"
@@ -15,7 +14,17 @@
       :tooltip="tooltip"
       :sliderStyle="sliderStyle"
       :formatter="formatter"
+      :piecewise="metadata.interval && metadata.interval > 3"
       ref="slider"
+      :piecewiseStyle="{
+          position: 'absolute',
+          'backgroundColor': nightMode ? '#253239' : '#eaecee',
+          height: '2px',
+          width: '2px',
+          'borderRadius': '1px',
+          top: '12px'
+      }"
+      :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
     />
     <input
       v-if="valueBox && !usePercentages"
@@ -37,6 +46,7 @@
 .slider-container {
   width: 100%;
   display: flex;
+  position: relative;
 }
 
 .slider-input {

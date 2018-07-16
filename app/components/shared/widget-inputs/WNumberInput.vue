@@ -1,7 +1,7 @@
 <template>
-  <span class="w-text-input">
+  <span class="w-number-input">
     <input
-        type="text"
+        type="number"
         :placeholder="metadata.placeholder"
         :value="value"
         @input="emitInput($event.target.value)"
@@ -14,10 +14,10 @@
   </span>
 </template>
 
-<script lang="ts" src="./WTextInput.vue.ts"></script>
+<script lang="ts" src="./WNumberInput.vue.ts"></script>
 
 <style lang="less" scoped>
-  .w-text-input {
+  .w-number-input {
     position: relative;
     .input-error {
       position: absolute;

@@ -15,6 +15,9 @@
               class="colorpicker__swatch"
               :style="swatchStyle"/>
         </div>
+        <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+          <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+        </div>
         <color-picker
             :value="{hex: value}"
             @input="(value) => emitInput(value.hex)"

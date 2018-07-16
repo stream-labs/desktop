@@ -10,6 +10,7 @@ import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
+import { ScenesService } from 'services/scenes';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -53,13 +54,27 @@ export class SourcesNode extends Node<ISchema, {}> {
   @Inject() private fontLibraryService: FontLibraryService;
   @Inject() private sourcesService: SourcesService;
   @Inject() private audioService: AudioService;
+  @Inject() private scenesService: ScenesService;
 
   getItems() {
-    return this.sourcesService.sources.filter(source => source.type !== 'scene');
+
+    const linkedSourcesIds = this.scenesService.getSceneItems()
+      .map(sceneItem => sceneItem.sourceId);
+
+    return this.sourcesService.sources.filter(source => {
+      // we store scenes in separated config
+      if (source.type === 'scene') return false;
+
+      // global audio sources must be saved
+      if (source.channel) return true;
+
+      // prevent sources without linked sceneItems to be saved
+      if (!linkedSourcesIds.includes(source.sourceId)) return false;
+      return true;
+    });
   }
 
   save(context: {}): Promise<void> {
-    const items: ISourceInfo[] = [];
     const promises: Promise<ISourceInfo>[] = this.getItems().map(source => {
       return new Promise(resolve => {
         const hotkeys = new HotkeysNode();

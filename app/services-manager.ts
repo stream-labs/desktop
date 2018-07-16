@@ -67,17 +67,18 @@ import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
-import { WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
+import { MediaGalleryService } from './services/media-gallery';
 
 import { BitGoalService } from 'services/widget-settings/bit-goal';
 import { ChatBoxService } from 'services/widget-settings/chat-box';
 import { DonationGoalService } from 'services/widget-settings/donation-goal';
 import { FollowerGoalService } from 'services/widget-settings/follower-goal';
+import { ViewerCountService } from 'services/widget-settings/viewer-count';
 
 const { ipcRenderer } = electron;
 
@@ -147,18 +148,18 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     ProjectorService,
     TransitionsService,
-    WidgetSettingsService,
     MediaBackupService,
     WebsocketService,
     FacemasksService,
     ProfanityFilterService,
     I18nService,
     OutageNotificationsService,
-
     BitGoalService,
     DonationGoalService,
     FollowerGoalService,
-    ChatBoxService
+    ChatBoxService,
+    ViewerCountService,
+    MediaGalleryService
   };
 
   private instances: Dictionary<Service> = {};
@@ -188,6 +189,12 @@ export class ServicesManager extends Service {
   subscriptions: Dictionary<Subscription> = {};
 
   init() {
+
+    // this helps to debug services from the console
+    if (Utils.isDevMode()) {
+      window['sm'] = this;
+    }
+
     if (!Utils.isMainWindow()) {
       Service.setupProxy(service => this.applyIpcProxy(service));
       Service.setupInitFunction(service => {
@@ -198,10 +205,6 @@ export class ServicesManager extends Service {
 
     Service.serviceAfterInit.subscribe(service => this.initObservers(service));
 
-    // this helps to debug services from console
-    if (Utils.isDevMode()) {
-      window['sm'] = this;
-    }
   }
 
   private initObservers(observableService: Service): Service[] {
@@ -424,7 +427,7 @@ export class ServicesManager extends Service {
    * @example
    * source = getResource('Source[12]')
    */
-  private getResource(resourceId: string) {
+  getResource(resourceId: string) {
     if (resourceId === 'ServicesManager') {
       return this;
     }
