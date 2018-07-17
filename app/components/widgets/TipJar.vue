@@ -25,7 +25,7 @@
     <w-form-group title="Minimum Tips">
       <w-number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </w-form-group>
-    <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip, description: backgroundColorDescription }" />
+    <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
     <w-form-group title="Twitch Follows">
       <w-media-gallery-input />
     </w-form-group>
