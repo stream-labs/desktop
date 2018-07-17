@@ -13,26 +13,19 @@ export interface ITipJarData extends IWidgetData {
   settings: {
     theme: 'twitch';
     background_color: string;
-    text_color: string;
-    show_moderator_icons: boolean;
-    show_subscriber_icons: boolean;
-    show_turbo_icons: boolean;
-    show_premium_icons: boolean;
-    show_bits_icons: boolean;
-    show_coin_icons: boolean;
-    show_bttv_emotes: boolean;
-    show_franker_emotes: boolean;
-    show_smf_emotes: boolean;
-    always_show_messages: boolean;
-    hide_common_chat_bots: boolean;
-    message_hide_delay: number;
-    text_size: 14;
-    muted_chatters: string;
-    hide_commands: boolean;
+    text: { color: string, font: string, show: boolean };
+    text_size: number;
     custom_enabled: boolean;
     custom_html: string;
     custom_js: string;
     custom_css: string;
+    types: {
+      tips: { enabled: boolean, minimum_amount?: number, tiers: any[] },
+      twitch_bits: { enabled: boolean, minimum_amount?: number },
+      twitch_follows: { enabled: boolean, minimum_amount?: number },
+      twitch_resubs: { enabled: boolean, minimum_amount?: number },
+      twitch_subs: { enabled: boolean, minimum_amount?: number }
+    };
   };
   custom_defaults: {
     html: string;
@@ -83,8 +76,6 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
   ];
 
   protected patchAfterFetch(data: ITipJarData): ITipJarData {
-    // backend accepts and returns message_hide_delay in different precision
-    data.settings.message_hide_delay = Math.round(data.settings.message_hide_delay / 1000);
     return data;
   }
 

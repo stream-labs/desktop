@@ -7,23 +7,23 @@
 
   <div slot="settings">
     <w-form-group title="Enabled Events">
-      <w-bool-input title="Tips &amp; Donations" v-model="wData.settings.show_moderator_icons"/>
-      <w-bool-input title="Twitch Follows" v-model="wData.settings.show_subscriber_icons"/>
-      <w-bool-input title="Twitch Bits/Cheers" v-model="wData.settings.show_turbo_icons"/>
-      <w-bool-input title="Twitch Subs" v-model="wData.settings.show_premium_icons"/>
-      <w-bool-input title="Twitch Resubs" v-model="wData.settings.show_bits_icons"/>
+      <w-bool-input title="Tips &amp; Donations" v-model="wData.settings.types.tips.enabled"/>
+      <w-bool-input title="Twitch Follows" v-model="wData.settings.types.twitch_follows.enabled"/>
+      <w-bool-input title="Twitch Bits/Cheers" v-model="wData.settings.types.twitch_bits.enabled"/>
+      <w-bool-input title="Twitch Subs" v-model="wData.settings.types.twitch_subs.enabled"/>
+      <w-bool-input title="Twitch Resubs" v-model="wData.settings.types.twitch_resubs.enabled"/>
     </w-form-group>
     <w-form-group title="Text">
-      <w-bool-input title="Show Text" v-model="wData.settings.show_bits_icons"/>
+      <w-bool-input title="Show Text" v-model="wData.settings.text.show"/>
     </w-form-group>
-    <w-form-group type="fontFamily" :value="wData.settings.font"/>
-    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <w-form-group type="fontFamily" :value="wData.settings.text.font"/>
+    <w-form-group title="Text Color" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
     <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
     <w-form-group title="Minimum Bits">
-      <w-number-input v-model="wData.settings.minimum_bits" :metadata="{ required: true, min: 1 }"/>
+      <w-number-input v-model="wData.settings.types.twitch_bits.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </w-form-group>
     <w-form-group title="Minimum Tips">
-      <w-number-input v-model="wData.settings.minimum_bits" :metadata="{ required: true, min: 1 }"/>
+      <w-number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </w-form-group>
     <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip, description: backgroundColorDescription }" />
     <w-form-group title="Twitch Follows">

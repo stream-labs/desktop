@@ -1,12 +1,7 @@
 import Vue from 'vue';
-import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from '../../services/persistent-stateful-service';
 import { Inject } from '../../util/injector';
-import { Component, Prop, Watch } from 'vue-property-decorator';
-import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../../services/stateful-service';
-import electron from 'electron';
+import { Component } from 'vue-property-decorator';
+import { authorizedHeaders } from 'util/requests';
 import { HostsService } from '../../services/hosts';
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -17,9 +12,8 @@ import {
   IPlatformService
 } from '../../services/platforms';
 import { CustomizationService } from '../../services/customization';
-import Raven from 'raven-js';
 import { AppService } from 'services/app';
-import { SceneCollectionsService } from 'services/scene-collections';
+import { UserService } from 'services/user';
 import {
   TipJarService,
   ITipJarData
@@ -38,16 +32,5 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   @Inject() hostsService: HostsService;
   @Inject() customizationService: CustomizationService;
   @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
-
-  mounted() {
-    this.getSettings();
-  }
-
-  getSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/widget/tipjar`;
-
-    return fetch(url);
-  }
+  @Inject() userService: UserService;
 }
