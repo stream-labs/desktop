@@ -23,6 +23,7 @@ import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
+import ChildWindow from 'components/windows/ChildWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 
@@ -135,8 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
       i18n,
       store,
       render: h => {
-        const componentName = windowsService.state[windowId].componentName;
+        if (windowId === 'child') return h(ChildWindow);
 
+        const componentName = windowsService.state[windowId].componentName;
         return h(windowsService.components[componentName]);
       }
     });
