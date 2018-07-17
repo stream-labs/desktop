@@ -13,9 +13,43 @@
       <w-bool-input title="Twitch Subs" v-model="wData.settings.show_premium_icons"/>
       <w-bool-input title="Twitch Resubs" v-model="wData.settings.show_bits_icons"/>
     </w-form-group>
+    <w-form-group title="Text">
+      <w-bool-input title="Show Text" v-model="wData.settings.show_bits_icons"/>
+    </w-form-group>
+    <w-form-group type="fontFamily" :value="wData.settings.font"/>
+    <w-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
+    <w-form-group title="Minimum Bits">
+      <w-number-input v-model="wData.settings.minimum_bits" :metadata="{ required: true, min: 1 }"/>
+    </w-form-group>
+    <w-form-group title="Minimum Tips">
+      <w-number-input v-model="wData.settings.minimum_bits" :metadata="{ required: true, min: 1 }"/>
+    </w-form-group>
+    <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip, description: backgroundColorDescription }" />
     <w-form-group title="Twitch Follows">
       <w-media-gallery-input />
     </w-form-group>
+    <w-form-group title="Tips over 0">
+      <w-media-gallery-input />
+    </w-form-group>
+    <w-form-group title="Tips over 3">
+      <w-media-gallery-input />
+    </w-form-group>
+    <w-form-group title="Tips over 20">
+      <w-media-gallery-input />
+    </w-form-group>
+  </div>
+
+  <div slot="HTML" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+  </div>
+
+  <div slot="CSS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+  </div>
+
+  <div slot="JS" >
+    <w-code-editor v-model="wData" :metadata="{ type: 'js' }"/>
   </div>
 </widget-window>
 </template>
