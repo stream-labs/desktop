@@ -384,7 +384,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.DonationGoal,
         WidgetType.FollowerGoal,
         WidgetType.ChatBox,
-        WidgetType.ViewerCount
+        WidgetType.ViewerCount,
+        WidgetType.StreamBoss
       ];
 
       if (isWidget) {
