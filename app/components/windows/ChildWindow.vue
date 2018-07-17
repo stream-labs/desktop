@@ -1,7 +1,7 @@
 <template>
 <div style="height: 100%">
     <!-- <keep-alive> helps to restore previous window from cache -->
-    <keep-alive v-if="componentExist">
+    <keep-alive v-if="options.isShown">
         <component :is="componentName"/>
     </keep-alive>
 </div>
