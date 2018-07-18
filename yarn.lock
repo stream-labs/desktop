@@ -6630,8 +6630,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@file:./node-libuiohook":
+"node-libuiohook@git+https://github.com/stream-labs/node-libuiohook.git":
   version "0.0.1"
+  resolved "git+https://github.com/stream-labs/node-libuiohook.git#ae16939b061934f392258c1b07eb4e7cdde13fed"
   dependencies:
     cmake-js "^3.4.1"
 

@@ -61,12 +61,6 @@ https://www.python.org/
 
 ## Installation
 
-First, make sure you have initialized git submodules:
-
-```
-git submodule update --init --recursive
-```
-
 Install all node modules via yarn:
 
 ```
