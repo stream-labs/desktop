@@ -33,6 +33,10 @@ export default class ChildWindow extends Vue {
   get componentName() {
     return this.options.componentName;
   }
+  //
+  // destroy() {
+  //   this.widowUpdatedSubscr.unsubscribe();
+  // }
 
   destroy() {
     this.widowUpdatedSubscr.unsubscribe();
