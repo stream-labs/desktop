@@ -99,8 +99,9 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     return this.source.getObsInput();
   }
 
-  getObsSceneItem(): obs.ISceneItem {
-    return this.getScene().getObsScene().findItem(this.obsSceneItemId);
+  getObsSceneItem(obsScene?: obs.IScene): obs.ISceneItem {
+    if (!obsScene) obsScene = this.getScene().getObsScene();
+    return obsScene.findItem(this.obsSceneItemId);
   }
 
   getSettings(): ISceneItemSettings {
@@ -111,10 +112,9 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     };
   }
 
-  setSettings(patch: IPartialSettings) {
-
+  setSettings(patch: IPartialSettings, scene?: obs.IScene) {
+    const obsSceneItem = this.getObsSceneItem(scene);
     // update only changed settings to reduce the amount of IPC calls
-    const obsSceneItem = this.getObsSceneItem();
     const changed = Utils.getChangedParams(this.sceneItemState, patch);
     const newSettings = merge({}, this.sceneItemState, patch);
 
@@ -150,7 +150,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
         // value between 0 and 360.
         const effectiveRotation = ((newSettings.transform.rotation % 360) + 360) % 360;
 
-        this.getObsSceneItem().rotation = effectiveRotation;
+        obsSceneItem.rotation = effectiveRotation;
         changed.transform.rotation = effectiveRotation;
       }
 
@@ -164,7 +164,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     }
 
     if (changed.visible !== void 0) {
-      this.getObsSceneItem().visible = newSettings.visible;
+      obsSceneItem.visible = newSettings.visible;
     }
 
     this.UPDATE({ sceneItemId: this.sceneItemId, ...changed });
@@ -238,8 +238,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
     });
   }
 
-  setTransform(transform: IPartialTransform) {
-    this.setSettings({ transform });
+  setTransform(transform: IPartialTransform, scene?: obs.IScene) {
+    this.setSettings({ transform }, scene);
   }
 
   resetTransform() {

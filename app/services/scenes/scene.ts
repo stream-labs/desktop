@@ -311,12 +311,14 @@ export class Scene implements ISceneApi {
       if (sourceFolder) sourceFolder.recalculateChildrenOrder();
     }
 
+    const obsScene = this.getObsScene();
+
     itemsToMove.forEach(item => {
       let currentIdx: number;
-      this.getObsScene().getItems().reverse().forEach((obsItem, idx) => {
+      obsScene.getItems().reverse().forEach((obsItem, idx) => {
         if (obsItem.id === item.obsSceneItemId) currentIdx = idx;
       });
-      this.getObsScene().moveItem(currentIdx, item.getItemIndex());
+      obsScene.moveItem(currentIdx, item.getItemIndex());
     });
   }
 

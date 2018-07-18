@@ -186,9 +186,12 @@ export class DragHandler {
     const deltaX = rect.x - this.draggedSource.transform.position.x;
     const deltaY = rect.y - this.draggedSource.transform.position.y;
 
+    // Optimization to reduce fetching scene multiple times later on
+    const obsScene = this.scenesService.activeScene.getObsScene();
+
     this.selectionService.getItems().forEach(item => {
       const pos = item.transform.position;
-      item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } });
+      item.setTransform({ position: { x: pos.x + deltaX, y: pos.y + deltaY } }, obsScene);
     });
   }
 
