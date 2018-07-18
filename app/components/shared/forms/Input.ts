@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
-import * as obs from '../../../../obs-api/obs-api';
+import * as obs from '../../../../obs-api';
 import {
   isListProperty,
   isEditableListProperty,
