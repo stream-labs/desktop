@@ -16,6 +16,7 @@ export interface ITipJarData extends IWidgetData {
     text: { color: string, font: string, show: boolean };
     text_size: number;
     custom_enabled: boolean;
+    custom_html_enabled: boolean;
     custom_html: string;
     custom_js: string;
     custom_css: string;
@@ -76,6 +77,11 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
   ];
 
   protected patchAfterFetch(data: ITipJarData): ITipJarData {
+    return data;
+  }
+
+  protected patchBeforeSend(data: ITipJarData): ITipJarData {
+    data.settings.custom_html_enabled = data.settings.custom_enabled;
     return data;
   }
 

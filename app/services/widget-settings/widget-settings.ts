@@ -109,7 +109,10 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     // patch fetched data to have the same data format
     if (data.settings.background) data.settings.background_color = data.settings.background.color;
     if (data.custom) data.custom_defaults = data.custom;
-    if (data.custom_html_enabled) data.custom_enabled = data.custom_html_enabled;
+    // Have to explicitly check if undefined here as it is a boolean value
+    if (data.settings.custom_html_enabled !== undefined) {
+      data.settings.custom_enabled = data.settings.custom_html_enabled;
+    }
     data.type = this.getWidgetType();
 
 
