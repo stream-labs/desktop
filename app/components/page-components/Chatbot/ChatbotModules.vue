@@ -1,6 +1,6 @@
 <template>
 <div>
-  Chatbot ModulesWS
+  Chatbot Modules
 </div>
 </template>
 

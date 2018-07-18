@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Vue from 'vue';
 import { Prop } from 'vue-property-decorator';
-import * as obs from '../../../../obs-api';
+import * as obs from '../../../../obs-api/obs-api';
 import {
   isListProperty,
   isEditableListProperty,
@@ -9,7 +9,7 @@ import {
   isTextProperty,
   isFontProperty,
   isPathProperty
-} from '../../../util/properties-type-guards';
+} from 'util/properties-type-guards';
 import { $t } from 'services/i18n';
 
 /**

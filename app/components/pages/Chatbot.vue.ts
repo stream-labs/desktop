@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import NavItem from 'components/shared/NavItem.vue';
-import NavMenu from 'components/shared/NavMenu.vue';
-import ChatbotModules from 'components/page-components/Chatbot/ChatbotModules.vue';
+import NavItem from '../shared/NavItem.vue';
+import NavMenu from '../shared/NavMenu.vue';
+import ChatbotModules from '../page-components/Chatbot/ChatbotModules.vue';
 
 @Component({
   components: {

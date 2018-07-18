@@ -6,9 +6,9 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IFormInput, IListInput, INumberInputValue, TFormData } from '../../components/shared/forms/Input';
-import Utils from 'services/utils';
-import { $t } from 'services/i18n';
+import { IFormInput, IListInput, INumberInputValue, TFormData } from 'components/shared/forms/Input';
+import Utils from '../utils';
+import { $t } from '../i18n';
 
 const LIVEDOCK_MIN_SIZE = 0.15;
 const LIVEDOCK_MAX_SIZE = 0.5;
