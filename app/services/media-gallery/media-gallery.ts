@@ -92,6 +92,7 @@ export class MediaGalleryService extends Service {
 
   async pickFile(): Promise<IMediaGalleryFile> {
     const promiseId = uuid();
+    console.log(promiseId);
     const promise = new Promise<IMediaGalleryFile> ((resolve, reject) => {
       this.promises[promiseId] = { resolve, reject };
     });
