@@ -110,7 +110,7 @@
     "babel-preset-es2015": "6.24.1",
     "babel-preset-stage-2": "6.24.1",
     "circular-dependency-plugin": "3.0.0",
-    "css-loader": "0.28.7",
+    "css-loader": "0.28.11",
     "devtron": "1.4.0",
     "electron": "2.0.5",
     "electron-builder": "20.22.0",
