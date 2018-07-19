@@ -257,9 +257,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/webdriverio@4.8.6":
-  version "4.8.6"
-  resolved "https://registry.yarnpkg.com/@types/webdriverio/-/webdriverio-4.8.6.tgz#4fc5786dee36b453f7f868f8532ad9d0de19ebef"
+"@types/webdriverio@4.10.3":
+  version "4.10.3"
+  resolved "https://registry.yarnpkg.com/@types/webdriverio/-/webdriverio-4.10.3.tgz#05861e9134ab41a693a42cd9bf4186593096f004"
   dependencies:
     "@types/node" "*"
 
