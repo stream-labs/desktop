@@ -121,7 +121,7 @@
     "eslint-plugin-jsx-a11y": "4.0.0",
     "eslint-plugin-react": "6.10.3",
     "eslint-plugin-vue": "2.1.0",
-    "file-loader": "1.1.10",
+    "file-loader": "1.1.11",
     "fuse.js": "3.2.1",
     "hyperform": "0.9.14",
     "js-yaml": "3.12.0",
