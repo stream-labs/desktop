@@ -260,9 +260,9 @@
   dependencies:
     "@types/node" "*"
 
-"@types/socket.io-client@1.4.31":
-  version "1.4.31"
-  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.31.tgz#86b8986409384a9ee1a74993a70822c36114dc79"
+"@types/socket.io-client@1.4.32":
+  version "1.4.32"
+  resolved "https://registry.yarnpkg.com/@types/socket.io-client/-/socket.io-client-1.4.32.tgz#988a65a0386c274b1c22a55377fab6a30789ac14"
 
 "@types/tough-cookie@*":
   version "2.3.3"
