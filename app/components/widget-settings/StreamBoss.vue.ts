@@ -6,14 +6,7 @@ import * as comps from 'components/shared/widget-inputs';
 import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
 import { $t } from 'services/i18n';
 import WForm from 'components/shared/widget-inputs/WForm.vue';
-import { IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
-
-interface IGoalCreateOptions {
-  title: string;
-  goal_amount: number;
-  manual_goal_amount: number;
-  ends_at: string;
-}
+import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
 
 @Component({
   components: {
@@ -29,11 +22,9 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
     form: WForm;
   };
 
-  streamBossCreateOptions = {
-    title: '',
-    goal_amount: 100,
-    manual_goal_amount: 0,
-    ends_at: ''
+  bossCreateOptions: IStreamBossCreateOptions = {
+    mode: 'fixed',
+    total_health: 4800
   };
 
   textColorTooltip = $t('A hex code for the base text color.');
@@ -43,9 +34,9 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
   }
 
   async saveGoal() {
-    // const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    // if (hasErrors) return;
-    // await this.save(this.goalCreateOptions);
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
+    await this.save(this.bossCreateOptions);
   }
 
 }

@@ -8,6 +8,7 @@ import {
 import { WidgetType } from 'services/widgets';
 import { Service } from 'services/service';
 import { Subject } from 'rxjs/Subject';
+import { IWInputMetadata } from 'components/shared/widget-inputs/WInput';
 
 
 
@@ -130,7 +131,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     return data;
   }
 
-  getMetadata(): Dictionary<any> {
+  getMetadata(): Dictionary<IWInputMetadata>  {
     return {};
   }
 

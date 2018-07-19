@@ -2,12 +2,13 @@ import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
-import WCodeInput, { IWCodeInputMetadata } from './WCodeInput.vue';
+import WCodeInput from './WCodeInput.vue';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { Inject } from '../../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n';
 import WBoolInput from './WBoolInput.vue';
+import { IWInputMetadata } from './WInput';
 
 
 @Component({
@@ -21,7 +22,7 @@ export default class WCodeEditor extends Vue {
   @Inject() private widgetsService: WidgetsService;
 
   @Prop({ default: () => ({ type: 'html' }) })
-  metadata: IWCodeInputMetadata;
+  metadata: IWInputMetadata;
 
   @Prop()
   value: IWidgetData;
