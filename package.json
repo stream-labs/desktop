@@ -91,7 +91,7 @@
   },
   "devDependencies": {
     "7zip-bin": "2.4.1",
-    "@types/archiver": "2.0.1",
+    "@types/archiver": "2.1.2",
     "@types/lodash": "4.14.112",
     "@types/node": "8.10.21",
     "@types/request": "2.47.1",
@@ -100,7 +100,7 @@
     "@types/uuid": "3.4.3",
     "@types/webdriverio": "4.8.6",
     "@xkeshi/vue-qrcode": "0.3.0",
-    "archiver": "2.0.3",
+    "archiver": "2.1.1",
     "ava": "0.25.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.6",
