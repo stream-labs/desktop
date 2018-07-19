@@ -106,7 +106,7 @@
     "babel-eslint": "8.0.3",
     "babel-loader": "7.1.3",
     "babel-plugin-transform-class-properties": "6.24.1",
-    "babel-plugin-transform-decorators-legacy": "1.3.4",
+    "babel-plugin-transform-decorators-legacy": "1.3.5",
     "babel-preset-es2015": "6.24.1",
     "babel-preset-stage-2": "6.24.1",
     "circular-dependency-plugin": "3.0.0",
