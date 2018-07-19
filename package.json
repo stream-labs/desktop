@@ -90,7 +90,7 @@
     "vue-toasted": "^1.1.24"
   },
   "devDependencies": {
-    "7zip-bin": "2.0.4",
+    "7zip-bin": "2.4.1",
     "@types/archiver": "2.0.1",
     "@types/lodash": "4.14.64",
     "@types/node": "8.0.53",
