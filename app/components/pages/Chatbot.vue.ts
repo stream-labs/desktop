@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import NavItem from '../shared/NavItem.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import ChatbotModules from '../page-components/Chatbot/ChatbotModules.vue';
@@ -8,11 +8,6 @@ import ChatbotModTools from '../page-components/Chatbot/ChatbotModTools.vue';
 import ChatbotTimers from '../page-components/Chatbot/ChatbotTimers.vue';
 import { ChatbotApiService } from 'services/chatbot-api';
 import { Inject } from 'util/injector';
-
-interface AuthResponse {
-  api_token: string;
-  socket_token: string;
-}
 
 @Component({
   components: {
@@ -27,6 +22,9 @@ interface AuthResponse {
 export default class Chatbot extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
 
+  //
+  // Default State
+  //
   icons: Dictionary<string> = {
     Modules: 'icon-widgets',
     Commands: 'icon-suggestions',
@@ -40,7 +38,7 @@ export default class Chatbot extends Vue {
 
   mounted() {
     this.chatbotApiService.logIn()
-      .then((response: AuthResponse) => {
+      .then((response) => {
         // user has authenticated chatbot api,
         // opening commands tab which will internally call
         // chatbotApiService interally to fetch chatbots
