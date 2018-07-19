@@ -1,21 +1,13 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { WInput, IWInputMetadata } from './WInput';
-
-interface IWImagePicker extends IWInputMetadata {
-  src: string;
-  images: string[];
-}
+import { IListInput } from '../forms/Input';
 
 @Component({})
-export default class WImagePicker extends WInput<string, IWImagePicker> {
+export default class WImagePicker extends WInput<string, IListInput<string>> {
 
   @Prop({ default: '' })
   value: string;
 
   @Prop({ default: {} })
-  metadata: IWImagePicker;
-
-  updateValue(value: string) {
-    this.emitInput(value);
-  }
+  metadata: IListInput<string>;
 }

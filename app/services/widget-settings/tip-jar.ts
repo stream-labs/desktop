@@ -10,6 +10,7 @@ export interface ITipJarData extends IWidgetData {
     url: string;
     simulate: string;
   };
+  jars: string[];
   settings: {
     theme: 'twitch';
     background_color: string;
@@ -46,7 +47,7 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
   }
 
   getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/tipjar/v1/${this.getWidgetToken()}?simulate=1`;
+    return `https://${ this.getHost() }/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`;
   }
 
   getDataUrl() {
@@ -80,8 +81,8 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
     return data;
   }
 
-  protected patchBeforeSend(data: ITipJarData): ITipJarData {
-    data.settings.custom_html_enabled = data.settings.custom_enabled;
+  protected patchBeforeSend(data: ITipJarData['settings']): ITipJarData['settings'] {
+    data.custom_html_enabled = data.custom_enabled;
     return data;
   }
 

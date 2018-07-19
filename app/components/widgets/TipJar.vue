@@ -15,7 +15,7 @@
     </w-form-group>
     <w-form-group title="Jar Image">
       <w-image-picker
-        :metadata="{ src: jarSrc, images: wData.jars }"
+        :metadata="{ options: inputOptions }"
         v-model="wData.settings.jar.type"
       />
     </w-form-group>

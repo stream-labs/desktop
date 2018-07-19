@@ -1,13 +1,13 @@
 <template>
 <div class="container">
   <div
-    v-for="image in metadata.images"
-    :key="`${image}`"
+    v-for="option in metadata.options"
+    :key="option.value"
     class="image-container radius"
-    :class="[value === image ? 'active' : '']"
-    @click="updateValue(image)"
+    :class="[value === option.value ? 'active' : '']"
+    @click="emitInput(option.value)"
   >
-    <img :src="`${metadata.src}${image}.png`" >
+    <img :src="option.description" >
   </div>
 </div>
 </template>
@@ -45,7 +45,7 @@
     transform: translate(-50%, -50%);
   }
 
-  .active {
+  &.active {
     background-color: @teal-light-opac;
     border-color: @teal-med-opac;
   }
@@ -57,6 +57,9 @@
 
     &:hover {
       border-color: @teal-light-opac;
+    }
+    &.active {
+      border-color: @teal-med-opac;
     }
   }
 }
