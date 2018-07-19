@@ -1,7 +1,7 @@
 <template>
 <div>
-  Chatbot Mod Tools
+  Chatbot Mod Toolssss
 </div>
 </template>
 
-<script lang='ts' src="./ChatbotTimers.vue.ts"></script>
+<script lang='ts' src="./ChatbotModTools.vue.ts"></script>

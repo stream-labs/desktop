@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
 })
-export default class ChatbotModules extends Vue {
+export default class ChatbotTimers extends Vue {
   data() {
     return {
     };

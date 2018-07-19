@@ -13,10 +13,14 @@
         </NavItem>
       </NavMenu>
     </div>
-    <div class="small-10">
-      <ChatbotModules
-        v-if="selectedTab === 'Modules'"
-      />
+    <div v-if="!authenticated">
+      <h1>Connecting to Chatbot...</h1>
+    </div>
+    <div v-else  class="small-10">
+      <ChatbotModules v-if="selectedTab === 'Modules'"/>
+      <ChatbotCommands v-if="selectedTab === 'Commands'"/>
+      <ChatbotTimers v-if="selectedTab === 'Timers'"/>
+      <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
     </div>
   </div>
 </template>
