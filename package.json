@@ -122,7 +122,7 @@
     "eslint-plugin-react": "6.10.3",
     "eslint-plugin-vue": "2.1.0",
     "file-loader": "1.1.10",
-    "fuse.js": "3.2.0",
+    "fuse.js": "3.2.1",
     "hyperform": "0.9.14",
     "js-yaml": "3.8.3",
     "less": "2.7.2",
