@@ -33,16 +33,20 @@
     </w-form-group>
     <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
     <w-form-group title="Twitch Follows">
-      <w-media-gallery-input />
+      <w-media-gallery-input
+        :metadata="{ fileName: fileNameFromHref(wData.settings.types.twitch_follows.image_src), clearImage: wData.defaultImage.twitch_account }"
+        v-model="wData.settings.types.twitch_follows.image_src"
+      />
     </w-form-group>
-    <w-form-group title="Tips over 0">
-      <w-media-gallery-input />
-    </w-form-group>
-    <w-form-group title="Tips over 3">
-      <w-media-gallery-input />
-    </w-form-group>
-    <w-form-group title="Tips over 20">
-      <w-media-gallery-input />
+    <w-form-group
+      v-for="tier in wData.settings.types.tips.tiers"
+      :key="tier.minimum_amount"
+      :title="`Tips over ${tier.minimum_amount}`"
+    >
+      <w-media-gallery-input
+        :metadata="{ fileName: fileNameFromHref(tier.image_src), clearImage: tier.clear_image }"
+        v-model="tier.image_src"
+      />
     </w-form-group>
   </div>
 

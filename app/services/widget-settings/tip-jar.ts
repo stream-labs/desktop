@@ -4,12 +4,18 @@ import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
 import { WidgetType } from 'services/widgets';
 
 
+interface ITipDarTierData {
+  clear_image: string;
+  image_src: string;
+  minimum_amount: number;
+}
 
 export interface ITipJarData extends IWidgetData {
   widget: {
     url: string;
     simulate: string;
   };
+  defaultImage: { twitch_account: string };
   jars: string[];
   settings: {
     theme: 'twitch';
@@ -22,9 +28,9 @@ export interface ITipJarData extends IWidgetData {
     custom_js: string;
     custom_css: string;
     types: {
-      tips: { enabled: boolean, minimum_amount?: number, tiers: any[] },
+      tips: { enabled: boolean, minimum_amount?: number, tiers: ITipDarTierData[] },
       twitch_bits: { enabled: boolean, minimum_amount?: number },
-      twitch_follows: { enabled: boolean, minimum_amount?: number },
+      twitch_follows: { enabled: boolean, image_src?: string },
       twitch_resubs: { enabled: boolean, minimum_amount?: number },
       twitch_subs: { enabled: boolean, minimum_amount?: number }
     };

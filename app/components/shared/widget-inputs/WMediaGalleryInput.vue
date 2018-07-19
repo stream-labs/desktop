@@ -1,13 +1,14 @@
 <template>
   <div>
     <div class="media-box radius">
+      <img :src="value || metadata.clearImage" >
       <div class="footer">
-        <span>Default</span>
+        <span>{{ fileName || 'Default' }}</span>
         <div>
           <span @click="updateValue" class="change-media">Change Media</span>
           <i class="icon-link" />
-          <i class="fa fa-search-plus" />
-          <i class="icon-close" />
+          <i @click="previewImage" class="fa fa-search-plus" />
+          <i @click="clearImage" class="icon-close" />
         </div>
       </div>
     </div>
@@ -24,6 +25,15 @@
   width: 100%;
   height: 120px;
   background-color: @day-secondary;
+
+  img {
+    height: 110px;
+    width: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .footer {
@@ -45,10 +55,6 @@
 
   i {
     margin-left: 10px;
-
-    &:hover {
-      cursor: pointer;
-    }
   }
 
   .icon-close {
@@ -56,13 +62,17 @@
   }
 }
 
+.change-media, i {
+  transition: 0.1s all linear;
+  &:hover {
+    cursor: pointer;
+    color: @white;
+  }
+}
+
 .change-media {
   text-transform: uppercase;
   color: @night-text;
-
-  &:hover {
-    cursor: pointer;
-  }
 }
 
 .night-theme {

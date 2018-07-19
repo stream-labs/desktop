@@ -27,6 +27,11 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   jarSrc = 'https://cdn.streamlabs.com/static/tip-jar/jars/glass-';
   inputOptions: { description: string, value: string }[] = [];
 
+  fileNameFromHref(href: string) {
+    if (!href) return null;
+    return decodeURIComponent(href.split(/[\\/]/).pop());
+  }
+
   afterFetch() {
     this.inputOptions = this.wData.jars.map((jar: string) => ({ description: `${this.jarSrc}${jar}.png`, value: jar }));
   }
