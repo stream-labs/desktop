@@ -2,5 +2,6 @@
   "extends": [
     "config:base"
   ],
-  "prConcurrentLimit": 3
+  "prConcurrentLimit": 3,
+  "labels": ["renovate"]
 }
