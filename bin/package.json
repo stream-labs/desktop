@@ -7,7 +7,7 @@
   "dependencies": {},
   "devDependencies": {
     "7zip-bin": "2.4.1",
-    "aws-sdk": "2.159.0",
+    "aws-sdk": "2.277.1",
     "cmake-js": "3.5.0",
     "colors": "1.1.2",
     "inquirer": "4.0.1",
