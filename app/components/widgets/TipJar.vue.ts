@@ -23,4 +23,6 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   backgroundColorDescription = $t(
     'Note: This background color is for preview purposes only. It will not be shown in your stream.'
   );
+
+  jarSrc = 'https://cdn.streamlabs.com/static/tip-jar/jars/glass-';
 }

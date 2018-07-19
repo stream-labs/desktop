@@ -10,3 +10,4 @@ export { default as WTextAreaInput } from './WTextAreaInput.vue';
 export { default as WBoolInput } from './WBoolInput.vue';
 export { default as WCodeInput } from './WCodeInput.vue';
 export { default as WMediaGalleryInput } from './WMediaGalleryInput.vue';
+export { default as WImagePicker } from './WImagePicker.vue';

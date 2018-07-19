@@ -16,7 +16,7 @@
 
 <script lang="ts" src="./WMediaGalleryInput.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../styles/index";
 
 .media-box {

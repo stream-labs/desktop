@@ -13,6 +13,12 @@
       <w-bool-input title="Twitch Subs" v-model="wData.settings.types.twitch_subs.enabled"/>
       <w-bool-input title="Twitch Resubs" v-model="wData.settings.types.twitch_resubs.enabled"/>
     </w-form-group>
+    <w-form-group title="Jar Image">
+      <w-image-picker
+        :metadata="{ src: jarSrc, images: wData.jars }"
+        v-model="wData.settings.jar.type"
+      />
+    </w-form-group>
     <w-form-group title="Text">
       <w-bool-input title="Show Text" v-model="wData.settings.text.show"/>
     </w-form-group>
