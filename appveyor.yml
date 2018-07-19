@@ -2,7 +2,6 @@ build: off
 
 install:
   - ps: Install-Product node 8
-  - git submodule update --init --recursive
   - yarn install
   - yarn install-plugins
   - yarn compile:ci

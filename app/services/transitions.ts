@@ -180,7 +180,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   createStudioModeTransition() {
     this.studioModeTransition = obs.TransitionFactory.create(
       ETransitionType.Cut,
-      'Studio Transition'
+      `studio_transition_${uuid()}`
     );
   }
 
@@ -192,6 +192,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (this.sceneDuplicate) {
       this.sceneDuplicate.release();
       this.sceneDuplicate = null;
+    }
+  }
+
+  get studioTransitionName() {
+    if (this.studioModeTransition) {
+      return this.studioModeTransition.name;
     }
   }
 
