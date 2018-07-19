@@ -20,6 +20,7 @@ import {
   Source,
   TPropertiesManager
 } from './index';
+import uuid from 'uuid/v4';
 
 
 
@@ -135,9 +136,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string =
-      options.sourceId ||
-      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
+    const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
