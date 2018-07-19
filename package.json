@@ -140,7 +140,7 @@
     "sockjs": "0.3.19",
     "sockjs-client": "1.1.5",
     "spectron": "3.8.0",
-    "style-loader": "0.19.1",
+    "style-loader": "0.21.0",
     "traverse": "0.6.6",
     "ts-loader": "4.0.0",
     "tslint": "5.8.0",
