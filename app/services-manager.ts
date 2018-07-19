@@ -79,6 +79,7 @@ import { ChatBoxService } from 'services/widget-settings/chat-box';
 import { DonationGoalService } from 'services/widget-settings/donation-goal';
 import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 import { ViewerCountService } from 'services/widget-settings/viewer-count';
+import uuid from 'uuid/v4';
 
 const { ipcRenderer } = electron;
 
@@ -370,7 +371,7 @@ export class ServicesManager extends Service {
     const isPromise = !!(responsePayload && responsePayload.then);
 
     if (isPromise) {
-      const promiseId = ipcRenderer.sendSync('getUniqueId');
+      const promiseId = uuid();
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
