@@ -1,13 +1,14 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { WInput } from './WInput';
+import { IWInputMetadata, WInput } from './WInput';
 
-interface IWTextMetadata {
+interface IWTextMetadata extends IWInputMetadata {
   placeholder: string;
   validate: string;
+  max: number;
+  dateFormat: string;
 }
 
-@Component({
-})
+@Component({})
 export default class WText extends WInput<string, IWTextMetadata> {
 
   @Prop()
@@ -16,5 +17,12 @@ export default class WText extends WInput<string, IWTextMetadata> {
   @Prop({ default: {} })
   metadata: IWTextMetadata;
 
+  getValidations() {
+    return {
+      ...super.getValidations(),
+      date_format:  this.options.dateFormat,
+      max: this.options.max
+    };
+  }
 
 }

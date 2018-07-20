@@ -1,8 +1,13 @@
 import { GenericGoalService } from './generic-goal';
+import { WidgetType } from 'services/widgets';
+import { CODE_EDITOR_TABS } from 'services/widget-settings/widget-settings';
 
 
 export class FollowerGoalService extends GenericGoalService {
 
+  getWidgetType() {
+    return WidgetType.FollowerGoal;
+  }
 
   protected tabs = [
     {
@@ -12,7 +17,9 @@ export class FollowerGoalService extends GenericGoalService {
     },
     {
       name: 'settings',
-    }
+    },
+
+    ...CODE_EDITOR_TABS
   ];
 
   getVersion() {
@@ -23,7 +30,7 @@ export class FollowerGoalService extends GenericGoalService {
     return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal/settings`;
   }
 
-  getWidgetUrl() {
+  getPreviewUrl() {
     return `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`;
   }
 

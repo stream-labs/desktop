@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
-import { IListOption, setupSourceDefaults, TObsValue } from 'components/shared/forms/Input';
+import { IListOption, setupConfigurableDefaults, TObsValue } from 'components/shared/forms/Input';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -20,6 +20,7 @@ import {
   Source,
   TPropertiesManager
 } from './index';
+import uuid from 'uuid/v4';
 
 
 
@@ -29,6 +30,7 @@ const { ipcRenderer } = electron;
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
+const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
@@ -101,6 +103,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
+      async: false,
       doNotDuplicate: false,
 
       // Unscaled width and height
@@ -133,9 +136,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string =
-      options.sourceId ||
-      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
+    const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
@@ -172,7 +173,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       type: managerType
     };
 
-    if (source.hasProps()) setupSourceDefaults(obsInput);
+    if (source.hasProps()) setupConfigurableDefaults(obsInput);
     this.sourceAdded.next(source.sourceState);
   }
 
@@ -319,10 +320,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private updateSourceFlags(source: ISource, flags: number, doNotEmit? : boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
+    const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }
@@ -378,11 +380,13 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       const source = this.getSource(sourceId);
       const isWidget = source.getPropertiesManagerType() === 'widget';
 
+      // show a custom component for widgets below
       const widgetsWhitelist = [
         WidgetType.BitGoal,
         WidgetType.DonationGoal,
         WidgetType.FollowerGoal,
-        WidgetType.ChatBox
+        WidgetType.ChatBox,
+        WidgetType.ViewerCount
       ];
 
       if (isWidget) {

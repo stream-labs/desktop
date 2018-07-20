@@ -267,7 +267,7 @@ function startApp() {
 
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
-    //
+
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);
@@ -494,11 +494,6 @@ ipcMain.on('obs-apiCall', (event, data) => {
   }
 
   event.returnValue = retVal;
-});
-
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
 });
 
 ipcMain.on('restartApp', () => {

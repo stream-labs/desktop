@@ -15,11 +15,10 @@ import {
 import { SourcesService, ISource } from 'services/sources';
 import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
-import { Inject } from '../../util/injector';
-import * as obs from '../obs-api';
-import namingHelpers from '../../util/NamingHelpers';
-import { $t } from 'services/i18n';
-const { ipcRenderer } = electron;
+import { Inject } from 'util/injector';
+import * as obs from 'services/obs-api';
+import namingHelpers from 'util/NamingHelpers';
+import uuid from 'uuid/v4';
 
 export class ScenesService extends StatefulService<IScenesState> implements IScenesServiceApi {
 
@@ -49,7 +48,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
       nodes: []
     });
     this.state.displayOrder.push(id);
-    this.state.activeSceneId = this.state.activeSceneId || id;
+    this.state.activeSceneId = this.state.activeSceneId;
   }
 
   @mutation()
@@ -72,7 +71,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
   createScene(name: string, options: ISceneCreateOptions = {}) {
     // Get an id to identify the scene on the frontend
-    const id = options.sceneId || ('scene_' + ipcRenderer.sendSync('getUniqueId'));
+    const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
     const obsScene = obs.SceneFactory.create(id);
     this.sourcesService.addSource(obsScene.source, name);
@@ -144,9 +143,10 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const scene = this.getScene(id);
     if (!scene) return false;
 
-    const obsScene = scene.getObsScene();
+    const activeScene = this.activeScene;
 
-    this.transitionsService.transitionTo(obsScene);
+    this.transitionsService.transition(activeScene && activeScene.id, scene.id);
+
     this.MAKE_SCENE_ACTIVE(id);
     this.sceneSwitched.next(scene.getModel());
     return true;

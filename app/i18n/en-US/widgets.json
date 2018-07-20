@@ -21,5 +21,9 @@
   "Subscription": "Subscription",
   "Donation": "Donation",
   "Bits": "Bits",
-  "Host": "Host"
+  "Host": "Host",
+  "The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.": "The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.",
+  "A hex code for the base text color.": "A hex code for the base text color.",
+  "A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.": "A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.",
+  "Note: This background color is for preview purposes only. It will not be shown in your stream.": "Note: This background color is for preview purposes only. It will not be shown in your stream."
 }

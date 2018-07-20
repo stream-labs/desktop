@@ -1,3 +1,5 @@
+/// <reference path="../vendor/toasted.d.ts" />
+
 // all global interfaces here
 
 interface Dictionary<TItemType> {
@@ -53,6 +55,8 @@ declare module 'vuedraggable';
 declare module 'font-manager';
 declare module 'vue-codemirror';
 declare module 'recursive-readdir';
+declare module 'vue-toasted';
+declare module 'hyperform';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

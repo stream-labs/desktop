@@ -25,6 +25,7 @@ export class Source implements ISourceApi {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
@@ -47,6 +48,7 @@ export class Source implements ISourceApi {
 
   updateSettings(settings: Dictionary<any>) {
     this.getObsInput().update(settings);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
 
@@ -123,6 +125,7 @@ export class Source implements ISourceApi {
   setPropertiesFormData(properties: TFormData) {
     const manager = this.sourcesService.propertiesManagers[this.sourceId].manager;
     manager.setPropertiesFormData(properties);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
 

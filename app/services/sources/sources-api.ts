@@ -9,6 +9,7 @@ export interface ISource extends IResource {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
@@ -49,6 +50,7 @@ export interface ISourcesServiceApi {
     settings?: Dictionary<any>,
     options?: ISourceCreateOptions
   ): ISourceApi;
+  removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
   getAvailableSourcesTypesList(): IListOption<TSourceType>[];
   getSources(): ISourceApi[];
