@@ -8,7 +8,7 @@
     </h4>
     <div>
       <i
-        class="icon-settings icon-btn"
+        class="icon-settings icon-button"
         @click="showAdvancedSettings()"
         v-tooltip.bottom="advancedSettingsTooltip"/>
     </div>

@@ -11,10 +11,10 @@
       <NavMenu v-model="selectedFilterName" class="side-menu">
         <div class="controls">
           <i
-            class="icon-add icon-btn"
+            class="icon-add icon-button"
             @click="addFilter"></i>
           <i
-            class="icon-subtract icon-btn"
+            class="icon-subtract icon-button"
             v-if="selectedFilterName"
             @click="removeFilter"></i>
         </div>
@@ -55,14 +55,15 @@
 
 <script lang="ts" src="./SourceFilters.vue.ts"></script>
 
-<style scoped>
+<style lang="less" scoped>
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
+@import "../../styles/index";
 
 .modal-container--side-nav {
   padding: 20px;
 }
 
-.modal--side-nav >>> .sl-vue-tree-toggle {
+.modal--side-nav > .sl-vue-tree-toggle {
   display: none;
 }
 

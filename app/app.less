@@ -1,7 +1,13 @@
 @import "./styles/index";
 
 body {
-  color: @navy;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 :not(input):not(textarea),
@@ -13,11 +19,7 @@ body {
 
 .main {
   background: @white;
-}
-
-a {
-  .transition;
-  text-decoration: underline;
+  color: @day-paragraph;
 }
 
 // Layout
@@ -47,22 +49,25 @@ h4 {
 }
 
 .label--essential {
-  background: @purple;
+  background: @secondary;
   .radius;
-  .semibold;
-  text-transform: uppercase;
-  font-size: 9px;
-  color: white;
-  letter-spacing: .5px;
+  .weight--medium;
+  font-size: 12px;
+  color: @white;
   padding: 0px 4px;
   margin-left: 10px;
   line-height: 16px
 }
 
+a,
 .link {
-  .semibold;
-  color: @grey;
   .transition;
+  text-decoration: underline;
+  .weight--medium;
+}
+
+.link {
+  color: @grey;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -73,7 +78,7 @@ h4 {
 
   .fa,
   i {
-    margin-right: 6px;
+    margin-right: 8px;
     font-size: 15px;
   }
 }
@@ -90,8 +95,9 @@ h4 {
 }
 
 .link--uppercase {
+  .link;
   text-transform: uppercase;
-  letter-spacing: .7px;
+  .letter-spacing;
   font-size: 12px;
 }
 
@@ -208,41 +214,39 @@ h4 {
 .tabs {
   background: transparent;
   padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
 }
 
 .tab-button {
   border-bottom: 1px solid transparent;
   height: 54px;
   margin-right: 20px;
-  text-transform: uppercase;
-  font-size: 12px;
-  .semibold;
-  letter-spacing: .7px;
-  color: @grey;
-  .transition;
+  .link--uppercase;
 
   .fa,
   i {
-    margin-right: 4px;
+    margin-right: 8px;
     font-size: 15px;
     vertical-align: middle;
+    color: @icon;
+  }
+
+  &:focus {
+    outline: 0;
   }
 
   &.active,
   &:hover {
-    border-color: @navy;
-    color: @navy;
+    border-color: @day-title;
+    color: @day-title;
 
     .fa,
     i {
-      color: @navy;
+      color: @day-title;
     }
   }
-}
-
-// TODO: eventuall use LESS variables from twitchalerts
-.bgColor-teal {
-  background-color: @teal;
 }
 
 // TODO: add "disable" and "enable" styles for form controls to styleguide
@@ -253,18 +257,12 @@ h4 {
     &.checkbox input:checked~label,
     &.checkbox input~label {
       &:before {
-        border-color: gray;
+        border-color: @day-input-border;
         background: transparent;
       }
 
-      &:after {color: gray}
+      &:after {color: @day-paragraph}
     }
-  }
-}
-
-.checkbox {
-  label {
-    text-transform: none;
   }
 }
 
@@ -348,18 +346,18 @@ th {
 }
 
 .v--modal {
-  background-color: @day-primary;
+  background-color: @day-bg;
 }
 
 // Night theme rules
 .night-theme {
   &.main {
-    background: @night-primary;
-    color: @night-text;
+    background: @night-bg;
+    color: @night-paragraph;
   }
 
   .v--modal {
-    background-color: @night-primary;
+    background-color: @night-bg;
   }
 
   a {

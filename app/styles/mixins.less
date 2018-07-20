@@ -32,6 +32,11 @@
   .aspect-ratio(16,9);
 }
 
+// Backgrounds
+.bg--teal {
+  background-color: @teal;
+}
+
 // Box shadows
 .shadow {
   box-shadow: 0 6px 20px rgba(0,0,0,.2);
@@ -39,21 +44,26 @@
 
 // Border radius
 .radius {
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 // Borders
 .border {
-  border: 1px solid @day-border;
+  border: 1px solid @day-section;
 }
 
 .night-border {
-  border: 1px solid @night-border;
+  border: 1px solid @night-section;
 }
 
 // Typography
 .normal {
   font-weight: 400;
+}
+
+.weight--medium {
+  font-weight: 500;
+  src: local('Roboto Medium');
 }
 
 .semibold {
@@ -74,7 +84,7 @@
 }
 
 .letter-spacing {
-  letter-spacing: .8px;
+  letter-spacing: .6px;
 }
 
 // Hovers
@@ -89,7 +99,7 @@
 }
 
 .icon--margin {
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
 // Paddings

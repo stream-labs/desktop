@@ -1,0 +1,64 @@
+.sl-vue-tree-toggle {
+  width: 16px;
+  margin-right: 8px;
+  display: inline-block;
+
+  i {
+    font-size: 7px;
+    font-weight: 700;
+    color: @day-title;
+    text-align: center;
+  }
+}
+
+.sl-vue-tree.sl-vue-tree-root {
+  background-color: @day-secondary!important;
+  border-color: @day-section!important;
+  color: @day-title!important;
+}
+
+.sl-vue-tree-selected>.sl-vue-tree-node-item {
+  border-color: @day-section!important;
+  background-color: @white!important;
+  color: @day-paragraph!important;
+}
+
+.sl-vue-tree-node-item {
+  color: @day-paragraph!important;
+
+  &:hover {
+    color: @day-paragraph;
+  }
+}
+
+.sl-vue-tree-cursor {
+  border-color: @navy;
+}
+
+.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+  border-color: @navy;
+}
+
+.night-theme {
+  .sl-vue-tree.sl-vue-tree-root {
+    background-color: @night-secondary!important;
+    border-color: @night-secondary!important;
+    color: @grey!important;
+  }
+
+  .sl-vue-tree-selected>.sl-vue-tree-node-item {
+    background-color: @night-hover!important;
+    border-color: transparent!important;
+    color: @white!important;
+  }
+
+  .sl-vue-tree-node-item {
+    color: @night-paragraph!important;
+  }
+
+  .sl-vue-tree-toggle {
+    i {
+      color: @grey;
+    }
+  }
+}

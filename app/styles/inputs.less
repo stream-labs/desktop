@@ -40,7 +40,8 @@
 
   &:after {
     content: '\f002';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
     line-height: 36px;
   }
@@ -76,10 +77,18 @@ textarea {
 
 .checkbox {
   margin-bottom: 0;
+  input:checked~label {
+    &:after {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      content: '\f00c';
+    }
+  }
 
   label {
     line-height: 20px;
     cursor: pointer;
+    text-transform: none;
 
     &:before {
       background: transparent;
@@ -117,7 +126,8 @@ textarea {
   position: relative;
 
   &:before {
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: '\f078';
     border: none;
     font-size: 9px;

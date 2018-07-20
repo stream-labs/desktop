@@ -4,7 +4,7 @@
   :class="{ collapsed, 'live-dock--left': onLeft }"
   :style="{ width: (liveDockSize * 100) + '%' }">
   <div
-    class="live-dock-chevron icon-btn"
+    class="live-dock-chevron icon-button"
     v-if="collapsed"
     @click="expand">
     <i :class="{
@@ -18,7 +18,7 @@
       :style="liveDockStyles"
       class="live-dock-expanded-contents">
       <div
-        class="live-dock-chevron icon-btn"
+        class="live-dock-chevron icon-button"
         @click="collapse">
         <i
           :class="{
@@ -204,7 +204,7 @@
 .live-dock-chat--offline {
   height: 100%;
 
-  img{ 
+  img{
     width: 75%;
   }
 }

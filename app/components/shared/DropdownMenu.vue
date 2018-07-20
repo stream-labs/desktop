@@ -1,8 +1,8 @@
 <template>
-  <popper trigger="click" :options="{ placement: 'bottom-start' }">
+  <popper class="dropdown-menu" trigger="click" :options="{ placement: 'bottom-start' }">
 
-    <div class="popper dropdown-menu">
-      <slot></slot>
+    <div class="popper dropdown-menu__menu">
+      <slot class="popper dropdown-menu__menu"></slot>
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
@@ -16,8 +16,11 @@
 
 <style lang="less">
 @import "../../styles/index";
-
 .dropdown-menu {
+  position: relative;
+}
+
+.dropdown-menu__menu {
   position: absolute;
   top: 20px!important;
   background-color: @day-primary;
@@ -34,14 +37,17 @@
   align-items: center;
   text-transform: uppercase;
   font-size: 13px;
-  .semibold;
+  .weight--medium;
   color: @day-title;
-  letter-spacing: .7px;
 
   .fa,
   i {
-    margin-left: 6px;
+    margin-left: 8px;
     font-size: 6px;
+  }
+
+  &:focus {
+    outline: 0;
   }
 }
 
@@ -65,7 +71,7 @@
 }
 
 .night-theme {
-  .dropdown-menu {
+  .dropdown-menu__menu {
     background-color: @night-primary;
     border-color: @night-secondary;
   }

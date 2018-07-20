@@ -7,7 +7,7 @@
     </multiselect>
   </div>
   <div class="w-tooltip">
-    <i class="icon-question icon-btn" v-tooltip="tooltipText" />
+    <i class="icon-question icon-button" v-tooltip="tooltipText" />
   </div>
 </div>
 </template>
