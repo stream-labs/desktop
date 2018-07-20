@@ -1,44 +1,30 @@
-import { CODE_EDITOR_TABS, IWidgetData, WidgetSettingsService } from './widget-settings';
-import { IWSliderMetadata } from 'components/shared/widget-inputs/WSliderInput.vue';
-import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
+import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
+import { metadata } from 'components/shared/widget-inputs/WInput';
 
-
+export interface IChatBoxSettings extends IWidgetSettings {
+  theme: string;
+  background_color: string;
+  text_color: string;
+  show_moderator_icons: boolean;
+  show_subscriber_icons: boolean;
+  show_turbo_icons: boolean;
+  show_premium_icons: boolean;
+  show_bits_icons: boolean;
+  show_coin_icons: boolean;
+  show_bttv_emotes: boolean;
+  show_franker_emotes: boolean;
+  show_smf_emotes: boolean;
+  always_show_messages: boolean;
+  hide_common_chat_bots: boolean;
+  message_hide_delay: number;
+  text_size: 14;
+  muted_chatters: string;
+  hide_commands: boolean;
+}
 
 export interface IChatBoxData extends IWidgetData {
-  widget: {
-    url: string;
-    simulate: string;
-  };
-  settings: {
-    theme: 'twitch';
-    background_color: string;
-    text_color: string;
-    show_moderator_icons: boolean;
-    show_subscriber_icons: boolean;
-    show_turbo_icons: boolean;
-    show_premium_icons: boolean;
-    show_bits_icons: boolean;
-    show_coin_icons: boolean;
-    show_bttv_emotes: boolean;
-    show_franker_emotes: boolean;
-    show_smf_emotes: boolean;
-    always_show_messages: boolean;
-    hide_common_chat_bots: boolean;
-    message_hide_delay: number;
-    text_size: 14;
-    muted_chatters: string;
-    hide_commands: boolean;
-    custom_enabled: boolean;
-    custom_html: string;
-    custom_js: string;
-    custom_css: string;
-  };
-  custom_defaults: {
-    html: string;
-    js: string;
-    css: string;
-  };
+  settings: IChatBoxSettings;
 }
 
 export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
@@ -61,19 +47,19 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
 
   getMetadata() {
     return {
-      theme: <IWListMetadata<string>>{
+      theme: metadata.list({
         options: [
-          { description: 'Clean', value: 'standard' },
-          { description: 'Boxed', value: 'boxed' },
-          { description: 'Twitch', value: 'twitch' },
-          { description: 'Old School', value: 'oldschool' },
-          { description: 'Chunky', value: 'chunky' }
+          { title: 'Clean', value: 'standard' },
+          { title: 'Boxed', value: 'boxed' },
+          { title: 'Twitch', value: 'twitch' },
+          { title: 'Old School', value: 'oldschool' },
+          { title: 'Chunky', value: 'chunky' }
         ]
-      },
-      message_hide_delay: <IWSliderMetadata> {
+      }),
+      message_hide_delay: metadata.slider({
         min: 0,
         max: 200
-      }
+      })
     };
   }
 

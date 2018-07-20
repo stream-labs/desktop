@@ -6,20 +6,17 @@ import 'codemirror/mode/css/css.js';
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
 import 'codemirror/keymap/sublime';
 
-export interface IWCodeInputMetadata extends IWInputMetadata {
-  type: string;
-}
 
 @Component({
   components: { codemirror }
 })
-export default class WCodeInput extends WInput<string, IWCodeInputMetadata> {
+export default class WCodeInput extends WInput<string, IWInputMetadata> {
 
   @Prop({ default: '' })
   value: string;
 
   @Prop({ default: () => ({ type: 'html' }) })
-  metadata: IWCodeInputMetadata;
+  metadata: IWInputMetadata;
 
   // codemirror options
   editorOptions = {

@@ -1,3 +1,4 @@
+export { default as WAnimationInput } from './WAnimationInput.vue';
 export { default as WCodeEditor } from './WCodeEditor.vue';
 export { default as WColorInput } from './WColorInput.vue';
 export { default as WFontFamilyInput } from './WFontFamilyInput.vue';

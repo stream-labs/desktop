@@ -181,9 +181,6 @@ async function runScript() {
     executeCmd(`git merge ${sourceBranch}`);
   }
 
-  info('Ensuring submodules are up to date...');
-  executeCmd('git submodule update --init --recursive');
-
   info('Removing old packages...');
   sh.rm('-rf', 'node_modules');
 
