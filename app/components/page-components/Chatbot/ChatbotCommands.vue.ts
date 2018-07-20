@@ -1,14 +1,14 @@
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import Tabs from 'components/Tabs.vue';
 import ChatbotDefaultCommands from 'components/page-components/Chatbot/Commands/ChatbotDefaultCommands.vue';
+import ChatbotCustomCommands from 'components/page-components/Chatbot/Commands/ChatbotCustomCommands.vue';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 @Component({
   components: {
-    Tabs,
-    ChatbotDefaultCommands
+    ChatbotDefaultCommands,
+    ChatbotCustomCommands
   }
 })
-export default class ChatbotCommands extends Vue {
+export default class ChatbotCommands extends ChatbotBase {
   tabs: { name: String; value: String }[] = [
     {
       name: 'Custom Commands',
@@ -24,7 +24,7 @@ export default class ChatbotCommands extends Vue {
     }
   ];
 
-  selectedTab: String = 'default';
+  selectedTab: String = 'custom';
 
   onSelectTab(tab: String) {
     this.selectedTab = tab;

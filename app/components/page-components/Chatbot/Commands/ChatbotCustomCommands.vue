@@ -3,6 +3,7 @@
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <button
+      @click="openCreateCommandWindow"
       class="button button--action margin--10"
     >
       Add Command
@@ -14,39 +15,43 @@
     />
   </div>
 
-  <!-- custom commands -->
-  <table>
-    <thead>
-      <tr>
-        <th>Command</th>
-        <th>Description</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(command, commandName, index) in commands"
-        :key="index"
-      >
-        <td> {{ $t(command.command) }} </td>
-        <td> {{ $t(command.description) }} </td>
-        <td>
-          <div class="align-items--inline">
-            <WToggleInput
-              v-if="typeof command.enabled === 'boolean'"
-              :value="command.enabled"
-              @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
-            />
-            <i class="icon-edit padding--5"></i>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- customcommands -->
+  <div class="padding--10">
+    <div v-if="commands.length === 0">
+      <h2>No custom commands. Click to add new.</h2>
+    </div>
+    <table v-else>
+      <thead>
+        <tr>
+          <th>Command</th>
+          <th>Response</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(command, commandName, index) in commands"
+          :key="index"
+        >
+          <td> {{ $t(command.command) }} </td>
+          <td> {{ $t(command.response) }} </td>
+          <td>
+            <div class="align-items--inline">
+              <WToggleInput
+                :value="command.enabled === 1"
+                @input="toggleEnableCommand(commandName, !command.enabled)"
+              />
+              <i class="icon-edit padding--5"></i>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </template>
 
-<script lang='ts' src="./ChatbotDefaultCommands.vue.ts"></script>
+<script lang='ts' src="./ChatbotCustomCommands.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../../styles/index";

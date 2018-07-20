@@ -6,7 +6,7 @@ import ChatbotModules from '../page-components/Chatbot/ChatbotModules.vue';
 import ChatbotCommands from '../page-components/Chatbot/ChatbotCommands.vue';
 import ChatbotModTools from '../page-components/Chatbot/ChatbotModTools.vue';
 import ChatbotTimers from '../page-components/Chatbot/ChatbotTimers.vue';
-import { ChatbotApiService } from 'services/chatbot/chatbot-api';
+import { ChatbotApiService } from 'services/chatbot/chatbot';
 import { Inject } from 'util/injector';
 
 @Component({

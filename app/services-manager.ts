@@ -55,7 +55,7 @@ import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
-import { ChatbotApiService } from 'services/chatbot/chatbot-api';
+import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -164,6 +164,7 @@ export class ServicesManager extends Service {
     ViewerCountService,
     MediaGalleryService,
     ChatbotApiService,
+    ChatbotCommonService,
     StreamBossService,
   };
 

@@ -4,11 +4,26 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
+import { WindowsService } from 'services/windows';
 
 import {
   ChatbotApiServiceState,
   DefaultCommandRow
 } from './chatbot-interfaces';
+
+export class ChatbotCommonService extends PersistentStatefulService<ChatbotApiServiceState> {
+  @Inject() windowsService: WindowsService;
+
+  openCreateCommandWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotAddCommand',
+      size: {
+        width: 650,
+        height: 600
+      }
+    });
+  }
+}
 
 
 export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
@@ -62,6 +77,17 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       .then(handleErrors)
       .then(response => response.json());
   }
+
+  fetchCustomCommands(page: number) {
+    const url = this.apiEndpoint(`commands?page=${page}`, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
 
   //
   // POST requests

@@ -5,28 +5,49 @@ export interface ChatbotApiServiceState {
 }
 
 // responses
-export interface DafaultCommandsResponse {
-  commands: DafaultCommandSlug;
-  'link-protection': DafaultCommandSlug;
-  giveaway: DafaultCommandSlug;
-}
-
 export interface ChatbotAPIPostResponse {
   success: boolean;
 }
 
+export interface DafaultCommandsResponse {
+  commands: DafaultCommandsSlug;
+  'link-protection': DafaultCommandsSlug;
+  giveaway: DafaultCommandsSlug;
+}
+
+export interface CustomCommandsResponse {
+  pagination: Pagination;
+  data: CustomCommandsData;
+}
 
 
-
+// shared
 export interface Permission {
   level: number;
   info?: any;
 }
 
+export interface Cooldown {
+  global: number;
+  user: number;
+}
+
+export interface Aliases {
+  [id: number]: string;
+}
+
+export interface Pagination {
+  current: number;
+  total: number;
+}
+
+
+
+// default commands
 export interface DefaultCommandRow {
   command: string;
   description: string;
-  aliases: string[];
+  aliases: Aliases;
   response_type: string;
   success_response?: string;
   failed_response?: string;
@@ -38,7 +59,26 @@ export interface DefaultCommandRow {
   disabled_response?: string;
 }
 
-export interface DafaultCommandSlug {
+export interface DafaultCommandsSlug {
   [id: string]: DefaultCommandRow;
 }
 
+// custom commands
+export interface CustomCommandsData {
+  [id: number]: CustomCommandRow;
+}
+
+
+export interface CustomCommandRow {
+  id: string;
+  user_id: number;
+  command: string;
+  permision: Permission;
+  response: string;
+  cooldowns: Cooldown;
+  aliases: Aliases;
+  platforms: number;
+  enabled: number;
+  created_at: string;
+  updated_at: string;
+}

@@ -1,4 +1,4 @@
-import ChatbotCommandsBase from 'components/page-components/Chatbot/Commands/ChatbotCommandsBase.vue';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
   DafaultCommandsResponse,
@@ -7,7 +7,7 @@ import {
 
 
 @Component({})
-export default class ChatbotDefaultCommands extends ChatbotCommandsBase {
+export default class ChatbotDefaultCommands extends ChatbotBase {
   commandSlugs: DafaultCommandsResponse = null;
 
   mounted() {

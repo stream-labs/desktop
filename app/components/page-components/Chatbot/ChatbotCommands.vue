@@ -2,7 +2,7 @@
 <div>
   <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
     <div slot='custom'>
-      Custom Commands Tab
+      <ChatbotCustomCommands />
     </div>
     <div slot="default">
       <ChatbotDefaultCommands />
