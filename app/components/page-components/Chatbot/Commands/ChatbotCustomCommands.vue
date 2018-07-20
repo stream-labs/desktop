@@ -1,11 +1,11 @@
 <template>
 <div>
   <!-- batch actions -->
-  <div class="align-items--inline align-items--top text-align--right padding--10">
+  <div class="flex flex--space-between padding--10">
     <button
-      class="chatbot__button--reset button margin--10"
+      class="button button--action margin--10"
     >
-      Reset Commands
+      Add Command
     </button>
     <input
       type="text"
@@ -14,47 +14,35 @@
     />
   </div>
 
-  <!-- slugs -->
-  <div
-    class="padding--10"
-    v-for="(commands, slugName, index) in commandSlugs"
-    :key="index"
-  >
-    <div class="chatbot__dropdown-header">
-      <i class="icon-down"></i>
-      <span>{{ $t(slugName) }}</span>
-    </div>
-
-    <!-- commands in slug -->
-    <table>
-      <thead>
-        <tr>
-          <th>Command</th>
-          <th>Description</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(command, commandName, index) in commands"
-          :key="index"
-        >
-          <td> {{ $t(command.command) }} </td>
-          <td> {{ $t(command.description) }} </td>
-          <td>
-            <div class="align-items--inline">
-              <WToggleInput
-                v-if="typeof command.enabled === 'boolean'"
-                :value="command.enabled"
-                @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
-              />
-              <i class="icon-edit padding--5"></i>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- custom commands -->
+  <table>
+    <thead>
+      <tr>
+        <th>Command</th>
+        <th>Description</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        v-for="(command, commandName, index) in commands"
+        :key="index"
+      >
+        <td> {{ $t(command.command) }} </td>
+        <td> {{ $t(command.description) }} </td>
+        <td>
+          <div class="align-items--inline">
+            <WToggleInput
+              v-if="typeof command.enabled === 'boolean'"
+              :value="command.enabled"
+              @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
+            />
+            <i class="icon-edit padding--5"></i>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 </template>
 
