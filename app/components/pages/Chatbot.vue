@@ -7,7 +7,7 @@
           :key="tab"
           :to="tab"
           :ico="icons[tab]"
-          class="padding--10"
+          class="padding--10 text-transform--uppercase"
         >
           {{ $t(tab) }}
         </NavItem>
@@ -16,7 +16,7 @@
     <div v-if="!authenticated" class='padding--20'>
       <h1>Connecting to Chatbot...</h1>
     </div>
-    <div v-else  class="small-10">
+    <div v-else  class="small-10 overflow--auto">
       <ChatbotModules v-if="selectedTab === 'Modules'"/>
       <ChatbotCommands v-if="selectedTab === 'Commands'"/>
       <ChatbotTimers v-if="selectedTab === 'Timers'"/>

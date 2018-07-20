@@ -101,6 +101,10 @@
   padding-right: 0;
 }
 
+.padding--5 {
+  padding: 5px;
+}
+
 .padding--10 {
   padding: 10px;
 }
@@ -172,13 +176,17 @@
 }
 
 // align items
-.align-items--inline > * {
-  display: inline-block;
-  vertical-align: middle;
+.align-items--inline {
+  & > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 
-.align-items--top > * {
-  vertical-align: top;
+.align-items--top {
+  & > * {
+    vertical-align: top;
+  }
 }
 
 
@@ -214,4 +222,26 @@
   .teal {
     color: @teal-bright;
   }
+}
+
+//cursors
+
+.cursor--pointer {
+  cursor: pointer;
+}
+
+// text transforms
+
+.text-transform--capitalize {
+  text-transform: capitalize;
+}
+
+.text-transform--uppercase {
+  text-transform: uppercase;
+}
+
+// overflows
+
+.overflow--auto {
+  overflow: auto;
 }
