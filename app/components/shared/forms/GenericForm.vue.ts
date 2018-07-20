@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { IFormInput, TObsValue } from './Input';
+import { IObsInput, TObsValue } from './ObsInput';
 import { propertyComponentForType } from './Components';
 
 
@@ -8,11 +8,11 @@ import { propertyComponentForType } from './Components';
 export default class GenericForm extends Vue {
 
   @Prop()
-  value: IFormInput<TObsValue>[];
+  value: IObsInput<TObsValue>[];
 
   propertyComponentForType = propertyComponentForType;
 
-  onInputHandler(value: IFormInput<TObsValue>, index: number) {
+  onInputHandler(value: IObsInput<TObsValue>, index: number) {
     const newValue = [].concat(this.value);
     newValue.splice(index, 1, value);
     this.$emit('input', newValue, index);

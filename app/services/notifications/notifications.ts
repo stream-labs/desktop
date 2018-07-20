@@ -4,7 +4,7 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
-import { IFormInput, TFormData } from '../../components/shared/forms/Input';
+import { IObsInput, TObsFormData } from '../../components/shared/forms/ObsInput';
 import {
   ENotificationType,
   INotification,
@@ -102,10 +102,10 @@ export class NotificationsService extends PersistentStatefulService<
     return this.state.settings;
   }
 
-  getSettingsFormData(): TFormData {
+  getSettingsFormData(): TObsFormData {
     const settings = this.state.settings;
     return [
-      <IFormInput<boolean>>{
+      <IObsInput<boolean>>{
         value: settings.enabled,
         name: 'enabled',
         description: $t('Enable notifications'),
@@ -114,7 +114,7 @@ export class NotificationsService extends PersistentStatefulService<
         enabled: true
       },
 
-      <IFormInput<boolean>>{
+      <IObsInput<boolean>>{
         value: settings.playSound,
         name: 'playSound',
         description: $t('Enable sound'),

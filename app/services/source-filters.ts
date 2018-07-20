@@ -1,8 +1,8 @@
 import { Service } from './service';
 import {
-  TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
+  TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
   TObsValue
-} from '../components/shared/forms/Input';
+} from '../components/shared/forms/ObsInput';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -54,9 +54,9 @@ export class SourceFiltersService extends Service {
   @Inject()
   windowsService: WindowsService;
 
-  getTypesList(): IListOption<TSourceFilterType>[] {
+  getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
+    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
       { description: $t('Gain'), value: 'gain_filter' },
@@ -165,7 +165,7 @@ export class SourceFiltersService extends Service {
   }
 
 
-  setPropertiesFormData(sourceId: string, filterName: string, properties: TFormData) {
+  setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
   }
@@ -210,7 +210,7 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getPropertiesFormData(sourceId: string, filterName: string): TFormData {
+  getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
     return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
   }

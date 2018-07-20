@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import ListInput from 'components/shared/forms/ListInput.vue';
+import ObsListInput from 'components/shared/forms/ObsListInput.vue.ts';
 import { ISourceApi } from 'services/sources';
-import { IListInput } from 'components/shared/forms/Input';
+import { IObsListInput } from 'components/shared/forms/ObsInput';
 import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
@@ -11,7 +11,7 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    ListInput
+    ListInput: ObsListInput
   }
 })
 export default class WidgetProperties extends Vue {
@@ -20,13 +20,13 @@ export default class WidgetProperties extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
 
-  widgetModel: IListInput<string> = null;
+  widgetModel: IObsListInput<string> = null;
 
   created() {
     this.refreshWidgetModel();
   }
 
-  handleInput(value: IListInput<string>) {
+  handleInput(value: IObsListInput<string>) {
     this.source.setPropertiesManagerSettings({
       widgetType: value.value
     });

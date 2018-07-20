@@ -11,7 +11,7 @@ import Display from 'components/shared/Display.vue';
 import { $t } from 'services/i18n';
 import { WidgetsService, WidgetType } from 'services/widgets';
 import Tabs from 'components/Tabs.vue';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/shared/forms/ObsInput';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
@@ -41,7 +41,7 @@ export default class WidgetWindow extends Vue {
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
   widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
-  properties: TFormData = [];
+  properties: TObsFormData = [];
   tabs: IWidgetTab[] = [];
   tabsList: { name: string, value: string}[] = [];
 
@@ -96,7 +96,7 @@ export default class WidgetWindow extends Vue {
     this.windowsService.closeChildWindow();
   }
 
-  onPropsInputHandler(properties: TFormData, changedIndex: number) {
+  onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData(
       [properties[changedIndex]]

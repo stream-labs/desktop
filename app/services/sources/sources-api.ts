@@ -1,5 +1,5 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
-import { IListOption, TFormData } from '../../components/shared/forms/Input';
+import { IObsListOption, TObsFormData } from '../../components/shared/forms/ObsInput';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 
@@ -35,8 +35,8 @@ export interface ISourceApi extends ISource {
   getPropertiesManagerType(): TPropertiesManager;
   getPropertiesManagerSettings(): Dictionary<any>;
   getPropertiesManagerUI(): string;
-  getPropertiesFormData(): TFormData;
-  setPropertiesFormData(properties: TFormData): void;
+  getPropertiesFormData(): TObsFormData;
+  setPropertiesFormData(properties: TObsFormData): void;
   setPropertiesManagerSettings(settings: Dictionary<any>): void;
   hasProps(): boolean;
   setName(newName: string): void;
@@ -52,7 +52,7 @@ export interface ISourcesServiceApi {
   ): ISourceApi;
   removeSource(id: string): void;
   getAvailableSourcesTypes(): TSourceType[];
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[];
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[];
   getSources(): ISourceApi[];
   getSource(sourceId: string): ISourceApi;
   getSourcesByName(name: string): ISourceApi[];

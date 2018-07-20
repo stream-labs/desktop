@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import * as comps from './index';
-import { TObsType } from './Input';
+import { TObsType } from './ObsInput';
 
 const inputComponents = comps as any as { [key: string]: typeof Vue };
 

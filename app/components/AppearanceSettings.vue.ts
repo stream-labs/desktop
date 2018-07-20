@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericForm from './shared/forms/GenericForm.vue';
-import { TFormData } from './shared/forms/Input';
+import { TObsFormData } from './shared/forms/ObsInput';
 import { ICustomizationServiceApi, ICustomizationSettings } from 'services/customization';
 
 @Component({
@@ -12,7 +12,7 @@ export default class AppearanceSettings extends Vue {
 
   @Inject() private customizationService: ICustomizationServiceApi;
 
-  settingsFormData: TFormData = null;
+  settingsFormData: TObsFormData = null;
 
 
   created() {
@@ -20,7 +20,7 @@ export default class AppearanceSettings extends Vue {
   }
 
 
-  saveSettings(formData: TFormData) {
+  saveSettings(formData: TObsFormData) {
     const settings: Partial<ICustomizationSettings> = {};
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;

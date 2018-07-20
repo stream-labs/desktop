@@ -2,12 +2,12 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericFormGroups from './shared/forms/GenericFormGroups.vue';
-import TextInput from './shared/forms/TextInput.vue';
+import ObsTextInput from './shared/forms/ObsTextInput.vue.ts';
 import { ITcpServerServiceApi, ITcpServersSettings } from '../services/tcp-server';
 import { ISettingsSubCategory } from '../services/settings';
 
 @Component({
-  components: { GenericFormGroups, TextInput }
+  components: { GenericFormGroups, TextInput: ObsTextInput }
 })
 export default class ApiSettings extends Vue {
 

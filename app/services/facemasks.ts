@@ -16,7 +16,7 @@ import https from 'https';
 import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { ProfanityFilterService } from 'util/profanity';
-import { TObsValue } from 'components/shared/forms/Input';
+import { TObsValue } from 'components/shared/forms/ObsInput';
 const notificationAudio = require('../../media/sound/facemask4.wav');
 
 interface IFacemasksServiceState {

@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { $t, I18nServiceApi } from 'services/i18n';
 import GenericForm from 'components/shared/forms/GenericForm.vue';
-import { TFormData } from './shared/forms/Input';
+import { TObsFormData } from './shared/forms/ObsInput';
 import electron from 'electron';
 
 @Component({
@@ -14,7 +14,7 @@ export default class LanguageSettings extends Vue {
 
   settings = this.i18nService.getLocaleFormData();
 
-  private async save(data: TFormData) {
+  private async save(data: TObsFormData) {
     const choice = electron.remote.dialog.showMessageBox(
       electron.remote.getCurrentWindow(),
       {

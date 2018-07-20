@@ -7,7 +7,7 @@ import { propertyComponentForType } from '../shared/forms/Components';
 import windowMixin from '../mixins/window';
 
 import ModalLayout from '../ModalLayout.vue';
-import { TObsValue } from '../shared/forms/Input';
+import { TObsValue } from '../shared/forms/ObsInput';
 
 @Component({
   components: { ModalLayout },

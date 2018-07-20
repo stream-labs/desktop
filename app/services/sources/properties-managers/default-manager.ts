@@ -1,7 +1,7 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
 import { MediaBackupService } from 'services/media-backup';
-import * as input from 'components/shared/forms/Input';
+import * as input from 'components/shared/forms/ObsInput';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';
@@ -39,7 +39,7 @@ export class DefaultManager extends PropertiesManager {
     this.downloadGoogleFont();
   }
 
-  setPropertiesFormData(properties: input.TFormData) {
+  setPropertiesFormData(properties: input.TObsFormData) {
     super.setPropertiesFormData(properties);
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
       this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];

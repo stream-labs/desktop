@@ -11,8 +11,8 @@ import { Inject } from 'util/injector';
 import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
 import {
-  IBitmaskInput, IFormInput, IListInput, INumberInputValue, TFormData,
-} from 'components/shared/forms/Input';
+  IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
+} from 'components/shared/forms/ObsInput';
 import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter
@@ -302,10 +302,10 @@ export class AudioSource implements IAudioSourceApi {
     return { ...this.source.sourceState, ...this.audioSourceState };
   }
 
-  getSettingsForm(): TFormData {
+  getSettingsForm(): TObsFormData {
 
     return [
-      <INumberInputValue>{
+      <IObsNumberInputValue>{
         name: 'deflection',
         value: Math.round(this.fader.deflection * 100),
         description: $t('Volume (%)'),
@@ -317,7 +317,7 @@ export class AudioSource implements IAudioSourceApi {
         type: 'OBS_PROPERTY_INT'
       },
 
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: this.forceMono,
         name: 'forceMono',
         description: $t('Downmix to Mono'),
@@ -327,7 +327,7 @@ export class AudioSource implements IAudioSourceApi {
         enabled: true,
       },
 
-      <IFormInput<number>> {
+      <IObsInput<number>> {
         value: this.syncOffset,
         name: 'syncOffset',
         description: $t('Sync Offset (ms)'),
@@ -337,7 +337,7 @@ export class AudioSource implements IAudioSourceApi {
         enabled: true,
       },
 
-      <IListInput<obs.EMonitoringType>> {
+      <IObsListInput<obs.EMonitoringType>> {
         value: this.monitoringType,
         name: 'monitoringType',
         description: $t('Audio Monitoring'),
@@ -353,7 +353,7 @@ export class AudioSource implements IAudioSourceApi {
       },
 
 
-      <IBitmaskInput> {
+      <IObsBitmaskInput> {
         value: this.audioMixers,
         name: 'audioMixers',
         description: $t('Tracks'),

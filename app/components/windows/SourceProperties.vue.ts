@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/shared/forms/ObsInput';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
 import { ISourcesServiceApi } from 'services/sources';
@@ -34,7 +34,7 @@ export default class SourceProperties extends Vue {
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  properties: TFormData = [];
+  properties: TObsFormData = [];
 
   sourcesSubscription: Subscription;
 
@@ -57,7 +57,7 @@ export default class SourceProperties extends Vue {
   }
 
 
-  onInputHandler(properties: TFormData, changedIndex: number) {
+  onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData(
       [properties[changedIndex]]

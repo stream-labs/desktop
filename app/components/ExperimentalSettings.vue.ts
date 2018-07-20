@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
 import GenericForm from './shared/forms/GenericForm.vue';
-import { TFormData, TObsValue } from './shared/forms/Input';
+import { TObsFormData, TObsValue } from './shared/forms/ObsInput';
 import { ICustomizationServiceApi } from 'services/customization';
 
 @Component({
@@ -12,7 +12,7 @@ export default class ExperimentalSettings extends Vue {
 
   @Inject() private customizationService: ICustomizationServiceApi;
 
-  settingsFormData: TFormData = null;
+  settingsFormData: TObsFormData = null;
 
 
   created() {
@@ -20,7 +20,7 @@ export default class ExperimentalSettings extends Vue {
   }
 
 
-  saveSettings(formData: TFormData) {
+  saveSettings(formData: TObsFormData) {
     const settings: Dictionary<TObsValue> = {};
     formData.forEach(formInput => {
       settings[formInput.name] = formInput.value;
