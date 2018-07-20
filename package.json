@@ -133,7 +133,7 @@
     "pixelmatch": "4.0.2",
     "pngjs": "3.3.1",
     "progress": "2.0.0",
-    "raven-js": "3.20.1",
+    "raven-js": "3.26.4",
     "reflect-metadata": "0.1.12",
     "rxjs": "5.4.3",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
