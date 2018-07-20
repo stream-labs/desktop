@@ -1,11 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IWInputMetadata, WInput } from './WInput';
-
-interface IWNumberMetadata extends IWInputMetadata {
-  min?: number;
-  max?: number;
-  placeholder?: string;
-}
+import { IWNumberMetadata, WInput } from './WInput';
 
 @Component({
 })

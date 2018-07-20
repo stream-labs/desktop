@@ -496,11 +496,6 @@ ipcMain.on('obs-apiCall', (event, data) => {
   event.returnValue = retVal;
 });
 
-// Used for guaranteeing unique ids for objects in the vuex store
-ipcMain.on('getUniqueId', event => {
-  event.returnValue = uuid();
-});
-
 ipcMain.on('restartApp', () => {
   app.relaunch();
   // Closing the main window starts the shut down sequence
