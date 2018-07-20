@@ -1,7 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IWInputMetadata, WInput } from './WInput';
 
-interface IWTextMetadata extends IWInputMetadata {
+export interface IWTextMetadata extends IWInputMetadata {
   placeholder: string;
   validate: string;
   max: number;

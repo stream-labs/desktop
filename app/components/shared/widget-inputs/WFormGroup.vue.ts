@@ -1,7 +1,7 @@
-import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Multiselect } from 'vue-multiselect';
 import * as comps from 'components/shared/widget-inputs';
+import { EWInputType, IWInputMetadata, WInput } from './WInput';
 
 
 
@@ -9,10 +9,10 @@ import * as comps from 'components/shared/widget-inputs';
   components: { ...comps }
 })
 
-export default class WFormGroup extends Vue {
+export default class WFormGroup extends WInput<any, IWInputMetadata> {
 
   @Prop()
-  type: string;
+  type: EWInputType;
 
   @Prop()
   value: undefined;
@@ -24,14 +24,15 @@ export default class WFormGroup extends Vue {
   title: string;
 
   get componentName() {
-    return 'W' + this.type.charAt(0).toUpperCase() + this.type.substr(1) + 'Input';
+    const type = this.options.type;
+    return 'W' + type.charAt(0).toUpperCase() + type.substr(1) + 'Input';
   }
 
-  get defaultTitle() {
-    return {
-      text: 'text',
-      fontFamily: 'Font'
-    }[this.type];
+  getOptions() {
+    const options = super.getOptions();
+    options.type = this.type || options.type;
+    options.title = this.title || options.title;
+    return options;
   }
 
 }

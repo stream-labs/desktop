@@ -1,12 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IObsListOption } from '../forms/ObsInput';
 import { Multiselect } from 'vue-multiselect';
-import { IWInputMetadata, WInput } from './WInput';
-
-export interface IWListMetadata<TValueType> extends IWInputMetadata {
-  options: IListOption<TValueType>[];
-}
-
+import { IWListMetadata, IWListOption, WInput } from './WInput';
 
 @Component({
   components: { Multiselect }
@@ -32,22 +27,18 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
     this.$nextTick();
   }
 
-  get currentValue() {
+  get currentMultiselectValue() {
+    const options = this.multiselectOptions;
 
-<<<<<<< Updated upstream
-    const option = this.metadata.options.find((opt: IListOption<string>) => {
-=======
     const option = options.find((opt: IObsListOption<string>) => {
->>>>>>> Stashed changes
       return this.value === opt.value;
     });
 
     if (option) return option;
-    return this.metadata.options[0];
+    return options[0];
   }
 
-<<<<<<< Updated upstream
-=======
+
   get multiselectOptions(): IObsListOption<string>[] {
     return this.options.options.map(item => {
       return { value: item.value, description: item.title };
@@ -57,5 +48,5 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   get selectedOption(): IWListOption<string> {
     return this.options.options.find(option => option.value === this.value);
   }
->>>>>>> Stashed changes
+
 }

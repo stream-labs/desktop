@@ -14,7 +14,7 @@ interface II18nState {
   locale: string;
 }
 
-export function $t(...args: any[]) {
+export function $t(...args: any[]): string {
   const vueI18nInstance = I18nService.vueI18nInstance;
 
   // some tests try to call this function before dictionaries have been loaded
