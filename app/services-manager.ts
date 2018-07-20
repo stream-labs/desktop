@@ -1,4 +1,5 @@
 import electron from 'electron';
+import uuid from 'uuid/v4';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ObsImporterService } from './services/obs-importer';
@@ -79,7 +80,7 @@ import { ChatBoxService } from 'services/widget-settings/chat-box';
 import { DonationGoalService } from 'services/widget-settings/donation-goal';
 import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 import { ViewerCountService } from 'services/widget-settings/viewer-count';
-import uuid from 'uuid/v4';
+import { StreamBossService } from 'services/widget-settings/stream-boss';
 
 const { ipcRenderer } = electron;
 
@@ -160,6 +161,7 @@ export class ServicesManager extends Service {
     FollowerGoalService,
     ChatBoxService,
     ViewerCountService,
+    StreamBossService,
     MediaGalleryService
   };
 

@@ -6,7 +6,7 @@
         type="checkbox"
         :checked="value"
       />
-      <label>{{ title }}</label>
+      <label>{{ options.title }}</label>
     </div>
   </div>
 </div>
