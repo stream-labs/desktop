@@ -113,7 +113,7 @@
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
     "electron": "2.0.5",
-    "electron-builder": "20.22.0",
+    "electron-builder": "20.24.4",
     "electron-devtools-installer": "2.2.4",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "14.1.0",
