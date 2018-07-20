@@ -5,7 +5,7 @@ import {
   IObsListOption,
   TObsValue,
   TObsFormData
-} from 'components/shared/forms/ObsInput';
+} from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';

@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import ObsListInput from 'components/shared/forms/ObsListInput.vue.ts';
+import ObsListInput from 'components/obs/inputs/ObsListInput.vue';
 import { ISourceApi } from 'services/sources';
-import { IObsListInput } from 'components/shared/forms/ObsInput';
+import { IObsListInput } from 'components/obs/inputs/ObsInput';
 import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';

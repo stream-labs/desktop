@@ -1,7 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IObsListOption } from '../forms/ObsInput';
 import { Multiselect } from 'vue-multiselect';
 import { IWListMetadata, IWListOption, WInput } from './WInput';
+
+interface IMultiselectListOption{
+  description: string;
+  value: string;
+}
 
 @Component({
   components: { Multiselect }
@@ -22,7 +26,7 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   placeholder: string;
 
 
-  onInputHandler(option: IObsListOption<string>) {
+  onInputHandler(option: IMultiselectListOption) {
     this.emitInput(option.value);
     this.$nextTick();
   }
@@ -30,7 +34,7 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   get currentMultiselectValue() {
     const options = this.multiselectOptions;
 
-    const option = options.find((opt: IObsListOption<string>) => {
+    const option = options.find((opt: IMultiselectListOption) => {
       return this.value === opt.value;
     });
 
@@ -39,7 +43,7 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   }
 
 
-  get multiselectOptions(): IObsListOption<string>[] {
+  get multiselectOptions(): IMultiselectListOption[] {
     return this.options.options.map(item => {
       return { value: item.value, description: item.title };
     });

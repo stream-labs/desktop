@@ -1,5 +1,5 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
-import { IObsListOption, TObsFormData } from '../../components/shared/forms/ObsInput';
+import { IObsListOption, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 

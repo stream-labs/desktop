@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs/Observable';
-import { TObsFormData } from 'components/shared/forms/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 
 interface II18nState {

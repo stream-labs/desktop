@@ -1,7 +1,7 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
 import { MediaBackupService } from 'services/media-backup';
-import * as input from 'components/shared/forms/ObsInput';
+import * as input from 'components/obs/inputs/ObsInput';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
 import { EFontStyle } from 'obs-studio-node';

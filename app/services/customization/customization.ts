@@ -6,7 +6,7 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData } from '../../components/shared/forms/ObsInput';
+import { IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 

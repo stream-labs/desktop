@@ -2,7 +2,7 @@ import { Service } from './service';
 import {
   TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
   TObsValue
-} from '../components/shared/forms/ObsInput';
+} from 'components/obs/inputs/ObsInput';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';

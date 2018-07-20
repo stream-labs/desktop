@@ -10,8 +10,8 @@ import { AppService } from 'services/app';
 import { WidgetsService } from 'services/widgets';
 import { ScenesService } from 'services/scenes';
 import { $t } from 'services/i18n';
-import { IObsInput } from 'components/shared/forms/ObsInput';
-import ObsBoolInput from 'components/shared/forms/ObsBoolInput.vue.ts';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
+import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 
 @Component({ components: { BoolInput: ObsBoolInput } })
 export default class OverlaySettings extends Vue {

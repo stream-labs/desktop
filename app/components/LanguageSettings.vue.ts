@@ -2,8 +2,8 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { $t, I18nServiceApi } from 'services/i18n';
-import GenericForm from 'components/shared/forms/GenericForm.vue';
-import { TObsFormData } from './shared/forms/ObsInput';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import electron from 'electron';
 
 @Component({

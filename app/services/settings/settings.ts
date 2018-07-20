@@ -4,9 +4,8 @@ import {
   inputValuesToObsValues,
   TObsValue,
   TObsFormData,
-  IObsListOption,
   IObsListInput
-} from '../../components/shared/forms/ObsInput';
+} from 'components/obs/inputs/ObsInput';
 import { nodeObs } from '../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';

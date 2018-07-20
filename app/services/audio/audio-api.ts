@@ -1,6 +1,6 @@
 import * as obs from '../../../obs-api';
 import { Subscription } from 'rxjs/Subscription';
-import { TObsFormData } from '../../components/shared/forms/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ISource } from '../sources/sources-api';
 
 export interface IAudioSourcesState {

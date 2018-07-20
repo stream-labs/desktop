@@ -12,7 +12,7 @@ import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
 import {
   IObsBitmaskInput, IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData,
-} from 'components/shared/forms/ObsInput';
+} from 'components/obs/inputs/ObsInput';
 import {
   IAudioDevice, IAudioServiceApi, IAudioSource, IAudioSourceApi, IAudioSourcesState, IFader,
   IVolmeter

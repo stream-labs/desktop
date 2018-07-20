@@ -1,4 +1,4 @@
-import * as input from 'components/shared/forms/ObsInput';
+import * as input from 'components/obs/inputs/ObsInput';
 import * as obs from '../../../../obs-api';
 import { compact } from 'lodash';
 

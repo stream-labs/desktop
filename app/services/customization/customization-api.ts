@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { TObsFormData } from '../../components/shared/forms/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ICustomizationServiceState {
   nightMode: boolean;

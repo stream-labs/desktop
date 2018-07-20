@@ -10,7 +10,7 @@ import {
   isFontProperty,
   isPathProperty
 } from '../../../util/properties-type-guards';
-import { $t } from 'services/i18n';
+import { $t } from 'services/i18n/index';
 
 /**
  * all possible OBS properties types

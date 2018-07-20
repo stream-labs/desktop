@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import GenericFormGroups from './shared/forms/GenericFormGroups.vue';
-import ObsTextInput from './shared/forms/ObsTextInput.vue.ts';
+import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
+import ObsTextInput from 'components/obs/inputs/ObsTextInput.vue';
 import { ITcpServerServiceApi, ITcpServersSettings } from '../services/tcp-server';
 import { ISettingsSubCategory } from '../services/settings';
 

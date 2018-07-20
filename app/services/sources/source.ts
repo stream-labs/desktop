@@ -11,9 +11,8 @@ import {
 import { mutation, ServiceHelper } from 'services/stateful-service';
 import { Inject } from 'util/injector';
 import { ScenesService } from 'services/scenes';
-import { TObsFormData } from 'components/shared/forms/ObsInput';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import Utils from 'services/utils';
-import { WidgetType } from 'services/widgets';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
 

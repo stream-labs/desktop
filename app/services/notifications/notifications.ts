@@ -4,7 +4,7 @@ import { PersistentStatefulService } from 'services/persistent-stateful-service'
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { ServicesManager } from '../../services-manager';
-import { IObsInput, TObsFormData } from '../../components/shared/forms/ObsInput';
+import { IObsInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import {
   ENotificationType,
   INotification,
