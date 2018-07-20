@@ -2,7 +2,7 @@ import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService }
 import { WidgetType } from 'services/widgets';
 import { IGoalData } from './generic-goal';
 import { $t } from 'services/i18n';
-import { EWInputType, IWInputMetadata, metadata } from 'components/shared/widget-inputs/WInput';
+import { metadata } from 'components/shared/widget-inputs/WInput';
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;

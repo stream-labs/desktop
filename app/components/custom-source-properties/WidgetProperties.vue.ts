@@ -11,7 +11,7 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    ListInput: ObsListInput
+    ObsListInput
   }
 })
 export default class WidgetProperties extends Vue {

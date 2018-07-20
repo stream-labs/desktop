@@ -46,7 +46,7 @@ export default class ApiSettings extends Vue {
 
 
   save(settingsData: ISettingsSubCategory[]) {
-    const settings: Partial<ITcpServersSettings> = {}
+    const settings: Partial<ITcpServersSettings> = {};
     settingsData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (!settings[subCategory.codeSubCategory]) settings[subCategory.codeSubCategory] = {};
