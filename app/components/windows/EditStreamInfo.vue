@@ -15,9 +15,9 @@
       {{ $t('If this error persists, you can try logging out and back in.') }}
     </div>
     <div v-if="!infoLoading && !infoError">
-      <TextInput v-model="streamTitleModel" />
-      <TextInput  v-if="isYoutube" v-model="streamDescriptionModel" />
-      <ListInput
+      <ObsTextInput v-model="streamTitleModel" />
+      <ObsTextInput  v-if="isYoutube" v-model="streamDescriptionModel" />
+      <ObsListInput
         v-if="isTwitch || isMixer"
         :value="gameModel"
         :allowEmpty="true"
@@ -75,7 +75,7 @@
           </div>
         </div>
       </div>
-      <BoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
+      <ObsBoolInput v-model="doNotShowAgainModel" v-if="!midStreamMode"/>
       <div class="warning" v-if="updateError">
         <div v-if="midStreamMode">
           {{ $t('Something went wrong while updating your stream info.  Please try again.') }}
