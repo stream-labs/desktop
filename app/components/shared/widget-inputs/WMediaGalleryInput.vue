@@ -1,12 +1,18 @@
 <template>
   <div>
     <div class="media-box radius">
-      <img :src="value || metadata.clearImage" >
+      <div class="url-uploader radius" v-if="showUrlUpload">
+        <w-form-group title="Image URL" >
+          <w-text-input v-model="url" :metadata="{ placeholder: 'Example: https://yoururl.com/image/Streamlabs' }" />
+        </w-form-group>
+        <button class="button button--action" @click="uploadUrl">Submit</button>
+      </div>
+      <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
       <div class="footer">
         <span>{{ fileName || 'Default' }}</span>
         <div>
           <span @click="updateValue" class="change-media">Change Media</span>
-          <i class="icon-link" />
+          <i @click="toggleUrlUpload" class="icon-link" />
           <i @click="previewImage" class="fa fa-search-plus" />
           <i @click="clearImage" class="icon-close" />
         </div>
@@ -70,6 +76,22 @@
   }
 }
 
+.url-uploader {
+  background-color: @day-primary;
+  padding: 12px;
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  right: 1px;
+  left: 1px;
+
+  button {
+    position: absolute;
+    bottom: 25px;
+    right: 12px;
+  }
+}
+
 .change-media {
   text-transform: uppercase;
   color: @night-text;
@@ -79,6 +101,10 @@
   .media-box {
     background-color: @night-secondary;
     border-color: @night-secondary;
+  }
+
+  .url-uploader {
+    background-color: @night-primary;
   }
 }
 </style>
