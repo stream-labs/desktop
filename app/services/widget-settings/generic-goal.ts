@@ -1,6 +1,6 @@
 import { IWidgetData, WidgetSettingsService } from './widget-settings';
-import { IWSliderMetadata } from 'components/shared/widget-inputs/WSliderInput.vue';
-import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
+
+import { metadata } from 'components/shared/widget-inputs/WInput';
 
 
 export interface IGoalData extends IWidgetData {
@@ -38,17 +38,17 @@ export abstract class GenericGoalService extends WidgetSettingsService<IGoalData
 
   getMetadata() {
     return {
-      layout: <IWListMetadata<string>>{
+      layout: metadata.list({
         options: [
-          { description: 'Standard', value: 'standard' },
-          { description: 'Condensed', value: 'condensed' }
+          { title: 'Standard', value: 'standard' },
+          { title: 'Condensed', value: 'condensed' }
         ]
-      },
-      bar_thickness: <IWSliderMetadata>{
+      }),
+      bar_thickness: metadata.slider({
         min: 32,
         max: 128,
         interval: 4
-      }
+      })
     };
   }
 

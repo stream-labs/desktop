@@ -20,6 +20,7 @@ import {
   Source,
   TPropertiesManager
 } from './index';
+import uuid from 'uuid/v4';
 
 
 
@@ -29,6 +30,7 @@ const { ipcRenderer } = electron;
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
+const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
@@ -101,6 +103,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
+      async: false,
       doNotDuplicate: false,
 
       // Unscaled width and height
@@ -133,9 +136,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-    const id: string =
-      options.sourceId ||
-      (type + '_' + ipcRenderer.sendSync('getUniqueId'));
+    const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
@@ -319,10 +320,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private updateSourceFlags(source: ISource, flags: number, doNotEmit? : boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
+    const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
     if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }
@@ -384,7 +386,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.DonationGoal,
         WidgetType.FollowerGoal,
         WidgetType.ChatBox,
-        WidgetType.ViewerCount
+        WidgetType.ViewerCount,
+        WidgetType.StreamBoss
       ];
 
       if (isWidget) {
