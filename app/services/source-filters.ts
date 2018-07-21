@@ -1,8 +1,9 @@
 import { Service } from './service';
 import {
   TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
-  TObsValue
+  TObsValue, IObsListInput
 } from 'components/obs/inputs/ObsInput';
+
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -212,7 +213,21 @@ export class SourceFiltersService extends Service {
 
   getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
-    return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+
+    // Show SLOBS frontend display names for the sidechain source options
+    formData.forEach(input => {
+      if (input.name === 'sidechain_source') {
+        (input as IObsListInput<string>).options.forEach(option => {
+          if (option.value === 'none') return;
+
+          const source = this.sourcesService.getSourceById(option.value);
+          if (source) option.description = source.name;
+        });
+      }
+    });
+
+    return formData;
   }
 
 
