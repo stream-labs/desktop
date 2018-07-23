@@ -3,7 +3,8 @@ import { Component } from 'vue-property-decorator';
 import {
   CustomCommandsResponse,
   CustomCommandsData,
-  Pagination
+  Pagination,
+  ChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
@@ -27,14 +28,31 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService
       .fetchCustomCommands(page)
       .then((response: CustomCommandsResponse) => {
+        console.log(response.data);
         this.commands = response.data;
         this.pagination = response.pagination;
       });
   }
 
-  openCreateCommandWindow() {
-    this.chatbotCommonService.openCreateCommandWindow();
+  openCommandWindow() {
+    this.chatbotCommonService.openCommandWindow();
   }
 
-  toggleEnableCommand(commandName: string, isEnabled: number) {}
+  toggleEnableCommand(commandId: string, index: number, isEnabled: number) {
+    const commandToBeUpdated = this.commands[index];
+
+    this.chatbotApiService
+      .updateCustomCommand(commandId, {
+        ...commandToBeUpdated,
+        enabled: isEnabled
+      })
+      .then((response: ChatbotAPIPutResponse) => {
+        if (response.success) {
+          this.$set(this.commands, index, {
+            ...commandToBeUpdated,
+            enabled: isEnabled
+          });
+        }
+      });
+  }
 }

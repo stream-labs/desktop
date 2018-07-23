@@ -5,16 +5,15 @@ import WTextAreaInput from 'components/shared/widget-inputs/WTextAreaInput.vue';
 import WListInput from 'components/shared/widget-inputs/WListInput.vue';
 
 import {
-  NewCustomCommand,
+  CustomCommand,
   ChatbotPermissions,
-  ChatbotResponseTypes
+  ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
   IWListMetadata,
   IWTextMetadata,
 } from 'components/shared/widget-inputs/WInput';
-import Chatbot from '../../../pages/Chatbot.vue';
 
 @Component({
   components: {
@@ -23,8 +22,8 @@ import Chatbot from '../../../pages/Chatbot.vue';
     WListInput
   }
 })
-export default class ChatbotAddCommand extends ChatbotWindowsBase {
-  newCommand: NewCustomCommand = {
+export default class ChatbotCommandWindow extends ChatbotWindowsBase {
+  newCommand: CustomCommand = {
     command: null,
     response: null,
     response_type: 'Chat',
@@ -37,7 +36,7 @@ export default class ChatbotAddCommand extends ChatbotWindowsBase {
       user: 0
     },
     aliases: [],
-    platforms: null,
+    platforms: 7,
     enabled: true
   };
 
@@ -89,5 +88,12 @@ export default class ChatbotAddCommand extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onSave() {}
+  onSave() {
+    debugger;
+    this.chatbotApiService
+      .createCustomCommand(this.newCommand)
+      .then((response: CustomCommand) => {
+        debugger;
+      });
+  }
 }

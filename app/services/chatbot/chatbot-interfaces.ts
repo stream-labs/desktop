@@ -9,6 +9,11 @@ export interface ChatbotAPIPostResponse {
   success: boolean;
 }
 
+export interface ChatbotAPIPutResponse {
+  success: boolean;
+}
+
+
 export interface DafaultCommandsResponse {
   commands: DafaultCommandsSlug;
   'link-protection': DafaultCommandsSlug;
@@ -18,6 +23,11 @@ export interface DafaultCommandsResponse {
 export interface CustomCommandsResponse {
   pagination: Pagination;
   data: CustomCommandsData;
+}
+
+export interface TimersResponse {
+  pagination: Pagination;
+  data: TimersData;
 }
 
 
@@ -45,10 +55,8 @@ export interface Pagination {
   total: number;
 }
 
-
-
 // default commands
-export interface DefaultCommandRow {
+export interface DefaultCommand {
   command: string;
   description: string;
   aliases: Aliases;
@@ -64,38 +72,45 @@ export interface DefaultCommandRow {
 }
 
 export interface DafaultCommandsSlug {
-  [id: string]: DefaultCommandRow;
+  [id: string]: DefaultCommand;
 }
 
 // custom commands
 export interface CustomCommandsData {
-  [id: number]: CustomCommandRow;
+  [id: number]: CustomCommand;
 }
 
-
-export interface CustomCommandRow {
-  id: string;
-  user_id: number;
+export interface CustomCommand {
+  id?: string;
+  user_id?: number;
   command: string;
   permision: Permission;
   response: string;
-  cooldowns: Cooldown;
-  aliases: Aliases;
-  platforms: number;
-  enabled: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface NewCustomCommand {
-  command: string;
-  response: string;
-  response_type: string;
-  permission: Permission;
+  response_type?: string;
   cooldowns: Cooldown;
   aliases: Aliases;
   platforms: number;
   enabled: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// timers
+export interface TimersData {
+  [id: number]: Timer
+}
+
+export interface Timer {
+  id?: string;
+  user_id?: number;
+  name: string;
+  interval: string;
+  chat_lines: number;
+  message: string;
+  platforms: number;
+  enabled: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // dictionaries

@@ -27,7 +27,7 @@ import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
 
-import ChatbotAddCommand from 'components/page-components/Chatbot/windows/ChatbotAddCommand.vue';
+import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
 
 import BitGoal from 'components/widget-settings/goal/BitGoal.vue';
 import DonationGoal from 'components/widget-settings/goal/DonationGoal.vue';
@@ -107,7 +107,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ViewerCount,
     StreamBoss,
 
-    ChatbotAddCommand,
+    ChatbotCommandWindow,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

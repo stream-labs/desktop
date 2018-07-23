@@ -3,7 +3,7 @@
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <button
-      @click="openCreateCommandWindow"
+      @click="openCommandWindow"
       class="button button--action margin--10"
     >
       Add Command
@@ -15,7 +15,7 @@
     />
   </div>
 
-  <!-- customcommands -->
+  <!-- custom commands -->
   <div class="padding--10">
     <div v-if="commands.length === 0">
       <h2>No custom commands. Click to add new.</h2>
@@ -30,7 +30,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="(command, commandName, index) in commands"
+          v-for="(command, index) in commands"
           :key="index"
         >
           <td> {{ $t(command.command) }} </td>
@@ -38,8 +38,9 @@
           <td>
             <div class="align-items--inline">
               <WToggleInput
-                :value="command.enabled === 1"
-                @input="toggleEnableCommand(commandName, !command.enabled)"
+                v-if="typeof command.enabled === 'boolean'"
+                :value="command.enabled"
+                @input="toggleEnableCommand(command.id, index, !command.enabled)"
               />
               <i class="icon-edit padding--5"></i>
             </div>

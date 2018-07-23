@@ -8,27 +8,9 @@ import { WindowsService } from 'services/windows';
 
 import {
   ChatbotApiServiceState,
-  DefaultCommandRow
+  CustomCommand,
+  DefaultCommand
 } from './chatbot-interfaces';
-
-export class ChatbotCommonService extends PersistentStatefulService<ChatbotApiServiceState> {
-  @Inject() windowsService: WindowsService;
-
-  closeChildWindow() {
-    this.windowsService.closeChildWindow();
-  }
-
-  openCreateCommandWindow() {
-    this.windowsService.showWindow({
-      componentName: 'ChatbotAddCommand',
-      size: {
-        width: 650,
-        height: 600
-      }
-    });
-  }
-}
-
 
 export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
   @Inject() userService: UserService;
@@ -93,11 +75,52 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   }
 
 
+  fetchTimers(page: number) {
+    const url = this.apiEndpoint(`timers?page=${page}`, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
   //
-  // POST requests
+  // POST, PUT requests
   //
-  updateDefaultCommand(slugName: string, commandName: string, data: any) {
+  updateDefaultCommand(slugName: string, commandName: string, data: DefaultCommand) {
     const url = this.apiEndpoint(`settings/${slugName}/commands/${commandName}`, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  updateCustomCommand(id: string, data: CustomCommand) {
+    const url = this.apiEndpoint(`commands/${id}`, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  createCustomCommand(data: CustomCommand) {
+    debugger;
+    const url = this.apiEndpoint('commands', true);
     const headers = authorizedHeaders(this.state.api_token);
     headers.append('Content-Type', 'application/json');
     const request = new Request(url, {
@@ -120,5 +143,24 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   LOGIN(response: ChatbotApiServiceState) {
     Vue.set(this.state, 'api_token', response.api_token);
     Vue.set(this.state, 'socket_token', response.socket_token);
+  }
+}
+
+
+export class ChatbotCommonService extends PersistentStatefulService<ChatbotApiServiceState> {
+  @Inject() windowsService: WindowsService;
+
+  closeChildWindow() {
+    this.windowsService.closeChildWindow();
+  }
+
+  openCommandWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotCommandWindow',
+      size: {
+        width: 650,
+        height: 600
+      }
+    });
   }
 }
