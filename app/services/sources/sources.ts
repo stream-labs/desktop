@@ -23,7 +23,6 @@ import {
 import uuid from 'uuid/v4';
 
 
-
 const SOURCES_UPDATE_INTERVAL = 1000;
 
 const { ipcRenderer } = electron;
@@ -410,7 +409,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
 
 
-
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
       queryParams: { sourceId },
@@ -481,5 +479,3 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 }
-
-

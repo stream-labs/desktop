@@ -115,7 +115,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
     categories = categories
-      .concat(['Scene Collections','Notifications', 'Appearance', 'Remote Control']);
+      .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
 
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);

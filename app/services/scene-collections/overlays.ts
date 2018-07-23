@@ -65,12 +65,13 @@ export class OverlaysPersistenceService extends Service {
           fileStream.write(chunk);
           downloaded += chunk.length;
 
-          if (progressCallback)
+          if (progressCallback) {
             progressCallback({
               totalBytes: totalSize,
               downloadedBytes: downloaded,
               percent: downloaded / totalSize
             });
+          }
         });
 
         response.on('end', () => resolve());

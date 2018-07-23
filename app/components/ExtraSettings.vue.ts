@@ -14,7 +14,7 @@ import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { BoolInput: ObsBoolInput }
+  components: { ObsBoolInput }
 })
 export default class ExtraSettings extends Vue {
   @Inject() cacheUploaderService: CacheUploaderService;

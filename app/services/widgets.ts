@@ -531,8 +531,9 @@ export class WidgetsService extends Service {
     widgetItem = scene.getItems().find(item => {
       const source = item.getSource();
       if (source.getPropertiesManagerType() !== 'widget') return false;
-      if (source.getPropertiesManagerSettings().widgetType !== widget.type)
+      if (source.getPropertiesManagerSettings().widgetType !== widget.type) {
         return false;
+      }
       return true;
     });
 
