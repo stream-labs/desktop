@@ -6,8 +6,7 @@
   </div>
 
   <div slot="settings" >
-
-    <w-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="wData.themes"/>
+    <w-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <w-form-group title="Credit Title" type="text" v-model="wData.settings.credit_title" />
     <w-form-group
       title="Credit Subtitle"
@@ -42,19 +41,19 @@
       type="slider"
       title="Delay Time"
       v-model="wData.settings.delay_time"
-      :metadata="{}"
+      :metadata="{ tooltip: delayTimeTooltip, max: 10, interval: 1 }"
     />
     <w-form-group
       type="slider"
       title="Roll Speed"
       v-model="wData.settings.roll_speed"
-      :metadata="{}"
+      :metadata="{ tooltip: rollSpeedTooltip, max: 5, interval: 1 }"
     />
     <w-form-group
       type="slider"
       title="Roll Time"
       v-model="wData.settings.roll_time"
-      :metadata="{}"
+      :metadata="{ tooltip: rollTimeTooltip, max: 150, interval: 5 }"
     />
   </div>
 

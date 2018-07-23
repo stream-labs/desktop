@@ -1,8 +1,36 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
 
+export interface ICreditsSettings extends IWidgetSettings {
+  theme: string;
+  credit_title: string;
+  credit_subtitle: string;
+  background_color: string;
+  text_color: string;
+  text_size: 14;
+  muted_chatters: string;
+  bits: boolean;
+  subscribers: boolean;
+  moderators: boolean;
+  donations: boolean;
+  followers: boolean;
+  bits_change: string;
+  donor_change: string;
+  followers_change: string;
+  mods_change: string;
+  subscribers_change: string;
+  delay_time: number;
+  roll_speed: number;
+  roll_time: number;
+  loop_credits: boolean;
+  custom_enabled: boolean;
+  custom_css: string;
+  custom_js: string;
+  custom_html: string;
+}
 export interface ICreditsData extends IWidgetData {
-  settings: {};
+  themes: any;
+  settings: ICreditsSettings;
 }
 
 export class CreditsService extends WidgetSettingsService<ICreditsData> {

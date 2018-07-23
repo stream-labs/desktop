@@ -33,6 +33,7 @@ import ChatBox from 'components/widget-settings/ChatBox.vue';
 import FollowerGoal from 'components/widget-settings/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widget-settings/ViewerCount.vue';
 import StreamBoss from 'components/widget-settings/StreamBoss.vue';
+import Credits from 'components/widget-settings/Credits.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -103,6 +104,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
+    Credits,
     StreamBoss
   };
 

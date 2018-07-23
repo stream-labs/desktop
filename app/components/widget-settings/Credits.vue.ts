@@ -19,9 +19,18 @@ import { $t } from 'services/i18n';
   }
 })
 export default class Credits extends WidgetSettings<ICreditsData, CreditsService> {
-  textColorTooltip = $t('A hex code for the base text color.');
+  get themeMetadata() {
+    return Object.keys(this.wData.themes).map((theme) => ({
+      title: this.wData.themes[theme].label,
+      value: theme
+    }));
+  }
 
-  creditSubtitleTooltip = $t(
+  textColorTooltip = $t('A hex code for the base text color.');
+  delayTimeTooltip = $t('Wait time before rerunning the credit reel.');
+  rollSpeedTooltip = $t('Speed of the rolling credits.');
+  rollTimeTooltip = $t('Duration of the rolling credits.');
+  creditsSubtitleTooltip = $t(
     'When the credits roll, this will be the format of the subtitle. Available tokens: {total_donated_amount}, {total_cheer_amount}, {top_donor}, {top_donated_amount}, {top_cheer_donor}, {username}, {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.'
   );
 }
