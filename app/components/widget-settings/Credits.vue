@@ -17,7 +17,7 @@
     <w-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <w-form-group type="fontFamily" :value="wData.settings.font"/>
     <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.font_size"/>
-    <w-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <w-form-group type="color" title="Text Color" v-model="wData.settings.font_color" :metadata="{ tooltip: textColorTooltip }"/>
 
     <w-form-group title="Includes">
       <w-bool-input title="Show followers" v-model="wData.settings.followers"/>

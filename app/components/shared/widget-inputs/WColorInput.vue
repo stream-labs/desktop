@@ -3,20 +3,22 @@
 
     <div class="input-wrapper">
       <div class="colorpicker">
-        <div
-            class="colorpicker__text"
-            @click="togglePicker">
-          <input
-              class="colorpicker__input"
-              type="text"
-              readonly
-              :value="value">
+        <div class="input-container">
           <div
-              class="colorpicker__swatch"
-              :style="swatchStyle"/>
-        </div>
-        <div v-if="metadata && metadata.tooltip" class="w-tooltip">
-          <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+              class="colorpicker__text"
+              @click="togglePicker">
+            <input
+                class="colorpicker__input"
+                type="text"
+                readonly
+                :value="value">
+            <div
+                class="colorpicker__swatch"
+                :style="swatchStyle"/>
+          </div>
+          <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+            <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+          </div>
         </div>
         <color-picker
             :value="{hex: value}"
@@ -35,6 +37,11 @@
   .colorpicker {
     position: relative;
     width: 220px;
+  }
+
+  .input-container {
+    display: flex;
+    align-items: center;
   }
 
   .colorpicker__text {
