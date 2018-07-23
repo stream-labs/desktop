@@ -1,7 +1,7 @@
 import { ArrayNode } from './array-node';
 import { Inject } from '../../../util/injector';
 import { ISourceFilter, SourceFiltersService, TSourceFilterType } from 'services/source-filters';
-import { TObsValue } from 'components/shared/forms/Input';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 interface IContext {
   sceneId: string;

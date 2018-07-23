@@ -1,8 +1,8 @@
 <template>
 <div>
-  <ListInput v-model="fromSceneModel"/>
-  <ListInput v-model="transitionModel"/>
-  <ListInput v-model="toSceneModel"/>
+  <ObsListInput v-model="fromSceneModel"/>
+  <ObsListInput v-model="transitionModel"/>
+  <ObsListInput v-model="toSceneModel"/>
 </div>
 </template>
 
