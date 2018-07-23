@@ -30,7 +30,6 @@ export default class Credits extends WidgetSettings<ICreditsData, CreditsService
   delayTimeTooltip = $t('Wait time before rerunning the credit reel.');
   rollSpeedTooltip = $t('Speed of the rolling credits.');
   rollTimeTooltip = $t('Duration of the rolling credits.');
-  creditsSubtitleTooltip = $t(
-    'When the credits roll, this will be the format of the subtitle. Available tokens: {total_donated_amount}, {total_cheer_amount}, {top_donor}, {top_donated_amount}, {top_cheer_donor}, {username}, {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.'
-  );
+  creditsSubtitleTooltip = $t('When the credits roll, this will be the format of the subtitle. Available tokens:') +
+    ' {total_donated_amount}, {total_cheer_amount}, {top_donor}, {top_donated_amount}, {top_cheer_donor}, {username}, {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.'
 }
