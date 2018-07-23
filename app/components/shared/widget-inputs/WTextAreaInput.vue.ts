@@ -15,10 +15,4 @@ export default class WTextAreaInput extends WInput<string, IWTextMetadata> {
 
   @Prop({ default: () => ({}) })
   metadata: IWTextMetadata;
-
-  getValidations() {
-    return {
-      ...super.getValidations(),
-    };
-  }
 }
