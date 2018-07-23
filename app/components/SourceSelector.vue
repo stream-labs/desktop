@@ -39,28 +39,26 @@
       :maxScrollSpeed="15">
 
       <template slot="title" slot-scope="{ node }">
-        <div class="title-container">
-          <span class="layer-icon">
-            <i v-if="!node.isLeaf" class="fa fa-folder"></i>
-            <i v-else-if="node.data.type === 'ffmpeg_source'" class="far fa-file-video"></i>
-            <i v-else-if="node.data.type === 'image_source'" class="icon-image"></i>
-            <i v-else-if="node.data.type === 'slideshow'" class="icon-image"></i>
-            <i v-else-if="node.data.type === 'text_gdiplus'" class="fas fa-font"></i>
-            <i v-else-if="node.data.type === 'text_ft2_source'" class="fas fa-font"></i>
-            <i v-else-if="node.data.type === 'dshow_input'" class="icon-webcam"></i>
-            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"></i>
-            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-audio"></i>
-            <i v-else-if="node.data.type === 'monitor_capture'" class="fas fa-desktop"></i>
-            <i v-else-if="node.data.type === 'game_capture'" class="fas fa-gamepad"></i>
-            <i v-else-if="node.data.type === 'browser_source'" class="fas fa-globe"></i>
-            <i v-else-if="node.data.type === 'scene'" class="far fa-object-group"></i>
-            <i v-else-if="node.data.type === 'color_source'" class="fas fa-fill"></i>
-            <i v-else-if="node.data.type === 'openvr_capture'" class="fab fa-simplybuilt fa-rotate-180"></i>
-            <i v-else-if="node.data.type === 'liv_capture'" class="fab fa-simplybuilt fa-rotate-180"></i>
-            <i v-else class="fas fa-file"></i>
-          </span>
-          <span class="item-title">{{ node.title }}</span>
-        </div>
+        <span class="layer-icon">
+          <i v-if="!node.isLeaf" class="fa fa-folder"></i>
+          <i v-else-if="node.data.type === 'ffmpeg_source'" class="far fa-file-video"></i>
+          <i v-else-if="node.data.type === 'image_source'" class="icon-image"></i>
+          <i v-else-if="node.data.type === 'slideshow'" class="icon-image"></i>
+          <i v-else-if="node.data.type === 'text_gdiplus'" class="fas fa-font"></i>
+          <i v-else-if="node.data.type === 'text_ft2_source'" class="fas fa-font"></i>
+          <i v-else-if="node.data.type === 'dshow_input'" class="icon-webcam"></i>
+          <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"></i>
+          <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-audio"></i>
+          <i v-else-if="node.data.type === 'monitor_capture'" class="fas fa-desktop"></i>
+          <i v-else-if="node.data.type === 'game_capture'" class="fas fa-gamepad"></i>
+          <i v-else-if="node.data.type === 'browser_source'" class="fas fa-globe"></i>
+          <i v-else-if="node.data.type === 'scene'" class="far fa-object-group"></i>
+          <i v-else-if="node.data.type === 'color_source'" class="fas fa-fill"></i>
+          <i v-else-if="node.data.type === 'openvr_capture'" class="fab fa-simplybuilt fa-rotate-180"></i>
+          <i v-else-if="node.data.type === 'liv_capture'" class="fab fa-simplybuilt fa-rotate-180"></i>
+          <i v-else class="fas fa-file"></i>
+        </span>
+        <span class="item-title">{{ node.title }}</span>
       </template>
 
       <template slot="toggle" slot-scope="{ node }">

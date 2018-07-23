@@ -272,33 +272,58 @@ select {
 }
 
 table {
-  tr {
-    td,
-    th {
-      &:last-child {
-        padding-right: 0;
+  color: @day-paragraph;
+
+  i,
+  .fa,
+  .fas,
+  .far {
+    .icon-hover();
+  }
+
+  td,
+  th {
+    .input-container {
+      width: 100%;
+      margin-bottom: 0!important;
+      display: block;
+    }
+
+    .input-label {
+      display: none;
+    }
+
+    .input-wrapper {
+      width: 100%;
+    }
+  }
+
+  tbody {
+    border: 1px solid @light-1;
+    background-color: transparent;
+
+    tr {
+      border: 0;
+
+      &:nth-child(odd) {
+        background-color: @light-1;
+        border: 0;
+      }
+
+      &:nth-child(even) {
+        background-color: @light-2;
+        border: 0;
+      }
+
+      td {
+        border: 0;
       }
     }
   }
 }
 
-td,
-th {
-  padding-right: 20px;
-
-  .input-container {
-    width: 100%;
-    margin-bottom: 0;
-    display: block;
-  }
-
-  .input-label {
-    display: none;
-  }
-
-  .input-wrapper {
-    width: 100%;
-  }
+td {
+  padding: .5rem .625rem .625rem;
 }
 
 th {
@@ -307,7 +332,11 @@ th {
   .semibold;
   letter-spacing: 1.5px;
   font-size: 11px;
-  padding-bottom: 10px;
+  padding: .5rem .625rem 10px;
+}
+
+.table__controls {
+  text-align: right;
 }
 
 // Scrolls
@@ -435,5 +464,46 @@ th {
   ::-webkit-scrollbar-thumb {
     background-color: @night-accent-light;
     border-color: @night-accent-dark;
+  }
+
+  .table {
+    color: @night-paragraph;
+
+    i,
+    .fa,
+    .fas,
+    .far {
+      .night-icon-hover();
+    }
+  }
+
+  tbody {
+    background-color: transparent;
+    border-color: @dark-2;
+
+    tr {
+      border: 0;
+
+      &:nth-child(odd) {
+        background-color: @dark-2;
+        border-color: transparent;
+
+        td {
+          border: 0;
+        }
+      }
+
+      &:nth-child(even) {
+        background-color: #121F27;
+      }
+
+      td {
+        border: 0;
+
+        a {
+          color: @white;
+        }
+      }
+    }
   }
 }

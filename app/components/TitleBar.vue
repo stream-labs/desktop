@@ -22,6 +22,7 @@
   flex-direction: row;
   align-items: center;
   height: 30px;
+  flex: 0 0 30px;
   border-bottom: 1px solid @day-border;
 }
 

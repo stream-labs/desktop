@@ -4,13 +4,13 @@
     <p>All inclusive guide for Streamlabs OBS styles, reusable components, assets, etc</p>
     <div class="design-system__wrapper">
       <div class="design-system__menu">
-        <a class="button button--trans" href="#buttons">Buttons</a>
-        <a class="button button--trans" href="#colors">Colors</a>
-        <a class="button button--trans" href="#dropdowns">Dropdowns</a>
-        <a class="button button--trans" href="#icons">Icons</a>
-        <a class="button button--trans" href="#inputs">Inputs</a>
-        <a class="button button--trans" href="#mixins">Mixins</a>
-        <a class="button button--trans" href="#states">States</a>
+        <a class="link link--uppercase" href="#buttons">Buttons</a>
+        <a class="link link--uppercase" href="#colors">Colors</a>
+        <a class="link link--uppercase" href="#dropdowns">Dropdowns</a>
+        <a class="link link--uppercase" href="#icons">Icons</a>
+        <a class="link link--uppercase" href="#inputs">Inputs</a>
+        <a class="link link--uppercase" href="#mixins">Mixins</a>
+        <a class="link link--uppercase" href="#states">States</a>
       </div>
 
       <div class="design-system__body">
@@ -132,22 +132,22 @@
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--dark-2"></div>
                 <div>
-                  <div class="design-system__code">@day-title, @dark-2</div>
-                  <div>Day Title</div>
+                  <div class="design-system__code">@day-title, @night-section, @dark-2</div>
+                  <div>Day Title, Night Sections Background</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--dark-3"></div>
                 <div>
-                  <div class="design-system__code">@icon, @dark-3</div>
+                  <div class="design-system__code">@night-bg, @dark-3</div>
                   <div>Night Background</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--dark-4"></div>
                 <div>
-                  <div class="design-system__code">@icon, @dark-4</div>
-                  <div>-</div>
+                  <div class="design-system__code">@night-section-alt, @dark-4</div>
+                  <div>Night Sections Alt Background (lighter), Night Cards</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
@@ -177,7 +177,7 @@
 
         <div id="icons" class="design-system__section">
           <h2>Icons</h2>
-          <p>We use a combination of <a href="https://fontawesome.com/icons?d=gallery" target="_blank">FontAwesome 5.1.0</a> and our own custom icons.</p>
+          <p>We use a combination of <a href="https://fontawesome.com/icons?d=gallery" target="_blank">FontAwesome 5.1.0</a> and our own <a href="https://www.dropbox.com/s/dlu2faapsgcurcs/icomoon.zip?dl=0" target="_blank">custom icons</a>.</p>
 
           <div class="design-system__icons">
             <div>
@@ -733,6 +733,10 @@
   flex: 0 0 200px;
   .flex;
   flex-direction: column;
+
+  .link {
+    margin-bottom: 16px;
+  }
 }
 
 .design-system__body {
@@ -791,7 +795,7 @@
 
 .design-system__color--white {
   background-color: @white;
-  border: 1px solid @light-4;
+  border-color: @light-4;
 }
 
 .design-system__color--light-1 {
@@ -820,6 +824,7 @@
 
 .design-system__color--dark-3 {
   background-color: @dark-3;
+  border-color: @light-4;
 }
 
 .design-system__color--dark-4 {

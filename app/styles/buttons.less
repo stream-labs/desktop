@@ -188,6 +188,12 @@
   }
 }
 
+.theme-toggle {
+  &:focus {
+    outline: 0;
+  }
+}
+
 .night-theme {
   .button--default {
     background-color: @night-accent-light;
@@ -207,5 +213,9 @@
     &:hover {
       color: @white;
     }
+  }
+
+  .icon-button {
+    .night-icon-hover();
   }
 }

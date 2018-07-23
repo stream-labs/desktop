@@ -26,6 +26,8 @@
 <script lang="ts" src="./GenericFormGroups.vue.ts"></script>
 
 <style lang="less">
+@import "../../../styles/index";
+
 .form-groups {
   .section{
     &:last-child {

@@ -5,26 +5,26 @@
 
   i {
     font-size: 7px;
-    font-weight: 700;
-    color: @day-title;
     text-align: center;
   }
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  background-color: @day-secondary!important;
-  border-color: @day-section!important;
-  color: @day-title!important;
+  background-color: @day-section!important;
+  border: 1px solid @day-section;
+  color: @day-paragraph!important;
 }
 
 .sl-vue-tree-selected>.sl-vue-tree-node-item {
-  border-color: @day-section!important;
   background-color: @white!important;
-  color: @day-paragraph!important;
+  color: @day-title!important;
 }
 
 .sl-vue-tree-node-item {
   color: @day-paragraph!important;
+  border: 1px solid @day-section;
+  height: 32px;
+  margin-top: 0;
 
   &:hover {
     color: @day-paragraph;
@@ -32,33 +32,44 @@
 }
 
 .sl-vue-tree-cursor {
-  border-color: @navy;
+  border: 0!important;
+  background-color: @day-input-border;
+  z-index: 10;
 }
 
 .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
-  border-color: @navy;
+  border-color: @day-input-border;
 }
 
 .night-theme {
   .sl-vue-tree.sl-vue-tree-root {
-    background-color: @night-secondary!important;
-    border-color: @night-secondary!important;
-    color: @grey!important;
+    background-color: @night-section!important;
+    border-color: @night-section!important;
+    color: @icon!important;
   }
 
   .sl-vue-tree-selected>.sl-vue-tree-node-item {
     background-color: @night-hover!important;
-    border-color: transparent!important;
     color: @white!important;
   }
 
   .sl-vue-tree-node-item {
     color: @night-paragraph!important;
+    border-color: @night-section;
   }
 
   .sl-vue-tree-toggle {
     i {
-      color: @grey;
+      color: @icon;
     }
+  }
+
+  .sl-vue-tree-cursor {
+    border: 0!important;
+    background-color: @night-border;
+  }
+
+  .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+    border-color: @night-border;
   }
 }

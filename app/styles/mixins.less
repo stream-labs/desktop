@@ -89,12 +89,20 @@
 
 // Hovers
 .icon-hover {
-  color: @grey;
-  opacity: .7;
-  transition: all 275ms;
+  color: @icon;
+  .transition();
 
   &:hover {
-    opacity: 1;
+    color: @dark-2;
+  }
+}
+
+.night-icon-hover {
+  color: @icon;
+  .transition;
+
+  &:hover {
+    color: @white;
   }
 }
 
@@ -137,10 +145,4 @@
 
 .bold {
   font-weight: 700;
-}
-
-.night-theme {
-  .teal {
-    color: @teal-bright;
-  }
 }
