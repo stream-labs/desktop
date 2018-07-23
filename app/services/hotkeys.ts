@@ -532,13 +532,17 @@ export class Hotkey implements IHotkey {
 
     // We defer the actions until after we've decided whether
     // or not to execute each action.
-    if (up) action.upHandler = () => {
-      if (!action.isActive(entityId)) defer(() => up(entityId));
-    };
+    if (up) {
+      action.upHandler = () => {
+        if (!action.isActive(entityId)) defer(() => up(entityId));
+      };
+    }
 
-    if (down) action.downHandler = () => {
-      if (!action.isActive(entityId)) defer(() => down(entityId));
-    };
+    if (down) {
+      action.downHandler = () => {
+        if (!action.isActive(entityId)) defer(() => down(entityId));
+      };
+    }
 
     return action;
   }

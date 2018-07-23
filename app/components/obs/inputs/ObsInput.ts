@@ -188,11 +188,13 @@ export function obsValuesToInputValues(
     if (['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'].includes(obsProp.type)) {
       const listOptions: any[] = [];
 
-      if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
-        listOptions.push({
-          value: listOption[Object.keys(listOption)[0]],
-          description: $t(Object.keys(listOption)[0])
-        });
+      if (options.transformListOptions) {
+        for (const listOption of (obsProp.values || []))  {
+          listOptions.push({
+            value: listOption[Object.keys(listOption)[0]],
+            description: $t(Object.keys(listOption)[0])
+          });
+        }
       }
 
       if (options.subParametersGetter) {
