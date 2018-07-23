@@ -11,7 +11,7 @@
     </div>
   </div>
 
-  <ListInput :value="widgetModel" @input="handleInput" />
+  <ObsListInput :value="widgetModel" @input="handleInput" />
 </div>
 </template>
 

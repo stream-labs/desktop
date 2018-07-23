@@ -6,9 +6,9 @@ import {
   ICustomizationServiceState,
   ICustomizationSettings
 } from './customization-api';
-import { IFormInput, IListInput, INumberInputValue, TFormData } from 'components/shared/forms/Input';
-import Utils from '../utils';
-import { $t } from '../i18n';
+import { IObsInput, IObsListInput, IObsNumberInputValue, TObsFormData } from 'components/obs/inputs/ObsInput';
+import Utils from 'services/utils';
+import { $t } from 'services/i18n';
 
 const LIVEDOCK_MIN_SIZE = 0.15;
 const LIVEDOCK_MAX_SIZE = 0.5;
@@ -104,11 +104,11 @@ export class CustomizationService
     this.setSettings({ mediaBackupOptOut: optOut });
   }
 
-  getSettingsFormData(): TFormData {
+  getSettingsFormData(): TObsFormData {
     const settings = this.getSettings();
 
     return [
-      <IFormInput<boolean>> {
+      <IObsInput<boolean>> {
         value: settings.nightMode,
         name: 'nightMode',
         description: $t('Night mode'),
@@ -117,7 +117,7 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IListInput<boolean>> {
+      <IObsListInput<boolean>> {
         value: settings.folderSelection,
         name: 'folderSelection',
         description: $t('Scene item selection mode'),
@@ -130,7 +130,7 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IFormInput<boolean>>{
+      <IObsInput<boolean>>{
         value: settings.leftDock,
         name: 'leftDock',
         description: $t('Show the live dock (chat) on the left side'),
@@ -139,7 +139,7 @@ export class CustomizationService
         enabled: true,
       },
 
-      <INumberInputValue> {
+      <IObsNumberInputValue> {
         value: settings.chatZoomFactor,
         name: 'chatZoomFactor',
         description: $t('Chat Text Size'),
@@ -152,7 +152,7 @@ export class CustomizationService
         usePercentages: true,
       },
 
-      <INumberInputValue> {
+      <IObsNumberInputValue> {
         value: settings.livedockSize,
         name: 'livedockSize',
         description: $t('Chat Width'),
@@ -165,7 +165,7 @@ export class CustomizationService
         usePercentages: true,
       },
 
-      <IFormInput<boolean>>  {
+      <IObsInput<boolean>>  {
         value: settings.enableBTTVEmotes,
         name: 'enableBTTVEmotes',
         description: $t('Enable BetterTTV emotes for Twitch'),
@@ -174,7 +174,7 @@ export class CustomizationService
         enabled: true,
       },
 
-      <IFormInput<boolean>>  {
+      <IObsInput<boolean>>  {
         value: settings.enableFFZEmotes,
         name: 'enableFFZEmotes',
         description: $t('Enable FrankerFaceZ emotes for Twitch'),
@@ -186,9 +186,9 @@ export class CustomizationService
     ];
   }
 
-  getExperimentalSettingsFormData(): TFormData {
+  getExperimentalSettingsFormData(): TObsFormData {
     return [
-      <IFormInput<boolean>>  {
+      <IObsInput<boolean>>  {
         value: this.state.experimental.newWidgets,
         name: 'newWidgets',
         description: 'New Widgets',

@@ -11,7 +11,6 @@ import { Subject } from 'rxjs/Subject';
 import { IWInputMetadata } from 'components/shared/widget-inputs/WInput';
 
 
-
 export interface IWidgetTab {
   title: string;
   name: string;
