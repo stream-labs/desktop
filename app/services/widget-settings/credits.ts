@@ -23,10 +23,6 @@ export interface ICreditsSettings extends IWidgetSettings {
   roll_speed: number;
   roll_time: number;
   loop_credits: boolean;
-  custom_enabled: boolean;
-  custom_css: string;
-  custom_js: string;
-  custom_html: string;
 }
 export interface ICreditsData extends IWidgetData {
   themes: any;
@@ -50,17 +46,6 @@ export class CreditsService extends WidgetSettingsService<ICreditsData> {
   getDataUrl() {
     return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/endcredits`;
   }
-
-  patchAfterFetch(data: any): ICreditsData {
-    // transform platform types to simple booleans
-    return data;
-  }
-
-  patchBeforeSend(settings: ICreditsSettings): any {
-    // the API accepts an object instead of simple booleans for platforms
-    return settings;
-  }
-
 
   protected tabs = [
     { name: 'settings' },
