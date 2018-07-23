@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="section">
-    <BoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
+    <ObsBoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
     <button class="button button--action" @click="restartStreamlabelsSession">
       {{ $t('Restart Streamlabels Session') }}
     </button>

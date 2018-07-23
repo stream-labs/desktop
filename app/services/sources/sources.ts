@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import Vue from 'vue';
 import { Subject } from 'rxjs/Subject';
-import { IListOption, setupConfigurableDefaults, TObsValue } from 'components/shared/forms/Input';
+import { IObsListOption, setupConfigurableDefaults, TObsValue } from 'components/obs/inputs/ObsInput';
 import { StatefulService, mutation } from 'services/stateful-service';
 import * as obs from '../../../obs-api';
 import electron from 'electron';
@@ -249,9 +249,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
+  getAvailableSourcesTypesList(): IObsListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
-    const whitelistedTypes: IListOption<TSourceType>[] = [
+    const whitelistedTypes: IObsListOption<TSourceType>[] = [
       { description: 'Image', value: 'image_source' },
       { description: 'Color Source', value: 'color_source' },
       { description: 'Browser Source', value: 'browser_source' },
