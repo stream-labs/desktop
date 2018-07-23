@@ -1,7 +1,8 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const plugins = [];
+const plugins = [new BundleAnalyzerPlugin()];
 
 
 // uncomment to watch circular dependencies
