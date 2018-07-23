@@ -111,4 +111,4 @@ export const ChatbotPermissions: Dictionary<number> = {
 export const ChatbotResponseTypes: string[] = [
   'Chat',
   'Whisper'
-]
+];
