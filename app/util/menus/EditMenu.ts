@@ -140,7 +140,6 @@ export class EditMenu extends Menu {
       }
 
 
-
       if (this.source && this.source.getPropertiesManagerType() === 'widget') {
         this.append({
           label: $t('Export Widget'),

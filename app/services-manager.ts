@@ -517,8 +517,9 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
-        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable))
+        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
+        }
 
         const serviceName = target.constructor.name;
         const methodName = property;

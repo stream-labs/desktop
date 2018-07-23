@@ -133,11 +133,13 @@ export function ServiceHelper(): ClassDecorator {
       .constructor
       .prototype
       .originalMethods;
-    if (baseClassMutations) Object.keys(baseClassMutations).forEach(methodName => {
-      if (Object.getOwnPropertyDescriptor(f.prototype, methodName)) return; // mutation is overridden
-      f.prototype[methodName] = baseClassMutations[methodName];
-      registerMutation(f.prototype, methodName, Object.getOwnPropertyDescriptor(f.prototype, methodName));
-    });
+    if (baseClassMutations) {
+      Object.keys(baseClassMutations).forEach(methodName => {
+        if (Object.getOwnPropertyDescriptor(f.prototype, methodName)) return; // mutation is overridden
+        f.prototype[methodName] = baseClassMutations[methodName];
+        registerMutation(f.prototype, methodName, Object.getOwnPropertyDescriptor(f.prototype, methodName));
+      });
+    }
 
     // return new constructor (will override original)
     return f;

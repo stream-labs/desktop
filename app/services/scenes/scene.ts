@@ -546,7 +546,4 @@ export class Scene implements ISceneApi {
       });
     });
   }
-
-
-
 }
