@@ -31,7 +31,7 @@
     </button>
   </div>
   <div class="section">
-    <BoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
+    <ObsBoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
   </div>
 </div>
 </template>

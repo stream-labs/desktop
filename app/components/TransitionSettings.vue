@@ -1,8 +1,8 @@
 <template>
 <div>
-  <TextInput v-model="nameModel"/>
-  <ListInput v-model="typeModel"/>
-  <IntInput v-model="durationModel"/>
+  <ObsTextInput v-model="nameModel"/>
+  <ObsListInput v-model="typeModel"/>
+  <ObsIntInput v-model="durationModel"/>
 
   <GenericForm v-model="properties" @input="saveProperties"></GenericForm>
 </div>

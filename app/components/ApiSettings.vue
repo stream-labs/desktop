@@ -7,13 +7,13 @@
     </div>
 
     <div class="section">
-      <TextInput :value="tokenInput">
+      <ObsTextInput :value="tokenInput">
         <button
             class="button button--input"
             @click="generateToken">
           Update
         </button>
-      </TextInput>
+      </ObsTextInput>
     </div>
 
 

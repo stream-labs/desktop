@@ -1,8 +1,9 @@
 import { Service } from './service';
 import {
-  TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
-  TObsValue
-} from '../components/shared/forms/Input';
+  TObsFormData, getPropertiesFormData, setPropertiesFormData, IObsListOption,
+  TObsValue, IObsListInput
+} from 'components/obs/inputs/ObsInput';
+
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
 import { WindowsService } from './windows';
@@ -54,9 +55,9 @@ export class SourceFiltersService extends Service {
   @Inject()
   windowsService: WindowsService;
 
-  getTypesList(): IListOption<TSourceFilterType>[] {
+  getTypesList(): IObsListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
-    const whitelistedTypes: IListOption<TSourceFilterType>[] = [
+    const whitelistedTypes: IObsListOption<TSourceFilterType>[] = [
       { description: $t('Image Mask/Blend'), value: 'mask_filter' },
       { description: $t('Crop/Pad'), value: 'crop_filter' },
       { description: $t('Gain'), value: 'gain_filter' },
@@ -165,7 +166,7 @@ export class SourceFiltersService extends Service {
   }
 
 
-  setPropertiesFormData(sourceId: string, filterName: string, properties: TFormData) {
+  setPropertiesFormData(sourceId: string, filterName: string, properties: TObsFormData) {
     if (!filterName) return;
     setPropertiesFormData(this.getObsFilter(sourceId, filterName), properties);
   }
@@ -210,9 +211,23 @@ export class SourceFiltersService extends Service {
   }
 
 
-  getPropertiesFormData(sourceId: string, filterName: string): TFormData {
+  getPropertiesFormData(sourceId: string, filterName: string): TObsFormData {
     if (!filterName) return [];
-    return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+
+    // Show SLOBS frontend display names for the sidechain source options
+    formData.forEach(input => {
+      if (input.name === 'sidechain_source') {
+        (input as IObsListInput<string>).options.forEach(option => {
+          if (option.value === 'none') return;
+
+          const source = this.sourcesService.getSourceById(option.value);
+          if (source) option.description = source.name;
+        });
+      }
+    });
+
+    return formData;
   }
 
 
