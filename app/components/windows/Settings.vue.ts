@@ -42,19 +42,19 @@ export default class SceneTransitions extends Vue {
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
-    General: 'fa fa-th-large',
-    Stream: 'fa fa-globe',
-    Output: 'fa fa-microchip',
-    Video: 'fa fa-film',
-    Audio: 'fa fa-volume-up',
-    Hotkeys: 'fa fa-keyboard-o',
-    Advanced: 'fa fa-cogs',
-    API: 'fa fa-file-code-o',
+    General: 'icon-overview',
+    Stream: 'fas fa-globe',
+    Output: 'fas fa-microchip',
+    Video: 'fas fa-film',
+    Audio: 'icon-audio',
+    Hotkeys: 'icon-settings',
+    Advanced: 'fas fa-cogs',
+    API: 'far fa-file-code',
     'Scene Collections': 'icon-themes',
-    Notifications: 'fa fa-warning',
-    Appearance: 'fa fa-television',
-    'Remote Control': 'fa fa-play-circle',
-    Experimental: 'fa fa-flask'
+    Notifications: 'icon-notifications',
+    Appearance: 'icon-settings-3-1',
+    'Remote Control': 'fas fa-play-circle',
+    Experimental: 'fas fa-flask'
   };
 
   get categoryName() {
