@@ -14,6 +14,10 @@ import {
 export class ChatbotCommonService extends PersistentStatefulService<ChatbotApiServiceState> {
   @Inject() windowsService: WindowsService;
 
+  closeChildWindow() {
+    this.windowsService.closeChildWindow();
+  }
+
   openCreateCommandWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotAddCommand',

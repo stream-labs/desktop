@@ -24,7 +24,11 @@ export interface CustomCommandsResponse {
 // shared
 export interface Permission {
   level: number;
-  info?: any;
+  info?: PermissionInfo;
+}
+
+export interface PermissionInfo {
+  [id: string]: any;
 }
 
 export interface Cooldown {
@@ -82,3 +86,29 @@ export interface CustomCommandRow {
   created_at: string;
   updated_at: string;
 }
+
+export interface NewCustomCommand {
+  command: string;
+  response: string;
+  response_type: string;
+  permission: Permission;
+  cooldowns: Cooldown;
+  aliases: Aliases;
+  platforms: number;
+  enabled: boolean;
+}
+
+// dictionaries
+export const ChatbotPermissions: Dictionary<number> = {
+  None: 0,
+  Viewer: 1,
+  Subscriber: 2,
+  Moderator: 32,
+  Broadcaster: 128,
+  All: 163
+};
+
+export const ChatbotResponseTypes: string[] = [
+  'Chat',
+  'Whisper'
+]
