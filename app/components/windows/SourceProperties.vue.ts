@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { TFormData } from 'components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
 import { ISourcesServiceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
-import GenericForm from 'components/shared/forms/GenericForm.vue';
+import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import WidgetProperties from 'components/custom-source-properties/WidgetProperties.vue';
 import StreamlabelProperties from 'components/custom-source-properties/StreamlabelProperties.vue';
 import { $t } from 'services/i18n';
@@ -34,7 +34,7 @@ export default class SourceProperties extends Vue {
 
   sourceId = this.windowsService.getChildWindowQueryParams().sourceId;
   source = this.sourcesService.getSource(this.sourceId);
-  properties: TFormData = [];
+  properties: TObsFormData = [];
 
   sourcesSubscription: Subscription;
 
@@ -57,7 +57,7 @@ export default class SourceProperties extends Vue {
   }
 
 
-  onInputHandler(properties: TFormData, changedIndex: number) {
+  onInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.sourcesService.getSource(this.sourceId);
     source.setPropertiesFormData(
       [properties[changedIndex]]

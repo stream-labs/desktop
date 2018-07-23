@@ -3,7 +3,7 @@ import os from 'os';
 import crypto from 'crypto';
 import { ServicesManager } from '../../services-manager';
 import { PersistentStatefulService } from 'services/persistent-stateful-service';
-import { IFormInput } from '../../components/shared/forms/Input';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { ISettingsSubCategory } from 'services/settings';
 import { mutation } from 'services/stateful-service';
 import { Inject } from '../../util/injector';
@@ -144,7 +144,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         nameSubCategory: 'Named Pipe',
         codeSubCategory: 'namedPipe',
         parameters: [
-          <IFormInput<boolean>> {
+          <IObsInput<boolean>> {
             value: settings.namedPipe.enabled,
             name: 'enabled',
             description: 'Enabled',
@@ -153,7 +153,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: true,
           },
 
-          <IFormInput<string>> {
+          <IObsInput<string>> {
             value: settings.namedPipe.pipeName,
             name: 'pipeName',
             description: 'Pipe Name',
@@ -167,7 +167,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
         nameSubCategory: 'Websockets',
         codeSubCategory: 'websockets',
         parameters: [
-          <IFormInput<boolean>> {
+          <IObsInput<boolean>> {
             value: settings.websockets.enabled,
             name: 'enabled',
             description: 'Enabled',
@@ -176,7 +176,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: true,
           },
 
-          <IFormInput<boolean>> {
+          <IObsInput<boolean>> {
             value: settings.websockets.allowRemote,
             name: 'allowRemote',
             description: 'Allow Remote Connections',
@@ -185,7 +185,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: settings.websockets.enabled,
           },
 
-          <IFormInput<number>> {
+          <IObsInput<number>> {
             value: settings.websockets.port,
             name: 'port',
             description: 'Port',

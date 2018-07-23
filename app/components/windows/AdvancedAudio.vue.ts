@@ -3,11 +3,11 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
 import { IAudioServiceApi, IAudioSourceApi } from '../../services/audio';
-import { propertyComponentForType } from '../shared/forms/Components';
+import { propertyComponentForType } from 'components/obs/inputs/Components';
 import windowMixin from '../mixins/window';
 
 import ModalLayout from '../ModalLayout.vue';
-import { TObsValue } from '../shared/forms/Input';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 @Component({
   components: { ModalLayout },
