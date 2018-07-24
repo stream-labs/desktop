@@ -30,10 +30,10 @@
                 @click="makeDefault(transition.id)">
                 <i
                   v-if="defaultTransitionId === transition.id"
-                  class="fa fa-circle transition-default" />
+                  class="fas fa-circle transition-default" />
                 <i
                   v-else
-                  class="fa fa-circle-o" />
+                  class="far fa-circle" />
               </td>
               <td>{{ transition.name }}</td>
               <td>{{ nameForType(transition.type) }}</td>
@@ -70,7 +70,7 @@
               <td class="table__controls">
                 <i
                   v-if="isConnectionRedundant(connection.id)"
-                  class="fas fa-exclamation-triangle transition-redundant"
+                  class="icon-information transition-redundant"
                   v-tooltip="redundantConnectionTooltip"/>
                 <i
                   @click="editConnection(connection.id)"
