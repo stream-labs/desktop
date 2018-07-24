@@ -523,6 +523,7 @@
         <ul class="source-list">
           <li
             v-for="source in availableSources"
+            :key="source.value"
             class="source source--standard"
             :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
@@ -536,109 +537,16 @@
         <h4>{{ $t('Widgets') }}</h4>
         <div class="source-list">
           <div
+            v-for="type in iterableWidgetTypes"
+            :key="type"
+            v-show="!widgetPlatform(type) || widgetPlatform(type) === platform"
             class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Alertbox}"
-            @click="inspectSource(widgetTypes.AlertBox)"
-            @dblclick="selectWidget(widgetTypes.AlertBox)">
-            <div>{{ $t('Alertbox') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.EventList}"
-            @click="inspectSource(widgetTypes.EventList)"
-            @dblclick="selectWidget(widgetTypes.EventList)">
-            <div>{{ $t('Event List') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
-            @click="inspectSource(widgetTypes.TheJar)"
-            @dblclick="selectWidget(widgetTypes.TheJar)">
-            <div>{{ $t('The Jar') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationGoal}"
-            @click="inspectSource(widgetTypes.DonationGoal)"
-            @dblclick="selectWidget(widgetTypes.DonationGoal)">
-            <div>{{ $t('Donation Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
-            @click="inspectSource(widgetTypes.FollowerGoal)"
-            @dblclick="selectWidget(widgetTypes.FollowerGoal)">
-            <div>{{ $t('Follower Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'twitch'"
-            :class="{'source--active': inspectedSource === widgetTypes.BitGoal}"
-            @click="inspectSource(widgetTypes.BitGoal)"
-            @dblclick="selectWidget(widgetTypes.BitGoal)">
-            <div>{{ $t('Bit Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'youtube'"
-            :class="{'source--active': inspectedSource === widgetTypes.SubscriptionGoal}"
-            @click="inspectSource(widgetTypes.SubscriptionGoal)"
-            @dblclick="selectWidget(widgetTypes.SubscriptionGoal)">
-            <div>{{ $t('Subscription Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationTicker}"
-            @click="inspectSource(widgetTypes.DonationTicker)"
-            @dblclick="selectWidget(widgetTypes.DonationTicker)">
-            <div>{{ $t('Donation Ticker') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
-            @click="inspectSource(widgetTypes.ChatBox)"
-            @dblclick="selectWidget(widgetTypes.ChatBox)">
-            <div>{{ $t('Chatbox') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.StreamBoss}"
-            @click="inspectSource(widgetTypes.StreamBoss)"
-            @dblclick="selectWidget(widgetTypes.StreamBoss)">
-            <div>{{ $t('Stream Boss') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Credits}"
-            @click="inspectSource(widgetTypes.Credits)"
-            @dblclick="selectWidget(widgetTypes.Credits)">
-            <div>{{ $t('Credits') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ViewerCount}"
-            @click="inspectSource(widgetTypes.ViewerCount)"
-            @dblclick="selectWidget(widgetTypes.ViewerCount)">
-            <div>{{ $t('Viewer Count') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.SpinWheel}"
-            @click="inspectSource(widgetTypes.SpinWheel)"
-            @dblclick="selectWidget(widgetTypes.SpinWheel)">
-            <div>{{ $t('Spin Wheel') }}</div>
+            :class="{'source--active': inspectedSource === widgetTypes[type]}"
+            @click="inspectSource(widgetTypes[type])"
+            @dblclick="selectWidget(widgetTypes[type])"
+          >
+            <div>{{ $t(widgetName(type)) }}</div>
+            <span v-if="essentialWidgetTypes.has(widgetTypes[type])" class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div

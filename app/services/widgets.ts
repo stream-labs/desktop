@@ -17,14 +17,14 @@ import { authorizedHeaders } from 'util/requests';
 
 export enum WidgetType {
   AlertBox = 0,
-  DonationGoal = 1,
-  FollowerGoal = 2,
-  SubscriberGoal = 3,
+  EventList = 1,
+  TheJar = 2,
+  DonationGoal = 3,
   BitGoal = 4,
   DonationTicker = 5,
   ChatBox = 6,
-  EventList = 7,
-  TheJar = 8,
+  FollowerGoal = 7,
+  SubscriberGoal = 8,
   ViewerCount = 9,
   StreamBoss = 10,
   Credits = 11,
@@ -155,6 +155,8 @@ export interface IWidget {
 
   // An anchor (origin) point can be specified for the x&y positions
   anchor: AnchorPoint;
+
+  platform?: string;
 }
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {
@@ -215,7 +217,9 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     x: 0,
     y: 1,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.SouthWest,
+
+    platform: 'youtube'
   },
 
   [WidgetType.BitGoal]: {
@@ -230,7 +234,9 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     x: 0,
     y: 1,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.SouthWest,
+
+    platform: 'twitch'
   },
 
   [WidgetType.DonationTicker]: {
@@ -428,6 +434,15 @@ export class WidgetsService extends Service {
 
   getWidgetComponent(type: WidgetType): string {
     return WidgetType[type];
+  }
+
+  getWidgetName(type: WidgetType): string {
+    return WidgetDefinitions[this.getWidgetComponent(type)].name;
+  }
+
+  getWidgetPlatform(type: WidgetType): string {
+    console.log(type);
+    return WidgetDefinitions[this.getWidgetComponent(type)].platform;
   }
 
   getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {

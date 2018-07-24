@@ -34,6 +34,10 @@ export default class SourcesShowcase extends Vue {
 
   widgetTypes = WidgetType;
 
+  iterableWidgetTypes = Object.keys(this.widgetTypes).filter((type: string) => isNaN(Number(type)))
+
+  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TheJar]);
+
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
 
@@ -63,6 +67,14 @@ export default class SourcesShowcase extends Vue {
       propertiesManager: 'widget',
       widgetType: type
     });
+  }
+
+  widgetName(type: WidgetType) {
+    return this.widgetsService.getWidgetName(type);
+  }
+
+  widgetPlatform(type: WidgetType) {
+    return this.widgetsService.getWidgetPlatform(type);
   }
 
   inspectedSource: TInspectableSource = null;
