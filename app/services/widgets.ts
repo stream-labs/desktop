@@ -442,7 +442,6 @@ export class WidgetsService extends Service {
   }
 
   getWidgetPlatform(type: WidgetType): string {
-    console.log(type);
     return WidgetDefinitions[this.getWidgetComponent(type)].platform;
   }
 
