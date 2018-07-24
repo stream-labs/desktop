@@ -13,7 +13,7 @@ import { $t } from 'services/i18n';
 import { IObsInput } from 'components/obs/inputs/ObsInput';
 import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 
-@Component({ components: { BoolInput: ObsBoolInput } })
+@Component({ components: { ObsBoolInput } })
 export default class OverlaySettings extends Vue {
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() overlaysPersistenceService: OverlaysPersistenceService;
