@@ -21,7 +21,7 @@
     </button>
     <button
       class="button button--action"
-      @click="doneHandler">
+      @click="done">
       {{ $t('Done') }}
     </button>
   </div>

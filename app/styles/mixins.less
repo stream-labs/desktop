@@ -101,6 +101,101 @@
   padding-right: 0;
 }
 
+.padding--5 {
+  padding: 5px;
+}
+
+.padding--10 {
+  padding: 10px;
+}
+
+.padding--20 {
+  padding: 20px;
+}
+
+.padding-vertical--20 {
+  padding: 20px 0;
+}
+
+// margins
+.margin--10 {
+  margin: 10px;
+}
+
+.margin--20 {
+  margin: 20px;
+}
+
+.margin-vertical--10 {
+  margin: 10px 0;
+}
+
+
+
+// flex helpers
+.flex {
+  display: flex;
+}
+
+.flex--start {
+  justify-content: flex-start;
+}
+
+.flex--end {
+  justify-content: flex-end;
+}
+
+.flex--v-center {
+  align-items: center;
+}
+
+.flex--v-start {
+  align-items: flex-start;
+}
+
+.flex--v-end {
+  align-items: flex-end;
+}
+
+.flex--space-between {
+  justify-content: space-between;
+}
+
+.flex--space-around {
+  justify-content: space-around;
+}
+
+// width
+
+.width--auto {
+  width: auto !important;
+}
+
+
+// text align
+.text-align--right {
+  text-align: right;
+}
+
+.text-align--center {
+  text-align: center;
+}
+
+// align items
+.align-items--inline {
+  & > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+.align-items--top {
+  & > * {
+    vertical-align: top;
+  }
+}
+
+
 // Shadows
 .shadow {
   box-shadow: 0 6px 14px @shadow;
@@ -133,4 +228,26 @@
   .teal {
     color: @teal-bright;
   }
+}
+
+//cursors
+
+.cursor--pointer {
+  cursor: pointer;
+}
+
+// text transforms
+
+.text-transform--capitalize {
+  text-transform: capitalize;
+}
+
+.text-transform--uppercase {
+  text-transform: uppercase;
+}
+
+// overflows
+
+.overflow--auto {
+  overflow: auto;
 }

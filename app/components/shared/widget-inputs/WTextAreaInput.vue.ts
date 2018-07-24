@@ -3,6 +3,7 @@ import { IWInputMetadata, WInput } from './WInput';
 
 interface IWTextMetadata extends IWInputMetadata {
   placeholder: string;
+  validate: string;
 }
 
 @Component({
@@ -14,6 +15,4 @@ export default class WTextAreaInput extends WInput<string, IWTextMetadata> {
 
   @Prop({ default: () => ({}) })
   metadata: IWTextMetadata;
-
-
 }
