@@ -2,7 +2,7 @@
   <span>
     <textarea
       type="text"
-      :placeholder="metadata.placeholder"
+      :placeholder="options.placeholder"
       :value="value"
       @input="emitInput($event.target.value)"
       class="text-area radius"
