@@ -16,11 +16,11 @@ import {
 export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
   @Inject() userService: UserService;
 
-  cdn = 'https://chatbot-api.streamlabs.com/';
+  apiUrl = 'https://chatbot-api.streamlabs.com/';
   version = 'api/v1/';
 
   apiEndpoint(route: String, versionIncluded?: Boolean) {
-    return `${this.cdn}${versionIncluded ? this.version : ''}${route}`;
+    return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
 
   //
@@ -51,123 +51,67 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
     });
   }
 
+  api(method: string, endpoint: string, data: any) {
+    const url = this.apiEndpoint(endpoint, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    if (method.toLowerCase() === 'post' || method.toLowerCase() === 'put') {
+      headers.append('Content-Type', 'application/json');
+    }
+    const request = new Request(url, {
+      headers,
+      method,
+      body: JSON.stringify(data || {})
+    });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
   //
   // GET requests
   //
 
   fetchDefaultCommands() {
-    const url = this.apiEndpoint('commands/default', true);
-    const headers = authorizedHeaders(this.state.api_token);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('GET','commands/default', {});
   }
 
   fetchCustomCommands(page: number) {
-    const url = this.apiEndpoint(`commands?page=${page}`, true);
-    const headers = authorizedHeaders(this.state.api_token);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('GET', `commands?page=${page}`, {});
   }
 
   fetchTimers(page: number) {
-    const url = this.apiEndpoint(`timers?page=${page}`, true);
-    const headers = authorizedHeaders(this.state.api_token);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('GET', `timers?page=${page}`, {});
   }
 
   //
   // POST, PUT requests
   //
   updateDefaultCommand(slugName: string, commandName: string, data: DefaultCommand) {
-    const url = this.apiEndpoint(`settings/${slugName}/commands/${commandName}`, true);
-    const headers = authorizedHeaders(this.state.api_token);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('POST', `settings/${slugName}/commands/${commandName}`, data);
   }
 
   updateCustomCommand(id: string, data: CustomCommand) {
-    const url = this.apiEndpoint(`commands/${id}`, true);
-    const headers = authorizedHeaders(this.state.api_token);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('PUT', `commands/${id}`, data);
   }
 
   createCustomCommand(data: CustomCommand) {
-    const url = this.apiEndpoint('commands', true);
-    const headers = authorizedHeaders(this.state.api_token);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('POST', 'commands', data);
   }
 
   createTimer(data: Timer) {
-    const url = this.apiEndpoint('timers', true);
-    const headers = authorizedHeaders(this.state.api_token);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'POST',
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('POST', 'timers', data);
   }
 
   updateTimer(id: string, data: Timer) {
-    const url = this.apiEndpoint(`timers/${id}`, true);
-    const headers = authorizedHeaders(this.state.api_token);
-    headers.append('Content-Type', 'application/json');
-    const request = new Request(url, {
-      headers,
-      method: 'PUT',
-      body: JSON.stringify(data)
-    });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
+    return this.api('PUT', `timers/${id}`, data);
   }
 
   //
   // Mutations
   //
   @mutation()
-  LOGIN(response: ChatbotApiServiceState) {
+  private LOGIN(response: ChatbotApiServiceState) {
     Vue.set(this.state, 'api_token', response.api_token);
     Vue.set(this.state, 'socket_token', response.socket_token);
   }

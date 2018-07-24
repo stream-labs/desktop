@@ -28,7 +28,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService
       .fetchCustomCommands(page)
       .then((response: CustomCommandsResponse) => {
-        console.log(response.data);
         this.commands = response.data;
         this.pagination = response.pagination;
       });

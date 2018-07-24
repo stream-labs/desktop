@@ -41,7 +41,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     enabled: true
   };
 
-  tabs: { name: String; value: String }[] = [
+  tabs: { name: string; value: string }[] = [
     {
       name: 'General',
       value: 'general'
@@ -52,7 +52,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     }
   ];
 
-  selectedTab: String = 'general';
+  selectedTab: string = 'general';
 
   // metadata
   commandMetadata: IWTextMetadata = {
@@ -81,7 +81,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     })
   };
 
-  onSelectTab(tab: String) {
+  onSelectTab(tab: string) {
     this.selectedTab = tab;
   }
 
@@ -90,11 +90,9 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
-    debugger;
     this.chatbotApiService
       .createCustomCommand(this.newCommand)
       .then((response: CustomCommand) => {
-        debugger;
       });
   }
 }

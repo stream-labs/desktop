@@ -9,7 +9,7 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
   }
 })
 export default class ChatbotCommands extends ChatbotBase {
-  tabs: { name: String; value: String }[] = [
+  tabs: { name: string; value: string }[] = [
     {
       name: 'Custom Commands',
       value: 'custom'
@@ -24,9 +24,9 @@ export default class ChatbotCommands extends ChatbotBase {
     }
   ];
 
-  selectedTab: String = 'custom';
+  selectedTab = 'custom';
 
-  onSelectTab(tab: String) {
+  onSelectTab(tab: string) {
     this.selectedTab = tab;
   }
 }

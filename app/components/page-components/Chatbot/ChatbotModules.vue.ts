@@ -3,11 +3,4 @@ import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
 })
-export default class ChatbotModules extends Vue {
-  data() {
-    return {
-    };
-  }
-}
-
-
+export default class ChatbotModules extends Vue {}

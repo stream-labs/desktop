@@ -25,7 +25,6 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService
       .fetchTimers(page)
       .then((response: TimersResponse) => {
-        console.log(response.data);
         this.timers = response.data;
         this.pagination = response.pagination;
       });

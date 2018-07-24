@@ -22,7 +22,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService
       .fetchDefaultCommands()
       .then((response: DafaultCommandsResponse) => {
-        console.log(response);
         this.commandSlugs = response;
       })
       .catch(err => {

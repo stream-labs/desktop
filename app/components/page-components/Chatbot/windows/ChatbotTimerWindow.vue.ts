@@ -55,11 +55,9 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
-    debugger;
     this.chatbotApiService
       .createTimer(this.newTimer)
       .then((response: Timer) => {
-        debugger;
       });
   }
 }

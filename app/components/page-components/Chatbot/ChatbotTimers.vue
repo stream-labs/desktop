@@ -21,26 +21,25 @@
     <table v-else>
       <thead>
         <tr>
-          <th>timer</th>
-          <th>interval</th>
-          <th>response</th>
-          <th>line minimum</th>
+          <th> {{ $t("timer") }} </th>
+          <th> {{ $t("interval") }} </th>
+          <th> {{ $t("response") }} </th>
+          <th> {{ $t("line minimum") }} </th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="(timer, index) in timers"
-          :key="index"
+          :key="timer.name"
         >
-          <td> {{ $t(timer.name) }} </td>
-          <td> {{ $t(timer.interval) }} </td>
-          <td> {{ $t(timer.message) }} </td>
-          <td> {{ $t(timer.chat_lines) }} </td>
+          <td> {{ timer.name }} </td>
+          <td> {{ timer.interval }} </td>
+          <td> {{ timer.message }} </td>
+          <td> {{ timer.chat_lines }} </td>
           <td>
             <div class="align-items--inline">
               <WToggleInput
-                v-if="typeof timer.enabled === 'boolean'"
                 :value="timer.enabled"
                 @input="toggleEnabletimer(timer.id, index, !timer.enabled)"
               />

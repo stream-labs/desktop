@@ -131,16 +131,16 @@ export interface Timer {
 }
 
 // dictionaries
-export const ChatbotPermissions: Dictionary<number> = {
-  None: 0,
-  Viewer: 1,
-  Subscriber: 2,
-  Moderator: 32,
-  Broadcaster: 128,
-  All: 163
-};
+export enum ChatbotPermissions {
+  None = 0,
+  Viewer = 1,
+  Subscriber = 1 << 1,
+  Moderator = 1 << 5,
+  Broadcaster = 1 << 7,
+  All = Viewer | Subscriber | Moderator | Broadcaster
+}
 
-export const ChatbotResponseTypes: string[] = [
-  'Chat',
-  'Whisper'
-];
+export enum ChatbotResponseType {
+  Chat = 'Chat',
+  Whisper = 'Whisper'
+}

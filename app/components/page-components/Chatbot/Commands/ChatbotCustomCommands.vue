@@ -31,14 +31,13 @@
       <tbody>
         <tr
           v-for="(command, index) in commands"
-          :key="index"
+          :key="command.command"
         >
           <td> {{ $t(command.command) }} </td>
           <td> {{ $t(command.response) }} </td>
           <td>
             <div class="align-items--inline">
               <WToggleInput
-                v-if="typeof command.enabled === 'boolean'"
                 :value="command.enabled"
                 @input="toggleEnableCommand(command.id, index, !command.enabled)"
               />
