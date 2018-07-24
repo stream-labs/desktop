@@ -29,9 +29,9 @@ interface IMultiSelectProfiles {
 @Component({
   components: {
     ModalLayout,
-    TextInput: ObsTextInput,
-    ListInput: ObsListInput,
-    BoolInput: ObsBoolInput,
+    ObsTextInput,
+    ObsListInput,
+    ObsBoolInput,
     Multiselect
   },
   mixins: [windowMixin]
