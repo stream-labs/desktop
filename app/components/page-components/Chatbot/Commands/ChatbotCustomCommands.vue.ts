@@ -10,27 +10,22 @@ import {
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
-  commands: CustomCommandsData = [];
-  pagination: Pagination = {
-    current: 1,
-    total: 1
-  };
+
+  get commands() {
+    return this.chatbotApiService.state.custom_commands_response.data;
+  }
+
+  get currentPage() {
+    return this.chatbotApiService.state.custom_commands_response.pagination
+      ? this.chatbotApiService.state.custom_commands_response.pagination.current
+      : 1;
+  }
 
   mounted() {
     //
     // get list of user's custom commands
     //
-    this.fetchCommands(this.pagination.current);
-  }
-
-  fetchCommands(page: number) {
-    // fetch custom commands
-    this.chatbotApiService
-      .fetchCustomCommands(page)
-      .then((response: CustomCommandsResponse) => {
-        this.commands = response.data;
-        this.pagination = response.pagination;
-      });
+    this.chatbotApiService.fetchCustomCommands(this.currentPage);
   }
 
   openCommandWindow() {
@@ -44,11 +39,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       .updateCustomCommand(commandId, {
         ...commandToBeUpdated,
         enabled: isEnabled
-      })
-      .then((response: ChatbotAPIPutResponse) => {
-        if (response.success) {
-          this.commands[index].enabled = isEnabled;
-        }
       });
   }
 }

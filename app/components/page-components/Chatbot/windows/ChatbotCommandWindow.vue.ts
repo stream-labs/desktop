@@ -64,19 +64,21 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     placeholder: 'The phrase that will appear after a user enters the command'
   };
   permissionMetadata: IWListMetadata<number> = {
-    options: Object.keys(ChatbotPermissions).map(permission => {
-      return {
-        value: ChatbotPermissions[permission],
-        title: permission
-      };
-    })
+    options: Object.keys(ChatbotPermissions)
+      .map(permission => {
+        return {
+          value: ChatbotPermissions[permission],
+          title: permission
+        };
+      })
+      .filter((listItem) => typeof listItem.value === 'number')
   };
 
   showToMetadata: IWListMetadata<string> = {
-    options: ChatbotResponseTypes.map(responseType => {
+    options: Object.keys(ChatbotResponseTypes).map(responseType => {
       return {
-        value: responseType,
-        title: responseType
+        value: ChatbotResponseTypes[responseType],
+        title: responseType,
       };
     })
   };
@@ -90,9 +92,6 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
-    this.chatbotApiService
-      .createCustomCommand(this.newCommand)
-      .then((response: CustomCommand) => {
-      });
+    this.chatbotApiService.createCustomCommand(this.newCommand);
   }
 }

@@ -8,25 +8,16 @@ import {
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
-  commandSlugs: DafaultCommandsResponse = null;
+
+  get commandSlugs() {
+    return this.chatbotApiService.state.default_commands_response;
+  }
 
   mounted() {
     //
     // get list of user's default commands
     //
-    this.fetchCommands();
-  }
-
-  fetchCommands() {
-    // fetch default commands
-    this.chatbotApiService
-      .fetchDefaultCommands()
-      .then((response: DafaultCommandsResponse) => {
-        this.commandSlugs = response;
-      })
-      .catch(err => {
-        alert('Error fetching default commands');
-      });
+    this.chatbotApiService.fetchDefaultCommands();
   }
 
   toggleEnableCommand(slugName: string, commandName: string, isEnabled: boolean) {
@@ -34,15 +25,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       ...this.commandSlugs[slugName][commandName],
       enabled: isEnabled
     };
-    this.chatbotApiService
-      .updateDefaultCommand(slugName, commandName, updatedCommand)
-      .then((response: ChatbotAPIPostResponse) => {
-        if (response.success === true) {
-          this.commandSlugs[slugName][commandName].enabled = isEnabled;
-        }
-      })
-      .catch(err => {
-        alert('Error updating command');
-      });
+    this.chatbotApiService.updateDefaultCommand(slugName, commandName, updatedCommand);
   }
 }

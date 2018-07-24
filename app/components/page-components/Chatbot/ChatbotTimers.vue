@@ -15,7 +15,7 @@
     />
   </div>
   <div class="padding--10">
-    <div v-if="timers.length === 0">
+    <div v-if="timers && timers.length === 0">
       <h2>No timers. Click to add new.</h2>
     </div>
     <table v-else>
@@ -41,7 +41,7 @@
             <div class="align-items--inline">
               <WToggleInput
                 :value="timer.enabled"
-                @input="toggleEnabletimer(timer.id, index, !timer.enabled)"
+                @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
               />
               <i class="icon-edit padding--5"></i>
             </div>

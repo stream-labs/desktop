@@ -24,7 +24,7 @@
           :metadata="responseMetadata"
         />
       </div>
-      <div>
+      <div class="row">
         <div class="small-6 columns">
           <label for="permission" class="margin-vertical--10">Permission</label>
           <WListInput
@@ -55,8 +55,7 @@
       class="button button--action"
       @click="onSave"
     >
-      <!-- <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" /> -->
-      Save
+      {{ $t("Save") }}
     </button>
   </div>
 </ModalLayout>

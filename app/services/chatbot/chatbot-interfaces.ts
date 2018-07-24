@@ -2,6 +2,9 @@
 export interface ChatbotApiServiceState {
   api_token: string;
   socket_token: string;
+  default_commands_response: DafaultCommandsResponse;
+  custom_commands_response: CustomCommandsResponse;
+  timers_response: TimersResponse;
 }
 
 // responses
@@ -140,7 +143,7 @@ export enum ChatbotPermissions {
   All = Viewer | Subscriber | Moderator | Broadcaster
 }
 
-export enum ChatbotResponseType {
+export enum ChatbotResponseTypes {
   Chat = 'Chat',
   Whisper = 'Whisper'
 }

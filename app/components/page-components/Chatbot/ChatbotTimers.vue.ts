@@ -9,43 +9,31 @@ import {
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
-  timers: TimersData = [];
-  pagination: Pagination = {
-    current: 1,
-    total: 1
-  };
+  get timers() {
+    return this.chatbotApiService.state.timers_response.data;
+  }
+
+  get currentPage() {
+    return this.chatbotApiService.state.timers_response.pagination
+      ? this.chatbotApiService.state.timers_response.pagination.current
+      : 1;
+  }
 
   mounted() {
     // get list of timers
-    this.fetchTimers(this.pagination.current);
-  }
-
-  fetchTimers(page: number) {
-    // fetch timers
-    this.chatbotApiService
-      .fetchTimers(page)
-      .then((response: TimersResponse) => {
-        this.timers = response.data;
-        this.pagination = response.pagination;
-      });
+    this.chatbotApiService.fetchTimers(this.currentPage);
   }
 
   openTimerWindow() {
     this.chatbotCommonService.openTimerWindow();
   }
 
-  toggleEnabletimer(timerId: string, index: number, isEnabled: boolean) {
+  toggleEnableTimer(timerId: string, index: number, isEnabled: boolean) {
     const timerToBeUpdated = this.timers[index];
 
-    this.chatbotApiService
-      .updateTimer(timerId, {
-        ...timerToBeUpdated,
-        enabled: isEnabled
-      })
-      .then((response: ChatbotAPIPutResponse) => {
-        if (response.success) {
-          this.timers[index].enabled = isEnabled;
-        }
-      });
+    this.chatbotApiService.updateTimer(timerId, {
+      ...timerToBeUpdated,
+      enabled: isEnabled
+    });
   }
 }

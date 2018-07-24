@@ -17,7 +17,7 @@
 
   <!-- custom commands -->
   <div class="padding--10">
-    <div v-if="commands.length === 0">
+    <div v-if="commands && commands.length === 0">
       <h2>No custom commands. Click to add new.</h2>
     </div>
     <table v-else>
