@@ -14,9 +14,7 @@ export default class ChatbotTimers extends ChatbotBase {
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.timers_response.pagination
-      ? this.chatbotApiService.state.timers_response.pagination.current
-      : 1;
+    return this.chatbotApiService.state.timers_response.pagination.current;
   }
 
   mounted() {

@@ -16,9 +16,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.custom_commands_response.pagination
-      ? this.chatbotApiService.state.custom_commands_response.pagination.current
-      : 1;
+    return this.chatbotApiService.state.custom_commands_response.pagination.current;
   }
 
   mounted() {
