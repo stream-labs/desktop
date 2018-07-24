@@ -9,7 +9,8 @@ import { WindowsService } from 'services/windows';
 import {
   ChatbotApiServiceState,
   CustomCommand,
-  DefaultCommand
+  DefaultCommand,
+  Timer
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
@@ -74,7 +75,6 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       .then(response => response.json());
   }
 
-
   fetchTimers(page: number) {
     const url = this.apiEndpoint(`timers?page=${page}`, true);
     const headers = authorizedHeaders(this.state.api_token);
@@ -119,7 +119,6 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   }
 
   createCustomCommand(data: CustomCommand) {
-    debugger;
     const url = this.apiEndpoint('commands', true);
     const headers = authorizedHeaders(this.state.api_token);
     headers.append('Content-Type', 'application/json');
@@ -129,7 +128,35 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       body: JSON.stringify(data)
     });
 
-    debugger;
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  createTimer(data: Timer) {
+    const url = this.apiEndpoint('timers', true);
+    const headers = authorizedHeaders(this.state.api_token);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json());
+  }
+
+  updateTimer(id: string, data: Timer) {
+    const url = this.apiEndpoint(`timers/${id}`, true);
+    const headers = authorizedHeaders(this.state.api_token);
+    headers.append('Content-Type', 'application/json');
+    const request = new Request(url, {
+      headers,
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
 
     return fetch(request)
       .then(handleErrors)
@@ -162,5 +189,15 @@ export class ChatbotCommonService extends PersistentStatefulService<ChatbotApiSe
         height: 600
       }
     });
+  }
+
+  openTimerWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotTimerWindow',
+      size: {
+        width: 650,
+        height: 400
+      }
+    })
   }
 }

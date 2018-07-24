@@ -38,7 +38,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotCommonService.openCommandWindow();
   }
 
-  toggleEnableCommand(commandId: string, index: number, isEnabled: number) {
+  toggleEnableCommand(commandId: string, index: number, isEnabled: boolean) {
     const commandToBeUpdated = this.commands[index];
 
     this.chatbotApiService
@@ -48,10 +48,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       })
       .then((response: ChatbotAPIPutResponse) => {
         if (response.success) {
-          this.$set(this.commands, index, {
-            ...commandToBeUpdated,
-            enabled: isEnabled
-          });
+          this.commands[index].enabled = isEnabled;
         }
       });
   }

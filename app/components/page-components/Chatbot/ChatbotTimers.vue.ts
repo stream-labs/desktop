@@ -4,6 +4,7 @@ import {
   TimersResponse,
   TimersData,
   Pagination,
+  ChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
@@ -34,5 +35,18 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotCommonService.openTimerWindow();
   }
 
-  toggleEnabletimer(id: string, index: number, isEnabled: boolean) {}
+  toggleEnabletimer(timerId: string, index: number, isEnabled: boolean) {
+    const timerToBeUpdated = this.timers[index];
+
+    this.chatbotApiService
+      .updateTimer(timerId, {
+        ...timerToBeUpdated,
+        enabled: isEnabled
+      })
+      .then((response: ChatbotAPIPutResponse) => {
+        if (response.success) {
+          this.timers[index].enabled = isEnabled;
+        }
+      });
+  }
 }

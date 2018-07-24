@@ -80,11 +80,28 @@ export interface CustomCommandsData {
   [id: number]: CustomCommand;
 }
 
+
+export interface CustomCommandRow {
+  id?: string;
+  user_id?: number;
+  command: string;
+  permission: Permission;
+  response: string;
+  response_type?: string;
+  cooldowns: Cooldown;
+  aliases: Aliases;
+  platforms: number;
+  enabled: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+
 export interface CustomCommand {
   id?: string;
   user_id?: number;
   command: string;
-  permision: Permission;
+  permission: Permission;
   response: string;
   response_type?: string;
   cooldowns: Cooldown;
@@ -97,14 +114,14 @@ export interface CustomCommand {
 
 // timers
 export interface TimersData {
-  [id: number]: Timer
+  [id: number]: Timer;
 }
 
 export interface Timer {
   id?: string;
   user_id?: number;
   name: string;
-  interval: string;
+  interval: number;
   chat_lines: number;
   message: string;
   platforms: number;
