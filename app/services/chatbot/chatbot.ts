@@ -15,7 +15,9 @@ import {
   CustomCommandsResponse,
   TimersResponse,
   ChatbotAPIPostResponse,
-  ChatbotAPIPutResponse
+  ChatbotAPIPutResponse,
+  CommandVariablesResponse,
+  ChatAlertsResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
@@ -40,6 +42,7 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       },
       data: []
     },
+    command_variables_response: [],
     timers_response: {
       pagination: {
         current: 1,
@@ -47,6 +50,10 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       },
       data: []
     },
+    chat_alerts_response: {
+      enabled: 0,
+      settings: null
+    }
   };
 
   //
@@ -122,11 +129,25 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       });
   }
 
+  fetchCommandVariables() {
+    // fetch command variables
+    // and then UPDATE_COMMAND_VARIABLES(response);
+    // assuming response is [{}]
+  }
+
   fetchTimers(page?: number) {
     return this.api('GET', `timers?page=${page || 1}`, {})
       .then((response: TimersResponse) => {
         this.UPDATE_TIMERS(response);
       });
+  }
+
+  fetchChatAlerts() {
+    return this.api('GET', 'settings/chat-notifications', {})
+      .then((response: ChatAlertsResponse) => {
+        debugger;
+        this.UPDATE_CHAT_ALERTS(response);
+      })
   }
 
   //
@@ -175,6 +196,7 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       });
   }
 
+
   //
   // Mutations
   //
@@ -195,8 +217,18 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   }
 
   @mutation()
+  private UPDATE_COMMAND_VARIABLES(response: CommandVariablesResponse) {
+    Vue.set(this.state, 'command_variables_response', response);
+  }
+
+  @mutation()
   private UPDATE_TIMERS(response: TimersResponse) {
     Vue.set(this.state, 'timers_response', response);
+  }
+
+  @mutation()
+  private UPDATE_CHAT_ALERTS(response: ChatAlertsResponse) {
+    Vue.set(this.state, 'chat_alerts_response', response);
   }
 }
 

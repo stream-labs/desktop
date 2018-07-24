@@ -56,24 +56,6 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 
-
-.chatbot__dropdown-header {
-  .align-items--inline;
-  .padding--10;
-  .text-transform--uppercase;
-  border-color: #274959;
-  background-color: rgba(27, 47,57, 0.68);
-  border-style: solid;
-  border-width: 1px 0;
-  color: white;
-  margin-bottom: 15px;
-
-  .icon-down {
-    font-size: 5px;
-    .icon--margin;
-  }
-}
-
 tbody tr {
   .transition;
   .cursor--pointer;

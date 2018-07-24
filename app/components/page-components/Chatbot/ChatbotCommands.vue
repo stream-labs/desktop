@@ -8,7 +8,7 @@
       <ChatbotDefaultCommands />
     </div>
     <div slot="variables">
-      Variables
+      <ChatbotCommandVariables />
     </div>
   </Tabs>
 </div>
