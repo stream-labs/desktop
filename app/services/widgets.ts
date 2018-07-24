@@ -15,16 +15,17 @@ import { WidgetSettingsService } from './widget-settings/widget-settings';
 import { ServicesManager } from '../services-manager';
 import { authorizedHeaders } from 'util/requests';
 
+// Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
-  EventList = 1,
-  TheJar = 2,
-  DonationGoal = 3,
+  DonationGoal = 1,
+  FollowerGoal = 2,
+  SubscriberGoal = 3,
   BitGoal = 4,
   DonationTicker = 5,
   ChatBox = 6,
-  FollowerGoal = 7,
-  SubscriberGoal = 8,
+  EventList = 7,
+  TheJar = 8,
   ViewerCount = 9,
   StreamBoss = 10,
   Credits = 11,
