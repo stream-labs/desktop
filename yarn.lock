@@ -4237,11 +4237,9 @@ fn-name@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
 
-"font-manager@git+https://github.com/computerquip-streamlabs/font-manager.git":
-  version "0.2.2"
-  resolved "git+https://github.com/computerquip-streamlabs/font-manager.git#b4620d050ed2eeb0431fe014a3a9896fb4bf987d"
-  dependencies:
-    nan "~2.2.0"
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz":
+  version "0.4.0"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz#33174403d765aab3151a88360d5e3fa4caa78c40"
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -6462,10 +6460,6 @@ nan@^2.3.0:
 nan@^2.9.2:
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
-
-nan@~2.2.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.2.1.tgz#d68693f6b34bb41d66bc68b3a4f9defc79d7149b"
 
 nanomatch@^1.2.9:
   version "1.2.9"
