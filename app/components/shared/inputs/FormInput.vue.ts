@@ -28,13 +28,6 @@ export default class FormInput extends BaseInput<any, IInputMetadata> {
   @Prop()
   title: string;
 
-  mounted() {
-    console.log('components mounted:', {
-      ...sharedInputComponents,
-      ...widgetInputComponents
-    });
-  }
-
   /**
    * returns a componentName based on the type
    */

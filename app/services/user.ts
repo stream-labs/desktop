@@ -326,8 +326,7 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn())
-          return original.apply(target, args);
+        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
       }
     };
   };

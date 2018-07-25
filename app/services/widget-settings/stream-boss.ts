@@ -48,8 +48,6 @@ export interface IStreamBossCreateOptions {
 
 export abstract class StreamBossService extends WidgetSettingsService<IStreamBossData> {
 
-
-
   getWidgetType() {
     return WidgetType.BitGoal;
   }

@@ -15,12 +15,6 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
   @Prop() value: number;
   @Prop() metadata: ISliderMetadata;
 
-  @Prop() disabled: boolean;
-  @Prop() tooltip: string;
-  @Prop() valueBox: boolean;
-  @Prop() dotSize: number;
-  @Prop() sliderStyle: object;
-
   usePercentages: boolean;
   interval: number;
 

@@ -23,10 +23,6 @@ export default class FormGroup extends BaseInput<any, IInputMetadata> {
   @Prop()
   title: string;
 
-  mounted() {
-    console.log('metadata');
-  }
-
   get formInputMetadata() {
     const options = this.options;
     if (!options.type) return {};

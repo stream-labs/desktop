@@ -5,16 +5,16 @@
       :value="value"
       @input="value => updateValue(value)"
       :disabled="disabled"
-      :max="metadata.max"
-      :min="metadata.min"
-      :interval="metadata.interval"
+      :max="options.max"
+      :min="options.min"
+      :interval="options.interval"
       :speed="0"
       :height="4"
       :dotSize="dotSize"
       :tooltip="tooltip"
       :sliderStyle="sliderStyle"
       :formatter="formatter"
-      :piecewise="metadata.interval && metadata.interval > 3"
+      :piecewise="!!options.interval"
       ref="slider"
       :piecewiseStyle="{
           position: 'absolute',
@@ -34,6 +34,9 @@
       @change="updateValue(parseFloat($event.target.value))"
       @keydown="handleKeydown"
     />
+    <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+      <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+    </div>
   </div>
 </div>
 </template>
@@ -47,6 +50,7 @@
   width: 100%;
   display: flex;
   position: relative;
+  align-items: center;
 }
 
 .slider-input {

@@ -23,7 +23,6 @@ import {
 import uuid from 'uuid/v4';
 
 
-
 const SOURCES_UPDATE_INTERVAL = 1000;
 
 const { ipcRenderer } = electron;
@@ -387,6 +386,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.FollowerGoal,
         WidgetType.ChatBox,
         WidgetType.ViewerCount,
+        WidgetType.Credits,
         WidgetType.StreamBoss
       ];
 
@@ -408,7 +408,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         }
       }
     }
-
 
 
     this.windowsService.showWindow({
@@ -481,5 +480,3 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 }
-
-

@@ -81,6 +81,7 @@ import { DonationGoalService } from 'services/widget-settings/donation-goal';
 import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 import { ViewerCountService } from 'services/widget-settings/viewer-count';
 import { StreamBossService } from 'services/widget-settings/stream-boss';
+import { CreditsService } from 'services/widget-settings/credits';
 
 const { ipcRenderer } = electron;
 
@@ -162,6 +163,7 @@ export class ServicesManager extends Service {
     ChatBoxService,
     ViewerCountService,
     StreamBossService,
+    CreditsService,
     MediaGalleryService
   };
 
@@ -517,8 +519,9 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
-        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable))
+        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
+        }
 
         const serviceName = target.constructor.name;
         const methodName = property;

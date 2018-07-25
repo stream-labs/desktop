@@ -44,7 +44,10 @@ export class VideoEncodingOptimizationService extends Service {
 
   init() {
     this.streamingService.streamingStatusChange.subscribe(status => {
-      if ((status === EStreamingState.Offline) && this.isUsingEncodingOptimizations) {
+      if (
+        status === EStreamingState.Offline &&
+        this.isUsingEncodingOptimizations
+      ) {
         this.isUsingEncodingOptimizations = false;
         this.restorePreviousValues();
       }
