@@ -207,7 +207,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   //     case 'DonationTicker':
   //       return `https://${host}/widgets/donation-ticker?token=${token}`;
   //
-  //     case 'EndCredits':
+  //     case 'Credits':
   //       return `https://${host}/widgets/end-credits?token=${token}`;
   //
   //     case 'EventList':
