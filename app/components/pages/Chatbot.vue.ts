@@ -33,7 +33,7 @@ export default class Chatbot extends Vue {
   };
 
   tabNames = ['Modules', 'Commands', 'Timers', 'Mod Tools'];
-  selectedTab = 'Commands';
+  selectedTab = 'Modules';
   authenticated = false;
 
   mounted() {

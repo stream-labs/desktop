@@ -1,6 +1,10 @@
 <template>
 <div>
-  Chatbot Modules
+  <ChatbotModule
+    v-for="(module, index) in modules"
+    :key="index"
+    :chatbotModule="module"
+  />
 </div>
 </template>
 

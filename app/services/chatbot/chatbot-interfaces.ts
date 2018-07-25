@@ -148,6 +148,15 @@ export interface Timer {
   updated_at?: string;
 }
 
+// modules
+export interface IChatbotModule {
+  title: string;
+  description: string;
+  window: string;
+  enabled: boolean;
+  onToggleEnabled: Function;
+}
+
 // chat alerts
 export interface ChatAlertsData {
   streamlabs: StreamlabsChatAlert;
@@ -248,12 +257,6 @@ export interface SuperchatMessage {
   amount: number;
   message: string;
 }
-
-
-
-
-
-
 
 
 // dictionaries
