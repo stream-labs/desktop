@@ -14,6 +14,7 @@ export interface IPatchNotes {
   version: string;
   title: string;
   notes: string[];
+  showChest: boolean;
 }
 
 export class PatchNotesService extends PersistentStatefulService<IPatchNotesState> {
