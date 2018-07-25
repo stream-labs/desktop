@@ -19,6 +19,8 @@
 
 .container {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .google-font-selector {
