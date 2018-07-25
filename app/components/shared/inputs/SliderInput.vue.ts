@@ -23,8 +23,8 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
   mounted() {
 
     // setup defaults
-    this.interval = this.metadata.interval || 1;
-    this.usePercentages = this.metadata.usePercentages || false;
+    this.interval = this.options.interval || 1;
+    this.usePercentages = this.options.usePercentages || false;
 
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => {

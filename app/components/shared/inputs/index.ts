@@ -14,8 +14,7 @@ export enum EInputType {
   textArea = 'textArea',
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
-  code = 'code',
-  animation = 'animation'
+  code = 'code'
 }
 
 /**
@@ -50,6 +49,7 @@ export interface ISliderMetadata extends IInputMetadata {
   max: number;
   interval?: number;
   usePercentages?: boolean;
+  hasValueBox?: boolean;
 }
 
 export interface IListOption<TValue> {

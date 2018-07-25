@@ -7,7 +7,7 @@ import { IInputMetadata } from './index';
 
 @Component({
   components: {
-    WSliderInput: SliderInput
+    SliderInput
   }
 })
 export default class FontSize extends BaseInput<string, IInputMetadata>{

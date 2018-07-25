@@ -13,8 +13,12 @@ export const inputComponents = {
   ...widgetInputComponents
 };
 
+export enum EWInput {
+  animation = 'animation'
+}
+
 export const metadata = {
   ...sharedMetadata,
-  animation: (options: IInputMetadata) => ({ type: EInputType.animation, ...options } as IInputMetadata)
+  animation: (options: IInputMetadata) => ({ type: EWInput.animation, ...options } as IInputMetadata)
 };
 

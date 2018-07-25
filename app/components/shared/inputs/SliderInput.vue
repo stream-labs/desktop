@@ -4,15 +4,11 @@
     <vue-slider class="slider w-form-group__input"
       :value="value"
       @input="value => updateValue(value)"
-      :disabled="disabled"
       :max="options.max"
       :min="options.min"
       :interval="options.interval"
       :speed="0"
       :height="4"
-      :dotSize="dotSize"
-      :tooltip="tooltip"
-      :sliderStyle="sliderStyle"
       :formatter="formatter"
       :piecewise="!!options.interval"
       ref="slider"
@@ -27,14 +23,14 @@
       :piecewiseActiveStyle="{ backgroundColor: '#3c4c53' }"
     />
     <input
-      v-if="valueBox && !usePercentages"
+      v-if="options.hasValueBox && !options.usePercentages"
       class="slider-input"
       type="text"
       :value="value"
       @change="updateValue(parseFloat($event.target.value))"
       @keydown="handleKeydown"
     />
-    <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+    <div v-if="options.tooltip" class="w-tooltip">
       <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
     </div>
   </div>
