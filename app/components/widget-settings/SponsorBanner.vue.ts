@@ -19,5 +19,5 @@ import { $t } from 'services/i18n';
   }
 })
 export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, SponsorBannerService> {
-
+  placementOptions = [{ title: $t('Single'), value: 'single' }, { title: $t('Double'), value: 'double' }];
 }

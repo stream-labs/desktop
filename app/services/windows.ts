@@ -39,6 +39,7 @@ import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 import TipJar from 'components/widgets/TipJar.vue';
+import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -79,6 +80,7 @@ export function getComponents() {
     Credits,
     EventList,
     TipJar,
+    SponsorBanner,
     StreamBoss
   };
 }
