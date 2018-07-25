@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slider-input :metadata="{min: 8, max: 144}" :value="sliderValue" @input="value => updateValue(value)"/>
+    <slider-input :metadata="sliderOptions" :value="sliderValue" @input="value => updateValue(value)"/>
   </div>
 </template>
 

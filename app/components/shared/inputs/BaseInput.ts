@@ -39,6 +39,8 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
   }
 
   getOptions(): TMetadataType {
+    // merge props and metadata to the 'options' object
+    // override this method if you need add more props to the 'option' object
     const metadata = this.metadata || {} as TMetadataType;
     const options = cloneDeep(metadata);
     options.title = this.title || metadata.title;
@@ -47,19 +49,6 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
 
   get options(): TMetadataType {
     return this.getOptions();
-  }
-
-
-  get required(): boolean {
-    return this.options.required === void 0 ? false : this.options.required;
-  }
-
-  get description(): string {
-    return this.options.description === void 0 ? '' : this.options.description;
-  }
-
-  get hint() {
-    return this.options.hint === void 0 ? '' : this.options.hint;
   }
 }
 
