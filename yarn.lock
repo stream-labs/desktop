@@ -6582,10 +6582,6 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-nan@2.8.0:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
-
 nan@^2.3.0:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.1.tgz#d5b01691253326a97a2bbee9e61c55d8d60351e2"
@@ -6639,11 +6635,9 @@ node-dir@0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
 
-node-fontinfo@^0.0.2:
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz":
   version "0.0.2"
-  resolved "https://registry.yarnpkg.com/node-fontinfo/-/node-fontinfo-0.0.2.tgz#a24492d2f0a83a52f81ae531db864b02627e23f8"
-  dependencies:
-    nan "2.8.0"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz#5a8b2cfadf001c440f1024de5954dc535878504a"
 
 node-gyp@^3.6.2:
   version "3.6.2"
