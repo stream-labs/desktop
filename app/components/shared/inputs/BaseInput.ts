@@ -1,0 +1,65 @@
+import Vue from 'vue';
+import { cloneDeep } from 'lodash';
+import { Prop } from 'vue-property-decorator';
+import uuid from 'uuid/v4';
+import { IInputMetadata } from './index';
+
+export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
+
+  @Prop()
+  value: TValueType;
+
+  @Prop()
+  title: string;
+
+  @Prop()
+  metadata: TMetadataType;
+
+  uuid = uuid(); // uuid serves to link input field and validator message
+
+  emitInput(eventData: TValueType) {
+    this.$emit('input', eventData);
+  }
+
+  getValidations() {
+    return { required: this.options.required };
+  }
+
+  /**
+   * object for vee validate plugin
+   */
+  get validate() {
+    const validations = this.getValidations();
+    Object.keys(validations).forEach(key => {
+      // VeeValidate recognizes undefined values as valid constraints
+      // so just remove it
+      if (validations[key] === void 0) delete validations[key];
+    });
+    return validations;
+  }
+
+  getOptions(): TMetadataType {
+    const metadata = this.metadata || {} as TMetadataType;
+    const options = cloneDeep(metadata);
+    options.title = this.title || metadata.title;
+    return options;
+  }
+
+  get options(): TMetadataType {
+    return this.getOptions();
+  }
+
+
+  get required(): boolean {
+    return this.options.required === void 0 ? false : this.options.required;
+  }
+
+  get description(): string {
+    return this.options.description === void 0 ? '' : this.options.description;
+  }
+
+  get hint() {
+    return this.options.hint === void 0 ? '' : this.options.hint;
+  }
+}
+
