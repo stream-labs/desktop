@@ -14,7 +14,7 @@
       :tooltip="tooltip"
       :sliderStyle="sliderStyle"
       :formatter="formatter"
-      :piecewise="metadata.interval && metadata.interval > 3"
+      :piecewise="!!metadata.interval"
       ref="slider"
       :piecewiseStyle="{
           position: 'absolute',
@@ -34,6 +34,9 @@
       @change="updateValue(parseFloat($event.target.value))"
       @keydown="handleKeydown"
     />
+    <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+      <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+    </div>
   </div>
 </div>
 </template>
@@ -47,6 +50,7 @@
   width: 100%;
   display: flex;
   position: relative;
+  align-items: center;
 }
 
 .slider-input {
