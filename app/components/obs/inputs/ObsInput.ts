@@ -403,7 +403,8 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
 
   form.forEach(item => {
     if (item.type === 'OBS_PROPERTY_BUTTON') {
-      buttons.push(item as IObsInput<boolean>);
+      // Value will be true if button was pressed
+      if (item.value) buttons.push(item as IObsInput<boolean>);
     } else {
       formInputs.push(item);
     }
