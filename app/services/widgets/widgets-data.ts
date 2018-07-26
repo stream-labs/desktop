@@ -290,7 +290,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   }
 };
 
-export const WidgetDisplayData: { [x: number]: IWidgetDisplayData } = {
+export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
   [WidgetType.AlertBox]: {
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
@@ -415,4 +415,4 @@ export const WidgetDisplayData: { [x: number]: IWidgetDisplayData } = {
     demoFilename: 'source-wheel.mp4',
     supportList: [$t('The streamer manually triggers a spin anytime while they are live.')]
   }
-};
+});

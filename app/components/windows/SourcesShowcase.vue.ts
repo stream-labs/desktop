@@ -66,6 +66,11 @@ export default class SourcesShowcase extends Vue {
     }
   }
 
+  getSrc(type: string, theme: string) {
+    console.log(require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`));
+    return require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`);
+  }
+
   selectWidget(type: WidgetType) {
     this.selectSource('browser_source', {
       propertiesManager: 'widget',
@@ -74,7 +79,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   widgetData(type: string) {
-    return WidgetDisplayData[this.widgetTypes[type]];
+    return WidgetDisplayData()[this.widgetTypes[type]];
   }
 
   inspectedSource: TInspectableSource = null;

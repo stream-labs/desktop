@@ -255,13 +255,13 @@
       :description="widgetData(type).description"
     >
       <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--day" autoplay loop slot="media">
-        <source :src="`../../../media/source-demos/day/${widgetData(type).demoFilename}`">
+        <source :src="getSrc(type, 'day')">
       </video>
       <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--night" autoplay loop slot="media">
-        <source :src="`../../../media/source-demos/night/${widgetData(type).demoFilename}`">
+        <source :src="getSrc(type, 'night')">
       </video>
-      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--day" slot="media" :src="`../../../media/source-demos/day/${widgetData(type).demoFilename}`"/>
-      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--night" slot="media" :src="`../../../media/source-demos/night/${widgetData(type).demoFilename}`"/>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--day" slot="media" :src="getSrc(type, 'day')"/>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--night" slot="media" :src="getSrc(type, 'night')"/>
       <ul slot="support-list" class="source-support__list">
         <li v-for="support in widgetData(type).supportList" :key="support">
           {{ support }}
