@@ -67,7 +67,6 @@ export default class SourcesShowcase extends Vue {
   }
 
   getSrc(type: string, theme: string) {
-    console.log(require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`));
     return require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`);
   }
 
