@@ -118,9 +118,9 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
     // update obs-preview
     // little hack: update some property to trigger preview refreshing
-    const height = this.source.height;
-    this.source.updateSettings({ height: height + 1 });
-    this.source.updateSettings({ height });
+    const shutdown = this.source.getSettings().shutdown;
+    this.source.updateSettings({ shutdown: !shutdown });
+    this.source.updateSettings({ shutdown });
   }
 
   afterFetch() {
