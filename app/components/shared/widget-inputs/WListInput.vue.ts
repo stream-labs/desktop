@@ -1,12 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { IListOption } from '../forms/Input';
 import { Multiselect } from 'vue-multiselect';
-import { IWInputMetadata, WInput } from './WInput';
+import { IWListMetadata, IWListOption, WInput } from './WInput';
 
-export interface IWListMetadata<TValueType> extends IWInputMetadata {
-  options: IListOption<TValueType>[];
+interface IMultiselectListOption{
+  description: string;
+  value: string;
 }
-
 
 @Component({
   components: { Multiselect }
@@ -27,19 +26,31 @@ export default class WListInput extends WInput<string, IWListMetadata<string>> {
   placeholder: string;
 
 
-  onInputHandler(option: IListOption<string>) {
+  onInputHandler(option: IMultiselectListOption) {
     this.emitInput(option.value);
     this.$nextTick();
   }
 
-  get currentValue() {
+  get currentMultiselectValue() {
+    const options = this.multiselectOptions;
 
-    const option = this.metadata.options.find((opt: IListOption<string>) => {
+    const option = options.find((opt: IMultiselectListOption) => {
       return this.value === opt.value;
     });
 
     if (option) return option;
-    return this.metadata.options[0];
+    return options[0];
+  }
+
+
+  get multiselectOptions(): IMultiselectListOption[] {
+    return this.options.options.map(item => {
+      return { value: item.value, description: item.title };
+    });
+  }
+
+  get selectedOption(): IWListOption<string> {
+    return this.options.options.find(option => option.value === this.value);
   }
 
 }

@@ -1,39 +1,42 @@
-import Vue from 'vue';
-import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from '../../services/persistent-stateful-service';
-import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../../services/stateful-service';
-import electron from 'electron';
-import { HostsService } from '../../services/hosts';
-import {
-  getPlatformService,
-  IPlatformAuth,
-  TPlatform,
-  IPlatformService
-} from '../../services/platforms';
-import { CustomizationService } from '../../services/customization';
-import Raven from 'raven-js';
-import { AppService } from 'services/app';
-import { SceneCollectionsService } from 'services/scene-collections';
-import { Subject } from 'rxjs/Subject';
-import Util from 'services/utils';
+import { Component } from 'vue-property-decorator';
+import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetSettings from 'components/widget-settings/WidgetSettings.vue';
 
-export default class AlertBox extends Vue {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
+import * as comps from 'components/shared/widget-inputs';
+import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
+import { $t } from 'services/i18n';
+import WForm from 'components/shared/widget-inputs/WForm.vue';
+import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
 
-  mounted() {
-    this.getSettings();
+@Component({
+  components: {
+    WidgetWindow,
+    WFormGroup,
+    WForm,
+    ...comps
+  }
+})
+export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBossService> {
+
+  $refs: {
+    form: WForm;
+  };
+
+  bossCreateOptions: IStreamBossCreateOptions = {
+    mode: 'fixed',
+    total_health: 4800
+  };
+
+  textColorTooltip = $t('A hex code for the base text color.');
+
+  get hasGoal() {
+    return this.wData.goal;
   }
 
-  getSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/widget/streamboss/settings`;
-
-    return fetch(url);
+  async saveGoal() {
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
+    await this.save(this.bossCreateOptions);
   }
+
 }

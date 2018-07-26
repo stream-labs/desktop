@@ -3,10 +3,9 @@ import {
   obsValuesToInputValues,
   inputValuesToObsValues,
   TObsValue,
-  TFormData,
-  IListOption,
-  IListInput
-} from '../../components/shared/forms/Input';
+  TObsFormData,
+  IObsListInput
+} from 'components/obs/inputs/ObsInput';
 import { nodeObs } from '../obs-api';
 import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
@@ -116,7 +115,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories = nodeObs.OBS_settings_getListCategories();
     categories = categories
-      .concat(['Scene Collections','Notifications', 'Appearance', 'Remote Control']);
+      .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
 
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);
@@ -234,7 +233,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       if (subCategory.nameSubCategory === category) {
         subCategory.parameters.find(param => {
           if (param.name === setting) {
-            settingValue = param.value || (param as IListInput<string>).options[0].value;
+            settingValue = param.value || (param as IObsListInput<string>).options[0].value;
             return true;
           }
         });
@@ -252,7 +251,7 @@ export class SettingsService extends StatefulService<ISettingsState>
       .getSources()
       .filter(source => source.channel !== void 0);
 
-    const parameters: TFormData = [];
+    const parameters: TObsFormData = [];
 
     // collect output channels info
     for (

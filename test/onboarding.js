@@ -1,6 +1,6 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
-import {selectSource, clickSourceProperties, sourceIsExisting} from './helpers/spectron/sources';
+import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers/spectron/sources';
 
 useSpectron({ skipOnboarding: false });
 

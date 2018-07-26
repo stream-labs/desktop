@@ -1,4 +1,5 @@
 import electron from 'electron';
+import uuid from 'uuid/v4';
 import { Service } from './services/service';
 import { AutoConfigService } from './services/auto-config';
 import { ObsImporterService } from './services/obs-importer';
@@ -79,6 +80,8 @@ import { ChatBoxService } from 'services/widget-settings/chat-box';
 import { DonationGoalService } from 'services/widget-settings/donation-goal';
 import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 import { ViewerCountService } from 'services/widget-settings/viewer-count';
+import { StreamBossService } from 'services/widget-settings/stream-boss';
+import { CreditsService } from 'services/widget-settings/credits';
 
 const { ipcRenderer } = electron;
 
@@ -159,6 +162,8 @@ export class ServicesManager extends Service {
     FollowerGoalService,
     ChatBoxService,
     ViewerCountService,
+    StreamBossService,
+    CreditsService,
     MediaGalleryService
   };
 
@@ -370,7 +375,7 @@ export class ServicesManager extends Service {
     const isPromise = !!(responsePayload && responsePayload.then);
 
     if (isPromise) {
-      const promiseId = ipcRenderer.sendSync('getUniqueId');
+      const promiseId = uuid();
       const promise = responsePayload as PromiseLike<any>;
 
       promise.then(
@@ -514,8 +519,9 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
-        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable))
+        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
+        }
 
         const serviceName = target.constructor.name;
         const methodName = property;

@@ -2,10 +2,10 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import * as obs from '../../obs-api';
 import { Inject } from 'util/injector';
 import {
-  IListOption,
+  IObsListOption,
   TObsValue,
-  TFormData
-} from 'components/shared/forms/Input';
+  TObsFormData
+} from 'components/obs/inputs/ObsInput';
 import { WindowsService } from 'services/windows';
 import { ScenesService } from 'services/scenes';
 import uuid from 'uuid/v4';
@@ -97,7 +97,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     });
   }
 
-  getTypes(): IListOption<ETransitionType>[] {
+  getTypes(): IObsListOption<ETransitionType>[] {
     return [
       { description: $t('Cut'), value: ETransitionType.Cut },
       { description: $t('Fade'), value: ETransitionType.Fade },
@@ -180,7 +180,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   createStudioModeTransition() {
     this.studioModeTransition = obs.TransitionFactory.create(
       ETransitionType.Cut,
-      'Studio Transition'
+      `studio_transition_${uuid()}`
     );
   }
 
@@ -192,6 +192,12 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (this.sceneDuplicate) {
       this.sceneDuplicate.release();
       this.sceneDuplicate = null;
+    }
+  }
+
+  get studioTransitionName() {
+    if (this.studioModeTransition) {
+      return this.studioModeTransition.name;
     }
   }
 
@@ -268,11 +274,11 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     return this.propertiesManagers[id].settings;
   }
 
-  getPropertiesFormData(id: string): TFormData {
+  getPropertiesFormData(id: string): TObsFormData {
     return this.propertiesManagers[id].getPropertiesFormData() || [];
   }
 
-  setPropertiesFormData(id: string, formData: TFormData) {
+  setPropertiesFormData(id: string, formData: TObsFormData) {
     return this.propertiesManagers[id].setPropertiesFormData(formData);
   }
 

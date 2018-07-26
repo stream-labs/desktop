@@ -1,9 +1,9 @@
-import { TFormData } from '../../components/shared/forms/Input';
+import { TObsFormData } from 'components/obs/inputs/ObsInput';
 
 export interface ISettingsSubCategory {
   nameSubCategory: string;
   codeSubCategory?: string;
-  parameters: TFormData;
+  parameters: TObsFormData;
 }
 
 export interface ISettingsServiceApi {

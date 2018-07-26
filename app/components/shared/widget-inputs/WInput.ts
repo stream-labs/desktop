@@ -1,11 +1,82 @@
 import Vue from 'vue';
+import { cloneDeep } from 'lodash';
 import { Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { Validator } from 'vee-validate';
 import { $t } from 'services/i18n';
 
+
+export enum EWInputType {
+  bool = 'bool',
+  number = 'number',
+  text = 'text',
+  slider = 'slider',
+  color = 'color',
+  list = 'list',
+  textArea = 'textArea',
+  fontSize = 'fontSize',
+  fontFamily = 'fontFamily',
+  code = 'code',
+  animation = 'animation'
+}
+
+/**
+ * base interface for all metadata types
+ */
+export interface IWInputMetadata {
+  required?: boolean;
+  description?: string;
+  hint?: string;
+  type?: EWInputType;
+  title?: string;
+}
+
+export interface IWNumberMetadata extends IWInputMetadata {
+  min?: number;
+  max?: number;
+  placeholder?: string;
+}
+
+export interface IWListMetadata<TValueType> extends IWInputMetadata {
+  options: IWListOption<TValueType>[];
+}
+
+export interface IWTextMetadata extends IWInputMetadata {
+  placeholder?: string;
+  max?: number;
+  dateFormat?: string;
+}
+
+export interface IWSliderMetadata extends IWInputMetadata {
+  min: number;
+  max: number;
+  interval?: number;
+  usePercentages?: boolean;
+}
+
+export interface IWListOption<TValue> {
+  value: TValue;
+  title: string;
+  description?: string;
+}
+
+// a helper for creating metadata
+export const metadata = {
+  bool: (options: IWInputMetadata) => ({ type: EWInputType.bool, ...options } as IWInputMetadata),
+  number: (options: IWNumberMetadata) => ({ type: EWInputType.number, ...options } as IWNumberMetadata),
+  text: (options: IWTextMetadata) => ({ type: EWInputType.text, ...options } as IWTextMetadata),
+  list: (options: IWListMetadata<string>) => ({ type: EWInputType.list, ...options } as IWListMetadata<string>),
+  color: (options: IWInputMetadata) => ({ type: EWInputType.color, ...options } as IWInputMetadata),
+  slider: (options: IWSliderMetadata) => ({ type: EWInputType.slider, ...options } as IWSliderMetadata),
+  textArea: (options: IWTextMetadata) => ({ type: EWInputType.textArea, ...options } as IWTextMetadata),
+  fontSize: (options: IWInputMetadata) => ({ type: EWInputType.fontSize, ...options } as IWInputMetadata),
+  fontFamily: (options: IWInputMetadata) => ({ type: EWInputType.fontFamily, ...options } as IWInputMetadata),
+  code: (options: IWInputMetadata) => ({ type: EWInputType.code, ...options } as IWInputMetadata),
+  animation: (options: IWInputMetadata) => ({ type: EWInputType.animation, ...options } as IWInputMetadata)
+};
+
 // rules https://baianat.github.io/vee-validate/guide/rules.html
-const dictionary = {
+const validationMessages = {
   en: {
     messages: {
       required: () => $t('The field is required'),
@@ -17,14 +88,8 @@ const dictionary = {
 };
 
 // Override and merge the dictionaries
-Validator.localize(dictionary);
+Validator.localize(validationMessages);
 
-
-export interface IWInputMetadata {
-  required?: boolean;
-  description?: string;
-  hint?: string;
-}
 
 export abstract class WInput<TValueType, TMetadataType extends IWInputMetadata> extends Vue {
 
@@ -32,7 +97,7 @@ export abstract class WInput<TValueType, TMetadataType extends IWInputMetadata> 
   value: TValueType;
 
   @Prop()
-  label: string;
+  title: string;
 
   @Prop()
   metadata: TMetadataType;
@@ -53,15 +118,22 @@ export abstract class WInput<TValueType, TMetadataType extends IWInputMetadata> 
   get validate() {
     const validations = this.getValidations();
     Object.keys(validations).forEach(key => {
-      // VeeValidate recognize undefined values as valid constraints
+      // VeeValidate recognizes undefined values as valid constraints
       // so just remove it
       if (validations[key] === void 0) delete validations[key];
     });
     return validations;
   }
 
+  getOptions(): TMetadataType {
+    const metadata = this.metadata || {} as TMetadataType;
+    const options = cloneDeep(metadata);
+    options.title = this.title || metadata.title;
+    return options;
+  }
+
   get options(): TMetadataType {
-    return this.metadata || {} as TMetadataType;
+    return this.getOptions();
   }
 
 

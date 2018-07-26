@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import URI from 'urijs';
 import { defer } from 'lodash';
-import { PersistentStatefulService } from './persistent-stateful-service';
-import { Inject } from '../util/injector';
+import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from './stateful-service';
+import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import {
@@ -13,13 +13,14 @@ import {
   TPlatform,
   IPlatformService
 } from './platforms';
-import { CustomizationService } from './customization';
+import { CustomizationService } from 'services/customization';
 import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
+import uuid from 'uuid/v4';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -105,7 +106,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     let userId = localStorage.getItem(localStorageKey);
 
     if (!userId) {
-      userId = electron.ipcRenderer.sendSync('getUniqueId');
+      userId = uuid();
       localStorage.setItem(localStorageKey, userId);
     }
 
@@ -325,8 +326,7 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn())
-          return original.apply(target, args);
+        if (UserService.instance.isLoggedIn()) return original.apply(target, args);
       }
     };
   };

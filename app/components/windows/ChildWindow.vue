@@ -1,9 +1,11 @@
 <template>
 <div style="height: 100%">
-    <!-- <keep-alive> helps to restore previous window from cache -->
-    <keep-alive v-if="options.isShown">
-        <component :is="componentName"/>
-    </keep-alive>
+    <!--
+        we use 2 components for situation when we need to open a new window and
+        save the previous window-component state
+    -->
+    <component v-if="components[0].name" v-show="components[0].isShown" :is="components[0].name"/>
+    <component v-if="components[1].name" v-show="components[1].isShown" :is="components[1].name"/>
 </div>
 </template>
 

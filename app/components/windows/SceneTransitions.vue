@@ -174,6 +174,12 @@ th, td {
 }
 
 tr:nth-child(even) {
-  background-color: @navy-secondary;
+  background-color: @light-grey;
+}
+
+.night-theme {
+  tr:nth-child(even) {
+    background-color: @navy-secondary;
+  }
 }
 </style>

@@ -3,9 +3,9 @@ import electron from 'electron';
 import { Component } from 'vue-property-decorator';
 import { CacheUploaderService } from 'services/cache-uploader';
 import { Inject } from 'util/injector';
-import BoolInput from 'components/shared/forms/BoolInput.vue';
+import ObsBoolInput from 'components/obs/inputs/ObsBoolInput.vue';
 import { CustomizationService } from 'services/customization';
-import { IFormInput } from 'components/shared/forms/Input';
+import { IObsInput } from 'components/obs/inputs/ObsInput';
 import { StreamlabelsService } from 'services/streamlabels';
 import { OnboardingService } from 'services/onboarding';
 import { WindowsService } from 'services/windows';
@@ -14,7 +14,7 @@ import { StreamingService } from 'services/streaming';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { BoolInput }
+  components: { ObsBoolInput }
 })
 export default class ExtraSettings extends Vue {
   @Inject() cacheUploaderService: CacheUploaderService;
@@ -27,7 +27,7 @@ export default class ExtraSettings extends Vue {
 
   cacheUploading = false;
 
-  get streamInfoUpdateModel(): IFormInput<boolean> {
+  get streamInfoUpdateModel(): IObsInput<boolean> {
     return {
       name: 'stream_info_udpate',
       description: $t('Confirm stream title and game before going live'),
@@ -35,7 +35,7 @@ export default class ExtraSettings extends Vue {
     };
   }
 
-  setStreamInfoUpdate(model: IFormInput<boolean>) {
+  setStreamInfoUpdate(model: IObsInput<boolean>) {
     this.customizationService.setUpdateStreamInfoOnLive(model.value);
   }
 
