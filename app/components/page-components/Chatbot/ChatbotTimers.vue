@@ -100,6 +100,7 @@ tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    color: white;
 
     &:hover {
       td {

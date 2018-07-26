@@ -8,8 +8,8 @@ export default class WBoolInput extends WInput<boolean, {}> {
   @Prop()
   value: boolean;
 
-  handleClick() {
-    this.emitInput(!this.value);
+  handleClick(e: any) {
+    this.emitInput(!this.value, e);
   }
 
 }

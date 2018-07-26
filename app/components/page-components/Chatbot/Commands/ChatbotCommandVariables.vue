@@ -62,14 +62,13 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-  }
 
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    .transition;
+    color: white;
 
     &:hover {
       td {

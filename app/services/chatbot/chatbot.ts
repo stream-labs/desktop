@@ -204,7 +204,6 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       })
   }
 
-
   //
   // Mutations
   //
@@ -273,7 +272,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     this.windowsService.showWindow({
       componentName: 'ChatbotAlertsWindow',
       size: {
-        width: 900,
+        width: 1000,
         height: 500
       }
     })

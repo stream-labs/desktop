@@ -22,6 +22,7 @@
 
 .wtoggleinput__container {
   padding: 5px;
+  margin: 0 2px;
   position: relative;
   width: 44px;
   height: 22px;

@@ -4,54 +4,64 @@
   :customControls="true"
   :title="$t('Chat Alert Preferences')"
 >
-  <div slot="content" class="chatbot-alerts-window__container row">
-    <div class="chatbot-alerts-window__sidebar small-4">
-      <NavMenu v-model="selectedTab" class="side-menu">
+  <div slot="content" class="chatbot-alerts-window__container flex">
+    <div class="chatbot-alerts-window__sidebar">
+      <NavMenu v-model="selectedType" class="side-menu">
         <NavItem
-          v-for="(tabData, tabName) in tabs"
-          :key="tabName"
-          :to="tabName"
-          class="padding--10"
+          v-for="(alertTypeData, alertTypeName) in alertTypes"
+          :key="alertTypeName"
+          :to="alertTypeName"
+          class="chatbot-alerts-window__sidebar__tab"
         >
-          {{ $t(tabName) }}
+          <div class="chatbot-alerts-window__sidebar__tab__content">
+            <span>{{ $t(alertTypeName) }}</span>
+            <WToggleInput
+              :value="isEnabled(alertTypeName)"
+              @input="(enabled, event) => {
+                event.stopPropagation();
+                toggleEnableAlert(alertTypeName);
+              }"
+            />
+          </div>
         </NavItem>
       </NavMenu>
     </div>
-    <div class="chatbot-alerts-window__content small-8">
+    <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
         <button class="button button--action">ADD ALERT</button>
       </div>
       <br />
       <table
-        v-for="title in selectedTabTableTitles"
+        v-for="title in selectedTypeTableTitles"
         :key="title"
       >
         <thead>
           <tr>
-            <th :colspan="selectedTabTableColumns.length">
-              {{ title }}
+            <th :colspan="selectedTypeTableColumns.length">
+              <h3 class="margin--none">{{ title | formatTextFromSnakeCase }}</h3>
             </th>
           </tr>
           <tr>
             <th
-              v-for="column in selectedTabTableColumns"
+              v-for="column in selectedTypeTableColumns"
               :key="column"
+              :class="`column--${column}`"
             >
-              {{ $t(column.split('_').join(' ')) }}
+              {{ $t(column) | formatTextFromSnakeCase }}
             </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(message, index) in selectedTabMessages[title]"
-            :key=" index"
+            v-for="(message, index) in selectedTypeMessages[title]"
+            :key="index"
           >
             <td
-              v-for="column in selectedTabTableColumns"
+              v-for="column in selectedTypeTableColumns"
               :key="column"
             >
-              {{ message[column] }}
+              {{ message[column] | formatTextBasedOnType | formatNumber(column === 'amounts' ? 2 : 0) }}
             </td>
             <td>Do stuff</td>
           </tr>
@@ -76,20 +86,44 @@
 @import "../../../../styles/index";
 .chatbot-alerts-window__container {
   margin: -20px;
+  width: calc(~"100% + 40px") !important;
 
   .chatbot-alerts-window__sidebar {
+    width: 250px;
     .padding--10();
     background: @day-secondary;
     border-right: 1px solid @day-border;
+
+    .chatbot-alerts-window__sidebar__tab {
+      .margin--10();
+      .text-transform--capitalize();
+      padding-left: 20px;
+
+      .chatbot-alerts-window__sidebar__tab__content {
+        .flex();
+        .flex--space-between();
+        .flex--v-center();
+        padding: 5px 0;
+      }
+    }
   }
 
   .chatbot-alerts-window__content {
+    width: 100%;
     .overflow--auto();
+    .padding--20();
 
     .chatbot-alerts-window__actions {
       .align-items--inline();
       .text-align--right();
     }
+  }
+}
+
+table thead tr th {
+  &.column--is_gifted,
+  &.column--months {
+    width: 100px;
   }
 }
 
@@ -128,14 +162,12 @@ td:last-child {
     background-color: @night-secondary;
   }
 
-  td {
-    .transition;
-  }
-
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    .transition;
+    color: white;
 
     &:hover {
       td {
