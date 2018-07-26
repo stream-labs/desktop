@@ -14,6 +14,7 @@ import fs from 'fs';
 import { WidgetSettingsService } from './widget-settings/widget-settings';
 import { ServicesManager } from '../services-manager';
 import { authorizedHeaders } from 'util/requests';
+import { ServiceHelper } from './stateful-service';
 
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
@@ -129,6 +130,7 @@ const WidgetTesters: IWidgetTester[] = [
   }
 ];
 
+@ServiceHelper()
 export class WidgetTester {
   constructor(public name: string, private url: string) {}
 
