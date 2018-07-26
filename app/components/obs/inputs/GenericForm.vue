@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(parameter, inputIndex) in value">
+    <div v-for="(parameter, inputIndex) in value" :key="parameter.name">
       <component
         v-if="parameter.visible && propertyComponentForType(parameter.type)"
         :is="propertyComponentForType(parameter.type)"
