@@ -6,10 +6,6 @@ import { IChatbotModule } from 'services/chatbot/chatbot-interfaces';
 export default class ChatbotModule extends ChatbotBase {
   @Prop() chatbotModule: IChatbotModule;
 
-  mounted() {
-    console.log(this.chatbotModule);
-  }
-
   // get chatAlerts() {
   //   return this.chatbotApiService.state.chat_alerts_response.settings;
   // }

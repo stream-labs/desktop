@@ -40,7 +40,7 @@ export interface TimersResponse {
 
 export interface ChatAlertsResponse {
   settings: ChatAlertsData;
-  enabled: number;
+  enabled: boolean;
 }
 
 
@@ -152,9 +152,9 @@ export interface Timer {
 export interface IChatbotModule {
   title: string;
   description: string;
-  window: string;
   enabled: boolean;
   onToggleEnabled: Function;
+  onExpand: Function;
 }
 
 // chat alerts
@@ -168,13 +168,13 @@ export interface ChatAlertsData {
 export interface StreamlabsChatAlert extends TipAlert {}
 
 export interface TwitchChatAlert
-  extends FollowerAlert, HostAlert, SubAlert, RaidAlert {}
+  extends FollowAlert, HostAlert, SubAlert, RaidAlert {}
 
 export interface YoutubeChatAlert
   extends YTSubAlert, SponsorAlert, SuperchatAlert {}
 
 export interface MixerChatAlert
-  extends FollowerAlert, HostAlert, SubAlert {}
+  extends FollowAlert, HostAlert, SubAlert {}
 
 
   // tips
@@ -189,9 +189,9 @@ export interface TipMessage {
 }
 
 // followers
-export interface FollowerAlert {
-  use_follower: boolean;
-  follower_messages: string[];
+export interface FollowAlert {
+  use_follow: boolean;
+  follow_messages: string[];
 }
 
 // hosts
@@ -221,7 +221,7 @@ export interface SubAlertMessage {
 
 // raids
 export interface RaidAlert {
-  use_raids: boolean;
+  use_raid: boolean;
   raid_messages: RaidMessage[];
 }
 

@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import NavItem from '../shared/NavItem.vue';
-import NavMenu from '../shared/NavMenu.vue';
-import ChatbotModules from '../page-components/Chatbot/ChatbotModules.vue';
-import ChatbotCommands from '../page-components/Chatbot/ChatbotCommands.vue';
-import ChatbotModTools from '../page-components/Chatbot/ChatbotModTools.vue';
-import ChatbotTimers from '../page-components/Chatbot/ChatbotTimers.vue';
+import NavItem from 'components/shared/NavItem.vue';
+import NavMenu from 'components/shared/NavMenu.vue';
+import ChatbotModules from 'components/page-components/Chatbot/ChatbotModules.vue';
+import ChatbotCommands from 'components/page-components/Chatbot/ChatbotCommands.vue';
+import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.vue';
+import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import { ChatbotApiService } from 'services/chatbot/chatbot';
 import { Inject } from 'util/injector';
 

@@ -23,21 +23,26 @@ export default class ChatbotModules extends ChatbotBase {
       {
         title: 'Chat Alerts',
         description: 'Get notified in chat whenever an activity happens like Donations and Subscribers.',
-        window: 'ChatbotAlertsWindow',
-        enabled: this.chatAlertsEnabled,
+        enabled: this.chatAlertCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotCommonService.openChatbotAlertsWindow();
+        },
         onToggleEnabled: () => {
-          // toggle chatbot alerts
-          // this.doSomething(!this.chatAlertsEnabled);
+          this.chatbotApiService.updateChatAlerts({
+            ...this.chatAlerts,
+            enabled: !this.chatAlertCurrentlyEnabled
+          });
         }
       }
     ];
     return modules;
   }
 
-  get chatAlertsEnabled() {
-    return this.chatbotApiService.state.chat_alerts_response.enabled === 1;
+  get chatAlerts() {
+    return this.chatbotApiService.state.chat_alerts_response;
   }
 
-
-
+  get chatAlertCurrentlyEnabled() {
+    return this.chatbotApiService.state.chat_alerts_response.enabled == true;
+  }
 }

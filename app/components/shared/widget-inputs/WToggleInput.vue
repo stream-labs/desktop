@@ -23,8 +23,9 @@
 .wtoggleinput__container {
   padding: 5px;
   position: relative;
-  width: 45px;
-  height: 25px;
+  width: 44px;
+  height: 22px;
+  .cursor--pointer();
 }
 .wtoggleinput__track {
   .transition;
@@ -35,12 +36,11 @@
 }
 
 .wtoggleinput__handle {
-  .cursor--pointer;
-  .transition;
+  .transition();
   position: absolute;
   z-index: 2;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   top: 0;
   left: 0;
@@ -55,7 +55,7 @@
 
 .wtoggleinput__container--active {
   .wtoggleinput__handle {
-    transform: translateX(20px);
+    transform: translateX(22px);
   }
 
   .wtoggleinput__track {

@@ -14,7 +14,12 @@
       <br />
       <br />
       <div class="chatbot-module__action">
-        <button class="button button--action">PREFERENCES</button>
+        <button
+          @click="chatbotModule.onExpand"
+          class="button button--action"
+        >
+          PREFERENCES
+        </button>
       </div>
     </div>
   </div>

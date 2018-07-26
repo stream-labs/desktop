@@ -29,6 +29,7 @@ import Util from 'services/utils';
 
 import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
+import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 
 import BitGoal from 'components/widget-settings/goal/BitGoal.vue';
 import DonationGoal from 'components/widget-settings/goal/DonationGoal.vue';
@@ -110,6 +111,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     ChatbotCommandWindow,
     ChatbotTimerWindow,
+    ChatbotAlertsWindow,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

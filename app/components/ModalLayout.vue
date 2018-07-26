@@ -54,6 +54,11 @@
 .modal-layout-content {
   flex-grow: 1;
   height: 100%;
+  display: flex;
+
+  & > * {
+    width: 100%;
+  }
 }
 
 .modal-layout-spinner {

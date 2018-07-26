@@ -51,7 +51,7 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       data: []
     },
     chat_alerts_response: {
-      enabled: 0,
+      enabled: false,
       settings: null
     }
   };
@@ -153,7 +153,7 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   // POST, PUT requests
   //
   createCustomCommand(data: CustomCommand) {
-    return this.api('POST', 'commands', data)
+    return this.api('POST', 'com mands', data)
       .then((response: CustomCommand) => {
         this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
@@ -193,6 +193,15 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
           this.fetchTimers();
         }
       });
+  }
+
+  updateChatAlerts(data: ChatAlertsResponse) {
+    return this.api('POST', 'settings/chat-notifications', data)
+      .then((response: ChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchChatAlerts();
+        }
+      })
   }
 
 
@@ -258,5 +267,15 @@ export class ChatbotCommonService extends PersistentStatefulService<
         height: 400
       }
     });
+  }
+
+  openChatbotAlertsWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotAlertsWindow',
+      size: {
+        width: 900,
+        height: 500
+      }
+    })
   }
 }

@@ -13,7 +13,7 @@
         </NavItem>
       </NavMenu>
     </div>
-    <div v-if="!authenticated" class='padding--20'>
+    <div v-if="!authenticated" class='small-10 padding--20'>
       <h1>Connecting to Chatbot...</h1>
     </div>
     <div v-else  class="small-10 overflow--auto">
