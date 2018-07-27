@@ -2,10 +2,8 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
 import windowMixin from '../mixins/window';
-import TextInput from '../shared/forms/TextInput.vue';
-import ListInput from '../shared/forms/ListInput.vue';
-import BoolInput from '../shared/forms/BoolInput.vue';
-import { IFormInput, IListInput, ITextInputValue } from '../shared/forms/Input';
+import { ObsTextInput, ObsListInput, ObsBoolInput }from 'components/obs/inputs';
+import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
 import { StreamInfoService } from 'services/stream-info';
 import { UserService } from '../../services/user';
 import { Inject } from '../../util/injector';
@@ -31,9 +29,9 @@ interface IMultiSelectProfiles {
 @Component({
   components: {
     ModalLayout,
-    TextInput,
-    ListInput,
-    BoolInput,
+    ObsTextInput,
+    ObsListInput,
+    ObsBoolInput,
     Multiselect
   },
   mixins: [windowMixin]
@@ -57,27 +55,27 @@ export default class EditStreamInfo extends Vue {
 
   // Form Models:
 
-  streamTitleModel: IFormInput<string> = {
+  streamTitleModel: IObsInput<string> = {
     name: 'stream_title',
     description: $t('Title'),
     value: ''
   };
 
-  streamDescriptionModel: ITextInputValue = {
+  streamDescriptionModel: IObsTextInputValue = {
     name: 'stream_description',
     description: 'Description',
     value: '',
     multiline: true
   };
 
-  gameModel: IListInput<string> = {
+  gameModel: IObsListInput<string> = {
     name: 'stream_game',
     description: $t('Game'),
     value: '',
     options: []
   };
 
-  doNotShowAgainModel: IFormInput<boolean> = {
+  doNotShowAgainModel: IObsInput<boolean> = {
     name: 'do_not_show_again',
     description: $t('Do not show this message when going live'),
     value: false
@@ -169,7 +167,7 @@ export default class EditStreamInfo extends Vue {
   }
 
   // For some reason, v-model doesn't work with ListInput
-  onGameInput(gameModel: IListInput<string>) {
+  onGameInput(gameModel: IObsListInput<string>) {
     this.gameModel = gameModel;
 
     this.loadAvailableProfiles();

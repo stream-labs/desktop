@@ -8,8 +8,7 @@ import {
 import { WidgetType } from 'services/widgets';
 import { Service } from 'services/service';
 import { Subject } from 'rxjs/Subject';
-import { IWInputMetadata } from 'components/shared/widget-inputs/WInput';
-
+import { IInputMetadata } from 'components/shared/inputs';
 
 
 export interface IWidgetTab {
@@ -131,7 +130,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     return data;
   }
 
-  getMetadata(): Dictionary<IWInputMetadata>  {
+  getMetadata(): Dictionary<IInputMetadata>  {
     return {};
   }
 
@@ -208,7 +207,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   //     case 'DonationTicker':
   //       return `https://${host}/widgets/donation-ticker?token=${token}`;
   //
-  //     case 'EndCredits':
+  //     case 'Credits':
   //       return `https://${host}/widgets/end-credits?token=${token}`;
   //
   //     case 'EventList':

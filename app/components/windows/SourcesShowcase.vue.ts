@@ -8,7 +8,7 @@ import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
-import { WidgetsService, WidgetType } from 'services/widgets';
+import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
@@ -33,6 +33,14 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   widgetTypes = WidgetType;
+  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TheJar]);
+
+  iterableWidgetTypes = Object.keys(this.widgetTypes)
+    .filter((type: string) => isNaN(Number(type)))
+    .sort((a: string, b: string) => {
+      return this.essentialWidgetTypes.has(this.widgetTypes[a]) ? -1 : 1;
+    });
+
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
@@ -58,11 +66,19 @@ export default class SourcesShowcase extends Vue {
     }
   }
 
+  getSrc(type: string, theme: string) {
+    return require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`);
+  }
+
   selectWidget(type: WidgetType) {
     this.selectSource('browser_source', {
       propertiesManager: 'widget',
       widgetType: type
     });
+  }
+
+  widgetData(type: string) {
+    return WidgetDisplayData()[this.widgetTypes[type]];
   }
 
   inspectedSource: TInspectableSource = null;

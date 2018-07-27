@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../util/injector';
-import GenericFormGroups from './shared/forms/GenericFormGroups.vue';
-import TextInput from './shared/forms/TextInput.vue';
+import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
+import ObsTextInput from 'components/obs/inputs/ObsTextInput.vue';
 import { ITcpServerServiceApi, ITcpServersSettings } from '../services/tcp-server';
 import { ISettingsSubCategory } from '../services/settings';
 
 @Component({
-  components: { GenericFormGroups, TextInput }
+  components: { GenericFormGroups, ObsTextInput }
 })
 export default class ApiSettings extends Vue {
 
@@ -46,7 +46,7 @@ export default class ApiSettings extends Vue {
 
 
   save(settingsData: ISettingsSubCategory[]) {
-    const settings: Partial<ITcpServersSettings> = {}
+    const settings: Partial<ITcpServersSettings> = {};
     settingsData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (!settings[subCategory.codeSubCategory]) settings[subCategory.codeSubCategory] = {};

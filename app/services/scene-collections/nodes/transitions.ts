@@ -1,7 +1,7 @@
 import { Node } from './node';
 import { TransitionsService, ETransitionType } from 'services/transitions';
 import { Inject } from 'util/injector';
-import { TObsValue } from 'components/shared/forms/Input';
+import { TObsValue } from 'components/obs/inputs/ObsInput';
 
 interface ITransition {
   id: string;

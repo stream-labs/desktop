@@ -248,229 +248,29 @@
 
     <!-- Widget Sources -->
     <add-source-info
-      v-if="inspectedSource === widgetTypes.AlertBox"
-      @clickAdd="selectWidget(widgetTypes.AlertBox)"
-      :name="$t('Alertbox')"
-      :description="$t('Thanks viewers with notification popups.')"
-      key="14">
-      <video class="source__demo source__demo--day" autoplay loop slot="media">
-        <source src="../../../media/source-demos/day/source-alertbox.mp4">
+      v-for="type in iterableWidgetTypes"
+      :key="type"
+      v-if="inspectedSource === widgetTypes[type]"
+      :name="widgetData(type).name"
+      :description="widgetData(type).description"
+    >
+      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--day" autoplay loop slot="media">
+        <source :src="getSrc(type, 'day')">
       </video>
-      <video class="source__demo source__demo--night" autoplay loop slot="media">
-        <source src="../../../media/source-demos/night/source-alertbox.mp4">
+      <video v-if="widgetData(type).demoVideo" class="source__demo source__demo--night" autoplay loop slot="media">
+        <source :src="getSrc(type, 'night')">
       </video>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--day" slot="media" :src="getSrc(type, 'day')"/>
+      <img v-if="!widgetData(type).demoVideo" class="source__demo source__demo--night" slot="media" :src="getSrc(type, 'night')"/>
       <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Donations') }}</li>
-        <li>{{ $t('Subscriptions') }}</li>
-        <li>{{ $t('Follows') }}</li>
-        <li>{{ $t('Bits') }}</li>
-        <li>{{ $t('Hosts') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.DonationTicker"
-      @clickAdd="selectWidget(widgetTypes.DonationTicker)"
-      :name="$t('Donation Ticker')"
-      :description="$t('Show off your most recent donations to your viewers.')"
-      key="15">
-      <video class="source__demo source__demo--day" autoplay loop slot="media">
-        <source src="../../../media/source-demos/day/source-donation-ticker.mp4">
-      </video>
-      <video class="source__demo source__demo--night" autoplay loop slot="media">
-        <source src="../../../media/source-demos/night/source-donation-ticker.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Donations') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.EventList"
-      @clickAdd="selectWidget(widgetTypes.EventList)"
-      :name="$t('Event List')"
-      :description="$t('Include your channel\'s most recent events into your stream.')"
-      key="16">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-eventlist.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-eventlist.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Donations') }}</li>
-        <li>{{ $t('Subscriptions') }}</li>
-        <li>{{ $t('Follows') }}</li>
-        <li>{{ $t('Bits') }}</li>
-        <li>{{ $t('Hosts') }}</li>
-        <li>{{ $t('Redemptions') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.DonationGoal"
-      @clickAdd="selectWidget(widgetTypes.DonationGoal)"
-      :name="$t('Donation Goal')"
-      :description="$t('Set a goal for your viewers to help you reach.')"
-      key="17">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-donation-goal.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-donation-goal.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Donations') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.FollowerGoal"
-      @clickAdd="selectWidget(widgetTypes.FollowerGoal)"
-      :name="$t('Follower Goal')"
-      :description="$t('Set a goal for your viewers to help you reach.')"
-      key="18">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Twitch Follows') }}</li>
-        <li>{{ $t('Youtube Follows') }}</li>
-        <li>{{ $t('Mixer Follows') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.BitGoal"
-      @clickAdd="selectWidget(widgetTypes.BitGoal)"
-      :name="$t('Bit Goal')"
-      :description="$t('Set a goal for your viewers to help you reach.')"
-      key="19">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-bit-goal.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-bit-goal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Twitch Bits') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.SubscriptionGoal"
-      @clickAdd="selectWidget(widgetTypes.SubscriptionGoal)"
-      :name="$t('Subscription Goal')"
-      :description="$t('Set a goal for your viewers to help you reach.')"
-      key="20">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-follower-goal.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-follower-goal.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Youtube Subscribers') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.ChatBox"
-      @clickAdd="selectWidget(widgetTypes.ChatBox)"
-      :name="$t('Chatbox')"
-      :description="$t('Include your channel\'s chat into your stream.')"
-      key="21">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-chatbox.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-chatbox.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Twitch chat') }}</li>
-        <li>{{ $t('Youtube chat') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.TheJar"
-      @clickAdd="selectWidget(widgetTypes.TheJar)"
-      :name="$t('The Jar')"
-      :description="$t('The jar that catches bits, tips, and more.')"
-      key="22">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-jar.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-jar.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('Donations') }}</li>
-        <li>{{ $t('Subscriptions') }}</li>
-        <li>{{ $t('Follows') }}</li>
-        <li>{{ $t('Bits') }}</li>
-        <li>{{ $t('Hosts') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.ViewerCount"
-      @clickAdd="selectWidget(widgetTypes.ViewerCount)"
-      :name="$t('Viewer Count')"
-      :description="$t('Show off your viewers from multiple platforms.')"
-      key="23">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/source-viewer-count.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/source-viewer-count.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Youtube</li>
-        <li>Twitch</li>
-        <li>Mixer</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.StreamBoss"
-      @clickAdd="selectWidget(widgetTypes.StreamBoss)"
-      :name="$t('Stream Boss')"
-      :description="$t('Battle with bits to be the boss of the stream!')"
-      key="24">
-      <img slot="media" src="../../../media/source-demos/streamboss-source.png"/>
-      <ul slot="support-list" class="source-support__list">
-        <li>Twitch Bits</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.Credits"
-      @clickAdd="selectWidget(widgetTypes.Credits)"
-      :name="$t('Credits')"
-      :description="$t('Rolling credits to play at the end of your stream.')"
-      key="25">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-credits.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-credits.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('New Followers') }}</li>
-        <li>{{ $t('New Subscribers') }}</li>
-        <li>{{ $t('Cheers') }}</li>
-        <li>{{ $t('Donations') }}</li>
-      </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === widgetTypes.SpinWheel"
-      @clickAdd="selectWidget(widgetTypes.SpinWheel)"
-      :name="$t('Spin Wheel')"
-      :description="$t('Spin the wheel to make a decision.')"
-      key="26">
-      <video class="source__demo source__demo--day" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/day/source-wheel.mp4">
-      </video>
-      <video class="source__demo source__demo--night" slot="media" autoplay loop>
-        <source src="../../../media/source-demos/night/source-wheel.mp4">
-      </video>
-      <ul slot="support-list" class="source-support__list">
-        <li>{{ $t('The streamer manually triggers a spin anytime while they are live.') }}</li>
+        <li v-for="support in widgetData(type).supportList" :key="support">
+          {{ support }}
+        </li>
       </ul>
     </add-source-info>
 
     <add-source-info
       v-if="inspectedSource === 'scene'"
-      @clickAdd="selectSource('scene')"
       :name="$t('Scene')"
       :description="$t('Allows you to add existing scene as a source')"
       key="27">
@@ -480,7 +280,6 @@
 
     <add-source-info
       v-if="inspectedSource === 'streamlabel'"
-      @clickAdd="selectWidget(widgetTypes.StreamLabel)"
       :name="$t('Stream Label')"
       :description="$t('Include text into your stream, such as follower count, last donation, and many others.')"
       key="28">
@@ -523,6 +322,7 @@
         <ul class="source-list">
           <li
             v-for="source in availableSources"
+            :key="source.value"
             class="source source--standard"
             :class="{'source--active': inspectedSource === source.value}"
             @click="inspectSource(source.value)"
@@ -536,109 +336,16 @@
         <h4>{{ $t('Widgets') }}</h4>
         <div class="source-list">
           <div
+            v-for="type in iterableWidgetTypes"
+            :key="type"
+            v-show="!widgetData(type).platform || widgetData(type).platform === platform"
             class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Alertbox}"
-            @click="inspectSource(widgetTypes.AlertBox)"
-            @dblclick="selectWidget(widgetTypes.AlertBox)">
-            <div>{{ $t('Alertbox') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.EventList}"
-            @click="inspectSource(widgetTypes.EventList)"
-            @dblclick="selectWidget(widgetTypes.EventList)">
-            <div>{{ $t('Event List') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.TheJar}"
-            @click="inspectSource(widgetTypes.TheJar)"
-            @dblclick="selectWidget(widgetTypes.TheJar)">
-            <div>{{ $t('The Jar') }}</div><span class="label--essential">{{ $t('Essential') }}</span>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationGoal}"
-            @click="inspectSource(widgetTypes.DonationGoal)"
-            @dblclick="selectWidget(widgetTypes.DonationGoal)">
-            <div>{{ $t('Donation Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.FollowerGoal}"
-            @click="inspectSource(widgetTypes.FollowerGoal)"
-            @dblclick="selectWidget(widgetTypes.FollowerGoal)">
-            <div>{{ $t('Follower Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'twitch'"
-            :class="{'source--active': inspectedSource === widgetTypes.BitGoal}"
-            @click="inspectSource(widgetTypes.BitGoal)"
-            @dblclick="selectWidget(widgetTypes.BitGoal)">
-            <div>{{ $t('Bit Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            v-show="platform === 'youtube'"
-            :class="{'source--active': inspectedSource === widgetTypes.SubscriptionGoal}"
-            @click="inspectSource(widgetTypes.SubscriptionGoal)"
-            @dblclick="selectWidget(widgetTypes.SubscriptionGoal)">
-            <div>{{ $t('Subscription Goal') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.DonationTicker}"
-            @click="inspectSource(widgetTypes.DonationTicker)"
-            @dblclick="selectWidget(widgetTypes.DonationTicker)">
-            <div>{{ $t('Donation Ticker') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ChatBox}"
-            @click="inspectSource(widgetTypes.ChatBox)"
-            @dblclick="selectWidget(widgetTypes.ChatBox)">
-            <div>{{ $t('Chatbox') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.StreamBoss}"
-            @click="inspectSource(widgetTypes.StreamBoss)"
-            @dblclick="selectWidget(widgetTypes.StreamBoss)">
-            <div>{{ $t('Stream Boss') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.Credits}"
-            @click="inspectSource(widgetTypes.Credits)"
-            @dblclick="selectWidget(widgetTypes.Credits)">
-            <div>{{ $t('Credits') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.ViewerCount}"
-            @click="inspectSource(widgetTypes.ViewerCount)"
-            @dblclick="selectWidget(widgetTypes.ViewerCount)">
-            <div>{{ $t('Viewer Count') }}</div>
-          </div>
-
-          <div
-            class="source source--widget"
-            :class="{'source--active': inspectedSource === widgetTypes.SpinWheel}"
-            @click="inspectSource(widgetTypes.SpinWheel)"
-            @dblclick="selectWidget(widgetTypes.SpinWheel)">
-            <div>{{ $t('Spin Wheel') }}</div>
+            :class="{'source--active': inspectedSource === widgetTypes[type]}"
+            @click="inspectSource(widgetTypes[type])"
+            @dblclick="selectWidget(widgetTypes[type])"
+          >
+            <div>{{ widgetData(type).name }}</div>
+            <span v-if="essentialWidgetTypes.has(widgetTypes[type])" class="label--essential">{{ $t('Essential') }}</span>
           </div>
 
           <div
