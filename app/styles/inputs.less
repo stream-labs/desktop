@@ -55,10 +55,13 @@ input[type=text],
 input[type=number],
 input[type=password],
 textarea {
-  font-size: 13px;
+  font-size: 14px;
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
+  color: @day-paragraph;
+  .radius();
+  box-shadow: none;
 
   &:focus {
     box-shadow: none;
@@ -73,42 +76,6 @@ textarea {
     height: 20px;
     background: transparent;
     border-radius: 0;
-  }
-}
-
-.checkbox {
-  margin-bottom: 0;
-  input:checked~label {
-    &:after {
-      font-family: "Font Awesome 5 Free";
-      font-weight: 900;
-      content: '\f00c';
-    }
-  }
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-    text-transform: none;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
-  }
-}
-
-.radio {
-  margin-bottom: 0;
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
   }
 }
 

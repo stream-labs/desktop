@@ -37,13 +37,8 @@
   background-color: @teal;
 }
 
-// Box shadows
-.shadow {
-  box-shadow: 0 6px 20px rgba(0,0,0,.2);
-}
-
 // Border radius
-.radius {
+.radius() {
   border-radius: 4px;
 }
 
@@ -54,37 +49,6 @@
 
 .night-border {
   border: 1px solid @night-section;
-}
-
-// Typography
-.normal {
-  font-weight: 400;
-}
-
-.weight--medium {
-  font-weight: 500;
-  src: local('Roboto Medium');
-}
-
-.semibold {
-  font-weight: 500;
-  src: local('Roboto Medium');
-}
-
-.bold {
-  font-weight: 700;
-}
-
-.teal {
-  color: @teal;
-}
-
-.warning {
-  color: @red;
-}
-
-.letter-spacing {
-  letter-spacing: .6px;
 }
 
 // Hovers
@@ -120,29 +84,46 @@
 }
 
 // Shadows
-.shadow {
+.shadow() {
   box-shadow: 0 6px 14px @shadow;
 }
 
-.night-shadow {
+.night-shadow() {
   box-shadow: 0 6px 14px 1px rgba(1, 2, 2, 0.3);
 }
 
 // Transitiions
-.transition {
+.transition() {
   transition: all 275ms;
 }
 
 // Typography
-.normal {
+.weight--normal() {
   font-weight: 400;
 }
 
-.semibold {
+.weight--medium() {
   font-weight: 500;
   src: local('Roboto Medium');
 }
 
-.bold {
+.semibold() {
+  font-weight: 500;
+  src: local('Roboto Medium');
+}
+
+.weight--bold() {
   font-weight: 700;
+}
+
+.teal() {
+  color: @teal;
+}
+
+.warning() {
+  color: @red;
+}
+
+.letter-spacing() {
+  letter-spacing: .6px;
 }

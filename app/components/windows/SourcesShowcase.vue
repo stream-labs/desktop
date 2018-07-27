@@ -654,7 +654,7 @@ h4 {
 .source {
   color: @navy;
   cursor: pointer;
-  .transition;
+  .transition();
   border: 1px solid @day-border;
   padding: 4px 10px;
   margin-top: 10px;
@@ -663,7 +663,7 @@ h4 {
   &:hover,
   &.source--active {
     color: @navy-secondary;
-    .semibold;
+    .weight--medium();
     border-color: @day-border;
     background-color: @day-secondary;
   }
@@ -684,8 +684,8 @@ h4 {
 .source--widget {
   display: flex;
   align-items: center;
-  .radius;
-  .transition;
+  .radius();
+  .transition();
 }
 
 .source-info__media {

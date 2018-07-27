@@ -18,21 +18,21 @@
     <button
       @click="navigateOverlays"
       class="tab-button"
-      :class="{ active: page === 'BrowseOverlays' }"
+      :class="{ 'is-active': page === 'BrowseOverlays' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-themes"/> {{ $t('Themes') }}
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
-      :class="{ active: page === 'Studio' }"
+      :class="{ 'is-active': page === 'Studio' }"
       :disabled="locked">
       <i class="icon-studio"/> {{ $t('Editor') }}
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
-      :class="{ active: page === 'Live' }"
+      :class="{ 'is-active': page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-live-dashboard"/> {{ $t('Live') }}
     </button>

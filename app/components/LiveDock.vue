@@ -45,7 +45,7 @@
             }"
             @click="toggleViewerCount"/>
           <i class="fa fa-user label--icon" />
-          <span class="semibold">{{ viewerCount }}</span> {{ $t('viewers')}}
+          <span class="weight--medium">{{ viewerCount }}</span> {{ $t('viewers')}}
         </div>
       </div>
 
@@ -158,7 +158,7 @@
 
 .live-dock-text {
   margin: 0 2px 0 4px;
-  .semibold;
+  .weight--medium();
 }
 
 .live-dock-expanded-contents {

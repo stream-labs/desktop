@@ -102,8 +102,8 @@
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--light-2"></div>
                 <div>
-                  <div class="design-system__code">@day-button, @light-2</div>
-                  <div>Day Button Background</div>
+                  <div class="design-system__code">@day-button, @day-input-border, @light-2</div>
+                  <div>Day Button Background, Day Input Border</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
@@ -681,8 +681,36 @@
               <span class="mls"> icon-stats</span>
             </div>
           </div>
-
         </div>
+
+        <div id="inputs" class="design-system__section">
+          <h2>Inputs</h2>
+          <div class="input-container">
+            <div class="input-label">
+              Example Checkbox
+            </div>
+            <div class="input-wrapper">
+              <div class="checkbox">
+                <input
+                  type="checkbox"
+                  v-model="exampleSettings.checkbox_standard"/>
+                <label>{{ $t('Include Resubs') }}</label>
+              </div>
+            </div>
+          </div>
+
+          <w-form-group title="Form Group">
+            <w-bool-input title="Example 1" v-model="exampleSettings.checkbox_1"/>
+            <w-bool-input title="Example 2" v-model="exampleSettings.checkbox_2"/>
+            <w-bool-input title="Example 3" v-model="exampleSettings.checkbox_3"/>
+            <w-bool-input title="Example 4" v-model="exampleSettings.checkbox_4"/>
+          </w-form-group>
+
+          <w-form-group title="Form Group">
+            <w-slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
+          </w-form-group>
+        </div>
+
         <div id="mixins" class="design-system__section">
           <h2>Mixins</h2>
           <table>
@@ -695,14 +723,59 @@
             </thead>
             <tbody>
               <tr>
-                <td class="design-system__code">.weight--normal</td>
+                <td class="design-system__code">.weight--normal()</td>
                 <td>normal, medium, bold</td>
+                <td>Adjust the font-weight of text</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.margin--8()</td>
+                <td>4, 8, 16, 24</td>
                 <td>Add right margin to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin-right</td>
-                <td>8, 16</td>
+                <td class="design-system__code">.margin-top--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add top margin to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.margin-right--8()</td>
+                <td>4, 8, 16, 24</td>
                 <td>Add right margin to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.margin-bottom--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add bottom margin to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.margin-left--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add left margin to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.padding--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add right padding to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.padding-top--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add top padding to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.padding-right--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add right padding to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.padding-bottom--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add bottom padding to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.padding-left--8()</td>
+                <td>4, 8, 16, 24</td>
+                <td>Add left padding to any element</td>
               </tr>
             </tbody>
           </table>
@@ -852,9 +925,9 @@
       }
     }
   }
+}
 
-  .design-system__code {
-    font-family: 'Courier New', Courier, monospace;
-  }
+.design-system__code {
+  font-family: 'Courier New', Courier, monospace;
 }
 </style>

@@ -48,7 +48,6 @@
   position: relative;
   padding: 10px 20px;
   background-color: @day-secondary;
-  border-top: 1px solid @day-border;
   max-width: none;
   flex: 0 0 auto;
 }
@@ -111,7 +110,7 @@
   border-radius: 100%;
   opacity: .6;
   .transition;
-  .bold;
+  .weight--bold;
   border: 1px solid #c4c5c5;
   box-sizing: content-box;
   letter-spacing: .2px;
@@ -147,7 +146,6 @@
 .night-theme {
   .footer {
     background-color: @night-primary;
-    border-color: @night-border;
   }
 
   .error-wrapper {
