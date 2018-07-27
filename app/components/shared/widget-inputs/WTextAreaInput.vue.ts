@@ -6,12 +6,9 @@ interface IWTextMetadata extends IWInputMetadata {
   validate: string;
 }
 
-@Component({
-})
+@Component({})
 export default class WTextAreaInput extends WInput<string, IWTextMetadata> {
-
-  @Prop()
-  value: string;
+  @Prop() value: string;
 
   @Prop({ default: () => ({}) })
   metadata: IWTextMetadata;
