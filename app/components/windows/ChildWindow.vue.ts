@@ -16,7 +16,7 @@ export default class ChildWindow extends Vue {
   activeComponentInd = 0;
 
   components = [
-    { name: '', isShown: false},
+    { name: this.options.componentName, isShown: this.options.isShown},
     { name: '', isShown: false},
   ];
 

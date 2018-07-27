@@ -72,7 +72,9 @@ export function getComponents() {
     DonationGoal,
     FollowerGoal,
     ChatBox,
-    ViewerCount
+    ViewerCount,
+    StreamBoss,
+    Credits
   };
 }
 
