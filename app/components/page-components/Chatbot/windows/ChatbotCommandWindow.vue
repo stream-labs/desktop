@@ -12,14 +12,14 @@
     <div v-if="selectedTab === 'general'">
       <div>
         <label for="command" class="margin-vertical--10">Command</label>
-        <WTextInput
+        <TextInput
           v-model="newCommand.command"
           :metadata="commandMetadata"
         />
       </div>
       <div>
         <label for="response" class="margin-vertical--10">Response</label>
-        <WTextAreaInput
+        <TextAreaInput
           v-model="newCommand.response"
           :metadata="responseMetadata"
         />
@@ -27,14 +27,14 @@
       <div class="row">
         <div class="small-6 columns">
           <label for="permission" class="margin-vertical--10">Permission</label>
-          <WListInput
+          <ListInput
             v-model="newCommand.permission.level"
             :metadata="permissionMetadata"
           />
         </div>
         <div class="small-6 columns">
           <label for="show to" class="margin-vertical--10">Show to</label>
-          <WListInput
+          <ListInput
             v-model="newCommand.response_type"
             :metadata="showToMetadata"
           />

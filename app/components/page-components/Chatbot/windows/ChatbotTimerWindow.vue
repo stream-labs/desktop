@@ -8,28 +8,28 @@
     <div>
       <div>
         <label for="timer" class="margin-vertical--10">Name</label>
-        <WTextInput
+        <TextInput
           v-model="newTimer.name"
           :metadata="nameMetadata"
         />
       </div>
       <div>
         <label for="response" class="margin-vertical--10">Response</label>
-        <WTextAreaInput
+        <TextAreaInput
           v-model="newTimer.message"
           :metadata="messageMetadata"
         />
       </div>
       <div class="columns small-6">
         <label for="interval" class="margin-vertical--10">Interval in mins</label>
-        <WSliderInput
+        <SliderInput
           v-model="newTimer.interval"
           :metadata="intervalMetadata"
         />
       </div>
       <div class="columns small-6">
         <label for="line" class="margin-vertical--10">Line Minimum</label>
-        <WSliderInput
+        <SliderInput
           v-model="newTimer.chat_lines"
           :metadata="chatLinesMetadata"
         />
