@@ -47,9 +47,10 @@
   align-items: center;
   position: relative;
   padding: 10px 20px;
-  background-color: @day-secondary;
+  background-color: @day-section;
   max-width: none;
   flex: 0 0 auto;
+  border-top: 1px solid transparent;
 }
 
 .nav-right {
@@ -146,6 +147,7 @@
 .night-theme {
   .footer {
     background-color: @night-primary;
+    border-color: @night-border;
   }
 
   .error-wrapper {
@@ -158,6 +160,10 @@
 
     &.active {
       border-color: @red;
+    }
+
+    &:focus {
+      outline: none;
     }
   }
 }

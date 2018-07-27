@@ -10,7 +10,7 @@
       <i
         class="icon-settings icon-button"
         @click="showAdvancedSettings()"
-        v-tooltip.bottom="advancedSettingsTooltip"/>
+        v-tooltip.left="advancedSettingsTooltip"/>
     </div>
   </div>
   <div class="studio-controls-selector mixer-panel">

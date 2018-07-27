@@ -6,7 +6,7 @@
   </div>
   <div class="titlebar-actions">
     <i class="icon-subtract titlebar-action" @click="minimize" />
-    <i class="icon-full-screen titlebar-action" @click="maximize" />
+    <i class="icon-system-expand titlebar-action" @click="maximize" />
     <i class="icon-close titlebar-action" @click="close" />
   </div>
 </div>
