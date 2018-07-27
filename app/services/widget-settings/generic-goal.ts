@@ -1,6 +1,6 @@
 import { IWidgetData, WidgetSettingsService } from './widget-settings';
 
-import { metadata } from 'components/shared/widget-inputs/WInput';
+import { metadata } from 'components/shared/inputs';
 
 
 export interface IGoalData extends IWidgetData {
