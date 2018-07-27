@@ -39,7 +39,7 @@
           <td> {{ timer.chat_lines }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 :value="timer.enabled"
                 @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
               />

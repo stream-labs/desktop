@@ -43,7 +43,7 @@
           <td> {{ $t(command.description) }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 v-if="typeof command.enabled === 'boolean'"
                 :value="command.enabled"
                 @input="toggleEnableCommand(slugName, commandName, !command.enabled)"

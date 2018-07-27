@@ -273,7 +273,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
       componentName: 'ChatbotAlertsWindow',
       size: {
         width: 1000,
-        height: 500
+        height: 700
       }
     })
   }

@@ -15,7 +15,7 @@
         >
           <div class="chatbot-alerts-window__sidebar__tab__content">
             <span>{{ $t(alertTypeName) }}</span>
-            <WToggleInput
+            <ToggleInput
               :value="isEnabled(alertTypeName)"
               @input="(enabled, event) => {
                 event.stopPropagation();

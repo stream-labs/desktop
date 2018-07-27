@@ -3,7 +3,7 @@
   <div class="chatbot-module__container">
     <div class="chatbot-module__header">
       <h3>{{ chatbotModule.title }}</h3>
-      <WToggleInput
+      <ToggleInput
         :value="chatbotModule.enabled"
         @input="chatbotModule.onToggleEnabled"
       />

@@ -37,7 +37,7 @@
           <td> {{ $t(command.response) }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 :value="command.enabled"
                 @input="toggleEnableCommand(command.id, index, !command.enabled)"
               />

@@ -107,16 +107,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
-<<<<<<< HEAD
     StreamBoss,
+    Credits,
 
     ChatbotCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
-=======
-    Credits,
-    StreamBoss
->>>>>>> chatbot-feature
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

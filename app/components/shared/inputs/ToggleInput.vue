@@ -1,26 +1,26 @@
 <template>
 <div
   @click="handleClick"
-  class="wtoggleinput__container"
-  :class="{'wtoggleinput__container--active' : value}"
+  class="toggleinput__container"
+  :class="{'toggleinput__container--active' : value}"
 >
   <div
-    class="wtoggleinput__track"
-    :class="{'wtoggleinput__track--active' : value}"
+    class="toggleinput__track"
+    :class="{'toggleinput__track--active' : value}"
   ></div>
   <div
-    class="wtoggleinput__handle"
-    :class="{'wtoggleinput__handle--active' : value}"
+    class="toggleinput__handle"
+    :class="{'toggleinput__handle--active' : value}"
   ></div>
 </div>
 </template>
 
-<script lang="ts" src="./WToggleInput.vue.ts"></script>
+<script lang="ts" src="./ToggleInput.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";
 
-.wtoggleinput__container {
+.toggleinput__container {
   padding: 5px;
   margin: 0 2px;
   position: relative;
@@ -28,7 +28,7 @@
   height: 22px;
   .cursor--pointer();
 }
-.wtoggleinput__track {
+.toggleinput__track {
   .transition;
   background-color: @grey;
   border-radius: 30px;
@@ -36,7 +36,7 @@
   height: 100%;
 }
 
-.wtoggleinput__handle {
+.toggleinput__handle {
   .transition();
   position: absolute;
   z-index: 2;
@@ -54,12 +54,12 @@
 
 }
 
-.wtoggleinput__container--active {
-  .wtoggleinput__handle {
+.toggleinput__container--active {
+  .toggleinput__handle {
     transform: translateX(22px);
   }
 
-  .wtoggleinput__track {
+  .toggleinput__track {
     background-color: @teal;
   }
 }
