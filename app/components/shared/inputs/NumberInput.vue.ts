@@ -11,7 +11,7 @@ export default class NumberInput extends BaseInput<number|string, INumberMetadat
   @Prop()
   metadata: INumberMetadata;
 
-  emitInput(eventData: string, event?: any) {
+  emitInput(eventData: string) {
     if (!isNaN(parseFloat(eventData))) {
       // if is a string of valid number
       // convert to number
