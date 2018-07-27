@@ -4,7 +4,7 @@
         type="number"
         :placeholder="metadata.placeholder"
         :value="value"
-        @input="emitInput($event.target.value)"
+        @input="emitInput($event.target.value, $event)"
         :name="uuid"
         v-validate="validate"
     />
