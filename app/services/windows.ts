@@ -259,17 +259,22 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
 
   updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
-    const options: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
-    if (options.preservePrevWindow) {
-      options.prevWindowOptions = cloneDeep(this.state.child);
+    const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
+    if (newOptions.preservePrevWindow) {
+      const currentOptions = cloneDeep(this.state.child);
+
+      if (currentOptions.preservePrevWindow) {
+        throw new Error('You can\'t use preservePrevWindow option for more that 1 window in the row');
+      }
+
+      newOptions.prevWindowOptions = currentOptions;
 
       // restrict saving history only for 1 window before
-      delete options.prevWindowOptions.prevWindowOptions;
-      delete options.prevWindowOptions.preservePrevWindow;
+      delete newOptions.prevWindowOptions.prevWindowOptions;
     }
 
-    this.SET_CHILD_WINDOW_OPTIONS(options);
-    this.windowUpdated.next({ windowId: 'child', options });
+    this.SET_CHILD_WINDOW_OPTIONS(newOptions);
+    this.windowUpdated.next({ windowId: 'child', options: newOptions });
   }
 
   updateMainWindowOptions(options: Partial<IWindowOptions>) {
