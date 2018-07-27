@@ -33,6 +33,14 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   widgetTypes = WidgetType;
+  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TheJar]);
+
+  iterableWidgetTypes = Object.keys(this.widgetTypes)
+    .filter((type: string) => isNaN(Number(type)))
+    .sort((a: string, b: string) => {
+      return this.essentialWidgetTypes.has(this.widgetTypes[a]) ? -1 : 1;
+    });
+
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
@@ -63,6 +71,14 @@ export default class SourcesShowcase extends Vue {
       propertiesManager: 'widget',
       widgetType: type
     });
+  }
+
+  widgetName(type: WidgetType) {
+    return this.widgetsService.getWidgetName(type);
+  }
+
+  widgetPlatform(type: WidgetType) {
+    return this.widgetsService.getWidgetPlatform(type);
   }
 
   inspectedSource: TInspectableSource = null;

@@ -15,6 +15,7 @@ import { WidgetSettingsService } from './widget-settings/widget-settings';
 import { ServicesManager } from '../services-manager';
 import { authorizedHeaders } from 'util/requests';
 
+// Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
   DonationGoal = 1,
@@ -155,6 +156,8 @@ export interface IWidget {
 
   // An anchor (origin) point can be specified for the x&y positions
   anchor: AnchorPoint;
+
+  platform?: string;
 }
 
 export const WidgetDefinitions: { [x: number]: IWidget } = {
@@ -215,7 +218,9 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     x: 0,
     y: 1,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.SouthWest,
+
+    platform: 'youtube'
   },
 
   [WidgetType.BitGoal]: {
@@ -230,7 +235,9 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     x: 0,
     y: 1,
 
-    anchor: AnchorPoint.SouthWest
+    anchor: AnchorPoint.SouthWest,
+
+    platform: 'twitch'
   },
 
   [WidgetType.DonationTicker]: {
@@ -428,6 +435,14 @@ export class WidgetsService extends Service {
 
   getWidgetComponent(type: WidgetType): string {
     return WidgetType[type];
+  }
+
+  getWidgetName(type: WidgetType): string {
+    return WidgetDefinitions[this.getWidgetComponent(type)].name;
+  }
+
+  getWidgetPlatform(type: WidgetType): string {
+    return WidgetDefinitions[this.getWidgetComponent(type)].platform;
   }
 
   getWidgetSettingsService(type: WidgetType): WidgetSettingsService<any> {
