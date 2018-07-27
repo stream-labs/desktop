@@ -7,15 +7,17 @@ import {
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
-import * as comps from 'components/shared/widget-inputs';
-import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
+import { inputComponents } from 'components/shared/inputs';
+import { AnimationInput } from './inputs';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 
 @Component({
   components: {
     WidgetWindow,
-    WFormGroup,
-    ...comps
+    FormGroup,
+    AnimationInput,
+    ...inputComponents
   }
 })
 export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, SponsorBannerService> {

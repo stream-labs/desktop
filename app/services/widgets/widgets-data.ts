@@ -16,7 +16,8 @@ export enum WidgetType {
   ViewerCount = 9,
   StreamBoss = 10,
   Credits = 11,
-  SpinWheel = 12
+  SpinWheel = 12,
+  SponsorBanner = 13
 }
 
 
@@ -274,6 +275,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.Center
   },
 
+  [WidgetType.SponsorBanner]: {
+    name: 'Sponsor Banner',
+    url(host, token) {
+      return `https://${host}/widgets/sponsor-banner?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
   [WidgetType.SpinWheel]: {
     name: 'Spin Wheel',
     url(host, token) {
@@ -407,6 +423,15 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
       $t('Cheers'),
       $t('Donations')
     ]
+  },
+  [WidgetType.SponsorBanner]: {
+    name: $t('Sponsor Banner'),
+    description: $t(
+      'Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.'
+    ),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: [$t('The streamer manually adds images of sponsors.')]
   },
   [WidgetType.SpinWheel]: {
     name: $t('Spin Wheel'),

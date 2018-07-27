@@ -1,6 +1,5 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
-import { metadata } from 'components/shared/widget-inputs/WInput';
 
 export interface ISponsorBannerSettings extends IWidgetSettings {
   background_color_option: boolean;
