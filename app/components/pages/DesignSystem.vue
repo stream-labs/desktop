@@ -699,16 +699,16 @@
             </div>
           </div>
 
-          <w-form-group title="Form Group">
-            <w-bool-input title="Example 1" v-model="exampleSettings.checkbox_1"/>
-            <w-bool-input title="Example 2" v-model="exampleSettings.checkbox_2"/>
-            <w-bool-input title="Example 3" v-model="exampleSettings.checkbox_3"/>
-            <w-bool-input title="Example 4" v-model="exampleSettings.checkbox_4"/>
-          </w-form-group>
+          <form-group title="Form Group">
+            <bool-input title="Example 1" v-model="exampleSettings.checkbox_1"/>
+            <bool-input title="Example 2" v-model="exampleSettings.checkbox_2"/>
+            <bool-input title="Example 3" v-model="exampleSettings.checkbox_3"/>
+            <bool-input title="Example 4" v-model="exampleSettings.checkbox_4"/>
+          </form-group>
 
-          <w-form-group title="Form Group">
-            <w-slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
-          </w-form-group>
+          <form-group title="Form Group">
+            <slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
+          </form-group>
         </div>
 
         <div id="mixins" class="design-system__section">

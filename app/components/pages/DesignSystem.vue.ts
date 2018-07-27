@@ -3,15 +3,15 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 
 import DropdownMenu from './../shared/DropdownMenu.vue';
 
-import * as comps from 'components/shared/widget-inputs';
-import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
-import { metadata } from 'components/shared/widget-inputs/WInput';
+import { inputComponents } from 'components/shared/inputs';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import { metadata } from 'components/shared/inputs';
 
 @Component({
   components: {
     DropdownMenu,
-    WFormGroup,
-    ...comps
+    FormGroup,
+    ...inputComponents
   }
 })
 export default class DesignSystem extends Vue {
