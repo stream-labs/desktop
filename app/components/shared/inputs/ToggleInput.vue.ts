@@ -1,15 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { WInput } from './WInput';
+import { BaseInput } from './BaseInput';
 
 @Component({})
-export default class WBoolInput extends WInput<boolean, {}> {
-
-
-  @Prop()
-  value: boolean;
+export default class WBoolInput extends BaseInput<boolean, {}> {
+  @Prop() value: boolean;
 
   handleClick(e: any) {
     this.emitInput(!this.value, e);
   }
-
 }
