@@ -215,4 +215,12 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     };
     return metadata;
   }
+
+  cancel() {
+    this.$modal.hide('new-alert');
+  }
+
+  done() {
+    debugger;
+  }
 }

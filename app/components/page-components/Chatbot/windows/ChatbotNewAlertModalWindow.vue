@@ -1,14 +1,15 @@
 <template>
 <modal
   name='new-alert'
-  :height="500"
+  :height="'auto'"
+  :maxHeight="600"
 >
   <div class="new-alert-modal">
     <div class="new-alert-modal__header">
       <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico" />
       <div class="new-alert-modal__header__title">{{ $t(title) }}</div>
     </div>
-    <div class="new-alerts-modal__body">
+    <div class="new-alert-modal__body">
       <div v-if="isFollower">
         <div>
           <label for="message" class="margin-vertical--10">Message</label>
@@ -85,6 +86,18 @@
         </div>
       </div>
     </div>
+    <div class="new-alert-modal__controls">
+      <button
+        class="button button--default"
+        @click="cancel">
+        {{ $t('Cancel') }}
+      </button>
+      <button
+        class="button button--action"
+        @click="done">
+        {{ $t('Done') }}
+      </button>
+    </div>
   </div>
 </modal>
 </template>
@@ -112,8 +125,21 @@
     }
   }
 
-  .new-alerts-modal__body {
+  .new-alert-modal__body {
     .padding--20();
+  }
+
+  .new-alert-modal__controls {
+    background-color: @day-secondary;
+    border-top: 1px solid @day-border;
+    padding: 10px 20px;
+    text-align: right;
+    flex-shrink: 0;
+    z-index: 10;
+
+    .button {
+      margin-left: 8px;
+    }
   }
 }
 
@@ -122,6 +148,11 @@
   .new-alert-modal {
     .new-alert-modal__header {
       border-bottom: 1px solid @night-border;
+    }
+
+    .new-alert-modal__controls {
+      border-top-color: @night-border;
+      background-color: @night-primary;
     }
   }
 
