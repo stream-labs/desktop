@@ -16,6 +16,13 @@
       <i class="icon-dashboard"/> {{ $t('Dashboard') }}
     </button>
     <button
+      @click="navigateChatBot"
+      class="tab-button"
+      :class="{ active: page === 'Chatbot' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="icon-chatbot"/> {{ $t('Chatbot') }}
+    </button>
+    <button
       @click="navigateOverlays"
       class="tab-button"
       :class="{ active: page === 'BrowseOverlays' }"
