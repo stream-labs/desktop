@@ -135,7 +135,10 @@ table thead tr th {
 
 tbody tr {
   .transition;
-  .cursor--pointer;
+
+  td {
+    color: black;
+  }
 
   &:hover {
     td {
@@ -143,7 +146,7 @@ tbody tr {
     }
   }
 
-td:last-child {
+  td:last-child {
     width: 100px;
     .align-items--inline;
     .text-align--right;
@@ -178,6 +181,10 @@ td:last-child {
       td {
         color: white;
       }
+    }
+
+    td:last-child {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {

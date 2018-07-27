@@ -184,7 +184,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           },
           message: {
             required: true,
-            placeholder: 'Message to tipper'
+            placeholder: 'Message to donator'
           }
         }
       },
@@ -222,5 +222,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   done() {
     debugger;
+    this.addNewAlert(this.selectedType, this.newAlert[this.selectedType].newMessage);
   }
 }

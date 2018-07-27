@@ -46,8 +46,12 @@
       <div v-if="isDonation">
         <div>
           <label for="amount" class="margin-vertical--10">Donation Amount</label>
+            <!-- v-model="newAlert.donations.newMessage.amount" -->
           <NumberInput
-            v-model="newAlert.donations.newMessage.amount"
+            @input="(data) => {
+              debugger;
+            }"
+            :value="newAlert.donations.newMessage.amount"
             :metadata="metadata.donations.newMessage.amount"
           />
           <label for="message" class="margin-vertical--10">Donation Message</label>

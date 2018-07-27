@@ -77,5 +77,23 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
     this.chatbotApiService.updateChatAlerts(newAlertsObject);
   }
+
+  // add new alert
+  addNewAlert(type: string, newAlert: any) {
+    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const { parent, enabled, messages } = this.typeKeys(type);
+
+    if (type === 'subscriptions') {
+      newAlertsObject.settings[parent][messages][newAlert.tier].push(newAlert);
+    } else {
+      newAlertsObject.settings[parent][messages].push(newAlert);
+    }
+
+    this.chatbotApiService
+      .updateChatAlerts(newAlertsObject)
+      .then(() => {
+        this.$modal.hide('new-alert');
+      });
+  }
 }
 
