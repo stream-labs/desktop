@@ -28,7 +28,12 @@
     </div>
     <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
-        <button class="button button--action">ADD ALERT</button>
+        <button
+          class="button button--action"
+          @click="showNewChatAlertWindow"
+        >
+          ADD ALERT
+        </button>
       </div>
       <br />
       <table
@@ -68,6 +73,7 @@
         </tbody>
       </table>
     </div>
+    <ChatbotNewAlertModalWindow :selectedType="selectedType"/>
   </div>
   <div slot="controls">
     <button
@@ -155,7 +161,6 @@ td:last-child {
   }
 }
 
-
 .night-theme {
   .chatbot-alerts-window__sidebar {
     border-color: @night-secondary;
@@ -181,7 +186,6 @@ td:last-child {
   tbody tr:nth-child(even) {
     background-color: @navy;
   }
-
 }
 
 
