@@ -14,7 +14,9 @@ import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
 import { ISerializableWidget } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
+import { ServiceHelper } from '../stateful-service';
 
+@ServiceHelper()
 export class WidgetTester {
   constructor(public name: string, private url: string) {}
 

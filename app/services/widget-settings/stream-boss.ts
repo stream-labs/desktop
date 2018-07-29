@@ -63,7 +63,12 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
       name: 'settings',
     },
 
-    ...CODE_EDITOR_TABS
+    ...CODE_EDITOR_TABS,
+
+    {
+      name: 'test',
+    }
+
   ];
 
   getVersion() {
