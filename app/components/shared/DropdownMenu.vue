@@ -28,7 +28,7 @@
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
-  // transform: none!important;
+  z-index: 200000;
 }
 
 .dropdown-menu__toggle {
@@ -82,15 +82,6 @@
   .dropdown-menu__toggle {
     color: @white;
   }
-}
-
-.popper {
-  width: auto;
-  text-align: center;
-  display: inline-block;
-  position: absolute;
-  font-weight: normal;
-  z-index: 200000;
 }
 
 .popper .popper__arrow {
