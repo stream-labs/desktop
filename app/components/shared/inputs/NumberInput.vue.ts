@@ -1,7 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { INumberMetadata } from './index';
-import { String } from '../../../../node_modules/aws-sdk/clients/ssm';
 
 @Component({})
 export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
@@ -12,7 +11,7 @@ export default class NumberInput extends BaseInput<number | string, INumberMetad
   @Prop()
   metadata: INumberMetadata;
 
-  emitInput(eventData: String) {
+  emitInput(eventData: string) {
     if (!isNaN(parseFloat(eventData))) {
       // if is a string of valid number
       // convert to number
