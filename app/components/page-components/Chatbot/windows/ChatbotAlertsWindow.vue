@@ -68,7 +68,9 @@
             >
               {{ formatNumber(formatTextBasedOnType(message[column]), column === 'amount' ? 2 : 0) }}
             </td>
-            <td>Do stuff</td>
+            <td>
+              <i class="icon-more"></i>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -151,7 +153,6 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-    color: white;
 
     .icon-edit {
       font-size: 10px;

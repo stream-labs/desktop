@@ -76,7 +76,6 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   formatNumber(value: any, dp?: number) {
-    debugger;
     if (isNaN(Number(value))) {
       return value;
     }
