@@ -6,60 +6,60 @@
   </div>
 
   <div slot="settings">
-    <w-form-group title="Enabled Events">
-      <w-bool-input title="Tips &amp; Donations" v-model="wData.settings.types.tips.enabled"/>
-      <w-bool-input title="Twitch Follows" v-model="wData.settings.types.twitch_follows.enabled"/>
-      <w-bool-input title="Twitch Bits/Cheers" v-model="wData.settings.types.twitch_bits.enabled"/>
-      <w-bool-input title="Twitch Subs" v-model="wData.settings.types.twitch_subs.enabled"/>
-      <w-bool-input title="Twitch Resubs" v-model="wData.settings.types.twitch_resubs.enabled"/>
-    </w-form-group>
-    <w-form-group title="Jar Image">
-      <w-image-picker
+    <form-group title="Enabled Events">
+      <bool-input title="Tips &amp; Donations" v-model="wData.settings.types.tips.enabled"/>
+      <bool-input title="Twitch Follows" v-model="wData.settings.types.twitch_follows.enabled"/>
+      <bool-input title="Twitch Bits/Cheers" v-model="wData.settings.types.twitch_bits.enabled"/>
+      <bool-input title="Twitch Subs" v-model="wData.settings.types.twitch_subs.enabled"/>
+      <bool-input title="Twitch Resubs" v-model="wData.settings.types.twitch_resubs.enabled"/>
+    </form-group>
+    <form-group title="Jar Image">
+      <image-picker
         :metadata="{ options: inputOptions }"
         v-model="wData.settings.jar.type"
       />
-    </w-form-group>
-    <w-form-group title="Text">
-      <w-bool-input title="Show Text" v-model="wData.settings.text.show"/>
-    </w-form-group>
-    <w-form-group type="fontFamily" :value="wData.settings.text.font"/>
-    <w-form-group title="Text Color" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
-    <w-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
-    <w-form-group title="Minimum Bits">
-      <w-number-input v-model="wData.settings.types.twitch_bits.minimum_amount" :metadata="{ required: true, min: 1 }"/>
-    </w-form-group>
-    <w-form-group title="Minimum Tips">
-      <w-number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
-    </w-form-group>
-    <w-form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
-    <w-form-group title="Twitch Follows">
-      <w-media-gallery-input
+    </form-group>
+    <form-group title="Text">
+      <bool-input title="Show Text" v-model="wData.settings.text.show"/>
+    </form-group>
+    <form-group type="fontFamily" :value="wData.settings.text.font"/>
+    <form-group title="Text Color" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
+    <form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
+    <form-group title="Minimum Bits">
+      <number-input v-model="wData.settings.types.twitch_bits.minimum_amount" :metadata="{ required: true, min: 1 }"/>
+    </form-group>
+    <form-group title="Minimum Tips">
+      <number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
+    </form-group>
+    <form-group title="Background Color" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
+    <form-group title="Twitch Follows">
+      <media-gallery-input
         :metadata="{ fileName: fileNameFromHref(wData.settings.types.twitch_follows.image_src), clearImage: wData.defaultImage.twitch_account }"
         v-model="wData.settings.types.twitch_follows.image_src"
       />
-    </w-form-group>
-    <w-form-group
+    </form-group>
+    <form-group
       v-for="tier in wData.settings.types.tips.tiers"
       :key="tier.minimum_amount"
       :title="`Tips over ${tier.minimum_amount}`"
     >
-      <w-media-gallery-input
+      <media-gallery-input
         :metadata="{ fileName: fileNameFromHref(tier.image_src), clearImage: tier.clear_image }"
         v-model="tier.image_src"
       />
-    </w-form-group>
+    </form-group>
   </div>
 
   <div slot="HTML" >
-    <w-code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
   </div>
 
   <div slot="CSS" >
-    <w-code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
   </div>
 
   <div slot="JS" >
-    <w-code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
   </div>
 </widget-window>
 </template>

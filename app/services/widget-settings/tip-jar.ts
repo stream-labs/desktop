@@ -1,6 +1,5 @@
 import { CODE_EDITOR_TABS, IWidgetData, WidgetSettingsService } from './widget-settings';
-import { IWSliderMetadata } from 'components/shared/widget-inputs/WSliderInput.vue';
-import { IWListMetadata } from 'components/shared/widget-inputs/WListInput.vue';
+import { ISliderMetadata, IListMetadata } from 'components/shared/inputs/index';
 import { WidgetType } from 'services/widgets';
 
 
@@ -62,7 +61,7 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
 
   getMetadata() {
     return {
-      theme: <IWListMetadata<string>>{
+      theme: <IListMetadata<string>>{
         options: [
           { description: 'Clean', value: 'standard' },
           { description: 'Boxed', value: 'boxed' },
@@ -71,7 +70,7 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
           { description: 'Chunky', value: 'chunky' }
         ]
       },
-      message_hide_delay: <IWSliderMetadata> {
+      message_hide_delay: <ISliderMetadata> {
         min: 0,
         max: 200
       }

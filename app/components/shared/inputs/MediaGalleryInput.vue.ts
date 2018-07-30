@@ -2,22 +2,23 @@ import { shell } from 'electron';
 import Component from 'vue-class-component';
 import { Inject } from 'util/injector';
 import { Prop } from 'vue-property-decorator';
-import { WInput, IWInputMetadata } from './WInput';
+import { BaseInput } from './BaseInput';
+import { IInputMetadata } from './index';
 import { MediaGalleryService } from 'services/media-gallery';
-import { WTextInput } from './index';
-import WFormGroup from './WFormGroup.vue';
+import { TextInput } from './inputs';
+import FormGroup from './FormGroup.vue';
 
-interface IWMediaGalleryMetadata extends IWInputMetadata {
+interface IMediaGalleryMetadata extends IInputMetadata {
   fileName: string;
   clearImage: string;
 }
 @Component({
-  components: { WTextInput, WFormGroup }
+  components: { TextInput, FormGroup }
 })
-export default class WMediaGallery extends WInput<string, IWMediaGalleryMetadata>{
+export default class MediaGallery extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() value: string;
-  @Prop() metadata: IWMediaGalleryMetadata;
+  @Prop() metadata: IMediaGalleryMetadata;
 
   fileName: string = this.metadata.fileName;
   url: string = '';

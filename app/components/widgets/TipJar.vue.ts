@@ -5,16 +5,16 @@ import {
   TipJarService,
   ITipJarData
 } from 'services/widget-settings/tip-jar';
-import * as comps from 'components/shared/widget-inputs';
-import WFormGroup from 'components/shared/widget-inputs/WFormGroup.vue';
+import { inputComponents } from 'components/shared/inputs';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 
 import { $t } from 'services/i18n';
 
 @Component({
   components: {
     WidgetWindow,
-    WFormGroup,
-    ...comps
+    FormGroup,
+    ...inputComponents
   }
 })
 export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {

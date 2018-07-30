@@ -2,9 +2,9 @@
   <div>
     <div class="media-box radius">
       <div class="url-uploader radius" v-if="showUrlUpload">
-        <w-form-group title="Image URL" >
-          <w-text-input v-model="url" :metadata="{ placeholder: 'Example: https://yoururl.com/image/Streamlabs' }" />
-        </w-form-group>
+        <form-group title="Image URL" >
+          <text-input v-model="url" :metadata="{ placeholder: 'Example: https://yoururl.com/image/Streamlabs' }" />
+        </form-group>
         <button class="button button--action" @click="uploadUrl">Submit</button>
       </div>
       <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
@@ -21,7 +21,7 @@
   </div>
 </template>
 
-<script lang="ts" src="./WMediaGalleryInput.vue.ts"></script>
+<script lang="ts" src="./MediaGalleryInput.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";
