@@ -2,17 +2,11 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
 
-Simple, powerful, and efficient live streaming software built on Electron.
+Simple, powerful, and efficient live streaming software built on Electron and OBS.
 
 ![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
 
 This application currently only supports 64-bit Windows.
-
-## Issues
-
-Please submit all issues here:
-
-https://tracker.streamlabs.com
 
 ## Dependencies
 
@@ -181,3 +175,9 @@ manual deploy.
 - [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
 - [ ] Deploy the new version `yarn deploy`
 - [ ] Merge master back into staging
+
+## ❤ OBS Developers
+
+At its core, Streamlabs OBS is powered by the [OBS](https://obsproject.com/)
+engine.  We want to thank all of the developers over at the OBS project for
+their years of tireless hard work, without which Streamlabs OBS wouldn't exist today.
