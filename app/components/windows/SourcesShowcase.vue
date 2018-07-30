@@ -13,10 +13,11 @@
       v-if="inspectedSource === source.value"
       :name="sourceData(source.value).name"
       :description="sourceData(source.value).description"
+      :showSupport="!!sourceData(source.value).supportList"
     >
       <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--day" :src="getSrc(source.value, 'day')" />
       <img v-if="sourceData(source.value).demoFilename" slot="media" class="source__demo source__demo--night" :src="getSrc(source.value, 'night')"/>
-      <ul v-if="sourceData(source.value).supportList" slot="support-list" class="source-support__list">
+      <ul slot="support-list" class="source-support__list">
         <li v-for="support in sourceData(source.value).supportList" :key="support">
           {{ support }}
         </li>
@@ -44,15 +45,6 @@
           {{ support }}
         </li>
       </ul>
-    </add-source-info>
-
-    <add-source-info
-      v-if="inspectedSource === 'scene'"
-      :name="$t('Scene')"
-      :description="$t('Allows you to add existing scene as a source')"
-      key="27">
-      <img class="source__demo source__demo--day" slot="media" src="../../../media/source-demos/day/scene.png"/>
-      <img class="source__demo source__demo--night" slot="media" src="../../../media/source-demos/night/scene.png"/>
     </add-source-info>
 
     <add-source-info

@@ -112,6 +112,11 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'audio-output.png',
     supportList: [$t('Desktop audio')]
   },
+  scene: {
+    name: $t('Scene'),
+    description: $t('Allows you to add existing scene as a source'),
+    demoFilename: 'scene.png'
+  },
   // vvv Not sure if this is still supported, there is no showcase data for it vvv
   text_ft2_source: {
     name: $t('Text (FreeType 2)'),
