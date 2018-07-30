@@ -45,7 +45,6 @@ function log(...args) {
 // Windows
 let mainWindow;
 let childWindow;
-let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -134,14 +133,18 @@ function startApp() {
     height: mainWindowState.height,
     x: mainWindowState.x,
     y: mainWindowState.y,
-    show: false,
     frame: false,
+    show: false,
     title: 'Streamlabs OBS',
+    backgroundColor: "#17242D"
   });
 
   mainWindowState.manage(mainWindow);
-
   mainWindow.setMenu(null);
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
 
   // wait until devtools will be opened and load app into window
   // it allows to start application with clean cache
@@ -190,7 +193,8 @@ function startApp() {
   // Pre-initialize the child window
   childWindow = new BrowserWindow({
     show: false,
-    frame: false
+    frame: false,
+    backgroundColor: "#228B22"
   });
 
   childWindow.setMenu(null);
@@ -233,10 +237,6 @@ function startApp() {
   ipcMain.on('services-ready', () => {
     callService('AppService', 'setArgv', process.argv);
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
-  });
-
-  ipcMain.on('window-childWindowIsReadyToShow', () => {
-    childWindowIsReadyToShow = true;
   });
 
   ipcMain.on('services-request', (event, payload) => {
@@ -326,53 +326,22 @@ ipcMain.on('openDevTools', () => {
 });
 
 ipcMain.on('window-showChildWindow', (event, windowOptions) => {
-  if (windowOptions.size.width && windowOptions.size.height) {
-    // Center the child window on the main window
+  const bounds = mainWindow.getBounds();
+  const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
+  const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
-    // For some unknown reason, electron sometimes gets into a
-    // weird state where this will always fail.  Instead, we
-    // should recover by simply setting the size and forgetting
-    // about the bounds.
-    try {
-      const bounds = mainWindow.getBounds();
-      const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
-      const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
+  childWindow.hide();
 
-      childWindow.restore();
-      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-
-      if (windowOptions.center) {
-        childWindow.setBounds({
-          x: Math.floor(childX),
-          y: Math.floor(childY),
-          width: windowOptions.size.width,
-          height: windowOptions.size.height
-        });
-      }
-    } catch (err) {
-      log('Recovering from error:', err);
-
-      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-      childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
-      childWindow.center();
-    }
-
-    childWindow.focus();
+  if (windowOptions.center) {
+    childWindow.setBounds({
+      x: Math.floor(childX),
+      y: Math.floor(childY),
+      width: windowOptions.size.width,
+      height: windowOptions.size.height
+    });
   }
 
-
-  // show the child window when it will be ready
-  new Promise(resolve => {
-    if (childWindowIsReadyToShow) {
-      resolve();
-      return;
-    }
-    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
-  }).then(() => {
-    // The child window will show itself when rendered
-    childWindow.send('window-setContents', windowOptions);
-  });
-
+  childWindow.webContents.send('window-setContents', windowOptions);
 });
 
 

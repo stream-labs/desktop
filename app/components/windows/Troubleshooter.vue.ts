@@ -3,7 +3,6 @@ import moment from 'moment';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
-import windowMixin from '../mixins/window';
 import { TIssueCode } from 'services/troubleshooter';
 import { INotificationsServiceApi, INotification } from 'services/notifications';
 import { ISettingsServiceApi } from 'services/settings';
@@ -11,8 +10,7 @@ import { WindowsService } from 'services/windows';
 
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class Troubleshooter extends Vue {
 

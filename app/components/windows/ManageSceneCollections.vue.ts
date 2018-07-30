@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import windowMixin from 'components/mixins/window';
 import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
@@ -9,7 +8,6 @@ import EditableSceneCollection from 'components/EditableSceneCollection.vue';
 import Fuse from 'fuse.js';
 
 @Component({
-  mixins: [windowMixin],
   components: {
     ModalLayout,
     EditableSceneCollection
