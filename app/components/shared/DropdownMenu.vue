@@ -2,7 +2,6 @@
   <popper
     trigger="click"
     :options="{ placement: (placement || 'bottom-start') }"
-    class="dropdown-menu__container"
   >
     <div class="popper dropdown-menu">
       <slot></slot>
