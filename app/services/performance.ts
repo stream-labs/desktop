@@ -13,6 +13,8 @@ interface IPerformanceState {
   frameRate: number;
 }
 
+const STATS_UPDATE_INTERVAL = 2 * 1000;
+
 // TODO: merge this service with PerformanceMonitorService
 
 // Keeps a store of up-to-date performance metrics
@@ -30,25 +32,32 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   private intervalId: number;
 
   @mutation()
-  SET_PERFORMANCE_STATS(stats: IPerformanceState) {
+  private SET_PERFORMANCE_STATS(stats: IPerformanceState) {
     Object.keys(stats).forEach(stat => {
       Vue.set(this.state, stat, stats[stat]);
     });
   }
 
   init() {
+    electron.ipcRenderer.on('notifyPerformanceStatistics', (stats: IPerformanceState) => {
+      this.processPerformanceStats(stats);
+    });
+
     this.intervalId = window.setInterval(() => {
-      const stats: IPerformanceState = nodeObs.OBS_API_getPerformanceStatistics();
-      if (stats.percentageDroppedFrames) {
-        this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
-      }
+      electron.ipcRenderer.send('requestPerformanceStatistics');
+    }, STATS_UPDATE_INTERVAL);
+  }
 
-      stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
-        return proc.cpu.percentCPUUsage;
-      }).reduce((sum, usage) => sum + usage);
+  processPerformanceStats(stats: IPerformanceState) {
+    if (stats.percentageDroppedFrames) {
+      this.droppedFramesDetected.next(stats.percentageDroppedFrames / 100);
+    }
 
-      this.SET_PERFORMANCE_STATS(stats);
-    }, 2 * 1000);
+    stats.CPU = electron.remote.app.getAppMetrics().map(proc => {
+      return proc.cpu.percentCPUUsage;
+    }).reduce((sum, usage) => sum + usage);
+
+    this.SET_PERFORMANCE_STATS(stats);
   }
 
   stop() {

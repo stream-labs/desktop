@@ -3,7 +3,7 @@ import { BaseInput } from './BaseInput';
 import { INumberMetadata } from './index';
 
 @Component({})
-export default class NumberInput extends BaseInput<number|string, INumberMetadata> {
+export default class NumberInput extends BaseInput<number | string, INumberMetadata> {
 
   @Prop()
   value: number | string; // the string type is for empty field
@@ -15,10 +15,10 @@ export default class NumberInput extends BaseInput<number|string, INumberMetadat
     if (!isNaN(parseFloat(eventData))) {
       // if is a string of valid number
       // convert to number
-      super.emitInput(parseFloat(eventData), event);
+      super.emitInput(parseFloat(eventData));
       return;
     }
-    super.emitInput(eventData, event);
+    super.emitInput(eventData);
   }
 
   getValidations() {
