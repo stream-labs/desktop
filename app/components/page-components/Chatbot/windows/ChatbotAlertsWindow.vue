@@ -69,7 +69,12 @@
               {{ formatNumber(formatTextBasedOnType(message[column]), column === 'amount' ? 2 : 0) }}
             </td>
             <td>
-              <i class="icon-more"></i>
+              <DropdownMenu
+                :placement="'bottom-end'"
+              >
+                <button class="button button--action">Edit</button>
+                <button class="button button--action">Delet</button>
+              </DropdownMenu>
             </td>
           </tr>
         </tbody>
@@ -92,6 +97,12 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
+.inline-menu__container {
+  .inline-menu__toggle {
+    .cursor--pointer();
+  }
+}
+
 .chatbot-alerts-window__container {
   margin: -20px;
   width: calc(~"100% + 40px") !important;
@@ -176,7 +187,10 @@ tbody tr {
     .transition;
     .cursor--pointer;
     .transition;
-    color: white;
+
+    td {
+      color: white;
+    }
 
     &:hover {
       td {

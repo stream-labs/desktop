@@ -9,4 +9,14 @@ export default class DropdownMenu extends Vue {
 
   @Prop()
   title: string;
+
+  @Prop()
+  placement: string;
+
+  @Prop()
+  icon: string;
+
+  get getPlacement() {
+    return this.placement || 'bottom-start';
+  }
 }
