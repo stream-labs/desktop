@@ -221,7 +221,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   done() {
-    debugger;
     this.addNewAlert(this.selectedType, this.newAlert[this.selectedType].newMessage);
   }
 }

@@ -43,7 +43,7 @@
         <thead>
           <tr>
             <th :colspan="selectedTypeTableColumns.length">
-              <h3 class="margin--none">{{ title | formatTextFromSnakeCase }}</h3>
+              <h3 class="margin--none">{{ formatTextFromSnakeCase(title) }}</h3>
             </th>
           </tr>
           <tr>
@@ -52,7 +52,7 @@
               :key="column"
               :class="`column--${column}`"
             >
-              {{ $t(column) | formatTextFromSnakeCase }}
+              {{ $t(formatTextFromSnakeCase(column)) }}
             </th>
             <th></th>
           </tr>
@@ -66,7 +66,7 @@
               v-for="column in selectedTypeTableColumns"
               :key="column"
             >
-              {{ message[column] | formatTextBasedOnType | formatNumber(column === 'amounts' ? 2 : 0) }}
+              {{ formatNumber(formatTextBasedOnType(message[column]), column === 'amount' ? 2 : 0) }}
             </td>
             <td>Do stuff</td>
           </tr>

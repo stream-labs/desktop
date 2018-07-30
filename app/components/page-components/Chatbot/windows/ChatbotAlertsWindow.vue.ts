@@ -11,29 +11,6 @@ import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windo
     NavItem,
     ChatbotNewAlertModalWindow
   },
-  filters: {
-    formatTextFromSnakeCase: function(text: string) {
-      if (!text) return '';
-      return text.split('_').join(' ');
-    },
-    formatTextBasedOnType: function(value: any) {
-      if (typeof value === 'string') return value;
-      if (typeof value === 'number') return value;
-      if (typeof value === 'boolean') return value === true ? 'Yes' : 'No';
-    },
-    formatNumber: function(value: any, dp?: number) {
-      if (isNaN(Number(value))) {
-        return value;
-      }
-
-      if (dp === undefined) dp = 2;
-
-      return value.toLocaleString(undefined, {
-        maximumFractionDigits: dp,
-        minimumFractionDigits: dp
-      });
-    }
-  }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   selectedType = 'followers';
@@ -84,5 +61,31 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
 
   onDone() {
     this.chatbotCommonService.closeChildWindow();
+  }
+
+  // filters
+  formatTextBasedOnType(value: any) {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value;
+    if (typeof value === 'boolean') return value === true ? 'Yes' : 'No';
+  }
+
+  formatTextFromSnakeCase(text: string) {
+    if (!text) return '';
+    return text.split('_').join(' ');
+  }
+
+  formatNumber(value: any, dp?: number) {
+    debugger;
+    if (isNaN(Number(value))) {
+      return value;
+    }
+
+    if (dp === undefined) dp = 2;
+
+    return value.toLocaleString(undefined, {
+      maximumFractionDigits: dp,
+      minimumFractionDigits: dp
+    });
   }
 }
