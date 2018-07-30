@@ -6,13 +6,19 @@ import NavMenu from 'components/shared/NavMenu.vue';
 import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windows/ChatbotNewAlertModalWindow.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 
+import {
+  ChatAlertsResponse
+} from 'services/chatbot/chatbot-interfaces';
+
+
+
 @Component({
   components: {
     NavMenu,
     NavItem,
     ChatbotNewAlertModalWindow,
     DropdownMenu
-  },
+  }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   selectedType = 'followers';
@@ -59,6 +65,23 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
 
   showNewChatAlertWindow() {
     this.$modal.show('new-alert');
+  }
+
+  onEdit() {
+    
+  }
+
+  onDelete(tier: string, index: number) {
+    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const { parent, messages } = this.typeKeys(this.selectedType);
+
+    if (this.selectedType === 'subscriptions') {
+      newAlertsObject.settings[parent][messages][tier].splice(index, 1);
+    } else {
+      newAlertsObject.settings[parent][messages].splice(index, 1);
+    }
+
+    this.chatbotApiService.updateChatAlerts(newAlertsObject);
   }
 
   onDone() {

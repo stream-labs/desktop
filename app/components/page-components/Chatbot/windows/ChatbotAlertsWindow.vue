@@ -60,7 +60,7 @@
         <tbody>
           <tr
             v-for="(message, index) in selectedTypeMessages[title]"
-            :key="index"
+            :key="message.message"
           >
             <td
               v-for="column in selectedTypeTableColumns"
@@ -71,9 +71,10 @@
             <td>
               <DropdownMenu
                 :placement="'bottom-end'"
+                class="chatbot-alerts__alert-actions_container"
               >
-                <button class="button button--action">Edit</button>
-                <button class="button button--action">Delet</button>
+                <button @click="onEdit" class="button button--action">Edit</button>
+                <button @click="onDelete(title, index)" class="button button margin-top--10">Delete</button>
               </DropdownMenu>
             </td>
           </tr>
@@ -97,11 +98,6 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
-.inline-menu__container {
-  .inline-menu__toggle {
-    .cursor--pointer();
-  }
-}
 
 .chatbot-alerts-window__container {
   margin: -20px;
@@ -136,6 +132,13 @@
       .align-items--inline();
       .text-align--right();
     }
+  }
+}
+
+.chatbot-alerts__alert-actions_container {
+  * > button {
+    display: block;
+    width: 100%;
   }
 }
 

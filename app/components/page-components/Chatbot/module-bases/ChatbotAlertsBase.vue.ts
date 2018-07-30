@@ -70,9 +70,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // calls to service methods
+
   toggleEnableAlert(type: string) {
     const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
-    const { parent, enabled, messages } = this.typeKeys(type);
+    const { parent, enabled } = this.typeKeys(type);
     newAlertsObject.settings[parent][enabled] = !this.chatAlerts.settings[parent][enabled];
 
     this.chatbotApiService.updateChatAlerts(newAlertsObject);
@@ -81,7 +82,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   // add new alert
   addNewAlert(type: string, newAlert: any) {
     const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
-    const { parent, enabled, messages } = this.typeKeys(type);
+    const { parent, messages } = this.typeKeys(type);
 
     if (type === 'subscriptions') {
       newAlertsObject.settings[parent][messages][newAlert.tier].push(newAlert);
