@@ -10,7 +10,6 @@ import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
 import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
-import windowMixin from '../mixins/window';
 import { Inject } from '../../util/injector';
 import { CustomizationService } from 'services/customization';
 import { NavigationService } from 'services/navigation';
@@ -23,7 +22,6 @@ import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 
 @Component({
-  mixins: [windowMixin],
   components: {
     TitleBar,
     TopNav,

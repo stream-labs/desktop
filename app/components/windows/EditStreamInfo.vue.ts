@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import ModalLayout from '../ModalLayout.vue';
-import windowMixin from '../mixins/window';
 import { ObsTextInput, ObsListInput, ObsBoolInput }from 'components/obs/inputs';
 import { IObsInput, IObsListInput, IObsTextInputValue } from 'components/obs/inputs/ObsInput';
 import { StreamInfoService } from 'services/stream-info';
@@ -33,8 +32,7 @@ interface IMultiSelectProfiles {
     ObsListInput,
     ObsBoolInput,
     Multiselect
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class EditStreamInfo extends Vue {
   @Inject() streamInfoService: StreamInfoService;

@@ -3,7 +3,6 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 
@@ -13,8 +12,7 @@ interface INameSceneCollectionOptions {
 }
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class NameSceneCollection extends Vue {
   name = '';

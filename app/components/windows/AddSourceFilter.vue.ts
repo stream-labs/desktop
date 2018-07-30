@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
 import { SourceFiltersService } from '../../services/source-filters';
 
 import * as inputComponents from 'components/obs/inputs';
@@ -11,8 +10,7 @@ import { $t } from 'services/i18n';
 
 
 @Component({
-  components: { ModalLayout, ...inputComponents },
-  mixins: [windowMixin]
+  components: { ModalLayout, ...inputComponents }
 })
 export default class AddSourceFilter extends Vue {
 

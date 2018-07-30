@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { IScenesServiceApi } from 'services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
@@ -12,8 +11,7 @@ import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets'
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout, Selector, Display },
-  mixins: [windowMixin]
+  components: { ModalLayout, Selector, Display }
 })
 export default class AddSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
