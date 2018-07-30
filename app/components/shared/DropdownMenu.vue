@@ -1,12 +1,15 @@
 <template>
-  <popper trigger="click" :options="{ placement: 'bottom-start' }">
-
+  <popper
+    trigger="click"
+    :options="{ placement: (placement || 'bottom-start') }"
+    class="dropdown-menu__container"
+  >
     <div class="popper dropdown-menu">
       <slot></slot>
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i class="icon-down"/>
+      {{ title }} <i :class="icon || 'icon-down'"/>
     </button>
 
   </popper>
@@ -18,15 +21,14 @@
 @import "../../styles/index";
 
 .dropdown-menu {
-  position: absolute;
-  top: 20px!important;
+  top: 5px !important;
   background-color: @day-primary;
   .border;
   .radius;
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
-  transform: none!important;
+  // transform: none!important;
 }
 
 .dropdown-menu__toggle {
@@ -81,30 +83,18 @@
     color: @white;
   }
 }
-</style>
-
-
-<style scoped>
 
 .popper {
   width: auto;
-  background-color: #fafafa;
-  color: #212121;
   text-align: center;
-  padding: 2px;
   display: inline-block;
-  border-radius: 3px;
   position: absolute;
-  font-size: 14px;
   font-weight: normal;
-  border: 1px #ebebeb solid;
   z-index: 200000;
-  -moz-box-shadow: rgb(58, 58, 58) 0 0 6px 0;
-  -webkit-box-shadow: rgb(58, 58, 58) 0 0 6px 0;
-  box-shadow: rgb(58, 58, 58) 0 0 6px 0;
 }
 
 .popper .popper__arrow {
+  display: none !important;
   width: 0;
   height: 0;
   border-style: solid;
@@ -166,3 +156,5 @@
 
 
 </style>
+
+
