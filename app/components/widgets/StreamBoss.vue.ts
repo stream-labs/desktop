@@ -8,6 +8,7 @@ import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
 import CodeEditor from './CodeEditor.vue';
+import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
@@ -15,6 +16,7 @@ import CodeEditor from './CodeEditor.vue';
     FormGroup,
     ValidatedForm,
     CodeEditor,
+    TestButtons,
     ...inputComponents
   }
 })
