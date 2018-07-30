@@ -2,6 +2,7 @@
   <popper
     trigger="click"
     :options="{ placement: (placement || 'bottom-start') }"
+    class="dropdown-menu__container"
   >
     <div class="popper dropdown-menu">
       <slot></slot>
@@ -83,6 +84,10 @@
   }
 }
 
+.popper .popper__arrow {
+  display: none !important;
+}
+
 .popper[x-placement^="top"] {
   margin-bottom: 5px;
 }
@@ -98,7 +103,6 @@
 .popper[x-placement^="left"] {
   margin-right: 5px;
 }
-
 </style>
 
 
