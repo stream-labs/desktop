@@ -25,6 +25,7 @@ import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
 import { WidgetsService } from './services/widgets';
+import { WidgetTester } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
 import { TransitionsService } from 'services/transitions';
@@ -125,6 +126,7 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
+    WidgetTester,
     WindowsService,
     FontLibraryService,
     ObsImporterService,
