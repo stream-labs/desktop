@@ -91,7 +91,7 @@
   "devDependencies": {
     "7zip-bin": "2.4.1",
     "@types/archiver": "2.1.2",
-    "@types/lodash": "4.14.112",
+    "@types/lodash": "4.14.115",
     "@types/node": "8.10.21",
     "@types/request": "2.47.1",
     "@types/socket.io-client": "1.4.32",
