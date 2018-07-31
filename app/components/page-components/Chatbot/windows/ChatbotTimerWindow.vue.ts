@@ -5,7 +5,7 @@ import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import SliderInput from 'components/shared/inputs/SliderInput.vue';
 
 import {
-  Timer,
+  ITimer,
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -21,7 +21,7 @@ import {
   }
 })
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-  newTimer: Timer = {
+  newTimer: ITimer = {
     name: null,
     interval: 5,
     chat_lines: 5,

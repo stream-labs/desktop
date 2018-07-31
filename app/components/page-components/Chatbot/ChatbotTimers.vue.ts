@@ -1,10 +1,10 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import {
-  TimersResponse,
-  TimersData,
-  Pagination,
-  ChatbotAPIPutResponse
+  ITimersResponse,
+  ITimersData,
+  IPagination,
+  IChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})

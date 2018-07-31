@@ -7,27 +7,27 @@ import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 
 import {
-  ChatbotApiServiceState,
-  CustomCommand,
-  DefaultCommand,
-  Timer,
-  DafaultCommandsResponse,
-  CustomCommandsResponse,
-  TimersResponse,
-  ChatbotAPIPostResponse,
-  ChatbotAPIPutResponse,
-  CommandVariablesResponse,
-  ChatAlertsResponse
+  IChatbotApiServiceState,
+  ICustomCommand,
+  IDefaultCommand,
+  ITimer,
+  IDafaultCommandsResponse,
+  ICustomCommandsResponse,
+  ITimersResponse,
+  IChatbotAPIPostResponse,
+  IChatbotAPIPutResponse,
+  ICommandVariablesResponse,
+  IChatAlertsResponse
 } from './chatbot-interfaces';
 
-export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServiceState> {
+export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
   @Inject() userService: UserService;
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
   version = 'api/v1/';
 
-  static defaultState: ChatbotApiServiceState = {
+  static defaultState: IChatbotApiServiceState = {
     api_token: null,
     socket_token: null,
     default_commands_response: {
@@ -74,7 +74,7 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
       fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then((response: ChatbotApiServiceState) => {
+        .then((response: IChatbotApiServiceState) => {
           this.LOGIN(response);
           resolve(true);
         })
@@ -117,14 +117,14 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
 
   fetchDefaultCommands() {
     return this.api('GET', 'commands/default', {})
-      .then((response: DafaultCommandsResponse) => {
+      .then((response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
       });
   }
 
   fetchCustomCommands(page?: number) {
     return this.api('GET', `commands?page=${page || 1}`, {})
-      .then((response: CustomCommandsResponse) => {
+      .then((response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
       });
   }
@@ -137,14 +137,14 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
 
   fetchTimers(page?: number) {
     return this.api('GET', `timers?page=${page || 1}`, {})
-      .then((response: TimersResponse) => {
+      .then((response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
       });
   }
 
   fetchChatAlerts() {
     return this.api('GET', 'settings/chat-notifications', {})
-      .then((response: ChatAlertsResponse) => {
+      .then((response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
       })
   }
@@ -152,52 +152,52 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   //
   // POST, PUT requests
   //
-  createCustomCommand(data: CustomCommand) {
-    return this.api('POST', 'com mands', data)
-      .then((response: CustomCommand) => {
+  createCustomCommand(data: ICustomCommand) {
+    return this.api('POST', 'commands', data)
+      .then((response: ICustomCommand) => {
         this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
       });
   }
 
-  createTimer(data: Timer) {
+  createTimer(data: ITimer) {
     return this.api('POST', 'timers', data)
-      .then((response: Timer) => {
+      .then((response: ITimer) => {
         this.fetchTimers();
         this.chatbotCommonService.closeChildWindow();
       });
   }
 
-  updateDefaultCommand(slugName: string, commandName: string, data: DefaultCommand) {
+  updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
     return this.api('POST', `settings/${slugName}/commands/${commandName}`, data)
-      .then((response: ChatbotAPIPostResponse) => {
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchDefaultCommands();
         }
       });
   }
 
-  updateCustomCommand(id: string, data: CustomCommand) {
+  updateCustomCommand(id: string, data: ICustomCommand) {
     return this.api('PUT', `commands/${id}`, data)
-      .then((response: ChatbotAPIPutResponse) => {
+      .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
         }
       });
   }
 
-  updateTimer(id: string, data: Timer) {
+  updateTimer(id: string, data: ITimer) {
     return this.api('PUT', `timers/${id}`, data)
-      .then((response: ChatbotAPIPutResponse) => {
+      .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchTimers();
         }
       });
   }
 
-  updateChatAlerts(data: ChatAlertsResponse) {
+  updateChatAlerts(data: IChatAlertsResponse) {
     return this.api('POST', 'settings/chat-notifications', data)
-      .then((response: ChatbotAPIPostResponse) => {
+      .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchChatAlerts();
         }
@@ -208,39 +208,39 @@ export class ChatbotApiService extends PersistentStatefulService<ChatbotApiServi
   // Mutations
   //
   @mutation()
-  private LOGIN(response: ChatbotApiServiceState) {
+  private LOGIN(response: IChatbotApiServiceState) {
     Vue.set(this.state, 'api_token', response.api_token);
     Vue.set(this.state, 'socket_token', response.socket_token);
   }
 
   @mutation()
-  private UPDATE_DEFAULT_COMMANDS(response: DafaultCommandsResponse) {
+  private UPDATE_DEFAULT_COMMANDS(response: IDafaultCommandsResponse) {
     Vue.set(this.state, 'default_commands_response', response);
   }
 
   @mutation()
-  private UPDATE_CUSTOM_COMMANDS(response: CustomCommandsResponse) {
+  private UPDATE_CUSTOM_COMMANDS(response: ICustomCommandsResponse) {
     Vue.set(this.state, 'custom_commands_response', response);
   }
 
   @mutation()
-  private UPDATE_COMMAND_VARIABLES(response: CommandVariablesResponse) {
+  private UPDATE_COMMAND_VARIABLES(response: ICommandVariablesResponse) {
     Vue.set(this.state, 'command_variables_response', response);
   }
 
   @mutation()
-  private UPDATE_TIMERS(response: TimersResponse) {
+  private UPDATE_TIMERS(response: ITimersResponse) {
     Vue.set(this.state, 'timers_response', response);
   }
 
   @mutation()
-  private UPDATE_CHAT_ALERTS(response: ChatAlertsResponse) {
+  private UPDATE_CHAT_ALERTS(response: IChatAlertsResponse) {
     Vue.set(this.state, 'chat_alerts_response', response);
   }
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<
-  ChatbotApiServiceState
+  IChatbotApiServiceState
   > {
   @Inject() windowsService: WindowsService;
 

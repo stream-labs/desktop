@@ -26,7 +26,7 @@
       </div>
       <div class="row">
         <div class="small-6 columns">
-          <label for="permission" class="margin-vertical--10">Permission</label>
+          <label for="permission" class="margin-vertical--10">IPermission</label>
           <ListInput
             v-model="newCommand.permission.level"
             :metadata="permissionMetadata"

@@ -5,7 +5,7 @@ import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 
 import {
-  CustomCommand,
+  ICustomCommand,
   ChatbotPermissions,
   ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
@@ -24,7 +24,7 @@ import {
   }
 })
 export default class ChatbotCommandWindow extends ChatbotWindowsBase {
-  newCommand: CustomCommand = {
+  newCommand: ICustomCommand = {
     command: null,
     response: null,
     response_type: 'Chat',

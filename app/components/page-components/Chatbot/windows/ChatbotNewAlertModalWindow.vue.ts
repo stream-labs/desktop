@@ -12,13 +12,13 @@ import {
 } from 'components/shared/inputs/index';
 
 import {
-  SubAlertMessage,
-  TipMessage,
-  HostMessage,
-  RaidMessage,
+  ISubAlertMessage,
+  ITipMessage,
+  IHostMessage,
+  IRaidMessage,
 } from 'services/chatbot/chatbot-interfaces';
 
-interface SubMessage extends SubAlertMessage {
+interface ISubMessage extends ISubAlertMessage {
   tier: string;
 }
 
@@ -31,7 +31,7 @@ interface INewAlertMetadata {
       tier: IListMetadata<string>;
       months: INumberMetadata;
       message: ITextMetadata;
-      is_gifted: boolean;
+      is_gifted: IListMetadata<boolean>;
     }
   },
   donations: {
@@ -59,16 +59,16 @@ interface INewAlertData {
     newMessage: string;
   };
   subscriptions: {
-    newMessage: SubMessage;
+    newMessage: ISubMessage;
   };
   donations: {
-    newMessage: TipMessage;
+    newMessage: ITipMessage;
   }
   hosts: {
-    newMessage: HostMessage;
+    newMessage: IHostMessage;
   }
   raids: {
-    newMessage: RaidMessage;
+    newMessage: IRaidMessage;
   }
 }
 
@@ -143,7 +143,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get metadata() {
-    const metadata: any = {
+    const metadata: INewAlertMetadata = {
       followers: {
         newMessage: {
           required: true,
@@ -153,7 +153,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
       subscriptions: {
         newMessage: {
           tier: {
-            placeholder: 'Suscription Tier',
             required: true,
             options: ['prime', 'tier_1', 'tier_2', 'tier_3'].map(tier => ({
               value: tier,
@@ -169,7 +168,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             placeholder: 'Message to subscriber'
           },
           is_gifted: {
-            placeholder: 'Is Gifted?',
             required: true,
             options: ['yes', 'no'].map(isGifted => ({
               value: isGifted === 'yes',

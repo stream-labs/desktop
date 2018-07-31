@@ -4,7 +4,7 @@ import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotMod
 
 import {
   IChatbotModule,
-  ChatAlertsResponse
+  IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({

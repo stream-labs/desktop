@@ -1,108 +1,108 @@
 // state
-export interface ChatbotApiServiceState {
+export interface IChatbotApiServiceState {
   api_token: string;
   socket_token: string;
-  default_commands_response: DafaultCommandsResponse;
-  custom_commands_response: CustomCommandsResponse;
-  timers_response: TimersResponse;
-  command_variables_response: CommandVariablesResponse;
-  chat_alerts_response: ChatAlertsResponse;
+  default_commands_response: IDafaultCommandsResponse;
+  custom_commands_response: ICustomCommandsResponse;
+  timers_response: ITimersResponse;
+  command_variables_response: ICommandVariablesResponse;
+  chat_alerts_response: IChatAlertsResponse;
 }
 
 // responses
-export interface ChatbotAPIPostResponse {
+export interface IChatbotAPIPostResponse {
   success: boolean;
 }
 
-export interface ChatbotAPIPutResponse {
+export interface IChatbotAPIPutResponse {
   success: boolean;
 }
 
-export interface DafaultCommandsResponse {
-  commands: DafaultCommandsSlug;
-  'link-protection': DafaultCommandsSlug;
-  giveaway: DafaultCommandsSlug;
+export interface IDafaultCommandsResponse {
+  commands: IDafaultCommandsSlug;
+  'link-protection': IDafaultCommandsSlug;
+  giveaway: IDafaultCommandsSlug;
 }
 
-export interface CustomCommandsResponse {
-  pagination: Pagination;
-  data: CustomCommandsData;
+export interface ICustomCommandsResponse {
+  pagination: IPagination;
+  data: ICustomCommandsData;
 }
 
-export interface CommandVariablesResponse {
-  [id: number] : CommandVariables;
+export interface ICommandVariablesResponse {
+  [id: number] : ICommandVariables;
 }
 
-export interface TimersResponse {
-  pagination: Pagination;
-  data: TimersData;
+export interface ITimersResponse {
+  pagination: IPagination;
+  data: ITimersData;
 }
 
-export interface ChatAlertsResponse {
-  settings: ChatAlertsData;
+export interface IChatAlertsResponse {
+  settings: IChatAlertsData;
   enabled: boolean;
 }
 
 
 // shared
-export interface Permission {
+export interface IPermission {
   level: number;
-  info?: PermissionInfo;
+  info?: IPermissionInfo;
 }
 
-export interface PermissionInfo {
+export interface IPermissionInfo {
   [id: string]: any;
 }
 
-export interface Cooldown {
+export interface ICooldown {
   global: number;
   user: number;
 }
 
-export interface Aliases {
+export interface IAliases {
   [id: number]: string;
 }
 
-export interface Pagination {
+export interface IPagination {
   current: number;
   total: number;
 }
 
 // default commands
-export interface DefaultCommand {
+export interface IDefaultCommand {
   command: string;
   description: string;
-  aliases: Aliases;
+  aliases: IAliases;
   response_type: string;
   success_response?: string;
   failed_response?: string;
   response?: string;
-  static_permission?: Permission;
-  permission?: Permission;
+  static_permission?: IPermission;
+  permission?: IPermission;
   enabled?: boolean;
   enabled_response?: string;
   disabled_response?: string;
 }
 
-export interface DafaultCommandsSlug {
-  [id: string]: DefaultCommand;
+export interface IDafaultCommandsSlug {
+  [id: string]: IDefaultCommand;
 }
 
 // custom commands
-export interface CustomCommandsData {
-  [id: number]: CustomCommand;
+export interface ICustomCommandsData {
+  [id: number]: ICustomCommand;
 }
 
 
-export interface CustomCommandRow {
+export interface ICustomCommandRow {
   id?: string;
   user_id?: number;
   command: string;
-  permission: Permission;
+  permission: IPermission;
   response: string;
   response_type?: string;
-  cooldowns: Cooldown;
-  aliases: Aliases;
+  cooldowns: ICooldown;
+  aliases: IAliases;
   platforms: number;
   enabled: boolean;
   created_at?: string;
@@ -110,15 +110,15 @@ export interface CustomCommandRow {
 }
 
 
-export interface CustomCommand {
+export interface ICustomCommand {
   id?: string;
   user_id?: number;
   command: string;
-  permission: Permission;
+  permission: IPermission;
   response: string;
   response_type?: string;
-  cooldowns: Cooldown;
-  aliases: Aliases;
+  cooldowns: ICooldown;
+  aliases: IAliases;
   platforms: number;
   enabled: boolean;
   created_at?: string;
@@ -126,16 +126,16 @@ export interface CustomCommand {
 }
 
 // command variables
-export interface CommandVariables {
+export interface ICommandVariables {
   [id: string]: any
 }
 
 // timers
-export interface TimersData {
-  [id: number]: Timer;
+export interface ITimersData {
+  [id: number]: ITimer;
 }
 
-export interface Timer {
+export interface ITimer {
   id?: string;
   user_id?: number;
   name: string;
@@ -158,102 +158,102 @@ export interface IChatbotModule {
 }
 
 // chat alerts
-export interface ChatAlertsData {
-  streamlabs: StreamlabsChatAlert;
-  twitch: TwitchChatAlert;
-  youtube: YoutubeChatAlert;
-  mixer: MixerChatAlert;
+export interface IChatAlertsData {
+  streamlabs: IStreamlabsChatAlert;
+  twitch: ITwitchChatAlert;
+  youtube: IYoutubeChatAlert;
+  mixer: IMixerChatAlert;
 }
 
-export interface StreamlabsChatAlert extends TipAlert {}
+export interface IStreamlabsChatAlert extends ITipAlert {}
 
-export interface TwitchChatAlert
-  extends FollowAlert, HostAlert, SubAlert, RaidAlert {}
+export interface ITwitchChatAlert
+  extends IFollowAlert, IHostAlert, ISubAlert, IRaidAlert {}
 
-export interface YoutubeChatAlert
-  extends YTSubAlert, SponsorAlert, SuperchatAlert {}
+export interface IYoutubeChatAlert
+  extends IYTSubAlert, ISponsorAlert, ISuperchatAlert {}
 
-export interface MixerChatAlert
-  extends FollowAlert, HostAlert, SubAlert {}
+export interface IMixerChatAlert
+  extends IFollowAlert, IHostAlert, ISubAlert {}
 
 
   // tips
-export interface TipAlert {
+export interface ITipAlert {
   use_tip: boolean;
-  tip_messages: TipMessage[];
+  tip_messages: ITipMessage[];
 }
 
-export interface TipMessage {
+export interface ITipMessage {
   amount: number;
   message: string;
 }
 
 // followers
-export interface FollowAlert {
+export interface IFollowAlert {
   use_follow: boolean;
   follow_messages: string[];
 }
 
 // hosts
-export interface HostAlert {
+export interface IHostAlert {
   use_host: boolean;
-  host_messages: HostMessage[];
+  host_messages: IHostMessage[];
 }
 
-export interface HostMessage {
+export interface IHostMessage {
   min_viewers: number;
   message: string;
 }
 
 // subscribers
-export interface SubAlert {
+export interface ISubAlert {
   use_sub: boolean;
   subscriber_messages: {
-    [id: string]: SubAlertMessage[];
+    [id: string]: ISubAlertMessage[];
   };
 }
 
-export interface SubAlertMessage {
+export interface ISubAlertMessage {
   months: number;
   message: string;
   is_gifted?: boolean;
 }
 
 // raids
-export interface RaidAlert {
+export interface IRaidAlert {
   use_raid: boolean;
-  raid_messages: RaidMessage[];
+  raid_messages: IRaidMessage[];
 }
 
-export interface RaidMessage {
+export interface IRaidMessage {
   amount: number;
   message: string;
 }
 
 // youtube subscribers
-export interface YTSubAlert {
+export interface IYTSubAlert {
   use_sub: boolean;
   subscriber_messages: string[];
 }
 
 // sponsors
-export interface SponsorAlert {
+export interface ISponsorAlert {
   use_sponsor: boolean;
-  sponsor_messsages: SponsorMessage[];
+  sponsor_messsages: ISponsorMessage[];
 }
 
-export interface SponsorMessage {
+export interface ISponsorMessage {
   months: number;
   message: string;
 }
 
 // superchat
-export interface SuperchatAlert {
+export interface ISuperchatAlert {
   use_superchat: boolean;
-  superchat_messages: SuperchatMessage[];
+  superchat_messages: ISuperchatMessage[];
 }
 
-export interface SuperchatMessage {
+export interface ISuperchatMessage {
   amount: number;
   message: string;
 }

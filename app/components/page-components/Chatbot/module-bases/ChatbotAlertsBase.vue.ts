@@ -2,21 +2,21 @@ import _ from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
-  FollowAlert,
-  SubAlert,
-  TipAlert,
-  HostAlert,
-  RaidAlert,
-  ChatAlertsResponse
+  IFollowAlert,
+  ISubAlert,
+  ITipAlert,
+  IHostAlert,
+  IRaidAlert,
+  IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
-interface AlertWindowData {
-  followers: FollowAlert;
-  subscriptions: SubAlert;
-  donations: TipAlert;
-  hosts: HostAlert;
-  raids: RaidAlert;
+interface IAlertWindowData {
+  followers: IFollowAlert;
+  subscriptions: ISubAlert;
+  donations: ITipAlert;
+  hosts: IHostAlert;
+  raids: IRaidAlert;
 }
 
 @Component({})
@@ -43,7 +43,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       subscriber_messages
     } = this.chatAlerts.settings.twitch;
 
-    const types: AlertWindowData = {
+    const types: IAlertWindowData = {
       followers: { use_follow, follow_messages },
       subscriptions: { use_sub, subscriber_messages },
       donations: { use_tip, tip_messages },
@@ -78,7 +78,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     updatedAlert: any,
     tier?: string
   ) {
-    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const newAlertsObject: IChatAlertsResponse = _.cloneDeep(this.chatAlerts);
     const { parent, messages } = this.typeKeys(type);
 
     let spliceArgs = [index, 1];
@@ -96,7 +96,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   toggleEnableAlert(type: string) {
-    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const newAlertsObject: IChatAlertsResponse = _.cloneDeep(this.chatAlerts);
     const { parent, enabled } = this.typeKeys(type);
     newAlertsObject.settings[parent][enabled] = !this.chatAlerts.settings[parent][enabled];
 
@@ -105,7 +105,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // add new alert
   addNewAlert(type: string, newAlert: any) {
-    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const newAlertsObject: IChatAlertsResponse = _.cloneDeep(this.chatAlerts);
     const { parent, messages } = this.typeKeys(type);
 
     if (type === 'subscriptions') {
@@ -120,7 +120,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // calls to service methods
-  _updateChatAlerts(newAlertsObject: ChatAlertsResponse) {
+  _updateChatAlerts(newAlertsObject: IChatAlertsResponse) {
     return this.chatbotApiService.updateChatAlerts(newAlertsObject);
   }
 

@@ -7,7 +7,7 @@ import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windo
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 
 import {
-  ChatAlertsResponse
+  IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -79,7 +79,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
       onSubmit: (updatedAlert: any) => {
         if (updatedAlert.tier !== tier && this.selectedType === 'subscriptions') {
           // moving tiers in twitch subscriptions
-          const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+          const newAlertsObject: IChatAlertsResponse = _.cloneDeep(this.chatAlerts);
           const { parent, messages } = this.typeKeys(this.selectedType);
 
           // delete it from old tier

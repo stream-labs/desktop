@@ -1,8 +1,8 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
-  DafaultCommandsResponse,
-  ChatbotAPIPostResponse
+  IDafaultCommandsResponse,
+  IChatbotAPIPostResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
