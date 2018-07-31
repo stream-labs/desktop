@@ -1,12 +1,13 @@
 <template>
   <span class="number-input">
     <input
-        type="number"
-        :placeholder="metadata.placeholder"
-        :value="value"
-        @input="emitInput($event.target.value)"
-        :name="uuid"
-        v-validate="validate"
+      type="number"
+      :placeholder="metadata.placeholder"
+      :value="value"
+      @input="emitInput($event.target.value)"
+      :name="uuid"
+      v-validate="validate"
+      :style="metadata.inputStyle"
     />
     <div v-if="metadata && metadata.tooltip" class="w-tooltip">
       <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
@@ -25,7 +26,7 @@
     display: flex;
 
     input {
-      width: 220px;
+      // width: 220px;
     }
     .input-error {
       position: absolute;

@@ -21,9 +21,12 @@ import CodeEditor from './CodeEditor.vue';
     ...inputComponents
   }
 })
-export default class EventList extends WidgetSettings<IEventListData, EventListService> {
+export default class EventList extends WidgetSettings<
+  IEventListData,
+  EventListService
+> {
   get themeMetadata() {
-    return Object.keys(this.wData.themes).map((theme) => ({
+    return Object.keys(this.wData.themes).map(theme => ({
       title: this.wData.themes[theme].label,
       value: theme
     }));
@@ -39,5 +42,11 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
     'The smallest amount of bits a cheer must have for an event to be shown. Setting this to 0 will make every cheer trigger an event.'
   );
 
-  fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
+  inputStyle = {
+    width: '220px'
+  };
+
+  fontSizeTooltip = $t(
+    'The font size in pixels. Reasonable size typically ranges between 24px and 48px.'
+  );
 }

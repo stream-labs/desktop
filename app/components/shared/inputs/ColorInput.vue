@@ -1,33 +1,37 @@
 <template>
 <div>
-
-    <div class="input-wrapper">
-      <div class="colorpicker">
-        <div class="input-container">
+  <div class="input-wrapper">
+    <div class="colorpicker">
+      <div class="input-container">
+        <div
+          class="colorpicker__text"
+          @click="togglePicker"
+        >
+          <input
+            class="colorpicker__input"
+            type="text"
+            readonly
+            :value="value"
+            :style="metadata.inputStyle"
+          />
           <div
-              class="colorpicker__text"
-              @click="togglePicker">
-            <input
-                class="colorpicker__input"
-                type="text"
-                readonly
-                :value="value">
-            <div
-                class="colorpicker__swatch"
-                :style="swatchStyle"/>
-          </div>
-          <div v-if="metadata && metadata.tooltip" class="w-tooltip">
-            <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
-          </div>
+            class="colorpicker__swatch"
+            :style="swatchStyle"
+          />
         </div>
-        <color-picker
-            :value="{hex: value}"
-            @input="(value) => emitInput(value.hex)"
-            v-if="pickerVisible"
-            class="colorpicker-menu"/>
+        <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+          <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+        </div>
       </div>
+      <color-picker
+        :value="{hex: value}"
+        @input="(value) => emitInput(value.hex)"
+        v-if="pickerVisible"
+        class="colorpicker-menu"
+      />
     </div>
   </div>
+</div>
 </template>
 
 <script lang="ts" src="./ColorInput.vue.ts"></script>
@@ -51,6 +55,7 @@
 
   .colorpicker__input {
     cursor: pointer !important;
+    // width: 220px;
   }
 
   .colorpicker__swatch {
