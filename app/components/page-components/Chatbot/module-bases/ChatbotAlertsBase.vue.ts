@@ -41,21 +41,25 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     updatedAlert: any,
     tier?: string
   ) {
-    const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-    const platform = this.platformForAlertType(type);
+      const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
+      const platform = this.platformForAlertType(type);
 
-    let spliceArgs = [index, 1];
-    if (updatedAlert) spliceArgs.push(updatedAlert);
+      newAlertsObject.settings[platform][type].messages.splice(index, 1);
+      if (updatedAlert) {
+        newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
+      }
 
-    newAlertsObject.settings[platform][type].messages.splice(index, 1);
-    if (updatedAlert) {
-      newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
+      // ideally want to do spread operater splice(...spliceArgs)
+      // let spliceArgs = [index, 1];
+      // if (updatedAlert) spliceArgs.push(updatedAlert);
+
+      // but TS doesnt like it
+      // https://github.com/Microsoft/TypeScript/issues/4130
+
+      this.updateChatAlerts(newAlertsObject).then(() => {
+        this.$modal.hide('new-alert');
+      });
     }
-
-    this.updateChatAlerts(newAlertsObject).then(() => {
-      this.$modal.hide('new-alert');
-    });
-  }
 
   // toggle enable type
   toggleEnableAlert(type: string) {

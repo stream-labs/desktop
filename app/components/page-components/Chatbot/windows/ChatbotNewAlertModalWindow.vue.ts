@@ -192,10 +192,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
       },
       sub: {
         newMessage: {
-          tier: 'prime',
           amount: null,
           message: null,
-          is_gifted: false
+          is_gifted: false,
+          tier: 'Prime',
         }
       },
       tip: {

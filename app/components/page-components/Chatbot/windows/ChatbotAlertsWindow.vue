@@ -29,10 +29,10 @@
     <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
         <button
-          class="button button--action"
+          class="button button--action text-transform--uppercase"
           @click="showNewChatAlertWindow"
         >
-          ADD ALERT
+          {{ $t('add alert') }}
         </button>
       </div>
       <br />
@@ -68,7 +68,7 @@
                 :icon="'icon-more'"
               >
                 <button @click="onEdit(message, index)" class="button button--action">Edit</button>
-                <button @click="onDelete(index)" class="button button--soft-warning margin-top--10">Delete</button>
+                <button @click="onDelete(index)" class="button button--soft-warning">Delete</button>
               </DropdownMenu>
             </td>
           </tr>
@@ -135,6 +135,11 @@
   * > button {
     display: block;
     width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .icon-more {
