@@ -84,6 +84,7 @@ import { FollowerGoalService } from 'services/widget-settings/follower-goal';
 import { ViewerCountService } from 'services/widget-settings/viewer-count';
 import { StreamBossService } from 'services/widget-settings/stream-boss';
 import { CreditsService } from 'services/widget-settings/credits';
+import { EventListService } from 'services/widget-settings/event-list';
 
 const { ipcRenderer } = electron;
 
@@ -165,11 +166,12 @@ export class ServicesManager extends Service {
     FollowerGoalService,
     ChatBoxService,
     ViewerCountService,
-    MediaGalleryService,
     ChatbotApiService,
     ChatbotCommonService,
     StreamBossService,
     CreditsService,
+    EventListService,
+    MediaGalleryService
   };
 
   private instances: Dictionary<Service> = {};

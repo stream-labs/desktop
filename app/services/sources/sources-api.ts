@@ -27,7 +27,6 @@ export interface ISourceComparison {
   widgetType?: WidgetType;
 }
 
-
 export interface ISourceApi extends ISource {
   updateSettings(settings: Dictionary<any>): void;
   getSettings(): Dictionary<any>;
@@ -41,7 +40,6 @@ export interface ISourceApi extends ISource {
   hasProps(): boolean;
   setName(newName: string): void;
 }
-
 
 export interface ISourcesServiceApi {
   createSource(
@@ -105,9 +103,6 @@ export type TSourceType =
 // Register new properties manager here
 export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
 
-
-
-
 export interface ISourcesState {
   sources: Dictionary<ISource>;
 }
@@ -115,4 +110,11 @@ export interface ISourcesState {
 export interface IActivePropertyManager {
   manager: IPropertyManager;
   type: TPropertiesManager;
+}
+
+export interface ISourceDisplayData {
+  name: string;
+  description: string;
+  demoFilename?: string;
+  supportList?: string[];
 }

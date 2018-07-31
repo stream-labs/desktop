@@ -39,7 +39,7 @@ export class PerformanceService extends StatefulService<IPerformanceState> {
   }
 
   init() {
-    electron.ipcRenderer.on('notifyPerformanceStatistics', (stats: IPerformanceState) => {
+    electron.ipcRenderer.on('notifyPerformanceStatistics', (e: Electron.Event, stats: IPerformanceState) => {
       this.processPerformanceStats(stats);
     });
 
