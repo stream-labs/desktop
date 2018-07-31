@@ -15,8 +15,8 @@
         <div>
           <label for="message" class="margin-vertical--10">Message</label>
           <TextAreaInput
-            v-model="newAlert.followers.newMessage"
-            :metadata="metadata.followers.newMessage"
+            v-model="newAlert.follow.newMessage.message"
+            :metadata="metadata.follow.newMessage.message"
           />
         </div>
       </div>
@@ -24,23 +24,23 @@
         <div>
           <label for="tier" class="margin-vertical--10">Subscription Tier</label>
           <ListInput
-            v-model="newAlert.subscriptions.newMessage.tier"
-            :metadata="metadata.subscriptions.newMessage.tier"
+            v-model="newAlert.sub.newMessage.tier"
+            :metadata="metadata.sub.newMessage.tier"
           />
           <label for="months" class="margin-vertical--10">Subscription Months</label>
           <NumberInput
-            v-model="newAlert.subscriptions.newMessage.months"
-            :metadata="metadata.subscriptions.newMessage.months"
+            v-model="newAlert.sub.newMessage.amount"
+            :metadata="metadata.sub.newMessage.amount"
           />
           <label for="message" class="margin-vertical--10">Subscription Message</label>
           <TextAreaInput
-            v-model="newAlert.subscriptions.newMessage.message"
-            :metadata="metadata.subscriptions.newMessage.message"
+            v-model="newAlert.sub.newMessage.message"
+            :metadata="metadata.sub.newMessage.message"
           />
           <label for="tier" class="margin-vertical--10">Is Gifted</label>
           <ListInput
-            v-model="newAlert.subscriptions.newMessage.is_gifted"
-            :metadata="metadata.subscriptions.newMessage.is_gifted"
+            v-model="newAlert.sub.newMessage.is_gifted"
+            :metadata="metadata.sub.newMessage.is_gifted"
           />
         </div>
       </div>
@@ -48,13 +48,13 @@
         <div>
           <label for="amount" class="margin-vertical--10">Donation Amount</label>
           <NumberInput
-            v-model="newAlert.donations.newMessage.amount"
-            :metadata="metadata.donations.newMessage.amount"
+            v-model="newAlert.tip.newMessage.amount"
+            :metadata="metadata.tip.newMessage.amount"
           />
           <label for="message" class="margin-vertical--10">Donation Message</label>
           <TextAreaInput
-            v-model="newAlert.donations.newMessage.message"
-            :metadata="metadata.donations.newMessage.message"
+            v-model="newAlert.tip.newMessage.message"
+            :metadata="metadata.tip.newMessage.message"
           />
         </div>
       </div>
@@ -62,13 +62,13 @@
         <div>
           <label for="min_viwers" class="margin-vertical--10">Minimum Viewers</label>
           <NumberInput
-            v-model="newAlert.hosts.newMessage.min_viewers"
-            :metadata="metadata.hosts.newMessage.min_viewers"
+            v-model="newAlert.host.newMessage.amount"
+            :metadata="metadata.host.newMessage.amount"
           />
           <label for="message" class="margin-vertical--10">Host Message</label>
           <TextAreaInput
-            v-model="newAlert.hosts.newMessage.message"
-            :metadata="metadata.hosts.newMessage.message"
+            v-model="newAlert.host.newMessage.message"
+            :metadata="metadata.host.newMessage.message"
           />
         </div>
       </div>
@@ -76,13 +76,13 @@
         <div>
           <label for="amount" class="margin-vertical--10">Raider Amount</label>
           <NumberInput
-            v-model="newAlert.raids.newMessage.amount"
-            :metadata="metadata.raids.newMessage.amount"
+            v-model="newAlert.raid.newMessage.amount"
+            :metadata="metadata.raid.newMessage.amount"
           />
           <label for="message" class="margin-vertical--10">Raider Message</label>
           <TextAreaInput
-            v-model="newAlert.raids.newMessage.message"
-            :metadata="metadata.raids.newMessage.message"
+            v-model="newAlert.raid.newMessage.message"
+            :metadata="metadata.raid.newMessage.message"
           />
         </div>
       </div>

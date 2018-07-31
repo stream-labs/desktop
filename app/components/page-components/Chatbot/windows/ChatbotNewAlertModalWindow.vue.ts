@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import TextInput from 'components/shared/inputs/TextInput.vue';
@@ -12,41 +13,36 @@ import {
 } from 'components/shared/inputs/index';
 
 import {
-  ISubAlertMessage,
-  ITipMessage,
-  IHostMessage,
-  IRaidMessage,
+  IAlertMessage
 } from 'services/chatbot/chatbot-interfaces';
 
-interface ISubMessage extends ISubAlertMessage {
-  tier: string;
-}
-
 interface INewAlertMetadata {
-  followers: {
-    newMessage: ITextMetadata;
+  follow: {
+    newMessage: {
+      message: ITextMetadata;
+    };
   },
-  subscriptions: {
+  sub: {
     newMessage: {
       tier: IListMetadata<string>;
-      months: INumberMetadata;
+      amount: INumberMetadata;
       message: ITextMetadata;
       is_gifted: IListMetadata<boolean>;
     }
   },
-  donations: {
+  tip: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
     }
   },
-  hosts: {
+  host: {
     newMessage: {
-      min_viewers: INumberMetadata;
+      amount: INumberMetadata;
       message: ITextMetadata;
     }
   },
-  raids: {
+  raid: {
     newMessage: {
       amount: INumberMetadata;
       message: ITextMetadata;
@@ -55,23 +51,22 @@ interface INewAlertMetadata {
 }
 
 interface INewAlertData {
-  followers: {
-    newMessage: string;
+  follow: {
+    newMessage: IAlertMessage;
   };
-  subscriptions: {
-    newMessage: ISubMessage;
+  sub: {
+    newMessage: IAlertMessage;
   };
-  donations: {
-    newMessage: ITipMessage;
+  tip: {
+    newMessage: IAlertMessage;
   }
-  hosts: {
-    newMessage: IHostMessage;
+  host: {
+    newMessage: IAlertMessage;
   }
-  raids: {
-    newMessage: IRaidMessage;
+  raid: {
+    newMessage: IAlertMessage;
   }
 }
-
 
 @Component({
   components: {
@@ -86,80 +81,52 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   onSubmit: Function = () => {};
 
-  newAlert: INewAlertData = {
-    followers: {
-      newMessage: ''
-    },
-    subscriptions: {
-      newMessage: {
-        tier: 'prime',
-        months: null,
-        message: null,
-        is_gifted: false
-      }
-    },
-    donations: {
-      newMessage: {
-        amount: null,
-        message: null
-      }
-    },
-    hosts: {
-      newMessage: {
-        min_viewers: null,
-        message: null
-      }
-    },
-    raids: {
-      newMessage: {
-        amount: null,
-        message: null
-      }
-    }
-  };
+  newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
 
   get title() {
     return `New ${this.selectedType} Alert`;
   }
 
   get isDonation() {
-    return this.selectedType === 'donations';
+    return this.selectedType === 'tip';
   }
 
   get isSubscription() {
-    return this.selectedType === 'subscriptions';
+    return this.selectedType === 'sub';
   }
 
   get isFollower() {
-    return this.selectedType === 'followers';
+    return this.selectedType === 'follow';
   }
 
   get isHost() {
-    return this.selectedType === 'hosts';
+    return this.selectedType === 'host';
   }
 
   get isRaid() {
-    return this.selectedType === 'raids';
+    return this.selectedType === 'raid';
   }
 
   get metadata() {
     const metadata: INewAlertMetadata = {
-      followers: {
+      follow: {
         newMessage: {
-          required: true,
-          placeholder: 'Message to follower'
+          message: {
+            required: true,
+            placeholder: 'Message to follower'
+          }
         }
       },
-      subscriptions: {
+      sub: {
         newMessage: {
           tier: {
             required: true,
-            options: ['prime', 'tier_1', 'tier_2', 'tier_3'].map(tier => ({
+            options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
               value: tier,
-              title: tier.split('_').join(' ')
+              title: tier
             }))
           },
-          months: {
+          amount: {
             required: true,
             placeholder: 'Number of months subscribed'
           },
@@ -176,7 +143,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           }
         }
       },
-      donations: {
+      tip: {
         newMessage: {
           amount: {
             min: 0,
@@ -188,9 +155,9 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           }
         }
       },
-      hosts: {
+      host: {
         newMessage: {
-          min_viewers: {
+          amount: {
             min: 0,
             placeholder: 'Minimum viewer count'
           },
@@ -200,7 +167,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           }
         }
       },
-      raids: {
+      raid: {
         newMessage: {
           amount: {
             min: 0,
@@ -216,16 +183,50 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return metadata;
   }
 
+  get initialNewAlertState() {
+    const initialState: INewAlertData = {
+      follow: {
+        newMessage: {
+          message: null
+        }
+      },
+      sub: {
+        newMessage: {
+          tier: 'prime',
+          amount: null,
+          message: null,
+          is_gifted: false
+        }
+      },
+      tip: {
+        newMessage: {
+          amount: null,
+          message: null
+        }
+      },
+      host: {
+        newMessage: {
+          amount: null,
+          message: null
+        }
+      },
+      raid: {
+        newMessage: {
+          amount: null,
+          message: null
+        }
+      }
+    };
+    return initialState;
+  }
+
   bindOnSubmitAndCheckIfEdited(event: any) {
     const { onSubmit, editedAlert } = event.params;
     this.onSubmit = onSubmit;
     if (editedAlert) {
-      if (this.selectedType === 'followers') {
-        this.newAlert[this.selectedType].newMessage = editedAlert.message;
-        return;
-      }
-
-      this.newAlert[this.selectedType].newMessage = editedAlert;
+      this.newAlert[this.selectedType].newMessage = cloneDeep(editedAlert);
+    } else {
+      this.newAlert = cloneDeep(this.initialNewAlertState);
     }
   }
 

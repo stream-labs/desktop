@@ -19,30 +19,15 @@ import {
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
-  selectedType = 'followers';
+  selectedType = 'follow';
 
   get selectedTypeData() {
-    // return { use_***, ***_messages };
+    console.log(this.alertTypes);
     return this.alertTypes[this.selectedType];
   }
 
   get selectedTypeMessages() {
-    // return { title: [messages] }
-    // default title is all_alerts;
-
-    const messageKey = Object.keys(this.selectedTypeData).find(
-      (key: string) => key.indexOf('messages') > -1
-    );
-    const messages = this.selectedTypeData[messageKey];
-    if (this.selectedType === 'subscriptions') {
-      return messages;
-    }
-    if (this.selectedType === 'followers') {
-      return {
-        all_alerts: messages.map((message: string) => ({ message }))
-      };
-    }
-    return { all_alerts: messages };
+    return this.selectedTypeData.messages;
   }
 
   get selectedTypeTableTitles() {
@@ -50,61 +35,35 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   get selectedTypeTableColumns() {
-    const firstKey = this.selectedTypeTableTitles[0];
-    const message = this.selectedTypeMessages[firstKey][0];
+    const message = this.selectedTypeMessages[0];
     if (message) return Object.keys(message);
 
     return [];
   }
 
   isEnabled(type: string) {
-    return this.alertTypes[type][this.typeKeys(type).enabled];
+    return this.alertTypes[type].enabled;
   }
 
   showNewChatAlertWindow() {
     this.$modal.show('new-alert', {
       onSubmit: (newAlert: any) => {
-        debugger;
         this.addNewAlert(this.selectedType, newAlert);
       }
     });
   }
 
-  onEdit(message: any, tier: string, index: number) {
+  onEdit(message: any, index: number) {
     this.$modal.show('new-alert', {
-      editedAlert: {
-        ...message,
-        tier
-      },
+      editedAlert: message,
       onSubmit: (updatedAlert: any) => {
-        if (updatedAlert.tier !== tier && this.selectedType === 'subscriptions') {
-          // moving tiers in twitch subscriptions
-          const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-          const { parent, messages } = this.typeKeys(this.selectedType);
-
-          // delete it from old tier
-          newAlertsObject.settings[parent][messages][tier].splice(index, 1);
-          // add to new tier
-          newAlertsObject.settings[parent][messages][updatedAlert.tier].push(updatedAlert);
-
-          this.updateChatAlerts(newAlertsObject).then(() => {
-            this.$modal.hide('new-alert');
-          });
-          return;
-        }
-
-        this.spliceAlertMessages(
-          this.selectedType,
-          index,
-          updatedAlert,
-          tier
-        );
+        this.spliceAlertMessages(this.selectedType, index, updatedAlert);
       }
     });
   }
 
-  onDelete(tier: string, index: number) {
-    this.spliceAlertMessages(this.selectedType, index, null, tier);
+  onDelete(index: number) {
+    this.spliceAlertMessages(this.selectedType, index, null);
   }
 
   onDone() {
@@ -112,17 +71,6 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   // filters
-  formatTextBasedOnType(value: any) {
-    if (typeof value === 'string') return value;
-    if (typeof value === 'number') return value;
-    if (typeof value === 'boolean') return value === true ? 'Yes' : 'No';
-  }
-
-  formatTextFromSnakeCase(text: string) {
-    if (!text) return '';
-    return text.split('_').join(' ');
-  }
-
   formatNumber(value: any, dp?: number) {
     if (isNaN(Number(value))) {
       return value;
@@ -134,5 +82,27 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
       maximumFractionDigits: dp,
       minimumFractionDigits: dp
     });
+  }
+
+  formatHeader(column: string) {
+    switch (column) {
+      case 'is_gifted':
+        return 'is gifted';
+      default:
+        return column;
+    }
+  }
+
+  formatValue(value: any, column: string) {
+    switch (column) {
+      case 'amount':
+        return this.formatNumber(value, 2);
+      case 'message':
+        return value;
+      case 'is_gifted':
+        return value === true ? 'Yes' : 'No';
+      default:
+        return value;
+    }
   }
 }

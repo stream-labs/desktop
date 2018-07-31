@@ -146,6 +146,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchChatAlerts() {
     return this.api('GET', 'settings/chat-notifications', {})
       .then((response: IChatAlertsResponse) => {
+        debugger;
         this.UPDATE_CHAT_ALERTS(response);
       })
   }
@@ -209,10 +210,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   // Mutations
   //
   @mutation()
-  private LOGIN(response: {
-    api_token: string,
-    socket_token: string
-  }) {
+  private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);
     Vue.set(this.state, 'socketToken', response.socket_token);
   }

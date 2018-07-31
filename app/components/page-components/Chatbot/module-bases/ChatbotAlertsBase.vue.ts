@@ -2,22 +2,9 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
-  IFollowAlert,
-  ISubAlert,
-  ITipAlert,
-  IHostAlert,
-  IRaidAlert,
   IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
-
-
-interface IAlertWindowData {
-  followers: IFollowAlert;
-  subscriptions: ISubAlert;
-  donations: ITipAlert;
-  hosts: IHostAlert;
-  raids: IRaidAlert;
-}
+import { debug } from 'util';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
@@ -30,41 +17,17 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   get alertTypes() {
-    const { use_tip, tip_messages } = this.chatAlerts.settings.streamlabs;
-
-    const {
-      use_follow,
-      follow_messages,
-      use_host,
-      host_messages,
-      use_raid,
-      raid_messages,
-      use_sub,
-      subscriber_messages
-    } = this.chatAlerts.settings.twitch;
-
-    const types: IAlertWindowData = {
-      followers: { use_follow, follow_messages },
-      subscriptions: { use_sub, subscriber_messages },
-      donations: { use_tip, tip_messages },
-      hosts: { use_host, host_messages },
-      raids: { use_raid, raid_messages }
-    };
-    return types;
-  }
-
-  typeKeys(type: string) {
-    let data = this.alertTypes[type];
-    const keys = Object.keys(data);
-    return {
-      parent: this.platformForAlertType(type),
-      enabled: keys.find(key => key.indexOf('use') > -1),
-      messages: keys.find(key => key.indexOf('message') > -1)
-    };
+    const { streamlabs, twitch } = this.chatAlerts.settings;
+    let alertTypes = {
+      ...streamlabs,
+      ...twitch
+    }
+    delete alertTypes.bits;
+    return alertTypes;
   }
 
   platformForAlertType(type: string) {
-    if (type === 'donations') return 'streamlabs';
+    if (type === 'tip') return 'streamlabs';
     return 'twitch';
   }
 
@@ -79,15 +42,14 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     tier?: string
   ) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-    const { parent, messages } = this.typeKeys(type);
+    const platform = this.platformForAlertType(type);
 
     let spliceArgs = [index, 1];
     if (updatedAlert) spliceArgs.push(updatedAlert);
 
-    if (type === 'subscriptions') {
-      newAlertsObject.settings[parent][messages][tier].splice(...spliceArgs);
-    } else {
-      newAlertsObject.settings[parent][messages].splice(...spliceArgs);
+    newAlertsObject.settings[platform][type].messages.splice(index, 1);
+    if (updatedAlert) {
+      newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
     }
 
     this.updateChatAlerts(newAlertsObject).then(() => {
@@ -95,24 +57,21 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     });
   }
 
+  // toggle enable type
   toggleEnableAlert(type: string) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-    const { parent, enabled } = this.typeKeys(type);
-    newAlertsObject.settings[parent][enabled] = !this.chatAlerts.settings[parent][enabled];
+    const platform = this.platformForAlertType(type);
 
+    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts.settings[platform][type].enabled;
     this.updateChatAlerts(newAlertsObject);
   }
 
   // add new alert
   addNewAlert(type: string, newAlert: any) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-    const { parent, messages } = this.typeKeys(type);
+    const platform = this.platformForAlertType(type);
 
-    if (type === 'subscriptions') {
-      newAlertsObject.settings[parent][messages][newAlert.tier].push(newAlert);
-    } else {
-      newAlertsObject.settings[parent][messages].push(newAlert);
-    }
+    newAlertsObject.settings[platform][type].messages.push(newAlert);
 
     this.updateChatAlerts(newAlertsObject).then(() => {
       this.$modal.hide('new-alert');

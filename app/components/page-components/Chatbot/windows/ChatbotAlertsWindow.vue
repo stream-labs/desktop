@@ -36,37 +36,30 @@
         </button>
       </div>
       <br />
-      <table
-        v-for="title in selectedTypeTableTitles"
-        :key="title"
-      >
+      <table>
         <thead>
-          <tr>
-            <th :colspan="selectedTypeTableColumns.length">
-              <h3 class="margin--none">{{ formatTextFromSnakeCase(title) }}</h3>
-            </th>
-          </tr>
           <tr>
             <th
               v-for="column in selectedTypeTableColumns"
               :key="column"
+              class="text-transform--capitalize"
               :class="`column--${column}`"
             >
-              {{ $t(formatTextFromSnakeCase(column)) }}
+              {{ $t(formatHeader(column)) }}
             </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(message, index) in selectedTypeMessages[title]"
-            :key="message.message"
+            v-for="(message, index) in selectedTypeMessages"
+            :key="`${message.message}__${index}`"
           >
             <td
               v-for="column in selectedTypeTableColumns"
               :key="column"
             >
-              {{ formatNumber(formatTextBasedOnType(message[column]), column === 'amount' ? 2 : 0) }}
+              {{ formatValue(message[column], column) }}
             </td>
             <td>
               <DropdownMenu
@@ -74,8 +67,8 @@
                 class="chatbot-alerts__alert-actions_container"
                 :icon="'icon-more'"
               >
-                <button @click="onEdit(message, title, index)" class="button button--action">Edit</button>
-                <button @click="onDelete(title, index)" class="button button--soft-warning margin-top--10">Delete</button>
+                <button @click="onEdit(message, index)" class="button button--action">Edit</button>
+                <button @click="onDelete(index)" class="button button--soft-warning margin-top--10">Delete</button>
               </DropdownMenu>
             </td>
           </tr>

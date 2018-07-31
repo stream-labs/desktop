@@ -164,103 +164,22 @@ export interface IChatbotModule {
 
 // chat alerts
 export interface IChatAlertsData {
-  streamlabs: IStreamlabsChatAlert;
-  twitch: ITwitchChatAlert;
-  youtube: IYoutubeChatAlert;
-  mixer: IMixerChatAlert;
+  [id: string]: {
+    [id: string]: IAlertType;
+  }
 }
 
-export interface IStreamlabsChatAlert extends ITipAlert {}
-
-export interface ITwitchChatAlert
-  extends IFollowAlert, IHostAlert, ISubAlert, IRaidAlert {}
-
-export interface IYoutubeChatAlert
-  extends IYTSubAlert, ISponsorAlert, ISuperchatAlert {}
-
-export interface IMixerChatAlert
-  extends IFollowAlert, IHostAlert, ISubAlert {}
-
-
-  // tips
-export interface ITipAlert {
-  use_tip: boolean;
-  tip_messages: ITipMessage[];
+// shared
+export interface IAlertType {
+  enabled: boolean;
+  messages: IAlertMessage[];
 }
 
-export interface ITipMessage {
-  amount: number;
+export interface IAlertMessage {
   message: string;
-}
-
-// followers
-export interface IFollowAlert {
-  use_follow: boolean;
-  follow_messages: string[];
-}
-
-// hosts
-export interface IHostAlert {
-  use_host: boolean;
-  host_messages: IHostMessage[];
-}
-
-export interface IHostMessage {
-  min_viewers: number;
-  message: string;
-}
-
-// subscribers
-export interface ISubAlert {
-  use_sub: boolean;
-  subscriber_messages: {
-    [id: string]: ISubAlertMessage[];
-  };
-}
-
-export interface ISubAlertMessage {
-  months: number;
-  message: string;
+  amount?: number;
   is_gifted?: boolean;
-}
-
-// raids
-export interface IRaidAlert {
-  use_raid: boolean;
-  raid_messages: IRaidMessage[];
-}
-
-export interface IRaidMessage {
-  amount: number;
-  message: string;
-}
-
-// youtube subscribers
-export interface IYTSubAlert {
-  use_sub: boolean;
-  subscriber_messages: string[];
-}
-
-// sponsors
-export interface ISponsorAlert {
-  use_sponsor: boolean;
-  sponsor_messsages: ISponsorMessage[];
-}
-
-export interface ISponsorMessage {
-  months: number;
-  message: string;
-}
-
-// superchat
-export interface ISuperchatAlert {
-  use_superchat: boolean;
-  superchat_messages: ISuperchatMessage[];
-}
-
-export interface ISuperchatMessage {
-  amount: number;
-  message: string;
+  tier?: string;
 }
 
 
