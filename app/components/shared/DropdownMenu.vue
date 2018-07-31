@@ -1,12 +1,14 @@
 <template>
-  <popper trigger="click" :options="{ placement: 'bottom-start' }">
-
+  <popper
+    trigger="click"
+    :options="{ placement: (placement || 'bottom-start') }"
+  >
     <div class="popper dropdown-menu">
       <slot></slot>
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i class="icon-down"/>
+      {{ title }} <i :class="icon || 'icon-down'"/>
     </button>
 
   </popper>
@@ -18,15 +20,14 @@
 @import "../../styles/index";
 
 .dropdown-menu {
-  position: absolute;
-  top: 20px!important;
+  top: 5px !important;
   background-color: @day-primary;
   .border;
   .radius;
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
-  transform: none!important;
+  z-index: 200000;
 }
 
 .dropdown-menu__toggle {
@@ -81,4 +82,26 @@
     color: @white;
   }
 }
+
+.popper .popper__arrow {
+  display: none !important;
+}
+
+.popper[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.popper[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.popper[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.popper[x-placement^="left"] {
+  margin-right: 5px;
+}
 </style>
+
+
