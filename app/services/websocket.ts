@@ -87,7 +87,7 @@ export class WebsocketService extends Service {
       .then(response => response.json())
       .then(json => json.socket_token)
       .then(token => {
-        const url = `https://aws-io.${this.hostsService.streamlabs}?token=${token}`;
+        const url = `${this.hostsService.io}?token=${token}`;
         this.socket = io(url, { transports: ['websocket'] });
 
         // These are useful for debugging
