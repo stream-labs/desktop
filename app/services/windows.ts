@@ -34,6 +34,9 @@ import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
 import Credits from 'components/widgets/Credits.vue';
 
+import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
+import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
+import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -104,8 +107,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
+<<<<<<< HEAD
     Credits,
     StreamBoss
+=======
+    StreamBoss,
+
+    ChatbotCommandWindow,
+    ChatbotTimerWindow,
+    ChatbotAlertsWindow,
+>>>>>>> b8fcd60c7791787b82315832ad2bbaae644e0139
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

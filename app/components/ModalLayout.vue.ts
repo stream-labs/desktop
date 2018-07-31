@@ -82,6 +82,14 @@ export default class ModalLayout extends Vue {
     }
   }
 
+  done() {
+    if (this.doneHandler) {
+      this.doneHandler();
+    } else {
+      this.windowsService.closeChildWindow();
+    }
+  }
+
   get loading() {
     return this.appService.state.loading;
   }

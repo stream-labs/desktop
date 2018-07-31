@@ -28,8 +28,10 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
 
 
   onInputHandler(option: IMultiselectListOption) {
-    this.emitInput(option.value);
-    this.$nextTick();
+    if (option) {
+      this.emitInput(option.value);
+      this.$nextTick();
+    }
   }
 
   get currentMultiselectValue() {
