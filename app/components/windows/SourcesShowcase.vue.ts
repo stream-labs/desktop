@@ -5,7 +5,7 @@ import ModalLayout from 'components/ModalLayout.vue';
 import { WindowsService } from 'services/windows';
 import windowMixin from 'components/mixins/window';
 import AddSourceInfo from './AddSourceInfo.vue';
-import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
+import { SourcesService, TSourceType, TPropertiesManager, SourceDisplayData } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
@@ -67,7 +67,8 @@ export default class SourcesShowcase extends Vue {
   }
 
   getSrc(type: string, theme: string) {
-    return require(`../../../media/source-demos/${theme}/${this.widgetData(type).demoFilename}`);
+    const dataSource = this.widgetData(type) ? this.widgetData : this.sourceData;
+    return require(`../../../media/source-demos/${theme}/${dataSource(type).demoFilename}`);
   }
 
   selectWidget(type: WidgetType) {
@@ -79,6 +80,10 @@ export default class SourcesShowcase extends Vue {
 
   widgetData(type: string) {
     return WidgetDisplayData()[this.widgetTypes[type]];
+  }
+
+  sourceData(type: string) {
+    return SourceDisplayData()[type];
   }
 
   inspectedSource: TInspectableSource = null;

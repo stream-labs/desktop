@@ -387,6 +387,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.ChatBox,
         WidgetType.ViewerCount,
         WidgetType.Credits,
+        WidgetType.EventList,
         WidgetType.StreamBoss
       ];
 
