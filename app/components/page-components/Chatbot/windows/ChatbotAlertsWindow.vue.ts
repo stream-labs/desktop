@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import {cloneDeep} from 'lodash';
 import { Component } from 'vue-property-decorator';
 import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import NavItem from 'components/shared/NavItem.vue';
@@ -79,7 +79,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
       onSubmit: (updatedAlert: any) => {
         if (updatedAlert.tier !== tier && this.selectedType === 'subscriptions') {
           // moving tiers in twitch subscriptions
-          const newAlertsObject: IChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+          const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
           const { parent, messages } = this.typeKeys(this.selectedType);
 
           // delete it from old tier
@@ -87,7 +87,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
           // add to new tier
           newAlertsObject.settings[parent][messages][updatedAlert.tier].push(updatedAlert);
 
-          this._updateChatAlerts(newAlertsObject).then(() => {
+          this.updateChatAlerts(newAlertsObject).then(() => {
             this.$modal.hide('new-alert');
           });
           return;

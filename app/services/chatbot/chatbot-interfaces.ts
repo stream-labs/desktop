@@ -1,15 +1,20 @@
 // state
 export interface IChatbotApiServiceState {
-  api_token: string;
-  socket_token: string;
-  default_commands_response: IDafaultCommandsResponse;
-  custom_commands_response: ICustomCommandsResponse;
-  timers_response: ITimersResponse;
-  command_variables_response: ICommandVariablesResponse;
-  chat_alerts_response: IChatAlertsResponse;
+  apiToken: string;
+  socketToken: string;
+  defaultCommandsResponse: IDafaultCommandsResponse;
+  customCommandsResponse: ICustomCommandsResponse;
+  timersResponse: ITimersResponse;
+  commandVariablesResponse: ICommandVariablesResponse;
+  chatAlertsResponse: IChatAlertsResponse;
 }
 
 // responses
+export interface IChatbotAuthResponse {
+  api_token: string;
+  socket_token: string;
+}
+
 export interface IChatbotAPIPostResponse {
   success: boolean;
 }

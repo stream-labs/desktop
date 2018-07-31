@@ -10,11 +10,11 @@ import {
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
   get timers() {
-    return this.chatbotApiService.state.timers_response.data;
+    return this.chatbotApiService.state.timersResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.timers_response.pagination.current;
+    return this.chatbotApiService.state.timersResponse.pagination.current;
   }
 
   mounted() {

@@ -72,6 +72,7 @@
               <DropdownMenu
                 :placement="'bottom-end'"
                 class="chatbot-alerts__alert-actions_container"
+                :icon="'icon-more'"
               >
                 <button @click="onEdit(message, title, index)" class="button button--action">Edit</button>
                 <button @click="onDelete(title, index)" class="button button--soft-warning margin-top--10">Delete</button>
@@ -141,6 +142,10 @@
   * > button {
     display: block;
     width: 100%;
+  }
+
+  .icon-more {
+    font-size: 15px;
   }
 }
 

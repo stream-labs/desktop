@@ -10,7 +10,7 @@ import {
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
   get commandSlugs() {
-    return this.chatbotApiService.state.default_commands_response;
+    return this.chatbotApiService.state.defaultCommandsResponse;
   }
 
   mounted() {

@@ -39,10 +39,10 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get chatAlerts() {
-    return this.chatbotApiService.state.chat_alerts_response;
+    return this.chatbotApiService.state.chatAlertsResponse;
   }
 
   get chatAlertCurrentlyEnabled() {
-    return this.chatbotApiService.state.chat_alerts_response.enabled == true;
+    return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
   }
 }

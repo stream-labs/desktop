@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 
 import {
   IChatbotApiServiceState,
+  IChatbotAuthResponse,
   ICustomCommand,
   IDefaultCommand,
   ITimer,
@@ -28,29 +29,29 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   version = 'api/v1/';
 
   static defaultState: IChatbotApiServiceState = {
-    api_token: null,
-    socket_token: null,
-    default_commands_response: {
+    apiToken: null,
+    socketToken: null,
+    defaultCommandsResponse: {
       commands: {},
       'link-protection': {},
       giveaway: {}
     },
-    custom_commands_response: {
+    customCommandsResponse: {
       pagination: {
         current: 1,
         total: 1
       },
       data: []
     },
-    command_variables_response: [],
-    timers_response: {
+    commandVariablesResponse: [],
+    timersResponse: {
       pagination: {
         current: 1,
         total: 1
       },
       data: []
     },
-    chat_alerts_response: {
+    chatAlertsResponse: {
       enabled: false,
       settings: null
     }
@@ -74,7 +75,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       fetch(request)
         .then(handleErrors)
         .then(response => response.json())
-        .then((response: IChatbotApiServiceState) => {
+        .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
           resolve(true);
         })
@@ -91,7 +92,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
   api(method: string, endpoint: string, data: any) {
     const url = this.apiEndpoint(endpoint, true);
-    const headers = authorizedHeaders(this.state.api_token);
+    const headers = authorizedHeaders(this.state.apiToken);
     let options: {
       headers: any,
       method: string,
@@ -208,34 +209,37 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   // Mutations
   //
   @mutation()
-  private LOGIN(response: IChatbotApiServiceState) {
-    Vue.set(this.state, 'api_token', response.api_token);
-    Vue.set(this.state, 'socket_token', response.socket_token);
+  private LOGIN(response: {
+    api_token: string,
+    socket_token: string
+  }) {
+    Vue.set(this.state, 'apiToken', response.api_token);
+    Vue.set(this.state, 'socketToken', response.socket_token);
   }
 
   @mutation()
   private UPDATE_DEFAULT_COMMANDS(response: IDafaultCommandsResponse) {
-    Vue.set(this.state, 'default_commands_response', response);
+    Vue.set(this.state, 'defaultCommandsResponse', response);
   }
 
   @mutation()
   private UPDATE_CUSTOM_COMMANDS(response: ICustomCommandsResponse) {
-    Vue.set(this.state, 'custom_commands_response', response);
+    Vue.set(this.state, 'customCommandsResponse', response);
   }
 
   @mutation()
   private UPDATE_COMMAND_VARIABLES(response: ICommandVariablesResponse) {
-    Vue.set(this.state, 'command_variables_response', response);
+    Vue.set(this.state, 'commandVariablesResponse', response);
   }
 
   @mutation()
   private UPDATE_TIMERS(response: ITimersResponse) {
-    Vue.set(this.state, 'timers_response', response);
+    Vue.set(this.state, 'timersResponse', response);
   }
 
   @mutation()
   private UPDATE_CHAT_ALERTS(response: IChatAlertsResponse) {
-    Vue.set(this.state, 'chat_alerts_response', response);
+    Vue.set(this.state, 'chatAlertsResponse', response);
   }
 }
 
