@@ -122,10 +122,8 @@ tbody tr {
     .transition;
     color: white;
 
-    &:hover {
-      td {
-        color: white;
-      }
+    td {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {
