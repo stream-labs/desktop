@@ -84,6 +84,8 @@ interface INewAlertData {
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop() selectedType: string;
 
+  onSubmit: Function = () => {};
+
   newAlert: INewAlertData = {
     followers: {
       newMessage: ''
@@ -216,11 +218,24 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return metadata;
   }
 
+  bindOnSubmitAndCheckIfEdited(event: any) {
+    const { onSubmit, editedAlert } = event.params;
+    this.onSubmit = onSubmit;
+    if (editedAlert) {
+      if (this.selectedType === 'followers') {
+        this.newAlert[this.selectedType].newMessage = editedAlert.message;
+        return;
+      }
+
+      this.newAlert[this.selectedType].newMessage = editedAlert;
+    }
+  }
+
   cancel() {
     this.$modal.hide('new-alert');
   }
 
-  done() {
-    this.addNewAlert(this.selectedType, this.newAlert[this.selectedType].newMessage);
+  submit() {
+    this.onSubmit(this.newAlert[this.selectedType].newMessage);
   }
 }

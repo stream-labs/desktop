@@ -10,8 +10,6 @@ import {
   ChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
-
-
 @Component({
   components: {
     NavMenu,
@@ -64,24 +62,49 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   showNewChatAlertWindow() {
-    this.$modal.show('new-alert');
+    this.$modal.show('new-alert', {
+      onSubmit: (newAlert: any) => {
+        debugger;
+        this.addNewAlert(this.selectedType, newAlert);
+      }
+    });
   }
 
-  onEdit() {
-    
+  onEdit(message: any, tier: string, index: number) {
+    this.$modal.show('new-alert', {
+      editedAlert: {
+        ...message,
+        tier
+      },
+      onSubmit: (updatedAlert: any) => {
+        if (updatedAlert.tier !== tier && this.selectedType === 'subscriptions') {
+          // moving tiers in twitch subscriptions
+          const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+          const { parent, messages } = this.typeKeys(this.selectedType);
+
+          // delete it from old tier
+          newAlertsObject.settings[parent][messages][tier].splice(index, 1);
+          // add to new tier
+          newAlertsObject.settings[parent][messages][updatedAlert.tier].push(updatedAlert);
+
+          this._updateChatAlerts(newAlertsObject).then(() => {
+            this.$modal.hide('new-alert');
+          });
+          return;
+        }
+
+        this.spliceAlertMessages(
+          this.selectedType,
+          index,
+          updatedAlert,
+          tier
+        );
+      }
+    });
   }
 
   onDelete(tier: string, index: number) {
-    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
-    const { parent, messages } = this.typeKeys(this.selectedType);
-
-    if (this.selectedType === 'subscriptions') {
-      newAlertsObject.settings[parent][messages][tier].splice(index, 1);
-    } else {
-      newAlertsObject.settings[parent][messages].splice(index, 1);
-    }
-
-    this.chatbotApiService.updateChatAlerts(newAlertsObject);
+    this.spliceAlertMessages(this.selectedType, index, null, tier);
   }
 
   onDone() {

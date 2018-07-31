@@ -21,7 +21,6 @@ interface AlertWindowData {
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
-
   get chatAlerts() {
     return this.chatbotApiService.state.chat_alerts_response;
   }
@@ -69,14 +68,39 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return 'twitch';
   }
 
-  // calls to service methods
+
+  // preparing data to send to service
+
+  // update/delete alert
+  spliceAlertMessages(
+    type: string,
+    index: number,
+    updatedAlert: any,
+    tier?: string
+  ) {
+    const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
+    const { parent, messages } = this.typeKeys(type);
+
+    let spliceArgs = [index, 1];
+    if (updatedAlert) spliceArgs.push(updatedAlert);
+
+    if (type === 'subscriptions') {
+      newAlertsObject.settings[parent][messages][tier].splice(...spliceArgs);
+    } else {
+      newAlertsObject.settings[parent][messages].splice(...spliceArgs);
+    }
+
+    this._updateChatAlerts(newAlertsObject).then(() => {
+      this.$modal.hide('new-alert');
+    });
+  }
 
   toggleEnableAlert(type: string) {
     const newAlertsObject: ChatAlertsResponse = _.cloneDeep(this.chatAlerts);
     const { parent, enabled } = this.typeKeys(type);
     newAlertsObject.settings[parent][enabled] = !this.chatAlerts.settings[parent][enabled];
 
-    this.chatbotApiService.updateChatAlerts(newAlertsObject);
+    this._updateChatAlerts(newAlertsObject);
   }
 
   // add new alert
@@ -90,11 +114,15 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       newAlertsObject.settings[parent][messages].push(newAlert);
     }
 
-    this.chatbotApiService
-      .updateChatAlerts(newAlertsObject)
-      .then(() => {
-        this.$modal.hide('new-alert');
-      });
+    this._updateChatAlerts(newAlertsObject).then(() => {
+      this.$modal.hide('new-alert');
+    });
   }
+
+  // calls to service methods
+  _updateChatAlerts(newAlertsObject: ChatAlertsResponse) {
+    return this.chatbotApiService.updateChatAlerts(newAlertsObject);
+  }
+
 }
 

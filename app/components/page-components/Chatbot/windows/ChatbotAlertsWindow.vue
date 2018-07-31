@@ -73,15 +73,17 @@
                 :placement="'bottom-end'"
                 class="chatbot-alerts__alert-actions_container"
               >
-                <button @click="onEdit" class="button button--action">Edit</button>
-                <button @click="onDelete(title, index)" class="button button margin-top--10">Delete</button>
+                <button @click="onEdit(message, title, index)" class="button button--action">Edit</button>
+                <button @click="onDelete(title, index)" class="button button--soft-warning margin-top--10">Delete</button>
               </DropdownMenu>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <ChatbotNewAlertModalWindow :selectedType="selectedType"/>
+    <ChatbotNewAlertModalWindow
+      :selectedType="selectedType"
+    />
   </div>
   <div slot="controls">
     <button

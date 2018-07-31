@@ -3,6 +3,7 @@
   name='new-alert'
   :height="'auto'"
   :maxHeight="600"
+  @before-open="bindOnSubmitAndCheckIfEdited"
 >
   <div class="new-alert-modal">
     <div class="new-alert-modal__header">
@@ -94,7 +95,7 @@
       </button>
       <button
         class="button button--action"
-        @click="done">
+        @click="submit">
         {{ $t('Done') }}
       </button>
     </div>
