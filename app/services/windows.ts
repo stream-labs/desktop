@@ -107,8 +107,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
-    StreamBoss,
     Credits,
+    StreamBoss,
 
     ChatbotCommandWindow,
     ChatbotTimerWindow,
