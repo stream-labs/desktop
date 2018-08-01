@@ -4,6 +4,7 @@
     <div class="checkbox" @click="handleClick">
       <input
         type="checkbox"
+        :style="options.inputStyle"
         :checked="value"
       />
       <label>{{ options.title }}</label>

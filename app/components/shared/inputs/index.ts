@@ -26,6 +26,7 @@ export interface IInputMetadata {
   hint?: string;
   type?: EInputType;
   title?: string;
+  inputStyle?: object;
 }
 
 export interface INumberMetadata extends IInputMetadata {

@@ -7,7 +7,7 @@
 
   <div slot="settings" >
     <form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
-    <form-group :title="$t('Theme Color')" type="color" v-model="wData.settings.theme_color" />
+    <form-group :title="$t('Theme Color')" type="color" v-model="wData.settings.theme_color" :metadata="{ inputStyle }" />
     <form-group :title="$t('Enable Events')">
       <bool-input :title="$t('Donations')" v-model="wData.settings.show_donations"/>
       <bool-input :title="$t('Follows')" v-model="wData.settings.show_follows"/>
@@ -19,12 +19,12 @@
       <bool-input :title="$t('Raids')" v-model="wData.settings.show_raids"/>
       <bool-input :title="$t('Merch')" v-model="wData.settings.show_merch"/>
     </form-group>
-    <form-group :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
+    <form-group :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip, inputStyle }" />
     <form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
-    <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip }" />
-    <form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }" />
-    <form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" />
-    <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
+    <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip, inputStyle }" />
+    <form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip, inputStyle }" />
+    <form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ inputStyle }"/>
+    <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" />
     <form-group :title="$t('Show Animation')">
       <animation-input v-model="wData.settings.show_animation" />
     </form-group>

@@ -1,6 +1,9 @@
 <template>
 <div>
-  <div class="w-form-group__wrapper slider-container">
+  <div
+    class="w-form-group__wrapper slider-container"
+    :style="options.inputStyle"
+  >
     <vue-slider class="slider w-form-group__input"
       :value="value"
       @input="value => updateValue(value)"

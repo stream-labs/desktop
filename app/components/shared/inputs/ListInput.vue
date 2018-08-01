@@ -4,6 +4,7 @@
   <multiselect
     :value="currentMultiselectValue"
     :options="multiselectOptions"
+    :style="options.inputStyle"
     track-by="value"
     :close-on-select="true"
     :placeholder="placeholder"

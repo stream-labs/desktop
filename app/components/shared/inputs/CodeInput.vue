@@ -4,6 +4,7 @@
         :value="value"
         :options="editorOptions[metadata.type]"
         @input="value => emitInput(value)"
+        :style="metadata.inputStyle"
     />
   </div>
 </template>

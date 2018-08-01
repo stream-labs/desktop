@@ -5,6 +5,7 @@ import { BaseInput } from './BaseInput';
 import SliderInput from './SliderInput.vue';
 import { IInputMetadata } from './index';
 import { metadata } from 'components/shared/inputs'
+import { cloneDeep } from 'lodash';
 
 @Component({
   components: {
@@ -18,7 +19,13 @@ export default class FontSize extends BaseInput<string, IInputMetadata>{
   @Prop()
   metadata: IInputMetadata;
 
-  sliderOptions = metadata.slider({min: 8, max: 144});
+  get sliderMetadata() {
+    let sliderOptions = metadata.slider({ min: 8, max: 144 });
+    return {
+      ...cloneDeep(sliderOptions),
+      ...metadata
+    }
+  }
 
   get sliderValue() {
     return parseInt(this.value, 10);

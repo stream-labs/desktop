@@ -7,6 +7,7 @@
         @input="emitInput($event.target.value)"
         :name="uuid"
         v-validate="validate"
+        :style="options.inputStyle"
     />
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}

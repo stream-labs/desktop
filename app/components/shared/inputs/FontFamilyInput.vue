@@ -1,6 +1,9 @@
 <template>
 <div class="container">
-  <div class="google-font-selector input-wrapper">
+  <div
+    class="google-font-selector input-wrapper"
+    :style="metadata.inputStyle"
+  >
     <multiselect
       :value="value"
       :options="fonts">
@@ -23,7 +26,4 @@
   align-items: center;
 }
 
-.google-font-selector {
-  width: 220px;
-}
 </style>
