@@ -8,6 +8,9 @@
         :name="uuid"
         v-validate="validate"
     />
+    <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+      <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+    </div>
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}
     </span>
@@ -19,6 +22,8 @@
 <style lang="less" scoped>
   .text-input {
     position: relative;
+    width: 75%;
+    display: flex;
     .input-error {
       position: absolute;
       white-space: nowrap;
