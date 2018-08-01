@@ -4,7 +4,7 @@
     Edit
   </span>
   <button
-    class="button button--semi-opac"
+    class="button button--default"
     @click="studioModeTransition">
     Transition
     <i class="fa fa-arrow-down" v-if="stacked" />

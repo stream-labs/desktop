@@ -76,7 +76,7 @@
 }
 
 .NameSource-label__error {
-  color: @red;
+  color: @warning;
 }
 
 .sources-container {
@@ -91,7 +91,6 @@
 }
 
 .sources-browser {
-
   .columns:first-child {
     display: flex;
   }
