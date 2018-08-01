@@ -13,7 +13,7 @@
       class="tab-button"
       :class="{ active: page === 'Dashboard' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-dashboard"/> {{ $t('Dashboard') }}
+      <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
     </button>
     <button
       @click="navigateChatBot"
@@ -25,23 +25,23 @@
     <button
       @click="navigateOverlays"
       class="tab-button"
-      :class="{ active: page === 'BrowseOverlays' }"
+      :class="{ 'is-active': page === 'BrowseOverlays' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-themes"/> {{ $t('Themes') }}
+      <i class="icon-themes"/> <span>{{ $t('Themes') }}</span>
     </button>
     <button
       @click="navigateStudio"
       class="tab-button"
-      :class="{ active: page === 'Studio' }"
+      :class="{ 'is-active': page === 'Studio' }"
       :disabled="locked">
-      <i class="icon-studio"/> {{ $t('Editor') }}
+      <i class="icon-studio"/> <span>{{ $t('Editor') }}</span>
     </button>
     <button
       @click="navigateLive"
       class="tab-button"
-      :class="{ active: page === 'Live' }"
+      :class="{ 'is-active': page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-live-dashboard"/> {{ $t('Live') }}
+      <i class="icon-live-dashboard"/> <span>{{ $t('Live') }}</span>
     </button>
   </div>
 
@@ -56,6 +56,9 @@
     </div>
     <div class="top-nav-item" v-if="isDevMode">
       <a class="link" @click="openDevTools">Dev Tools</a>
+    </div>
+    <div class="top-nav-item" v-if="isDevMode">
+      <a class="link" @click="navigateDesignSystem">Design System</a>
     </div>
     <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a

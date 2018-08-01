@@ -40,7 +40,8 @@
 
   &:after {
     content: '\f002';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
     line-height: 36px;
   }
@@ -54,11 +55,14 @@ input[type=text],
 input[type=number],
 input[type=password],
 textarea {
-  font-size: 13px;
+  font-size: 14px;
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
   font-size: 13px;
+  color: @day-paragraph;
+  .radius();
+  box-shadow: none;
 
   &:focus {
     box-shadow: none;
@@ -73,34 +77,6 @@ textarea {
     height: 20px;
     background: transparent;
     border-radius: 0;
-  }
-}
-
-.checkbox {
-  margin-bottom: 0;
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
-  }
-}
-
-.radio {
-  margin-bottom: 0;
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
   }
 }
 
@@ -119,7 +95,8 @@ textarea {
   position: relative;
 
   &:before {
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: '\f078';
     border: none;
     font-size: 9px;

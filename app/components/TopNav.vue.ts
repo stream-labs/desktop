@@ -54,6 +54,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('Onboarding');
   }
 
+  navigateDesignSystem() {
+    this.navigationService.navigate('DesignSystem');
+  }
+
   studioMode() {
     if (this.transitionsService.state.studioMode) {
       this.transitionsService.disableStudioMode();

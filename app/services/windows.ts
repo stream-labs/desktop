@@ -32,6 +32,7 @@ import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
+import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 
@@ -108,17 +109,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
-<<<<<<< HEAD
+    DonationTicker,
     Credits,
     EventList,
-    StreamBoss
-=======
     StreamBoss,
 
     ChatbotCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
->>>>>>> b8fcd60c7791787b82315832ad2bbaae644e0139
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};
