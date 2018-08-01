@@ -25,7 +25,7 @@ export default class ChatbotModTools extends ChatbotBase {
       {
         title: 'Caps Protection',
         description: 'Restrict viewers from spamming all caps messages to chat.',
-        backgroundUrl: 'media/images/chatbot/chatbot-caps-protection.png',
+        backgroundUrl: require('../../../../media/images/chatbot/chatbot-caps-protection.png'),
         enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openCapsProtectionWindow();
@@ -40,7 +40,7 @@ export default class ChatbotModTools extends ChatbotBase {
       {
         title: 'Symbol Protection',
         description: 'Restrict viewers from spamming messages with too many symbols.',
-        backgroundUrl: 'media/images/chatbot/chatbot-symbol-protection.png',
+        backgroundUrl: require('../../../../media/images/chatbot/chatbot-symbol-protection.png'),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();
@@ -55,7 +55,7 @@ export default class ChatbotModTools extends ChatbotBase {
       {
         title: 'Link Protection',
         description: 'Allows a viewer to only send links to chat from websites on the whitelist.',
-        backgroundUrl: 'media/images/chatbot/chatbot-link-protection.png',
+        backgroundUrl: require('../../../../media/images/chatbot/chatbot-link-protection.png'),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();
@@ -70,7 +70,7 @@ export default class ChatbotModTools extends ChatbotBase {
       {
         title: 'Word Protection',
         description: 'Restrict words from appearing on chat and add words to your blacklist.',
-        backgroundUrl: 'media/images/chatbot/chatbot-word-protection.png',
+        backgroundUrl: require('../../../../media/images/chatbot/chatbot-word-protection.png'),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();
