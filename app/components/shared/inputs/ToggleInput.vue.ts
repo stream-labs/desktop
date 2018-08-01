@@ -5,7 +5,7 @@ import { BaseInput } from './BaseInput';
 export default class WBoolInput extends BaseInput<boolean, {}> {
   @Prop() value: boolean;
 
-  handleClick(e: any) {
+  handleClick(e: KeyboardEvent) {
     this.emitInput(!this.value, e);
   }
 }

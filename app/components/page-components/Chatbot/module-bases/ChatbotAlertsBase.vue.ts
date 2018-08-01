@@ -2,7 +2,8 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
-  IChatAlertsResponse
+  IChatAlertsResponse,
+  IAlertMessage
 } from 'services/chatbot/chatbot-interfaces';
 import { debug } from 'util';
 
@@ -21,7 +22,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     let alertTypes = {
       ...streamlabs,
       ...twitch
-    }
+    };
     delete alertTypes.bits;
     return alertTypes;
   }
@@ -31,42 +32,46 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return 'twitch';
   }
 
-
   // preparing data to send to service
 
   // update/delete alert
   spliceAlertMessages(
     type: string,
     index: number,
-    updatedAlert: any,
+    updatedAlert: IAlertMessage,
     tier?: string
   ) {
-      const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
-      const platform = this.platformForAlertType(type);
+    const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
+    const platform = this.platformForAlertType(type);
 
-      newAlertsObject.settings[platform][type].messages.splice(index, 1);
-      if (updatedAlert) {
-        newAlertsObject.settings[platform][type].messages.splice(index, 0, updatedAlert);
-      }
-
-      // ideally want to do spread operater splice(...spliceArgs)
-      // let spliceArgs = [index, 1];
-      // if (updatedAlert) spliceArgs.push(updatedAlert);
-
-      // but TS doesnt like it
-      // https://github.com/Microsoft/TypeScript/issues/4130
-
-      this.updateChatAlerts(newAlertsObject).then(() => {
-        this.$modal.hide('new-alert');
-      });
+    newAlertsObject.settings[platform][type].messages.splice(index, 1);
+    if (updatedAlert) {
+      newAlertsObject.settings[platform][type].messages.splice(
+        index,
+        0,
+        updatedAlert
+      );
     }
+
+    // ideally want to do spread operater splice(...spliceArgs)
+    // let spliceArgs = [index, 1];
+    // if (updatedAlert) spliceArgs.push(updatedAlert);
+
+    // but TS doesnt like it
+    // https://github.com/Microsoft/TypeScript/issues/4130
+
+    this.updateChatAlerts(newAlertsObject).then(() => {
+      this.$modal.hide('new-alert');
+    });
+  }
 
   // toggle enable type
   toggleEnableAlert(type: string) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
-    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts.settings[platform][type].enabled;
+    newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
+      .settings[platform][type].enabled;
     this.updateChatAlerts(newAlertsObject);
   }
 
@@ -86,6 +91,5 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   updateChatAlerts(newAlertsObject: IChatAlertsResponse) {
     return this.chatbotApiService.updateChatAlerts(newAlertsObject);
   }
-
 }
 

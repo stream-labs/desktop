@@ -7,7 +7,7 @@ import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windo
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 
 import {
-  IChatAlertsResponse
+  IAlertMessage
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -47,16 +47,16 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
 
   showNewChatAlertWindow() {
     this.$modal.show('new-alert', {
-      onSubmit: (newAlert: any) => {
+      onSubmit: (newAlert: IAlertMessage) => {
         this.addNewAlert(this.selectedType, newAlert);
       }
     });
   }
 
-  onEdit(message: any, index: number) {
+  onEdit(message: IAlertMessage, index: number) {
     this.$modal.show('new-alert', {
       editedAlert: message,
-      onSubmit: (updatedAlert: any) => {
+      onSubmit: (updatedAlert: IAlertMessage) => {
         this.spliceAlertMessages(this.selectedType, index, updatedAlert);
       }
     });
@@ -71,7 +71,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   // filters
-  formatNumber(value: any, dp?: number) {
+  formatNumber(value: number, dp?: number) {
     if (isNaN(Number(value))) {
       return value;
     }
