@@ -6,7 +6,8 @@ type TAppPage =
   | 'Live'
   | 'Onboarding'
   | 'BrowseOverlays'
-  | 'PatchNotes';
+  | 'PatchNotes'
+  | 'DesignSystem';
 
 interface INavigationState {
   currentPage: TAppPage;

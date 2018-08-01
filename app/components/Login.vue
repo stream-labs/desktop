@@ -20,7 +20,7 @@
 @import "../styles/index";
 
 .user__name {
-  .semibold;
+  .weight--medium();
 
   @media(max-width: 1600px) {
     display: none;

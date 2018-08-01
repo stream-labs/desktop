@@ -31,7 +31,7 @@
         </div>
         <div class="flex flex--center">
           <button
-            class="button button--semi-opac"
+            class="button button--default"
             @click="$emit('toggle') + $emit('close')">
             {{ buttonTextForWidget() }}
           </button>
@@ -76,7 +76,8 @@
 
     &:before {
       content: '\f00c';
-      font-family: FontAwesome;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
       color: @teal;
       position: absolute;
       top: 6px;
@@ -99,13 +100,14 @@
 }
 
 .widget__name {
-  .semibold;
+  .weight--medium();
   color: @white;
   font-size: 14px;
 }
 
 .widget__desc {
   color: @grey;
+  font-size: 13px;
 }
 
 .widget-detail-wrapper {

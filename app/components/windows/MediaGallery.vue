@@ -14,13 +14,13 @@
           <ul v-for="(category) in ['uploads', 'stock']" :key="category" class="nav-list">
             <div>
               <div class="bold">{{ category === 'stock' ? $t('Stock Files') : $t('My Uploads') }}</div>
-              <li class="list__item semibold" @click="handleTypeFilter(null, category)">
+              <li class="list__item" @click="handleTypeFilter(null, category)">
                 <i class="fa fa-file"></i>{{ $t('All Files') }}
               </li>
-              <li class="list__item semibold" @click="handleTypeFilter('image', category)">
+              <li class="list__item" @click="handleTypeFilter('image', category)">
                 <i class="icon-image"></i>{{ $t('Images') }}
               </li>
-              <li class="list__item semibold" @click="handleTypeFilter('audio', category)">
+              <li class="list__item" @click="handleTypeFilter('audio', category)">
                 <i class="icon-music"></i>{{ $t('Sounds') }}
               </li>
             </div>
@@ -137,6 +137,7 @@
 .list__item {
   padding: 3px 0;
   color: @white;
+  .weight--medium();
 
   i {
     color: @grey;

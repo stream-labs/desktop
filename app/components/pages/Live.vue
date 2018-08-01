@@ -22,12 +22,12 @@
             <div v-if="!performanceModeEnabled">
               <i
                 v-if="previewEnabled"
-                class="icon-view icon-btn icon-btn--lg"
+                class="icon-view icon-button icon-button--lg"
                 @click="previewEnabled = false"
                 v-tooltip="disablePreviewTooltip"/>
               <i
                 v-if="!previewEnabled"
-                class="icon-hide icon-btn icon-btn--lg"
+                class="icon-hide icon-button icon-button--lg"
                 @click="previewEnabled = true"
                 v-tooltip="enablePreviewTooltip"/>
             </div>
