@@ -385,4 +385,14 @@ export class ChatbotCommonService extends PersistentStatefulService<
       }
     })
   }
+
+  openCapsProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotCapsProtectionWindow',
+      size: {
+        width: 650,
+        height: 600
+      }
+    });
+  }
 }

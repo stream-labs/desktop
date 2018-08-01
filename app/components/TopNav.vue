@@ -103,6 +103,7 @@
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 54px;
+  z-index: 1;
 }
 
 .top-nav-right {

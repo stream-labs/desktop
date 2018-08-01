@@ -28,7 +28,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: 'media/images/chatbot/chatbot-caps-protection.png',
         enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openCapsProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateCapsProtection({
