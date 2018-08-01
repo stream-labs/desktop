@@ -7,6 +7,10 @@ export interface IChatbotApiServiceState {
   timersResponse: ITimersResponse;
   commandVariablesResponse: ICommandVariablesResponse;
   chatAlertsResponse: IChatAlertsResponse;
+  capsProtectionResponse: ICapsProtectionResponse;
+  symbolProtectionResponse: ISymbolProtectionResponse;
+  linkProtectionResponse: ILinkProtectionResponse;
+  wordProtectionResponse: IWordProtectionResponse;
 }
 
 // responses
@@ -45,6 +49,26 @@ export interface ITimersResponse {
 
 export interface IChatAlertsResponse {
   settings: IChatAlertsData;
+  enabled: boolean;
+}
+
+export interface ICapsProtectionResponse {
+  settings: object;
+  enabled: boolean;
+}
+
+export interface ISymbolProtectionResponse {
+  settings: object;
+  enabled: boolean;
+}
+
+export interface ILinkProtectionResponse {
+  settings: object;
+  enabled: boolean;
+}
+
+export interface IWordProtectionResponse {
+  settings: object;
   enabled: boolean;
 }
 

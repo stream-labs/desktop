@@ -18,7 +18,11 @@ import {
   IChatbotAPIPostResponse,
   IChatbotAPIPutResponse,
   ICommandVariablesResponse,
-  IChatAlertsResponse
+  IChatAlertsResponse,
+  ICapsProtectionResponse,
+  ISymbolProtectionResponse,
+  ILinkProtectionResponse,
+  IWordProtectionResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -54,7 +58,23 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     chatAlertsResponse: {
       enabled: false,
       settings: null
-    }
+    },
+    capsProtectionResponse: {
+      enabled: false,
+      settings: null
+    },
+    symbolProtectionResponse: {
+      enabled: false,
+      settings: null
+    },
+    linkProtectionResponse: {
+      enabled: false,
+      settings: null
+    },
+    wordProtectionResponse: {
+      enabled: false,
+      settings: null
+    },
   };
 
   //
@@ -150,6 +170,35 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  fetchCapsProtection() {
+    return this.api('GET', 'settings/caps-protection', {})
+      .then((response: ICapsProtectionResponse) => {
+        this.UPDATE_CAPS_PROTECTION(response);
+      })
+  }
+
+  fetchSymbolProtection() {
+    return this.api('GET', 'settings/symbol-protection', {})
+      .then((response: ISymbolProtectionResponse) => {
+        this.UPDATE_SYMBOL_PROTECTION(response);
+      })
+  }
+
+  fetchLinkProtection() {
+    return this.api('GET', 'settings/link-protection', {})
+      .then((response: ILinkProtectionResponse) => {
+        this.UPDATE_LINK_PROTECTION(response);
+      })
+  }
+
+  fetchWordProtection() {
+    return this.api('GET', 'settings/words-protection', {}).then(
+      (response: IWordProtectionResponse) => {
+        this.UPDATE_WORD_PROTECTION(response);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
@@ -205,6 +254,43 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  updateCapsProtection(data: ICapsProtectionResponse) {
+    return this.api('POST', 'settings/caps-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchCapsProtection();
+        }
+      })
+  }
+
+  updateSymbolProtection(data: ISymbolProtectionResponse) {
+    return this.api('POST', 'settings/symbol-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchSymbolProtection();
+        }
+      })
+  }
+
+  updateLinkProtection(data: ILinkProtectionResponse) {
+    return this.api('POST', 'settings/link-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchLinkProtection();
+        }
+      })
+  }
+
+  updateWordProtection(data: IWordProtectionResponse) {
+    return this.api('POST', 'settings/words-protection', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchWordProtection();
+        }
+      })
+  }
+
+
   //
   // Mutations
   //
@@ -238,6 +324,27 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   private UPDATE_CHAT_ALERTS(response: IChatAlertsResponse) {
     Vue.set(this.state, 'chatAlertsResponse', response);
   }
+
+  @mutation()
+  private UPDATE_CAPS_PROTECTION(response: ICapsProtectionResponse) {
+    Vue.set(this.state, 'capsProtectionResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SYMBOL_PROTECTION(response: ISymbolProtectionResponse) {
+    Vue.set(this.state, 'symbolProtectionResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_LINK_PROTECTION(response: ILinkProtectionResponse) {
+    Vue.set(this.state, 'linkProtectionResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_WORD_PROTECTION(response: IWordProtectionResponse) {
+    Vue.set(this.state, 'wordProtectionResponse', response);
+  }
+
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<

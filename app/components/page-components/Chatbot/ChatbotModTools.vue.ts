@@ -14,24 +14,71 @@ import {
 })
 export default class ChatbotModTools extends ChatbotBase {
   mounted() {
-    this.chatbotApiService.fetchChatAlerts();
+    this.chatbotApiService.fetchCapsProtection();
+    this.chatbotApiService.fetchSymbolProtection();
+    this.chatbotApiService.fetchLinkProtection();
+    this.chatbotApiService.fetchWordProtection();
   }
 
   get modules() {
     let modules: IChatbotModule[] = [
       {
-        title: 'Chat Alerts',
-        description:
-          'Get notified in chat whenever an activity happens like Donations and Subscribers.',
-        backgroundUrl: 'media/images/chatbot/chatbot-alert.png',
-        enabled: this.chatAlertCurrentlyEnabled,
+        title: 'Caps Protection',
+        description: 'Restrict viewers from spamming all caps messages to chat.',
+        backgroundUrl: 'media/images/chatbot/chatbot-caps-protection.png',
+        enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();
         },
         onToggleEnabled: () => {
-          this.chatbotApiService.updateChatAlerts({
-            ...this.chatAlerts,
-            enabled: !this.chatAlertCurrentlyEnabled
+          this.chatbotApiService.updateCapsProtection({
+            ...this.capsProtection,
+            enabled: !this.capsProtectionCurrentlyEnabled
+          });
+        }
+      },
+      {
+        title: 'Symbol Protection',
+        description: 'Restrict viewers from spamming messages with too many symbols.',
+        backgroundUrl: 'media/images/chatbot/chatbot-symbol-protection.png',
+        enabled: this.symbolProtectionCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotCommonService.openChatbotAlertsWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.updateSymbolProtection({
+            ...this.symbolProtection,
+            enabled: !this.symbolProtectionCurrentlyEnabled
+          });
+        }
+      },
+      {
+        title: 'Link Protection',
+        description: 'Allows a viewer to only send links to chat from websites on the whitelist.',
+        backgroundUrl: 'media/images/chatbot/chatbot-link-protection.png',
+        enabled: this.linkProtectionCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotCommonService.openChatbotAlertsWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.updateLinkProtection({
+            ...this.linkProtection,
+            enabled: !this.linkProtectionCurrentlyEnabled
+          });
+        }
+      },
+      {
+        title: 'Word Protection',
+        description: 'Restrict words from appearing on chat and add words to your blacklist.',
+        backgroundUrl: 'media/images/chatbot/chatbot-word-protection.png',
+        enabled: this.wordProtectionCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotCommonService.openChatbotAlertsWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.updateWordProtection({
+            ...this.wordProtection,
+            enabled: !this.wordProtectionCurrentlyEnabled
           });
         }
       }
@@ -39,11 +86,36 @@ export default class ChatbotModTools extends ChatbotBase {
     return modules;
   }
 
-  get chatAlerts() {
-    return this.chatbotApiService.state.chatAlertsResponse;
+  get capsProtection() {
+    return this.chatbotApiService.state.capsProtectionResponse;
   }
 
-  get chatAlertCurrentlyEnabled() {
-    return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
+  get symbolProtection() {
+    return this.chatbotApiService.state.symbolProtectionResponse;
   }
+
+  get linkProtection() {
+    return this.chatbotApiService.state.linkProtectionResponse;
+  }
+
+  get wordProtection() {
+    return this.chatbotApiService.state.wordProtectionResponse;
+  }
+
+  get capsProtectionCurrentlyEnabled() {
+    return this.capsProtection.enabled == true;
+  }
+
+  get symbolProtectionCurrentlyEnabled() {
+    return this.symbolProtection.enabled == true;
+  }
+
+  get linkProtectionCurrentlyEnabled() {
+    return this.linkProtection.enabled == true;
+  }
+
+  get wordProtectionCurrentlyEnabled() {
+    return this.wordProtection.enabled == true;
+  }
+
 }

@@ -1,8 +1,8 @@
 <template>
-<div>
+<div class="align-items--inline">
   <ChatbotModule
-    v-for="(module, index) in modules"
-    :key="index"
+    v-for="module in modules"
+    :key="module.title"
     :chatbotModule="module"
   />
 </div>
