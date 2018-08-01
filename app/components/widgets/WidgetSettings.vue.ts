@@ -26,7 +26,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   tabs = this.service.getTabs();
 
   fontFamilyTooltip = $t(
-    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
+    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' + 
+      ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
   );
 
 
