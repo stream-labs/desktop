@@ -65,6 +65,7 @@ import {
   JsonrpcService
 } from 'services/jsonrpc';
 import { FileManagerService } from 'services/file-manager';
+import { CrashReporterService } from 'services/crash-reporter';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WebsocketService } from 'services/websocket';
@@ -141,6 +142,7 @@ export class ServicesManager extends Service {
     StreamlabelsService,
     GuestApiService,
     VideoEncodingOptimizationService,
+    CrashReporterService,
     DismissablesService,
     SceneCollectionsServerApiService,
     SceneCollectionsService,
