@@ -26,10 +26,6 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
     return { required: this.options.required };
   }
 
-  fontFamilyTooltip = $t(
-    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
-  );
-
   /**
    * object for vee validate plugin
    */

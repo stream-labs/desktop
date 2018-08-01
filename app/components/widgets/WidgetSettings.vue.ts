@@ -25,6 +25,11 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   loadingState: 'success' | 'pending' | 'fail' = 'pending';
   tabs = this.service.getTabs();
 
+  fontFamilyTooltip = $t(
+    'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include: Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
+  );
+
+
   private dataUpdatedSubscr: Subscription;
 
   get widgetType(): WidgetType {

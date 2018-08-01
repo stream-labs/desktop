@@ -23,7 +23,7 @@
     <form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
     <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip }" />
     <form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }" />
-    <form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" />
+    <form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ tooltip: fontFamilyTooltip }" />
     <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
     <form-group :title="$t('Show Animation')">
       <animation-input v-model="wData.settings.show_animation" />
