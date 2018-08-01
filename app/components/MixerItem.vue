@@ -21,21 +21,21 @@
       tooltip="false"
     />
     <div class="controls">
-      <i class="icon-btn icon-audio"
+      <i class="icon-button icon-audio"
          title="click to switch off"
          v-if="!audioSource.muted"
          @click="setMuted(true)"
       >
       </i>
       <i
-        class="icon-btn icon-mute"
+        class="icon-button icon-mute"
         title="click to switch on"
         v-if="audioSource.muted"
         @click="setMuted(false)"
       >
       </i>
       <i
-        class="icon-btn icon-settings"
+        class="icon-button icon-settings"
         @click="showSourceMenu(audioSource.sourceId)"
       >
       </i>

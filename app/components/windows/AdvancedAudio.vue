@@ -7,15 +7,16 @@
 
 
     <table>
-
-      <tr>
-        <th>{{ $t('Name') }}</th>
-        <th>{{ $t('Volume ( % )') }}</th>
-        <th>{{ $t('Downmix to Mono') }}</th>
-        <th>{{ $t('Sync Offset ( ms )') }}</th>
-        <th>{{ $t('Audio Monitoring') }}</th>
-        <th>{{ $t('Tracks') }}</th>
-      </tr>
+      <thead>
+        <tr>
+          <th>{{ $t('Name') }}</th>
+          <th>{{ $t('Volume ( % )') }}</th>
+          <th>{{ $t('Downmix to Mono') }}</th>
+          <th>{{ $t('Sync Offset ( ms )') }}</th>
+          <th>{{ $t('Audio Monitoring') }}</th>
+          <th>{{ $t('Tracks') }}</th>
+        </tr>
+      </thead>
 
       <tr v-for="audioSource in audioSources">
         <td>{{ audioSource.name }}</td>
@@ -51,10 +52,5 @@ tr {
       white-space: nowrap;
     }
   }
-}
-
-th,
-td {
-  text-align: left;
 }
 </style>

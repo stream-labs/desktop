@@ -23,14 +23,14 @@
   <span class="editable-scene-collection--modified flex--grow">
     Updated {{ modified }}
   </span>
-  <a class="editable-scene-collection--action link link--underlined">
+  <a class="editable-scene-collection--action">
     <span @click.stop="startRenaming">{{ $t('Rename') }}</span>
   </a>
-  <a v-if="!duplicating" class="editable-scene-collection--action link link--underlined">
+  <a v-if="!duplicating" class="editable-scene-collection--action">
     <span @click.stop="duplicate">{{ $t('Duplicate') }}</span>
   </a>
   <i class="fa fa-spinner fa-pulse" v-else />
-  <a class="editable-scene-collection--action editable-scene-collection--action-delete link link--underlined">
+  <a class="editable-scene-collection--action editable-scene-collection--action-delete">
     <span @click.stop="remove">{{ $t('Delete') }}</span>
   </a>
 </div>
