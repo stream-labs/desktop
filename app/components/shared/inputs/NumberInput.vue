@@ -25,9 +25,6 @@
     position: relative;
     display: flex;
 
-    input {
-      // width: 220px;
-    }
     .input-error {
       position: absolute;
       white-space: nowrap;

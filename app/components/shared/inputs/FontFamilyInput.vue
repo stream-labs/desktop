@@ -26,7 +26,4 @@
   align-items: center;
 }
 
-.google-font-selector {
-  // width: 220px;
-}
 </style>

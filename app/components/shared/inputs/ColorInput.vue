@@ -55,7 +55,6 @@
 
   .colorpicker__input {
     cursor: pointer !important;
-    // width: 220px;
   }
 
   .colorpicker__swatch {
