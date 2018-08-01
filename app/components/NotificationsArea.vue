@@ -20,6 +20,7 @@
   <div class="notifications__container flex--grow" ref="notificationsContainer">
     <div
       v-for="notify in notifications"
+      :key="`${notify.message}${notify.date}`"
       class="notification"
       v-show="showExtendedNotifications"
       @click="onNotificationClickHandler(notify.id)"

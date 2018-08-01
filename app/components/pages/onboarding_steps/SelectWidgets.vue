@@ -205,7 +205,7 @@
 }
 
 .select-widgets__column-title {
-  .semibold;
+  .weight--medium();
   color: @white;
   font-size: 14px;
 }

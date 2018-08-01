@@ -37,6 +37,8 @@
 <script lang="ts" src="./Settings.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .settings {
   display: flex;
   align-content: stretch;

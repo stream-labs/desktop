@@ -12,9 +12,5 @@
 .button--go-live {
   min-width: 150px;
   text-transform: none;
-
-  // @media(max-width: 1200px) {
-  //   font-size: 11px;
-  // }
 }
 </style>

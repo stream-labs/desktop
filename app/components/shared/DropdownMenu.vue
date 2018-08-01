@@ -18,12 +18,11 @@
 
 <style lang="less">
 @import "../../styles/index";
-
 .dropdown-menu {
   top: 5px !important;
   background-color: @day-primary;
-  .border;
-  .radius;
+  .border();
+  .radius();
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
@@ -35,14 +34,17 @@
   align-items: center;
   text-transform: uppercase;
   font-size: 13px;
-  .semibold;
+  .weight--medium();
   color: @day-title;
-  letter-spacing: .7px;
 
   .fa,
   i {
-    margin-left: 6px;
+    margin-left: 8px;
     font-size: 6px;
+  }
+
+  &:focus {
+    outline: 0;
   }
 }
 
@@ -66,7 +68,7 @@
 }
 
 .night-theme {
-  .dropdown-menu {
+  .dropdown-menu__menu {
     background-color: @night-primary;
     border-color: @night-secondary;
   }

@@ -27,7 +27,6 @@
 @import "../../styles/index";
 
 .studio-page {
-  display: flex;
   flex-direction: column;
 }
 

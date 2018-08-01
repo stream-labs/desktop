@@ -22,7 +22,7 @@
     </div>
 
     <!-- other tabs -->
-    <div v-for="tabItem in tabsList" >
+    <div v-for="tabItem in tabsList" :key="tabItem.value">
       <div v-if="tabItem.value !== 'source'">
         <slot :name="tabItem.value" v-if="tabItem.value === value"></slot>
       </div>
@@ -31,7 +31,7 @@
 
   <!-- buttons -->
   <div slot="controls" v-if="tab && tab.showControls">
-    <div v-for="tabItem in tabsList" v-if="tabItem.value === value">
+    <div v-for="tabItem in tabsList" :key="tabItem.value" v-if="tabItem.value === value">
       <slot :name="tabItem.value + '-controls'">
         <button
             class="button button--action"
