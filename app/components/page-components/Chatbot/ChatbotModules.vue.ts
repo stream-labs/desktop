@@ -23,6 +23,7 @@ export default class ChatbotModules extends ChatbotBase {
       {
         title: 'Chat Alerts',
         description: 'Get notified in chat whenever an activity happens like Donations and Subscribers.',
+        backgroundUrl: 'media/images/chatbot/chatbot-alert.png',
         enabled: this.chatAlertCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();

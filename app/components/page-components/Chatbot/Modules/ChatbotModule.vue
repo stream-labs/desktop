@@ -8,7 +8,12 @@
         @input="chatbotModule.onToggleEnabled"
       />
     </div>
-    <div class="chatbot-module__image" />
+    <div
+      class="chatbot-module__image"
+      :style="{
+        backgroundImage: `url(${chatbotModule.backgroundUrl})`
+      }"
+    />
     <div class="chatbot-module__body">
       <p>{{ chatbotModule.description }}</p>
       <br />
@@ -52,7 +57,6 @@
 
   .chatbot-module__image {
     height: 150px;
-    background-image: url("../../../../../media/images/chatbot/chatbot-alert.png");
     width: 100%;
     background-size: cover;
   }

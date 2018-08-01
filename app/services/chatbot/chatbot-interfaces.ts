@@ -157,6 +157,7 @@ export interface ITimer {
 export interface IChatbotModule {
   title: string;
   description: string;
+  backgroundUrl: string;
   enabled: boolean;
   onToggleEnabled: Function;
   onExpand: Function;

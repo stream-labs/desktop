@@ -146,7 +146,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchChatAlerts() {
     return this.api('GET', 'settings/chat-notifications', {})
       .then((response: IChatAlertsResponse) => {
-        debugger;
         this.UPDATE_CHAT_ALERTS(response);
       })
   }
