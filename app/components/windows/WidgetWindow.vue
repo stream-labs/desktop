@@ -34,7 +34,7 @@
     <div v-for="tabItem in tabsList" v-if="tabItem.value === value">
       <slot :name="tabItem.value + '-controls'">
         <button
-            class="button button--action"
+            class="button button--default"
             @click="close">
           {{ $t('Close') }}
         </button>

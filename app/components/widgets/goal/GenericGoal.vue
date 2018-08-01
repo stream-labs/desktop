@@ -73,7 +73,7 @@
       {{ $t('Start Goal') }}
     </button>
     <button
-        class="button button--warn"
+        class="button button--soft-warning"
         v-show="hasGoal"
         @click="reset()"
     >
