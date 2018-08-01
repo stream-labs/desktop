@@ -20,7 +20,7 @@ interface INewAlertMetadata {
   follow: {
     newMessage: {
       message: ITextMetadata;
-    };
+    }
   },
   sub: {
     newMessage: {

@@ -5,7 +5,6 @@ import {
   IChatAlertsResponse,
   IAlertMessage
 } from 'services/chatbot/chatbot-interfaces';
-import { debug } from 'util';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {

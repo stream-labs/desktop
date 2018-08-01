@@ -8,30 +8,37 @@
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
     </Tabs>
   </div>
-  <div slot="content" class="chatbot-add-command__container">
-    <div v-if="selectedTab === 'general'">
+  <div slot="content" class="chatbot-caps-protection__container">
+    <div v-if="selectedTab === 'general' && capsProtection">
       <div class="row">
         <div class="small-6 columns">
-          <label for="permission" class="margin-vertical--10">Auto Permit</label>
-          <!-- <ListInput
-            v-model="newCommand.permission.level"
-            :metadata="permissionMetadata"
-          /> -->
+          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+          <ListInput
+            v-model="capsProtection.general.excluded.level"
+            :metadata="metadata.general.excluded.level"
+          />
         </div>
         <div class="small-6 columns">
           <label for="show to" class="margin-vertical--10">Punishment</label>
-          <!-- <ListInput
-            v-model="newCommand.response_type"
-            :metadata="showToMetadata"
-          /> -->
+          <ListInput
+            v-model="capsProtection.general.punishment.type"
+            :metadata="metadata.general.punishment.type"
+          />
         </div>
       </div>
       <div>
+        <label for="response" class="margin-vertical--10">Punishment Duration</label>
+        <NumberInput
+          v-model="capsProtection.general.punishment.duration"
+          :metadata="metadata.general.punishment.duration"
+        />
+      </div>
+      <div>
         <label for="response" class="margin-vertical--10">Punishment Response</label>
-        <!-- <TextAreaInput
-          v-model="newCommand.response"
-          :metadata="responseMetadata"
-        /> -->
+        <TextAreaInput
+          v-model="capsProtection.general.message"
+          :metadata="metadata.general.message"
+        />
       </div>
     </div>
     <div v-if="selectedTab === 'advanced'">
@@ -57,7 +64,7 @@
 <script lang="ts" src="./ChatbotCapsProtectionWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
-.chatbot-add-command__container {
+.chatbot-caps-protection__container {
   padding-top: 45px;
 }
 </style>

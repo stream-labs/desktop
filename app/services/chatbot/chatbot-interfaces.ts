@@ -53,7 +53,7 @@ export interface IChatAlertsResponse {
 }
 
 export interface ICapsProtectionResponse {
-  settings: object;
+  settings: IChatCapsProtectionData;
   enabled: boolean;
 }
 
@@ -96,6 +96,14 @@ export interface IPagination {
   current: number;
   total: number;
 }
+
+export interface IPunishment {
+  duration: number;
+  type: string;
+}
+
+export interface IExcluded extends IPermission {}
+
 
 // default commands
 export interface IDefaultCommand {
@@ -194,7 +202,6 @@ export interface IChatAlertsData {
   }
 }
 
-// shared
 export interface IAlertType {
   enabled: boolean;
   messages: IAlertMessage[];
@@ -207,6 +214,24 @@ export interface IAlertMessage {
   tier?: string;
 }
 
+// caps protection data
+export interface IChatCapsProtectionData {
+  general: {
+    punishment: IPunishment;
+    excluded: IExcluded;
+    message: string;
+  },
+  advanced: {
+    minimum: number;
+    maximum: number;
+    percent: number;
+  }
+}
+
+// link protection data
+// symbol protection data
+// words protection data
+
 
 // dictionaries
 export enum ChatbotPermissions {
@@ -216,6 +241,12 @@ export enum ChatbotPermissions {
   Moderator = 1 << 5,
   Broadcaster = 1 << 7,
   All = Viewer | Subscriber | Moderator | Broadcaster
+}
+
+export enum ChatbotPunishments {
+  Purge = 'Purge',
+  Timeout = 'Timeout',
+  Ban = 'Ban'
 }
 
 export enum ChatbotResponseTypes {

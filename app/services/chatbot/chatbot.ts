@@ -391,7 +391,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
       componentName: 'ChatbotCapsProtectionWindow',
       size: {
         width: 650,
-        height: 600
+        height: 500
       }
     });
   }
