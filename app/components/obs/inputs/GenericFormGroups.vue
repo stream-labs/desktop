@@ -1,7 +1,9 @@
 <template>
   <div class="form-groups">
     <div
-      class="section" v-for="(formGroup, groupIndex) in value"
+      class="section"
+      v-for="(formGroup, groupIndex) in value"
+      :key="formGroup.nameSubCategory"
       v-if="hasAnyVisibleSettings(formGroup)">
 
       <div class="section-title--dropdown" v-if="formGroup.nameSubCategory != 'Untitled'">

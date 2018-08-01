@@ -59,7 +59,7 @@ export default class MediaGallery extends Vue {
     if (!this.galleryInfo) return [];
 
     return this.galleryInfo.files.filter(file => {
-      if (!this.category && file.isStock) return false;
+      if (this.category !== 'stock' && file.isStock) return false;
       if (this.type && file.type !== this.type) return false;
       return true;
     });

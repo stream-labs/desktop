@@ -18,9 +18,13 @@
         </tr>
       </thead>
 
-      <tr v-for="audioSource in audioSources">
+      <tr v-for="audioSource in audioSources" :key="audioSource.name">
         <td>{{ audioSource.name }}</td>
-        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name">
+        <td
+          v-for="formInput in audioSource.getSettingsForm()"
+          :key="`${audioSource.name}${formInput.name}`"
+          :class="'column-' + formInput.name"
+        >
           <component
               v-if="propertyComponentForType(formInput.type)"
               :is="propertyComponentForType(formInput.type)"

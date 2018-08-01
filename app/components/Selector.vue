@@ -5,9 +5,10 @@
     :options="{draggable: draggableSelector}"
     @change="handleChange">
     <li
+      v-for="(item, index) in normalizedItems"
+      :key="item.value"
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-      v-for="(item, index) in normalizedItems"
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">

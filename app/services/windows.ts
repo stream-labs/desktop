@@ -32,6 +32,7 @@ import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
+import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 
@@ -105,6 +106,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
+    DonationTicker,
     Credits,
     EventList,
     StreamBoss
