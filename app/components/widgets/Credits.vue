@@ -15,7 +15,7 @@
       :metadata="{ tooltip: creditsSubtitleTooltip }"
     />
     <form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
-    <form-group type="fontFamily" :value="wData.settings.font"/>
+    <form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
     <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.font_size"/>
     <form-group type="color" :title="$t('Text Color')" v-model="wData.settings.font_color" :metadata="{ tooltip: textColorTooltip }"/>
 
