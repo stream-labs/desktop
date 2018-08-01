@@ -41,5 +41,4 @@ export default class FormGroup extends BaseInput<any, IInputMetadata> {
     return options;
   }
 
-
 }
