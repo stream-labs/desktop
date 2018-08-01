@@ -8,6 +8,7 @@
       class="text-area radius"
       :name="uuid"
       v-validate="validate"
+      :style="options.inputStyle"
     />
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}

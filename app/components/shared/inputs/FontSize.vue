@@ -1,6 +1,10 @@
 <template>
   <div>
-    <slider-input :metadata="sliderOptions" :value="sliderValue" @input="value => updateValue(value)"/>
+    <slider-input
+      :metadata="sliderMetadata"
+      :value="sliderValue"
+      @input="value => updateValue(value)"
+    />
   </div>
 </template>
 
