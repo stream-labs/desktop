@@ -14,4 +14,5 @@ import Tabs from 'components/Tabs.vue';
 export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
   @Inject() chatbotCommonService: ChatbotCommonService;
+
 }

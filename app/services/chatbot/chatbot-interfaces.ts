@@ -1,3 +1,4 @@
+
 // state
 export interface IChatbotApiServiceState {
   apiToken: string;
@@ -11,6 +12,10 @@ export interface IChatbotApiServiceState {
   symbolProtectionResponse: ISymbolProtectionResponse;
   linkProtectionResponse: ILinkProtectionResponse;
   wordProtectionResponse: IWordProtectionResponse;
+}
+
+export interface IChatbotCommonServiceState {
+  toasted: any;
 }
 
 // responses
@@ -53,22 +58,22 @@ export interface IChatAlertsResponse {
 }
 
 export interface ICapsProtectionResponse {
-  settings: IChatCapsProtectionData;
+  settings: ICapsProtectionData;
   enabled: boolean;
 }
 
 export interface ISymbolProtectionResponse {
-  settings: object;
+  settings: ISymbolProtectionData;
   enabled: boolean;
 }
 
 export interface ILinkProtectionResponse {
-  settings: object;
+  settings: ILinkProtectionData;
   enabled: boolean;
 }
 
 export interface IWordProtectionResponse {
-  settings: object;
+  settings: IWordProtectionData;
   enabled: boolean;
 }
 
@@ -214,23 +219,66 @@ export interface IAlertMessage {
   tier?: string;
 }
 
-// caps protection data
-export interface IChatCapsProtectionData {
-  general: {
-    punishment: IPunishment;
-    excluded: IExcluded;
-    message: string;
-  },
-  advanced: {
-    minimum: number;
-    maximum: number;
-    percent: number;
-  }
+// protections
+export interface IProtectionGeneral {
+  punishment: IPunishment;
+  excluded: IExcluded;
+  message: string;
 }
 
-// link protection data
+export interface IProtectionAdvanced {
+  minimum?: number;
+  maximum?: number;
+  percent?: number;
+}
+
+export interface IProtectionList<type> {
+  [id: number]: type;
+}
+
+
+// caps protection data
+export interface ICapsProtectionData {
+  general: IProtectionGeneral;
+  advanced: IProtectionAdvanced;
+}
+
 // symbol protection data
+export interface ISymbolProtectionData {
+  general: IProtectionGeneral;
+  advanced: IProtectionAdvanced;
+}
+// link protection data
+export interface ILinkProtectionData {
+  commands: ILinkProtectionCommands;
+  general: IProtectionGeneral;
+  whitelist: IProtectionList<string>;
+  blacklist: IProtectionList<string>;
+}
+
+export interface ILinkProtectionCommands {
+  [id: string]: ILinkProtectionCommand;
+}
+
+export interface ILinkProtectionCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IAliases;
+}
+
 // words protection data
+export interface IWordProtectionData {
+  general: IProtectionGeneral;
+  blacklist: IProtectionList<IWordProtectionBlackListItem>;
+}
+
+export interface IWordProtectionBlackListItem {
+  text: string;
+  is_regex: boolean;
+  punishment: IPunishment;
+}
 
 
 // dictionaries

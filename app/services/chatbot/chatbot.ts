@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 
 import {
   IChatbotApiServiceState,
+  IChatbotCommonServiceState,
   IChatbotAuthResponse,
   ICustomCommand,
   IDefaultCommand,
@@ -290,10 +291,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
-
   //
   // Mutations
   //
+
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);
@@ -347,10 +348,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
 }
 
-export class ChatbotCommonService extends PersistentStatefulService<
-  IChatbotApiServiceState
-  > {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
+
+  static defaultState: IChatbotCommonServiceState = {
+    toasted: null,
+  };
+
+  bindsToasted(toasted: object) {
+    this.BINDS_TOASTED(toasted);
+  }
 
   closeChildWindow() {
     this.windowsService.closeChildWindow();
@@ -395,4 +402,25 @@ export class ChatbotCommonService extends PersistentStatefulService<
       }
     });
   }
+
+  openSymbolProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSymbolProtectionWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+
+  showToast(message: string, options: object) {
+    this.state.toasted.show(message, options);
+  }
+
+  @mutation()
+  private BINDS_TOASTED(toasted: object) {
+    Vue.set(this.state, 'toasted', toasted);
+  }
+
 }

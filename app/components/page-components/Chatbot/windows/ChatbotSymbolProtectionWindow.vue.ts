@@ -3,7 +3,7 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 
 @Component({})
-export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
+export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   tabs: { name: string; value: string }[] = [
     {
       name: 'General',
@@ -23,9 +23,9 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   onSave() {
     this.chatbotApiService
-      .updateCapsProtection({
-        enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection
+      .updateSymbolProtection({
+        enabled: this.symbolProtectionResponse.enabled,
+        settings: this.symbolProtection
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

@@ -2,42 +2,42 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Caps Protection Preferences')"
+  :title="$t('Symbol Protection Preferences')"
 >
   <div slot="fixed">
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
     </Tabs>
   </div>
-  <div slot="content" class="chatbot-caps-protection__container">
-    <div v-if="selectedTab === 'general' && capsProtection">
+  <div slot="content" class="chatbot-symbol-protection__container">
+    <div v-if="selectedTab === 'general' && symbolProtection">
       <div class="row">
         <div class="small-6 columns">
           <label for="excluded" class="margin-vertical--10">Auto Permit</label>
           <ListInput
-            v-model="capsProtection.general.excluded.level"
-            :metadata="metadata.caps.general.excluded.level"
+            v-model="symbolProtection.general.excluded.level"
+            :metadata="metadata.symbol.general.excluded.level"
           />
         </div>
         <div class="small-6 columns">
           <label for="show to" class="margin-vertical--10">Punishment</label>
           <ListInput
-            v-model="capsProtection.general.punishment.type"
-            :metadata="metadata.caps.general.punishment.type"
+            v-model="symbolProtection.general.punishment.type"
+            :metadata="metadata.symbol.general.punishment.type"
           />
         </div>
       </div>
       <div>
         <label for="response" class="margin-vertical--10">Punishment Duration</label>
         <NumberInput
-          v-model="capsProtection.general.punishment.duration"
-          :metadata="metadata.caps.general.punishment.duration"
+          v-model="symbolProtection.general.punishment.duration"
+          :metadata="metadata.symbol.general.punishment.duration"
         />
       </div>
       <div>
         <label for="response" class="margin-vertical--10">Punishment Response</label>
         <TextAreaInput
-          v-model="capsProtection.general.message"
-          :metadata="metadata.caps.general.message"
+          v-model="symbolProtection.general.message"
+          :metadata="metadata.symbol.general.message"
         />
       </div>
     </div>
@@ -61,10 +61,10 @@
 </ModalLayout>
 </template>
 
-<script lang="ts" src="./ChatbotCapsProtectionWindow.vue.ts"></script>
+<script lang="ts" src="./ChatbotSymbolProtectionWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
-.chatbot-caps-protection__container {
+.chatbot-symbol-protection__container {
   padding-top: 45px;
 }
 </style>

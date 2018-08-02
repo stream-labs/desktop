@@ -18,7 +18,11 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchSymbolProtection();
     this.chatbotApiService.fetchLinkProtection();
     this.chatbotApiService.fetchWordProtection();
+
+    // adding toasted to service state to toggle toast from child
+    this.chatbotCommonService.bindsToasted(this.$toasted);
   }
+
 
   get modules() {
     let modules: IChatbotModule[] = [
@@ -43,7 +47,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-symbol-protection.png'),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openSymbolProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateSymbolProtection({
