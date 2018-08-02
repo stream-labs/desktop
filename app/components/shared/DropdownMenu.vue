@@ -8,7 +8,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i :class="icon || 'icon-down'"/>
+      <span>{{ title }}</span> <i :class="icon || 'icon-down'"/>
     </button>
 
   </popper>
@@ -37,6 +37,13 @@
   .weight--medium();
   color: @day-title;
 
+  span {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .fa,
   i {
     margin-left: 8px;
@@ -62,6 +69,9 @@
 
 .dropdown-menu__item {
   white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: @grey;
 
@@ -72,7 +82,8 @@
 }
 
 .night-theme {
-  .dropdown-menu__menu {
+  .dropdown-menu__menu,
+  .dropdown-menu {
     background-color: @night-primary;
     border-color: @night-secondary;
   }
