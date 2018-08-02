@@ -2,16 +2,16 @@
   <div>
     <div class="media-box radius">
       <div class="url-uploader radius" v-if="showUrlUpload">
-        <form-group title="Image URL" >
+        <form-group :title="$t('Image URL')" >
           <text-input v-model="url" :metadata="{ placeholder: 'Example: https://yoururl.com/image/Streamlabs' }" />
         </form-group>
-        <button class="button button--action" @click="uploadUrl">Submit</button>
+        <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
       <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
       <div class="footer">
         <span>{{ fileName || 'Default' }}</span>
         <div>
-          <span @click="updateValue" class="change-media">Change Media</span>
+          <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
           <i @click="toggleUrlUpload" class="icon-link" />
           <i @click="previewImage" class="fa fa-search-plus" />
           <i @click="clearImage" class="icon-close" />

@@ -7,6 +7,7 @@ import {
   ITipJarData
 } from 'services/widget-settings/tip-jar';
 import { UserService } from 'services/user';
+import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
 
@@ -43,6 +44,7 @@ const mediaGalleryInputs = {
 })
 export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   @Inject() userService: UserService;
+  @Inject() hostsService: HostsService;
 
   textColorTooltip = $t('A hex code for the base text color.');
 
@@ -50,7 +52,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
     'Note: This background color is for preview purposes only. It will not be shown in your stream.'
   );
 
-  jarSrc = 'https://cdn.streamlabs.com/static/tip-jar/jars/glass-';
+  jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string, value: string }[] = [];
 
   fileNameFromHref(href: string) {

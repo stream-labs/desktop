@@ -3,15 +3,11 @@ import Component from 'vue-class-component';
 import { Inject } from 'util/injector';
 import { Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
-import { IInputMetadata } from './index';
+import { IMediaGalleryMetadata } from './index';
 import { MediaGalleryService } from 'services/media-gallery';
 import { TextInput } from './inputs';
 import FormGroup from './FormGroup.vue';
 
-interface IMediaGalleryMetadata extends IInputMetadata {
-  fileName: string;
-  clearImage: string;
-}
 @Component({
   components: { TextInput, FormGroup }
 })
