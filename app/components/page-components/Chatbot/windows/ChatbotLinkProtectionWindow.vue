@@ -1,0 +1,73 @@
+<template>
+<ModalLayout
+  :showControls="false"
+  :customControls="true"
+  :title="$t('Link Protection Preferences')"
+>
+  <div slot="fixed">
+    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
+    </Tabs>
+  </div>
+  <div slot="content" class="chatbot-link-protection__container">
+    <div v-if="selectedTab === 'general' && linkProtection">
+      <div class="row">
+        <div class="small-6 columns">
+          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+          <ListInput
+            v-model="linkProtection.general.excluded.level"
+            :metadata="metadata.link.general.excluded.level"
+          />
+        </div>
+        <div class="small-6 columns">
+          <label for="show to" class="margin-vertical--10">Punishment</label>
+          <ListInput
+            v-model="linkProtection.general.punishment.type"
+            :metadata="metadata.link.general.punishment.type"
+          />
+        </div>
+      </div>
+      <div>
+        <label for="response" class="margin-vertical--10">Punishment Duration</label>
+        <NumberInput
+          v-model="linkProtection.general.punishment.duration"
+          :metadata="metadata.link.general.punishment.duration"
+        />
+      </div>
+      <div>
+        <label for="response" class="margin-vertical--10">Punishment Response</label>
+        <TextAreaInput
+          v-model="linkProtection.general.message"
+          :metadata="metadata.link.general.message"
+        />
+      </div>
+    </div>
+    <div v-if="selectedTab === 'whitelist'">
+      white list Stuff
+    </div>
+    <div v-if="selectedTab === 'blacklist'">
+      black list Stuff
+    </div>
+  </div>
+  <div slot="controls">
+    <button
+      class="button button--default"
+      @click="onCancel">
+      Cancel
+    </button>
+    <button
+      class="button button--action"
+      @click="onSave"
+    >
+      {{ $t("Save") }}
+    </button>
+  </div>
+</ModalLayout>
+</template>
+
+<script lang="ts" src="./ChatbotLinkProtectionWindow.vue.ts"></script>
+
+<style <style lang="less" scoped>
+.chatbot-link-protection__container {
+  padding-top: 45px;
+}
+</style>

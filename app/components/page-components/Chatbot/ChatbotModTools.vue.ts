@@ -62,7 +62,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-link-protection.png'),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openLinkProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateLinkProtection({

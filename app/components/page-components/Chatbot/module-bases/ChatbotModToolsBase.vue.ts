@@ -12,7 +12,8 @@ import {
   ILinkProtectionData,
   IWordProtectionData,
   ChatbotPunishments,
-  ChatbotPermissions
+  ChatbotPermissions,
+  ChatbotResponseTypes
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -56,11 +57,11 @@ interface ISymbolProtectionMetadata {
 
 interface ILinkProtectionMetadata {
   commands: {
-    all_commands: {
+    permit: {
       command: ITextMetadata;
       description: ITextMetadata;
       response: ITextMetadata;
-      response_type: ITextMetadata;
+      response_type: IListMetadata<string>;
       new_alias: ITextMetadata;
     }
   },
@@ -81,7 +82,7 @@ interface IWordProtectionMetadata {
 interface IProtectionMetadata {
   caps: ICapsProtectionMetadata;
   symbol: ISymbolProtectionMetadata;
-  link?: ILinkProtectionMetadata;
+  link: ILinkProtectionMetadata;
   word?: IWordProtectionMetadata;
 }
 
@@ -129,6 +130,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         return 'Capitalized letters';
       case 'symbol':
         return 'Symbols';
+      case 'links':
+        return 'Links';
       default:
         return 'unpermitted value';
     }
@@ -193,6 +196,37 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     };
   }
 
+  get linkCommandsMetadata() {
+    return {
+      permit: {
+        command: {
+          required: true,
+          placeholder: 'Command phrase',
+        },
+        description: {
+          required: true,
+          placeholder: 'Command description',
+        },
+        response: {
+          required: true,
+          placeholder: 'Message in chat',
+        },
+        response_type: {
+          options: Object.keys(ChatbotResponseTypes).map(responseType => {
+            return {
+              value: ChatbotResponseTypes[responseType],
+              title: responseType,
+            };
+          })
+        },
+        new_alias: {
+          required: false,
+          placeholder: 'New Command Alias'
+        }
+      }
+    }
+  }
+
   get metadata() {
     const metadata: IProtectionMetadata = {
       caps: {
@@ -202,6 +236,18 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       symbol: {
         general: this.generalMetadata('symbol'),
         advanced: this.advancedMetadata('symbol')
+      },
+      link: {
+        commands: this.linkCommandsMetadata,
+        general: this.generalMetadata('links'),
+        new_whitelist_item: {
+          required: true,
+          placeholder: 'Link to whitelist'
+        },
+        new_blacklist_item: {
+          required: true,
+          placeholder: 'Link to blacklist'
+        },
       }
     };
     return metadata;
