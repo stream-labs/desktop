@@ -28,7 +28,7 @@
 
   &.active {
     opacity: 1;
-    .semibold;
+    .weight--medium();
     border-color: @navy;
     color: @navy;
 

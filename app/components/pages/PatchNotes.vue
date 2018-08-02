@@ -45,8 +45,8 @@
       <ul class="patch-notes-list">
         <li
           class="patch-notes-item"
-          v-for="(item, index) in notes.notes"
-          :key="index">
+          v-for="item in notes.notes"
+          :key="item">
           {{ item }}
         </li>
       </ul>

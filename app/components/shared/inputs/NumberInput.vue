@@ -8,6 +8,7 @@
         :name="uuid"
         v-validate="validate"
     />
+
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}
     </span>
@@ -19,6 +20,7 @@
 <style lang="less" scoped>
   .number-input {
     position: relative;
+
     .input-error {
       position: absolute;
       white-space: nowrap;

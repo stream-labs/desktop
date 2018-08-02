@@ -1,39 +1,44 @@
-import Vue from 'vue';
-import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from '../../services/persistent-stateful-service';
-import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../../services/stateful-service';
-import electron from 'electron';
-import { HostsService } from '../../services/hosts';
+import { Component } from 'vue-property-decorator';
 import {
-  getPlatformService,
-  IPlatformAuth,
-  TPlatform,
-  IPlatformService
-} from '../../services/platforms/index';
-import { CustomizationService } from '../../services/customization/index';
-import Raven from 'raven-js';
-import { AppService } from 'services/app/index';
-import { SceneCollectionsService } from 'services/scene-collections/index';
-import { Subject } from 'rxjs/Subject';
-import Util from 'services/utils';
+  EventListService,
+  IEventListData
+} from 'services/widget-settings/event-list';
 
-export default class AlertBox extends Vue {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
+import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetSettings from './WidgetSettings.vue';
+import { inputComponents } from 'components/shared/inputs';
+import { AnimationInput } from './inputs';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import { $t } from 'services/i18n';
+import CodeEditor from './CodeEditor.vue';
 
-  mounted() {
-    this.getSettings();
+@Component({
+  components: {
+    WidgetWindow,
+    FormGroup,
+    CodeEditor,
+    AnimationInput,
+    ...inputComponents
+  }
+})
+export default class EventList extends WidgetSettings<IEventListData, EventListService> {
+  get themeMetadata() {
+    return Object.keys(this.wData.themes).map((theme) => ({
+      title: this.wData.themes[theme].label,
+      value: theme
+    }));
   }
 
-  getSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/widget/eventlist`;
+  textColorTooltip = $t('A hex code for the base text color.');
 
-    return fetch(url);
-  }
+  backgroundColorTooltip = $t(
+    'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.'
+  );
+
+  minBitsTooltip = $t(
+    'The smallest amount of bits a cheer must have for an event to be shown.' +
+      ' Setting this to 0 will make every cheer trigger an event.'
+  );
+
+  fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
 }

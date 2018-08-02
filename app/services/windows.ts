@@ -35,7 +35,9 @@ import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
 import StreamBoss from 'components/widgets/StreamBoss.vue';
+import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
+import EventList from 'components/widgets/EventList.vue';
 
 
 const { ipcRenderer, remote } = electron;
@@ -73,8 +75,10 @@ export function getComponents() {
     FollowerGoal,
     ChatBox,
     ViewerCount,
-    StreamBoss,
-    Credits
+    DonationTicker,
+    Credits,
+    EventList,
+    StreamBoss
   };
 }
 
@@ -129,6 +133,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
+
 
   windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};

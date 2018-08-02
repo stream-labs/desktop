@@ -1,39 +1,46 @@
-import Vue from 'vue';
-import URI from 'urijs';
-import { defer } from 'lodash';
-import { PersistentStatefulService } from '../../services/persistent-stateful-service';
-import { Inject } from '../../util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../../services/stateful-service';
-import electron from 'electron';
-import { HostsService } from '../../services/hosts';
+import { Component } from 'vue-property-decorator';
 import {
-  getPlatformService,
-  IPlatformAuth,
-  TPlatform,
-  IPlatformService
-} from '../../services/platforms/index';
-import { CustomizationService } from '../../services/customization/index';
-import Raven from 'raven-js';
-import { AppService } from 'services/app/index';
-import { SceneCollectionsService } from 'services/scene-collections/index';
-import { Subject } from 'rxjs/Subject';
-import Util from 'services/utils';
+  DonationTickerService,
+  IDonationTickerData
+} from 'services/widget-settings/donation-ticker';
 
-export default class AlertBox extends Vue {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
+import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetSettings from './WidgetSettings.vue';
+import { inputComponents } from 'components/shared/inputs';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import { $t } from 'services/i18n';
+import CodeEditor from './CodeEditor.vue';
 
-  mounted() {
-    this.getSettings();
+@Component({
+  components: {
+    WidgetWindow,
+    FormGroup,
+    CodeEditor,
+    ...inputComponents
   }
+})
+export default class DonationTicker extends WidgetSettings<IDonationTickerData, DonationTickerService> {
+  messageFormatTooltip = $t(
+    'Each donation that shows in the donation ticker will be in this format. Available tokens:'
+  ) + ' {name} ' + $t('The name of the donator,') + ' {amount} ' + $t('The amount that was donated');
 
-  getSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/widget/ticker`;
+  maxDonationsTooltip = $t('The maximum amount of donations to show in the ticker. Must be a number greater than 0.');
 
-    return fetch(url);
-  }
+  scrollSpeedTooltip = $t(
+    'How fast the ticker should scroll between 1 (fastest) and 10 (slowest). Set to 0 for no scrolling.'
+  );
+
+  backgroundColorTooltip = $t(
+    'A hex code for the widget background. This is for preview purposes only. It will not be shown in your stream.'
+  );
+
+  fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
+
+  fontWeightTooltip = $t(
+    'How thick to make the font. The value should range between 300 (thinnest) and 900 (thickest)'
+  );
+
+  textColorTooltip = $t('A hex code for the base text color.');
+  nameColorTooltip = $t('A hex color for the text of the') + ' {name} ' + $t('token');
+  amountColorTooltip = $t('A hex color for the text of the') + ' {amount} ' + $t('token');
 }

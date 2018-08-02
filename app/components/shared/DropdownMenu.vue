@@ -1,12 +1,14 @@
 <template>
-  <popper trigger="click" :options="{ placement: 'bottom-start' }">
-
+  <popper
+    trigger="click"
+    :options="{ placement: (placement || 'bottom-start') }"
+  >
     <div class="popper dropdown-menu">
       <slot></slot>
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i class="icon-down"/>
+      <span>{{ title }}</span> <i :class="icon || 'icon-down'"/>
     </button>
 
   </popper>
@@ -16,17 +18,15 @@
 
 <style lang="less">
 @import "../../styles/index";
-
 .dropdown-menu {
-  position: absolute;
-  top: 20px!important;
+  top: 5px !important;
   background-color: @day-primary;
-  .border;
-  .radius;
+  .border();
+  .radius();
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
-  transform: none!important;
+  z-index: 200000;
 }
 
 .dropdown-menu__toggle {
@@ -34,14 +34,24 @@
   align-items: center;
   text-transform: uppercase;
   font-size: 13px;
-  .semibold;
+  .weight--medium();
   color: @day-title;
-  letter-spacing: .7px;
+
+  span {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .fa,
   i {
-    margin-left: 6px;
+    margin-left: 8px;
     font-size: 6px;
+  }
+
+  &:focus {
+    outline: 0;
   }
 }
 
@@ -55,6 +65,9 @@
 
 .dropdown-menu__item {
   white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: @grey;
 
@@ -65,6 +78,7 @@
 }
 
 .night-theme {
+  .dropdown-menu__menu,
   .dropdown-menu {
     background-color: @night-primary;
     border-color: @night-secondary;
@@ -81,4 +95,26 @@
     color: @white;
   }
 }
+
+.popper .popper__arrow {
+  display: none !important;
+}
+
+.popper[x-placement^="top"] {
+  margin-bottom: 5px;
+}
+
+.popper[x-placement^="bottom"] {
+  margin-top: 5px;
+}
+
+.popper[x-placement^="right"] {
+  margin-left: 5px;
+}
+
+.popper[x-placement^="left"] {
+  margin-right: 5px;
+}
 </style>
+
+
