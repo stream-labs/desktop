@@ -94,7 +94,7 @@
         v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
     />
-    <form-group type="fontFamily" :value="wData.settings.font"/>
+    <form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
   </div>
 
 

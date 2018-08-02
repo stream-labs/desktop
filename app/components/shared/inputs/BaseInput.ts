@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
+import { $t } from 'services/i18n';
 
 export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 

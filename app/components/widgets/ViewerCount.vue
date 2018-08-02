@@ -17,7 +17,7 @@
       </form-group>
 
 
-      <form-group title="Font" type="fontFamily" v-model="wData.settings.font"/>
+      <form-group title="Font" type="fontFamily" v-model="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
       <form-group title="Text Color" type="color" v-model="wData.settings.font_color"/>
       <form-group title="Font Size" type="fontSize" v-model="wData.settings.font_size"/>
 
