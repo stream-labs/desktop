@@ -44,7 +44,7 @@ export interface ICustomCommandsResponse {
 }
 
 export interface ICommandVariablesResponse {
-  [id: number] : ICommandVariables;
+  [id: number] : ICommandVariable;
 }
 
 export interface ITimersResponse {
@@ -168,8 +168,12 @@ export interface ICustomCommand {
 }
 
 // command variables
-export interface ICommandVariables {
-  [id: string]: any
+export interface ICommandVariable {
+  variable: string;
+  description: string;
+  example: string;
+  result: string;
+  tags: string[];
 }
 
 // timers

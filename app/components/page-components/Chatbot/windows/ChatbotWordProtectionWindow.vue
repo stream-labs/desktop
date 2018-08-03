@@ -10,7 +10,7 @@
   </div>
   <div slot="content" class="chatbot-word-protection__container">
     <div v-if="selectedTab === 'general' && wordProtection">
-      <div class="row">
+      <div>
         <label for="excluded" class="margin-vertical--10">Auto Permit</label>
         <ListInput
           v-model="wordProtection.general.excluded.level"

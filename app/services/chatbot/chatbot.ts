@@ -152,9 +152,11 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   fetchCommandVariables() {
-    // fetch command variables
-    // and then UPDATE_COMMAND_VARIABLES(response);
-    // assuming response is [{}]
+    return this.api('GET', 'commands/variables', {}).then(
+      (response: ICommandVariablesResponse) => {
+        this.UPDATE_COMMAND_VARIABLES(response);
+      }
+    );
   }
 
   fetchTimers(page?: number) {
