@@ -401,8 +401,6 @@ export function setPropertiesFormData(obsSource: obs.ISource, form: TObsFormData
   const formInputs: IObsInput<TObsValue>[] = [];
   let properties = null;
 
-  console.log('set propreties', form);
-
   form.forEach(item => {
     if (item.type === 'OBS_PROPERTY_BUTTON') {
       // Value will be true if button was pressed
