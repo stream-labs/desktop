@@ -2,12 +2,12 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
 import { Inject } from 'util/injector';
-import WToggleInput from 'components/shared/widget-inputs/WToggleInput.vue';
+import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import Tabs from 'components/Tabs.vue';
 
 @Component({
   components: {
-    WToggleInput,
+    ToggleInput,
     Tabs,
   }
 })

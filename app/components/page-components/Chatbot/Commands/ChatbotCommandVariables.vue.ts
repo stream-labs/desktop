@@ -5,7 +5,7 @@ import { Component } from 'vue-property-decorator';
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
   get variables() {
-    return this.chatbotApiService.state.command_variables_response;
+    return this.chatbotApiService.state.commandVariablesResponse;
   }
 
   mounted() {

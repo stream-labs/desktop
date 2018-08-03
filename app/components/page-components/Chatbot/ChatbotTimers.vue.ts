@@ -1,20 +1,20 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import {
-  TimersResponse,
-  TimersData,
-  Pagination,
-  ChatbotAPIPutResponse
+  ITimersResponse,
+  ITimersData,
+  IPagination,
+  IChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
   get timers() {
-    return this.chatbotApiService.state.timers_response.data;
+    return this.chatbotApiService.state.timersResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.timers_response.pagination.current;
+    return this.chatbotApiService.state.timersResponse.pagination.current;
   }
 
   mounted() {

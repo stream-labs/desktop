@@ -1,15 +1,16 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.9.4',
-  title: 'Transitions Overhaul',
+  version: '0.9.6',
+  title: 'Improving Stability 🔧',
+  showChest: false,
   notes: [
-    "We've completely overhauled transitions from the ground up. You can create as many transitions as you want, " +
-      'and set up connections to automatically use certain transitions between scenes of your choice.',
-    'Added a confirmation dialog when deleting sources',
-    'Fixed an issue where the active scene collection would be changed when restoring from cloud backup',
-    'Fixed an issue where animated gifs were not properly restored from cloud backup',
-    'Fixed an issue where logging into a different account would still display chat for the previous account',
-    'Fixed some crashes relating to the SLOBS chat window and starting a raid'
+    'The focus of this patch is improving overall stability of the application. ' +
+      'We have fixed a number of application crashes and are continuing to investigate ' +
+      'and fix crashes going forward.',
+    'Fixed an issue where the "Configure Video" button would not work ' +
+      'for Elgato capture cards.',
+    'Improved the performance of the source properties window and various settings inputs',
+    'Fixed a bug where incorrect source names were displayed in the compressor filter settings'
   ]
 };

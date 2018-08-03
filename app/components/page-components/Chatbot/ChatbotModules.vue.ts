@@ -4,7 +4,7 @@ import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotMod
 
 import {
   IChatbotModule,
-  ChatAlertsResponse
+  IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -23,6 +23,7 @@ export default class ChatbotModules extends ChatbotBase {
       {
         title: 'Chat Alerts',
         description: 'Get notified in chat whenever an activity happens like Donations and Subscribers.',
+        backgroundUrl: require('../../../../media/images/chatbot/chatbot-alert.png'),
         enabled: this.chatAlertCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();
@@ -39,10 +40,10 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get chatAlerts() {
-    return this.chatbotApiService.state.chat_alerts_response;
+    return this.chatbotApiService.state.chatAlertsResponse;
   }
 
   get chatAlertCurrentlyEnabled() {
-    return this.chatbotApiService.state.chat_alerts_response.enabled == true;
+    return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
   }
 }

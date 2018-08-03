@@ -263,7 +263,7 @@ export class ApiClient {
 
     return new Proxy(resourceModel, {
 
-      get: (target, property, receiver) => {
+      get: (target, property: string, receiver) => {
 
 
         if (resourceModel[property] !== void 0) return resourceModel[property];

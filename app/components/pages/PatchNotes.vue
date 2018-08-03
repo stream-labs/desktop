@@ -1,6 +1,7 @@
 <template>
 <div class="patch-notes-page">
   <div
+    v-if="notes.showChest"
     class="patch-notes-container patch-notes-container--closed"
     :class="{ 'patch-notes-container--closing': patchNotesClosing }">
     <div class="patch-notes-content">
@@ -27,8 +28,11 @@
   </div>
 
   <div
-    class="patch-notes-container patch-notes-container--opened"
-    :class="{ 'patch-notes-container--opening': patchNotesOpening }">
+    class="patch-notes-container"
+    :class="{
+      'patch-notes-container--opened': notes.showChest,
+      'patch-notes-container--opening': patchNotesOpening
+    }">
     <div class="patch-notes-content">
       <div class="patch-notes-header">
         <div class="patch-notes-title">
@@ -41,8 +45,8 @@
       <ul class="patch-notes-list">
         <li
           class="patch-notes-item"
-          v-for="(item, index) in notes.notes"
-          :key="index">
+          v-for="item in notes.notes"
+          :key="item">
           {{ item }}
         </li>
       </ul>

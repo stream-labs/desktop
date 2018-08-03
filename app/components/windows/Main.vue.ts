@@ -22,6 +22,7 @@ import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
+import DesignSystem from '../pages/DesignSystem.vue';
 
 @Component({
   mixins: [windowMixin],
@@ -37,7 +38,8 @@ import PatchNotes from '../pages/PatchNotes.vue';
     StudioFooter,
     CustomLoader,
     PatchNotes,
-    Chatbot
+    Chatbot,
+    DesignSystem
   }
 })
 export default class Main extends Vue {

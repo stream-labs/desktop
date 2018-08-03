@@ -37,7 +37,7 @@
           <td> {{ $t(command.response) }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 :value="command.enabled"
                 @input="toggleEnableCommand(command.id, index, !command.enabled)"
               />
@@ -58,12 +58,15 @@
 
 tbody tr {
   .transition;
-  .cursor--pointer;
 
   &:hover {
     td {
       color: black;
     }
+  }
+
+  td {
+    color: black;
   }
 
   td:first-child {
@@ -74,7 +77,6 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-    color: white;
 
     .icon-edit {
       font-size: 10px;
@@ -89,19 +91,14 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-  }
 
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
-
-    &:hover {
-      td {
-        color: white;
-      }
+    .transition;
+    td {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {

@@ -26,17 +26,20 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
+import BitGoal from 'components/widgets/goal/BitGoal.vue';
+import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
+import ChatBox from 'components/widgets/ChatBox.vue';
+import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
+import ViewerCount from 'components/widgets/ViewerCount.vue';
+import StreamBoss from 'components/widgets/StreamBoss.vue';
+import DonationTicker from 'components/widgets/DonationTicker.vue';
+import Credits from 'components/widgets/Credits.vue';
+import EventList from 'components/widgets/EventList.vue';
 
 import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
-
-import BitGoal from 'components/widget-settings/goal/BitGoal.vue';
-import DonationGoal from 'components/widget-settings/goal/DonationGoal.vue';
-import ChatBox from 'components/widget-settings/ChatBox.vue';
-import FollowerGoal from 'components/widget-settings/goal/FollowerGoal.vue';
-import ViewerCount from 'components/widget-settings/ViewerCount.vue';
-import StreamBoss from 'components/widget-settings/StreamBoss.vue';
+import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -107,11 +110,15 @@ export class WindowsService extends StatefulService<IWindowsState> {
     FollowerGoal,
     ChatBox,
     ViewerCount,
+    DonationTicker,
+    Credits,
+    EventList,
     StreamBoss,
 
     ChatbotCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
+    ChatbotCapsProtectionWindow,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

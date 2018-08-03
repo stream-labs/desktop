@@ -1,30 +1,30 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import WTextInput from 'components/shared/widget-inputs/WTextInput.vue';
-import WTextAreaInput from 'components/shared/widget-inputs/WTextAreaInput.vue';
-import WListInput from 'components/shared/widget-inputs/WListInput.vue';
+import TextInput from 'components/shared/inputs/TextInput.vue';
+import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
+import ListInput from 'components/shared/inputs/ListInput.vue';
 
 import {
-  CustomCommand,
+  ICustomCommand,
   ChatbotPermissions,
   ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
 
 
 import {
-  IWListMetadata,
-  IWTextMetadata,
-} from 'components/shared/widget-inputs/WInput';
+  IListMetadata,
+  ITextMetadata,
+} from 'components/shared/inputs/index';
 
 @Component({
   components: {
-    WTextInput,
-    WTextAreaInput,
-    WListInput
+    TextInput,
+    TextAreaInput,
+    ListInput
   }
 })
 export default class ChatbotCommandWindow extends ChatbotWindowsBase {
-  newCommand: CustomCommand = {
+  newCommand: ICustomCommand = {
     command: null,
     response: null,
     response_type: 'Chat',
@@ -55,15 +55,15 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
   selectedTab: string = 'general';
 
   // metadata
-  commandMetadata: IWTextMetadata = {
+  commandMetadata: ITextMetadata = {
     required: true,
     placeholder: 'Enter the text string which will trigger the response'
   };
-  responseMetadata: IWTextMetadata = {
+  responseMetadata: ITextMetadata = {
     required: true,
     placeholder: 'The phrase that will appear after a user enters the command'
   };
-  permissionMetadata: IWListMetadata<number> = {
+  permissionMetadata: IListMetadata<number> = {
     options: Object.keys(ChatbotPermissions)
       .map(permission => {
         return {
@@ -74,7 +74,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
       .filter((listItem) => typeof listItem.value === 'number')
   };
 
-  showToMetadata: IWListMetadata<string> = {
+  showToMetadata: IListMetadata<string> = {
     options: Object.keys(ChatbotResponseTypes).map(responseType => {
       return {
         value: ChatbotResponseTypes[responseType],

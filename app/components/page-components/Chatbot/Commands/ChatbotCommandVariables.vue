@@ -62,19 +62,15 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-  }
 
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    .transition;
 
-    &:hover {
-      td {
-        color: white;
-      }
+    td {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {

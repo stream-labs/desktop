@@ -39,7 +39,7 @@
           <td> {{ timer.chat_lines }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 :value="timer.enabled"
                 @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
               />
@@ -77,7 +77,6 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-    color: white;
 
     .icon-edit {
       font-size: 10px;
@@ -100,6 +99,7 @@ tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    color: white;
 
     &:hover {
       td {
