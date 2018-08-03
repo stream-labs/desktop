@@ -3,9 +3,11 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import {
   IChatAlertsResponse,
-  IAlertMessage
+  IAlertMessage,
+  ChatbotAlertTypes
 } from 'services/chatbot/chatbot-interfaces';
-import { debug } from 'util';
+
+const NEW_ALERT_MODAL_ID = 'new-alert';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
@@ -27,7 +29,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return alertTypes;
   }
 
-  platformForAlertType(type: string) {
+  platformForAlertType(type: ChatbotAlertTypes) {
     if (type === 'tip') return 'streamlabs';
     return 'twitch';
   }
@@ -35,8 +37,8 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   // preparing data to send to service
 
   // update/delete alert
-  spliceAlertMessages(
-    type: string,
+  async spliceAlertMessages(
+    type: ChatbotAlertTypes,
     index: number,
     updatedAlert: IAlertMessage,
     tier?: string
@@ -53,38 +55,30 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       );
     }
 
-    // ideally want to do spread operater splice(...spliceArgs)
-    // let spliceArgs = [index, 1];
-    // if (updatedAlert) spliceArgs.push(updatedAlert);
-
-    // but TS doesnt like it
-    // https://github.com/Microsoft/TypeScript/issues/4130
-
-    this.updateChatAlerts(newAlertsObject).then(() => {
-      this.$modal.hide('new-alert');
-    });
+    this.updateChatAlerts(newAlertsObject);
+    await this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
   // toggle enable type
-  toggleEnableAlert(type: string) {
+  async toggleEnableAlert(type: ChatbotAlertTypes) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
     newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
       .settings[platform][type].enabled;
+
     this.updateChatAlerts(newAlertsObject);
   }
 
   // add new alert
-  addNewAlert(type: string, newAlert: any) {
+  async addNewAlert(type: ChatbotAlertTypes, newAlert: any) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
     newAlertsObject.settings[platform][type].messages.push(newAlert);
 
-    this.updateChatAlerts(newAlertsObject).then(() => {
-      this.$modal.hide('new-alert');
-    });
+    this.updateChatAlerts(newAlertsObject);
+    await this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
   // calls to service methods

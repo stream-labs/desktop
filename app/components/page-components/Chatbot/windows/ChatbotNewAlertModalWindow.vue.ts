@@ -79,7 +79,7 @@ interface INewAlertData {
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop() selectedType: string;
 
-  onSubmit: Function = () => {};
+  onSubmitHandler: Function = () => {};
 
   newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
 
@@ -195,7 +195,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: null,
           message: null,
           is_gifted: false,
-          tier: 'Prime',
+          tier: 'Prime'
         }
       },
       tip: {
@@ -221,8 +221,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   bindOnSubmitAndCheckIfEdited(event: any) {
-    const { onSubmit, editedAlert } = event.params;
-    this.onSubmit = onSubmit;
+    const { onSubmitHandler, editedAlert } = event.params;
+    this.onSubmitHandler = onSubmitHandler;
     if (editedAlert) {
       this.newAlert[this.selectedType].newMessage = cloneDeep(editedAlert);
     } else {
@@ -235,6 +235,6 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   submit() {
-    this.onSubmit(this.newAlert[this.selectedType].newMessage);
+    this.onSubmitHandler(this.newAlert[this.selectedType].newMessage);
   }
 }

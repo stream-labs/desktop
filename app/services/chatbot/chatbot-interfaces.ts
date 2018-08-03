@@ -222,3 +222,5 @@ export enum ChatbotResponseTypes {
   Chat = 'Chat',
   Whisper = 'Whisper'
 }
+
+export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';

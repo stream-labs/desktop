@@ -1,6 +1,7 @@
 import { Component } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotModule.vue';
+import { $t } from 'services/i18n';
 
 import {
   IChatbotModule,
@@ -23,8 +24,8 @@ export default class ChatbotModTools extends ChatbotBase {
   get modules() {
     let modules: IChatbotModule[] = [
       {
-        title: 'Caps Protection',
-        description: 'Restrict viewers from spamming all caps messages to chat.',
+        title: $t('Caps Protection'),
+        description: $t('Restrict viewers from spamming all caps messages to chat.'),
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-caps-protection.png'),
         enabled: this.capsProtectionCurrentlyEnabled,
         onExpand: () => {
@@ -38,8 +39,8 @@ export default class ChatbotModTools extends ChatbotBase {
         }
       },
       {
-        title: 'Symbol Protection',
-        description: 'Restrict viewers from spamming messages with too many symbols.',
+        title: $t('Symbol Protection'),
+        description: $t('Restrict viewers from spamming messages with too many symbols.'),
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-symbol-protection.png'),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
@@ -53,8 +54,8 @@ export default class ChatbotModTools extends ChatbotBase {
         }
       },
       {
-        title: 'Link Protection',
-        description: 'Allows a viewer to only send links to chat from websites on the whitelist.',
+        title: $t('Link Protection'),
+        description: $t('Allows a viewer to only send links to chat from websites on the whitelist.'),
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-link-protection.png'),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
@@ -68,8 +69,8 @@ export default class ChatbotModTools extends ChatbotBase {
         }
       },
       {
-        title: 'Word Protection',
-        description: 'Restrict words from appearing on chat and add words to your blacklist.',
+        title: $t('Word Protection'),
+        description: $t('Restrict words from appearing on chat and add words to your blacklist.'),
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-word-protection.png'),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
