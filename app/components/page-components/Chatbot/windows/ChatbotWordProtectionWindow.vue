@@ -9,25 +9,27 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-word-protection__container">
-    <div v-if="selectedTab === 'general' && wordProtection">
-      <div>
-        <label for="excluded" class="margin-vertical--10">Auto Permit</label>
-        <ListInput
-          v-model="wordProtection.general.excluded.level"
-          :metadata="metadata.word.general.excluded.level"
-        />
+    <transition name='fade' mode="out-in" appear>
+      <div v-if="selectedTab === 'general' && wordProtection">
+        <div>
+          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+          <ListInput
+            v-model="wordProtection.general.excluded.level"
+            :metadata="metadata.word.general.excluded.level"
+          />
+        </div>
+        <div>
+          <label for="message" class="margin-vertical--10">Punishment Message</label>
+          <TextAreaInput
+            v-model="wordProtection.general.message"
+            :metadata="metadata.word.general.message"
+          />
+        </div>
       </div>
-      <div>
-        <label for="message" class="margin-vertical--10">Punishment Message</label>
-        <TextAreaInput
-          v-model="wordProtection.general.message"
-          :metadata="metadata.word.general.message"
-        />
+      <div v-if="selectedTab === 'blacklist'">
+        blacklist Stuff
       </div>
-    </div>
-    <div v-if="selectedTab === 'blacklist'">
-      blacklist Stuff
-    </div>
+    </transition>
   </div>
   <div slot="controls">
     <button

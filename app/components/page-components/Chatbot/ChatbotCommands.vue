@@ -2,13 +2,19 @@
 <div>
   <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
     <div slot='custom'>
-      <ChatbotCustomCommands />
+      <transition name="fade" mode="out-in" appear>
+        <ChatbotCustomCommands />
+      </transition>
     </div>
     <div slot="default">
-      <ChatbotDefaultCommands />
+      <transition name="fade" mode="out-in">
+        <ChatbotDefaultCommands />
+      </transition>
     </div>
     <div slot="variables">
-      <ChatbotCommandVariables />
+      <transition name="fade" mode="out-in">
+        <ChatbotCommandVariables />
+      </transition>
     </div>
   </Tabs>
 </div>

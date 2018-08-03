@@ -9,41 +9,43 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-caps-protection__container">
-    <div v-if="selectedTab === 'general' && capsProtection">
-      <div class="row">
-        <div class="small-6 columns">
-          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
-          <ListInput
-            v-model="capsProtection.general.excluded.level"
-            :metadata="metadata.caps.general.excluded.level"
+    <transition name='fade' mode="out-in" appear>
+      <div v-if="selectedTab === 'general' && capsProtection">
+        <div class="row">
+          <div class="small-6 columns">
+            <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+            <ListInput
+              v-model="capsProtection.general.excluded.level"
+              :metadata="metadata.caps.general.excluded.level"
+            />
+          </div>
+          <div class="small-6 columns">
+            <label for="show to" class="margin-vertical--10">Punishment</label>
+            <ListInput
+              v-model="capsProtection.general.punishment.type"
+              :metadata="metadata.caps.general.punishment.type"
+            />
+          </div>
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Punishment Duration</label>
+          <NumberInput
+            v-model="capsProtection.general.punishment.duration"
+            :metadata="metadata.caps.general.punishment.duration"
           />
         </div>
-        <div class="small-6 columns">
-          <label for="show to" class="margin-vertical--10">Punishment</label>
-          <ListInput
-            v-model="capsProtection.general.punishment.type"
-            :metadata="metadata.caps.general.punishment.type"
+        <div>
+          <label for="response" class="margin-vertical--10">Punishment Response</label>
+          <TextAreaInput
+            v-model="capsProtection.general.message"
+            :metadata="metadata.caps.general.message"
           />
         </div>
       </div>
-      <div>
-        <label for="response" class="margin-vertical--10">Punishment Duration</label>
-        <NumberInput
-          v-model="capsProtection.general.punishment.duration"
-          :metadata="metadata.caps.general.punishment.duration"
-        />
+      <div v-if="selectedTab === 'advanced'">
+        Advanced Stuff
       </div>
-      <div>
-        <label for="response" class="margin-vertical--10">Punishment Response</label>
-        <TextAreaInput
-          v-model="capsProtection.general.message"
-          :metadata="metadata.caps.general.message"
-        />
-      </div>
-    </div>
-    <div v-if="selectedTab === 'advanced'">
-      Advanced Stuff
-    </div>
+    </transition>
   </div>
   <div slot="controls">
     <button

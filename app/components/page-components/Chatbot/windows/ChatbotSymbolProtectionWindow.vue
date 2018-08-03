@@ -9,41 +9,43 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-symbol-protection__container">
-    <div v-if="selectedTab === 'general' && symbolProtection">
-      <div class="row">
-        <div class="small-6 columns">
-          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
-          <ListInput
-            v-model="symbolProtection.general.excluded.level"
-            :metadata="metadata.symbol.general.excluded.level"
+    <transition name='fade' mode="out-in" appear>
+      <div v-if="selectedTab === 'general' && symbolProtection">
+        <div class="row">
+          <div class="small-6 columns">
+            <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+            <ListInput
+              v-model="symbolProtection.general.excluded.level"
+              :metadata="metadata.symbol.general.excluded.level"
+            />
+          </div>
+          <div class="small-6 columns">
+            <label for="show to" class="margin-vertical--10">Punishment</label>
+            <ListInput
+              v-model="symbolProtection.general.punishment.type"
+              :metadata="metadata.symbol.general.punishment.type"
+            />
+          </div>
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Punishment Duration</label>
+          <NumberInput
+            v-model="symbolProtection.general.punishment.duration"
+            :metadata="metadata.symbol.general.punishment.duration"
           />
         </div>
-        <div class="small-6 columns">
-          <label for="show to" class="margin-vertical--10">Punishment</label>
-          <ListInput
-            v-model="symbolProtection.general.punishment.type"
-            :metadata="metadata.symbol.general.punishment.type"
+        <div>
+          <label for="response" class="margin-vertical--10">Punishment Response</label>
+          <TextAreaInput
+            v-model="symbolProtection.general.message"
+            :metadata="metadata.symbol.general.message"
           />
         </div>
       </div>
-      <div>
-        <label for="response" class="margin-vertical--10">Punishment Duration</label>
-        <NumberInput
-          v-model="symbolProtection.general.punishment.duration"
-          :metadata="metadata.symbol.general.punishment.duration"
-        />
+      <div v-if="selectedTab === 'advanced'">
+        Advanced Stuff
       </div>
-      <div>
-        <label for="response" class="margin-vertical--10">Punishment Response</label>
-        <TextAreaInput
-          v-model="symbolProtection.general.message"
-          :metadata="metadata.symbol.general.message"
-        />
-      </div>
-    </div>
-    <div v-if="selectedTab === 'advanced'">
-      Advanced Stuff
-    </div>
+    </transition>
   </div>
   <div slot="controls">
     <button

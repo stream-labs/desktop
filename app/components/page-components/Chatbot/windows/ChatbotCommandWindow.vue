@@ -9,41 +9,43 @@
     </Tabs>
   </div>
   <div slot="content" class="chatbot-add-command__container">
-    <div v-if="selectedTab === 'general'">
-      <div>
-        <label for="command" class="margin-vertical--10">Command</label>
-        <TextInput
-          v-model="newCommand.command"
-          :metadata="commandMetadata"
-        />
-      </div>
-      <div>
-        <label for="response" class="margin-vertical--10">Response</label>
-        <TextAreaInput
-          v-model="newCommand.response"
-          :metadata="responseMetadata"
-        />
-      </div>
-      <div class="row">
-        <div class="small-6 columns">
-          <label for="permission" class="margin-vertical--10">Permission</label>
-          <ListInput
-            v-model="newCommand.permission.level"
-            :metadata="permissionMetadata"
+    <transition name='fade' mode="out-in" appear>
+      <div v-if="selectedTab === 'general'">
+        <div>
+          <label for="command" class="margin-vertical--10">Command</label>
+          <TextInput
+            v-model="newCommand.command"
+            :metadata="commandMetadata"
           />
         </div>
-        <div class="small-6 columns">
-          <label for="show to" class="margin-vertical--10">Show to</label>
-          <ListInput
-            v-model="newCommand.response_type"
-            :metadata="showToMetadata"
+        <div>
+          <label for="response" class="margin-vertical--10">Response</label>
+          <TextAreaInput
+            v-model="newCommand.response"
+            :metadata="responseMetadata"
           />
         </div>
+        <div class="row">
+          <div class="small-6 columns">
+            <label for="permission" class="margin-vertical--10">Permission</label>
+            <ListInput
+              v-model="newCommand.permission.level"
+              :metadata="permissionMetadata"
+            />
+          </div>
+          <div class="small-6 columns">
+            <label for="show to" class="margin-vertical--10">Show to</label>
+            <ListInput
+              v-model="newCommand.response_type"
+              :metadata="showToMetadata"
+            />
+          </div>
+        </div>
       </div>
-    </div>
-    <div v-if="selectedTab === 'advanced'">
-      Advanced Stuff
-    </div>
+      <div v-if="selectedTab === 'advanced'">
+        Advanced Stuff
+      </div>
+    </transition>
   </div>
   <div slot="controls">
     <button
