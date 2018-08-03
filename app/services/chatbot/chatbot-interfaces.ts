@@ -224,3 +224,6 @@ export enum ChatbotResponseTypes {
 }
 
 export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
+
+// modals (inside child window)
+export const NEW_ALERT_MODAL_ID = 'new-alert';

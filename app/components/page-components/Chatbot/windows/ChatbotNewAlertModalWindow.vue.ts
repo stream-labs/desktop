@@ -13,7 +13,8 @@ import {
 } from 'components/shared/inputs/index';
 
 import {
-  IAlertMessage
+  IAlertMessage,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
 interface INewAlertMetadata {
@@ -231,7 +232,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   cancel() {
-    this.$modal.hide('new-alert');
+    this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
   submit() {

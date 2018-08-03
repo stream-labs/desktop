@@ -4,10 +4,9 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import {
   IChatAlertsResponse,
   IAlertMessage,
-  ChatbotAlertTypes
+  ChatbotAlertTypes,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
-
-const NEW_ALERT_MODAL_ID = 'new-alert';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {

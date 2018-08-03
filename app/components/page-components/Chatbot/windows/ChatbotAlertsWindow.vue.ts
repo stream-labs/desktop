@@ -9,7 +9,8 @@ import { $t } from 'services/i18n';
 
 import {
   IAlertMessage,
-  ChatbotAlertTypes
+  ChatbotAlertTypes,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -47,7 +48,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   showNewChatAlertWindow() {
-    this.$modal.show('new-alert', {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
       onSubmitHandler: (newAlert: IAlertMessage) => {
         this.addNewAlert(this.selectedType, newAlert);
       }
@@ -55,7 +56,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   onEdit(message: IAlertMessage, index: number) {
-    this.$modal.show('new-alert', {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
       editedAlert: message,
       onSubmitHandler: (updatedAlert: IAlertMessage) => {
         this.spliceAlertMessages(this.selectedType, index, updatedAlert);
