@@ -23,7 +23,6 @@ export enum EInputType {
 export interface IInputMetadata {
   required?: boolean;
   description?: string;
-  hint?: string;
   type?: EInputType;
   title?: string;
   tooltip?: string;
