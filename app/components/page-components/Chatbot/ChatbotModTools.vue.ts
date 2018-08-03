@@ -77,7 +77,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-word-protection.png'),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openWordProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateWordProtection({

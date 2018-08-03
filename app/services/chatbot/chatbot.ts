@@ -423,6 +423,17 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openWordProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotWordProtectionWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+
   showToast(message: string, options: object) {
     this.state.toasted.show(message, options);
   }

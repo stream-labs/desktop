@@ -221,7 +221,7 @@ export interface IAlertMessage {
 
 // protections
 export interface IProtectionGeneral {
-  punishment: IPunishment;
+  punishment?: IPunishment;
   excluded: IExcluded;
   message: string;
 }

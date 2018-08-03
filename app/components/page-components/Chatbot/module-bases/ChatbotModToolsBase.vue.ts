@@ -70,20 +70,22 @@ interface ILinkProtectionMetadata {
   new_blacklist_item: ITextMetadata;
 }
 
+interface IWordProtectionBlacklistItem {
+  text: ITextMetadata;
+  is_regex: IInputMetadata;
+  punishment: IPunishmentMetadata;
+}
+
 interface IWordProtectionMetadata {
   general: IProtectionGeneralMetadata;
-  new_blacklist_item: {
-    text: ITextMetadata;
-    is_regex: IInputMetadata;
-    punishment: IPunishmentMetadata;
-  }
+  new_blacklist_item: IWordProtectionBlacklistItem;
 }
 
 interface IProtectionMetadata {
   caps: ICapsProtectionMetadata;
   symbol: ISymbolProtectionMetadata;
   link: ILinkProtectionMetadata;
-  word?: IWordProtectionMetadata;
+  word: IWordProtectionMetadata;
 }
 
 
@@ -171,7 +173,9 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       },
       message: {
         required: true,
-        placeholder: `The phrase that will appear after a viewer enters too many ${ this.label(protectionType) }.`
+        placeholder: `The phrase that will appear after a viewer enters too many ${this.label(
+          protectionType
+        )}.`
       }
     };
   }
@@ -180,12 +184,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return {
       minimum: {
         required: true,
-        placeholder: `Minimum amount of ${ this.label(protectionType) }`,
+        placeholder: `Minimum amount of ${this.label(protectionType)}`,
         min: 0
       },
       maximum: {
         required: true,
-        placeholder: `Maximum amount of ${ this.label(protectionType) }`,
+        placeholder: `Maximum amount of ${this.label(protectionType)}`,
         min: 0
       },
       percent: {
@@ -201,21 +205,21 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       permit: {
         command: {
           required: true,
-          placeholder: 'Command phrase',
+          placeholder: 'Command phrase'
         },
         description: {
           required: true,
-          placeholder: 'Command description',
+          placeholder: 'Command description'
         },
         response: {
           required: true,
-          placeholder: 'Message in chat',
+          placeholder: 'Message in chat'
         },
         response_type: {
           options: Object.keys(ChatbotResponseTypes).map(responseType => {
             return {
               value: ChatbotResponseTypes[responseType],
-              title: responseType,
+              title: responseType
             };
           })
         },
@@ -224,7 +228,35 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           placeholder: 'New Command Alias'
         }
       }
-    }
+    };
+  }
+
+  get wordBlacklistItemMetadata() {
+    return {
+      text: {
+        required: true,
+        placeholder: 'word to protect',
+      },
+      is_regex: {
+        required: true,
+      },
+      punishment: {
+        type: {
+          required: true,
+          options: Object.keys(ChatbotPunishments).map(punishmentType => {
+            return {
+              value: ChatbotPunishments[punishmentType],
+              title: punishmentType
+            };
+          })
+        },
+        duration: {
+          required: true,
+          placeholder: 'Punishment Duration in minutes',
+          min: 0
+        }
+      },
+    };
   }
 
   get metadata() {
@@ -247,7 +279,11 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         new_blacklist_item: {
           required: true,
           placeholder: 'Link to blacklist'
-        },
+        }
+      },
+      word: {
+        general: this.generalMetadata('words'),
+        new_blacklist_item: this.wordBlacklistItemMetadata
       }
     };
     return metadata;

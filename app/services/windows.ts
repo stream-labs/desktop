@@ -44,6 +44,8 @@ import ChatbotSymbolProtectionWindow
   from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
 import ChatbotLinkProtectionWindow
   from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
+import ChatbotWordProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -125,6 +127,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ChatbotCapsProtectionWindow,
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
+    ChatbotWordProtectionWindow,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};
