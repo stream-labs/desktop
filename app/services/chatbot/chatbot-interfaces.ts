@@ -285,8 +285,9 @@ export interface IWordProtectionBlackListItem {
 }
 
 
+
 // dictionaries
-export enum ChatbotPermissions {
+export enum ChatbotPermissionsEnums {
   None = 0,
   Viewer = 1,
   Subscriber = 1 << 1,
@@ -305,3 +306,8 @@ export enum ChatbotResponseTypes {
   Chat = 'Chat',
   Whisper = 'Whisper'
 }
+
+export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
+
+// modals (inside child window)
+export const NEW_ALERT_MODAL_ID = 'new-alert';

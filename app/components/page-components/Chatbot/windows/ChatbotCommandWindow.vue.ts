@@ -6,7 +6,6 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 
 import {
   ICustomCommand,
-  ChatbotPermissions,
   ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
 
@@ -63,25 +62,20 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     required: true,
     placeholder: 'The phrase that will appear after a user enters the command'
   };
-  permissionMetadata: IListMetadata<number> = {
-    options: Object.keys(ChatbotPermissions)
-      .map(permission => {
-        return {
-          value: ChatbotPermissions[permission],
-          title: permission
-        };
-      })
-      .filter((listItem) => typeof listItem.value === 'number')
-  };
 
-  showToMetadata: IListMetadata<string> = {
-    options: Object.keys(ChatbotResponseTypes).map(responseType => {
-      return {
-        value: ChatbotResponseTypes[responseType],
-        title: responseType,
-      };
-    })
-  };
+  get permissionMetadata() {
+    let permissionMetadata: IListMetadata<number> = {
+      options: this.chatbotPermissions
+    };
+    return permissionMetadata;
+  }
+
+  get showToMetadata() {
+    let showToMetadata: IListMetadata<string> = {
+      options: this.chatbotResponseTypes
+    };
+    return showToMetadata;
+  }
 
   onSelectTab(tab: string) {
     this.selectedTab = tab;

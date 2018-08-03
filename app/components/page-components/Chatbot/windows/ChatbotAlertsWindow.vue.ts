@@ -5,9 +5,12 @@ import NavItem from 'components/shared/NavItem.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windows/ChatbotNewAlertModalWindow.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
+import { $t } from 'services/i18n';
 
 import {
-  IAlertMessage
+  IAlertMessage,
+  ChatbotAlertTypes,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -19,10 +22,9 @@ import {
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
-  selectedType = 'follow';
+  selectedType: ChatbotAlertTypes = 'follow';
 
   get selectedTypeData() {
-    console.log(this.alertTypes);
     return this.alertTypes[this.selectedType];
   }
 
@@ -41,22 +43,22 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     return [];
   }
 
-  isEnabled(type: string) {
+  isEnabled(type: ChatbotAlertTypes) {
     return this.alertTypes[type].enabled;
   }
 
   showNewChatAlertWindow() {
-    this.$modal.show('new-alert', {
-      onSubmit: (newAlert: IAlertMessage) => {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
+      onSubmitHandler: (newAlert: IAlertMessage) => {
         this.addNewAlert(this.selectedType, newAlert);
       }
     });
   }
 
   onEdit(message: IAlertMessage, index: number) {
-    this.$modal.show('new-alert', {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
       editedAlert: message,
-      onSubmit: (updatedAlert: IAlertMessage) => {
+      onSubmitHandler: (updatedAlert: IAlertMessage) => {
         this.spliceAlertMessages(this.selectedType, index, updatedAlert);
       }
     });
@@ -71,12 +73,10 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   // filters
-  formatNumber(value: number, dp?: number) {
+  formatNumber(value: number, dp = 2) {
     if (isNaN(Number(value))) {
       return value;
     }
-
-    if (dp === undefined) dp = 2;
 
     return value.toLocaleString(undefined, {
       maximumFractionDigits: dp,
@@ -100,7 +100,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
       case 'message':
         return value;
       case 'is_gifted':
-        return value === true ? 'Yes' : 'No';
+        return value === true ? $t('Yes') : $t('No');
       default:
         return value;
     }

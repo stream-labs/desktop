@@ -13,14 +13,15 @@ import {
 } from 'components/shared/inputs/index';
 
 import {
-  IAlertMessage
+  IAlertMessage,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
 interface INewAlertMetadata {
   follow: {
     newMessage: {
       message: ITextMetadata;
-    }
+    };
   },
   sub: {
     newMessage: {
@@ -79,7 +80,7 @@ interface INewAlertData {
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop() selectedType: string;
 
-  onSubmit: Function = () => {};
+  onSubmitHandler: Function = () => {};
 
   newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
 
@@ -221,8 +222,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   bindOnSubmitAndCheckIfEdited(event: any) {
-    const { onSubmit, editedAlert } = event.params;
-    this.onSubmit = onSubmit;
+    const { onSubmitHandler, editedAlert } = event.params;
+    this.onSubmitHandler = onSubmitHandler;
     if (editedAlert) {
       this.newAlert[this.selectedType].newMessage = cloneDeep(editedAlert);
     } else {
@@ -231,10 +232,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   cancel() {
-    this.$modal.hide('new-alert');
+    this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
   submit() {
-    this.onSubmit(this.newAlert[this.selectedType].newMessage);
+    this.onSubmitHandler(this.newAlert[this.selectedType].newMessage);
   }
 }

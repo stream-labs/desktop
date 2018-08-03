@@ -145,12 +145,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       punishment: {
         type: {
           required: true,
-          options: Object.keys(ChatbotPunishments).map(punishmentType => {
-            return {
-              value: ChatbotPunishments[punishmentType],
-              title: punishmentType
-            };
-          })
+          options: this.chatbotPunishments
         },
         duration: {
           required: true,
@@ -161,14 +156,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       excluded: {
         level: {
           required: true,
-          options: Object.keys(ChatbotPermissions)
-            .map(permission => {
-              return {
-                value: ChatbotPermissions[permission],
-                title: permission
-              };
-            })
-            .filter(listItem => typeof listItem.value === 'number')
+          options: this.chatbotPermissions
         }
       },
       message: {
@@ -216,12 +204,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           placeholder: 'Message in chat'
         },
         response_type: {
-          options: Object.keys(ChatbotResponseTypes).map(responseType => {
-            return {
-              value: ChatbotResponseTypes[responseType],
-              title: responseType
-            };
-          })
+          options: this.chatbotResponseTypes
         },
         new_alias: {
           required: false,
@@ -243,12 +226,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       punishment: {
         type: {
           required: true,
-          options: Object.keys(ChatbotPunishments).map(punishmentType => {
-            return {
-              value: ChatbotPunishments[punishmentType],
-              title: punishmentType
-            };
-          })
+          options: this.chatbotPunishments
         },
         duration: {
           required: true,
