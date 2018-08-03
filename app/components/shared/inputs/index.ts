@@ -58,6 +58,11 @@ export interface IListOption<TValue> {
   description?: string;
 }
 
+export interface IMediaGalleryMetadata extends IInputMetadata {
+  fileName: string;
+  clearImage: string;
+}
+
 // a helper for creating metadata
 export const metadata = {
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),

@@ -12,7 +12,7 @@ export enum WidgetType {
   DonationTicker = 5,
   ChatBox = 6,
   EventList = 7,
-  TheJar = 8,
+  TipJar = 8,
   ViewerCount = 9,
   StreamBoss = 10,
   Credits = 11,
@@ -214,7 +214,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.NorthEast
   },
 
-  [WidgetType.TheJar]: {
+  [WidgetType.TipJar]: {
     name: 'The Jar',
     url(host, token) {
       return `https://${host}/widgets/tip-jar/v1/${token}`;
@@ -369,7 +369,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
       $t('Redemptions')
     ]
   },
-  [WidgetType.TheJar]: {
+  [WidgetType.TipJar]: {
     name: $t('The Jar'),
     description: $t('The jar that catches bits, tips, and more.'),
     demoVideo: true,

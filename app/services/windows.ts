@@ -38,7 +38,7 @@ import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
-
+import TipJar from 'components/widgets/TipJar.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -78,6 +78,7 @@ export function getComponents() {
     DonationTicker,
     Credits,
     EventList,
+    TipJar,
     StreamBoss
   };
 }
@@ -133,7 +134,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // This is a list of components that are registered to be
   // top level components in new child windows.
   components = getComponents();
-
 
   windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};

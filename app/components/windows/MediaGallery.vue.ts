@@ -48,11 +48,14 @@ export default class MediaGallery extends Vue {
   galleryInfo: IMediaGalleryInfo = null;
   busy: IToast = null;
 
-  private promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
   private typeMap = getTypeMap();
 
   async mounted() {
     this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
+  }
+
+  get promiseId() {
+    return this.windowsService.state.child.queryParams.promiseId;
   }
 
   get files() {

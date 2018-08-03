@@ -64,7 +64,7 @@ export default class WidgetProperties extends Vue {
       [WidgetType.DonationTicker]: 'donationticker',
       [WidgetType.ChatBox]: 'chatbox',
       [WidgetType.EventList]: 'eventlist',
-      [WidgetType.TheJar]: 'jar',
+      [WidgetType.TipJar]: 'jar',
       [WidgetType.ViewerCount]: 'viewercount',
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',
