@@ -64,14 +64,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     placeholder: 'The phrase that will appear after a user enters the command'
   };
   permissionMetadata: IListMetadata<number> = {
-    options: Object.keys(ChatbotPermissions)
-      .map(permission => {
-        return {
-          value: ChatbotPermissions[permission],
-          title: permission
-        };
-      })
-      .filter((listItem) => typeof listItem.value === 'number')
+    options: ChatbotPermissions
   };
 
   showToMetadata: IListMetadata<string> = {
@@ -82,6 +75,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
       };
     })
   };
+
 
   onSelectTab(tab: string) {
     this.selectedTab = tab;

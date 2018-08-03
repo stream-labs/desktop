@@ -209,7 +209,7 @@ export interface IAlertMessage {
 
 
 // dictionaries
-export enum ChatbotPermissions {
+export enum ChatbotPermissionsEnums {
   None = 0,
   Viewer = 1,
   Subscriber = 1 << 1,
@@ -217,6 +217,15 @@ export enum ChatbotPermissions {
   Broadcaster = 1 << 7,
   All = Viewer | Subscriber | Moderator | Broadcaster
 }
+
+export const ChatbotPermissions = Object.keys(ChatbotPermissionsEnums)
+  .reduce((a: any[], b: string) => {
+    if (typeof ChatbotPermissionsEnums[b] === 'number') {
+      a.push({ title: b, value: ChatbotPermissionsEnums[b] });
+      return a;
+    }
+  }, []);
+
 
 export enum ChatbotResponseTypes {
   Chat = 'Chat',
