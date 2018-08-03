@@ -33,7 +33,7 @@
   background-color: @day-secondary;
 
   img {
-    height: 110px;
+    max-height: 110px;
     width: auto;
     position: absolute;
     top: 50%;

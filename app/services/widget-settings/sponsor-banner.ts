@@ -51,9 +51,17 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
   protected patchAfterFetch(data: any): ISponsorBannerData {
     // make data structure interable and type-predictable
     data.settings.placement_1_images = data.settings.image_1_href
-      .map((href: string, i: number) => ({ href: href, duration: data.settings.placement1_durations[i] }))
+      .map((href: string, i: number) => {
+        const subbedHref = href === '/imgs/streamlabs.png' ?
+          'https://cdn.streamlabs.com/static/imgs/logos/logo.png' : href;
+        return ({ href: subbedHref, duration: data.settings.placement1_durations[i] });
+      });
     data.settings.placement_2_images = data.settings.image_2_href
-      .map((href: string, i: number) => ({ href: href, duration: data.settings.placement2_durations[i] }))
+      .map((href: string, i: number) => {
+        const subbedHref = href === '/imgs/streamlabs.png' ?
+          'https://cdn.streamlabs.com/static/imgs/logos/logo.png' : href;
+        return ({ href: subbedHref, duration: data.settings.placement2_durations[i] });
+      });
     return data;
   }
 

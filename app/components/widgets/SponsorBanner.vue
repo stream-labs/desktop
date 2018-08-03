@@ -39,7 +39,7 @@
       <image-layout v-model="wData.settings.layout" />
     </form-group>
 
-    <form-group v-for="position in positions" :key="position" :title="`${$t('Placement ')} ${position} ${$t('Images')}`">
+    <form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
       <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
         <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
         <button class="close-button" @click="removeImage(image.href, position)"><i class="icon-close" /></button>
