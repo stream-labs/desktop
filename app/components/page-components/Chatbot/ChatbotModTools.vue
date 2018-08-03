@@ -1,6 +1,10 @@
 <template>
-<div>
-  Chatbot Mod Toolssss
+<div class="align-items--inline">
+  <ChatbotModule
+    v-for="module in modules"
+    :key="module.title"
+    :chatbotModule="module"
+  />
 </div>
 </template>
 

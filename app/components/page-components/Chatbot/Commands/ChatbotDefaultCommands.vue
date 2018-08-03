@@ -43,7 +43,7 @@
           <td> {{ $t(command.description) }} </td>
           <td>
             <div class="align-items--inline">
-              <WToggleInput
+              <ToggleInput
                 v-if="typeof command.enabled === 'boolean'"
                 :value="command.enabled"
                 @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
@@ -114,19 +114,16 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-  }
 
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    .transition;
+    color: white;
 
-    &:hover {
-      td {
-        color: white;
-      }
+    td {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {

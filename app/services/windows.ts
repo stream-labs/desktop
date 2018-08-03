@@ -39,6 +39,7 @@ import EventList from 'components/widgets/EventList.vue';
 import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
+import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -117,6 +118,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ChatbotCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
+    ChatbotCapsProtectionWindow,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

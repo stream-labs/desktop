@@ -1,103 +1,108 @@
-import { Component, Prop } from 'vue-property-decorator';
-import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
+import {cloneDeep} from 'lodash';
+import { Component } from 'vue-property-decorator';
+import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/ChatbotAlertsBase.vue';
 import NavItem from 'components/shared/NavItem.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
+import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windows/ChatbotNewAlertModalWindow.vue';
+import DropdownMenu from 'components/shared/DropdownMenu.vue';
+import { $t } from 'services/i18n';
 
 import {
-  FollowAlert,
-  SubAlert,
-  TipAlert,
-  HostAlert,
-  RaidAlert
+  IAlertMessage,
+  ChatbotAlertTypes,
+  NEW_ALERT_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
-
-
-interface AlertWindowData {
-  followers: FollowAlert;
-  subscriptions: SubAlert;
-  donations: TipAlert;
-  hosts: HostAlert;
-  raids: RaidAlert;
-}
 
 @Component({
   components: {
     NavMenu,
     NavItem,
+    ChatbotNewAlertModalWindow,
+    DropdownMenu
   }
 })
-export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-  selectedTab = 'followers';
+export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
+  selectedType: ChatbotAlertTypes = 'follow';
 
-  get chatAlerts() {
-    return this.chatbotApiService.state.chat_alerts_response;
+  get selectedTypeData() {
+    return this.alertTypes[this.selectedType];
   }
 
-  get selectedTabData() {
-    // return { use_***, ***_messages };
-    return this.tabs[this.selectedTab];
+  get selectedTypeMessages() {
+    return this.selectedTypeData.messages;
   }
 
-  get selectedTabMessages() {
-    // return { title: [messages] }
-    // default title is all_alerts;
-
-    const messageKey = Object
-      .keys(this.selectedTabData)
-      .find((key: string) => key.indexOf('messages') > -1);
-    const messages = this.selectedTabData[messageKey];
-    if (this.selectedTab === 'subscriptions') {
-      return messages;
-    }
-    if (this.selectedTab === 'followers') {
-      return {
-        all_alerts: messages.map((message: string) => ({message}))
-      }
-    }
-    return { all_alerts: messages };
+  get selectedTypeTableTitles() {
+    return Object.keys(this.selectedTypeMessages);
   }
 
-  get selectedTabTableTitles() {
-    return Object.keys(this.selectedTabMessages);
-  }
-
-  get selectedTabTableColumns() {
-    const firstKey = this.selectedTabTableTitles[0];
-    const message = this.selectedTabMessages[firstKey][0];
+  get selectedTypeTableColumns() {
+    const message = this.selectedTypeMessages[0];
     if (message) return Object.keys(message);
 
     return [];
   }
 
+  isEnabled(type: ChatbotAlertTypes) {
+    return this.alertTypes[type].enabled;
+  }
 
-  get tabs() {
-    const {
-      use_tip,
-      tip_messages
-    } = this.chatAlerts.settings.streamlabs;
+  showNewChatAlertWindow() {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
+      onSubmitHandler: (newAlert: IAlertMessage) => {
+        this.addNewAlert(this.selectedType, newAlert);
+      }
+    });
+  }
 
-    const {
-      use_follow,
-      follow_messages,
-      use_host,
-      host_messages,
-      use_raid,
-      raid_messages,
-      use_sub,
-      subscriber_messages
-    } = this.chatAlerts.settings.twitch;
+  onEdit(message: IAlertMessage, index: number) {
+    this.$modal.show(NEW_ALERT_MODAL_ID, {
+      editedAlert: message,
+      onSubmitHandler: (updatedAlert: IAlertMessage) => {
+        this.spliceAlertMessages(this.selectedType, index, updatedAlert);
+      }
+    });
+  }
 
-    const tabs: AlertWindowData = {
-      followers: { use_follow, follow_messages },
-      subscriptions: { use_sub, subscriber_messages },
-      donations: { use_tip, tip_messages },
-      hosts: { use_host, host_messages } ,
-      raids: { use_raid, raid_messages },
-    }
-    return tabs;
+  onDelete(index: number) {
+    this.spliceAlertMessages(this.selectedType, index, null);
   }
 
   onDone() {
     this.chatbotCommonService.closeChildWindow();
+  }
+
+  // filters
+  formatNumber(value: number, dp = 2) {
+    if (isNaN(Number(value))) {
+      return value;
+    }
+
+    return value.toLocaleString(undefined, {
+      maximumFractionDigits: dp,
+      minimumFractionDigits: dp
+    });
+  }
+
+  formatHeader(column: string) {
+    switch (column) {
+      case 'is_gifted':
+        return 'is gifted';
+      default:
+        return column;
+    }
+  }
+
+  formatValue(value: any, column: string) {
+    switch (column) {
+      case 'amount':
+        return this.formatNumber(value, 2);
+      case 'message':
+        return value;
+      case 'is_gifted':
+        return value === true ? $t('Yes') : $t('No');
+      default:
+        return value;
+    }
   }
 }

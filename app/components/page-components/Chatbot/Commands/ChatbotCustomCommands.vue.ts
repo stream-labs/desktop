@@ -1,10 +1,10 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
-  CustomCommandsResponse,
-  CustomCommandsData,
-  Pagination,
-  ChatbotAPIPutResponse
+  ICustomCommandsResponse,
+  ICustomCommandsData,
+  IPagination,
+  IChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
@@ -12,11 +12,11 @@ import {
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
   get commands() {
-    return this.chatbotApiService.state.custom_commands_response.data;
+    return this.chatbotApiService.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.custom_commands_response.pagination.current;
+    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
   }
 
   mounted() {

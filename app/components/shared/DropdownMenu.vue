@@ -47,7 +47,11 @@
   .fa,
   i {
     margin-left: 8px;
-    font-size: 6px;
+    font-size: 10px;
+
+    &.icon-down {
+      font-size: 6px;
+    }
   }
 
   &:focus {

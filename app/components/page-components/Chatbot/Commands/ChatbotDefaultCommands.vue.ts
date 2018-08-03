@@ -1,8 +1,8 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
-  DafaultCommandsResponse,
-  ChatbotAPIPostResponse
+  IDafaultCommandsResponse,
+  IChatbotAPIPostResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
@@ -10,7 +10,7 @@ import {
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
   get commandSlugs() {
-    return this.chatbotApiService.state.default_commands_response;
+    return this.chatbotApiService.state.defaultCommandsResponse;
   }
 
   mounted() {

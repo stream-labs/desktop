@@ -18,8 +18,8 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
 
   uuid = uuid(); // uuid serves to link input field and validator message
 
-  emitInput(eventData: TValueType) {
-    this.$emit('input', eventData);
+  emitInput(eventData: TValueType, event?: any) {
+    this.$emit('input', eventData, event);
   }
 
   getValidations() {

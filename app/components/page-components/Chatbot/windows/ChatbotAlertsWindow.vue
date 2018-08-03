@@ -4,60 +4,80 @@
   :customControls="true"
   :title="$t('Chat Alert Preferences')"
 >
-  <div slot="content" class="chatbot-alerts-window__container row">
-    <div class="chatbot-alerts-window__sidebar small-4">
-      <NavMenu v-model="selectedTab" class="side-menu">
+  <div slot="content" class="chatbot-alerts-window__container flex">
+    <div class="chatbot-alerts-window__sidebar">
+      <NavMenu v-model="selectedType" class="side-menu">
         <NavItem
-          v-for="(tabData, tabName) in tabs"
-          :key="tabName"
-          :to="tabName"
-          class="padding--10"
+          v-for="(alertTypeData, alertTypeName) in alertTypes"
+          :key="alertTypeName"
+          :to="alertTypeName"
+          class="chatbot-alerts-window__sidebar__tab"
         >
-          {{ $t(tabName) }}
+          <div class="chatbot-alerts-window__sidebar__tab__content">
+            <span>{{ $t(alertTypeName) }}</span>
+            <ToggleInput
+              :value="isEnabled(alertTypeName)"
+              @input="(enabled, event) => {
+                event.stopPropagation();
+                toggleEnableAlert(alertTypeName);
+              }"
+            />
+          </div>
         </NavItem>
       </NavMenu>
     </div>
-    <div class="chatbot-alerts-window__content small-8">
+    <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
-        <button class="button button--action">ADD ALERT</button>
+        <button
+          class="button button--action text-transform--uppercase"
+          @click="showNewChatAlertWindow"
+        >
+          {{ $t('add alert') }}
+        </button>
       </div>
       <br />
-      <table
-        v-for="title in selectedTabTableTitles"
-        :key="title"
-      >
+      <table>
         <thead>
           <tr>
-            <th :colspan="selectedTabTableColumns.length">
-              {{ title }}
-            </th>
-          </tr>
-          <tr>
             <th
-              v-for="column in selectedTabTableColumns"
+              v-for="column in selectedTypeTableColumns"
               :key="column"
+              class="text-transform--capitalize"
+              :class="`column--${column}`"
             >
-              {{ $t(column.split('_').join(' ')) }}
+              {{ $t(formatHeader(column)) }}
             </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(message, index) in selectedTabMessages[title]"
-            :key=" index"
+            v-for="(message, index) in selectedTypeMessages"
+            :key="`${message.message}__${index}`"
           >
             <td
-              v-for="column in selectedTabTableColumns"
+              v-for="column in selectedTypeTableColumns"
               :key="column"
             >
-              {{ message[column] }}
+              {{ formatValue(message[column], column) }}
             </td>
-            <td>Do stuff</td>
+            <td>
+              <DropdownMenu
+                :placement="'bottom-end'"
+                class="chatbot-alerts__alert-actions_container"
+                :icon="'icon-more'"
+              >
+                <button @click="onEdit(message, index)" class="button button--action">Edit</button>
+                <button @click="onDelete(index)" class="button button--soft-warning">Delete</button>
+              </DropdownMenu>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <ChatbotNewAlertModalWindow
+      :selectedType="selectedType"
+    />
   </div>
   <div slot="controls">
     <button
@@ -74,17 +94,35 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
+
 .chatbot-alerts-window__container {
   margin: -20px;
+  width: calc(~"100% + 40px") !important;
 
   .chatbot-alerts-window__sidebar {
+    width: 250px;
     .padding--10();
     background: @day-secondary;
     border-right: 1px solid @day-border;
+
+    .chatbot-alerts-window__sidebar__tab {
+      .margin--10();
+      .text-transform--capitalize();
+      padding-left: 20px;
+
+      .chatbot-alerts-window__sidebar__tab__content {
+        .flex();
+        .flex--space-between();
+        .flex--v-center();
+        padding: 5px 0;
+      }
+    }
   }
 
   .chatbot-alerts-window__content {
+    width: 100%;
     .overflow--auto();
+    .padding--20();
 
     .chatbot-alerts-window__actions {
       .align-items--inline();
@@ -93,9 +131,35 @@
   }
 }
 
+.chatbot-alerts__alert-actions_container {
+  * > button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
+  }
+}
+
+table thead tr th {
+  &.column--is_gifted,
+  &.column--months {
+    width: 100px;
+  }
+}
+
 tbody tr {
   .transition;
-  .cursor--pointer;
+
+  td {
+    color: black;
+  }
 
   &:hover {
     td {
@@ -103,12 +167,11 @@ tbody tr {
     }
   }
 
-td:last-child {
+  td:last-child {
     width: 100px;
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-    color: white;
 
     .icon-edit {
       font-size: 10px;
@@ -121,26 +184,30 @@ td:last-child {
   }
 }
 
-
 .night-theme {
   .chatbot-alerts-window__sidebar {
     border-color: @night-secondary;
     background-color: @night-secondary;
   }
 
-  td {
-    .transition;
-  }
-
   tbody tr {
     border: 2px solid transparent;
     .transition;
     .cursor--pointer;
+    .transition;
+
+    td {
+      color: white;
+    }
 
     &:hover {
       td {
         color: white;
       }
+    }
+
+    td:last-child {
+      color: white;
     }
   }
   tbody tr:nth-child(odd) {
@@ -149,7 +216,6 @@ td:last-child {
   tbody tr:nth-child(even) {
     background-color: @navy;
   }
-
 }
 
 
