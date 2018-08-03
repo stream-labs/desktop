@@ -36,7 +36,7 @@
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
     </form-group>
     <form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
-      <image-layout v-model="wData.settings.layout" />
+      <image-layout-input v-model="wData.settings.layout" />
     </form-group>
 
     <form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">

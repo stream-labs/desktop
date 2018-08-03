@@ -1,2 +1,2 @@
 export { default as AnimationInput } from './AnimationInput.vue';
-export { default as ImageLayout } from './ImageLayout.vue';
+export { default as ImageLayoutInput } from './ImageLayoutInput.vue';

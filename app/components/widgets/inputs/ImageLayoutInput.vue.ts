@@ -1,12 +1,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { IListMetadata } from '../../shared/inputs';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
-import ImagePicker from '../../shared/inputs/ImagePicker.vue';
+import ImagePickerInput from '../../shared/inputs/ImagePickerInput.vue';
 
 @Component({
-  components: { ImagePicker }
+  components: { ImagePickerInput }
 })
-export default class AnimationInput extends BaseInput<string, IListMetadata<string>> {
+export default class ImageLayoutInput extends BaseInput<string, IListMetadata<string>> {
 
   @Prop()
   value: string;
