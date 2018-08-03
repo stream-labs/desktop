@@ -125,12 +125,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
     ChatbotCapsProtectionWindow,
-<<<<<<< HEAD
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
     ChatbotWordProtectionWindow,
-=======
->>>>>>> chatbot-feature
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

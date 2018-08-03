@@ -8,10 +8,7 @@ import { WindowsService } from 'services/windows';
 
 import {
   IChatbotApiServiceState,
-<<<<<<< HEAD
   IChatbotCommonServiceState,
-=======
->>>>>>> chatbot-feature
   IChatbotAuthResponse,
   ICustomCommand,
   IDefaultCommand,
@@ -295,10 +292,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         }
       })
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> chatbot-feature
 
   //
   // Mutations
@@ -311,15 +304,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   @mutation()
-<<<<<<< HEAD
-=======
-  private LOGIN(response: IChatbotAuthResponse) {
-    Vue.set(this.state, 'apiToken', response.api_token);
-    Vue.set(this.state, 'socketToken', response.socket_token);
-  }
-
-  @mutation()
->>>>>>> chatbot-feature
   private UPDATE_DEFAULT_COMMANDS(response: IDafaultCommandsResponse) {
     Vue.set(this.state, 'defaultCommandsResponse', response);
   }
