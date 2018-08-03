@@ -6,7 +6,6 @@ import ListInput from 'components/shared/inputs/ListInput.vue';
 
 import {
   ICustomCommand,
-  ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
 
 

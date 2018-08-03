@@ -65,6 +65,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
     newAlertsObject.settings[platform][type].enabled = !this.chatAlerts
       .settings[platform][type].enabled;
+
     this.updateChatAlerts(newAlertsObject);
   }
 
