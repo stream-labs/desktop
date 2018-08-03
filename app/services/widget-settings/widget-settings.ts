@@ -50,6 +50,11 @@ export const CODE_EDITOR_TABS: (Partial<IWidgetTab> & { name: string })[] = [
   { name: 'JS', showControls: false, autosave: false }
 ];
 
+export const CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS: (Partial<IWidgetTab> & { name: string })[] = [
+  ...CODE_EDITOR_TABS,
+  { name: 'customFields', title: 'Custom Fields', showControls: false, autosave: false }
+];
+
 /**
  * base class for widget settings
  * TODO: join this service with WidgetsService.ts after widgets rewrite

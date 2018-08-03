@@ -1,6 +1,6 @@
 import { GenericGoalService } from './generic-goal';
 import { WidgetType } from 'services/widgets';
-import { CODE_EDITOR_TABS } from 'services/widget-settings/widget-settings';
+import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS } from 'services/widget-settings/widget-settings';
 
 
 export class FollowerGoalService extends GenericGoalService {
@@ -19,7 +19,7 @@ export class FollowerGoalService extends GenericGoalService {
       name: 'settings',
     },
 
-    ...CODE_EDITOR_TABS
+    ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
   ];
 
   getVersion() {
