@@ -8,14 +8,17 @@ export interface ISponsorBannerSettings extends IWidgetSettings {
   banner_width: number;
   hide_duration: number;
   hide_duration_secs: number;
-  image_1_href: string[];
   layout: string;
-  placement1_durations: number[];
   placement_options: string;
   show_animation: string;
   show_duration: number;
   show_duration_secs: number;
-  images: { href: string, duration: number }[];
+  image_1_href: string[];
+  image_2_href: string[];
+  placement1_durations: number[];
+  placement2_durations: number[];
+  placement_1_images: { href: string, duration: number }[];
+  placement_2_images: { href: string, duration: number }[];
 }
 
 export interface ISponsorBannerData extends IWidgetData {
@@ -47,17 +50,18 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
 
   protected patchAfterFetch(data: any): ISponsorBannerData {
     // make data structure interable and type-predictable
-    data.settings.images = Object.keys(data.settings)
-      .filter((key) => /image_\d_href/.test(key))
-      .map((key, i) => ({ href: data.settings[key][0], duration: data.settings[`placement${i + 1}_durations`][0] }))
+    data.settings.placement_1_images = data.settings.image_1_href
+      .map((href: string, i: number) => ({ href: href, duration: data.settings.placement1_durations[i] }))
+    data.settings.placement_2_images = data.settings.image_2_href
+      .map((href: string, i: number) => ({ href: href, duration: data.settings.placement2_durations[i] }))
     return data;
   }
 
   protected patchBeforeSend(settings: ISponsorBannerSettings): any {
-    settings.images.forEach((image, i) => {
-      settings[`image_${i + 1}_href`] = [image.href];
-      settings[`placement${i + 1}_durations`] = [image.duration];
-    });
+      settings.image_1_href = settings.placement_1_images.map((image) => image.href);
+      settings.placement1_durations = settings.placement_1_images.map((image) => image.duration);
+      settings.image_2_href = settings.placement_2_images.map((image) => image.href);
+      settings.placement2_durations = settings.placement_2_images.map((image) => image.duration);
 
     return settings;
   }
