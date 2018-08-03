@@ -1,11 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
-import { BaseInput } from './BaseInput';
+import BoolInput from './BoolInput.vue';
 
 @Component({})
-export default class WBoolInput extends BaseInput<boolean, {}> {
-  @Prop() value: boolean;
-
-  handleClick(e: KeyboardEvent) {
-    this.emitInput(!this.value, e);
-  }
+export default class ToggleInput extends BoolInput {
 }

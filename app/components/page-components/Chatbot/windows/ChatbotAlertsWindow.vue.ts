@@ -24,7 +24,6 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   selectedType: ChatbotAlertTypes = 'follow';
 
   get selectedTypeData() {
-    console.log(this.alertTypes);
     return this.alertTypes[this.selectedType];
   }
 

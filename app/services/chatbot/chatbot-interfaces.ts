@@ -218,15 +218,6 @@ export enum ChatbotPermissionsEnums {
   All = Viewer | Subscriber | Moderator | Broadcaster
 }
 
-export const ChatbotPermissions = Object.keys(ChatbotPermissionsEnums)
-  .reduce((a: any[], b: string) => {
-    if (typeof ChatbotPermissionsEnums[b] === 'number') {
-      a.push({ title: b, value: ChatbotPermissionsEnums[b] });
-      return a;
-    }
-  }, []);
-
-
 export enum ChatbotResponseTypes {
   Chat = 'Chat',
   Whisper = 'Whisper'
