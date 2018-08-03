@@ -22,6 +22,9 @@
     <form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
     </form-group>
+    <form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
+      <image-layout v-model="wData.settings.layout" />
+    </form-group>
   </div>
 
   <div slot="HTML" >

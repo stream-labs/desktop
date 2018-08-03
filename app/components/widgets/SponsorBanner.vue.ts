@@ -7,8 +7,7 @@ import {
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
-import { inputComponents } from 'components/shared/inputs';
-import { AnimationInput } from './inputs';
+import { inputComponents } from './inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 
@@ -16,7 +15,6 @@ import { $t } from 'services/i18n';
   components: {
     WidgetWindow,
     FormGroup,
-    AnimationInput,
     ...inputComponents
   }
 })
