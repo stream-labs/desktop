@@ -11,9 +11,6 @@ import {
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
-  ChatbotPunishments,
-  ChatbotPermissions,
-  ChatbotResponseTypes
 } from 'services/chatbot/chatbot-interfaces';
 
 import {

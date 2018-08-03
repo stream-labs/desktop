@@ -59,16 +59,6 @@
 tbody tr {
   .transition;
 
-  &:hover {
-    td {
-      color: black;
-    }
-  }
-
-  td {
-    color: black;
-  }
-
   td:first-child {
     width: 300px;
   }
@@ -94,9 +84,6 @@ tbody tr {
 
   tbody tr {
     border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    .transition;
     td {
       color: white;
     }

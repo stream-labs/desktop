@@ -284,8 +284,6 @@ export interface IWordProtectionBlackListItem {
   punishment: IPunishment;
 }
 
-
-
 // dictionaries
 export enum ChatbotPermissionsEnums {
   None = 0,

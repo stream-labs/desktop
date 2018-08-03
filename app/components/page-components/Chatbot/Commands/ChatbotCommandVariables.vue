@@ -8,8 +8,11 @@
     <table v-else>
       <thead>
         <tr>
-          <th>variable</th>
-          <th>description</th>
+          <th> {{ $t('Variable') }}</th>
+          <th> {{ $t('Description') }} </th>
+          <th> {{ $t('Example') }} </th>
+          <th> {{ $t('Result') }} </th>
+          <th> {{ $t('Tags') }} </th>
         </tr>
       </thead>
       <tbody>
@@ -17,7 +20,11 @@
           v-for="(variable, index) in variables"
           :key="index"
         >
-          <td> {{ $t(index) }} </td>
+          <td> {{ variable.variable }} </td>
+          <td> {{ variable.description }} </td>
+          <td> {{ variable.example }} </td>
+          <td> {{ variable.result }} </td>
+          <td> {{ variable.tags.join(', ') }} </td>
         </tr>
       </tbody>
     </table>
@@ -30,14 +37,6 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 tbody tr {
-  .transition;
-  .cursor--pointer;
-
-  &:hover {
-    td {
-      color: black;
-    }
-  }
 
   td:first-child {
     width: 300px;
@@ -47,7 +46,6 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-    color: white;
 
     .icon-edit {
       font-size: 10px;

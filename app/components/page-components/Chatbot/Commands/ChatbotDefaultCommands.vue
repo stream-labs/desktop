@@ -82,14 +82,6 @@
 }
 
 tbody tr {
-  .transition;
-  .cursor--pointer;
-
-  &:hover {
-    td {
-      color: black;
-    }
-  }
 
   td:first-child {
     width: 300px;
