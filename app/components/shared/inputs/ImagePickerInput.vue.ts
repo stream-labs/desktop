@@ -3,7 +3,7 @@ import { BaseInput } from './BaseInput';
 import { IListOption } from './index';
 
 @Component({})
-export default class ImagePicker extends BaseInput<string, IListOption<string>> {
+export default class ImagePickerInput extends BaseInput<string, IListOption<string>> {
 
   @Prop({ default: '' })
   value: string;
