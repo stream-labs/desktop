@@ -4,15 +4,19 @@
     <code-input v-if="customEnabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
 
     <div class="modal-layout-controls">
-      <button v-if="hasDefaults" class="button button--default restore-button" @click="restoreDefaults">
+      <button v-if="hasDefaults" class="button button--action restore-button" @click="restoreDefaults">
         {{ $t('Restore Defaults') }}
       </button>
-      <button class="button button--default discard-button" @click="discardChanges">
+      <button
+        class="button discard-button"
+        @click="hasChanges && discardChanges()"
+        :class="{'button--action': hasChanges, 'is-disabled': !hasChanges }"
+      >
         {{ $t('Discard Changes') }}
       </button>
       <button
           class="button"
-          :class="{'button--action': canSave, 'button--disabled': !canSave }"
+          :class="{'button--action': canSave, 'is-disabled': !canSave }"
           @click="canSave && save()">
         {{ $t('Save') }}
       </button>
