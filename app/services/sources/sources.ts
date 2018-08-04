@@ -375,43 +375,40 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showSourceProperties(sourceId: string) {
     this.windowsService.closeChildWindow();
 
-    if (this.customizationService.getSettings().experimental.newWidgets) {
-      const source = this.getSource(sourceId);
-      const isWidget = source.getPropertiesManagerType() === 'widget';
+    const source = this.getSource(sourceId);
+    const isWidget = source.getPropertiesManagerType() === 'widget';
 
-      // show a custom component for widgets below
-      const widgetsWhitelist = [
-        WidgetType.BitGoal,
-        WidgetType.DonationGoal,
-        WidgetType.FollowerGoal,
-        WidgetType.ChatBox,
-        WidgetType.ViewerCount,
-        WidgetType.DonationTicker,
-        WidgetType.Credits,
-        WidgetType.EventList,
-        WidgetType.StreamBoss,
-        WidgetType.TipJar
-      ];
+    // show a custom component for widgets below
+    const widgetsWhitelist = [
+      WidgetType.BitGoal,
+      WidgetType.DonationGoal,
+      WidgetType.FollowerGoal,
+      WidgetType.ChatBox,
+      WidgetType.ViewerCount,
+      WidgetType.DonationTicker,
+      WidgetType.Credits,
+      WidgetType.EventList,
+      WidgetType.StreamBoss,
+      WidgetType.TipJar
+    ];
 
-      if (isWidget) {
-        const widgetType = source.getPropertiesManagerSettings().widgetType;
-        if (widgetsWhitelist.includes(widgetType)) {
-          const componentName = this.widgetsService.getWidgetComponent(widgetType);
+    if (isWidget) {
+      const widgetType = source.getPropertiesManagerSettings().widgetType;
+      if (widgetsWhitelist.includes(widgetType)) {
+        const componentName = this.widgetsService.getWidgetComponent(widgetType);
 
-          this.windowsService.showWindow({
-            componentName,
-            queryParams: { sourceId },
-            size: {
-              width: 600,
-              height: 800
-            }
-          });
+        this.windowsService.showWindow({
+          componentName,
+          queryParams: { sourceId },
+          size: {
+            width: 600,
+            height: 800
+          }
+        });
 
-          return;
-        }
+        return;
       }
     }
-
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
