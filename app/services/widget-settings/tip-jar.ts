@@ -56,7 +56,8 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
 
   protected tabs = [
     { name: 'settings' },
-    ...CODE_EDITOR_TABS
+    ...CODE_EDITOR_TABS,
+    { name: 'test' }
   ];
 
   protected patchAfterFetch(data: any): ITipJarData {

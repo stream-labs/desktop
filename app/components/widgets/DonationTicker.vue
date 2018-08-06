@@ -18,10 +18,6 @@
     <form-group :title="$t('Amount Text Color')" type="color" v-model="wData.settings.font_color3" :metadata="{ tooltip: amountColorTooltip }" />
   </div>
 
-  <div slot="test" >
-    <test-buttons :testers="['Donation']"/>
-  </div>
-
   <div slot="HTML" >
     <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
   </div>
@@ -32,6 +28,10 @@
 
   <div slot="JS" >
     <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
+
+  <div slot="test" >
+    <test-buttons :testers="['Donation']"/>
   </div>
 </widget-window>
 </template>
