@@ -160,21 +160,20 @@ export default class MediaGallery extends Vue {
 
   selectFile(file: IMediaGalleryFile, select: boolean) {
     if (this.audioOnly && file.type !== 'audio') {
-      this.$toasted.show($t('Not a supported file type'), {
+      return this.$toasted.show($t('Not a supported file type'), {
         duration: 1000,
         position: 'top-right',
         className: 'toast-alert'
       });
-    } else {
-      this.selectedFile = file;
-
-      if (file.type === 'audio') {
-        const audio = new Audio(file.href);
-        audio.play();
-      }
-
-      if (select === true) this.handleSelect();
     }
+    this.selectedFile = file;
+
+    if (file.type === 'audio') {
+      const audio = new Audio(file.href);
+      audio.play();
+    }
+
+    if (select === true) this.handleSelect();
   }
 
   handleSelect() {
