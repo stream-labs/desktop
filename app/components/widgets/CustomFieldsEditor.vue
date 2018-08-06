@@ -2,7 +2,18 @@
   <div>
 
     <div v-if="hasCustomFields">
-      <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
+      <div v-if="isEditMode">
+        <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
+      </div>
+      <div v-else>
+        <form-group
+          v-for="inputData in inputsData"
+          v-if="inputData.metadata"
+          :key="inputData.fieldName"
+          :value="inputData.value"
+          :metadata="inputData.metadata"
+        />
+      </div>
     </div>
     <div v-else>
       <button
@@ -13,13 +24,21 @@
     </div>
 
     <div class="modal-layout-controls">
-      <button class="button button--default restore-button"  v-if="hasCustomFields" @click="removeFields()">
+      <button class="button button--default left-button button--action"  v-if="hasCustomFields" @click="removeFields()">
         {{ $t('Remove Custom Fields') }}
       </button>
 
       <button
+        class="button left-button button--action"
+        v-if="!isEditMode"
+        @click="setEditMode(true)"
+      >
+        {{ $t('Update') }}
+      </button>
+
+      <button
           class="button"
-          :class="{'button--action': canSave, 'button--disabled': !canSave }"
+          :class="{'button--action': canSave, 'is-disabled': !canSave }"
           @click="canSave && save()">
         {{ $t('Save') }}
       </button>
@@ -50,8 +69,7 @@
     }
   }
 
-  .restore-button,
-  .discard-button {
+  .left-button {
     float: left;
   }
 
