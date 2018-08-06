@@ -47,8 +47,8 @@
 
   .tooltip {
     position: relative;
-    margin-left: 4px;
-    font-size: 18px;
+    margin-left: 8px;
+    font-size: 16px;
     align-self: center;
     display: inline-block;
     color: @icon;

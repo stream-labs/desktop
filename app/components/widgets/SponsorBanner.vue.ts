@@ -9,12 +9,15 @@ import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import CodeEditor from './CodeEditor.vue';
+
 import { $t } from 'services/i18n';
 
 @Component({
   components: {
     WidgetWindow,
     FormGroup,
+    CodeEditor,
     ...inputComponents
   }
 })

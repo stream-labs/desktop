@@ -10,6 +10,7 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
 
@@ -39,6 +40,7 @@ const mediaGalleryInputs = {
   components: {
     WidgetWindow,
     FormGroup,
+    CodeEditor,
     ...inputComponents
   }
 })
