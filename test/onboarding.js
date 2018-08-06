@@ -2,7 +2,7 @@ import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers/spectron/sources';
 import { logOut } from './helpers/spectron/user';
-import { sleep } from './helpers/sleep';
+
 
 useSpectron({ skipOnboarding: false });
 
