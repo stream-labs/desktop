@@ -51,7 +51,7 @@ test('Adding some starter widgets', async t => {
   t.false(await sourceIsExisting(t, 'Donation Ticker'));
   t.true(await sourceIsExisting(t, 'Donation Goal'));
 
-  await logOut(t); // we can't fetch widget setting
+  await logOut(t); // widget settings don't work with a fake-auth
   await selectSource(t, 'Chat Box');
   await clickSourceProperties(t);
   await focusChild(t);
