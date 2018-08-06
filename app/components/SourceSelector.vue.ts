@@ -168,7 +168,6 @@ export default class SourceSelector extends Vue {
   }
 
   makeActive(treeNodes: ISlTreeNode<ISceneItemNode>[], ev: MouseEvent) {
-    console.log(this.nodes);
     const ids = treeNodes.map(treeNode => treeNode.data.id);
     this.selectionService.select(ids);
   }
