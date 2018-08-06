@@ -12,6 +12,42 @@ import SlVueTree, {
 } from 'sl-vue-tree';
 import { $t } from 'services/i18n';
 
+const widgetIconMap = {
+  'Alert Box': 'fas fa-bell',
+  'Stream Boss': 'fas fa-gavel',
+  'Event List': 'fas fa-th-list',
+  'The Jar': 'fas fa-beer',
+  'Stream Labels': 'fas fa-file-alt',
+  'Donation Ticker': 'fas fa-ellipsis',
+  'Chat Box': 'fas-fa-comments',
+  'Viewer Count': 'fas fa-eye',
+  'Spin Wheel': 'fas fa-chart-pie',
+  'Wish List': 'fas fa-shopping-cart',
+  Credits: 'fas fa-align-center',
+  'Sponsor Banner': 'fas fa-heart',
+  'Media Share': 'fas fa-share-alt',
+  'Donation Goal': 'fas fa-calendar',
+  'Bit Goal': 'fas fa-calendar',
+  'Follower Goal': 'fas fa-calendar'
+};
+
+const sourceIconMap = {
+  ffmpeg_source: 'far fa-file-video',
+  text_gdiplus: 'fas fa-font',
+  text_ft2_source: 'fas fa-font',
+  image_source: 'icon-image',
+  slideshow: 'icon-image',
+  dshow_input: 'icon-webcam',
+  wasapi_input_capture: 'icon-mic',
+  wasapi_output_capture: 'icon-audio',
+  monitor_capture: 'fas fa-desktop',
+  game_capture: 'fas fa-gamepad',
+  scene: 'far fa-object-group',
+  color_source: 'fas fa-fill',
+  openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
+  liv_capture: 'fab fa-simplybuilt fa-rotate-180'
+};
+
 @Component({
   components: { SlVueTree }
 })
@@ -53,6 +89,12 @@ export default class SourceSelector extends Vue {
     };
 
     return getSlVueTreeNodes(this.scene.getRootNodes());
+  }
+
+  determineIcon(isLeaf: boolean, data: { type: string, name: string }) {
+    if (!isLeaf) { return 'fa fa-folder'; }
+    if (data.type === 'browser_source') { return widgetIconMap[data.name] || 'fas fa-globe'; }
+    return sourceIconMap[data.name] || 'fas fa-file';
   }
 
   addSource() {

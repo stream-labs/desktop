@@ -11,3 +11,4 @@ export { default as CodeInput } from './CodeInput.vue';
 export { default as FormInput } from './FormInput.vue';
 export { default as MediaGalleryInput } from './MediaGalleryInput.vue';
 export { default as ImagePickerInput } from './ImagePickerInput.vue';
+export { default as SoundInput } from './SoundInput.vue';
