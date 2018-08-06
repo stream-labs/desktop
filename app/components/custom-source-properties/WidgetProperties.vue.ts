@@ -8,6 +8,7 @@ import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -19,8 +20,13 @@ export default class WidgetProperties extends Vue {
 
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
 
   widgetModel: IObsListInput<string> = null;
+
+  get isLoggedIn() {
+    return this.userService.isLoggedIn();
+  }
 
   created() {
     this.refreshWidgetModel();
@@ -52,6 +58,11 @@ export default class WidgetProperties extends Vue {
         };
       })
     };
+  }
+
+  login() {
+    this.windowsService.closeChildWindow();
+    this.userService.showLogin();
   }
 
   navigateDashboard() {
