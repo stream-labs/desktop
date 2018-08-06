@@ -162,6 +162,7 @@ export class MediaGalleryService extends Service {
   private showMediaGallery(promiseId: string) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
+      preservePrevWindow: true,
       queryParams: { promiseId },
       size: {
         width: 1100,

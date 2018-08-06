@@ -18,10 +18,10 @@
 
       <div v-if="!hasGoal">
 
-        <form ref="form" class="section__body" v-if="loadingState !== 'pending'">
+        <validated-form ref="form" class="section__body" v-if="loadingState !== 'pending'">
           <form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
-        </form>
+        </validated-form>
 
         <div v-else class="loading-spinner">
           <img src="../../../media/images/loader.svg" />

@@ -14,7 +14,7 @@
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
-  <div slot="content">
+  <div slot="content" class="content">
 
     <!-- browser-source properties tab -->
     <div v-if="value === 'source'">
@@ -51,6 +51,10 @@
 
   .description {
     padding: 20px;
+  }
+
+  .content {
+    padding-top: 20px;
   }
 
   .display {

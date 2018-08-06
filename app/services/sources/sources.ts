@@ -389,7 +389,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.DonationTicker,
         WidgetType.Credits,
         WidgetType.EventList,
-        WidgetType.StreamBoss
+        WidgetType.StreamBoss,
+        WidgetType.TipJar,
+        WidgetType.SponsorBanner
       ];
 
       if (isWidget) {
@@ -449,6 +451,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
+      preservePrevWindow: true,
       queryParams: { sourceType, propertiesManager },
       size: {
         width: 400,
