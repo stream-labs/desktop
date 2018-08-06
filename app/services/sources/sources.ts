@@ -394,7 +394,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.SponsorBanner
     ];
 
-    if (isWidget) {
+    if (isWidget && this.userService.isLoggedIn()) {
       const widgetType = source.getPropertiesManagerSettings().widgetType;
       if (widgetsWhitelist.includes(widgetType)) {
         const componentName = this.widgetsService.getWidgetComponent(widgetType);

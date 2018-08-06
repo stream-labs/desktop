@@ -1,6 +1,8 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers/spectron/sources';
+import { logOut } from './helpers/spectron/user';
+import { sleep } from './helpers/sleep';
 
 useSpectron({ skipOnboarding: false });
 
@@ -49,7 +51,8 @@ test('Adding some starter widgets', async t => {
   t.false(await sourceIsExisting(t, 'Donation Ticker'));
   t.true(await sourceIsExisting(t, 'Donation Goal'));
 
-  await selectSource(t, 'Alert Box');
+  await logOut(t); // we can't fetch widget setting
+  await selectSource(t, 'Chat Box');
   await clickSourceProperties(t);
   await focusChild(t);
 
