@@ -46,10 +46,6 @@
         v-model="tier.image_src"
       />
     </form-group>
-
-    <form-group>
-      <sound-input v-model="wData.settings.types.twitch_follows.image_src" :metadata="{}" />
-    </form-group>
   </div>
 
   <div slot="HTML" >
