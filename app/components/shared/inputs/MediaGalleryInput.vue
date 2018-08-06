@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="media-box radius">
-      <div class="url-uploader radius" v-if="showUrlUpload">
+    <div class="media-box">
+      <div class="url-uploader" v-if="showUrlUpload">
         <form-group :title="$t('Image URL')" >
           <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
         </form-group>
@@ -9,7 +9,7 @@
       </div>
       <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
       <div class="footer">
-        <span>{{ fileName || 'Default' }}</span>
+        <span class="filename">{{ fileName || 'Default' }}</span>
         <div>
           <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
           <i @click="toggleUrlUpload" class="icon-link" />
@@ -27,6 +27,7 @@
 @import "../../../styles/index";
 
 .media-box {
+  .radius();
   position: relative;
   width: 100%;
   height: 120px;
@@ -51,13 +52,9 @@
   right: 1px;
   height: 30px;
   justify-content: space-between;
+  padding: 6px;
   background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
   border-radius: 0 0 3px 3px;
-
-  span, i {
-    position: relative;
-    top: -12px;
-  }
 
   i {
     margin-left: 10px;
@@ -66,6 +63,13 @@
   .icon-close {
     color: @red;
   }
+}
+
+.filename {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .change-media, i {
@@ -77,6 +81,7 @@
 }
 
 .url-uploader {
+  .radius();
   background-color: @day-primary;
   padding: 12px;
   position: absolute;
