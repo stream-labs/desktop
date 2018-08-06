@@ -101,7 +101,7 @@ export default class LiveDock extends Vue {
 
   get viewerCount() {
     if (this.hideViewerCount) {
-      return '?';
+      return 'viewers hidden';
     }
 
     return this.streamInfoService.state.viewerCount.toString();

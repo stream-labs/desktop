@@ -6,17 +6,20 @@
       :key="formGroup.nameSubCategory"
       v-if="hasAnyVisibleSettings(formGroup)">
 
-      <div class="section-title--dropdown" v-if="formGroup.nameSubCategory != 'Untitled'">
-        <h4 class="section-title" @click="toggleGroup(groupIndex)">
+      <div
+        class="section-title section-title--dropdown"
+        :class="{ 'section-title--opened': !collapsedGroups[groupIndex] }"
+        v-if="formGroup.nameSubCategory != 'Untitled'">
+        <h2 @click="toggleGroup(groupIndex)">
           <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
           <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
           {{ $t(formGroup.nameSubCategory) }}
-        </h4>
+        </h2>
       </div>
 
       <div
-          class="section-content section-content--dropdown"
-          v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
+        class="section-content"
+        v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
       >
         <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
       </div>
@@ -30,11 +33,4 @@
 <style lang="less">
 @import "../../../styles/index";
 
-.form-groups {
-  .section{
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-}
 </style>

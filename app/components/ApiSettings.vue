@@ -1,19 +1,23 @@
 <template>
   <div>
     <div class="section">
-      <button class="button button--soft-warning" @click="restoreDefaults">
-        Restore Defaults
-      </button>
+      <div class="section-content">
+        <button class="button button--soft-warning" @click="restoreDefaults">
+          Restore Defaults
+        </button>
+      </div>
     </div>
 
     <div class="section">
-      <ObsTextInput :value="tokenInput">
-        <button
-            class="button button--default button--input"
-            @click="generateToken">
-          Update
-        </button>
-      </ObsTextInput>
+      <div class="section-content">
+        <ObsTextInput :value="tokenInput">
+          <button
+              class="button button--default button--input"
+              @click="generateToken">
+            Update
+          </button>
+        </ObsTextInput>
+      </div>
     </div>
 
 
