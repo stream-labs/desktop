@@ -22,13 +22,13 @@ export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>
   showUrlUpload = false;
 
   async updateValue() {
-    const selectedFile = await this.mediaGalleryService.pickFile();
+    const selectedFile = await this.mediaGalleryService.pickFile({ audioOnly: true });
     this.fileName = selectedFile.fileName;
     this.emitInput(selectedFile.href);
   }
 
   clearSound() {
-    this.emitInput(null);
+    this.emitInput('');
   }
 
   previewSound() {

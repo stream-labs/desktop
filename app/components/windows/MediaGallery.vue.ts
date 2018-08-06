@@ -58,6 +58,10 @@ export default class MediaGallery extends Vue {
     return this.windowsService.state.child.queryParams.promiseId;
   }
 
+  get audioOnly() {
+    return this.windowsService.state.child.queryParams.audioOnly;
+  }
+
   get files() {
     if (!this.galleryInfo) return [];
 
@@ -155,14 +159,22 @@ export default class MediaGallery extends Vue {
   }
 
   selectFile(file: IMediaGalleryFile, select: boolean) {
-    this.selectedFile = file;
+    if (this.audioOnly && file.type !== 'audio') {
+      this.$toasted.show($t('Not a supported file type'), {
+        duration: 1000,
+        position: 'top-right',
+        className: 'toast-alert'
+      });
+    } else {
+      this.selectedFile = file;
 
-    if (file.type === 'audio') {
-      const audio = new Audio(file.href);
-      audio.play();
+      if (file.type === 'audio') {
+        const audio = new Audio(file.href);
+        audio.play();
+      }
+
+      if (select === true) this.handleSelect();
     }
-
-    if (select === true) this.handleSelect();
   }
 
   handleSelect() {

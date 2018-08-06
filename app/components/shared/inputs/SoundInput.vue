@@ -66,10 +66,10 @@
   background-color: @day-primary;
   padding: 12px;
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  right: 1px;
-  left: 1px;
+  height: 120px;
+  width: 100%;
+  border: 1px solid @day-secondary;
+  z-index: 10;
 
   button {
     position: absolute;
@@ -91,6 +91,7 @@
 
   .url-uploader {
     background-color: @night-primary;
+    border-color: @night-secondary;
   }
 }
 </style>
