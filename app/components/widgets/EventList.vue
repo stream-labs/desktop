@@ -40,6 +40,10 @@
     </form-group>
   </div>
 
+  <div slot="test" >
+    <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>
+  </div>
+
   <div slot="HTML" >
     <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
   </div>
