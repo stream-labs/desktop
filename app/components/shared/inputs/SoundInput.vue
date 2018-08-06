@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div class="media-box radius">
-      <div class="url-uploader radius" v-if="showUrlUpload">
+    <div class="media-box">
+      <div class="url-uploader" v-if="showUrlUpload">
         <form-group :title="$t('Image URL')" >
           <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
         </form-group>
         <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
       <div class="footer">
-        <span>{{ fileName || 'Default' }}</span>
+        <span>{{ fileName || $t('No Sound') }}</span>
         <div>
           <i @click="clearSound" class="icon-close" />
           <i @click="previewSound" class="fa fa-search-plus" />
@@ -26,9 +26,10 @@
 @import "../../../styles/index";
 
 .media-box {
+  .radius();
   position: relative;
   width: 100%;
-  height: 20px;
+  height: 30px;
   background-color: @day-secondary;
 }
 
@@ -40,12 +41,8 @@
   left: 1px;
   right: 1px;
   height: 30px;
+  padding: 6px;
   justify-content: space-between;
-
-  span, i {
-    position: relative;
-    top: -12px;
-  }
 
   i {
     margin-left: 10px;
@@ -65,6 +62,7 @@
 }
 
 .url-uploader {
+  .radius();
   background-color: @day-primary;
   padding: 12px;
   position: absolute;

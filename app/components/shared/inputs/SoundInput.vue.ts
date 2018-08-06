@@ -28,11 +28,11 @@ export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>
   }
 
   clearSound() {
-    this.emitInput($t('No Sound'));
+    this.emitInput(null);
   }
 
   previewSound() {
-    if (this.url && this.url !== $t('No Sound')) {
+    if (this.url) {
       const audio = new Audio(this.url);
       audio.play();
     }
