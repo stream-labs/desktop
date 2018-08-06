@@ -23,5 +23,5 @@
   </div>
 </template>
 
-<script lang="ts" src="./ApiSettings.vue.ts"></script>
+<script lang="ts" src="./DeveloperSettings.vue.ts"></script>
 
