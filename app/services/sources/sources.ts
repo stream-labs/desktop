@@ -374,7 +374,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     this.windowsService.closeChildWindow();
-
     const source = this.getSource(sourceId);
     const isWidget = source.getPropertiesManagerType() === 'widget';
 
@@ -389,7 +388,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.Credits,
       WidgetType.EventList,
       WidgetType.StreamBoss,
-      WidgetType.TipJar
+      WidgetType.TipJar,
+      WidgetType.SponsorBanner
     ];
 
     if (isWidget) {

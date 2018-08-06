@@ -15,7 +15,7 @@
       />
     </form-group>
     <form-group :title="$t('Jar Image')">
-      <image-picker :metadata="{ options: inputOptions }" v-model="wData.settings.jar.type"/>
+      <image-picker-input :metadata="{ options: inputOptions }" v-model="wData.settings.jar.type"/>
     </form-group>
     <form-group :title="$t('Text')">
       <bool-input :title="$t('Show Text')" v-model="wData.settings.text.show"/>

@@ -49,7 +49,7 @@ test('Adding some starter widgets', async t => {
   t.false(await sourceIsExisting(t, 'Donation Ticker'));
   t.true(await sourceIsExisting(t, 'Donation Goal'));
 
-  await selectSource(t, 'Chat Box');
+  await selectSource(t, 'Alert Box');
   await clickSourceProperties(t);
   await focusChild(t);
 

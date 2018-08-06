@@ -12,7 +12,7 @@
 </div>
 </template>
 
-<script lang="ts" src="./ImagePicker.vue.ts"></script>
+<script lang="ts" src="./ImagePickerInput.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";
