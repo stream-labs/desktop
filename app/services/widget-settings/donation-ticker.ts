@@ -41,7 +41,8 @@ export class DonationTickerService extends WidgetSettingsService<IDonationTicker
 
   protected tabs = [
     { name: 'settings' },
-    ...CODE_EDITOR_TABS
+    ...CODE_EDITOR_TABS,
+    { name: 'test' }
   ];
 
   protected patchAfterFetch(data: any): IDonationTickerData {

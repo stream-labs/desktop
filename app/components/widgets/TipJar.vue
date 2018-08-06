@@ -59,6 +59,10 @@
   <div slot="JS" >
     <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
   </div>
+
+  <div slot="test" >
+    <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>
+  </div>
 </widget-window>
 </template>
 
