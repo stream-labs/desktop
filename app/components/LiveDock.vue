@@ -43,7 +43,6 @@
               'icon-hide': hideViewerCount
             }"
             @click="toggleViewerCount"/>
-          <!-- <i class="icon-team label--icon" /> -->
           <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
         </div>
       </div>
@@ -198,7 +197,7 @@
 }
 
 .live-dock-viewer-count__count {
- padding-right: 3px;
+  padding-right: 3px;
 }
 
 .live-dock-chat {
