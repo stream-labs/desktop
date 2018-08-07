@@ -62,6 +62,19 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     placeholder: 'The phrase that will appear after a user enters the command'
   };
 
+  mounted() {
+    // if editing existing custom command
+    debugger;
+    if (this.commandToUpdate) {
+      debugger;
+      this.newCommand = this.commandToUpdate;
+    }
+  }
+
+  get commandToUpdate() {
+    return this.chatbotCommonService.state.commandToUpdate;
+  }
+
   get permissionMetadata() {
     let permissionMetadata: IListMetadata<number> = {
       options: this.chatbotPermissions

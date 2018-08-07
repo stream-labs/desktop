@@ -4,7 +4,8 @@ import {
   ICustomCommandsResponse,
   ICustomCommandsData,
   IPagination,
-  IChatbotAPIPutResponse
+  IChatbotAPIPutResponse,
+  ICustomCommand
 } from 'services/chatbot/chatbot-interfaces';
 
 
@@ -23,8 +24,8 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService.fetchCustomCommands(this.currentPage);
   }
 
-  openCommandWindow(index?: number) {
-    this.chatbotCommonService.openCustomCommandWindow();
+  openCommandWindow(command?: ICustomCommand) {
+    this.chatbotCommonService.openCustomCommandWindow(command);
   }
 
   deleteCommand(index: number) {

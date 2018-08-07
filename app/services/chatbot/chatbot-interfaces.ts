@@ -16,6 +16,7 @@ export interface IChatbotApiServiceState {
 
 export interface IChatbotCommonServiceState {
   toasted: any;
+  commandToUpdate: ICustomCommand;
 }
 
 // responses
@@ -134,23 +135,6 @@ export interface IDafaultCommandsSlug {
 export interface ICustomCommandsData {
   [id: number]: ICustomCommand;
 }
-
-
-export interface ICustomCommandRow {
-  id?: string;
-  user_id?: number;
-  command: string;
-  permission: IPermission;
-  response: string;
-  response_type?: string;
-  cooldowns: ICooldown;
-  aliases: IAliases;
-  platforms: number;
-  enabled: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
 
 export interface ICustomCommand {
   id?: string;

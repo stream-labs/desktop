@@ -23,7 +23,7 @@ import {
   ICapsProtectionResponse,
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
-  IWordProtectionResponse
+  IWordProtectionResponse,
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -355,6 +355,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
 
   static defaultState: IChatbotCommonServiceState = {
     toasted: null,
+    commandToUpdate: null
   };
 
   bindsToasted(toasted: object) {
@@ -365,7 +366,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     this.windowsService.closeChildWindow();
   }
 
-  openCustomCommandWindow() {
+  openCustomCommandWindow(command?: ICustomCommand) {
+    if (command) {
+      this.SET_COMAND_TO_UPDATE(command);
+    }
     this.windowsService.showWindow({
       componentName: 'ChatbotCustomCommandWindow',
       size: {
@@ -443,6 +447,11 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private BINDS_TOASTED(toasted: object) {
     Vue.set(this.state, 'toasted', toasted);
+  }
+
+  @mutation()
+  private SET_COMAND_TO_UPDATE(command: ICustomCommand) {
+    Vue.set(this.state, 'commandToUpdate', command);
   }
 
 }

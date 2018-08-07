@@ -33,7 +33,7 @@
             v-for="(command, index) in commands"
             :key="command.command"
           >
-            <td> {{ $t(command.command) }} </td>
+            <td> {{ $t(command.command) }} {{ index }} </td>
             <td> {{ $t(command.response) }} </td>
             <td>
               <div class="align-items--inline">
@@ -46,7 +46,7 @@
                   class="chatbot-alerts__alert-actions_container"
                   :icon="'icon-more'"
                 >
-                  <button @click="openCommandWindow(index)" class="button button--action">Edit</button>
+                  <button @click="openCommandWindow(command)" class="button button--action">Edit</button>
                   <button @click="deleteCommand(index)" class="button button--soft-warning">Delete</button>
                 </DropdownMenu>
               </div>
