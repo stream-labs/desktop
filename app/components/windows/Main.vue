@@ -6,6 +6,7 @@
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
     <div class="main-middle">
+      <news-banner />
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <div v-if="shouldLockContent" class="main-loading">
         <custom-loader></custom-loader>

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 
 // Pages
@@ -37,6 +38,7 @@ import DesignSystem from '../pages/DesignSystem.vue';
     StudioFooter,
     CustomLoader,
     PatchNotes,
+    NewsBanner,
     DesignSystem
   }
 })
