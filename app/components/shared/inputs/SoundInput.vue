@@ -7,21 +7,20 @@
         </form-group>
         <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
-      <img :src="value || metadata.clearImage" v-if="!showUrlUpload" >
       <div class="footer">
-        <span class="filename">{{ fileName || 'Default' }}</span>
+        <span>{{ fileName || $t('No Sound') }}</span>
         <div>
-          <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
+          <i @click="clearSound" class="icon-close" />
+          <i @click="previewSound" class="fa fa-search-plus" />
           <i @click="toggleUrlUpload" class="icon-link" />
-          <i @click="previewImage" class="fa fa-search-plus" />
-          <i @click="clearImage" class="icon-close" />
+          <span @click="updateValue" class="change-media">{{ $t('Change Media') }}</span>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" src="./MediaGalleryInput.vue.ts"></script>
+<script lang="ts" src="./SoundInput.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../styles/index";
@@ -30,17 +29,8 @@
   .radius();
   position: relative;
   width: 100%;
-  height: 120px;
+  height: 30px;
   background-color: @day-secondary;
-
-  img {
-    max-height: 110px;
-    width: auto;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
 }
 
 .footer {
@@ -51,10 +41,8 @@
   left: 1px;
   right: 1px;
   height: 30px;
-  justify-content: space-between;
   padding: 6px;
-  background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
-  border-radius: 0 0 3px 3px;
+  justify-content: space-between;
 
   i {
     margin-left: 10px;
@@ -63,13 +51,6 @@
   .icon-close {
     color: @red;
   }
-}
-
-.filename {
-  max-width: 150px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .change-media, i {
@@ -85,10 +66,10 @@
   background-color: @day-primary;
   padding: 12px;
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  right: 1px;
-  left: 1px;
+  height: 120px;
+  width: 100%;
+  border: 1px solid @day-secondary;
+  z-index: 10;
 
   button {
     position: absolute;
@@ -110,6 +91,7 @@
 
   .url-uploader {
     background-color: @night-primary;
+    border-color: @night-secondary;
   }
 }
 </style>
