@@ -40,7 +40,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  color: @grey;
+  color: @day-paragraph;
 }
 
 .modal-layout-titlebar {
@@ -65,9 +65,8 @@
 }
 
 .modal-layout-controls {
-  background-color: @day-secondary;
-  border-top: 1px solid @day-border;
-  padding: 10px 20px;
+  background-color: @day-section;
+  padding: 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
@@ -93,11 +92,11 @@
 .night-theme {
   &.modal-layout {
     background-color: @night-primary;
+    color: @night-paragraph;
   }
 
   .modal-layout-controls {
-    border-top-color: @night-border;
-    background-color: @night-primary;
+    background-color: @night-section;
   }
 }
 </style>

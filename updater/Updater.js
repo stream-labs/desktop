@@ -80,7 +80,7 @@ class Updater {
       height: 180,
       frame: false,
       resizable: false,
-      show: false
+      show: false,
     });
 
     browserWindow.on('ready-to-show', () => {

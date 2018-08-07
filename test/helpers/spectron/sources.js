@@ -5,7 +5,7 @@ import { dialogDismiss } from './dialog';
 
 async function clickSourceAction(t, selector) {
   await t.context.app.client
-    .$('h4=Sources')
+    .$('h2=Sources')
     .$('..')
     .click(selector);
 }

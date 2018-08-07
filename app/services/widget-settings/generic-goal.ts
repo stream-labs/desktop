@@ -1,6 +1,7 @@
 import { IWidgetData, WidgetSettingsService } from './widget-settings';
 
 import { metadata } from 'components/shared/inputs';
+import { $t } from 'services/i18n';
 
 
 export interface IGoalData extends IWidgetData {
@@ -35,9 +36,33 @@ export interface IGoalData extends IWidgetData {
 
 export abstract class GenericGoalService extends WidgetSettingsService<IGoalData> {
 
-
   getMetadata() {
     return {
+
+      title: metadata.text({
+        title: $t('Title'),
+        required: true,
+        max: 60
+      }),
+
+      goal_amount: metadata.number({
+        title: $t('Goal Amount'),
+        required: true,
+        min: 1
+      }),
+
+      manual_goal_amount: metadata.number({
+        title: $t('Starting Amount'),
+        min: 0
+      }),
+
+      ends_at: metadata.text({
+        title: $t('End After'),
+        required: true,
+        dateFormat: 'MM/DD/YYYY',
+        placeholder:'MM/DD/YYYY'
+      }),
+
       layout: metadata.list({
         options: [
           { title: 'Standard', value: 'standard' },

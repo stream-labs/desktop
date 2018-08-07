@@ -14,7 +14,7 @@
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
-  <div slot="content">
+  <div slot="content" class="content">
 
     <!-- browser-source properties tab -->
     <div v-if="value === 'source'">
@@ -34,7 +34,7 @@
     <div v-for="tabItem in tabsList" :key="tabItem.value" v-if="tabItem.value === value">
       <slot :name="tabItem.value + '-controls'">
         <button
-            class="button button--action"
+            class="button button--default"
             @click="close">
           {{ $t('Close') }}
         </button>

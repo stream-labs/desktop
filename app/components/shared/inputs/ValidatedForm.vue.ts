@@ -10,9 +10,14 @@ import { IInputMetadata } from './index';
 @Component({})
 export default class ValidatedForm extends Vue {
 
-  getInputs(): BaseInput<any, IInputMetadata>[] {
-    return this.$children
-      .filter(child => child instanceof BaseInput) as BaseInput<any, IInputMetadata>[];
+  getInputs(children?: Vue[]): BaseInput<any, IInputMetadata>[] {
+    children = children || this.$children;
+    const inputs: BaseInput<any, IInputMetadata>[] = [];
+    children.forEach(child => {
+      if (child instanceof BaseInput) inputs.push(child);
+      if (child.$children.length) inputs.push(...this.getInputs(child.$children));
+    });
+    return inputs;
   }
 
   /**

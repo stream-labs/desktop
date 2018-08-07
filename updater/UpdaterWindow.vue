@@ -1,15 +1,21 @@
 <template>
 <div class="UpdaterWindow">
-  <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
-  {{ message }}
-  <div v-if="(percentComplete !== null) && !installing && !error" class="UpdaterWindow-progressBarContainer">
-    <div
-      class="UpdaterWindow-progressBar"
-      :style="{ width: percentComplete + '%' }"/>
+  <div>
+    <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
+    {{ message }}
+  </div>
+
+  <div v-if="(percentComplete !== null) && !installing && !error">
     <div class="UpdaterWindow-progressPercent">
-      {{ percentComplete }}%
+      {{ percentComplete }}% complete
+    </div>
+    <div class="UpdaterWindow-progressBarContainer">
+      <div
+        class="UpdaterWindow-progressBar"
+        :style="{ width: percentComplete + '%' }"/>
     </div>
   </div>
+
   <div class="UpdaterWindow-issues" v-if="installing">
     This may take a few minutes.  If you are having issues updating, please
     <span class="UpdaterWindow-link" @click="download">
@@ -76,39 +82,41 @@ export default {
 <style lang="less" scoped>
 .UpdaterWindow {
   height: 100%;
-  padding: 40px;
-  background-color: #2b383f;
-  color: #f3f3f4;
+  padding: 32px;
+  background-color: #17242D;
+  color: #ffffff;
   font-size: 18px;
   text-align: center;
   -webkit-app-region: drag
 }
 
+.updater-window__img {
+  width: 48px;
+}
+
 .UpdaterWindow-icon {
-  margin-right: 10px;
+  margin-right: 8px;
 }
 
 .UpdaterWindow-progressBarContainer {
   position: relative;
   margin-top: 40px;
-  background-color: #13242d;
-  border-radius: 3px;
+  background-color: #09161D;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .UpdaterWindow-progressBar {
-  height: 30px;
+  height: 8px;
   background-color: #31c3a2;
 }
 
 .UpdaterWindow-progressPercent {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   text-align: center;
-  line-height: 30px;
-  font-size: 15px;
+  color: #BDC2C4;
+  font-size: 14px;
+  margin: 16px 0 24px 0;
 }
 
 .UpdaterWindow-issues {
