@@ -16,7 +16,8 @@ export interface IChatbotApiServiceState {
 
 export interface IChatbotCommonServiceState {
   toasted: any;
-  commandToUpdate: ICustomCommand;
+  customCommandToUpdate: ICustomCommand;
+  defaultCommandToUpdate: IDefaultCommand;
 }
 
 // responses
@@ -32,6 +33,11 @@ export interface IChatbotAPIPostResponse {
 export interface IChatbotAPIPutResponse {
   success: boolean;
 }
+
+export interface IChatbotAPIDeleteResponse {
+  success: boolean;
+}
+
 
 export interface IDafaultCommandsResponse {
   commands: IDafaultCommandsSlug;
@@ -116,7 +122,7 @@ export interface IDefaultCommand {
   command: string;
   description: string;
   aliases: IAliases;
-  response_type: string;
+  response_type?: string;
   success_response?: string;
   failed_response?: string;
   response?: string;
@@ -125,6 +131,8 @@ export interface IDefaultCommand {
   enabled?: boolean;
   enabled_response?: string;
   disabled_response?: string;
+  slugName?: string;
+  commandName?: string;
 }
 
 export interface IDafaultCommandsSlug {

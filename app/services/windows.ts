@@ -40,6 +40,7 @@ import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 
 import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
+import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
@@ -96,6 +97,7 @@ export function getComponents() {
     StreamBoss,
 
     ChatbotCustomCommandWindow,
+    ChatbotDefaultCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
     ChatbotCapsProtectionWindow,

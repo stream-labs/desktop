@@ -2,6 +2,7 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
   IDafaultCommandsResponse,
+  IDefaultCommand,
   IChatbotAPIPostResponse
 } from 'services/chatbot/chatbot-interfaces';
 
@@ -26,5 +27,13 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       enabled: isEnabled
     };
     this.chatbotApiService.updateDefaultCommand(slugName, commandName, updatedCommand);
+  }
+
+  openCommandWindow(slugName: string, commandName: string, command: IDefaultCommand) {
+    this.chatbotCommonService.openDefaultCommandWindow({
+      ...command,
+      slugName,
+      commandName
+    });
   }
 }

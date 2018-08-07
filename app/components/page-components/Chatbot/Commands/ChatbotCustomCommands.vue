@@ -31,9 +31,9 @@
         <tbody>
           <tr
             v-for="(command, index) in commands"
-            :key="command.command"
+            :key="command.id"
           >
-            <td> {{ $t(command.command) }} {{ index }} </td>
+            <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>
             <td>
               <div class="align-items--inline">
@@ -43,11 +43,11 @@
                 />
                   <DropdownMenu
                   :placement="'bottom-end'"
-                  class="chatbot-alerts__alert-actions_container"
+                  class="chatbot-custom-commands__command-actions__container"
                   :icon="'icon-more'"
                 >
                   <button @click="openCommandWindow(command)" class="button button--action">Edit</button>
-                  <button @click="deleteCommand(index)" class="button button--soft-warning">Delete</button>
+                  <button @click="deleteCommand(command)" class="button button--soft-warning">Delete</button>
                 </DropdownMenu>
               </div>
             </td>
@@ -83,6 +83,22 @@ tbody tr {
         color: @teal;
       }
     }
+  }
+}
+
+.chatbot-custom-commands__command-actions__container {
+  * > button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
   }
 }
 

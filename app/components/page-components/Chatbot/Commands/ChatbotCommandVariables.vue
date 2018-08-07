@@ -64,8 +64,6 @@ tbody tr {
   tbody tr {
     border: 2px solid transparent;
     .transition;
-    .cursor--pointer;
-    .transition;
 
     td {
       color: white;

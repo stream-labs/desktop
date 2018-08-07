@@ -18,6 +18,7 @@ import {
   ITimersResponse,
   IChatbotAPIPostResponse,
   IChatbotAPIPutResponse,
+  IChatbotAPIDeleteResponse,
   ICommandVariablesResponse,
   IChatAlertsResponse,
   ICapsProtectionResponse,
@@ -226,6 +227,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchDefaultCommands();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
@@ -235,6 +237,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
@@ -292,6 +295,21 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         }
       })
   }
+
+  //
+  // DELETE methods
+  //
+
+  deleteCustomCommand(id: string) {
+    return this.api('DELETE', `commands/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchCustomCommands();
+        }
+      }
+    );
+  }
+
 
   //
   // Mutations
@@ -355,7 +373,8 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
 
   static defaultState: IChatbotCommonServiceState = {
     toasted: null,
-    commandToUpdate: null
+    customCommandToUpdate: null,
+    defaultCommandToUpdate: null
   };
 
   bindsToasted(toasted: object) {
@@ -368,10 +387,23 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
 
   openCustomCommandWindow(command?: ICustomCommand) {
     if (command) {
-      this.SET_COMAND_TO_UPDATE(command);
+      this.SET_CUSTOM_COMAND_TO_UPDATE(command);
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotCustomCommandWindow',
+      size: {
+        width: 650,
+        height: 600
+      }
+    });
+  }
+
+  openDefaultCommandWindow(command: IDefaultCommand) {
+    if (command) {
+      this.SET_DEFAULT_COMAND_TO_UPDATE(command);
+    }
+    this.windowsService.showWindow({
+      componentName: 'ChatbotDefaultCommandWindow',
       size: {
         width: 650,
         height: 600
@@ -450,8 +482,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   }
 
   @mutation()
-  private SET_COMAND_TO_UPDATE(command: ICustomCommand) {
-    Vue.set(this.state, 'commandToUpdate', command);
+  private SET_CUSTOM_COMAND_TO_UPDATE(command: ICustomCommand) {
+    Vue.set(this.state, 'customCommandToUpdate', command);
+  }
+
+  @mutation()
+  private SET_DEFAULT_COMAND_TO_UPDATE(command: IDefaultCommand) {
+    Vue.set(this.state, 'defaultCommandToUpdate', command);
   }
 
 }

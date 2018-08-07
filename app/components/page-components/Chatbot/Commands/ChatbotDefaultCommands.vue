@@ -48,7 +48,10 @@
                   :value="command.enabled"
                   @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
                 />
-                <i class="icon-edit padding--5"></i>
+                <i
+                  class="icon-edit padding--5"
+                  @click="openCommandWindow(slugName, commandName, command)"
+                />
               </div>
             </td>
           </tr>
@@ -109,8 +112,6 @@ tbody tr {
 
   tbody tr {
     border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
     .transition;
 
     td {

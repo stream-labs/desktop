@@ -64,7 +64,7 @@
             <td>
               <DropdownMenu
                 :placement="'bottom-end'"
-                class="chatbot-alerts__alert-actions_container"
+                class="chatbot-alerts__alert-actions__container"
                 :icon="'icon-more'"
               >
                 <button @click="onEdit(message, index)" class="button button--action">Edit</button>
@@ -131,7 +131,7 @@
   }
 }
 
-.chatbot-alerts__alert-actions_container {
+.chatbot-alerts__alert-actions__container {
   * > button {
     display: block;
     width: 100%;

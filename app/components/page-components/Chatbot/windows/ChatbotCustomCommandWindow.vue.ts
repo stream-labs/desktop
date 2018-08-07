@@ -3,6 +3,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
+import { cloneDeep } from 'lodash';
 
 import {
   ICustomCommand,
@@ -64,15 +65,17 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   mounted() {
     // if editing existing custom command
-    debugger;
-    if (this.commandToUpdate) {
-      debugger;
-      this.newCommand = this.commandToUpdate;
+    if (this.isEdit) {
+      this.newCommand = cloneDeep(this.customCommandToUpdate);
     }
   }
 
-  get commandToUpdate() {
-    return this.chatbotCommonService.state.commandToUpdate;
+  get isEdit() {
+    return this.customCommandToUpdate && this.customCommandToUpdate.id;
+  }
+
+  get customCommandToUpdate() {
+    return this.chatbotCommonService.state.customCommandToUpdate;
   }
 
   get permissionMetadata() {
@@ -98,6 +101,11 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
+    if (this.isEdit) {
+      this.chatbotApiService.updateCustomCommand(this.customCommandToUpdate.id, this.newCommand);
+      return;
+    }
+
     this.chatbotApiService.createCustomCommand(this.newCommand);
   }
 }

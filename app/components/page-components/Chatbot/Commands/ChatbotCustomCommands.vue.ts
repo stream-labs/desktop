@@ -11,13 +11,13 @@ import {
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
-
   get commands() {
     return this.chatbotApiService.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
+    return this.chatbotApiService.state.customCommandsResponse.pagination
+      .current;
   }
 
   mounted() {
@@ -28,17 +28,16 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotCommonService.openCustomCommandWindow(command);
   }
 
-  deleteCommand(index: number) {
-
+  deleteCommand(command?: ICustomCommand) {
+    this.chatbotApiService.deleteCustomCommand(command.id);
   }
 
   toggleEnableCommand(commandId: string, index: number, isEnabled: boolean) {
     const commandToBeUpdated = this.commands[index];
 
-    this.chatbotApiService
-      .updateCustomCommand(commandId, {
-        ...commandToBeUpdated,
-        enabled: isEnabled
-      });
+    this.chatbotApiService.updateCustomCommand(commandId, {
+      ...commandToBeUpdated,
+      enabled: isEnabled
+    });
   }
 }
