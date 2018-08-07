@@ -365,9 +365,9 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     this.windowsService.closeChildWindow();
   }
 
-  openCommandWindow() {
+  openCustomCommandWindow() {
     this.windowsService.showWindow({
-      componentName: 'ChatbotCommandWindow',
+      componentName: 'ChatbotCustomCommandWindow',
       size: {
         width: 650,
         height: 600

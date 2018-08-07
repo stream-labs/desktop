@@ -63,7 +63,7 @@
 </ModalLayout>
 </template>
 
-<script lang="ts" src="./ChatbotCommandWindow.vue.ts"></script>
+<script lang="ts" src="./ChatbotCustomCommandWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
 .chatbot-add-command__container {

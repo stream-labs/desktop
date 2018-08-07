@@ -4,7 +4,6 @@ import ChatbotAlertsBase from 'components/page-components/Chatbot/module-bases/C
 import NavItem from 'components/shared/NavItem.vue';
 import NavMenu from 'components/shared/NavMenu.vue';
 import ChatbotNewAlertModalWindow from 'components/page-components/Chatbot/windows/ChatbotNewAlertModalWindow.vue';
-import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { $t } from 'services/i18n';
 
 import {
@@ -18,7 +17,6 @@ import {
     NavMenu,
     NavItem,
     ChatbotNewAlertModalWindow,
-    DropdownMenu
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {

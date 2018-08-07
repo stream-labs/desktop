@@ -41,7 +41,14 @@
                   :value="command.enabled"
                   @input="toggleEnableCommand(command.id, index, !command.enabled)"
                 />
-                <i class="icon-edit padding--5"></i>
+                  <DropdownMenu
+                  :placement="'bottom-end'"
+                  class="chatbot-alerts__alert-actions_container"
+                  :icon="'icon-more'"
+                >
+                  <button @click="openCommandWindow(index)" class="button button--action">Edit</button>
+                  <button @click="deleteCommand(index)" class="button button--soft-warning">Delete</button>
+                </DropdownMenu>
               </div>
             </td>
           </tr>

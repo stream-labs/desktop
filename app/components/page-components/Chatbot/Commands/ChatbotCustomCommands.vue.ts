@@ -20,14 +20,15 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   mounted() {
-    //
-    // get list of user's custom commands
-    //
     this.chatbotApiService.fetchCustomCommands(this.currentPage);
   }
 
-  openCommandWindow() {
-    this.chatbotCommonService.openCommandWindow();
+  openCommandWindow(index?: number) {
+    this.chatbotCommonService.openCustomCommandWindow();
+  }
+
+  deleteCommand(index: number) {
+
   }
 
   toggleEnableCommand(commandId: string, index: number, isEnabled: boolean) {

@@ -21,7 +21,7 @@ import {
     ListInput
   }
 })
-export default class ChatbotCommandWindow extends ChatbotWindowsBase {
+export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   newCommand: ICustomCommand = {
     command: null,
     response: null,

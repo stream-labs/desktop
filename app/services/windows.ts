@@ -36,7 +36,7 @@ import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 
-import ChatbotCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCommandWindow.vue';
+import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
 import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
@@ -121,7 +121,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     EventList,
     StreamBoss,
 
-    ChatbotCommandWindow,
+    ChatbotCustomCommandWindow,
     ChatbotTimerWindow,
     ChatbotAlertsWindow,
     ChatbotCapsProtectionWindow,

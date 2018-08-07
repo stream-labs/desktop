@@ -4,17 +4,19 @@ import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbo
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import Tabs from 'components/Tabs.vue';
+import DropdownMenu from 'components/shared/DropdownMenu.vue';
 
 import {
   ChatbotPermissionsEnums,
   ChatbotResponseTypes,
-  ChatbotPunishments
+  ChatbotPunishments,
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
   components: {
     ToggleInput,
     Tabs,
+    DropdownMenu
   }
 })
 export default class ChatbotBase extends Vue {
@@ -22,8 +24,8 @@ export default class ChatbotBase extends Vue {
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   get chatbotPermissions() {
-    let permissions = Object.keys(ChatbotPermissionsEnums)
-      .reduce((a: any[], b: string) => {
+    let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
+      (a: any[], b: string) => {
         if (typeof ChatbotPermissionsEnums[b] === 'number') {
           a.push({
             title: b,
@@ -31,7 +33,9 @@ export default class ChatbotBase extends Vue {
           });
         }
         return a;
-      }, []);
+      },
+      []
+    );
     return permissions;
   }
 
@@ -50,7 +54,6 @@ export default class ChatbotBase extends Vue {
         value: ChatbotPunishments[punishmentType],
         title: punishmentType
       };
-    })
+    });
   }
-
 }
