@@ -40,6 +40,7 @@ import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
+import MediaShare from 'components/widgets/MediaShare.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -81,6 +82,7 @@ export function getComponents() {
     EventList,
     TipJar,
     SponsorBanner,
+    MediaShare,
     StreamBoss
   };
 }
