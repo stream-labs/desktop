@@ -19,9 +19,8 @@
   list-style: none;
   border-left: 1px solid transparent;
   padding-left: 50px;
-  opacity: 0.7;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -30,11 +29,11 @@
     opacity: 1;
     .weight--medium();
     border-color: @navy;
-    color: @navy;
+    color: @day-title;
 
     .fa,
     i {
-      color: @navy;
+      color: @day-title;
     }
   }
 
@@ -49,10 +48,10 @@
 
   .fa,
   i {
-    color: #999;
+    color: @icon;
     position: relative;
-    margin-right: -15px;
-    left: -25px;
+    margin-right: -16px;
+    left: -24px;
     width: 16px;
   }
 }

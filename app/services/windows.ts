@@ -1,5 +1,6 @@
 // This singleton class provides a renderer-space API
 // for spawning various child windows.
+import { cloneDeep } from 'lodash';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
@@ -26,6 +27,8 @@ import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
 import Util from 'services/utils';
+import { Subject } from 'rxjs/Subject';
+
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
@@ -41,48 +44,17 @@ import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/Chatb
 import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
 import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
 
+import TipJar from 'components/widgets/TipJar.vue';
+import SponsorBanner from 'components/widgets/SponsorBanner.vue';
+
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
 const uuid = window['require']('uuid/v4');
 
-export interface IWindowOptions {
-  componentName: string;
-  queryParams?: Dictionary<any>;
-  size?: {
-    width: number;
-    height: number;
-  };
-  scaleFactor: number;
-  title?: string;
-  center?: boolean;
-}
-
-interface IWindowsState {
-  [windowId: string]: IWindowOptions;
-}
-
-export class WindowsService extends StatefulService<IWindowsState> {
-
-  /**
-   * 'main' and 'child' are special window ids that always exist
-   * and have special purposes.  All other windows ids are considered
-   * 'one-off' windows and can be freely created and destroyed.
-   */
-  static initialState: IWindowsState = {
-    main: {
-      componentName: 'Main',
-      scaleFactor: 1,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
-    },
-    child: {
-      componentName: 'Blank',
-      scaleFactor: 1,
-    }
-  };
-
-  // This is a list of components that are registered to be
-  // top level components in new child windows.
-  components = {
+// This is a list of components that are registered to be
+// top level components in new child windows.
+export function getComponents() {
+  return {
     Main,
     Settings,
     SceneTransitions,
@@ -113,6 +85,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     DonationTicker,
     Credits,
     EventList,
+    TipJar,
+    SponsorBanner,
     StreamBoss,
 
     ChatbotCommandWindow,
@@ -120,7 +94,61 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ChatbotAlertsWindow,
     ChatbotCapsProtectionWindow,
   };
+}
 
+
+export interface IWindowOptions {
+  componentName: string;
+  queryParams?: Dictionary<any>;
+  size?: {
+    width: number;
+    height: number;
+  };
+  scaleFactor: number;
+  isShown: boolean;
+  title?: string;
+  center?: boolean;
+  isPreserved?: boolean;
+  preservePrevWindow?: boolean;
+  prevWindowOptions? : IWindowOptions;
+}
+
+interface IWindowsState {
+  [windowId: string]: IWindowOptions;
+}
+
+const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
+  componentName: 'Blank',
+  scaleFactor: 1,
+  isShown: true
+};
+
+export class WindowsService extends StatefulService<IWindowsState> {
+
+  /**
+   * 'main' and 'child' are special window ids that always exist
+   * and have special purposes.  All other windows ids are considered
+   * 'one-off' windows and can be freely created and destroyed.
+   */
+  static initialState: IWindowsState = {
+    main: {
+      componentName: 'Main',
+      scaleFactor: 1,
+      isShown: true,
+      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
+    },
+    child: {
+      componentName: 'Blank',
+      scaleFactor: 1,
+      isShown: false
+    }
+  };
+
+  // This is a list of components that are registered to be
+  // top level components in new child windows.
+  components = getComponents();
+
+  windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -152,11 +180,24 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   closeChildWindow() {
+
+    const windowOptions = this.state.child;
+
+    // show previous window if `preservePrevWindow` flag is true
+    if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
+      ipcRenderer.send('window-showChildWindow', {
+        ...windowOptions.prevWindowOptions,
+        isPreserved: true
+      });
+      return;
+    }
+
+
     ipcRenderer.send('window-closeChildWindow');
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
-    this.updateChildWindowOptions({ componentName: 'Blank' });
+    this.updateChildWindowOptions({ componentName: 'Blank', isShown: false });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
@@ -238,8 +279,23 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
-  updateChildWindowOptions(options: Partial<IWindowOptions>) {
-    this.UPDATE_CHILD_WINDOW_OPTIONS(options);
+  updateChildWindowOptions(optionsPatch: Partial<IWindowOptions>) {
+    const newOptions: IWindowOptions = { ...DEFAULT_WINDOW_OPTIONS, ...optionsPatch };
+    if (newOptions.preservePrevWindow) {
+      const currentOptions = cloneDeep(this.state.child);
+
+      if (currentOptions.preservePrevWindow) {
+        throw new Error('You can\'t use preservePrevWindow option for more that 1 window in the row');
+      }
+
+      newOptions.prevWindowOptions = currentOptions;
+
+      // restrict saving history only for 1 window before
+      delete newOptions.prevWindowOptions.prevWindowOptions;
+    }
+
+    this.SET_CHILD_WINDOW_OPTIONS(newOptions);
+    this.windowUpdated.next({ windowId: 'child', options: newOptions });
   }
 
   updateMainWindowOptions(options: Partial<IWindowOptions>) {
@@ -247,8 +303,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   @mutation()
-  private UPDATE_CHILD_WINDOW_OPTIONS(options: Partial<IWindowOptions>) {
-    this.state.child = { ...this.state.child, ...options };
+  private SET_CHILD_WINDOW_OPTIONS(options: IWindowOptions) {
+    this.state.child = options;
   }
 
   @mutation()

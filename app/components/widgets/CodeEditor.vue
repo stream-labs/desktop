@@ -7,12 +7,16 @@
       <button v-if="hasDefaults" class="button button--default restore-button" @click="restoreDefaults">
         {{ $t('Restore Defaults') }}
       </button>
-      <button class="button button--default discard-button" @click="discardChanges">
+      <button
+        class="button button--soft-warning discard-button"
+        @click="hasChanges && discardChanges()"
+        :class="{ 'is-disabled': !hasChanges }"
+      >
         {{ $t('Discard Changes') }}
       </button>
       <button
           class="button"
-          :class="{'button--action': canSave, 'button--disabled': !canSave }"
+          :class="{'button--action': canSave, 'button--default is-disabled': !canSave }"
           @click="canSave && save()">
         {{ $t('Save') }}
       </button>
@@ -31,28 +35,22 @@
     width: 100%;
     left: 0;
     bottom: 0;
-    background-color: @day-secondary;
-    border-top: 1px solid @day-border;
+    background-color: @day-section;
     padding: 10px 20px;
     text-align: right;
     flex-shrink: 0;
     z-index: 11;
-
-    .button {
-      margin-left: 8px;
-    }
   }
 
   .restore-button,
   .discard-button {
     float: left;
+    .margin-right();
   }
 
   .night-theme {
-
     .modal-layout-controls {
-      border-top-color: @night-border;
-      background-color: @night-primary;
+      background-color: @night-section;
     }
   }
 

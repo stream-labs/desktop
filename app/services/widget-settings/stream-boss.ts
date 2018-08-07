@@ -49,13 +49,13 @@ export interface IStreamBossCreateOptions {
 export abstract class StreamBossService extends WidgetSettingsService<IStreamBossData> {
 
   getWidgetType() {
-    return WidgetType.BitGoal;
+    return WidgetType.StreamBoss;
   }
 
   protected tabs = [
     {
       name: 'goal',
-      title: 'MANAGE BATTLE',
+      title: 'Manage Battle',
       saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/streamboss`,
       autosave: false
     },
