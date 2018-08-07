@@ -34,12 +34,12 @@
             </selectable-widget>
 
             <selectable-widget
-              :selected="selectedWidgets.includes(widgetTypes.TheJar)"
-              :inspected="inspectedWidget === widgetTypes.TheJar"
+              :selected="selectedWidgets.includes(widgetTypes.TipJar)"
+              :inspected="inspectedWidget === widgetTypes.TipJar"
               name="The Jar"
               :description="$t('A jar that catches bits, tips, and more')"
-              @toggle="toggleWidget(widgetTypes.TheJar)"
-              @inspect="inspectWidget(widgetTypes.TheJar)"
+              @toggle="toggleWidget(widgetTypes.TipJar)"
+              @inspect="inspectWidget(widgetTypes.TipJar)"
               @close="closeInspection">
               <img slot="icon" src="../../../../media/images/icons/jar.png">
               <video slot="body" autoplay loop muted src="../../../../media/mp4/jar.mp4"></video>
