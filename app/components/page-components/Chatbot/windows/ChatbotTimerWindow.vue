@@ -2,7 +2,7 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Add Timer')"
+  :title="$t(`${isEdit ? 'Edit' : 'Add'} Timer`)"
 >
   <div slot="content">
     <div>

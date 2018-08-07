@@ -3,6 +3,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import SliderInput from 'components/shared/inputs/SliderInput.vue';
+import { cloneDeep } from 'lodash';
 
 import {
   ITimer,
@@ -50,11 +51,30 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     max: 100
   }
 
+  mounted() {
+    // if editing existing custom command
+    if (this.isEdit) {
+      this.newTimer = cloneDeep(this.timerToUpdate);
+    }
+  }
+
+  get isEdit() {
+    return this.timerToUpdate && this.timerToUpdate.id;
+  }
+
+  get timerToUpdate() {
+    return this.chatbotCommonService.state.timerToUpdate;
+  }
+
   onCancel() {
     this.chatbotCommonService.closeChildWindow();
   }
 
   onSave() {
+    if (this.isEdit) {
+      this.chatbotApiService.updateTimer(this.timerToUpdate.id, this.newTimer);
+      return;
+    }
     this.chatbotApiService.createTimer(this.newTimer);
   }
 }

@@ -247,6 +247,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchTimers();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
@@ -305,6 +306,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       (response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
+        }
+      }
+    );
+  }
+
+  deleteTimer(id: string) {
+    return this.api('DELETE', `timers/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchTimers();
         }
       }
     );
@@ -374,7 +385,8 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   static defaultState: IChatbotCommonServiceState = {
     toasted: null,
     customCommandToUpdate: null,
-    defaultCommandToUpdate: null
+    defaultCommandToUpdate: null,
+    timerToUpdate: null
   };
 
   bindsToasted(toasted: object) {
@@ -411,7 +423,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openTimerWindow() {
+  openTimerWindow(timer?: ITimer) {
+    if (timer) {
+      this.SET_TIMER_TO_UPDATE(timer);
+    }
     this.windowsService.showWindow({
       componentName: 'ChatbotTimerWindow',
       size: {
@@ -491,4 +506,8 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     Vue.set(this.state, 'defaultCommandToUpdate', command);
   }
 
+  @mutation()
+  private SET_TIMER_TO_UPDATE(timer: ITimer) {
+    Vue.set(this.state, 'timerToUpdate', timer);
+  }
 }

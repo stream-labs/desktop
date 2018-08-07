@@ -3,6 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import {
   ITimersResponse,
   ITimersData,
+  ITimer,
   IPagination,
   IChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
@@ -22,8 +23,8 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService.fetchTimers(this.currentPage);
   }
 
-  openTimerWindow() {
-    this.chatbotCommonService.openTimerWindow();
+  openTimerWindow(timer?: ITimer) {
+    this.chatbotCommonService.openTimerWindow(timer);
   }
 
   toggleEnableTimer(timerId: string, index: number, isEnabled: boolean) {
@@ -33,5 +34,9 @@ export default class ChatbotTimers extends ChatbotBase {
       ...timerToBeUpdated,
       enabled: isEnabled
     });
+  }
+
+  deleteTimer(timer?: ITimer) {
+    this.chatbotApiService.deleteTimer(timer.id);
   }
 }

@@ -43,7 +43,14 @@
                 :value="timer.enabled"
                 @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
               />
-              <i class="icon-edit padding--5"></i>
+              <DropdownMenu
+                :placement="'bottom-end'"
+                class="chatbot-timers__timer-actions__container"
+                :icon="'icon-more'"
+              >
+                <button @click="openTimerWindow(timer)" class="button button--action">Edit</button>
+                <button @click="deleteTimer(timer)" class="button button--soft-warning">Delete</button>
+              </DropdownMenu>
             </div>
           </td>
         </tr>
@@ -88,6 +95,23 @@ tbody tr {
     }
   }
 }
+
+.chatbot-timers__timer-actions__container {
+  * > button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
+  }
+}
+
 
 
 .night-theme {

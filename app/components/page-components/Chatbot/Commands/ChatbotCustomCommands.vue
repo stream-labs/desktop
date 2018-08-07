@@ -41,7 +41,7 @@
                   :value="command.enabled"
                   @input="toggleEnableCommand(command.id, index, !command.enabled)"
                 />
-                  <DropdownMenu
+                <DropdownMenu
                   :placement="'bottom-end'"
                   class="chatbot-custom-commands__command-actions__container"
                   :icon="'icon-more'"

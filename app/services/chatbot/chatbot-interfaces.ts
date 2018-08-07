@@ -18,6 +18,7 @@ export interface IChatbotCommonServiceState {
   toasted: any;
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
+  timerToUpdate: ITimer;
 }
 
 // responses
