@@ -1,18 +1,16 @@
 <template>
   <div>
     <div class="section">
-      <div class="section-content">
-        <button class="button button--soft-warning" @click="restoreDefaults">
-          Restore Defaults
-        </button>
-      </div>
+      <button class="button button--soft-warning" @click="restoreDefaults">
+        Restore Defaults
+      </button>
     </div>
 
     <div class="section">
       <div class="section-content">
         <ObsTextInput :value="tokenInput">
           <button
-              class="button button--default button--input"
+              class="button button--default"
               @click="generateToken">
             Update
           </button>

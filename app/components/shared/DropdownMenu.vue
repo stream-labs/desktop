@@ -32,8 +32,8 @@
 .dropdown-menu__toggle {
   display: flex;
   align-items: center;
-  text-transform: uppercase;
-  font-size: 13px;
+  text-transform: capitalize;
+  font-size: 16px;
   .weight--medium();
   color: @day-title;
 

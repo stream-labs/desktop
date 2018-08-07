@@ -56,21 +56,21 @@
     <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
         @click="studioMode"
-        class="link link--uppercase">
+        class="link">
         <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
       </a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openDiscord"
-        class="link link--uppercase">
+        class="link">
         <i class="icon-discord"></i><span>Discord</span>
       </a>
     </div>
     <div class="top-nav-item">
       <a
         @click="openSettingsWindow"
-        class="link link--uppercase">
+        class="link">
         <i class="icon-settings"/><span>{{ $t('Settings') }}</span>
       </a>
     </div>
@@ -113,19 +113,16 @@
 
   &.top-nav-item--active {
     >a {
-      >i, >span {
+      >i,
+      >span {
         color: @teal;
       }
     }
   }
-
-  @media(max-width: 1600px) {
-    font-size: 12px;
-  }
 }
 
 .link {
-  @media(max-width: 1600px) {
+  @media(max-width: 1500px) {
     span {
       display: none;
     }

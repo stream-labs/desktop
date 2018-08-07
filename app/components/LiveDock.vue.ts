@@ -91,12 +91,12 @@ export default class LiveDock extends Vue {
   }
 
   get liveText() {
-    if (this.streamingStatus === EStreamingState.Live) return 'LIVE';
-    if (this.streamingStatus === EStreamingState.Starting) return 'STARTING';
-    if (this.streamingStatus === EStreamingState.Ending) return 'ENDING';
+    if (this.streamingStatus === EStreamingState.Live) return 'Live';
+    if (this.streamingStatus === EStreamingState.Starting) return 'Starting';
+    if (this.streamingStatus === EStreamingState.Ending) return 'Ending';
     if (this.streamingStatus === EStreamingState.Reconnecting)
-      return 'RECONNECTING';
-    return 'OFFLINE';
+      return 'Reconnecting';
+    return 'Offline';
   }
 
   get viewerCount() {

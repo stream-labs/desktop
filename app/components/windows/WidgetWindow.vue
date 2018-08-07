@@ -53,10 +53,6 @@
     padding: 20px;
   }
 
-  .content {
-    padding-top: 20px;
-  }
-
   .display {
     height: 200px !important;
     cursor: pointer;

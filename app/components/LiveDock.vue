@@ -44,7 +44,7 @@
             }"
             @click="toggleViewerCount"/>
           <!-- <i class="icon-team label--icon" /> -->
-          <span class="weight--medium">{{ viewerCount }} </span><span v-if="viewerCount >= 0"> {{ $t('viewers')}}</span>
+          <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
             @click="showEditStreamInfo"
             v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
             v-tooltip="editStreamInfoTooltip">
-            <i class="icon-edit" /> Edit Info
+            <i class="icon-edit" />
           </a>
           <a
             @click="openYoutubeStreamUrl"
@@ -168,7 +168,7 @@
 
   .live-dock-platform-tools {
     a {
-      padding: 0 10px;
+      padding: 0 8px;
     }
   }
 
@@ -195,6 +195,10 @@
       opacity: 1;
     }
   }
+}
+
+.live-dock-viewer-count__count {
+ padding-right: 3px;
 }
 
 .live-dock-chat {
@@ -230,6 +234,10 @@
     background: @icon;
     animation: none;
   }
+}
+
+.live-dock-platform-tools {
+  .flex();
 }
 
 .night-theme {

@@ -2,6 +2,7 @@
   margin-bottom: 24px;
   position: relative;
   display: flex;
+  align-items: flex-start;
 
   &.input-container--no-label {
     width: 100%;
@@ -232,8 +233,16 @@ textarea {
     color: @white;
   }
 
+  .multiselect__option {
+    color: @night-paragraph;
+  }
+
+  .multiselect__option--selected {
+    color: @white;
+  }
+
   .multiselect__option--highlight {
     background: @night-hover;
-    color: @white;
+    color: @night-title;
   }
 }

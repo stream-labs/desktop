@@ -36,7 +36,7 @@
 }
 
 .tab-content {
-  padding-top: 60px;
+  padding-top: 54px;
 }
 
 .night-theme {

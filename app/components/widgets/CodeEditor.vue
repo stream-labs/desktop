@@ -4,13 +4,13 @@
     <code-input v-if="customEnabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
 
     <div class="modal-layout-controls">
-      <button v-if="hasDefaults" class="button button--action restore-button" @click="restoreDefaults">
+      <button v-if="hasDefaults" class="button button--default restore-button" @click="restoreDefaults">
         {{ $t('Restore Defaults') }}
       </button>
       <button
-        class="button discard-button"
+        class="button button--soft-warning discard-button"
         @click="hasChanges && discardChanges()"
-        :class="{'button--action': hasChanges, 'is-disabled': !hasChanges }"
+        :class="{ 'is-disabled': !hasChanges }"
       >
         {{ $t('Discard Changes') }}
       </button>
@@ -45,7 +45,7 @@
   .restore-button,
   .discard-button {
     float: left;
-    margin-right: 8px;
+    .margin-right();
   }
 
   .night-theme {
