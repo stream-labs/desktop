@@ -191,7 +191,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     this.windowsService.showWindow({
       componentName: 'AdvancedAudio',
       size: {
-        width: 1150,
+        width: 1200,
         height: 600
       }
     });

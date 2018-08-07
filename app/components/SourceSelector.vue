@@ -2,9 +2,9 @@
 
   <div class="source-selector">
     <div class="studio-controls-top">
-      <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
+      <h2 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
         {{ $t('Sources') }}
-      </h4>
+      </h2>
       <div>
         <i
           class="icon-add-folder icon-button icon-button--lg"

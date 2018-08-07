@@ -30,10 +30,6 @@
 <style lang="less" scoped>
   @import "../../../styles/index";
 
-  .row {
-    margin-bottom: 20px;
-  }
-
   .input-container {
     display: flex;
     align-items: center;

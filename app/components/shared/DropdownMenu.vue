@@ -21,19 +21,19 @@
 .dropdown-menu {
   top: 5px !important;
   background-color: @day-primary;
-  .border();
   .radius();
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
   z-index: 200000;
+  .day-shadow();
 }
 
 .dropdown-menu__toggle {
   display: flex;
   align-items: center;
-  text-transform: uppercase;
-  font-size: 13px;
+  text-transform: capitalize;
+  font-size: 16px;
   .weight--medium();
   color: @day-title;
 
@@ -78,10 +78,9 @@
 }
 
 .night-theme {
-  .dropdown-menu__menu,
   .dropdown-menu {
     background-color: @night-primary;
-    border-color: @night-secondary;
+    .night-shadow();
   }
 
   .dropdown-menu__item {

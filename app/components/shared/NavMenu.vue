@@ -12,18 +12,9 @@
 .nav-menu {
   margin: 0 0 -20px -20px;
   flex: 0 0 220px;
-  border-right: 1px solid @day-border;
   display: flex;
   flex-direction: column;
-  background: @day-secondary;
   margin-top: -20px;
   padding-top: 20px;
-}
-
-.night-theme {
-  .nav-menu {
-    border-color: @night-secondary;
-    background-color: @night-secondary;
-  }
 }
 </style>
