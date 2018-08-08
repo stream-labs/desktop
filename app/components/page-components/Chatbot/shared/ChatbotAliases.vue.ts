@@ -17,11 +17,16 @@ export default class ChatbotTimers extends Vue {
   newAlias: string = null;
 
   textInputMetadata: ITextMetadata = {
-    placeholder: 'An alternative text string to trigger your command'
+    placeholder: '!example'
   };
+
+  get isDuplicate() {
+    return this.value.length > 0 && this.newAlias && this.value.indexOf(this.newAlias) > -1;
+  }
 
   onAddAlias() {
     if (!this.newAlias) return;
+    if (this.isDuplicate) return;
 
     let newAliasArray = this.value.slice(0);
     newAliasArray.push(this.newAlias);

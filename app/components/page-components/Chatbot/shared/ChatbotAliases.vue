@@ -1,6 +1,9 @@
 <template>
-<div class="chatbot-aliases__container">
-  <label for="alias" class="margin-vertical--10">Enter Aliases</label>
+<form
+  class="chatbot-aliases__container"
+  @submit.prevent="onAddAlias"
+>
+  <label for="alias" class="margin-vertical--10"> {{ $t('Enter Aliases') }} </label>
   <div class="row">
     <div class="small-9 columns">
       <TextInput
@@ -11,17 +14,23 @@
     </div>
     <div class="small-3 columns">
       <button
-        class="chatbot-aliases__new-alias__button"
-        @click="onAddAlias"
+        type="submit"
+        :disabled="!newAlias || isDuplicate"
+        class="chatbot-aliases__new-alias__button button button--default"
       >
-        Add Alias
+        {{ $t('Add Alias') }}
       </button>
     </div>
   </div>
-  <div class="align-items--inline">
+  <div class="margin-vertical--10">
+    <i v-if="isDuplicate" > {{ $t('Cannot add duplicate aliases. Please add something else.') }} </i>
+    <i v-else> {{ $t('An alternative text string to trigger your command') }} </i>
+  </div>
+
+  <div class="chatbot-aliases__aliases_wrapper">
     <div
-      v-for="alias in value"
-      :key="alias"
+      v-for="(alias, index) in value"
+      :key="`${alias}__${index}`"
       class="chatbot-aliases__alias"
       @click="onDeleteAlias(alias)"
     >
@@ -29,7 +38,7 @@
       {{ alias }}
     </div>
   </div>
-</div>
+</form>
 </template>
 
 <script lang="ts" src="./ChatbotAliases.vue.ts"></script>
@@ -39,9 +48,13 @@
 .chatbot-aliases__container {
 
   .chatbot-aliases__new-alias__button {
-    .button();
-    .text-transform--capitalize();
+    .text-transform--capitalize;
     .width--100();
+  }
+
+  .chatbot-aliases__aliases_wrapper {
+    .align-items--inline;
+    .margin-top();
   }
   .chatbot-aliases__alias {
     margin-right: 10px;
