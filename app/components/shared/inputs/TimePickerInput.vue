@@ -13,11 +13,3 @@
 </template>
 
 <script lang="ts" src="./TimePickerInput.vue.ts"></script>
-
-<style lang="less">
-  @import "../../../styles/index";
-
-  .night-theme {
-
-  }
-</style>

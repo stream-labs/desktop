@@ -4,6 +4,7 @@ import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { cloneDeep } from 'lodash';
+import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 
 import {
   IDefaultCommand,
@@ -32,7 +33,8 @@ interface IDefaultCommandMetadata {
   components: {
     TextInput,
     TextAreaInput,
-    ListInput
+    ListInput,
+    ChatbotAliases
   }
 })
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
@@ -70,10 +72,18 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         'The phrase that will appear after a user enters the command'
       ),
       new_alias: this.stringMetadata('Add a new command alias'),
-      success_response: this.stringMetadata('The phrase that will appear after a successful command'),
-      failed_response: this.stringMetadata('The phrase that will appear after a failed command'),
-      enabled_response: this.stringMetadata('The phrase that will appear after a command is enabled'),
-      disabled_response: this.stringMetadata('The phrase that will appear after a command is disabled'),
+      success_response: this.stringMetadata(
+        'The phrase that will appear after a successful command'
+      ),
+      failed_response: this.stringMetadata(
+        'The phrase that will appear after a failed command'
+      ),
+      enabled_response: this.stringMetadata(
+        'The phrase that will appear after a command is enabled'
+      ),
+      disabled_response: this.stringMetadata(
+        'The phrase that will appear after a command is disabled'
+      ),
       response_type: this.responseTypeMetadata
     };
     return metadata;

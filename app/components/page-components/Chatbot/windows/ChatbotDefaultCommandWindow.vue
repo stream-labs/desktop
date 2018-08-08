@@ -66,7 +66,7 @@
         </div>
       </div>
       <div v-if="selectedTab === 'advanced'">
-        Advanced Stuff
+        <ChatbotAliases v-model="editedCommand.aliases" />
       </div>
     </transition>
   </div>
