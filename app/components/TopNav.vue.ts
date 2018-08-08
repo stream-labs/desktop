@@ -57,7 +57,7 @@ export default class TopNav extends Vue {
   }
 
   openHelp() {
-    electron.remote.shell.openExternal('https://qa.nicovideo.jp');
+    electron.remote.shell.openExternal('https://qa.nicovideo.jp/faq/show/11856');
   }
 
   get isDevMode() {
