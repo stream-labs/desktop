@@ -1,11 +1,7 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import {
-  ITimersResponse,
-  ITimersData,
   ITimer,
-  IPagination,
-  IChatbotAPIPutResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})

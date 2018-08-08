@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js install
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add vue2-timepicker
 
 PATH: 
   C:\Users\Oat\Downloads\cmder\bin;C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\iCLS\;C:\Program Files\Intel\Intel(R) Management Engine Components\iCLS\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\ProgramData\chocolatey\bin;C:\Users\Oat\AppData\Local\Microsoft\WindowsApps;C:\Users\Oat\AppData\Local\hyper\app-2.0.0\resources\bin;C:\Users\Oat\AppData\Roaming\npm;C:\Users\Oat\AppData\Local\Yarn\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\mingw64;C:\Program Files\Git\usr\bin;C:\Users\Oat\Downloads\cmder
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: EPERM: operation not permitted, unlink 'C:\Users\Oat\Documents\projects\slobs\node_modules\obs-studio-node\libobs\bin\64bit\avformat-57.dll'
+  Error: EBUSY: resource busy or locked, unlink 'C:\Users\Oat\Documents\projects\slobs\node_modules\electron\dist\debug.log'
 
 npm manifest: 
   {

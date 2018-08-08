@@ -43,7 +43,23 @@
         </div>
       </div>
       <div v-if="selectedTab === 'advanced'">
-        Advanced Stuff
+        <div class="row">
+          <div class="small-5 columns">
+            <label for="global_cooldown" class="margin-vertical--10">Global Command Cooldown</label>
+            <TimePickerInput
+              v-model="globalCooldown"
+              :metadata="timerMetadata"
+            />
+          </div>
+          <div class="small-5 columns">
+            <label for="user_cooldown" class="margin-vertical--10">User Command Cooldown</label>
+            <TimePickerInput
+              v-model="userCooldown"
+              :metadata="timerMetadata"
+            />
+          </div>
+        </div>
+        <ChatbotAliases v-model="newCommand.aliases" />
       </div>
     </transition>
   </div>

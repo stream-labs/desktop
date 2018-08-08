@@ -1,9 +1,7 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import {
-  IDafaultCommandsResponse,
   IDefaultCommand,
-  IChatbotAPIPostResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 
@@ -15,9 +13,6 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   mounted() {
-    //
-    // get list of user's default commands
-    //
     this.chatbotApiService.fetchDefaultCommands();
   }
 

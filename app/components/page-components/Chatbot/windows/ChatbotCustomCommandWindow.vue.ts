@@ -2,6 +2,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
+import TimePickerInput, { ITimeInputValueMetadata } from 'components/shared/inputs/TimePickerInput.vue';
+import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { cloneDeep } from 'lodash';
 
@@ -9,17 +11,19 @@ import {
   ICustomCommand,
 } from 'services/chatbot/chatbot-interfaces';
 
-
 import {
   IListMetadata,
   ITextMetadata,
+  ITimeMetadata,
 } from 'components/shared/inputs/index';
 
 @Component({
   components: {
     TextInput,
     TextAreaInput,
-    ListInput
+    ListInput,
+    TimePickerInput,
+    ChatbotAliases,
   }
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
@@ -70,6 +74,40 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     }
   }
 
+  get globalCooldown() {
+    return {
+      HH: Math.round(this.newCommand.cooldowns.global / 60).toLocaleString(
+        undefined,
+        { minimumIntegerDigits: 2 }
+      ),
+      mm: (this.newCommand.cooldowns.global % 60).toLocaleString(undefined, {
+        minimumIntegerDigits: 2
+      })
+    };
+  }
+
+  set globalCooldown(timeObject: ITimeInputValueMetadata) {
+    const { HH, mm } = timeObject;
+    this.newCommand.cooldowns.global = parseInt(HH) * 60 + parseInt(mm);
+  }
+
+  get userCooldown() {
+    return {
+      HH: Math.round(this.newCommand.cooldowns.user / 60).toLocaleString(
+        undefined,
+        { minimumIntegerDigits: 2 }
+      ),
+      mm: (this.newCommand.cooldowns.user % 60).toLocaleString(undefined, {
+        minimumIntegerDigits: 2
+      })
+    };
+  }
+
+  set userCooldown(timeObject: ITimeInputValueMetadata) {
+    const { HH, mm } = timeObject;
+    this.newCommand.cooldowns.user = parseInt(HH) * 60 + parseInt(mm);
+  }
+
   get isEdit() {
     return this.customCommandToUpdate && this.customCommandToUpdate.id;
   }
@@ -92,6 +130,14 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return showToMetadata;
   }
 
+  get timerMetadata() {
+    let timerMetadata: ITimeMetadata = {
+      format: 'HH:mm',
+      hideClearButton: true
+    };
+    return timerMetadata;
+  }
+
   onSelectTab(tab: string) {
     this.selectedTab = tab;
   }
@@ -102,7 +148,10 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   onSave() {
     if (this.isEdit) {
-      this.chatbotApiService.updateCustomCommand(this.customCommandToUpdate.id, this.newCommand);
+      this.chatbotApiService.updateCustomCommand(
+        this.customCommandToUpdate.id,
+        this.newCommand
+      );
       return;
     }
 
