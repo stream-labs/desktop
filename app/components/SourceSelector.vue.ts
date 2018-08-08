@@ -94,7 +94,8 @@ export default class SourceSelector extends Vue {
     if (!isLeaf) { return 'fa fa-folder'; }
     const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
     if (sourceDetails.isStreamlabel) { return 'fas fa-file-alt'; }
-    if (sourceDetails.widgetType) { return widgetIconMap[sourceDetails.widgetType]; }
+    // We want simple equality here to also check for undefined
+    if (sourceDetails.widgetType != null) { return widgetIconMap[sourceDetails.widgetType]; }
     return sourceIconMap[sourceDetails.type] || 'fas fa-file';
   }
 
