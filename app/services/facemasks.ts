@@ -213,9 +213,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   trigger(mask: string, message: string, name: string) {
+    const clean = this.profanitize(message, name);
     this.updateFilter({
       Mask: `${mask}.json`,
-      alertText: this.profanitize(message, name)['message'],
+      alertText: clean['message'],
+      donorName: clean['name'],
       alertActivate: true
     });
     this.playAudio();
