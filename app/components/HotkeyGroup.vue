@@ -14,7 +14,7 @@
     {{ title }}
   </h2>
   <div class="section-content" v-show="!collapsed">
-    <div v-for="hotkey in hotkeys" :key="hotkey">
+    <div v-for="hotkey in hotkeys" :key="`${hotkey.actionName}${hotkey.sceneId}${hotkey.sourceId}${hotkey.sceneItemId}`">
       <hotkey :hotkey="hotkey" />
     </div>
   </div>
