@@ -27,7 +27,9 @@
         </div>
       </div>
       <div v-if="selectedTab === 'blacklist'">
-        blacklist Stuff
+        <ChatbotWordProtectionList
+          v-model="wordProtection.blacklist"
+        />
       </div>
     </transition>
   </div>

@@ -20,7 +20,7 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchLinkProtection();
     this.chatbotApiService.fetchWordProtection();
 
-    this.chatbotCommonService.bindsToasted(this.$toasted);
+    // this.chatbotCommonService.bindsToasted(this.$toasted);
   }
 
   get modules() {

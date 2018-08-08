@@ -29,11 +29,6 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();
-        this.chatbotCommonService.showToast($t('Saved successfully'), {
-          duration: 3000,
-          position: 'top-right',
-          className: 'toast-success'
-        });
       });
   }
 }

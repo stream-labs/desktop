@@ -2,15 +2,16 @@
 <div>
   <div class="flex flex--end">
     <button @click="onAddingNewItem(null, -1)" class="button button--action">
-      {{ $t('Add Link') }}
+      {{ $t('Add Word/ Phrase') }}
     </button>
   </div>
 
   <table v-if="value.length > 0">
     <thead>
       <tr>
-        <th>Link</th>
-        <th></th>
+        <th>Word</th>
+        <th>Punishment</th>
+        <th>Duration in min.</th>
       </tr>
     </thead>
     <tbody>
@@ -18,7 +19,9 @@
         v-for="(item, index) in value"
         :key="`${item}__${index}`"
       >
-        <td> {{ item }} </td>
+        <td> {{ item.text }} </td>
+        <td> {{ item.punishment.type }} </td>
+        <td> {{ item.punishment.duration }} </td>
         <td>
           <div class="align-items--inline">
             <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
@@ -30,21 +33,40 @@
   </table>
   <label v-else> {{ $t('No items in list. Add new.') }} </label>
   <modal
-    :name="NEW_LINK_PROTECTION_LIST_MODAL_ID"
+    :name="NEW_WORD_PROTECTION_LIST_MODAL_ID"
     :height="'auto'"
     :maxHeight="300"
   >
     <form @submit.prevent="onAddNewItem" class="new-list-item__container">
       <div class="new-list-item-modal__header">
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
-        <div class="new-list-item-modal__header__title">{{ $t(title) }}</div>
+        <div class="new-list-item-modal__header__title">{{ $t('Add to Blacklist') }}</div>
       </div>
       <div class="new-list-item-modal__body">
-        <TextInput
-          class="width--100"
-          :metadata="textInputMetadata"
-          v-model="newListItem"
-        />
+        <div class="row">
+          <div class="small--7 columns">
+            <label for="text" class="margin-vertical--10">Word or Phrase</label>
+            <TextInput
+              class="width--100"
+              :metadata="metadata.text"
+              v-model="newListItem.text"
+            />
+          </div>
+          <div class="small--5 columns">
+            <label for="show to" class="margin-vertical--10">Punishment</label>
+            <ListInput
+              v-model="newListItem.punishment.type"
+              :metadata="metadata.punishment.type"
+            />
+          </div>
+        </div>
+        <div>
+          <label for="show to" class="margin-vertical--10">Punishment duration in minutes</label>
+          <NumberInput
+            v-model="newListItem.punishment.duration"
+            :metadata="metadata.punishment.duration"
+          />
+        </div>
       </div>
       <div class="new-list-item-modal__controls">
         <button
@@ -65,7 +87,7 @@
 </div>
 </template>
 
-<script lang="ts" src="./ChatbotLinkProtectionList.vue.ts"></script>
+<script lang="ts" src="./ChatbotWordProtectionList.vue.ts"></script>
 
 <style lang="less" scoped>
 @import "../../../../styles/index";

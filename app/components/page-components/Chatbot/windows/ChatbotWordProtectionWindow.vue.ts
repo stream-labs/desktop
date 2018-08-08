@@ -1,8 +1,13 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
+import ChatbotWordProtectionList from 'components/page-components/Chatbot/windows/ChatbotWordProtectionList.vue';
 
-@Component({})
+@Component({
+  components: {
+    ChatbotWordProtectionList
+  }
+})
 export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
   tabs: { name: string; value: string }[] = [
     {
@@ -29,11 +34,6 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();
-        this.chatbotCommonService.showToast($t('Saved successfully'), {
-          duration: 3000,
-          position: 'top-right',
-          className: 'toast-success'
-        });
       });
   }
 }

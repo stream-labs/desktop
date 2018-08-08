@@ -389,9 +389,9 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     timerToUpdate: null
   };
 
-  bindsToasted(toasted: object) {
-    this.BINDS_TOASTED(toasted);
-  }
+  // bindsToasted(toasted: object) {
+  //   this.BINDS_TOASTED(toasted);
+  // }
 
   closeChildWindow() {
     this.windowsService.closeChildWindow();
@@ -487,14 +487,15 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   }
 
 
-  showToast(message: string, options: object) {
-    this.state.toasted.show(message, options);
-  }
+  // @mutation()
+  // showToast(message: string, options: object) {
+  //   this.state.toasted.show(message, options);
+  // }
 
-  @mutation()
-  private BINDS_TOASTED(toasted: object) {
-    Vue.set(this.state, 'toasted', toasted);
-  }
+  // @mutation()
+  // private BINDS_TOASTED(toasted: object) {
+  //   Vue.set(this.state, 'toasted', toasted);
+  // }
 
   @mutation()
   private SET_CUSTOM_COMAND_TO_UPDATE(command: ICustomCommand) {

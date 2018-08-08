@@ -1,5 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
-import Vue from 'vue';
+import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 
 import { ITextMetadata } from 'components/shared/inputs/index';
@@ -13,7 +13,7 @@ import {
     TextInput
   }
 })
-export default class ChatbotLinkProtectionList extends Vue {
+export default class ChatbotLinkProtectionList extends ChatbotBase {
   @Prop() value: string[];
   @Prop() title: string;
 
@@ -29,7 +29,11 @@ export default class ChatbotLinkProtectionList extends Vue {
   }
 
   get isDuplicate() {
-    return this.value.length > 0 && this.newListItem && this.value.indexOf(this.newListItem) > -1;
+    return (
+      this.value.length > 0 &&
+      this.newListItem &&
+      this.value.indexOf(this.newListItem) > -1
+    );
   }
 
   onAddingNewItem(editedItem?: string, index: number = -1) {
@@ -54,8 +58,7 @@ export default class ChatbotLinkProtectionList extends Vue {
     if (this.editIndex > -1) {
       // editing existing item
       newListItemArray.splice(this.editIndex, 1, this.newListItem);
-    }
-    else {
+    } else {
       newListItemArray.push(this.newListItem);
     }
     this.$emit('input', newListItemArray);
