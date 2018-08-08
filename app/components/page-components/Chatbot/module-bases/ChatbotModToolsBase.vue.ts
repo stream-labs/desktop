@@ -5,6 +5,7 @@ import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
+import SliderInput from 'components/shared/inputs/SliderInput.vue';
 
 import {
   ICapsProtectionData,
@@ -91,7 +92,8 @@ interface IProtectionMetadata {
     TextInput,
     TextAreaInput,
     ListInput,
-    NumberInput
+    NumberInput,
+    SliderInput
   }
 })
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
@@ -215,10 +217,10 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return {
       text: {
         required: true,
-        placeholder: 'word to protect',
+        placeholder: 'word to protect'
       },
       is_regex: {
-        required: true,
+        required: true
       },
       punishment: {
         type: {
@@ -230,7 +232,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           placeholder: 'Punishment Duration in minutes',
           min: 0
         }
-      },
+      }
     };
   }
 

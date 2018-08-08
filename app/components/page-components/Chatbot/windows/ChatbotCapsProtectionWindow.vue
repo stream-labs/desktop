@@ -43,7 +43,27 @@
         </div>
       </div>
       <div v-if="selectedTab === 'advanced'">
-        Advanced Stuff
+        <div>
+          <label for="response" class="margin-vertical--10">Minimum Amount of Caps</label>
+          <NumberInput
+            v-model="capsProtection.advanced.minimum"
+            :metadata="metadata.caps.advanced.minimum"
+          />
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Maximum Amount of Caps</label>
+          <NumberInput
+            v-model="capsProtection.advanced.maximum"
+            :metadata="metadata.caps.advanced.maximum"
+          />
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Maximum Percent</label>
+          <SliderInput
+            v-model="capsProtection.advanced.percent"
+            :metadata="metadata.caps.advanced.percent"
+          />
+        </div>
       </div>
     </transition>
   </div>
