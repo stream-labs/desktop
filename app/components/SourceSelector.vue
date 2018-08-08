@@ -40,7 +40,7 @@
 
       <template slot="title" slot-scope="{ node }">
         <span class="layer-icon">
-          <i :class="determineIcon(node.isLeaf, node.data)"></i>
+          <i :class="determineIcon(node.isLeaf, node.data.sourceId)"></i>
         </span>
         <span class="item-title">{{ node.title }}</span>
       </template>
