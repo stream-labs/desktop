@@ -1,16 +1,11 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.9.6',
-  title: 'Improving Stability 🔧',
+  version: '0.9.8',
+  title: 'UI Tweaks 🔧',
   showChest: false,
   notes: [
-    'The focus of this patch is improving overall stability of the application. ' +
-      'We have fixed a number of application crashes and are continuing to investigate ' +
-      'and fix crashes going forward.',
-    'Fixed an issue where the "Configure Video" button would not work ' +
-      'for Elgato capture cards.',
-    'Improved the performance of the source properties window and various settings inputs',
-    'Fixed a bug where incorrect source names were displayed in the compressor filter settings'
+    "We've made lots of small style tweaks across our UI to improve readability and usability",
+    'Fixed a bug where window capture would reset to a different window when opening source properties'
   ]
 };
