@@ -1,43 +1,50 @@
 // Tools for dealing with forms in spectron
 
 async function getNthLabelId(t, label, index) {
-  return (await t.context.app.client.$$(`label=${label}`))[index].ELEMENT;
+  return (await t.context.app.client.$$(label))[index].ELEMENT;
 }
 
 export async function setFormInput(t, label, value, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
-    .elementIdElement(id, '../..')
-    .setValue('input', value);
+    .elementIdElement(id, 'input')
+    .setValue(value);
 }
 
 export async function getFormInput(t, label, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   return t.context.app.client
-    .elementIdElement(id, '../..')
-    .getValue('input');
+    .elementIdElement(id, 'input')
+    .getValue();
 }
 
 export async function clickFormInput(t, label, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click('input');
+    .elementIdElement(id, 'input')
+    .click();
 }
 
 export async function setFormDropdown(t, label, value, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click('.multiselect');
+    .elementIdElement(id, '.multiselect')
+    .click();
 
   await t.context.app.client
-    .elementIdElement(id, '../..')
-    .click(`li=${value}`);
+    .elementIdElement(id, `[data-test="${value}"]`)
+    .click();
+}
+
+export async function getFormDropdown(t, label, index = 0) {
+  const id = await getNthLabelId(t, label, index);
+
+  return t.context.app.client
+    .elementIdAttribute(id, 'data-test-value');
 }
 
 // Percent is a value between 0 and 1

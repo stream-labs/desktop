@@ -1,5 +1,5 @@
 <template>
-<div class="input-container">
+<div :data-test="testingAnchor" class="input-container">
   <div class="input-label">
     <label>{{ value.description }}</label>
   </div>

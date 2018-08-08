@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div :data-test="testingAnchor">
     <div class="input-container">
       <div class="input-label">
-        <label>Font Family</label>
+        <label>{{ $t('settings.fontFamily') }}</label>
       </div>
       <div class="input-wrapper">
         <multiselect
@@ -19,12 +19,15 @@
               {{ props.option.family }}
             </span>
           </template>
+          <template slot="noResult">
+            {{ $t('settings.itemNotFoundMessage') }}
+          </template>
         </multiselect>
       </div>
     </div>
     <div class="input-container">
       <div class="input-label">
-        <label>Font Style</label>
+        <label>{{ $t('settings.fontStyle') }}</label>
       </div>
       <div class="input-wrapper">
         <multiselect
@@ -41,6 +44,9 @@
               :style="styleForFont(props.option)">
               {{ props.option.style }}
             </span>
+          </template>
+          <template slot="noResult">
+            {{ $t('settings.itemNotFoundMessage') }}
           </template>
         </multiselect>
       </div>

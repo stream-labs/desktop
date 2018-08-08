@@ -10,6 +10,12 @@ export default class GenericForm extends Vue {
   @Prop()
   value: IFormInput<TObsValue>[];
 
+  @Prop()
+  category: string;
+
+  @Prop()
+  subCategory: string;
+
   propertyComponentForType = propertyComponentForType;
 
   onInputHandler(value: IFormInput<TObsValue>, index: number) {

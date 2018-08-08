@@ -39,16 +39,12 @@
 
 // Border radius
 .radius {
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 // Borders
 .border {
-  border: 1px solid @day-border;
-}
-
-.night-border {
-  border: 1px solid @night-border;
+  border: 1px solid @border;
 }
 
 // Typography
@@ -58,7 +54,6 @@
 
 .semibold {
   font-weight: 500;
-  src: local('Roboto Medium');
 }
 
 .bold {
@@ -66,7 +61,7 @@
 }
 
 .teal {
-  color: @teal;
+  color: @accent;
 }
 
 .warning {
@@ -79,7 +74,7 @@
 
 // Hovers
 .icon-hover {
-  color: @grey;
+  color: @text-primary;
   opacity: .7;
   transition: all 275ms;
 
@@ -103,11 +98,7 @@
 
 // Shadows
 .shadow {
-  box-shadow: 0 6px 14px @shadow;
-}
-
-.night-shadow {
-  box-shadow: 0 6px 14px 1px rgba(1, 2, 2, 0.3);
+  box-shadow: 0 6px 14px 1px rgba(1, 2, 2, .3);
 }
 
 // Transitiions
@@ -122,15 +113,8 @@
 
 .semibold {
   font-weight: 500;
-  src: local('Roboto Medium');
 }
 
 .bold {
   font-weight: 700;
-}
-
-.night-theme {
-  .teal {
-    color: @teal-bright;
-  }
 }

@@ -1,14 +1,20 @@
 <template>
   <div>
-    <div v-if="loggedIn">
+    <div class="login__status" v-if="loggedIn">
+      <a
+        @click="openUserpage"
+        class="link user__profile">
+          <img class="user__thumbnail" :src="userIcon">
+          <span class="user__name">{{ username }}</span>
+      </a>
       <a class="link" @click="logout">
-        <i class="icon-logout"/> <span class="user__name">{{ username }}</span>
+        <i class="icon-log-out"/> {{ $t('common.logout') }}
       </a>
     </div>
     <div
       v-else>
-      <a class="link link--uppercase" @click="login">
-        <i class="fa fa-sign-in"/> {{ $t('Login') }}
+      <a class="link" @click="login">
+        <i class="icon-log-in" /> {{ $t('common.login') }}
       </a>
     </div>
   </div>
@@ -18,12 +24,37 @@
 
 <style lang="less" scoped>
 @import "../styles/index";
+.login__status {
+  display: flex;
+  align-items: center;
 
-.user__name {
-  .semibold;
+}
+.user__profile {
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  
+  .user__thumbnail {
+    display: flex;
+    align-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    margin-right: 4px;
+    opacity: .8;
+    background-color: @text-secondary;
+  }
 
-  @media(max-width: 1600px) {
-    display: none;
+  .user__name {
+    display: inline-block;
+    max-width: 160px;
+    text-align: left;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    .semibold;
+
   }
 }
 </style>

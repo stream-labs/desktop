@@ -8,31 +8,53 @@ import AddSourceInfo from './AddSourceInfo.vue';
 import { SourcesService, TSourceType, TPropertiesManager } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
-import { WidgetsService, WidgetType } from 'services/widgets';
+const BrowserSourceIcon = require('../../../media/images/browser-source-icon.svg');
+const ColorSourceIcon = require('../../../media/images/color-source-icon.svg');
+const DshowInputIcon = require('../../../media/images/display-icon.svg');
+const ImageSourceIcon = require('../../../media/images/slideshow-icon.svg');
+const WindowCaptureIcon = require('../../../media/images/window-capture-icon.svg');
+const AddSceneIcon = require('../../../media/images/add-scene-icon.svg');
+const AddFileIcon = require('../../../media/images/add-file-icon.svg');
+const WasapiInputCaptureIcon = require('../../../media/images/wasapi-input-icon.svg');
+const GameCaptureIcon = require('../../../media/images/game-capture-icon.svg');
+const TextGdiplusIcon = require('../../../media/images/text-gdiplus-icon.svg');
+const FfmpegSourceIcon = require('../../../media/images/ffmpeg-source-icon.svg');
+const SlideshowIcon = require('../../../media/images/slideshow-icon.svg');
+const WasapiOutputIcon = require('../../../media/images/wasapi-output-icon.svg');
+const MonitorCaptureIcon = require('../../../media/images/monitor-capture-icon.svg');
 
-
-type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
+type TInspectableSource = TSourceType;
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
-  widgetType?: WidgetType;
 }
 
 @Component({
   components: {
     ModalLayout,
-    AddSourceInfo
+    AddSourceInfo,
+    BrowserSourceIcon,
+    ColorSourceIcon,
+    DshowInputIcon,
+    ImageSourceIcon,
+    WindowCaptureIcon,
+    AddSceneIcon,
+    AddFileIcon,
+    WasapiInputCaptureIcon,
+    TextGdiplusIcon,
+    GameCaptureIcon,
+    FfmpegSourceIcon,
+    SlideshowIcon,
+    WasapiOutputIcon,
+    MonitorCaptureIcon
   },
   mixins: [windowMixin],
 })
 export default class SourcesShowcase extends Vue {
   @Inject() sourcesService: SourcesService;
   @Inject() userService: UserService;
-  @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
-
-  widgetTypes = WidgetType;
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
@@ -42,27 +64,15 @@ export default class SourcesShowcase extends Vue {
         return source.isSameType({
           type: sourceType,
           propertiesManager: managerType,
-          widgetType: options.widgetType
         });
       })
       .length;
 
     if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
+      this.sourcesService.showAddSource(sourceType, managerType);
     } else {
-      if (managerType === 'widget') {
-        this.sourcesService.showNameWidget(options.widgetType);
-      } else {
-        this.sourcesService.showNameSource(sourceType, managerType);
-      }
+      this.sourcesService.showNameSource(sourceType, managerType);
     }
-  }
-
-  selectWidget(type: WidgetType) {
-    this.selectSource('browser_source', {
-      propertiesManager: 'widget',
-      widgetType: type
-    });
   }
 
   inspectedSource: TInspectableSource = null;
@@ -82,10 +92,6 @@ export default class SourcesShowcase extends Vue {
   selectInspectedSource() {
     if (this.sourcesService.getAvailableSourcesTypes().includes(this.inspectedSource as TSourceType)) {
       this.selectSource(this.inspectedSource as TSourceType);
-    } else if (this.inspectedSource === 'streamlabel') {
-      this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
-    } else {
-      this.selectWidget(this.inspectedSource as WidgetType);
     }
   }
 

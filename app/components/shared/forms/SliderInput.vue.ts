@@ -12,6 +12,7 @@ class SliderInput extends Input<ISliderInputValue> {
 
   @Prop()
   value: ISliderInputValue;
+  testingAnchor = `Form/Slider/${this.value.name}`;
 
   @throttle(100)
   updateValue(value: number) {

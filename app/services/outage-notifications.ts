@@ -28,7 +28,7 @@ interface IOutageNotification {
 }
 
 // Configuration
-const S3_BUCKET = 'streamlabs-obs';
+const S3_BUCKET = ''; // TODO: set bucket name
 const S3_KEY = 'outage-notification.json';
 const POLLING_INTERVAL = 5 * 60 * 1000;
 

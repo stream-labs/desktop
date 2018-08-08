@@ -5,12 +5,9 @@ import { Component, Prop } from 'vue-property-decorator';
 export default class AddSourceInfo extends Vue {
 
   @Prop()
-  name: string;
-
-  @Prop()
-  description: string;
+  sourceType: string;
 
   @Prop({ default: true })
-  showSupport: boolean;
+  showAttention: boolean;
 
 }

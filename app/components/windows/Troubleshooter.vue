@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-    :title="$t('Troubleshooter')"
+    :title="$t('troubleshooter.pageTitle')"
     :showControls="false"
     :customControls="true"
 >
@@ -9,7 +9,7 @@
         class="button button--action"
         @click="showSettings"
     >
-      {{ $t('Open Settings') }}
+      {{ $t('troubleshooter.openSettings') }}
     </button>
   </div>
 
@@ -17,24 +17,24 @@
 
     <div v-if="issue.code == 'FRAMES_DROPPED'">
       <h4>
-        <span class="fa fa-warning"></span>
+        <span class="icon-warning"></span>
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t(' Streamlabs OBS has detected dropped frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t('troubleshooter.droppedFramesAreDetected') }} {{ moment(issue.date) }}.<br/>
       </p>
-      <h4>{{ $t('What does this mean?') }}</h4>
+      <h4>{{ $t('troubleshooter.whatDoesThisMean') }}</h4>
       <p>
-        {{ $t(' Some frames have not been uploaded. This problem is usually related to a poor network connection.') }}
+        {{ $t('troubleshooter.meaningOfDroppedFramesAreDetected') }}
       </p>
       <h4>
-        {{ $t('What can I do?') }}
+        {{ $t('troubleshooter.whatCanIDo') }}
       </h4>
 
       <ul>
-        <li>{{ $t('Check the health of your Internet connection') }}</li>
-        <li>{{ $t('Change your ingest server') }}Change your ingest server</li>
-        <li>{{ $t('If none of these worked, lower your bitrate') }}</li>
+        <li>{{ $t('troubleshooter.checkTheHealthOfYourInternetConnection') }}</li>
+        <li>{{ $t('troubleshooter.changeYourIngestServer') }}</li>
+        <li>{{ $t('troubleshooter.lowerYourBitrate') }}</li>
       </ul>
 
     </div>
@@ -42,26 +42,26 @@
 
     <div v-if="issue.code == 'FRAMES_SKIPPED'">
       <h4>
-        <span class="fa fa-warning"></span>
+        <span class="icon-warning"></span>
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t('Streamlabs OBS has detected skipped frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t('troubleshooter.skippedFramesAreDetected') }} {{ moment(issue.date) }}.<br/>
       </p>
       <h4>
-        {{ $t('What does this mean?') }}</h4>
+        {{ $t('troubleshooter.whatDoesThisMean') }}</h4>
       <p>
-        {{ $t('Some frames have not been encoded.') }}
-        {{ $t('This problem is usually due to high CPU usage or unsuitable encoder settings.') }}
+        {{ $t('troubleshooter.meaningOfDroppedFramesAreDetected1') }}
+        {{ $t('troubleshooter.meaningOfDroppedFramesAreDetected2') }}
       </p>
       <h4>
-        {{ $t('What can I do?') }}
+        {{ $t('troubleshooter.whatCanIDo') }}
       </h4>
 
       <ul>
-        <li>{{ $t('Lower your encoder settings (preset)') }}</li>
-        <li>{{ $t('Ensure that you don\'t have any other applications open that are heavy on your CPU') }}</li>
-        <li>{{ $t('Enable performance mode in the Editor context menu') }}</li>
+        <li>{{ $t('troubleshooter.lowerYourEncoderPreset') }}</li>
+        <li>{{ $t('troubleshooter.closeOtherHeavyApplication') }}</li>
+        <li>{{ $t('troubleshooter.enablePerformanceModeInTheEditorContextMenu') }}</li>
       </ul>
 
     </div>
@@ -69,28 +69,28 @@
 
     <div v-if="issue.code == 'FRAMES_LAGGED'">
       <h4>
-        <span class="fa fa-warning"></span>
+        <span class="icon-warning"></span>
         {{ issue.message }}
       </h4>
       <p>
-        {{ $t('Streamlabs OBS has detected lagged frames') }} {{ moment(issue.date) }}.<br/>
+        {{ $t('troubleshooter.laggedFramesAreDetected') }} {{ moment(issue.date) }}.<br/>
       </p>
-      <h4>{{ $t('What does this mean?') }}</h4>
+      <h4>{{ $t('troubleshooter.whatDoesThisMean') }}</h4>
       <p>
-        {{ $t('Some frames took too long to get rendered.') }}
-        {{ $t('Usually the problem is related to your game using up too many GPU resources.') }}
-        {{ $t('When this happens, Streamlabs OBS does not have any resources left over to render frames.') }}
+        {{ $t('troubleshooter.meaningOflaggedFramesAreDetected1') }}
+        {{ $t('troubleshooter.meaningOflaggedFramesAreDetected2') }}
+        {{ $t('troubleshooter.meaningOflaggedFramesAreDetected3') }}
       </p>
       <h4>
-        {{ $t('What can I do?') }}
+        {{ $t('troubleshooter.whatCanIDo') }}
       </h4>
 
       <ul>
-        <li>{{ $t('Cap your in-game framerate') }}</li>
-        <li>{{ $t('Enable VSync in your game') }}</li>
-        <li>{{ $t('Disable FreeSync or GSync in your Driver') }}</li>
-        <li>{{ $t('Lower graphics settings until you stop lagging frames') }}</li>
-        <li>{{ $t('Disable hardware decoding under any media sources(This will slightly increase cpu over gpu)') }}</li>
+        <li>{{ $t('troubleshooter.capYourInGameFramerate') }}</li>
+        <li>{{ $t('troubleshooter.enableVSyncInYourGame') }}</li>
+        <li>{{ $t('troubleshooter.disableFreeSyncOrGSyncInYourDriver') }}</li>
+        <li>{{ $t('troubleshooter.lowerGraphicsSettingsUntilYouStopLaggingFrames') }}</li>
+        <li>{{ $t('troubleshooter.disableHardwareDecodingUnderAnyMediaSources') }}</li>
       </ul>
 
     </div>
@@ -105,8 +105,9 @@
 <style lang="less" scoped>
   @import "../../styles/index";
 
-  .fa-warning {
+  .icon-warning {
     color: @red;
+    margin-right: 4px;
   }
 
   p, ul {

@@ -1,5 +1,5 @@
 <template>
-  <div class="input-container">
+  <div :data-test="testingAnchor" class="input-container">
     <div v-if="value.showDescription !== false" class="input-label">
       <label>{{ value.description }}</label>
     </div>
@@ -35,7 +35,7 @@
 .slider-label {
   position: absolute;
   bottom: 4px;
-  color: @input-label-color;
+  color: #70A0AF;
   &.slider-label--left { left: 0 }
   &.slider-label--right { right: 0 }
 }

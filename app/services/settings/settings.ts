@@ -12,6 +12,7 @@ import { SourcesService } from 'services/sources';
 import { Inject } from '../../util/injector';
 import { AudioService, E_AUDIO_CHANNELS } from 'services/audio';
 import { WindowsService } from 'services/windows';
+import { UserService } from 'services/user';
 import Utils from '../utils';
 import { AppService } from 'services/app';
 import {
@@ -41,6 +42,13 @@ export interface ISettingsState {
   Output: Dictionary<TObsValue>;
   Video: {
     Base: string;
+    Output: string;
+    FPSType: string;
+    FPSCommon?: string;
+    FPSInt?: number;
+    FPSNum?: number;
+    FPSDen?: number;
+    ScaleType: string;
   };
   Audio: Dictionary<TObsValue>;
   Advanced: {
@@ -51,6 +59,15 @@ export interface ISettingsState {
 
 declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 
+const niconicoResolutions = [
+  '1280x720',
+  '800x450',
+  '640x360'
+];
+
+const niconicoResolutionValues = niconicoResolutions.map(res => ({
+  [res]: res
+}));
 
 export class SettingsService extends StatefulService<ISettingsState>
   implements ISettingsServiceApi {
@@ -80,11 +97,17 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   @Inject() private appService: AppService;
 
+  @Inject() private userService: UserService;
+
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
 
   init() {
     this.loadSettingsIntoStore();
+  }
+
+  private isNiconicoLoggedIn() {
+    return this.userService.isLoggedIn() && this.userService.platform.type === 'niconico';
   }
 
   loadSettingsIntoStore() {
@@ -94,6 +117,21 @@ export class SettingsService extends StatefulService<ISettingsState>
       settingsFormData[categoryName] = this.getSettingsFormData(categoryName);
     });
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
+
+    // ensure 'custom streaming server'
+    this.setSettings('Stream', [
+      {
+        nameSubCategory: 'Untitled',
+        parameters: [
+          {
+            name: 'streamType',
+            type: 'OBS_PROPERTY_LIST',
+            description: 'Stream Type',
+            value: 'rtmp_custom',
+          }
+        ]
+      }
+    ]);
   }
 
   showSettings(categoryName?: string) {
@@ -114,12 +152,13 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   getCategories(): string[] {
-    let categories = nodeObs.OBS_settings_getListCategories();
-    categories = categories
-      .concat(['Scene Collections','Notifications', 'Appearance', 'Remote Control']);
+    let categories: string[] = nodeObs.OBS_settings_getListCategories();
 
-    // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);
+    if (this.isNiconicoLoggedIn()) {
+      categories = categories.filter(x => x !== 'Stream');
+    }
+
+    // if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
     return categories;
   }
@@ -149,14 +188,51 @@ export class SettingsService extends StatefulService<ISettingsState>
       'OverwriteIfExists',
       'RecRBPrefix',
       'Reconnect',
-      'RetryDelay'
+      'RetryDelay',
+      'DisableAudioDucking',
     ];
 
+    // We inject niconico specific resolutions
+    if (categoryName === 'Video') {
+      const outputSettings = this.findSetting(settings, 'Untitled', 'Output');
+
+      if (outputSettings) {
+        // filter resolutions if duplicated in the meaning of value
+        outputSettings.values = outputSettings.values
+          .filter((x: {[key: string]: string}) => {
+            // one item has only one key-value pair
+            return !Object.keys(x).some(y => niconicoResolutions.includes(x[y]));
+          });
+        outputSettings.values.unshift(...niconicoResolutionValues);
+      }
+    }
+
+    if (categoryName === 'Advanced') {
+      // 入力フォームで0未満を設定できないようにするための措置
+      const delaySecSetting = this.findSetting(settings, 'Stream Delay', 'DelaySec');
+      if (delaySecSetting) {
+        delaySecSetting.type = 'OBS_PROPERTY_UINT';
+      }
+    }
+
     for (const group of settings) {
-      group.parameters = obsValuesToInputValues(group.parameters, {
-        disabledFields: BLACK_LIST_NAMES,
-        transformListOptions: true
-      });
+      group.parameters = obsValuesToInputValues(
+        categoryName,
+        group.nameSubCategory,
+        group.parameters,
+        {
+          disabledFields: BLACK_LIST_NAMES,
+          transformListOptions: true
+        }
+      );
+    }
+
+    // We hide the stream type settings
+    if (categoryName === 'Stream') {
+      const setting = this.findSetting(settings, 'Untitled', 'streamType');
+      if (setting) {
+        setting.visible = false;
+      }
     }
 
     // We hide the encoder preset and settings if the optimized ones are in used
@@ -190,6 +266,32 @@ export class SettingsService extends StatefulService<ISettingsState>
       );
       settings[indexSubCategory].parameters[indexX264Settings].visible = false;
     }
+
+    if (categoryName === 'Output') {
+      const indexSubCategory = settings.findIndex((category: any) => {
+        return category.nameSubCategory === 'Streaming';
+      });
+
+      const parameters = settings[indexSubCategory].parameters;
+
+      // カスタムビットレートにしかならない前提があるので無意味、ということで隠す
+      const parameterEnforceBitrate = parameters.find((parameter: any) => {
+        return parameter.name === 'EnforceBitrate';
+      });
+      if (parameterEnforceBitrate) {
+        parameterEnforceBitrate.visible = false;
+      }
+
+      // EnforceBitrateと同じだが詳細と基本で別の項目として出てくる
+      const parameterApplyServiceSettings = parameters.find((parameter: any) => {
+        return parameter.name === 'ApplyServiceSettings';
+      });
+      if (parameterApplyServiceSettings) {
+        parameterApplyServiceSettings.visible = false;
+      }
+    }
+
+    // これ以上消すものが増えるなら、フィルタリング機構は整備したほうがよいかもしれない
 
     return settings;
   }
@@ -227,23 +329,22 @@ export class SettingsService extends StatefulService<ISettingsState>
     };
   }
 
+  private findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
+    const subCategory = settings.find(subCategory => subCategory.nameSubCategory === category);
+    if (subCategory) {
+      return subCategory.parameters.find(param => param.name === setting) as any;
+    } else {
+      return undefined;
+    }
+  }
+
   private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
-    let settingValue: any;
-
-    settings.find(subCategory => {
-      if (subCategory.nameSubCategory === category) {
-        subCategory.parameters.find(param => {
-          if (param.name === setting) {
-            settingValue = param.value || (param as IListInput<string>).options[0].value;
-            return true;
-          }
-        });
-
-        return true;
-      }
-    });
-
-    return settingValue;
+    const param = this.findSetting(settings, category, setting);
+    if (param) {
+      return param.value || (param as IListInput<string>).options[0].value;
+    } else {
+      return undefined;
+    }
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
@@ -267,15 +368,18 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `${$t('Desktop Audio Device')} ${deviceInd}`,
+        description: `${$t('settings.desktopAudioDevice')} ${deviceInd}`,
         name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
-        options: [{ description: 'Disabled', value: null }].concat(
+        options: [{ description: $t('settings.disabled'), value: null }].concat(
           audioDevices
             .filter(device => device.type === 'output')
             .map(device => {
+              if (device.id === 'default') {
+                return { description: $t('settings.default'), value: device.id };
+              }
               return { description: device.description, value: device.id };
             })
         )
@@ -295,13 +399,16 @@ export class SettingsService extends StatefulService<ISettingsState>
 
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
-        description: `${$t('Mic/Auxiliary Device')} ${deviceInd}`,
+        description: `${$t('settings.micAuxDevice')} ${deviceInd}`,
         name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
-        options: [{ description: 'Disabled', value: null }].concat(
+        options: [{ description: $t('settings.disabled'), value: null }].concat(
           audioDevices.filter(device => device.type === 'input').map(device => {
+            if (device.id === 'default') {
+              return { description: $t('settings.default'), value: device.id };
+            }
             return { description: device.description, value: device.id };
           })
         )

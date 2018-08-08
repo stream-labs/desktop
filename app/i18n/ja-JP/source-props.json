@@ -1,17 +1,368 @@
 {
-    "Image": "イメージ",
-    "Color Source": "色のソース",
-    "Browser Source": "ブラウザーのソース",
-    "Media Source": "メディア ソース",
-    "Image Slide Show": "画像スライド ショー",
-    "Text (GDI+)": "テキスト (GDI +)",
-    "Text (FreeType 2)": "テキスト (FreeType 2)",
-    "Display Capture": "キャプチャーを表示します。",
-    "Window Capture": "ウィンドウのキャプチャー",
-    "Game Capture": "ゲームの キャプチャー",
-    "Video Capture Device": "ビデオ キャプチャー デバイス",
-    "Audio Input Capture": "オーディオ入力のキャプチャー",
-    "Audio Output Capture": "オーディオ出力のキャプチャー",
-    "Blackmagic Device": "Blackmagic デバイス",
-    "NDI Source": "NDI のソース"
+  "image_source": {
+    "name": "画像ファイル",
+    "description": "シーンに画像を追加します。",
+    "file": {
+      "name": "画像ファイル"
+    },
+    "unload": {
+      "name": "表示中でない画像は読み込まない"
+    }
+  },
+  "color_source": {
+    "name": "カラーソース",
+    "description": "シーンの全体、もしくは一部に色をつけます。",
+    "color": {
+      "name": "色"
+    },
+    "height": {
+      "name": "高さ"
+    },
+    "width": {
+      "name": "幅"
+    }
+  },
+  "browser_source": {
+    "name": "Webページ",
+    "description": "シーンにWebページをソースとして追加します。",
+    "css": {
+      "name": "カスタムCSS"
+    },
+    "fps": {
+      "name": "FPS"
+    },
+    "height": {
+      "name": "高さ"
+    },
+    "is_local_file": {
+      "name": "ローカルファイル"
+    },
+    "local_file": {
+      "name": "ローカルファイル"
+    },
+    "refreshnocache": {
+      "name": "キャッシュを消去して再読み込み"
+    },
+    "restart_when_active": {
+      "name": "アクティブになるたびに再読み込み"
+    },
+    "shutdown": {
+      "name": "非表示のときはページを閉じる"
+    },
+    "url": {
+      "name": "URL"
+    },
+    "width": {
+      "name": "幅"
+    }
+  },
+  "ffmpeg_source": {
+    "name": "動画・音声ファイル",
+    "description": "シーンに映像や音声を追加します。",
+    "clear_on_media_end": {
+      "name": "再生終了時にソースを非表示にする"
+    },
+    "close_when_inactive": {
+      "name": "アクティブでないときにファイルを閉じる"
+    },
+    "color_range": {
+      "name": "YUV 色範囲"
+    },
+    "hw_decode": {
+      "name": "可能な場合ハードウェアデコードを使用"
+    },
+    "input": {
+      "name": "入力"
+    },
+    "input_format": {
+      "name": "入力フォーマット"
+    },
+    "is_local_file": {
+      "name": "ローカルファイル"
+    },
+    "local_file": {
+      "name": "ローカルファイル"
+    },
+    "looping": {
+      "name": "繰り返し"
+    },
+    "restart_on_activate": {
+      "name": "ソースがアクティブになったときに再生を再開する"
+    },
+    "seekable": {
+      "name": "シーク可能"
+    },
+    "speed_percent": {
+      "name": "速度 (パーセント)"
+    }
+  },
+  "slideshow": {
+    "name": "画像スライド",
+    "description": "シーンに画像スライドショーを追加します。",
+    "files": {
+      "name": "画像ファイル"
+    },
+    "hide": {
+      "name": "スライドショーが終わったら非表示にする"
+    },
+    "loop": {
+      "name": "繰り返し"
+    },
+    "playback_behavior": {
+      "name": "表示の動作"
+    },
+    "randomize": {
+      "name": "ランダム再生"
+    },
+    "slide_mode": {
+      "name": "スライドモード"
+    },
+    "slide_time": {
+      "name": "スライド時間間隔 (ミリ秒)"
+    },
+    "transition": {
+      "name": "トランジション"
+    },
+    "transition_speed": {
+      "name": "画面切替速度 (ミリ秒)"
+    },
+    "use_custom_size": {
+      "name": "バウンディングサイズ/アスペクト比"
+    }
+  },
+  "text_gdiplus": {
+    "name": "テキスト",
+    "description": "シーンにテキストを追加します。",
+    "align": {
+      "name": "位置揃え"
+    },
+    "bk_color": {
+      "name": "背景色"
+    },
+    "bk_opacity": {
+      "name": "背景の不透明度"
+    },
+    "chatlog": {
+      "name": "チャットログモード"
+    },
+    "chatlog_lines": {
+      "name": "チャットログ行の制限"
+    },
+    "color": {
+      "name": "色"
+    },
+    "extents": {
+      "name": "テキスト領域の範囲を指定する"
+    },
+    "extents_cx": {
+      "name": "幅"
+    },
+    "extents_cy": {
+      "name": "高さ"
+    },
+    "extents_wrap": {
+      "name": "折り返す"
+    },
+    "file": {
+      "name": "テキストファイル (UTF-8)"
+    },
+    "font": {
+      "name": "フォント"
+    },
+    "gradient": {
+      "name": "グラデーション"
+    },
+    "gradient_color": {
+      "name": "グラデーションカラー"
+    },
+    "gradient_dir": {
+      "name": "グラデーションの方向"
+    },
+    "gradient_opacity": {
+      "name": "グラデーションの不透明度"
+    },
+    "opacity": {
+      "name": "不透明度"
+    },
+    "outline": {
+      "name": "輪郭"
+    },
+    "outline_color": {
+      "name": "輪郭の色"
+    },
+    "outline_opacity": {
+      "name": "輪郭の不透明度"
+    },
+    "outline_size": {
+      "name": "輪郭のサイズ"
+    },
+    "read_from_file": {
+      "name": "ファイルからの読み取り"
+    },
+    "text": {
+      "name": "テキスト"
+    },
+    "valign": {
+      "name": "垂直位置揃え"
+    },
+    "vertical": {
+      "name": "垂直方向"
+    }
+  },
+  "text (FreeType2)": {
+    "name": "テキスト(FreeType 2)"
+  },
+  "monitor_capture": {
+    "name": "ディスプレイキャプチャ",
+    "description": "PCの画面全体をキャプチャします。",
+    "capture_cursor": {
+      "name": "カーソルをキャプチャ"
+    },
+    "monitor": {
+      "name": "画面"
+    }
+  },
+  "window_capture": {
+    "name": "ウィンドウキャプチャ",
+    "description": "デスクトップ上で開いているウィンドウを指定してキャプチャします。",
+    "compatibility": {
+      "name": "マルチアダプターの互換性"
+    },
+    "cursor": {
+      "name": "カーソルをキャプチャ"
+    },
+    "priority": {
+      "name": "ウィンドウの一致優先順位"
+    },
+    "window": {
+      "name": "ウィンドウ"
+    }
+  },
+  "game_capture": {
+    "name": "PCゲームキャプチャ",
+    "description": "PC上でプレイ中のゲームをキャプチャします。",
+    "allow_transparency": {
+      "name": "透過を許可"
+    },
+    "anti_cheat_hook": {
+      "name": "アンチチート互換性フックを使用する"
+    },
+    "capture_cursor": {
+      "name": "カーソルをキャプチャ"
+    },
+    "capture_mode": {
+      "name": "モード"
+    },
+    "capture_overlays": {
+      "name": "(steamなどの) サードパーティ製のオーバーレイをキャプチャする"
+    },
+    "force_scaling": {
+      "name": "強制的にスケーリングする"
+    },
+    "limit_framerate": {
+      "name": "キャプチャのフレームレートを制限する"
+    },
+    "priority": {
+      "name": "ウィンドウの一致優先順位"
+    },
+    "scale_res": {
+      "name": "出力解像度"
+    },
+    "sli_compatibility": {
+      "name": "SLI/Crossfire キャプチャモード (遅い)"
+    },
+    "window": {
+      "name": "ウィンドウ"
+    }
+  },
+  "dshow_input": {
+    "name": "映像キャプチャデバイス",
+    "description": "シーンに内蔵/外付けのWebカメラやキャプチャーボートを通したゲーム画面などを追加します。",
+    "activate": {
+      "name": "無効化"
+    },
+    "audio_device_id": {
+      "name": "音声デバイス"
+    },
+    "audio_output_mode": {
+      "name": "音声出力モード"
+    },
+    "buffering": {
+      "name": "バッファリング"
+    },
+    "color_range": {
+      "name": "YUV 色範囲"
+    },
+    "color_space": {
+      "name": "YUV 色空間"
+    },
+    "deactivate_when_not_showing": {
+      "name": "表示中でない場合非アクティブ化する"
+    },
+    "flip_vertically": {
+      "name": "垂直方向に反転"
+    },
+    "frame_interval": {
+      "name": "FPS"
+    },
+    "res_type": {
+      "name": "解像度/FPS タイプ"
+    },
+    "resolution": {
+      "name": "解像度"
+    },
+    "use_custom_audio_device": {
+      "name": "カスタム音声デバイスを使用する"
+    },
+    "video_config": {
+      "name": "映像を構成"
+    },
+    "video_device_id": {
+      "name": "デバイス"
+    },
+    "video_format": {
+      "name": "映像フォーマット"
+    },
+    "xbar_config": {
+      "name": "クロスバーを構成"
+    }
+  },
+  "wasapi_input_capture": {
+    "name": "音声入力キャプチャ",
+    "description": "内蔵マイクや外付けマイクなど、PCに接続されているデバイスからの音声をキャプチャします。",
+    "device_id": {
+      "name": "デバイス",
+      "default": "標準"
+    },
+    "use_device_timing": {
+      "name": "デバイスのタイムスタンプを使用"
+    }
+  },
+  "wasapi_output_capture": {
+    "name": "音声出力キャプチャ",
+    "description": "デスクトップ上で再生中の音声をキャプチャします。",
+    "device_id": {
+      "name": "デバイス",
+      "default": "標準"
+    },
+    "use_device_timing": {
+      "name": "デバイスのタイムスタンプを使用"
+    }
+  },
+  "scene": {
+    "name": "シーン",
+    "description": "既存のシーンをソースとして新たに追加します。"
+  },
+  "blackmagicDevice": {
+    "name": "Blackmagicデバイス"
+  },
+  "ndiSource": {
+    "name": "NDIソース"
+  },
+  "openvr_capture": {
+    "name": "OpenVR Capture"
+  },
+  "liv_capture": {
+    "name": "LIV Client Capture"
+  }
 }

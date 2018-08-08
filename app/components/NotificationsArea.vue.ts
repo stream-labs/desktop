@@ -33,8 +33,8 @@ export default class NotificationsArea extends Vue {
     notificationsContainer: HTMLDivElement;
   };
 
-  showNotificationsTooltip = $t('Click to open your Notifications window');
-  showUnreadNotificationsTooltip = $t('Click to read your unread Notifications');
+  showNotificationsTooltip = $t('notifications.showNotificationsTooltip');
+  showUnreadNotificationsTooltip = $t('notifications.showUnreadNotificationsTooltip');
 
   mounted() {
     this.notifyAudio = new Audio(notificationAudio);
@@ -123,8 +123,9 @@ export default class NotificationsArea extends Vue {
       }
       Vue.nextTick(() => {
         this.notifications.push({ ...notify, outdated: false });
-        if (notify.lifeTime !== -1)
+        if (notify.lifeTime !== -1) {
           window.setTimeout(() => this.hideOutdated(), notify.lifeTime);
+        }
       });
     });
   }

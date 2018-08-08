@@ -8,6 +8,7 @@ class IntInput extends Input<INumberInputValue> {
 
   @Prop()
   value: INumberInputValue;
+  testingAnchor = `Form/Int/${this.value.name}`;
 
   $refs: {
     input: HTMLInputElement

@@ -50,9 +50,9 @@ export default class AddSourceFilter extends Vue {
   }
 
   validateName(name: string) {
-    if (!name) return $t('Name is required');
+    if (!name) return $t('common.nameIsRequiredMessage');
     if (this.filtersService.getFilters(this.sourceId).find(filter => filter.name === name)) {
-      return $t('That name is already taken');
+      return $t('common.alreadyTakenNameMessage');
     }
     return '';
   }

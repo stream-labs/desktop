@@ -10,7 +10,7 @@ class TextInput extends Input<IFormInput<string>> {
   value: IFormInput<string>;
 
   textVisible = !this.value.masked;
-
+  testingAnchor = `Form/Text/${this.value.name}`;
 
   toggleVisible() {
     this.textVisible = !this.textVisible;

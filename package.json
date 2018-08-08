@@ -1,9 +1,12 @@
 {
-  "name": "slobs-client",
-  "description": "Streamlabs streaming software",
-  "author": "General Workings, Inc.",
+  "name": "n-air-app",
+  "description": "Streaming application for niconico",
+  "author": "DWANGO Co.,Ltd.",
   "license": "GPL-3.0",
-  "version": "0.9.3-preview.3",
+  "//": {
+    "version": "0.9.3-preview.3"
+  },
+  "version": "0.1.20180807-5",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -11,21 +14,22 @@
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
-    "install-plugins": "yarn install --cwd bin && node bin/install-plugins.js",
-    "clear-plugins": "rm -rf plugins",
-    "package": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
-    "package:preview": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
-    "package:ipc": "rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-ipc\" --config.productName=\"Streamlabs OBS IPC\" --config.appId=\"com.streamlabs.slobsipc\"",
-    "release": "yarn install --cwd bin && node bin/release.js",
-    "test": "tsc -p test && ava -v",
-    "clear": "rm -rf bundles/media",
+    "clear-plugins": "rimraf plugins",
+    "package": "rimraf dist && yarn install --cwd bin && node bin/convert-to-shiftjis.js AGREEMENT && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.getlicensenair_key=%NAIR_LICENSE_API_KEY%",
+    "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-preview\" --config.productName=\"N Air Preview\" --config.appId=\"jp.nicovideo.n-air-app.preview\"",
+    "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-ipc\" --config.productName=\"N Air IPC\" --config.appId=\"jp.nicovideo.n-air-app.ipc\"",
+    "release": "yarn install --cwd bin && node bin/mini-release.js",
+    "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
+    "test:unit": "tsc -p tsconfig.unit.json && cross-env NODE_PATH=./test-unit-dist ava --serial false -v test-unit-dist/**/*.test.js",
+    "lint": "tslint -p . -c tslint.json",
+    "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js"
   },
   "build": {
-    "appId": "com.streamlabs.slobs",
-    "productName": "Streamlabs OBS",
+    "appId": "jp.nicovideo.nair",
+    "productName": "N Air",
     "icon": "media/images/icon.ico",
     "files": [
       "bundles",
@@ -40,60 +44,76 @@
     ],
     "extraFiles": [
       "LICENSE",
-      "AGREEMENT"
+      "AGREEMENT.sjis"
     ],
     "publish": {
-      "provider": "generic",
-      "url": "https://d1g6eog1uhe0xm.cloudfront.net"
+      "provider": "github",
+      "owner": "n-air-app",
+      "repo": "n-air-app",
+      "host": "github.com",
+      "releaseType": "draft"
     },
     "nsis": {
-      "license": "AGREEMENT",
+      "license": "AGREEMENT.sjis",
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
+      "artifactName": "n-air-app-setup.${version}.${ext}",
       "include": "installer.nsh"
     },
     "win": {
+      "publisherName": [
+        "DWANGO Co.,Ltd."
+      ],
       "rfc3161TimeStampServer": "http://timestamp.digicert.com"
     }
   },
   "ava": {
     "files": [
-      "test-dist/test/*.js",
+      "test-dist/test/e2e/*.js",
       "test-dist/test/api/*.js"
     ],
     "serial": true
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "2.0.1",
+    "runtimeVersion": "2.0.5",
     "arch": "x64"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint"
+    ]
   },
   "dependencies": {
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^2.21.1",
+    "electron-updater": "^3.0.3",
     "electron-window-state": "^4.1.1",
-    "font-manager": "git+https://github.com/computerquip-streamlabs/font-manager.git",
-    "node-fontinfo": "^0.0.2",
-    "node-gyp": "^3.6.2",
-    "node-libuiohook": "file:./node-libuiohook",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.41/iojs-v2.0.1-signed.tar.gz",
+    "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz",
+    "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz",
+    "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.1/iojs-v2.0.5-node-libuiohook.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.0.48/iojs-v2.0.4-signed.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
     "socket.io-client": "2.0.3",
-    "uuid": "^3.0.1"
+    "uuid": "^3.3.2",
+    "vue-svg-loader": "^0.5.0"
   },
   "devDependencies": {
     "7zip-bin": "^2.0.4",
     "@types/archiver": "^2.0.1",
-    "@types/lodash": "^4.14.64",
+    "@types/base64-js": "^1.2.5",
+    "@types/lodash": "^4.14.115",
     "@types/node": "^8.0.0",
+    "@types/proxyquire": "^1.3.28",
     "@types/request": "^2.47.0",
+    "@types/sinon": "^5.0.1",
     "@types/socket.io-client": "^1.4.31",
     "@types/urijs": "^1.15.37",
     "@types/webdriverio": "^4.8.6",
+    "@types/xml2js": "^0.4.3",
     "@xkeshi/vue-qrcode": "^0.3.0",
     "archiver": "^2.0.3",
     "ava": "^0.25.0",
@@ -104,12 +124,14 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
+    "base64-js": "^1.3.0",
     "circular-dependency-plugin": "^3.0.0",
+    "cross-env": "^5.2.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "2.0.1",
-    "electron-builder": "20.6.1",
-    "electron-devtools-installer": "^2.2.1",
+    "electron": "2.0.5",
+    "electron-builder": "20.26.0",
+    "electron-devtools-installer": "2.2.4",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-plugin-import": "^2.2.0",
@@ -118,17 +140,22 @@
     "eslint-plugin-vue": "^2.0.1",
     "file-loader": "^1.1.10",
     "fuse.js": "^3.2.0",
+    "husky": "^1.0.0-rc.13",
     "js-yaml": "^3.8.3",
     "less": "^2.7.2",
     "less-loader": "^4.0.6",
+    "lint-staged": "^7.2.0",
     "lodash": "^4.17.4",
     "lodash-decorators": "^4.3.1",
     "moment": "^2.17.1",
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.3.1",
+    "prettier": "1.14.0",
     "progress": "^2.0.0",
+    "proxyquire": "^2.0.1",
     "raven-js": "^3.20.1",
     "rxjs": "^5.4.3",
+    "sinon": "^6.1.4",
     "sl-vue-tree": "https://github.com/stream-labs/sl-vue-tree.git",
     "sockjs": "^0.3.19",
     "sockjs-client": "^1.1.4",
@@ -137,10 +164,10 @@
     "traverse": "^0.6.6",
     "ts-loader": "^4.0.0",
     "tslint": "^5.8.0",
-    "tslint-config-airbnb": "^5.4.2",
+    "tslint-config-prettier": "^1.14.0",
     "tslint-loader": "^3.6.0",
     "typedoc": "^0.9.0",
-    "typescript": "^2.6.2",
+    "typescript": "^2.9.2",
     "unzip-stream": "^0.2.1",
     "urijs": "^1.18.5",
     "v-tooltip": "^2.0.0-rc.31",
@@ -157,5 +184,10 @@
     "vuex": "^3.0.1",
     "webpack": "^4.8.3",
     "webpack-cli": "^2.1.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

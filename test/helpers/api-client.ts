@@ -6,7 +6,7 @@ const net = require('net');
 const { spawnSync } = require('child_process');
 
 
-const PIPE_NAME = 'slobs';
+const PIPE_NAME = 'n-air-app';
 const PIPE_PATH = '\\\\.\\pipe\\' + PIPE_NAME;
 const PROMISE_TIMEOUT = 20000;
 
@@ -270,7 +270,7 @@ export class ApiClient {
 
         const resourceScheme = this.getResourceScheme(resourceId);
 
-        if (resourceScheme[property] !== 'function') {
+        if (resourceScheme[property as string] !== 'function') {
           return handleRequest(resourceId, property as string);
         }
 

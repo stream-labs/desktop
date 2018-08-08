@@ -1,7 +1,7 @@
 <template>
-<div class="input-container">
+<div :data-test="testingAnchor" class="input-container">
   <div class="input-label">
-    <label>Font Size</label>
+    <label>{{ $t('settings.fontSize') }}</label>
   </div>
   <div class="input-wrapper">
     <multiselect
@@ -15,6 +15,9 @@
         <span>
           {{ props.option }}
         </span>
+      </template>
+      <template slot="noResult">
+        {{ $t('settings.itemNotFoundMessage') }}
       </template>
     </multiselect>
   </div>

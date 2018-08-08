@@ -3,12 +3,14 @@
 node_modules/
 build/
 npm-debug.log
+yarn-error.log
 lib/
 rtmp-services/
 text-freetype2/
 /data/
 dist/
 test-dist/
+test-unit-dist/
 bundles/
 node-obs/
 node-boost/
@@ -16,3 +18,4 @@ electron.sln
 electron.VC.db
 .vs/
 plugins/
+AGREEMENT.sjis

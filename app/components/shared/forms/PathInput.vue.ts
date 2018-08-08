@@ -11,7 +11,7 @@ class PathInput extends Input<IPathInputValue> {
 
   @Prop()
   value: IPathInputValue;
-
+  testingAnchor = `Form/Path/${this.value.name}`;
 
   $refs: {
     input: HTMLInputElement

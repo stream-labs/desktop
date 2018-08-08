@@ -18,8 +18,11 @@ import Raven from 'raven-js';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
+import { Observable } from 'rxjs/Observable';
+import { mergeStatic } from 'rxjs/operator/merge';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
+import { SettingsService } from 'services/settings';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -32,6 +35,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() appService: AppService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
   @Inject() windowsService: WindowsService;
+  @Inject() settingsService: SettingsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -54,54 +58,59 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   userLogin = new Subject<IPlatformAuth>();
+  userLogout = new Subject<void>();
+  userLoginState: Observable<IPlatformAuth | void> = mergeStatic(this.userLogin, this.userLogout);
 
   init() {
     super.init();
     this.setRavenContext();
-    this.validateLogin();
+    this.validateLogin().then(() => {
+      this.updatePlatformUserInfo();
+    });
   }
 
   mounted() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
+    // This is used for faking authentication in tests
     electron.ipcRenderer.on(
       'testing-fakeAuth',
       (e: Electron.Event, auth: any) => {
         this.LOGIN(auth);
+        this.setRavenContext();
       }
     );
   }
 
   // Makes sure the user's login is still good
-  validateLogin() {
-    if (!this.isLoggedIn()) return;
+  validateLogin(): Promise<void> {
+    if (!this.isLoggedIn()) return Promise.resolve();
 
-    const host = this.hostsService.streamlabs;
-    const headers = authorizedHeaders(this.apiToken);
-    const url = `https://${host}/api/v5/slobs/validate`;
-    const request = new Request(url, { headers });
-
-    fetch(request)
-      .then(res => {
-        return res.text();
-      })
-      .then(valid => {
-        if (valid.match(/false/)) this.LOGOUT();
+    console.log('validateLogin: this.platform=' + JSON.stringify(this.platform));
+    const service = getPlatformService(this.platform.type);
+    if (service && service.isLoggedIn) {
+      return service.isLoggedIn().then(valid => {
+        if (!valid) {
+          this.LOGOUT();
+        }
       });
+    }
+
+    // ここに来るパターンは存在しないはず
+    console.error('unexpected state: There is no proper instance of the platform service');
+    this.LOGOUT();
+    return Promise.resolve();
   }
 
   isLoggedIn() {
-    return !!(this.state.auth && this.state.auth.widgetToken);
+    return !!(this.state.auth && this.state.auth.apiToken);
   }
 
   /**
    * This is a uuid that persists across the application lifetime and uniquely
-   * identifies this particular installation of slobs, even when the user is
+   * identifies this particular installation of N Air, even when the user is
    * not logged in.
    */
   getLocalUserId() {
-    const localStorageKey = 'SlobsLocalUserId';
+    const localStorageKey = 'NAirLocalUserId';
     let userId = localStorage.getItem(localStorageKey);
 
     if (!userId) {
@@ -116,12 +125,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) return this.state.auth.apiToken;
   }
 
-  get widgetToken() {
-    if (this.isLoggedIn()) {
-      return this.state.auth.widgetToken;
-    }
-  }
-
   get platform() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform;
@@ -133,10 +136,23 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return this.state.auth.platform.username;
     }
   }
-
+  get userIcon() {
+    if (this.isLoggedIn()) {
+      return this.state.auth.platform.userIcon;
+    }
+  }
   get platformId() {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.id;
+    }
+  }
+  get platformUserPageURL() {
+    if (this.isLoggedIn()) {
+      const platform = getPlatformService(this.state.auth.platform.type);
+      if (platform.getUserPageURL !== undefined) {
+        return platform.getUserPageURL();
+      }
+      return '';
     }
   }
 
@@ -144,55 +160,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     if (this.isLoggedIn()) {
       return this.state.auth.platform.channelId;
     }
-  }
-
-  recentEventsUrl() {
-    if (this.isLoggedIn()) {
-      const host = this.hostsService.streamlabs;
-      const token = this.widgetToken;
-      const nightMode = this.customizationService.nightMode ? 'night' : 'day';
-
-      return `https://${host}/dashboard/recent-events?token=${token}&mode=${nightMode}&electron`;
-    }
-  }
-
-  dashboardUrl(subPage: string) {
-    const host = Util.isPreview()
-      ? this.hostsService.beta3
-      : this.hostsService.streamlabs;
-    const token = this.apiToken;
-    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
-
-    return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
-  }
-
-  overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
-    const host = Util.isPreview()
-      ? this.hostsService.beta3
-      : this.hostsService.streamlabs;
-    const uiTheme = this.customizationService.nightMode ? 'night' : 'day';
-    let url = `https://${host}/library?mode=${uiTheme}&slobs`;
-
-    if (this.isLoggedIn()) {
-      url += `&oauth_token=${this.apiToken}`;
-    }
-
-    if (type && id) {
-      url += `#/?type=${type}&id=${id}`;
-    }
-
-    return url;
-  }
-
-  getDonationSettings() {
-    const host = this.hostsService.streamlabs;
-    const url = `https://${host}/api/v5/slobs/donation/settings`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json());
   }
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {
@@ -206,8 +173,16 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   async logOut() {
     // Attempt to sync scense before logging out
     this.appService.startLoading();
+
+    // TODO niconico専用なので抽象化する
+    getPlatformService('niconico').logout();
+
     await this.sceneCollectionsService.save();
+
+    /* DEBUG
     await this.sceneCollectionsService.safeSync();
+    */
+    this.userLogout.next();
     this.LOGOUT();
     this.appService.finishLoading();
   }
@@ -220,9 +195,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     platform: TPlatform,
     onWindowShow: (...args: any[]) => any,
     onAuthStart: (...args: any[]) => any,
+    onAuthCancel: (...args: any[]) => any,
     onAuthFinish: (...args: any[]) => any
   ) {
     const service = getPlatformService(platform);
+    console.log('startAuth service = ' + JSON.stringify(service));
 
     const authWindow = new electron.remote.BrowserWindow({
       ...service.authWindowOptions,
@@ -237,6 +214,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
     authWindow.webContents.on('did-navigate', async (e, url) => {
       const parsed = this.parseAuthFromUrl(url);
+      console.log('parsed = ' + JSON.stringify(parsed)); // DEBUG
 
       if (parsed) {
         authWindow.close();
@@ -249,6 +227,47 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     authWindow.once('ready-to-show', () => {
       authWindow.show();
       defer(onWindowShow);
+    });
+
+    authWindow.once('close', () => {
+      onAuthCancel();
+    });
+
+    authWindow.setMenu(null);
+    authWindow.loadURL(service.authUrl);
+  }
+
+  /**
+   * ユーザアイコンなどの情報だけ更新する
+   * FIXME: validateLoginが成功した後にHTTPエラーが返ってくると説明なしにウィンドウが出てしまう
+   */
+  private updatePlatformUserInfo() {
+    if (!this.isLoggedIn()) return;
+
+    const service = getPlatformService(this.platform.type);
+
+    const authWindow = new electron.remote.BrowserWindow({
+      ...service.authWindowOptions,
+      alwaysOnTop: false,
+      show: false,
+      webPreferences: {
+        nodeIntegration: false,
+        nativeWindowOpen: true,
+        sandbox: true
+      }
+    });
+
+    authWindow.webContents.on('did-navigate', (e, url) => {
+      const parsed = this.parseAuthFromUrl(url);
+
+      if (parsed) {
+        authWindow.close();
+        this.LOGIN(parsed);
+        this.setRavenContext();
+      } else {
+        // 認可されていない場合は画面を出して操作可能にする
+        authWindow.show();
+      }
     });
 
     authWindow.setMenu(null);
@@ -277,13 +296,13 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       query.oauth_token
     ) {
       return {
-        widgetToken: query.token,
         apiToken: query.oauth_token,
         platform: {
           type: query.platform,
           username: query.platform_username,
           token: query.platform_token,
-          id: query.platform_id
+          id: query.platform_id,
+          userIcon: query.platform_user_icon,
         }
       } as IPlatformAuth;
     }
@@ -297,7 +316,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
    */
   setRavenContext() {
     if (!this.isLoggedIn()) return;
-    Raven.setUserContext({ username: this.username });
+    Raven.setUserContext({ username: this.username, id: this.platformId });
     Raven.setExtraContext({ platform: this.platform.type });
   }
 
@@ -309,6 +328,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
         height: 600
       }
     }, 'RecentEvents');
+  }
+
+  async updateStreamSettings(): Promise<string> {
+    return getPlatformService(this.platform.type).setupStreamSettings({} as IPlatformAuth).then(() => {
+      const settings = this.settingsService.getSettingsFormData('Stream');
+      let key = '';
+      settings.forEach(subCategory => {
+        subCategory.parameters.forEach(parameter => {
+          if (parameter.name === 'key') {
+            key = parameter.value as string;
+          }
+        });
+      });
+      return key;
+    });
   }
 }
 
@@ -324,8 +358,9 @@ export function requiresLogin() {
       ...descriptor,
       value(...args: any[]) {
         // TODO: Redirect to login if not logged in?
-        if (UserService.instance.isLoggedIn())
+        if (UserService.instance.isLoggedIn()) {
           return original.apply(target, args);
+        }
       }
     };
   };

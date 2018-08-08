@@ -6,7 +6,7 @@ import { sleep } from '../helpers/sleep';
 import { focusChild } from '../helpers/spectron/index';
 import { PerformanceService } from '../../app/services/performance';
 import { IAudioServiceApi } from '../../app/services/audio/audio-api';
-import { WindowsService } from "../../app/services/windows";
+import { WindowsService } from '../../app/services/windows';
 
 const fs = require('fs');
 const CONFIG = getConfig();
@@ -18,8 +18,6 @@ let branchName: string;
 export async function applyConfig(t: any, config: Dictionary<any>) {
   const api = await getClient();
   const customizationService = api.getResource<CustomizationService>('CustomizationService');
-
-  customizationService.setNightMode(config.nightMode);
 
   if (config.resolution) {
     t.context.app.browserWindow.setSize(
@@ -44,7 +42,7 @@ export async function makeScreenshots(t: any, options: IScreentestOptions) {
   // AudioSources causes a different volmeter level
   audioService.getSources().forEach(audioSource => audioSource.setMuted(true));
   // main window title may contain different project version
-  windowService.updateMainWindowOptions({ title: 'Streamlabs OBS - screentest' });
+  windowService.updateMainWindowOptions({ title: 'N Air - screentest' });
 
 
   if (options.window === 'child') {
@@ -99,4 +97,3 @@ export function useScreentest(options: IScreentestOptions = { window: 'main' }) 
     await makeScreenshots(t, options);
   });
 }
-

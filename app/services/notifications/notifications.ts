@@ -25,7 +25,7 @@ export class NotificationsService extends PersistentStatefulService<
   static defaultState: INotificationsState = {
     notifications: [],
     settings: {
-      enabled: true,
+      enabled: false,
       playSound: false
     }
   };
@@ -108,7 +108,7 @@ export class NotificationsService extends PersistentStatefulService<
       <IFormInput<boolean>>{
         value: settings.enabled,
         name: 'enabled',
-        description: $t('Enable notifications'),
+        description: $t('notifications.enableNotifications'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true
@@ -117,7 +117,7 @@ export class NotificationsService extends PersistentStatefulService<
       <IFormInput<boolean>>{
         value: settings.playSound,
         name: 'playSound',
-        description: $t('Enable sound'),
+        description: $t('notifications.enableSound'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: settings.enabled

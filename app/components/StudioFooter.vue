@@ -1,23 +1,10 @@
 <template>
 <div class="footer">
   <div class="flex flex--center flex--grow flex--justify-start">
-    <div class="error-wrapper" v-if="loggedIn && !youtubeEnabled">
-      <div class="platform-error">
-        <i class="fa fa-exclamation-triangle" />
-        <span>{{ $t('YouTube account not enabled for live streaming') }}</span>
-        <button class="button alert-button" @click="openYoutubeEnable">{{ $t('Fix') }}</button>
-        <button class="button alert-button" @click="confirmYoutubeEnabled">{{ $t('I\'m set up') }}</button>
-      </div>
-    </div>
     <performance-metrics />
-    <global-sync-status v-if="loggedIn && !mediaBackupOptOut" />
-    <notifications-area class="notifications-area flex--grow"/>
   </div>
 
   <div class="nav-right">
-    <div class="nav-item">
-      <test-widgets v-if="loggedIn" />
-    </div>
     <div class="nav-item">
       <button
         :disabled="locked"
@@ -25,7 +12,7 @@
         @click="toggleRecording"
         :class="{ active: streamingService.isRecording }"
         v-tooltip.left="recordTooltip">
-        <span>REC</span>
+        <span>{{ $t('streaming.recording') }}</span>
       </button>
     </div>
     <div class="nav-item">
@@ -46,9 +33,7 @@
   flex-direction: row;
   align-items: center;
   position: relative;
-  padding: 10px 20px;
-  background-color: @day-secondary;
-  border-top: 1px solid @day-border;
+  padding: 8px;
   max-width: none;
   flex: 0 0 auto;
 }
@@ -68,18 +53,18 @@
 }
 
 .error-wrapper {
-  background-color: @day-secondary;
   position: absolute;
   z-index: 2;
+  
 }
 
 .platform-error {
   background: rgba(251,72,76,.28);
-  padding: 5px;
+  padding: 4px;
   border-radius: 3px;
 
   i {
-    margin-left: 5px;
+    margin-left: 4px;
     color: @red;
   }
 
@@ -101,34 +86,45 @@
 
 .record-button {
   position: relative;
-  width: 30px;
-  height: 30px;
-  background-color: #dcdfe2;
-  border: none;
+  width: 32px;
+  height: 32px;
+  background-color: @text-secondary;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .6;
   .transition;
   .bold;
-  border: 1px solid #c4c5c5;
   box-sizing: content-box;
   letter-spacing: .2px;
 
   span {
-    font-size: 10px;
-    color: @red;
+    font-size: 12px;
   }
 
   &:hover {
-    opacity: 1;
+    background: @red;
+    span {
+      color: @white;
+    }
   }
 
   &.active {
     opacity: 1;
     animation: pulse 2.5s infinite;
     border: 1px solid @red;
+    background: @red;
+    span {
+      color: @white;
+    }
+    &:hover {
+      opacity: 1;
+      background: rgba(204, 0, 41, .3);
+       border: 1px solid @red;
+      span {
+        color: @red;
+      }
+    }
   }
 }
 
@@ -144,23 +140,4 @@
   }
 }
 
-.night-theme {
-  .footer {
-    background-color: @night-primary;
-    border-color: @night-border;
-  }
-
-  .error-wrapper {
-    background-color: @night-primary;
-  }
-
-  .record-button {
-    background-color: #3c4c53;
-    border-color: @night-border;
-
-    &.active {
-      border-color: @red;
-    }
-  }
-}
 </style>

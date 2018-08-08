@@ -1,6 +1,7 @@
 button,
 .button {
   .transition;
+  text-decoration: none;
 
   &:focus, &:visited {
     outline: none;
@@ -8,38 +9,37 @@ button,
 }
 
 .button--action {
-  background-color: @teal;
+  background-color: @accent;
   color: @white;
 
   &:hover {
-    background-color: lighten(@teal, 4%);
+    background-color: lighten(@accent, 4%);
   }
 
   &:focus {
-    background-color: @teal;
+    background-color: @accent;
   }
 }
 
 .button--trans {
   background: transparent;
-  color: @grey;
+  color: @text-primary;
 
-  .fa,
   i {
-    color: @grey;
+    color: @text-primary;
     .transition;
   }
 
   &:hover, &:focus {
-    color: @navy;
+    color: @white;
     background: transparent;
 
-    .fa,
     i {
       color: @navy;
     }
   }
 }
+
 
 .button--semi-opac {
   background: rgba(255, 255, 255, .1);
@@ -83,7 +83,7 @@ button,
 }
 
 .back-arrow--light {
-  color: @grey;
+  color: @text-primary;
 
   &:hover {
     color: @white;
@@ -96,10 +96,10 @@ button,
   align-content: center;
 }
 
-.button--twitch,
-.button--yt,
-.button--mixer {
-  width: 48%;
+.button--niconico,
+.button--skip {
+  width: 56%;
+  border-radius: 25px;
 }
 
 .square-button {
@@ -114,87 +114,65 @@ button,
   font-size: 16px;
 }
 
-.square-button--twitch,
-.button--twitch {
-  background: #6441A4;
+.square-button--niconico,
+.button--niconico {
+  color: @white;
+  background: @accent;
+  font-size: 16px;
+
+
+  &:focus,
+  &:hover {
+    background: @red;
+  }
+
+}
+
+.square-button--skip,
+.button--skip {
+  background: transparent;
+  border: 1px solid @text-primary;
+  color: @text-primary;
+  text-decoration: none;
 
   &:hover {
-    background: lighten(#6441A4, 4%);
+    background: @text-primary;
+    color: @bg-primary;
   }
 
   &:focus {
-    background: #6441A4;
+    background: transparent;
   }
 }
 
-.square-button--yt,
-.button--yt {
-  background: #D22222;
 
+.button--go-live {
+  color: @white;
+  background: @accent;
+  font-size: 20px;
+
+  &:focus,
   &:hover {
-    background: lighten(#D22222, 4%);
-  }
-
-  &:focus {
-    background: #D22222;
-  }
-}
-
-.square-button--fb {
-  background: #3B5998;
-
-  &:hover {
-    background: lighten(#3B5998, 4%);
-  }
-}
-
-.square-button--twitter {
-  background: #1DA1F2;
-
-  &:hover {
-    background: lighten(#1DA1F2, 4%)
+    background: @accent-hover;
   }
 }
 
 .button--soft-warning {
-  color: @red;
-  border-color: rgba(251,72,76,.3);
-  background: rgba(251,72,76,.08);
+  color: @white;
+  background: @red;
+  border: 1px solid @red;
+  font-size: 20px;
 
-  &:focus {
-    color: @red;
-    border-color: rgba(251,72,76,.3);
-    background: rgba(251,72,76,.08);
-  }
-
+  &:focus,
   &:hover {
-    border-color: rgba(251,72,76,.4);
-    background: rgba(251,72,76,.12);
-    color: @red;
+    background: rgba(204, 0, 41, .3);
+    border: 1px solid @red;
+
   }
 }
 
-.square-button--mixer,
-.button--mixer {
-  background: #0078d7;
-
-  &:hover {
-    background: lighten(#0078d7,4%)
-  }
-}
-
-.night-theme {
-  .button--trans {
-    color: @night-link;
-
-    &:hover {
-      color: @white;
-    }
-  }
-
-  .button--default {
-    background: rgba(255, 255, 255, .1);
-    border-color: transparent;
-    color: @white;
-  }
+.button--default {
+  background: rgba(255, 255, 255, .1);
+  border-color: transparent;
+  color: @white;
 }

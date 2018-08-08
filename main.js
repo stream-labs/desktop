@@ -7,18 +7,23 @@ const pjson = require('./package.json');
 if (pjson.env === 'production') {
   process.env.NODE_ENV = 'production';
 }
-if (pjson.name === 'slobs-client-preview') {
-  process.env.SLOBS_PREVIEW = true;
+if (pjson.name === 'n-air-app-preview') {
+  process.env.NAIR_PREVIEW = true;
 }
-if (pjson.name === 'slobs-client-ipc') {
-  process.env.SLOBS_IPC = true;
+if (pjson.name === 'n-air-app-ipc') {
+  process.env.NAIR_IPC = true;
 }
-process.env.SLOBS_VERSION = pjson.version;
+process.env.NAIR_VERSION = pjson.version;
+
+if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
+  process.env.NAIR_LICENSE_API_KEY = pjson.getlicensenair_key;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
+const electron = require('electron');
 const fs = require('fs');
 const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
@@ -37,7 +42,7 @@ if (process.argv.includes('--clearCacheDir')) {
 ////////////////////////////////////////////////////////////////////////////////
 
 function log(...args) {
-  if (!process.env.SLOBS_DISABLE_MAIN_LOGGING) {
+  if (!process.env.NAIR_DISABLE_MAIN_LOGGING) {
     console.log(...args);
   }
 }
@@ -98,8 +103,8 @@ function startApp() {
   if (pjson.env === 'production') {
     bt.initialize({
       disableGlobalHandler: true,
-      endpoint: 'https://streamlabs.sp.backtrace.io:6098',
-      token: 'e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      endpoint: 'https://n-air-app.sp.backtrace.io:8443',
+      token: '66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
       attributes: {
         version: pjson.version,
         processType: 'main'
@@ -109,12 +114,12 @@ function startApp() {
     process.on('uncaughtException', handleUnhandledException);
 
     crashReporter.start({
-      productName: 'streamlabs-obs',
-      companyName: 'streamlabs',
+      productName: 'n-air-app',
+      companyName: 'n-air-app',
       submitURL:
-        'https://streamlabs.sp.backtrace.io:6098/post?' +
+        'https://n-air-app.sp.backtrace.io:8443/post?' +
         'format=minidump&' +
-        'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+        'token=66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
       extra: {
         version: pjson.version,
         processType: 'main'
@@ -127,16 +132,25 @@ function startApp() {
     defaultHeight: 1000
   });
 
+  const mainWindowIsVisible = electron.screen.getAllDisplays().some(display => (
+    display.workArea.x < mainWindowState.x + mainWindowState.width &&
+    display.workArea.x + display.workArea.width > mainWindowState.x &&
+    display.workArea.y < mainWindowState.y &&
+    display.workArea.y < mainWindowState.y + mainWindowState.height
+  ));
+
   mainWindow = new BrowserWindow({
     minWidth: 800,
     minHeight: 600,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    x: mainWindowState.x,
-    y: mainWindowState.y,
     show: false,
     frame: false,
-    title: 'Streamlabs OBS',
+    title: 'N Air',
+    ...(mainWindowIsVisible ? {
+      x: mainWindowState.x,
+      y: mainWindowState.y
+    } : {})
   });
 
   mainWindowState.manage(mainWindow);
@@ -276,25 +290,25 @@ function startApp() {
 
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
-    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + 
+    path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
               '/node_modules/obs-studio-node'));
 
   getObs().OBS_API_initAPI('en-US', app.getPath('userData'));
 }
 
 // We use a special cache directory for running tests
-if (process.env.SLOBS_CACHE_DIR) {
-  app.setPath('appData', process.env.SLOBS_CACHE_DIR);
+if (process.env.NAIR_CACHE_DIR) {
+  app.setPath('appData', process.env.NAIR_CACHE_DIR);
 }
-app.setPath('userData', path.join(app.getPath('appData'), 'slobs-client'));
+app.setPath('userData', path.join(app.getPath('appData'), 'n-air-app'));
 
-app.setAsDefaultProtocolClient('slobs');
+app.setAsDefaultProtocolClient('nair');
 
 // This ensures that only one copy of our app can run at once.
 const shouldQuit = app.makeSingleInstance(argv => {
   // Check for protocol links in the argv of the other process
   argv.forEach(arg => {
-    if (arg.match(/^slobs:\/\//)) {
+    if (arg.match(/^nair:\/\//)) {
       mainWindow.send('protocolLink', arg);
     }
   });
@@ -314,7 +328,7 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
-  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+  if ((process.env.NODE_ENV === 'production') || process.env.NAIR_FORCE_AUTO_UPDATE) {
     (new Updater(startApp)).run();
   } else {
     startApp();
@@ -334,26 +348,37 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
     // should recover by simply setting the size and forgetting
     // about the bounds.
     try {
-      const bounds = mainWindow.getBounds();
-      const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
-      const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
+      const mainWindowBounds = mainWindow.getBounds();
+      const mainWindowDisplay = electron.screen.getDisplayMatching(mainWindowBounds);
+      const targetWorkArea = mainWindowDisplay.workArea;
+
+      const width = Math.min(windowOptions.size.width, targetWorkArea.width);
+      const height = Math.min(windowOptions.size.height, targetWorkArea.height);
 
       childWindow.restore();
-      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
+      childWindow.setMinimumSize(width, height);
 
       if (windowOptions.center) {
+        const overflowsVertically = Math.max(0, mainWindowBounds.y + height - targetWorkArea.y - targetWorkArea.height);
+        const childX = (mainWindowBounds.x + (mainWindowBounds.width / 2)) - (width / 2);
+        const childY = mainWindowBounds.y - overflowsVertically;
+
         childWindow.setBounds({
           x: Math.floor(childX),
           y: Math.floor(childY),
-          width: windowOptions.size.width,
-          height: windowOptions.size.height
+          width,
+          height
         });
       }
     } catch (err) {
       log('Recovering from error:', err);
 
-      childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
-      childWindow.setSize(windowOptions.size.width, windowOptions.size.height);
+      const workAreaSize = electron.screen.getPrimaryDisplay().workAreaSize;
+      const width = Math.min(windowOptions.size.width, workAreaSize.width);
+      const height = Math.min(windowOptions.size.height, workAreaSize.height);
+
+      childWindow.setMinimumSize(width, height);
+      childWindow.setSize(width, height);
       childWindow.center();
     }
 
@@ -502,7 +527,10 @@ ipcMain.on('getUniqueId', event => {
 });
 
 ipcMain.on('restartApp', () => {
-  app.relaunch();
+  // prevent unexpected cache clear
+  const args = process.argv.slice(1).filter(x => x !== '--clearCacheDir');
+
+  app.relaunch( args );
   // Closing the main window starts the shut down sequence
   mainWindow.close();
 });
@@ -511,12 +539,4 @@ ipcMain.on('requestSourceAttributes', (e, names) => {
   const sizes = require('obs-studio-node').getSourcesSize(names);
 
   e.sender.send('notifySourceAttributes', sizes);
-});
-
-ipcMain.on('streamlabels-writeFile', (e, info) => {
-  fs.writeFile(info.path, info.data, err => {
-    if (err) {
-      console.log('Streamlabels: Error writing file', err);
-    }
-  });
 });

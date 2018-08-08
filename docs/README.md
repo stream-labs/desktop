@@ -1,10 +1,10 @@
 # API reference
 
-Streamlabs-OBS allows remote management of the application via
+N Air allows remote management of the application via
 an RPC-based API. The API is split into several different services.
 You can access services' methods and properties by sending
 [JSON-RPC](http://www.jsonrpc.org/specification) messages to the
-named pipe `slobs`.
+named pipe `n-air-app`.
 
 Individual JSON-RPC requests should be separated by a single newline
 character `LF` ( ASCII code 10).  You should ensure that your JSON message does not
@@ -218,7 +218,7 @@ execution.
 
 ## Reducing response body
 By default if the response returns resources with `"_type": "HELPER"`,
-Streamlabs-OBS will attach some data by calling `getModel()` method of resource.
+N Air will attach some data by calling `getModel()` method of resource.
 To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 
 
@@ -259,8 +259,8 @@ To disable that behavior, use the `compactMode` parameter in JSON-RPC request:
 ```
 
 # Remote connections
-Streamlabs OBS allows remote connection via websokets protocol powered by [Sockjs](https://github.com/sockjs).
-To enable remote connections run Streamlabs OBS with `--adv-settings` parameter, go to `Settings->API`,
+N Air allows remote connection via websokets protocol powered by [Sockjs](https://github.com/sockjs).
+To enable remote connections run N Air with `--adv-settings` parameter, go to `Settings->API`,
 enable Websokets and check `Allow Remote Connections`.
 Use API token from this window to authorize you connection:
 

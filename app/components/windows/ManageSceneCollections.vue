@@ -1,17 +1,17 @@
 <template>
 <modal-layout
-  :title="$t('Manage Scene Collections')"
+  :title="$t('scenes.manageSceneCollections')"
   :show-cancel="false"
   :done-handler="close">
   <div slot="content">
     <div class="manage-scene-collections__header">
       <div class="input-wrapper input-wrapper--search">
-        <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
+        <input class="input--search" type="text" :placeholder="$t('common.search')" v-model="searchQuery" />
       </div>
 
       <button class="button button--action" @click="create">
-        <i class="fa fa-plus" />
-        {{ $t('Create New') }}
+        <i class="icon-plus" />
+        {{ $t('common.createNew') }}
       </button>
     </div>
     <editable-scene-collection
@@ -38,11 +38,10 @@
   width: 50%;
 }
 
-.night-theme {
-  .manage-scene-collections--new {
-    &:hover {
-      background: @night-hover;
-    }
+.manage-scene-collections--new {
+  &:hover {
+    background: @hover;
   }
 }
+
 </style>

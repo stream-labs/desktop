@@ -1,3 +1,4 @@
+import electron from 'electron';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import { SceneCollectionsService } from 'services/scene-collections';
@@ -80,9 +81,20 @@ export default class EditableSceneCollection extends Vue {
   }
 
   remove() {
-    if (!confirm($t('Are you sure you want to remove %{collectionName}?', { collectionName: this.collection.name })))
-      return;
-    this.sceneCollectionsService.delete(this.collectionId);
+    electron.remote.dialog.showMessageBox(
+      electron.remote.getCurrentWindow(),
+      {
+        type: 'warning',
+        buttons: [$t('common.cancel'), $t('common.ok')],
+        title: $t('scenes.removeSceneCollectionConfirmTitle'),
+        message: $t('scenes.removeSceneCollectionConfirm', { collectionName: this.collection.name }),
+        noLink: true,
+      },
+      ok => {
+        if (!ok) return;
+        this.sceneCollectionsService.delete(this.collectionId);
+      }
+    );
   }
 
 }

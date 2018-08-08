@@ -1,22 +1,24 @@
 <template>
   <modal-layout
-    :title="$t('Layer filters') + ' (' + sourceDisplayName + ')'"
+    :title="$t('sources.layerFilters') + ' (' + sourceDisplayName + ')'"
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"
   >
     <display slot="fixed" :sourceId="sourceId" />
 
-    <div slot="content" class="modal--side-nav">
+    <div slot="content" class="modal--side-nav" data-test="SourceFilters">
       <NavMenu v-model="selectedFilterName" class="side-menu">
         <div class="controls">
           <i
-            class="icon-add icon-btn"
-            @click="addFilter"></i>
+            class="icon-add-file icon-btn"
+            @click="addFilter"
+            data-test="Add"></i>
           <i
-            class="icon-subtract icon-btn"
+            class="icon-delete icon-btn"
             v-if="selectedFilterName"
-            @click="removeFilter"></i>
+            @click="removeFilter"
+            data-test="Remove"></i>
         </div>
 
         <sl-vue-tree
@@ -30,10 +32,10 @@
           <template slot="title" slot-scope="{ node }">
             <div class="title-container">
               <span class="layer-icon">
-                <i @click="toggleVisibility(node.title)" class="icon-view" v-if="node.data.visible"></i>
+                <i @click="toggleVisibility(node.title)" class="icon-unhide" v-if="node.data.visible"></i>
                 <i @click="toggleVisibility(node.title)" class="icon-hide" v-if="!node.data.visible"></i>
               </span> &nbsp;
-              <span class="item-title">{{ node.title }}</span>
+              <span class="item-title" :data-test="node.title">{{ node.title }}</span>
             </div>
           </template>
 
@@ -46,7 +48,7 @@
           <GenericForm v-model="properties" @input="save"></GenericForm>
         </div>
         <div v-if="!selectedFilterName">
-          {{ $t('No filters applied') }}
+          {{ $t('filters.noFilterMessage') }}
         </div>
       </div>
     </div>
@@ -59,7 +61,7 @@
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
 .modal-container--side-nav {
-  padding: 20px;
+  padding: 16px;
 }
 
 .modal--side-nav >>> .sl-vue-tree-toggle {
@@ -67,7 +69,7 @@
 }
 
 .controls {
-  margin-left: 13px;
-  margin-bottom: 20px;
+  margin-left: 8px;
+  margin-bottom: 16px;
 }
 </style>

@@ -8,18 +8,15 @@ import electron from 'electron';
 import { Inject } from 'util/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import { WidgetType } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
-import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
-import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
   Source,
   TPropertiesManager
 } from './index';
-
+import { $t } from '../i18n';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -32,8 +29,6 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
-  widget: WidgetManager,
-  streamlabels: StreamlabelsManager
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
@@ -139,7 +134,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://streamlabs.com/browser-source';
+      if (settings.url === void 0) settings.url = 'https://site.nicovideo.jp/nicolive/n-air-app/browser-source/';
     }
 
     if (type === 'text_gdiplus') {
@@ -250,31 +245,37 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   getAvailableSourcesTypesList(): IListOption<TSourceType>[] {
     const obsAvailableTypes = obs.InputFactory.types();
-    const whitelistedTypes: IListOption<TSourceType>[] = [
-      { description: 'Image', value: 'image_source' },
-      { description: 'Color Source', value: 'color_source' },
-      { description: 'Browser Source', value: 'browser_source' },
-      { description: 'Media Source', value: 'ffmpeg_source' },
-      { description: 'Image Slide Show', value: 'slideshow' },
-      { description: 'Text (GDI+)', value: 'text_gdiplus' },
-      { description: 'Text (FreeType 2)', value: 'text_ft2_source' },
-      { description: 'Display Capture', value: 'monitor_capture' },
-      { description: 'Window Capture', value: 'window_capture' },
-      { description: 'Game Capture', value: 'game_capture' },
-      { description: 'Video Capture Device', value: 'dshow_input' },
-      { description: 'Audio Input Capture', value: 'wasapi_input_capture' },
-      { description: 'Audio Output Capture', value: 'wasapi_output_capture' },
-      { description: 'Blackmagic Device', value: 'decklink-input' },
-      { description: 'NDI Source', value: 'ndi_source' },
-      { description: 'OpenVR Capture', value: 'openvr_capture' },
-      { description: 'LIV Client Capture', value: 'liv_capture' }
+    const whitelistedTypes: TSourceType[] = [
+      'image_source',
+      'color_source',
+      'browser_source',
+      'ffmpeg_source',
+      'slideshow',
+      'text_gdiplus',
+      'text_ft2_source',
+      'monitor_capture',
+      'window_capture',
+      'game_capture',
+      'dshow_input',
+      'wasapi_input_capture',
+      'wasapi_output_capture',
+      'decklink-input',
+      'ndi_source',
+      'openvr_capture',
+      'liv_capture'
     ];
 
-    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
+    const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type));
     // 'scene' is not an obs input type so we have to set it manually
-    availableWhitelistedType.push({ description: 'Scene', value: 'scene' });
+    availableWhitelistedType.push('scene');
 
-    return availableWhitelistedType;
+    const availableWhitelistedSourceType =
+      availableWhitelistedType.map((value) => ({
+        value,
+        description: $t(`source-props.${value}.name`)
+      }));
+
+    return availableWhitelistedSourceType;
   }
 
   getAvailableSourcesTypes(): TSourceType[] {
@@ -378,7 +379,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       queryParams: { sourceId },
       size: {
         width: 600,
-        height: 800
+        height: 600
       }
     });
   }
@@ -388,20 +389,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     this.windowsService.showWindow({
       componentName: 'SourcesShowcase',
       size: {
-        width: 1000,
-        height: 650
+        width: 680,
+        height: 600
       }
     });
   }
 
 
-  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager, widgetType?: WidgetType) {
+  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
-      queryParams: { sourceType, propertiesManager, widgetType },
+      queryParams: { sourceType, propertiesManager },
       size: {
-        width: 600,
-        height: 540
+        width: 640,
+        height: 600
       }
     });
   }
@@ -429,19 +430,5 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       }
     });
   }
-
-
-  showNameWidget(widgetType: WidgetType) {
-    this.windowsService.showWindow({
-      componentName: 'NameSource',
-      queryParams: { widgetType: String(widgetType) },
-      size: {
-        width: 400,
-        height: 250
-      }
-    });
-  }
-
 }
-
 

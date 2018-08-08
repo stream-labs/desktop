@@ -6,14 +6,6 @@
 
 <script lang="ts" src="./Onboarding.vue.ts"></script>
 
-<style lang="less" scoped>
-@import "../../styles/index";
-
-.onboarding {
-  background-color: @onboarding-bg;
-}
-</style>
-
 <style lang="less">
 @import "../../styles/index";
 
@@ -39,7 +31,6 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  width: 300px;
 
   .button--lg {
     &:first-child {
@@ -63,13 +54,8 @@
   display: inline-block
 }
 
-.onboarding-image {
-  width: 200px;
-  margin-bottom: 30px;
-}
-
 .onboarding-title {
-  color: @white;
+  color: @text-primary;
   font-size: 22px;
   margin-bottom: 20px;
   letter-spacing: .5px;
@@ -82,14 +68,14 @@
 }
 
 .onboarding-desc {
-  color: @grey;
+  color: @text-primary;
   margin-bottom: 20px;
   padding: 0 20px;
 }
 
 .setup-later {
   margin-top: 20px;
-  color: @grey;
+  color: @text-primary;
 
   span {
     display: block;
@@ -109,7 +95,7 @@
   width: 100%;
   padding: 30px;
   color: @white;
-  background-color: @night-primary;
+  background-color: @bg-primary;
   margin-bottom: 20px;
   height: 270px;
   position: relative;
@@ -147,11 +133,11 @@
 }
 
 .running-setup-row--complete {
-  color: @teal-bright;
+  color: @accent;
 }
 
 .running-setup-percent {
-  color: @grey;
+  color: @text-primary;
 }
 
 .running-setup__deco {
@@ -174,4 +160,5 @@
 .running-setup__deco--left {
   left: -90px;
 }
+
 </style>

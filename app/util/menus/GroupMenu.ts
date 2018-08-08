@@ -26,7 +26,7 @@ export class GroupMenu extends Menu {
 
 
     this.append({
-      label: $t('Group into Folder'),
+      label: $t('sources.groupIntoFolder'),
       click: () => {
         this.scenesService.showNameFolder({
           itemsToGroup: this.selectionService.getIds(),
@@ -37,7 +37,7 @@ export class GroupMenu extends Menu {
     });
 
     this.append({
-      label: $t('Ungroup Folder'),
+      label: $t('sources.ungroupFolder'),
       click: () => {
         this.selectionService.getFolders()[0].ungroup();
       },
@@ -46,7 +46,7 @@ export class GroupMenu extends Menu {
 
 
     this.append({
-      label: $t('Group into Scene'),
+      label: $t('sources.groupIntoScene'),
       click: () => {
         this.scenesService.showNameScene({
           itemsToGroup: this.selectionService.getIds()
@@ -56,7 +56,7 @@ export class GroupMenu extends Menu {
     });
 
     this.append({
-      label: $t('Ungroup Scene'),
+      label: $t('sources.ungroupScene'),
       click: () => {
         const scene = this.scenesService.getScene(
           selectedItem.getSource().sourceId

@@ -6,7 +6,6 @@ import { WindowsService } from '../../services/windows';
 import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
-import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
 import { $t } from 'services/i18n';
 
 @Component({
@@ -16,12 +15,10 @@ import { $t } from 'services/i18n';
 export default class NameSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;
   @Inject() scenesService: IScenesServiceApi;
-  @Inject() widgetsService: WidgetsService;
   @Inject() windowsService: WindowsService;
 
   options: {
     sourceType?: TSourceType,
-    widgetType?: string,
     renameId?: string,
     propertiesManager?: TPropertiesManager
   }  = this.windowsService.getChildWindowQueryParams();
@@ -44,14 +41,12 @@ export default class NameSource extends Vue {
       this.sourcesService.getAvailableSourcesTypesList()
         .find(sourceTypeDef => sourceTypeDef.value === this.sourceType);
 
-    this.name = this.sourcesService.suggestName(
-      (this.sourceType && sourceType.description) || WidgetDefinitions[this.widgetType].name
-    );
+    this.name = this.sourcesService.suggestName(this.sourceType && sourceType.description);
   }
 
   submit() {
     if (!this.name) {
-      this.error = $t('The source name is required');
+      this.error = $t('sources.sourceNameIsRequired');
     } else if (this.options.renameId) {
       this.sourcesService.getSource(this.options.renameId).setName(this.name);
       this.windowsService.closeChildWindow();
@@ -73,11 +68,6 @@ export default class NameSource extends Vue {
 
         this.scenesService.activeScene.addSource(source.sourceId);
         sourceId = source.sourceId;
-      } else if (this.widgetType != null) {
-        sourceId = this.widgetsService.createWidget(
-          this.widgetType,
-          this.name
-        ).sourceId;
       }
 
       this.sourcesService.showSourceProperties(sourceId);
@@ -87,9 +77,4 @@ export default class NameSource extends Vue {
   get sourceType(): TSourceType {
     return this.options.sourceType;
   }
-
-  get widgetType(): WidgetType {
-    return parseInt(this.options.widgetType) as WidgetType;
-  }
-
 }

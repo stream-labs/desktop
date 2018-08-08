@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="section">
-      <button class="button button--action button--sm" @click="showNotifications">
-        {{ $t('Show Notifications') }}
+      <button class="button button--action" @click="showNotifications">
+        {{ $t('notifications.showNotifications') }}
       </button>
-      <button class="button button--sm button--soft-warning" @click="restoreDefaults">
-        {{ $t('Restore Defaults') }}
+      <button class="button button--sm button-soft-warning" @click="restoreDefaults">
+        {{ $t('notifications.restoreDefaults') }}
       </button>
     </div>
     <div class="section">
@@ -13,7 +13,7 @@
     </div>
     <div class="section">
       <h4>
-        {{ $t('Troubleshooter Notifications') }}
+        {{ $t('notifications.troubleshooterNotifications') }}
       </h4>
 
       <GenericForm v-model="troubleshooterFormData"  @input="saveTroubleshooterSettings"/>

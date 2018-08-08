@@ -20,37 +20,38 @@ import RavenVue from 'raven-js/plugins/vue';
 import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import VueI18n from 'vue-i18n';
+import moment from 'moment';
 
 const { ipcRenderer, remote } = electron;
 
-const slobsVersion = remote.process.env.SLOBS_VERSION;
+const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
 
 // This is the development DSN
-let sentryDsn = 'https://8f444a81edd446b69ce75421d5e91d4d@sentry.io/252950';
+const sentryDsn = 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
 
 if (isProduction) {
   // This is the production DSN
-  sentryDsn = 'https://6971fa187bb64f58ab29ac514aa0eb3d@sentry.io/251674';
+  // sentryDsn = 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
 
   electron.crashReporter.start({
-    productName: 'streamlabs-obs',
-    companyName: 'streamlabs',
+    productName: 'n-air-app',
+    companyName: 'n-air-app',
     submitURL:
-      'https://streamlabs.sp.backtrace.io:6098/post?' +
+      'https://n-air-app.sp.backtrace.io:8443/post?' +
       'format=minidump&' +
-      'token=e3f92ff3be69381afe2718f94c56da4644567935cc52dec601cf82b3f52a06ce',
+      'token=66abc2eda8a8ead580b825dd034d9b4f9da4d54eeb312bf8ce713571e1b1d35f',
     extra: {
-      version: slobsVersion,
+      version: nAirVersion,
       processType: 'renderer'
     }
   });
 }
 
-if ((isProduction || process.env.SLOBS_REPORT_TO_SENTRY) && !electron.remote.process.env.SLOBS_IPC) {
+if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.process.env.NAIR_IPC) {
   Raven.config(sentryDsn, {
-    release: slobsVersion,
+    release: nAirVersion,
     dataCallback: data => {
       // Because our URLs are local files and not publicly
       // accessible URLs, we simply truncate and send only
@@ -118,10 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
+      missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]) => {
+        return (values[0] && values[0].fallback) || key;
+        // return key + (values[0] && values[0].fallback ? ': ' + values[0].fallback : '');
+      }) as any, // 型定義と実装が異なっている
       silentTranslationWarn: true
     });
 
     I18nService.setVuei18nInstance(i18n);
+
+    const momentLocale = i18nService.state.locale.split('-')[0];
+    moment.locale(momentLocale);
 
     const vm = new Vue({
       el: '#app',

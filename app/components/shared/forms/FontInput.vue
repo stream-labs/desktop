@@ -1,5 +1,5 @@
 <template>
-<div>
+<div :data-test="testingAnchor">
   <div class="input-container">
     <div class="input-label">
     </div>
@@ -10,7 +10,7 @@
           :checked="isGoogleFont"
           @change="setFontType"
         />
-        <label>{{ $t('Use Google Font') }}</label>
+        <label>{{ $t('sources.useGoogleFont') }}</label>
       </div>
     </div>
   </div>

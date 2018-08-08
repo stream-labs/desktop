@@ -1,5 +1,5 @@
 .input-container {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   position: relative;
   display: flex;
 
@@ -39,8 +39,9 @@
   position: relative;
 
   &:after {
-    content: '\f002';
-    font-family: FontAwesome;
+    //icon-searchに変更
+    content: '\e92b';
+    font-family: n-air;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
     line-height: 36px;
   }
@@ -53,14 +54,14 @@
 input[type=text],
 input[type="password"],
 textarea {
-  border: 1px solid @day-input-border;
-  background: @day-input-bg;
+  border: 1px solid @grey;
+  background: #2B2F3B;
   margin-bottom: 0;
 
   &:focus {
     box-shadow: none;
-    background: @day-input-bg;
-    border-color: @day-focus-border;
+    background: @input-bg;
+    border-color: @text-secondary;
   }
 
   &.input--transparent {
@@ -82,7 +83,7 @@ textarea {
 
     &:before {
       background: transparent;
-      border-color: @day-input-border;
+      border-color: @grey;
     }
   }
 }
@@ -96,7 +97,7 @@ textarea {
 
     &:before {
       background: transparent;
-      border-color: @day-input-border;
+      border-color: @grey;
     }
   }
 }
@@ -116,8 +117,8 @@ textarea {
   position: relative;
 
   &:before {
-    font-family: FontAwesome;
-    content: '\f078';
+    font-family: n-air;
+    content: '\e90e';
     border: none;
     font-size: 9px;
     position: absolute;
@@ -141,8 +142,8 @@ textarea {
 .multiselect__input,
 .multiselect__single {
   &:hover, &:focus {
-    background: @day-input-bg;
-    border-color: @day-focus-border;
+    background: @input-bg;
+    border-color: @text-secondary;
   }
 }
 
@@ -153,9 +154,9 @@ textarea {
 .multiselect__content {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
-  border: 1px solid @day-focus-border;
+  border: 1px solid @text-secondary;
   top: 35px;
-  background: @day-input-bg;
+  background: @input-bg;
   list-style-type: none;
   margin: 0;
   width: 100%;
@@ -187,7 +188,7 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @day-hover;
+  background: @hover;
   color: @navy;
 
   &:after {
@@ -196,11 +197,11 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @teal;
+  background: @accent;
   color: @white;
 
   &.multiselect__option--highlight {
-    background: @teal;
+    background: @accent;
 
     &:after {
       display: none;
@@ -230,37 +231,35 @@ textarea {
   }
 }
 
-.night-theme {
-  input[type="text"],
-  input[type="password"],
-  textarea {
-    background: @night-secondary;
-    color: @white;
-    border-color: transparent;
+input[type="text"],
+input[type="password"],
+textarea {
+  background: @bg-secondary;
+  color: @white;
+  border-color: transparent;
 
-    &.input--transparent {
-      border-bottom: 1px dashed @grey;
-    }
+  &.input--transparent {
+    border-bottom: 1px dashed @grey;
+  }
+}
+
+.multiselect__content {
+  background: @bg-secondary;
+  border-color: @bg-secondary;
+  color: @white;
+}
+
+.multiselect__option--highlight {
+  background: @hover;
+  color: @white;
+}
+
+.input-wrapper--inverted {
+  input[type="text"] {
+    background: @input-bg;
   }
 
   .multiselect__content {
-    background: @night-secondary;
-    border-color: @night-secondary;
-    color: @white;
-  }
-
-  .multiselect__option--highlight {
-    background: @night-hover;
-    color: @white;
-  }
-
-  .input-wrapper--inverted {
-    input[type="text"] {
-      background: @night-bg;
-    }
-
-    .multiselect__content {
-      background: @night-bg;
-    }
+    background: @input-bg;
   }
 }

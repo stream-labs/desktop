@@ -6,12 +6,16 @@ import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import electron from 'electron';
 import Login from 'components/Login.vue';
+import StreamingStatus from 'components/StreamingStatus.vue';
 import { SettingsService } from 'services/settings';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
 
 @Component({
-  components: { Login }
+  components: {
+    Login,
+    StreamingStatus
+  }
 })
 export default class TopNav extends Vue {
   @Inject() settingsService: SettingsService;
@@ -22,24 +26,10 @@ export default class TopNav extends Vue {
 
   slideOpen = false;
 
-  studioModeTooltip = 'Studio Mode';
-
   @Prop() locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
-  }
-
-  navigateDashboard() {
-    this.navigationService.navigate('Dashboard');
-  }
-
-  navigateOverlays() {
-    this.navigationService.navigate('BrowseOverlays');
-  }
-
-  navigateLive() {
-    this.navigationService.navigate('Live');
   }
 
   navigateOnboarding() {
@@ -62,12 +52,12 @@ export default class TopNav extends Vue {
     this.settingsService.showSettings();
   }
 
-  toggleNightTheme() {
-    this.customizationService.nightMode = !this.customizationService.nightMode;
+  openFeedback() {
+    electron.remote.shell.openExternal('https://secure.nicovideo.jp/form/entry/n_air_feedback');
   }
 
-  openDiscord() {
-    electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
+  openHelp() {
+    electron.remote.shell.openExternal('https://qa.nicovideo.jp');
   }
 
   get isDevMode() {

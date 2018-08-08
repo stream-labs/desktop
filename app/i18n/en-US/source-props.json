@@ -1,17 +1,366 @@
 {
- "Image": "Image",
- "Color Source": "Color Source",
- "Browser Source": "Browser Source",
- "Media Source": "Media Source",
- "Image Slide Show": "Image Slide Show",
- "Text (GDI+)": "Text (GDI+)",
- "Text (FreeType 2)": "Text (FreeType 2)",
- "Display Capture": "Display Capture",
- "Window Capture": "Window Capture",
- "Game Capture": "Game Capture",
- "Video Capture Device": "Video Capture Device",
- "Audio Input Capture": "Audio Input Capture",
- "Audio Output Capture": "Audio Output Capture",
- "Blackmagic Device": "Blackmagic Device",
- "NDI Source": "NDI Source"
+  "image_source": {
+    "name": "Image",
+    "description": "Add images to your scene.",
+    "file": {
+      "name": "Image File"
+    },
+    "unload": {
+      "name": "Unload image when not showing"
+    }
+  },
+  "color_source": {
+    "name": "Color Source",
+    "description": "Add a color to the background of your whole scene or just a part.",
+    "color": {
+      "name": "Color"
+    },
+    "height": {
+      "name": "Height"
+    },
+    "width": {
+      "name": "Width"
+    }
+  },
+  "browser_source": {
+    "name": "Browser Source",
+    "description": "Allows you to add web-based content as a source, such as web pages and Flash SWFs.",
+    "css": {
+      "name": "Custom CSS"
+    },
+    "fps": {
+      "name": "FPS"
+    },
+    "height": {
+      "name": "Height"
+    },
+    "is_local_file": {
+      "name": "Local file"
+    },
+    "local_file": {
+      "name": "Local file"
+    },
+    "refreshnocache": {
+      "name": "Refresh cache of current page"
+    },
+    "restart_when_active": {
+      "name": "Refresh browser when scene becomes active"
+    },
+    "shutdown": {
+      "name": "Shutdown source when not visible"
+    },
+    "url": {
+      "name": "URL"
+    },
+    "width": {
+      "name": "Width"
+    }
+  },
+  "ffmpeg_source": {
+    "name": "Media Source",
+    "description": "Add videos or sound clips to your scene.",
+    "clear_on_media_end": {
+      "name": "Hide source when playback ends"
+    },
+    "close_when_inactive": {
+      "name": "Close file when inactive"
+    },
+    "color_range": {
+      "name": "YUV Color Range"
+    },
+    "hw_decode": {
+      "name": "Use hardware decoding when available"
+    },
+    "input": {
+      "name": "Input"
+    },
+    "input_format": {
+      "name": "Input Format"
+    },
+    "is_local_file": {
+      "name": "Local File"
+    },
+    "local_file": {
+      "name": "Local File"
+    },
+    "looping": {
+      "name": "Loop"
+    },
+    "restart_on_activate": {
+      "name": "Restart playback when source becomes active"
+    },
+    "seekable": {
+      "name": "Seekable"
+    },
+    "speed_percent": {
+      "name": "Speed (percent)"
+    }
+  },
+  "slideshow": {
+    "name": "Image Slide Show",
+    "description": "Add a slideshow of images to your scene.",
+    "files": {
+      "name": "Image Files"
+    },
+    "hide": {
+      "name": "Hide when slideshow is done"
+    },
+    "loop": {
+      "name": "Loop"
+    },
+    "playback_behavior": {
+      "name": "Visibility Behavior"
+    },
+    "randomize": {
+      "name": "Randomize Playback"
+    },
+    "slide_mode": {
+      "name": "Slide Mode"
+    },
+    "slide_time": {
+      "name": "Time Between Slides (milliseconds)"
+    },
+    "transition": {
+      "name": "Transition"
+    },
+    "transition_speed": {
+      "name": "Transition Speed (milliseconds)"
+    },
+    "use_custom_size": {
+      "name": "Bounding Size/Aspect Ratio"
+    }
+  },
+  "text_gdiplus": {
+    "name": "Text (GDI+)",
+    "description": "Add text to your scene and adjust its style.",
+    "align": {
+      "name": "Alignment"
+    },
+    "bk_color": {
+      "name": "Background Color"
+    },
+    "bk_opacity": {
+      "name": "Background Opacity"
+    },
+    "chatlog": {
+      "name": "Chatlog Mode"
+    },
+    "chatlog_lines": {
+      "name": "Chatlog Line Limit"
+    },
+    "color": {
+      "name": "Color"
+    },
+    "extents": {
+      "name": "Use Custom Text Extents"
+    },
+    "extents_cx": {
+      "name": "Width"
+    },
+    "extents_cy": {
+      "name": "Height"
+    },
+    "extents_wrap": {
+      "name": "Wrap"
+    },
+    "file": {
+      "name": "Text File (UTF-8)"
+    },
+    "font": {
+      "name": "Font"
+    },
+    "gradient": {
+      "name": "Gradient"
+    },
+    "gradient_color": {
+      "name": "Gradient Color"
+    },
+    "gradient_dir": {
+      "name": "Gradient Direction"
+    },
+    "gradient_opacity": {
+      "name": "Gradient Opacity"
+    },
+    "opacity": {
+      "name": "Opacity"
+    },
+    "outline": {
+      "name": "Outline"
+    },
+    "outline_color": {
+      "name": "Outline Color"
+    },
+    "outline_opacity": {
+      "name": "Outline Opacity"
+    },
+    "outline_size": {
+      "name": "Outline Size"
+    },
+    "read_from_file": {
+      "name": "Read from file"
+    },
+    "text": {
+      "name": "Text"
+    },
+    "valign": {
+      "name": "Vertical Alignment"
+    },
+    "vertical": {
+      "name": "Vertical"
+    }
+  },
+  "text (FreeType2)": {
+    "name": "Text (FreeType 2)"
+  },
+  "monitor_capture": {
+    "name": "Display Capture",
+    "description": "Capture your entire computer monitor.",
+    "capture_cursor": {
+      "name": "Capture Cursor"
+    },
+    "monitor": {
+      "name": "Display"
+    }
+  },
+  "window_capture": {
+    "name": "Window Capture",
+    "description": "Capture a specific window that's open on your computer.",
+    "compatibility": {
+      "name": "Multi-adapter Compatibility"
+    },
+    "cursor": {
+      "name": "Capture Cursor"
+    },
+    "priority": {
+      "name": "Window Match Priority"
+    },
+    "window": {
+      "name": "Window"
+    }
+  },
+  "game_capture": {
+    "name": "Game Capture",
+    "description": "Capture a game you're playing on your computer.",
+    "allow_transparency": {
+      "name": "Allow Transparency"
+    },
+    "anti_cheat_hook": {
+      "name": "Use anti-cheat compatibility hook"
+    },
+    "capture_cursor": {
+      "name": "Capture Cursor"
+    },
+    "capture_mode": {
+      "name": "Mode"
+    },
+    "capture_overlays": {
+      "name": "Capture third-party overlays (such as steam)"
+    },
+    "force_scaling": {
+      "name": "Force Scaling"
+    },
+    "limit_framerate": {
+      "name": "Limit capture framerate"
+    },
+    "priority": {
+      "name": "Window Match Priority"
+    },
+    "scale_res": {
+      "name": "Scale Resolution"
+    },
+    "sli_compatibility": {
+      "name": "SLI/Crossfire Capture Mode (Slow)"
+    },
+    "window": {
+      "name": "Window"
+    }
+  },
+  "dshow_input": {
+    "name": "Video Capture Device",
+    "description": "Select from your build in USB webcam or an external.",
+    "activate": {
+      "name": "Deactivate"
+    },
+    "audio_device_id": {
+      "name": "Audio Device"
+    },
+    "audio_output_mode": {
+      "name": "Audio Output Mode"
+    },
+    "buffering": {
+      "name": "Buffering"
+    },
+    "color_range": {
+      "name": "YUV Color Range"
+    },
+    "color_space": {
+      "name": "YUV Color Space"
+    },
+    "deactivate_when_not_showing": {
+      "name": "Deactivate when not showing"
+    },
+    "flip_vertically": {
+      "name": "Flip Vertically"
+    },
+    "frame_interval": {
+      "name": "FPS"
+    },
+    "res_type": {
+      "name": "Resolution/FPS Type"
+    },
+    "resolution": {
+      "name": "Resolution"
+    },
+    "use_custom_audio_device": {
+      "name": "Use custom audio device"
+    },
+    "video_config": {
+      "name": "Configure Video"
+    },
+    "video_device_id": {
+      "name": "Device"
+    },
+    "video_format": {
+      "name": "Video Format"
+    },
+    "xbar_config": {
+      "name": "Configure Crossbar"
+    }
+  },
+  "wasapi_input_capture": {
+    "name": "Audio Input Capture",
+    "description": "Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.",
+    "device_id": {
+      "name": "Device"
+    },
+    "use_device_timing": {
+      "name": "Use Device Timestamps"
+    }
+  },
+  "wasapi_output_capture": {
+    "name": "Audio Output Capture",
+    "description": "Captures your desktop audio for the purpose of playing sound, such as music or speech.",
+    "device_id": {
+      "name": "Device"
+    },
+    "use_device_timing": {
+      "name": "Use Device Timestamps"
+    }
+  },
+  "scene": {
+    "name": "Scene",
+    "description": "Allows you to add existing scene as a source"
+  },
+  "blackmagicDevice": {
+    "name": "Blackmagic Device"
+  },
+  "ndiSource": {
+    "name": "NDI Source"
+  },
+  "openvr_capture": {
+    "name": "OpenVR Capture"
+  },
+  "liv_capture": {
+    "name": "LIV Client Capture"
+  }
 }

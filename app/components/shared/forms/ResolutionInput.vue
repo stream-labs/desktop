@@ -1,5 +1,5 @@
 <template>
-<div class="input-container select" :class="{disabled: value.enabled === false}">
+<div :data-test="testingAnchor" class="input-container select" :class="{disabled: value.enabled === false}">
   <div v-if="value.showDescription !== false" class="input-label">
     <label>{{ value.description }}</label>
   </div>
@@ -10,7 +10,7 @@
       :options="value.options"
       track-by="value"
       :close-on-select="true"
-      :placeholder="placeholder"
+      :placeholder="placeholder || $t('settings.resolutionPlaceholder')"
       :allow-custom="getCustomResolution"
       label="description"
       @input="onInputHandler"
@@ -19,6 +19,9 @@
         <span>
           {{ props.option.description }}
         </span>
+      </template>
+      <template slot="noResult">
+        {{ $t('settings.itemNotFoundMessage') }}
       </template>
     </multiselect>
   </div>

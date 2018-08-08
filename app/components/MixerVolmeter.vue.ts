@@ -6,22 +6,21 @@ import { Inject } from 'util/injector';
 import { CustomizationService } from 'services/customization';
 
 // Configuration
-const CHANNEL_HEIGHT = 3;
-const PADDING_HEIGHT = 2;
+const CHANNEL_HEIGHT = 4;
+const PADDING_HEIGHT = 4;
 const PEAK_WIDTH = 4;
 const PEAK_HOLD_CYCLES = 100;
 const WARNING_LEVEL = -20;
 const DANGER_LEVEL = -9;
 
 // Colors
-const GREEN = 'rgba(49,195,162,.6)';
-const GREEN_BG = 'rgba(49,195,162,.16)';
-const YELLOW = 'rgba(255,205,71,.6)';
-const YELLOW_BG = 'rgba(255,205,71,.16)';
-const RED = 'rgba(252,62,63,.6)';
-const RED_BG = 'rgba(252,62,63,.16)';
-const NIGHT_BG = '#09161d';
-const DAY_BG = '#f7f9f9';
+const GREEN = 'rgba(0,224,79, .4)';
+const GREEN_BG = 'rgba(1,85,49, .4)';
+const YELLOW = 'rgba(181,224,79, .4)';
+const YELLOW_BG = 'rgba(65,85,49, .4)';
+const RED = 'rgba(255,31,79, .4)';
+const RED_BG = 'rgba(65,20,49, .4)';
+const ADVANCED_BG = '#050e18';
 
 @Component({})
 export default class MixerVolmeter extends Vue {
@@ -57,10 +56,6 @@ export default class MixerVolmeter extends Vue {
     );
   }
 
-  get backgroundColor() {
-    return this.customizationService.nightMode ? NIGHT_BG : DAY_BG;
-  }
-
   destroyed() {
     clearInterval(this.canvasWidthInterval);
     this.unsubscribeVolmeter();
@@ -88,7 +83,7 @@ export default class MixerVolmeter extends Vue {
   }
 
   drawVolmeter(peaks: number[]) {
-    this.ctx.fillStyle = this.backgroundColor;
+    this.ctx.fillStyle = ADVANCED_BG;
     this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     peaks.forEach((peak, channel) => {

@@ -102,14 +102,16 @@ export class SourcesNode extends Node<ISchema, {}> {
             propertiesManagerSettings: source.getPropertiesManagerSettings()
           };
 
-          if (audioSource) data = {
-            ...data,
-            forceMono: audioSource.forceMono,
-            syncOffset: AudioService.msToTimeSpec(audioSource.syncOffset),
-            audioMixers: audioSource.audioMixers,
-            monitoringType: audioSource.monitoringType,
-            mixerHidden: audioSource.mixerHidden
-          };
+          if (audioSource) {
+            data = {
+              ...data,
+              forceMono: audioSource.forceMono,
+              syncOffset: AudioService.msToTimeSpec(audioSource.syncOffset),
+              audioMixers: audioSource.audioMixers,
+              monitoringType: audioSource.monitoringType,
+              mixerHidden: audioSource.mixerHidden
+            };
+          }
 
           resolve(data);
         });
@@ -123,7 +125,6 @@ export class SourcesNode extends Node<ISchema, {}> {
       });
     });
   }
-
 
 
   checkTextSourceValidity(item: ISourceInfo) {

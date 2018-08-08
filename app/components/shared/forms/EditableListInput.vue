@@ -1,5 +1,5 @@
 <template>
-<div class="input-container">
+<div :data-test="testingAnchor" class="input-container">
   <div class="input-label">
     <label>
       {{ value.description }}
@@ -9,13 +9,16 @@
     <div class="editable-list__bar">
       <i
         @click="menu.popup()"
-        class="icon-add icon-btn editable-list__control"/>
+        class="icon-add-file icon-btn editable-list__control"
+        data-test="Add"/>
       <i
         @click="handleRemove"
-        class="icon-subtract icon-btn editable-list__control"/>
+        class="icon-delete icon-btn editable-list__control"
+        data-test="Remove"/>
       <i
         @click="handleEdit"
-        class="icon-settings icon-btn editable-list__control"/>
+        class="icon-settings icon-btn editable-list__control"
+        data-test="Edit"/>
     </div>
     <selector
       class="editable-list__list"
@@ -33,8 +36,8 @@
 @import "../../../styles/index";
 
 .editable-list__list {
-  background: @day-input-bg;
-  border: 1px solid @day-input-border;
+  background: @bg-secondary;
+  border: 1px solid @bg-secondary;
 }
 
 .editable-list__bar {
@@ -43,10 +46,4 @@
   margin-bottom: 10px;
 }
 
-.night-theme {
-  .editable-list__list {
-    border-color: @night-secondary;
-    background: @night-secondary;
-  }
-}
 </style>

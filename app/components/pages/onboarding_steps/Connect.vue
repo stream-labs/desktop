@@ -1,37 +1,29 @@
 <template>
-  <div>
+  <div class="main" data-test="Connect">
     <div class="onboarding-step">
-      <div class="onboarding-image"><img src="../../../../media/images/connect.png"></div>
+      <NAirLogo />
       <div class="onboarding-title" v-if="isSecurityUpgrade">Re-Authorize</div>
-      <div class="onboarding-title" v-else>Connect</div>
       <div class="onboarding-desc" v-if="isSecurityUpgrade">
-        {{ $t('We are improving our backend systems. As part of the migration process, we will need to you log in again. If you have any questions, you can') }}
-        <a @click="contactSupport">$t('contact support.')</a>
+        {{ $t('onboarding.secutityUpgrade') }}
+        <a @click="contactSupport">{{ $t('onboarding.contactSupport') }}</a>
       </div>
-      <div class="onboarding-desc" v-else>{{ $t('Sign in with your Twitch or Youtube account to get started with Streamlabs') }}</div>
+      <div class="onboarding-desc" v-else>{{ $t('onboarding.urgeToSignIn') }}</div>
       <div class="signup-buttons">
         <button
-          class="button button--twitch"
+          class="button button--niconico"
           :disabled="loadingState"
-          @click="authPlatform('twitch')">
-          <i class="fa" :class="iconForPlatform('twitch')" /> Twitch
-        </button>
-        <button
-          class="button button--yt"
-          :disabled="loadingState"
-          @click="authPlatform('youtube')">
-          <i class="fa" :class="iconForPlatform('youtube')" /> Youtube
-        </button>
-        <button
-          class="button button--mixer"
-          :disabled="loadingState"
-          @click="authPlatform('mixer')">
-          <i class="fa" :class="iconForPlatform('mixer')" /> Mixer
+          @click="authPlatform('niconico')"
+          data-test="NiconicoSignup">
+          <i class="fa" :class="iconForPlatform('niconico')" /> {{ $t('onboarding.loginToNiconico') }}
         </button>
       </div>
-      <div class="setup-later" v-if="!isSecurityUpgrade">
-        <a @click="skipOnboarding">{{ $t('Setup later')}}</a>
-      </div>
+      <button
+        @click="skipOnboarding"
+        class="button button--skip"
+        :disabled="loadingState"
+        v-if="!isSecurityUpgrade"
+        data-test="Skip">{{ $t('onboarding.skipConnect')}}</button>
+      <footer>©DWANGO Co.,Ltd.</footer>
     </div>
   </div>
 </template>
@@ -39,14 +31,41 @@
 <script lang="ts" src="./Connect.vue.ts"></script>
 
 <style lang="less" scoped>
-  .signup-buttons {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-
-    button {
-      margin: 5px 0;
-    }
+.onboarding-step {
+  > svg {
+    width: 256px;
+    margin-bottom: 30px;
   }
+}
+.signup-buttons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+
+  button {
+    margin-bottom: 24px;
+  }
+}
+footer {
+  position: fixed;
+  color: #70A0AF;
+  bottom: 0;
+  width: 100%;
+  padding: 8px;
+}
+
+.icon-spin {
+  animation: icon-spin 2s infinite linear;
+}
+
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
 </style>

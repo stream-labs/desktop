@@ -5,7 +5,7 @@
     v-if="unreadCount"
     v-tooltip="showUnreadNotificationsTooltip"
     @click="showNotifications">
-    <span class="fa fa-exclamation-triangle"></span>
+    <span class="icon-warning"></span>
     {{ unreadCount }}
   </div>
 
@@ -71,8 +71,8 @@
 
 
   &.info {
-    background-color: fade(@grey, 15%);
-    color: @grey;
+    background-color: fade(@text-primary, 15%);
+    color: @text-primary;
   }
 
   &.warning {
@@ -81,8 +81,8 @@
   }
 
   &.success {
-    background-color: fade(@teal, 20%);
-    color: @teal;
+    background-color: fade(@accent, 20%);
+    color: @accent;
   }
 
   &.has-action {
@@ -103,10 +103,10 @@
     content: '|';
     padding-right: 12px;
     opacity: .5;
-    color: @grey;
+    color: @text-primary;
   }
 
-  .fa {
+  .icon-warning {
     font-size: 15px;
   }
 }
@@ -114,7 +114,7 @@
 .notifications__counter--warning {
   color: @red;
 
-  .fa {
+  i {
     color: @red;
   }
 }

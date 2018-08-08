@@ -7,11 +7,6 @@ export interface ITcpServersSettings {
     enabled: boolean;
     pipeName: string;
   };
-  websockets: {
-    enabled: boolean;
-    port: number;
-    allowRemote: boolean;
-  };
 }
 
 export interface ITcpServerServiceApi {
@@ -21,9 +16,7 @@ export interface ITcpServerServiceApi {
   getDefaultSettings(): ITcpServersSettings;
   listen(): void;
   stopListening(): void;
-  enableWebsoketsRemoteConnections(): void;
   getIPAddresses(): IIPAddressDescription[];
-  generateToken(): string;
   state: ITcpServersSettings;
 }
 

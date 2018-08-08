@@ -1,18 +1,18 @@
 <template>
 <modal-layout
   :showControls="false"
-  :title="$t('Add Source')">
+  :title="$t('sources.addSourceTitle')">
 
-  <div slot="content">
+  <div slot="content" data-test="AddSource">
 
     <div v-if="sourceType != 'scene'">
       <div class="row">
         <div class="column small-12">
-          <h4>{{ $t('Add New Source') }}</h4>
+          <h4>{{ $t('sources.addNewSourceTitle') }}</h4>
           <p
             v-if="!error"
             class="NameSource-label">
-            {{ $t('Please enter the name of the source') }}
+            {{ $t('sources.enterTheNameOfSource') }}
           </p>
           <p v-if="error"
             class="NameSource-label NameSource-label__error">
@@ -23,7 +23,7 @@
       </div>
       <div class="row">
         <div class="columns small-12 buttons">
-          <button @click="addNew" class="button button--action">{{ $t('Add New Source') }}</button>
+          <button @click="addNew" class="button button--action" data-test="AddNewSource">{{ $t('sources.addNewSource') }}</button>
         </div>
       </div>
     </div>
@@ -31,12 +31,7 @@
     <div class="row">
       <div class="columns small-12">
         <h4>
-          {{ $t('Add Existing Source') }}
-          <span
-            v-if="propertiesManager === 'widget'"
-            class="recommended-label">
-            {{ $t('Recommended') }}
-          </span>
+          {{ $t('sources.addExistingSourceTitle') }}
         </h4>
       </div>
     </div>
@@ -58,7 +53,7 @@
 
     <div class="row">
       <div class="columns small-12 buttons">
-        <button @click="addExisting" class="button button--action">{{ $t('Add Existing Source') }}</button>
+        <button @click="addExisting" class="button button--action" data-test="AddExistingSource">{{ $t('sources.addExistingSource') }}</button>
       </div>
     </div>
   </div>
@@ -72,7 +67,7 @@
 @import "../../styles/index";
 
 .NameSource-label {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .NameSource-label__error {
@@ -108,9 +103,8 @@
 }
 
 .recommended-label {
-  color: @teal;
+  color: @accent;
   margin-left: 10px;
-  text-transform: none;
 }
 
 .studio-controls-selector {

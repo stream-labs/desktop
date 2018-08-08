@@ -1,73 +1,517 @@
 {
-  "General": "全般的",
-  "Stream": "ストリーム",
-  "Output": "アウトプット",
-  "Audio": "オーディオ",
-  "Video": "ビデオ",
-  "Hotkeys": "ホットキー",
-  "Advanced": "詳細設定",
-  "Overlays": "オーバーレイ",
-  "Notifications": "通知",
-  "Appearance": "面目",
-  "Remote Control": "リモート コントロール",
-  "Night mode": "夜モード",
-  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "奇妙な動作が発生した場合は、キャッシュディレクトリを排除してみて下さい。シーンのコンフィグや設定も失われますが、安定問題を治せる可能性はあります。",
-  "Show Cache Directory": "キャッシュディレクトリを表示します。",
-  "Delete Cache and Restart": "キャッシュを排除して再起動します。",
-  "Upload Cache to Developers": "開発元へキャッシュをアップロードします。",
-  "Restart Streamlabels Session": "Streamlabelsのセッションを再起動します。",
-  "Run Auto Optimizer": "自動オプティマイザーを実行します。",
-  "Confirm stream title and game before going live": "ライブになる前にストリームのタイトルとゲームを確認して下さい。",
-  "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "警告！シーンとソースと設定を排除しています。もとに戻すことはできません！",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.  Please paste it into discord and tag a developer.": "キャッシュダイレクトリのアップロードは成功しました。%{file} 名乗ったファイルはクリップボードにコピーされました。Discordにペーストして開発元をタッグしてください。",
-  "Streamlabels session has been succesfully restarted!": "Streamlabelsセッションの再起動は成功しました！",
-  "This action will restart the application. Continue?": "アプリは再起動します。続行してもよろしいですか？",
-  "Show confirmation dialog when starting streams": "ストリームを開始する時に確認ダイアログを表示する",
-  "Show confirmation dialog when stopping streams": "ストリームを終了する時に確認ダイアログを表示する",
-  "Automatically record when streaming": "ストリーミング時に自動的に録画",
-  "Keep recording when stream stops": "ストリームが停止しても録画を続ける",
-  "Source Alignement Snapping": "ソースの配置をスナップする",
-  "Snap Sources to edge of screen": "ソースを画面の端にスナップする",
-  "Snap Sources to other sources": "他のソースにソースをスナップする",
-  "Stream Type": "ストリームタイプ",
-  "Output Mode": "出力モード",
-  "Streaming": "ストリーミング",
-  "Enable Advanced Encoder Settings": "高度なエンコーダ設定を有効にする",
-  "Enforce streaming service bitrate limits": "ストリーミングサービスのビットレート制限を強制する",
-  "Encoder Preset (Higher = Less CPU)": "エンコーダのプリセット（より高い=より少ないCPU）",
-  "Generate File Name without Space": "スペースなしでファイル名を生成する",
-  "Recording": "記録",
-  "Recording Quality": "リコーディングのクオリティ",
-  "Recording Format": "リコーディングのフォーマット",
-  "Custom Muxer Settings": "カスタムのMuxerの設定",
-  "Enable Replay Buffer": "再生バッファーを有効にします。",
-  "Base (Canvas) Resolution": "ベース（キャンバス）解像度",
-  "Output (Scaled) Resolution": "出力（スケーリング）解像度",
-  "Downscale Filter": "ダウンスケール・フィルター",
-  "Bilinear (Fastest, but blurry if scaling)": "バイリニア（最速ですが、スケーリングした場合はぼやけます）",
-  "Bicubic (Sharpened scaling, 16 samples)": "バイキュービック（鮮明なスケーリング、16サンプル）",
-  "Lanczos (Sharpened scaling, 32 samples)": "Lanczos（シャープスケーリング、32サンプル）",
-  "No elements found. Consider changing the search query.": "要素が見つかりませんでした。 検索語を変更することを検討してください。",
-  "Do not back up my media files in the cloud (requires app restart)": "メディアファイルをクラウドにバックアップしないでください（アプリの再起動が必要です）",
-  "FPS Type": "FPSのタイプ",
-  "Common FPS Values": "一般的な FPS の値",
-  "Integer FPS Value": "整数FPS値",
-  "Fractional FPS Value": "フラクショナルFPS値",
-  "Process Priority": "プロセスの優先順位",
-  "Color Format": "色のフォーマット",
-  "Audio Monitoring Device": "オーディオ監視デバイス",
-  "Disable Windows audio ducking": "Windows オーディオ ダッキングを無効にします。",
-  "YUV Color Space": "YUVカラースペース",
-  "YUV Color Range": "YUVカラーレンジ",
-  "Stream Delay": "ストリームの遅延",
-  "Duration (Seconds)": "継続時間 (秒)",
-  "Preserved cutoff point (increase delay) when reconnecting": "再接続時のカットオフポイントの保存（遅延の増加）",
-  "Desktop Audio Device": "デスクトップオーディオデバイス",
-  "Mic/Auxiliary Device": "マイク/補助装置",
-  "Recording Path": "リコーディングのパス",
-  "Enable": "有効",
-  "Default": "デフォルト",
-  "Custom Encoder Settings": "カスタムのエンコーダー設定",
-  "Audio Bitrate": "オーディオ ビット レート",
-  "Video Bitrate": "映像ビットレート"
+  "General": {
+    "name": "一般",
+    "General": {
+      "name": null
+    },
+    "Output": {
+      "name": "出力",
+      "WarnBeforeStartingStream": {
+        "name": "配信を開始する際に確認ダイアログを表示する"
+      },
+      "WarnBeforeStoppingStream": {
+        "name": "配信を終了する際に確認ダイアログを表示する"
+      },
+      "RecordWhenStreaming": {
+        "name": "配信時に自動的に録画する"
+      },
+      "KeepRecordingWhenStreamStops": {
+        "name": "配信終了後も録画を続ける"
+      },
+      "ReplayBufferWhileStreaming": {
+        "name": null
+      },
+      "KeepReplayBufferStreamStops": {
+        "name": null
+      }
+    },
+    "Source Alignement Snapping": {
+      "name": "ソースの配置をスナップする",
+      "SnappingEnabled": {
+        "name": "有効"
+      },
+      "SnapDistance": {
+        "name": "スナップ感度"
+      },
+      "ScreenSnapping": {
+        "name": "ソースをプレビュー画面の端にスナップする"
+      },
+      "SourceSnapping": {
+        "name": "ソースを他のソースにスナップする"
+      },
+      "CenterSnapping": {
+        "name": null
+      }
+    },
+    "Projectors": {
+      "name": null,
+      "HideProjectorCursor": {
+        "name": null
+      },
+      "ProjectorAlwaysOnTop": {
+        "name": null
+      },
+      "SaveProjectors": {
+        "name": null
+      }
+    },
+    "System Tray": {
+      "name": null,
+      "SysTrayEnabled": {
+        "name": null
+      },
+      "SysTrayWhenStarted": {
+        "name": null
+      },
+      "SysTrayMinimizeToTray": {
+        "name": null
+      }
+    }
+  },
+  "Stream": {
+    "name": "配信",
+    "Untitled": {
+      "name": null,
+      "streamType": {
+        "name": "ストリームタイプ",
+        "rtmp_common": null,
+        "rtmp_custom": null
+      },
+      "server": {
+        "name": "URL"
+      },
+      "key": {
+        "name": "ストリームキー"
+      },
+      "use_auth": {
+        "name": "認証を使用する"
+      },
+      "username": {
+        "name": "ユーザ名"
+      },
+      "password": {
+        "name": "パスワード"
+      }
+    }
+  },
+  "Output": {
+    "name": "出力",
+    "Untitled": {
+      "Mode": {
+        "name": "出力モード",
+        "Simple": "基本",
+        "Advanced": "詳細"
+      }
+    },
+    "Streaming": {
+      "name": "配信品質",
+      "VBitrate": {
+        "name": "映像ビットレート（kbps）"
+      },
+      "StreamEncoder": {
+        "name": "エンコーダ",
+        "obs_x264": "ソフトウェア（x264）",
+        "obs_qsv11": "ハードウェア（QSV）"
+      },
+      "ABitrate": {
+        "name": "音声ビットレート（kbps）"
+      },
+      "UseAdvanced": {
+        "name": "高度なエンコーダ設定を有効にする"
+      },
+      "EnforceBitrate": {
+        "name": "ストリーミングサービスのビットレート制限を強制する"
+      },
+      "Preset": {
+        "name": "エンコーダープリセット（上にいくほどCPU使用率は低くなります）",
+        "ultrafast": null,
+        "superfast": null,
+        "veryfast": null,
+        "faster": null,
+        "fast": null,
+        "medium": null,
+        "slow": null,
+        "slower": null,
+        "veryslow": null,
+        "placebo": null
+      },
+      "QSVPreset": {
+        "name": "@:settings.Output.Streaming.target_usage.name",
+        "quality": null,
+        "balanced": null,
+        "speed": null
+      },
+      "x264Settings": {
+        "name": "エンコーダーのカスタム設定"
+      },
+      "TrackIndex": {
+        "name": "音声トラック"
+      },
+      "Encoder": {
+        "name": "@:settings.Output.Streaming.StreamEncoder.name",
+        "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11"
+      },
+      "ApplyServiceSettings": {
+        "name": "@:settings.Output.Streaming.EnforceBitrate.name"
+      },
+      "Rescale": {
+        "name": "出力をリスケールする"
+      },
+      "RescaleRes": {
+        "name": "リスケール後解像度"
+      },
+      "rate_control": {
+        "name": "ビットレート制御",
+        "CBR": "CBR",
+        "ABR": "ABR",
+        "VBR": "VBR",
+        "CRF": "CRF"
+      },
+      "bitrate": {
+        "name": "ビットレート（kbps）"
+      },
+      "use_bufsize": {
+        "name": "バッファサイズを指定する"
+      },
+      "buffer_size": {
+        "name": "バッファサイズ"
+      },
+      "crf": {
+        "name": "CRF"
+      },
+      "keyint_sec": {
+        "name": "キーフレーム間隔（秒, 0=自動）"
+      },
+      "preset": {
+        "name": "エンコーダープリセット（上にいくほどCPU使用率は低くなります）",
+        "ultrafast": null,
+        "superfast": null,
+        "veryfast": null,
+        "faster": null,
+        "fast": null,
+        "medium": null,
+        "slow": null,
+        "slower": null,
+        "veryslow": null,
+        "placebo": null
+      },
+      "target_usage": {
+        "name": "ターゲットの利用法",
+        "quality": null,
+        "balanced": null,
+        "speed": null
+      },
+      "profile": {
+        "name": "プロファイル",
+        "": null,
+        "baseline": null,
+        "main": null,
+        "high": null
+      },
+      "tune": {
+        "name": "チューン",
+        "": null,
+        "film": null,
+        "animation": null,
+        "grain": null,
+        "stillimage": null,
+        "psnr": null,
+        "ssim": null,
+        "fastdecode": null,
+        "zerolatency": null
+      },
+      "x264opts": {
+        "name": "@:settings.Output.Streaming.x264Settings.name"
+      }
+    },
+    "Recording": {
+      "name": "録画",
+      "FilePath": {
+        "name": "録画パス"
+      },
+      "RecFilePath": {
+        "name": "@:settings.Output.Recording.FilePath.name"
+      },
+      "RecQuality": {
+        "name": "録画品質",
+        "Stream": "配信品質と同等",
+        "Small": "高品質、ファイルサイズ中",
+        "HQ": "超高品質、ファイルサイズ大",
+        "Lossless": "最高品質（元映像のまま）、ファイルサイズ特大"
+      },
+      "RecType": {
+        "name": "録画形式",
+        "Standard": null,
+        "Custom Output (FFmpeg)": null
+      },
+      "FileNameWithoutSpace": {
+        "name": "空白無しでファイル名を作成する"
+      },
+      "RecFileNameWithoutSpace": {
+        "name": "@:settings.Output.Recording.FileNameWithoutSpace.name"
+      },
+      "RecFormat": {
+        "name": "録画フォーマット",
+        "flv": null,
+        "mp4": null,
+        "mov": null,
+        "mkv": null,
+        "ts": null,
+        "m3u8": null
+      },
+      "RecTracks": {
+        "name": "音声トラック"
+      },
+      "RecEncoder": {
+        "name": "@:settings.Output.Streaming.Encoder.name",
+        "obs_x264": "@:settings.Output.Streaming.Encoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.Encoder.obs_qsv11"
+      },
+      "RecRescale": {
+        "name": "@:settings.Output.Streaming.Rescale.name"
+      },
+      "RecRescaleRes": {
+        "name": "@:settings.Output.Streaming.RescaleRes.name"
+      },
+      "RecMuxerCustom": {
+        "name": "Muxerのカスタム設定"
+      },
+      "MuxerCustom": {
+        "name": "@:settings.Output.Recording.RecMuxerCustom.name"
+      },
+      "RecRB": {
+        "name": "再生バッファを有効にする"
+      },
+      "rate_control": {
+        "name": "@:settings.Output.Streaming.rate_control.name",
+        "CBR": "@:settings.Output.Streaming.rate_control.CBR",
+        "ABR": "@:settings.Output.Streaming.rate_control.ABR",
+        "VBR": "@:settings.Output.Streaming.rate_control.VBR",
+        "CRF": "@:settings.Output.Streaming.rate_control.CRF"
+      },
+      "bitrate": {
+        "name": "@:settings.Output.Streaming.bitrate.name"
+      },
+      "use_bufsize": {
+        "name": "@:settings.Output.Streaming.use_bufsize.name"
+      },
+      "buffer_size": {
+        "name": "@:settings.Output.Streaming.buffer_size.name"
+      },
+      "crf": {
+        "name": "@:settings.Output.Streaming.crf.name"
+      },
+      "keyint_sec": {
+        "name": "@:settings.Output.Streaming.keyint_sec.name"
+      },
+      "preset": {
+        "name": "@:settings.Output.Streaming.preset.name",
+        "ultrafast": "@:settings.Output.Streaming.preset.ultrafast",
+        "superfast": "@:settings.Output.Streaming.preset.superfast",
+        "veryfast": "@:settings.Output.Streaming.preset.veryfast",
+        "faster": "@:settings.Output.Streaming.preset.faster",
+        "fast": "@:settings.Output.Streaming.preset.fast",
+        "medium": "@:settings.Output.Streaming.preset.medium",
+        "slow": "@:settings.Output.Streaming.preset.slow",
+        "slower": "@:settings.Output.Streaming.preset.slower",
+        "veryslow": "@:settings.Output.Streaming.preset.veryslow",
+        "placebo": "@:settings.Output.Streaming.preset.placebo"
+      },
+      "profile": {
+        "name": "@:settings.Output.Streaming.profile.name",
+        "": null,
+        "baseline": "@:settings.Output.Streaming.profile.baseline",
+        "main": "@:settings.Output.Streaming.profile.main",
+        "high": "@:settings.Output.Streaming.profile.high"
+      },
+      "tune": {
+        "name": "@:settings.Output.Streaming.tune.name",
+        "": null,
+        "film": "@:settings.Output.Streaming.tune.film",
+        "animation": "@:settings.Output.Streaming.tune.animation",
+        "grain": "@:settings.Output.Streaming.tune.grain",
+        "stillimage": "@:settings.Output.Streaming.tune.stillimage",
+        "psnr": "@:settings.Output.Streaming.tune.psnr",
+        "ssim": "@:settings.Output.Streaming.tune.ssim",
+        "fastdecode": "@:settings.Output.Streaming.tune.fastdecode",
+        "zerolatency": "@:settings.Output.Streaming.tune.zerolatency"
+      },
+      "x264opts": {
+        "name": "@:settings.Output.Streaming.x264opts.name"
+      }
+    }
+  },
+  "Audio": {
+    "name": "音声"
+  },
+  "Video": {
+    "name": "映像",
+    "Untitled": {
+      "name": null,
+      "Base": {
+        "name": "基本（キャンバス）解像度",
+        "1920x1080": null,
+        "1280x720": null,
+        "3840x2160": null
+      },
+      "Output": {
+        "name": "配信映像の解像度",
+        "1280x720": "HD配信用 (1280x720)",
+        "800x450": "通常配信用 (800x450)",
+        "640x360": "低画質配信用 (640x360)",
+        "1920x1080": null,
+        "1536x864": null,
+        "1440x810": null,
+        "1152x648": null,
+        "1096x616": null,
+        "960x540": null,
+        "852x480": null,
+        "768x432": null,
+        "698x392": null
+      },
+      "ScaleType": {
+        "name": "ダウンスケールフィルター",
+        "bilinear": "バイリニア（最速だが、スケーリングした場合はぼやける）",
+        "bicubic": "バイキュービック（鮮明なスケーリング、16サンプル）",
+        "lanczos": "Lanczos（鮮明なスケーリング、32サンプル）"
+      },
+      "FPSType": {
+        "name": "フレームレートの指定方法",
+        "Common FPS Values": "通常",
+        "Integer FPS Value": "整数値で指定",
+        "Fractional FPS Value": "分数値で指定"
+      },
+      "FPSCommon": {
+        "name": "フレームレートの値を指定"
+      },
+      "FPSInt": {
+        "name": "フレームレートの値を整数値で指定"
+      },
+      "FPSNum": {
+        "name": "分母を指定"
+      },
+      "FPSDen": {
+        "name": "分子を指定"
+      }
+    }
+  },
+  "Hotkeys": {
+    "name": "ショートカットキー"
+  },
+  "Advanced": {
+    "name": "詳細設定",
+    "General": {
+      "name": "一般",
+      "ProcessPriority": {
+        "name": "プロセス優先度",
+        "High": null,
+        "AboveNormal": null,
+        "Normal": null,
+        "BelowNormal": null,
+        "Idle": null
+      }
+    },
+    "Video": {
+      "name": "映像",
+      "ColorFormat": {
+        "name": "色のフォーマット",
+        "NV12": null,
+        "I420": null,
+        "I444": null,
+        "RGB": null
+      },
+      "ColorSpace": {
+        "name": "YUVカラースペース",
+        "601": null,
+        "709": null
+      },
+      "ColorRange": {
+        "name": "YUVカラーレンジ",
+        "Partial": null,
+        "Full": null
+      }
+    },
+    "Audio": {
+      "name": "音声",
+      "MonitoringDeviceName": {
+        "name": "音声モニタリングデバイス",
+        "Default": "@:settings.default"
+      },
+      "DisableAudioDucking": {
+        "name": "Windowsの自動音量調整機能を無効にする"
+      }
+    },
+    "Recording": {
+      "name": "録画",
+      "FilenameFormatting": {
+        "name": null
+      },
+      "OverwriteIfExists": {
+        "name": null
+      },
+      "RecRBPrefix": {
+        "name": null
+      },
+      "RecRBSuffix": {
+        "name": null
+      }
+    },
+    "Stream Delay": {
+      "name": "配信遅延",
+      "DelayEnable": {
+        "name": "配信遅延を有効にする"
+      },
+      "DelaySec": {
+        "name": "遅延時間 (秒)"
+      },
+      "DelayPreserve": {
+        "name": "再接続時のカットオフポイントの保存（遅延の増加）"
+      }
+    },
+    "Automatically Reconnect": {
+      "name": null,
+      "Reconnect": {
+        "name": null
+      },
+      "RetryDelay": {
+        "name": null
+      },
+      "MaxRetries": {
+        "name": null
+      }
+    },
+    "Network": {
+      "name": null,
+      "BindIP": {
+        "name": null,
+        "既定": null
+      },
+      "NewSocketLoopEnable": {
+        "name": null
+      },
+      "LowLatencyEnable": {
+        "name": null
+      }
+    }
+  },
+  "listPlaceholder": "選択してください",
+  "resolutionPlaceholder": "選択するか、値を入力してください",
+  "addFiles": "ファイルを追加する",
+  "addDirectory": "ディレクトリを追加する",
+  "cacheClearDescription": "不具合が発生した場合、キャッシュディレクトリを削除すると改善する可能性があります。ただしシーン設定が初期化されますのでご注意ください。",
+  "showCacheDirectory": "キャッシュディレクトリを表示",
+  "deleteCacheAndRestart": "キャッシュを削除して再起動",
+  "confirmStreamTitleAndGameBeforeGoingLive": "ライブになる前にストリームのタイトルとゲームを確認して下さい。",
+  "clearCacheConfirm": "警告: すべてのシーン、ソース、設定を抹消します。この操作は元に戻せません。",
+  "restartConfirm": "N Airを再起動します。よろしいですか？",
+  "itemNotFoundMessage": "要素が見つかりませんでした。 検索する語句を変更してみてください。",
+  "desktopAudioDevice": "デスクトップ音声デバイス",
+  "micAuxDevice": "マイク",
+  "enable": "有効",
+  "disabled": "無効",
+  "default": "標準",
+  "fontFamily": "フォントファミリー",
+  "fontStyle": "フォントスタイル",
+  "fontSize": "フォントサイズ"
 }

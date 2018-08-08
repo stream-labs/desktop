@@ -48,7 +48,7 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
     if (Util.isPreview()) return;
     if (Util.isIpc()) return;
 
-    const currentVersion = electron.remote.process.env.SLOBS_VERSION;
+    const currentVersion = electron.remote.process.env.NAIR_VERSION;
 
     // If the notes don't match the current version, we shouldn't
     // show them.

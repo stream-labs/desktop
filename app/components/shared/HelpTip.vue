@@ -3,7 +3,7 @@
     <div class="help-tip__arrow"></div>
     <i @click="closeHelpTip" class="help-tip__close icon-close" />
     <div class="help-tip__title">
-      <i class="fa fa-info-circle" />
+      <i class="icon-notification" />
       <slot name="title"></slot>
     </div>
     <div class="help-tip__body"><slot name="content"></slot>
@@ -17,15 +17,15 @@
 @import "../../styles/index";
 .help-tip {
   position: absolute;
-  background: @teal;
+  background: @text-primary;
   .radius;
-  color: white;
+  color: @hover;
   top: -8px;
-  right: 102px;
-  width: 260px;
-  padding: 10px;
+  left: 90px;
+  width: 240px;
+  padding: 8px;
   font-size: 14px;
-  animation: bounce 18s ease-in-out 2s 3 both;
+  z-index: 100000;
 }
 
 .help-tip__arrow {
@@ -33,7 +33,7 @@
   height: 0;
   border-style: solid;
   border-width: 8px 8px 8px 0;
-  border-color: transparent @teal transparent transparent;
+  border-color: transparent @text-primary transparent transparent;
   position: absolute;
   left: -8px;
 }
@@ -41,6 +41,7 @@
 .help-tip__close {
   position: absolute;
   right: 10px;
+  font-size: 20px;
   cursor: pointer;
   opacity: .6;
   .transition;
@@ -55,42 +56,14 @@
   font-size: 16px;
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255,255,255,.2);
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid @hover;
 
-  .fa {
+  i {
     margin-right: 8px;
     font-size: 16px;
   }
 }
 
-@keyframes bounce {
-   from, 3%, 6%, 10%, to {
-    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-    transform: translateX(0);
-  }
-
-  4%, 5% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
-    transform: translateX(30px);
-  }
-
-  8% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
-    transform: translateX(15px);
-  }
-
-  11% {
-    transform: translateX(4px);
-  }
-
-  12% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(0);
-  }
-}
 </style>

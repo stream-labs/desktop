@@ -4,6 +4,7 @@ import Selector from '../../Selector.vue';
 import { Component, Prop } from 'vue-property-decorator';
 import  { IEditableListInputValue, Input, TObsType } from './Input';
 import { Menu } from '../../../util/menus/Menu';
+import { $t } from '../../../services/i18n';
 
 interface ISelectorSortEventData {
   change: any;
@@ -19,20 +20,23 @@ class EditableListProperty extends Input<IEditableListInputValue> {
 
   @Prop()
   value: IEditableListInputValue;
+  testingAnchor = `Form/EditableList/${this.value.name}`;
 
   activeItem = '';
   menu = new Menu();
 
   created() {
     this.menu.append({
-      label: 'Add Files',
+      id: 'Add Files',
+      label: $t('settings.addFiles'),
       click: () => {
         this.showFileDialog();
       }
     });
 
     this.menu.append({
-      label: 'Add Directory',
+      id: 'Add Directory',
+      label: $t('settings.addDirectory'),
       click: () => {
         this.showDirDialog();
       }

@@ -1,6 +1,6 @@
 <template>
 <modal-layout
-  title="Name Scene Collection"
+  :title="$t('scenes.nameSceneCollection')"
   :done-handler="submit">
   <form
     slot="content"
@@ -8,7 +8,7 @@
     <p
       v-if="!error"
       class="NameScene-label">
-      {{ $t('Please enter the name of the Scenes Collection') }}
+      {{ $t('scenes.enterTheNameOfTheSceneCollection') }}
     </p>
     <p
       v-if="error"

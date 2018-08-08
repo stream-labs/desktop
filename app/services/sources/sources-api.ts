@@ -1,6 +1,5 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IListOption, TFormData } from '../../components/shared/forms/Input';
-import { WidgetType } from '../widgets';
 import { Observable } from 'rxjs/Observable';
 
 export interface ISource extends IResource {
@@ -23,7 +22,6 @@ export interface ISource extends IResource {
 export interface ISourceComparison {
   type: TSourceType;
   propertiesManager: TPropertiesManager;
-  widgetType?: WidgetType;
 }
 
 
@@ -65,7 +63,6 @@ export interface ISourcesServiceApi {
   showShowcase(): void;
   showAddSource(sourceType: TSourceType): void;
   showNameSource(sourceType: TSourceType): void;
-  showNameWidget(widgetType: WidgetType): void;
   sourceAdded: Observable<ISource>;
   sourceUpdated: Observable<ISource>;
   sourceRemoved: Observable<ISource>;
@@ -101,9 +98,7 @@ export type TSourceType =
   ;
 
 // Register new properties manager here
-export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
-
-
+export type TPropertiesManager = 'default';
 
 
 export interface ISourcesState {

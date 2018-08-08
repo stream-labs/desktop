@@ -34,14 +34,14 @@ export default class NameFolder extends Vue {
         .getFolder(this.options.renameId)
         .name;
     } else {
-      this.name = this.scenesService.suggestName('New Folder');
+      this.name = this.scenesService.suggestName($t('sources.newFolderName'));
     }
 
   }
 
   submit() {
     if (!this.name) {
-      this.error = $t('The source name is required');
+      this.error = $t('sources.sourceNameIsRequired');
     } else if (this.options.renameId) {
       const folder = this.scenesService
         .activeScene

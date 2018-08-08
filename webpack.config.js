@@ -17,8 +17,7 @@ const plugins = [];
 module.exports = {
   entry: {
     renderer: './app/app.ts',
-    updater: './updater/ui.js',
-    'guest-api': './guest-api'
+    updater: './updater/ui.js'
   },
   output: {
     path: __dirname + '/bundles',
@@ -94,7 +93,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpe?g|gif|svg|mp4|ico|wav|webm)(\?.*)?$/,
+        test: /\.(png|jpe?g|gif|mp4|ico|wav|webm)(\?.*)?$/,
         loader: 'file-loader',
         options: {
           name: '[name]-[hash].[ext]',
@@ -111,6 +110,10 @@ module.exports = {
           outputPath: 'fonts/',
           publicPath: 'bundles/fonts/'
         }
+      },
+      {
+        test: /\.svg$/,
+        loader: 'vue-svg-loader'
       }
     ]
   },

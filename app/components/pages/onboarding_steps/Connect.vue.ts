@@ -4,9 +4,13 @@ import { UserService } from 'services/user';
 import { TPlatform } from 'services/platforms';
 import { Inject } from 'util/injector';
 import { OnboardingService } from 'services/onboarding';
-import electron from 'electron';
+const NAirLogo = require('../../../../media/images/n-air-logo.svg');
 
-@Component({})
+@Component({
+  components: {
+    NAirLogo
+  }
+})
 export default class Connect extends Vue {
   @Inject() userService: UserService;
   @Inject() onboardingService: OnboardingService;
@@ -17,11 +21,12 @@ export default class Connect extends Vue {
     this.loadingState = true;
     this.userService.startAuth(
       platform,
-      () => {
-        this.loadingState = false;
-      },
+      () => {},
       () => {
         this.loadingState = true;
+      },
+      () => {
+        this.loadingState = false;
       },
       () => {
         this.onboardingService.next();
@@ -30,12 +35,10 @@ export default class Connect extends Vue {
   }
 
   iconForPlatform(platform: TPlatform) {
-    if (this.loadingState) return 'fa-spinner fa-spin';
+    if (this.loadingState) return 'icon-spinner icon-spin';
 
     return {
-      twitch: 'fa-twitch',
-      youtube: 'fa-youtube-play',
-      mixer: 'fa-times'
+      niconico: 'icon-niconico'
     }[platform];
   }
 
@@ -45,10 +48,6 @@ export default class Connect extends Vue {
 
   get isSecurityUpgrade() {
     return this.onboardingService.options.isSecurityUpgrade;
-  }
-
-  contactSupport() {
-    electron.remote.shell.openExternal('https://support.streamlabs.com');
   }
 
 }

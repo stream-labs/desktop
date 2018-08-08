@@ -1,8 +1,13 @@
 <template>
-<div class="studio-controls row expanded">
-  <scene-selector class="studio-controls-panel small-4 columns" />
-  <source-selector class="studio-controls-panel small-4 columns" />
-  <mixer class="studio-controls-panel small-4 columns" />
+<div class="studio-controls row expanded" :class="{ opened }">
+  <button @click="onToggleControls" class="studio-controls-toggle-button" :class="{ 'studio-controls--opened': opened }">
+    <ControlsArrow />
+  </button>
+  <template v-if="opened">
+    <scene-selector class="studio-controls-panel small-4 columns" />
+    <source-selector class="studio-controls-panel small-4 columns" />
+    <mixer class="studio-controls-panel small-4 columns" />
+  </template>
 </div>
 </template>
 
@@ -12,9 +17,58 @@
 @import "../styles/index";
 
 .studio-controls {
-  height: 240px;
+  position: relative;
+  height: 0;
   width: 100%;
-  padding: 20px 10px;
+  padding: 16px 8px 0 8px;
+  svg {
+    width: 140px;
+    height: 10px;
+    transition: .5s;
+  }
+  &:hover {
+    svg {
+      transition: .5s;
+      width: 160px;
+    }
+  }
+  &.opened {
+    height: 196px;
+    svg {
+      width: 140px;
+      height: 10px;
+      transform: rotate(0deg);
+    }
+  }
+}
+
+.studio-controls-toggle-button {
+  position: absolute;
+  background-color: @bg-primary;
+  border: 1px solid @bg-secondary;
+  border: none 1px 1px 1px;
+  width: 180px;
+  height: 16px;
+  margin: -16px auto 0 auto;
+  left: 0;
+  right: 0;
+
+  >svg {
+    width: 140px;
+    height: 10px;
+    transform: rotate(180deg);
+    fill: @bg-secondary;
+    transition: .5s;
+  }
+
+  &:hover {
+    background-color: @bg-secondary;
+    >svg {
+      transition: 0.5s;
+      width: 160px;
+      fill: @text-primary;
+    }
+  }
 }
 </style>
 
@@ -25,7 +79,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 4px;
   position: relative;
 }
 
@@ -33,33 +87,22 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 10px;
   justify-content: space-between;
-  flex: 0 0 20px;
+  flex: 0 0 16px;
+  margin: 4px 0;
 }
 
 .studio-controls__label {
+  color: @text-primary;
   margin-bottom: 0;
   .semibold;
-  color: @day-title;
 }
 
 .studio-controls-selector {
-  background: @day-secondary;
-  .border;
+  background: @padding-color;
   .radius;
   flex-grow: 1;
   overflow-y: auto;
 }
 
-.night-theme {
-  .studio-controls-selector {
-    background: @navy-secondary;
-    border-color: @navy-secondary;
-  }
-
-  .studio-controls__label {
-    color: @white;
-  }
-}
 </style>

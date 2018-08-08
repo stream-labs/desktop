@@ -175,7 +175,7 @@ export class ObsImporterService extends Service {
             properties
           );
         } else {
-          // TODO Report to the user that slobs does not support the filter
+          // TODO Report to the user that N Air does not support the filter
         }
       });
     }
@@ -220,7 +220,7 @@ export class ObsImporterService extends Service {
             this.importFilters(filtersJSON, source);
           }
         } else {
-          // TODO Report to the user that slobs does not support the source
+          // TODO Report to the user that N Air does not support the source
         }
       });
     }
@@ -329,7 +329,7 @@ export class ObsImporterService extends Service {
   }
 
   importTransitions(configJSON: IOBSConfigJSON) {
-    // Only import the first transition found in obs as slobs only
+    // Only import the first transition found in obs as N Air only
     // uses one global transition
     if (configJSON.transitions && configJSON.transitions.length > 0) {
       this.transitionsService.setType(configJSON.transitions[0].id as ETransitionType);

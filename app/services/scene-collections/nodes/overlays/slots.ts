@@ -8,19 +8,15 @@ import { ImageNode } from './image';
 import { TextNode } from './text';
 import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
-import { StreamlabelNode } from './streamlabel';
-import { WidgetNode } from './widget';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
-import { WidgetType } from '../../../widgets';
 
 type TContent =
   | ImageNode
   | TextNode
   | WebcamNode
   | VideoNode
-  | StreamlabelNode
-  | WidgetNode;
+  ;
 
 interface IFilterInfo {
   name: string;
@@ -116,18 +112,6 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
 
     const manager = sceneNode.source.getPropertiesManagerType();
 
-    if (manager === 'streamlabels') {
-      const content = new StreamlabelNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
-      return { ...details, content } as IItemSchema;
-    }
-
-    if (manager === 'widget') {
-      const content = new WidgetNode();
-      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
-      return { ...details, content } as IItemSchema;
-    }
-
     if (sceneNode.type === 'image_source') {
       const content = new ImageNode();
       await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
@@ -188,38 +172,16 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       return;
     }
 
-    let existing = false;
-
     if (obj.content instanceof ImageNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'image_source', {}, { id });
     } else if (obj.content instanceof TextNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus', {}, { id });
     } else if (obj.content instanceof VideoNode) {
       sceneItem = context.scene.createAndAddSource(obj.name, 'ffmpeg_source', {}, { id });
-    } else if (obj.content instanceof StreamlabelNode) {
-      sceneItem = context.scene.createAndAddSource(obj.name, 'text_gdiplus', {}, { id });
-    } else if (obj.content instanceof WidgetNode) {
-      // Check for already existing widgets of the same type instead
-      const widgetType = obj.content.data.type;
-
-      this.sourcesService.sources.forEach(source => {
-        if (source.getPropertiesManagerType() === 'widget') {
-          const type: WidgetType = source.getPropertiesManagerSettings().widgetType;
-
-          if (widgetType === type) {
-            sceneItem = context.scene.addSource(source.sourceId, { id });
-            existing = true;
-          }
-        }
-      });
-
-      if (!sceneItem) {
-        sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source', {}, { id });
-      }
     }
 
     this.adjustTransform(sceneItem, obj);
-    if (!existing) await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
+    await obj.content.load({ sceneItem, assetsPath: context.assetsPath });
 
     if (sceneItem.getObsInput().audioMixers) {
       this.audioService.getSource(sceneItem.sourceId).setHidden(obj.mixerHidden);

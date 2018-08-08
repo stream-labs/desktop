@@ -5,6 +5,8 @@
         v-if="parameter.visible && propertyComponentForType(parameter.type)"
         :is="propertyComponentForType(parameter.type)"
         :value="value[inputIndex]"
+        :data-test-category="category"
+        :data-test-subCategory="subCategory"
         @input="value => onInputHandler(value, inputIndex)"
       />
     </div>

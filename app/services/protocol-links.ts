@@ -30,7 +30,7 @@ export class ProtocolLinksService extends Service {
   start(argv: string[]) {
     // Check if this instance was started with a protocol link
     argv.forEach(arg => {
-      if (arg.match(/^slobs:\/\//)) this.handleLink(arg);
+      if (arg.match(/^nair:\/\//)) this.handleLink(arg);
     });
 
     // Other instances started with a protocol link will receive this message
@@ -50,23 +50,6 @@ export class ProtocolLinksService extends Service {
 
     if (this.handlers[info.base]) {
       this[this.handlers[info.base]](info);
-    }
-  }
-
-  @protocolHandler('dashboard')
-  private navigateDashboard(info: IProtocolLinkInfo) {
-    const subPage = info.path.replace('/', '');
-    this.navigationService.navigate('Dashboard', { subPage });
-  }
-
-  @protocolHandler('library')
-  private navigateLibrary(info: IProtocolLinkInfo) {
-    const parts = info.path.match(/^\/(.+)\/(.+)$/);
-    if (parts) {
-      this.navigationService.navigate('BrowseOverlays', {
-        type: parts[1],
-        id: parts[2]
-      });
     }
   }
 }

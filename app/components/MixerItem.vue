@@ -21,7 +21,7 @@
       tooltip="false"
     />
     <div class="controls">
-      <i class="icon-btn icon-audio"
+      <i class="icon-btn icon-speaker"
          title="click to switch off"
          v-if="!audioSource.muted"
          @click="setMuted(true)"
@@ -52,10 +52,11 @@
 
 .mixer-item {
   position: relative;
-  padding: 10px 12px;
+  padding: 4px 8px;
+  color: @text-secondary;
 
   .source-name {
-    flex: 1
+    flex: 1;
   }
 
   .db-value {
@@ -75,10 +76,6 @@
     width: 60px;
     text-align: right;
     flex: 0 0 60px;
-
-    .fa-volume-off {
-      color: @red;
-    }
   }
 }
 

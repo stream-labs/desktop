@@ -8,6 +8,7 @@ class ButtonInput extends Input<IFormInput<boolean>> {
 
   @Prop()
   value: IFormInput<boolean>;
+  testingAnchor = `Form/Button/${this.value.name}`;
 
   handleClick() {
     this.emitInput({ ...this.value, value: true });

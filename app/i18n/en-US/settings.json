@@ -1,76 +1,517 @@
 {
-  "General": "General",
-  "Stream": "Stream",
-  "Output": "Output",
-  "Audio": "Audio",
-  "Video": "Video",
-  "Hotkeys": "Hotkeys",
-  "Advanced": "Advanced",
-  "Overlays": "Overlays",
-  "Notifications": "Notifications",
-  "Appearance": "Appearance",
-  "Remote Control": "Remote Control",
-  "Night mode": "Night mode",
-  "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
-  "Show Cache Directory": "Show Cache Directory",
-  "Delete Cache and Restart": "Delete Cache and Restart",
-  "Upload Cache to Developers": "Upload Cache to Developers",
-  "Restart Streamlabels Session": "Restart Streamlabels Session",
-  "Run Auto Optimizer": "Run Auto Optimizer",
-  "Confirm stream title and game before going live": "Confirm stream title and game before going live",
-  "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
-  "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.": "Your cache directory has been successfully uploaded.  The file name %{file} has been copied to your clipboard.",
-  "Streamlabels session has been succesfully restarted!": "Streamlabels session has been succesfully restarted!",
-  "This action will restart the application. Continue?": "This action will restart the application. Continue?",
-  "Show confirmation dialog when starting streams": "Show confirmation dialog when starting streams",
-  "Show confirmation dialog when stopping streams": "Show confirmation dialog when stopping streams",
-  "Automatically record when streaming": "Automatically record when streaming",
-  "Keep recording when stream stops": "Keep recording when stream stops",
-  "Source Alignement Snapping": "Source Alignment Snapping",
-  "Snap Sources to edge of screen": "Snap Sources to edge of screen",
-  "Snap Sources to other sources": "Snap Sources to other sources",
-  "Stream Type": "Stream Type",
-  "Output Mode": "Output Mode",
-  "Streaming": "Streaming",
-  "Enable Advanced Encoder Settings": "Enable Advanced Encoder Settings",
-  "Enforce streaming service bitrate limits": "Enforce streaming service bitrate limits",
-  "Encoder Preset (Higher = Less CPU)": "Encoder Preset (Higher = Less CPU)",
-  "Generate File Name without Space": "Generate File Name without Space",
-  "Recording": "Recording",
-  "Recording Quality": "Recording Quality",
-  "Recording Format": "Recording Format",
-  "Custom Muxer Settings": "Custom Muxer Settings",
-  "Enable Replay Buffer": "Enable Replay Buffer",
-  "Base (Canvas) Resolution": "Base (Canvas) Resolution",
-  "Output (Scaled) Resolution": "Output (Scaled) Resolution",
-  "Downscale Filter": "Downscale Filter",
-  "Bilinear (Fastest, but blurry if scaling)": "Bilinear (Fastest, but blurry if scaling)",
-  "Bicubic (Sharpened scaling, 16 samples)": "Bicubic (Sharpened scaling, 16 samples)",
-  "Lanczos (Sharpened scaling, 32 samples)": "Lanczos (Sharpened scaling, 32 samples)",
-  "No elements found. Consider changing the search query.": "No elements found. Consider changing the search query.",
-  "Do not back up my media files in the cloud (requires app restart)": "Do not back up my media files in the cloud (requires app restart)",
-  "FPS Type": "FPS Type",
-  "Common FPS Values": "Common FPS Values",
-  "Integer FPS Value": "Integer FPS Value",
-  "Fractional FPS Value": "Fractional FPS Value",
-  "Process Priority": "Process Priority",
-  "Color Format": "Color Format",
-  "Audio Monitoring Device": "Audio Monitoring Device",
-  "Disable Windows audio ducking": "Disable Windows audio ducking",
-  "YUV Color Space": "YUV Color Space",
-  "YUV Color Range": "YUV Color Range",
-  "Stream Delay": "Stream Delay",
-  "Duration (Seconds)": "Duration (Seconds)",
-  "Preserved cutoff point (increase delay) when reconnecting": "Preserved cutoff point (increase delay) when reconnecting",
-  "Desktop Audio Device": "Desktop Audio Device",
-  "Mic/Auxiliary Device": "Mic/Auxiliary Device",
-  "Recording Path": "Recording Path",
-  "Enable": "Enable",
-  "Default": "Default",
-  "Custom Encoder Settings": "Custom Encoder Settings",
-  "Audio Bitrate": "Audio Bitrate",
-  "Video Bitrate": "Video Bitrate",
-  "Scene item selection mode": "Scene item selection mode",
-  "Single click selects group. Double click selects item": "Single click selects group. Double click selects item",
-  "Double click selects group. Single click selects item": "Double click selects group. Single click selects item"
+  "General": {
+    "name": null,
+    "General": {
+      "name": null
+    },
+    "Output": {
+      "name": null,
+      "WarnBeforeStartingStream": {
+        "name": null
+      },
+      "WarnBeforeStoppingStream": {
+        "name": null
+      },
+      "RecordWhenStreaming": {
+        "name": null
+      },
+      "KeepRecordingWhenStreamStops": {
+        "name": null
+      },
+      "ReplayBufferWhileStreaming": {
+        "name": null
+      },
+      "KeepReplayBufferStreamStops": {
+        "name": null
+      }
+    },
+    "Source Alignement Snapping": {
+      "name": null,
+      "SnappingEnabled": {
+        "name": null
+      },
+      "SnapDistance": {
+        "name": null
+      },
+      "ScreenSnapping": {
+        "name": null
+      },
+      "SourceSnapping": {
+        "name": null
+      },
+      "CenterSnapping": {
+        "name": null
+      }
+    },
+    "Projectors": {
+      "name": null,
+      "HideProjectorCursor": {
+        "name": null
+      },
+      "ProjectorAlwaysOnTop": {
+        "name": null
+      },
+      "SaveProjectors": {
+        "name": null
+      }
+    },
+    "System Tray": {
+      "name": null,
+      "SysTrayEnabled": {
+        "name": null
+      },
+      "SysTrayWhenStarted": {
+        "name": null
+      },
+      "SysTrayMinimizeToTray": {
+        "name": null
+      }
+    }
+  },
+  "Stream": {
+    "name": null,
+    "Untitled": {
+      "name": null,
+      "streamType": {
+        "name": null,
+        "rtmp_common": null,
+        "rtmp_custom": null
+      },
+      "server": {
+        "name": null
+      },
+      "key": {
+        "name": null
+      },
+      "use_auth": {
+        "name": null
+      },
+      "username": {
+        "name": null
+      },
+      "password": {
+        "name": null
+      }
+    }
+  },
+  "Output": {
+    "name": null,
+    "Untitled": {
+      "Mode": {
+        "name": null,
+        "Simple": null,
+        "Advanced": null
+      }
+    },
+    "Streaming": {
+      "name": null,
+      "VBitrate": {
+        "name": null
+      },
+      "StreamEncoder": {
+        "name": null,
+        "obs_x264": null,
+        "obs_qsv11": null
+      },
+      "ABitrate": {
+        "name": null
+      },
+      "UseAdvanced": {
+        "name": null
+      },
+      "EnforceBitrate": {
+        "name": null
+      },
+      "Preset": {
+        "name": null,
+        "ultrafast": null,
+        "superfast": null,
+        "veryfast": null,
+        "faster": null,
+        "fast": null,
+        "medium": null,
+        "slow": null,
+        "slower": null,
+        "veryslow": null,
+        "placebo": null
+      },
+      "QSVPreset": {
+        "name": "@:settings.Output.Streaming.target_usage.name",
+        "quality": null,
+        "balanced": null,
+        "speed": null
+      },
+      "x264Settings": {
+        "name": null
+      },
+      "TrackIndex": {
+        "name": null
+      },
+      "Encoder": {
+        "name": "@:settings.Output.Streaming.StreamEncoder.name",
+        "obs_x264": "@:settings.Output.Streaming.StreamEncoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.StreamEncoder.obs_qsv11"
+      },
+      "ApplyServiceSettings": {
+        "name": "@:settings.Output.Streaming.EnforceBitrate.name"
+      },
+      "Rescale": {
+        "name": null
+      },
+      "RescaleRes": {
+        "name": null
+      },
+      "rate_control": {
+        "name": null,
+        "CBR": null,
+        "ABR": null,
+        "VBR": null,
+        "CRF": null
+      },
+      "bitrate": {
+        "name": null
+      },
+      "use_bufsize": {
+        "name": null
+      },
+      "buffer_size": {
+        "name": null
+      },
+      "crf": {
+        "name": null
+      },
+      "keyint_sec": {
+        "name": null
+      },
+      "preset": {
+        "name": null,
+        "ultrafast": null,
+        "superfast": null,
+        "veryfast": null,
+        "faster": null,
+        "fast": null,
+        "medium": null,
+        "slow": null,
+        "slower": null,
+        "veryslow": null,
+        "placebo": null
+      },
+      "target_usage": {
+        "name": "Target Usage",
+        "quality": null,
+        "balanced": null,
+        "speed": null
+      },
+      "profile": {
+        "name": null,
+        "": null,
+        "baseline": null,
+        "main": null,
+        "high": null
+      },
+      "tune": {
+        "name": null,
+        "": null,
+        "film": null,
+        "animation": null,
+        "grain": null,
+        "stillimage": null,
+        "psnr": null,
+        "ssim": null,
+        "fastdecode": null,
+        "zerolatency": null
+      },
+      "x264opts": {
+        "name": "@:settings.Output.Streaming.x264Settings.name"
+      }
+    },
+    "Recording": {
+      "name": null,
+      "FilePath": {
+        "name": null
+      },
+      "RecFilePath": {
+        "name": "@:settings.Output.Recording.FilePath.name"
+      },
+      "RecQuality": {
+        "name": null,
+        "Stream": null,
+        "Small": null,
+        "HQ": null,
+        "Lossless": null
+      },
+      "RecType": {
+        "name": null,
+        "Standard": null,
+        "Custom Output (FFmpeg)": null
+      },
+      "FileNameWithoutSpace": {
+        "name": null
+      },
+      "RecFileNameWithoutSpace": {
+        "name": "@:settings.Output.Recording.FileNameWithoutSpace.name"
+      },
+      "RecFormat": {
+        "name": null,
+        "flv": null,
+        "mp4": null,
+        "mov": null,
+        "mkv": null,
+        "ts": null,
+        "m3u8": null
+      },
+      "RecTracks": {
+        "name": null
+      },
+      "RecEncoder": {
+        "name": "@:settings.Output.Streaming.Encoder.name",
+        "obs_x264": "@:settings.Output.Streaming.Encoder.obs_x264",
+        "obs_qsv11": "@:settings.Output.Streaming.Encoder.obs_qsv11"
+      },
+      "RecRescale": {
+        "name": "@:settings.Output.Streaming.Rescale.name"
+      },
+      "RecRescaleRes": {
+        "name": "@:settings.Output.Streaming.RescaleRes.name"
+      },
+      "RecMuxerCustom": {
+        "name": null
+      },
+      "MuxerCustom": {
+        "name": "@:settings.Output.Recording.RecMuxerCustom.name"
+      },
+      "RecRB": {
+        "name": null
+      },
+      "rate_control": {
+        "name": "@:settings.Output.Streaming.rate_control.name",
+        "CBR": "@:settings.Output.Streaming.rate_control.CBR",
+        "ABR": "@:settings.Output.Streaming.rate_control.ABR",
+        "VBR": "@:settings.Output.Streaming.rate_control.VBR",
+        "CRF": "@:settings.Output.Streaming.rate_control.CRF"
+      },
+      "bitrate": {
+        "name": "@:settings.Output.Streaming.bitrate.name"
+      },
+      "use_bufsize": {
+        "name": "@:settings.Output.Streaming.use_bufsize.name"
+      },
+      "buffer_size": {
+        "name": "@:settings.Output.Streaming.buffer_size.name"
+      },
+      "crf": {
+        "name": "@:settings.Output.Streaming.crf.name"
+      },
+      "keyint_sec": {
+        "name": "@:settings.Output.Streaming.keyint_sec.name"
+      },
+      "preset": {
+        "name": "@:settings.Output.Streaming.preset.name",
+        "ultrafast": "@:settings.Output.Streaming.preset.ultrafast",
+        "superfast": "@:settings.Output.Streaming.preset.superfast",
+        "veryfast": "@:settings.Output.Streaming.preset.veryfast",
+        "faster": "@:settings.Output.Streaming.preset.faster",
+        "fast": "@:settings.Output.Streaming.preset.fast",
+        "medium": "@:settings.Output.Streaming.preset.medium",
+        "slow": "@:settings.Output.Streaming.preset.slow",
+        "slower": "@:settings.Output.Streaming.preset.slower",
+        "veryslow": "@:settings.Output.Streaming.preset.veryslow",
+        "placebo": "@:settings.Output.Streaming.preset.placebo"
+      },
+      "profile": {
+        "name": "@:settings.Output.Streaming.profile.name",
+        "": null,
+        "baseline": "@:settings.Output.Streaming.profile.baseline",
+        "main": "@:settings.Output.Streaming.profile.main",
+        "high": "@:settings.Output.Streaming.profile.high"
+      },
+      "tune": {
+        "name": "@:settings.Output.Streaming.tune.name",
+        "": null,
+        "film": "@:settings.Output.Streaming.tune.film",
+        "animation": "@:settings.Output.Streaming.tune.animation",
+        "grain": "@:settings.Output.Streaming.tune.grain",
+        "stillimage": "@:settings.Output.Streaming.tune.stillimage",
+        "psnr": "@:settings.Output.Streaming.tune.psnr",
+        "ssim": "@:settings.Output.Streaming.tune.ssim",
+        "fastdecode": "@:settings.Output.Streaming.tune.fastdecode",
+        "zerolatency": "@:settings.Output.Streaming.tune.zerolatency"
+      },
+      "x264opts": {
+        "name": "@:settings.Output.Streaming.x264opts.name"
+      }
+    }
+  },
+  "Audio": {
+    "name": null
+  },
+  "Video": {
+    "name": null,
+    "Untitled": {
+      "name": null,
+      "Base": {
+        "name": null,
+        "1920x1080": null,
+        "1280x720": null,
+        "3840x2160": null
+      },
+      "Output": {
+        "name": null,
+        "1280x720": "nicolive High Definition (1280x720)",
+        "800x450": "nicolive Standard Definition (800x450)",
+        "640x360": "nicolive Low Definition (640x360)",
+        "1920x1080": null,
+        "1536x864": null,
+        "1440x810": null,
+        "1152x648": null,
+        "1096x616": null,
+        "960x540": null,
+        "852x480": null,
+        "768x432": null,
+        "698x392": null
+      },
+      "ScaleType": {
+        "name": null,
+        "bilinear": null,
+        "bicubic": null,
+        "lanczos": null
+      },
+      "FPSType": {
+        "name": null,
+        "Common FPS Values": null,
+        "Integer FPS Value": null,
+        "Fractional FPS Value": null
+      },
+      "FPSCommon": {
+        "name": null
+      },
+      "FPSInt": {
+        "name": null
+      },
+      "FPSNum": {
+        "name": null
+      },
+      "FPSDen": {
+        "name": null
+      }
+    }
+  },
+  "Hotkeys": {
+    "name": null
+  },
+  "Advanced": {
+    "name": null,
+    "General": {
+      "name": null,
+      "ProcessPriority": {
+        "name": null,
+        "High": null,
+        "AboveNormal": null,
+        "Normal": null,
+        "BelowNormal": null,
+        "Idle": null
+      }
+    },
+    "Video": {
+      "name": null,
+      "ColorFormat": {
+        "name": null,
+        "NV12": null,
+        "I420": null,
+        "I444": null,
+        "RGB": null
+      },
+      "ColorSpace": {
+        "name": null,
+        "601": null,
+        "709": null
+      },
+      "ColorRange": {
+        "name": null,
+        "Partial": null,
+        "Full": null
+      }
+    },
+    "Audio": {
+      "name": null,
+      "MonitoringDeviceName": {
+        "name": null,
+        "Default": null
+      },
+      "DisableAudioDucking": {
+        "name": null
+      }
+    },
+    "Recording": {
+      "name": null,
+      "FilenameFormatting": {
+        "name": null
+      },
+      "OverwriteIfExists": {
+        "name": null
+      },
+      "RecRBPrefix": {
+        "name": null
+      },
+      "RecRBSuffix": {
+        "name": null
+      }
+    },
+    "Stream Delay": {
+      "name": null,
+      "DelayEnable": {
+        "name": null
+      },
+      "DelaySec": {
+        "name": null
+      },
+      "DelayPreserve": {
+        "name": null
+      }
+    },
+    "Automatically Reconnect": {
+      "name": null,
+      "Reconnect": {
+        "name": null
+      },
+      "RetryDelay": {
+        "name": null
+      },
+      "MaxRetries": {
+        "name": null
+      }
+    },
+    "Network": {
+      "name": null,
+      "BindIP": {
+        "name": null,
+        "Default": null
+      },
+      "NewSocketLoopEnable": {
+        "name": null
+      },
+      "LowLatencyEnable": {
+        "name": null
+      }
+    }
+  },
+  "listPlaceholder": "Select Option",
+  "resolutionPlaceholder": "Select Option or Type New Value",
+  "addFiles": "Add files",
+  "addDirectory": "Add directory",
+  "cacheClearDescription": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
+  "showCacheDirectory": "Show Cache Directory",
+  "deleteCacheAndRestart": "Delete Cache and Restart",
+  "confirmStreamTitleAndGameBeforeGoingLive": "Confirm stream title and game before going live",
+  "clearCacheConfirm": "WARNING! You will lose all scenes, sources, and settings. This cannot be undone!",
+  "restartConfirm": "This action will restart the application. Continue?",
+  "itemNotFoundMessage": "No elements found. Consider changing the search query.",
+  "desktopAudioDevice": "Desktop Audio Device",
+  "micAuxDevice": "Mic / Auxiliary Device",
+  "enable": "Enable",
+  "disabled": "Disabled",
+  "default": "Default",
+  "fontFamily": "Font Family",
+  "fontStyle": "Font Style",
+  "fontSize": "Font Size"
 }

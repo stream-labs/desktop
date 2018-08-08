@@ -7,9 +7,13 @@ import { ObsImporterService } from '../../../services/obs-importer';
 import { defer } from 'lodash';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
+const NAirObsLogo = require('../../../../media/images/n-air-obs-logo.svg');
 
 @Component({
-  components: { Multiselect }
+  components: {
+    Multiselect,
+    NAirObsLogo
+  }
 })
 export default class ObsImport extends Vue {
 
@@ -22,7 +26,7 @@ export default class ObsImport extends Vue {
   @Inject()
   sceneCollectionsService: SceneCollectionsService;
 
-  status = 'initial';
+  status: 'initial' | 'importing' | 'done' = 'initial';
 
   sceneCollections = this.obsImporterService.getSceneCollections();
 
@@ -37,26 +41,26 @@ export default class ObsImport extends Vue {
 
   get title() {
     if (this.status === 'importing') {
-      return $t('Importing');
+      return $t('onboarding.importingStateTitle');
     }
 
     if (this.status === 'done') {
-      return $t('Successfully Imported');
+      return $t('onboarding.doneStateTitle');
     }
 
-    return $t('Import from OBS');
+    return $t('onboarding.initialStateTitle');
   }
 
   get description() {
     if (this.status === 'importing') {
-      return $t('Importing your scenes and sources');
+      return $t('onboarding.importingStateDescription');
     }
 
     if (this.status === 'done') {
-      return $t('All scenes, sources and settings have been imported.');
+      return $t('onboarding.doneStateDescription');
     }
 
-    return $t('Import your scenes and your settings from OBS with a simple click, or start fresh.');
+    return $t('onboarding.initialStateDescription');
   }
 
   startImport() {

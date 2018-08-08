@@ -10,9 +10,16 @@ import { ISettingsServiceApi } from '../../app/services/settings';
 
 useSpectron({ restartAppAfterEachTest: true });
 
-test('Streaming to Twitch via API', async t => {
-  if (!process.env.SLOBS_TEST_STREAM_KEY) {
-    console.warn('SLOBS_TEST_STREAM_KEY not found!  Skipping streaming test.');
+test('Streaming to server via API', async t => {
+  const streamingServerURL = process.env.NAIR_TEST_STREAM_SERVER;
+  const streamingKey = process.env.NAIR_TEST_STREAM_KEY;
+
+  if (!(streamingServerURL && streamingKey)) {
+    console.warn(
+      'テスト用配信情報が不足しています。配信テストをスキップします。\n' +
+      `NAIR_TEST_STREAM_SERVER: ${process.env.NAIR_TEST_STREAM_SERVER}\n` +
+      `NAIR_TEST_STREAM_KEY   : ${process.env.NAIR_TEST_STREAM_KEY}`
+    );
     t.pass();
     return;
   }
@@ -24,8 +31,8 @@ test('Streaming to Twitch via API', async t => {
   const streamSettings = settingsService.getSettingsFormData('Stream');
   streamSettings.forEach(subcategory => {
     subcategory.parameters.forEach(setting => {
-      if (setting.name === 'service') setting.value = 'Twitch';
-      if (setting.name === 'key') setting.value = process.env.SLOBS_TEST_STREAM_KEY;
+      if (setting.name === 'server') setting.value = streamingServerURL;
+      if (setting.name === 'key') setting.value = streamingKey;
     });
   });
   settingsService.setSettings('Stream', streamSettings);

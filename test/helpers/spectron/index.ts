@@ -59,7 +59,7 @@ export function useSpectron(options: ITestRunnerOptions) {
   let app: any;
 
   async function startApp(t: any) {
-    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'slobs-test'));
+    t.context.cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'n-air-test'));
     app = t.context.app = new Application({
       path: path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'electron.cmd'),
       args: [
@@ -71,7 +71,7 @@ export function useSpectron(options: ITestRunnerOptions) {
       ],
       env: {
         NODE_ENV: 'test',
-        SLOBS_CACHE_DIR: t.context.cacheDir
+        NAIR_CACHE_DIR: t.context.cacheDir
       }
     });
 
@@ -85,20 +85,20 @@ export function useSpectron(options: ITestRunnerOptions) {
     t.context.app.client.timeouts('implicit', 2000);
 
     // await sleep(100000);
+    await focusMain(t);
 
     // Pretty much all tests except for onboarding-specific
     // tests will want to skip this flow, so we do it automatically.
     if (options.skipOnboarding) {
-      await focusMain(t);
-      await t.context.app.client.click('a=Setup later');
+      await t.context.app.client.click('[data-test="Skip"]');
 
       // This will only show up if OBS is installed
-      if (await t.context.app.client.isExisting('button=Start Fresh')) {
-        await t.context.app.client.click('button=Start Fresh');
+      if (await t.context.app.client.isExisting('[data-test="Skip"]')) {
+        await t.context.app.client.click('[data-test="Skip"]');
       }
     } else {
       // Wait for the connect screen before moving on
-      await t.context.app.client.isExisting('button=Twitch');
+      await t.context.app.client.isExisting('[data-test="NiconicoSignup"]');
     }
 
     // disable the popups that prevents context menu to be shown

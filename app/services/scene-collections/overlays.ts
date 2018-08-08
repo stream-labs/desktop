@@ -8,8 +8,6 @@ import { WebcamNode } from './nodes/overlays/webcam';
 import { VideoNode } from './nodes/overlays/video';
 import { TransitionNode } from './nodes/overlays/transition';
 import { parse } from './parse';
-import { StreamlabelNode } from './nodes/overlays/streamlabel';
-import { WidgetNode } from './nodes/overlays/widget';
 import { Inject } from '../../util/injector';
 import electron from 'electron';
 import fs from 'fs';
@@ -29,8 +27,6 @@ const NODE_TYPES = {
   TextNode,
   WebcamNode,
   VideoNode,
-  StreamlabelNode,
-  WidgetNode,
   TransitionNode
 };
 
@@ -66,12 +62,13 @@ export class OverlaysPersistenceService extends Service {
           fileStream.write(chunk);
           downloaded += chunk.length;
 
-          if (progressCallback)
+          if (progressCallback) {
             progressCallback({
               totalBytes: totalSize,
               downloadedBytes: downloaded,
               percent: downloaded / totalSize
             });
+          }
         });
 
         response.on('end', () => resolve());

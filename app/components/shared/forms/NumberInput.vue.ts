@@ -8,6 +8,7 @@ class NumberInput extends Input<IFormInput<number>> {
 
   @Prop()
   value: IFormInput<number>;
+  testingAnchor = `Form/Number/${this.value.name}`;
 
   $refs: {
     input: HTMLInputElement

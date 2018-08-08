@@ -13,7 +13,6 @@ import { Inject } from 'util/injector';
 import { ScenesService } from 'services/scenes';
 import { TFormData } from 'components/shared/forms/Input';
 import Utils from 'services/utils';
-import { WidgetType } from 'services/widgets';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
 
@@ -70,10 +69,6 @@ export class Source implements ISourceApi {
       type: this.type,
       propertiesManager: this.getPropertiesManagerType()
     };
-
-    if (this.getPropertiesManagerType() === 'widget') {
-      details.widgetType = this.getPropertiesManagerSettings().widgetType;
-    }
 
     return details;
   }

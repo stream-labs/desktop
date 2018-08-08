@@ -7,7 +7,13 @@ import { StreamingService } from 'services/streaming';
 import Utils from 'services/utils';
 import { $t } from 'services/i18n';
 
-@Component({})
+const LiveIcon = require('../../media/images/live-icon.svg');
+
+@Component({
+  components: {
+    LiveIcon
+  }
+})
 export default class TitleBar extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() streamingService: StreamingService;
@@ -30,14 +36,14 @@ export default class TitleBar extends Vue {
 
   close() {
     if (Utils.isMainWindow() && this.streamingService.isStreaming) {
-      if (!confirm($t('Are you sure you want to exit while live?'))) return;
+      if (!confirm($t('streaming.endStreamInStreamingConfirm'))) return;
     }
 
     electron.remote.getCurrentWindow().close();
   }
 
-  get nightMode() {
-    return this.customizationService.nightMode;
+  get isStreaming() {
+    return this.streamingService.isStreaming;
   }
 
 }

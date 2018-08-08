@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="onboarding-step">
-      <div class="onboarding-image"><img src="../../../../media/images/import.png"></div>
       <div class="onboarding-title">Successfully Imported</div>
       <div class="running-setup-container">
         <div class="running-setup-row">

@@ -19,9 +19,11 @@ export default class LanguageSettings extends Vue {
       electron.remote.getCurrentWindow(),
       {
         type: 'question',
-        buttons: [$t('Yes'), $t('No')],
-        title: $t('Confirm'),
-        message: $t('This action will restart the application. Continue?')
+        buttons: [$t('common.yes'), $t('common.no')],
+        title: $t('common.confirm'),
+        message: $t('settings.restartConfirm'),
+        noLink: true,
+        cancelId: 1,
       });
 
     if (choice !== 0) return;

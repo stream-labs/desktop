@@ -5,9 +5,6 @@ import { ScenesService } from 'services/scenes';
 
 // Pages
 import Studio from '../pages/Studio.vue';
-import Dashboard from '../pages/Dashboard.vue';
-import BrowseOverlays from 'components/pages/BrowseOverlays.vue';
-import Live from '../pages/Live.vue';
 import Onboarding from '../pages/Onboarding.vue';
 import TitleBar from '../TitleBar.vue';
 import windowMixin from '../mixins/window';
@@ -17,10 +14,10 @@ import { NavigationService } from 'services/navigation';
 import { AppService } from 'services/app';
 import { UserService } from 'services/user';
 import { WindowsService } from 'services/windows';
-import LiveDock from '../LiveDock.vue';
 import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
+import Questionaire from '../pages/Questionaire.vue';
 
 @Component({
   mixins: [windowMixin],
@@ -28,14 +25,11 @@ import PatchNotes from '../pages/PatchNotes.vue';
     TitleBar,
     TopNav,
     Studio,
-    Dashboard,
-    BrowseOverlays,
-    Live,
     Onboarding,
-    LiveDock,
     StudioFooter,
     CustomLoader,
-    PatchNotes
+    PatchNotes,
+    Questionaire
   }
 })
 export default class Main extends Vue {
@@ -59,20 +53,12 @@ export default class Main extends Vue {
     return this.navigationService.state.params;
   }
 
-  get nightTheme() {
-    return this.customizationService.nightMode;
-  }
-
   get applicationLoading() {
     return this.appService.state.loading;
   }
 
   get isLoggedIn() {
     return this.userService.isLoggedIn();
-  }
-
-  get leftDock() {
-    return this.customizationService.state.leftDock;
   }
 
   get isOnboarding() {
@@ -86,8 +72,7 @@ export default class Main extends Vue {
   get shouldLockContent() {
     return (
       this.applicationLoading &&
-      (this.navigationService.state.currentPage === 'Studio' ||
-        this.navigationService.state.currentPage === 'Live')
+      this.navigationService.state.currentPage === 'Studio'
     );
   }
 

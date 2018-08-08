@@ -2,6 +2,7 @@
 
 body {
   color: @navy;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Meiryo", "メイリオ", sans-serif;
 }
 
 :not(input):not(textarea),
@@ -12,12 +13,16 @@ body {
 }
 
 .main {
-  background: @white;
+  background: @bg-primary;
+  color: @text-primary;
 }
 
 a {
   .transition;
   text-decoration: underline;
+  &:hover {
+    color: @white;
+  }
 }
 
 // Layout
@@ -31,23 +36,20 @@ a {
 
 // Type
 h3 {
-  font-family: 'Roboto';
   font-size: 14px;
+  color: @text-primary;
   .semibold;
 }
 
 h4 {
-  font-family: 'Roboto';
-  text-transform: uppercase;
   font-size: 13px;
   .letter-spacing;
   .semibold;
   margin-bottom: 20px;
-  color: @day-title;
 }
 
 .label--essential {
-  background: @purple;
+  background: @accent;
   .radius;
   .semibold;
   text-transform: uppercase;
@@ -61,20 +63,19 @@ h4 {
 
 .link {
   .semibold;
-  color: @grey;
+  color: @text-secondary;
   .transition;
   text-decoration: none;
   display: flex;
   align-items: center;
 
   &:hover {
-    color: @navy;
+    color: @text-primary;
   }
 
-  .fa,
   i {
-    margin-right: 6px;
-    font-size: 15px;
+    margin-right: 4px;
+    font-size: 14px;
   }
 }
 
@@ -149,7 +150,7 @@ h4 {
     background: transparent;
     border: none;
     padding: 0 32px 0 8px;
-    color: @grey;
+    color: @text-primary;
     .radius;
     .transition;
 
@@ -160,7 +161,7 @@ h4 {
     }
   }
 
-  .fa-search {
+  .icon-search {
     position: absolute;
     top: 8px;
     right: 8px;
@@ -194,14 +195,13 @@ h4 {
 
 .slide-open__menu {
   position: absolute;
-  background: @day-primary;
+  background-color: @bg-secondary;
   right: calc(~'100% + 20px');
   bottom: -10px;
-  padding: 0px 12px;
+  padding: 0 12px;
   display: flex;
   z-index: 10;
   .radius;
-  .border;
   .shadow;
 }
 
@@ -218,10 +218,9 @@ h4 {
   font-size: 12px;
   .semibold;
   letter-spacing: .7px;
-  color: @grey;
+  color: @text-primary;
   .transition;
 
-  .fa,
   i {
     margin-right: 4px;
     font-size: 15px;
@@ -230,28 +229,22 @@ h4 {
 
   &.active,
   &:hover {
-    border-color: @navy;
-    color: @navy;
-
-    .fa,
+    border-color: @white;
+    color: @white;
     i {
-      color: @navy;
+      color: @white;
     }
   }
 }
 
-// TODO: eventuall use LESS variables from twitchalerts
-.bgColor-teal {
-  background-color: @teal;
-}
-
-// TODO: add "disable" and "enable" styles for form controls to styleguide
 .input {
   &.disabled {
-    opacity: 0.5;
+    opacity: .5;
 
     &.checkbox input:checked~label,
+    
     &.checkbox input~label {
+      color: @white;
       &:before {
         border-color: gray;
         background: transparent;
@@ -265,10 +258,12 @@ h4 {
 .checkbox {
   label {
     text-transform: none;
+    background: transparent;
+    border-color: @accent-hover;
   }
 }
 
-// Make select boxes look similar to input boxes
+
 select {
   .radius;
   height: 36px;
@@ -305,7 +300,7 @@ th {
 }
 
 th {
-  color: @grey;
+  color: @text-primary;
   text-transform: uppercase;
   .semibold;
   letter-spacing: 1.5px;
@@ -320,15 +315,16 @@ th {
 }
 
 ::-webkit-scrollbar-track {
-  background: @day-border;
+  background: @accent-dark;
   border-radius: 0 3px 3px 0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: @white;
-  border: 2px solid @day-border;
-  border-right: 1px solid @day-border;
+  background-color: @accent-light;
+  border: 2px solid @border;
+  border-right: 1px solid @border;
   border-radius: 10px;
+  border-color: @accent-dark;
 }
 
 // Vue transitions
@@ -341,86 +337,4 @@ th {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
-}
-
-// Night theme rules
-.night-theme {
-  &.main {
-    background: @night-primary;
-    color: @night-text;
-  }
-
-  a {
-    &:hover {
-      color: @white;
-    }
-  }
-
-  .border {
-    border: 1px solid transparent;
-  }
-
-  h3 {
-    color: @grey;
-  }
-
-  h4 {
-    color: @white;
-  }
-
-  .checkbox {
-    input:checked~label {
-      color: @white;
-    }
-
-    label {
-      &:before {
-        background: transparent;
-        border-color: @teal-light-opac;
-      }
-    }
-  }
-
-  .link {
-    &:hover {
-      color: @white;
-    }
-  }
-
-  .slide-open__menu {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-    .night-shadow;
-  }
-
-  .slide-open__close {
-    &:hover {
-      .fa,
-      i {
-        color: @white;
-      }
-    }
-  }
-
-  .tab-button{
-    &.active,
-    &:hover {
-      color: @white;
-      border-bottom-color: @white;
-
-      .fa,
-      i {
-        color: @white;
-      }
-    }
-  }
-
-  ::-webkit-scrollbar-track {
-    background: @night-accent-dark;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: @night-accent-light;
-    border-color: @night-accent-dark;
-  }
 }

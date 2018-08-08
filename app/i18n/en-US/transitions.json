@@ -1,12 +1,12 @@
 {
-  "Scene transition": "Scene transition",
-  "Cut": "Cut",
-  "Fade": "Fade",
-  "Swipe": "Swipe",
-  "Slide": "Slide",
-  "Fade to Color": "Fade to Color",
-  "Luma Wipe": "Luma Wipe",
-  "Stinger": "Stinger",
-  "Transition": "Transition",
-  "Duration": "Duration"
+  "sceneTransition": "Scene transition",
+  "cut_transition": "Cut",
+  "fade_transition": "Fade",
+  "swipe_transition": "Swipe",
+  "slide_transition": "Slide",
+  "fade_to_color_transition": "Fade to Color",
+  "wipe_transition": "Luma Wipe",
+  "obs_stinger_transition": "Stinger",
+  "transition": "Transition",
+  "duration": "Duration"
 }

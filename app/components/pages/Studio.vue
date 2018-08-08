@@ -1,5 +1,5 @@
 <template>
-<div class="studio-page">
+<div class="studio-page" data-test="Studio">
   <div class="studio-mode-container" ref="studioModeContainer" :class="{ stacked }">
     <studio-mode-controls v-if="studioMode" :stacked="stacked" />
     <div
@@ -13,8 +13,8 @@
   </div>
   <div v-if="!previewEnabled" class="no-preview">
     <div class="message">
-      {{ $t('Preview is disabled in performance mode') }}
-      <div class="button button--action button--sm" @click="enablePreview">{{ $t('Disable Performance Mode') }}</div>
+      {{ $t('scenes.previewIsDisabledInPerformanceMode') }}
+      <div class="button button--action button--sm" @click="enablePreview">{{ $t('scenes.disablePerformanceMode') }}</div>
     </div>
   </div>
   <studio-controls />
@@ -64,7 +64,7 @@
 .no-preview {
   position: relative;
   flex-grow: 1;
-  background-color: @navy-secondary;
+  background-color: @padding-color;
   display: flex;
   align-items: center;
   justify-content: center;

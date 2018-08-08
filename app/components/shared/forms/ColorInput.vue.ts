@@ -21,6 +21,7 @@ class ColorInput extends Input<IFormInput<number>> {
 
   @Prop()
   value: IFormInput<number>;
+  testingAnchor = `Form/Color/${this.value.name}`;
 
   pickerVisible = false;
 

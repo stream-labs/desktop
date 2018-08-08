@@ -33,7 +33,7 @@ export default class NameSceneCollection extends Vue {
 
   submit() {
     if (this.isTaken(this.name)) {
-      this.error = $t('That name is already taken');
+      this.error = $t('common.alreadyTakenNameMessage');
     } else if (this.options.rename) {
       this.sceneCollectionsService.rename(this.name);
       this.windowsService.closeChildWindow();

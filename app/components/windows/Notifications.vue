@@ -1,17 +1,17 @@
 <template>
 <modal-layout
-    :title="$t('Notifications')"
+    :title="$t('common.notifications')"
     :showControls="false"
 >
   <div slot="content">
 
     <h4 v-if="!notificationsCount">
-      {{ $t('You don\'t have any notifications') }}
+      {{ $t('notifications.noNotification') }}
     </h4>
 
     <div v-for="(notificationsService, groupName) in notificationGroups">
       <h4 v-if="notificationsService.length">
-        {{ groupName == 'unread' ? $t('New Notifications') : $t('Log') }}
+        {{ groupName == 'unread' ? $t('notifications.newNotifications') : $t('notifications.log') }}
       </h4>
       <div
         class="notification"
@@ -23,8 +23,8 @@
         }"
       >
         <div class="icon">
-          <span class="fa fa-info-circle" v-if="notify.type == 'INFO'"></span>
-          <span class="fa fa-warning" v-if="notify.type == 'WARNING'"></span>
+          <span class="icon-notification" v-if="notify.type == 'INFO'"></span>
+          <span class="icon-warning" v-if="notify.type == 'WARNING'"></span>
         </div>
         <div class="message">{{ notify.message }}</div>
         <div class="date">{{ moment(notify.date) }}</div>
@@ -42,17 +42,19 @@
   @import "../../styles/index";
 
 .notification {
-  color: @grey;
+  color: @text-primary;
   padding: 5px 10px;
   margin-bottom: 5px;
   display: grid;
   grid-template-columns: 30px 1fr 130px;
-  background: @day-primary;
+  background: @hover;
+  border-color: @hover;
   .border;
 
   &.has-action:hover {
-    color: @navy;
-    background: @day-secondary;
+    color: @white;
+    border-color: @bg-secondary;
+    background: @bg-secondary;
     cursor: pointer;
   }
 
@@ -60,8 +62,12 @@
     margin-bottom: 20px;
   }
 
-  .fa-warning {
+  .icon-warning {
     color: @red;
+  }
+  .icon-notification,
+  .icon-warning {
+    margin-right: 4px;
   }
 
   .date {
@@ -69,16 +75,4 @@
   }
 }
 
-.night-theme {
-  .notification {
-    background: @night-hover;
-    border-color: @night-hover;
-
-    &.has-action:hover {
-      color: @white;
-      border-color: @night-secondary;
-      background: @night-secondary;
-    }
-  }
-}
 </style>

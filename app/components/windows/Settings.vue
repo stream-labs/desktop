@@ -1,18 +1,19 @@
 <template>
 <modal-layout
-  :title="$t('Settings')"
+  :title="$t('common.settings')"
   :show-cancel="false"
   :done-handler="done">
 
-  <div slot="content" class="settings">
-    <NavMenu v-model="categoryName" class="side-menu">
+  <div slot="content" class="settings" data-test="Settings">
+    <NavMenu v-model="categoryName" class="side-menu" data-test="SideMenu">
       <NavItem
         v-for="category in categoryNames"
         :key="category"
         :to="category"
         :ico="icons[category]"
+        :data-test="category"
       >
-        {{ $t(category) }}
+        {{ $t(`settings.${category}.name`, { fallback: category }) }}
       </NavItem>
     </NavMenu>
     <div class="settings-container">
@@ -20,14 +21,13 @@
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
       <api-settings v-if="categoryName === 'API'" />
-      <overlay-settings v-if="categoryName === 'Scene Collections'" />
       <notifications-settings v-if="categoryName === 'Notifications'" />
       <appearance-settings v-if="categoryName === 'Appearance'" />
       <experimental-settings v-if="categoryName === 'Experimental'" />
-      <remote-control-settings v-if="categoryName === 'Remote Control'" />
       <GenericFormGroups
-        v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
+        v-if="!['Hotkeys', 'API', 'Notifications', 'Appearance', 'Experimental'].includes(categoryName)"
         v-model="settingsData"
+        :category="categoryName"
         @input="save" />
     </div>
   </div>

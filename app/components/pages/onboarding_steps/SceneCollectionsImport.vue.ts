@@ -2,9 +2,6 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../../util/injector';
 import { OnboardingService } from '../../../services/onboarding';
-import { Multiselect } from 'vue-multiselect';
-import { ObsImporterService } from '../../../services/obs-importer';
-import { defer } from 'lodash';
 import { SceneCollectionsService } from 'services/scene-collections';
 
 @Component({})

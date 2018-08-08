@@ -5,29 +5,41 @@ import { dialogDismiss } from './dialog';
 
 async function clickSceneAction(t, selector) {
   await t.context.app.client
-    .$('[rel=SceneSelector]')
+    .$('[data-test="SceneSelector"]')
     .click(selector);
 }
 
 export async function clickAddScene(t) {
-  await clickSceneAction(t, '.icon-add');
+  await clickSceneAction(t, '[data-test="Add"]');
 }
 
 export async function clickRemoveScene(t) {
-  await clickSceneAction(t, '.icon-subtract');
+  await clickSceneAction(t, '[data-test="Remove"]');
   await dialogDismiss(t, 'OK');
 }
 
 export async function clickSceneTransitions(t) {
-  await clickSceneAction(t, '.icon-settings');
+  await clickSceneAction(t, '[data-test="Edit"]');
 }
 
 export async function selectScene(t, name) {
-  await t.context.app.client.click(`div=${name}`);
+  const sel = `[data-test="SceneSelector"] [data-test="${name}"]`;
+  t.context.app.client.execute((selector) => {
+    const el = document.querySelector(selector);
+    el.dispatchEvent(new MouseEvent('down', { button: 0 }));
+    el.dispatchEvent(new MouseEvent('up', { button: 0 }));
+  }, sel);
+  await t.context.app.client.click(sel);
 }
 
 export async function rightClickScene(t, name) {
-  await t.context.app.client.rightClick(`div=${name}`);
+  const sel = `[data-test="SceneSelector"] [data-test="${name}"]`;
+  t.context.app.client.execute((selector) => {
+    const el = document.querySelector(selector);
+    el.dispatchEvent(new MouseEvent('down', { button: 2 }));
+    el.dispatchEvent(new MouseEvent('up', { button: 2 }));
+  }, sel);
+  await t.context.app.client.rightClick(sel);
 }
 
 export async function addScene(t, name) {
@@ -37,12 +49,12 @@ export async function addScene(t, name) {
   await clickAddScene(t);
   await focusChild(t);
   await app.client.setValue('input', name);
-  await app.client.click('button=Done');
+  await app.client.click('[data-test="Done"]');
 }
 
-export async function openRenameWindow(t, sourceName) {
+export async function openRenameWindow(t, sceneName) {
   await focusMain(t);
-  await rightClickScene(t, sourceName);
+  await rightClickScene(t, sceneName);
   await contextMenuClick(t, 'Rename');
   await focusChild(t);
 }

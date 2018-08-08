@@ -9,28 +9,28 @@ import { addSource, clickRemoveSource } from '../helpers/spectron/sources';
 useSpectron();
 
 const SOURCE_TYPES = [
-  'Image',
-  'Color Source',
-  'Image Slide Show',
-  'Browser Source',
-  'Media Source',
-  'Text (GDI+)',
-  'Display Capture',
-  'Window Capture',
-  'Game Capture',
-  'Video Capture Device',
-  'Audio Input Capture',
-  'Audio Output Capture'
+  'image_source',
+  'color_source',
+  'slideshow',
+  'browser_source',
+  'ffmpeg_source',
+  'text_gdiplus',
+  'monitor_capture',
+  'window_capture',
+  'game_capture',
+  'dshow_input',
+  'wasapi_input_capture',
+  'wasapi_output_capture',
 ];
 
 // Utilities
 
 async function getSceneElements(t) {
-  return t.context.app.client.$('h4=Scenes').$('../..').$$('li');
+  return t.context.app.client.$('[data-test="SceneSelector"]').$$('li');
 }
 
 async function getSourceElements(t) {
-  return t.context.app.client.$('h4=Sources').$('../..').$$('li');
+  return t.context.app.client.$('[data-test="SourceSelector"]').$$('li');
 }
 
 

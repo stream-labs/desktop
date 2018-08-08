@@ -6,9 +6,11 @@
 
       <div class="section-title--dropdown" v-if="formGroup.nameSubCategory != 'Untitled'">
         <h4 class="section-title" @click="toggleGroup(groupIndex)">
-          <i class="fa fa-plus"  v-show="collapsedGroups[groupIndex]"></i>
-          <i class="fa fa-minus" v-show="!collapsedGroups[groupIndex]"></i>
-          {{ $t(formGroup.nameSubCategory) }}
+          <i class="icon-plus"  v-show="collapsedGroups[groupIndex]"></i>
+          <i class="icon-minus" v-show="!collapsedGroups[groupIndex]"></i>
+          {{ $t(`settings.${category}['${formGroup.nameSubCategory}'].name`, {
+            fallback: formGroup.nameSubCategory
+          }) }}
         </h4>
       </div>
 
@@ -16,7 +18,11 @@
           class="section-content section-content--dropdown"
           v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
       >
-        <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
+        <GenericForm
+          v-model="formGroup.parameters"
+          @input="onInputHandler"
+          :category="category"
+          :subCategory="formGroup.nameSubCategory"></GenericForm>
       </div>
 
     </div>

@@ -20,7 +20,7 @@ export class SourceTransformMenu extends Menu {
 
   appendMenuItems() {
     this.append({
-      label: $t('Reset Transform'),
+      label: $t('sources.resetTransform'),
       click: () => {
         this.selectionService.resetTransform();
       }
@@ -29,14 +29,14 @@ export class SourceTransformMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: $t('Stretch to Screen'),
+      label: $t('sources.stretchToScreen'),
       click: () => {
         this.selectionService.stretchToScreen();
       }
     });
 
     this.append({
-      label: $t('Fit to Screen'),
+      label: $t('sources.fitToScreen'),
       click: () => {
         this.selectionService.fitToScreen();
       }
@@ -45,21 +45,21 @@ export class SourceTransformMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: $t('Center on Screen'),
+      label: $t('sources.centerOnScreen'),
       click: () => {
         this.selectionService.centerOnScreen();
       }
     });
 
     this.append({
-      label: $t('Center Horizontal'),
+      label: $t('sources.centerHorizontal'),
       click: () => {
         this.selectionService.centerOnHorizontal();
       }
     });
 
     this.append({
-      label: $t('Center Vertical'),
+      label: $t('sources.centerVertical'),
       click: () => {
         this.selectionService.centerOnVertical();
       }
@@ -68,14 +68,14 @@ export class SourceTransformMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: 'Flip Vertical',
+      label: $t('sources.flipVertical'),
       click: () => {
         this.selectionService.flipY();
       }
     });
 
     this.append({
-      label: 'Flip Horizontal',
+      label: $t('sources.flipHorizontal'),
       click: () => {
         this.selectionService.flipX();
       }
@@ -84,21 +84,21 @@ export class SourceTransformMenu extends Menu {
     this.append({ type: 'separator' });
 
     this.append({
-      label: $t('Rotate 90 Degrees CW'),
+      label: $t('sources.rotate90DegreesCw'),
       click: () => {
         this.selectionService.rotate(90);
       }
     });
 
     this.append({
-      label: $t('Rotate 90 Degrees CCW'),
+      label: $t('sources.rotate90DegreesCcw'),
       click: () => {
         this.selectionService.rotate(-90);
       }
     });
 
     this.append({
-      label: $t('Rotate 180 Degrees'),
+      label: $t('sources.rotate180Degrees'),
       click: () => {
         this.selectionService.rotate(180);
       }

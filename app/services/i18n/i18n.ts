@@ -4,6 +4,7 @@ import { PersistentStatefulService } from '../persistent-stateful-service';
 import { mutation } from 'services/stateful-service';
 import { Inject } from '../../util/injector';
 import { FileManagerService } from 'services/file-manager';
+import { AppService } from 'services/app';
 import { IListInput, TFormData } from 'components/shared/forms/Input';
 import { I18nServiceApi } from './i18n-api';
 import * as obs from '../../../obs-api';
@@ -52,7 +53,7 @@ const LANG_CODE_MAP = {
 export class I18nService extends PersistentStatefulService<II18nState> implements I18nServiceApi {
 
   static defaultState: II18nState = {
-    locale: ''
+    locale: 'ja-JP'
   };
 
   static vueI18nInstance: VueI18n;
@@ -66,15 +67,13 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   private isLoaded = false;
 
   @Inject() fileManagerService: FileManagerService;
+  @Inject() appService: AppService;
 
 
   async load() {
 
     const WHITE_LIST = [
-      'en-US',
-      'ru-RU', 'zh-TW', 'da-DK', 'de-DE',
-      'hu-HU', 'it-IT', 'ja-JP', 'Ko-KR', 'pl-PL',
-      'pt-PT', 'pt-BR', 'es-ES',  'fr-FR', 'tr-TR',
+      'en-US', 'ja-JP',
     ];
 
     if (this.isLoaded) return;
@@ -98,13 +97,29 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
     // load dictionary if not loaded
     if (!this.loadedDictionaries[locale]) {
-      await this.loadDictionary(locale);
+      await this.loadDictionary(locale).catch(e => {
+        console.error(e);
+        electron.remote.dialog.showErrorBox(
+          'N Air - Error',
+          `${locale}向けの辞書ファイル読み込みに失敗しました。\n` + 
+          `Failed to read the dictionary file for ${locale}.\n` + 
+          e.message
+        );
+      });
     }
 
     // load fallback dictionary
     const fallbackLocale = this.getFallbackLocale();
     if (!this.loadedDictionaries[fallbackLocale]) {
-      await this.loadDictionary(fallbackLocale);
+      await this.loadDictionary(fallbackLocale).catch(e => {
+        console.error(e);
+        electron.remote.dialog.showErrorBox(
+          'N Air - Error',
+          `${fallbackLocale}向けの辞書ファイル読み込みに失敗しました。\n` + 
+          `Failed to read the dictionary file for ${fallbackLocale}.\n` + 
+          e.message
+        );
+      });
     }
 
     // setup locale in libobs
@@ -125,8 +140,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
 
   setLocale(locale: string) {
     this.SET_LOCALE(locale);
-    electron.remote.app.relaunch();
-    electron.remote.app.quit();
+    this.appService.relaunch();
   }
 
   setWebviewLocale(webview: Electron.WebviewTag) {
@@ -155,7 +169,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
       <IListInput<string>>{
         type: 'OBS_PROPERTY_LIST',
         name: 'locale',
-        description: $t('Language'),
+        description: $t('common.language'),
         value: this.state.locale,
         enabled: true,
         visible: true,
@@ -172,12 +186,24 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
     if (this.loadedDictionaries[locale]) return this.loadedDictionaries[locale];
 
     const i18nPath = this.getI18nPath();
-    const dictionaryFiles = fs.readdirSync(`${i18nPath}/${locale}`)
-      .filter(fileName => fileName.split('.')[1] === 'json');
+    const files = await new Promise<string[]>((resolve, reject) => {
+      fs.readdir(`${i18nPath}/${locale}`, (err, files) => err ? reject(err) : resolve(files));
+    });
+
+    const dictionaryFiles = files
+      .filter(fileName => fileName.endsWith('.json'))
+      .map(fileName => fileName.replace(/\.json$/, ''));
 
     const dictionary: Dictionary<string> = {};
-    for (const fileName of dictionaryFiles) {
-      Object.assign(dictionary, JSON.parse(this.fileManagerService.read(`${i18nPath}/${locale}/${fileName}`)));
+    let lastReadFilePath = '';
+    try {
+      for (const fileName of dictionaryFiles) {
+        const filePath = `${i18nPath}/${locale}/${fileName}.json`;
+        lastReadFilePath = filePath;
+        dictionary[fileName] = JSON.parse(this.fileManagerService.read(filePath));
+      }
+    } catch (e) {
+      throw new Error(`in file: ${require('path').resolve(lastReadFilePath)}\n${e.message}`);
     }
     this.loadedDictionaries[locale] = dictionary;
     return dictionary;

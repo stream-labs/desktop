@@ -17,9 +17,6 @@ export interface IPropertyManager {
 }
 
 
-
-
-
 /**
  * A property manager is a class that manages the source
  * properties for a particular source.  It shares the same

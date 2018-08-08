@@ -1,5 +1,5 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
-import { Input, IFormInput, TObsType, IBitmaskInput } from './Input';
+import { Input, TObsType, IBitmaskInput } from './Input';
 import { EBit, default as Utils } from '../../../services/utils';
 
 @Component
@@ -9,6 +9,7 @@ class BitMaskInput extends Input<IBitmaskInput> {
 
   @Prop()
   value: IBitmaskInput;
+  testingAnchor = `Form/BitMask/${this.value.name}`;
 
   flags: EBit[] = [];
 

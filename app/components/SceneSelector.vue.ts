@@ -32,27 +32,32 @@ export default class SceneSelector extends Vue {
   showContextMenu() {
     const menu = new Menu();
     menu.append({
-      label: $t('Duplicate'),
+      id: 'Duplicate',
+      label: $t('common.duplicate'),
       click: () => this.scenesService.showDuplicateScene(this.scenesService.activeScene.name)
     });
     menu.append({
-      label: $t('Rename'),
+      id: 'Rename',
+      label: $t('common.rename'),
       click: () => this.scenesService.showNameScene({
         rename: this.scenesService.activeScene.name
       })
     });
     menu.append({
-      label: $t('Remove'),
+      id: 'Remove',
+      label: $t('common.remove'),
       click: () => this.removeScene()
     });
     menu.append({
-      label: $t('Filters'),
+      id: 'Filters',
+      label: $t('common.filters'),
       click: () => this.sourceFiltersService.showSourceFilters(
         this.scenesService.activeScene.id
       )
     });
     menu.append({
-      label: $t('Create Scene Projector'),
+      id: 'Create Scene Projector',
+      label: $t('scenes.createSceneProjector'),
       click: () => this.projectorService.createProjector(this.scenesService.activeScene.id)
     });
     menu.popup();
@@ -76,13 +81,14 @@ export default class SceneSelector extends Vue {
       electron.remote.getCurrentWindow(),
       {
         type: 'warning',
-        message: $t('Are you sure you want to remove %{sceneName}?', { sceneName: name }),
-        buttons: [$t('Cancel'), $t('OK')]
+        message: $t('scenes.removeSceneConfirm', { sceneName: name }),
+        buttons: [$t('common.cancel'), $t('common.ok')],
+        noLink: true,
       },
       ok => {
         if (!ok) return;
         if (!this.scenesService.removeScene(this.activeSceneId)) {
-          alert($t('There needs to be at least one scene.'));
+          alert($t('scenes.mustHaveLeastOnceScene'));
         }
       }
     );

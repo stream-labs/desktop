@@ -12,8 +12,8 @@ import { Menu } from 'util/menus/Menu';
 export default class Mixer extends Vue {
   @Inject() audioService: AudioService;
   
-  advancedSettingsTooltip = $t('Open advanced audio settings');
-  mixerTooltip = $t('Monitor audio levels. If the bars are moving you are outputting audio.');
+  advancedSettingsTooltip = $t('audio.advancedSettingsTooltip');
+  mixerTooltip = $t('audio.mixerTooltip');
 
   showAdvancedSettings() {
     this.audioService.showAdvancedSettings();
@@ -22,7 +22,8 @@ export default class Mixer extends Vue {
   handleRightClick() {
     const menu = new Menu();
     menu.append({
-      label: $t('Unhide All'),
+      id: 'Unhide All',
+      label: $t('sources.unhideAll'),
       click: () => this.audioService.unhideAllSourcesForCurrentScene()
     });
     menu.popup();

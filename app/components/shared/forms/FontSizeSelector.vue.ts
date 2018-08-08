@@ -7,6 +7,7 @@ export default class FontSizeSelector extends Input<number> {
 
   @Prop()
   value: number;
+  testingAnchor = 'Form/FontSize';
 
   setFontSizePreset(size: string) {
     this.emitInput(Number(size));

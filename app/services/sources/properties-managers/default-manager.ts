@@ -1,6 +1,5 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
-import { MediaBackupService } from 'services/media-backup';
 import * as input from 'components/shared/forms/Input';
 import * as fi from 'node-fontinfo';
 import { FontLibraryService } from 'services/font-library';
@@ -23,7 +22,6 @@ export interface IDefaultManagerSettings {
  * and does not modify them.
  */
 export class DefaultManager extends PropertiesManager {
-  @Inject() mediaBackupService: MediaBackupService;
   @Inject() fontLibraryService: FontLibraryService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
@@ -35,7 +33,6 @@ export class DefaultManager extends PropertiesManager {
 
   init() {
     if (!this.settings.mediaBackup) this.settings.mediaBackup = {};
-    this.initializeMediaBackup();
     this.downloadGoogleFont();
   }
 
@@ -43,72 +40,24 @@ export class DefaultManager extends PropertiesManager {
     super.setPropertiesFormData(properties);
     if (this.obsSource.settings[this.mediaBackupFileSetting] !== this.currentMediaPath) {
       this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
-      this.uploadNewMediaFile();
     }
   }
 
-  initializeMediaBackup() {
-    if (this.customizationService.state.mediaBackupOptOut) {
-      this.settings.mediaBackup = {};
-      return;
-    }
+  getPropertiesFormData(): input.TFormData {
+    const propArray = super.getPropertiesFormData();
 
-    if (!this.userService.isLoggedIn()) return;
-
-    if (this.obsSource.id === 'ffmpeg_source') {
-      this.mediaBackupFileSetting = 'local_file';
-    } else if (this.obsSource.id === 'image_source') {
-      this.mediaBackupFileSetting = 'file';
-    } else if (this.obsSource.id === 'obs_stinger_transition') {
-      this.mediaBackupFileSetting = 'path';
-    } else {
-      return;
-    }
-
-    this.ensureMediaBackupId();
-    this.currentMediaPath = this.obsSource.settings[this.mediaBackupFileSetting];
-
-    if (this.settings.mediaBackup.serverId && this.settings.mediaBackup.originalPath) {
-      this.mediaBackupService.syncFile(
-        this.settings.mediaBackup.localId,
-        this.settings.mediaBackup.serverId,
-        this.settings.mediaBackup.originalPath
-      ).then(file => {
-        if (file) {
-          this.currentMediaPath = file.filePath;
-          this.obsSource.update({ [this.mediaBackupFileSetting]: file.filePath });
-        }
-      });
-    } else {
-      this.uploadNewMediaFile();
-    }
-  }
-
-  uploadNewMediaFile() {
-    if (!this.mediaBackupFileSetting) return;
-    if (!this.obsSource.settings[this.mediaBackupFileSetting]) return;
-
-    this.settings.mediaBackup.serverId = null;
-    this.settings.mediaBackup.originalPath = null;
-
-    this.mediaBackupService.createNewFile(
-      this.settings.mediaBackup.localId,
-      this.obsSource.settings[this.mediaBackupFileSetting]
-    ).then(file => {
-      if (file) {
-        this.settings.mediaBackup.serverId = file.serverId;
-        this.settings.mediaBackup.originalPath = this.obsSource.settings[this.mediaBackupFileSetting];
+    // TODO: 選択肢単位のフィルタリング機構がないので暫定対処、これ以上増やしたくなったらやり方を考えること
+    // TODO: ホットキーのフォームが未実装
+    if (this.obsSource.id === 'game_capture') {
+      const captureModeProp = propArray.find(prop => prop.name === 'capture_mode') as input.IListInput<input.TObsValue>;
+      if (captureModeProp) {
+        captureModeProp.options = captureModeProp.options.filter(option => {
+          return option.value !== 'hotkey';
+        });
       }
-    });
-  }
+    }
 
-  ensureMediaBackupId() {
-    if (this.settings.mediaBackup.localId) return;
-    this.settings.mediaBackup.localId = this.mediaBackupService.getLocalFileId();
-  }
-
-  isMediaBackupSource() {
-    return this.obsSource.id === 'ffmpeg_source';
+    return propArray;
   }
 
   async downloadGoogleFont() {

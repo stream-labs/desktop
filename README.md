@@ -1,189 +1,75 @@
-# Streamlabs OBS
+# N Air
 
-[![Build status](https://ci.appveyor.com/api/projects/status/xxn8immagev9o1fd/branch/staging?svg=true)](https://ci.appveyor.com/project/Streamlabs/streamlabs-obs)
+Build Status: TBD
 
-Simple, powerful, and efficient live streaming software built on Electron.
+N AirはStreamlabs OBSをベースにした、生放送に便利な機能が豊富に組み込まれた高画質配信ソフトです。NLE（Niconico Live Encoder）よりも、さらに便利になって生まれ変わりました。
+![N Air](https://site.nicovideo.jp/nicolive/n-air-app/image/screenshot.png)
 
-![Streamlabs OBS](https://cdn.streamlabs.com/slobs/slobs-chatbox.png)
+## 動作条件
+* DirectX 10.1 互換のGPU
+* Windows 7 以降(64ビット版)
+* メモリ：8GB以上
+* CPU：Core i5第四世代相当
+* インターネット接続環境が必要です。
 
-This application currently only supports 64-bit Windows.
+## インストール
+<http://site.nicovideo.jp/nicolive/n-air-app/>
 
-## Issues
-
-Please submit all issues here:
-
-https://tracker.streamlabs.com
-
-## Dependencies
-
+## ビルド方法
 ### Node.js
+npmパッケージをインストールし、さまざまなスクリプトを実行するにはNodeが必要です。
 
-Node is required for installing npm packages and for running
-various scripts.  We recommend the current LTS release, 8.x.x:
-
-https://nodejs.org
-
+現在のLTSリリース8.x.xを推奨します：<https://nodejs.org/>
 ### Yarn
+各ノードモジュールの正しいバージョンを使用するためには、yarn パッケージマネージャーを使用する必要があります。
 
-In order to ensure you are using the correct version of each
-node module, you should use the yarn package manager.
-Installation instructions can be found here:
+インストール方法については、こちらを参照してください：<https://yarnpkg.com/ja/docs/install>
 
-https://yarnpkg.com/en/docs/install
+### Visual C++コンパイラ
+yarnは、ソースから多くのネイティブ拡張をインストールしてコンパイルします。このためには、Visual C ++コンパイラが必要です：[Visual Studio Community 2017](https://visualstudio.microsoft.com/ja/downloads/)
 
-### Visual C++ Compiler
-
-Yarn will install and compile a number of native extensions from
-source.  For yarn to do this, it needs a Visual C++ compiler.  The
-most reliable way to get this is to install:
-
-Visual Studio Community 2015 with Update 3
-
-Make sure you do a custom installation and select Visual C++ from
-the languages section.
-
+※カスタムインストールにて、ワークロード内の「C++によるデスクトップ開発」を選択してインストールしてください。 
 ### CMake
+N Airのネイティブアドオンの中には、コンパイルにCMakeが必要なものがあります。こちらからダウンロードできます：<https://cmake.org/download/>
 
-Some of our native addons require CMake for compilation.  You can
-download it here:
-
-https://cmake.org/download/
-
-Make sure to add CMake to your path. You may have to restart your
-machine before CMake is available.
-
+※パスにCMakeを追加してください。 CMakeを利用可能な状態にするにはマシンを再起動する必要があります。 
 ### Python 2.7
+Node-gypでは、ネイティブアドオンをインストールするためにパスにPython 2.7が必要です。
 
-Node-gyp requires python 2.7 available in your path to install some
-native addons.  You can download it here:
+こちらからダウンロードできます：<https://www.python.org/>
 
-https://www.python.org/
-
-## Installation
-
-First, make sure you have initialized git submodules:
-
-```
-git submodule update --init --recursive
-```
-
-Install all node modules via yarn:
+### インストール
+1.yarnを介してすべての node モジュールをインストールする。
 
 ```
 yarn install
 ```
 
-Install OBS plugins:
-
-```
-yarn install-plugins
-```
-
-Then, compile assets with webpack:
+2.webpackを使用してアセットをコンパイルする。
 
 ```
 yarn compile
 ```
-
-## Starting
-
-If you are using Visual Studio Code, you can start the app
-using the built in debugger (default F5).
-
-Otherwise, you can run the app with:
-
+### 実行
+Visual Studioコードを使用している場合は、組み込みのデバッガを使用してアプリケーションを実行できます（デフォルトのF5ボタン）。
+それ以外の場合は以下のコマンドにより実行可能です。
 ```
 yarn start
 ```
 
-## Environment Variables
+## ライセンス
+N Air本体はGPLv3で公開しています。
 
-These variables can be used in development to force certain behavior.
+N Airには外部の多くのオープンソースを利用しております。それらに関しては各パッケージのライセンス条項を御確認ください。
 
-`SLOBS_FORCE_AUTO_UPDATE`: Force the auto-updater to run in development. Normally
-this would only run in production.
+## Special Thanks
+This Open Source Program is forked from Streamlabs OBS, a software originally created by Streamlabs.
 
-`SLOBS_CACHE_DIR`: Force a different location for the user data cache directory.
+## バグ報告
+- フィードバックへのリンク
+  - <https://secure.nicovideo.jp/form/entry/n_air_feedback>
+- issue
+  - <https://github.com/n-air-app/n-air-app/issues>
 
-`SLOBS_DISABLE_MAIN_LOGGING`: Disable javascript logging in the main process.
-
-`SLOBS_REPORT_TO_SENTRY`: Report errors to sentry in the dev environment
-
-## Packaging / Distributing
-
-Currently only Windows x64 packaging is supported.
-
-### Prerequesites
-
-The packager will use whatever version of node-obs you have
-checked out in the slobs directory (at `./node-obs`).  You
-should make sure that node-obs is compiled correctly with 32-bit
-and 64-bit plugins, and works properly with the currently checked
-out version of `streamlabs-obs`.  If you're releasing, that should
-probably be the `master` branch.  You should probably try running
-the app from your dev environment to make sure everything is
-working before you start the release process.
-
-### Packaging
-
-Make sure the app is not running in your dev environment
-before you start the packaging process.
-
-You can package the app by running:
-
-```
-yarn package
-```
-
-This will package a distributable installer `.exe` to the `dist/`
-directory.  There is also an unpacked version in `dist/win-unpacked`.
-
-### Releasing
-
-If you want to release a new version to the update server, you will need
-the following variables in your environment:
-
-```
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-CSC_LINK
-CSC_KEY_PASSWORD
-SENTRY_AUTH_TOKEN
-```
-
-Only authorized team members have permission to release new versions.
-If you need help setting up your environment for release, you can ask
-someone on the team for help.
-
-If your environment is properly set up, you can use the automated
-release script to push out a new release.
-
-Simply run:
-
-```
-yarn release
-```
-
-and follow the instructions.
-
-### Legacy Release Checklist
-
-NOTE: This checklist is deprecated, and is only kept here in case
-the automated deploy script isn't working and we need to do a
-manual deploy.
-
-- [ ] Merge `staging` into `master` - DO NOT "Squash & Merge", just do a regular merge
-- [ ] Check out `master`
-- [ ] If submodules are out of date `git submodule update --init --recursive`
-- [ ] Remove node modules `rm -rf node_modules`
-- [ ] Install fresh packages `yarn install`
-- [ ] Install node-obs with latest plugins `yarn install-node-obs`
-- [ ] Compile assets `yarn compile`
-- [ ] Run the test suite `yarn test`
-- [ ] Change the version in `package.json`
-- [ ] Commit and push
-- [ ] Tag the repo `git tag 'v0.0.11'` and `git push --tags`
-- [ ] Package the app `yarn package`
-- [ ] Run the packaged version in `dist/win-unpacked` and make sure it runs
-- [ ] Deploy the new version `yarn deploy`
-- [ ] Merge master back into staging
+## ヘルプページへのリンク
+<https://qa.nicovideo.jp/faq/show/11857>

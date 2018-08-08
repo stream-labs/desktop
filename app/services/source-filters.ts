@@ -28,8 +28,7 @@ export type TSourceFilterType =
   'noise_suppress_filter' |
   'noise_gate_filter' |
   'compressor_filter' |
-  'vst_filter' |
-  'face_mask_filter';
+  'vst_filter';
 
 interface ISourceFilterType {
   type: TSourceFilterType;
@@ -58,23 +57,22 @@ export class SourceFiltersService extends Service {
   getTypesList(): IListOption<TSourceFilterType>[] {
     const obsAvailableTypes = obs.FilterFactory.types();
     const whitelistedTypes: IListOption<TSourceFilterType>[] = [
-      { description: $t('Image Mask/Blend'), value: 'mask_filter' },
-      { description: $t('Crop/Pad'), value: 'crop_filter' },
-      { description: $t('Gain'), value: 'gain_filter' },
-      { description: $t('Color Correction'), value: 'color_filter' },
-      { description: $t('Scaling/Aspect Ratio'), value: 'scale_filter' },
-      { description: $t('Scroll'), value: 'scroll_filter' },
-      { description: $t('Render Delay'), value: 'gpu_delay' },
-      { description: $t('Color Key'), value: 'color_key_filter' },
-      { description: $t('Apply LUT'), value: 'clut_filter' },
-      { description: $t('Sharpen'), value: 'sharpness_filter' },
-      { description: $t('Chroma Key'), value: 'chroma_key_filter' },
-      { description: $t('Video Delay (Async)'), value: 'async_delay_filter' },
-      { description: $t('Noise Suppression'), value: 'noise_suppress_filter' },
-      { description: $t('Noise Gate'), value: 'noise_gate_filter' },
-      { description: $t('Compressor'), value: 'compressor_filter' },
-      { description: $t('VST 2.x Plugin'), value: 'vst_filter' },
-      { description: $t('Face Mask Plugin'), value: 'face_mask_filter' }
+      { description: $t('filters.mask'), value: 'mask_filter' },
+      { description: $t('filters.crop'), value: 'crop_filter' },
+      { description: $t('filters.gain'), value: 'gain_filter' },
+      { description: $t('filters.color'), value: 'color_filter' },
+      { description: $t('filters.scale'), value: 'scale_filter' },
+      { description: $t('filters.scroll'), value: 'scroll_filter' },
+      { description: $t('filters.renderDelay'), value: 'gpu_delay' },
+      { description: $t('filters.colorKey'), value: 'color_key_filter' },
+      { description: $t('filters.applyLut'), value: 'clut_filter' },
+      { description: $t('filters.sharpen'), value: 'sharpness_filter' },
+      { description: $t('filters.chromaKey'), value: 'chroma_key_filter' },
+      { description: $t('filters.asyncDelay'), value: 'async_delay_filter' },
+      { description: $t('filters.noiseSuppression'), value: 'noise_suppress_filter' },
+      { description: $t('filters.noiseGate'), value: 'noise_gate_filter' },
+      { description: $t('filters.compressor'), value: 'compressor_filter' },
+      { description: $t('filters.vst'), value: 'vst_filter' }
     ];
 
     return whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -181,13 +179,13 @@ export class SourceFiltersService extends Service {
 
     return {
       type: {
-        description: $t('Filter type'),
+        description: $t('filters.filterType'),
         name: 'type',
         value: availableTypesList[0].value,
         options: availableTypesList
       },
       name: {
-        description: $t('Filter name'),
+        description: $t('filters.filterName'),
         name: 'name',
         value: 'New filter'
       }

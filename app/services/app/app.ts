@@ -13,15 +13,14 @@ import { StreamInfoService } from 'services/stream-info';
 import { track } from 'services/usage-statistics';
 import { IpcServerService } from 'services/ipc-server';
 import { TcpServerService } from 'services/tcp-server';
-import { StreamlabelsService } from 'services/streamlabels';
 import { PerformanceMonitorService } from 'services/performance-monitor';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
-import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
+import { QuestionaireService } from 'services/questionaire';
 
 interface IAppState {
   loading: boolean;
@@ -41,7 +40,6 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() streamInfoService: StreamInfoService;
   @Inject() patchNotesService: PatchNotesService;
   @Inject() windowsService: WindowsService;
-  @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
 
   static initialState: IAppState = {
@@ -55,12 +53,12 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() sourcesService: SourcesService;
   @Inject() scenesService: ScenesService;
   @Inject() videoService: VideoService;
-  @Inject() streamlabelsService: StreamlabelsService;
   @Inject() private ipcServerService: IpcServerService;
   @Inject() private tcpServerService: TcpServerService;
   @Inject() private performanceMonitorService: PerformanceMonitorService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
+  @Inject() private questionaireService: QuestionaireService;
 
   @track('app_start')
   load() {
@@ -71,18 +69,19 @@ export class AppService extends StatefulService<IAppState> {
     // associated with the user in sentry.
     this.userService;
 
-    this.sceneCollectionsService.initialize().then(() => {
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
+    this.sceneCollectionsService.initialize().then(
+      () => this.questionaireService.startIfRequired()
+    ).then(questionaireStarted => {
+      if (!questionaireStarted) {
+        this.onboardingService.startOnboardingIfRequired();
+      }
 
       electron.ipcRenderer.on('shutdown', () => {
         electron.ipcRenderer.send('acknowledgeShutdown');
         this.shutdownHandler();
       });
 
-      this.facemasksService;
-
       this.shortcutsService;
-      this.streamlabelsService;
 
       // Pre-fetch stream info
       this.streamInfoService;
@@ -91,9 +90,6 @@ export class AppService extends StatefulService<IAppState> {
 
       this.ipcServerService.listen();
       this.tcpServerService.listen();
-
-      this.patchNotesService.showPatchNotesIfRequired(onboarded);
-      this.outageNotificationsService;
 
       this.FINISH_LOADING();
     });
@@ -122,6 +118,18 @@ export class AppService extends StatefulService<IAppState> {
       await this.fileManagerService.flushAll();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
+  }
+
+  relaunch({ clearCacheDir }: { clearCacheDir?: boolean } = {}) {
+    const originalArgs: string[] = electron.remote.process.argv.slice(1);
+
+    // キャッシュクリアしたいときだけつくようにする
+    const args = clearCacheDir
+      ? originalArgs.concat('--clearCacheDir')
+      : originalArgs.filter(x => x !== '--clearCacheDir');
+
+    electron.remote.app.relaunch({ args });
+    electron.remote.app.quit();
   }
 
   startLoading() {

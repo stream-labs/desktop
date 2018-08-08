@@ -46,13 +46,13 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
 
   getTypes(): IListOption<string>[] {
     return [
-      { description: $t('Cut'), value: 'cut_transition' },
-      { description: $t('Fade'), value: 'fade_transition' },
-      { description: $t('Swipe'), value: 'swipe_transition' },
-      { description: $t('Slide'), value: 'slide_transition' },
-      { description: $t('Fade to Color'), value: 'fade_to_color_transition' },
-      { description: $t('Luma Wipe'), value: 'wipe_transition' },
-      { description: $t('Stinger'), value: 'obs_stinger_transition' }
+      { description: $t('transitions.cut_transition'), value: 'cut_transition' },
+      { description: $t('transitions.fade_transition'), value: 'fade_transition' },
+      { description: $t('transitions.swipe_transition'), value: 'swipe_transition' },
+      { description: $t('transitions.slide_transition'), value: 'slide_transition' },
+      { description: $t('transitions.fade_to_color_transition'), value: 'fade_to_color_transition' },
+      { description: $t('transitions.wipe_transition'), value: 'wipe_transition' },
+      { description: $t('transitions.obs_stinger_transition'), value: 'obs_stinger_transition' }
     ];
   }
 
@@ -121,13 +121,13 @@ export class ScenesTransitionsService extends StatefulService<ISceneTransitionsS
   getFormData() {
     return {
       type: {
-        description: $t('Transition'),
+        description: $t('transitions.transition'),
         name: 'type',
         value: this.state.type,
         options: this.getTypes()
       },
       duration: {
-        description: $t('Duration'),
+        description: $t('transitions.duration'),
         name: 'duration',
         value: this.state.duration
       }

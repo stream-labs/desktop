@@ -1,6 +1,4 @@
-import { TwitchService } from './twitch';
-import { YoutubeService } from './youtube';
-import { MixerService } from './mixer';
+import { NiconicoService } from './niconico';
 import { integer } from 'aws-sdk/clients/lightsail';
 
 export interface IChannelInfo {
@@ -22,7 +20,7 @@ export interface IPlatformService {
 
   // This function is responsible for setting up stream
   // settings for this platform, given an auth.
-  setupStreamSettings: (auth: IPlatformAuth) => void;
+  setupStreamSettings: (auth: IPlatformAuth) => Promise<void>;
 
   fetchViewerCount: () => Promise<number>;
 
@@ -35,26 +33,29 @@ export interface IPlatformService {
   searchGames: (searchString: string) => Promise<IGame[]>;
 
   getChatUrl: (mode: string) => Promise<string>;
+
+  isLoggedIn?: () => Promise<boolean>;
+  logout?: () => Promise<void>;
+
+  getUserPageURL?: () => string;
 }
 
 export interface IPlatformAuth {
-  widgetToken: string;
-  apiToken: string; // Streamlabs API Token
+  apiToken: string; // N Air API Token
   platform: {
     type: TPlatform;
     username: string;
     token: string;
     id: string;
     channelId?: string;
+    userIcon?: string;
   };
 }
 
-export type TPlatform = 'twitch' | 'youtube' | 'mixer';
+export type TPlatform = 'niconico';
 
 export function getPlatformService(platform: TPlatform): IPlatformService {
   return {
-    twitch: TwitchService.instance,
-    youtube: YoutubeService.instance,
-    mixer: MixerService.instance
+    niconico: NiconicoService.instance
   }[platform];
 }

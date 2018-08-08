@@ -52,12 +52,7 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     token: '',
     namedPipe: {
       enabled: true,
-      pipeName: 'slobs'
-    },
-    websockets: {
-      enabled: false,
-      port: 59650,
-      allowRemote: false
+      pipeName: 'n-air-app'
     }
   };
 
@@ -81,7 +76,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
   listen() {
     this.listenConnections(this.createTcpServer());
     if (this.state.namedPipe.enabled) this.listenConnections(this.createNamedPipeServer());
-    if (this.state.websockets.enabled) this.listenConnections(this.createWebsoketsServer());
   }
 
 
@@ -104,32 +98,11 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
     Object.keys(this.clients).forEach(clientId => this.disconnectClient(Number(clientId)));
   }
 
-  enableWebsoketsRemoteConnections() {
-    this.stopListening();
-
-    // update websockets settings
-    const defaultWebsoketsSettings = this.getDefaultSettings().websockets;
-    this.setSettings({
-      websockets: {
-        ...defaultWebsoketsSettings,
-        enabled: true,
-        allowRemote: true
-      }
-    });
-
-    this.listen();
-  }
-
-
   getDefaultSettings(): ITcpServersSettings {
     return TcpServerService.defaultState;
   }
 
-
   setSettings(settings: Partial<ITcpServersSettings>) {
-    const needToGenerateToken =
-      settings.websockets && settings.websockets.allowRemote && !this.state.token;
-    if (needToGenerateToken) this.generateToken();
     this.SET_SETTINGS(settings);
   }
 
@@ -162,40 +135,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
             enabled: settings.namedPipe.enabled,
           }
         ]
-      },
-      {
-        nameSubCategory: 'Websockets',
-        codeSubCategory: 'websockets',
-        parameters: [
-          <IFormInput<boolean>> {
-            value: settings.websockets.enabled,
-            name: 'enabled',
-            description: 'Enabled',
-            type: 'OBS_PROPERTY_BOOL',
-            visible: true,
-            enabled: true,
-          },
-
-          <IFormInput<boolean>> {
-            value: settings.websockets.allowRemote,
-            name: 'allowRemote',
-            description: 'Allow Remote Connections',
-            type: 'OBS_PROPERTY_BOOL',
-            visible: true,
-            enabled: settings.websockets.enabled,
-          },
-
-          <IFormInput<number>> {
-            value: settings.websockets.port,
-            name: 'port',
-            description: 'Port',
-            type: 'OBS_PROPERTY_INT',
-            minVal: 0,
-            maxVal: 65535,
-            visible: true,
-            enabled: settings.websockets.enabled,
-          }
-        ]
       }
     ];
   }
@@ -215,15 +154,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       });
     });
     return addresses;
-  }
-
-  generateToken(): string {
-    const buf = new Uint8Array(20);
-    crypto.randomFillSync(buf);
-    let token = '';
-    buf.forEach(val => token += val.toString(16));
-    this.setSettings({ token });
-    return token;
   }
 
   private listenConnections(server: IServer) {
@@ -259,24 +189,6 @@ export class TcpServerService extends PersistentStatefulService<ITcpServersSetti
       nativeServer: server,
       close() {
         server.close();
-      }
-    };
-  }
-
-
-  private createWebsoketsServer(): IServer {
-    const settings = this.state.websockets;
-    const http = require('http');
-    const sockjs = require('sockjs');
-    const websocketsServer = sockjs.createServer();
-    const httpServer = http.createServer();
-    websocketsServer.installHandlers(httpServer, { prefix:'/api' });
-    httpServer.listen(settings.port, settings.allowRemote ? WILDCARD_HOST_NAME : LOCAL_HOST_NAME);
-    return {
-      type: 'websockets',
-      nativeServer: websocketsServer,
-      close() {
-        httpServer.close();
       }
     };
   }

@@ -13,13 +13,11 @@ import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
 import SourceFilters from 'components/windows/SourceFilters.vue';
 import AddSourceFilter from 'components/windows/AddSourceFilter.vue';
-import EditStreamInfo from 'components/windows/EditStreamInfo.vue';
 import AdvancedAudio from 'components/windows/AdvancedAudio.vue';
 import Notifications from 'components/windows/Notifications.vue';
 import Troubleshooter from 'components/windows/Troubleshooter.vue';
 import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
-import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
@@ -57,7 +55,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
-      title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
+      title: `N Air - Ver: ${remote.process.env.NAIR_VERSION}`
     },
     child: {
       componentName: 'Blank',
@@ -81,13 +79,11 @@ export class WindowsService extends StatefulService<IWindowsState> {
     SourceFilters,
     AddSourceFilter,
     Blank,
-    EditStreamInfo,
     AdvancedAudio,
     Notifications,
     Troubleshooter,
     ManageSceneCollections,
-    Projector,
-    RecentEvents
+    Projector
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

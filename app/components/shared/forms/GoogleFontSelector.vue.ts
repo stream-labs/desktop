@@ -23,6 +23,7 @@ export default class GoogleFontSelector extends Input<IGoogleFont> {
 
   @Prop()
   value: IGoogleFont;
+  testingAnchor = `Form/GoogleFont/${this.value.face}`;
 
   fontFamilies: string[] = [];
 

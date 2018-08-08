@@ -1,6 +1,5 @@
 import { Service } from 'services/service';
 import { Inject } from 'util/injector';
-import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { RootNode } from './nodes/root';
 import { SourcesNode, ISourceInfo } from './nodes/sources';
 import { ScenesNode, ISceneSchema } from './nodes/scenes';
@@ -30,6 +29,7 @@ import {
 } from '.';
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
+import { $t } from 'services/i18n';
 
 const uuid = window['require']('uuid/v4');
 
@@ -61,8 +61,6 @@ interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOp
  */
 export class SceneCollectionsService extends Service
   implements ISceneCollectionsServiceApi {
-  @Inject('SceneCollectionsServerApiService')
-  serverApi: SceneCollectionsServerApiService;
   @Inject('SceneCollectionsStateService')
   stateService: SceneCollectionsStateService;
   @Inject() scenesService: ScenesService;
@@ -98,7 +96,6 @@ export class SceneCollectionsService extends Service
   async initialize() {
     await this.migrate();
     await this.stateService.loadManifestFile();
-    await this.safeSync();
     if (this.activeCollection) {
       await this.load(this.activeCollection.id);
     } else if (this.collections.length > 0) {
@@ -115,7 +112,6 @@ export class SceneCollectionsService extends Service
    * the manifest and load from the server.
    */
   async setupNewUser() {
-    const serverCollections = await this.serverApi.fetchSceneCollections();
     await this.initialize();
   }
 
@@ -126,7 +122,6 @@ export class SceneCollectionsService extends Service
     this.disableAutoSave();
     await this.save();
     await this.deloadCurrentApplicationState();
-    await this.safeSync();
     await this.stateService.flushManifestFile();
   }
 
@@ -152,7 +147,7 @@ export class SceneCollectionsService extends Service
    * @param shouldAttemptRecovery whether a new copy of the file should
    * be downloaded from the server if loading fails.
    */
-  async load(id: string, shouldAttemptRecovery = true): Promise<void> {
+  async load(id: string): Promise<void> {
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
@@ -162,15 +157,11 @@ export class SceneCollectionsService extends Service
     } catch (e) {
       console.error('Error loading collection!', e);
 
-      if (shouldAttemptRecovery) {
-        await this.attemptRecovery(id);
-      } else {
-        console.warn(
-          `Unsuccessful recovery of scene collection ${id} attempted`
-        );
-        alert('Failed to load scene collection.  A new one will be created instead.');
-        await this.create();
-      }
+      console.warn(
+        `Unsuccessful recovery of scene collection ${id} attempted`
+      );
+      alert('Failed to load scene collection.  A new one will be created instead.');
+      await this.create();
     }
 
     this.finishLoadingOperation();
@@ -186,7 +177,10 @@ export class SceneCollectionsService extends Service
     this.startLoadingOperation();
     await this.deloadCurrentApplicationState();
 
-    const name = options.name || this.suggestName(DEFAULT_COLLECTION_NAME);
+    const name = options.name || this.suggestName(
+      $t('scenes.sceneCollectionDefaultName',
+      { fallback: DEFAULT_COLLECTION_NAME }
+    ));
     const id: string = uuid();
 
     await this.insertCollection(id, name);
@@ -237,21 +231,7 @@ export class SceneCollectionsService extends Service
       name,
       new Date().toISOString()
     );
-    this.safeSync();
     this.collectionUpdated.next(this.getCollection(id));
-  }
-
-  /**
-   * Calls sync, but will never cause a rejected promise.
-   * Instead, it will log an error and continue.
-   */
-  async safeSync(retries = 2) {
-    try {
-      await this.sync();
-    } catch (e) {
-      console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
-      if (retries > 0) await this.safeSync(retries - 1);
-    }
   }
 
   /**
@@ -444,36 +424,33 @@ export class SceneCollectionsService extends Service
    */
   private async readCollectionDataAndLoadIntoApplicationState(id: string): Promise<void> {
     const exists = await this.stateService.collectionFileExists(id);
+    if (!exists) return;
 
-    if (exists) {
-      let data: string;
+    let data: string;
 
-      try {
-        data = this.stateService.readCollectionFile(id);
-        if (data == null) throw new Error('Got blank data from collection file');
+    try {
+      data = this.stateService.readCollectionFile(id);
+      if (data == null) throw new Error('Got blank data from collection file');
 
-        await this.loadDataIntoApplicationState(data);
-      } catch (e) {
-        // Check for a backup and load it
-        const exists = await this.stateService.collectionFileExists(id, true);
+      await this.loadDataIntoApplicationState(data);
+    } catch (e) {
+      // Check for a backup and load it
+      const exists = await this.stateService.collectionFileExists(id, true);
 
-        // If there's no backup, throw the original error
-        if (!exists) throw e;
+      // If there's no backup, throw the original error
+      if (!exists) throw e;
 
-        data = this.stateService.readCollectionFile(id, true);
-        await this.loadDataIntoApplicationState(data);
-      }
-
-      if (this.scenesService.scenes.length === 0) {
-        throw new Error('Scene collection was loaded but there were no scenes.');
-      }
-
-      // Everything was successful, write a backup
-      this.stateService.writeDataToCollectionFile(id, data, true);
-      this.collectionLoaded = true;
-    } else {
-      await this.attemptRecovery(id);
+      data = this.stateService.readCollectionFile(id, true);
+      await this.loadDataIntoApplicationState(data);
     }
+
+    if (this.scenesService.scenes.length === 0) {
+      throw new Error('Scene collection was loaded but there were no scenes.');
+    }
+
+    // Everything was successful, write a backup
+    this.stateService.writeDataToCollectionFile(id, data, true);
+    this.collectionLoaded = true;
   }
 
   /**
@@ -496,37 +473,6 @@ export class SceneCollectionsService extends Service
     const data = JSON.stringify(root, null, 2);
 
     this.stateService.writeDataToCollectionFile(id, data);
-  }
-
-  /**
-   * Attempts to recover and load a copy of this scene
-   * collection from the server.
-   * @param id The id of the collection to recover
-   */
-  private async attemptRecovery(id: string) {
-    // Check if the server has a copy
-    const collection = this.collections.find(coll => coll.id === id);
-
-    if (collection.serverId && this.userService.isLoggedIn()) {
-      const coll = await this.serverApi.fetchSceneCollection(collection.serverId);
-
-      if (coll.scene_collection.data) {
-        // A local hard delete without notifying the server
-        // will force a fresh download from the server on next sync
-        this.stateService.HARD_DELETE_COLLECTION(id);
-        await this.safeSync();
-
-        // Find the newly downloaded collection and load it
-        const newCollection = this.collections.find(
-          coll => coll.serverId === collection.serverId
-        );
-
-        if (newCollection) {
-          await this.load(newCollection.id, false);
-          return;
-        }
-      }
-    }
   }
 
   /**
@@ -617,7 +563,6 @@ export class SceneCollectionsService extends Service
   private async insertCollection(id: string, name: string) {
     await this.saveCurrentApplicationStateAs(id);
     this.stateService.ADD_COLLECTION(id, name, new Date().toISOString());
-    await this.safeSync();
     this.collectionAdded.next(this.collections.find(coll => coll.id === id));
   }
 
@@ -627,7 +572,6 @@ export class SceneCollectionsService extends Service
   private removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
-    this.safeSync();
 
     // Currently we don't remove files on disk in case we need to recover them
     // manually at a later point in time.  Once we are more comfortable with
@@ -653,13 +597,6 @@ export class SceneCollectionsService extends Service
     const collection = this.collections.find(coll => coll.id === id);
 
     if (collection) {
-      if (collection.serverId && this.userService.isLoggedIn()) {
-        try {
-          await this.serverApi.makeSceneCollectionActive(collection.serverId);
-        } catch (e) {
-          console.warn('Failed setting active collection');
-        }
-      }
       this.stateService.SET_ACTIVE_COLLECTION(id);
       this.collectionSwitched.next(collection);
     }
@@ -667,148 +604,6 @@ export class SceneCollectionsService extends Service
 
   private get legacyDirectory() {
     return path.join(electron.remote.app.getPath('userData'), 'SceneConfigs');
-  }
-
-  /**
-   * Synchronizes with the server based on the current state
-   * of the manifest.  It can either be used in a "fire and forget"
-   * manner, or you can wait on the promise.  If you wait on the
-   * promise, it will ensure that files are fully synchronized as
-   * of the time of the original function invocation.
-   * This function is idempotent.
-   * This function is a no-op if the user is logged out.
-   *
-   * This function essentially performs 6 tasks all in parallel:
-   * - Delete collections on the server that were deleted locally
-   * - Delete collections locally that were deleted on the server
-   * - Create collections on the server that were created locally
-   * - Create collections locally that were created on the server
-   * - Upload collections that have newer versions locally
-   * - Download collections that have newer version on the server
-   */
-  private async sync() {
-    if (!this.userService.isLoggedIn()) return;
-
-    const serverCollections = (await this.serverApi.fetchSceneCollections())
-      .data;
-
-    let failed = false;
-
-    for (const onServer of serverCollections) {
-      const inManifest = this.stateService.state.collections.find(
-        coll => coll.serverId === onServer.id
-      );
-
-      if (inManifest) {
-        if (inManifest.deleted) {
-          const success = await this.performSyncStep('Delete on server', async () => {
-            await this.serverApi.deleteSceneCollection(inManifest.serverId);
-            this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
-          });
-
-          if (!success) failed = true;
-        } else if (
-          new Date(inManifest.modified) > new Date(onServer.last_updated_at)
-        ) {
-          const success = await this.performSyncStep('Update on server', async () => {
-            const exists = await this.stateService.collectionFileExists(inManifest.id);
-
-            if (exists) {
-              const data = this.stateService.readCollectionFile(inManifest.id);
-
-              if (data) {
-                await this.serverApi.updateSceneCollection({
-                  id: inManifest.serverId,
-                  name: inManifest.name,
-                  data,
-                  last_updated_at: inManifest.modified
-                });
-              }
-            }
-          });
-
-          if (!success) failed = true;
-        } else if (
-          new Date(inManifest.modified) < new Date(onServer.last_updated_at)
-        ) {
-          const success = await this.performSyncStep('Update from server', async () => {
-            const response = await this.serverApi.fetchSceneCollection(onServer.id);
-            this.stateService.writeDataToCollectionFile(
-              inManifest.id,
-              response.scene_collection.data
-            );
-
-            this.stateService.RENAME_COLLECTION(
-              inManifest.id,
-              onServer.name,
-              onServer.last_updated_at
-            );
-          });
-
-          if (!success) failed = true;
-        } else {
-          console.log('Up to date file: ', inManifest.id);
-        }
-      } else {
-        const success = await this.performSyncStep('Insert from server', async () => {
-          const id: string = uuid();
-          const response = await this.serverApi.fetchSceneCollection(onServer.id);
-
-          // Empty data means that the collection was created from the Streamlabs
-          // dashboard and does not currently have any scenes assoicated with it.
-          // The first time we try to load this collection, we will initialize it
-          // with some scenes.
-
-          if (response.scene_collection.data != null) {
-            this.stateService.writeDataToCollectionFile(id, response.scene_collection.data);
-          }
-
-          this.stateService.ADD_COLLECTION(
-            id,
-            onServer.name,
-            new Date().toISOString()
-          );
-          this.stateService.SET_SERVER_ID(id, onServer.id);
-        });
-
-        if (!success) failed = true;
-      }
-    }
-
-    for (const inManifest of this.stateService.state.collections) {
-      const onServer = serverCollections.find(
-        coll => coll.id === inManifest.serverId
-      );
-
-      // We already dealt with the overlap above
-      if (!onServer) {
-        if (!inManifest.serverId) {
-          const success = await this.performSyncStep('Insert on server', async () => {
-            const data = this.stateService.readCollectionFile(inManifest.id);
-
-            const response = await this.serverApi.createSceneCollection({
-              name: inManifest.name,
-              data,
-              last_updated_at: inManifest.modified
-            });
-
-            this.stateService.SET_SERVER_ID(inManifest.id, response.id);
-          });
-
-          if (!success) failed = true;
-        } else {
-          const success = this.performSyncStep('Delete from server', async () => {
-            this.stateService.HARD_DELETE_COLLECTION(inManifest.id);
-          });
-
-          if (!success) failed = true;
-        }
-      }
-    }
-
-    await this.stateService.flushManifestFile();
-
-    if (failed) throw new Error('Sync failed!');
   }
 
   /**

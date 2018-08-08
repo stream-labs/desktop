@@ -6,31 +6,22 @@ import Util from 'services/utils';
 // are just keeping the value in one place.
 export class HostsService extends Service {
 
-  get streamlabs() {
-    return 'streamlabs.com';
+  get niconicoAccount() {
+    return 'https://account.nicovideo.jp';
   }
-
-  get overlays() {
-    if (Util.isPreview()) {
-      return 'beta-overlays.streamlabs.com';
+  get niconicoOAuth() {
+    return 'https://oauth.nicovideo.jp/oauth2';
+  }
+  get niconicoFlapi() {
+    return 'http://flapi.nicovideo.jp/api';
+  }
+  get niconicolive() {
+    return 'http://live.nicovideo.jp';
+  }
+  get nAirLogin() {
+    if (process.env.NAIR_LOGIN_URL) {
+      return process.env.NAIR_LOGIN_URL;
     }
-    return 'overlays.streamlabs.com';
+    return 'https://n-air-app.nicovideo.jp/authorize';
   }
-
-  get media() {
-    return 'media.streamlabs.com';
-  }
-
-  get beta2() {
-    return 'beta2.streamlabs.com';
-  }
-
-  get beta3() {
-    return 'beta3.streamlabs.com';
-  }
-
-  get facemaskCDN() {
-    return 'facemasks-cdn.streamlabs.com/';
-  }
-
 }

@@ -8,14 +8,18 @@ const electron = require('electron');
 
 let currentMenu;
 
+// const originalPopup = electron.Menu.prototype.popup;
 electron.Menu.prototype.popup = function popup() {
   currentMenu = this;
+  // originalPopup.call(this);
 };
 
-electron.ipcMain.on('__SPECTRON_FAKE_CONTEXT_MENU', (e, label) => {
-  const found = currentMenu.items.find(item => {
-    return item.label.indexOf(label) !== -1;
-  });
+electron.ipcMain.on('__SPECTRON_FAKE_CONTEXT_MENU', (e, id) => {
+  const found = currentMenu.getMenuItemById(id);
 
-  found.click();
+  if (!found) {
+    throw new Error(`context menu is not found specified by id: ${id}\n${currentMenu.items.map(x => x.label).join('\n')}`);
+  }
+
+  e.returnValue = found.click();
 });

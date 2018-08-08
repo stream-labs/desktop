@@ -95,8 +95,6 @@ function checkoutBranch(branchName) {
     execSync(`git checkout ${branchName}`);
     log('run yarn install');
     execSync('yarn install');
-    log('run yarn install-plugins');
-    execSync('yarn install-plugins');
   }
   fs.writeFileSync(`${CONFIG.dist}/current-branch.txt`, branchName);
 }

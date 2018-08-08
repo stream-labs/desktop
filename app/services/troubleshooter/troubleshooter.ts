@@ -19,11 +19,11 @@ export class TroubleshooterService
 
   static defaultState: ITroubleshooterState = {
     settings: {
-      skippedEnabled: true,
+      skippedEnabled: false,
       skippedThreshold: 0.15,
       laggedEnabled: false,
       laggedThreshold: 0.15,
-      droppedEnabled: true,
+      droppedEnabled: false,
       droppedThreshold: 0.1,
     }
   };
@@ -42,7 +42,7 @@ export class TroubleshooterService
       <IFormInput<boolean>> {
         value: settings.skippedEnabled,
         name: 'skippedEnabled',
-        description: $t('Detect skipped frames'),
+        description: $t('notifications.detectSkippedFrames'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -51,7 +51,7 @@ export class TroubleshooterService
       <INumberInputValue> {
         value: settings.skippedThreshold,
         name: 'skippedThreshold',
-        description: $t('Skipped frames threshold'),
+        description: $t('notifications.skippedFramesThreshold'),
         type: 'OBS_PROPERTY_SLIDER',
         minVal: 0,
         maxVal: 1,
@@ -64,7 +64,7 @@ export class TroubleshooterService
       <IFormInput<boolean>> {
         value: settings.laggedEnabled,
         name: 'laggedEnabled',
-        description: $t('Detect lagged frames'),
+        description: $t('notifications.detectLaggedFrames'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -73,7 +73,7 @@ export class TroubleshooterService
       <INumberInputValue> {
         value: settings.laggedThreshold,
         name: 'laggedThreshold',
-        description: $t('Lagged frames threshold'),
+        description: $t('notifications.laggedFramesThreshold'),
         type: 'OBS_PROPERTY_SLIDER',
         minVal: 0,
         maxVal: 1,
@@ -86,7 +86,7 @@ export class TroubleshooterService
       <IFormInput<boolean>> {
         value: settings.droppedEnabled,
         name: 'droppedEnabled',
-        description: $t('Detect dropped frames'),
+        description: $t('notifications.detectDroppedFrames'),
         type: 'OBS_PROPERTY_BOOL',
         visible: true,
         enabled: true,
@@ -95,7 +95,7 @@ export class TroubleshooterService
       <INumberInputValue> {
         value: settings.droppedThreshold,
         name: 'droppedThreshold',
-        description: $t('Dropped frames threshold'),
+        description: $t('notifications.droppedFramesThreshold'),
         type: 'OBS_PROPERTY_SLIDER',
         minVal: 0,
         maxVal: 1,

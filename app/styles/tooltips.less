@@ -1,7 +1,7 @@
 // TOOLTIPS
 
 .tooltip-trigger {
-  color: @grey;
+  color: @text-primary;
   margin: 0 10px;
   opacity: .6;
 }
@@ -19,14 +19,16 @@
 }
 
 .tooltip .tooltip-inner {
-  background: @white;
   .border;
   .shadow;
-  color: @navy;
   .radius;
   .shadow;
   padding: 8px 10px 7px;
   font-size: 12px;
+  background-color: @accent-light;
+  border-color: @accent-light;
+  color: @white;
+  .shadow;
 }
 
 .tooltip .tooltip-arrow {
@@ -35,7 +37,7 @@
   border-style: solid;
   position: absolute;
   margin: 5px;
-  border-color: @day-border;
+  border-color: @accent-light;
 }
 
 .tooltip[x-placement^="top"] {
@@ -108,17 +110,4 @@
   visibility: visible;
   opacity: 1;
   transition: opacity .15s;
-}
-
-.night-theme {
-  .tooltip .tooltip-inner {
-    background-color: @night-accent-light;
-    border-color: @night-accent-light;
-    color: @white;
-    .night-shadow;
-  }
-
-  .tooltip-arrow {
-    border-color: @night-accent-light;
-  }
 }

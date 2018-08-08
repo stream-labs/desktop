@@ -6,7 +6,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i class="icon-down"/>
+      <span class="scene-name">{{ title }}</span><i class="icon-down-arrow"/>
     </button>
 
   </popper>
@@ -18,67 +18,67 @@
 @import "../../styles/index";
 
 .dropdown-menu {
+  width: 124%;
   position: absolute;
-  top: 20px!important;
-  background-color: @day-primary;
+  top: 22px!important;
+  left: 2px!important;
+  background-color: @bg-secondary;
+  border-color: @bg-primary;
   .border;
   .radius;
-  padding: 10px;
-  max-height: 166px;
+  padding: 8px;
+  max-height: 152px;
   overflow-y: auto;
   transform: none!important;
 }
 
 .dropdown-menu__toggle {
   display: flex;
+  text-align: left;
   align-items: center;
-  text-transform: uppercase;
   font-size: 13px;
   .semibold;
-  color: @day-title;
   letter-spacing: .7px;
+  color: @text-primary;;
 
-  .fa,
   i {
     margin-left: 6px;
-    font-size: 6px;
+    font-size: 10px;
+    color: @text-secondary;
+    &:hover {
+      color: @text-primary;
+    }
   }
-}
 
-.dropdown-menu__separator {
-  width: 100%;
-  height: 1px;
-  background-color: @grey;
-  opacity: .2;
-  margin: 10px 0;
+  > .scene-name {
+    display: inline-block;
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &:hover,
+    &.active {
+      color: @text-primary;
+    }
+  }
 }
 
 .dropdown-menu__item {
   white-space: nowrap;
   cursor: pointer;
-  color: @grey;
+  color: @text-secondary;
 
   &:hover,
   &.active {
-    color: @navy;
-  }
-}
-
-.night-theme {
-  .dropdown-menu {
-    background-color: @night-primary;
-    border-color: @night-secondary;
-  }
-
-  .dropdown-menu__item {
-    &:hover,
-    &.active {
-      color: @white;
+    color: @text-primary;
+    background-color: @bg-primary;
+    &:before {
+      content:"\003e";
+      position: relative;
+      top: 0;
+      left: -10px;
     }
   }
-
-  .dropdown-menu__toggle {
-    color: @white;
-  }
 }
+
 </style>

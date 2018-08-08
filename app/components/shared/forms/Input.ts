@@ -51,6 +51,8 @@ export interface IFormInput<TValueType> {
   visible?: boolean;
   masked?: boolean;
   type?: TObsType;
+  category?: string;
+  subCategory?: string;
 }
 
 export declare type TFormData = (IFormInput<TObsValue> | IListInput<TObsValue>)[];
@@ -155,6 +157,8 @@ interface IObsFetchOptions {
 }
 
 export function obsValuesToInputValues(
+  category: string,
+  subCategory: string,
   obsProps: Dictionary<any>[],
   options: IObsFetchOptions = {}
 ): TFormData {
@@ -175,7 +179,17 @@ export function obsValuesToInputValues(
       obsValue = obsValue.value;
     }
 
-    prop.description = $t(prop.description);
+    prop.category = category;
+    prop.subCategory = subCategory;
+
+    /*
+      各設定項目の説明に翻訳がかかるようになっている。
+      存在しない場合はOBSが返してくる説明の文言をそのまま返す。
+    */
+    prop.description = $t(
+      `settings.${category}['${subCategory}']['${prop.name}'].name`,
+      { fallback: prop.description }
+    );
     prop.value = obsValue;
     prop.masked = !!obsProp.masked;
     prop.enabled = !!obsProp.enabled;
@@ -188,11 +202,21 @@ export function obsValuesToInputValues(
     if (['OBS_PROPERTY_LIST', 'OBS_INPUT_RESOLUTION_LIST'].includes(obsProp.type)) {
       const listOptions: any[] = [];
 
-      if (options.transformListOptions) for (const listOption of (obsProp.values || []))  {
-        listOptions.push({
-          value: listOption[Object.keys(listOption)[0]],
-          description: $t(Object.keys(listOption)[0])
-        });
+      if (options.transformListOptions) {
+        for (const listOption of (obsProp.values || []))  {
+          const key = Object.keys(listOption)[0];
+          /*
+            リストから選択する項目にも翻訳がかかるようになっている。
+            存在しない場合はOBSが返してくる説明の文言をそのまま返す。
+          */
+          listOptions.push({
+            value: listOption[key],
+            description: $t(
+              `settings.${category}['${subCategory}']['${obsProp.name}']['${listOption[key]}']`,
+              { fallback: key }
+            )
+          });
+        }
       }
 
       if (options.subParametersGetter) {
@@ -200,7 +224,9 @@ export function obsValuesToInputValues(
       }
 
       for (const listOption of listOptions) {
-        if (listOption.description === void 0) listOption.description = listOption['name'];
+        if (listOption.description === void 0) {
+          listOption.description = listOption['name'];
+        }
       }
 
       const needToSetDefaultValue = listOptions.length && prop.value === void 0;
@@ -292,9 +318,9 @@ export function inputValuesToObsValues(
 
 
 export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
-
   setupSourceDefaults(obsSource);
 
+  const sourceType = obsSource.id;
   const formData: TFormData = [];
   const obsProps = obsSource.properties;
   const obsSettings = obsSource.settings;
@@ -336,7 +362,10 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
     const formItem: IFormInput<TObsValue> = {
       value: obsSettings[obsProp.name],
       name: obsProp.name,
-      description: $t(obsProp.description),
+      description: $t(
+        `source-props.${sourceType}['${obsProp.name}'].name`,
+        { fallback: obsProp.description }
+      ),
       enabled: obsProp.enabled,
       visible: obsProp.visible,
       type: obsType
@@ -346,7 +375,13 @@ export function getPropertiesFormData(obsSource: obs.ISource): TFormData {
 
     if (isListProperty(obsProp)) {
       const options: IListOption<any>[] = obsProp.details.items.map(option => {
-        return { value: option.value, description: option.name };
+        return {
+          value: option.value,
+          description: $t(
+            `source-props.${sourceType}['${obsProp.name}']['${option.value}']`,
+            { fallback: option.name }
+          )
+        };
       });
       (formItem as IListInput<TObsValue>).options = options;
     }
@@ -448,11 +483,16 @@ export function setupSourceDefaults(obsSource: obs.ISource) {
   if (needUpdate) obsSource.update(defaultSettings);
 }
 
-
 export abstract class Input<TValueType> extends Vue {
 
   @Prop()
   value: TValueType;
+
+  @Prop()
+  category: string;
+
+  @Prop()
+  subCategory: string;
 
   emitInput(eventData: TValueType) {
     this.$emit('input', eventData);

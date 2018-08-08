@@ -13,15 +13,6 @@ export type TUsageEvent =
   'app_start' |
   'app_close';
 
-interface IUsageApiData {
-  installer_id?: string;
-  version: string;
-  slobs_user_id: string;
-  event: TUsageEvent;
-  data: string;
-}
-
-
 export function track(event: TUsageEvent) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
 
@@ -41,7 +32,7 @@ export class UsageStatisticsService extends Service {
   @Inject() hostsService: HostsService;
 
   installerId: string;
-  version = electron.remote.process.env.SLOBS_VERSION;
+  version = electron.remote.process.env.NAIR_VERSION;
 
   init() {
     this.loadInstallerId();
@@ -84,33 +75,8 @@ export class UsageStatisticsService extends Service {
    * @param metadata arbitrary data to store with the event (must be serializable)
    */
   recordEvent(event: TUsageEvent, metadata: object = {}) {
-    if (!this.isProduction) return;
-
-    const headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-
-    const bodyData: IUsageApiData = {
-      slobs_user_id: this.userService.getLocalUserId(),
-      version: this.version,
-      event,
-      data: JSON.stringify(metadata)
-    };
-
-    if (this.userService.isLoggedIn()) {
-      authorizedHeaders(this.userService.apiToken, headers);
-    }
-
-    if (this.installerId) {
-      bodyData.installer_id = this.installerId;
-    }
-
-    const request = new Request(`https://${this.hostsService.streamlabs}/api/v5/slobs/log`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(bodyData)
-    });
-
-    return fetch(request);
+    // TODO
+    return;
   }
 
 }

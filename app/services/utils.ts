@@ -38,11 +38,11 @@ export default class Utils {
   }
 
   static isPreview(): boolean {
-    return electron.remote.process.env.SLOBS_PREVIEW;
+    return electron.remote.process.env.NAIR_PREVIEW;
   }
 
   static isIpc(): boolean {
-    return electron.remote.process.env.SLOBS_IPC;
+    return electron.remote.process.env.NAIR_IPC;
   }
 
   /**

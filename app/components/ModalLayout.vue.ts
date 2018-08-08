@@ -54,7 +54,7 @@ export default class ModalLayout extends Vue {
 
   created() {
     const contentStyle = {
-      padding: '20px',
+      padding: '16px',
       overflow: 'auto'
     };
 
@@ -68,10 +68,6 @@ export default class ModalLayout extends Vue {
     this.fixedStyle = fixedStyle;
 
     electron.remote.getCurrentWindow().setTitle(this.title);
-  }
-
-  get nightTheme() {
-    return this.customizationService.nightMode;
   }
 
   cancel() {

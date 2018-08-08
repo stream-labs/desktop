@@ -2,10 +2,8 @@ import { StatefulService, mutation } from './stateful-service';
 
 type TAppPage =
   | 'Studio'
-  | 'Dashboard'
-  | 'Live'
   | 'Onboarding'
-  | 'BrowseOverlays'
+  | 'Questionaire'
   | 'PatchNotes';
 
 interface INavigationState {

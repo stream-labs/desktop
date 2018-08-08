@@ -6,16 +6,10 @@ import electron from 'electron';
 
 type TOnboardingStep =
   | 'Connect'
-  | 'SelectWidgets'
-  | 'OptimizeA'
-  | 'OptimizeB'
-  | 'OptimizeC'
-  | 'SceneCollectionsImport'
   | 'ObsImport';
 
 interface IOnboardingOptions {
   isLogin: boolean; // When logging into a new account after onboarding
-  isOptimize: boolean; // When re-running the optimizer after onboarding
   isSecurityUpgrade: boolean; // When logging in, display a special message
                               // about our security upgrade.
 }
@@ -40,14 +34,6 @@ interface IOnboardingStep {
 const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   Connect: {
     isEligible: () => true,
-    next: 'SceneCollectionsImport'
-  },
-
-  SceneCollectionsImport: {
-    isEligible: service => {
-      if (service.options.isSecurityUpgrade) return false;
-      return service.userService.isLoggedIn();
-    },
     next: 'ObsImport'
   },
 
@@ -55,29 +41,6 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
     isEligible: service => {
       if (service.options.isLogin) return false;
       return true;
-    },
-    next: 'SelectWidgets'
-  },
-
-  SelectWidgets: {
-    isEligible: service => {
-      if (service.options.isLogin) return false;
-      return service.userService.isLoggedIn();
-    },
-    next: 'OptimizeA'
-  },
-
-  OptimizeA: {
-    isEligible: service => {
-      if (service.options.isLogin) return false;
-      return service.isTwitchAuthed;
-    },
-    next: 'OptimizeB'
-  },
-
-  OptimizeB: {
-    isEligible: service => {
-      return service.completedSteps.includes('OptimizeA');
     }
   }
 };
@@ -88,7 +51,6 @@ export class OnboardingService extends StatefulService<
   static initialState: IOnboardingServiceState = {
     options: {
       isLogin: false,
-      isOptimize: false,
       isSecurityUpgrade: false
     },
     currentStep: null,
@@ -101,9 +63,7 @@ export class OnboardingService extends StatefulService<
   @Inject() userService: UserService;
 
   init() {
-    // This is used for faking authentication in tests.  We have
-    // to do this because Twitch adds a captcha when we try to
-    // actually log in from integration tests.
+    // This is used for faking authentication in tests
     electron.ipcRenderer.on('testing-fakeAuth', () => {
       this.COMPLETE_STEP('Connect');
       this.SET_CURRENT_STEP('ObsImport');
@@ -160,16 +120,13 @@ export class OnboardingService extends StatefulService<
   start(options: Partial<IOnboardingOptions> = {}) {
     const actualOptions: IOnboardingOptions = {
       isLogin: false,
-      isOptimize: false,
       isSecurityUpgrade: false,
       ...options
     };
 
-    const step = options.isOptimize ? 'OptimizeA' : 'Connect';
-
     this.RESET_COMPLETED_STEPS();
     this.SET_OPTIONS(actualOptions);
-    this.SET_CURRENT_STEP(step);
+    this.SET_CURRENT_STEP('Connect');
     this.navigationService.navigate('Onboarding');
   }
 
@@ -177,13 +134,6 @@ export class OnboardingService extends StatefulService<
   finish() {
     localStorage.setItem(this.localStorageKey, 'true');
     this.navigationService.navigate('Studio');
-  }
-
-  get isTwitchAuthed() {
-    return (
-      this.userService.isLoggedIn() &&
-      this.userService.platform.type === 'twitch'
-    );
   }
 
   private goToNextStep(step: TOnboardingStep) {

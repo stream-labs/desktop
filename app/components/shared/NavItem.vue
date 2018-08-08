@@ -17,29 +17,30 @@
 .nav-item {
   cursor: pointer;
   list-style: none;
-  border-left: 1px solid transparent;
-  padding-left: 50px;
+  border-left: 4px solid transparent;
+  padding: 8px 0 8px 36px;
   opacity: 0.7;
-  font-size: 14px;
-  margin-bottom: 5px;
+  font-size: 16px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
   &.active {
     opacity: 1;
+    background: @bg-secondary;
     .semibold;
-    border-color: @navy;
-    color: @navy;
+    border-color: @text-primary;
+    color: @text-primary;
 
-    .fa,
     i {
-      color: @navy;
+      color: @text-primary;
     }
   }
 
   &:hover {
     opacity: 1;
+    background: @bg-secondary;
   }
 
   &.disabled {
@@ -47,9 +48,7 @@
     cursor: default;
   }
 
-  .fa,
   i {
-    color: #999;
     position: relative;
     margin-right: -15px;
     left: -25px;
@@ -62,20 +61,6 @@
   max-width: calc(~"100% - 20px");
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.night-theme {
-  .nav-item {
-    &.active {
-      border-color: @white;
-      color: @white;
-
-      .fa,
-      i {
-        color: @white;
-      }
-    }
-  }
 }
 
 </style>

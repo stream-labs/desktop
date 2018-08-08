@@ -1,10 +1,6 @@
 import electron from 'electron';
 import { Service } from './services/service';
-import { AutoConfigService } from './services/auto-config';
 import { ObsImporterService } from './services/obs-importer';
-import { YoutubeService } from './services/platforms/youtube';
-import { TwitchService } from './services/platforms/twitch';
-import { MixerService } from './services/platforms/mixer';
 import { ScenesService, SceneItem, SceneItemFolder, Scene, SceneItemNode } from './services/scenes';
 import { ClipboardService } from './services/clipboard';
 import { AudioService, AudioSource } from './services/audio';
@@ -23,7 +19,6 @@ import { SettingsService } from './services/settings';
 import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
-import { WidgetsService } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
 import { TransitionsService } from 'services/transitions';
@@ -31,13 +26,11 @@ import { FontLibraryService } from './services/font-library';
 import { SourceFiltersService } from './services/source-filters';
 import { AppService } from './services/app';
 import { ShortcutsService } from './services/shortcuts';
-import { CacheUploaderService } from './services/cache-uploader';
 import { TcpServerService } from './services/tcp-server';
 import { IpcServerService } from './services/ipc-server';
 import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
-import { StreamlabelsService } from './services/streamlabels';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -45,14 +38,11 @@ import { ObserveList } from './util/service-observer';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { Observable } from 'rxjs/Observable';
-import { GuestApiService } from 'services/guest-api';
 import { VideoEncodingOptimizationService } from 'services/video-encoding-optimizations';
 import { DismissablesService } from 'services/dismissables';
-import { SceneCollectionsServerApiService } from 'services/scene-collections/server-api';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
-import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import {
   IJsonRpcResponse,
@@ -65,13 +55,11 @@ import {
 import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
-import { WebsocketService } from 'services/websocket';
 import { ProjectorService } from 'services/projector';
-import { FacemasksService } from 'services/facemasks';
 import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
-import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
+import { QuestionaireService } from 'services/questionaire';
 
 const { ipcRenderer } = electron;
 
@@ -82,10 +70,6 @@ export class ServicesManager extends Service {
    * list of used application services
    */
   private services: Dictionary<any> = {
-    AutoConfigService,
-    YoutubeService,
-    TwitchService,
-    MixerService,
     ScenesService,
     SceneItemNode,
     SceneItem,
@@ -113,23 +97,17 @@ export class ServicesManager extends Service {
     StreamingService,
     UserService,
     VideoService,
-    WidgetsService,
     WindowsService,
     FontLibraryService,
     ObsImporterService,
-    OverlaysPersistenceService,
     AppService,
     ShortcutsService,
-    CacheUploaderService,
     UsageStatisticsService,
     IpcServerService,
     TcpServerService,
     StreamInfoService,
-    StreamlabelsService,
-    GuestApiService,
     VideoEncodingOptimizationService,
     DismissablesService,
-    SceneCollectionsServerApiService,
     SceneCollectionsService,
     SceneCollectionsStateService,
     TroubleshooterService,
@@ -141,12 +119,10 @@ export class ServicesManager extends Service {
     ProtocolLinksService,
     ProjectorService,
     TransitionsService,
-    FacemasksService,
     ProfanityFilterService,
     I18nService,
-    MediaBackupService,
-    WebsocketService,
-    OutageNotificationsService
+    OutageNotificationsService,
+    QuestionaireService,
   };
 
   private instances: Dictionary<Service> = {};
@@ -499,8 +475,9 @@ export class ServicesManager extends Service {
           return this.applyIpcProxy(target[property]);
         }
 
-        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable))
+        if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {
           return target[property];
+        }
 
         const serviceName = target.constructor.name;
         const methodName = property;

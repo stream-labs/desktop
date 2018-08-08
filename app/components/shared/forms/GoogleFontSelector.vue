@@ -1,11 +1,11 @@
 <template>
-<div class="google-font-selector">
+<div :data-test="testingAnchor" class="google-font-selector">
   <div>
     <div class="input-container">
       <div class="input-label">
         <label>
-          Font Family
-          <i v-if="loading" class="fa fa-spinner fa-pulse google-font-loading" />
+          {{ $t('settings.fontFamily') }}
+          <i v-if="loading" class="icon-spinner icon-spin google-font-loading" />
         </label>
       </div>
       <div class="input-wrapper">
@@ -20,8 +20,8 @@
     <div class="input-container">
       <div class="input-label">
         <label>
-          Font Style
-          <i v-if="loading" class="fa fa-spinner fa-pulse google-font-loading" />
+          {{ $t('settings.fontStyle') }}
+          <i v-if="loading" class="icon-spinner icon-spin google-font-loading" />
         </label>
       </div>
       <div class="input-wrapper">
@@ -32,6 +32,9 @@
           :disabled="loading"
           @input="setStyle">
         </multiselect>
+        <template slot="noResult">
+          {{ $t('settings.itemNotFoundMessage') }}
+        </template>
       </div>
     </div>
     <font-size-selector :value="value.size" @input="setSize" />
@@ -44,5 +47,17 @@
 <style lang="less" scoped>
 .google-font-loading {
   margin-left: 5px;
+}
+.icon-spin {
+  animation: icon-spin 2s infinite linear;
+}
+
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
 }
 </style>

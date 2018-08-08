@@ -126,7 +126,7 @@ export class PerformanceMonitorService extends StatefulService<IMonitorState> {
       data: factor,
       lifeTime: -1,
       showTime: true,
-      message: $t('Skipped frames detected:') +  Math.round(factor * 100) + '%',
+      message: $t('notifications.skippedFramesDetected') +  Math.round(factor * 100) + '%',
       action: this.jsonrpcService.createRequest(
         Service.getResourceId(this.troubleshooterService),
         'showTroubleshooter',

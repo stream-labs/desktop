@@ -98,10 +98,7 @@ export default class StudioEditor extends Vue {
 
     const parent = overSource.getParent();
 
-    if (
-      (this.customizationService.getSettings().folderSelection) &&
-      (!parent || parent && parent.isSelected())
-    ) {
+    if (!parent || parent && parent.isSelected()) {
       this.selectionService.select(overSource.id);
     } else if (parent) {
       this.selectionService.select(parent.id);
@@ -142,10 +139,9 @@ export default class StudioEditor extends Vue {
       // Either select a new source, or deselect all sources
       if (overSource) {
 
-        let overNode: TSceneNode = overSource;
-        if (this.customizationService.getSettings().folderSelection) {
-          overNode = overSource.hasParent() ? overSource.getParent() : overSource;
-        }
+        const overNode: TSceneNode = overSource.hasParent()
+          ? overSource.getParent()
+          : overSource;
 
         if (event.ctrlKey) {
           if (overNode.isSelected()) {

@@ -44,9 +44,9 @@ export default class NameScene extends Vue {
     } else if (this.options.sceneToDuplicate) {
       name = this.options.sceneToDuplicate;
     } else if (this.options.itemsToGroup) {
-      name = `${this.scenesService.activeScene.name} Group`;
+      name = $t('scenes.newSceneGroupName', { activeSceneName: this.scenesService.activeScene.name });
     } else {
-      name = 'New Scene';
+      name = $t('scenes.newSceneName');
     }
 
     this.name = this.sourcesService.suggestName(name);
@@ -56,7 +56,7 @@ export default class NameScene extends Vue {
     const activeScene = this.scenesService.activeScene;
 
     if (!this.name) {
-      this.error = $t('The scene name is required');
+      this.error = $t('scenes.nameIsRequired');
     } else if (this.options.rename) {
       this.scenesService.getSceneByName(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();

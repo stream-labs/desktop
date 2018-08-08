@@ -1,25 +1,22 @@
 <template>
 <modal-layout
   :showControls="false"
-  :title="$t('Advanced Audio Settings')">
+  :title="$t('audio.advancedAudioSettings')">
 
   <div slot="content">
-
-
     <table>
-
       <tr>
-        <th>{{ $t('Name') }}</th>
-        <th>{{ $t('Volume ( % )') }}</th>
-        <th>{{ $t('Downmix to Mono') }}</th>
-        <th>{{ $t('Sync Offset ( ms )') }}</th>
-        <th>{{ $t('Audio Monitoring') }}</th>
-        <th>{{ $t('Tracks') }}</th>
+        <th class="device">{{ $t('common.name') }}</th>
+        <th class="volume">{{ $t('audio.volumeInPercent') }}</th>
+        <th class="downmix">{{ $t('audio.downmixToMono') }}</th>
+        <th class="syncOffset">{{ $t('audio.syncOffsetInMs') }}</th>
+        <th class="audioMonitor">{{ $t('audio.audioMonitoring') }}</th>
+        <th class="track">{{ $t('audio.tracks') }}</th>
       </tr>
 
-      <tr v-for="audioSource in audioSources">
+      <tr v-for="audioSource in audioSources" :key="audioSource.sourceId">
         <td>{{ audioSource.name }}</td>
-        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name">
+        <td v-for="formInput in audioSource.getSettingsForm()" :class="'column-' + formInput.name" :key="formInput.name">
           <component
               v-if="propertyComponentForType(formInput.type)"
               :is="propertyComponentForType(formInput.type)"
@@ -41,8 +38,29 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.column-deflection {
+table {
+  min-width: 1060px;
+}
+
+.volume {}
+.device {
+  width: 150px;
+}
+.downmix {
   width: 120px;
+}
+.syncOffset {}     
+.audioMonitor {}
+.track {}
+
+.device,
+.volume,
+.downmix,
+.syncOffset,     
+.audioMonitor,
+.track {
+  color: @text-secondary;
+  text-align: center;
 }
 
 tr {
@@ -56,5 +74,15 @@ tr {
 th,
 td {
   text-align: left;
+}
+
+.column-deflection {
+  width: 80px;
+}
+.column-syncOffset {
+  width: 100px;
+}
+.column-monitoringType {
+  width: 260px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-<div class="modal-layout" :class="{'night-theme': nightTheme}">
+<div class="modal-layout" data-test="ModalLayout">
   <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
@@ -10,19 +10,21 @@
     class="modal-layout-content"
     :style="contentStyle">
     <slot name="content" v-if="!loading"/>
-    <i class="fa fa-spinner fa-pulse modal-layout-spinner" v-else/>
+    <i class="icon-spinner icon-spin modal-layout-spinner" v-else/>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button
       v-if="showCancel"
       class="button button--default"
-      @click="cancel">
-      {{ $t('Cancel') }}
+      @click="cancel"
+      data-test="Cancel">
+      {{ $t('common.cancel') }}
     </button>
     <button
       class="button button--action"
-      @click="doneHandler">
-      {{ $t('Done') }}
+      @click="doneHandler"
+      data-test="Done">
+      {{ $t('common.done') }}
     </button>
   </div>
   <div v-if="customControls" class="modal-layout-controls">
@@ -40,7 +42,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  color: @grey;
+  color: @text-primary;
+  background-color: @bg-primary;
 }
 
 .modal-layout-titlebar {
@@ -65,9 +68,9 @@
 }
 
 .modal-layout-controls {
-  background-color: @day-secondary;
-  border-top: 1px solid @day-border;
-  padding: 10px 20px;
+  background-color: @bg-primary;
+  box-shadow: 0 -5px 10px 2px #2F3340;
+  padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
@@ -90,14 +93,16 @@
   overflow: auto;
 }
 
-.night-theme {
-  &.modal-layout {
-    background-color: @night-primary;
-  }
+.icon-spin {
+  animation: icon-spin 2s infinite linear;
+}
 
-  .modal-layout-controls {
-    border-top-color: @night-border;
-    background-color: @night-primary;
+@keyframes icon-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
   }
 }
 </style>

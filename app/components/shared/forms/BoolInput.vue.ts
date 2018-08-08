@@ -8,6 +8,7 @@ class BoolInput extends Input<IFormInput<boolean>> {
 
   @Prop()
   value: IFormInput<boolean>;
+  testingAnchor = `Form/Bool/${this.value.name}`;
 
   handleClick() {
     if (this.value.enabled === false) return;

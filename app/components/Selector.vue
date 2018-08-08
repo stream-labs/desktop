@@ -1,5 +1,5 @@
 <template>
-<ul class="selector-list" @contextmenu="handleContextMenu()">
+<ul class="selector-list" @contextmenu="handleContextMenu()" data-test="Selector">
   <draggable
     :list="normalizedItems"
     :options="{draggable: draggableSelector}"
@@ -8,11 +8,12 @@
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
       v-for="(item, index) in normalizedItems"
+      :key="item.name"
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
-      <div class="selector-item-text">
-        {{item.name}}
+      <div class="selector-item-text" :data-test="item.name">
+        <span class="layer-icon"><i class="icon-studio-mode"/></span>{{item.name}}
       </div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
@@ -30,11 +31,13 @@
 .sortable-ghost {
   opacity: .7;
   background-image: none;
+  background: @accent-light;
 }
 
 .sortable-chosen {
   opacity: .7;
   background-image: none;
+  background: @accent-light;
 }
 
 .sortable-drag {
@@ -52,23 +55,19 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px 12px;
+  padding: 4px 8px;
   cursor: pointer;
   justify-content: space-between;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-  color: @navy;
+  color: @text-secondary;
   .transition;
   margin-top: -1px;
 
+  &:hover {
+    color: @text-primary;
+  }
   &.selector-item--active {
-    background-color: @white;
-    border-color: @day-border;
-    color: @navy-secondary;
-
-    .selector-actions {
-      opacity: 1;
-    }
+    background-color: @hover;
+    color: @text-primary;
   }
 
   &:hover {
@@ -78,6 +77,17 @@
   }
 }
 
+.layer-icon {
+  display: inline-block;
+  text-align: left;
+  width: 16px;
+  margin-right: 4px;
+
+  i {
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
 .selector-item-text {
   text-overflow: ellipsis;
   max-width: 100%;
@@ -99,20 +109,4 @@
   .icon-hover;
 }
 
-.night-theme {
-  .sortable-ghost,
-  .sortable-chosen {
-    background: @night-accent-light;
-  }
-
-  .selector-item {
-    color: @grey;
-
-    &.selector-item--active {
-      background-color: @night-hover;
-      border-color: transparent;
-      color: @white;
-    }
-  }
-}
 </style>

@@ -5,58 +5,69 @@ import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
-import { MediaBackupService, EGlobalSyncStatus } from 'services/media-backup';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+const StartStreamingIcon = require('../../media/images/start-streaming-icon.svg');
 
-@Component({})
+@Component({
+  components: {
+    StartStreamingIcon
+  }
+})
 export default class StartStreamingButton extends Vue {
   @Inject() streamingService: StreamingService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
-  @Inject() mediaBackupService: MediaBackupService;
 
   @Prop() disabled: boolean;
 
   async toggleStreaming() {
     if (this.streamingService.isStreaming) {
       this.streamingService.toggleStreaming();
-    } else {
-      if (this.mediaBackupService.globalSyncStatus === EGlobalSyncStatus.Syncing) {
-        const goLive = await new Promise<boolean>(resolve => {
+      return;
+    }
+
+    console.log('Start Streaming button: platform=' + JSON.stringify(this.userService.platform));
+    if (this.userService.platform && this.userService.platform.type === 'niconico') {
+      try {
+        const streamkey = await this.userService.updateStreamSettings();
+        if (streamkey === '') {
+          return new Promise(resolve => {
+            electron.remote.dialog.showMessageBox(
+              electron.remote.getCurrentWindow(),
+              {
+                title: $t('streaming.notBroadcasting'),
+                type: 'warning',
+                message: $t('streaming.notBroadcastingMessage'),
+                buttons: [$t('common.close')],
+                noLink: true,
+              },
+              done => resolve(done)
+            );
+          });
+        }
+      } catch (e) {
+        const message = e instanceof Response
+          ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
+          : $t('streaming.broadcastStatusFetchingError.default');
+
+          return new Promise(resolve => {
           electron.remote.dialog.showMessageBox(
             electron.remote.getCurrentWindow(),
             {
-              title: $t('Cloud Backup'),
               type: 'warning',
-              message: $t('Your media files are currently being synced with the cloud. ') +
-                $t('It is recommended that you wait until this finishes before going live.'),
-              buttons: [$t('Wait'), $t('Go Live Anyway')]
+              message,
+              buttons: [$t('common.close')],
+              noLink: true,
             },
-            goLive => {
-              resolve(!!goLive);
-            }
+            done => resolve(done)
           );
         });
-
-        if (!goLive) return;
-      }
-
-      if (
-        this.userService.isLoggedIn() &&
-        this.customizationService.state.updateStreamInfoOnLive &&
-        (this.userService.platform.type === 'twitch' ||
-        this.userService.platform.type === 'mixer')
-      ) {
-        this.streamingService.showEditStreamInfo();
-      } else {
-        this.streamingService.toggleStreaming();
-        if (this.userService.isLoggedIn()) {
-          this.navigationService.navigate('Live');
-        }
       }
     }
+
+    this.streamingService.toggleStreaming();
   }
 
   get streamingStatus() {
@@ -65,30 +76,30 @@ export default class StartStreamingButton extends Vue {
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
-      return $t('END STREAM');
+      return $t('streaming.endStream');
     }
 
     if (this.streamingStatus === EStreamingState.Starting) {
       if (this.streamingService.delayEnabled) {
-        return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
+        return $t('streaming.startingWithDelay', { delaySeconds: this.streamingService.delaySecondsRemaining });
       }
 
-      return $t('STARTING');
+      return $t('streaming.starting');
     }
 
     if (this.streamingStatus === EStreamingState.Ending) {
       if (this.streamingService.delayEnabled) {
-        return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
+        return $t('streaming.endingWithDelay', { delaySeconds: this.streamingService.delaySecondsRemaining });
       }
 
-      return $t('ENDING');
+      return $t('streaming.ending');
     }
 
     if (this.streamingStatus === EStreamingState.Reconnecting) {
-      return $t('RECONNECTING');
+      return $t('streaming.reconnecting');
     }
 
-    return $t('GO LIVE');
+    return $t('streaming.goLive');
   }
 
   getIsRedButton() {

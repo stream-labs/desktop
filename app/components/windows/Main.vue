@@ -1,10 +1,7 @@
 <template>
-<div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
+<div class="main" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
-  <div class="main-spacer bgColor-teal"></div>
   <div class="main-contents">
-    <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
-
     <div class="main-middle">
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <div v-if="shouldLockContent" class="main-loading">
@@ -18,8 +15,6 @@
         :params="params"/>
       <studio-footer v-if="(page !== 'Onboarding')" :locked="applicationLoading" />
     </div>
-
-    <live-dock v-if="isLoggedIn && !leftDock && !isOnboarding" />
   </div>
 </div>
 </template>
@@ -47,10 +42,6 @@
   flex-direction: column;
 }
 
-.main-spacer {
-  height: 4px;
-}
-
 .main-page-container {
   /* Page always takes up remaining space */
   flex-grow: 1;
@@ -65,4 +56,5 @@
   align-items: center;
   justify-content: center;
 }
+
 </style>

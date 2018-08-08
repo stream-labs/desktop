@@ -55,9 +55,9 @@ export default class Projector extends Vue {
   get title() {
     if (this.sourceId) {
       const name = this.sourcesService.getSource(this.sourceId).name;
-      return $t('Projector:') + name;
+      return $t('scenes.projectorPrefix') + name;
     }
-    return $t('Projector: Output');
+    return $t('scenes.outputProjector');
   }
 
 }

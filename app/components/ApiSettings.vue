@@ -19,6 +19,7 @@
 
     <GenericFormGroups
       v-model="settingsFormData"
+      category="API"
       @input="save" />
   </div>
 </template>

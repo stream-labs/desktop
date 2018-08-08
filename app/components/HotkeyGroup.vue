@@ -6,10 +6,10 @@
       @click="collapsed = !collapsed">
       <i
         v-if="collapsed === true"
-        class="fa fa-plus"/>
+        class="icon-plus"/>
       <i
         v-if="collapsed === false"
-        class="fa fa-minus"/>
+        class="icon-minus"/>
       {{ title }}
     </h4>
   </div>

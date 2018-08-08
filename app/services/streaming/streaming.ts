@@ -99,7 +99,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Offline) {
       const shouldConfirm = this.settingsService.state.General
         .WarnBeforeStartingStream;
-      const confirmText = 'Are you sure you want to start streaming?';
+      const confirmText = $t('streaming.startStreamingConfirm');
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
@@ -123,16 +123,18 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
     if (
       this.state.streamingStatus === EStreamingState.Starting ||
-      this.state.streamingStatus === EStreamingState.Live
+      this.state.streamingStatus === EStreamingState.Live ||
+      this.state.streamingStatus === EStreamingState.Reconnecting
     ) {
       const shouldConfirm = this.settingsService.state.General
         .WarnBeforeStoppingStream;
-      const confirmText = $t('Are you sure you want to stop streaming?');
+      const confirmText = $t('streaming.stopStreamingConfirm');
 
       if (shouldConfirm && !confirm(confirmText)) return;
 
-      if (this.powerSaveId)
+      if (this.powerSaveId) {
         electron.remote.powerSaveBlocker.stop(this.powerSaveId);
+      }
 
       this.obsApiService.nodeObs.OBS_service_stopStreaming(false);
 
@@ -178,17 +180,6 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       this.obsApiService.nodeObs.OBS_service_startRecording();
       return;
     }
-  }
-
-  showEditStreamInfo() {
-    this.windowsService.showWindow({
-      componentName: 'EditStreamInfo',
-      queryParams: {},
-      size: {
-        width: 500,
-        height: 400
-      }
-    });
   }
 
   get delayEnabled() {
@@ -246,21 +237,14 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.streamingStatusChange.next(EStreamingState.Live);
 
         let streamEncoderInfo: Dictionary<string> = {};
-        let game: string = null;
 
         try {
           streamEncoderInfo = this.settingsService.getStreamEncoderSettings();
-          if (this.streamInfoService.state.channelInfo) {
-            game = this.streamInfoService.state.channelInfo.game;
-          }
         } catch (e) {
           console.error('Error fetching stream encoder info: ', e);
         }
 
-        this.usageStatisticsService.recordEvent('stream_start', {
-          ...streamEncoderInfo,
-          game
-        });
+        this.usageStatisticsService.recordEvent('stream_start', streamEncoderInfo);
       } else if (info.signal === EOBSOutputSignal.Starting) {
         this.SET_STREAMING_STATUS(EStreamingState.Starting, time);
         this.streamingStatusChange.next(EStreamingState.Starting);
@@ -301,25 +285,23 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
       if (info.code === EOutputCode.BadPath) {
         errorText =
-          $t('Invalid Path or Connection URL.  Please check your settings to confirm that they are valid.');
+          $t('streaming.badPathError');
       } else if (info.code === EOutputCode.ConnectFailed) {
         errorText =
-          $t('Failed to connect to the streaming server.  Please check your internet connection.');
+          $t('streaming.connectFailedError');
       } else if (info.code === EOutputCode.Disconnected) {
         errorText =
-          $t('Disconnected from the streaming server.  Please check your internet connection.');
+          $t('streaming.disconnectedError');
       } else if (info.code === EOutputCode.InvalidStream) {
         errorText =
-          $t('Could not access the specified channel or stream key, please double-check your stream key.  ') +
-          $t('If it is correct, there may be a problem connecting to the server.');
+          $t('streaming.invalidStreamError');
       } else if (info.code === EOutputCode.NoSpace) {
-        errorText = $t('There is not sufficient disk space to continue recording.');
+        errorText = $t('streaming.noSpaceError');
       } else if (info.code === EOutputCode.Unsupported) {
         errorText =
-          $t('The output format is either unsupported or does not support more than one audio track.  ') +
-          $t('Please check your settings and try again.');
+          $t('streaming.unsupportedError');
       } else if (info.code === EOutputCode.Error) {
-        errorText = $t('An unexpected error occurred:') + info.error;
+        errorText = $t('streaming.error') + info.error;
       }
 
       alert(errorText);

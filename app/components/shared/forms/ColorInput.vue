@@ -1,5 +1,5 @@
 <template>
-<div>
+<div :data-test="testingAnchor">
   <div class="input-container">
     <div class="input-label">
       <label>{{ value.description }}</label>
@@ -60,25 +60,18 @@
 .colorpicker-menu {
   top: 6px;
   z-index: 10;
-  background: @day-input-bg !important;
   .radius !important;
-  border: 1px solid @day-input-border !important;
+  background: @bg-secondary !important;
+  border-color: @bg-secondary !important;
   box-shadow: none !important;
 }
 
-.night-theme {
-  .colorpicker-menu {
-    background: @night-secondary !important;
-    border-color: @night-secondary !important;
-  }
-
-  .vue-color__editable-input__label {
-    color: @grey !important;
-  }
-
-  .vue-color__sketch__presets {
-    border-color: @night-border;
-  }
-
+.vue-color__editable-input__label {
+  color: @text-primary !important;
 }
+
+.vue-color__sketch__presets {
+  border-color: @border;
+}
+
 </style>

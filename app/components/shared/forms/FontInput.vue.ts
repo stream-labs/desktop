@@ -12,6 +12,7 @@ class FontInput extends Input<IFormInput<IFont>> {
 
   @Prop()
   value: IFormInput<IFont>;
+  testingAnchor = `Form/Font/${this.value.name}`;
 
   isGoogleFont = !!this.value.value.path;
 

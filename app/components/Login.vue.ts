@@ -4,6 +4,7 @@ import { UserService } from 'services/user';
 import { OnboardingService } from 'services/onboarding';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
+import electron from 'electron';
 
 @Component({})
 export default class Login extends Vue {
@@ -17,9 +18,18 @@ export default class Login extends Vue {
   get username() {
     return this.userService.username;
   }
+  get userIcon() {
+    return this.userService.userIcon;
+  }
+  get userId() {
+    return this.userService.platformId;
+  }
+  get userPageURL() {
+    return this.userService.platformUserPageURL;
+  }
 
   logout() {
-    if (confirm($t('Are you sure you want to log out?'))) {
+    if (confirm($t('common.logoutConfirmMessage'))) {
       this.userService.logOut();
     }
   }
@@ -28,4 +38,7 @@ export default class Login extends Vue {
     this.onboardingService.start({ isLogin: true });
   }
 
+  openUserpage() {
+    electron.remote.shell.openExternal(this.userPageURL);
+  }
 }

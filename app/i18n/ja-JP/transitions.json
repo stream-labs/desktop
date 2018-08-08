@@ -1,12 +1,12 @@
 {
-  "Scene transition": "シーン切り替え",
-  "Cut": "カット",
-  "Fade": "フェード",
-  "Swipe": "スワイプ",
-  "Slide": "スライド",
-  "Fade to Color": "カラーにフェードします。",
-  "Luma Wipe": "ルミナンス ワイプ",
-  "Stinger": "スティンガー",
-  "Transition": "遷移",
-  "Duration": "期間"
+  "sceneTransition": "シーン切り替え",
+  "cut_transition": "カット",
+  "fade_transition": "フェード",
+  "swipe_transition": "スワイプ",
+  "slide_transition": "スライド",
+  "fade_to_color_transition": "カラーフェード",
+  "wipe_transition": "ルミナンスワイプ",
+  "obs_stinger_transition": "スティンガー",
+  "transition": "種類",
+  "duration": "時間（ミリ秒）"
 }

@@ -38,7 +38,7 @@ const CPU_profile: IProfile = {
   description: 'Medium',
   preset: PresetType.veryfast,
   get longDescription() {
-    return $t('Optimized profile for average CPUs');
+    return $t('streaming.optimizedProfileForAverageCpUs');
   }
 };
 
@@ -47,7 +47,7 @@ const VQ_profile: IProfile = {
   description: 'Low',
   preset: PresetType.ultrafast,
   get longDescription() {
-    return $t('Optimized profile for weak CPUs');
+    return $t('streaming.optimizedProfileForWeakCpUs');
   }
 };
 

@@ -1,18 +1,16 @@
 <template>
-<div rel="SceneSelector">
+<div data-test="SceneSelector">
   <div class="studio-controls-top">
 
     <div class="scene-collections-wrapper">
 
       <DropdownMenu class="scene-collections__dropdown" :title="activeCollection.name">
         <div class="input-wrapper input-wrapper--search">
-          <input class="input--search" type="text" :placeholder="$t('Search')" v-model="searchQuery" />
+          <input class="input--search" type="text" :placeholder="$t('common.search')" v-model="searchQuery" />
         </div>
-
-        <div class="link link--pointer" @click="manageCollections">
-          {{ $t('Manage All') }}
-        </div>
-        <div class="dropdown-menu__separator"></div>
+        <a class="link settings-link" @click="manageCollections">
+          <i class="icon-settings"/>
+        </a>
         <div
           v-for="sceneCollection in sceneCollections"
           :key="sceneCollection.id"
@@ -28,14 +26,17 @@
 
     <div>
       <i
-        class="icon-add icon-btn icon-btn--lg"
-        @click="addScene"/>
+        class="icon-add-file icon-btn icon-btn--lg"
+        @click="addScene"
+        data-test="Add" />
       <i
-        class="icon-subtract icon-btn icon-btn--lg"
-        @click="removeScene"/>
+        class="icon-delete icon-btn icon-btn--lg"
+        @click="removeScene"
+        data-test="Remove" />
       <i
         class="icon-settings icon-btn icon-btn--lg"
-        @click="showTransitions"/>
+        @click="showTransitions"
+        data-test="Edit" />
     </div>
   </div>
 
@@ -50,10 +51,10 @@
 
   <help-tip :dismissable-key="helpTipDismissable">
     <div slot="title">
-      {{ $t('Scene Collections') }}
+      {{ $t('scenes.sceneCollections') }}
     </div>
     <div slot="content">
-      {{ $t('This is where your Scene Collections live. Clicking the title will dropdown a menu where you can view & manage.') }}
+      {{ $t('scenes.sceneCollectionSelectionDescription') }}
     </div>
   </help-tip>
 </div>
@@ -71,11 +72,23 @@
 }
 
 .input-wrapper--search {
-  width: 100%;
-  margin-bottom: 10px;
+  width: 89%;
+  margin-bottom: 4px;
+  border-radius: 25%;
+  > input[type="text"] {
+    background-color: @bg-primary!important;
+    border:1px solid @text-secondary;
+    &:focus {
+      background-color: #3a585f!important;
+      border:1px solid @text-primary;
+    }
+  }
 }
 
-.scene-collections__dropdown {
-  min-width: 200px;
+.settings-link {
+  position: absolute;
+  top: 18px;
+  right: 0;
+  display: inline-block;
 }
 </style>

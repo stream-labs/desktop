@@ -1,21 +1,21 @@
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
+import { Subscription } from 'rxjs/Subscription';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import NavMenu from '../shared/NavMenu.vue';
 import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
+import { UserService } from '../../services/user';
 import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
-import OverlaySettings from 'components/OverlaySettings.vue';
 import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
-import RemoteControlSettings from 'components/RemoteControlSettings.vue';
 import LanguageSettings from 'components/LanguageSettings.vue';
 
 @Component({
@@ -27,35 +27,46 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     ExtraSettings,
     Hotkeys,
     ApiSettings,
-    OverlaySettings,
     NotificationsSettings,
     AppearanceSettings,
-    RemoteControlSettings,
     ExperimentalSettings,
     LanguageSettings
   },
   mixins: [windowMixin]
 })
-export default class SceneTransitions extends Vue {
+export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
+  categoryNames = this.settingsService.getCategories();
+  userSubscription: Subscription;
   icons: Dictionary<string> = {
-    General: 'fa fa-th-large',
-    Stream: 'fa fa-globe',
-    Output: 'fa fa-microchip',
-    Video: 'fa fa-film',
-    Audio: 'fa fa-volume-up',
-    Hotkeys: 'fa fa-keyboard-o',
-    Advanced: 'fa fa-cogs',
-    API: 'fa fa-file-code-o',
-    'Scene Collections': 'icon-themes',
-    Notifications: 'fa fa-warning',
-    Appearance: 'fa fa-television',
-    'Remote Control': 'fa fa-play-circle',
-    Experimental: 'fa fa-flask'
+    General: 'icon-settings',
+    Stream: 'icon-video',
+    Output: 'icon-output',
+    Video: 'icon-video',
+    Audio: 'icon-speaker',
+    Hotkeys: 'icon-keyborad',
+    Advanced: 'icon-details-setting',
   };
+
+  mounted() {
+    // Categories depend on whether the user is logged in or not.
+    // When they depend another state, it's time to refine this implementation.
+    this.userSubscription = this.userService.userLoginState.subscribe(() => {
+      this.categoryNames = this.settingsService.getCategories();
+      // reopen settings because new categories may not have previous category
+      this.settingsService.showSettings();
+    });
+  }
+
+  beforeDestroy() {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
 
   get categoryName() {
     return this.windowsService.state.child.queryParams.categoryName || 'General';
@@ -63,10 +74,6 @@ export default class SceneTransitions extends Vue {
 
   set categoryName(name) {
     this.settingsService.showSettings(name);
-  }
-
-  get categoryNames() {
-    return this.settingsService.getCategories();
   }
 
   save(settingsData: ISettingsSubCategory[]) {

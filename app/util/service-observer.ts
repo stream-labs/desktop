@@ -31,4 +31,3 @@ export class ObserveList extends Service {
   }
 }
 
-

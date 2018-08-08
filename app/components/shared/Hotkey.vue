@@ -12,10 +12,10 @@
           :value="getBindingString(binding.binding)"
           @keydown="e => handleKeydown(e, index)"/>
         <i
-          class="Hotkey-control fa fa-plus"
+          class="Hotkey-control icon-plus"
           @click="addBinding(index)"/>
         <i
-          class="Hotkey-control fa fa-minus"
+          class="Hotkey-control icon-minus"
           @click="removeBinding(index)"/>
       </div>
     </transition-group>

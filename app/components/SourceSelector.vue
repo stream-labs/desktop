@@ -1,28 +1,32 @@
 <template>
 
-  <div class="source-selector">
+  <div class="source-selector" data-test="SourceSelector">
     <div class="studio-controls-top">
       <h4 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
-        {{ $t('Sources') }}
+        {{ $t('common.sources') }}
       </h4>
       <div>
         <i
           class="icon-add-folder icon-btn icon-btn--lg"
           @click="addFolder"
-          v-tooltip.bottom="addGroupTooltip" />
+          v-tooltip.bottom="addGroupTooltip"
+          data-test="AddFolder" />
         <i
-          class="icon-add icon-btn icon-btn--lg"
+          class="icon-add-file icon-btn icon-btn--lg"
           @click="addSource"
-          v-tooltip.bottom="addSourceTooltip" />
+          v-tooltip.bottom="addSourceTooltip"
+          data-test="Add" />
         <i
-          class="icon-subtract icon-btn icon-btn--lg"
+          class="icon-delete icon-btn icon-btn--lg"
           :class="{ disabled: activeItemIds.length === 0}" @click="removeItems"
-          v-tooltip.bottom="removeSourcesTooltip" />
+          v-tooltip.bottom="removeSourcesTooltip"
+          data-test="Remove" />
         <i
           :class="{ disabled: !canShowProperties()}"
           class="icon-settings icon-btn"
           @click="sourceProperties"
-          v-tooltip.bottom="openSourcePropertiesTooltip" />
+          v-tooltip.bottom="openSourcePropertiesTooltip"
+          data-test="Edit" />
       </div>
     </div>
 
@@ -41,32 +45,32 @@
       <template slot="title" slot-scope="{ node }">
         <div class="title-container">
           <span class="layer-icon">
-            <i v-if="!node.isLeaf" class="fa fa-folder"></i>
-            <i v-else-if="node.data.type === 'ffmpeg_source'" class="fa fa-file-video-o"></i>
+            <i v-if="!node.isLeaf" class="icon-folder"></i>
+            <i v-else-if="node.data.type === 'ffmpeg_source'" class="icon-media"></i>
             <i v-else-if="node.data.type === 'image_source'" class="icon-image"></i>
-            <i v-else-if="node.data.type === 'slideshow'" class="icon-image"></i>
-            <i v-else-if="node.data.type === 'text_gdiplus'" class="fa fa-font"></i>
-            <i v-else-if="node.data.type === 'text_ft2_source'" class="fa fa-font"></i>
-            <i v-else-if="node.data.type === 'dshow_input'" class="icon-webcam"></i>
+            <i v-else-if="node.data.type === 'slideshow'" class="icon-slideshow"></i>
+            <i v-else-if="node.data.type === 'text_gdiplus'" class="icon-text"></i>
+            <i v-else-if="node.data.type === 'text_ft2_source'" class="icon-text"></i>
+            <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"></i>
             <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"></i>
-            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-audio"></i>
-            <i v-else-if="node.data.type === 'monitor_capture'" class="fa fa-desktop"></i>
-            <i v-else-if="node.data.type === 'game_capture'" class="fa fa-gamepad"></i>
-            <i v-else-if="node.data.type === 'browser_source'" class="fa fa-globe"></i>
-            <i v-else-if="node.data.type === 'scene'" class="fa fa-sitemap"></i>
-            <i v-else-if="node.data.type === 'color_source'" class="fa fa-paint-brush"></i>
-            <i v-else-if="node.data.type === 'openvr_capture'" class="fa fa-simplybuilt fa-rotate-180"></i>
-            <i v-else-if="node.data.type === 'liv_capture'" class="fa fa-simplybuilt fa-rotate-180"></i>
-            <i v-else class="fa fa-file"></i>
+            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"></i>
+            <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"></i>
+            <i v-else-if="node.data.type === 'game_capture'" class="icon-game-capture"></i>
+            <i v-else-if="node.data.type === 'browser_source'" class="icon-browser"></i>
+            <i v-else-if="node.data.type === 'scene'" class="icon-studio-mode"></i>
+            <i v-else-if="node.data.type === 'color_source'" class="icon-color"></i>
+            <i v-else-if="node.data.type === 'openvr_capture'" class="icon-vr-google"></i>
+            <i v-else-if="node.data.type === 'liv_capture'" class="icon-vr-google"></i>
+            <i v-else class="icon-file"></i>
           </span>
-          <span class="item-title">{{ node.title }}</span>
+          <span class="item-title" :data-test="node.title">{{ node.title }}</span>
         </div>
       </template>
 
       <template slot="toggle" slot-scope="{ node }">
         <span v-if="!node.isLeaf && node.children.length">
-          <i v-if="node.isExpanded" class="icon-down"></i>
-          <i v-if="!node.isExpanded" class="icon-down icon-right"></i>
+          <i v-if="node.isExpanded" class="icon-down-arrow"></i>
+          <i v-if="!node.isExpanded" class="icon-down-arrow icon-right"></i>
         </span>
       </template>
 
@@ -91,14 +95,13 @@
   text-align: center;
   opacity: .26;
   margin-left: 8px;
-  color: @grey;
+  color: @text-primary;
 }
 
 .sl-vue-tree-node-item {
-  padding: 0 12px;
+  padding: 0 4px;
 }
 
-.fa.disabled,
 i.disabled {
   opacity: 0.26;
   cursor: inherit;
@@ -121,39 +124,42 @@ i.disabled {
     .source-selector-action {
       .transition;
       opacity: 1;
-      color: @grey;
+      color: @text-primary;
+    }
+
+    .title-container {
+      color: @text-primary;
     }
   }
 }
 
 .sl-vue-tree-node-item {
   cursor: pointer;
-  border: 1px solid transparent;
-  border-right: 0;
-  border-left: 0;
   margin-top: -1px;
+  border: none;
 }
 
 .title-container {
   display: inline-block;
-  color: @grey;
+  color: @text-primary;
 }
 
 .layer-icon {
   display: inline-block;
   text-align: left;
   width: 16px;
-  margin-right: 8px;
 
-  i,
-  .fa {
+  i {
     font-size: 12px;
     font-weight: 700;
   }
 }
 
 .title-container {
-  color: @day-title
+  color: @text-secondary;
+  &:hover {
+    color: @text-primary;
+  }
 }
 
 .sl-vue-tree-toggle {
@@ -164,26 +170,24 @@ i.disabled {
   i {
     font-size: 7px;
     font-weight: 700;
-    color: @day-title;
+    color: @text-primary;
     text-align: center;
   }
 }
 
 .sl-vue-tree.sl-vue-tree-root {
-  background-color: @day-secondary;
-  border-color: @day-border;
-  color: @day-title;
+  color: @text-primary;
+  background-color: #050e18;
+  border: #050e18 1px solid;
 }
 
 .sl-vue-tree-selected>.sl-vue-tree-node-item {
-  border-color: @day-border;
-  border-left: none;
-  border-right: none;
-  background-color: @white;
+  background-color: @hover;
+  color: @text-primary;
 }
 
 .sl-vue-tree-node-item:hover {
-  color: white;
+  color: @text-primary;
 }
 
 .sl-vue-tree-cursor {
@@ -194,27 +198,17 @@ i.disabled {
   border-color: @navy;
 }
 
-.night-theme {
-  .title-container {
-    color: @grey;
-  }
-
-  .sl-vue-tree.sl-vue-tree-root {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
-    color: @grey;
-  }
-
-  .sl-vue-tree-selected>.sl-vue-tree-node-item {
-    background-color: @night-hover;
-    border-color: transparent;
-    color: @white;
-  }
-
-  .sl-vue-tree-toggle {
-    i {
-      color: @grey;
-    }
+//Simple Mode
+.advanced-theme {
+  .icon-add-folder {
+    display: inline-block;
   }
 }
+
+.beginner-theme {
+  .icon-add-folder {
+    display: none;
+  }
+}
+
 </style>

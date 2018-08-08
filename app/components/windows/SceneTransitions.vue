@@ -1,7 +1,7 @@
 <template>
 <modal-layout
-  :title="$t('Scene transition')"
-  :done-handler="done">
+  :title="$t('transitions.sceneTransition')"
+  :done-handler="done" :showCancel="false">
 
   <div slot="content">
     <ListInput

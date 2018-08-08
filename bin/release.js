@@ -1,5 +1,5 @@
 /*
- * All-in-one interactive Streamlabs OBS release script.
+ * All-in-one interactive N Air release script.
  */
 
 const sh = require('shelljs');
@@ -15,9 +15,9 @@ const yml = require('js-yaml');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs';
-const sentryOrg = 'streamlabs-obs';
-const sentryProject = 'streamlabs-obs';
+const s3Bucket = 'n-air-app';
+const sentryOrg = 'dwango';
+const sentryProject = 'n-air-app';
 
 
 function info(msg) {
@@ -96,9 +96,9 @@ async function uploadS3File(name, filePath) {
  * This is the main function of the script
  */
 async function runScript() {
-  info(colors.magenta('|-------------------------------------------|'));
-  info(colors.magenta('| Streamlabs OBS Interactive Release Script |'));
-  info(colors.magenta('|-------------------------------------------|'));
+  info(colors.magenta('|----------------------------------|'));
+  info(colors.magenta('| N Air Interactive Release Script |'));
+  info(colors.magenta('|----------------------------------|'));
 
   if (!await confirm('Are you sure you want to release?')) sh.exit(0);
 
@@ -181,17 +181,11 @@ async function runScript() {
     executeCmd(`git merge ${sourceBranch}`);
   }
 
-  info('Ensuring submodules are up to date...');
-  executeCmd('git submodule update --init --recursive');
-
   info('Removing old packages...');
   sh.rm('-rf', 'node_modules');
 
   info('Installing fresh packages...');
   executeCmd('yarn install');
-
-  info('Installing OBS plugins...');
-  executeCmd('yarn install-plugins');
 
   info('Compiling assets...');
   executeCmd('yarn compile:production');

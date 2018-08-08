@@ -1,5 +1,5 @@
 <template>
-<div class="input-container IntInput" :class="{disabled: value.enabled == false}">
+<div :data-test="testingAnchor" class="input-container IntInput" :class="{disabled: value.enabled == false}">
   <div class="input-label">
     <label v-if="value.showDescription !== false">{{ value.description }}</label>
   </div>
@@ -15,10 +15,10 @@
       />
       <div class="arrows" @mousewheel="onMouseWheelHandler">
         <div class="arrow arrow-up" @click="increment">
-          <i class="fa fa-chevron-up"></i>
+          <i class="icon-up-arrow"></i>
         </div>
         <div class="arrow arrow-down" @click="decrement">
-          <i class="fa fa-chevron-down"></i>
+          <i class="icon-down-arrow"></i>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
   .arrows {
     .absolute(0, 8px, 0, auto);
     width: 30px;
-    color: @grey;
+    color: @text-primary;
     opacity: .7;
     cursor: pointer;
     .transition;
@@ -49,7 +49,7 @@
     .arrow {
       display: flex !important;
 
-      .fa {
+      i {
         position: relative;
         font-size: 9px;
       }

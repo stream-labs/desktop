@@ -1,2 +1,4 @@
-provider: generic
-url: 'https://d1g6eog1uhe0xm.cloudfront.net'
+provider: github
+owner: n-air-app
+repo: n-air-app
+host: github.com

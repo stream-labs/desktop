@@ -30,10 +30,6 @@ export default class ApiSettings extends Vue {
     };
   }
 
-  generateToken() {
-    this.tcpServerService.generateToken();
-  }
-
   destroyed() {
     this.tcpServerService.listen();
   }
@@ -46,7 +42,7 @@ export default class ApiSettings extends Vue {
 
 
   save(settingsData: ISettingsSubCategory[]) {
-    const settings: Partial<ITcpServersSettings> = {}
+    const settings: Partial<ITcpServersSettings> = {};
     settingsData.forEach(subCategory => {
       subCategory.parameters.forEach(parameter => {
         if (!settings[subCategory.codeSubCategory]) settings[subCategory.codeSubCategory] = {};

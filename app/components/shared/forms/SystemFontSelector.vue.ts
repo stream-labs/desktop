@@ -32,6 +32,7 @@ export default class SystemFontSelector extends Input<IFormInput<IFont>>{
 
   @Prop()
   value: IFormInput<IFont>;
+  testingAnchor = `Form/SystemFont/${this.value.name}`;
 
   fonts: IFontDescriptor[] = fontManager.getAvailableFontsSync();
 

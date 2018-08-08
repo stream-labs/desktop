@@ -1,6 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { TObsType, IListInput, IListOption, Input, TObsValue } from './Input';
 import { Multiselect } from 'vue-multiselect';
+import { $t } from '../../../services/i18n';
 
 @Component({
   components: { Multiselect }
@@ -12,6 +13,7 @@ class ListInput extends Input<IListInput<TObsValue>> {
 
   @Prop()
   value: IListInput<TObsValue>;
+  testingAnchor = `Form/List/${this.value.name}`;
 
   @Prop({ default: false })
   allowEmpty: boolean;
@@ -19,7 +21,7 @@ class ListInput extends Input<IListInput<TObsValue>> {
   @Prop({ default: true })
   internalSearch: boolean;
 
-  @Prop({ default: 'Select Option' })
+  @Prop()
   placeholder: string;
 
   @Prop({ default: false })
