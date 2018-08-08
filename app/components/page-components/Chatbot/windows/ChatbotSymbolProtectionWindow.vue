@@ -43,7 +43,27 @@
         </div>
       </div>
       <div v-if="selectedTab === 'advanced'">
-        Advanced Stuff
+        <div>
+          <label for="response" class="margin-vertical--10">Minimum Amount of Symbols</label>
+          <NumberInput
+            v-model="symbolProtection.advanced.minimum"
+            :metadata="metadata.symbol.advanced.minimum"
+          />
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Maximum Amount of Symbols</label>
+          <NumberInput
+            v-model="symbolProtection.advanced.maximum"
+            :metadata="metadata.symbol.advanced.maximum"
+          />
+        </div>
+        <div>
+          <label for="response" class="margin-vertical--10">Maximum Percent</label>
+          <SliderInput
+            v-model="symbolProtection.advanced.percent"
+            :metadata="metadata.symbol.advanced.percent"
+          />
+        </div>
       </div>
     </transition>
   </div>
