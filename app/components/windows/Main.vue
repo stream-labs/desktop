@@ -2,11 +2,11 @@
 <div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
   <div class="main-spacer"></div>
+  <news-banner />
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
     <div class="main-middle">
-      <news-banner />
       <top-nav v-if="(page !== 'Onboarding')" :locked="applicationLoading"></top-nav>
       <div v-if="shouldLockContent" class="main-loading">
         <custom-loader></custom-loader>
