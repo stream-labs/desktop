@@ -70,10 +70,8 @@ tbody tr {
   .transition;
   .cursor--pointer;
 
-  &:hover {
-    td {
-      color: black;
-    }
+  td {
+    color: black;
   }
 
   td:first-child {
@@ -117,6 +115,7 @@ tbody tr {
 .night-theme {
   td {
     .transition;
+    color: white;
   }
 
   tbody tr {
@@ -124,12 +123,6 @@ tbody tr {
     .transition;
     .cursor--pointer;
     color: white;
-
-    &:hover {
-      td {
-        color: white;
-      }
-    }
   }
   tbody tr:nth-child(odd) {
     background-color: @navy-secondary;

@@ -84,6 +84,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
 
+  get NEW_ALERT_MODAL_ID() {
+    return NEW_ALERT_MODAL_ID;
+  }
+
   get title() {
     return `New ${this.selectedType} Alert`;
   }

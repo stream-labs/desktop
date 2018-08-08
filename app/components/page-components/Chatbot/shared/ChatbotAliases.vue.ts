@@ -11,7 +11,7 @@ import {
     TextInput
   }
 })
-export default class ChatbotTimers extends Vue {
+export default class ChatbotAliases extends Vue {
   @Prop() value: string[];
 
   newAlias: string = null;

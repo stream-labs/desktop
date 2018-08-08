@@ -43,10 +43,16 @@
         </div>
       </div>
       <div v-if="selectedTab === 'whitelist'">
-        white list Stuff
+        <ChatbotLinkProtectionList
+          :title="'Add to Whitelist'"
+          v-model="linkProtection.whitelist"
+        />
       </div>
       <div v-if="selectedTab === 'blacklist'">
-        black list Stuff
+        <ChatbotLinkProtectionList
+          :title="'Add to Blacklist'"
+          v-model="linkProtection.blacklist"
+        />
       </div>
     </transition>
   </div>

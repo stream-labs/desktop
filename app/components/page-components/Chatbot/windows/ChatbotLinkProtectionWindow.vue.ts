@@ -1,8 +1,13 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
+import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 
-@Component({})
+@Component({
+  components: {
+    ChatbotLinkProtectionList
+  }
+})
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   tabs: { name: string; value: string }[] = [
     {
