@@ -9,7 +9,7 @@ import { ISettingsSubCategory } from 'services/settings';
 @Component({
   components: { GenericFormGroups, ObsTextInput }
 })
-export default class ApiSettings extends Vue {
+export default class DeveloperSettings extends Vue {
 
   @Inject()
   tcpServerService: ITcpServerServiceApi;

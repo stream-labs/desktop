@@ -19,7 +19,7 @@ import {
 } from '../video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
-
+import electron from 'electron';
 
 export interface ISettingsState {
   General: {
@@ -118,7 +118,12 @@ export class SettingsService extends StatefulService<ISettingsState>
       .concat(['Scene Collections', 'Notifications', 'Appearance', 'Remote Control']);
 
     // we decided to not expose API settings for production version yet
-    if (this.advancedSettingEnabled()) categories = categories.concat(['API', 'Experimental']);
+    if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
+
+    // TODO: Add developer flag
+    if (Utils.isDevMode()) {
+      categories = categories.concat('Developer');
+    }
 
     return categories;
   }
