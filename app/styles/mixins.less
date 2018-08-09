@@ -8,6 +8,46 @@
   left: @left;
 }
 
+.flex() {
+  display: flex;
+}
+
+.flex--center() {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex--wrap() {
+  flex-wrap: wrap;
+}
+
+.flex--space-between() {
+  justify-content: space-between;
+}
+
+.flex--justify-start() {
+  justify-content: flex-start;
+}
+
+.flex--align-start() {
+  align-items: flex-start;
+}
+
+.flex--column() {
+  flex-direction: column;
+}
+
+.flex--grow() {
+  flex-grow: 1;
+}
+
+.flex__column() {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
+}
+
 // Aspect ratio for responsive height/width
 .aspect-ratio(@width, @height) {
   position: relative;
@@ -28,12 +68,12 @@
   }
 }
 
-.aspect-ratio--16-9 {
+.aspect-ratio--16-9() {
   .aspect-ratio(16,9);
 }
 
 // Backgrounds
-.bg--teal {
+.bg--teal() {
   background-color: @teal;
 }
 
@@ -43,16 +83,16 @@
 }
 
 // Borders
-.border {
+.border() {
   border: 1px solid @day-section;
 }
 
-.night-border {
+.night-border() {
   border: 1px solid @night-section;
 }
 
 // Hovers
-.icon-hover {
+.icon-hover() {
   color: @icon;
   .transition();
 
@@ -61,7 +101,7 @@
   }
 }
 
-.night-icon-hover {
+.night-icon-hover() {
   color: @icon;
   .transition;
 
@@ -70,7 +110,7 @@
   }
 }
 
-.icon--margin {
+.icon--margin() {
   margin-right: 8px;
 }
 
@@ -108,11 +148,11 @@
 }
 
 // Paddings
-.no-padding-left {
+.no-padding-left() {
   padding-left: 0;
 }
 
-.no-padding-right {
+.no-padding-right() {
   padding-right: 0;
 }
 

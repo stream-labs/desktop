@@ -71,6 +71,9 @@ export class Source implements ISourceApi {
       type: this.type,
       propertiesManager: this.getPropertiesManagerType()
     };
+    if (this.getPropertiesManagerType() === 'streamlabels') {
+      details.isStreamlabel = true;
+    }
 
     if (this.getPropertiesManagerType() === 'widget') {
       details.widgetType = this.getPropertiesManagerSettings().widgetType;
