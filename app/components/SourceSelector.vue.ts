@@ -10,25 +10,23 @@ import SlVueTree, {
   ISlTreeNodeModel,
   ICursorPosition
 } from 'sl-vue-tree';
+import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
 
 const widgetIconMap = {
-  'Alert Box': 'fas fa-bell',
-  'Stream Boss': 'fas fa-gavel',
-  'Event List': 'fas fa-th-list',
-  'The Jar': 'fas fa-beer',
-  'Stream Labels': 'fas fa-file-alt',
-  'Donation Ticker': 'fas fa-ellipsis-h',
-  'Chat Box': 'fas fa-comments',
-  'Viewer Count': 'fas fa-eye',
-  'Spin Wheel': 'fas fa-chart-pie',
-  'Wish List': 'fas fa-shopping-cart',
-  Credits: 'fas fa-align-center',
-  'Sponsor Banner': 'fas fa-heart',
-  'Media Share': 'fas fa-share-alt',
-  'Donation Goal': 'fas fa-calendar',
-  'Bit Goal': 'fas fa-calendar',
-  'Follower Goal': 'fas fa-calendar'
+  [WidgetType.AlertBox]: 'fas fa-bell',
+  [WidgetType.StreamBoss]: 'fas fa-gavel',
+  [WidgetType.EventList]: 'fas fa-th-list',
+  [WidgetType.TipJar]: 'fas fa-beer',
+  [WidgetType.DonationTicker]: 'fas fa-ellipsis-h',
+  [WidgetType.ChatBox]: 'fas fa-comments',
+  [WidgetType.ViewerCount]: 'fas fa-eye',
+  [WidgetType.SpinWheel]: 'fas fa-chart-pie',
+  [WidgetType.Credits]: 'fas fa-align-center',
+  [WidgetType.SponsorBanner]: 'fas fa-heart',
+  [WidgetType.DonationGoal]: 'fas fa-calendar',
+  [WidgetType.BitGoal]: 'fas fa-calendar',
+  [WidgetType.FollowerGoal]: 'fas fa-calendar'
 };
 
 const sourceIconMap = {
@@ -41,6 +39,7 @@ const sourceIconMap = {
   wasapi_input_capture: 'icon-mic',
   wasapi_output_capture: 'icon-audio',
   monitor_capture: 'fas fa-desktop',
+  browser_source: 'fas fa-globe',
   game_capture: 'fas fa-gamepad',
   scene: 'far fa-object-group',
   color_source: 'fas fa-fill',
@@ -91,10 +90,13 @@ export default class SourceSelector extends Vue {
     return getSlVueTreeNodes(this.scene.getRootNodes());
   }
 
-  determineIcon(isLeaf: boolean, data: { type: string, name: string }) {
+  determineIcon(isLeaf: boolean, sourceId: string) {
     if (!isLeaf) { return 'fa fa-folder'; }
-    if (data.type === 'browser_source') { return widgetIconMap[data.name] || 'fas fa-globe'; }
-    return sourceIconMap[data.name] || 'fas fa-file';
+    const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
+    if (sourceDetails.isStreamlabel) { return 'fas fa-file-alt'; }
+    // We want simple equality here to also check for undefined
+    if (sourceDetails.widgetType != null) { return widgetIconMap[sourceDetails.widgetType]; }
+    return sourceIconMap[sourceDetails.type] || 'fas fa-file';
   }
 
   addSource() {

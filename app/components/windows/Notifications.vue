@@ -49,7 +49,7 @@
   display: grid;
   grid-template-columns: 30px 1fr 130px;
   background: @day-primary;
-  .border;
+  .border();
 
   &.has-action:hover {
     color: @navy;
