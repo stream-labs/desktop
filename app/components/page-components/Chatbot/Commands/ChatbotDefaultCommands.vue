@@ -3,11 +3,13 @@
     <!-- batch actions -->
     <div class="align-items--inline align-items--top text-align--right padding--10">
       <button
+        @click="onResetDefaultCommands"
         class="chatbot__button--reset button margin--10"
       >
         Reset Commands
       </button>
       <input
+        v-model="searchQuery"
         type="text"
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
@@ -38,6 +40,7 @@
           <tr
             v-for="(command, commandName, index) in commands"
             :key="index"
+            v-if="matchesQuery(commandName, command)"
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.description) }} </td>

@@ -11,6 +11,9 @@ import {
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
+
+  searchQuery = '';
+
   get commands() {
     return this.chatbotApiService.state.customCommandsResponse.data;
   }
@@ -22,6 +25,13 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
 
   mounted() {
     this.chatbotApiService.fetchCustomCommands(this.currentPage);
+  }
+
+  matchesQuery(command: ICustomCommand) {
+    return (
+      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      command.response.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
+    )
   }
 
   openCommandWindow(command?: ICustomCommand) {

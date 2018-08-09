@@ -8,12 +8,26 @@ import {
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
+  searchQuery = '';
+
   get commandSlugs() {
     return this.chatbotApiService.state.defaultCommandsResponse;
   }
 
+  matchesQuery(name: string, command: IDefaultCommand) {
+    return (
+      name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      command.description.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
+    )
+  }
+
   mounted() {
     this.chatbotApiService.fetchDefaultCommands();
+  }
+
+  onResetDefaultCommands() {
+    this.chatbotApiService.resetDefaultCommands();
   }
 
   toggleEnableCommand(slugName: string, commandName: string, isEnabled: boolean) {

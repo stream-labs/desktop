@@ -10,9 +10,11 @@
         <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
-        <div @click="toggleLinkProtectionWindow">
-          <span>EDIT COMMAND</span>
-          <i class="icon-transition"></i>
+        <div class="window-toggle__wrapper">
+          <div @click="toggleLinkProtectionWindow">
+            <span class="text-transform--uppercase">edit command</span>
+            <i class="icon-transition window-toggle__icon"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -86,7 +88,31 @@
 <script lang="ts" src="./ChatbotLinkProtectionWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
+@import "../../../../styles/index";
+
+.window-toggle__wrapper {
+  background-color: @day-primary;
+  z-index: 1;
+  width: 100%;
+  padding: 15px;
+  height: 54px;
+  border-bottom: 1px solid @day-border;
+  cursor: pointer;
+  text-align: right;
+
+  .window-toggle__icon {
+    .margin-left();
+  }
+}
+
 .chatbot-link-protection__container {
   padding-top: 45px;
+}
+
+.night-theme {
+  .window-toggle__wrapper {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
 }
 </style>

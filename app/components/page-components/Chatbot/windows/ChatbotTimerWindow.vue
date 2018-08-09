@@ -22,14 +22,14 @@
       </div>
       <div class="columns small-6">
         <label for="interval" class="margin-vertical--10">Interval in mins</label>
-        <SliderInput
+        <NumberInput
           v-model="newTimer.interval"
           :metadata="intervalMetadata"
         />
       </div>
       <div class="columns small-6">
         <label for="line" class="margin-vertical--10">Line Minimum</label>
-        <SliderInput
+        <NumberInput
           v-model="newTimer.chat_lines"
           :metadata="chatLinesMetadata"
         />

@@ -2,7 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import SliderInput from 'components/shared/inputs/SliderInput.vue';
+import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -11,14 +11,14 @@ import {
 
 import {
   ITextMetadata,
-  ISliderMetadata
+  INumberMetadata
 } from 'components/shared/inputs/index';
 
 @Component({
   components: {
     TextAreaInput,
     TextInput,
-    SliderInput
+    NumberInput
   }
 })
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
@@ -41,14 +41,16 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     placeholder: 'This phrase will appear after the timer has ended'
   };
 
-  intervalMetadata: ISliderMetadata = {
+  intervalMetadata: INumberMetadata = {
     min: 0,
     max: 150,
+    placeholder: 'Interval in minutes'
   }
 
-  chatLinesMetadata: ISliderMetadata = {
+  chatLinesMetadata: INumberMetadata = {
     min: 0,
-    max: 100
+    max: 100,
+    placeholder: 'Minimum chat lines'
   }
 
   mounted() {

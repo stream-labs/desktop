@@ -9,6 +9,7 @@
       Add Timer
     </button>
     <input
+      v-model="searchQuery"
       type="text"
       class="chatbot__input--search width--auto margin--10"
       placeholder="Search"
@@ -32,6 +33,7 @@
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
+            v-if="matchesQuery(timer)"
         >
           <td> {{ timer.name }} </td>
           <td> {{ timer.interval }} </td>

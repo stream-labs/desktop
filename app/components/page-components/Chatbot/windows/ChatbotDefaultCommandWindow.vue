@@ -10,12 +10,14 @@
         <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
-        <div
-          v-if="isLinkProtectionPermitCommand"
-          @click="toggleLinkProtectionWindow"
-        >
-          <span>link protection preferences</span>
-          <i class="icon-transition"></i>
+        <div class="window-toggle__wrapper">
+          <div
+            @click="toggleLinkProtectionWindow"
+            v-if="isLinkProtectionPermitCommand"
+          >
+            <span class="text-transform--uppercase">link protection preferences</span>
+            <i class="icon-transition window-toggle__icon"></i>
+          </div>
         </div>
       </div>
     </div>
@@ -101,7 +103,30 @@
 <script lang="ts" src="./ChatbotDefaultCommandWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
+@import "../../../../styles/index";
 .chatbot-add-command__container {
   padding-top: 45px;
+}
+
+.window-toggle__wrapper {
+  background-color: @day-primary;
+  z-index: 1;
+  width: 100%;
+  padding: 15px;
+  height: 54px;
+  border-bottom: 1px solid @day-border;
+  cursor: pointer;
+  text-align: right;
+
+  .window-toggle__icon {
+    .margin-left();
+  }
+}
+
+.night-theme {
+  .window-toggle__wrapper {
+    background-color: @night-primary;
+    border-color: @night-border;
+  }
 }
 </style>

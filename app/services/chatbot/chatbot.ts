@@ -206,6 +206,14 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // POST, PUT requests
   //
+
+  resetDefaultCommands() {
+    return this.api('POST', 'commands/default/reset', {})
+      .then((response: IDafaultCommandsResponse) => {
+        this.UPDATE_DEFAULT_COMMANDS(response);
+      });
+  }
+
   createCustomCommand(data: ICustomCommand) {
     return this.api('POST', 'commands', data)
       .then((response: ICustomCommand) => {

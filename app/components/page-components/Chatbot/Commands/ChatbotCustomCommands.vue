@@ -9,6 +9,7 @@
         Add Command
       </button>
       <input
+        v-model="searchQuery"
         type="text"
         class="chatbot__input--search width--auto margin--10"
         placeholder="Search"
@@ -32,6 +33,7 @@
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
+            v-if="matchesQuery(command)"
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>

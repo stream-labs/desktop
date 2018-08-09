@@ -6,6 +6,9 @@ import {
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
+
+  searchQuery = '';
+
   get timers() {
     return this.chatbotApiService.state.timersResponse.data;
   }
@@ -17,6 +20,13 @@ export default class ChatbotTimers extends ChatbotBase {
   mounted() {
     // get list of timers
     this.chatbotApiService.fetchTimers(this.currentPage);
+  }
+
+  matchesQuery(timer: ITimer) {
+    return (
+      timer.name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      timer.message.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
+    )
   }
 
   openTimerWindow(timer?: ITimer) {
