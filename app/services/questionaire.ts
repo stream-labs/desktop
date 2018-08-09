@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import electron from 'electron';
 import crypto from 'crypto';
 import base64 from 'base64-js';
-import uuidv5 from 'uuid/v5';
+import uuidv4 from 'uuid/v4';
 import querystring from 'querystring';
 
 type TQuestionaireStep =
@@ -54,7 +54,7 @@ export class QuestionaireService extends StatefulService<
     completedSteps: []
   };
 
-  localStorageKey = 'InstallationUuid';
+  localStorageKey = 'InstallationUuidv4';
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
@@ -147,7 +147,7 @@ export class QuestionaireService extends StatefulService<
   }
 
   private generateUuid(): string {
-    return uuidv5('https://live.nicovideo.jp/nair', uuidv5.URL);
+    return uuidv4();
   }
 
   private getUuid(): string {
