@@ -11,7 +11,7 @@ export default class NewsBanner extends Vue {
   }
 
   get bannerExists() {
-    return this.newsBannerService.bannerExists;
+    return this.newsBannerService.bannerExists();
   }
 
   closeBanner() {

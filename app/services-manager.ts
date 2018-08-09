@@ -75,7 +75,8 @@ import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
-import { MediaGalleryService } from './services/media-gallery';
+import { MediaGalleryService } from 'services/media-gallery';
+import { NewsBannerService } from 'services/news-banner';
 
 import { BitGoalService } from 'services/widget-settings/bit-goal';
 import { ChatBoxService } from 'services/widget-settings/chat-box';
@@ -176,7 +177,8 @@ export class ServicesManager extends Service {
     EventListService,
     TipJarService,
     SponsorBannerService,
-    MediaGalleryService
+    MediaGalleryService,
+    NewsBannerService
   };
 
   private instances: Dictionary<Service> = {};
