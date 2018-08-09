@@ -1,11 +1,9 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import TimePickerInput, { ITimeInputValueMetadata } from 'components/shared/inputs/TimePickerInput.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
+import { ITime } from 'components/shared/inputs/TimePickerInput.vue';
 import { cloneDeep } from 'lodash';
+import { ITab } from 'components/Tabs.vue';
 
 import {
   ICustomCommand,
@@ -19,10 +17,6 @@ import {
 
 @Component({
   components: {
-    TextInput,
-    TextAreaInput,
-    ListInput,
-    TimePickerInput,
     ChatbotAliases,
   }
 })
@@ -44,7 +38,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     enabled: true
   };
 
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
       name: 'General',
       value: 'general'
@@ -86,7 +80,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     };
   }
 
-  set globalCooldown(timeObject: ITimeInputValueMetadata) {
+  set globalCooldown(timeObject: ITime) {
     const { HH, mm } = timeObject;
     this.newCommand.cooldowns.global = parseInt(HH) * 60 + parseInt(mm);
   }
@@ -103,7 +97,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     };
   }
 
-  set userCooldown(timeObject: ITimeInputValueMetadata) {
+  set userCooldown(timeObject: ITime) {
     const { HH, mm } = timeObject;
     this.newCommand.cooldowns.user = parseInt(HH) * 60 + parseInt(mm);
   }

@@ -1,6 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
 
 import { ITextMetadata } from 'components/shared/inputs/index';
 
@@ -8,11 +7,7 @@ import {
   NEW_LINK_PROTECTION_LIST_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
-@Component({
-  components: {
-    TextInput
-  }
-})
+@Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
   @Prop() value: string[];
   @Prop() title: string;

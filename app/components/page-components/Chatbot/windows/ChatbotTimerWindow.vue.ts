@@ -1,8 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -14,13 +11,7 @@ import {
   INumberMetadata
 } from 'components/shared/inputs/index';
 
-@Component({
-  components: {
-    TextAreaInput,
-    TextInput,
-    NumberInput
-  }
-})
+@Component({})
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   newTimer: ITimer = {
     name: null,

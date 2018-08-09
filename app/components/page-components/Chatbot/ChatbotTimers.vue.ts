@@ -1,8 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component, Prop } from 'vue-property-decorator';
-import {
-  ITimer,
-} from 'services/chatbot/chatbot-interfaces';
+import { Component } from 'vue-property-decorator';
+import { ITimer } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {

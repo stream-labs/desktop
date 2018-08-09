@@ -1,15 +1,8 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
 import { cloneDeep } from 'lodash';
-import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
-
-import {
-  IDefaultCommand,
-} from 'services/chatbot/chatbot-interfaces';
-
+import { ITab } from 'components/Tabs.vue';
+import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
 
 import {
   IListMetadata,
@@ -29,18 +22,11 @@ interface IDefaultCommandMetadata {
 }
 
 
-@Component({
-  components: {
-    TextInput,
-    TextAreaInput,
-    ListInput,
-    ChatbotAliases
-  }
-})
+@Component({})
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   editedCommand: IDefaultCommand = null;
 
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
       name: 'General',
       value: 'general'

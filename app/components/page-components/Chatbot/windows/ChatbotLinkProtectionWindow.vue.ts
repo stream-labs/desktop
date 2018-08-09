@@ -2,26 +2,24 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
-import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
-
+import { ITab } from 'components/Tabs.vue';
 @Component({
   components: {
     ChatbotLinkProtectionList,
-    ChatbotDefaultCommandWindow
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Whitelist',
+      name: $t('Whitelist'),
       value: 'whitelist'
     },
     {
-      name: 'Blacklist',
+      name: $t('Blacklist'),
       value: 'blacklist'
     }
   ];

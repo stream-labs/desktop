@@ -1,11 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
-import SliderInput from 'components/shared/inputs/SliderInput.vue';
 
 import {
   ICapsProtectionData,
@@ -87,15 +82,7 @@ interface IProtectionMetadata {
 }
 
 
-@Component({
-  components: {
-    TextInput,
-    TextAreaInput,
-    ListInput,
-    NumberInput,
-    SliderInput
-  }
-})
+@Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   capsProtection: ICapsProtectionData = null;
   symbolProtection: ISymbolProtectionData = null;

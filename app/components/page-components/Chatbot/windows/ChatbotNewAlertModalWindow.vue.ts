@@ -6,6 +6,7 @@ import TextInput from 'components/shared/inputs/TextInput.vue';
 import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
+import { $t } from 'services/i18n';
 import {
   IListMetadata,
   ITextMetadata,
@@ -118,7 +119,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           message: {
             required: true,
-            placeholder: 'Message to follower'
+            placeholder: $t('Message to follower')
           }
         }
       },
@@ -128,22 +129,22 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             required: true,
             options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
               value: tier,
-              title: tier
+              title: $t(tier)
             }))
           },
           amount: {
             required: true,
-            placeholder: 'Number of months subscribed'
+            placeholder: $t('Number of months subscribed')
           },
           message: {
             required: true,
-            placeholder: 'Message to subscriber'
+            placeholder: $t('Message to subscriber')
           },
           is_gifted: {
             required: true,
             options: ['yes', 'no'].map(isGifted => ({
               value: isGifted === 'yes',
-              title: isGifted
+              title: $t(isGifted)
             }))
           }
         }
@@ -152,11 +153,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
-            placeholder: 'Minimum amount'
+            placeholder: $t('Minimum amount')
           },
           message: {
             required: true,
-            placeholder: 'Message to donator'
+            placeholder: $t('Message to donator')
           }
         }
       },
@@ -164,11 +165,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
-            placeholder: 'Minimum viewer count'
+            placeholder: $t('Minimum viewer count')
           },
           message: {
             required: true,
-            placeholder: 'Message to hosts'
+            placeholder: $t('Message to hosts')
           }
         }
       },
@@ -176,11 +177,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
-            placeholder: 'Minimum amount'
+            placeholder: $t('Minimum amount')
           },
           message: {
             required: true,
-            placeholder: 'Message to raider'
+            placeholder: $t('Message to raider')
           }
         }
       }
@@ -200,7 +201,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: null,
           message: null,
           is_gifted: false,
-          tier: 'Prime'
+          tier: $t('Prime')
         }
       },
       tip: {

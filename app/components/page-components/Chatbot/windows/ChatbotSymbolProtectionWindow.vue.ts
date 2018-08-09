@@ -1,16 +1,17 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
+import { ITab } from 'components/Tabs.vue';
 
 @Component({})
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Advanced',
+      name: $t('Advanced'),
       value: 'advanced'
     }
   ];

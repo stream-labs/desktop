@@ -1,16 +1,11 @@
 import { Component, Prop } from 'vue-property-decorator';
 import Vue from 'vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
 
 import {
   ITextMetadata,
 } from 'components/shared/inputs/index';
 
-@Component({
-  components: {
-    TextInput
-  }
-})
+@Component({})
 export default class ChatbotAliases extends Vue {
   @Prop() value: string[];
 

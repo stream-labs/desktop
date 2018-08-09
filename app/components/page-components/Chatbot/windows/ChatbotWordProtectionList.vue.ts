@@ -1,8 +1,5 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue'
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import NumberInput from 'components/shared/inputs/NumberInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
 
 import { ITextMetadata, IListMetadata, INumberMetadata } from 'components/shared/inputs/index';
 
@@ -11,13 +8,7 @@ import {
   NEW_WORD_PROTECTION_LIST_MODAL_ID
 } from 'services/chatbot/chatbot-interfaces';
 
-@Component({
-  components: {
-    TextInput,
-    ListInput,
-    NumberInput
-  }
-})
+@Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
   @Prop() value: IWordProtectionBlackListItem[];
 

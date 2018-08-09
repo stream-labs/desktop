@@ -3,7 +3,7 @@ import VueTimepicker from 'vue2-timepicker';
 import { BaseInput } from './BaseInput';
 import { ITimeMetadata } from './index';
 
-export interface ITimeInputValueMetadata {
+export interface ITime {
   HH?: string;
   H?: string;
   hh?: string;
@@ -23,8 +23,8 @@ export interface ITimeInputValueMetadata {
     VueTimepicker
   }
 })
-export default class TimePickerInput extends BaseInput<ITimeInputValueMetadata, ITimeMetadata> {
-  @Prop() value: ITimeInputValueMetadata;
+export default class TimePickerInput extends BaseInput<ITime, ITimeMetadata> {
+  @Prop() value: ITime;
   @Prop() metadata: ITimeMetadata;
 }
 

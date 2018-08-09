@@ -2,6 +2,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import ChatbotWordProtectionList from 'components/page-components/Chatbot/windows/ChatbotWordProtectionList.vue';
+import { ITab } from 'components/Tabs.vue';
 
 @Component({
   components: {
@@ -9,13 +10,13 @@ import ChatbotWordProtectionList from 'components/page-components/Chatbot/window
   }
 })
 export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Blacklist',
+      name: $t('Blacklist'),
       value: 'blacklist'
     }
   ];

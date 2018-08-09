@@ -1,12 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
-import {
-  ICustomCommandsResponse,
-  ICustomCommandsData,
-  IPagination,
-  IChatbotAPIPutResponse,
-  ICustomCommand
-} from 'services/chatbot/chatbot-interfaces';
+import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
 
 
 @Component({})
