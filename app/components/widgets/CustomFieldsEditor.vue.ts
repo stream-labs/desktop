@@ -71,17 +71,18 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
     value: 'optionB'
   },
 
-  customField6: {
-    label: 'Image Input Example',
-    type: 'image-input',
-    value: null
-  },
-
-  customField7: {
-    label: 'Sound Input Example',
-    type: 'sound-input',
-    value: null
-  }
+  // TODO:
+  // customField6: {
+  //   label: 'Image Input Example',
+  //   type: 'image-input',
+  //   value: null
+  // },
+  //
+  // customField7: {
+  //   label: 'Sound Input Example',
+  //   type: 'sound-input',
+  //   value: null
+  // }
 
 };
 
