@@ -95,7 +95,7 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover;
+  .icon-hover();
 }
 
 .night-theme {

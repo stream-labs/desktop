@@ -50,7 +50,7 @@
 .main-spacer {
   height: 4px;
   flex: 0 0 4px;
-  .bg--teal;
+  .bg--teal();
 }
 
 .main-page-container {

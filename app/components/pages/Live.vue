@@ -34,7 +34,7 @@
           </div>
 
           <div class="sizer-container">
-            <div class="aspect-ratio--16-9 live-display-wrapper" >
+            <div class="live-display-wrapper" >
               <div class="content" v-if="previewEnabled">
                 <display class="live-display" :drawUI="false" />
               </div>
@@ -82,7 +82,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   position: relative;
-  .border;
+  .border();
   border-top: 0;
   height: calc(~'100% - 29px');
 }
@@ -147,7 +147,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   position: relative;
-  .border;
+  .border();
   border-top: 0;
   height: calc(~'100% - 29px');
 }
@@ -164,6 +164,7 @@
 }
 
 .live-display-wrapper {
+  .aspect-ratio--16-9();
   width: 100%;
 }
 
