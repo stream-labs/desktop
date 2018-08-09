@@ -1,10 +1,5 @@
 <template>
   <widget-window v-if="wData" v-model="tabName">
-
-    <div slot="description">
-      {{ $t('Let your viewers seize the opportunity of becoming a boss in your channel by interacting with the stream. Works with tips, follows, subscriptions and cheers.') }}
-    </div>
-
     <!-- streamboss setup -->
     <div slot="goal" >
       <div v-if="hasGoal">
