@@ -6,7 +6,7 @@
         @click="onResetDefaultCommands"
         class="chatbot__button--reset button margin--10"
       >
-        Reset Commands
+        {{ $t('Reset Commands') }}
       </button>
       <input
         v-model="searchQuery"

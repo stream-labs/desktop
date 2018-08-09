@@ -50,8 +50,8 @@
                 class="chatbot-timers__timer-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="openTimerWindow(timer)" class="button button--action">Edit</button>
-                <button @click="deleteTimer(timer)" class="button button--soft-warning">Delete</button>
+                <button @click="openTimerWindow(timer)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="deleteTimer(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </div>
           </td>

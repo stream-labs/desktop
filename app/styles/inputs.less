@@ -213,6 +213,28 @@ textarea {
   }
 }
 
+.time-picker {
+  input.display-time {
+    border: 1px solid @day-input-border !important;
+    background: @day-input-bg;
+    margin-bottom: 0;
+    font-size: 13px;
+    color: @day-paragraph;
+    border-radius: 4px !important;
+    box-shadow: none;
+    height: 36px;
+    cursor: default;
+  }
+
+  .dropdown {
+    ul {
+      li.active {
+        background-color: @teal;
+      }
+    }
+  }
+}
+
 .night-theme {
   input[type="text"],
   input[type="password"],
@@ -244,5 +266,26 @@ textarea {
   .multiselect__option--highlight {
     background: @night-hover;
     color: @night-title;
+  }
+
+  .time-picker {
+    input.display-time {
+      background: @night-input-bg;
+      color: @night-paragraph;
+      border-color: @night-input-border !important;
+    }
+
+    .dropdown {
+      ul {
+        li {
+          background: @night-input-bg;
+          color: @night-paragraph;
+        }
+        li:not(.hint):hover {
+          color: white;
+          background: @night-input-bg !important;
+        }
+      }
+    }
   }
 }

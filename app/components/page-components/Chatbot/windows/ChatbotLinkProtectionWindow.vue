@@ -12,7 +12,7 @@
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
           <div @click="toggleLinkProtectionWindow">
-            <span class="text-transform--uppercase">edit command</span>
+            <span class="text-transform--uppercase"> {{ $t('edit command') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
         </div>

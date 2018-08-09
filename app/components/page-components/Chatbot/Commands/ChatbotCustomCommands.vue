@@ -24,8 +24,8 @@
       <table v-else>
         <thead>
           <tr>
-            <th>Command</th>
-            <th>Response</th>
+            <th> {{ $t('Command') }} </th>
+            <th> {{ $t('Response') }} </th>
             <th></th>
           </tr>
         </thead>
@@ -48,8 +48,8 @@
                   class="chatbot-custom-commands__command-actions__container"
                   :icon="'icon-more'"
                 >
-                  <button @click="openCommandWindow(command)" class="button button--action">Edit</button>
-                  <button @click="deleteCommand(command)" class="button button--soft-warning">Delete</button>
+                  <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                 </DropdownMenu>
               </div>
             </td>
