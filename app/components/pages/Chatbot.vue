@@ -7,7 +7,7 @@
           :key="tab"
           :to="tab"
           :ico="icons[tab]"
-          class="padding--10 text-transform--uppercase"
+          class="padding--10 text-transform--uppercase chatbot__side-menu__tab"
         >
           {{ $t(tab) }}
         </NavItem>
@@ -35,6 +35,14 @@
 .chatbot__side-menu {
   background: @day-secondary;
   border-right: 1px solid @day-border;
+
+  .side-menu {
+    margin-top: 0;
+  }
+
+  .chatbot__side-menu__tab {
+    padding: 10px 80px;
+  }
 }
 
 .night-theme {
