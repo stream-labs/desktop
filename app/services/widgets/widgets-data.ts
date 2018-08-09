@@ -1,7 +1,15 @@
-import { IWidgetTester, IWidget, IWidgetDisplayData } from './widgets-api';
+import { IWidgetTester, IWidget } from './widgets-api';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { $t } from 'services/i18n';
 
+export interface IWidgetDisplayData {
+  name: string;
+  description: string;
+  platforms?: Set<string>;
+  demoVideo: boolean;
+  demoFilename: string;
+  supportList: string[];
+}
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
