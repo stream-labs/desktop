@@ -13,3 +13,4 @@ export { default as MediaGalleryInput } from './MediaGalleryInput.vue';
 export { default as ImagePickerInput } from './ImagePickerInput.vue';
 export { default as SoundInput } from './SoundInput.vue';
 export { default as TimePickerInput } from './TimePickerInput.vue';
+export { default as ToggleInput } from './ToggleInput.vue';

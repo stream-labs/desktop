@@ -48,16 +48,18 @@ interface ISymbolProtectionMetadata {
   advanced: IProtectionAdvancedMetadata;
 };
 
+interface ILinkProtectionCommandsMetadata {
+  permit: {
+    command: ITextMetadata;
+    description: ITextMetadata;
+    response: ITextMetadata;
+    response_type: IListMetadata<string>;
+    new_alias: ITextMetadata;
+  }
+}
+
 interface ILinkProtectionMetadata {
-  commands: {
-    permit: {
-      command: ITextMetadata;
-      description: ITextMetadata;
-      response: ITextMetadata;
-      response_type: IListMetadata<string>;
-      new_alias: ITextMetadata;
-    }
-  },
+  commands: ILinkProtectionCommandsMetadata,
   general: IProtectionGeneralMetadata;
   new_whitelist_item: ITextMetadata;
   new_blacklist_item: ITextMetadata;
@@ -127,7 +129,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // metadata
   generalMetadata(protectionType: string) {
-    return {
+    const generalMetadata: IProtectionGeneralMetadata = {
       punishment: {
         type: {
           required: true,
@@ -152,10 +154,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         )}.`
       }
     };
+
+    return generalMetadata;
   }
 
   advancedMetadata(protectionType: string) {
-    return {
+    const advancedMetadata: IProtectionAdvancedMetadata = {
       minimum: {
         required: true,
         placeholder: `Minimum amount of ${this.label(protectionType)}`,
@@ -172,10 +176,11 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         max: 100
       }
     };
+    return advancedMetadata;
   }
 
   get linkCommandsMetadata() {
-    return {
+    let linkCommandsMetadata: ILinkProtectionCommandsMetadata = {
       permit: {
         command: {
           required: true,
@@ -198,10 +203,11 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         }
       }
     };
+    return linkCommandsMetadata;
   }
 
   get wordBlacklistItemMetadata() {
-    return {
+    let wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
       text: {
         required: true,
         placeholder: 'word to protect'
@@ -221,6 +227,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         }
       }
     };
+    return wordBlacklistItemMetadata;
   }
 
   get metadata() {

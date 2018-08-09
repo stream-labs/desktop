@@ -3,6 +3,8 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { cloneDeep } from 'lodash';
 import { ITab } from 'components/Tabs.vue';
 import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
+import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
+import { metadata as metadataHelper } from 'components/widgets/inputs';
 
 import {
   IListMetadata,
@@ -22,7 +24,11 @@ interface IDefaultCommandMetadata {
 }
 
 
-@Component({})
+@Component({
+  components: {
+    ChatbotAliases,
+  }
+})
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   editedCommand: IDefaultCommand = null;
 
@@ -55,35 +61,30 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   // metadata
   get metadata() {
     let metadata: IDefaultCommandMetadata = {
-      command: this.stringMetadata(
-        'Enter the text string which will trigger the response'
-      ),
-      response: this.stringMetadata(
-        'The phrase that will appear after a user enters the command'
-      ),
-      new_alias: this.stringMetadata('Add a new command alias'),
-      success_response: this.stringMetadata(
-        'The phrase that will appear after a successful command'
-      ),
-      failed_response: this.stringMetadata(
-        'The phrase that will appear after a failed command'
-      ),
-      enabled_response: this.stringMetadata(
-        'The phrase that will appear after a command is enabled'
-      ),
-      disabled_response: this.stringMetadata(
-        'The phrase that will appear after a command is disabled'
-      ),
+      command: metadataHelper.text({
+        placeholder: 'Enter the text string which will trigger the response'
+      }),
+      response: metadataHelper.text({
+        placeholder: 'The phrase that will appear after a user enters the command'
+      }),
+      new_alias: metadataHelper.text({
+        placeholder: 'Add a new command alias'
+      }),
+      success_response: metadataHelper.text({
+        placeholder: 'The phrase that will appear after a successful command'
+      }),
+      failed_response: metadataHelper.text({
+        placeholder: 'The phrase that will appear after a failed command'
+      }),
+      enabled_response: metadataHelper.text({
+        placeholder: 'The phrase that will appear after a command is enabled'
+      }),
+      disabled_response: metadataHelper.text({
+        placeholder: 'The phrase that will appear after a command is disabled'
+      }),
       response_type: this.responseTypeMetadata
     };
     return metadata;
-  }
-
-  stringMetadata(placeholder?: string) {
-    return {
-      required: true,
-      placeholder
-    };
   }
 
   get responseTypeMetadata() {

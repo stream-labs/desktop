@@ -20,19 +20,21 @@
           :metadata="messageMetadata"
         />
       </div>
-      <div class="columns small-6">
-        <label for="interval" class="margin-vertical--10">Interval in mins</label>
-        <NumberInput
-          v-model="newTimer.interval"
-          :metadata="intervalMetadata"
-        />
-      </div>
-      <div class="columns small-6">
-        <label for="line" class="margin-vertical--10">Line Minimum</label>
-        <NumberInput
-          v-model="newTimer.chat_lines"
-          :metadata="chatLinesMetadata"
-        />
+      <div class="row">
+        <div class="columns small-6">
+          <label for="interval" class="margin-vertical--10">Interval in mins</label>
+          <NumberInput
+            v-model="newTimer.interval"
+            :metadata="intervalMetadata"
+          />
+        </div>
+        <div class="columns small-6">
+          <label for="line" class="margin-vertical--10">Line Minimum</label>
+          <NumberInput
+            v-model="newTimer.chat_lines"
+            :metadata="chatLinesMetadata"
+          />
+        </div>
       </div>
     </div>
   </div>

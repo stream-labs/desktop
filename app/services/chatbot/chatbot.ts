@@ -261,6 +261,9 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   updateChatAlerts(data: IChatAlertsResponse) {
+    console.log(data);
+    let x = data;
+    debugger;
     return this.api('POST', 'settings/chat-notifications', data)
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
