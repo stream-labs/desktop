@@ -46,7 +46,7 @@ export interface IWidget {
 export interface IWidgetDisplayData {
   name: string;
   description: string;
-  platform?: string;
+  platforms?: Set<string>;
   demoVideo: boolean;
   demoFilename: string;
   supportList: string[];
