@@ -418,7 +418,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotDefaultCommandWindow',
       size: {
         width: 650,
-        height: 600
+        height: 500
       }
     });
   }

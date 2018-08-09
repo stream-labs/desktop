@@ -5,8 +5,20 @@
   :title="$t('Edit Command')"
 >
   <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
-    </Tabs>
+    <div class="row">
+      <div class="small-6 columns position--relative">
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+      </div>
+      <div class="small-6 columns position--relative">
+        <div
+          v-if="isLinkProtectionPermitCommand"
+          @click="toggleLinkProtectionWindow"
+        >
+          <span>link protection preferences</span>
+          <i class="icon-transition"></i>
+        </div>
+      </div>
+    </div>
   </div>
   <div
     v-if="editedCommand"

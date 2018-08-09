@@ -44,7 +44,7 @@
       </div>
       <div class="new-list-item-modal__body">
         <div class="row">
-          <div class="small--7 columns">
+          <div class="small-7 columns">
             <label for="text" class="margin-vertical--10">Word or Phrase</label>
             <TextInput
               class="width--100"
@@ -52,7 +52,7 @@
               v-model="newListItem.text"
             />
           </div>
-          <div class="small--5 columns">
+          <div class="small-5 columns">
             <label for="show to" class="margin-vertical--10">Punishment</label>
             <ListInput
               v-model="newListItem.punishment.type"

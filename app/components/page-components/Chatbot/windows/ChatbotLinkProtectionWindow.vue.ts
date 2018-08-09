@@ -2,10 +2,12 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
+import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
 
 @Component({
   components: {
-    ChatbotLinkProtectionList
+    ChatbotLinkProtectionList,
+    ChatbotDefaultCommandWindow
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {

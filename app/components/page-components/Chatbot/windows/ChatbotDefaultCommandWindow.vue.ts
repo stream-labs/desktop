@@ -55,7 +55,11 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   mounted() {
     this.editedCommand = cloneDeep(this.defaultCommandToUpdate);
-    console.log(this.editedCommand);
+  }
+
+  get isLinkProtectionPermitCommand() {
+    return this.defaultCommandToUpdate.slugName === 'link-protection'
+    && this.defaultCommandToUpdate.commandName === 'permit';
   }
 
   get defaultCommandToUpdate() {

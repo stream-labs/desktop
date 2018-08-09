@@ -5,56 +5,67 @@
   :title="$t('Link Protection Preferences')"
 >
   <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
-    </Tabs>
+    <div class="row">
+      <div class="small-6 columns position--relative">
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+      </div>
+      <div class="small-6 columns position--relative">
+        <div @click="toggleLinkProtectionWindow">
+          <span>EDIT COMMAND</span>
+          <i class="icon-transition"></i>
+        </div>
+      </div>
+    </div>
   </div>
   <div slot="content" class="chatbot-link-protection__container">
-    <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general' && linkProtection">
-        <div class="row">
-          <div class="small-6 columns">
-            <label for="excluded" class="margin-vertical--10">Auto Permit</label>
-            <ListInput
-              v-model="linkProtection.general.excluded.level"
-              :metadata="metadata.link.general.excluded.level"
+    <div>
+      <transition name='fade' mode="out-in" appear>
+        <div v-if="selectedTab === 'general' && linkProtection">
+          <div class="row">
+            <div class="small-6 columns">
+              <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+              <ListInput
+                v-model="linkProtection.general.excluded.level"
+                :metadata="metadata.link.general.excluded.level"
+              />
+            </div>
+            <div class="small-6 columns">
+              <label for="show to" class="margin-vertical--10">Punishment</label>
+              <ListInput
+                v-model="linkProtection.general.punishment.type"
+                :metadata="metadata.link.general.punishment.type"
+              />
+            </div>
+          </div>
+          <div>
+            <label for="response" class="margin-vertical--10">Punishment Duration</label>
+            <NumberInput
+              v-model="linkProtection.general.punishment.duration"
+              :metadata="metadata.link.general.punishment.duration"
             />
           </div>
-          <div class="small-6 columns">
-            <label for="show to" class="margin-vertical--10">Punishment</label>
-            <ListInput
-              v-model="linkProtection.general.punishment.type"
-              :metadata="metadata.link.general.punishment.type"
+          <div>
+            <label for="response" class="margin-vertical--10">Punishment Response</label>
+            <TextAreaInput
+              v-model="linkProtection.general.message"
+              :metadata="metadata.link.general.message"
             />
           </div>
         </div>
-        <div>
-          <label for="response" class="margin-vertical--10">Punishment Duration</label>
-          <NumberInput
-            v-model="linkProtection.general.punishment.duration"
-            :metadata="metadata.link.general.punishment.duration"
+        <div v-if="selectedTab === 'whitelist'">
+          <ChatbotLinkProtectionList
+            :title="'Add to Whitelist'"
+            v-model="linkProtection.whitelist"
           />
         </div>
-        <div>
-          <label for="response" class="margin-vertical--10">Punishment Response</label>
-          <TextAreaInput
-            v-model="linkProtection.general.message"
-            :metadata="metadata.link.general.message"
+        <div v-if="selectedTab === 'blacklist'">
+          <ChatbotLinkProtectionList
+            :title="'Add to Blacklist'"
+            v-model="linkProtection.blacklist"
           />
         </div>
-      </div>
-      <div v-if="selectedTab === 'whitelist'">
-        <ChatbotLinkProtectionList
-          :title="'Add to Whitelist'"
-          v-model="linkProtection.whitelist"
-        />
-      </div>
-      <div v-if="selectedTab === 'blacklist'">
-        <ChatbotLinkProtectionList
-          :title="'Add to Blacklist'"
-          v-model="linkProtection.blacklist"
-        />
-      </div>
-    </transition>
+      </transition>
+    </div>
   </div>
   <div slot="controls">
     <button

@@ -23,6 +23,12 @@ export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
   @Inject() chatbotCommonService: ChatbotCommonService;
 
+  mounted() {
+    // pre-load them to switch between 2 windows
+    this.chatbotApiService.fetchDefaultCommands();
+    this.chatbotApiService.fetchLinkProtection();
+  }
+
   get chatbotPermissions() {
     let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
       (a: any[], b: string) => {
