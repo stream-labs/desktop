@@ -38,7 +38,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotCommonService.openCustomCommandWindow(command);
   }
 
-  deleteCommand(command?: ICustomCommand) {
+  deleteCommand(command: ICustomCommand) {
     this.chatbotApiService.deleteCustomCommand(command.id);
   }
 
