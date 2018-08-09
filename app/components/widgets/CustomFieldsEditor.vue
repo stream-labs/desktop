@@ -16,21 +16,30 @@
       </div>
     </div>
     <div v-else>
-      <button
-        class="button"
-        @click="addDefaultFields()">
-        {{ $t('Add Custom Fields') }}
-      </button>
+      {{ $t('No fields added')}}
     </div>
 
     <div class="modal-layout-controls">
-      <button class="button button--default left-button button--action" v-if="customFields" @click="removeFields()">
+
+      <button
+        class="button button--action"
+        v-if="!customFields"
+        @click="addDefaultFields()"
+      >
+        {{ $t('Add Custom Fields') }}
+      </button>
+
+      <button
+        class="button button--default left-button button--action"
+        v-if="customFields && !isEditMode"
+        @click="removeFields()"
+      >
         {{ $t('Remove Custom Fields') }}
       </button>
 
       <button
-        class="button left-button button--action"
-        v-if="!isEditMode"
+        class="button button--action"
+        v-if="customFields && !isEditMode"
         @click="showJsonEditor()"
       >
         {{ $t('Update') }}
@@ -45,7 +54,7 @@
 
       <button
           class="button button--action"
-          v-if="!isEditMode"
+          v-if="isEditMode"
           @click="closeJsonEditor(true)">
         {{ $t('Save') }}
       </button>

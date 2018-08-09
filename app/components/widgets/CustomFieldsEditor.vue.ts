@@ -9,7 +9,7 @@ import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata, metadata } from 'components/shared/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
-import { debounce } from "lodash-decorators";
+import { debounce } from 'lodash-decorators';
 
 type TCustomFieldType =
   'colorpicker' |
@@ -183,14 +183,14 @@ export default class CustomFieldsEditor extends Vue {
     this.isLoading = false;
   }
 
-  showJsonEditor(enabled: boolean) {
-    this.isEditMode = enabled;
+  showJsonEditor() {
+    this.isEditMode = true;
+    this.editorInputValue = JSON.stringify(this.customFields, null, 2);
   }
 
   closeJsonEditor(needSave: boolean) {
     if (!needSave) {
       this.isEditMode = false;
-      this.editorInputValue = JSON.stringify(this.customFields);
       return;
     }
 
@@ -203,6 +203,7 @@ export default class CustomFieldsEditor extends Vue {
     }
 
     this.customFields = newCustomFields;
+    this.isEditMode = false;
   }
 
   addDefaultFields() {
