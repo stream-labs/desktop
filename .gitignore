@@ -16,5 +16,4 @@ electron.sln
 electron.VC.db
 .vs/
 plugins/
-# yarn-error.log
-# yarn.lock
+yarn-error.log
