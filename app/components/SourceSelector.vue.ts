@@ -10,7 +10,42 @@ import SlVueTree, {
   ISlTreeNodeModel,
   ICursorPosition
 } from 'sl-vue-tree';
+import { WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
+
+const widgetIconMap = {
+  [WidgetType.AlertBox]: 'fas fa-bell',
+  [WidgetType.StreamBoss]: 'fas fa-gavel',
+  [WidgetType.EventList]: 'fas fa-th-list',
+  [WidgetType.TipJar]: 'fas fa-beer',
+  [WidgetType.DonationTicker]: 'fas fa-ellipsis-h',
+  [WidgetType.ChatBox]: 'fas fa-comments',
+  [WidgetType.ViewerCount]: 'fas fa-eye',
+  [WidgetType.SpinWheel]: 'fas fa-chart-pie',
+  [WidgetType.Credits]: 'fas fa-align-center',
+  [WidgetType.SponsorBanner]: 'fas fa-heart',
+  [WidgetType.DonationGoal]: 'fas fa-calendar',
+  [WidgetType.BitGoal]: 'fas fa-calendar',
+  [WidgetType.FollowerGoal]: 'fas fa-calendar'
+};
+
+const sourceIconMap = {
+  ffmpeg_source: 'far fa-file-video',
+  text_gdiplus: 'fas fa-font',
+  text_ft2_source: 'fas fa-font',
+  image_source: 'icon-image',
+  slideshow: 'icon-image',
+  dshow_input: 'icon-webcam',
+  wasapi_input_capture: 'icon-mic',
+  wasapi_output_capture: 'icon-audio',
+  monitor_capture: 'fas fa-desktop',
+  browser_source: 'fas fa-globe',
+  game_capture: 'fas fa-gamepad',
+  scene: 'far fa-object-group',
+  color_source: 'fas fa-fill',
+  openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
+  liv_capture: 'fab fa-simplybuilt fa-rotate-180'
+};
 
 @Component({
   components: { SlVueTree }
@@ -53,6 +88,15 @@ export default class SourceSelector extends Vue {
     };
 
     return getSlVueTreeNodes(this.scene.getRootNodes());
+  }
+
+  determineIcon(isLeaf: boolean, sourceId: string) {
+    if (!isLeaf) { return 'fa fa-folder'; }
+    const sourceDetails = this.sourcesService.getSource(sourceId).getComparisonDetails();
+    if (sourceDetails.isStreamlabel) { return 'fas fa-file-alt'; }
+    // We want simple equality here to also check for undefined
+    if (sourceDetails.widgetType != null) { return widgetIconMap[sourceDetails.widgetType]; }
+    return sourceIconMap[sourceDetails.type] || 'fas fa-file';
   }
 
   addSource() {

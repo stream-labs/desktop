@@ -1,18 +1,17 @@
 <template>
 <div>
   <div class="section">
-    {{ $t('This is an experimental feature.  Use at your own risk.') }}
-    <br/>
-    <br/>
+    <p>{{ $t('This is an experimental feature.  Use at your own risk.') }}</p>
+
     <button
-      class="button button--sm button--action margin-right--20"
+      class="button button--action"
       :disabled="busy"
       @click="saveOverlay">
       {{ $t('Export Overlay File') }}
       <i class="fa fa-spinner fa-pulse" v-if="busy" />
     </button>
     <button
-      class="button button--sm button--action"
+      class="button button--action"
       :disabled="busy"
       @click="loadOverlay">
       {{ $t('Import Overlay File') }}
@@ -23,7 +22,7 @@
   </div>
   <div class="section">
     <button
-      class="button button--sm button--action"
+      class="button button--action"
       :disabled="busy"
       @click="loadWidget">
       {{ $t('Import Widget File in Current Scene') }}
@@ -31,7 +30,9 @@
     </button>
   </div>
   <div class="section">
-    <ObsBoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
+    <div class="section-content">
+      <ObsBoolInput :value="mediaBackupOptOut" @input="setMediaBackupOptOut" />
+    </div>
   </div>
 </div>
 </template>
