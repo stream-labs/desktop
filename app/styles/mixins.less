@@ -8,6 +8,46 @@
   left: @left;
 }
 
+.flex() {
+  display: flex;
+}
+
+.flex--center() {
+  align-items: center;
+  justify-content: center;
+}
+
+.flex--wrap() {
+  flex-wrap: wrap;
+}
+
+.flex--space-between() {
+  justify-content: space-between;
+}
+
+.flex--justify-start() {
+  justify-content: flex-start;
+}
+
+.flex--align-start() {
+  align-items: flex-start;
+}
+
+.flex--column() {
+  flex-direction: column;
+}
+
+.flex--grow() {
+  flex-grow: 1;
+}
+
+.flex__column() {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
+}
+
 // Aspect ratio for responsive height/width
 .aspect-ratio(@width, @height) {
   position: relative;
@@ -28,12 +68,12 @@
   }
 }
 
-.aspect-ratio--16-9 {
+.aspect-ratio--16-9() {
   .aspect-ratio(16,9);
 }
 
 // Backgrounds
-.bg--teal {
+.bg--teal() {
   background-color: @teal;
 }
 
@@ -43,16 +83,16 @@
 }
 
 // Borders
-.border {
+.border() {
   border: 1px solid @day-section;
 }
 
-.night-border {
+.night-border() {
   border: 1px solid @night-section;
 }
 
 // Hovers
-.icon-hover {
+.icon-hover() {
   color: @icon;
   .transition();
 
@@ -61,7 +101,7 @@
   }
 }
 
-.night-icon-hover {
+.night-icon-hover() {
   color: @icon;
   .transition;
 
@@ -70,26 +110,59 @@
   }
 }
 
-.icon--margin {
+.icon--margin() {
   margin-right: 8px;
 }
 
+// Margins
+.margin-top() {
+  margin-top: 8px;
+}
+
+.margin-right() {
+  margin-right: 8px;
+}
+
+.margin-right--16() {
+  margin-right: 16px;
+}
+
+.margin-right--24() {
+  margin-right: 24px;
+}
+
+.margin-bottom() {
+  margin-bottom: 8px;
+}
+
+.margin-bottom--16() {
+  margin-bottom: 16px;
+}
+
+.margin-bottom--24() {
+  margin-bottom: 24px;
+}
+
+.margin-left() {
+  margin-left: 8px;
+}
+
 // Paddings
-.no-padding-left {
+.no-padding-left() {
   padding-left: 0;
 }
 
-.no-padding-right {
+.no-padding-right() {
   padding-right: 0;
 }
 
 // Shadows
-.shadow() {
-  box-shadow: 0 6px 14px @shadow;
+.day-shadow() {
+  box-shadow: 0 4px 10px @day-shadow;
 }
 
 .night-shadow() {
-  box-shadow: 0 6px 14px 1px rgba(1, 2, 2, 0.3);
+  box-shadow: 0 4px 10px @night-shadow;
 }
 
 // Transitiions

@@ -68,7 +68,16 @@
 }
 
 .controls {
-  margin-left: 13px;
-  margin-bottom: 20px;
+  margin-left: 20px;
+  .margin-bottom--16();
+
+  .icon-button {
+    margin-left: 0;
+    .margin-right--16();
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
 }
 </style>

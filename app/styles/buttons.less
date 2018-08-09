@@ -60,7 +60,7 @@
   .fa,
   i {
     color: @grey;
-    .transition;
+    .transition();
   }
 
   &:hover,
@@ -79,7 +79,7 @@
   font-size: 14px;
   cursor: pointer;
   margin-left: 10px;
-  .icon-hover;
+  .icon-hover();
 
   &:first-child {
     margin-left: inherit;
@@ -112,8 +112,8 @@
 }
 
 .square-button {
-  .radius;
-  .transition;
+  .radius();
+  .transition();
   display: flex;
   justify-content: center;
   align-items: center;
@@ -144,7 +144,9 @@
     background: lighten(#D22222, 4%);
   }
 
-  &:focus {
+  &:focus,
+  &:active,
+  &:disabled {
     background: #D22222;
   }
 }

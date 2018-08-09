@@ -30,10 +30,6 @@
 <style lang="less" scoped>
   @import "../../../styles/index";
 
-  .row {
-    margin-bottom: 20px;
-  }
-
   .input-container {
     display: flex;
     align-items: center;
@@ -47,8 +43,8 @@
 
   .tooltip {
     position: relative;
-    margin-left: 4px;
-    font-size: 18px;
+    margin-left: 8px;
+    font-size: 16px;
     align-self: center;
     display: inline-block;
     color: @icon;

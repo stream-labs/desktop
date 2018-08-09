@@ -21,6 +21,7 @@ import { Subject } from 'rxjs/Subject';
 import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid/v4';
+import { OnboardingService } from './onboarding';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -28,11 +29,12 @@ interface IUserServiceState {
 }
 
 export class UserService extends PersistentStatefulService<IUserServiceState> {
-  @Inject() hostsService: HostsService;
-  @Inject() customizationService: CustomizationService;
-  @Inject() appService: AppService;
-  @Inject() sceneCollectionsService: SceneCollectionsService;
-  @Inject() windowsService: WindowsService;
+  @Inject() private hostsService: HostsService;
+  @Inject() private customizationService: CustomizationService;
+  @Inject() private appService: AppService;
+  @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private windowsService: WindowsService;
+  @Inject() private onboardingService: OnboardingService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -194,6 +196,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json());
+  }
+
+  async showLogin() {
+    if (this.isLoggedIn()) await this.logOut();
+    this.onboardingService.start({ isLogin: true });
   }
 
   private async login(service: IPlatformService, auth: IPlatformAuth) {

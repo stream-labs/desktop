@@ -15,11 +15,12 @@
 
 <style lang="less" scoped>
 @import "../../styles/index";
+
 .help-tip {
   position: absolute;
   background: @teal;
-  .radius;
-  color: white;
+  .radius();
+  color: @white;
   top: -8px;
   right: 102px;
   width: 260px;
@@ -43,7 +44,7 @@
   right: 10px;
   cursor: pointer;
   opacity: .6;
-  .transition;
+  .transition();
 
   &:hover {
     opacity: 1;

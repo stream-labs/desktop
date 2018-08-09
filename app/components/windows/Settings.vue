@@ -48,7 +48,8 @@
 
 .settings-container {
   flex-grow: 1;
-  margin: -20px -20px -20px 0;
+  margin: 0px -20px -20px 0;
+  padding-right: 20px;
   overflow: auto;
 }
 </style>
@@ -58,7 +59,8 @@
   .input-container {
     flex-direction: column;
 
-    .input-label, .input-wrapper {
+    .input-label,
+    .input-wrapper {
       width: 100%;
     }
 

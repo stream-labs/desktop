@@ -1,11 +1,11 @@
 <template>
 <div @contextmenu="handleRightClick">
   <div class="studio-controls-top">
-    <h4
+    <h2
       class="studio-controls__label"
       v-tooltip.bottom="mixerTooltip">
       {{ $t('Mixer') }}
-    </h4>
+    </h2>
     <div>
       <i
         class="icon-settings icon-button"

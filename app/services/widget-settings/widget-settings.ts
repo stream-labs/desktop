@@ -107,8 +107,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   protected handleDataAfterFetch(data: any): TWidgetData {
 
     // patch fetched data to have the same data format
-
     if (data.custom) data.custom_defaults = data.custom;
+
     data.type = this.getWidgetType();
 
 

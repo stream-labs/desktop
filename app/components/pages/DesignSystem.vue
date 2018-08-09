@@ -17,7 +17,7 @@
         <div id="buttons" class="design-system__section">
           <h2>Buttons</h2>
           <h4>Buttons</h4>
-          <div class="button-container margin-bot--20">
+          <div class="button-container">
             <button class="button button--default">Button Standard</button>
             <button class="button button--action">Button Action</button>
             <button class="button button--soft-warning">Button Soft Warning</button>
@@ -25,7 +25,7 @@
             <button class="button button--action is-disabled">Button Disabled</button>
           </div>
           <h4>Square Buttons</h4>
-          <div class="button-container margin-bot--20">
+          <div class="button-container">
             <button class="square-button button--twitch"><i class="fab fa-twitch"></i></button>
             <button class="square-button button--yt"><i class="fab fa-youtube"></i></button>
             <button class="square-button button--mixer"><i class="fas fa-times"></i></button>
@@ -929,5 +929,9 @@
 
 .design-system__code {
   font-family: 'Courier New', Courier, monospace;
+}
+
+.button-container {
+  .margin-bottom--16();
 }
 </style>

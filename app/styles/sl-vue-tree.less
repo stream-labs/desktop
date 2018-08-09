@@ -20,6 +20,10 @@
   color: @day-title!important;
 }
 
+.sl-vue-tree-root > .sl-vue-tree-nodes-list {
+  padding-bottom: 0;
+}
+
 .sl-vue-tree-node-item {
   color: @day-paragraph!important;
   border: 1px solid @day-section;
@@ -39,6 +43,23 @@
 
 .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
   border-color: @day-input-border;
+}
+
+// sl-vue-tree styles within a window
+.modal-layout {
+  .sl-vue-tree.sl-vue-tree-root {
+    background-color: transparent!important;
+    border: 0;
+  }
+
+  .sl-vue-tree-node-item {
+    border: 0;
+    padding: 0 0 0 24px;
+  }
+
+  .sl-vue-tree-selected>.sl-vue-tree-node-item {
+    background-color: transparent!important;
+  }
 }
 
 .night-theme {
@@ -71,5 +92,16 @@
 
   .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
     border-color: @night-border;
+  }
+
+  // sl-vue-tree styles within a window
+  &.modal-layout {
+    .sl-vue-tree.sl-vue-tree-root {
+      background-color: transparent!important;
+    }
+
+    .sl-vue-tree-selected>.sl-vue-tree-node-item {
+      background-color: transparent!important;
+    }
   }
 }

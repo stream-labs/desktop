@@ -7,13 +7,15 @@
     </div>
 
     <div class="section">
-      <ObsTextInput :value="tokenInput">
-        <button
-            class="button button--default button--input"
-            @click="generateToken">
-          Update
-        </button>
-      </ObsTextInput>
+      <div class="section-content">
+        <ObsTextInput :value="tokenInput">
+          <button
+              class="button button--default"
+              @click="generateToken">
+            Update
+          </button>
+        </ObsTextInput>
+      </div>
     </div>
 
 

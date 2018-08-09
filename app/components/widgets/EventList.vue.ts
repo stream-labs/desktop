@@ -11,12 +11,14 @@ import { AnimationInput } from './inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
+import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
     WidgetWindow,
     FormGroup,
     CodeEditor,
+    TestButtons,
     AnimationInput,
     ...inputComponents
   }

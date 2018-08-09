@@ -33,7 +33,7 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   widgetTypes = WidgetType;
-  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TheJar]);
+  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TipJar]);
 
   iterableWidgetTypes = Object.keys(this.widgetTypes)
     .filter((type: string) => isNaN(Number(type)))

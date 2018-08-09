@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="section">
-      <GenericForm v-model="settingsFormData" @input="saveSettings" />
+      <div class="section-content">
+        <GenericForm v-model="settingsFormData" @input="saveSettings" />
+      </div>
     </div>
   </div>
 </template>

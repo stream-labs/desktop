@@ -63,9 +63,7 @@
 .no-preview {
   position: relative;
   flex-grow: 1;
-  background-color: @navy-secondary;
   display: flex;
-  align-items: center;
   justify-content: center;
 
   .message {

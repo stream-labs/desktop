@@ -1,6 +1,8 @@
 <template>
 <div class="section">
-  <GenericForm :value="settings" @input="save"></GenericForm>
+  <div class="section-content">
+    <GenericForm :value="settings" @input="save"></GenericForm>
+  </div>
 </div>
 </template>
 

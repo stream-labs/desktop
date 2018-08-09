@@ -14,6 +14,7 @@ import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { CustomizationService } from 'services/customization';
+import { UserService } from 'services/user';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
@@ -51,6 +52,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: WidgetsService;
+  @Inject() private userService: UserService;
   @Inject() private customizationService: CustomizationService;
 
   /**
@@ -375,7 +377,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showSourceProperties(sourceId: string) {
     this.windowsService.closeChildWindow();
 
-    if (this.customizationService.getSettings().experimental.newWidgets) {
+    if (this.customizationService.getSettings().experimental.newWidgets && this.userService.isLoggedIn()) {
       const source = this.getSource(sourceId);
       const isWidget = source.getPropertiesManagerType() === 'widget';
 
@@ -389,7 +391,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         WidgetType.DonationTicker,
         WidgetType.Credits,
         WidgetType.EventList,
-        WidgetType.StreamBoss
+        WidgetType.StreamBoss,
+        WidgetType.TipJar,
+        WidgetType.SponsorBanner
       ];
 
       if (isWidget) {
@@ -449,6 +453,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
+      preservePrevWindow: true,
       queryParams: { sourceType, propertiesManager },
       size: {
         width: 400,

@@ -5,8 +5,11 @@
       {{ $t('Configure') }}
     </div>
     <div class="input-wrapper">
-      <button class="button button--default" @click="navigateDashboard">
+      <button v-if="isLoggedIn"  class="button button--default" @click="navigateDashboard">
         {{ $t('Go To Widget Settings') }}
+      </button>
+      <button v-else class="button button--default" @click="login">
+        {{ $t('Please login to configure widget') }}
       </button>
     </div>
   </div>

@@ -235,7 +235,7 @@
   width: 100%;
   height: 100%;
   border: 1px solid @night-secondary;
-  background: @shadow;
+  background: @day-shadow;
   z-index: 99999;
   border-radius: 3px;
 }

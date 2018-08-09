@@ -27,10 +27,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    font-size: 12px;
-    letter-spacing: 1px;
-    font-weight: normal;
-    margin-top: 15px;
+    margin-top: 16px;
   }
 }
 
@@ -72,7 +69,6 @@
   color: @white;
   font-size: 22px;
   margin-bottom: 20px;
-  letter-spacing: .5px;
 }
 
 .onboarding-title--sm {
@@ -82,14 +78,14 @@
 }
 
 .onboarding-desc {
-  color: @grey;
+  color: @light-3;
   margin-bottom: 20px;
   padding: 0 20px;
 }
 
 .setup-later {
   margin-top: 20px;
-  color: @grey;
+  color: @light-3;
 
   span {
     display: block;
@@ -98,7 +94,8 @@
 
   a {
     text-decoration: underline;
-    transition: all 275ms;
+    .transition();
+
     &:hover {
       color: @white;
     }
@@ -147,11 +144,11 @@
 }
 
 .running-setup-row--complete {
-  color: @teal-bright;
+  color: @primary;
 }
 
 .running-setup-percent {
-  color: @grey;
+  color: @light-3;
 }
 
 .running-setup__deco {
@@ -159,7 +156,7 @@
   top: 0;
   height: 240px;
   width: auto;
-  margin: 15px 0;
+  margin: 16px 0;
 
   img {
     height: 100%;

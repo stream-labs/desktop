@@ -463,18 +463,6 @@ export function setupConfigurableDefaults(
       defaultSettings[obsProp.name] = items[0].value;
       continue;
     }
-
-    let validItem = false;
-
-    /* If there is a setting, make sure it's a valid item */
-    for (let i = 0; i < items.length; ++i) {
-      if (settings[obsProp.name] === items[i].value) {
-        validItem = true;
-        break;
-      }
-    }
-
-    if (!validItem) defaultSettings[obsProp.name] = items[0].value;
   } while ((obsProp = obsProp.next()));
   const needUpdate = Object.keys(defaultSettings).length > 0;
   if (needUpdate) configurable.update(defaultSettings);

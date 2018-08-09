@@ -87,6 +87,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
 
   protected tabs = [
     { name: 'settings' },
-    ...CODE_EDITOR_TABS
+    ...CODE_EDITOR_TABS,
+    { name: 'test' }
   ];
 }

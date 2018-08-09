@@ -1,6 +1,12 @@
 @import "./styles/index";
 @import "./styles/checkboxes";
 @import "./styles/tables";
+@import "./styles/buttons";
+@import "./styles/classes";
+@import "./styles/custom-icons";
+@import "./styles/inputs";
+@import "./styles/sl-vue-tree";
+@import "./styles/tooltips";
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -34,17 +40,26 @@ body {
 }
 
 // Type
+h2 {
+  font-family: 'Roboto';
+  font-size: 16px;
+  .weight--medium();
+  text-transform: capitalize;
+  color: @day-title;
+  margin-bottom: 24px;
+}
+
 h3 {
   font-family: 'Roboto';
   font-size: 14px;
   .weight--medium();
+  color: @day-title;
 }
 
 h4 {
   font-family: 'Roboto';
   text-transform: uppercase;
   font-size: 13px;
-  .letter-spacing;
   .weight--medium();
   margin-bottom: 20px;
   color: @day-title;
@@ -213,9 +228,8 @@ a,
   padding: 0px 12px;
   display: flex;
   z-index: 10;
-  .radius;
-  .border;
-  .shadow;
+  .radius();
+  .day-shadow();
 }
 
 .tabs {
@@ -339,12 +353,16 @@ select {
     border: 1px solid transparent;
   }
 
+  h2 {
+    color: @night-title;
+  }
+
   h3 {
-    color: @grey;
+    color: @night-title;
   }
 
   h4 {
-    color: @white;
+    color: @night-title;
   }
 
   label {

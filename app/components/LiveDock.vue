@@ -38,14 +38,12 @@
         </div>
         <div class="live-dock-viewer-count">
           <i
-            class="fa fa-eye live-dock-viewer-count-toggle label--icon"
             :class="{
-              'fa-eye': !hideViewerCount,
-              'fa-eye-slash': hideViewerCount
+              'icon-view': !hideViewerCount,
+              'icon-hide': hideViewerCount
             }"
             @click="toggleViewerCount"/>
-          <i class="fa fa-user label--icon" />
-          <span class="weight--medium">{{ viewerCount }}</span> {{ $t('viewers')}}
+          <span class="live-dock-viewer-count__count">{{ viewerCount }}</span><span v-if="viewerCount >= 0">{{ $t('viewers')}}</span>
         </div>
       </div>
 
@@ -55,19 +53,19 @@
             @click="showEditStreamInfo"
             v-if="isTwitch || isMixer || (isYoutube && isStreaming)"
             v-tooltip="editStreamInfoTooltip">
-            <i class="fa fa-pencil" />
+            <i class="icon-edit" />
           </a>
           <a
             @click="openYoutubeStreamUrl"
             v-if="isYoutube && isStreaming"
             v-tooltip="viewStreamTooltip">
-            <i class="fa fa-video-camera" />
+            <i class="icon-studio" />
           </a>
           <a
             @click="openYoutubeControlRoom"
             v-if="isYoutube && isStreaming"
             v-tooltip="controlRoomTooltip">
-            <i class="fa fa-cogs" />
+            <i class="icon-settings" />
           </a>
         </div>
         <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
@@ -77,12 +75,10 @@
         <chat ref="chat" />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
-        <img class="flex flex--center flex--column margin-bot--20" src="../../media/images/sleeping-kevin-night.png">
+        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
+        <img class="live-dock-chat__img--offline live-dock-chat__img--offline-night" src="../../media/images/sleeping-kevin-night.png">
         <span>{{ $t('Your chat is currently offline') }}</span>
       </div>
-
-
-
     </div>
   </transition>
 </div>
@@ -99,7 +95,7 @@
   width: 28%;
   border-left: 1px solid @day-border;
   padding: 16px 20px 10px;
-  transition: all 275ms;
+  .transition();
 
   &.live-dock--left {
     border-right: 1px solid @day-border;
@@ -122,13 +118,10 @@
 
 .live-dock-chevron {
   cursor: pointer;
-  position: absolute;
-  top: 0;
-  bottom: 0;
+  .absolute(@top: 0, @bottom: 0, @left: 0);
   display: flex;
   align-items: center;
   height: 100%;
-  left: 0px;
   padding-left: 4px;
 
   &:hover {
@@ -174,7 +167,7 @@
 
   .live-dock-platform-tools {
     a {
-      padding: 0 10px;
+      padding: 0 8px;
     }
   }
 
@@ -184,6 +177,13 @@
 }
 
 .live-dock-viewer-count {
+  .flex();
+  .flex--center();
+
+  i {
+    .margin-right();
+  }
+
   .live-dock-viewer-count-toggle {
     opacity: 0;
     cursor: pointer;
@@ -196,6 +196,10 @@
   }
 }
 
+.live-dock-viewer-count__count {
+  padding-right: 3px;
+}
+
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
@@ -203,10 +207,18 @@
 
 .live-dock-chat--offline {
   height: 100%;
+}
 
-  img{
-    width: 75%;
-  }
+.live-dock-chat__img--offline {
+  width: 60%;
+  .flex();
+  .flex--center();
+  .flex--column();
+  margin-bottom: 16px;
+}
+
+.live-dock-chat__img--offline-night {
+  display: none;
 }
 
 .live-dock-pulse {
@@ -214,13 +226,17 @@
   height: 10px;
   border-radius: 50%;
   background: @red;
-  margin: 0 6px;
+  margin: 0 8px;
   box-shadow: 0 0 0 rgba(252, 62, 63, 0.4);
 
   &.live-dock-offline {
-    background: @grey;
+    background: @icon;
     animation: none;
   }
+}
+
+.live-dock-platform-tools {
+  .flex();
 }
 
 .night-theme {
@@ -232,6 +248,14 @@
   .live-dock-timer,
   .live-dock-viewer-count {
     color: @white;
+  }
+
+  .live-dock-chat__img--offline-day {
+    display: none;
+  }
+
+  .live-dock-chat__img--offline-night {
+    display: flex;
   }
 }
 </style>

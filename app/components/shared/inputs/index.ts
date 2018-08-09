@@ -23,9 +23,9 @@ export enum EInputType {
 export interface IInputMetadata {
   required?: boolean;
   description?: string;
-  hint?: string;
   type?: EInputType;
   title?: string;
+  tooltip?: string;
 }
 
 export interface INumberMetadata extends IInputMetadata {
@@ -56,6 +56,11 @@ export interface IListOption<TValue> {
   value: TValue;
   title: string;
   description?: string;
+}
+
+export interface IMediaGalleryMetadata extends IInputMetadata {
+  fileName: string;
+  clearImage: string;
 }
 
 // a helper for creating metadata
