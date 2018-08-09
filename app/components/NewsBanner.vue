@@ -1,19 +1,19 @@
 <template>
-<div class="banner">
-  <img class="bg-image" src="http://via.placeholder.com/150x150" />
+<div class="banner" :class="[bannerExists ? '' : 'hide']">
+  <img class="bg-image" :src="currentBanner.thumbnail" />
   <div class="image-container">
-    <img class="shadow-image__left" src="http://via.placeholder.com/150x150" />
-    <img class="shadow-image__right" src="http://via.placeholder.com/150x150" />
-    <img class="main-image" src="http://via.placeholder.com/150x150" />
+    <img class="shadow-image__left" :src="currentBanner.thumbnail" />
+    <img class="shadow-image__right" :src="currentBanner.thumbnail" />
+    <img class="main-image" :src="currentBanner.thumbnail" />
   </div>
   <div>
     <div class="new-label">New</div>
-    <h3 class="title">The Affiliate Program Has Arrived. $53,678 Has Been Paid Out So Far.</h3>
-    <p class="subheading">If you use Streamlabs OBS, you’re probably already recommending it to your friends. Now you can earn revenue for your channel in the process.</p>
+    <h3 class="title">{{ currentBanner.header }}</h3>
+    <p class="subheading">{{ currentBanner.sub_header }}</p>
   </div>
   <div>
-    <button class="button learn-more">{{ $t('Learn More') }}</button>
-    <button class="dismiss-button">{{ $t('Dismiss') }}</button>
+    <button class="button learn-more" @click="followLink">{{ currentBanner.link_title }}</button>
+    <button class="dismiss-button" @click="closeBanner">{{ $t('Dismiss') }}</button>
   </div>
 </div>
 </template>
@@ -24,6 +24,7 @@
 @import "../styles/index";
 
 .banner{
+  .transition();
   width: 100%;
   height: 100px;
   background-color: @teal;
@@ -34,6 +35,10 @@
   align-content: center;
   justify-content: space-between;
   overflow: hidden;
+}
+
+.banner.hide {
+  height: 0;
 }
 
 .bg-image {
