@@ -1,7 +1,7 @@
 <template>
   <div>
 
-    <div v-if="hasCustomFields">
+    <div v-if="customFields">
       <div v-if="isEditMode">
         <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
       </div>
@@ -10,7 +10,7 @@
           v-for="inputData in inputsData"
           v-if="inputData.metadata"
           :key="inputData.fieldName"
-          :value="inputData.value"
+          v-model="customFields[inputData.fieldName].value"
           :metadata="inputData.metadata"
         />
       </div>
@@ -18,28 +18,35 @@
     <div v-else>
       <button
         class="button"
-        @click="addFields()">
+        @click="addDefaultFields()">
         {{ $t('Add Custom Fields') }}
       </button>
     </div>
 
     <div class="modal-layout-controls">
-      <button class="button button--default left-button button--action"  v-if="hasCustomFields" @click="removeFields()">
+      <button class="button button--default left-button button--action" v-if="customFields" @click="removeFields()">
         {{ $t('Remove Custom Fields') }}
       </button>
 
       <button
         class="button left-button button--action"
         v-if="!isEditMode"
-        @click="setEditMode(true)"
+        @click="showJsonEditor()"
       >
         {{ $t('Update') }}
       </button>
 
       <button
-          class="button"
-          :class="{'button--action': canSave, 'is-disabled': !canSave }"
-          @click="canSave && save()">
+        class="button button--default"
+        v-if="isEditMode"
+        @click="closeJsonEditor()">
+        {{ $t('Cancel') }}
+      </button>
+
+      <button
+          class="button button--action"
+          v-if="!isEditMode"
+          @click="closeJsonEditor(true)">
         {{ $t('Save') }}
       </button>
     </div>

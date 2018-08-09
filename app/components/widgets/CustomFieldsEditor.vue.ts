@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
 import { CodeInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
@@ -9,6 +9,7 @@ import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata, metadata } from 'components/shared/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import { debounce } from "lodash-decorators";
 
 type TCustomFieldType =
   'colorpicker' |
@@ -30,7 +31,7 @@ export interface ICustomField {
   steps?: number;
 }
 
-const DEFAULT_JSON: Dictionary<ICustomField> = {
+const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
 
   customField1: {
     label: 'Color Picker Example',
@@ -98,34 +99,26 @@ export default class CustomFieldsEditor extends Vue {
   @Prop()
   value: IWidgetData;
 
+  customFields: Dictionary<ICustomField> = this.value.settings['custom_json'];
   editorInputValue = this.value.settings['custom_json'];
-
-  private initialInputValue = this.editorInputValue;
-  private serverInputValue = this.editorInputValue;
-
   isEditMode = false;
   isLoading = false;
 
+  private serverInputValue = this.editorInputValue;
   private settingsService: WidgetSettingsService<any>;
+
+  @debounce(1000)
+  @Watch('customFields', { deep: true })
+  async onDataChangeHandler() {
+    this.save();
+  }
 
   created() {
     this.settingsService = this.widgetsService.getWidgetSettingsService(this.value.type);
   }
 
-  get hasCustomFields() {
-    return this.editorInputValue !== null;
-  }
-
-  get hasChanges() {
-    return this.serverInputValue !== this.editorInputValue;
-  }
-
-  get canSave() {
-    return this.hasChanges && !this.isLoading;
-  }
-
   get inputsData(): { value: number | string, metadata: IInputMetadata, fieldName: string }[] {
-    const fields: Dictionary<ICustomField> = JSON.parse(this.editorInputValue);
+    const fields: Dictionary<ICustomField> = this.customFields;
     return Object.keys(fields).map((fieldName) => {
       const field = fields[fieldName];
       const inputValue = field.value;
@@ -171,18 +164,11 @@ export default class CustomFieldsEditor extends Vue {
 
 
   async save() {
-    if (!this.canSave) return;
-
-    try {
-      JSON.stringify(this.editorInputValue);
-    } catch (e) {
-      alert($t('Invalid JSON'));
-    }
 
     this.isLoading = true;
 
     const newData = cloneDeep(this.value);
-    newData.settings['custom_json'] = this.editorInputValue;
+    newData.settings['custom_json'] = this.customFields;
 
 
     try {
@@ -195,26 +181,36 @@ export default class CustomFieldsEditor extends Vue {
 
     this.serverInputValue = this.editorInputValue;
     this.isLoading = false;
-    this.setEditMode(false);
   }
 
-  discardChanges() {
-    const newData = cloneDeep(this.value);
-    newData.settings['custom_json'] = this.initialInputValue;
-    this.emitInput(newData);
-  }
-
-  setEditMode(enabled: boolean) {
+  showJsonEditor(enabled: boolean) {
     this.isEditMode = enabled;
   }
 
-  addFields() {
-    this.editorInputValue = JSON.stringify(DEFAULT_JSON, null, 2);
+  closeJsonEditor(needSave: boolean) {
+    if (!needSave) {
+      this.isEditMode = false;
+      this.editorInputValue = JSON.stringify(this.customFields);
+      return;
+    }
+
+    let newCustomFields: Dictionary<ICustomField>;
+    try {
+      newCustomFields = JSON.parse(this.editorInputValue);
+    } catch (e) {
+      alert('Invalid JSON');
+      return;
+    }
+
+    this.customFields = newCustomFields;
+  }
+
+  addDefaultFields() {
+    this.customFields = cloneDeep(DEFAULT_CUSTOM_FIELDS);
   }
 
   removeFields() {
-    this.editorInputValue = null;
-    this.setEditMode(false);
+    this.customFields = null;
   }
 
 
