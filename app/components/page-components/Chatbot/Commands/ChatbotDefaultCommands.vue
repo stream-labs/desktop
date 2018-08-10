@@ -1,61 +1,67 @@
 <template>
-<div>
-  <!-- batch actions -->
-  <div class="align-items--inline align-items--top text-align--right padding--10">
-    <button
-      class="chatbot__button--reset button margin--10"
-    >
-      Reset Commands
-    </button>
-    <input
-      type="text"
-      class="chatbot__input--search width--auto margin--10"
-      placeholder="Search"
-    />
-  </div>
-
-  <!-- slugs -->
-  <div
-    class="padding--10"
-    v-for="(commands, slugName, index) in commandSlugs"
-    :key="index"
-  >
-    <div class="chatbot__dropdown-header">
-      <i class="icon-down"></i>
-      <span>{{ $t(slugName) }}</span>
+  <div>
+    <!-- batch actions -->
+    <div class="align-items--inline align-items--top text-align--right padding--10">
+      <button
+        @click="onResetDefaultCommands"
+        class="chatbot__button--reset button button--default margin--10"
+      >
+        {{ $t('Reset Commands') }}
+      </button>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="chatbot__input--search width--auto margin--10"
+        placeholder="Search"
+      />
     </div>
 
-    <!-- commands in slug -->
-    <table>
-      <thead>
-        <tr>
-          <th>Command</th>
-          <th>Description</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(command, commandName, index) in commands"
-          :key="index"
-        >
-          <td> {{ $t(command.command) }} </td>
-          <td> {{ $t(command.description) }} </td>
-          <td>
-            <div class="align-items--inline">
-              <ToggleInput
-                v-if="typeof command.enabled === 'boolean'"
-                :value="command.enabled"
-                @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
-              />
-              <i class="icon-edit padding--5"></i>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- slugs -->
+    <div
+      class="padding--10"
+      v-for="(commands, slugName, index) in commandSlugs"
+      :key="index"
+    >
+      <div class="chatbot__dropdown-header">
+        <i class="icon-down"></i>
+        <span>{{ $t(slugName) }}</span>
+      </div>
+
+      <!-- commands in slug -->
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(command, commandName, index) in commands"
+            :key="index"
+            v-if="matchesQuery(commandName, command)"
+          >
+            <td> {{ $t(command.command) }} </td>
+            <td> {{ $t(command.description) }} </td>
+            <td>
+              <div class="align-items--inline">
+                <ToggleInput
+                  v-if="typeof command.enabled === 'boolean'"
+                  :value="command.enabled"
+                  @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
+                />
+                <i
+                  class="icon-edit padding--5"
+                  @click="openCommandWindow(slugName, commandName, command)"
+                />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang='ts' src="./ChatbotDefaultCommands.vue.ts"></script>
@@ -82,14 +88,6 @@
 }
 
 tbody tr {
-  .transition;
-  .cursor--pointer;
-
-  &:hover {
-    td {
-      color: black;
-    }
-  }
 
   td:first-child {
     width: 300px;
@@ -118,9 +116,6 @@ tbody tr {
   tbody tr {
     border: 2px solid transparent;
     .transition;
-    .cursor--pointer;
-    .transition;
-    color: white;
 
     td {
       color: white;

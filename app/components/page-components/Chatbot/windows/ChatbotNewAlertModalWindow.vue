@@ -1,6 +1,6 @@
 <template>
 <modal
-  name='new-alert'
+  :name="NEW_ALERT_MODAL_ID"
   :height="'auto'"
   :maxHeight="600"
   @before-open="bindOnSubmitAndCheckIfEdited"

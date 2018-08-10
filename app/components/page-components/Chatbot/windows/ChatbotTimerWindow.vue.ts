@@ -1,8 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import SliderInput from 'components/shared/inputs/SliderInput.vue';
+import { cloneDeep } from 'lodash';
 
 import {
   ITimer,
@@ -10,16 +8,10 @@ import {
 
 import {
   ITextMetadata,
-  ISliderMetadata
+  INumberMetadata
 } from 'components/shared/inputs/index';
 
-@Component({
-  components: {
-    TextAreaInput,
-    TextInput,
-    SliderInput
-  }
-})
+@Component({})
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   newTimer: ITimer = {
     name: null,
@@ -40,14 +32,31 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     placeholder: 'This phrase will appear after the timer has ended'
   };
 
-  intervalMetadata: ISliderMetadata = {
+  intervalMetadata: INumberMetadata = {
     min: 0,
     max: 150,
+    placeholder: 'Interval in minutes'
   }
 
-  chatLinesMetadata: ISliderMetadata = {
+  chatLinesMetadata: INumberMetadata = {
     min: 0,
-    max: 100
+    max: 100,
+    placeholder: 'Minimum chat lines'
+  }
+
+  mounted() {
+    // if editing existing custom command
+    if (this.isEdit) {
+      this.newTimer = cloneDeep(this.timerToUpdate);
+    }
+  }
+
+  get isEdit() {
+    return this.timerToUpdate && this.timerToUpdate.id;
+  }
+
+  get timerToUpdate() {
+    return this.chatbotCommonService.state.timerToUpdate;
   }
 
   onCancel() {
@@ -55,6 +64,10 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
+    if (this.isEdit) {
+      this.chatbotApiService.updateTimer(this.timerToUpdate.id, this.newTimer);
+      return;
+    }
     this.chatbotApiService.createTimer(this.newTimer);
   }
 }

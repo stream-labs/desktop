@@ -2,66 +2,66 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Caps Protection Preferences')"
+  :title="$t('Symbol Protection Preferences')"
 >
   <div slot="fixed">
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
     </Tabs>
   </div>
-  <div slot="content" class="chatbot-caps-protection__container">
+  <div slot="content" class="chatbot-symbol-protection__container">
     <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general' && capsProtection">
+      <div v-if="selectedTab === 'general' && symbolProtection">
         <div class="row">
           <div class="small-6 columns">
             <label for="excluded" class="margin-vertical--10">Auto Permit</label>
             <ListInput
-              v-model="capsProtection.general.excluded.level"
-              :metadata="metadata.caps.general.excluded.level"
+              v-model="symbolProtection.general.excluded.level"
+              :metadata="metadata.symbol.general.excluded.level"
             />
           </div>
           <div class="small-6 columns">
             <label for="punishment" class="margin-vertical--10">Punishment</label>
             <ListInput
-              v-model="capsProtection.general.punishment.type"
-              :metadata="metadata.caps.general.punishment.type"
+              v-model="symbolProtection.general.punishment.type"
+              :metadata="metadata.symbol.general.punishment.type"
             />
           </div>
         </div>
-        <div v-if="capsProtection.general.punishment.type === 'Timeout'">
+        <div v-if="symbolProtection.general.punishment.type === 'Timeout'">
           <label for="response" class="margin-vertical--10">Punishment Duration</label>
           <NumberInput
-            v-model="capsProtection.general.punishment.duration"
-            :metadata="metadata.caps.general.punishment.duration"
+            v-model="symbolProtection.general.punishment.duration"
+            :metadata="metadata.symbol.general.punishment.duration"
           />
         </div>
         <div>
           <label for="response" class="margin-vertical--10">Punishment Response</label>
           <TextAreaInput
-            v-model="capsProtection.general.message"
-            :metadata="metadata.caps.general.message"
+            v-model="symbolProtection.general.message"
+            :metadata="metadata.symbol.general.message"
           />
         </div>
       </div>
       <div v-if="selectedTab === 'advanced'">
         <div>
-          <label for="response" class="margin-vertical--10">Minimum Amount of Caps</label>
+          <label for="response" class="margin-vertical--10">Minimum Amount of Symbols</label>
           <NumberInput
-            v-model="capsProtection.advanced.minimum"
-            :metadata="metadata.caps.advanced.minimum"
+            v-model="symbolProtection.advanced.minimum"
+            :metadata="metadata.symbol.advanced.minimum"
           />
         </div>
         <div>
-          <label for="response" class="margin-vertical--10">Maximum Amount of Caps</label>
+          <label for="response" class="margin-vertical--10">Maximum Amount of Symbols</label>
           <NumberInput
-            v-model="capsProtection.advanced.maximum"
-            :metadata="metadata.caps.advanced.maximum"
+            v-model="symbolProtection.advanced.maximum"
+            :metadata="metadata.symbol.advanced.maximum"
           />
         </div>
         <div>
           <label for="response" class="margin-vertical--10">Maximum Percent</label>
           <SliderInput
-            v-model="capsProtection.advanced.percent"
-            :metadata="metadata.caps.advanced.percent"
+            v-model="symbolProtection.advanced.percent"
+            :metadata="metadata.symbol.advanced.percent"
           />
         </div>
       </div>
@@ -83,10 +83,10 @@
 </ModalLayout>
 </template>
 
-<script lang="ts" src="./ChatbotCapsProtectionWindow.vue.ts"></script>
+<script lang="ts" src="./ChatbotSymbolProtectionWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
-.chatbot-caps-protection__container {
+.chatbot-symbol-protection__container {
   padding-top: 45px;
 }
 </style>

@@ -13,4 +13,26 @@ Vue.use(VModal);
   },
   mixins: [windowMixin]
 })
-export default class ChatbotWindowsBase extends ChatbotBase {}
+export default class ChatbotWindowsBase extends ChatbotBase {
+
+  // switching between 2 child windows, link protection and default command(to edit link protection command)
+  toggleLinkProtectionWindow() {
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions().componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotCommonService.openLinkProtectionWindow();
+        break;
+      case 'ChatbotLinkProtectionWindow':
+        const linkProtectionPermitCommand =
+          this.chatbotApiService.state.defaultCommandsResponse['link-protection'].permit;
+
+        this.chatbotCommonService.openDefaultCommandWindow({
+          ...linkProtectionPermitCommand,
+          slugName: 'link-protection',
+          commandName: 'permit'
+        });
+        break;
+    }
+  }
+}

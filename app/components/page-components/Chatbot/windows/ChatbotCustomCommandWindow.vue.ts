@@ -1,29 +1,25 @@
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
-import TextInput from 'components/shared/inputs/TextInput.vue';
-import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
-import ListInput from 'components/shared/inputs/ListInput.vue';
+import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
+import { cloneDeep } from 'lodash';
+import { ITab } from 'components/Tabs.vue';
 
 import {
   ICustomCommand,
-  ChatbotPermissionsEnums,
-  ChatbotResponseTypes,
 } from 'services/chatbot/chatbot-interfaces';
-
 
 import {
   IListMetadata,
   ITextMetadata,
+  INumberMetadata
 } from 'components/shared/inputs/index';
 
 @Component({
   components: {
-    TextInput,
-    TextAreaInput,
-    ListInput
+    ChatbotAliases
   }
 })
-export default class ChatbotCommandWindow extends ChatbotWindowsBase {
+export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   newCommand: ICustomCommand = {
     command: null,
     response: null,
@@ -41,7 +37,7 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     enabled: true
   };
 
-  tabs: { name: string; value: string }[] = [
+  tabs: ITab[] = [
     {
       name: 'General',
       value: 'general'
@@ -64,6 +60,21 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     placeholder: 'The phrase that will appear after a user enters the command'
   };
 
+  mounted() {
+    // if editing existing custom command
+    if (this.isEdit) {
+      this.newCommand = cloneDeep(this.customCommandToUpdate);
+    }
+  }
+
+  get isEdit() {
+    return this.customCommandToUpdate && this.customCommandToUpdate.id;
+  }
+
+  get customCommandToUpdate() {
+    return this.chatbotCommonService.state.customCommandToUpdate;
+  }
+
   get permissionMetadata() {
     let permissionMetadata: IListMetadata<number> = {
       options: this.chatbotPermissions
@@ -71,11 +82,19 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
     return permissionMetadata;
   }
 
-  get showToMetadata() {
-    let showToMetadata: IListMetadata<string> = {
+  get replyTypeMetadata() {
+    let replyTypeMetadata: IListMetadata<string> = {
       options: this.chatbotResponseTypes
     };
-    return showToMetadata;
+    return replyTypeMetadata;
+  }
+
+  get cooldownsMetadata() {
+    let timerMetadata: INumberMetadata = {
+      placeholder: 'cooldown in minutes',
+      min: 0
+    };
+    return timerMetadata;
   }
 
   onSelectTab(tab: string) {
@@ -87,6 +106,14 @@ export default class ChatbotCommandWindow extends ChatbotWindowsBase {
   }
 
   onSave() {
+    if (this.isEdit) {
+      this.chatbotApiService.updateCustomCommand(
+        this.customCommandToUpdate.id,
+        this.newCommand
+      );
+      return;
+    }
+
     this.chatbotApiService.createCustomCommand(this.newCommand);
   }
 }

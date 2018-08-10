@@ -2,8 +2,9 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
+
 @Component({})
-export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
+export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -23,9 +24,9 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   onSave() {
     this.chatbotApiService
-      .updateCapsProtection({
-        enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection
+      .updateSymbolProtection({
+        enabled: this.symbolProtectionResponse.enabled,
+        settings: this.symbolProtection
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

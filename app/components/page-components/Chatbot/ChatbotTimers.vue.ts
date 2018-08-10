@@ -1,14 +1,12 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component, Prop } from 'vue-property-decorator';
-import {
-  ITimersResponse,
-  ITimersData,
-  IPagination,
-  IChatbotAPIPutResponse
-} from 'services/chatbot/chatbot-interfaces';
+import { Component } from 'vue-property-decorator';
+import { ITimer } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
+
+  searchQuery = '';
+
   get timers() {
     return this.chatbotApiService.state.timersResponse.data;
   }
@@ -22,8 +20,15 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService.fetchTimers(this.currentPage);
   }
 
-  openTimerWindow() {
-    this.chatbotCommonService.openTimerWindow();
+  matchesQuery(timer: ITimer) {
+    return (
+      timer.name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
+      timer.message.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
+    )
+  }
+
+  openTimerWindow(timer?: ITimer) {
+    this.chatbotCommonService.openTimerWindow(timer);
   }
 
   toggleEnableTimer(timerId: string, index: number, isEnabled: boolean) {
@@ -33,5 +38,9 @@ export default class ChatbotTimers extends ChatbotBase {
       ...timerToBeUpdated,
       enabled: isEnabled
     });
+  }
+
+  deleteTimer(timer?: ITimer) {
+    this.chatbotApiService.deleteTimer(timer.id);
   }
 }

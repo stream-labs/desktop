@@ -9,6 +9,7 @@
       Add Timer
     </button>
     <input
+      v-model="searchQuery"
       type="text"
       class="chatbot__input--search width--auto margin--10"
       placeholder="Search"
@@ -32,6 +33,7 @@
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
+            v-if="matchesQuery(timer)"
         >
           <td> {{ timer.name }} </td>
           <td> {{ timer.interval }} </td>
@@ -43,7 +45,14 @@
                 :value="timer.enabled"
                 @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
               />
-              <i class="icon-edit padding--5"></i>
+              <DropdownMenu
+                :placement="'bottom-end'"
+                class="chatbot-timers__timer-actions__container"
+                :icon="'icon-more'"
+              >
+                <button @click="openTimerWindow(timer)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="deleteTimer(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+              </DropdownMenu>
             </div>
           </td>
         </tr>
@@ -63,10 +72,8 @@ tbody tr {
   .transition;
   .cursor--pointer;
 
-  &:hover {
-    td {
-      color: black;
-    }
+  td {
+    color: black;
   }
 
   td:first-child {
@@ -89,10 +96,28 @@ tbody tr {
   }
 }
 
+.chatbot-timers__timer-actions__container {
+  button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
+  }
+}
+
+
 
 .night-theme {
   td {
     .transition;
+    color: white;
   }
 
   tbody tr {
@@ -100,12 +125,6 @@ tbody tr {
     .transition;
     .cursor--pointer;
     color: white;
-
-    &:hover {
-      td {
-        color: white;
-      }
-    }
   }
   tbody tr:nth-child(odd) {
     background-color: @navy-secondary;

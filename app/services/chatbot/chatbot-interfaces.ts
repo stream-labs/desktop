@@ -1,3 +1,4 @@
+
 // state
 export interface IChatbotApiServiceState {
   apiToken: string;
@@ -11,6 +12,13 @@ export interface IChatbotApiServiceState {
   symbolProtectionResponse: ISymbolProtectionResponse;
   linkProtectionResponse: ILinkProtectionResponse;
   wordProtectionResponse: IWordProtectionResponse;
+}
+
+export interface IChatbotCommonServiceState {
+  toasted: any;
+  customCommandToUpdate: ICustomCommand;
+  defaultCommandToUpdate: IDefaultCommand;
+  timerToUpdate: ITimer;
 }
 
 // responses
@@ -27,6 +35,11 @@ export interface IChatbotAPIPutResponse {
   success: boolean;
 }
 
+export interface IChatbotAPIDeleteResponse {
+  success: boolean;
+}
+
+
 export interface IDafaultCommandsResponse {
   commands: IDafaultCommandsSlug;
   'link-protection': IDafaultCommandsSlug;
@@ -39,7 +52,7 @@ export interface ICustomCommandsResponse {
 }
 
 export interface ICommandVariablesResponse {
-  [id: number] : ICommandVariables;
+  [id: number] : ICommandVariable;
 }
 
 export interface ITimersResponse {
@@ -53,22 +66,22 @@ export interface IChatAlertsResponse {
 }
 
 export interface ICapsProtectionResponse {
-  settings: object;
+  settings: ICapsProtectionData;
   enabled: boolean;
 }
 
 export interface ISymbolProtectionResponse {
-  settings: object;
+  settings: ISymbolProtectionData;
   enabled: boolean;
 }
 
 export interface ILinkProtectionResponse {
-  settings: object;
+  settings: ILinkProtectionData;
   enabled: boolean;
 }
 
 export interface IWordProtectionResponse {
-  settings: object;
+  settings: IWordProtectionData;
   enabled: boolean;
 }
 
@@ -97,12 +110,21 @@ export interface IPagination {
   total: number;
 }
 
+export interface IPunishment {
+  duration: number;
+  type: string;
+}
+
+
+export interface IExcluded extends IPermission {}
+
+
 // default commands
 export interface IDefaultCommand {
   command: string;
   description: string;
   aliases: IAliases;
-  response_type: string;
+  response_type?: string;
   success_response?: string;
   failed_response?: string;
   response?: string;
@@ -111,6 +133,8 @@ export interface IDefaultCommand {
   enabled?: boolean;
   enabled_response?: string;
   disabled_response?: string;
+  slugName?: string;
+  commandName?: string;
 }
 
 export interface IDafaultCommandsSlug {
@@ -121,23 +145,6 @@ export interface IDafaultCommandsSlug {
 export interface ICustomCommandsData {
   [id: number]: ICustomCommand;
 }
-
-
-export interface ICustomCommandRow {
-  id?: string;
-  user_id?: number;
-  command: string;
-  permission: IPermission;
-  response: string;
-  response_type?: string;
-  cooldowns: ICooldown;
-  aliases: IAliases;
-  platforms: number;
-  enabled: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
 
 export interface ICustomCommand {
   id?: string;
@@ -155,8 +162,12 @@ export interface ICustomCommand {
 }
 
 // command variables
-export interface ICommandVariables {
-  [id: string]: any
+export interface ICommandVariable {
+  variable: string;
+  description: string;
+  example: string;
+  result: string;
+  tags: string[];
 }
 
 // timers
@@ -194,7 +205,6 @@ export interface IChatAlertsData {
   }
 }
 
-// shared
 export interface IAlertType {
   enabled: boolean;
   messages: IAlertMessage[];
@@ -207,6 +217,66 @@ export interface IAlertMessage {
   tier?: string;
 }
 
+// protections
+export interface IProtectionGeneral {
+  punishment?: IPunishment;
+  excluded: IExcluded;
+  message: string;
+}
+
+export interface IProtectionAdvanced {
+  minimum?: number;
+  maximum?: number;
+  percent?: number;
+}
+
+export interface IProtectionList<type> {
+  [id: number]: type;
+}
+
+
+// caps protection data
+export interface ICapsProtectionData {
+  general: IProtectionGeneral;
+  advanced: IProtectionAdvanced;
+}
+
+// symbol protection data
+export interface ISymbolProtectionData {
+  general: IProtectionGeneral;
+  advanced: IProtectionAdvanced;
+}
+// link protection data
+export interface ILinkProtectionData {
+  commands: ILinkProtectionCommands;
+  general: IProtectionGeneral;
+  whitelist: IProtectionList<string>;
+  blacklist: IProtectionList<string>;
+}
+
+export interface ILinkProtectionCommands {
+  [id: string]: ILinkProtectionCommand;
+}
+
+export interface ILinkProtectionCommand {
+  command: string;
+  description: string;
+  response: string;
+  response_type: string;
+  aliases: IAliases;
+}
+
+// words protection data
+export interface IWordProtectionData {
+  general: IProtectionGeneral;
+  blacklist: IProtectionList<IWordProtectionBlackListItem>;
+}
+
+export interface IWordProtectionBlackListItem {
+  text: string;
+  is_regex: boolean;
+  punishment: IPunishment;
+}
 
 // dictionaries
 export enum ChatbotPermissionsEnums {
@@ -218,6 +288,12 @@ export enum ChatbotPermissionsEnums {
   All = Viewer | Subscriber | Moderator | Broadcaster
 }
 
+export enum ChatbotPunishments {
+  Purge = 'Purge',
+  Timeout = 'Timeout',
+  Ban = 'Ban'
+}
+
 export enum ChatbotResponseTypes {
   Chat = 'Chat',
   Whisper = 'Whisper'
@@ -227,3 +303,5 @@ export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
+export const NEW_LINK_PROTECTION_LIST_MODAL_ID = 'new-link-protection-list';
+export const NEW_WORD_PROTECTION_LIST_MODAL_ID = 'new-word-protection-list';

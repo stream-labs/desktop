@@ -1,17 +1,26 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
+import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
-@Component({})
-export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
+@Component({
+  components: {
+    ChatbotLinkProtectionList,
+  }
+})
+export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
       value: 'general'
     },
     {
-      name: $t('Advanced'),
-      value: 'advanced'
+      name: $t('Whitelist'),
+      value: 'whitelist'
+    },
+    {
+      name: $t('Blacklist'),
+      value: 'blacklist'
     }
   ];
 
@@ -23,9 +32,9 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   onSave() {
     this.chatbotApiService
-      .updateCapsProtection({
-        enabled: this.capsProtectionResponse.enabled,
-        settings: this.capsProtection
+      .updateLinkProtection({
+        enabled: this.linkProtectionResponse.enabled,
+        settings: this.linkProtection
       })
       .then(() => {
         this.chatbotCommonService.closeChildWindow();

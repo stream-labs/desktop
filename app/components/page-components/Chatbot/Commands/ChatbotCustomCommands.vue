@@ -1,54 +1,63 @@
 <template>
-<div>
-  <!-- batch actions -->
-  <div class="flex flex--space-between padding--10">
-    <button
-      @click="openCommandWindow"
-      class="button button--action margin--10"
-    >
-      Add Command
-    </button>
-    <input
-      type="text"
-      class="chatbot__input--search width--auto margin--10"
-      placeholder="Search"
-    />
-  </div>
-
-  <!-- custom commands -->
-  <div class="padding--10">
-    <div v-if="commands && commands.length === 0">
-      <h2>No custom commands. Click to add new.</h2>
+  <div>
+    <!-- batch actions -->
+    <div class="flex flex--space-between padding--10">
+      <button
+        @click="openCommandWindow"
+        class="button button--action margin--10"
+      >
+        Add Command
+      </button>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="chatbot__input--search width--auto margin--10"
+        placeholder="Search"
+      />
     </div>
-    <table v-else>
-      <thead>
-        <tr>
-          <th>Command</th>
-          <th>Response</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(command, index) in commands"
-          :key="command.command"
-        >
-          <td> {{ $t(command.command) }} </td>
-          <td> {{ $t(command.response) }} </td>
-          <td>
-            <div class="align-items--inline">
-              <ToggleInput
-                :value="command.enabled"
-                @input="toggleEnableCommand(command.id, index, !command.enabled)"
-              />
-              <i class="icon-edit padding--5"></i>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+
+    <!-- custom commands -->
+    <div class="padding--10">
+      <div v-if="commands && commands.length === 0">
+        <h2>No custom commands. Click to add new.</h2>
+      </div>
+      <table v-else>
+        <thead>
+          <tr>
+            <th> {{ $t('Command') }} </th>
+            <th> {{ $t('Response') }} </th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(command, index) in commands"
+            :key="command.id"
+            v-if="matchesQuery(command)"
+          >
+            <td> {{ $t(command.command) }} </td>
+            <td> {{ $t(command.response) }} </td>
+            <td>
+              <div class="align-items--inline">
+                <ToggleInput
+                  :value="command.enabled"
+                  @input="toggleEnableCommand(command.id, index, !command.enabled)"
+                />
+                <DropdownMenu
+                  :placement="'bottom-end'"
+                  class="chatbot-custom-commands__command-actions__container"
+                  :icon="'icon-more'"
+                >
+                  <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                </DropdownMenu>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 </template>
 
 <script lang='ts' src="./ChatbotCustomCommands.vue.ts"></script>
@@ -58,16 +67,6 @@
 
 tbody tr {
   .transition;
-
-  &:hover {
-    td {
-      color: black;
-    }
-  }
-
-  td {
-    color: black;
-  }
 
   td:first-child {
     width: 300px;
@@ -89,14 +88,27 @@ tbody tr {
   }
 }
 
+.chatbot-custom-commands__command-actions__container {
+  button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
+  }
+}
+
 
 .night-theme {
 
   tbody tr {
     border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    .transition;
     td {
       color: white;
     }
