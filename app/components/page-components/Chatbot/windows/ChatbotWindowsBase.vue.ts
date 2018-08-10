@@ -25,7 +25,8 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         break;
       case 'ChatbotLinkProtectionWindow':
         const linkProtectionPermitCommand =
-        this.chatbotApiService.state.defaultCommandsResponse['link-protection'].permit;
+          this.chatbotApiService.state.defaultCommandsResponse['link-protection'].permit;
+
         this.chatbotCommonService.openDefaultCommandWindow({
           ...linkProtectionPermitCommand,
           slugName: 'link-protection',

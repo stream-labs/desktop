@@ -115,6 +115,7 @@ export interface IPunishment {
   type: string;
 }
 
+
 export interface IExcluded extends IPermission {}
 
 

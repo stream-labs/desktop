@@ -132,7 +132,7 @@
 }
 
 .chatbot-alerts__alert-actions__container {
-  * > button {
+  button {
     display: block;
     width: 100%;
     margin-bottom: 10px;

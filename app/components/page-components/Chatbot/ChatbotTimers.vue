@@ -97,7 +97,7 @@ tbody tr {
 }
 
 .chatbot-timers__timer-actions__container {
-  * > button {
+  button {
     display: block;
     width: 100%;
     margin-bottom: 10px;

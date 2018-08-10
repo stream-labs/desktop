@@ -11,6 +11,8 @@ import {
   ChatbotPunishments,
 } from 'services/chatbot/chatbot-interfaces';
 
+import { IListOption } from 'components/shared/inputs'
+
 @Component({
   components: {
     ...inputComponents,
@@ -30,7 +32,7 @@ export default class ChatbotBase extends Vue {
 
   get chatbotPermissions() {
     let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
-      (a: any[], b: string) => {
+      (a: IListOption<number>[], b: string) => {
         if (typeof ChatbotPermissionsEnums[b] === 'number') {
           a.push({
             title: b,
