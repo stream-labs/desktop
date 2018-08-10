@@ -21,10 +21,10 @@
     <form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ tooltip: fontFamilyTooltip }" />
     <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
     <form-group :title="$t('Show Animation')">
-      <animation-input v-model="wData.settings.show_animation" />
+      <animation-input v-model="wData.settings.show_animation" :metadata="{filter: 'in'}" />
     </form-group>
     <form-group :title="$t('Hide Animation')">
-      <animation-input v-model="wData.settings.hide_animation" />
+      <animation-input v-model="wData.settings.hide_animation" :metadata="{filter: 'out'}"/>
     </form-group>
     <form-group :title="$t('Animation Speed')" type="slider" v-model="wData.settings.animation_speed" :metadata="{ min: 250, max: 4000, interval: 250 }" />
     <form-group :title="$t('Fade Time')" type="slider" v-model="wData.settings.fade_time" :metadata="{ max: 60, interval: 1 }" />
