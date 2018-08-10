@@ -107,7 +107,7 @@
           <div
             v-for="type in iterableWidgetTypes"
             :key="type"
-            v-show="!widgetData(type).platform || widgetData(type).platform === platform"
+            v-show="!widgetData(type).platforms || widgetData(type).platforms.has(platform)"
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes[type]}"
             @click="inspectSource(widgetTypes[type])"

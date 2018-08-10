@@ -40,7 +40,7 @@
 
       <template slot="title" slot-scope="{ node }">
         <span class="layer-icon">
-          <i :class="determineIcon(node.isLeaf, node.data)"></i>
+          <i :class="determineIcon(node.isLeaf, node.data.sourceId)"></i>
         </span>
         <span class="item-title">{{ node.title }}</span>
       </template>
@@ -104,6 +104,10 @@ i.disabled {
   }
 }
 
+.sl-vue-tree.sl-vue-tree-root {
+  border-color: @day-section;
+}
+
 .sl-vue-tree-node-item {
   cursor: pointer;
   border: 1px solid transparent;
@@ -138,6 +142,10 @@ i.disabled {
 .night-theme {
   .title-container {
     color: @grey;
+  }
+
+  .sl-vue-tree.sl-vue-tree-root {
+    border-color: @night-section;
   }
 }
 </style>

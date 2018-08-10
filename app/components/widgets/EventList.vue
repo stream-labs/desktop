@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Include your channel\'s most recent events into your stream.') }}
-  </div>
-
   <div slot="settings" >
     <form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <form-group :title="$t('Theme Color')" type="color" v-model="wData.settings.theme_color" />

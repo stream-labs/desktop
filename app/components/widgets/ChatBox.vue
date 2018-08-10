@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Include your channel\'s chat into your stream, and make it look pretty while you\'re at it.') }}
-  </div>
-
   <div slot="settings" >
 
     <form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>

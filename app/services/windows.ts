@@ -169,7 +169,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   closeChildWindow() {
-
     const windowOptions = this.state.child;
 
     // show previous window if `preservePrevWindow` flag is true
@@ -293,6 +292,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
   @mutation()
   private SET_CHILD_WINDOW_OPTIONS(options: IWindowOptions) {
+    options.queryParams = options.queryParams || {};
     this.state.child = options;
   }
 
