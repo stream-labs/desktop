@@ -15,7 +15,6 @@ export enum EInputType {
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
   code = 'code',
-  time = 'time',
 }
 
 /**
@@ -65,12 +64,6 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
   clearImage: string;
 }
 
-export interface ITimeMetadata extends IInputMetadata {
-  format?: string;
-  minuteInterval?: number;
-  secondInterval?: number;
-  hideClearButton?: boolean;
-}
 
 // a helper for creating metadata
 export const metadata = {
@@ -84,7 +77,6 @@ export const metadata = {
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
-  time: (options: ITimeMetadata) => ({ type: EInputType.time, ...options } as ITimeMetadata)
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html

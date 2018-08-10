@@ -57,7 +57,6 @@ declare module 'vue-codemirror';
 declare module 'recursive-readdir';
 declare module 'vue-toasted';
 declare module 'hyperform';
-declare module 'vue2-timepicker';
 
 // uncomment to allow TS to import components without type definitions
 // webpack still checks the module existence

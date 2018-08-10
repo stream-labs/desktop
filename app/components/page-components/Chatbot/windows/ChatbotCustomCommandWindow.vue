@@ -45,17 +45,17 @@
       <div v-if="selectedTab === 'advanced'">
         <div class="row">
           <div class="small-5 columns">
-            <label for="global_cooldown" class="margin-vertical--10">Global Command Cooldown</label>
-            <TimePickerInput
-              v-model="globalCooldown"
-              :metadata="timerMetadata"
+            <label for="global_cooldown" class="margin-vertical--10">Global Command Cooldown in mins</label>
+            <NumberInput
+              v-model="newCommand.cooldowns.global"
+              :metadata="cooldownsMetadata"
             />
           </div>
           <div class="small-5 columns">
-            <label for="user_cooldown" class="margin-vertical--10">User Command Cooldown</label>
-            <TimePickerInput
-              v-model="userCooldown"
-              :metadata="timerMetadata"
+            <label for="user_cooldown" class="margin-vertical--10">User Command Cooldown in mins</label>
+            <NumberInput
+              v-model="newCommand.cooldowns.user"
+              :metadata="cooldownsMetadata"
             />
           </div>
         </div>

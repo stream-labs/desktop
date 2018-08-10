@@ -1,7 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
-import { ITime } from 'components/shared/inputs/TimePickerInput.vue';
 import { cloneDeep } from 'lodash';
 import { ITab } from 'components/Tabs.vue';
 
@@ -12,12 +11,12 @@ import {
 import {
   IListMetadata,
   ITextMetadata,
-  ITimeMetadata,
+  INumberMetadata
 } from 'components/shared/inputs/index';
 
 @Component({
   components: {
-    ChatbotAliases,
+    ChatbotAliases
   }
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
@@ -68,40 +67,6 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     }
   }
 
-  get globalCooldown() {
-    return {
-      HH: Math.round(this.newCommand.cooldowns.global / 60).toLocaleString(
-        undefined,
-        { minimumIntegerDigits: 2 }
-      ),
-      mm: (this.newCommand.cooldowns.global % 60).toLocaleString(undefined, {
-        minimumIntegerDigits: 2
-      })
-    };
-  }
-
-  set globalCooldown(timeObject: ITime) {
-    const { HH, mm } = timeObject;
-    this.newCommand.cooldowns.global = parseInt(HH) * 60 + parseInt(mm);
-  }
-
-  get userCooldown() {
-    return {
-      HH: Math.round(this.newCommand.cooldowns.user / 60).toLocaleString(
-        undefined,
-        { minimumIntegerDigits: 2 }
-      ),
-      mm: (this.newCommand.cooldowns.user % 60).toLocaleString(undefined, {
-        minimumIntegerDigits: 2
-      })
-    };
-  }
-
-  set userCooldown(timeObject: ITime) {
-    const { HH, mm } = timeObject;
-    this.newCommand.cooldowns.user = parseInt(HH) * 60 + parseInt(mm);
-  }
-
   get isEdit() {
     return this.customCommandToUpdate && this.customCommandToUpdate.id;
   }
@@ -124,10 +89,10 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return replyTypeMetadata;
   }
 
-  get timerMetadata() {
-    let timerMetadata: ITimeMetadata = {
-      format: 'HH:mm',
-      hideClearButton: true
+  get cooldownsMetadata() {
+    let timerMetadata: INumberMetadata = {
+      placeholder: 'cooldown in minutes',
+      min: 0
     };
     return timerMetadata;
   }
