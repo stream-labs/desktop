@@ -1,7 +1,15 @@
-import { IWidgetTester, IWidget, IWidgetDisplayData } from './widgets-api';
+import { IWidgetTester, IWidget } from './widgets-api';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { $t } from 'services/i18n';
 
+export interface IWidgetDisplayData {
+  name: string;
+  description: string;
+  platforms?: Set<string>;
+  demoVideo: boolean;
+  demoFilename: string;
+  supportList: string[];
+}
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
@@ -332,9 +340,9 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
+    platforms: new Set(['twitch', 'mixer']),
     supportList: [
       $t('Twitch Follows'),
-      $t('Youtube Follows'),
       $t('Mixer Follows')
     ]
   },
@@ -344,7 +352,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
     supportList: [$t('Youtube Subscribers')],
-    platform: 'youtube'
+    platforms: new Set(['youtube'])
   },
   [WidgetType.BitGoal]: {
     name: $t('Bit Goal'),
@@ -352,7 +360,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: false,
     demoFilename: 'source-bit-goal.png',
     supportList: [$t('Twitch Bits')],
-    platform: 'twitch'
+    platforms: new Set(['twitch'])
   },
   [WidgetType.DonationTicker]: {
     name: $t('Donation Ticker'),
