@@ -16,7 +16,7 @@ export default class NewsBanner extends Vue {
   }
 
   get headerText() {
-    return emojione.toImage(this.currentBanner.header);
+    return emojione.shortnameToUnicode(this.currentBanner.header);
   }
 
   closeBanner() {

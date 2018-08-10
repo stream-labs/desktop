@@ -19,7 +19,7 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
 
   static initialState: INewsBannerInfo = {
     id: null,
-    header: null,
+    header: '',
     sub_header: null,
     link: null,
     link_title: null,
@@ -40,10 +40,11 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
   }
 
   private async fetchBanner() {
-    const endpoint = `api/slobs/announcements/get?=clientId=${this.userService.getLocalUserId()}`
+    const endpoint = `api/v5/slobs/announcement/get?=clientId=${this.userService.getLocalUserId()}`
     const req = this.formRequest(endpoint);
     try {
-      return await fetch(req).then((rawResp) => rawResp.json());
+      let newState = await fetch(req).then((rawResp) => rawResp.json());
+      return newState.id ? newState : this.state;
     } catch (e) {
       return this.state;
     }

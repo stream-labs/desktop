@@ -13,7 +13,7 @@
   </div>
   <div>
     <button class="button learn-more" @click="followLink">{{ currentBanner.link_title }}</button>
-    <button class="dismiss-button" @click="closeBanner">{{ $t('Dismiss') }}</button>
+    <button class="dismiss-button" @click="closeBanner()">{{ $t('Dismiss') }}</button>
   </div>
 </div>
 </template>
@@ -45,7 +45,7 @@
   position: absolute;
   opacity: 0.2;
   height: 400%;
-  top: -50%;
+  top: -100%;
   left: -100px;
 }
 
@@ -73,6 +73,7 @@
 }
 
 .main-image {
+  position: relative;
   height: 100%;
   width: auto;
   z-index: 1;
