@@ -42,6 +42,7 @@ export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
   dateFormat?: string;
+  alphaOnly?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
