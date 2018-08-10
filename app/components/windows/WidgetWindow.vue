@@ -3,13 +3,9 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
-  :fixedSectionHeight="330"
   v-if="previewSource">
 
   <div slot="fixed">
-    <div class="description">
-      <slot name="description"></slot>
-    </div>
     <display class="display" :sourceId="previewSource.id" @click="createProjector"/>
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
