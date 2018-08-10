@@ -1,6 +1,8 @@
 import test from 'ava';
 import { useSpectron, focusMain, focusChild } from './helpers/spectron/index';
 import { selectSource, clickSourceProperties, sourceIsExisting } from './helpers/spectron/sources';
+import { logOut } from './helpers/spectron/user';
+
 
 useSpectron({ skipOnboarding: false });
 
@@ -49,6 +51,7 @@ test('Adding some starter widgets', async t => {
   t.false(await sourceIsExisting(t, 'Donation Ticker'));
   t.true(await sourceIsExisting(t, 'Donation Goal'));
 
+  await logOut(t); // widget settings don't work with a fake-auth
   await selectSource(t, 'Chat Box');
   await clickSourceProperties(t);
   await focusChild(t);
