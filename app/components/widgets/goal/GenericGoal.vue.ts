@@ -11,6 +11,7 @@ import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
+import CustomFieldsEditor from '../CustomFieldsEditor.vue';
 
 interface IGoalCreateOptions {
   title: string;
@@ -25,6 +26,7 @@ interface IGoalCreateOptions {
     FormGroup,
     ValidatedForm,
     CodeEditor,
+    CustomFieldsEditor,
     ...inputComponents
   }
 })

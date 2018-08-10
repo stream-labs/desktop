@@ -36,7 +36,7 @@
     left: 0;
     bottom: 0;
     background-color: @day-section;
-    padding: 10px 20px;
+    padding: 16px;
     text-align: right;
     flex-shrink: 0;
     z-index: 11;
