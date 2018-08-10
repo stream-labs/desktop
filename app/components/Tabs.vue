@@ -28,7 +28,7 @@
   background-color: @day-primary;
   box-sizing: border-box;
   position: absolute;
-  z-index: 1000;
+  z-index: 100;
   width: 100%;
   padding: 0 15px;
   height: 54px;
