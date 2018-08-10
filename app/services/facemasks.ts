@@ -213,9 +213,11 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   trigger(mask: string, message: string, name: string) {
+    const clean = this.profanitize(message, name);
     this.updateFilter({
       Mask: `${mask}.json`,
-      alertText: this.profanitize(message, name)['message'],
+      alertText: clean['message'],
+      donorName: clean['name'],
       alertActivate: true
     });
     this.playAudio();
@@ -463,10 +465,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
             {
               maskFolder: this.facemasksDirectory,
               alertDuration: this.settings.duration,
-              alertIntro: `${this.settings.transition.uuid}.json`,
-              alertOutro: `${this.settings.transition.uuid}.json`,
-              alertDoIntro: this.settings.transitions_enabled,
-              alertDoOutro: this.settings.transitions_enabled,
+              alertDoIntro: false,
+              alertDoOutro: false,
               alertActivate: false
             });
         } else {
@@ -474,10 +474,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
           this.updateFilter({
             maskFolder: this.facemasksDirectory,
             alertDuration: this.settings.duration,
-            alertIntro: `${this.settings.transition.uuid}.json`,
-            alertOutro: `${this.settings.transition.uuid}.json`,
-            alertDoIntro: this.settings.transitions_enabled,
-            alertDoOutro: this.settings.transitions_enabled,
+            alertDoIntro: false,
+            alertDoOutro: false,
             alertActivate: false
           });
         }
@@ -629,7 +627,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   private get facemasksDirectory() {
-    return path.join(electron.remote.app.getPath('userData'), 'Facemasks');
+    return path.join(electron.remote.app.getPath('userData'), 'plugin_config/facemask-plugin');
   }
 
   private libraryUrl(uuid: string) {
