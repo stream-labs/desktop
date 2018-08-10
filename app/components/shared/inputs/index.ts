@@ -42,7 +42,7 @@ export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
   dateFormat?: string;
-  alphaOnly?: boolean;
+  alpha?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -87,6 +87,10 @@ const validationMessages = {
       min_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or larger`,
       max_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or less`,
       date_format: (fieldName: string, params: number[]) => `The date must be in ${ params[0] } format`,
+<<<<<<< HEAD
+=======
+      alpha: () => $t('This field may only contain alphabetic characters')
+>>>>>>> chatbot-feature
     }
   }
 };
