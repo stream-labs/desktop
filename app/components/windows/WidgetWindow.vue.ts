@@ -82,7 +82,7 @@ export default class WidgetWindow extends Vue {
   }
 
   get windowTitle() {
-    return this.source ? $t('Settings for %{sourceName}', { sourceName: this.source.name }) : '';
+    return this.source ? $t('Settings for ') + this.source.name : '';
   }
 
   get tab(): IWidgetTab {
