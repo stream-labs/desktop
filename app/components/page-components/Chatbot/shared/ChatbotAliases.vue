@@ -15,7 +15,7 @@
     <div class="small-3 columns">
       <button
         type="submit"
-        :disabled="!newAlias || isDuplicate"
+        :disabled="!newAlias || isDuplicate || containsSpaces"
         class="chatbot-aliases__new-alias__button button button--default"
       >
         {{ $t('Add Alias') }}
@@ -24,6 +24,7 @@
   </div>
   <div class="margin-vertical--10">
     <i v-if="isDuplicate" > {{ $t('Cannot add duplicate aliases. Please add something else.') }} </i>
+    <i v-if="containsSpaces" > {{ $t('Alias cannot contain spaces.') }} </i>
     <i v-else> {{ $t('An alternative text string to trigger your command') }} </i>
   </div>
 

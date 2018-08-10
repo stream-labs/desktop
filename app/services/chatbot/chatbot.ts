@@ -442,7 +442,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotTimerWindow',
       size: {
         width: 650,
-        height: 400
+        height: 500
       }
     });
   }

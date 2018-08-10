@@ -20,14 +20,14 @@
             />
           </div>
           <div class="small-6 columns">
-            <label for="show to" class="margin-vertical--10">Punishment</label>
+            <label for="punishment" class="margin-vertical--10">Punishment</label>
             <ListInput
               v-model="capsProtection.general.punishment.type"
               :metadata="metadata.caps.general.punishment.type"
             />
           </div>
         </div>
-        <div>
+        <div v-if="capsProtection.general.punishment.type === 'Timeout'">
           <label for="response" class="margin-vertical--10">Punishment Duration</label>
           <NumberInput
             v-model="capsProtection.general.punishment.duration"

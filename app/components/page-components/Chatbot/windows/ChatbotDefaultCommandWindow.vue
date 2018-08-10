@@ -72,7 +72,7 @@
           />
         </div>
         <div v-if="defaultCommandToUpdate.response_type">
-          <label for="show to" class="margin-vertical--10">Show to</label>
+          <label for="reply in" class="margin-vertical--10">Reply in</label>
           <ListInput
             v-model="editedCommand.response_type"
             :metadata="metadata.response_type"

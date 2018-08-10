@@ -117,11 +117,11 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return permissionMetadata;
   }
 
-  get showToMetadata() {
-    let showToMetadata: IListMetadata<string> = {
+  get replyTypeMetadata() {
+    let replyTypeMetadata: IListMetadata<string> = {
       options: this.chatbotResponseTypes
     };
-    return showToMetadata;
+    return replyTypeMetadata;
   }
 
   get timerMetadata() {

@@ -4,7 +4,7 @@
     <div class="align-items--inline align-items--top text-align--right padding--10">
       <button
         @click="onResetDefaultCommands"
-        class="chatbot__button--reset button margin--10"
+        class="chatbot__button--reset button button--default margin--10"
       >
         {{ $t('Reset Commands') }}
       </button>

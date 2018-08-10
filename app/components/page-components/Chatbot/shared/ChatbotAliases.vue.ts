@@ -19,6 +19,10 @@ export default class ChatbotAliases extends ChatbotBase {
     return this.value.length > 0 && this.newAlias && this.value.indexOf(this.newAlias) > -1;
   }
 
+  get containsSpaces() {
+    return this.newAlias && this.newAlias.indexOf(' ') > -1;
+  }
+
   onAddAlias() {
     if (!this.newAlias) return;
     if (this.isDuplicate) return;

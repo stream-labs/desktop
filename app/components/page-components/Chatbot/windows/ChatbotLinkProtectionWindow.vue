@@ -32,14 +32,14 @@
               />
             </div>
             <div class="small-6 columns">
-              <label for="show to" class="margin-vertical--10">Punishment</label>
+              <label for="punishment" class="margin-vertical--10">Punishment</label>
               <ListInput
                 v-model="linkProtection.general.punishment.type"
                 :metadata="metadata.link.general.punishment.type"
               />
             </div>
           </div>
-          <div>
+          <div v-if="linkProtection.general.punishment.type === 'Timeout'">
             <label for="response" class="margin-vertical--10">Punishment Duration</label>
             <NumberInput
               v-model="linkProtection.general.punishment.duration"

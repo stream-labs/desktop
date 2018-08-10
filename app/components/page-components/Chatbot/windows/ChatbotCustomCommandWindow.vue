@@ -34,10 +34,10 @@
             />
           </div>
           <div class="small-6 columns">
-            <label for="show to" class="margin-vertical--10">Show to</label>
+            <label for="reply in" class="margin-vertical--10">Reply In</label>
             <ListInput
               v-model="newCommand.response_type"
-              :metadata="showToMetadata"
+              :metadata="replyTypeMetadata"
             />
           </div>
         </div>

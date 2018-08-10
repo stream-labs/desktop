@@ -53,15 +53,15 @@
             />
           </div>
           <div class="small-5 columns">
-            <label for="show to" class="margin-vertical--10">Punishment</label>
+            <label for="punishment" class="margin-vertical--10">Punishment</label>
             <ListInput
               v-model="newListItem.punishment.type"
               :metadata="metadata.punishment.type"
             />
           </div>
         </div>
-        <div>
-          <label for="show to" class="margin-vertical--10">Punishment duration in minutes</label>
+        <div v-if="newListItem.punishment.type === 'Timeout'">
+          <label for="punishment duration" class="margin-vertical--10">Punishment duration in minutes</label>
           <NumberInput
             v-model="newListItem.punishment.duration"
             :metadata="metadata.punishment.duration"
