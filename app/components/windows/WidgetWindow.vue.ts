@@ -36,6 +36,7 @@ export default class WidgetWindow extends Vue {
   @Prop()
   value: string; // selected tab
 
+  canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
@@ -73,6 +74,7 @@ export default class WidgetWindow extends Vue {
     this.tabs = settingsService.getTabs();
     this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
       .concat({ name: 'Source', value: 'source' });
+    this.canRender = true;
   }
 
   get webview() {
