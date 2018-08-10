@@ -8,6 +8,7 @@ import { WindowsService } from 'services/windows';
 
 import {
   IChatbotApiServiceState,
+  IChatbotCommonServiceState,
   IChatbotAuthResponse,
   ICustomCommand,
   IDefaultCommand,
@@ -17,12 +18,13 @@ import {
   ITimersResponse,
   IChatbotAPIPostResponse,
   IChatbotAPIPutResponse,
+  IChatbotAPIDeleteResponse,
   ICommandVariablesResponse,
   IChatAlertsResponse,
   ICapsProtectionResponse,
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
-  IWordProtectionResponse
+  IWordProtectionResponse,
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -151,9 +153,11 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   fetchCommandVariables() {
-    // fetch command variables
-    // and then UPDATE_COMMAND_VARIABLES(response);
-    // assuming response is [{}]
+    return this.api('GET', 'commands/variables', {}).then(
+      (response: ICommandVariablesResponse) => {
+        this.UPDATE_COMMAND_VARIABLES(response);
+      }
+    );
   }
 
   fetchTimers(page?: number) {
@@ -202,6 +206,14 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // POST, PUT requests
   //
+
+  resetDefaultCommands() {
+    return this.api('POST', 'commands/default/reset', {})
+      .then((response: IDafaultCommandsResponse) => {
+        this.UPDATE_DEFAULT_COMMANDS(response);
+      });
+  }
+
   createCustomCommand(data: ICustomCommand) {
     return this.api('POST', 'commands', data)
       .then((response: ICustomCommand) => {
@@ -223,6 +235,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchDefaultCommands();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
@@ -232,6 +245,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
@@ -241,11 +255,15 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchTimers();
+          this.chatbotCommonService.closeChildWindow();
         }
       });
   }
 
   updateChatAlerts(data: IChatAlertsResponse) {
+    console.log(data);
+    let x = data;
+    debugger;
     return this.api('POST', 'settings/chat-notifications', data)
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
@@ -290,10 +308,35 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  //
+  // DELETE methods
+  //
+
+  deleteCustomCommand(id: string) {
+    return this.api('DELETE', `commands/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchCustomCommands();
+        }
+      }
+    );
+  }
+
+  deleteTimer(id: string) {
+    return this.api('DELETE', `timers/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchTimers();
+        }
+      }
+    );
+  }
+
 
   //
   // Mutations
   //
+
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);
@@ -347,18 +390,30 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
 }
 
-export class ChatbotCommonService extends PersistentStatefulService<
-  IChatbotApiServiceState
-  > {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
+
+  static defaultState: IChatbotCommonServiceState = {
+    toasted: null,
+    customCommandToUpdate: null,
+    defaultCommandToUpdate: null,
+    timerToUpdate: null
+  };
+
+  // bindsToasted(toasted: object) {
+  //   this.BINDS_TOASTED(toasted);
+  // }
 
   closeChildWindow() {
     this.windowsService.closeChildWindow();
   }
 
-  openCommandWindow() {
+  openCustomCommandWindow(command?: ICustomCommand) {
+    if (command) {
+      this.SET_CUSTOM_COMAND_TO_UPDATE(command);
+    }
     this.windowsService.showWindow({
-      componentName: 'ChatbotCommandWindow',
+      componentName: 'ChatbotCustomCommandWindow',
       size: {
         width: 650,
         height: 600
@@ -366,12 +421,28 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
-  openTimerWindow() {
+  openDefaultCommandWindow(command: IDefaultCommand) {
+    if (command) {
+      this.SET_DEFAULT_COMAND_TO_UPDATE(command);
+    }
+    this.windowsService.showWindow({
+      componentName: 'ChatbotDefaultCommandWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openTimerWindow(timer?: ITimer) {
+    if (timer) {
+      this.SET_TIMER_TO_UPDATE(timer);
+    }
     this.windowsService.showWindow({
       componentName: 'ChatbotTimerWindow',
       size: {
         width: 650,
-        height: 400
+        height: 500
       }
     });
   }
@@ -391,8 +462,64 @@ export class ChatbotCommonService extends PersistentStatefulService<
       componentName: 'ChatbotCapsProtectionWindow',
       size: {
         width: 650,
-        height: 600
+        height: 500
       }
     });
+  }
+
+  openSymbolProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSymbolProtectionWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openLinkProtectionWindow() {
+      this.windowsService.showWindow({
+      componentName: 'ChatbotLinkProtectionWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openWordProtectionWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotWordProtectionWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+
+  // @mutation()
+  // showToast(message: string, options: object) {
+  //   this.state.toasted.show(message, options);
+  // }
+
+  // @mutation()
+  // private BINDS_TOASTED(toasted: object) {
+  //   Vue.set(this.state, 'toasted', toasted);
+  // }
+
+  @mutation()
+  private SET_CUSTOM_COMAND_TO_UPDATE(command: ICustomCommand) {
+    Vue.set(this.state, 'customCommandToUpdate', command);
+  }
+
+  @mutation()
+  private SET_DEFAULT_COMAND_TO_UPDATE(command: IDefaultCommand) {
+    Vue.set(this.state, 'defaultCommandToUpdate', command);
+  }
+
+  @mutation()
+  private SET_TIMER_TO_UPDATE(timer: ITimer) {
+    Vue.set(this.state, 'timerToUpdate', timer);
   }
 }

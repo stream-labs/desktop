@@ -5,7 +5,6 @@ import { $t } from 'services/i18n';
 
 import {
   IChatbotModule,
-  IChatAlertsResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
@@ -44,7 +43,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-symbol-protection.png'),
         enabled: this.symbolProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openSymbolProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateSymbolProtection({
@@ -59,7 +58,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-link-protection.png'),
         enabled: this.linkProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openLinkProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateLinkProtection({
@@ -74,7 +73,7 @@ export default class ChatbotModTools extends ChatbotBase {
         backgroundUrl: require('../../../../media/images/chatbot/chatbot-word-protection.png'),
         enabled: this.wordProtectionCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openChatbotAlertsWindow();
+          this.chatbotCommonService.openWordProtectionWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateWordProtection({

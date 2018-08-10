@@ -14,7 +14,6 @@
   flex: 0 0 220px;
   display: flex;
   flex-direction: column;
-  background: @day-secondary;
   margin-top: -20px;
   padding-top: 20px;
 }

@@ -64,11 +64,11 @@
             <td>
               <DropdownMenu
                 :placement="'bottom-end'"
-                class="chatbot-alerts__alert-actions_container"
+                class="chatbot-alerts__alert-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="onEdit(message, index)" class="button button--action">Edit</button>
-                <button @click="onDelete(index)" class="button button--soft-warning">Delete</button>
+                <button @click="onEdit(message, index)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="onDelete(index)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </td>
           </tr>
@@ -131,8 +131,8 @@
   }
 }
 
-.chatbot-alerts__alert-actions_container {
-  * > button {
+.chatbot-alerts__alert-actions__container {
+  button {
     display: block;
     width: 100%;
     margin-bottom: 10px;
