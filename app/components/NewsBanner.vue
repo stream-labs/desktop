@@ -8,7 +8,7 @@
   </div>
   <div>
     <div class="new-label">New</div>
-    <h3 class="title">{{ currentBanner.header }}</h3>
+    <h3 class="title">{{ headerText }}</h3>
     <p class="subheading">{{ currentBanner.sub_header }}</p>
   </div>
   <div>

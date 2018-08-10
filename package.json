@@ -114,6 +114,7 @@
     "electron": "2.0.6",
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
+    "emojione": "3.1.7",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-plugin-import": "2.13.0",

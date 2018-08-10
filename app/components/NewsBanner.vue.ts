@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { shell } from 'electron';
+import emojione from 'emojione';
 import { NewsBannerService} from 'services/news-banner';
 import { Inject } from 'util/injector';
 
@@ -12,6 +13,10 @@ export default class NewsBanner extends Vue {
 
   get bannerExists() {
     return this.newsBannerService.bannerExists();
+  }
+
+  get headerText() {
+    return emojione.toImage(this.currentBanner.header);
   }
 
   closeBanner() {
