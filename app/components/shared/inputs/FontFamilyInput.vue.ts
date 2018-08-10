@@ -1,4 +1,10 @@
-export const fonts = [
+import { Component, Prop } from 'vue-property-decorator';
+import { Multiselect } from 'vue-multiselect';
+import { BaseInput } from './BaseInput';
+import ListInput from './ListInput.vue';
+import { IInputMetadata } from './index';
+
+const fonts = [
   'ABeeZee',
   'Abel',
   'Abril Fatface',
@@ -725,3 +731,20 @@ export const fonts = [
   'Yesteryear',
   'Zeyada'
 ];
+
+
+@Component({
+  components: { ListInput }
+})
+export default class FontFamilyInput extends BaseInput<string, IInputMetadata> {
+  @Prop() value: string;
+
+  fonts = fonts;
+
+  get listInputMetadata() {
+    return {
+      ...this.options,
+      options: fonts.map(fontName => ({ title: fontName, value: fontName }))
+    }
+  }
+}
