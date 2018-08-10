@@ -3,6 +3,7 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
+  :fixedSectionHeight="254"
   v-if="previewSource">
 
   <div slot="fixed">
@@ -44,14 +45,8 @@
 <script lang="ts" src="./WidgetWindow.vue.ts"></script>
 
 <style lang="less" scoped>
-
-  .description {
-    padding: 20px;
-  }
-
   .display {
     height: 200px !important;
     cursor: pointer;
   }
-
 </style>
