@@ -22,6 +22,8 @@ export class CustomizationService
   static defaultState: ICustomizationServiceState = {
     performanceMode: false,
     studioControlsOpened: true,
+    optimizeForNiconico: true,
+    showOptimizationDialogForNiconico: true,
     experimental: {
       // put experimental features here
     }
@@ -45,6 +47,25 @@ export class CustomizationService
 
   toggleStudioControls() {
     this.setSettings({ studioControlsOpened: !this.state.studioControlsOpened });
+  }
+
+  get optimizeForNiconico() {
+    return this.state.optimizeForNiconico;
+  }
+
+  setOptimizeForNiconico(optimize: boolean) {
+    this.setSettings({
+      optimizeForNiconico: optimize,
+      showOptimizationDialogForNiconico: optimize
+    });
+  }
+
+  get showOptimizationDialogForNiconico() {
+    return this.state.showOptimizationDialogForNiconico;
+  }
+
+  setShowOptimizationDialogForNiconico(optimize: boolean) {
+    this.setSettings({ showOptimizationDialogForNiconico: optimize });
   }
 
   getSettingsFormData(): TFormData {

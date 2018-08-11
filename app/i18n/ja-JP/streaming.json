@@ -26,5 +26,17 @@
   "broadcastStatusFetchingError": {
     "default": "配信に必要な情報を取得できませんでした。インターネットの接続状態を確認してください。",
     "httpError": "配信に必要な情報を取得できませんでした。（%{statusText}）"
-  }
+  },
+  "bitrateFetchingError": {
+    "title": "ビットレート取得失敗",
+    "message": "ビットレート情報を取得できませんでした。インターネットの接続状態を確認してください。"
+  },
+  "optimizationForNiconico": {
+    "title": "設定の最適化",
+    "description": "ニコニコ生放送に最適化した設定で配信します。"
+  },
+  "FPS": "フレームレート",
+  "optimizeAndGoLive": "最適化して配信を開始する",
+  "skipOptimization": "最適化しないで配信を開始する",
+  "doNotShowAgainOptimizationDialog": "今後、このダイアログを表示しない"
 }

@@ -267,6 +267,17 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     return this.fetchStreamUrlAndKey().then(urlkey => urlkey.key);
   }
 
+  fetchBitrate(): Promise<number | undefined> {
+    return this.fetchRawChannelInfo().then(result => {
+      const status = result.status;
+      console.log('getpublishstatus status=' + status);
+      if (status === 'ok') {
+        return parseInt(result.items[0].rtmp[0].bitrate[0], 10);
+      }
+      return undefined;
+    });
+  }
+
   fetchChannelInfo(): Promise<IChannelInfo> {
     return this.fetchRawChannelInfo().then(json => {
       return {

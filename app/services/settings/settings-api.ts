@@ -12,3 +12,16 @@ export interface ISettingsServiceApi {
   setSettings(categoryName: string, settingsData: ISettingsSubCategory[]): void;
   showSettings(categoryName?: string): void;
 }
+
+export interface OptimizedSettings {
+  optimizedVideoBitrate?: number;
+  optimizedAudioBitrate?: string;
+  optimizedQuality?: string;
+  optimizedColorSpace?: string;
+  optimizedFps?: string;
+  currentVideoBitrate?: number;
+  currentAudioBitrate?: string;
+  currentQuality?: string;
+  currentColorSpace?: string;
+  currentFps?: string;
+}

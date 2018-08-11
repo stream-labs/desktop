@@ -359,7 +359,8 @@
         "name": "配信映像の解像度",
         "1280x720": "HD配信用 (1280x720)",
         "800x450": "通常配信用 (800x450)",
-        "640x360": "低画質配信用 (640x360)",
+        "512x288": "低画質配信用 (512x288)",
+        "640x360": null,
         "1920x1080": null,
         "1536x864": null,
         "1440x810": null,
@@ -499,7 +500,9 @@
   "resolutionPlaceholder": "選択するか、値を入力してください",
   "addFiles": "ファイルを追加する",
   "addDirectory": "ディレクトリを追加する",
+  "optimizationForNiconicoLiveService": "ニコニコ生放送への最適化",
   "cacheClearDescription": "不具合が発生した場合、キャッシュディレクトリを削除すると改善する可能性があります。ただしシーン設定が初期化されますのでご注意ください。",
+  "cacheManagement": "キャッシュ管理",
   "showCacheDirectory": "キャッシュディレクトリを表示",
   "deleteCacheAndRestart": "キャッシュを削除して再起動",
   "confirmStreamTitleAndGameBeforeGoingLive": "ライブになる前にストリームのタイトルとゲームを確認して下さい。",
@@ -513,5 +516,7 @@
   "default": "標準",
   "fontFamily": "フォントファミリー",
   "fontStyle": "フォントスタイル",
-  "fontSize": "フォントサイズ"
+  "fontSize": "フォントサイズ",
+  "optimizeForNiconico": "配信設定をニコニコ生放送に最適化する",
+  "showOptimizationDialogForNiconico": "配信開始時に最適化の確認ダイアログを表示する"
 }

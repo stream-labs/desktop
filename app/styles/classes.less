@@ -45,7 +45,11 @@
 
 .section {
   padding: 16px 16px 0;
-  background: @bg-primary;
+  margin-bottom: 16px;
+  border-bottom: 2px solid @bg-secondary;
+  &:last-child {
+    border-bottom: none;
+  }
 
   .button {
     margin-bottom: 16px;
