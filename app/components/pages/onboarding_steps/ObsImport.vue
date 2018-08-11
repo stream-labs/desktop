@@ -14,7 +14,7 @@
         <i class="importing-spinner icon-spinner icon-spin" />
       </div>
       <NAirObsLogo />
-      <div class="obs-impoart-contents" v-if="status === 'initial'">
+      <div class="obs-import-contents" v-if="status === 'initial'">
         <div v-if="profiles.length > 1">
           {{ $t('onboarding.selectObsProfile') }}
           <multiselect
@@ -53,7 +53,7 @@ label {
   font-size: 32px;
 }
 
-.obs-impoart-contents {
+.obs-import-contents {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -61,7 +61,7 @@ label {
   align-items: center;
 }
 
-.impoart-obs-image {
+.import-obs-image {
   width: 512px;
   margin: 20px 0;
 }
