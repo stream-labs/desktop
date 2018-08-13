@@ -7,7 +7,6 @@
     <img class="main-image" :src="currentBanner.thumbnail" />
   </div>
   <div>
-    <div class="new-label">{{ $t('New') }}</div>
     <h3 class="title">{{ headerText }}</h3>
     <p class="subheading">{{ currentBanner.subHeader }}</p>
   </div>
@@ -80,16 +79,6 @@
   z-index: 1;
 }
 
-.new-label {
-  .radius();
-  background-color: @white;
-  color: @black;
-  padding: 2px 4px;
-  font-size: 14px;
-  font-weight: 500;
-  display: inline-block;
-}
-
 .title {
   display: inline-block;
   font-size: 20px;
@@ -101,7 +90,11 @@
 }
 
 .learn-more {
-  .new-label;
+  background-color: @white;
+  color: @black;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
   padding: 0 12px;
 }
 
