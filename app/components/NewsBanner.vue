@@ -1,5 +1,5 @@
 <template>
-<div class="banner" :class="[bannerExists ? '' : 'hide']">
+<div class="banner" :class="[bannerExists ? 'show' : '']">
   <img class="bg-image" :src="currentBanner.thumbnail" />
   <div class="image-container">
     <img class="shadow-image__left" :src="currentBanner.thumbnail" />
@@ -7,12 +7,12 @@
     <img class="main-image" :src="currentBanner.thumbnail" />
   </div>
   <div>
-    <div class="new-label">New</div>
+    <div class="new-label">{{ $t('New') }}</div>
     <h3 class="title">{{ headerText }}</h3>
-    <p class="subheading">{{ currentBanner.sub_header }}</p>
+    <p class="subheading">{{ currentBanner.subHeader }}</p>
   </div>
   <div>
-    <button class="button learn-more" @click="followLink">{{ currentBanner.link_title }}</button>
+    <button class="button learn-more" @click="followLink">{{ currentBanner.linkTitle }}</button>
     <button class="dismiss-button" @click="closeBanner()">{{ $t('Dismiss') }}</button>
   </div>
 </div>
@@ -24,21 +24,24 @@
 @import "../styles/index";
 
 .banner{
-  .transition();
   width: 100%;
-  height: 100px;
+  min-height: 0;
+  max-height: 0;
   background-color: @teal;
   color: @white;
-  padding: 20px;
   display: flex;
   position: relative;
   align-content: center;
   justify-content: space-between;
   overflow: hidden;
+  transition: all 0.5s cubic-bezier(0, 1, 0, 1);
 }
 
-.banner.hide {
-  height: 0;
+.banner.show {
+  min-height: 100px;
+  max-height: 140px;
+  padding: 20px;
+  transition: all 0.5s ease-in-out;
 }
 
 .bg-image {
@@ -51,15 +54,14 @@
 
 .image-container {
   position: relative;
-  height: 100%;
   left: 50px;
+  width: 80px;
 }
 
 .shadow-image__left,
 .shadow-image__right {
   opacity: 0.8;
-  height: 80%;
-  width: auto;
+  width: 80%;
   position: absolute;
   top: 10%;
 }
@@ -74,7 +76,6 @@
 
 .main-image {
   position: relative;
-  height: 100%;
   width: auto;
   z-index: 1;
 }
@@ -96,6 +97,7 @@
 
 .subheading {
   display: block;
+  max-width: 700px;
 }
 
 .learn-more {

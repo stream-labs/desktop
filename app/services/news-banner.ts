@@ -7,9 +7,9 @@ import { authorizedHeaders } from '../util/requests';
 interface INewsBannerInfo {
   id: number;
   header: string;
-  sub_header: string;
+  subHeader: string;
   link: string;
-  link_title: string;
+  linkTitle: string;
   thumbnail: string;
 }
 
@@ -20,9 +20,9 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
   static initialState: INewsBannerInfo = {
     id: null,
     header: '',
-    sub_header: null,
+    subHeader: null,
     link: null,
-    link_title: null,
+    linkTitle: null,
     thumbnail: null
   };
 
@@ -40,10 +40,10 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
   }
 
   private async fetchBanner() {
-    const endpoint = `api/v5/slobs/announcement/get?=clientId=${this.userService.getLocalUserId()}`
+    const endpoint = `api/v5/slobs/announcement/get?clientId=${this.userService.getLocalUserId()}`
     const req = this.formRequest(endpoint);
     try {
-      let newState = await fetch(req).then((rawResp) => rawResp.json());
+      const newState = await fetch(req).then((rawResp) => rawResp.json());
       return newState.id ? newState : this.state;
     } catch (e) {
       return this.state;
@@ -52,7 +52,11 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
 
   private async postBannerClose() {
     const endpoint = 'api/v5/slobs/announcement/close';
-    const postData = { body: { clientId: this.userService.getLocalUserId(), announcementId: this.state.id } }
+    const postData = {
+      method: 'POST',
+      body: JSON.stringify({ clientId: this.userService.getLocalUserId(), announcementId: this.state.id }),
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    };
     const req = this.formRequest(endpoint, postData);
     try {
       await fetch(req);
@@ -62,9 +66,9 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
     }
   }
 
-  private formRequest(endpoint: string, options?: any) {
+  private formRequest(endpoint: string, options: any = {}) {
     const host = this.hostsService.streamlabs;
-    const headers = authorizedHeaders(this.userService.apiToken);
+    const headers = authorizedHeaders(this.userService.apiToken, options.headers);
     const url = `https://${host}/${endpoint}`;
     return new Request(url, { ...options, headers });
   }
