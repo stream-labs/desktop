@@ -30,6 +30,10 @@ export default class ChatbotBase extends Vue {
     this.chatbotApiService.fetchLinkProtection();
   }
 
+  get chatbotPermissionsEnums() {
+    return ChatbotPermissionsEnums;
+  }
+
   get chatbotPermissions() {
     let permissions = Object.keys(ChatbotPermissionsEnums).reduce(
       (a: IListOption<number>[], b: string) => {

@@ -214,6 +214,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+  resetDefaultCommand(slugName: string, commandName: string) {
+    return this.api('POST', `settings/${slugName}/commands/${commandName}/reset`, {})
+      .then((response: IDefaultCommand) => {
+        return Promise.resolve(response);
+      });
+  }
+
   createCustomCommand(data: ICustomCommand) {
     return this.api('POST', 'commands', data)
       .then((response: ICustomCommand) => {
@@ -261,9 +268,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   updateChatAlerts(data: IChatAlertsResponse) {
-    console.log(data);
-    let x = data;
-    debugger;
     return this.api('POST', 'settings/chat-notifications', data)
       .then((response: IChatbotAPIPostResponse) => {
         if (response.success === true) {

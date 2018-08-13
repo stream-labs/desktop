@@ -84,18 +84,18 @@
       </div>
     </transition>
   </div>
-  <div slot="controls">
-    <button
-      class="button button--default"
-      @click="onCancel">
-      Cancel
+  <div slot="controls" class="flex flex--space-between">
+    <button class="button button--default" @click="resetCommand">
+      {{ $t('Reset Command') }}
     </button>
-    <button
-      class="button button--action"
-      @click="onSave"
-    >
-      {{ $t("Save") }}
-    </button>
+    <div>
+      <button class="button button--default" @click="onCancel">
+        {{ $t('Cancel') }}
+      </button>
+      <button class="button button--action" @click="onSave">
+        {{ $t("Save") }}
+      </button>
+    </div>
   </div>
 </ModalLayout>
 </template>

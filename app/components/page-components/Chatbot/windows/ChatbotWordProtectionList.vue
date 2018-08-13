@@ -67,6 +67,15 @@
             :metadata="metadata.punishment.duration"
           />
         </div>
+        <div>
+          <label for="is regex">
+            <label for="is regex" class="margin-vertical--10">This word contains Regular Expression</label>
+            <BoolInput
+              v-model="newListItem.is_regex"
+              :metadata="metadata.is_regex"
+            />
+          </label>
+        </div>
       </div>
       <div class="new-list-item-modal__controls">
         <button
@@ -77,7 +86,7 @@
         <button
           class="button button--action"
           type="submit"
-          :disabled="!newListItem"
+          :disabled="!newListItem.text"
         >
           {{ $t('Done') }}
         </button>

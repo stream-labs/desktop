@@ -33,6 +33,7 @@
           <tr>
             <th>Command</th>
             <th>Description</th>
+            <th>Static Permission</th>
             <th></th>
           </tr>
         </thead>
@@ -44,6 +45,7 @@
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.description) }} </td>
+            <td> {{ command.static_permission ? chatbotPermissionsEnums[command.static_permission.level] : '-' }} </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput
@@ -87,10 +89,16 @@
   }
 }
 
-tbody tr {
+table tr {
 
   td:first-child {
     width: 300px;
+  }
+
+  td:nth-child(3),
+  th:nth-child(3) {
+    width: 200px;
+    .text-align--right;
   }
   td:last-child {
     width: 100px;

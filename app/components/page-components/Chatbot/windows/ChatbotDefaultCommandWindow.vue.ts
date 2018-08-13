@@ -26,7 +26,7 @@ interface IDefaultCommandMetadata {
 
 @Component({
   components: {
-    ChatbotAliases,
+    ChatbotAliases
   }
 })
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
@@ -50,8 +50,10 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   }
 
   get isLinkProtectionPermitCommand() {
-    return this.defaultCommandToUpdate.slugName === 'link-protection'
-    && this.defaultCommandToUpdate.commandName === 'permit';
+    return (
+      this.defaultCommandToUpdate.slugName === 'link-protection' &&
+      this.defaultCommandToUpdate.commandName === 'permit'
+    );
   }
 
   get defaultCommandToUpdate() {
@@ -65,7 +67,8 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
         placeholder: 'Enter the text string which will trigger the response'
       }),
       response: metadataHelper.text({
-        placeholder: 'The phrase that will appear after a user enters the command'
+        placeholder:
+          'The phrase that will appear after a user enters the command'
       }),
       new_alias: metadataHelper.text({
         placeholder: 'Add a new command alias'
@@ -101,6 +104,19 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   onCancel() {
     this.chatbotCommonService.closeChildWindow();
+  }
+
+  async resetCommand() {
+    const { slugName, commandName } = this.defaultCommandToUpdate;
+    const resettedCommand = await this.chatbotApiService.resetDefaultCommand(
+      slugName,
+      commandName,
+    );
+    this.editedCommand = cloneDeep({
+      ...resettedCommand,
+      slugName,
+      commandName
+    })
   }
 
   onSave() {

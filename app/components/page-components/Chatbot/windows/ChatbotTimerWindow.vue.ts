@@ -26,7 +26,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   nameMetadata: ITextMetadata = {
     required: true,
     placeholder: 'Name of the timer',
-    alphaOnly: true
+    alpha: true
   };
   messageMetadata: ITextMetadata = {
     required: true,
