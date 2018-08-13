@@ -34,16 +34,18 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   };
 
   intervalMetadata: INumberMetadata = {
+    required: true,
     min: 0,
-    max: 150,
-    placeholder: 'Interval in minutes'
-  }
+    max: 1440,
+    placeholder: 'Interval (Value in Minutes)'
+  };
 
   chatLinesMetadata: INumberMetadata = {
+    required: true,
     min: 0,
-    max: 100,
+    max: 1000,
     placeholder: 'Minimum chat lines'
-  }
+  };
 
   mounted() {
     // if editing existing custom command

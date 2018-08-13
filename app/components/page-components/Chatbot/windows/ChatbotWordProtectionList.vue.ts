@@ -37,12 +37,13 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
       is_regex: IInputMetadata
     } = {
       text: {
+        required: true,
         placeholder: 'Add a link to add to list'
       },
       punishment: {
         duration: {
           required: true,
-          placeholder: 'Punishment Duration in minutes',
+          placeholder: 'Punishment Duration (Value in Minutes)',
           min: 0
         },
         type: {
@@ -51,6 +52,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
         }
       },
       is_regex: {
+        required: true,
         title: 'This word/ phrase contains a regular expression.'
       }
     };

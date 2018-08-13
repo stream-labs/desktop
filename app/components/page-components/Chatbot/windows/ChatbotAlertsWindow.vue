@@ -84,7 +84,7 @@
       class="button button--default"
       @click="onDone"
     >
-      DONE
+      {{ $t('DONE') }}
     </button>
   </div>
 </ModalLayout>

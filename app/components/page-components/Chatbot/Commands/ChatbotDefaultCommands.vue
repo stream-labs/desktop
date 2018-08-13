@@ -31,9 +31,9 @@
       <table>
         <thead>
           <tr>
-            <th>Command</th>
-            <th>Description</th>
-            <th>Static Permission</th>
+            <th> {{ $t('Command') }} </th>
+            <th> {{ $t('Description') }} </th>
+            <th> {{ $t('Static Permission') }} </th>
             <th></th>
           </tr>
         </thead>
@@ -43,9 +43,9 @@
             :key="index"
             v-if="matchesQuery(commandName, command)"
           >
-            <td> {{ $t(command.command) }} </td>
+            <td> {{ command.command }} </td>
             <td> {{ $t(command.description) }} </td>
-            <td> {{ command.static_permission ? chatbotPermissionsEnums[command.static_permission.level] : '-' }} </td>
+            <td> {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) : '-' }} </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput

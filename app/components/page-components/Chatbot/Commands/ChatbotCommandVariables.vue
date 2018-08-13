@@ -2,10 +2,7 @@
   <div>
     <!-- variables -->
     <div class="padding--10">
-      <div v-if="variables && variables.length === 0">
-        <h2>No variables.</h2>
-      </div>
-      <table v-else>
+      <table v-if="variables && variables.length > 0">
         <thead>
           <tr>
             <th> {{ $t('Variable') }}</th>

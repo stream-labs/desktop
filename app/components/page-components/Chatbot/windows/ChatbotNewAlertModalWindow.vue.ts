@@ -113,6 +113,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     return this.selectedType === 'raid';
   }
 
+  get disabledSubmit() {
+    const { message, tier, amount } = this.newAlert[this.selectedType].newMessage;
+    if (this.isFollower) return !message;
+    if (this.isSubscription) return !amount || !message || !tier;
+
+    return !amount || !message;
+  }
+
   get metadata() {
     const metadata: INewAlertMetadata = {
       follow: {

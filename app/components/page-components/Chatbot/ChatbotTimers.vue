@@ -6,7 +6,7 @@
       @click="openTimerWindow"
       class="button button--action margin--10"
     >
-      Add Timer
+      {{ $t('Add Timer') }}
     </button>
     <input
       v-model="searchQuery"
@@ -17,7 +17,7 @@
   </div>
   <div class="padding--10">
     <div v-if="timers && timers.length === 0">
-      <h2>No timers. Click to add new.</h2>
+      <h2> {{ $t('No timers. Click to add new.') }} </h2>
     </div>
     <table v-else>
       <thead>

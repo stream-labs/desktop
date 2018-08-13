@@ -10,6 +10,8 @@ import {
   IChatbotApiServiceState,
   IChatbotCommonServiceState,
   IChatbotAuthResponse,
+  IChatbotStatusResponse,
+  ChatbotClients,
   ICustomCommand,
   IDefaultCommand,
   ITimer,
@@ -37,6 +39,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   static defaultState: IChatbotApiServiceState = {
     apiToken: null,
     socketToken: null,
+    globallyEnabled: false,
     defaultCommandsResponse: {
       commands: {},
       'link-protection': {},
@@ -111,7 +114,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
 
-
   api(method: string, endpoint: string, data: any) {
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
@@ -137,6 +139,23 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // GET requests
   //
+
+  fetchChatbotGlobalEnabled() {
+    return this.api('GET', 'status', {})
+      .then((response: IChatbotStatusResponse) => {
+
+        // check for clients
+        const allclientsOnline = ChatbotClients.every((client: string) => {
+          return response.clients.services.indexOf(client) > -1;
+        });
+        // all status online.
+        this.UPDATE_GLOBALLY_ENABLED((
+          response.worker.status === 'Online' &&
+          response.clients.status === 'Online' &&
+          allclientsOnline
+        ))
+      })
+  }
 
   fetchDefaultCommands() {
     return this.api('GET', 'commands/default', {})
@@ -206,6 +225,26 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // POST, PUT requests
   //
+
+  toggleEnableChatbot() {
+    const platforms = ChatbotClients.map(client => client.toLowerCase());
+    return Promise.all(platforms.map(platform => {
+      return this.state.globallyEnabled
+        ? this.leavePlatformChannel(platform)
+        : this.joinPlatformChannel(platform);
+    }))
+      .then((response: IChatbotAPIPostResponse[]) => {
+        this.fetchChatbotGlobalEnabled();
+      });
+  }
+
+  joinPlatformChannel(platform: string) {
+    return this.api('POST', `bot/${platform}/join`, {});
+  }
+
+  leavePlatformChannel(platform: string) {
+    return this.api('POST', `bot/${platform}/part`, {});
+  }
 
   resetDefaultCommands() {
     return this.api('POST', 'commands/default/reset', {})
@@ -346,6 +385,12 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'apiToken', response.api_token);
     Vue.set(this.state, 'socketToken', response.socket_token);
   }
+
+  @mutation()
+  private UPDATE_GLOBALLY_ENABLED(enabled: boolean) {
+    Vue.set(this.state, 'globallyEnabled', enabled);
+  }
+
 
   @mutation()
   private UPDATE_DEFAULT_COMMANDS(response: IDafaultCommandsResponse) {

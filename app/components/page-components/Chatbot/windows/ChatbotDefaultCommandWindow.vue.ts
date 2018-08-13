@@ -62,31 +62,32 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   // metadata
   get metadata() {
-    let metadata: IDefaultCommandMetadata = {
-      command: metadataHelper.text({
+    let metadata: IDefaultCommandMetadata = { command: metadataHelper.text({
+        required: true,
         placeholder: 'Enter the text string which will trigger the response'
-      }),
-      response: metadataHelper.text({
+      }), response: metadataHelper.text({
+        required: true,
         placeholder:
           'The phrase that will appear after a user enters the command'
-      }),
-      new_alias: metadataHelper.text({
+      }), new_alias: metadataHelper.text({
+        required: true,
         placeholder: 'Add a new command alias'
-      }),
-      success_response: metadataHelper.text({
-        placeholder: 'The phrase that will appear after a successful command'
-      }),
-      failed_response: metadataHelper.text({
+      }), success_response: metadataHelper.text({
+        required: true,
+        placeholder:
+          'The phrase that will appear after a successful command'
+      }), failed_response: metadataHelper.text({
+        required: true,
         placeholder: 'The phrase that will appear after a failed command'
-      }),
-      enabled_response: metadataHelper.text({
-        placeholder: 'The phrase that will appear after a command is enabled'
-      }),
-      disabled_response: metadataHelper.text({
-        placeholder: 'The phrase that will appear after a command is disabled'
-      }),
-      response_type: this.responseTypeMetadata
-    };
+      }), enabled_response: metadataHelper.text({
+        required: true,
+        placeholder:
+          'The phrase that will appear after a command is enabled'
+      }), disabled_response: metadataHelper.text({
+        required: true,
+        placeholder:
+          'The phrase that will appear after a command is disabled'
+      }), response_type: this.responseTypeMetadata };
     return metadata;
   }
 

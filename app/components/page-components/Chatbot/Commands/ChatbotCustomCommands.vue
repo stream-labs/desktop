@@ -6,7 +6,7 @@
         @click="openCommandWindow"
         class="button button--action margin--10"
       >
-        Add Command
+        {{ $t('Add Command') }}
       </button>
       <input
         v-model="searchQuery"
@@ -19,7 +19,7 @@
     <!-- custom commands -->
     <div class="padding--10">
       <div v-if="commands && commands.length === 0">
-        <h2>No custom commands. Click to add new.</h2>
+        <h2> {{ $t('No custom commands. Click to add new.') }} </h2>
       </div>
       <table v-else>
         <thead>

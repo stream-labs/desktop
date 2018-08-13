@@ -9,9 +9,9 @@
   <table v-if="value.length > 0">
     <thead>
       <tr>
-        <th>Word</th>
-        <th>Punishment</th>
-        <th>Duration in min.</th>
+        <th> {{ $t('Word') }} </th>
+        <th> {{ $t('Punishment') }} </th>
+        <th> {{ $t('Duration (Value in Minutes).') }} </th>
       </tr>
     </thead>
     <tbody>
@@ -20,7 +20,7 @@
         :key="`${item}__${index}`"
       >
         <td> {{ item.text }} </td>
-        <td> {{ item.punishment.type }} </td>
+        <td> {{ $t(item.punishment.type) }} </td>
         <td> {{ item.punishment.duration }} </td>
         <td>
           <div class="align-items--inline">
@@ -45,7 +45,7 @@
       <div class="new-list-item-modal__body">
         <div class="row">
           <div class="small-7 columns">
-            <label for="text" class="margin-vertical--10">Word or Phrase</label>
+            <label for="text" class="margin-vertical--10"> {{ $t('Word or Phrase') }} </label>
             <TextInput
               class="width--100"
               :metadata="metadata.text"
@@ -53,7 +53,7 @@
             />
           </div>
           <div class="small-5 columns">
-            <label for="punishment" class="margin-vertical--10">Punishment</label>
+            <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
             <ListInput
               v-model="newListItem.punishment.type"
               :metadata="metadata.punishment.type"
@@ -61,7 +61,7 @@
           </div>
         </div>
         <div v-if="newListItem.punishment.type === 'Timeout'">
-          <label for="punishment duration" class="margin-vertical--10">Punishment duration in minutes</label>
+          <label for="punishment duration" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
           <NumberInput
             v-model="newListItem.punishment.duration"
             :metadata="metadata.punishment.duration"
@@ -69,7 +69,7 @@
         </div>
         <div>
           <label for="is regex">
-            <label for="is regex" class="margin-vertical--10">This word contains Regular Expression</label>
+            <label for="is regex" class="margin-vertical--10"> {{ $t('This word contains Regular Expression') }} </label>
             <BoolInput
               v-model="newListItem.is_regex"
               :metadata="metadata.is_regex"
@@ -86,7 +86,7 @@
         <button
           class="button button--action"
           type="submit"
-          :disabled="!newListItem.text"
+          :disabled="errors.items.length > 0"
         >
           {{ $t('Done') }}
         </button>
