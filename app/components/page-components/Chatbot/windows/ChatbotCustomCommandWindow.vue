@@ -44,14 +44,14 @@
       </div>
       <div v-if="selectedTab === 'advanced'">
         <div class="row">
-          <div class="small-5 columns">
+          <div class="small-6 columns">
             <label for="global_cooldown" class="margin-vertical--10"> {{ $t('Global Command Cooldown (Value in Minutes)') }} </label>
             <NumberInput
               v-model="newCommand.cooldowns.global"
               :metadata="cooldownsMetadata"
             />
           </div>
-          <div class="small-5 columns">
+          <div class="small-6 columns">
             <label for="user_cooldown" class="margin-vertical--10"> {{ $t('User Command Cooldown (Value in Minutes)') }} </label>
             <NumberInput
               v-model="newCommand.cooldowns.user"
