@@ -25,7 +25,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     response: null,
     response_type: 'Chat',
     permission: {
-      level: 163,
+      level: 1,
       info: {}
     },
     cooldowns: {

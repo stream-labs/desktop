@@ -39,7 +39,7 @@ export default class ChatbotBase extends Vue {
       (a: IListOption<number>[], b: string) => {
         if (typeof ChatbotPermissionsEnums[b] === 'number') {
           a.push({
-            title: b,
+            title: b.split('_').join(' '),
             value: ChatbotPermissionsEnums[b]
           });
         }

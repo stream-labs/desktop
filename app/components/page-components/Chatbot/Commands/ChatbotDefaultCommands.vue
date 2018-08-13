@@ -58,7 +58,7 @@
                   @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
                 />
                 <i
-                  class="icon-edit padding--5"
+                  class="icon-edit padding--5 cursor--pointer"
                   @click="openCommandWindow(slugName, commandName, command)"
                 />
               </div>
