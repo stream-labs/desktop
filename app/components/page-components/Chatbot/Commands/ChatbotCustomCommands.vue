@@ -23,6 +23,8 @@
           <tr>
             <th> {{ $t('Command') }} </th>
             <th> {{ $t('Response') }} </th>
+            <th> {{ $t('Global Cooldown in mins') }} </th>
+            <th> {{ $t('User Cooldown in mins') }} </th>
             <th> {{ $t('Permission') }} </th>
             <th></th>
           </tr>
@@ -35,6 +37,8 @@
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>
+            <td> {{ command.cooldowns.global }} </td>
+            <td> {{ command.cooldowns.user }} </td>
             <td> {{ command.permission ? $t(chatbotPermissionsEnums[command.permission.level]) : '-' }} </td>
             <td>
               <div class="align-items--inline">
@@ -56,7 +60,7 @@
         </tbody>
         <tbody v-else>
           <tr>
-            <td colspan="4" class="text-align--center"> {{ $t('Click add command to get started.') }} </td>
+            <td colspan="6" class="text-align--center"> {{ $t('Click add command to get started.') }} </td>
           </tr>
         </tbody>
       </table>
@@ -76,8 +80,8 @@ table tr {
     width: 300px;
   }
 
-  td:nth-child(3),
-  th:nth-child(3) {
+  td:nth-child(5),
+  th:nth-child(5) {
     width: 200px;
     .text-align--right;
   }
