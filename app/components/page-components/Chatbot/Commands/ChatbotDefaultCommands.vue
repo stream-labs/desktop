@@ -80,11 +80,11 @@
   .align-items--inline;
   .padding--10;
   .text-transform--uppercase;
-  border-color: #274959;
-  background-color: rgba(27, 47,57, 0.68);
+  border-color: @teal;
+  background-color: #eaf9f5;
+  color: @teal;
   border-style: solid;
   border-width: 1px 0;
-  color: white;
   margin-bottom: 15px;
 
   &.chatbot__dropdown-header--hidden {
@@ -131,6 +131,12 @@ table tr {
 
 
 .night-theme {
+
+  .chatbot__dropdown-header {
+    border-color: #274959;
+    background-color: rgba(27, 47,57, 0.68);
+    color: white;
+  }
 
   tbody tr {
     border: 2px solid transparent;
