@@ -22,13 +22,17 @@
       v-for="(commands, slugName, index) in commandSlugs"
       :key="index"
     >
-      <div class="chatbot__dropdown-header">
-        <i class="icon-down"></i>
+      <div
+        class="chatbot__dropdown-header"
+        :class="{'chatbot__dropdown-header--hidden': !visible[slugName]}"
+        @click="toggleVisible(slugName)"
+      >
+        <i class="icon-down cursor--pointer"></i>
         <span>{{ $t(slugName) }}</span>
       </div>
 
       <!-- commands in slug -->
-      <table>
+      <table v-if="visible[slugName]">
         <thead>
           <tr>
             <th> {{ $t('Command') }} </th>
@@ -83,9 +87,16 @@
   color: white;
   margin-bottom: 15px;
 
+  &.chatbot__dropdown-header--hidden {
+    .icon-down {
+      transform: rotate(180deg);
+    }
+  }
+
   .icon-down {
     font-size: 5px;
     .icon--margin;
+    .transition();
   }
 }
 
