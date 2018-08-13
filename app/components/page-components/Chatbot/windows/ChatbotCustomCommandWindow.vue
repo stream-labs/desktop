@@ -71,6 +71,7 @@
     </button>
     <button
       class="button button--action"
+      :disabled="!newCommand.command || !newCommand.response"
       @click="onSave"
     >
       {{ $t("Save") }}

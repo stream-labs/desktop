@@ -47,8 +47,8 @@
     <button
       class="button button--action"
       @click="onSave"
+      :disabled="!newTimer.name || !newTimer.message"
     >
-      <!-- <i class="fa fa-spinner fa-pulse" v-if="updatingInfo" /> -->
       Save
     </button>
   </div>
