@@ -25,7 +25,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     response: null,
     response_type: 'Chat',
     permission: {
-      level: 163,
+      level: 1,
       info: {}
     },
     cooldowns: {
@@ -77,6 +77,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   get permissionMetadata() {
     let permissionMetadata: IListMetadata<number> = {
+      required: true,
       options: this.chatbotPermissions
     };
     return permissionMetadata;
@@ -84,6 +85,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   get replyTypeMetadata() {
     let replyTypeMetadata: IListMetadata<string> = {
+      required: true,
       options: this.chatbotResponseTypes
     };
     return replyTypeMetadata;
@@ -91,7 +93,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
-      placeholder: 'cooldown in minutes',
+      placeholder: 'Cooldown (Value in Minutes)',
       min: 0
     };
     return timerMetadata;

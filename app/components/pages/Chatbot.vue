@@ -1,6 +1,15 @@
 <template>
   <div>
-    <div class="small-2 padding--10 chatbot__side-menu">
+    <div class="small-2 chatbot__side-menu">
+      <div class="flex flex--space-between chatbot__side-menu__global-toggle">
+        <span class="text-transform--uppercase">
+          {{ $t(`Chatbot ${globallyEnabled ? 'enabled' : 'disabled'}`) }}
+        </span>
+        <ToggleInput
+          :value="globallyEnabled"
+          @input="toggleEnableChatbot"
+        />
+      </div>
       <NavMenu v-model="selectedTab" class="side-menu">
         <NavItem
           v-for="tab in tabNames"
@@ -33,6 +42,11 @@
   background: @day-secondary;
   border-right: 1px solid @day-border;
 
+  .chatbot__side-menu__global-toggle {
+    padding: 20px 36px;
+    background-color: #EAF9F5;
+    .weight--bold();
+  }
   .side-menu {
     margin-top: 0;
   }
@@ -46,6 +60,10 @@
   .chatbot__side-menu {
     border-color: @night-secondary;
     background-color: @night-secondary;
+
+    .chatbot__side-menu__global-toggle {
+      background-color: #173134;
+    }
   }
 }
 </style>

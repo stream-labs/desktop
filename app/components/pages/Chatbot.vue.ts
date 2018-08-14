@@ -8,6 +8,7 @@ import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import { ChatbotApiService } from 'services/chatbot/chatbot';
 import { Inject } from 'util/injector';
+import ToggleInput from 'components/shared/inputs/ToggleInput.vue'
 
 @Component({
   components: {
@@ -16,11 +17,13 @@ import { Inject } from 'util/injector';
     ChatbotModules,
     ChatbotCommands,
     ChatbotTimers,
-    ChatbotModTools
+    ChatbotModTools,
+    ToggleInput
   }
 })
 export default class Chatbot extends Vue {
-  @Inject() chatbotApiService: ChatbotApiService;
+  @Inject()
+  chatbotApiService: ChatbotApiService;
 
   //
   // Default State
@@ -36,9 +39,20 @@ export default class Chatbot extends Vue {
   selectedTab = 'Modules';
   authenticated = false;
 
+  enabled = false;
+
+  get globallyEnabled() {
+    return this.chatbotApiService.state.globallyEnabled;
+  }
+
+  toggleEnableChatbot() {
+    this.chatbotApiService.toggleEnableChatbot();
+  }
+
   mounted() {
-    this.chatbotApiService.logIn()
-      .then((response) => {
+    this.chatbotApiService
+      .logIn()
+      .then(response => {
         // user has authenticated chatbot api,
         // opening commands tab which will internally call
         // chatbotApiService interally to fetch chatbots

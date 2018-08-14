@@ -30,49 +30,49 @@
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general'">
         <div>
-          <label for="command" class="margin-vertical--10">Command</label>
+          <label for="command" class="margin-vertical--10"> {{ $t('Command') }} </label>
           <TextInput
             v-model="editedCommand.command"
             :metadata="metadata.command"
           />
         </div>
         <div v-if="defaultCommandToUpdate.response">
-          <label for="response" class="margin-vertical--10">Response</label>
+          <label for="response" class="margin-vertical--10"> {{ $t('Response (Line breaks will be ignored)') }} </label>
           <TextAreaInput
             v-model="editedCommand.response"
             :metadata="metadata.response"
           />
         </div>
         <div v-if="defaultCommandToUpdate.success_response">
-          <label for="success_response" class="margin-vertical--10">Success Response</label>
+          <label for="success_response" class="margin-vertical--10"> {{ $t('Success Response (Line breaks will be ignored)') }} </label>
           <TextAreaInput
             v-model="editedCommand.success_response"
             :metadata="metadata.success_response"
           />
         </div>
         <div v-if="defaultCommandToUpdate.failed_response">
-          <label for="failed_response" class="margin-vertical--10">Failed Response</label>
+          <label for="failed_response" class="margin-vertical--10"> {{ $t('Failed Response (Line breaks will be ignored)') }} </label>
           <TextAreaInput
             v-model="editedCommand.failed_response"
             :metadata="metadata.failed_response"
           />
         </div>
         <div v-if="defaultCommandToUpdate.enabled_response">
-          <label for="enabled_response" class="margin-vertical--10">Enabled Response</label>
+          <label for="enabled_response" class="margin-vertical--10"> {{ $t('Enabled Response (Line breaks will be ignored)') }} </label>
           <TextAreaInput
             v-model="editedCommand.enabled_response"
             :metadata="metadata.enabled_response"
           />
         </div>
         <div v-if="defaultCommandToUpdate.disabled_response">
-          <label for="disabled_response" class="margin-vertical--10">Disabled Response</label>
+          <label for="disabled_response" class="margin-vertical--10"> {{ $t('Disabled Response (Line breaks will be ignored)') }} </label>
           <TextAreaInput
             v-model="editedCommand.disabled_response"
             :metadata="metadata.disabled_response"
           />
         </div>
         <div v-if="defaultCommandToUpdate.response_type">
-          <label for="reply in" class="margin-vertical--10">Reply in</label>
+          <label for="reply in" class="margin-vertical--10"> {{ $t('Reply in') }} </label>
           <ListInput
             v-model="editedCommand.response_type"
             :metadata="metadata.response_type"
@@ -84,18 +84,22 @@
       </div>
     </transition>
   </div>
-  <div slot="controls">
-    <button
-      class="button button--default"
-      @click="onCancel">
-      Cancel
+  <div slot="controls" class="flex flex--space-between">
+    <button class="button button--default" @click="resetCommand">
+      {{ $t('Reset Command') }}
     </button>
-    <button
-      class="button button--action"
-      @click="onSave"
-    >
-      {{ $t("Save") }}
-    </button>
+    <div>
+      <button class="button button--default" @click="onCancel">
+        {{ $t('Cancel') }}
+      </button>
+      <button
+        class="button button--action"
+        :disabled="errors.items.length > 0"
+        @click="onSave"
+      >
+        {{ $t("Save") }}
+      </button>
+    </div>
   </div>
 </ModalLayout>
 </template>

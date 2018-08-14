@@ -6,7 +6,7 @@
       @click="openTimerWindow"
       class="button button--action margin--10"
     >
-      Add Timer
+      {{ $t('Add Timer') }}
     </button>
     <input
       v-model="searchQuery"
@@ -16,10 +16,7 @@
     />
   </div>
   <div class="padding--10">
-    <div v-if="timers && timers.length === 0">
-      <h2>No timers. Click to add new.</h2>
-    </div>
-    <table v-else>
+    <table>
       <thead>
         <tr>
           <th> {{ $t("timer") }} </th>
@@ -29,7 +26,7 @@
           <th></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody v-if="timers && timers.length > 0">
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
@@ -57,6 +54,11 @@
           </td>
         </tr>
       </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="5" class="text-align--center"> {{ $t('Click add timer to get started.') }} </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </div>
@@ -79,7 +81,7 @@ tbody tr {
   td:first-child {
     width: 300px;
   }
-  td:last-child {
+  td:last-child:not(.text-align--center) {
     width: 100px;
     .align-items--inline;
     .text-align--right;

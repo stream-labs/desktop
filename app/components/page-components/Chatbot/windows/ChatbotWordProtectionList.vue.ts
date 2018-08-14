@@ -1,7 +1,12 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue'
 
-import { ITextMetadata, IListMetadata, INumberMetadata } from 'components/shared/inputs/index';
+import {
+  IInputMetadata,
+  ITextMetadata,
+  IListMetadata,
+  INumberMetadata
+} from 'components/shared/inputs/index';
 
 import {
   IWordProtectionBlackListItem,
@@ -29,20 +34,26 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
         duration: INumberMetadata;
         type: IListMetadata<string>;
       };
+      is_regex: IInputMetadata
     } = {
       text: {
+        required: true,
         placeholder: 'Add a link to add to list'
       },
       punishment: {
         duration: {
           required: true,
-          placeholder: 'Punishment Duration in minutes',
+          placeholder: 'Punishment Duration (Value in Minutes)',
           min: 0
         },
         type: {
           required: true,
           options: this.chatbotPunishments
         }
+      },
+      is_regex: {
+        required: true,
+        title: 'This word/ phrase contains a regular expression.'
       }
     };
     return metadata;

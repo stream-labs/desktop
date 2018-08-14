@@ -25,14 +25,14 @@
         <div v-if="selectedTab === 'general' && linkProtection">
           <div class="row">
             <div class="small-6 columns">
-              <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+              <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
               <ListInput
                 v-model="linkProtection.general.excluded.level"
                 :metadata="metadata.link.general.excluded.level"
               />
             </div>
             <div class="small-6 columns">
-              <label for="punishment" class="margin-vertical--10">Punishment</label>
+              <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
               <ListInput
                 v-model="linkProtection.general.punishment.type"
                 :metadata="metadata.link.general.punishment.type"
@@ -40,14 +40,14 @@
             </div>
           </div>
           <div v-if="linkProtection.general.punishment.type === 'Timeout'">
-            <label for="response" class="margin-vertical--10">Punishment Duration</label>
+            <label for="response" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
             <NumberInput
               v-model="linkProtection.general.punishment.duration"
               :metadata="metadata.link.general.punishment.duration"
             />
           </div>
           <div>
-            <label for="response" class="margin-vertical--10">Punishment Response</label>
+            <label for="response" class="margin-vertical--10"> {{ $t('Punishment Response (Line breaks will be ignored)') }} </label>
             <TextAreaInput
               v-model="linkProtection.general.message"
               :metadata="metadata.link.general.message"
@@ -73,10 +73,11 @@
     <button
       class="button button--default"
       @click="onCancel">
-      Cancel
+      {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
+      :disabled="errors.items.length > 0"
       @click="onSave"
     >
       {{ $t("Save") }}

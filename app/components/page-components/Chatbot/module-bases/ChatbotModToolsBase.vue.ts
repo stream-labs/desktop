@@ -137,7 +137,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
         duration: {
           required: true,
-          placeholder: 'Punishment Duration in minutes',
+          placeholder: 'Punishment Duration (Value in Minutes)',
           min: 0
         }
       },
@@ -163,12 +163,15 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       minimum: {
         required: true,
         placeholder: `Minimum amount of ${this.label(protectionType)}`,
-        min: 0
+        min: 0,
+        max: 500
       },
       maximum: {
         required: true,
         placeholder: `Maximum amount of ${this.label(protectionType)}`,
-        min: 0
+        min: 0,
+        max: 500
+
       },
       percent: {
         required: true,
@@ -222,7 +225,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
         duration: {
           required: true,
-          placeholder: 'Punishment Duration in minutes',
+          placeholder: 'Punishment Duration (Value in Minutes)',
           min: 0
         }
       }
@@ -263,5 +266,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   onCancel() {
     this.chatbotCommonService.closeChildWindow();
   }
+
 }
 

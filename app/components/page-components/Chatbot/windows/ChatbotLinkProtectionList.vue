@@ -9,7 +9,7 @@
   <table v-if="value.length > 0">
     <thead>
       <tr>
-        <th>Link</th>
+        <th> {{ $t('Link') }} </th>
         <th></th>
       </tr>
     </thead>
@@ -55,7 +55,7 @@
         <button
           class="button button--action"
           type="submit"
-          :disabled="!newListItem"
+          :disabled="!newListItem || errors.items.length > 0"
         >
           {{ $t('Done') }}
         </button>

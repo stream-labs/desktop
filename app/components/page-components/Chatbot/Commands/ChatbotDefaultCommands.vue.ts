@@ -8,6 +8,20 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
 
   searchQuery = '';
 
+  visible: {
+    commands: boolean;
+    'link-protection': boolean;
+    giveaway: boolean;
+  } = {
+    commands: true,
+    'link-protection': true,
+    giveaway: true
+  }
+
+  toggleVisible(tab: 'commands' | 'link-protection' | 'giveaway') {
+    this.visible[tab] = !this.visible[tab];
+  }
+
   get commandSlugs() {
     return this.chatbotApiService.state.defaultCommandsResponse;
   }

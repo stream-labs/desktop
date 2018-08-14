@@ -12,14 +12,14 @@
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general' && wordProtection">
         <div>
-          <label for="excluded" class="margin-vertical--10">Auto Permit</label>
+          <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
           <ListInput
             v-model="wordProtection.general.excluded.level"
             :metadata="metadata.word.general.excluded.level"
           />
         </div>
         <div>
-          <label for="message" class="margin-vertical--10">Punishment Message</label>
+          <label for="message" class="margin-vertical--10"> {{ $t('Punishment Message') }} </label>
           <TextAreaInput
             v-model="wordProtection.general.message"
             :metadata="metadata.word.general.message"
@@ -37,10 +37,11 @@
     <button
       class="button button--default"
       @click="onCancel">
-      Cancel
+      {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
+      :disabled="errors.items.length > 0"
       @click="onSave"
     >
       {{ $t("Save") }}
