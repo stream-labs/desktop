@@ -3,7 +3,6 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
-import { ChatbotSettingSlugs } from 'services/chatbot/chatbot-interfaces';
 
 @Component({
   components: {
@@ -34,7 +33,7 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
   }
 
   onReset() {
-    this.onResetSlug(ChatbotSettingSlugs['link-protection']);
+    this.onResetSlug('link-protection');
   }
 
   onSave() {

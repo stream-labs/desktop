@@ -2,7 +2,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
-import { ChatbotSettingSlugs } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
@@ -25,7 +24,7 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
   }
 
   onReset() {
-  this.onResetSlug(ChatbotSettingSlugs['symbol-protection']);
+  this.onResetSlug('symbol-protection');
   }
 
   onSave() {

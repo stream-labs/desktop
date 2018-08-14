@@ -24,7 +24,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       ...streamlabs,
       ...twitch
     };
-    delete alertTypes.bits;
     return alertTypes;
   }
 

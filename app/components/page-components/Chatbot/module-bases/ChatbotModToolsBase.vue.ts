@@ -279,7 +279,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         ILinkProtectionResponse |
         IWordProtectionResponse
       )) => {
-        switch (ChatbotSettingSlugs[slug]) {
+        switch (slug) {
           case 'caps-protection':
             this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
             break;

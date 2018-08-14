@@ -315,19 +315,13 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
+export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits';
 
 export const ChatbotClients = [
   'Twitch'
 ]
 
-
-export enum ChatbotSettingSlugs {
-  'caps-protection',
-  'symbol-protection',
-  'link-protection',
-  'words-protection'
-}
+export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';

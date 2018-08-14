@@ -230,7 +230,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
 
   resetSettings(slug: ChatbotSettingSlugs) {
-    return this.api('POST', `settings/${ChatbotSettingSlugs[slug]}/reset`, {}).then(
+    return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
           | ICapsProtectionResponse
@@ -238,7 +238,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
           | ILinkProtectionResponse
           | IWordProtectionResponse
       ) => {
-        switch (ChatbotSettingSlugs[slug]) {
+        switch (slug) {
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(
               response as ICapsProtectionResponse

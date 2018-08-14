@@ -4,11 +4,6 @@ import { $t } from 'services/i18n';
 import ChatbotWordProtectionList from 'components/page-components/Chatbot/windows/ChatbotWordProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
 
-import {
-  ChatbotSettingSlugs
-} from 'services/chatbot/chatbot-interfaces';
-
-
 @Component({
   components: {
     ChatbotWordProtectionList
@@ -33,7 +28,7 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
   }
 
   onReset() {
-    this.onResetSlug(ChatbotSettingSlugs['words-protection']);
+    this.onResetSlug('words-protection');
   }
 
   onSave() {

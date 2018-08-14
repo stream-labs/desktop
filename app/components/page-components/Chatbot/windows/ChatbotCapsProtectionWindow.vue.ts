@@ -3,7 +3,6 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 
-import { ChatbotSettingSlugs } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
@@ -27,7 +26,7 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
   }
 
   onReset() {
-    this.onResetSlug(ChatbotSettingSlugs['caps-protection']);
+    this.onResetSlug('caps-protection');
   }
 
   onSave() {
