@@ -10,7 +10,6 @@ import { ITab } from 'components/Tabs.vue';
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
-  modToolSlug = 'link-protection';
   tabs: ITab[] = [
     {
       name: $t('General'),

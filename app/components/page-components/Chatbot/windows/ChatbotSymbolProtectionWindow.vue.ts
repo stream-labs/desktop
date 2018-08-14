@@ -5,7 +5,6 @@ import { ITab } from 'components/Tabs.vue';
 
 @Component({})
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
-  modToolSlug = 'symbol-protection';
   tabs: ITab[] = [
     {
       name: $t('General'),
