@@ -128,6 +128,7 @@ export interface IExcluded extends IPermission {}
 // status
 export interface IChatbotWorkerStatus {
   status: string;
+  type: string;
 }
 export interface IChatbotClientsStatus {
   status: string;

@@ -152,6 +152,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         // all status online.
         this.UPDATE_GLOBALLY_ENABLED((
           response.worker.status === 'Online' &&
+          response.worker.type === 'Full' &&
           response.clients.status === 'Online' &&
           allclientsOnline
         ))
