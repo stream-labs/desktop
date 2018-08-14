@@ -8,6 +8,7 @@ import { WidgetsService, WidgetType } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
+import uuid from 'uuid';
 
 @Component({})
 export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
@@ -120,12 +121,9 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   refreshPreview() {
-
-    // update obs-preview
-    // little hack: update some property to trigger preview refreshing
-    const shutdown = this.source.getSettings().shutdown;
-    this.source.updateSettings({ shutdown: !shutdown });
-    this.source.updateSettings({ shutdown });
+    // little hack: update url property to trigger browser_source refreshing
+    const url = this.service.getWidgetUrl() + '&' + uuid();
+    this.source.updateSettings( { url });
   }
 
   afterFetch() {
