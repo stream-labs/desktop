@@ -9,6 +9,7 @@ import FormWrapper from 'components/shared/inputs/FormWrapper.vue';
 
 import {
   ChatbotPermissionsEnums,
+  ChatbotAutopermitEnums,
   ChatbotResponseTypes,
   ChatbotPunishments,
 } from 'services/chatbot/chatbot-interfaces';
@@ -52,6 +53,23 @@ export default class ChatbotBase extends Vue {
     );
     return permissions;
   }
+
+  get chatbotAutopermitOptions() {
+    let permissions = Object.keys(ChatbotAutopermitEnums).reduce(
+      (a: IListOption<number>[], b: string) => {
+        if (typeof ChatbotAutopermitEnums[b] === 'number') {
+          a.push({
+            title: b.split('_').join(' '),
+            value: ChatbotAutopermitEnums[b]
+          });
+        }
+        return a;
+      },
+      []
+    );
+    return permissions;
+  }
+
 
   get chatbotResponseTypes() {
     return Object.keys(ChatbotResponseTypes).map(responseType => {

@@ -21,7 +21,6 @@ import {
   ISliderMetadata,
   IInputMetadata
 } from 'components/shared/inputs/index';
-import { debug } from 'util';
 
 interface IPunishmentMetadata {
   type: IListMetadata<string>;
@@ -149,7 +148,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       excluded: {
         level: {
           required: true,
-          options: this.chatbotPermissions
+          options: this.chatbotAutopermitOptions
         }
       },
       message: {

@@ -103,7 +103,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         .then(response => response.json())
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
-          console.log(response);
           resolve(true);
         })
         .catch(err => {
@@ -192,6 +191,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchChatAlerts() {
     return this.api('GET', 'settings/chat-notifications', {})
       .then((response: IChatAlertsResponse) => {
+        console.log(response);
         this.UPDATE_CHAT_ALERTS(response);
       })
   }

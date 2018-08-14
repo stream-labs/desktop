@@ -295,6 +295,13 @@ export interface IWordProtectionBlackListItem {
 }
 
 // dictionaries
+export enum ChatbotAutopermitEnums {
+  'None' = 0,
+  'Everyone' = 1,
+  'Subscriber Only' = 1 << 1,
+  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
+}
+
 export enum ChatbotPermissionsEnums {
   'None' = 0,
   'Everyone' = 1,
@@ -303,6 +310,7 @@ export enum ChatbotPermissionsEnums {
   'Streamers Only' = 1 << 7,
   'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
 }
+
 
 export enum ChatbotPunishments {
   Purge = 'Purge',
