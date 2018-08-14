@@ -12,6 +12,7 @@
       :close-on-select="true"
       :placeholder="placeholder || $t('settings.resolutionPlaceholder')"
       :allow-custom="getCustomResolution"
+      :allow-empty="false"
       label="description"
       @input="onInputHandler"
       @search-change="onSearchChange">
