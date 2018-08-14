@@ -332,6 +332,7 @@ export const ChatbotClients = [
 
 export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
+
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
 export const NEW_LINK_PROTECTION_LIST_MODAL_ID = 'new-link-protection-list';
