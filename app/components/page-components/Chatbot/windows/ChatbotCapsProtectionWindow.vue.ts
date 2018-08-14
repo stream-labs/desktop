@@ -2,8 +2,13 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
+
+import { ChatbotSettingSlugs } from 'services/chatbot/chatbot-interfaces';
+
 @Component({})
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
+  modToolSlug = 'caps-protection';
+
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -19,6 +24,10 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   onSelectTab(tab: string) {
     this.selectedTab = tab;
+  }
+
+  onReset() {
+    this.onResetSlug(ChatbotSettingSlugs['caps-protection']);
   }
 
   onSave() {

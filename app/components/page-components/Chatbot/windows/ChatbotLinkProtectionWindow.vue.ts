@@ -3,12 +3,15 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
+import { ChatbotSettingSlugs } from 'services/chatbot/chatbot-interfaces';
+
 @Component({
   components: {
-    ChatbotLinkProtectionList,
+    ChatbotLinkProtectionList
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
+  modToolSlug = 'link-protection';
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -28,6 +31,10 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
 
   onSelectTab(tab: string) {
     this.selectedTab = tab;
+  }
+
+  onReset() {
+    this.onResetSlug(ChatbotSettingSlugs['link-protection']);
   }
 
   onSave() {

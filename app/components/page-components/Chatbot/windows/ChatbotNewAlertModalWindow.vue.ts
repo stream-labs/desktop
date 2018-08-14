@@ -127,7 +127,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           message: {
             required: true,
-            placeholder: $t('Message to follower')
+            placeholder: $t('Message to follower'),
           }
         }
       },
@@ -161,6 +161,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
+            required: true,
             placeholder: $t('Minimum amount')
           },
           message: {
@@ -172,6 +173,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
       host: {
         newMessage: {
           amount: {
+            required: true,
             min: 0,
             placeholder: $t('Minimum viewer count')
           },
@@ -185,6 +187,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
+            required: true,
             placeholder: $t('Minimum amount')
           },
           message: {

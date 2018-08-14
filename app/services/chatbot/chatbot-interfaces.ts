@@ -296,6 +296,7 @@ export interface IWordProtectionBlackListItem {
 
 // dictionaries
 export enum ChatbotPermissionsEnums {
+  'None' = 0,
   'Everyone' = 1,
   'Subscriber Only' = 1 << 1,
   'Moderator Only' = 1 << 5,
@@ -319,6 +320,14 @@ export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
 export const ChatbotClients = [
   'Twitch'
 ]
+
+
+export enum ChatbotSettingSlugs {
+  'caps-protection',
+  'symbol-protection',
+  'link-protection',
+  'words-protection'
+}
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';

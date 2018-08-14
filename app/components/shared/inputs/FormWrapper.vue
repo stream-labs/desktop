@@ -1,31 +1,38 @@
 <template>
-  <div class="row">
-    <div class="col-xs-4">
-      {{ options.title }}
-    </div>
-    <div class="col-xs-8">
-      <div class="input-container">
-        <form-input
-          :value="value"
-          :metadata="formInputMetadata"
-          @input="value => $emit('input', value)"
-        />
-        <div v-if="!type" class="slots">
-          <slot></slot>
-        </div>
-        <div v-if="options.tooltip" class="tooltip">
-          <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
-        </div>
+
+  <div>
+    <!-- title -->
+    <div>
+      <div class="margin-vertical--10">
+        {{ options.title }}
       </div>
+      <div v-if="options.tooltip" class="tooltip">
+        <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+      </div>
+    </div>
+
+    <div>
+      <!-- input(s) & whisper -->
+      <form-input
+        :value="value"
+        :metadata="formInputMetadata"
+        @input="value => $emit('input', value)"
+      />
+
+      <div v-if="!type" class="slots">
+        <slot></slot>
+      </div>
+
       <div v-if="options.description" class="whisper">
         {{ options.description }}
       </div>
     </div>
   </div>
+
 </template>
 
 
-<script lang="ts" src="./FormGroup.vue.ts"></script>
+<script lang="ts" src="./FormWrapper.vue.ts"></script>
 
 <style lang="less" scoped>
   @import "../../../styles/index";

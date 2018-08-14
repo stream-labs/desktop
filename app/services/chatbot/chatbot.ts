@@ -27,6 +27,7 @@ import {
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
   IWordProtectionResponse,
+  ChatbotSettingSlugs
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -227,6 +228,42 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // POST, PUT requests
   //
+
+  resetSettings(slug: ChatbotSettingSlugs) {
+    return this.api('POST', `settings/${ChatbotSettingSlugs[slug]}/reset`, {}).then(
+      (
+        response:
+          | ICapsProtectionResponse
+          | ISymbolProtectionResponse
+          | ILinkProtectionResponse
+          | IWordProtectionResponse
+      ) => {
+        switch (ChatbotSettingSlugs[slug]) {
+          case 'caps-protection':
+            this.UPDATE_CAPS_PROTECTION(
+              response as ICapsProtectionResponse
+            );
+            break;
+          case 'symbol-protection':
+            this.UPDATE_SYMBOL_PROTECTION(
+              response as ISymbolProtectionResponse
+            );
+            break;
+          case 'link-protection':
+            this.UPDATE_LINK_PROTECTION(
+              response as ILinkProtectionResponse
+            );
+            break;
+          case 'words-protection':
+            this.UPDATE_WORD_PROTECTION(
+              response as IWordProtectionResponse
+            );
+            break;
+        }
+        return Promise.resolve(response);
+      }
+    );
+  }
 
   toggleEnableChatbot() {
     const platforms = ChatbotClients.map(client => client.toLowerCase());
