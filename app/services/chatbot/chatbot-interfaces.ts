@@ -20,6 +20,7 @@ export interface IChatbotCommonServiceState {
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
   timerToUpdate: ITimer;
+  modBannerVisible: boolean;
 }
 
 // responses

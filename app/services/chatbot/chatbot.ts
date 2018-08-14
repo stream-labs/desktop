@@ -111,6 +111,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     });
   }
 
+  logOut() {
+    this.LOGOUT();
+  }
+
   apiEndpoint(route: String, versionIncluded?: Boolean) {
     return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
@@ -426,6 +430,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   @mutation()
+  private LOGOUT() {
+    Vue.set(this.state, 'apiToken', null);
+    Vue.set(this.state, 'socketToken', null);
+  }
+
+
+  @mutation()
   private UPDATE_GLOBALLY_ENABLED(enabled: boolean) {
     Vue.set(this.state, 'globallyEnabled', enabled);
   }
@@ -485,12 +496,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     toasted: null,
     customCommandToUpdate: null,
     defaultCommandToUpdate: null,
-    timerToUpdate: null
+    timerToUpdate: null,
+    modBannerVisible: true
   };
 
-  // bindsToasted(toasted: object) {
-  //   this.BINDS_TOASTED(toasted);
-  // }
+  closeModBanner() {
+    this.CLOSE_MOD_BANNER();
+  }
 
   closeChildWindow() {
     this.windowsService.closeChildWindow();
@@ -595,6 +607,11 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   // private BINDS_TOASTED(toasted: object) {
   //   Vue.set(this.state, 'toasted', toasted);
   // }
+
+  @mutation()
+  private CLOSE_MOD_BANNER() {
+    Vue.set(this.state, 'modBannerVisible', false);
+  }
 
   @mutation()
   private SET_CUSTOM_COMAND_TO_UPDATE(command: ICustomCommand) {

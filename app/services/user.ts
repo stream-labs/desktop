@@ -7,6 +7,7 @@ import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
+import { ChatbotApiService } from './chatbot/chatbot';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -35,6 +36,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
+  @Inject() private chatbotApiService: ChatbotApiService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -216,6 +218,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
+    await this.chatbotApiService.logOut();
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
