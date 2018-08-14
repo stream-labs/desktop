@@ -6,7 +6,7 @@
     <img class="shadow-image__right" :src="currentBanner.thumbnail" />
     <img class="main-image" :src="currentBanner.thumbnail" />
   </div>
-  <div>
+  <div class="title-container">
     <h3 class="title">{{ headerText }}</h3>
     <p class="subheading">{{ currentBanner.subHeader }}</p>
   </div>
@@ -76,6 +76,10 @@
 .main-image {
   position: relative;
   width: auto;
+  z-index: 1;
+}
+
+.title-container {
   z-index: 1;
 }
 
