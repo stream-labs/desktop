@@ -15,7 +15,8 @@ import {
 
 import {
   IAlertMessage,
-  NEW_ALERT_MODAL_ID
+  NEW_ALERT_MODAL_ID,
+  ChatbotAlertTypes
 } from 'services/chatbot/chatbot-interfaces';
 
 interface INewAlertMetadata {
@@ -49,10 +50,19 @@ interface INewAlertMetadata {
       amount: INumberMetadata;
       message: ITextMetadata;
     }
+  },
+  bits: {
+    newMessage: {
+      amount: INumberMetadata;
+      message: ITextMetadata;
+    }
   }
 }
 
 interface INewAlertData {
+  [id: string] : {
+    newMessage: IAlertMessage;
+  }
   follow: {
     newMessage: IAlertMessage;
   };
@@ -61,11 +71,14 @@ interface INewAlertData {
   };
   tip: {
     newMessage: IAlertMessage;
-  }
+  };
   host: {
     newMessage: IAlertMessage;
-  }
+  };
   raid: {
+    newMessage: IAlertMessage;
+  };
+  bits: {
     newMessage: IAlertMessage;
   }
 }
@@ -79,7 +92,7 @@ interface INewAlertData {
   }
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
-  @Prop() selectedType: string;
+  @Prop() selectedType: ChatbotAlertTypes;
 
   onSubmitHandler: Function = () => {};
 
@@ -111,6 +124,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   get isRaid() {
     return this.selectedType === 'raid';
+  }
+
+  get isBit() {
+    return this.selectedType === 'bits';
   }
 
   get disabledSubmit() {
@@ -195,7 +212,20 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             placeholder: $t('Message to raider')
           }
         }
-      }
+      },
+      bits: {
+        newMessage: {
+          amount: {
+            required: true,
+            min: 0,
+            placeholder: $t('Minimum bit count')
+          },
+          message: {
+            required: true,
+            placeholder: $t('Message to Bit donators')
+          }
+        }
+      },
     };
     return metadata;
   }
@@ -232,7 +262,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: null,
           message: null
         }
-      }
+      },
+      bits: {
+        newMessage: {
+          amount: null,
+          message: null
+        }
+      },
     };
     return initialState;
   }

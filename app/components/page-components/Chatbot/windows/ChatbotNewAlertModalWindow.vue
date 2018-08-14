@@ -97,6 +97,22 @@
           />
         </div>
       </div>
+      <div v-if="isBit">
+        <div>
+          <FormWrapper
+            :title="$t('Minimum Bits')"
+            type='number'
+            v-model="newAlert.bits.newMessage.amount"
+            :metadata="metadata.bits.newMessage.amount"
+          />
+          <FormWrapper
+            :title="$t('Bit Donator Message')"
+            type='textArea'
+            v-model="newAlert.bits.newMessage.message"
+            :metadata="metadata.bits.newMessage.message"
+          />
+        </div>
+      </div>
     </div>
     <div class="new-alert-modal__controls">
       <button
