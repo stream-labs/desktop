@@ -21,7 +21,7 @@
       >
         <td> {{ item.text }} </td>
         <td> {{ $t(item.punishment.type) }} </td>
-        <td> {{ item.punishment.duration }} </td>
+        <td> {{ item.punishment.type === 'Timeout' ? item.punishment.duration : '-' }} </td>
         <td>
           <div class="align-items--inline">
             <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
