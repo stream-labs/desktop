@@ -86,7 +86,7 @@
         <button
           class="button button--action"
           type="submit"
-          :disabled="errors.items.length > 0"
+          :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
         </button>
