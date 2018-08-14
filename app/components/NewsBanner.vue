@@ -10,7 +10,7 @@
     <h3 class="title">{{ headerText }}</h3>
     <p class="subheading">{{ currentBanner.subHeader }}</p>
   </div>
-  <div>
+  <div class="cta-container">
     <button class="button learn-more" @click="followLink">{{ currentBanner.linkTitle }}</button>
     <button class="dismiss-button" @click="closeBanner()">{{ $t('Dismiss') }}</button>
   </div>
@@ -31,7 +31,6 @@
   display: flex;
   position: relative;
   align-content: center;
-  justify-content: space-between;
   overflow: hidden;
   transition: all 0.5s cubic-bezier(0, 1, 0, 1);
 }
@@ -45,16 +44,22 @@
 
 .bg-image {
   position: absolute;
-  opacity: 0.2;
+  opacity: 0.1;
   height: 400%;
   top: -100%;
   left: -100px;
+  filter: blur(6px);
 }
 
 .image-container {
   position: relative;
-  left: 50px;
+  margin-left: 50px;
   width: 80px;
+
+  img {
+    top: 50%;
+    transform: translate(0, -50%);
+  }
 }
 
 .shadow-image__left,
@@ -81,6 +86,7 @@
 
 .title-container {
   z-index: 1;
+  margin-left: 50px;
 }
 
 .title {
@@ -90,7 +96,12 @@
 
 .subheading {
   display: block;
-  max-width: 700px;
+  max-width: 900px;
+  color: @white;
+}
+
+.cta-container {
+  margin-left: auto;
 }
 
 .learn-more {
