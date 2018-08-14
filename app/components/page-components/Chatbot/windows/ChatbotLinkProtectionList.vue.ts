@@ -16,6 +16,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   editIndex: number = -1;
 
   textInputMetadata: ITextMetadata = {
+    required: true,
     placeholder: 'Add a link to add to list'
   };
 

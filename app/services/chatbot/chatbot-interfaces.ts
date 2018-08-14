@@ -3,6 +3,7 @@
 export interface IChatbotApiServiceState {
   apiToken: string;
   socketToken: string;
+  globallyEnabled: boolean;
   defaultCommandsResponse: IDafaultCommandsResponse;
   customCommandsResponse: ICustomCommandsResponse;
   timersResponse: ITimersResponse;
@@ -25,6 +26,11 @@ export interface IChatbotCommonServiceState {
 export interface IChatbotAuthResponse {
   api_token: string;
   socket_token: string;
+}
+
+export interface IChatbotStatusResponse {
+  worker: IChatbotWorkerStatus;
+  clients: IChatbotClientsStatus;
 }
 
 export interface IChatbotAPIPostResponse {
@@ -118,6 +124,15 @@ export interface IPunishment {
 
 export interface IExcluded extends IPermission {}
 
+
+// status
+export interface IChatbotWorkerStatus {
+  status: string;
+}
+export interface IChatbotClientsStatus {
+  status: string;
+  services: string[];
+}
 
 // default commands
 export interface IDefaultCommand {
@@ -280,12 +295,11 @@ export interface IWordProtectionBlackListItem {
 
 // dictionaries
 export enum ChatbotPermissionsEnums {
-  None = 0,
-  Viewer = 1,
-  Subscriber = 1 << 1,
-  Moderator = 1 << 5,
-  Broadcaster = 1 << 7,
-  All = Viewer | Subscriber | Moderator | Broadcaster
+  'Everyone' = 1,
+  'Subscriber Only' = 1 << 1,
+  'Moderator Only' = 1 << 5,
+  'Streamers Only' = 1 << 7,
+  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
 }
 
 export enum ChatbotPunishments {
@@ -300,6 +314,10 @@ export enum ChatbotResponseTypes {
 }
 
 export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
+
+export const ChatbotClients = [
+  'Twitch'
+]
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';

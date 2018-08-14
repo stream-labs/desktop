@@ -24,7 +24,7 @@
   </div>
   <div class="margin-vertical--10">
     <i v-if="isDuplicate" > {{ $t('Cannot add duplicate aliases. Please add something else.') }} </i>
-    <i v-if="containsSpaces" > {{ $t('Alias cannot contain spaces.') }} </i>
+    <i v-else-if="containsSpaces" > {{ $t('Alias cannot contain spaces.') }} </i>
     <i v-else> {{ $t('An alternative text string to trigger your command') }} </i>
   </div>
 

@@ -95,6 +95,7 @@
       </button>
       <button
         class="button button--action"
+        :disabled="disabledSubmit || errors.items.length > 0"
         @click="submit">
         {{ $t('Done') }}
       </button>

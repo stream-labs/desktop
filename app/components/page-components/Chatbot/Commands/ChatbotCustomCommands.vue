@@ -6,7 +6,7 @@
         @click="openCommandWindow"
         class="button button--action margin--10"
       >
-        Add Command
+        {{ $t('Add Command') }}
       </button>
       <input
         v-model="searchQuery"
@@ -18,18 +18,18 @@
 
     <!-- custom commands -->
     <div class="padding--10">
-      <div v-if="commands && commands.length === 0">
-        <h2>No custom commands. Click to add new.</h2>
-      </div>
-      <table v-else>
+      <table>
         <thead>
           <tr>
             <th> {{ $t('Command') }} </th>
             <th> {{ $t('Response') }} </th>
+            <th> {{ $t('Global Cooldown in mins') }} </th>
+            <th> {{ $t('User Cooldown in mins') }} </th>
+            <th> {{ $t('Permission') }} </th>
             <th></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="commands && commands.length > 0">
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
@@ -37,6 +37,9 @@
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>
+            <td> {{ command.cooldowns.global }} </td>
+            <td> {{ command.cooldowns.user }} </td>
+            <td> {{ command.permission ? $t(chatbotPermissionsEnums[command.permission.level]) : '-' }} </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput
@@ -55,6 +58,11 @@
             </td>
           </tr>
         </tbody>
+        <tbody v-else>
+          <tr>
+            <td colspan="6" class="text-align--center"> {{ $t('Click add command to get started.') }} </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -65,13 +73,20 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 
-tbody tr {
+table tr {
   .transition;
 
   td:first-child {
     width: 300px;
   }
-  td:last-child {
+
+  td:nth-child(5),
+  th:nth-child(5) {
+    width: 200px;
+    .text-align--right;
+  }
+
+  td:last-child:not(.text-align--center) {
     width: 100px;
     .align-items--inline;
     .text-align--right;

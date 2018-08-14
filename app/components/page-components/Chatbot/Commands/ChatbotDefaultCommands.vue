@@ -22,17 +22,22 @@
       v-for="(commands, slugName, index) in commandSlugs"
       :key="index"
     >
-      <div class="chatbot__dropdown-header">
-        <i class="icon-down"></i>
+      <div
+        class="chatbot__dropdown-header"
+        :class="{'chatbot__dropdown-header--hidden': !visible[slugName]}"
+        @click="toggleVisible(slugName)"
+      >
+        <i class="icon-down cursor--pointer"></i>
         <span>{{ $t(slugName) }}</span>
       </div>
 
       <!-- commands in slug -->
-      <table>
+      <table v-if="visible[slugName]">
         <thead>
           <tr>
-            <th>Command</th>
-            <th>Description</th>
+            <th> {{ $t('Command') }} </th>
+            <th> {{ $t('Description') }} </th>
+            <th> {{ $t('Static Permission') }} </th>
             <th></th>
           </tr>
         </thead>
@@ -42,8 +47,9 @@
             :key="index"
             v-if="matchesQuery(commandName, command)"
           >
-            <td> {{ $t(command.command) }} </td>
+            <td> {{ command.command }} </td>
             <td> {{ $t(command.description) }} </td>
+            <td> {{ command.static_permission ? $t(chatbotPermissionsEnums[command.static_permission.level]) : '-' }} </td>
             <td>
               <div class="align-items--inline">
                 <ToggleInput
@@ -52,7 +58,7 @@
                   @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
                 />
                 <i
-                  class="icon-edit padding--5"
+                  class="icon-edit padding--5 cursor--pointer"
                   @click="openCommandWindow(slugName, commandName, command)"
                 />
               </div>
@@ -74,23 +80,36 @@
   .align-items--inline;
   .padding--10;
   .text-transform--uppercase;
-  border-color: #274959;
-  background-color: rgba(27, 47,57, 0.68);
+  border-color: @teal;
+  background-color: #eaf9f5;
+  color: @teal;
   border-style: solid;
   border-width: 1px 0;
-  color: white;
   margin-bottom: 15px;
+
+  &.chatbot__dropdown-header--hidden {
+    .icon-down {
+      transform: rotate(180deg);
+    }
+  }
 
   .icon-down {
     font-size: 5px;
     .icon--margin;
+    .transition();
   }
 }
 
-tbody tr {
+table tr {
 
   td:first-child {
     width: 300px;
+  }
+
+  td:nth-child(3),
+  th:nth-child(3) {
+    width: 200px;
+    .text-align--right;
   }
   td:last-child {
     width: 100px;
@@ -112,6 +131,12 @@ tbody tr {
 
 
 .night-theme {
+
+  .chatbot__dropdown-header {
+    border-color: #274959;
+    background-color: rgba(27, 47,57, 0.68);
+    color: white;
+  }
 
   tbody tr {
     border: 2px solid transparent;
