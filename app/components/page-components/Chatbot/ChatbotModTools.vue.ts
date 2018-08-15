@@ -14,7 +14,6 @@ import {
 })
 export default class ChatbotModTools extends ChatbotBase {
 
-
   mounted() {
     this.chatbotApiService.fetchCapsProtection();
     this.chatbotApiService.fetchSymbolProtection();
