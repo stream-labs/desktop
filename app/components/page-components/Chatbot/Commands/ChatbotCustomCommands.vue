@@ -108,20 +108,6 @@ table tr {
   }
 }
 
-.chatbot-custom-commands__pagination-container {
-  .flex();
-
-  .chatbot-custom-commands__pagination__page {
-    .padding--10;
-    cursor: pointer;
-
-    &.chatbot-custom-commands__pagination__page--current {
-      color: @day-title;
-      .weight--bold();
-    }
-  }
-}
-
 .chatbot-custom-commands__command-actions__container {
   button {
     display: block;
@@ -152,13 +138,6 @@ table tr {
   }
   tbody tr:nth-child(even) {
     background-color: @navy;
-  }
-
-  .chatbot-custom-commands__pagination__page {
-
-    &.chatbot-custom-commands__pagination__page--current {
-      color: @white;
-    }
   }
 
 }
