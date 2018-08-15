@@ -1,10 +1,6 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
 
-  <div slot="description">
-    {{ $t('Please note that when advanced media share is enabled, media will no longer play through your alert box widget. Media will only play through this media share widget.') }}
-  </div>
-
   <div slot="settings" >
     <form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
       <number-input v-model="wData.settings.price_per_second" />
