@@ -27,7 +27,7 @@
   display: flex;
   background-color: @day-primary;
   box-sizing: border-box;
-  position: absolute;
+  position: relative;
   width: 100%;
   padding: 0 15px;
   height: 54px;
@@ -35,7 +35,9 @@
 }
 
 .tab-content {
-  padding-top: 54px;
+  max-height: 75vh;
+  position: relative;
+  overflow-y: auto;
 }
 
 .night-theme {
