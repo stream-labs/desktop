@@ -29,6 +29,7 @@
   display: flex;
   background-color: @day-primary;
   box-sizing: border-box;
+  position: relative;
   width: 100%;
   padding: 0 15px;
   height: 54px;
@@ -36,8 +37,9 @@
 }
 
 .tab-content {
-  height: calc(~'100% - 54px');
-  overflow-y: scroll;
+  max-height: 75vh;
+  position: relative;
+  overflow-y: auto;
 }
 
 .night-theme {
