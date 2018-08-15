@@ -1,14 +1,12 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
+import { Debounce } from 'lodash-decorators';
 
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
-
-  query = '';
-
-  timeOutFetchQuery: number = null;
+  searchQuery = '';
 
   get commands() {
     return this.chatbotApiService.state.customCommandsResponse.data;
@@ -26,16 +24,10 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.fetchCommands(1);
   }
 
-  get searchQuery() {
-    return this.query;
-  }
-
-  set searchQuery(value: string) {
-    this.query = value;
-    window.clearTimeout(this.timeOutFetchQuery);
-    this.timeOutFetchQuery = window.setTimeout(() => {
-      this.fetchCommands(this.currentPage, value);
-    }, 1000)
+  @Watch('searchQuery')
+  @Debounce(1000)
+  onQueryChangeHandler(value: string) {
+    this.fetchCommands(this.currentPage, value);
   }
 
   fetchCommands(page: number = this.currentPage, query?: string) {

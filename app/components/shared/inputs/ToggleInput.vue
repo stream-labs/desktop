@@ -27,6 +27,7 @@
   width: 44px;
   height: 22px;
   .cursor--pointer();
+  z-index: 0;
 }
 .toggleinput__track {
   .transition;

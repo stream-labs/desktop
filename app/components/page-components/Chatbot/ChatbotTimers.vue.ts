@@ -1,11 +1,12 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { ITimer } from 'services/chatbot/chatbot-interfaces';
+import { Debounce } from 'lodash-decorators';
+
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
-  query = '';
-  timeOutFetchQuery: number = null;
+  searchQuery = '';
 
   get timers() {
     return this.chatbotApiService.state.timersResponse.data;
@@ -24,16 +25,10 @@ export default class ChatbotTimers extends ChatbotBase {
     this.fetchTimers(1);
   }
 
-  get searchQuery() {
-    return this.query;
-  }
-
-  set searchQuery(value: string) {
-    this.query = value;
-    window.clearTimeout(this.timeOutFetchQuery);
-    this.timeOutFetchQuery = window.setTimeout(() => {
-      this.fetchTimers(this.currentPage, value);
-    }, 1000);
+  @Watch('searchQuery')
+  @Debounce(1000)
+  onQueryChangeHandler(value: string) {
+    this.fetchTimers(this.currentPage, value);
   }
 
   fetchTimers(page: number = this.currentPage, query?: string) {

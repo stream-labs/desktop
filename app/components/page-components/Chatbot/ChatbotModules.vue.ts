@@ -19,7 +19,7 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get modules() {
-    const backgroundUrlSuffix = this.nightTheme ? 'night' : 'day';
+    const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     let modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),

@@ -36,7 +36,7 @@ export default class ChatbotBase extends Vue {
     this.chatbotApiService.fetchLinkProtection();
   }
 
-  get nightTheme() {
+  get nightMode() {
     return this.customizationService.nightMode;
   }
 
