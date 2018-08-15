@@ -1,5 +1,6 @@
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const plugins = [];
 
@@ -116,7 +117,8 @@ module.exports = {
   },
 
   optimization: {
-    minimize: false
+    minimize: process.env.NODE_ENV === 'production',
+    minimizer: [new UglifyJsPlugin({ uglifyOptions: { mangle: false } })]
   },
 
   plugins
