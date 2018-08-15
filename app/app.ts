@@ -27,7 +27,6 @@ const { ipcRenderer, remote } = electron;
 const nAirVersion = remote.process.env.NAIR_VERSION;
 const isProduction = process.env.NODE_ENV === 'production';
 
-
 // This is the development DSN
 let sentryDsn = 'https://1cb5cdf6a93c466dad570861b8c82b61@sentry.io/1262580';
 
@@ -65,7 +64,7 @@ if ((isProduction || process.env.NAIR_REPORT_TO_SENTRY) && !electron.remote.proc
 
       if (data.exception) {
         data.exception.values[0].stacktrace.frames.forEach((frame: any) => {
-          frame.filename = normalize(frame.filename);
+          frame.filename = 'app:///' + normalize(frame.filename);
         });
 
         data.culprit = data.exception.values[0].stacktrace.frames[0].filename;
