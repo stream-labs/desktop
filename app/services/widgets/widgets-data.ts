@@ -376,7 +376,8 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoFilename: 'source-chatbox.mp4',
     supportList: [
       $t('Twitch chat'),
-      $t('Youtube chat')
+      $t('Youtube chat'),
+      $t('Mixer chat')
     ]
   },
   [WidgetType.EventList]: {
