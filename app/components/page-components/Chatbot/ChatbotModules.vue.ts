@@ -19,11 +19,12 @@ export default class ChatbotModules extends ChatbotBase {
   }
 
   get modules() {
+    const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     let modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),
         description: $t('Get notified in chat whenever an activity happens like Donations and Subscribers.'),
-        backgroundUrl: require('../../../../media/images/chatbot/chatbot-alert.png'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.chatAlertCurrentlyEnabled,
         onExpand: () => {
           this.chatbotCommonService.openChatbotAlertsWindow();

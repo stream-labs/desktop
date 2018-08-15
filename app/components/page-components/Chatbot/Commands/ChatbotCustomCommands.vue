@@ -33,7 +33,6 @@
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
-            v-if="matchesQuery(command)"
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>
@@ -64,6 +63,12 @@
           </tr>
         </tbody>
       </table>
+      <ChatbotPagination
+        v-if="totalPages > 1"
+        :totalPages="totalPages"
+        :currentPage="currentPage"
+        @change="fetchCommands"
+      />
     </div>
   </div>
 </template>

@@ -1,10 +1,16 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { ITimer } from 'services/chatbot/chatbot-interfaces';
+import { Debounce } from 'lodash-decorators';
+import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
-@Component({})
+
+@Component({
+  components: {
+    ChatbotPagination
+  }
+})
 export default class ChatbotTimers extends ChatbotBase {
-
   searchQuery = '';
 
   get timers() {
@@ -15,16 +21,23 @@ export default class ChatbotTimers extends ChatbotBase {
     return this.chatbotApiService.state.timersResponse.pagination.current;
   }
 
-  mounted() {
-    // get list of timers
-    this.chatbotApiService.fetchTimers(this.currentPage);
+  get totalPages() {
+    return this.chatbotApiService.state.timersResponse.pagination.total;
   }
 
-  matchesQuery(timer: ITimer) {
-    return (
-      timer.name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-      timer.message.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
-    )
+  mounted() {
+    // get list of timers
+    this.fetchTimers(1);
+  }
+
+  @Watch('searchQuery')
+  @Debounce(1000)
+  onQueryChangeHandler(value: string) {
+    this.fetchTimers(this.currentPage, value);
+  }
+
+  fetchTimers(page: number = this.currentPage, query?: string) {
+    this.chatbotApiService.fetchTimers(page, query);
   }
 
   openTimerWindow(timer?: ITimer) {

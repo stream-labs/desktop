@@ -135,7 +135,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     if (this.isFollower) return !message;
     if (this.isSubscription) return !amount || !message || !tier;
 
-    return !amount || !message;
+    return amount === null || !message;
   }
 
   get metadata() {

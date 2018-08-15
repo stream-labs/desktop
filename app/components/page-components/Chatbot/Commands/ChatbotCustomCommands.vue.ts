@@ -1,11 +1,16 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
+import { Debounce } from 'lodash-decorators';
+import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
 
-@Component({})
+@Component({
+  components: {
+    ChatbotPagination
+  }
+})
 export default class ChatbotDefaultCommands extends ChatbotBase {
-
   searchQuery = '';
 
   get commands() {
@@ -17,15 +22,22 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
       .current;
   }
 
-  mounted() {
-    this.chatbotApiService.fetchCustomCommands(this.currentPage);
+  get totalPages() {
+    return this.chatbotApiService.state.customCommandsResponse.pagination.total;
   }
 
-  matchesQuery(command: ICustomCommand) {
-    return (
-      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-      command.response.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
-    )
+  mounted() {
+    this.fetchCommands(1);
+  }
+
+  @Watch('searchQuery')
+  @Debounce(1000)
+  onQueryChangeHandler(value: string) {
+    this.fetchCommands(this.currentPage, value);
+  }
+
+  fetchCommands(page: number = this.currentPage, query?: string) {
+    this.chatbotApiService.fetchCustomCommands(page, query);
   }
 
   openCommandWindow(command?: ICustomCommand) {

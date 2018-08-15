@@ -30,7 +30,6 @@
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
-            v-if="matchesQuery(timer)"
         >
           <td> {{ timer.name }} </td>
           <td> {{ timer.interval }} </td>
@@ -60,6 +59,12 @@
         </tr>
       </tbody>
     </table>
+    <ChatbotPagination
+      v-if="totalPages > 1"
+      :totalPages="totalPages"
+      :currentPage="currentPage"
+      @change="fetchTimers"
+    />
   </div>
 </div>
 </template>
@@ -134,6 +139,5 @@ tbody tr {
   tbody tr:nth-child(even) {
     background-color: @navy;
   }
-
 }
 </style>

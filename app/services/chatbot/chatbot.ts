@@ -170,8 +170,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
-  fetchCustomCommands(page?: number) {
-    return this.api('GET', `commands?page=${page || 1}`, {})
+  fetchCustomCommands(page = 1, query = '') {
+    return this.api('GET', `commands?page=${page}&query=${query}`, {})
       .then((response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
       });
@@ -185,8 +185,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-  fetchTimers(page?: number) {
-    return this.api('GET', `timers?page=${page || 1}`, {})
+  fetchTimers(page = 1, query = '') {
+    return this.api('GET', `timers?page=${page}&query=${query}`, {})
       .then((response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
       });
