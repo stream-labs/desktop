@@ -89,7 +89,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   }
 
   onAddNewItem() {
-    if (!this.newListItem) return;
+    if (!this.newListItem.text) return;
 
     let newListItemArray = this.value.slice(0);
 

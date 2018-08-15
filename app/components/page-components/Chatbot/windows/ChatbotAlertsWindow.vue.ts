@@ -71,7 +71,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   // filters
-  formatNumber(value: number, dp = 2) {
+  formatNumber(value: number, dp = 0) {
     if (isNaN(Number(value))) {
       return value;
     }
@@ -94,7 +94,8 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   formatValue(value: any, column: string) {
     switch (column) {
       case 'amount':
-        return this.formatNumber(value, 2);
+        const dp = this.selectedType === 'tip' ? 2 : 0;
+        return this.formatNumber(value, dp);
       case 'message':
         return value;
       case 'is_gifted':

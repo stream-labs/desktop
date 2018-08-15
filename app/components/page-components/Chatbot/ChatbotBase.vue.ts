@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
+import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
@@ -27,11 +28,16 @@ import { IListOption } from 'components/shared/inputs'
 export default class ChatbotBase extends Vue {
   @Inject() chatbotApiService: ChatbotApiService;
   @Inject() chatbotCommonService: ChatbotCommonService;
+  @Inject() customizationService: CustomizationService;
 
   mounted() {
     // pre-load them to switch between 2 windows
     this.chatbotApiService.fetchDefaultCommands();
     this.chatbotApiService.fetchLinkProtection();
+  }
+
+  get nightTheme() {
+    return this.customizationService.nightMode;
   }
 
   get chatbotPermissionsEnums() {

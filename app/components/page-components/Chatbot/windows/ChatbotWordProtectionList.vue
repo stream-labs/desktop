@@ -37,7 +37,7 @@
     :height="'auto'"
     :maxHeight="300"
   >
-    <form @submit.prevent="onAddNewItem" class="new-list-item__container">
+    <div class="new-list-item__container">
       <div class="new-list-item-modal__header">
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
         <div class="new-list-item-modal__header__title">{{ $t('Add to Blacklist') }}</div>
@@ -85,13 +85,13 @@
         </button>
         <button
           class="button button--action"
-          type="submit"
+          @click="onAddNewItem"
           :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
         </button>
       </div>
-    </form>
+    </div>
   </modal>
 </div>
 </template>
