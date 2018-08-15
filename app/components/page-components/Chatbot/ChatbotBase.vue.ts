@@ -5,8 +5,11 @@ import { Inject } from 'util/injector';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
+import FormWrapper from 'components/shared/inputs/FormWrapper.vue';
+
 import {
   ChatbotPermissionsEnums,
+  ChatbotAutopermitEnums,
   ChatbotResponseTypes,
   ChatbotPunishments,
 } from 'services/chatbot/chatbot-interfaces';
@@ -16,6 +19,7 @@ import { IListOption } from 'components/shared/inputs'
 @Component({
   components: {
     ...inputComponents,
+    FormWrapper,
     Tabs,
     DropdownMenu,
   }
@@ -49,6 +53,23 @@ export default class ChatbotBase extends Vue {
     );
     return permissions;
   }
+
+  get chatbotAutopermitOptions() {
+    let permissions = Object.keys(ChatbotAutopermitEnums).reduce(
+      (a: IListOption<number>[], b: string) => {
+        if (typeof ChatbotAutopermitEnums[b] === 'number') {
+          a.push({
+            title: b.split('_').join(' '),
+            value: ChatbotAutopermitEnums[b]
+          });
+        }
+        return a;
+      },
+      []
+    );
+    return permissions;
+  }
+
 
   get chatbotResponseTypes() {
     return Object.keys(ChatbotResponseTypes).map(responseType => {

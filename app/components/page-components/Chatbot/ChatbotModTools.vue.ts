@@ -13,11 +13,21 @@ import {
   }
 })
 export default class ChatbotModTools extends ChatbotBase {
+
   mounted() {
     this.chatbotApiService.fetchCapsProtection();
     this.chatbotApiService.fetchSymbolProtection();
     this.chatbotApiService.fetchLinkProtection();
     this.chatbotApiService.fetchWordProtection();
+  }
+
+
+  onCloseBanner() {
+    this.chatbotCommonService.closeModBanner();
+  }
+
+  get modBannerVisible() {
+    return this.chatbotCommonService.state.modBannerVisible;
   }
 
   get modules() {

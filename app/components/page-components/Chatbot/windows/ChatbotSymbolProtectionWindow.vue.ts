@@ -22,6 +22,10 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
     this.selectedTab = tab;
   }
 
+  onReset() {
+  this.onResetSlug('symbol-protection');
+  }
+
   onSave() {
     this.chatbotApiService
       .updateSymbolProtection({

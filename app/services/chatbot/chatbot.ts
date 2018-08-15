@@ -27,6 +27,7 @@ import {
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
   IWordProtectionResponse,
+  ChatbotSettingSlugs
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -102,13 +103,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         .then(response => response.json())
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
-          console.log(response);
           resolve(true);
         })
         .catch(err => {
           reject(err);
         });
     });
+  }
+
+  logOut() {
+    this.LOGOUT();
   }
 
   apiEndpoint(route: String, versionIncluded?: Boolean) {
@@ -152,6 +156,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         // all status online.
         this.UPDATE_GLOBALLY_ENABLED((
           response.worker.status === 'Online' &&
+          response.worker.type === 'Full' &&
           response.clients.status === 'Online' &&
           allclientsOnline
         ))
@@ -226,6 +231,42 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // POST, PUT requests
   //
+
+  resetSettings(slug: ChatbotSettingSlugs) {
+    return this.api('POST', `settings/${slug}/reset`, {}).then(
+      (
+        response:
+          | ICapsProtectionResponse
+          | ISymbolProtectionResponse
+          | ILinkProtectionResponse
+          | IWordProtectionResponse
+      ) => {
+        switch (slug) {
+          case 'caps-protection':
+            this.UPDATE_CAPS_PROTECTION(
+              response as ICapsProtectionResponse
+            );
+            break;
+          case 'symbol-protection':
+            this.UPDATE_SYMBOL_PROTECTION(
+              response as ISymbolProtectionResponse
+            );
+            break;
+          case 'link-protection':
+            this.UPDATE_LINK_PROTECTION(
+              response as ILinkProtectionResponse
+            );
+            break;
+          case 'words-protection':
+            this.UPDATE_WORD_PROTECTION(
+              response as IWordProtectionResponse
+            );
+            break;
+        }
+        return Promise.resolve(response);
+      }
+    );
+  }
 
   toggleEnableChatbot() {
     const platforms = ChatbotClients.map(client => client.toLowerCase());
@@ -388,6 +429,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   @mutation()
+  private LOGOUT() {
+    Vue.set(this.state, 'apiToken', null);
+    Vue.set(this.state, 'socketToken', null);
+  }
+
+
+  @mutation()
   private UPDATE_GLOBALLY_ENABLED(enabled: boolean) {
     Vue.set(this.state, 'globallyEnabled', enabled);
   }
@@ -447,12 +495,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     toasted: null,
     customCommandToUpdate: null,
     defaultCommandToUpdate: null,
-    timerToUpdate: null
+    timerToUpdate: null,
+    modBannerVisible: true
   };
 
-  // bindsToasted(toasted: object) {
-  //   this.BINDS_TOASTED(toasted);
-  // }
+  closeModBanner() {
+    this.CLOSE_MOD_BANNER();
+  }
 
   closeChildWindow() {
     this.windowsService.closeChildWindow();
@@ -557,6 +606,11 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   // private BINDS_TOASTED(toasted: object) {
   //   Vue.set(this.state, 'toasted', toasted);
   // }
+
+  @mutation()
+  private CLOSE_MOD_BANNER() {
+    Vue.set(this.state, 'modBannerVisible', false);
+  }
 
   @mutation()
   private SET_CUSTOM_COMAND_TO_UPDATE(command: ICustomCommand) {

@@ -27,6 +27,10 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
     this.selectedTab = tab;
   }
 
+  onReset() {
+    this.onResetSlug('words-protection');
+  }
+
   onSave() {
     this.chatbotApiService
       .updateWordProtection({

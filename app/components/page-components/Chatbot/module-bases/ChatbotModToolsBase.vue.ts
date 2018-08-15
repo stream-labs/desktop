@@ -3,10 +3,15 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 
 import {
+  ICapsProtectionResponse,
+  ISymbolProtectionResponse,
+  ILinkProtectionResponse,
+  IWordProtectionResponse,
   ICapsProtectionData,
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
+  ChatbotSettingSlugs
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -83,7 +88,6 @@ interface IProtectionMetadata {
   word: IWordProtectionMetadata;
 }
 
-
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   capsProtection: ICapsProtectionData = null;
@@ -144,7 +148,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       excluded: {
         level: {
           required: true,
-          options: this.chatbotPermissions
+          options: this.chatbotAutopermitOptions
         }
       },
       message: {
@@ -171,7 +175,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         placeholder: `Maximum amount of ${this.label(protectionType)}`,
         min: 0,
         max: 500
-
       },
       percent: {
         required: true,
@@ -267,5 +270,30 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
+  onResetSlug(slug: ChatbotSettingSlugs) {
+    this.chatbotApiService.resetSettings(slug)
+      .then((response: (
+        ICapsProtectionResponse |
+        ISymbolProtectionResponse |
+        ILinkProtectionResponse |
+        IWordProtectionResponse
+      )) => {
+        switch (slug) {
+          case 'caps-protection':
+            this.capsProtection = cloneDeep(response.settings as ICapsProtectionData);
+            break;
+          case 'symbol-protection':
+            this.symbolProtection = cloneDeep(response.settings as ISymbolProtectionData);
+            break;
+          case 'link-protection':
+            this.linkProtection = cloneDeep(response.settings as ILinkProtectionData);
+            break;
+          case 'words-protection':
+            this.wordProtection = cloneDeep(response.settings as IWordProtectionData);
+            break;
+          default:
+            break;
+        }
+      })
+  }
 }
-
