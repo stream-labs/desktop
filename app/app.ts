@@ -29,11 +29,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 
 // This is the development DSN
-const sentryDsn = 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
+let sentryDsn = 'https://1cb5cdf6a93c466dad570861b8c82b61@sentry.io/1262580';
 
 if (isProduction) {
   // This is the production DSN
-  // sentryDsn = 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
+  sentryDsn = 'https://35a02d8ebec14fd3aadc9d95894fabcf@sentry.io/1246812';
 
   electron.crashReporter.start({
     productName: 'n-air-app',
