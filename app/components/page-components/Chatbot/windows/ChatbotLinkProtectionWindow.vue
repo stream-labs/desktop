@@ -69,19 +69,26 @@
       </transition>
     </div>
   </div>
-  <div slot="controls">
+  <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onCancel">
-      {{ $t('Cancel') }}
+      @click="onReset">
+      {{ $t('Reset') }}
     </button>
-    <button
-      class="button button--action"
-      :disabled="errors.items.length > 0"
-      @click="onSave"
-    >
-      {{ $t("Save") }}
-    </button>
+    <div>
+      <button
+        class="button button--default"
+        @click="onCancel">
+        {{ $t('Cancel') }}
+      </button>
+      <button
+        class="button button--action"
+        @click="onSave"
+        :disabled="errors.items.length > 0"
+      >
+        {{ $t("Save") }}
+      </button>
+    </div>
   </div>
 </ModalLayout>
 </template>

@@ -3,6 +3,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { cloneDeep } from 'lodash';
 import { ITab } from 'components/Tabs.vue';
+import { $t } from 'services/i18n';
 
 import {
   ICustomCommand,
@@ -53,11 +54,11 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   // metadata
   commandMetadata: ITextMetadata = {
     required: true,
-    placeholder: 'Enter the text string which will trigger the response'
+    placeholder: $t('Enter the text string which will trigger the response')
   };
   responseMetadata: ITextMetadata = {
     required: true,
-    placeholder: 'The phrase that will appear after a user enters the command'
+    placeholder: $t('The phrase that will appear after a user enters the command')
   };
 
   mounted() {
@@ -93,7 +94,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
-      placeholder: 'Cooldown (Value in Minutes)',
+      placeholder: $t('Cooldown (Value in Minutes)'),
       min: 0
     };
     return timerMetadata;

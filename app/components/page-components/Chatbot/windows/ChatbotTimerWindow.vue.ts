@@ -1,6 +1,7 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
+import { $t } from 'services/i18n';
 
 import {
   ITimer,
@@ -25,26 +26,26 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   // metadata
   nameMetadata: ITextMetadata = {
     required: true,
-    placeholder: 'Name of the timer',
+    placeholder: $t('Name of the timer'),
     alpha: true
   };
   messageMetadata: ITextMetadata = {
     required: true,
-    placeholder: 'This phrase will appear after the timer has ended'
+    placeholder: $t('This phrase will appear after the timer has ended')
   };
 
   intervalMetadata: INumberMetadata = {
     required: true,
     min: 0,
     max: 1440,
-    placeholder: 'Interval (Value in Minutes)'
+    placeholder: $t('Interval (Value in Minutes)')
   };
 
   chatLinesMetadata: INumberMetadata = {
     required: true,
     min: 0,
     max: 1000,
-    placeholder: 'Minimum chat lines'
+    placeholder: $t('Minimum chat lines')
   };
 
   mounted() {

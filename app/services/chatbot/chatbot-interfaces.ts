@@ -20,6 +20,7 @@ export interface IChatbotCommonServiceState {
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
   timerToUpdate: ITimer;
+  modBannerVisible: boolean;
 }
 
 // responses
@@ -128,6 +129,7 @@ export interface IExcluded extends IPermission {}
 // status
 export interface IChatbotWorkerStatus {
   status: string;
+  type: string;
 }
 export interface IChatbotClientsStatus {
   status: string;
@@ -294,13 +296,22 @@ export interface IWordProtectionBlackListItem {
 }
 
 // dictionaries
+export enum ChatbotAutopermitEnums {
+  'None' = 0,
+  'Everyone' = 1,
+  'Subscriber Only' = 1 << 1,
+  'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
+}
+
 export enum ChatbotPermissionsEnums {
+  'None' = 0,
   'Everyone' = 1,
   'Subscriber Only' = 1 << 1,
   'Moderator Only' = 1 << 5,
   'Streamers Only' = 1 << 7,
   'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
 }
+
 
 export enum ChatbotPunishments {
   Purge = 'Purge',
@@ -313,11 +324,14 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub';
+export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits';
 
 export const ChatbotClients = [
   'Twitch'
 ]
+
+export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
+
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';

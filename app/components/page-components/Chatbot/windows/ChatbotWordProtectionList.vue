@@ -21,7 +21,7 @@
       >
         <td> {{ item.text }} </td>
         <td> {{ $t(item.punishment.type) }} </td>
-        <td> {{ item.punishment.duration }} </td>
+        <td> {{ item.punishment.type === 'Timeout' ? item.punishment.duration : '-' }} </td>
         <td>
           <div class="align-items--inline">
             <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
@@ -86,7 +86,7 @@
         <button
           class="button button--action"
           type="submit"
-          :disabled="errors.items.length > 0"
+          :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
         </button>

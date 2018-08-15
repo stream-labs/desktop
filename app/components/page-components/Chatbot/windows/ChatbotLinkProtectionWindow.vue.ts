@@ -3,9 +3,10 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
+
 @Component({
   components: {
-    ChatbotLinkProtectionList,
+    ChatbotLinkProtectionList
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
@@ -28,6 +29,10 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
 
   onSelectTab(tab: string) {
     this.selectedTab = tab;
+  }
+
+  onReset() {
+    this.onResetSlug('link-protection');
   }
 
   onSave() {
