@@ -42,12 +42,3 @@ export interface IWidget {
   // An anchor (origin) point can be specified for the x&y positions
   anchor: AnchorPoint;
 }
-
-export interface IWidgetDisplayData {
-  name: string;
-  description: string;
-  platform?: string;
-  demoVideo: boolean;
-  demoFilename: string;
-  supportList: string[];
-}

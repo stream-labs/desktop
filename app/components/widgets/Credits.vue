@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Set up a rolling credit to show all the supporters during the session.') }}
-  </div>
-
   <div slot="settings" >
     <form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <form-group :title="$t('Credit Title')" type="text" v-model="wData.settings.credit_title" />
