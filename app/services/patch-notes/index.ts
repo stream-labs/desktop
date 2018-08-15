@@ -42,24 +42,20 @@ export class PatchNotesService extends PersistentStatefulService<IPatchNotesStat
    */
   showPatchNotesIfRequired(onboarded: boolean) {
     // Don't show the patch notes in dev mode
-    /* DEBUG
     if (Util.isDevMode()) return;
 
     // We do not show patch notes for preview
     if (Util.isPreview()) return;
     if (Util.isIpc()) return;
-    */
 
     const currentVersion = electron.remote.process.env.NAIR_VERSION;
 
-    /*
     // If the notes don't match the current version, we shouldn't
     // show them.
     if (notes.version !== currentVersion) return;
 
     // The user has already seen the current patch notes
     if (currentVersion === this.state.lastVersionSeen) return;
-    */
 
     this.SET_LAST_VERSION_SEEN(currentVersion);
 
