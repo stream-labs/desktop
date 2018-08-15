@@ -53,7 +53,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
       },
       is_regex: {
         required: true,
-        title: 'This word/ phrase contains a regular expression.'
+        title: 'This word / phrase contains a regular expression.'
       }
     };
     return metadata;

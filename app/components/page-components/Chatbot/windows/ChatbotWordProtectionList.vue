@@ -2,7 +2,7 @@
 <div>
   <div class="flex flex--end">
     <button @click="onAddingNewItem(null, -1)" class="button button--action">
-      {{ $t('Add Word/ Phrase') }}
+      {{ $t('Add Word / Phrase') }}
     </button>
   </div>
 

@@ -33,7 +33,6 @@
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
-            v-if="matchesQuery(command)"
           >
             <td> {{ $t(command.command) }} </td>
             <td> {{ $t(command.response) }} </td>
@@ -64,6 +63,17 @@
           </tr>
         </tbody>
       </table>
+      <div v-if="totalPages > 1" class="chatbot-custom-commands__pagination-container">
+        <div
+          v-for="i in totalPages"
+          :class="{'chatbot-custom-commands__pagination__page--current': i === currentPage}"
+          @click="fetchCommands(i)"
+          class="chatbot-custom-commands__pagination__page"
+          :key="i"
+        >
+          {{ i }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -103,6 +113,20 @@ table tr {
   }
 }
 
+.chatbot-custom-commands__pagination-container {
+  .flex();
+
+  .chatbot-custom-commands__pagination__page {
+    .padding--10;
+    cursor: pointer;
+
+    &.chatbot-custom-commands__pagination__page--current {
+      color: @day-title;
+      .weight--bold();
+    }
+  }
+}
+
 .chatbot-custom-commands__command-actions__container {
   button {
     display: block;
@@ -133,6 +157,13 @@ table tr {
   }
   tbody tr:nth-child(even) {
     background-color: @navy;
+  }
+
+  .chatbot-custom-commands__pagination__page {
+
+    &.chatbot-custom-commands__pagination__page--current {
+      color: @white;
+    }
   }
 
 }

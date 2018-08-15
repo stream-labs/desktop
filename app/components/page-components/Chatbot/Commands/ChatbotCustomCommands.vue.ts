@@ -6,26 +6,40 @@ import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
 
-  searchQuery = '';
+  query = '';
+
+  timeOutFetchQuery: number = null;
 
   get commands() {
     return this.chatbotApiService.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination
-      .current;
+    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
+  }
+
+  get totalPages() {
+    return this.chatbotApiService.state.customCommandsResponse.pagination.total;
   }
 
   mounted() {
-    this.chatbotApiService.fetchCustomCommands(this.currentPage);
+    this.fetchCommands(1);
   }
 
-  matchesQuery(command: ICustomCommand) {
-    return (
-      command.command.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-      command.response.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
-    )
+  get searchQuery() {
+    return this.query;
+  }
+
+  set searchQuery(value: string) {
+    this.query = value;
+    window.clearTimeout(this.timeOutFetchQuery);
+    this.timeOutFetchQuery = window.setTimeout(() => {
+      this.fetchCommands(this.currentPage, value);
+    }, 1000)
+  }
+
+  fetchCommands(page: number = this.currentPage, query?: string) {
+    this.chatbotApiService.fetchCustomCommands(page, query);
   }
 
   openCommandWindow(command?: ICustomCommand) {

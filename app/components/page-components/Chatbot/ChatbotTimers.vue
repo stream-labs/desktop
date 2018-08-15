@@ -30,7 +30,6 @@
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
-            v-if="matchesQuery(timer)"
         >
           <td> {{ timer.name }} </td>
           <td> {{ timer.interval }} </td>
@@ -60,6 +59,17 @@
         </tr>
       </tbody>
     </table>
+    <div v-if="totalPages > 1" class="chatbot-timers__pagination-container">
+      <div
+        v-for="i in totalPages"
+        :class="{'chatbot-timers__pagination__page--current': i === currentPage}"
+        @click="fetchTimers(i)"
+        class="chatbot-timers__pagination__page"
+        :key="i"
+      >
+        {{ i }}
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -94,6 +104,20 @@ tbody tr {
       &:hover {
         color: @teal;
       }
+    }
+  }
+}
+
+.chatbot-timers__pagination-container {
+  .flex();
+
+  .chatbot-timers__pagination__page {
+    .padding--10;
+    cursor: pointer;
+
+    &.chatbot-timers__pagination__page--current {
+      color: @day-title;
+      .weight--bold();
     }
   }
 }
@@ -135,5 +159,10 @@ tbody tr {
     background-color: @navy;
   }
 
+.chatbot-timers__pagination__page {
+    &.chatbot-timers__pagination__page--current {
+      color: @white;
+    }
+  }
 }
 </style>

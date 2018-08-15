@@ -4,8 +4,8 @@ import { ITimer } from 'services/chatbot/chatbot-interfaces';
 
 @Component({})
 export default class ChatbotTimers extends ChatbotBase {
-
-  searchQuery = '';
+  query = '';
+  timeOutFetchQuery: number = null;
 
   get timers() {
     return this.chatbotApiService.state.timersResponse.data;
@@ -15,16 +15,29 @@ export default class ChatbotTimers extends ChatbotBase {
     return this.chatbotApiService.state.timersResponse.pagination.current;
   }
 
-  mounted() {
-    // get list of timers
-    this.chatbotApiService.fetchTimers(this.currentPage);
+  get totalPages() {
+    return this.chatbotApiService.state.timersResponse.pagination.total;
   }
 
-  matchesQuery(timer: ITimer) {
-    return (
-      timer.name.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1 ||
-      timer.message.toLowerCase().indexOf(this.searchQuery.toLowerCase()) > -1
-    )
+  mounted() {
+    // get list of timers
+    this.fetchTimers(1);
+  }
+
+  get searchQuery() {
+    return this.query;
+  }
+
+  set searchQuery(value: string) {
+    this.query = value;
+    window.clearTimeout(this.timeOutFetchQuery);
+    this.timeOutFetchQuery = window.setTimeout(() => {
+      this.fetchTimers(this.currentPage, value);
+    }, 1000);
+  }
+
+  fetchTimers(page: number = this.currentPage, query?: string) {
+    this.chatbotApiService.fetchTimers(page, query);
   }
 
   openTimerWindow(timer?: ITimer) {

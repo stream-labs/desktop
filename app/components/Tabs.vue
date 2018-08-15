@@ -31,6 +31,7 @@
   width: 100%;
   padding: 0 15px;
   height: 54px;
+  z-index: 10;
   border-bottom: 1px solid @day-border;
 }
 
