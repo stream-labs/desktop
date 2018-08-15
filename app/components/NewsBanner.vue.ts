@@ -1,18 +1,18 @@
 import Vue from 'vue';
 import { shell } from 'electron';
 import emojione from 'emojione';
-import { NewsBannerService} from 'services/news-banner';
+import { AnnouncementsService } from 'services/announcements';
 import { Inject } from 'util/injector';
 
 export default class NewsBanner extends Vue {
-  @Inject() newsBannerService: NewsBannerService;
+  @Inject() announcementsService: AnnouncementsService;
 
   get currentBanner() {
-    return this.newsBannerService.state;
+    return this.announcementsService.state;
   }
 
   get bannerExists() {
-    return this.newsBannerService.bannerExists();
+    return this.announcementsService.bannerExists();
   }
 
   get headerText() {
@@ -20,7 +20,7 @@ export default class NewsBanner extends Vue {
   }
 
   closeBanner() {
-    this.newsBannerService.closeBanner();
+    this.announcementsService.closeBanner();
   }
 
   followLink() {

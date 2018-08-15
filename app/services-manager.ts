@@ -76,7 +76,7 @@ import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { MediaGalleryService } from 'services/media-gallery';
-import { NewsBannerService } from 'services/news-banner';
+import { AnnouncementsService } from 'services/announcements';
 
 import { BitGoalService } from 'services/widget-settings/bit-goal';
 import { ChatBoxService } from 'services/widget-settings/chat-box';
@@ -178,7 +178,7 @@ export class ServicesManager extends Service {
     TipJarService,
     SponsorBannerService,
     MediaGalleryService,
-    NewsBannerService
+    AnnouncementsService
   };
 
   private instances: Dictionary<Service> = {};

@@ -4,7 +4,7 @@ import { HostsService } from './hosts';
 import { Inject } from '../util/injector';
 import { authorizedHeaders } from '../util/requests';
 
-interface INewsBannerInfo {
+interface IAnnouncementsInfo {
   id: number;
   header: string;
   subHeader: string;
@@ -13,11 +13,11 @@ interface INewsBannerInfo {
   thumbnail: string;
 }
 
-export class NewsBannerService extends StatefulService<INewsBannerInfo> {
+export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
 
-  static initialState: INewsBannerInfo = {
+  static initialState: IAnnouncementsInfo = {
     id: null,
     header: '',
     subHeader: null,
@@ -74,12 +74,12 @@ export class NewsBannerService extends StatefulService<INewsBannerInfo> {
   }
 
   @mutation()
-  SET_BANNER(banner: INewsBannerInfo) {
+  SET_BANNER(banner: IAnnouncementsInfo) {
     this.state = banner;
   }
 
   @mutation()
   CLEAR_BANNER() {
-    this.state = NewsBannerService.initialState;
+    this.state = AnnouncementsService.initialState;
   }
 }
