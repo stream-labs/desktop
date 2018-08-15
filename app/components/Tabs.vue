@@ -37,7 +37,7 @@
 }
 
 .tab-content {
-  max-height: 75vh;
+  height: calc(~'100% - 54px');
   position: relative;
   overflow-y: auto;
 }
