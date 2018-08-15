@@ -2,9 +2,14 @@ import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
 import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
 import { Debounce } from 'lodash-decorators';
+import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
 
-@Component({})
+@Component({
+  components: {
+    ChatbotPagination
+  }
+})
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
@@ -13,7 +18,8 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination.current;
+    return this.chatbotApiService.state.customCommandsResponse.pagination
+      .current;
   }
 
   get totalPages() {

@@ -63,17 +63,12 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="totalPages > 1" class="chatbot-custom-commands__pagination-container">
-        <div
-          v-for="i in totalPages"
-          :class="{'chatbot-custom-commands__pagination__page--current': i === currentPage}"
-          @click="fetchCommands(i)"
-          class="chatbot-custom-commands__pagination__page"
-          :key="i"
-        >
-          {{ i }}
-        </div>
-      </div>
+      <ChatbotPagination
+        v-if="totalPages > 1"
+        :totalPages="totalPages"
+        :currentPage="currentPage"
+        @change="fetchCommands"
+      />
     </div>
   </div>
 </template>
