@@ -129,7 +129,7 @@ interface IWindowsState {
 }
 
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
-  componentName: 'Blank',
+  componentName: '',
   scaleFactor: 1,
   isShown: true
 };
@@ -149,7 +149,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
     },
     child: {
-      componentName: 'Blank',
+      componentName: '',
       scaleFactor: 1,
       isShown: false
     }
@@ -209,7 +209,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
-    this.updateChildWindowOptions({ componentName: 'Blank', isShown: false });
+    this.updateChildWindowOptions({ componentName: '', isShown: false });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
