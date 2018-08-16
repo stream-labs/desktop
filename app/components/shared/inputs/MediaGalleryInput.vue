@@ -54,7 +54,7 @@
   justify-content: space-between;
   padding: 6px;
   background: linear-gradient(rgba(0, 0, 0, 0), @night-accent-dark 40%);
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 @radius @radius;
 
   i {
     margin-left: 10px;

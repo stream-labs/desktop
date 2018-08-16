@@ -44,12 +44,13 @@
   align-content: stretch;
   align-items: stretch;
   height: 100%;
+  .transition();
 }
 
 .settings-container {
   flex-grow: 1;
-  margin: 0px -20px -20px 0;
-  padding-right: 20px;
+  .padding-right(2);
+  .padding-top(2);
   overflow: auto;
 }
 </style>
@@ -67,6 +68,7 @@
     .input-label {
       label {
         margin-bottom: 8px;
+        line-height: 16px;
       }
     }
   }

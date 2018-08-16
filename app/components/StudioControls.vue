@@ -41,7 +41,7 @@
 
 .studio-controls__label {
   margin-bottom: 0;
-  .weight--medium();
+  .weight(@medium);
   color: @day-title;
 }
 

@@ -76,7 +76,7 @@
 .platform-error {
   background: rgba(251,72,76,.28);
   padding: 5px;
-  border-radius: 3px;
+  .radius();
 
   i {
     margin-left: 5px;
@@ -110,8 +110,8 @@
   justify-content: center;
   border-radius: 100%;
   opacity: .6;
-  .transition;
-  .weight--bold;
+  .transition();
+  .weight(@bold);
   border: 1px solid #c4c5c5;
   box-sizing: content-box;
   letter-spacing: .2px;

@@ -1,5 +1,5 @@
 .input-container {
-  margin-bottom: 24px;
+  .margin-bottom(2);
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -23,7 +23,7 @@
 
 .input-label {
   width: 30%;
-  padding-right: 16px;
+  .padding-right(2);
 }
 
 .input-wrapper {
@@ -44,7 +44,7 @@
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
-    line-height: 36px;
+    line-height: 34px;
   }
 }
 
@@ -63,8 +63,8 @@ textarea {
   color: @day-paragraph;
   .radius();
   box-shadow: none;
-  height: 36px;
-  padding: 0 10px;
+  height: 34px;
+  padding: 0 @spacing;
 
   &:focus {
     box-shadow: none;
@@ -83,12 +83,12 @@ textarea {
 }
 
 textarea {
-  padding: 8px 10px;
+  .padding();
   line-height: 20px;
 }
 
 .multiselect {
-  min-height: 36px;
+  min-height: 34px;
 }
 
 .multiselect__select {
@@ -108,7 +108,7 @@ textarea {
     border: none;
     font-size: 9px;
     position: absolute;
-    right: 0;
+    right: 2px;
     top: 2px;
   }
 }
@@ -138,8 +138,8 @@ textarea {
 }
 
 .multiselect__content {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: @radius;
+  border-bottom-right-radius: @radius;
   border: 1px solid @day-focus-border;
   top: 35px;
   background: @day-input-bg;
@@ -160,10 +160,10 @@ textarea {
 }
 
 .multiselect__option {
-  padding: 0px 8px;
-  height: 36px;
+  padding: 0px @spacing;
+  height: 34px;
   min-height: 0;
-  line-height: 36px;
+  line-height: 34px;
   .transition;
   display: block;
   cursor: pointer;

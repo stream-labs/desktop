@@ -16,20 +16,24 @@
         {{ $t(formGroup.nameSubCategory) }}
       </h2>
 
-      <div
-        class="section-content"
-        v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
-      >
-        <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
-      </div>
-
+      <transition
+        name="accordion"
+        v-on:before-enter="beforeEnter" v-on:enter="enter"
+        v-on:before-leave="beforeLeave" v-on:leave="leave">
+        <div
+          class="section-content"
+          v-if="!collapsedGroups[groupIndex] || formGroup.nameSubCategory === 'Untitled'"
+        >
+          <GenericForm v-model="formGroup.parameters" @input="onInputHandler"></GenericForm>
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script lang="ts" src="./GenericFormGroups.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../styles/index";
 
 </style>

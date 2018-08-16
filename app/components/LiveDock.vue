@@ -151,7 +151,7 @@
 
 .live-dock-text {
   margin: 0 2px 0 4px;
-  .weight--medium();
+  .weight(@medium);
 }
 
 .live-dock-expanded-contents {

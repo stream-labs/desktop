@@ -166,7 +166,7 @@
 @import "../../styles/index";
 
 h2 {
-  .margin-bottom--16();
+  .margin-bottom(2);
 }
 
 .add-source {
@@ -228,7 +228,7 @@ h2 {
   &:hover,
   &.source--active {
     color: @day-title;
-    .weight--medium();
+    .weight(@medium);
     background-color: @light-2;
   }
 

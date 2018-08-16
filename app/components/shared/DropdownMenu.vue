@@ -34,7 +34,7 @@
   align-items: center;
   text-transform: capitalize;
   font-size: 16px;
-  .weight--medium();
+  .weight(@medium);
   color: @day-title;
 
   span {

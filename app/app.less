@@ -10,7 +10,7 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -43,7 +43,7 @@ body {
 h2 {
   font-family: 'Roboto';
   font-size: 16px;
-  .weight--medium();
+  .weight(@medium);
   text-transform: capitalize;
   color: @day-title;
   margin-bottom: 24px;
@@ -52,7 +52,7 @@ h2 {
 h3 {
   font-family: 'Roboto';
   font-size: 14px;
-  .weight--medium();
+  .weight(@medium);
   color: @day-title;
 }
 
@@ -60,7 +60,7 @@ h4 {
   font-family: 'Roboto';
   text-transform: uppercase;
   font-size: 13px;
-  .weight--medium();
+  .weight(@medium);
   margin-bottom: 20px;
   color: @day-title;
 }
@@ -72,7 +72,7 @@ label {
 .label--essential {
   background: @secondary;
   .radius;
-  .weight--medium;
+  .weight(@medium);
   font-size: 12px;
   color: @white;
   padding: 0px 4px;
@@ -84,7 +84,7 @@ a,
 .link {
   .transition;
   text-decoration: underline;
-  .weight--medium;
+  .weight(@medium);
   color: @day-link;
   text-decoration: none;
   display: flex;
@@ -101,7 +101,7 @@ a,
 
   .fa,
   i {
-    margin-right: 8px;
+    .margin-right();
     font-size: 15px;
     color: @icon;
   }
@@ -291,7 +291,7 @@ a,
 // Make select boxes look similar to input boxes
 select {
   .radius;
-  height: 36px;
+  height: 34px;
 }
 
 // Scrolls

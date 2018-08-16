@@ -18,7 +18,7 @@
   cursor: pointer;
   list-style: none;
   border-left: 1px solid transparent;
-  padding-left: 50px;
+  padding-left: 46px;
   font-size: 14px;
   margin-bottom: 8px;
   display: flex;
@@ -27,7 +27,7 @@
 
   &.active {
     opacity: 1;
-    .weight--medium();
+    .weight(@medium);
     border-color: @navy;
     color: @day-title;
 
@@ -52,7 +52,7 @@
     position: relative;
     margin-right: -16px;
     left: -24px;
-    width: 16px;
+    width: 20px;
   }
 }
 
