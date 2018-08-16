@@ -36,7 +36,7 @@
       :key="tier.minimum_amount"
       :title="`${$t('Tips over')} ${tier.minimum_amount}`"
     >
-      <image-media-input
+      <media-gallery-input
         :metadata="{ fileName: fileNameFromHref(tier.image_src), clearImage: tier.clear_image }"
         v-model="tier.image_src"
       />

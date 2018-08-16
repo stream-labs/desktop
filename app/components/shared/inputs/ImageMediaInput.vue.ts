@@ -13,4 +13,8 @@ export default class ImageMediaInput extends BaseInput<string, IMediaGalleryMeta
 
   @Prop({ default: {} })
   metadata: IMediaGalleryMetadata;
+
+  get imageMetadata() {
+    return { ...this.metadata, imageOnly: true };
+  }
 }
