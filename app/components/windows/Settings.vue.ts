@@ -7,7 +7,6 @@ import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
 import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
-import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import DeveloperSettings from '../DeveloperSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
@@ -33,8 +32,7 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     RemoteControlSettings,
     ExperimentalSettings,
     LanguageSettings
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class SceneTransitions extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
