@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, WindowsService } from 'services/windows';
-
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -11,7 +11,7 @@ import { getComponents, WindowsService } from 'services/windows';
 })
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
-
+  @Inject() private customizationService: CustomizationService;
 
   activeComponentInd = 0;
 
@@ -19,7 +19,6 @@ export default class ChildWindow extends Vue {
     { name: this.options.componentName, isShown: this.options.isShown},
     { name: '', isShown: false},
   ];
-
 
   private widowUpdatedSubscr = this.windowsService.windowUpdated.subscribe(params => {
     if (params.windowId !== 'child') return;
@@ -30,16 +29,12 @@ export default class ChildWindow extends Vue {
     return this.windowsService.state.child;
   }
 
+  get nightTheme() {
+    return this.customizationService.nightMode;
+  }
+
   get componentName() {
     return this.options.componentName;
-  }
-  //
-  // destroy() {
-  //   this.widowUpdatedSubscr.unsubscribe();
-  // }
-
-  destroy() {
-    this.widowUpdatedSubscr.unsubscribe();
   }
 
   private onWindowUpdatedHandler() {
@@ -64,10 +59,12 @@ export default class ChildWindow extends Vue {
       return;
     }
 
-    this.$set(this.components, this.activeComponentInd, {
-      name: this.options.componentName,
-      isShown: this.options.isShown
-    });
+    setTimeout(() => {
+      this.$set(this.components, this.activeComponentInd, {
+        name: this.options.componentName,
+        isShown: this.options.isShown
+      });
+    }, 50);
 
   }
 }

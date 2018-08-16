@@ -2,7 +2,6 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { ISource, ISourceApi, ISourcesServiceApi } from 'services/sources';
 
 import ModalLayout from 'components/ModalLayout.vue';
@@ -23,8 +22,7 @@ import { IWidgetTab } from 'services/widget-settings/widget-settings';
     Display,
     Tabs,
     GenericForm
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class WidgetWindow extends Vue {
 

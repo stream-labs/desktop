@@ -8,7 +8,6 @@ import {
   IMediaGalleryFile,
   IMediaGalleryInfo
 } from 'services/media-gallery';
-import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
 
@@ -34,8 +33,7 @@ interface IToast {
 }
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;

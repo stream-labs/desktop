@@ -166,6 +166,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (options.componentName !== this.state.child.componentName) options.center = true;
 
     ipcRenderer.send('window-showChildWindow', options);
+    this.updateChildWindowOptions(options);
   }
 
   closeChildWindow() {
@@ -181,14 +182,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
 
 
-    ipcRenderer.send('window-closeChildWindow');
-
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
     this.updateChildWindowOptions({ componentName: 'Blank', isShown: false });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
+    ipcRenderer.send('window-closeChildWindow');
   }
 
   closeMainWindow() {
