@@ -196,10 +196,13 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     // show previous window if `preservePrevWindow` flag is true
     if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
-      ipcRenderer.send('window-showChildWindow', {
+      const options = {
         ...windowOptions.prevWindowOptions,
         isPreserved: true
-      });
+      };
+
+      ipcRenderer.send('window-showChildWindow', options);
+      this.updateChildWindowOptions(options);
       return;
     }
 
