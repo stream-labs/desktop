@@ -32,7 +32,7 @@ window['obs'] = window['require']('obs-studio-node');
 
 { // Set up things for IPC
   // Connect to the IPC Server
-  window['obs'].IPC.connect(process.env.SLOBS_IPC_PATH);
+  window['obs'].IPC.connect(remote.process.env.SLOBS_IPC_PATH);
   document.addEventListener('close', (e) => {
     window['obs'].IPC.disconnect();
   });
