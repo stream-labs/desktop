@@ -30,7 +30,7 @@ export default class OptimizeNiconico extends Vue {
     return {
       name: 'do_not_show_again',
       description: $t('streaming.doNotShowAgainOptimizationDialog'),
-      value: false
+      value: this.customizationService.showOptimizationDialogForNiconico === false
     };
   }
 
@@ -51,6 +51,9 @@ export default class OptimizeNiconico extends Vue {
   }
 
   skip() {
+    if (this.doNotShowAgain.value) {
+      this.customizationService.setOptimizeForNiconico(false);
+    }
     this.streamingService.toggleStreaming();
     this.windowsService.closeChildWindow();
   }
