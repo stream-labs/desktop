@@ -19,9 +19,11 @@ export interface OptimizedSettings {
   optimizedQuality?: string;
   optimizedColorSpace?: string;
   optimizedFps?: string;
+  optimizedOutputMode?: string;
   currentVideoBitrate?: number;
   currentAudioBitrate?: string;
   currentQuality?: string;
   currentColorSpace?: string;
   currentFps?: string;
+  currentOutputMode?: string;
 }

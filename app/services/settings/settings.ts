@@ -361,10 +361,6 @@ export class SettingsService extends StatefulService<ISettingsState>
     };
   }
 
-  isOutputModeAdvanced(): boolean {
-    return this.findSettingValue(this.getSettingsFormData('Output'), 'Untitled', 'Mode') === 'Advanced';
-  }
-
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
     let audioBitrate: number;
     let quality: string;
@@ -387,6 +383,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     const videoBitrate = bitrate - audioBitrate;
     const colorSpace = '709';
     const fps = '30';
+    const outputMode = 'Simple';
     const output = this.getSettingsFormData('Output');
     const video = this.getSettingsFormData('Video');
     const advanced = this.getSettingsFormData('Advanced');
@@ -395,7 +392,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
       currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
       currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
-      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon')
+      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
+      currentOutputMode: this.findSettingValue(output, 'Untitled', 'Mode')
     };
     const length = Object.keys(settings).length;
     if (videoBitrate !== settings.currentVideoBitrate) {
@@ -414,6 +412,9 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
     if (fps !== settings.currentFps) {
       settings.optimizedFps = fps;
+    }
+    if (outputMode !== settings.currentOutputMode) {
+      settings.optimizedOutputMode = outputMode;
     }
     return Object.keys(settings).length > length ? settings : undefined;
   }
@@ -442,6 +443,12 @@ export class SettingsService extends StatefulService<ISettingsState>
       const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
       if (aBitrateSetting) {
         aBitrateSetting.value = settings.optimizedAudioBitrate;
+      }
+    }
+    if ('optimizedOutputMode' in settings) {
+      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
+      if (anOutputMode) {
+        anOutputMode.value = settings.optimizedOutputMode;
       }
     }
     this.setSettings('Output', output);

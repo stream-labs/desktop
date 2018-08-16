@@ -40,6 +40,12 @@ export default class OptimizeNiconico extends Vue {
     return name !== arg ? name : value;
   }
 
+  outputModeName(value: string): string {
+    const arg = `settings.Output.Untitled.Mode.${value}`;
+    const name = $t(arg);
+    return name !== arg ? name : value;
+  }
+
   setDoNotShowAgain(model: IFormInput<boolean>) {
     this.customizationService.setShowOptimizationDialogForNiconico(!model.value);
   }
