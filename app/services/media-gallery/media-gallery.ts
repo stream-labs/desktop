@@ -28,8 +28,7 @@ export interface IMediaGalleryInfo extends IMediaGalleryLimits {
 }
 
 interface IMediaGalleryProps {
-  audioOnly?: boolean;
-  imageOnly?: boolean;
+  filter: 'audio' | 'image';
 }
 
 const fileTypeMap = {

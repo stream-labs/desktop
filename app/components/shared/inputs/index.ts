@@ -60,9 +60,8 @@ export interface IListOption<TValue> {
 }
 
 export interface IMediaGalleryMetadata extends IInputMetadata {
-  fileName: string;
   clearImage: string;
-  imageOnly?: boolean;
+  filter?: 'audio' | 'image';
 }
 
 

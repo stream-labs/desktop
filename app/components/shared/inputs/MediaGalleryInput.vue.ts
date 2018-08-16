@@ -16,14 +16,17 @@ export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMe
   @Prop() value: string;
   @Prop() metadata: IMediaGalleryMetadata;
 
-  fileName: string = this.metadata.fileName;
   url: string = '';
   showUrlUpload = false;
 
+  get fileName() {
+    if (!this.value) return null;
+    return decodeURIComponent(this.value.split(/[\\/]/).pop());
+  }
+
   async updateValue() {
-    const imageOnly = this.metadata.imageOnly;
-    const selectedFile = await this.mediaGalleryService.pickFile({ imageOnly });
-    this.fileName = selectedFile.fileName;
+    const filter = this.metadata.filter;
+    const selectedFile = await this.mediaGalleryService.pickFile({ filter });
     this.emitInput(selectedFile.href);
   }
 
