@@ -329,7 +329,8 @@ export const ChatbotClients = [
   'Twitch'
 ]
 
-export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
+export type ChatbotSettingSlugs =
+  'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 
 // modals (inside child window)

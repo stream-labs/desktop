@@ -236,12 +236,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
+          IChatAlertsResponse
           | ICapsProtectionResponse
           | ISymbolProtectionResponse
           | ILinkProtectionResponse
           | IWordProtectionResponse
       ) => {
         switch (slug) {
+          case 'chat-notifications':
+            this.UPDATE_CHAT_ALERTS(
+              response as IChatAlertsResponse
+            )
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(
               response as ICapsProtectionResponse

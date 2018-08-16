@@ -79,7 +79,13 @@
       :selectedType="selectedType"
     />
   </div>
-  <div slot="controls">
+  <div slot="controls" class="flex flex--space-between">
+    <button
+      class="button button--default"
+      @click="onReset"
+    >
+      {{ $t('RESET') }}
+    </button>
     <button
       class="button button--default"
       @click="onDone"
