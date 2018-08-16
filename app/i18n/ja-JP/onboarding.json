@@ -16,5 +16,8 @@
   "doneStateDescription": "シーンとソース設定をインポートしました。",
 
   "sceneCollectionsImportTitle": "シーンコレクションのインポート",
-  "sceneCollectionsImportDescription": "シーンコレクションはインポートされました。"
+  "sceneCollectionsImportDescription": "シーンコレクションはインポートされました。",
+
+  "updateHeader": "更新内容のお知らせ",
+  "updateDone": "確認"
 }

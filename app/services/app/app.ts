@@ -72,8 +72,9 @@ export class AppService extends StatefulService<IAppState> {
     this.sceneCollectionsService.initialize().then(
       () => this.questionaireService.startIfRequired()
     ).then(questionaireStarted => {
+      let onboarded = false;
       if (!questionaireStarted) {
-        this.onboardingService.startOnboardingIfRequired();
+        onboarded = this.onboardingService.startOnboardingIfRequired();
       }
 
       electron.ipcRenderer.on('shutdown', () => {
@@ -90,6 +91,8 @@ export class AppService extends StatefulService<IAppState> {
 
       this.ipcServerService.listen();
       this.tcpServerService.listen();
+
+      this.patchNotesService.showPatchNotesIfRequired(onboarded);
 
       this.FINISH_LOADING();
     });

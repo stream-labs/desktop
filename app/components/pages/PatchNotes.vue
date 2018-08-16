@@ -1,55 +1,28 @@
 <template>
 <div class="patch-notes-page">
   <div
-    class="patch-notes-container patch-notes-container--closed"
-    :class="{ 'patch-notes-container--closing': patchNotesClosing }">
+    class="patch-notes-container patch-notes-container--opened">
     <div class="patch-notes-content">
-      <div class="patch-notes-header">
-        <video
-          src="../../../media/chest.webm"
-          ref="patchNotesVideo"
-          class="patch-notes-chest">
-        </video>
-        <video
-          src="../../../media/chest-deco.webm"
-          class="patch-notes-chest-deco"
-          autoplay
-          loop>
-        </video>
+      <header>
+        {{ $t('onboarding.updateHeader') }}
+      </header>
+      <p class="patch-notes-version">
+        {{ notes.version }}
+      </p>
+      <div class="patch-notes-wrap">
+        <ul class="patch-notes-list">
+          <li
+            class="patch-notes-item"
+            v-for="(item, index) in notes.notes"
+            :key="index">
+            {{ item }}
+          </li>
+        </ul>
       </div>
-
-      <button
-        @click="show"
-        class="patch-notes-button button button--action">
-        Open Update {{ notes.version }}
-      </button>
-    </div>
-  </div>
-
-  <div
-    class="patch-notes-container patch-notes-container--opened"
-    :class="{ 'patch-notes-container--opening': patchNotesOpening }">
-    <div class="patch-notes-content">
-      <div class="patch-notes-header">
-        <div class="patch-notes-title">
-          {{ notes.title }}
-        </div>
-        <div class="patch-notes-version">
-          {{ notes.version }}
-        </div>
-      </div>
-      <ul class="patch-notes-list">
-        <li
-          class="patch-notes-item"
-          v-for="(item, index) in notes.notes"
-          :key="index">
-          {{ item }}
-        </li>
-      </ul>
       <button
         @click="done"
         class="patch-notes-button button button--action">
-        Done
+        {{ $t('onboarding.updateDone') }}
       </button>
     </div>
   </div>
@@ -61,122 +34,15 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.patch-notes-chest,
-.patch-notes-chest-deco {
-  width: 100%;
-}
-
-.patch-notes-chest-deco {
-  position: absolute;
-}
-
-.patch-notes-chest {
-  animation: floatingChest ease-in-out 1.5s infinite alternate;
-}
-
-.patch-notes-container--opened {
-  opacity: 0;
-  display: none;
-
-  &.patch-notes-container--opening {
-    display: flex;
-    animation: fadeIn 1s ease-in-out 1.5s 1 forwards;
-  }
-}
-
-.patch-notes-container--closed {
-  z-index: 10;
-  display: flex;
-
-  &.patch-notes-container--closing {
-    overflow: visible;
-    animation: fadeOut 1s ease-in .75s forwards;
-
-    .patch-notes-chest {
-      animation: expandChest .5s ease-in .25s 1 forwards;
-    }
-
-    .patch-notes-button {
-      animation: hideButton .25s ease-in 1 forwards;
-    }
-  }
-
-  .patch-notes-header {
-    align-items: center;
-    position: relative;
-  }
-
-  .patch-notes-content {
-    height: 280px;
-  }
-
-  .patch-notes-button {
-    position: absolute;
-    bottom: 0;
-  }
-}
-
-@keyframes floatingChest {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-@keyframes hideButton {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    display: none;
-  }
-}
-
-@keyframes expandChest {
-  0% {
-    transform: scale(1)
-  }
-
-  100% {
-    transform: scale(1.2);
-  }
-}
-
-@keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    display: none;
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .patch-notes-page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .patch-notes-container {
-  width: 400px;
+  width: 480px;
   overflow: auto;
   position: absolute;
 }
@@ -185,29 +51,51 @@
   position: relative;
 }
 
-.patch-notes-header {
-  display: flex;
-  font-size: 22px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-}
-
-.patch-notes-title {
-  flex-grow: 1;
-  color: @white;
+.patch-notes-content > header {
+  font-size: 16px;
+  text-align: left;
+  letter-spacing: .5px;
+  padding-left: 24px;
+  color: @text-secondary;
 }
 
 .patch-notes-version {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 24px 0;
+  letter-spacing: .5px;
+  text-align: center;
   color: @text-primary;
 }
 
+.patch-notes-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
 .patch-notes-list {
-  margin-top: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
+  //foundation対応
+  margin-right: 1.25rem;
+  text-align: left;
+  color: @text-secondary;
+  //lessなので　width: calc(100% + 8px) ではなく↓で記述
+  width: calc(~'100% + 8px');
+  max-height: 160px;
+  padding: 0 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.patch-notes-item {
+  margin-bottom: 8px;
 }
 
 .patch-notes-button {
-  width: 100%;
+  width: 50%;
+  margin: 0 auto;
+  font-size: 20px;
 }
 
 </style>
