@@ -344,6 +344,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       return key;
     });
   }
+
+  isNiconicoLoggedIn() {
+    return this.isLoggedIn() && this.platform.type === 'niconico';
+  }
 }
 
 /**

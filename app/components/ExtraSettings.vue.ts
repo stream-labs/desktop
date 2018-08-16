@@ -25,6 +25,30 @@ export default class ExtraSettings extends Vue {
 
   cacheUploading = false;
 
+  get optimizeForNiconicoModel(): IFormInput<boolean> {
+    return {
+      name: 'optimize_for_niconico',
+      description: $t('settings.optimizeForNiconico'),
+      value: this.customizationService.state.optimizeForNiconico
+    };
+  }
+
+  setOptimizeForNiconico(model: IFormInput<boolean>) {
+    this.customizationService.setOptimizeForNiconico(model.value);
+  }
+
+  get showOptimizationDialogForNiconicoModel(): IFormInput<boolean> {
+    return {
+      name: 'show_optimization_dialog_for_niconico',
+      description: $t('settings.showOptimizationDialogForNiconico'),
+      value: this.customizationService.state.showOptimizationDialogForNiconico
+    };
+  }
+
+  setShowOptimizationDialogForNiconico(model: IFormInput<boolean>) {
+    this.customizationService.setShowOptimizationDialogForNiconico(model.value);
+  }
+
   showCacheDir() {
     electron.remote.shell.showItemInFolder(
       electron.remote.app.getPath('userData')
@@ -39,5 +63,9 @@ export default class ExtraSettings extends Vue {
     ) {
       this.appService.relaunch({ clearCacheDir: true });
     }
+  }
+
+  isNiconicoLoggedIn(): boolean {
+    return this.userService.isNiconicoLoggedIn();
   }
 }

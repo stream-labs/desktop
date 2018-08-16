@@ -27,5 +27,17 @@
   "broadcastStatusFetchingError": {
     "default": "Failed to get information on streaming server.  Please check your internet connection.",
     "httpError": "Failed to get information on streaming server. (%{statusText})"
-  }
+  },
+  "bitrateFetchingError": {
+    "title": "Failed to get bitrate",
+    "message": "Failed to get bitrate on server. Please check your internet connection."
+  },
+  "optimizationForNiconico": {
+    "title": "Optimize simple settings",
+    "description": "Optimize simple settings to deliver Nicolive."
+  },
+  "FPS": "FPS",
+  "optimizeAndGoLive": "Optimize & Go Live",
+  "skipOptimization": "Skip Optimization",
+  "doNotShowAgainOptimizationDialog": "Do not show this dialog again"
 }

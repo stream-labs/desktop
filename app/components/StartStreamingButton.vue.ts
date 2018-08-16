@@ -5,6 +5,10 @@ import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
 import { UserService } from 'services/user';
 import { CustomizationService } from 'services/customization';
+import { SettingsService } from 'services/settings';
+import { getPlatformService } from '../services/platforms';
+import { NiconicoService } from '../services/platforms/niconico';
+import { WindowsService } from '../services/windows';
 import electron from 'electron';
 import { $t } from 'services/i18n';
 const StartStreamingIcon = require('../../media/images/start-streaming-icon.svg');
@@ -19,6 +23,8 @@ export default class StartStreamingButton extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
   @Inject() navigationService: NavigationService;
+  @Inject() settingsService: SettingsService;
+  @Inject() windowsService: WindowsService;
 
   @Prop() disabled: boolean;
 
@@ -29,7 +35,7 @@ export default class StartStreamingButton extends Vue {
     }
 
     console.log('Start Streaming button: platform=' + JSON.stringify(this.userService.platform));
-    if (this.userService.platform && this.userService.platform.type === 'niconico') {
+    if (this.userService.isNiconicoLoggedIn()) {
       try {
         const streamkey = await this.userService.updateStreamSettings();
         if (streamkey === '') {
@@ -46,6 +52,19 @@ export default class StartStreamingButton extends Vue {
               done => resolve(done)
             );
           });
+        }
+        if (this.customizationService.optimizeForNiconico) {
+          if (this.settingsService.isOutputModeAdvanced()) {
+            this.customizationService.setOptimizeForNiconico(false);
+          } else {
+            const platform = getPlatformService(this.userService.platform.type);
+            if (platform instanceof NiconicoService) {
+              // FIXME: `this.userService.updateStreamSettings`とあわせて
+              //       2度 `getpublishstatus` を呼んでいるが
+              //       不整合回避のために1回だけにしたい
+              return this.optimizeForNiconico(platform);
+            }
+          }
         }
       } catch (e) {
         const message = e instanceof Response
@@ -68,6 +87,43 @@ export default class StartStreamingButton extends Vue {
     }
 
     this.streamingService.toggleStreaming();
+  }
+
+  private async optimizeForNiconico(platform: NiconicoService) {
+    const bitrate = await platform.fetchBitrate();
+    if (bitrate === undefined) {
+      return new Promise(resolve => {
+        electron.remote.dialog.showMessageBox(
+          electron.remote.getCurrentWindow(),
+          {
+            title: $t('streaming.bitrateFetchingError.title'),
+            type: 'warning',
+            message: $t('streaming.bitrateFetchingError.message'),
+            buttons: [$t('common.close')],
+            noLink: true,
+          },
+          done => resolve(done)
+        );
+      });
+    }
+    const settings = this.settingsService.diffOptimizedSettings(bitrate);
+    if (settings) {
+      if (this.customizationService.showOptimizationDialogForNiconico) {
+        this.windowsService.showWindow({
+          componentName: 'OptimizeForNiconico',
+          queryParams: settings,
+          size: {
+          width: 500,
+          height: 400
+          }
+        });
+      } else {
+        this.settingsService.optimizeForNiconico(settings);
+        this.streamingService.toggleStreaming();
+      }
+    } else {
+      this.streamingService.toggleStreaming();
+    }
   }
 
   get streamingStatus() {

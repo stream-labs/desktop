@@ -4,6 +4,8 @@ import { TFormData } from '../../components/shared/forms/Input';
 export interface ICustomizationServiceState {
   performanceMode: boolean;
   studioControlsOpened: boolean;
+  optimizeForNiconico: boolean;
+  showOptimizationDialogForNiconico: boolean;
   experimental: any;
 }
 

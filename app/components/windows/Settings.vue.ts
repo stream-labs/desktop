@@ -8,7 +8,8 @@ import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from '../shared/forms/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
 import { UserService } from '../../services/user';
-import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
+import { CustomizationService } from '../../services/customization';
+import { SettingsService, ISettingsSubCategory } from '../../services/settings';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
@@ -35,9 +36,10 @@ import LanguageSettings from 'components/LanguageSettings.vue';
   mixins: [windowMixin]
 })
 export default class Settings extends Vue {
-  @Inject() settingsService: ISettingsServiceApi;
+  @Inject() settingsService: SettingsService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
+  @Inject() customizationService: CustomizationService;
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   categoryNames = this.settingsService.getCategories();
@@ -82,6 +84,9 @@ export default class Settings extends Vue {
   }
 
   done() {
+    if (this.settingsService.isOutputModeAdvanced()) {
+      this.customizationService.setOptimizeForNiconico(false);
+    }
     this.windowsService.closeChildWindow();
   }
 

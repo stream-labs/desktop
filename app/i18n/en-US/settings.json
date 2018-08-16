@@ -359,7 +359,8 @@
         "name": null,
         "1280x720": "nicolive High Definition (1280x720)",
         "800x450": "nicolive Standard Definition (800x450)",
-        "640x360": "nicolive Low Definition (640x360)",
+        "512x288": "nicolive Low Definition (512x288)",
+        "640x360": null,
         "1920x1080": null,
         "1536x864": null,
         "1440x810": null,
@@ -499,7 +500,9 @@
   "resolutionPlaceholder": "Select Option or Type New Value",
   "addFiles": "Add files",
   "addDirectory": "Add directory",
+  "optimizationForNiconicoLiveService": "Optimization for niconico live service",
   "cacheClearDescription": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
+  "cacheManagement": "Management of the cashe",
   "showCacheDirectory": "Show Cache Directory",
   "deleteCacheAndRestart": "Delete Cache and Restart",
   "confirmStreamTitleAndGameBeforeGoingLive": "Confirm stream title and game before going live",
@@ -513,5 +516,7 @@
   "default": "Default",
   "fontFamily": "Font Family",
   "fontStyle": "Font Style",
-  "fontSize": "Font Size"
+  "fontSize": "Font Size",
+  "optimizeForNiconico": "optimize settings for niconico live service",
+  "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams"
 }

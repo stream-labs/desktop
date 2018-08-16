@@ -19,7 +19,11 @@ import {
   VideoEncodingOptimizationService,
   IOutputSettings
 } from '../video-encoding-optimizations';
-import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
+import {
+  ISettingsSubCategory,
+  ISettingsServiceApi,
+  OptimizedSettings
+} from './settings-api';
 import { $t } from 'services/i18n';
 
 
@@ -62,11 +66,27 @@ declare type TSettingsFormData = Dictionary<ISettingsSubCategory[]>;
 const niconicoResolutions = [
   '1280x720',
   '800x450',
+  '512x288',
   '640x360'
 ];
 
 const niconicoResolutionValues = niconicoResolutions.map(res => ({
   [res]: res
+}));
+
+const niconicoAudioBitrates = [
+  '48',
+  '96',
+  '192'
+];
+
+const niconicoAudioBitrateValues = niconicoAudioBitrates.map(res => ({
+  [res]: res
+}));
+
+const niconicoAudioBitrateOptions = niconicoAudioBitrates.map(res => ({
+  value: res,
+  description: res
 }));
 
 export class SettingsService extends StatefulService<ISettingsState>
@@ -104,10 +124,6 @@ export class SettingsService extends StatefulService<ISettingsState>
 
   init() {
     this.loadSettingsIntoStore();
-  }
-
-  private isNiconicoLoggedIn() {
-    return this.userService.isLoggedIn() && this.userService.platform.type === 'niconico';
   }
 
   loadSettingsIntoStore() {
@@ -154,7 +170,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   getCategories(): string[] {
     let categories: string[] = nodeObs.OBS_settings_getListCategories();
 
-    if (this.isNiconicoLoggedIn()) {
+    if (this.userService.isNiconicoLoggedIn()) {
       categories = categories.filter(x => x !== 'Stream');
     }
 
@@ -289,6 +305,22 @@ export class SettingsService extends StatefulService<ISettingsState>
       if (parameterApplyServiceSettings) {
         parameterApplyServiceSettings.visible = false;
       }
+
+      const aBitrate = parameters.find((parameter: any) => {
+        return parameter.name === 'ABitrate';
+      });
+      if (aBitrate) {
+        aBitrate.values = aBitrate.values
+          .filter((x: {[key: string]: string}) => {
+            return !Object.keys(x).some(y => niconicoAudioBitrates.includes(x[y]));
+          });
+        aBitrate.values.unshift(...niconicoAudioBitrateValues);
+        aBitrate.options = aBitrate.options
+          .filter((x: { value: string, description: string }) => {
+            return !niconicoAudioBitrates.includes(x.value);
+          });
+        aBitrate.options.unshift(...niconicoAudioBitrateOptions);
+      }
     }
 
     // これ以上消すものが増えるなら、フィルタリング機構は整備したほうがよいかもしれない
@@ -327,6 +359,107 @@ export class SettingsService extends StatefulService<ISettingsState>
       baseResolution,
       outputResolution
     };
+  }
+
+  isOutputModeAdvanced(): boolean {
+    return this.findSettingValue(this.getSettingsFormData('Output'), 'Untitled', 'Mode') === 'Advanced';
+  }
+
+  diffOptimizedSettings(bitrate: number): OptimizedSettings {
+    let audioBitrate: number;
+    let quality: string;
+    if (bitrate >= 6000) {
+      audioBitrate = 192;
+      quality = '1280x720';
+    } else if (bitrate >= 2000) {
+      audioBitrate = 192;
+      quality = '800x450';
+    } else if (bitrate >= 1000) {
+      audioBitrate = 96;
+      quality = '800x450';
+    } else if (bitrate >= 384) {
+      audioBitrate = 48;
+      quality = '512x288';
+    } else {
+      audioBitrate = 48;
+      quality = '512x288';
+    }
+    const videoBitrate = bitrate - audioBitrate;
+    const colorSpace = '709';
+    const fps = '30';
+    const output = this.getSettingsFormData('Output');
+    const video = this.getSettingsFormData('Video');
+    const advanced = this.getSettingsFormData('Advanced');
+    const settings: OptimizedSettings = {
+      currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
+      currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
+      currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
+      currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
+      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon')
+    };
+    const length = Object.keys(settings).length;
+    if (videoBitrate !== settings.currentVideoBitrate) {
+      settings.optimizedVideoBitrate = videoBitrate;
+    }
+    // aBitrateは文字列にする必要がある
+    const audioBitrateValue = audioBitrate.toString(10);
+    if (audioBitrateValue !== settings.currentAudioBitrate) {
+      settings.optimizedAudioBitrate = audioBitrateValue;
+    }
+    if (quality !== settings.currentQuality) {
+      settings.optimizedQuality = quality;
+    }
+    if (colorSpace !== settings.currentColorSpace) {
+      settings.optimizedColorSpace = colorSpace;
+    }
+    if (fps !== settings.currentFps) {
+      settings.optimizedFps = fps;
+    }
+    return Object.keys(settings).length > length ? settings : undefined;
+  }
+
+  optimizeForNiconico(settings: OptimizedSettings) {
+
+    // https://github.com/n-air-app/n-air-app/issues/3
+    if ('optimizedColorSpace' in settings) {
+      const advanced = this.getSettingsFormData('Advanced');
+      const colorSpaceSetting = this.findSetting(advanced, 'Video', 'ColorSpace');
+      if (colorSpaceSetting) {
+        colorSpaceSetting.value = settings.optimizedColorSpace;
+      }
+      this.setSettings('Advanced', advanced);
+    }
+
+    // https://github.com/n-air-app/n-air-app/issues/13
+    const output = this.getSettingsFormData('Output');
+    if ('optimizedVideoBitrate' in settings) {
+      const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
+      if (vBitrateSetting) {
+        vBitrateSetting.value = settings.optimizedVideoBitrate;
+      }
+    }
+    if ('optimizedAudioBitrate' in settings) {
+      const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
+      if (aBitrateSetting) {
+        aBitrateSetting.value = settings.optimizedAudioBitrate;
+      }
+    }
+    this.setSettings('Output', output);
+
+    const video = this.getSettingsFormData('Video');
+    if ('optimizedQuality' in settings) {
+      const outputSetting = this.findSetting(video, 'Untitled', 'Output');
+      if (outputSetting) {
+        outputSetting.value = settings.optimizedQuality;
+      }
+    }
+    if ('optimizedFps' in settings) {
+      const fpsSetting = this.findSetting(video, 'Untitled', 'FPSCommon');
+      if (fpsSetting) {
+        fpsSetting.value = settings.optimizedFps;
+      }
+    }
+    this.setSettings('Video', video);
   }
 
   private findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
