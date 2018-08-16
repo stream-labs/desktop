@@ -17,8 +17,12 @@ export enum EWInput {
   animation = 'animation'
 }
 
+export interface IAnimationMetadata extends IInputMetadata {
+  filter?: 'in' | 'out'
+}
+
 export const metadata = {
   ...sharedMetadata,
-  animation: (options: IInputMetadata) => ({ type: EWInput.animation, ...options } as IInputMetadata)
+  animation: (options: IAnimationMetadata) => ({ type: EWInput.animation, ...options } as IAnimationMetadata)
 };
 

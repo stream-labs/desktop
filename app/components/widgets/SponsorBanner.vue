@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.') }}
-  </div>
-
   <div slot="settings" >
     <form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>

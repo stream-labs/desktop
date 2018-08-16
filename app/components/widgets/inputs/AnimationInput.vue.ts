@@ -3,24 +3,46 @@ import { Multiselect } from 'vue-multiselect';
 import { IInputMetadata, IListOption } from '../../shared/inputs';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import { BaseInput } from 'components/shared/inputs/BaseInput';
+import { IAnimationMetadata } from './index'
 
-enum EWidgetAnimation {
-  bounce, flash, pulse, rubberBand, shake, headShake, swing, tada, wobble, jello, bounceIn, bounceInDown, bounceInLeft,
-  bounceInRight, bounceInUp, bounceOut, bounceOutDown, bounceOutLeft, bounceOutRight, bounceOutUp, fadeIn, fadeInDown,
-  fadeInDownBig, fadeInLeft, fadeInLeftBig, fadeInRight, fadeInRightBig, fadeInUp, fadeInUpBig, fadeOut, fadeOutDown,
-  fadeOutDownBig, fadeOutLeft, fadeOutLeftBig, fadeOutRight, fadeOutRightBig, fadeOutUp, fadeOutUpBig, flip, flipInX,
-  flipInY, flipOutX, flipOutY, lightSpeedIn, lightSpeedOut, rotateIn, rotateInDownLeft, rotateInDownRight,
-  rotateInUpLeft, rotateInUpRight, rotateOut, rotateOutDownLeft, rotateOutDownRight, rotateOutUpLeft, rotateOutUpRight,
-  hinge, jackInTheBox, rollIn, rollOut, zoomIn, zoomInDown, zoomInLeft, zoomInRight, zoomInUp, zoomOut, zoomOutDown,
-  zoomOutLeft, zoomOutRight, zoomOutUp, slideInDown, slideInLeft, slideInRight, slideInUp, slideOutDown, slideOutLeft,
-  slideOutRight, slideOutUp
-}
+
+const COMMON_ANIMATIONS = [
+  'bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'headShake', 'swing', 'tada', 'wobble', 'jello', 'flip', 'hinge',
+  'jackInTheBox'
+];
+
+const IN_ANIMATIONS = [
+  'bounceIn', 'bounceInDown', 'bounceInLeft', 'bounceInRight', 'bounceInUp',
+  'fadeIn', 'fadeInDown', 'fadeInDownBig', 'fadeInLeft', 'fadeInLeftBig', 'fadeInRight', 'fadeInRightBig', 'fadeInUp',
+  'fadeInUpBig',
+  'flipInX', 'flipInY',
+  'lightSpeedIn',
+  'rotateInDownLeft', 'rotateInDownRight', 'rotateInUpLeft', 'rotateInUpRight',
+  'jackInTheBox',
+  'rollIn',
+  'zoomIn', 'zoomInDown', 'zoomInLeft', 'zoomInRight', 'zoomInUp',
+  'slideInDown', 'slideInLeft', 'slideInRight', 'slideInUp'
+
+];
+
+const OUT_ANIMATIONS = [
+  'bounceOut', 'bounceOutDown', 'bounceOutLeft', 'bounceOutRight', 'bounceOutUp',
+  'fadeOut', 'fadeOutDown', 'fadeOutDownBig', 'fadeOutLeft', 'fadeOutLeftBig', 'fadeOutRight', 'fadeOutRightBig',
+  'fadeOutUp', 'fadeOutUpBig',
+  'flipOutX', 'flipOutY',
+  'lightSpeedOut',
+  'rotateOut', 'rotateOutDownLeft', 'rotateOutDownRight', 'rotateOutUpLeft', 'rotateOutUpRight',
+  'rollOut',
+  'zoomOut', 'zoomOutDown', 'zoomOutLeft', 'zoomOutRight', 'zoomOutUp',
+  'slideOutDown', 'slideOutLeft', 'slideOutRight', 'slideOutUp'
+];
+
 
 @Component({
   components: { ListInput }
 })
 
-export default class AnimationInput extends BaseInput<string, IInputMetadata> {
+export default class AnimationInput extends BaseInput<string, IAnimationMetadata> {
 
   @Prop()
   value: string;
@@ -31,21 +53,23 @@ export default class AnimationInput extends BaseInput<string, IInputMetadata> {
   @Prop()
   title: string;
 
-  // create options for the WListInput from EWidgetAnimation enum
-  animations: IListOption<string>[] = (() => {
-    const keys = Object.keys(EWidgetAnimation);
-    const options: IListOption<string>[] = [];
-    const animationsCount = keys.length / 2;
-    for (let i = 0; i < animationsCount; i++) {
-      const animationName = EWidgetAnimation[keys[i]] as string;
-      options.push({ value: animationName, title: animationName });
-    }
-    return options;
-  })();
 
-  listInputMetadata = {
-    ...this.options,
-    options: this.animations
-  };
+  get listInputMetadata() {
+
+    const animations = [].concat(COMMON_ANIMATIONS);
+
+    if (this.options.filter === 'in') {
+      animations.push(...IN_ANIMATIONS);
+    } else if (this.options.filter === 'out') {
+      animations.push(...OUT_ANIMATIONS);
+    } else {
+      animations.push( ...IN_ANIMATIONS, ...OUT_ANIMATIONS);
+    }
+
+    return {
+      ...this.options,
+      options: animations.map(animationName => ({ title: animationName, value: animationName}))
+    }
+  }
 
 }

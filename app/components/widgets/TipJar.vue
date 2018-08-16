@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Following in the footsteps of some other similar Twitch services, we\'ve decided to make our own take on a jar that catches bits, tips, and more. Copy the Widget URL into your streaming software, or launch it and capture it.') }}
-  </div>
-
   <div slot="settings">
     <form-group :title="$t('Enabled Events')">
       <bool-input

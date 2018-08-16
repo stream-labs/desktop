@@ -28,7 +28,6 @@
   background-color: @day-primary;
   box-sizing: border-box;
   position: absolute;
-  z-index: 1;
   width: 100%;
   padding: 0 15px;
   height: 54px;

@@ -3,18 +3,15 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
-  :fixedSectionHeight="330"
+  :fixedSectionHeight="254"
   v-if="previewSource">
 
   <div slot="fixed">
-    <div class="description">
-      <slot name="description"></slot>
-    </div>
     <display class="display" :sourceId="previewSource.id" @click="createProjector"/>
     <tabs ref="tabs" :tabs="tabsList" :value="value" @input="value => $emit('input', value)"></tabs>
   </div>
 
-  <div slot="content" class="content">
+  <div slot="content" class="content" v-if="canRender">
 
     <!-- browser-source properties tab -->
     <div v-if="value === 'source'">
@@ -30,9 +27,9 @@
   </div>
 
   <!-- buttons -->
-  <div slot="controls" v-if="tab && tab.showControls">
+  <div slot="controls" v-if="canRender">
     <div v-for="tabItem in tabsList" :key="tabItem.value" v-if="tabItem.value === value">
-      <slot :name="tabItem.value + '-controls'">
+      <slot :name="tabItem.value + '-controls'" v-if="(tab && tab.showControls) || tabItem.value === 'source'">
         <button
             class="button button--default"
             @click="close">
@@ -48,14 +45,8 @@
 <script lang="ts" src="./WidgetWindow.vue.ts"></script>
 
 <style lang="less" scoped>
-
-  .description {
-    padding: 20px;
-  }
-
   .display {
     height: 200px !important;
     cursor: pointer;
   }
-
 </style>

@@ -12,7 +12,7 @@ const os = require('os');
 const colors = require('colors/safe');
 
 // CONFIGURATION
-const FACE_MASK_VERSION = '0.7.2';
+const FACE_MASK_VERSION = '0.7.4';
 
 // This is the main function
 async function runScript() {
