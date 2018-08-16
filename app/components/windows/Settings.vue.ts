@@ -79,6 +79,8 @@ export default class SceneTransitions extends Vue {
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+    const settingsWindow = document.getElementsByClassName('settings-container')[0];
+    settingsWindow.scrollTop = 0;
   }
 
 }
