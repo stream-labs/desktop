@@ -9,7 +9,8 @@ export interface ITab {
 @Component({})
 export default class Tabs extends Vue {
 
-  @Prop() tabs: ITab[];
+  @Prop()
+  tabs: ITab[];
 
   @Prop()
   value: string;

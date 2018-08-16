@@ -38,6 +38,19 @@ import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
+
+import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
+import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
+import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
+import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
+import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
+import ChatbotSymbolProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
+import ChatbotLinkProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
+import ChatbotWordProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
+
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 
@@ -81,7 +94,16 @@ export function getComponents() {
     EventList,
     TipJar,
     SponsorBanner,
-    StreamBoss
+    StreamBoss,
+
+    ChatbotCustomCommandWindow,
+    ChatbotDefaultCommandWindow,
+    ChatbotTimerWindow,
+    ChatbotAlertsWindow,
+    ChatbotCapsProtectionWindow,
+    ChatbotSymbolProtectionWindow,
+    ChatbotLinkProtectionWindow,
+    ChatbotWordProtectionWindow,
   };
 }
 

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { UserService } from '../../services/user';
-import { Inject } from '../../util/injector';
+import { UserService } from 'services/user';
+import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { FacemasksService } from 'services/facemasks';
 import { I18nService } from 'services/i18n';

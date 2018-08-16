@@ -34,6 +34,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('Studio');
   }
 
+  navigateChatBot() {
+    this.navigationService.navigate('Chatbot');
+  }
+
   navigateDashboard() {
     this.navigationService.navigate('Dashboard');
   }
