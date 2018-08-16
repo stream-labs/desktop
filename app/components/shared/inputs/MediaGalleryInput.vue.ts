@@ -11,18 +11,22 @@ import FormGroup from './FormGroup.vue';
 @Component({
   components: { TextInput, FormGroup }
 })
-export default class MediaGallery extends BaseInput<string, IMediaGalleryMetadata>{
+export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() value: string;
   @Prop() metadata: IMediaGalleryMetadata;
 
-  fileName: string = this.metadata.fileName;
   url: string = '';
   showUrlUpload = false;
 
+  get fileName() {
+    if (!this.value) return null;
+    return decodeURIComponent(this.value.split(/[\\/]/).pop());
+  }
+
   async updateValue() {
-    const selectedFile = await this.mediaGalleryService.pickFile();
-    this.fileName = selectedFile.fileName;
+    const filter = this.metadata.filter;
+    const selectedFile = await this.mediaGalleryService.pickFile({ filter });
     this.emitInput(selectedFile.href);
   }
 
