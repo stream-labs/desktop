@@ -47,7 +47,12 @@
   .fa,
   i {
     margin-left: 8px;
-    font-size: 6px;
+    font-size: 10px;
+    padding: 3px; // easier to click
+
+    &.icon-down {
+      font-size: 6px;
+    }
   }
 
   &:focus {

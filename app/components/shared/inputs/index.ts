@@ -14,7 +14,7 @@ export enum EInputType {
   textArea = 'textArea',
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
-  code = 'code'
+  code = 'code',
 }
 
 /**
@@ -64,6 +64,7 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
   clearImage: string;
 }
 
+
 // a helper for creating metadata
 export const metadata = {
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
@@ -75,7 +76,7 @@ export const metadata = {
   textArea: (options: IInputMetadata) => ({ type: EInputType.textArea, ...options } as ITextMetadata),
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
-  code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata)
+  code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html

@@ -275,7 +275,7 @@ function startApp() {
     // }, 10 * 1000);
 
   }
-  
+
   getObs().IPC.ConnectOrHost("slobs" + uuid());
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
