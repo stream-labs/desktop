@@ -28,7 +28,8 @@ export interface IMediaGalleryInfo extends IMediaGalleryLimits {
 }
 
 interface IMediaGalleryProps {
-  audioOnly: boolean;
+  audioOnly?: boolean;
+  imageOnly?: boolean;
 }
 
 const fileTypeMap = {
@@ -57,13 +58,6 @@ export class MediaGalleryService extends Service {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
   @Inject() private windowsService: WindowsService;
-
-  static initialState: IMediaGalleryInfo = {
-    files: [],
-    totalUsage: 0,
-    maxUsage: null,
-    maxFileSize: null
-  };
 
   private promises: Dictionary<{
     resolve: (value?: IMediaGalleryFile) => void;

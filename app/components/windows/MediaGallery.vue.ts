@@ -60,6 +60,10 @@ export default class MediaGallery extends Vue {
     return this.windowsService.state.child.queryParams.audioOnly;
   }
 
+  get imageOnly() {
+    return this.windowsService.state.child.queryParams.imageOnly;
+  }
+
   get files() {
     if (!this.galleryInfo) return [];
 
@@ -157,7 +161,7 @@ export default class MediaGallery extends Vue {
   }
 
   selectFile(file: IMediaGalleryFile, select: boolean) {
-    if (this.audioOnly && file.type !== 'audio') {
+    if ((this.audioOnly && file.type !== 'audio') || (this.imageOnly && file.type !== 'image')) {
       return this.$toasted.show($t('Not a supported file type'), {
         duration: 1000,
         position: 'top-right',

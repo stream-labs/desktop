@@ -11,7 +11,7 @@ import FormGroup from './FormGroup.vue';
 @Component({
   components: { TextInput, FormGroup }
 })
-export default class MediaGallery extends BaseInput<string, IMediaGalleryMetadata>{
+export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
   @Prop() value: string;
   @Prop() metadata: IMediaGalleryMetadata;
@@ -21,7 +21,8 @@ export default class MediaGallery extends BaseInput<string, IMediaGalleryMetadat
   showUrlUpload = false;
 
   async updateValue() {
-    const selectedFile = await this.mediaGalleryService.pickFile();
+    const imageOnly = this.metadata.imageOnly;
+    const selectedFile = await this.mediaGalleryService.pickFile({ imageOnly });
     this.fileName = selectedFile.fileName;
     this.emitInput(selectedFile.href);
   }
