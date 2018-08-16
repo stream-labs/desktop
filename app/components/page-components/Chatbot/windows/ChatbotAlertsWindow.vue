@@ -29,7 +29,7 @@
     <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
         <button
-          class="button button--action text-transform--uppercase"
+          class="button button--action"
           @click="showNewChatAlertWindow"
         >
           {{ $t('add alert') }}
@@ -42,7 +42,6 @@
             <th
               v-for="column in selectedTypeTableColumns"
               :key="column"
-              class="text-transform--capitalize"
               :class="`column--${column}`"
             >
               {{ $t(formatHeader(column)) }}
@@ -106,8 +105,8 @@
     border-right: 1px solid @day-border;
 
     .chatbot-alerts-window__sidebar__tab {
-      .margin--10();
-      .text-transform--capitalize();
+      .margin();
+      .text-transform();
       padding-left: 20px;
 
       .chatbot-alerts-window__sidebar__tab__content {

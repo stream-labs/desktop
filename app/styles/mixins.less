@@ -107,7 +107,7 @@
 }
 
 .icon--margin() {
-  @margin-right();
+  .margin-right();
 }
 
 // Margins
@@ -166,6 +166,11 @@
 
 .padding-vertical--20 {
   padding: 20px 0;
+}
+
+// Text aligns
+.text-align(@left: @left) {
+  text-align: @left;
 }
 
 // margins
@@ -283,20 +288,14 @@
   font-weight: @normal;
 }
 
-//cursors
-
+// Cursors
 .cursor--pointer {
   cursor: pointer;
 }
 
 // text transforms
-
-.text-transform--capitalize {
-  text-transform: capitalize;
-}
-
-.text-transform--uppercase {
-  text-transform: uppercase;
+.text-transform(@capitalize: @capitalize) {
+  text-transform: @capitalize;
 }
 
 // overflows

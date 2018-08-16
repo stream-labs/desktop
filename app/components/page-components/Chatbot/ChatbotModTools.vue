@@ -24,10 +24,10 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 .mod-chat-banner {
-  margin: 10px;
+  .margin();
   display: flex;
   .radius();
-  padding: 10px;
+  .padding();
   text-align: center;
   background-color: @yellow-light-opac;
   border: @yellow;
@@ -46,7 +46,7 @@
     padding: 4px 7px;
     margin: 0 5px;
     .radius();
-    .weight--bold();
+    .weight(@medium);
     background-color: @yellow-med-opac;
     user-select: all;
   }
