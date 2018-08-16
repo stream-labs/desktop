@@ -16,6 +16,13 @@
       <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
     </button>
     <button
+      @click="navigateChatBot"
+      class="tab-button"
+      :class="{ active: page === 'Chatbot' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="icon-chatbot"/> {{ $t('Chatbot') }}
+    </button>
+    <button
       @click="navigateOverlays"
       class="tab-button"
       :class="{ 'is-active': page === 'BrowseOverlays' }"
@@ -96,6 +103,7 @@
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 54px;
+  z-index: 1;
 }
 
 .top-nav-right {

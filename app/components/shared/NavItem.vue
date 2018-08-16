@@ -5,7 +5,7 @@
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
-  <span class="nav-item__name"><slot></slot></span>
+  <div class="nav-item__name"><slot></slot></div>
 </li>
 </template>
 
@@ -58,7 +58,9 @@
 
 .nav-item__name {
   overflow: hidden;
-  max-width: calc(~"100% - 20px");
+  // max-width: calc(~"100% - 20px");
+  width: 100%;
+  max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

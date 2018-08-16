@@ -324,6 +324,20 @@ select {
   opacity: 0;
 }
 
+.fade-enter-active {
+  transition: all .4s ease;
+}
+
+.fade-leave-active {
+  transition: all .2s ease;
+}
+
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .v--modal-overlay {
   background: rgba(0, 0, 0, 0.3);
 }
@@ -331,6 +345,8 @@ select {
 .v--modal {
   background-color: @day-bg;
 }
+
+
 
 // Night theme rules
 .night-theme {
@@ -341,6 +357,10 @@ select {
 
   .v--modal {
     background-color: @night-bg;
+  }
+
+  .v--modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
   }
 
   a {
