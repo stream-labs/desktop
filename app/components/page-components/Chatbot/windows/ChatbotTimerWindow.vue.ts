@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 
 import {
-  ITimer,
+  IChatbotTimer,
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -14,7 +14,7 @@ import {
 
 @Component({})
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-  newTimer: ITimer = {
+  newTimer: IChatbotTimer = {
     name: null,
     interval: 5,
     chat_lines: 5,

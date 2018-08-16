@@ -19,7 +19,7 @@ export interface IChatbotCommonServiceState {
   toasted: any;
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
-  timerToUpdate: ITimer;
+  timerToUpdate: IChatbotTimer;
   modBannerVisible: boolean;
 }
 
@@ -54,7 +54,7 @@ export interface IDafaultCommandsResponse {
 }
 
 export interface ICustomCommandsResponse {
-  pagination: IPagination;
+  pagination: IChatbotPagination;
   data: ICustomCommandsData;
 }
 
@@ -63,7 +63,7 @@ export interface ICommandVariablesResponse {
 }
 
 export interface ITimersResponse {
-  pagination: IPagination;
+  pagination: IChatbotPagination;
   data: ITimersData;
 }
 
@@ -94,36 +94,36 @@ export interface IWordProtectionResponse {
 
 
 // shared
-export interface IPermission {
+export interface IChatbotPermission {
   level: number;
-  info?: IPermissionInfo;
+  info?: IChatbotPermissionInfo;
 }
 
-export interface IPermissionInfo {
+export interface IChatbotPermissionInfo {
   [id: string]: any;
 }
 
-export interface ICooldown {
+export interface IChatbotCooldown {
   global: number;
   user: number;
 }
 
-export interface IAliases {
+export interface IChatbotAliases {
   [id: number]: string;
 }
 
-export interface IPagination {
+export interface IChatbotPagination {
   current: number;
   total: number;
 }
 
-export interface IPunishment {
+export interface IChatbotPunishment {
   duration: number;
   type: string;
 }
 
 
-export interface IExcluded extends IPermission {}
+export interface IChatbotExcluded extends IChatbotPermission {}
 
 
 // status
@@ -140,13 +140,13 @@ export interface IChatbotClientsStatus {
 export interface IDefaultCommand {
   command: string;
   description: string;
-  aliases: IAliases;
+  aliases: IChatbotAliases;
   response_type?: string;
   success_response?: string;
   failed_response?: string;
   response?: string;
-  static_permission?: IPermission;
-  permission?: IPermission;
+  static_permission?: IChatbotPermission;
+  permission?: IChatbotPermission;
   enabled?: boolean;
   enabled_response?: string;
   disabled_response?: string;
@@ -167,11 +167,11 @@ export interface ICustomCommand {
   id?: string;
   user_id?: number;
   command: string;
-  permission: IPermission;
+  permission: IChatbotPermission;
   response: string;
   response_type?: string;
-  cooldowns: ICooldown;
-  aliases: IAliases;
+  cooldowns: IChatbotCooldown;
+  aliases: IChatbotAliases;
   platforms: number;
   enabled: boolean;
   created_at?: string;
@@ -189,10 +189,10 @@ export interface ICommandVariable {
 
 // timers
 export interface ITimersData {
-  [id: number]: ITimer;
+  [id: number]: IChatbotTimer;
 }
 
-export interface ITimer {
+export interface IChatbotTimer {
   id?: string;
   user_id?: number;
   name: string;
@@ -236,8 +236,8 @@ export interface IAlertMessage {
 
 // protections
 export interface IProtectionGeneral {
-  punishment?: IPunishment;
-  excluded: IExcluded;
+  punishment?: IChatbotPunishment;
+  excluded: IChatbotExcluded;
   message: string;
 }
 
@@ -280,7 +280,7 @@ export interface ILinkProtectionCommand {
   description: string;
   response: string;
   response_type: string;
-  aliases: IAliases;
+  aliases: IChatbotAliases;
 }
 
 // words protection data
@@ -292,7 +292,7 @@ export interface IWordProtectionData {
 export interface IWordProtectionBlackListItem {
   text: string;
   is_regex: boolean;
-  punishment: IPunishment;
+  punishment: IChatbotPunishment;
 }
 
 // dictionaries

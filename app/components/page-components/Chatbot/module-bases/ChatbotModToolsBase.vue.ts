@@ -22,7 +22,7 @@ import {
   IInputMetadata
 } from 'components/shared/inputs/index';
 
-interface IPunishmentMetadata {
+interface IChatbotPunishmentMetadata {
   type: IListMetadata<string>;
   duration: INumberMetadata;
 }
@@ -32,7 +32,7 @@ interface IExcludedMetadata {
 }
 
 interface IProtectionGeneralMetadata {
-  punishment: IPunishmentMetadata;
+  punishment: IChatbotPunishmentMetadata;
   excluded: IExcludedMetadata;
   message: ITextMetadata;
 }
@@ -73,7 +73,7 @@ interface ILinkProtectionMetadata {
 interface IWordProtectionBlacklistItem {
   text: ITextMetadata;
   is_regex: IInputMetadata;
-  punishment: IPunishmentMetadata;
+  punishment: IChatbotPunishmentMetadata;
 }
 
 interface IWordProtectionMetadata {
