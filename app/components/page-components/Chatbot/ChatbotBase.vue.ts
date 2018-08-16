@@ -6,7 +6,7 @@ import { Inject } from 'util/injector';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
-import FormWrapper from 'components/shared/inputs/FormWrapper.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import {
   ChatbotPermissionsEnums,
@@ -20,7 +20,7 @@ import { IListOption } from 'components/shared/inputs'
 @Component({
   components: {
     ...inputComponents,
-    FormWrapper,
+    VFormGroup,
     Tabs,
     DropdownMenu,
   }
