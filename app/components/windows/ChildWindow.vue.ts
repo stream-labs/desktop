@@ -59,6 +59,9 @@ export default class ChildWindow extends Vue {
       return;
     }
 
+    // This is essentially a race condition, but make a best effort
+    // at having a successful paint cycle before loading a component
+    // that will do a bunch of synchronous IO.
     setTimeout(() => {
       this.$set(this.components, this.activeComponentInd, {
         name: this.options.componentName,
