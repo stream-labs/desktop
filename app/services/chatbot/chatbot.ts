@@ -14,7 +14,7 @@ import {
   ChatbotClients,
   ICustomCommand,
   IDefaultCommand,
-  ITimer,
+  IChatbotTimer,
   IDafaultCommandsResponse,
   ICustomCommandsResponse,
   ITimersResponse,
@@ -310,9 +310,9 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
-  createTimer(data: ITimer) {
+  createTimer(data: IChatbotTimer) {
     return this.api('POST', 'timers', data)
-      .then((response: ITimer) => {
+      .then((response: IChatbotTimer) => {
         this.fetchTimers();
         this.chatbotCommonService.closeChildWindow();
       });
@@ -338,7 +338,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
-  updateTimer(id: string, data: ITimer) {
+  updateTimer(id: string, data: IChatbotTimer) {
     return this.api('PUT', `timers/${id}`, data)
       .then((response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
@@ -533,7 +533,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openTimerWindow(timer?: ITimer) {
+  openTimerWindow(timer?: IChatbotTimer) {
     if (timer) {
       this.SET_TIMER_TO_UPDATE(timer);
     }
@@ -623,7 +623,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   }
 
   @mutation()
-  private SET_TIMER_TO_UPDATE(timer: ITimer) {
+  private SET_TIMER_TO_UPDATE(timer: IChatbotTimer) {
     Vue.set(this.state, 'timerToUpdate', timer);
   }
 }
