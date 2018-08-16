@@ -29,7 +29,8 @@ export default class ExtraSettings extends Vue {
     return {
       name: 'optimize_for_niconico',
       description: $t('settings.optimizeForNiconico'),
-      value: this.customizationService.state.optimizeForNiconico
+      value: this.customizationService.state.optimizeForNiconico,
+      enabled: this.streamingService.isStreaming === false
     };
   }
 
@@ -41,7 +42,8 @@ export default class ExtraSettings extends Vue {
     return {
       name: 'show_optimization_dialog_for_niconico',
       description: $t('settings.showOptimizationDialogForNiconico'),
-      value: this.customizationService.state.showOptimizationDialogForNiconico
+      value: this.customizationService.state.showOptimizationDialogForNiconico,
+      enabled: this.streamingService.isStreaming === false
     };
   }
 
