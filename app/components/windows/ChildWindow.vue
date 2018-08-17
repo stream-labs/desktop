@@ -1,16 +1,16 @@
 <template>
 <div style="height: 100%" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}">
-  <!--
-      we use 2 components for situation when we need to open a new window and
-      save the previous window-component state
-  -->
   <div class="blank-slate">
     <div class="spinner-spacer" />
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component v-if="components[0].name" v-show="components[0].isShown" :is="components[0].name"/>
-  <component v-if="components[1].name" v-show="components[1].isShown" :is="components[1].name"/>
+  <component
+    v-for="(component, index) in components"
+    :key="`${component.name}-${index}`"
+    v-if="component.name"
+    v-show="component.isShown"
+    :is="component.name"/>
 </div>
 </template>
 
