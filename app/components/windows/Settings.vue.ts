@@ -38,6 +38,8 @@ export default class SceneTransitions extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
 
+  $refs: { settingsContainer: HTMLElement }
+
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
     General: 'icon-overview',
@@ -79,6 +81,7 @@ export default class SceneTransitions extends Vue {
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+    this.$refs.settingsContainer.scrollTop = 0;
   }
 
 }
