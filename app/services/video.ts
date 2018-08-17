@@ -55,12 +55,20 @@ export class Display {
       nodeObs.OBS_content_createSourcePreviewDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
         this.sourceId,
-        name
+        name,
+        this.currentPosition.width,
+        this.currentPosition.height,
+        this.currentPosition.x,
+        this.currentPosition.y
       );
     } else {
       nodeObs.OBS_content_createDisplay(
         remote.getCurrentWindow().getNativeWindowHandle(),
-        name
+        name,
+        this.currentPosition.width,
+        this.currentPosition.height,
+        this.currentPosition.x,
+        this.currentPosition.y
       );
     }
     this.displayDestroyed = false;
