@@ -120,11 +120,7 @@ table tr {
 
     .icon-edit {
       font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
+      .icon-hover();
     }
   }
 }
@@ -144,6 +140,12 @@ table tr {
 
     td {
       color: white;
+    }
+
+    td:last-child {
+      .icon-edit {
+        .night-icon-hover();
+      }
     }
   }
   tbody tr:nth-child(odd) {
