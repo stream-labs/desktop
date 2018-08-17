@@ -28,7 +28,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   nameMetadata: ITextMetadata = {
     required: true,
     placeholder: $t('Name of the timer'),
-    alpha: true
+    alphaNum: true
   };
   messageMetadata: ITextMetadata = {
     required: true,

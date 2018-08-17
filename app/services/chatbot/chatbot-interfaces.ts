@@ -303,7 +303,6 @@ export interface IWordProtectionBlackListItem {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Everyone' = 1,
   'Subscriber Only' = 1 << 1,
 }
 

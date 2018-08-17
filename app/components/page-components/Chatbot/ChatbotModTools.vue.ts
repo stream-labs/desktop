@@ -19,7 +19,6 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchSymbolProtection();
     this.chatbotApiService.fetchLinkProtection();
     this.chatbotApiService.fetchWordProtection();
-    this.chatbotCommonService.showModBanner();
   }
 
   onCloseBanner() {
