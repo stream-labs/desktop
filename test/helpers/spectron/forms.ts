@@ -1,7 +1,6 @@
 // Tools for dealing with forms in spectron
 
-import { GenericTestContext } from "ava";
-import { async } from "rxjs/scheduler/async";
+import { GenericTestContext } from 'ava';
 
 async function getNthLabelId(t: GenericTestContext<any>, label: string, index: number) {
   return (await t.context.app.client.$$(`label=${label}`))[index].ELEMENT;
