@@ -10,6 +10,7 @@ import { WindowsService } from '../../services/windows';
 import { UserService } from '../../services/user';
 import { CustomizationService } from '../../services/customization';
 import { SettingsService, ISettingsSubCategory } from '../../services/settings';
+import { StreamingService } from '../../services/streaming';
 import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
@@ -40,6 +41,7 @@ export default class Settings extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() streamingService: StreamingService;
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   categoryNames = this.settingsService.getCategories();
@@ -68,6 +70,10 @@ export default class Settings extends Vue {
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
+  }
+
+  get isStreaming() {
+    return this.streamingService.isStreaming;
   }
 
   get categoryName() {

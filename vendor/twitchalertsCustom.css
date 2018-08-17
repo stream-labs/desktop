@@ -27,3 +27,10 @@ vendor分離前暫定対応
 .checkbox input:checked~label:before {
     background-color: rgba(252,80,53,.2);
 }
+
+/*配信中に設定ダイアログへ表示するメッセージのstyle*/
+.settings .settings-container .section .notice {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ff6952;
+}

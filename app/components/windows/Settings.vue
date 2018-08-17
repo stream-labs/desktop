@@ -17,6 +17,9 @@
       </NavItem>
     </NavMenu>
     <div class="settings-container">
+      <div class="section" v-if="isStreaming">
+        <p class="notice">{{ $t('settings.noticeWhileStreaming')}}</p>
+      </div>
       <extra-settings v-if="categoryName === 'General'" />
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
