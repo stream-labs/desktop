@@ -384,18 +384,41 @@ export class SettingsService extends StatefulService<ISettingsState>
     const colorSpace = '709';
     const fps = '30';
     const outputMode = 'Simple';
-    const output = this.getSettingsFormData('Output');
+
+    // 出力モードが Simple でないときは Simpleに戻した上で現在の値を取得する
+    let output = this.getSettingsFormData('Output');
+    const lastMode = this.findSettingValue(output, 'Untitled', 'Mode');
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = outputMode;
+        this.setSettings('Output', output);
+        output = this.getSettingsFormData('Output');
+      }
+    }
+
     const video = this.getSettingsFormData('Video');
     const advanced = this.getSettingsFormData('Advanced');
+
     const settings: OptimizedSettings = {
       currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
       currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
       currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
       currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
       currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
-      currentOutputMode: this.findSettingValue(output, 'Untitled', 'Mode')
+      currentOutputMode: lastMode
     };
     const length = Object.keys(settings).length;
+
+    // 出力モードを元に戻す
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = lastMode;
+        this.setSettings('Output', output);
+      }
+    }
+
     if (videoBitrate !== settings.currentVideoBitrate) {
       settings.optimizedVideoBitrate = videoBitrate;
     }
@@ -420,6 +443,15 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   optimizeForNiconico(settings: OptimizedSettings) {
+    let output = this.getSettingsFormData('Output');
+    if ('optimizedOutputMode' in settings) {
+      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
+      if (anOutputMode) {
+        anOutputMode.value = settings.optimizedOutputMode;
+      }
+      this.setSettings('Output', output);
+      output = this.getSettingsFormData('Output');
+    }
 
     // https://github.com/n-air-app/n-air-app/issues/3
     if ('optimizedColorSpace' in settings) {
@@ -432,7 +464,6 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     // https://github.com/n-air-app/n-air-app/issues/13
-    const output = this.getSettingsFormData('Output');
     if ('optimizedVideoBitrate' in settings) {
       const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
       if (vBitrateSetting) {
@@ -443,12 +474,6 @@ export class SettingsService extends StatefulService<ISettingsState>
       const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
       if (aBitrateSetting) {
         aBitrateSetting.value = settings.optimizedAudioBitrate;
-      }
-    }
-    if ('optimizedOutputMode' in settings) {
-      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
-      if (anOutputMode) {
-        anOutputMode.value = settings.optimizedOutputMode;
       }
     }
     this.setSettings('Output', output);
