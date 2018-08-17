@@ -13,8 +13,8 @@ import FormGroup from './FormGroup.vue';
 })
 export default class MediaGalleryInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
-  @Prop() value: string;
-  @Prop() metadata: IMediaGalleryMetadata;
+  @Prop() readonly value: string;
+  @Prop() readonly metadata: IMediaGalleryMetadata;
 
   url: string = '';
   showUrlUpload = false;
