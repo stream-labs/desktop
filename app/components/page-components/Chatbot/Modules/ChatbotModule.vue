@@ -26,10 +26,10 @@
           @click="chatbotModule.onExpand"
           class="button button--action"
         >
-          Preferences
+          {{ $t('Preferences') }}
         </button>
         <button v-else disabled class="button button--default">
-          Coming Soon
+          {{ $t('Coming Soon') }}
         </button>
       </div>
     </div>

@@ -20,11 +20,9 @@ export default class ChatbotModules extends ChatbotBase {
 
   get modules() {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
-    const comingSoonText = $t(`
-      Streamlabs is diligently working on the next release of Chatbot.
-       Stay tuned.
-       We have more features on the way.
-    `);
+    const comingSoonText = $t(
+      'Streamlabs is diligently working on the next release of Chatbot. Stay tuned. We have more features on the way.'
+    );
     let modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),

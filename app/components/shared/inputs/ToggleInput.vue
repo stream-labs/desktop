@@ -39,7 +39,6 @@
 .toggleinput__handle {
   .transition();
   position: absolute;
-  z-index: 2;
   width: 18px;
   height: 18px;
   border-radius: 50%;
