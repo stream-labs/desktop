@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="small-2 chatbot__side-menu">
+    <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span class="text-transform--uppercase">
           {{ $t(`Chatbot ${globallyEnabled ? 'enabled' : 'disabled'}`) }}
@@ -16,13 +16,13 @@
           :key="tab"
           :to="tab"
           :ico="icons[tab]"
-          class="padding--10 text-transform--uppercase chatbot__side-menu__tab"
+          class="padding--10 text-transform--capitalize chatbot__side-menu__tab"
         >
           {{ $t(tab) }}
         </NavItem>
       </NavMenu>
     </div>
-    <div v-if="authenticated" class="small-10 overflow--auto">
+    <div v-if="authenticated" class="small-10 overflow--auto chatbot__content">
       <transition name="fade" mode="out-in" appear>
         <ChatbotModules v-if="selectedTab === 'Modules'"/>
         <ChatbotCommands v-if="selectedTab === 'Commands'"/>
@@ -38,12 +38,17 @@
 <style lang='less' scoped>
 @import "../../styles/index";
 
+
+.chatbot__content {
+  width: calc(~"100% - 250px");
+}
 .chatbot__side-menu {
+  width: 250px;
   background: @day-secondary;
   border-right: 1px solid @day-border;
 
   .chatbot__side-menu__global-toggle {
-    padding: 20px 36px;
+    padding: 20px;
     background-color: #EAF9F5;
     .weight--bold();
   }
@@ -52,7 +57,7 @@
   }
 
   .chatbot__side-menu__tab {
-    padding: 10px 80px;
+    padding: 10px 65px;
   }
 }
 

@@ -29,6 +29,10 @@ export interface IChatbotAuthResponse {
   socket_token: string;
 }
 
+export interface IChatbotErrorResponse {
+  error?: 'Duplicate' | 'Bad Request'
+}
+
 export interface IChatbotStatusResponse {
   worker: IChatbotWorkerStatus;
   clients: IChatbotClientsStatus;

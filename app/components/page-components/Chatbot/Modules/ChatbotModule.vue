@@ -23,7 +23,7 @@
           @click="chatbotModule.onExpand"
           class="button button--action"
         >
-          PREFERENCES
+          Preferences
         </button>
       </div>
     </div>
@@ -41,7 +41,6 @@
   width: 300px;
   .radius();
   background-color: @day-secondary;
-  .border();
 
   .chatbot-module__header {
     .flex();
@@ -63,6 +62,7 @@
 
   .chatbot-module__body {
     .padding--10();
+    color: @day-paragraph;
 
     .chatbot-module__action {
       .align-items--inline;
@@ -74,11 +74,14 @@
 
 .night-theme {
   .chatbot-module__container {
-    .night-border();
     background-color: @night-accent-light;
 
     h3, p {
       color: white;
+    }
+
+    .chatbot-module__body {
+      color: @night-paragraph;
     }
   }
 }

@@ -10,6 +10,7 @@ import {
   IChatbotApiServiceState,
   IChatbotCommonServiceState,
   IChatbotAuthResponse,
+  IChatbotErrorResponse,
   IChatbotStatusResponse,
   ChatbotClients,
   ICustomCommand,
@@ -99,7 +100,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
 
       fetch(request)
-        .then(handleErrors)
+        .catch(handleErrors)
         .then(response => response.json())
         .then((response: IChatbotAuthResponse) => {
           this.LOGIN(response);
@@ -138,7 +139,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        // errors contain string response. Need to json()
+        // and return the promised error
+        return error.json()
+          .then((errJson: Promise<IChatbotErrorResponse>) =>
+            Promise.reject(errJson)
+          );
+      })
   }
 
   //
@@ -504,8 +515,12 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     modBannerVisible: true
   };
 
-  closeModBanner() {
-    this.CLOSE_MOD_BANNER();
+  hideModBanner() {
+    this.HIDE_MOD_BANNER();
+  }
+
+  showModBanner() {
+    this.SHOW_MOD_BANNER();
   }
 
   closeChildWindow() {
@@ -613,8 +628,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   // }
 
   @mutation()
-  private CLOSE_MOD_BANNER() {
+  private HIDE_MOD_BANNER() {
     Vue.set(this.state, 'modBannerVisible', false);
+  }
+
+  @mutation()
+  private SHOW_MOD_BANNER() {
+    Vue.set(this.state, 'modBannerVisible', true);
   }
 
   @mutation()
