@@ -45,13 +45,13 @@ const OUT_ANIMATIONS = [
 export default class AnimationInput extends BaseInput<string, IAnimationMetadata> {
 
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
 
   get listInputMetadata() {

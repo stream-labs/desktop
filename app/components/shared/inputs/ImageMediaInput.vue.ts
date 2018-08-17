@@ -9,10 +9,10 @@ import { MediaGalleryInput } from './inputs';
 export default class ImageMediaInput extends BaseInput<string, IMediaGalleryMetadata> {
 
   @Prop({ default: '' })
-  value: string;
+  readonly value: string;
 
   @Prop({ default: {} })
-  metadata: IMediaGalleryMetadata;
+  readonly metadata: IMediaGalleryMetadata;
 
   get imageMetadata() {
     return { ...this.metadata, imageOnly: true };
