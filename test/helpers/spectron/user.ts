@@ -1,16 +1,6 @@
 import { focusMain } from './index';
 import { GenericTestContext } from 'ava';
 
-const user = {
-  apiToken: '05154bcaeb38c5e9d88481950',
-  widgetToken: '7862F8372D62E4EE98BB',
-  platform: {
-    id: '248300137',
-    token: '2cfjx7j0nlbcggyw6kb53wg8x1jz3g',
-    username: 'alexstreamlabs'
-  }
-};
-
 export async function logOut(t: GenericTestContext<any>) {
   await focusMain(t);
   await t.context.app.client.click('.icon-logout');

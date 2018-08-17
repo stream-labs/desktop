@@ -56,8 +56,3 @@ export async function setSliderPercent(t: GenericTestContext<any>, label: string
     .elementIdElement(id, '../..')
     .leftClick('.vue-slider', Math.floor(width.parsed.value * percent), 0);
 }
-
-
-export async function setForm(t: GenericTestContext<any>, formData: Dictionary<number|string>) {
-  
-}
