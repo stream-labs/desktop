@@ -22,7 +22,7 @@
   font-size: 14px;
   margin-bottom: 8px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 
   &.active {
@@ -53,6 +53,7 @@
     margin-right: -16px;
     left: -24px;
     width: 16px;
+    padding-top: 3px;
   }
 }
 

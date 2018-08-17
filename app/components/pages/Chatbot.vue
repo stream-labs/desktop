@@ -13,12 +13,14 @@
       <NavMenu v-model="selectedTab" class="side-menu">
         <NavItem
           v-for="tab in tabNames"
-          :key="tab"
-          :to="tab"
-          :ico="icons[tab]"
+          :key="tab.title"
+          :to="tab.title"
+          :ico="icons[tab.title]"
+          :enabled="tab.enabled"
           class="padding--10 text-transform--capitalize chatbot__side-menu__tab"
         >
-          {{ $t(tab) }}
+          <div>{{ $t(tab.title) }}</div>
+          <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
         </NavItem>
       </NavMenu>
     </div>
@@ -57,7 +59,11 @@
   }
 
   .chatbot__side-menu__tab {
-    padding: 10px 65px;
+    padding: 5px 65px;
+
+    .chatbot__side-menu__tab__description {
+      font-size: 12px;
+    }
   }
 }
 

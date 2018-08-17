@@ -217,6 +217,7 @@ export interface IChatbotModule {
   enabled: boolean;
   onToggleEnabled: Function;
   onExpand: Function;
+  comingSoon?: boolean;
 }
 
 // chat alerts

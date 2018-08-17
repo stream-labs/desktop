@@ -20,6 +20,11 @@ export default class ChatbotModules extends ChatbotBase {
 
   get modules() {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
+    const comingSoonText = $t(`
+      Streamlabs is diligently working on the next release of Chatbot.
+       Stay tuned.
+       We have more features on the way.
+    `);
     let modules: IChatbotModule[] = [
       {
         title: $t('Chat Alerts'),
@@ -35,6 +40,33 @@ export default class ChatbotModules extends ChatbotBase {
             enabled: !this.chatAlertCurrentlyEnabled
           });
         }
+      },
+      {
+        title: $t('Song Request'),
+        description: comingSoonText,
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: false,
+        onExpand: () => {},
+        onToggleEnabled: () => {},
+        comingSoon: true
+      },
+      {
+        title: $t('Mini Games'),
+        description: comingSoonText,
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: false,
+        onExpand: () => { },
+        onToggleEnabled: () => { },
+        comingSoon: true
+      },
+      {
+        title: $t('Counter'),
+        description: comingSoonText,
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: false,
+        onExpand: () => { },
+        onToggleEnabled: () => { },
+        comingSoon: true
       }
     ];
     return modules;

@@ -83,7 +83,7 @@ table tr {
   .transition;
 
   td:first-child {
-    width: 300px;
+    width: 200px;
   }
 
   td:nth-child(5),

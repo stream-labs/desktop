@@ -187,6 +187,10 @@ tbody tr {
   tbody tr:nth-child(even) {
     background-color: @navy;
   }
+
+  .chatbot-alerts-window__sidebar {
+    border-right: 1px solid @night-border;
+  }
 }
 
 
