@@ -67,11 +67,14 @@ function startApp() {
   { // Initialize obs-studio-server
     // Set up environment variables for IPC.
     process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
-    process.env.SLOBS_IPC_WORKING_DIRECTORY = path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') + '/node_modules/obs-studio-node');
     process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
     // Host a new IPC Server and connect to it.
     obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
-    obs.NodeObs.SetWorkingDirectory(process.env.SLOBS_IPC_WORKING_DIRECTORY);
+    obs.NodeObs.SetWorkingDirectory(path.join(
+      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+      'node_modules',
+      'obs-studio-node')
+    );
   }
 
   const bt = require('backtrace-node');
