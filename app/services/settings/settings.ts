@@ -361,10 +361,6 @@ export class SettingsService extends StatefulService<ISettingsState>
     };
   }
 
-  isOutputModeAdvanced(): boolean {
-    return this.findSettingValue(this.getSettingsFormData('Output'), 'Untitled', 'Mode') === 'Advanced';
-  }
-
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
     let audioBitrate: number;
     let quality: string;
@@ -387,17 +383,42 @@ export class SettingsService extends StatefulService<ISettingsState>
     const videoBitrate = bitrate - audioBitrate;
     const colorSpace = '709';
     const fps = '30';
-    const output = this.getSettingsFormData('Output');
+    const outputMode = 'Simple';
+
+    // 出力モードが Simple でないときは Simpleに戻した上で現在の値を取得する
+    let output = this.getSettingsFormData('Output');
+    const lastMode = this.findSettingValue(output, 'Untitled', 'Mode');
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = outputMode;
+        this.setSettings('Output', output);
+        output = this.getSettingsFormData('Output');
+      }
+    }
+
     const video = this.getSettingsFormData('Video');
     const advanced = this.getSettingsFormData('Advanced');
+
     const settings: OptimizedSettings = {
       currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
       currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
       currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
       currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
-      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon')
+      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
+      currentOutputMode: lastMode
     };
     const length = Object.keys(settings).length;
+
+    // 出力モードを元に戻す
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = lastMode;
+        this.setSettings('Output', output);
+      }
+    }
+
     if (videoBitrate !== settings.currentVideoBitrate) {
       settings.optimizedVideoBitrate = videoBitrate;
     }
@@ -415,10 +436,22 @@ export class SettingsService extends StatefulService<ISettingsState>
     if (fps !== settings.currentFps) {
       settings.optimizedFps = fps;
     }
+    if (outputMode !== settings.currentOutputMode) {
+      settings.optimizedOutputMode = outputMode;
+    }
     return Object.keys(settings).length > length ? settings : undefined;
   }
 
   optimizeForNiconico(settings: OptimizedSettings) {
+    let output = this.getSettingsFormData('Output');
+    if ('optimizedOutputMode' in settings) {
+      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
+      if (anOutputMode) {
+        anOutputMode.value = settings.optimizedOutputMode;
+      }
+      this.setSettings('Output', output);
+      output = this.getSettingsFormData('Output');
+    }
 
     // https://github.com/n-air-app/n-air-app/issues/3
     if ('optimizedColorSpace' in settings) {
@@ -431,7 +464,6 @@ export class SettingsService extends StatefulService<ISettingsState>
     }
 
     // https://github.com/n-air-app/n-air-app/issues/13
-    const output = this.getSettingsFormData('Output');
     if ('optimizedVideoBitrate' in settings) {
       const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
       if (vBitrateSetting) {

@@ -54,16 +54,12 @@ export default class StartStreamingButton extends Vue {
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          if (this.settingsService.isOutputModeAdvanced()) {
-            this.customizationService.setOptimizeForNiconico(false);
-          } else {
-            const platform = getPlatformService(this.userService.platform.type);
-            if (platform instanceof NiconicoService) {
-              // FIXME: `this.userService.updateStreamSettings`とあわせて
-              //       2度 `getpublishstatus` を呼んでいるが
-              //       不整合回避のために1回だけにしたい
-              return this.optimizeForNiconico(platform);
-            }
+          const platform = getPlatformService(this.userService.platform.type);
+          if (platform instanceof NiconicoService) {
+            // FIXME: `this.userService.updateStreamSettings`とあわせて
+            //       2度 `getpublishstatus` を呼んでいるが
+            //       不整合回避のために1回だけにしたい
+            return this.optimizeForNiconico(platform);
           }
         }
       } catch (e) {
@@ -71,7 +67,7 @@ export default class StartStreamingButton extends Vue {
           ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
           : $t('streaming.broadcastStatusFetchingError.default');
 
-          return new Promise(resolve => {
+        return new Promise(resolve => {
           electron.remote.dialog.showMessageBox(
             electron.remote.getCurrentWindow(),
             {
@@ -113,8 +109,8 @@ export default class StartStreamingButton extends Vue {
           componentName: 'OptimizeForNiconico',
           queryParams: settings,
           size: {
-          width: 500,
-          height: 400
+            width: 500,
+            height: 400
           }
         });
       } else {

@@ -27,6 +27,10 @@
         {{ $t('streaming.FPS') }}: {{ settings.currentFps }}
         <span v-if="settings.optimizedFps"> -&gt; {{ settings.optimizedFps }}</span>
       </li>
+      <li>
+        {{ $t('settings.Output.Untitled.Mode.name') }}: {{ outputModeName(settings.currentOutputMode) }}
+        <span v-if="settings.optimizedOutputMode"> -&gt; {{ outputModeName(settings.optimizedOutputMode) }}</span>
+      </li>
     </ul>
     <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
   </div>

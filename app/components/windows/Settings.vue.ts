@@ -84,9 +84,6 @@ export default class Settings extends Vue {
   }
 
   done() {
-    if (this.settingsService.isOutputModeAdvanced()) {
-      this.customizationService.setOptimizeForNiconico(false);
-    }
     this.windowsService.closeChildWindow();
   }
 
