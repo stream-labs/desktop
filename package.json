@@ -60,7 +60,8 @@
   "ava": {
     "files": [
       "test-dist/test/*.js",
-      "test-dist/test/api/*.js"
+      "test-dist/test/api/*.js",
+      "test-dist/test/widgets/*.js"
     ],
     "serial": true
   },
