@@ -1,10 +1,13 @@
 // Tools for dealing with forms in spectron
 
-async function getNthLabelId(t, label, index) {
+import { GenericTestContext } from "ava";
+import { async } from "rxjs/scheduler/async";
+
+async function getNthLabelId(t: GenericTestContext<any>, label: string, index: number) {
   return (await t.context.app.client.$$(`label=${label}`))[index].ELEMENT;
 }
 
-export async function setFormInput(t, label, value, index = 0) {
+export async function setFormInput(t: GenericTestContext<any>, label: string, value: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
@@ -12,7 +15,7 @@ export async function setFormInput(t, label, value, index = 0) {
     .setValue('input', value);
 }
 
-export async function getFormInput(t, label, index = 0) {
+export async function getFormInput(t: GenericTestContext<any>, label: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   return t.context.app.client
@@ -20,7 +23,7 @@ export async function getFormInput(t, label, index = 0) {
     .getValue('input');
 }
 
-export async function clickFormInput(t, label, index = 0) {
+export async function clickFormInput(t: GenericTestContext<any>, label: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
@@ -28,7 +31,7 @@ export async function clickFormInput(t, label, index = 0) {
     .click('input');
 }
 
-export async function setFormDropdown(t, label, value, index = 0) {
+export async function setFormDropdown(t: GenericTestContext<any>, label: string, value: string, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   await t.context.app.client
@@ -41,7 +44,7 @@ export async function setFormDropdown(t, label, value, index = 0) {
 }
 
 // Percent is a value between 0 and 1
-export async function setSliderPercent(t, label, percent, index = 0) {
+export async function setSliderPercent(t: GenericTestContext<any>, label: string, percent: number, index = 0) {
   const id = await getNthLabelId(t, label, index);
 
   const width = await t.context.app.client
@@ -52,4 +55,9 @@ export async function setSliderPercent(t, label, percent, index = 0) {
   await t.context.app.client
     .elementIdElement(id, '../..')
     .leftClick('.vue-slider', Math.floor(width.parsed.value * percent), 0);
+}
+
+
+export async function setForm(t: GenericTestContext<any>, formData: Dictionary<number|string>) {
+  
 }
