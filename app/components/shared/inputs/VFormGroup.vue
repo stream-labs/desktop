@@ -32,7 +32,7 @@
 </template>
 
 
-<script lang="ts" src="./FormWrapper.vue.ts"></script>
+<script lang="ts" src="./VFormGroup.vue.ts"></script>
 
 <style lang="less" scoped>
   @import "../../../styles/index";

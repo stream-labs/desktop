@@ -71,7 +71,7 @@
     </button>
     <button
       class="button button--action"
-      :disabled="errors.items.length > 0"
+      :disabled="errors.items.length > 0 || !newCommand.command || !newCommand.response"
       @click="onSave"
     >
       {{ $t("Save") }}
