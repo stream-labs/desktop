@@ -1,8 +1,8 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, WindowsService } from 'services/windows';
-
+import { CustomizationService } from 'services/customization';
 
 @Component({
   components: {
@@ -11,63 +11,60 @@ import { getComponents, WindowsService } from 'services/windows';
 })
 export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
+  @Inject() private customizationService: CustomizationService;
 
+  components: { name: string; isShown: boolean; }[] = [];
 
-  activeComponentInd = 0;
-
-  components = [
-    { name: this.options.componentName, isShown: this.options.isShown},
-    { name: '', isShown: false},
-  ];
-
-
-  private widowUpdatedSubscr = this.windowsService.windowUpdated.subscribe(params => {
-    if (params.windowId !== 'child') return;
+  mounted() {
     this.onWindowUpdatedHandler();
-  });
+    this.windowsService.windowUpdated.subscribe(params => {
+      if (params.windowId !== 'child') return;
+      this.onWindowUpdatedHandler();
+    });
+  }
 
   get options() {
     return this.windowsService.state.child;
   }
 
-  get componentName() {
-    return this.options.componentName;
+  get nightTheme() {
+    return this.customizationService.nightMode;
   }
-  //
-  // destroy() {
-  //   this.widowUpdatedSubscr.unsubscribe();
-  // }
 
-  destroy() {
-    this.widowUpdatedSubscr.unsubscribe();
+  get currentComponent() {
+    return this.components[this.components.length - 1];
+  }
+
+  clearComponentStack() {
+    this.components = [];
   }
 
   private onWindowUpdatedHandler() {
+    // If the window was closed, just clear the stack
     if (!this.options.isShown) {
-      this.components = [
-        { name: '', isShown: false},
-        { name: '', isShown: false},
-      ];
-      this.activeComponentInd = 0;
-    } else if (this.options.preservePrevWindow) {
-      this.components[this.activeComponentInd].isShown = false;
-      this.activeComponentInd++;
-      if (this.activeComponentInd > 1 ) this.activeComponentInd = 0;
-    } else if (this.options.isPreserved) {
-      this.$set(this.components, this.activeComponentInd, {
-        name: '',
-        isShown: false
-      });
-      this.activeComponentInd--;
-      if (this.activeComponentInd < 0) this.activeComponentInd = 1;
-      this.components[this.activeComponentInd].isShown = true;
+      this.clearComponentStack();
       return;
     }
 
-    this.$set(this.components, this.activeComponentInd, {
-      name: this.options.componentName,
-      isShown: this.options.isShown
-    });
+    if (this.options.preservePrevWindow) {
+      this.currentComponent.isShown = false;
+      this.components.push({ name: this.options.componentName, isShown: true });
+      return;
+    }
 
+    if (this.options.isPreserved) {
+      this.components.pop();
+      this.currentComponent.isShown = true;
+      return;
+    }
+
+    this.clearComponentStack();
+
+    // This is essentially a race condition, but make a best effort
+    // at having a successful paint cycle before loading a component
+    // that will do a bunch of synchronous IO.
+    setTimeout(() => {
+      this.components.push({ name: this.options.componentName, isShown: true });
+    }, 50);
   }
 }

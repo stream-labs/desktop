@@ -38,7 +38,13 @@ export async function addSource(t, type, name, closeProps = true) {
   await clickAddSource(t);
 
   await focusChild(t);
-  await app.client.click(`li=${type}`);
+
+  if (await app.client.isExisting(`li=${type}`)) {
+    await app.client.click(`li=${type}`); // source
+  } else {
+    await app.client.click(`div=${type}`); // widget
+  }
+
   await app.client.click('button=Add Source');
   await app.client.setValue('input', name);
 
@@ -51,6 +57,8 @@ export async function addSource(t, type, name, closeProps = true) {
   // Close source properties too
   if (closeProps) {
     await app.client.click('button=Done');
+  } else {
+    await focusChild(t);
   }
 }
 

@@ -3,7 +3,6 @@ import { Component, Watch } from 'vue-property-decorator';
 import SlVueTree, { ISlTreeNodeModel, ICursorPosition } from 'sl-vue-tree';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { SourceFiltersService } from 'services/source-filters';
 import { ISourcesServiceApi } from 'services/sources';
 
@@ -25,8 +24,7 @@ interface IFilterNodeData {
     GenericForm,
     Display,
     SlVueTree
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class SourceFilters extends Vue {
   @Inject() sourceFiltersService: SourceFiltersService;

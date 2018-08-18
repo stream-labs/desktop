@@ -120,7 +120,15 @@ table tr {
 
     .icon-edit {
       font-size: 10px;
+<<<<<<< HEAD
       .icon-hover();
+=======
+      .transition;
+
+      &:hover {
+        color: @teal;
+      }
+>>>>>>> staging
     }
   }
 }
@@ -141,12 +149,15 @@ table tr {
     td {
       color: white;
     }
+<<<<<<< HEAD
 
     td:last-child {
       .icon-edit {
         .night-icon-hover();
       }
     }
+=======
+>>>>>>> staging
   }
   tbody tr:nth-child(odd) {
     background-color: @navy-secondary;

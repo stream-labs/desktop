@@ -6,10 +6,10 @@ import { ITextMetadata } from './index';
 export default class TextInput extends BaseInput<string, ITextMetadata> {
 
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop({ default: {} })
-  metadata: ITextMetadata;
+  readonly metadata: ITextMetadata;
 
   getValidations() {
     return {

@@ -47,12 +47,20 @@
                 />
                 <DropdownMenu
                   :placement="'bottom-end'"
+<<<<<<< HEAD
                   :icon="'icon-more'"
                 >
                   <div class="chatbot-custom-commands__command-actions__container">
                     <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
                   <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                   </div>
+=======
+                  class="chatbot-custom-commands__command-actions__container"
+                  :icon="'icon-more'"
+                >
+                  <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+>>>>>>> staging
                 </DropdownMenu>
               </div>
             </td>
@@ -83,7 +91,11 @@ table tr {
   .transition;
 
   td:first-child {
+<<<<<<< HEAD
     width: 200px;
+=======
+    width: 300px;
+>>>>>>> staging
   }
 
   td:nth-child(5),
@@ -97,6 +109,18 @@ table tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
+<<<<<<< HEAD
+=======
+
+    .icon-edit {
+      font-size: 10px;
+      .transition;
+
+      &:hover {
+        color: @teal;
+      }
+    }
+>>>>>>> staging
   }
 }
 
@@ -104,16 +128,32 @@ table tr {
   button {
     display: block;
     width: 100%;
+<<<<<<< HEAD
 
     &:first-child {
       margin-bottom: 10px;
     }
 
+=======
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .icon-more {
+    font-size: 15px;
+>>>>>>> staging
   }
 }
 
 
 .night-theme {
+<<<<<<< HEAD
+=======
+
+>>>>>>> staging
   tbody tr {
     border: 2px solid transparent;
     td {
