@@ -80,7 +80,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
     if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert('This timer name is already taken. Try another name.');
+      alert($t('This timer name is already taken. Try another name.'));
     }
   }
 }

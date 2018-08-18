@@ -126,7 +126,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   onErrorHandler(errorResponse: IChatbotErrorResponse) {
     if (errorResponse.error && errorResponse.error === 'Duplicate') {
-      alert('This command is already taken. Try another command.');
+      alert($t('This command is already taken. Try another command.'));
     }
   }
 }
