@@ -503,6 +503,7 @@
   "optimizationForNiconicoLiveService": "Optimization for niconico live service",
   "cacheClearDescription": "If you are experiencing weird behavior, you can try deleting your cache directory.  This will result in you losing your scene configuration and settings, but can fix some stability issues.",
   "cacheManagement": "Management of the cashe",
+  "noticeWhileStreaming": "Some settings cannot be changed while streaming.",
   "showCacheDirectory": "Show Cache Directory",
   "deleteCacheAndRestart": "Delete Cache and Restart",
   "confirmStreamTitleAndGameBeforeGoingLive": "Confirm stream title and game before going live",
