@@ -7,7 +7,6 @@ import NavItem from '../shared/NavItem.vue';
 import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
 import { WindowsService } from '../../services/windows';
 import { ISettingsServiceApi, ISettingsSubCategory } from '../../services/settings';
-import windowMixin from '../mixins/window';
 import ExtraSettings from '../ExtraSettings.vue';
 import ApiSettings from '../ApiSettings.vue';
 import Hotkeys from '../Hotkeys.vue';
@@ -33,12 +32,13 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     RemoteControlSettings,
     ExperimentalSettings,
     LanguageSettings
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class SceneTransitions extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
+
+  $refs: { settingsContainer: HTMLElement }
 
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   icons: Dictionary<string> = {
@@ -81,6 +81,7 @@ export default class SceneTransitions extends Vue {
   @Watch('categoryName')
   onCategoryNameChangedHandler(categoryName: string) {
     this.settingsData = this.settingsService.getSettingsFormData(categoryName);
+    this.$refs.settingsContainer.scrollTop = 0;
   }
 
 }

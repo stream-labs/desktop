@@ -36,7 +36,7 @@ export class CustomizationService
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
-    folderSelection: true,
+    folderSelection: false,
     experimental: {
       // put experimental features here
     }

@@ -14,16 +14,19 @@ import { $t } from 'services/i18n';
 })
 export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
-  @Prop() value: string;
-  @Prop() metadata: IMediaGalleryMetadata;
+  @Prop() readonly value: string;
+  @Prop() readonly metadata: IMediaGalleryMetadata;
 
-  fileName: string = this.metadata.fileName;
   url: string = '';
   showUrlUpload = false;
 
+  get fileName() {
+    if (!this.value) return null;
+    return decodeURIComponent(this.value.split(/[\\/]/).pop());
+  }
+
   async updateValue() {
-    const selectedFile = await this.mediaGalleryService.pickFile({ audioOnly: true });
-    this.fileName = selectedFile.fileName;
+    const selectedFile = await this.mediaGalleryService.pickFile({ filter: 'audio' });
     this.emitInput(selectedFile.href);
   }
 
@@ -32,8 +35,8 @@ export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>
   }
 
   previewSound() {
-    if (this.url) {
-      const audio = new Audio(this.url);
+    if (this.value) {
+      const audio = new Audio(this.value);
       audio.play();
     }
   }
