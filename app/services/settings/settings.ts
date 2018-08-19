@@ -135,19 +135,16 @@ export class SettingsService extends StatefulService<ISettingsState>
     this.SET_SETTINGS(SettingsService.convertFormDataToState(settingsFormData));
 
     // ensure 'custom streaming server'
-    this.setSettings('Stream', [
-      {
-        nameSubCategory: 'Untitled',
-        parameters: [
-          {
-            name: 'streamType',
-            type: 'OBS_PROPERTY_LIST',
-            description: 'Stream Type',
-            value: 'rtmp_custom',
-          }
-        ]
+    {
+      const settings = settingsFormData['Stream'];
+      const setting = this.findSetting(settings, 'Untitled', 'streamType');
+      if (setting) {
+        if (setting.value !== 'rtmp_custom') {
+          setting.value = 'rtmp_custom';
+          this.setSettings('Stream', settings);
+        }
       }
-    ]);
+    }
   }
 
   showSettings(categoryName?: string) {
