@@ -17,9 +17,11 @@
       </NavItem>
     </NavMenu>
     <div class="settings-container">
-      <div class="section" v-if="isStreaming">
-        <p class="notice">{{ $t('settings.noticeWhileStreaming')}}</p>
-      </div>
+      <aside class="notice-section" v-if="isStreaming">
+        <p class="notice-message">
+          <i class="icon-warning"/>{{ $t('settings.noticeWhileStreaming')}}
+        </p>
+      </aside>
       <extra-settings v-if="categoryName === 'General'" />
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
@@ -55,6 +57,24 @@
 </style>
 
 <style lang="less">
+@import "../../styles/index";
+/*配信中に設定ダイアログへ表示するメッセージのstyle*/
+.notice-section {
+  padding-top: 16px;
+
+  .notice-message {
+    color: @accent;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 12px;
+  }
+
+  .icon-warning {
+    margin-right: 4px;
+  }
+}
+
 .settings-container {
   .input-container {
     flex-direction: column;
