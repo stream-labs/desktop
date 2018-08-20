@@ -63,6 +63,7 @@
 
     .chatbot__side-menu__tab__description {
       font-size: 12px;
+      line-height: 13px;
     }
   }
 }

@@ -15,7 +15,14 @@
       placeholder="Search"
     />
   </div>
-  <div class="padding--10">
+  <div v-if="!timers || timers.length === 0" class="chatbot-empty-placeholder__container">
+    <img
+      :src="require(`../../../../media/images/chatbot/chatbot-placeholder-timer--${this.nightMode ? 'night' : 'day'}.svg`)"
+      width="200"
+    >
+    <span>{{ $t('Click add timer to get started.') }}</span>
+  </div>
+  <div v-else class="padding--10">
     <table>
       <thead>
         <tr>
@@ -26,7 +33,7 @@
           <th></th>
         </tr>
       </thead>
-      <tbody v-if="timers && timers.length > 0">
+      <tbody>
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
@@ -53,11 +60,6 @@
           </td>
         </tr>
       </tbody>
-      <tbody v-else>
-        <tr>
-          <td colspan="5" class="text-align--center"> {{ $t('Click add timer to get started.') }} </td>
-        </tr>
-      </tbody>
     </table>
     <ChatbotPagination
       v-if="totalPages > 1"
@@ -74,6 +76,12 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 
 tbody tr {
   .transition;
