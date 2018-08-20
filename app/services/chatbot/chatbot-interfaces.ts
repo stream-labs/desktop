@@ -29,6 +29,10 @@ export interface IChatbotAuthResponse {
   socket_token: string;
 }
 
+export interface IChatbotErrorResponse {
+  error?: 'Duplicate' | 'Bad Request'
+}
+
 export interface IChatbotStatusResponse {
   worker: IChatbotWorkerStatus;
   clients: IChatbotClientsStatus;
@@ -213,6 +217,7 @@ export interface IChatbotModule {
   enabled: boolean;
   onToggleEnabled: Function;
   onExpand: Function;
+  comingSoon?: boolean;
 }
 
 // chat alerts
@@ -298,7 +303,6 @@ export interface IWordProtectionBlackListItem {
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Everyone' = 1,
   'Subscriber Only' = 1 << 1,
 }
 
@@ -329,7 +333,8 @@ export const ChatbotClients = [
   'Twitch'
 ]
 
-export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
+export type ChatbotSettingSlugs =
+  'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 
 // modals (inside child window)

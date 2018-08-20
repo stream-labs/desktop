@@ -17,16 +17,16 @@ import { BaseInput } from './BaseInput';
 export default class FormInput extends BaseInput<any, IInputMetadata> {
 
   @Prop()
-  type: EInputType;
+  readonly type: EInputType;
 
   @Prop()
-  value: undefined;
+  readonly value: undefined;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
   /**
    * returns a componentName based on the type

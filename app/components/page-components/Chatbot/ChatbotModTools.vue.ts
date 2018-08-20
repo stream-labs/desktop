@@ -22,7 +22,7 @@ export default class ChatbotModTools extends ChatbotBase {
   }
 
   onCloseBanner() {
-    this.chatbotCommonService.closeModBanner();
+    this.chatbotCommonService.hideModBanner();
   }
 
   get modBannerVisible() {

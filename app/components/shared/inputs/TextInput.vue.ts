@@ -6,17 +6,17 @@ import { ITextMetadata } from './index';
 export default class TextInput extends BaseInput<string, ITextMetadata> {
 
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop({ default: {} })
-  metadata: ITextMetadata;
+  readonly metadata: ITextMetadata;
 
   getValidations() {
     return {
       ...super.getValidations(),
       date_format:  this.options.dateFormat,
       max: this.options.max,
-      alpha: this.options.alpha
+      alpha_num: this.options.alphaNum
     };
   }
 }

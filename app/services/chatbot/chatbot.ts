@@ -10,6 +10,7 @@ import {
   IChatbotApiServiceState,
   IChatbotCommonServiceState,
   IChatbotAuthResponse,
+  IChatbotErrorResponse,
   IChatbotStatusResponse,
   ChatbotClients,
   ICustomCommand,
@@ -138,7 +139,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        // errors contain string response. Need to json()
+        // and return the promised error
+        return error.json()
+          .then((errJson: Promise<IChatbotErrorResponse>) =>
+            Promise.reject(errJson)
+          );
+      })
   }
 
   //
@@ -236,12 +247,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
+          IChatAlertsResponse
           | ICapsProtectionResponse
           | ISymbolProtectionResponse
           | ILinkProtectionResponse
           | IWordProtectionResponse
       ) => {
         switch (slug) {
+          case 'chat-notifications':
+            this.UPDATE_CHAT_ALERTS(
+              response as IChatAlertsResponse
+            )
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(
               response as ICapsProtectionResponse
@@ -499,8 +515,12 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     modBannerVisible: true
   };
 
-  closeModBanner() {
-    this.CLOSE_MOD_BANNER();
+  hideModBanner() {
+    this.HIDE_MOD_BANNER();
+  }
+
+  showModBanner() {
+    this.SHOW_MOD_BANNER();
   }
 
   closeChildWindow() {
@@ -528,7 +548,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotDefaultCommandWindow',
       size: {
         width: 650,
-        height: 500
+        height: 650
       }
     });
   }
@@ -608,8 +628,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   // }
 
   @mutation()
-  private CLOSE_MOD_BANNER() {
+  private HIDE_MOD_BANNER() {
     Vue.set(this.state, 'modBannerVisible', false);
+  }
+
+  @mutation()
+  private SHOW_MOD_BANNER() {
+    Vue.set(this.state, 'modBannerVisible', true);
   }
 
   @mutation()

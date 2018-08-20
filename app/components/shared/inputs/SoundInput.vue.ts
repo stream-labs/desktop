@@ -14,8 +14,8 @@ import { $t } from 'services/i18n';
 })
 export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
-  @Prop() value: string;
-  @Prop() metadata: IMediaGalleryMetadata;
+  @Prop() readonly value: string;
+  @Prop() readonly metadata: IMediaGalleryMetadata;
 
   url: string = '';
   showUrlUpload = false;
