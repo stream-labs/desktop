@@ -59,11 +59,6 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string, value: string }[] = [];
 
-  fileNameFromHref(href: string) {
-    if (!href) return null;
-    return decodeURIComponent(href.split(/[\\/]/).pop());
-  }
-
   titleFromKey(key: string) {
     return nameMap()[key];
   }

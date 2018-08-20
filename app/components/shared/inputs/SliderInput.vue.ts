@@ -12,8 +12,8 @@ import { ISliderMetadata } from './index';
 export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
   @Inject() customizationService: CustomizationService;
 
-  @Prop() value: number;
-  @Prop() metadata: ISliderMetadata;
+  @Prop() readonly value: number;
+  @Prop() readonly metadata: ISliderMetadata;
 
   usePercentages: boolean;
   interval: number;

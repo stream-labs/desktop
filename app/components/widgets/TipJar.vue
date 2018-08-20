@@ -27,7 +27,7 @@
     <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
     <form-group v-for="key in mediaGalleryInputs" :key="key" :title="titleFromKey(key)">
       <media-gallery-input
-        :metadata="{ fileName: fileNameFromHref(wData.settings.types[key].image_src), clearImage: wData.defaultImage[`${platform}_account`] }"
+        :metadata="{ clearImage: wData.defaultImage[`${platform}_account`] }"
         v-model="wData.settings.types[key].image_src"
       />
     </form-group>
@@ -37,7 +37,7 @@
       :title="`${$t('Tips over')} ${tier.minimum_amount}`"
     >
       <media-gallery-input
-        :metadata="{ fileName: fileNameFromHref(tier.image_src), clearImage: tier.clear_image }"
+        :metadata="{ clearImage: tier.clear_image }"
         v-model="tier.image_src"
       />
     </form-group>

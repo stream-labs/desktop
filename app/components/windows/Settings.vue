@@ -16,7 +16,7 @@
         {{ $t(category) }}
       </NavItem>
     </NavMenu>
-    <div class="settings-container">
+    <div class="settings-container" ref="settingsContainer">
       <extra-settings v-if="categoryName === 'General'" />
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
