@@ -5,6 +5,7 @@ import { $t } from 'services/i18n';
 
 import {
   IChatbotTimer,
+  IChatbotErrorResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -27,7 +28,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   nameMetadata: ITextMetadata = {
     required: true,
     placeholder: $t('Name of the timer'),
-    alpha: true
+    alphaNum: true
   };
   messageMetadata: ITextMetadata = {
     required: true,
@@ -69,9 +70,17 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
 
   onSave() {
     if (this.isEdit) {
-      this.chatbotApiService.updateTimer(this.timerToUpdate.id, this.newTimer);
+      this.chatbotApiService.updateTimer(this.timerToUpdate.id, this.newTimer)
+        .catch(this.onErrorHandler);
       return;
     }
-    this.chatbotApiService.createTimer(this.newTimer);
+    this.chatbotApiService.createTimer(this.newTimer)
+      .catch(this.onErrorHandler);
+  }
+
+  onErrorHandler(errorResponse: IChatbotErrorResponse) {
+    if (errorResponse.error && errorResponse.error === 'Duplicate') {
+      alert($t('This timer name is already taken. Try another name.'));
+    }
   }
 }

@@ -7,6 +7,7 @@ import { $t } from 'services/i18n';
 
 import {
   ICustomCommand,
+  IChatbotErrorResponse
 } from 'services/chatbot/chatbot-interfaces';
 
 import {
@@ -58,7 +59,9 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   };
   responseMetadata: ITextMetadata = {
     required: true,
-    placeholder: $t('The phrase that will appear after a user enters the command')
+    placeholder: $t(
+      'The phrase that will appear after a user enters the command'
+    )
   };
 
   mounted() {
@@ -110,13 +113,20 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   onSave() {
     if (this.isEdit) {
-      this.chatbotApiService.updateCustomCommand(
-        this.customCommandToUpdate.id,
-        this.newCommand
-      );
+      this.chatbotApiService
+        .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)
+        .catch(this.onErrorHandler);
       return;
     }
 
-    this.chatbotApiService.createCustomCommand(this.newCommand);
+    this.chatbotApiService
+      .createCustomCommand(this.newCommand)
+      .catch(this.onErrorHandler);
+  }
+
+  onErrorHandler(errorResponse: IChatbotErrorResponse) {
+    if (errorResponse.error && errorResponse.error === 'Duplicate') {
+      alert($t('This command is already taken. Try another command.'));
+    }
   }
 }

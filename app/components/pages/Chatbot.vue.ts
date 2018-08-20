@@ -25,6 +25,17 @@ export default class Chatbot extends Vue {
   @Inject()
   chatbotApiService: ChatbotApiService;
 
+  tabNames = [
+    {title: 'Modules', enabled: true},
+    {title: 'Commands', enabled: true},
+    {title: 'Timers', enabled: true},
+    { title: 'Mod Tools', enabled: true},
+    {title: 'Quotes', enabled: false},
+    {title: 'Queue', enabled: false},
+    {title: 'Currency', enabled: false},
+    {title: 'Poll', enabled: false},
+    {title: 'Betting', enabled: false},
+  ];
   //
   // Default State
   //
@@ -32,10 +43,14 @@ export default class Chatbot extends Vue {
     Modules: 'icon-widgets',
     Commands: 'icon-suggestions',
     Timers: 'icon-time',
-    'Mod Tools': 'icon-settings-3-1'
+    'Mod Tools': 'icon-settings-3-1',
+    Quotes: 'fas fa-quote-left',
+    Queue: 'fas fa-list-ul',
+    Currency: 'fas fa-dollar-sign',
+    Poll: 'icon-suggestions',
+    Betting: 'fas fa-money-bill-wave'
   };
 
-  tabNames = ['Modules', 'Commands', 'Timers', 'Mod Tools'];
   selectedTab = 'Modules';
   authenticated = false;
 
