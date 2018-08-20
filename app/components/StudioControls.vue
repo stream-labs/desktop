@@ -95,6 +95,7 @@
 .studio-controls__label {
   color: @text-primary;
   margin-bottom: 0;
+  font-size: 12px;
   .semibold;
 }
 

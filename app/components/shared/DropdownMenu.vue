@@ -36,10 +36,10 @@
   display: flex;
   text-align: left;
   align-items: center;
-  font-size: 13px;
+  font-size: 12px;
   .semibold;
   letter-spacing: .7px;
-  color: @text-primary;;
+  color: @text-primary;
 
   i {
     margin-left: 6px;
