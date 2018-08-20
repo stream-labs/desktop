@@ -11,7 +11,8 @@ export default class AppPlatformDeveloperSettings extends Vue {
   appPathMetadata = metadata.file({
     title: 'Unpacked App Path',
     tooltip: 'This is the path to your unpacked app.  ' +
-      'It should be a folder containing a valid manifest.json'
+      'It should be a folder containing a valid manifest.json',
+    directory: true
   });
 
   appPathValue = 'test';

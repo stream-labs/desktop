@@ -66,7 +66,8 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
 }
 
 export interface IFileMetadata extends IInputMetadata {
-  // TODO
+  filters?: Electron.FileFilter[];
+  directory?: boolean;
 }
 
 
@@ -82,7 +83,7 @@ export const metadata = {
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
-  file: (options: IInputMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
+  file: (options: IFileMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html

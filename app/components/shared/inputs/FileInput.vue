@@ -3,10 +3,9 @@
   <div class="flex">
     <input
       type="text"
-      ref="input"
+      readonly
       :value="value"
-      class="path__input"
-      @change="handleChange">
+      class="path__input">
     <button
       @click="showFileDialog"
       class="path__browse-button button button--default">
