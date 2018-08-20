@@ -3,7 +3,7 @@
     <!-- batch actions -->
     <div class="align-items--inline align-items--top text-align--right padding--10">
       <button
-        @click="onResetDefaultCommands"
+        @click="onResetDefaultCommandsHandler"
         class="chatbot__button--reset button button--default margin--10"
       >
         {{ $t('Reset Commands') }}
@@ -25,7 +25,7 @@
       <div
         class="chatbot__dropdown-header"
         :class="{'chatbot__dropdown-header--hidden': !visible[slugName]}"
-        @click="toggleVisible(slugName)"
+        @click="onToggleVisibleHandler(slugName)"
       >
         <i class="icon-down cursor--pointer"></i>
         <span>{{ $t(slugName) }}</span>
@@ -55,11 +55,11 @@
                 <ToggleInput
                   v-if="typeof command.enabled === 'boolean'"
                   :value="command.enabled"
-                  @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
+                  @input="onToggleEnableCommandHandler(slugName, commandName, !command.enabled)"
                 />
                 <i
                   class="icon-edit padding--5 cursor--pointer"
-                  @click="openCommandWindow(slugName, commandName, command)"
+                  @click="onOpenCommandWindowHandler(slugName, commandName, command)"
                 />
               </div>
             </td>

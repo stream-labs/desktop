@@ -6,7 +6,7 @@ export default class ChatbotPagination extends Vue {
   @Prop() totalPages: number;
   @Prop() currentPage: number;
 
-  emitPageChange(page: number) {
+  onEmitPageChangeHandler(page: number) {
     this.$emit('change', page);
   }
 }

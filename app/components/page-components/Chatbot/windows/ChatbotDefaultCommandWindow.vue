@@ -7,12 +7,12 @@
   <div slot="fixed">
     <div class="row">
       <div class="small-6 columns position--relative">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
           <div
-            @click="toggleLinkProtectionWindow"
+            @click="onToggleLinkProtectionWindowHandler"
             v-if="isLinkProtectionPermitCommand"
           >
             <span class="text-transform--uppercase"> {{ $t('link protection preferences') }} </span>
@@ -85,11 +85,11 @@
     </transition>
   </div>
   <div slot="controls" class="flex flex--space-between">
-    <button class="button button--default" @click="resetCommand">
+    <button class="button button--default" @click="onResetCommandHandler">
       {{ $t('Reset Command') }}
     </button>
     <div>
-      <button class="button button--default" @click="onCancel">
+      <button class="button button--default" @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button

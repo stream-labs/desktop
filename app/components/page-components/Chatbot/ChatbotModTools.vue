@@ -7,7 +7,7 @@
         Don't forget to mod streamlabs chatbot by typing <span class="mod-chat-banner__code-highlight">/mod streamlabs</span> in your chat.
       </span>
     </div>
-    <i class="icon-close cursor--pointer" @click="onCloseBanner"></i>
+    <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
   </div>
   <div class="align-items--inline">
     <ChatbotModule

@@ -117,13 +117,13 @@
     <div class="new-alert-modal__controls">
       <button
         class="button button--default"
-        @click="cancel">
+        @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button
         class="button button--action"
         :disabled="disabledSubmit || errors.items.length > 0"
-        @click="submit">
+        @click="onSubmit">
         {{ $t('Done') }}
       </button>
     </div>

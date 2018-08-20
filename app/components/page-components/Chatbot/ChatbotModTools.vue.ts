@@ -21,7 +21,7 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchWordProtection();
   }
 
-  onCloseBanner() {
+  onCloseBannerHandler() {
     this.chatbotCommonService.hideModBanner();
   }
 

@@ -41,13 +41,13 @@
   <div slot="controls">
     <button
       class="button button--default"
-      @click="onCancel">
+      @click="onCancelHandler">
       {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
-      @click="onSave"
-      :disabled="errors.items.length > 0"
+      @click="onSaveHandler"
+      :disabled="errors.items.length > 0 || !newTimer.name || !newTimer.message"
     >
       {{ $t('Save') }}
     </button>

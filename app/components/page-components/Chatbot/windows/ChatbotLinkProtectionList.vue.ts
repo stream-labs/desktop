@@ -9,8 +9,12 @@ import {
 
 @Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
-  @Prop() value: string[];
-  @Prop() title: string;
+  @Prop()
+  value: string[];
+  @Prop()
+  title: string;
+  @Prop()
+  type: 'blacklist' | 'whitelist';
 
   newListItem: string = null;
   editIndex: number = -1;
@@ -32,7 +36,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     );
   }
 
-  onAddingNewItem(editedItem?: string, index: number = -1) {
+  onAddingNewItemHandler(editedItem?: string, index: number = -1) {
     if (editedItem) {
       this.newListItem = editedItem;
     }
@@ -40,13 +44,13 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$modal.show(NEW_LINK_PROTECTION_LIST_MODAL_ID);
   }
 
-  onDeleteAlias(index: number) {
+  onDeleteAliasHandler(index: number) {
     let newListItemArray = this.value.slice(0);
     newListItemArray.splice(index, 1);
     this.$emit('input', newListItemArray);
   }
 
-  onAddNewItem() {
+  onAddNewItemHandler() {
     if (!this.newListItem) return;
 
     let newListItemArray = this.value.slice(0);
@@ -60,10 +64,10 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$emit('input', newListItemArray);
     this.newListItem = null;
     this.editIndex = -1;
-    this.onCancelNewItemModal();
+    this.onCancelNewItemModalHandler();
   }
 
-  onCancelNewItemModal() {
+  onCancelNewItemModalHandler() {
     this.$modal.hide(NEW_LINK_PROTECTION_LIST_MODAL_ID);
   }
 }

@@ -1,6 +1,6 @@
 <template>
 <div class="height--100">
-  <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
+  <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     <div slot='custom'>
       <transition name="fade" mode="out-in" appear>
         <ChatbotCustomCommands />

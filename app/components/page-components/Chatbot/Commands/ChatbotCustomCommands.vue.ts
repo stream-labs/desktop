@@ -40,15 +40,19 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService.fetchCustomCommands(page, query);
   }
 
-  openCommandWindow(command?: ICustomCommand) {
+  onOpenCommandWindowHandler(command?: ICustomCommand) {
     this.chatbotCommonService.openCustomCommandWindow(command);
   }
 
-  deleteCommand(command: ICustomCommand) {
+  onDeleteCommandHandler(command: ICustomCommand) {
     this.chatbotApiService.deleteCustomCommand(command.id);
   }
 
-  toggleEnableCommand(commandId: string, index: number, isEnabled: boolean) {
+  onToggleEnableCommandHandler(
+    commandId: string,
+    index: number,
+    isEnabled: boolean
+  ) {
     const commandToBeUpdated = this.commands[index];
 
     this.chatbotApiService.updateCustomCommand(commandId, {
