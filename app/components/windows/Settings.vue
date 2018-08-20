@@ -6,7 +6,7 @@
   class="modal-layout--w-side-menu">
 
   <div slot="content" class="settings">
-    <NavMenu v-model="categoryName" class="side-menu">
+    <NavMenu v-model="categoryName">
       <NavItem
         v-for="category in categoryNames"
         :key="category"

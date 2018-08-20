@@ -43,8 +43,8 @@
   }
 
   .mod-chat-banner__code-highlight {
-    padding: 4px 7px;
-    margin: 0 5px;
+    padding: 4px @spacing;
+    margin: 0 4px;
     .radius();
     .weight(@medium);
     background-color: @yellow-med-opac;

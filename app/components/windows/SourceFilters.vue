@@ -8,7 +8,7 @@
     <display slot="fixed" :sourceId="sourceId" />
 
     <div slot="content" class="modal--side-nav">
-      <NavMenu v-model="selectedFilterName" class="side-menu">
+      <NavMenu v-model="selectedFilterName">
         <div class="controls">
           <i
             class="icon-add icon-button"

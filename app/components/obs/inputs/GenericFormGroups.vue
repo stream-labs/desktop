@@ -41,17 +41,22 @@
 
 .expand-enter-active,
 .expand-leave-active {
-  transition: all .75s ease;
+  transition: all .5s ease;
 }
 
 .expand-enter-to {
-  max-height: 2000px;
+  max-height: 1000px;
   opacity: 1;
+}
+
+.expand-leave,
+.expand-leave-to {
+  transition: all .275s ease;
 }
 
 .expand-leave {
   opacity: 1;
-  max-height: 2000px;
+  max-height: 1000px;
 }
 
 .expand-leave-to {

@@ -20,9 +20,10 @@
   border-left: 1px solid transparent;
   padding-left: 46px;
   font-size: 14px;
-  margin-bottom: 8px;
+  .margin-bottom();
+  .text-transform();
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
 
   &.active {

@@ -46,6 +46,13 @@
     cursor: pointer !important;
     background: @day-dropdown-bg;
     border-color: @day-dropdown-border;
+
+    &:focus,
+    &:visited,
+    &:active {
+      background: @day-dropdown-bg;
+      border-color: @day-dropdown-border;
+    }
   }
 
 
@@ -60,11 +67,12 @@
   }
 
   .colorpicker-menu {
-    top: 6px;
+    top: -2px;
     z-index: 10;
-    background: @day-dropdown-bg !important;
-    .radius() !important;
-    border: 1px solid @day-dropdown-border !important;
+    border-bottom-right-radius: @radius;
+    border-bottom-left-radius: @radius;
+    border: 1px solid @day-dropdown-border;
+    background: @day-dropdown-bg;
     box-shadow: none !important;
   }
 }

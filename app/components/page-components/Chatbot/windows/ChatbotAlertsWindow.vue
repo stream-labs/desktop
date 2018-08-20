@@ -101,16 +101,14 @@
 @import "../../../../styles/index";
 
 .chatbot-alerts-window__container {
-  margin: -20px;
+  margin: -16px;
   width: calc(~"100% + 40px") !important;
 
   .chatbot-alerts-window__sidebar {
     width: 250px;
-    .padding--10();
     border-right: 1px solid @day-border;
 
     .chatbot-alerts-window__sidebar__tab {
-      .margin();
       .text-transform();
       padding-left: 20px;
 
@@ -126,7 +124,7 @@
   .chatbot-alerts-window__content {
     width: 100%;
     .overflow--auto();
-    .padding--20();
+    .padding(2);
 
     .chatbot-alerts-window__actions {
       .align-items--inline();
@@ -169,10 +167,12 @@ tbody tr {
 }
 
 .night-theme {
+
   tbody tr {
     border: 2px solid transparent;
+    .transition;
     .cursor--pointer;
-    .transition();
+    .transition;
 
     td {
       color: white;

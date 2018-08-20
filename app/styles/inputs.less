@@ -131,11 +131,17 @@ textarea {
   }
 }
 
-.multiselect__input,
-.multiselect__single {
-  &:hover, &:focus {
-    background: @day-input-bg;
-    border-color: @day-focus-border;
+.multiselect {
+  .multiselect__input,
+  .multiselect__single {
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+
+    &:hover,
+    &:focus {
+      background: @day-dropdown-bg;
+      border-color: @day-dropdown-border;
+    }
   }
 }
 
@@ -146,9 +152,8 @@ textarea {
 .multiselect__content {
   border-bottom-left-radius: @radius;
   border-bottom-right-radius: @radius;
-  border: 0;
   top: 30px;
-  background: @day-input-bg;
+  background: @day-dropdown-bg;
   list-style-type: none;
   margin: 0;
   width: 100%;
@@ -195,7 +200,7 @@ textarea {
 
 .multiselect__option--selected {
   background: @light-2;
-  color: @white;
+  color: @day-title;
 
   &.multiselect__option--highlight {
     background: @light-2;
@@ -242,10 +247,17 @@ textarea {
     }
   }
 
-  .multiselect__tags {
-    .multiselect__input {
-      background-color: @night-dropdown-bg;
+  .multiselect {
+    .multiselect__input,
+    .multiselect__single {
+      background: @night-dropdown-bg;
       border-color: @night-dropdown-border;
+
+      &:hover,
+      &:focus {
+        background: @night-dropdown-bg;
+        border-color: @night-dropdown-border;
+      }
     }
   }
 

@@ -38,13 +38,13 @@
     background: @day-dropdown-bg;
     border-color: @day-dropdown-border;
 
-    &:focus {
+    &:focus,
+    &:visited,
+    &:active {
       background: @day-dropdown-bg;
       border-color: @day-dropdown-border;
     }
   }
-
-
 
   .colorpicker__text {
     position: relative;
@@ -62,9 +62,10 @@
   }
 
   .colorpicker-menu {
-    top: 6px;
+    top: -2px;
     z-index: 10;
-    .radius() !important;
+    border-bottom-right-radius: @radius;
+    border-bottom-left-radius: @radius;
     background: @day-dropdown-bg;
     border-color: @day-dropdown-border;
     box-shadow: none !important;
@@ -97,10 +98,17 @@
 
 .night-theme {
   .colorpicker {
-    .colorpicker__input {
+  .colorpicker__input {
+    background: @night-dropdown-bg;
+    border-color: @night-dropdown-border;
+
+    &:focus,
+    &:visited,
+    &:active {
       background: @night-dropdown-bg;
       border-color: @night-dropdown-border;
     }
+  }
 
     .colorpicker-menu {
       background: @night-dropdown-bg!important;

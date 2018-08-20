@@ -33,7 +33,7 @@
 
 <script lang="ts" src="./ModalLayout.vue.ts"></script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../styles/index";
 
 .modal-layout {
