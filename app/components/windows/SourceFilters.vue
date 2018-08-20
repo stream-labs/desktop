@@ -60,7 +60,7 @@
 @import "../../styles/index";
 
 .modal-container--side-nav {
-  padding: 20px;
+  .padding(2);
 }
 
 .modal--side-nav > .sl-vue-tree-toggle {
@@ -68,7 +68,6 @@
 }
 
 .controls {
-  margin-left: 20px;
   .margin-bottom(2);
 
   .icon-button {

@@ -36,49 +36,58 @@
 .colorpicker {
   position: relative;
   width: 220px;
-}
 
-.colorpicker__text {
-  position: relative;
-  cursor: pointer;
-}
+  .colorpicker__text {
+    position: relative;
+    cursor: pointer;
+  }
 
-.colorpicker__input {
-  cursor: pointer !important;
-}
+  .colorpicker__input {
+    cursor: pointer !important;
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+  }
 
-.colorpicker__swatch {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  border-radius: 2px;
-  border: 1px solid #ccc;
-  width: 20px;
-  height: 20px;
-}
 
-.colorpicker-menu {
-  top: 6px;
-  z-index: 10;
-  background: @day-input-bg !important;
-  .radius !important;
-  border: 1px solid @day-input-border !important;
-  box-shadow: none !important;
+  .colorpicker__swatch {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    width: 20px;
+    height: 20px;
+  }
+
+  .colorpicker-menu {
+    top: 6px;
+    z-index: 10;
+    background: @day-dropdown-bg !important;
+    .radius() !important;
+    border: 1px solid @day-dropdown-border !important;
+    box-shadow: none !important;
+  }
 }
 
 .night-theme {
-  .colorpicker-menu {
-    background: @night-secondary !important;
-    border-color: @night-secondary !important;
-  }
+  .colorpicker {
+    .colorpicker-menu {
+      background: @night-dropdown-bg !important;
+      border-color: @night-dropdown-border !important;
+    }
 
-  .vue-color__editable-input__label {
-    color: @grey !important;
-  }
+    .colorpicker__input {
+      background: @night-dropdown-bg;
+      border-color: @night-dropdown-border;
+    }
 
-  .vue-color__sketch__presets {
-    border-color: @night-border;
-  }
+    .vue-color__editable-input__label {
+      color: @grey !important;
+    }
 
+    .vue-color__sketch__presets {
+      border-color: @night-border;
+    }
+  }
 }
 </style>

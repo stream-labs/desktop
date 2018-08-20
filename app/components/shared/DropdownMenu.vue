@@ -33,7 +33,7 @@
   display: flex;
   align-items: center;
   text-transform: capitalize;
-  font-size: 16px;
+  font-size: 14px;
   .weight(@medium);
   color: @day-title;
 

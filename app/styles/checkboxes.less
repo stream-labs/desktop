@@ -9,6 +9,7 @@
   min-height: 18px;
   line-height: 18px;
   min-width: 18px;
+  .margin-bottom();
 
   label {
     margin: 0;
@@ -96,6 +97,16 @@
     border-radius: 20px;
     left: 4px;
     top: 4px;
+  }
+}
+
+.slots {
+  .input-wrapper {
+    &:last-child {
+      .checkbox {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 

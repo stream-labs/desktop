@@ -2,7 +2,8 @@
 <modal-layout
   :title="$t('Settings')"
   :show-cancel="false"
-  :done-handler="done">
+  :done-handler="done"
+  class="modal-layout--w-side-menu">
 
   <div slot="content" class="settings">
     <NavMenu v-model="categoryName" class="side-menu">
@@ -43,8 +44,9 @@
   display: flex;
   align-content: stretch;
   align-items: stretch;
-  height: 100%;
+  flex: 1;
   .transition();
+  margin: -16px;
 }
 
 .settings-container {

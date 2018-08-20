@@ -91,6 +91,11 @@ textarea {
   min-height: 34px;
 }
 
+.multiselect__input {
+  background: @day-dropdown-bg;
+  border-color: @day-dropdown-border;
+}
+
 .multiselect__select {
   z-index: 10;
   padding: 0;
@@ -100,6 +105,7 @@ textarea {
   top: 0px;
   line-height: 32px;
   position: relative;
+  min-width: 220px;
 
   &:before {
     font-family: "Font Awesome 5 Free";
@@ -140,8 +146,8 @@ textarea {
 .multiselect__content {
   border-bottom-left-radius: @radius;
   border-bottom-right-radius: @radius;
-  border: 1px solid @day-focus-border;
-  top: 35px;
+  border: 0;
+  top: 30px;
   background: @day-input-bg;
   list-style-type: none;
   margin: 0;
@@ -150,6 +156,7 @@ textarea {
   position: absolute;
   max-height: 300px;
   overflow-y: auto;
+  .padding-top();
 }
 
 .multiselect__element {
@@ -160,14 +167,17 @@ textarea {
 }
 
 .multiselect__option {
-  padding: 0px @spacing;
-  height: 34px;
+  padding: 4px @spacing;
+  height: auto;
   min-height: 0;
-  line-height: 34px;
-  .transition;
-  display: block;
+  .transition();
+  display: flex;
   cursor: pointer;
   color: @day-paragraph;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
   &:after {
     display: none;
@@ -175,7 +185,7 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @day-hover;
+  background: transparent;
   color: @day-title;
 
   &:after {
@@ -184,11 +194,11 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @teal;
+  background: @light-2;
   color: @white;
 
   &.multiselect__option--highlight {
-    background: @teal;
+    background: @light-2;
 
     &:after {
       display: none;
@@ -232,9 +242,15 @@ textarea {
     }
   }
 
+  .multiselect__tags {
+    .multiselect__input {
+      background-color: @night-dropdown-bg;
+      border-color: @night-dropdown-border;
+    }
+  }
+
   .multiselect__content {
-    background: @night-input-bg;
-    border-color: @night-input-border;
+    background: @night-dropdown-bg;
     color: @white;
   }
 
@@ -244,10 +260,15 @@ textarea {
 
   .multiselect__option--selected {
     color: @white;
+    background: @night-hover;
+
+    &.multiselect__option--highlight {
+      background: @night-hover;
+    }
   }
 
   .multiselect__option--highlight {
-    background: @night-hover;
+    background: transparent;
     color: @night-title;
   }
 }

@@ -222,12 +222,12 @@ a,
 
 .slide-open__menu {
   position: absolute;
-  background: @day-primary;
+  background: @day-bg;
   right: calc(~'100% + 20px');
-  bottom: -10px;
-  padding: 0px 12px;
+  bottom: -8px;
   display: flex;
   z-index: 10;
+  .padding-h-sides();
   .radius();
   .day-shadow();
 }
@@ -243,7 +243,7 @@ a,
 
 .tab-button {
   border-bottom: 1px solid transparent;
-  height: 54px;
+  height: 48px;
   margin-right: 20px;
   .link--capitalize();
 
@@ -253,7 +253,6 @@ a,
 
   .fa,
   i {
-    margin-right: 8px;
     font-size: 15px;
     vertical-align: middle;
     color: @icon;

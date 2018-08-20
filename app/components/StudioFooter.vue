@@ -46,11 +46,11 @@
   flex-direction: row;
   align-items: center;
   position: relative;
-  padding: 10px 20px;
+  .padding-h-sides(2);
+  .padding-v-sides();
   background-color: @day-section;
   max-width: none;
   flex: 0 0 auto;
-  border-top: 1px solid transparent;
 }
 
 .nav-right {
@@ -59,7 +59,7 @@
 }
 
 .nav-item {
-  margin-left: 20px;
+  .margin-left(2);
 
   @media(max-width: 1200px) {
     font-size: 12px;
@@ -146,8 +146,7 @@
 
 .night-theme {
   .footer {
-    background-color: @night-primary;
-    border-color: @night-border;
+    background-color: @night-section;
   }
 
   .error-wrapper {

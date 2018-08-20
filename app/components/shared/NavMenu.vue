@@ -13,6 +13,7 @@
   flex: 0 0 220px;
   display: flex;
   flex-direction: column;
-  padding-top: 16px;
+  .padding-top(2);
+  margin-left: @0;
 }
 </style>
