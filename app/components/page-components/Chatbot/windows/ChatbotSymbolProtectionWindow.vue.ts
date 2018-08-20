@@ -18,15 +18,15 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
 
   selectedTab: string = 'general';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
-  onReset() {
-  this.onResetSlug('symbol-protection');
+  onResetHandler() {
+    this.onResetSlugHandler('symbol-protection');
   }
 
-  onSave() {
+  onSaveHandler() {
     this.chatbotApiService
       .updateSymbolProtection({
         enabled: this.symbolProtectionResponse.enabled,

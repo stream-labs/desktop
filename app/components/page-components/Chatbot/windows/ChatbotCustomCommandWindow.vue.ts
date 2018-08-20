@@ -103,15 +103,15 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return timerMetadata;
   }
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
-  onCancel() {
+  onCancelHandler() {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onSave() {
+  onSaveHandler() {
     if (this.isEdit) {
       this.chatbotApiService
         .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)

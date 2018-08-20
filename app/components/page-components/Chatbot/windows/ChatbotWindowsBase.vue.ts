@@ -16,7 +16,7 @@ Vue.use(VModal);
 export default class ChatbotWindowsBase extends ChatbotBase {
 
   // switching between 2 child windows, link protection and default command(to edit link protection command)
-  toggleLinkProtectionWindow() {
+  onToggleLinkProtectionWindowHandler() {
     const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions().componentName;
 
     switch (currentWindow) {

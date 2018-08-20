@@ -15,7 +15,8 @@ import {
 
 @Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
-  @Prop() value: IWordProtectionBlackListItem[];
+  @Prop()
+  value: IWordProtectionBlackListItem[];
 
   newListItem: IWordProtectionBlackListItem = {
     text: null,
@@ -34,7 +35,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
         duration: INumberMetadata;
         type: IListMetadata<string>;
       };
-      is_regex: IInputMetadata
+      is_regex: IInputMetadata;
     } = {
       text: {
         required: true,
@@ -71,7 +72,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     );
   }
 
-  onAddingNewItem(
+  onAddingNewItemHandler(
     editedItem?: IWordProtectionBlackListItem,
     index: number = -1
   ) {
@@ -82,13 +83,13 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$modal.show(NEW_WORD_PROTECTION_LIST_MODAL_ID);
   }
 
-  onDeleteAlias(index: number) {
+  onDeleteAliasHandler(index: number) {
     let newListItemArray = this.value.slice(0);
     newListItemArray.splice(index, 1);
     this.$emit('input', newListItemArray);
   }
 
-  onAddNewItem() {
+  onAddNewItemHandler() {
     if (!this.newListItem.text) return;
 
     let newListItemArray = this.value.slice(0);
@@ -109,10 +110,10 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
       }
     };
     this.editIndex = -1;
-    this.onCancelNewItemModal();
+    this.onCancelNewItemModalHandler();
   }
 
-  onCancelNewItemModal() {
+  onCancelNewItemModalHandler() {
     this.$modal.hide(NEW_WORD_PROTECTION_LIST_MODAL_ID);
   }
 }
