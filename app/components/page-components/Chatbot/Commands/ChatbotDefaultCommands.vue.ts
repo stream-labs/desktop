@@ -1,7 +1,7 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
 import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
-
+import { $t } from 'services/i18n';
 
 @Component({})
 export default class ChatbotDefaultCommands extends ChatbotBase {
@@ -41,7 +41,9 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   onResetDefaultCommandsHandler() {
-    this.chatbotApiService.resetDefaultCommands();
+    if (confirm($t('Are you sure you want to reset default commands?'))) {
+      this.chatbotApiService.resetDefaultCommands();
+    }
   }
 
   onToggleEnableCommandHandler(

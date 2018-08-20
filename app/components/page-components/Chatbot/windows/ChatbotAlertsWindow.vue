@@ -14,7 +14,7 @@
           class="chatbot-alerts-window__sidebar__tab"
         >
           <div class="chatbot-alerts-window__sidebar__tab__content">
-            <span>{{ $t(alertTypeName) }}</span>
+            <span>{{ $t(alertTypeFormattedName(alertTypeName)) }}</span>
             <ToggleInput
               :value="isEnabled(alertTypeName)"
               @input="(enabled, event) => {

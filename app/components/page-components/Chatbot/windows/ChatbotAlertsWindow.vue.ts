@@ -41,6 +41,11 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     return [];
   }
 
+  alertTypeFormattedName(type: ChatbotAlertTypes) {
+    if (type === 'tip') return 'donation';
+    return type;
+  };
+
   isEnabled(type: ChatbotAlertTypes) {
     return this.alertTypes[type].enabled;
   }
@@ -71,7 +76,13 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   onResetHandler() {
-    this.chatbotApiService.resetSettings('chat-notifications');
+    if (
+      confirm(
+        $t('Are you sure you want to reset chatbot notifications preferences?')
+      )
+    ) {
+      this.chatbotApiService.resetSettings('chat-notifications');
+    }
   }
 
   // filters
