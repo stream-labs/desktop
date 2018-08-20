@@ -15,6 +15,7 @@ export enum EInputType {
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
   code = 'code',
+  file = 'file'
 }
 
 /**
@@ -64,6 +65,10 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
   filter?: 'audio' | 'image';
 }
 
+export interface IFileMetadata extends IInputMetadata {
+  // TODO
+}
+
 
 // a helper for creating metadata
 export const metadata = {
@@ -77,6 +82,7 @@ export const metadata = {
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
+  file: (options: IInputMetadata) => ({ type: EInputType.file, ...options } as IFileMetadata),
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html

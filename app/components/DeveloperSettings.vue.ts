@@ -5,9 +5,14 @@ import GenericFormGroups from './obs/inputs/GenericFormGroups.vue';
 import ObsTextInput from './obs/inputs/ObsTextInput.vue';
 import { ITcpServerServiceApi, ITcpServersSettings } from 'services/tcp-server';
 import { ISettingsSubCategory } from 'services/settings';
+import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
 
 @Component({
-  components: { GenericFormGroups, ObsTextInput }
+  components: {
+    GenericFormGroups,
+    ObsTextInput,
+    AppPlatformDeveloperSettings
+  }
 })
 export default class DeveloperSettings extends Vue {
 
