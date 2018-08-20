@@ -70,6 +70,10 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
+  onReset() {
+    this.chatbotApiService.resetSettings('chat-notifications');
+  }
+
   // filters
   formatNumber(value: number, dp = 0) {
     if (isNaN(Number(value))) {

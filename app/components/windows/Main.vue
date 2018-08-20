@@ -45,6 +45,7 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  width: 72%;
 }
 
 .main-spacer {
