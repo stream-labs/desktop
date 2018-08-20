@@ -13,7 +13,7 @@
     <div class="new-alert-modal__body">
       <div v-if="isFollower">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Message')"
             type="text"
             v-model="newAlert.follow.newMessage.message"
@@ -23,25 +23,25 @@
       </div>
       <div v-if="isSubscription">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Subscription Tier')"
             type="list"
             v-model="newAlert.sub.newMessage.tier"
             :metadata="metadata.sub.newMessage.tier"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Subscription Months')"
             type="number"
             v-model="newAlert.sub.newMessage.amount"
             :metadata="metadata.sub.newMessage.amount"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Subscription Message')"
             type="textArea"
             v-model="newAlert.sub.newMessage.message"
             :metadata="metadata.sub.newMessage.message"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Is Gifted')"
             type="list"
             v-model="newAlert.sub.newMessage.is_gifted"
@@ -51,13 +51,13 @@
       </div>
       <div v-if="isDonation">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Donation Amount')"
             type='number'
             v-model="newAlert.tip.newMessage.amount"
             :metadata="metadata.tip.newMessage.amount"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Donation Message')"
             type='textArea'
             v-model="newAlert.tip.newMessage.message"
@@ -67,13 +67,13 @@
       </div>
       <div v-if="isHost">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Minimum Viewers')"
             type='number'
             v-model="newAlert.host.newMessage.amount"
             :metadata="metadata.host.newMessage.amount"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Host Message')"
             type='textArea'
             v-model="newAlert.host.newMessage.message"
@@ -83,13 +83,13 @@
       </div>
       <div v-if="isRaid">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Raider Amount')"
             type='number'
             v-model="newAlert.raid.newMessage.amount"
             :metadata="metadata.raid.newMessage.amount"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Raider Message')"
             type='textArea'
             v-model="newAlert.raid.newMessage.message"
@@ -99,13 +99,13 @@
       </div>
       <div v-if="isBit">
         <div>
-          <FormWrapper
+          <VFormGroup
             :title="$t('Minimum Bits')"
             type='number'
             v-model="newAlert.bits.newMessage.amount"
             :metadata="metadata.bits.newMessage.amount"
           />
-          <FormWrapper
+          <VFormGroup
             :title="$t('Bit Donator Message')"
             type='textArea'
             v-model="newAlert.bits.newMessage.message"

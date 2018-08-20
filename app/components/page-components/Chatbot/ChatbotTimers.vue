@@ -107,10 +107,9 @@ tbody tr {
   button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &:first-child {
+      margin-bottom: 10px;
     }
   }
 

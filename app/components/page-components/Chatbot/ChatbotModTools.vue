@@ -29,8 +29,8 @@
   .radius();
   .padding();
   text-align: center;
-  background-color: @yellow-light-opac;
-  border: @yellow;
+  background-color: @info-light;
+  color: @info-dark;
 
   .icon-close {
     .padding--5;
@@ -52,9 +52,4 @@
   }
 }
 
-.night-theme {
-  .mod-chat-banner {
-    color: white;
-  }
-}
 </style>

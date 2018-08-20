@@ -24,8 +24,8 @@
   padding: 5px;
   margin: 0 2px;
   position: relative;
-  width: 44px;
-  height: 22px;
+  width: 40px;
+  height: 18px;
   .cursor--pointer();
 }
 .toggleinput__track {
@@ -39,9 +39,8 @@
 .toggleinput__handle {
   .transition();
   position: absolute;
-  z-index: 2;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   top: 0;
   left: 0;
@@ -56,7 +55,7 @@
 
 .toggleinput__container--active {
   .toggleinput__handle {
-    transform: translateX(22px);
+    transform: translateX(20px);
   }
 
   .toggleinput__track {

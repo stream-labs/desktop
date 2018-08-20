@@ -78,7 +78,13 @@
       :selectedType="selectedType"
     />
   </div>
-  <div slot="controls">
+  <div slot="controls" class="flex flex--space-between">
+    <button
+      class="button button--default"
+      @click="onReset"
+    >
+      {{ $t('RESET') }}
+    </button>
     <button
       class="button button--default"
       @click="onDone"
@@ -101,7 +107,6 @@
   .chatbot-alerts-window__sidebar {
     width: 250px;
     .padding--10();
-    background: @day-secondary;
     border-right: 1px solid @day-border;
 
     .chatbot-alerts-window__sidebar__tab {
@@ -134,15 +139,10 @@
   button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &:first-child {
+      margin-bottom: 10px;
     }
-  }
-
-  .icon-more {
-    font-size: 15px;
   }
 }
 
@@ -160,52 +160,21 @@ tbody tr {
     color: black;
   }
 
-  &:hover {
-    td {
-      color: black;
-    }
-  }
-
   td:last-child {
     width: 100px;
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
 }
 
 .night-theme {
-  .chatbot-alerts-window__sidebar {
-    border-color: @night-secondary;
-    background-color: @night-secondary;
-  }
-
   tbody tr {
     border: 2px solid transparent;
-    .transition;
     .cursor--pointer;
-    .transition;
+    .transition();
 
     td {
-      color: white;
-    }
-
-    &:hover {
-      td {
-        color: white;
-      }
-    }
-
-    td:last-child {
       color: white;
     }
   }
@@ -214,6 +183,10 @@ tbody tr {
   }
   tbody tr:nth-child(even) {
     background-color: @navy;
+  }
+
+  .chatbot-alerts-window__sidebar {
+    border-right: 1px solid @night-border;
   }
 }
 
