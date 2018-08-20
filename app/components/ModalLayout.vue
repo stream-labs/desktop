@@ -41,6 +41,7 @@
   display: flex;
   flex-direction: column;
   color: @day-paragraph;
+  background-color: @white;
 }
 
 .modal-layout--w-side-menu {
