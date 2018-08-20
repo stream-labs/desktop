@@ -266,11 +266,11 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return metadata;
   }
 
-  onCancel() {
+  onCancelHandler() {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onResetSlug(slug: ChatbotSettingSlugs) {
+  onResetSlugHandler(slug: ChatbotSettingSlugs) {
     this.chatbotApiService.resetSettings(slug)
       .then((response: (
         ICapsProtectionResponse |

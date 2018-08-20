@@ -3,7 +3,7 @@
     <!-- batch actions -->
     <div class="flex flex--space-between padding--10">
       <button
-        @click="openCommandWindow"
+        @click="onOpenCommandWindowHandler"
         class="button button--action margin--10"
       >
         {{ $t('Add Command') }}
@@ -21,7 +21,7 @@
       <img
         :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-command--${this.nightMode ? 'night' : 'day'}.svg`)"
         width="200"
-      >
+      />
       <span>{{ $t('Click add command to get started.') }}</span>
     </div>
     <div v-else class="padding--10">
@@ -50,15 +50,15 @@
               <div class="align-items--inline">
                 <ToggleInput
                   :value="command.enabled"
-                  @input="toggleEnableCommand(command.id, index, !command.enabled)"
+                  @input="onToggleEnableCommandHandler(command.id, index, !command.enabled)"
                 />
                 <DropdownMenu
                   :placement="'bottom-end'"
                   :icon="'icon-more'"
                 >
                   <div class="chatbot-custom-commands__command-actions__container">
-                    <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                    <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                  <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                   </div>
                 </DropdownMenu>
               </div>

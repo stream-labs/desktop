@@ -19,7 +19,7 @@
               :value="isEnabled(alertTypeName)"
               @input="(enabled, event) => {
                 event.stopPropagation();
-                toggleEnableAlert(alertTypeName);
+                onToggleEnableAlertHandler(alertTypeName);
               }"
             />
           </div>
@@ -30,7 +30,7 @@
       <div class="chatbot-alerts-window__actions">
         <button
           class="button button--action text-transform--capitalize"
-          @click="showNewChatAlertWindow"
+          @click="onShowNewChatAlertWindowHandler"
         >
           {{ $t('add alert') }}
         </button>
@@ -67,8 +67,8 @@
                 class="chatbot-alerts__alert-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="onEdit(message, index)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="onDelete(index)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                <button @click="onEditHandler(message, index)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="onDeleteHandler(index)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </td>
           </tr>
@@ -82,13 +82,13 @@
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onReset"
+      @click="onResetHandler"
     >
       {{ $t('RESET') }}
     </button>
     <button
       class="button button--default"
-      @click="onDone"
+      @click="onDoneHandler"
     >
       {{ $t('DONE') }}
     </button>

@@ -7,7 +7,7 @@
         </span>
         <ToggleInput
           :value="globallyEnabled"
-          @input="toggleEnableChatbot"
+          @input="onToggleEnableChatbotHandler"
         />
       </div>
       <NavMenu v-model="selectedTab" class="side-menu">

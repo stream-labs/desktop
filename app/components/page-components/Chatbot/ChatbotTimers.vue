@@ -3,7 +3,7 @@
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <button
-      @click="openTimerWindow"
+      @click="onOpenTimerWindowHandler"
       class="button button--action margin--10"
     >
       {{ $t('Add Timer') }}
@@ -19,7 +19,7 @@
     <img
       :src="require(`../../../../media/images/chatbot/chatbot-placeholder-timer--${this.nightMode ? 'night' : 'day'}.svg`)"
       width="200"
-    >
+    />
     <span>{{ $t('Click add timer to get started.') }}</span>
   </div>
   <div v-else class="padding--10">
@@ -46,15 +46,15 @@
             <div class="align-items--inline">
               <ToggleInput
                 :value="timer.enabled"
-                @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
+                @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
               />
               <DropdownMenu
                 :placement="'bottom-end'"
                 class="chatbot-timers__timer-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="openTimerWindow(timer)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="deleteTimer(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                <button @click="onOpenTimerWindowHandler(timer)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="onDeleteTimerHandler(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </div>
           </td>

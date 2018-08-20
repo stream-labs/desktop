@@ -40,11 +40,15 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService.fetchTimers(page, query);
   }
 
-  openTimerWindow(timer?: IChatbotTimer) {
+  onOpenTimerWindowHandler(timer?: IChatbotTimer) {
     this.chatbotCommonService.openTimerWindow(timer);
   }
 
-  toggleEnableTimer(timerId: string, index: number, isEnabled: boolean) {
+  onToggleEnableTimerHandler(
+    timerId: string,
+    index: number,
+    isEnabled: boolean
+  ) {
     const timerToBeUpdated = this.timers[index];
 
     this.chatbotApiService.updateTimer(timerId, {
@@ -53,7 +57,7 @@ export default class ChatbotTimers extends ChatbotBase {
     });
   }
 
-  deleteTimer(timer?: IChatbotTimer) {
+  onDeleteTimerHandler(timer?: IChatbotTimer) {
     this.chatbotApiService.deleteTimer(timer.id);
   }
 }
