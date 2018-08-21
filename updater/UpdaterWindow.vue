@@ -1,24 +1,25 @@
 <template>
 <div class="UpdaterWindow">
-  <i18n :path="`${currentState}.message`">
+  <i18n :path="`${currentState}.message`" class="message" v-bind:class="{ error: isError }">
     <br place="br" />
     <span place="version">{{ version }}</span>
   </i18n>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="icon-spin"><path d="M59.077.648V11.725a53.139,53.139,0,0,0-33.231,90l13.385-12a35.278,35.278,0,0,1,19.846-60V40.033L90.615,20.34Zm43.077,26.923-13.231,12a35.277,35.277,0,0,1-20,59.846V89.263L37.385,108.956l31.538,19.692V117.571a53.139,53.139,0,0,0,33.231-90Z"/></svg>
-  <div v-if="isDownloading && percentComplete !== null" class="UpdaterWindow-progressBarContainer">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="icon-spin" v-if="!isError"><path d="M59.077.648V11.725a53.139,53.139,0,0,0-33.231,90l13.385-12a35.278,35.278,0,0,1,19.846-60V40.033L90.615,20.34Zm43.077,26.923-13.231,12a35.277,35.277,0,0,1-20,59.846V89.263L37.385,108.956l31.538,19.692V117.571a53.139,53.139,0,0,0,33.231-90Z"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="icon-warning" v-if="isError"><path d="M126.508,104.516,69.747,18.25a6.576,6.576,0,0,0-9.88-1.7,7.57,7.57,0,0,0-1.512,1.7L1.392,104.742a8.817,8.817,0,0,0,1.466,11.39A6.74,6.74,0,0,0,7.1,117.749l113.724-.236c3.994-.063,7.186-3.753,7.129-8.241A8.8,8.8,0,0,0,126.508,104.516ZM60.824,36.144h6.254A4.825,4.825,0,0,1,71.9,40.968V80.387a4.825,4.825,0,0,1-4.825,4.825H60.824A4.825,4.825,0,0,1,56,80.387V40.968A4.825,4.825,0,0,1,60.824,36.144ZM71.9,103.791a4.825,4.825,0,0,1-4.825,4.825H60.824A4.825,4.825,0,0,1,56,103.791V96.78a4.825,4.825,0,0,1,4.825-4.825h6.254A4.825,4.825,0,0,1,71.9,96.78Z"/></svg>
+  <div v-if="isDownloading && percentComplete !== null" class="progressBarContainer">
     <div
-      class="UpdaterWindow-progressBar"
+      class="progressBar"
       :style="{ width: percentComplete + '%' }"/>
-    <div class="UpdaterWindow-progressPercent">
+    <div class="progressPercent">
       {{ percentComplete }}%
     </div>
   </div>
-  <div class="UpdaterWindow-issues" v-if="isInstalling || isError">
+  <div class="issues" v-if="isInstalling || isError">
     <i18n :path="`${currentState}.description`">
       <br place="br" />
-      <span class="UpdaterWindow-link" @click="download" place="linkText">
+      <a class="link" @click="download" place="linkText">
         {{ $t(`${currentState}.linkText`) }}
-      </span>
+      </a>
     </i18n>
   </div>
 </div>
@@ -77,67 +78,3 @@ export default {
   }
 };
 </script>
-
-<style lang="less" scoped>
-.UpdaterWindow {
-  height: 100%;
-  padding: 24px;
-  background-color: #2F3340;
-  color: #9eeaf9;
-  font-size: 18px;
-  text-align: center;
-  -webkit-app-region: drag;
-  p {
-    white-space: pre-wrap;
-    color: #9eeaf9;
-  }
-}
-.UpdaterWindow-progressBarContainer {
-  position: relative;
-  margin-top: 36px;
-  background-color: #050e18;
-  border-radius: 3px;
-  overflow: hidden;
-}
-.UpdaterWindow-progressBar {
-  height: 24px;
-  background-color: #ff6952;
-}
-.UpdaterWindow-progressPercent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  color: #fff;
-  text-align: center;
-  line-height: 24px;
-  font-size: 15px;
-}
-.UpdaterWindow-issues {
-  font-size: 12px;
-  font-weight: 300;
-  padding-top: 24px;
-  -webkit-app-region: no-drag;
-}
-.UpdaterWindow-link {
-  color: #70A0AF;
-  cursor: pointer;
-  &:hover {
-    color: #9eeaf9;
-  }
-}
-.icon-spin {
-  animation: icon-spin 2s infinite linear;
-  fill: #9eeaf9;
-  width: 22px;
-  vertical-align: middle;
-}
-@keyframes icon-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(359deg);
-  }
-}
-</style>

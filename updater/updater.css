@@ -1,0 +1,88 @@
+@charset "utf-8";
+/*　updaterのみで参照するcssスタイル　*/
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Meiryo", "メイリオ", sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+body,
+html {
+    height: 100%;
+}
+.UpdaterWindow {
+    height: 100%;
+    padding: 24px;
+    margin: 0;
+    background-color: #2F3340;
+    color: #9eeaf9;
+    font-size: 18px;
+    text-align: center;
+    -webkit-app-region: drag;
+    box-sizing: border-box;
+}
+.message {
+    color: #9eeaf9;
+    vertical-align: middle
+}
+.error {
+    color: #ff6952;
+}
+.progressBarContainer {
+    position: relative;
+    margin-top: 36px;
+    background-color: #050e18;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progressBar {
+    height: 24px;
+    background-color: #ff6952;
+}
+.progressPercent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+    font-size: 15px;
+}
+.issues {
+    font-size: 12px;
+    font-weight: 300;
+    padding-top: 24px;
+    -webkit-app-region: no-drag;
+}
+.link {
+    color: #70A0AF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.link:hover {
+    color: #9eeaf9;
+    text-decoration: none;
+}
+.icon-spin {
+    animation: icon-spin 2s infinite linear;
+    fill: #9eeaf9;
+    width: 22px;
+    vertical-align: middle;
+}
+.icon-warning {
+    fill: #ff6952;
+    width: 22px;
+    vertical-align: middle;
+}
+@keyframes icon-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(359deg);
+    }
+}
