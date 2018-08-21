@@ -6,7 +6,6 @@ import { SourcesService, ISource, Source } from 'services/sources';
 import { ScenesService } from 'services/scenes';
 import * as obs from '../../../obs-api';
 import Utils from 'services/utils';
-import electron from 'electron';
 import { Inject } from 'util/injector';
 import { InitAfter } from 'util/service-observer';
 import { WindowsService } from 'services/windows';
@@ -20,8 +19,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { $t } from 'services/i18n';
 import uuid from 'uuid/v4';
-
-const { ipcRenderer } = electron;
+import { omit } from 'lodash';
 
 export enum E_AUDIO_CHANNELS {
   OUTPUT_1 = 1,
@@ -45,6 +43,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     audioSources: {}
   };
 
+  audioSourceUpdated = new Subject<IAudioSource>();
 
   sourceData: Dictionary<IAudioSourceData> = {};
 
@@ -128,7 +127,6 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   fetchFaderDetails(sourceId: string): IFader {
     const source = this.sourcesService.getSource(sourceId);
-    const obsSource = source.getObsInput();
     const obsFader = this.sourceData[source.sourceId].fader;
 
     return {
@@ -197,6 +195,48 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     });
   }
 
+  setSettings(sourceId: string, patch: Partial<IAudioSource>) {
+    const obsInput = this.sourcesService.getSourceById(sourceId).getObsInput();
+
+    // Fader is ignored by this method.  Use setFader instead
+    const newPatch = omit(patch, 'fader');
+
+    Object.keys(newPatch).forEach(name => {
+      const value = newPatch[name];
+      if (value === void 0) return;
+
+      if (name === 'syncOffset') {
+        obsInput.syncOffset = AudioService.msToTimeSpec(value);
+      } else if (name === 'forceMono') {
+        if (this.getSource(sourceId).forceMono !== value) {
+          value ?
+            obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono :
+            obsInput.flags -= obs.ESourceFlags.ForceMono;
+        }
+      } else if (name === 'muted') {
+        this.sourcesService.setMuted(sourceId, value);
+      } else {
+        obsInput[name] = value;
+      }
+    });
+
+    this.UPDATE_AUDIO_SOURCE(sourceId, newPatch);
+    this.audioSourceUpdated.next(this.state.audioSources[sourceId]);
+  }
+
+  setFader(sourceId: string, patch: Partial<IFader>) {
+    const obsFader = this.sourceData[sourceId].fader;
+
+    if (patch.deflection) obsFader.deflection = patch.deflection;
+    if (patch.mul) obsFader.mul = patch.mul;
+    // We never set db directly
+
+    const fader = this.fetchFaderDetails(sourceId);
+    Object.assign({}, fader, patch);
+
+    this.UPDATE_AUDIO_SOURCE(sourceId, { fader });
+    this.audioSourceUpdated.next(this.state.audioSources[sourceId]);
+  }
 
   private createAudioSource(source: Source) {
     this.sourceData[source.sourceId] = {};
@@ -263,6 +303,14 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
     Vue.set(this.state.audioSources, source.sourceId, source);
   }
 
+  @mutation()
+  private UPDATE_AUDIO_SOURCE(sourceId: string, patch: Partial<IAudioSource>) {
+    if (patch.fader) {
+      Object.assign(this.state.audioSources[sourceId].fader, patch.fader);
+    }
+
+    Object.assign(this.state.audioSources[sourceId], omit(patch, 'fader'));
+  }
 
   @mutation()
   private REMOVE_AUDIO_SOURCE(sourceId: string) {
@@ -372,53 +420,21 @@ export class AudioSource implements IAudioSourceApi {
 
 
   setSettings(patch: Partial<IAudioSource>) {
-    const obsInput = this.source.getObsInput();
-
-    Object.keys(patch).forEach(name => {
-      const value = patch[name];
-      if (value === void 0) return;
-
-      if (name === 'deflection') {
-        this.setDeflection(value / 100);
-      } else if (name === 'syncOffset') {
-        this.source.getObsInput().syncOffset = AudioService.msToTimeSpec(value);
-      } else if (name === 'forceMono') {
-        if (this.forceMono !== value) {
-          value ?
-            obsInput.flags = obsInput.flags | obs.ESourceFlags.ForceMono :
-            obsInput.flags -= obs.ESourceFlags.ForceMono;
-        }
-      } else if (name === 'muted') {
-        this.setMuted(value);
-      } else {
-        obsInput[name] = value;
-      }
-    });
-    this.UPDATE({ sourceId: this.sourceId, ...patch });
+    this.audioService.setSettings(this.sourceId, patch);
   }
 
   setDeflection(deflection: number) {
-    const obsFader = this.audioService.sourceData[this.sourceId].fader;
-    obsFader.deflection = deflection;
-
-    const fader = this.audioService.fetchFaderDetails(this.sourceId);
-
-    this.UPDATE({ sourceId: this.sourceId, fader });
+    this.audioService.setFader(this.sourceId, { deflection });
   }
 
 
   setMul(mul: number) {
-    const obsFader = this.audioService.sourceData[this.sourceId].fader;
-    obsFader.mul = mul;
-
-    const fader = this.audioService.fetchFaderDetails(this.sourceId);
-
-    this.UPDATE({ sourceId: this.sourceId, fader });
+    this.audioService.setFader(this.sourceId, { mul });
   }
 
 
   setHidden(hidden: boolean) {
-    this.UPDATE({ sourceId: this.sourceId, mixerHidden: hidden });
+    this.audioService.setSettings(this.sourceId, { mixerHidden: hidden });
   }
 
 
@@ -430,12 +446,6 @@ export class AudioSource implements IAudioSourceApi {
   subscribeVolmeter(cb: (volmeter: IVolmeter) => void): Subscription {
     const stream = this.audioService.sourceData[this.sourceId].stream;
     return stream.subscribe(cb);
-  }
-
-
-  @mutation()
-  private UPDATE(patch: { sourceId: string } & Partial<IAudioSource>) {
-    Object.assign(this.audioSourceState, patch);
   }
 
 }

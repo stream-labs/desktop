@@ -23,7 +23,12 @@ export default class AdvancedAudio extends Vue {
   }
 
   onInputHandler(audioSource: IAudioSourceApi, name: string, value: TObsValue) {
-    audioSource.setSettings({ [name]: value });
+    console.log('input', name, value);
+    if (name === 'deflection') {
+      audioSource.setDeflection((value as number) / 100);
+    } else {
+      audioSource.setSettings({ [name]: value });
+    }
   }
 
 }
