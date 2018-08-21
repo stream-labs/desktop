@@ -137,11 +137,13 @@ export class SettingsService extends StatefulService<ISettingsState>
     // ensure 'custom streaming server'
     {
       const settings = settingsFormData['Stream'];
-      const setting = this.findSetting(settings, 'Untitled', 'streamType');
-      if (setting) {
-        if (setting.value !== 'rtmp_custom') {
-          setting.value = 'rtmp_custom';
-          this.setSettings('Stream', settings);
+      if (settings) {
+        const setting = this.findSetting(settings, 'Untitled', 'streamType');
+        if (setting) {
+          if (setting.value !== 'rtmp_custom') {
+            setting.value = 'rtmp_custom';
+            this.setSettings('Stream', settings);
+          }
         }
       }
     }
