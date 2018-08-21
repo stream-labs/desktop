@@ -24,7 +24,7 @@
         <button
           v-if="!chatbotModule.comingSoon"
           @click="chatbotModule.onExpand"
-          class="button button--action"
+          class="button button--default"
         >
           {{ $t('Preferences') }}
         </button>

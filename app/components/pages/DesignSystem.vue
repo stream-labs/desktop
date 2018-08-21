@@ -154,7 +154,7 @@
                 <div class="design-system__color design-system__color--dark-5"></div>
                 <div>
                   <div class="design-system__code">@day-paragraph, @dark-5</div>
-                  <div>Day Paragraph</div>
+                  <div>Day Paragraph, Night Standard Button</div>
                 </div>
               </div>
             </div>
@@ -708,6 +708,14 @@
 
           <form-group title="Form Group">
             <slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
+          </form-group>
+
+          <form-group title="Text Input">
+            <input type="text" placeholder="Example Text Input">
+          </form-group>
+
+          <form-group title="Text Input - Disabled">
+            <input type="text" disabled placeholder="Example Text Input">
           </form-group>
         </div>
 

@@ -24,12 +24,12 @@
     <div class="section-content">
       <ObsBoolInput :value="streamInfoUpdateModel" @input="setStreamInfoUpdate" />
       <div class="input-container">
-        <button class="button button--action" @click="restartStreamlabelsSession">
+        <button class="button button--default" @click="restartStreamlabelsSession">
           {{ $t('Restart Streamlabels Session') }}
         </button>
       </div>
       <div class="input-container" v-if="isTwitch && !isRecordingOrStreaming">
-        <button class="button button--action" @click="runAutoOptimizer">
+        <button class="button button--default" @click="runAutoOptimizer">
           {{ $t('Run Auto Optimizer') }}
         </button>
       </div>

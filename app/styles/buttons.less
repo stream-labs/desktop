@@ -15,14 +15,15 @@
     outline: none;
   }
 
-  &.is-disabled {
+  &.is-disabled,
+  &:disabled {
     opacity: .6;
     cursor: not-allowed;
   }
 
   span,
   i {
-    margin-right: 6px;
+    .margin-right();
   }
 }
 
@@ -33,6 +34,15 @@
   &:hover {
     background-color: darken(@day-button, 2%);
     color: @day-title;
+  }
+
+
+  &.is-disabled,
+  &:disabled {
+    &:hover {
+      background-color: @day-button;
+      color: @day-title;
+    }
   }
 }
 
@@ -48,6 +58,13 @@
 
   &:focus {
     background-color: @teal;
+  }
+
+  &.is-disabled,
+  &:disabled {
+    &:hover {
+      background-color: @teal;
+    }
   }
 }
 
@@ -199,12 +216,20 @@
 
 .night-theme {
   .button--default {
-    background-color: @night-accent-light;
-    border-color: @night-accent-light;
+    background-color: @dark-5;
+    border-color: @dark-5;
     color: @light-1;
 
     &:hover {
       color: @white;
+    }
+
+    &.is-disabled,
+    &:disabled {
+      &:hover {
+        background-color: @dark-5;
+        color: @white;
+      }
     }
   }
 
