@@ -56,6 +56,7 @@
     display: inline-block;
     z-index: 1;
     color: @icon;
+    line-height: 0;
   }
 
   .whisper {

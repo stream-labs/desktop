@@ -59,7 +59,7 @@
   }
 
   .chatbot__side-menu__tab {
-    padding: 5px 65px;
+    padding: 5px 40px;
 
     .chatbot__side-menu__tab__description {
       font-size: 12px;
