@@ -150,9 +150,9 @@ tbody tr {
   }
 
   .new-list-item-modal__header__title {
-    .text-transform--capitalize();
+    .text-transform();
     flex-grow: 1;
-    padding-left: 10px;
+    .padding-left();
   }
 }
 
@@ -161,9 +161,9 @@ tbody tr {
 }
 
 .new-list-item-modal__controls {
-  background-color: @day-secondary;
+  background-color: @day-section;
   border-top: 1px solid @day-border;
-  padding: 10px 20px;
+  padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
@@ -176,7 +176,7 @@ tbody tr {
 .night-theme {
   tbody tr {
     border: 2px solid transparent;
-    .transition;
+    .transition();
     .cursor--pointer;
     color: white;
     td {

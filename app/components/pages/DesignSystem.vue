@@ -154,7 +154,7 @@
                 <div class="design-system__color design-system__color--dark-5"></div>
                 <div>
                   <div class="design-system__code">@day-paragraph, @dark-5</div>
-                  <div>Day Paragraph</div>
+                  <div>Day Paragraph, Night Standard Button</div>
                 </div>
               </div>
             </div>
@@ -709,6 +709,14 @@
           <form-group title="Form Group">
             <slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
           </form-group>
+
+          <form-group title="Text Input">
+            <input type="text" placeholder="Example Text Input">
+          </form-group>
+
+          <form-group title="Text Input - Disabled">
+            <input type="text" disabled placeholder="Example Text Input">
+          </form-group>
         </div>
 
         <div id="mixins" class="design-system__section">
@@ -717,65 +725,89 @@
             <thead>
               <tr>
                 <th>Class Name</th>
-                <th>Variations</th>
+                <th>Attributes</th>
+                <th>Default (Base)</th>
                 <th>Description</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="design-system__code">.weight--normal()</td>
-                <td>normal, medium, bold</td>
-                <td>Adjust the font-weight of text</td>
+                <td class="design-system__code">.aspect-ratio()</td>
+                <td>16,9 or 4,3</td>
+                <td>-</td>
+                <td>Relative width and height sizing - takes a width and height attribute</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin--8()</td>
-                <td>4, 8, 16, 24</td>
-                <td>Add right margin to any element</td>
+                <td class="design-system__code">.margin()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
+                <td>Add right margin to any element. 2 = 16px, 3 = 24px, etc</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin-top--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.margin-top()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add top margin to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin-right--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.margin-right()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add right margin to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin-bottom--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.margin-bottom()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add bottom margin to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.margin-left--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.margin-left()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add left margin to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.padding--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.padding()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add right padding to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.padding-top--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.padding-top()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add top padding to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.padding-right--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.padding-right()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add right padding to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.padding-bottom--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.padding-bottom()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add bottom padding to any element</td>
               </tr>
               <tr>
-                <td class="design-system__code">.padding-left--8()</td>
-                <td>4, 8, 16, 24</td>
+                <td class="design-system__code">.padding-left()</td>
+                <td>1, 2, 3, 4</td>
+                <td>1 (8px)</td>
                 <td>Add left padding to any element</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.radius()</td>
+                <td>1, 2</td>
+                <td>1 (4px)</td>
+                <td>Add border radius to elements. 1 (4px) is standard, 2 (8px) is for larger sections</td>
+              </tr>
+              <tr>
+                <td class="design-system__code">.weight()</td>
+                <td>@normal, @medium, @bold</td>
+                <td>@normal</td>
+                <td>Adjust the font-weight of text</td>
               </tr>
             </tbody>
           </table>
@@ -932,6 +964,6 @@
 }
 
 .button-container {
-  .margin-bottom--16();
+  .margin-bottom(2);
 }
 </style>

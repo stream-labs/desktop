@@ -116,12 +116,12 @@ tbody tr {
   border-bottom: 1px solid @day-border;
 
   .new-list-item-modal__header__icon {
-    padding-left: 10px;
+    .padding-left();
     width: 32px;
   }
 
   .new-list-item-modal__header__title {
-    .text-transform--capitalize();
+    .text-transform();
     flex-grow: 1;
     padding-left: 10px;
   }

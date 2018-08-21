@@ -22,12 +22,12 @@
   .flex();
 
   .chatbot-pagination__page {
-    .padding--10;
+    .padding(1);
     cursor: pointer;
 
     &.chatbot-pagination__page--current {
       color: @day-title;
-      .weight--bold();
+      .weight(@bold);
     }
   }
 }

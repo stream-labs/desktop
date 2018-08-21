@@ -33,6 +33,7 @@
 
 .int-input {
   position: relative;
+  width: 100px;
 
   .arrows {
     .absolute(0, 8px, 0, auto);

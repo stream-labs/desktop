@@ -44,6 +44,12 @@
   background-color: @white;
 }
 
+.modal-layout--w-side-menu {
+  .modal-layout-content {
+    overflow-y: hidden;
+  }
+}
+
 .modal-layout-titlebar {
   flex-shrink: 0;
 }
@@ -56,6 +62,8 @@
   flex-grow: 1;
   height: 100%;
   display: flex;
+  overflow-x: hidden;
+  .padding(2);
 
   & > * {
     width: 100%;
@@ -72,13 +80,14 @@
 
 .modal-layout-controls {
   background-color: @day-section;
-  padding: 16px;
-  text-align: right;
+  .padding-v-sides();
+  .padding-h-sides(2);
+  .text-align(@right);
   flex-shrink: 0;
   z-index: 10;
 
   .button {
-    margin-left: 8px;
+    .margin-left();
   }
 }
 
@@ -91,13 +100,13 @@
 
 .modal-container--side-nav {
   flex-grow: 1;
-  margin: -20px -20px -20px 0;
+  margin: -16px -16px -16px 0;
   overflow: auto;
 }
 
 .night-theme {
   &.modal-layout {
-    background-color: @night-primary;
+    background-color: @night-bg;
     color: @night-paragraph;
   }
 

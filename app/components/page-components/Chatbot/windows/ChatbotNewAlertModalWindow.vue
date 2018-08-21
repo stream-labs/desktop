@@ -148,7 +148,7 @@
     }
 
     .new-alert-modal__header__title {
-      .text-transform--capitalize();
+      .text-transform();
       flex-grow: 1;
       padding-left: 10px;
     }
