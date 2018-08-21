@@ -4,7 +4,7 @@
     <div
       v-for="i in totalPages"
       :class="{'chatbot-pagination__page--current': i === currentPage}"
-      @click="emitPageChange(i)"
+      @click="onEmitPageChangeHandler(i)"
       class="chatbot-pagination__page"
       :key="i"
     >

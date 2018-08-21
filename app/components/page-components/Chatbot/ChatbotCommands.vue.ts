@@ -29,7 +29,7 @@ export default class ChatbotCommands extends ChatbotBase {
 
   selectedTab = 'custom';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 }
