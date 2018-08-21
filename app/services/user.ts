@@ -74,8 +74,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     // actually log in from integration tests.
     electron.ipcRenderer.on(
       'testing-fakeAuth',
-      (e: Electron.Event, auth: any) => {
+      async (e: Electron.Event, auth: any) => {
         this.LOGIN(auth);
+        await this.sceneCollectionsService.setupNewUser();
       }
     );
   }
