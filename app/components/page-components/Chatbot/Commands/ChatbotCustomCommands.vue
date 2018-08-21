@@ -30,8 +30,18 @@
           <tr>
             <th> {{ $t('Command') }} </th>
             <th> {{ $t('Response') }} </th>
-            <th> {{ $t('Global Cooldown in mins') }} </th>
-            <th> {{ $t('User Cooldown in mins') }} </th>
+            <th>
+              <div class="flex">
+                {{ $t('GCD') }}
+                <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in minutes')" />
+              </div>
+            </th>
+            <th>
+              <div class="flex">
+                {{ $t('UCD') }}
+                <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in minutes')" />
+              </div>
+            </th>
             <th> {{ $t('Permission') }} </th>
             <th></th>
           </tr>
@@ -81,6 +91,10 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 
+.icon-question {
+  .icon-hover();
+}
+
 table tr {
   .transition;
 
@@ -123,6 +137,10 @@ table tr {
 
 
 .night-theme {
+  .icon-question {
+    .night-icon-hover();
+    padding-left: 3px;
+  }
   tbody tr {
     border: 2px solid transparent;
     td {
