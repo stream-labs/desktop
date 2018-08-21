@@ -46,7 +46,10 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     required: true,
     min: 0,
     max: 1000,
-    placeholder: $t('Minimum chat lines')
+    placeholder: $t('Minimum chat lines'),
+    tooltip: $t(
+      'Set the number of chat lines that need to appear when the timer ends before the response appears.'
+    )
   };
 
   mounted() {

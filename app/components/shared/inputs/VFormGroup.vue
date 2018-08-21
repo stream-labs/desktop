@@ -2,8 +2,8 @@
 
   <div>
     <!-- title -->
-    <div>
-      <div class="margin-vertical--10">
+    <div class="flex margin-vertical--10">
+      <div>
         {{ options.title }}
       </div>
       <div v-if="options.tooltip" class="tooltip">

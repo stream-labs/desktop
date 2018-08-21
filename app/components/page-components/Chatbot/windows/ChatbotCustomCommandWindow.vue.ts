@@ -41,11 +41,11 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Advanced',
+      name: $t('Advanced'),
       value: 'advanced'
     }
   ];
@@ -55,7 +55,8 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   // metadata
   commandMetadata: ITextMetadata = {
     required: true,
-    placeholder: $t('Enter the text string which will trigger the response')
+    placeholder: $t('Enter the text string which will trigger the response'),
+    tooltip: $t('Enter a word used to trigger a response')
   };
   responseMetadata: ITextMetadata = {
     required: true,
