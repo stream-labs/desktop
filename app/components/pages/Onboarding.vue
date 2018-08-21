@@ -10,7 +10,7 @@
 @import "../../styles/index";
 
 .onboarding {
-  background-color: @onboarding-bg;
+  background-color: @night-bg;
 }
 </style>
 
