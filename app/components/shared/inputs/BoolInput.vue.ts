@@ -3,16 +3,10 @@ import { BaseInput } from './BaseInput';
 
 @Component({})
 export default class BoolInput extends BaseInput<boolean, {}> {
+  @Prop() readonly value: boolean;
+  @Prop() readonly title: string;
 
-
-  @Prop()
-  value: boolean;
-
-  @Prop()
-  title: string;
-
-  handleClick() {
-    this.emitInput(!this.value);
+  handleClick(e?: MouseEvent) {
+    this.emitInput(!this.value, e);
   }
-
 }

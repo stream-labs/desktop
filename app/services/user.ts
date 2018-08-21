@@ -7,6 +7,7 @@ import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
+import { ChatbotApiService } from './chatbot/chatbot';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -22,6 +23,7 @@ import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid/v4';
 import { OnboardingService } from './onboarding';
+import { NavigationService } from './navigation';
 
 // Eventually we will support authing multiple platforms at once
 interface IUserServiceState {
@@ -35,6 +37,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private sceneCollectionsService: SceneCollectionsService;
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private chatbotApiService: ChatbotApiService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -216,6 +220,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
+    // Navigate away from disabled tabs on logout
+    this.navigationService.navigate('Studio');
+    await this.chatbotApiService.logOut();
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();

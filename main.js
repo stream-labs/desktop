@@ -45,7 +45,6 @@ function log(...args) {
 // Windows
 let mainWindow;
 let childWindow;
-let childWindowIsReadyToShow = false;
 
 // Somewhat annoyingly, this is needed so that the child window
 // can differentiate between a user closing it vs the app
@@ -237,10 +236,6 @@ function startApp() {
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 
-  ipcMain.on('window-childWindowIsReadyToShow', () => {
-    childWindowIsReadyToShow = true;
-  });
-
   ipcMain.on('services-request', (event, payload) => {
     sendRequest(payload, event);
   });
@@ -275,7 +270,7 @@ function startApp() {
     // }, 10 * 1000);
 
   }
-  
+
   getObs().IPC.ConnectOrHost("slobs" + uuid());
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
@@ -341,6 +336,7 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
       const childX = (bounds.x + (bounds.width / 2)) - (windowOptions.size.width / 2);
       const childY = (bounds.y + (bounds.height / 2)) - (windowOptions.size.height / 2);
 
+      childWindow.show();
       childWindow.restore();
       childWindow.setMinimumSize(windowOptions.size.width, windowOptions.size.height);
 
@@ -362,19 +358,6 @@ ipcMain.on('window-showChildWindow', (event, windowOptions) => {
 
     childWindow.focus();
   }
-
-
-  // show the child window when it will be ready
-  new Promise(resolve => {
-    if (childWindowIsReadyToShow) {
-      resolve();
-      return;
-    }
-    ipcMain.once('window-childWindowIsReadyToShow', () => resolve());
-  }).then(() => {
-    // The child window will show itself when rendered
-    childWindow.send('window-setContents', windowOptions);
-  });
 
 });
 

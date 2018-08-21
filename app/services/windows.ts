@@ -38,6 +38,19 @@ import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
+
+import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
+import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
+import ChatbotTimerWindow from 'components/page-components/Chatbot/windows/ChatbotTimerWindow.vue';
+import ChatbotAlertsWindow from 'components/page-components/Chatbot/windows/ChatbotAlertsWindow.vue';
+import ChatbotCapsProtectionWindow from 'components/page-components/Chatbot/windows/ChatbotCapsProtectionWindow.vue';
+import ChatbotSymbolProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSymbolProtectionWindow.vue';
+import ChatbotLinkProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
+import ChatbotWordProtectionWindow
+  from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
+
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 
@@ -81,7 +94,16 @@ export function getComponents() {
     EventList,
     TipJar,
     SponsorBanner,
-    StreamBoss
+    StreamBoss,
+
+    ChatbotCustomCommandWindow,
+    ChatbotDefaultCommandWindow,
+    ChatbotTimerWindow,
+    ChatbotAlertsWindow,
+    ChatbotCapsProtectionWindow,
+    ChatbotSymbolProtectionWindow,
+    ChatbotLinkProtectionWindow,
+    ChatbotWordProtectionWindow,
   };
 }
 
@@ -107,7 +129,7 @@ interface IWindowsState {
 }
 
 const DEFAULT_WINDOW_OPTIONS: IWindowOptions = {
-  componentName: 'Blank',
+  componentName: '',
   scaleFactor: 1,
   isShown: true
 };
@@ -127,7 +149,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       title: `Streamlabs OBS - Version: ${remote.process.env.SLOBS_VERSION}`
     },
     child: {
-      componentName: 'Blank',
+      componentName: '',
       scaleFactor: 1,
       isShown: false
     }
@@ -166,6 +188,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     if (options.componentName !== this.state.child.componentName) options.center = true;
 
     ipcRenderer.send('window-showChildWindow', options);
+    this.updateChildWindowOptions(options);
   }
 
   closeChildWindow() {
@@ -173,22 +196,24 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     // show previous window if `preservePrevWindow` flag is true
     if (windowOptions.preservePrevWindow && windowOptions.prevWindowOptions) {
-      ipcRenderer.send('window-showChildWindow', {
+      const options = {
         ...windowOptions.prevWindowOptions,
         isPreserved: true
-      });
+      };
+
+      ipcRenderer.send('window-showChildWindow', options);
+      this.updateChildWindowOptions(options);
       return;
     }
 
 
-    ipcRenderer.send('window-closeChildWindow');
-
     // This prevents you from seeing the previous contents
     // of the window for a split second after it is shown.
-    this.updateChildWindowOptions({ componentName: 'Blank', isShown: false });
+    this.updateChildWindowOptions({ componentName: '', isShown: false });
 
     // Refocus the main window
     ipcRenderer.send('window-focusMain');
+    ipcRenderer.send('window-closeChildWindow');
   }
 
   closeMainWindow() {

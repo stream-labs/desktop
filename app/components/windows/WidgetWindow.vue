@@ -3,6 +3,7 @@
   :title="windowTitle"
   :showControls="false"
   :customControls="true"
+  :fixedSectionHeight="254"
   v-if="previewSource">
 
   <div slot="fixed">
@@ -26,9 +27,9 @@
   </div>
 
   <!-- buttons -->
-  <div slot="controls" v-if="canRender && tab && tab.showControls">
+  <div slot="controls" v-if="canRender">
     <div v-for="tabItem in tabsList" :key="tabItem.value" v-if="tabItem.value === value">
-      <slot :name="tabItem.value + '-controls'">
+      <slot :name="tabItem.value + '-controls'" v-if="(tab && tab.showControls) || tabItem.value === 'source'">
         <button
             class="button button--default"
             @click="close">
@@ -44,14 +45,8 @@
 <script lang="ts" src="./WidgetWindow.vue.ts"></script>
 
 <style lang="less" scoped>
-
-  .description {
-    padding: 20px;
-  }
-
   .display {
     height: 200px !important;
     cursor: pointer;
   }
-
 </style>

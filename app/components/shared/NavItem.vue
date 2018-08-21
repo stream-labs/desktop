@@ -5,7 +5,7 @@
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
-  <span class="nav-item__name"><slot></slot></span>
+  <div class="nav-item__name"><slot></slot></div>
 </li>
 </template>
 
@@ -22,7 +22,7 @@
   font-size: 14px;
   margin-bottom: 8px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 
   &.active {
@@ -53,12 +53,15 @@
     margin-right: -16px;
     left: -24px;
     width: 16px;
+    padding-top: 3px;
   }
 }
 
 .nav-item__name {
   overflow: hidden;
-  max-width: calc(~"100% - 20px");
+  // max-width: calc(~"100% - 20px");
+  width: 100%;
+  max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

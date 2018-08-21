@@ -3,15 +3,13 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
 import ModalLayout from '../ModalLayout.vue';
 import { WindowsService } from '../../services/windows';
-import windowMixin from '../mixins/window';
 import { IScenesServiceApi } from '../../services/scenes';
 import { ISourcesServiceApi, TSourceType, TPropertiesManager } from '../../services/sources';
 import { WidgetsService, WidgetDefinitions, WidgetType } from '../../services/widgets';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class NameSource extends Vue {
   @Inject() sourcesService: ISourcesServiceApi;

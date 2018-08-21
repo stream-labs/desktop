@@ -21,7 +21,7 @@
     </button>
     <button
       class="button button--action"
-      @click="doneHandler">
+      @click="done">
       {{ $t('Done') }}
     </button>
   </div>
@@ -41,6 +41,7 @@
   display: flex;
   flex-direction: column;
   color: @day-paragraph;
+  background-color: @white;
 }
 
 .modal-layout-titlebar {
@@ -54,6 +55,11 @@
 .modal-layout-content {
   flex-grow: 1;
   height: 100%;
+  display: flex;
+
+  & > * {
+    width: 100%;
+  }
 }
 
 .modal-layout-spinner {

@@ -47,7 +47,13 @@
   .fa,
   i {
     margin-left: 8px;
-    font-size: 6px;
+    font-size: 10px;
+    padding: 3px; // easier to click
+    .icon-hover();
+
+    &.icon-down {
+      font-size: 6px;
+    }
   }
 
   &:focus {
@@ -81,6 +87,17 @@
   .dropdown-menu {
     background-color: @night-primary;
     .night-shadow();
+  }
+
+  .dropdown-menu__toggle {
+    .fa,
+    i {
+      .night-icon-hover();
+    }
+
+    &:focus {
+      outline: 0;
+    }
   }
 
   .dropdown-menu__item {

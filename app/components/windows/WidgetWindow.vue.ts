@@ -2,20 +2,20 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import windowMixin from 'components/mixins/window';
 import { ISource, ISourceApi, ISourcesServiceApi } from 'services/sources';
 
 import ModalLayout from 'components/ModalLayout.vue';
 import Display from 'components/shared/Display.vue';
 
 import { $t } from 'services/i18n';
-import { WidgetsService, WidgetType } from 'services/widgets';
+import { WidgetsService } from 'services/widgets';
 import Tabs from 'components/Tabs.vue';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
 import { IWidgetTab } from 'services/widget-settings/widget-settings';
+import uuid from 'uuid';
 
 @Component({
   components: {
@@ -23,8 +23,7 @@ import { IWidgetTab } from 'services/widget-settings/widget-settings';
     Display,
     Tabs,
     GenericForm
-  },
-  mixins: [windowMixin]
+  }
 })
 export default class WidgetWindow extends Vue {
 
@@ -82,7 +81,7 @@ export default class WidgetWindow extends Vue {
   }
 
   get windowTitle() {
-    return this.source ? $t('Properties for %{sourceName}', { sourceName: this.source.name }) : '';
+    return this.source ? $t('Settings for ') + this.source.name : '';
   }
 
   get tab(): IWidgetTab {
@@ -119,7 +118,7 @@ export default class WidgetWindow extends Vue {
     if (sourceModel.sourceId !== this.sourceId) return;
     const newPreviewSettings = this.source.getSettings();
     delete newPreviewSettings.shutdown;
-    delete newPreviewSettings.url;
+    newPreviewSettings.url = this.service.getPreviewUrl() + '&' + uuid();
     this.previewSource.updateSettings(newPreviewSettings);
   }
 }

@@ -15,21 +15,23 @@ interface IMultiselectListOption{
 export default class ListInput extends BaseInput<string, IListMetadata<string>> {
 
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop()
-  metadata: IListMetadata<string>;
+  readonly metadata: IListMetadata<string>;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
   @Prop({ default: 'Select Option' })
-  placeholder: string;
+  readonly placeholder: string;
 
 
   onInputHandler(option: IMultiselectListOption) {
-    this.emitInput(option.value);
-    this.$nextTick();
+    if (option) {
+      this.emitInput(option.value);
+      this.$nextTick();
+    }
   }
 
   get currentMultiselectValue() {

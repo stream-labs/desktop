@@ -31,16 +31,14 @@
           v-show="!hasGoal"
           @click="saveGoal()"
           class="button button--action"
-      >
-        {{ $t('Set Stream Boss Health') }}
-      </button>
+      >{{ $t('Set Stream Boss Health') }}</button>
+
       <button
           class="button button--warn"
           v-show="hasGoal"
           @click="reset()"
-      >
-        {{ $t('Reset Stream Boss') }}
-      </button>
+      >{{ $t('Reset Stream Boss') }}</button>
+
     </div>
 
     <div slot="settings">
