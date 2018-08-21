@@ -92,7 +92,8 @@ interface INewAlertData {
   }
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
-  @Prop() selectedType: ChatbotAlertTypes;
+  @Prop()
+  selectedType: ChatbotAlertTypes;
 
   onSubmitHandler: Function = () => {};
 
@@ -131,7 +132,9 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   }
 
   get disabledSubmit() {
-    const { message, tier, amount } = this.newAlert[this.selectedType].newMessage;
+    const { message, tier, amount } = this.newAlert[
+      this.selectedType
+    ].newMessage;
     if (this.isFollower) return !message;
     if (this.isSubscription) return !amount || !message || !tier;
 
@@ -144,7 +147,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           message: {
             required: true,
-            placeholder: $t('Message to follower'),
+            placeholder: $t('Message to follower')
           }
         }
       },
@@ -225,7 +228,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             placeholder: $t('Message to Bit donators')
           }
         }
-      },
+      }
     };
     return metadata;
   }
@@ -268,7 +271,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: null,
           message: null
         }
-      },
+      }
     };
     return initialState;
   }
@@ -283,11 +286,11 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     }
   }
 
-  cancel() {
+  onCancelHandler() {
     this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
-  submit() {
+  onSubmit() {
     this.onSubmitHandler(this.newAlert[this.selectedType].newMessage);
   }
 }

@@ -5,7 +5,7 @@
   :title="$t('Word Protection Preferences')"
 >
   <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
+    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     </Tabs>
   </div>
   <div slot="content" class="chatbot-word-protection__container">
@@ -36,18 +36,18 @@
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onReset">
+      @click="onResetHandler">
       {{ $t('Reset') }}
     </button>
     <div>
       <button
         class="button button--default"
-        @click="onCancel">
+        @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button
         class="button button--action"
-        @click="onSave"
+        @click="onSaveHandler"
         :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
