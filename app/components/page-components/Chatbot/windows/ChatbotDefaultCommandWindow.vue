@@ -29,55 +29,54 @@
   >
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general'">
-        <div>
-          <label for="command" class="margin-vertical--10"> {{ $t('Command') }} </label>
-          <TextInput
-            v-model="editedCommand.command"
-            :metadata="metadata.command"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.response">
-          <label for="response" class="margin-vertical--10"> {{ $t('Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.response"
-            :metadata="metadata.response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.success_response">
-          <label for="success_response" class="margin-vertical--10"> {{ $t('Success Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.success_response"
-            :metadata="metadata.success_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.failed_response">
-          <label for="failed_response" class="margin-vertical--10"> {{ $t('Failed Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.failed_response"
-            :metadata="metadata.failed_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.enabled_response">
-          <label for="enabled_response" class="margin-vertical--10"> {{ $t('Enabled Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.enabled_response"
-            :metadata="metadata.enabled_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.disabled_response">
-          <label for="disabled_response" class="margin-vertical--10"> {{ $t('Disabled Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.disabled_response"
-            :metadata="metadata.disabled_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.response_type">
-          <label for="reply in" class="margin-vertical--10"> {{ $t('Reply in') }} </label>
-          <ListInput
-            v-model="editedCommand.response_type"
-            :metadata="metadata.response_type"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Command')"
+          type="text"
+          v-model="editedCommand.command"
+          :metadata="metadata.command"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.response"
+          :title="$t('Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="editedCommand.response"
+          :metadata="metadata.response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.success_response"
+          :title="$t('Success Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="editedCommand.success_response"
+          :metadata="metadata.success_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.failed_response"
+          :title="$t('Failed Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="editedCommand.failed_response"
+          :metadata="metadata.failed_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.enabled_response"
+          :title="$t('Enabled Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="editedCommand.enabled_response"
+          :metadata="metadata.enabled_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.disabled_response"
+          :title="$t('Disabled Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="editedCommand.disabled_response"
+          :metadata="metadata.disabled_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.response_type"
+          :title="$t('Reply in')"
+          type="list"
+          v-model="editedCommand.response_type"
+          :metadata="metadata.response_type"
+        />
       </div>
       <div v-if="selectedTab === 'advanced'">
         <ChatbotAliases v-model="editedCommand.aliases" />

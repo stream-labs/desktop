@@ -13,57 +13,55 @@
       <div v-if="selectedTab === 'general' && symbolProtection">
         <div class="row">
           <div class="small-6 columns">
-            <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
-            <ListInput
+            <VFormGroup
+              type="list"
+              :title="$t('Auto Permit')"
               v-model="symbolProtection.general.excluded.level"
               :metadata="metadata.symbol.general.excluded.level"
             />
           </div>
           <div class="small-6 columns">
-            <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
-            <ListInput
+            <VFormGroup
+              type="list"
+              :title="$t('Punishment')"
               v-model="symbolProtection.general.punishment.type"
               :metadata="metadata.symbol.general.punishment.type"
             />
           </div>
         </div>
-        <div v-if="symbolProtection.general.punishment.type === 'Timeout'">
-          <label for="response" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
-          <NumberInput
-            v-model="symbolProtection.general.punishment.duration"
-            :metadata="metadata.symbol.general.punishment.duration"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Punishment Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="symbolProtection.general.message"
-            :metadata="metadata.symbol.general.message"
-          />
-        </div>
+        <VFormGroup
+          type="number"
+          v-if="symbolProtection.general.punishment.type === 'Timeout'"
+          :title="$t('Punishment Duration (Value in Minutes)')"
+          v-model="symbolProtection.general.punishment.duration"
+          :metadata="metadata.symbol.general.punishment.duration"
+        />
+        <VFormGroup
+          type="textArea"
+          :title="$t('Punishment Response (Line breaks will be ignored)')"
+          v-model="symbolProtection.general.message"
+          :metadata="metadata.symbol.general.message"
+        />
       </div>
       <div v-if="selectedTab === 'advanced'">
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Minimum Amount of Symbols') }} </label>
-          <NumberInput
-            v-model="symbolProtection.advanced.minimum"
-            :metadata="metadata.symbol.advanced.minimum"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Maximum Amount of Symbols') }} </label>
-          <NumberInput
-            v-model="symbolProtection.advanced.maximum"
-            :metadata="metadata.symbol.advanced.maximum"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Maximum Percent') }} </label>
-          <SliderInput
-            v-model="symbolProtection.advanced.percent"
-            :metadata="metadata.symbol.advanced.percent"
-          />
-        </div>
+        <VFormGroup
+          type="number"
+          :title="$t('Minimum Amount of Symbols')"
+          v-model="symbolProtection.advanced.minimum"
+          :metadata="metadata.symbol.advanced.minimum"
+        />
+        <VFormGroup
+          type="number"
+          :title="$t('Maximum Amount of Symbols')"
+          v-model="symbolProtection.advanced.maximum"
+          :metadata="metadata.symbol.advanced.maximum"
+        />
+        <VFormGroup
+          type="slider"
+          :title="$t('Maximum Percent')"
+          v-model="symbolProtection.advanced.percent"
+          :metadata="metadata.symbol.advanced.percent"
+        />
       </div>
     </transition>
   </div>

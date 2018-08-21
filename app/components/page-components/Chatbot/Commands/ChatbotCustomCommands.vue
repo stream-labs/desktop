@@ -58,7 +58,7 @@
                 >
                   <div class="chatbot-custom-commands__command-actions__container">
                     <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                  <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                    <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                   </div>
                 </DropdownMenu>
               </div>

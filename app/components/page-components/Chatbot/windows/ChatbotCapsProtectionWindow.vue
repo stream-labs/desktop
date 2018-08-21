@@ -13,57 +13,55 @@
       <div v-if="selectedTab === 'general' && capsProtection">
         <div class="row">
           <div class="small-6 columns">
-            <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Auto Permit')"
+              type="list"
               v-model="capsProtection.general.excluded.level"
               :metadata="metadata.caps.general.excluded.level"
             />
           </div>
           <div class="small-6 columns">
-            <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Punishment')"
+              type="list"
               v-model="capsProtection.general.punishment.type"
               :metadata="metadata.caps.general.punishment.type"
             />
           </div>
         </div>
-        <div v-if="capsProtection.general.punishment.type === 'Timeout'">
-          <label for="response" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
-          <NumberInput
-            v-model="capsProtection.general.punishment.duration"
-            :metadata="metadata.caps.general.punishment.duration"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Punishment Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="capsProtection.general.message"
-            :metadata="metadata.caps.general.message"
-          />
-        </div>
+        <VFormGroup
+          v-if="capsProtection.general.punishment.type === 'Timeout'"
+          :title="$t('Punishment Duration (Value in Minutes)')"
+          type="number"
+          v-model="capsProtection.general.punishment.duration"
+          :metadata="metadata.caps.general.punishment.duration"
+        />
+        <VFormGroup
+          :title="$t('Punishment Response (Line breaks will be ignored)')"
+          type="textArea"
+          v-model="capsProtection.general.message"
+          :metadata="metadata.caps.general.message"
+        />
       </div>
       <div v-if="selectedTab === 'advanced'">
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Minimum Amount of Caps') }} </label>
-          <NumberInput
-            v-model="capsProtection.advanced.minimum"
-            :metadata="metadata.caps.advanced.minimum"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Maximum Amount of Caps') }} </label>
-          <NumberInput
-            v-model="capsProtection.advanced.maximum"
-            :metadata="metadata.caps.advanced.maximum"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Maximum Percent') }} </label>
-          <SliderInput
-            v-model="capsProtection.advanced.percent"
-            :metadata="metadata.caps.advanced.percent"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Minimum Amount of Caps')"
+          type="number"
+          v-model="capsProtection.advanced.minimum"
+          :metadata="metadata.caps.advanced.minimum"
+        />
+        <VFormGroup
+          :title="$t('Maximum Amount of Caps')"
+          type="number"
+          v-model="capsProtection.advanced.maximum"
+          :metadata="metadata.caps.advanced.maximum"
+        />
+        <VFormGroup
+          :title="$t('Maximum Percent')"
+          type="slider"
+          v-model="capsProtection.advanced.percent"
+          :metadata="metadata.caps.advanced.percent"
+        />
       </div>
     </transition>
   </div>

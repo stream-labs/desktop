@@ -53,37 +53,35 @@
       <div class="new-list-item-modal__body">
         <div class="row">
           <div class="small-7 columns">
-            <label for="text" class="margin-vertical--10"> {{ $t('Word or Phrase') }} </label>
-            <TextInput
-              class="width--100"
+            <VFormGroup
+              :title="$t('Word or Phrase')"
+              type="text"
               :metadata="metadata.text"
               v-model="newListItem.text"
             />
           </div>
           <div class="small-5 columns">
-            <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Punishment')"
+              type="list"
               v-model="newListItem.punishment.type"
               :metadata="metadata.punishment.type"
             />
           </div>
         </div>
-        <div v-if="newListItem.punishment.type === 'Timeout'">
-          <label for="punishment duration" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
-          <NumberInput
-            v-model="newListItem.punishment.duration"
-            :metadata="metadata.punishment.duration"
-          />
-        </div>
-        <div>
-          <label for="is regex">
-            <label for="is regex" class="margin-vertical--10"> {{ $t('This word contains Regular Expression') }} </label>
-            <BoolInput
-              v-model="newListItem.is_regex"
-              :metadata="metadata.is_regex"
-            />
-          </label>
-        </div>
+        <VFormGroup
+          v-if="newListItem.punishment.type === 'Timeout'"
+          :title="$t('Punishment Duration (Value in Minutes)')"
+          type="type"
+          v-model="newListItem.punishment.duration"
+          :metadata="metadata.punishment.duration"
+        />
+        <BoolInput
+          class="margin-top--10"
+          :title="$t('This word contains Regular Expression')"
+          v-model="newListItem.is_regex"
+          :metadata="metadata.is_regex"
+        />
       </div>
       <div class="new-list-item-modal__controls">
         <button
