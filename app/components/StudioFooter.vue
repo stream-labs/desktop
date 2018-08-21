@@ -46,11 +46,11 @@
   flex-direction: row;
   align-items: center;
   position: relative;
-  padding: 10px 20px;
+  .padding-h-sides(2);
+  .padding-v-sides();
   background-color: @day-section;
   max-width: none;
   flex: 0 0 auto;
-  border-top: 1px solid transparent;
 }
 
 .nav-right {
@@ -59,7 +59,7 @@
 }
 
 .nav-item {
-  margin-left: 20px;
+  .margin-left(2);
 
   @media(max-width: 1200px) {
     font-size: 12px;
@@ -76,7 +76,7 @@
 .platform-error {
   background: rgba(251,72,76,.28);
   padding: 5px;
-  border-radius: 3px;
+  .radius();
 
   i {
     margin-left: 5px;
@@ -110,8 +110,8 @@
   justify-content: center;
   border-radius: 100%;
   opacity: .6;
-  .transition;
-  .weight--bold;
+  .transition();
+  .weight(@bold);
   border: 1px solid #c4c5c5;
   box-sizing: content-box;
   letter-spacing: .2px;
@@ -146,8 +146,7 @@
 
 .night-theme {
   .footer {
-    background-color: @night-primary;
-    border-color: @night-border;
+    background-color: @night-section;
   }
 
   .error-wrapper {

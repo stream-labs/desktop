@@ -41,16 +41,17 @@
   width: 100%;
   display: flex;
   position: relative;
+  .padding-bottom(2);
 }
 
 .slider-input {
-  margin-left: 10px;
+  .margin-left(3);
   width: 60px;
 }
 
 .slider {
   background: transparent;
-  padding:8px 0 !important;
+  padding: 8px 0 !important;
   margin: 0;
   flex-grow: 1;
   height: auto;
@@ -94,6 +95,12 @@
 
   &:before {
     display: none;
+  }
+}
+
+.vue-slider-piecewise {
+  .vue-slider-piecewise-dot {
+    display: none!important;
   }
 }
 

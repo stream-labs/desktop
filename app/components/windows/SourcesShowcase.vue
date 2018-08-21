@@ -166,7 +166,7 @@
 @import "../../styles/index";
 
 h2 {
-  .margin-bottom--16();
+  .margin-bottom(2);
 }
 
 .add-source {
@@ -224,11 +224,12 @@ h2 {
   margin-top: 8px;
   background-color: @day-section;
   width: 49%;
+  .radius();
 
   &:hover,
   &.source--active {
     color: @day-title;
-    .weight--medium();
+    .weight(@medium);
     background-color: @light-2;
   }
 
@@ -248,8 +249,6 @@ h2 {
 .source--widget {
   display: flex;
   align-items: center;
-  .radius();
-  .transition();
 }
 
 .source-info__media {

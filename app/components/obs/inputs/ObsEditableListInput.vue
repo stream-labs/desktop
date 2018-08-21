@@ -34,7 +34,7 @@
 
 .editable-list__list {
   background: @day-input-bg;
-  border: 1px solid @day-input-border;
+  border: 0;
 }
 
 .editable-list__bar {

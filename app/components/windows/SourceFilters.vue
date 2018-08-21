@@ -8,7 +8,7 @@
     <display slot="fixed" :sourceId="sourceId" />
 
     <div slot="content" class="modal--side-nav">
-      <NavMenu v-model="selectedFilterName" class="side-menu">
+      <NavMenu v-model="selectedFilterName">
         <div class="controls">
           <i
             class="icon-add icon-button"
@@ -60,7 +60,7 @@
 @import "../../styles/index";
 
 .modal-container--side-nav {
-  padding: 20px;
+  .padding(2);
 }
 
 .modal--side-nav > .sl-vue-tree-toggle {
@@ -68,12 +68,11 @@
 }
 
 .controls {
-  margin-left: 20px;
-  .margin-bottom--16();
+  .margin-bottom(2);
 
   .icon-button {
     margin-left: 0;
-    .margin-right--16();
+    .margin-right(2);
 
     &:first-child {
       margin-left: 0;

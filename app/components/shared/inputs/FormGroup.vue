@@ -10,7 +10,7 @@
           :metadata="formInputMetadata"
           @input="value => $emit('input', value)"
         />
-        <div v-if="!type" class="slots">
+        <div v-if="$slots.default" class="slots">
           <slot></slot>
         </div>
         <div v-if="options.tooltip" class="tooltip">
