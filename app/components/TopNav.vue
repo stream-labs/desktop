@@ -90,34 +90,21 @@
 
 <script lang="ts" src="./TopNav.vue.ts"></script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../styles/index";
 
-.top-nav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0 20px;
-  position: relative;
-  max-width:  none;
-  background-color: @day-secondary;
-  border-bottom: 1px solid @day-border;
-  flex: 0 0 54px;
-  z-index: 1;
-}
-
-.top-nav-right {
-  flex-grow: 1;
-  display: flex;
-  text-align: right;
-  justify-content: flex-end;
-  align-items: center;
-}
-
 .top-nav-item {
-  margin-left: 20px;
+  .margin-left(2);
   display: flex;
   align-items: center;
+
+  i {
+    .margin-right(@0);
+  }
+
+  span {
+    .margin-left();
+  }
 
   &.top-nav-item--active {
     >a {
@@ -127,6 +114,31 @@
       }
     }
   }
+}
+</style>
+
+<style lang="less" scoped>
+@import "../styles/index";
+
+.top-nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .padding-h-sides(2);
+  position: relative;
+  max-width:  none;
+  background-color: @day-secondary;
+  border-bottom: 1px solid @day-border;
+  flex: 0 0 48px;
+  z-index: 1;
+}
+
+.top-nav-right {
+  flex-grow: 1;
+  display: flex;
+  text-align: right;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .link {

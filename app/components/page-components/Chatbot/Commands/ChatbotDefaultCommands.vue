@@ -78,8 +78,7 @@
 
 .chatbot__dropdown-header {
   .align-items--inline;
-  .padding--10;
-  .text-transform--uppercase;
+  .padding();
   border-color: @teal;
   background-color: #eaf9f5;
   color: @teal;
@@ -95,7 +94,7 @@
 
   .icon-down {
     font-size: 5px;
-    .icon--margin;
+    .icon--margin();
     .transition();
   }
 }
@@ -114,9 +113,9 @@ table tr {
   td:last-child {
     width: 100px;
     .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
-    color: white;
+    .text-align(@right);
+    .padding-right();
+    color: @white;
 
     .icon-edit {
       font-size: 10px;
@@ -136,7 +135,7 @@ table tr {
 
   tbody tr {
     border: 2px solid transparent;
-    .transition;
+    .transition();
 
     td {
       color: white;

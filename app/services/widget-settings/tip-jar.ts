@@ -15,8 +15,7 @@ interface ITipJarSettings extends IWidgetSettings {
   background_color: string;
   background: any;
   custom_html_enabled: boolean;
-  text: { color: string, font: string, show: boolean };
-  text_size: number;
+  text: { color: string, font: string, show: boolean, size: number };
   types: {
     tips: { enabled: boolean, minimum_amount?: number, tiers: ITipDarTierData[] },
     twitch_bits: { enabled: boolean, minimum_amount?: number },

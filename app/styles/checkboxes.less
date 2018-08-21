@@ -9,6 +9,7 @@
   min-height: 18px;
   line-height: 18px;
   min-width: 18px;
+  .margin-bottom();
 
   label {
     margin: 0;
@@ -17,11 +18,11 @@
     position: relative;
     display: inline-block;
     width: auto;
-    padding-left: 24px;
+    padding-left: 28px;
     outline: 0;
     transition: color .1s ease;
     color: @day-paragraph;
-    .weight--normal();
+    .weight();
 
     &:before {
       position: absolute;
@@ -96,6 +97,16 @@
     border-radius: 20px;
     left: 4px;
     top: 4px;
+  }
+}
+
+.slots {
+  .input-wrapper {
+    &:last-child {
+      .checkbox {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 

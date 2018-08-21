@@ -47,9 +47,8 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 .chatbot-aliases__container {
-
   .chatbot-aliases__new-alias__button {
-    .text-transform--capitalize;
+    .text-transform();
     .width--100();
   }
 

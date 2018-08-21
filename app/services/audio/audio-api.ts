@@ -2,6 +2,7 @@ import * as obs from '../../../obs-api';
 import { Subscription } from 'rxjs/Subscription';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import { ISource } from '../sources/sources-api';
+import { Observable } from 'rxjs/Observable';
 
 export interface IAudioSourcesState {
   audioSources: Dictionary<IAudioSource>;
@@ -37,6 +38,7 @@ export interface IAudioServiceApi {
   getSources(): IAudioSourceApi[];
   getSourcesForScene(sceneId: string): IAudioSourceApi[];
   getSourcesForCurrentScene(): IAudioSourceApi[];
+  audioSourceUpdated: Observable<IAudioSource>;
 }
 
 export interface IVolmeter {

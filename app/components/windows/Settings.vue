@@ -2,10 +2,11 @@
 <modal-layout
   :title="$t('Settings')"
   :show-cancel="false"
-  :done-handler="done">
+  :done-handler="done"
+  class="modal-layout--w-side-menu">
 
   <div slot="content" class="settings">
-    <NavMenu v-model="categoryName" class="side-menu">
+    <NavMenu v-model="categoryName">
       <NavItem
         v-for="category in categoryNames"
         :key="category"
@@ -43,13 +44,15 @@
   display: flex;
   align-content: stretch;
   align-items: stretch;
-  height: 100%;
+  flex: 1;
+  .transition();
+  margin: -16px;
 }
 
 .settings-container {
   flex-grow: 1;
-  margin: 0px -20px -20px 0;
-  padding-right: 20px;
+  .padding-right(2);
+  .padding-top(2);
   overflow: auto;
 }
 </style>
@@ -67,6 +70,7 @@
     .input-label {
       label {
         margin-bottom: 8px;
+        line-height: 16px;
       }
     }
   }

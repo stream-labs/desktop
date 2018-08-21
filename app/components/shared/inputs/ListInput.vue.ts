@@ -34,6 +34,14 @@ export default class ListInput extends BaseInput<string, IListMetadata<string>> 
     }
   }
 
+  getOptions(): IListMetadata<string> {
+    const options = super.getOptions();
+    return {
+      ...options,
+      allowEmpty: !!options.allowEmpty // undefined value is not working for vue-multiselect
+    }
+  }
+
   get currentMultiselectValue() {
     const options = this.multiselectOptions;
 

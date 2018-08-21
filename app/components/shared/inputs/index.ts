@@ -37,6 +37,7 @@ export interface INumberMetadata extends IInputMetadata {
 
 export interface IListMetadata<TValueType> extends IInputMetadata {
   options: IListOption<TValueType>[];
+  allowEmpty?: boolean;
 }
 
 export interface ITextMetadata extends IInputMetadata {

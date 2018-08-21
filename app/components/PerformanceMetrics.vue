@@ -82,6 +82,6 @@
 }
 
 .performance-metric__value {
-  .weight--medium();
+  .weight(@medium);
 }
 </style>
