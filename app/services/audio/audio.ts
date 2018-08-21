@@ -305,11 +305,7 @@ export class AudioService extends StatefulService<IAudioSourcesState> implements
 
   @mutation()
   private UPDATE_AUDIO_SOURCE(sourceId: string, patch: Partial<IAudioSource>) {
-    if (patch.fader) {
-      Object.assign(this.state.audioSources[sourceId].fader, patch.fader);
-    }
-
-    Object.assign(this.state.audioSources[sourceId], omit(patch, 'fader'));
+    Object.assign(this.state.audioSources[sourceId], patch);
   }
 
   @mutation()
