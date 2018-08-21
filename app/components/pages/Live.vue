@@ -76,8 +76,8 @@
 @import "../../styles/index";
 .sizer-container {
   width: 100%;
-  .radius;
-  background-color: @day-secondary;
+  .radius();
+  background-color: @day-section;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -118,7 +118,7 @@
 .mission-control-container {
   flex: 1;
   margin-bottom: 20px;
-  .radius;
+  .radius();
   overflow: hidden;
   position: relative;
 }
@@ -141,7 +141,7 @@
 
 .sizer-container {
   width: 100%;
-  .radius;
+  .radius();
   background-color: @day-secondary;
   display: flex;
   justify-content: flex-start;
@@ -164,7 +164,7 @@
 }
 
 .live-display-wrapper {
-  .aspect-ratio--16-9();
+  .aspect-ratio(16, 9);
   width: 100%;
 }
 

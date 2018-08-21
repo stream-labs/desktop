@@ -36,8 +36,9 @@
     left: 0;
     bottom: 0;
     background-color: @day-section;
-    padding: 16px;
-    text-align: right;
+    .padding-v-sides();
+    .padding-h-sides(2);
+    .text-align(@right);
     flex-shrink: 0;
     z-index: 11;
   }

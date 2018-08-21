@@ -3,8 +3,7 @@
   <h2
     class="section-title section-title--dropdown"
     v-if="title"
-    @click="collapsed = !collapsed"
-    :class="{ 'section-title--opened': !collapsed }">
+    @click="collapsed = !collapsed">
     <i
       v-if="collapsed === true"
       class="fa fa-plus section-title__icon"/>
@@ -13,11 +12,16 @@
       class="fa fa-minus section-title__icon"/>
     {{ title }}
   </h2>
-  <div class="section-content" v-show="!collapsed">
-    <div v-for="hotkey in hotkeys" :key="hotkey.resourceId">
-      <hotkey :hotkey="hotkey" />
+  <transition name="expand">
+    <div
+      class="section-content"
+      v-show="!collapsed"
+      :class="{ 'section-content--opened': title }">
+      <div v-for="hotkey in hotkeys" :key="hotkey.resourceId">
+        <hotkey :hotkey="hotkey" />
+      </div>
     </div>
-  </div>
+  </transition>
 </div>
 </template>
 

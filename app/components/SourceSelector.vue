@@ -94,10 +94,10 @@ i.disabled {
 .sl-vue-tree-node {
   &:hover,
   &.sl-vue-tree-selected {
-    .transition;
+    .transition();
 
     .source-selector-action {
-      .transition;
+      .transition();
       opacity: 1;
       color: @grey;
     }
@@ -106,15 +106,6 @@ i.disabled {
 
 .sl-vue-tree.sl-vue-tree-root {
   border-color: @day-section;
-}
-
-.sl-vue-tree-node-item {
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-right: 0;
-  border-left: 0;
-  margin-top: -1px;
-  padding: 0 12px;
 }
 
 .title-container {

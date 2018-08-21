@@ -20,10 +20,11 @@
 <script lang="ts" src="./ListInput.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../../styles/index";
 
-  .description {
-    margin-top: 6px;
-    font-size: 11px;
-    font-style: italic;
-  }
+.description {
+  margin-top: 6px;
+  font-size: 11px;
+  font-style: italic;
+}
 </style>
