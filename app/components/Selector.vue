@@ -56,8 +56,7 @@
   align-items: center;
   padding-top: 4px;
   padding-bottom: 4px;
-  .padding-right();
-  .padding-left();
+  .padding-h-sides();
   cursor: pointer;
   justify-content: space-between;
   color: @day-paragraph;
@@ -66,6 +65,7 @@
   &.selector-item--active {
     background-color: @light-2;
     color: @day-title;
+    .weight(@medium);
 
     .selector-actions {
       opacity: 1;

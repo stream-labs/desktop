@@ -98,17 +98,17 @@
 
 .night-theme {
   .colorpicker {
-  .colorpicker__input {
-    background: @night-dropdown-bg;
-    border-color: @night-dropdown-border;
-
-    &:focus,
-    &:visited,
-    &:active {
+    .colorpicker__input {
       background: @night-dropdown-bg;
       border-color: @night-dropdown-border;
+
+      &:focus,
+      &:visited,
+      &:active {
+        background: @night-dropdown-bg;
+        border-color: @night-dropdown-border;
+      }
     }
-  }
 
     .colorpicker-menu {
       background: @night-dropdown-bg!important;

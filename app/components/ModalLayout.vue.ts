@@ -54,7 +54,7 @@ export default class ModalLayout extends Vue {
 
   created() {
     const contentStyle = {
-      // padding: '20px',
+      padding: '16px',
       overflowY: 'auto'
     };
 

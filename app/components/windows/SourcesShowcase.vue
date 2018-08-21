@@ -224,6 +224,7 @@ h2 {
   margin-top: 8px;
   background-color: @day-section;
   width: 49%;
+  .radius();
 
   &:hover,
   &.source--active {
@@ -248,8 +249,6 @@ h2 {
 .source--widget {
   display: flex;
   align-items: center;
-  .radius();
-  .transition();
 }
 
 .source-info__media {
