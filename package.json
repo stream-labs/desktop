@@ -164,8 +164,7 @@
     "vuedraggable": "2.8.5",
     "vuex": "3.0.1",
     "webpack": "4.8.3",
-    "webpack-cli": "2.1.3",
-    "vue-toasted": "^1.1.24"
+    "webpack-cli": "2.1.3"
   },
   "resolutions": {
     "uglify-es": "3.3.9"
