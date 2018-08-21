@@ -8,9 +8,10 @@
     :close-on-select="true"
     :placeholder="placeholder"
     label="description"
+    :allow-empty="options.allowEmpty"
     @input="onInputHandler">
   </multiselect>
-  <div v-if="selectedOption.description" class="description">
+  <div v-if="selectedOption && selectedOption.description" class="description">
     {{ selectedOption.description }}
   </div>
 </div>
