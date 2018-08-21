@@ -1,13 +1,9 @@
 import { NiconicoService } from './niconico';
-import { integer } from 'aws-sdk/clients/lightsail';
 
-export interface IChannelInfo {
-  title: string;
-  game: string;
-}
-
-export interface IGame {
-  name: string;
+export type IStreamingSetting = {
+  asking: boolean,
+  url: string,
+  key: string
 }
 
 // All platform services should implement
@@ -18,19 +14,9 @@ export interface IPlatformService {
 
   authUrl: string;
 
-  // This function is responsible for setting up stream
-  // settings for this platform, given an auth.
-  setupStreamSettings: (auth: IPlatformAuth) => Promise<void>;
+  setupStreamSettings: (programId: string) => Promise<IStreamingSetting>;
 
   fetchViewerCount: () => Promise<number>;
-
-  fetchStreamKey: () => Promise<string>;
-
-  fetchChannelInfo: () => Promise<IChannelInfo>;
-
-  putChannelInfo: (streamTitle: string, streamGame: string) => Promise<boolean>;
-
-  searchGames: (searchString: string) => Promise<IGame[]>;
 
   getChatUrl: (mode: string) => Promise<string>;
 

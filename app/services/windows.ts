@@ -20,6 +20,7 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import Projector from 'components/windows/Projector.vue';
 import OptimizeForNiconico from 'components/windows/OptimizeForNiconico.vue';
+import NicoliveProgramSelector from 'components/windows/NicoliveProgramSelector.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -85,7 +86,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    OptimizeForNiconico
+    OptimizeForNiconico,
+    NicoliveProgramSelector
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};

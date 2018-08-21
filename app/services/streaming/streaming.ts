@@ -101,7 +101,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  async toggleStreamingAsync() {
+  // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+  async toggleStreamingAsync(programId: string = '') {
     if (this.isStreaming) {
       this.toggleStreaming();
       return;
@@ -110,7 +111,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     console.log('Start Streaming button: platform=' + JSON.stringify(this.userService.platform));
     if (this.userService.isNiconicoLoggedIn()) {
       try {
-        const streamkey = await this.userService.updateStreamSettings();
+        const setting = await this.userService.updateStreamSettings(programId);
+        if (setting.asking) {
+          return;
+        }
+        const streamkey = setting.key;
         if (streamkey === '') {
           return new Promise(resolve => {
             electron.remote.dialog.showMessageBox(
