@@ -73,7 +73,7 @@
 
 .onboarding-title--sm {
   font-size: 15px;
-  .weight--medium();
+  .weight(@medium);
   color: @white;
 }
 

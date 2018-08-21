@@ -12,6 +12,7 @@ import uuid from 'uuid/v4';
 import { SceneCollectionsService } from 'services/scene-collections';
 import { $t } from 'services/i18n';
 import { DefaultManager } from 'services/sources/properties-managers/default-manager';
+import { Subject } from 'rxjs/Subject';
 
 export enum ETransitionType {
   Cut = 'cut_transition',
@@ -63,6 +64,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   @Inject() scenesService: ScenesService;
   @Inject() sceneCollectionsService: SceneCollectionsService;
 
+  studioModeChanged = new Subject<boolean>();
+
   /**
    * This transition is used to render the left (EDIT) display
    * while in studio mode
@@ -113,6 +116,8 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (this.state.studioMode) return;
 
     this.SET_STUDIO_MODE(true);
+    this.studioModeChanged.next(true);
+
     if (!this.studioModeTransition) this.createStudioModeTransition();
     const currentScene = this.scenesService.activeScene.getObsScene();
     this.sceneDuplicate = currentScene.duplicate(
@@ -130,6 +135,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
     if (!this.state.studioMode) return;
 
     this.SET_STUDIO_MODE(false);
+    this.studioModeChanged.next(false);
 
     this.getCurrentTransition().set(
       this.scenesService.activeScene.getObsScene()

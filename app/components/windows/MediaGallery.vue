@@ -137,7 +137,7 @@
 .list__item {
   padding: 3px 0;
   color: @white;
-  .weight--medium();
+  .weight(@medium);
 
   i {
     color: @grey;
@@ -173,8 +173,8 @@
 
 .toolbar {
   border: 1px solid @night-accent-light;
-  padding: 8px;
-  border-radius: 3px;
+  .padding();
+  .radius;
   background: @night-secondary;
   width: 100%;
 
@@ -237,7 +237,7 @@
   border: 1px solid @night-secondary;
   background: @day-shadow;
   z-index: 99999;
-  border-radius: 3px;
+  .radius;
 }
 
 .uploads-manager__list {

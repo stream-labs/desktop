@@ -12,7 +12,7 @@
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
           <div @click="onToggleLinkProtectionWindowHandler">
-            <span class="text-transform--uppercase"> {{ $t('edit command') }} </span>
+            <span> {{ $t('Edit Command') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
         </div>
@@ -57,14 +57,22 @@
         </div>
         <div v-if="selectedTab === 'whitelist'">
           <ChatbotLinkProtectionList
+<<<<<<< HEAD
             :title="$t('Add to Whitelist')"
+=======
+            :title="'Add to Whitelist'"
+>>>>>>> chatbot-feature
             :type="'whitelist'"
             v-model="linkProtection.whitelist"
           />
         </div>
         <div v-if="selectedTab === 'blacklist'">
           <ChatbotLinkProtectionList
+<<<<<<< HEAD
             :title="$t('Add to Blacklist')"
+=======
+            :title="'Add to Blacklist'"
+>>>>>>> chatbot-feature
             :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />

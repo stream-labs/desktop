@@ -5,7 +5,7 @@
   </div>
   <div class="Hotkey-bindings">
     <transition-group name="bindings" tag="div">
-      <div v-for="(binding, index) in bindings" :key="binding.key">
+      <div v-for="(binding, index) in bindings" :key="binding.key" class="hotkey-bindings__binding">
         <input
           type="text"
           class="Hotkey-input"
@@ -31,7 +31,7 @@
 .hotkey {
   display: flex;
   flex-direction: row;
-  .margin-bottom--24();
+  .margin-bottom(3);
 }
 
 .Hotkey-description {

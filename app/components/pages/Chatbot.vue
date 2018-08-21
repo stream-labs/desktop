@@ -2,7 +2,7 @@
   <div>
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
-        <span class="text-transform--uppercase">
+        <span>
           {{ $t(`Chatbot ${globallyEnabled ? 'enabled' : 'disabled'}`) }}
         </span>
         <ToggleInput
@@ -52,7 +52,7 @@
   .chatbot__side-menu__global-toggle {
     padding: 20px;
     background-color: #EAF9F5;
-    .weight--bold();
+    .weight(@bold);
   }
   .side-menu {
     margin-top: 0;

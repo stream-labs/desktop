@@ -31,7 +31,10 @@
   box-sizing: border-box;
   position: relative;
   width: 100%;
-  padding: 0 15px;
+  .padding-top(@0);
+  .padding-bottom(@0);
+  .padding-right(2);
+  .padding-left(2);
   height: 54px;
   border-bottom: 1px solid @day-border;
 }

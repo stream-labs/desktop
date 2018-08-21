@@ -15,7 +15,7 @@
             @click="onToggleLinkProtectionWindowHandler"
             v-if="isLinkProtectionPermitCommand"
           >
-            <span class="text-transform--uppercase"> {{ $t('link protection preferences') }} </span>
+            <span> {{ $t('Link Protection Preferences') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
         </div>

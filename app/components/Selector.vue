@@ -47,23 +47,25 @@
   list-style-type: none;
   margin: 0;
   overflow: auto;
+  .radius();
 }
 
 .selector-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 4px 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  .padding-h-sides();
   cursor: pointer;
   justify-content: space-between;
-  border: 1px solid @day-section;
   color: @day-paragraph;
-  .transition;
+  .transition();
 
   &.selector-item--active {
-    background-color: @white;
-    border-color: @day-section;
+    background-color: @light-2;
     color: @day-title;
+    .weight(@medium);
 
     .selector-actions {
       opacity: 1;
@@ -106,7 +108,6 @@
 
   .selector-item {
     color: @grey;
-    border-color: @night-section;
 
     &.selector-item--active {
       background-color: @night-hover;

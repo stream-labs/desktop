@@ -43,23 +43,19 @@
 }
 
 .section {
-  padding: 16px;
-  margin-bottom: 24px;
+  .padding(2);
+  .margin-bottom(3);
   background: @day-section;
   .radius();
 
   .button {
-    .margin-right--16();
+    .margin-right(2);
   }
 }
 
 .section-title--dropdown {
   cursor: pointer;
   margin-bottom: 0;
-}
-
-.section-title--opened {
-  margin-bottom: 24px;
 }
 
 .section-title__icon {
@@ -73,7 +69,11 @@
 }
 
 .section-content {
-  margin-bottom: -24px;
+  margin-bottom: -16px;
+}
+
+.section-content--opened {
+  .margin-top(3);
 }
 
 .noselect {
