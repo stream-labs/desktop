@@ -69,7 +69,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
     {
       name: 'TOGGLE_START_STREAMING',
       description: () => $t('hotkeys.startStreaming'),
-      down: () => getStreamingService().toggleStreaming(),
+      down: () => getStreamingService().toggleStreamingAsync(),
       isActive: () => {
         const streamingService = getStreamingService();
         return streamingService.isStreaming;
@@ -80,7 +80,7 @@ const HOTKEY_ACTIONS: Dictionary<IHotkeyAction[]> = {
       description: () => $t('hotkeys.stopStreaming'),
       down: () => {
         const streamingService = getStreamingService();
-        streamingService.toggleStreaming();
+        streamingService.toggleStreamingAsync();
       },
       isActive: () => {
         const streamingService = getStreamingService();

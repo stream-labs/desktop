@@ -15,7 +15,11 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
+import { CustomizationService } from 'services/customization';
 import { StreamInfoService }from 'services/stream-info';
+import { UserService } from 'services/user';
+import { getPlatformService } from '../platforms';
+import { NiconicoService } from '../platforms/niconico';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -42,9 +46,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   implements IStreamingServiceApi {
   @Inject() obsApiService: ObsApiService;
   @Inject() settingsService: SettingsService;
+  @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() customizationService: CustomizationService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -92,6 +98,62 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
    * @deprecated Use toggleStreaming instead
    */
   stopStreaming() {
+    this.toggleStreaming();
+  }
+
+  async toggleStreamingAsync() {
+    if (this.isStreaming) {
+      this.toggleStreaming();
+      return;
+    }
+
+    console.log('Start Streaming button: platform=' + JSON.stringify(this.userService.platform));
+    if (this.userService.isNiconicoLoggedIn()) {
+      try {
+        const streamkey = await this.userService.updateStreamSettings();
+        if (streamkey === '') {
+          return new Promise(resolve => {
+            electron.remote.dialog.showMessageBox(
+              electron.remote.getCurrentWindow(),
+              {
+                title: $t('streaming.notBroadcasting'),
+                type: 'warning',
+                message: $t('streaming.notBroadcastingMessage'),
+                buttons: [$t('common.close')],
+                noLink: true,
+              },
+              done => resolve(done)
+            );
+          });
+        }
+        if (this.customizationService.optimizeForNiconico) {
+          const platform = getPlatformService(this.userService.platform.type);
+          if (platform instanceof NiconicoService) {
+            // FIXME: `this.userService.updateStreamSettings`とあわせて
+            //       2度 `getpublishstatus` を呼んでいるが
+            //       不整合回避のために1回だけにしたい
+            return this.optimizeForNiconico(platform);
+          }
+        }
+      } catch (e) {
+        const message = e instanceof Response
+          ? $t('streaming.broadcastStatusFetchingError.httpError', { statusText: e.statusText })
+          : $t('streaming.broadcastStatusFetchingError.default');
+
+        return new Promise(resolve => {
+          electron.remote.dialog.showMessageBox(
+            electron.remote.getCurrentWindow(),
+            {
+              type: 'warning',
+              message,
+              buttons: [$t('common.close')],
+              noLink: true,
+            },
+            done => resolve(done)
+          );
+        });
+      }
+    }
     this.toggleStreaming();
   }
 
@@ -153,6 +215,43 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     if (this.state.streamingStatus === EStreamingState.Ending) {
       this.obsApiService.nodeObs.OBS_service_stopStreaming(true);
       return;
+    }
+  }
+
+  private async optimizeForNiconico(platform: NiconicoService) {
+    const bitrate = await platform.fetchBitrate();
+    if (bitrate === undefined) {
+      return new Promise(resolve => {
+        electron.remote.dialog.showMessageBox(
+          electron.remote.getCurrentWindow(),
+          {
+            title: $t('streaming.bitrateFetchingError.title'),
+            type: 'warning',
+            message: $t('streaming.bitrateFetchingError.message'),
+            buttons: [$t('common.close')],
+            noLink: true,
+          },
+          done => resolve(done)
+        );
+      });
+    }
+    const settings = this.settingsService.diffOptimizedSettings(bitrate);
+    if (settings) {
+      if (this.customizationService.showOptimizationDialogForNiconico) {
+        this.windowsService.showWindow({
+          componentName: 'OptimizeForNiconico',
+          queryParams: settings,
+          size: {
+            width: 500,
+            height: 400
+          }
+        });
+      } else {
+        this.settingsService.optimizeForNiconico(settings);
+        this.toggleStreaming();
+      }
+    } else {
+      this.toggleStreaming();
     }
   }
 
