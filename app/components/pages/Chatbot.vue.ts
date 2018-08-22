@@ -7,8 +7,8 @@ import ChatbotCommands from 'components/page-components/Chatbot/ChatbotCommands.
 import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.vue';
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import {
-  IChatbotWindowApi,
-  IChatbotServerApi
+  IChatbotServerApi,
+  IChatbotCommonServiceState
 } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue'
@@ -27,9 +27,6 @@ import ToggleInput from 'components/shared/inputs/ToggleInput.vue'
 export default class Chatbot extends Vue {
   @Inject()
   chatbotApiService: IChatbotServerApi;
-
-  // @Inject()
-  // chatbotCommonService: IChatbotWindowApi;
 
   tabNames = [
     { title: 'Modules', enabled: true },
@@ -71,7 +68,7 @@ export default class Chatbot extends Vue {
   }
 
   mounted() {
-    debugger;
+
     this.chatbotApiService
       .logIn()
       .then(response => {
