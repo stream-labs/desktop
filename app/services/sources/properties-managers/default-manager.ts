@@ -34,6 +34,10 @@ export class DefaultManager extends PropertiesManager {
   init() {
     if (!this.settings.mediaBackup) this.settings.mediaBackup = {};
     this.downloadGoogleFont();
+
+    if (this.obsSource.id === 'slideshow') {
+      this.blacklist = ['slide_mode'];
+    }
   }
 
   setPropertiesFormData(properties: input.TFormData) {
