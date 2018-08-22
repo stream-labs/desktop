@@ -17,22 +17,14 @@
     </div>
 
     <!-- slugs -->
-    <div
-      class="padding--10"
+    <CollapsibleSection
+      class="margin--20"
       v-for="(commands, slugName, index) in commandSlugs"
+      :title="$t(slugName)"
       :key="index"
     >
-      <div
-        class="chatbot__dropdown-header"
-        :class="{'chatbot__dropdown-header--hidden': !visible[slugName]}"
-        @click="onToggleVisibleHandler(slugName)"
-      >
-        <i class="icon-down cursor--pointer"></i>
-        <span>{{ $t(slugName) }}</span>
-      </div>
-
       <!-- commands in slug -->
-      <table v-if="visible[slugName]">
+      <table>
         <thead>
           <tr>
             <th> {{ $t('Command') }} </th>
@@ -66,7 +58,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
+    </CollapsibleSection>
   </div>
 </template>
 
@@ -74,30 +66,6 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
-
-
-.chatbot__dropdown-header {
-  .align-items--inline;
-  .padding();
-  border-color: @teal;
-  background-color: #eaf9f5;
-  color: @teal;
-  border-style: solid;
-  border-width: 1px 0;
-  margin-bottom: 15px;
-
-  &.chatbot__dropdown-header--hidden {
-    .icon-down {
-      transform: rotate(180deg);
-    }
-  }
-
-  .icon-down {
-    font-size: 5px;
-    .icon--margin();
-    .transition();
-  }
-}
 
 table tr {
 
@@ -126,12 +94,6 @@ table tr {
 
 
 .night-theme {
-
-  .chatbot__dropdown-header {
-    border-color: #274959;
-    background-color: rgba(27, 47,57, 0.68);
-    color: white;
-  }
 
   tbody tr {
     border: 2px solid transparent;

@@ -23,7 +23,7 @@
   .margin-bottom();
   .text-transform();
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 
   &.active {
@@ -54,6 +54,7 @@
     margin-right: -16px;
     left: -24px;
     width: 16px;
+    padding: 3px 0;
   }
 }
 
