@@ -7,7 +7,7 @@ import { mutation, ServiceHelper } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 import {
   IChatbotServerApi,
-  IChatbotWindowApi,
+  IChatbotCommonApi,
 } from 'services/chatbot';
 
 
@@ -530,7 +530,7 @@ export class ChatbotApiService
 
 export class ChatbotCommonService
   extends PersistentStatefulService<IChatbotCommonServiceState>
-  implements IChatbotWindowApi {
+  implements IChatbotCommonApi {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {

@@ -70,7 +70,7 @@ export interface IChatbotServerApi {
   deleteTimer(id: string): Promise<any | void>;
 }
 
-export interface IChatbotWindowApi {
+export interface IChatbotCommonApi {
   state: IChatbotCommonServiceState;
   windowsService: any;
   hideModBanner(): void;

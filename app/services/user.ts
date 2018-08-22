@@ -220,9 +220,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.appService.startLoading();
     await this.sceneCollectionsService.save();
     await this.sceneCollectionsService.safeSync();
+    // signs out of chatbot
+    await this.chatbotApiService.logOut();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
-    await this.chatbotApiService.logOut();
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();

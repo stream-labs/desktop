@@ -3,7 +3,7 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 
 import {
-  IChatbotWindowApi,
+  IChatbotCommonApi,
   IChatbotServerApi,
 } from 'services/chatbot';
 
@@ -35,7 +35,7 @@ export default class ChatbotBase extends Vue {
   chatbotApiService: IChatbotServerApi;
 
   @Inject()
-  chatbotCommonService: IChatbotWindowApi;
+  chatbotCommonService: IChatbotCommonApi;
 
   @Inject()
   customizationService: CustomizationService;
