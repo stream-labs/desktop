@@ -26,15 +26,15 @@ export default class Chatbot extends Vue {
   chatbotApiService: ChatbotApiService;
 
   tabNames = [
-    {title: 'Modules', enabled: true},
-    {title: 'Commands', enabled: true},
-    {title: 'Timers', enabled: true},
-    { title: 'Mod Tools', enabled: true},
-    {title: 'Quotes', enabled: false},
-    {title: 'Queue', enabled: false},
-    {title: 'Currency', enabled: false},
-    {title: 'Poll', enabled: false},
-    {title: 'Betting', enabled: false},
+    { title: 'Modules', enabled: true },
+    { title: 'Commands', enabled: true },
+    { title: 'Timers', enabled: true },
+    { title: 'Mod Tools', enabled: true },
+    { title: 'Quotes', enabled: false },
+    { title: 'Queue', enabled: false },
+    { title: 'Currency', enabled: false },
+    { title: 'Poll', enabled: false },
+    { title: 'Betting', enabled: false }
   ];
   //
   // Default State
@@ -60,7 +60,7 @@ export default class Chatbot extends Vue {
     return this.chatbotApiService.state.globallyEnabled;
   }
 
-  toggleEnableChatbot() {
+  onToggleEnableChatbotHandler() {
     this.chatbotApiService.toggleEnableChatbot();
   }
 
@@ -70,7 +70,7 @@ export default class Chatbot extends Vue {
       .then(response => {
         // user has authenticated chatbot api,
         // opening commands tab which will internally call
-        // chatbotApiService interally to fetch chatbots
+        // chatbotApiService interally to fetch chatbot data
         this.authenticated = true;
       })
       .catch(err => {

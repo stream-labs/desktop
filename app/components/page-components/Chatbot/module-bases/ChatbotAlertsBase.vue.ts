@@ -58,7 +58,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // toggle enable type
-  async toggleEnableAlert(type: ChatbotAlertTypes) {
+  async onToggleEnableAlertHandler(type: ChatbotAlertTypes) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 

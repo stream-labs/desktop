@@ -64,17 +64,19 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     return this.chatbotCommonService.state.timerToUpdate;
   }
 
-  onCancel() {
+  onCancelHandler() {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onSave() {
+  onSaveHandler() {
     if (this.isEdit) {
-      this.chatbotApiService.updateTimer(this.timerToUpdate.id, this.newTimer)
+      this.chatbotApiService
+        .updateTimer(this.timerToUpdate.id, this.newTimer)
         .catch(this.onErrorHandler);
       return;
     }
-    this.chatbotApiService.createTimer(this.newTimer)
+    this.chatbotApiService
+      .createTimer(this.newTimer)
       .catch(this.onErrorHandler);
   }
 

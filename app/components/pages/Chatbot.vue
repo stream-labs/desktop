@@ -7,7 +7,7 @@
         </span>
         <ToggleInput
           :value="globallyEnabled"
-          @input="toggleEnableChatbot"
+          @input="onToggleEnableChatbotHandler"
         />
       </div>
       <NavMenu v-model="selectedTab" class="side-menu">
@@ -63,6 +63,7 @@
 
     .chatbot__side-menu__tab__description {
       font-size: 12px;
+      line-height: 13px;
     }
   }
 }

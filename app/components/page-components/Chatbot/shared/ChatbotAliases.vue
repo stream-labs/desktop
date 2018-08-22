@@ -1,7 +1,7 @@
 <template>
 <form
   class="chatbot-aliases__container"
-  @submit.prevent="onAddAlias"
+  @submit.prevent="onAddAliasHandler"
 >
   <label for="alias" class="margin-vertical--10"> {{ $t('Enter Aliases') }} </label>
   <div class="row">
@@ -33,7 +33,7 @@
       v-for="(alias, index) in value"
       :key="`${alias}__${index}`"
       class="chatbot-aliases__alias"
-      @click="onDeleteAlias(alias)"
+      @click="onDeleteAliasHandler(alias)"
     >
       <i class="chatbot-aliases__alias__close-icon icon-close"></i>
       {{ alias }}

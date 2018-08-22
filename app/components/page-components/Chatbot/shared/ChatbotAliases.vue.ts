@@ -7,30 +7,40 @@ import {
 
 @Component({})
 export default class ChatbotAliases extends ChatbotBase {
-  @Prop() value: string[];
+  @Prop()
+  value: string[];
 
-  newAlias: string = null;
+  newAlias: string = '';
 
   textInputMetadata: ITextMetadata = {
     placeholder: '!example'
   };
 
   get isDuplicate() {
-    return this.value.length > 0 && this.newAlias && this.value.indexOf(this.newAlias) > -1;
+    // remove "!" and check the rest
+    const existingWithoutPrefix = this.value.map(alias =>
+      alias.replace('!', '')
+    );
+    const newWithoutPrefix = this.newAlias.replace('!', '');
+    return (
+      existingWithoutPrefix.length > 0 &&
+      newWithoutPrefix &&
+      existingWithoutPrefix.indexOf(newWithoutPrefix) > -1
+    );
   }
 
   get containsSpaces() {
     return this.newAlias && this.newAlias.indexOf(' ') > -1;
   }
 
-  onAddAlias() {
+  onAddAliasHandler() {
     if (!this.newAlias) return;
     if (this.isDuplicate) return;
 
     let newAliasArray = this.value.slice(0);
     newAliasArray.push(this.formatAlias(this.newAlias));
     this.$emit('input', newAliasArray);
-    this.newAlias = null;
+    this.newAlias = '';
   }
 
   formatAlias(value: string) {
@@ -40,7 +50,7 @@ export default class ChatbotAliases extends ChatbotBase {
     return value.replace(/\s/g, '');
   }
 
-  onDeleteAlias(aliasToDelete: string) {
+  onDeleteAliasHandler(aliasToDelete: string) {
     let newAliasArray = this.value.slice(0);
     newAliasArray = newAliasArray.filter(alias => alias !== aliasToDelete);
     this.$emit('input', newAliasArray);

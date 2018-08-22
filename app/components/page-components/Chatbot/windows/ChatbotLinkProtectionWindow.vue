@@ -7,11 +7,11 @@
   <div slot="fixed">
     <div class="row">
       <div class="small-6 columns position--relative">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
-          <div @click="toggleLinkProtectionWindow">
+          <div @click="onToggleLinkProtectionWindowHandler">
             <span> {{ $t('Edit Command') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
@@ -57,12 +57,14 @@
         <div v-if="selectedTab === 'whitelist'">
           <ChatbotLinkProtectionList
             :title="'Add to Whitelist'"
+            :type="'whitelist'"
             v-model="linkProtection.whitelist"
           />
         </div>
         <div v-if="selectedTab === 'blacklist'">
           <ChatbotLinkProtectionList
             :title="'Add to Blacklist'"
+            :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />
         </div>
@@ -72,18 +74,18 @@
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onReset">
+      @click="onResetHandler">
       {{ $t('Reset') }}
     </button>
     <div>
       <button
         class="button button--default"
-        @click="onCancel">
+        @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button
         class="button button--action"
-        @click="onSave"
+        @click="onSaveHandler"
         :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
