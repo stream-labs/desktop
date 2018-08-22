@@ -1,6 +1,11 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
+import { Component, Prop } from 'vue-property-decorator';
+
+import {
+  IChatbotWindowApi,
+  IChatbotServerApi,
+} from 'services/chatbot';
+
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
 import Tabs from 'components/Tabs.vue';
@@ -13,7 +18,7 @@ import {
   ChatbotAutopermitEnums,
   ChatbotResponseTypes,
   ChatbotPunishments,
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import { IListOption } from 'components/shared/inputs'
 
@@ -22,13 +27,18 @@ import { IListOption } from 'components/shared/inputs'
     ...inputComponents,
     VFormGroup,
     Tabs,
-    DropdownMenu,
+    DropdownMenu
   }
 })
 export default class ChatbotBase extends Vue {
-  @Inject() chatbotApiService: ChatbotApiService;
-  @Inject() chatbotCommonService: ChatbotCommonService;
-  @Inject() customizationService: CustomizationService;
+  @Prop()
+  chatbotApiService: IChatbotServerApi;
+
+  @Prop()
+  chatbotCommonService: IChatbotWindowApi;
+
+  @Inject()
+  customizationService: CustomizationService;
 
   mounted() {
     // pre-load them to switch between 2 windows
@@ -75,7 +85,6 @@ export default class ChatbotBase extends Vue {
     );
     return permissions;
   }
-
 
   get chatbotResponseTypes() {
     return Object.keys(ChatbotResponseTypes).map(responseType => {

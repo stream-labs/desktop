@@ -12,8 +12,8 @@ import {
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
-  ChatbotSettingSlugs
-} from 'services/chatbot/chatbot-interfaces';
+  ChatbotSettingSlugs,
+} from 'services/chatbot';
 
 import {
   IListMetadata,
@@ -28,12 +28,17 @@ interface IChatbotPunishmentMetadata {
   duration: INumberMetadata;
 }
 
+interface IChatbotPermitMetadata {
+  duration: INumberMetadata;
+}
+
 interface IExcludedMetadata {
   level: IListMetadata<number>;
 }
 
 interface IProtectionGeneralMetadata {
   punishment: IChatbotPunishmentMetadata;
+  permit: IChatbotPermitMetadata;
   excluded: IExcludedMetadata;
   message: ITextMetadata;
 }
@@ -170,6 +175,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
           required: true,
           placeholder: $t('Punishment Duration (Value in Minutes)'),
           min: 0
+        }
+      },
+      permit: {
+        duration: {
+          required: true,
+          placeholder: $t('Permission Duration (Value in Minutes)'),
         }
       },
       excluded: {

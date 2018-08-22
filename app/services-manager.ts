@@ -56,7 +56,7 @@ import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
+import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,

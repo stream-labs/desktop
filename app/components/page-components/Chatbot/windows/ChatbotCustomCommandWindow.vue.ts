@@ -8,7 +8,7 @@ import { $t } from 'services/i18n';
 import {
   ICustomCommand,
   IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import {
   IListMetadata,

@@ -1,6 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
-import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
+import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
 import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 

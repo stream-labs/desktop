@@ -6,7 +6,7 @@ import { $t } from 'services/i18n';
 import {
   IChatbotTimer,
   IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import {
   ITextMetadata,

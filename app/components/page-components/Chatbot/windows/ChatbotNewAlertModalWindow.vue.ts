@@ -17,7 +17,7 @@ import {
   IAlertMessage,
   NEW_ALERT_MODAL_ID,
   ChatbotAlertTypes
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 interface INewAlertMetadata {
   follow: {

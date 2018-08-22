@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { ITab } from 'components/Tabs.vue';
-import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
+import { IDefaultCommand } from 'services/chatbot';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';

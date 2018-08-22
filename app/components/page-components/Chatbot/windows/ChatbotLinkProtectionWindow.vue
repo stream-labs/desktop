@@ -42,6 +42,12 @@
             </div>
           </div>
           <VFormGroup
+            :title="$t('Permit Duration (Value in Minutes)')"
+            type="number"
+            v-model="linkProtection.general.permit.duration"
+            :metadata="metadata.link.general.permit.duration"
+          />
+          <VFormGroup
             v-if="linkProtection.general.punishment.type === 'Timeout'"
             :title="$t('Punishment Duration (Value in Minutes)')"
             type="number"
