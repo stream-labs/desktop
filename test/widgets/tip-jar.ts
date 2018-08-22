@@ -15,7 +15,13 @@ test('Set tip-jar settings', async t => {
   await blankSlate(t);
   await addSource(t, 'The Jar', '__The Jar', false);
 
-  await sleep(100);
+  const bourbonGlass = '[src="https://cdn.streamlabs.com/static/tip-jar/jars/glass-burbon.png"]';
+  const activeBourbonGlass = '.active img[src="https://cdn.streamlabs.com/static/tip-jar/jars/glass-burbon.png"]';
+  // Have to sleep to let render-blocking operations complete
+  await sleep(2000);
+  await client.click(bourbonGlass);
+  await client.waitForVisible(activeBourbonGlass);
+
   await client.click('button=Close');
   await blankSlate(t);
   t.pass();
