@@ -5,7 +5,7 @@
   :title="$t(`${isEdit ? 'Edit' : 'Add'} Command`)"
 >
   <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
+    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     </Tabs>
   </div>
   <div slot="content" class="chatbot-add-command__container">
@@ -66,13 +66,13 @@
   <div slot="controls">
     <button
       class="button button--default"
-      @click="onCancel">
+      @click="onCancelHandler">
       {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
       :disabled="errors.items.length > 0 || !newCommand.command || !newCommand.response"
-      @click="onSave"
+      @click="onSaveHandler"
     >
       {{ $t("Save") }}
     </button>

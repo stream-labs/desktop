@@ -16,7 +16,7 @@ import {
   components: {
     NavMenu,
     NavItem,
-    ChatbotNewAlertModalWindow,
+    ChatbotNewAlertModalWindow
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
@@ -41,11 +41,16 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     return [];
   }
 
+  alertTypeFormattedName(type: ChatbotAlertTypes) {
+    if (type === 'tip') return 'donation';
+    return type;
+  };
+
   isEnabled(type: ChatbotAlertTypes) {
     return this.alertTypes[type].enabled;
   }
 
-  showNewChatAlertWindow() {
+  onShowNewChatAlertWindowHandler() {
     this.$modal.show(NEW_ALERT_MODAL_ID, {
       onSubmitHandler: (newAlert: IAlertMessage) => {
         this.addNewAlert(this.selectedType, newAlert);
@@ -53,7 +58,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     });
   }
 
-  onEdit(message: IAlertMessage, index: number) {
+  onEditHandler(message: IAlertMessage, index: number) {
     this.$modal.show(NEW_ALERT_MODAL_ID, {
       editedAlert: message,
       onSubmitHandler: (updatedAlert: IAlertMessage) => {
@@ -62,16 +67,22 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     });
   }
 
-  onDelete(index: number) {
+  onDeleteHandler(index: number) {
     this.spliceAlertMessages(this.selectedType, index, null);
   }
 
-  onDone() {
+  onDoneHandler() {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onReset() {
-    this.chatbotApiService.resetSettings('chat-notifications');
+  onResetHandler() {
+    if (
+      confirm(
+        $t('Are you sure you want to reset chatbot notifications preferences?')
+      )
+    ) {
+      this.chatbotApiService.resetSettings('chat-notifications');
+    }
   }
 
   // filters

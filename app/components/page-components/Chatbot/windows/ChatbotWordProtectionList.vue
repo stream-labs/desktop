@@ -1,12 +1,21 @@
 <template>
 <div>
   <div class="flex flex--end">
-    <button @click="onAddingNewItem(null, -1)" class="button button--action">
+    <button @click="onAddingNewItemHandler(null, -1)" class="button button--action">
       {{ $t('Add Word / Phrase') }}
     </button>
   </div>
-
-  <table v-if="value.length > 0">
+  <div
+    v-if="value.length === 0"
+    class="chatbot-empty-placeholder__container"
+  >
+    <img
+      :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-blacklist--${this.nightMode ? 'night' : 'day'}.svg`)"
+      width="200"
+    />
+    {{ $t('No items in list. Add new.') }}
+  </div>
+  <table v-else>
     <thead>
       <tr>
         <th> {{ $t('Word') }} </th>
@@ -24,14 +33,13 @@
         <td> {{ item.punishment.type === 'Timeout' ? item.punishment.duration : '-' }} </td>
         <td>
           <div class="align-items--inline">
-            <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
-            <i @click="onAddingNewItem(item, index)" class="icon-edit padding--5" />
+            <i @click="onDeleteAliasHandler(index)" class="icon-trash padding--5" />
+            <i @click="onAddingNewItemHandler(item, index)" class="icon-edit padding--5" />
           </div>
         </td>
       </tr>
     </tbody>
   </table>
-  <label v-else> {{ $t('No items in list. Add new.') }} </label>
   <modal
     :name="NEW_WORD_PROTECTION_LIST_MODAL_ID"
     :height="'auto'"
@@ -80,12 +88,12 @@
       <div class="new-list-item-modal__controls">
         <button
           class="button button--default"
-          @click="onCancelNewItemModal">
+          @click="onCancelNewItemModalHandler">
           {{ $t('Cancel') }}
         </button>
         <button
           class="button button--action"
-          @click="onAddNewItem"
+          @click="onAddNewItemHandler"
           :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
@@ -100,6 +108,12 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 tbody tr {
 
   td {

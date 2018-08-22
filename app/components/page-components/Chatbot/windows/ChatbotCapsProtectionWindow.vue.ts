@@ -21,15 +21,15 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
 
   selectedTab: string = 'general';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
-  onReset() {
-    this.onResetSlug('caps-protection');
+  onResetHandler() {
+    this.onResetSlugHandler('caps-protection');
   }
 
-  onSave() {
+  onSaveHandler() {
     this.chatbotApiService
       .updateCapsProtection({
         enabled: this.capsProtectionResponse.enabled,

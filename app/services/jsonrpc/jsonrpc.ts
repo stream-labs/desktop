@@ -61,7 +61,7 @@ export class JsonrpcService extends Service implements IJsonrpcServiceApi {
 
   static createResponse<TResult>(
     requestOrRequestId: string | IJsonRpcRequest,
-    result: TResult
+    result: TResult = null
   ): IJsonRpcResponse<TResult> {
     const id =
       (arguments[0] && typeof arguments[0] === 'object')

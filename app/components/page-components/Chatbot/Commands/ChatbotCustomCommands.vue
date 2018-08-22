@@ -3,7 +3,7 @@
     <!-- batch actions -->
     <div class="flex flex--space-between padding--10">
       <button
-        @click="openCommandWindow"
+        @click="onOpenCommandWindowHandler"
         class="button button--action margin--10"
       >
         {{ $t('Add Command') }}
@@ -17,7 +17,14 @@
     </div>
 
     <!-- custom commands -->
-    <div class="padding--10">
+    <div v-if="!commands || commands.length === 0" class="chatbot-empty-placeholder__container">
+      <img
+        :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-command--${this.nightMode ? 'night' : 'day'}.svg`)"
+        width="200"
+      />
+      <span>{{ $t('Click add command to get started.') }}</span>
+    </div>
+    <div v-else class="padding--10">
       <table>
         <thead>
           <tr>
@@ -29,7 +36,7 @@
             <th></th>
           </tr>
         </thead>
-        <tbody v-if="commands && commands.length > 0">
+        <tbody>
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
@@ -43,24 +50,19 @@
               <div class="align-items--inline">
                 <ToggleInput
                   :value="command.enabled"
-                  @input="toggleEnableCommand(command.id, index, !command.enabled)"
+                  @input="onToggleEnableCommandHandler(command.id, index, !command.enabled)"
                 />
                 <DropdownMenu
                   :placement="'bottom-end'"
                   :icon="'icon-more'"
                 >
                   <div class="chatbot-custom-commands__command-actions__container">
-                    <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                    <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                  <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                   </div>
                 </DropdownMenu>
               </div>
             </td>
-          </tr>
-        </tbody>
-        <tbody v-else>
-          <tr>
-            <td colspan="6" class="text-align--center"> {{ $t('Click add command to get started.') }} </td>
           </tr>
         </tbody>
       </table>
@@ -98,6 +100,13 @@ table tr {
     .text-align--right;
     padding-right: 10px;
   }
+}
+
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
 }
 
 .chatbot-custom-commands__command-actions__container {
