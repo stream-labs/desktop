@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import { Inject } from 'util/injector';
 
 import {
   IChatbotWindowApi,
@@ -7,7 +8,6 @@ import {
 } from 'services/chatbot';
 
 import { CustomizationService } from 'services/customization';
-import { Inject } from 'util/injector';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
@@ -31,10 +31,10 @@ import { IListOption } from 'components/shared/inputs'
   }
 })
 export default class ChatbotBase extends Vue {
-  @Prop()
+  @Inject()
   chatbotApiService: IChatbotServerApi;
 
-  @Prop()
+  @Inject()
   chatbotCommonService: IChatbotWindowApi;
 
   @Inject()

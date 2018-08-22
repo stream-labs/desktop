@@ -8,7 +8,6 @@ import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import {
   IChatbotServerApi,
-  IChatbotCommonServiceState
 } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue'

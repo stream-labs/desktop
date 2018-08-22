@@ -36,7 +36,6 @@ import {
   ChatbotSettingSlugs
 } from './index';
 
-@ServiceHelper()
 export class ChatbotApiService
   extends PersistentStatefulService<IChatbotApiServiceState>
   implements IChatbotServerApi {
@@ -529,7 +528,6 @@ export class ChatbotApiService
   }
 }
 
-@ServiceHelper()
 export class ChatbotCommonService
   extends PersistentStatefulService<IChatbotCommonServiceState>
   implements IChatbotWindowApi {
