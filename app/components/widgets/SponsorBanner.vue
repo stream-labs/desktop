@@ -1,6 +1,12 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
-  <div slot="settings" >
+<widget-editor
+  v-if="wData"
+  ref="layout"
+  v-model="tabName"
+  :slots="[]"
+  :settings="[{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }]"
+>
+  <!-- <div slot="settings" >
     <form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
       <span>{{ $t('mins') }}</span>
@@ -31,7 +37,7 @@
       </div>
       <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
     </form-group>
-  </div>
+  </div> -->
 
   <div slot="visual-properties">
     <form-group :title="$t('Banner Width')">
@@ -48,20 +54,7 @@
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
     </form-group>
   </div>
-
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-</widget-window>
+</widget-editor>
 </template>
 
 <script lang="ts" src="./SponsorBanner.vue.ts"></script>

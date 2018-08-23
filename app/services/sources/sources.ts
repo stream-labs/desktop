@@ -402,8 +402,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           componentName,
           queryParams: { sourceId },
           size: {
-            width: 600,
-            height: 800
+            width: 900,
+            height: 1024
           }
         });
 

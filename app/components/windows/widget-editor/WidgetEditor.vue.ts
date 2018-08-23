@@ -11,4 +11,10 @@ import Tabs from 'components/Tabs.vue';
   }
 })
 export default class WidgetWindow extends Vue {
+  @Prop() slots: any[];
+  @Prop() settings: any[];
+
+  previewSource = { id: '' }
+
+  createProjector() {}
 }

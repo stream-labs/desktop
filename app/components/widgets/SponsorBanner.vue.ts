@@ -4,7 +4,7 @@ import {
   ISponsorBannerData
 } from 'services/widget-settings/sponsor-banner';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/widget-editor/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
@@ -15,7 +15,7 @@ import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    WidgetWindow,
+    WidgetEditor,
     FormGroup,
     CodeEditor,
     ...inputComponents
