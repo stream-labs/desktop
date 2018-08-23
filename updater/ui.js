@@ -4,6 +4,7 @@ import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import UpdaterWindow from './UpdaterWindow.vue';
 import electron from 'electron';
+import './updater.css';
 
 Vue.use(VueI18n);
 
