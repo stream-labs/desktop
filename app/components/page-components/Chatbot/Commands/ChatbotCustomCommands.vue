@@ -141,18 +141,6 @@ table tr {
     .night-icon-hover();
     padding-left: 3px;
   }
-  tbody tr {
-    border: 2px solid transparent;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
 
 }
 </style>

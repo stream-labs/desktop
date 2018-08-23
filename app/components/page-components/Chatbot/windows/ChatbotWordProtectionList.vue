@@ -111,10 +111,6 @@
 }
 tbody tr {
 
-  td {
-    color: black;
-  }
-
   td:last-child {
     width: 100px;
     .align-items--inline;
@@ -169,22 +165,6 @@ tbody tr {
 }
 
 .night-theme {
-  tbody tr {
-    border: 2px solid transparent;
-    .transition();
-    .cursor--pointer;
-    color: white;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
   .new-list-item-modal__header {
     border-bottom: 1px solid @night-border;
   }
