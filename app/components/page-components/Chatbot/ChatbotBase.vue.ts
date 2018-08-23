@@ -31,14 +31,9 @@ import { IListOption } from 'components/shared/inputs'
   }
 })
 export default class ChatbotBase extends Vue {
-  @Inject()
-  chatbotApiService: IChatbotServerApi;
-
-  @Inject()
-  chatbotCommonService: IChatbotCommonApi;
-
-  @Inject()
-  customizationService: CustomizationService;
+  @Inject() chatbotApiService: IChatbotServerApi;
+  @Inject() chatbotCommonService: IChatbotCommonApi;
+  @Inject() customizationService: CustomizationService;
 
   mounted() {
     // pre-load them to switch between 2 windows

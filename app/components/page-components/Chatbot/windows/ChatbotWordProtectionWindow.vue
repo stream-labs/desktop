@@ -12,13 +12,11 @@
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general' && wordProtection">
         <VFormGroup
-          type="list"
           :title="$t('Auto Permit')"
           v-model="wordProtection.general.excluded.level"
           :metadata="metadata.word.general.excluded.level"
         />
         <VFormGroup
-          type="textArea"
           :title="$t('Punishment Message')"
           v-model="wordProtection.general.message"
           :metadata="metadata.word.general.message"

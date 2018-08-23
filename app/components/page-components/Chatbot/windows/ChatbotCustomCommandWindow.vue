@@ -13,13 +13,11 @@
       <div v-if="selectedTab === 'general'">
         <VFormGroup
           :title="$t('Command')"
-          type="text"
           v-model="newCommand.command"
           :metadata="commandMetadata"
         />
         <VFormGroup
           :title="$t('Response (Line breaks will be ignored)')"
-          type="textArea"
           v-model="newCommand.response"
           :metadata="responseMetadata"
         />
@@ -27,7 +25,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('Permission')"
-              type="list"
               v-model="newCommand.permission.level"
               :metadata="permissionMetadata"
             />
@@ -35,7 +32,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('Reply In')"
-              type="list"
               v-model="newCommand.response_type"
               :metadata="replyTypeMetadata"
             />
@@ -47,7 +43,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('Global Command Cooldown (Value in Minutes)')"
-              type="number"
               v-model="newCommand.cooldowns.global"
               :metadata="cooldownsMetadata"
             />
@@ -55,7 +50,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('User Command Cooldown (Value in Minutes)')"
-              type="number"
               v-model="newCommand.cooldowns.user"
               :metadata="cooldownsMetadata"
             />

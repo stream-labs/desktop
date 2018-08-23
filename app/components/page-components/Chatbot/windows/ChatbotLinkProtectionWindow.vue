@@ -27,7 +27,6 @@
             <div class="small-6 columns">
               <VFormGroup
                 :title="$t('Auto Permit')"
-                type="list"
                 v-model="linkProtection.general.excluded.level"
                 :metadata="metadata.link.general.excluded.level"
               />
@@ -35,7 +34,6 @@
             <div class="small-6 columns">
               <VFormGroup
                 :title="$t('Punishment')"
-                type="list"
                 v-model="linkProtection.general.punishment.type"
                 :metadata="metadata.link.general.punishment.type"
               />
@@ -43,20 +41,17 @@
           </div>
           <VFormGroup
             :title="$t('Permit Duration (Value in Minutes)')"
-            type="number"
             v-model="linkProtection.general.permit.duration"
             :metadata="metadata.link.general.permit.duration"
           />
           <VFormGroup
             v-if="linkProtection.general.punishment.type === 'Timeout'"
             :title="$t('Punishment Duration (Value in Minutes)')"
-            type="number"
             v-model="linkProtection.general.punishment.duration"
             :metadata="metadata.link.general.punishment.duration"
           />
           <VFormGroup
             :title="$t('Punishment Response (Line breaks will be ignored)')"
-            type="textArea"
             v-model="linkProtection.general.message"
             :metadata="metadata.link.general.message"
           />
@@ -64,14 +59,12 @@
         <div v-if="selectedTab === 'whitelist'">
           <ChatbotLinkProtectionList
             :title="$t('Add to Whitelist')"
-            :type="'whitelist'"
             v-model="linkProtection.whitelist"
           />
         </div>
         <div v-if="selectedTab === 'blacklist'">
           <ChatbotLinkProtectionList
             :title="$t('Add to Blacklist')"
-            :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />
         </div>

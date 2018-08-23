@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
-
 import {
   ICapsProtectionResponse,
   ISymbolProtectionResponse,
@@ -16,6 +15,7 @@ import {
 } from 'services/chatbot';
 
 import {
+  EInputType,
   IListMetadata,
   ITextMetadata,
   INumberMetadata,
@@ -125,42 +125,25 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
-    switch (fieldType) {
-      case 'message':
-        switch (protectionType) {
-          case 'caps':
-            return $t('The phrase that will appear after a viewer enters too many capitalized letters');
-          case 'symbol':
-            return $t('The phrase that will appear after a viewer enters too many symbols');
-          case 'links':
-            return $t('The phrase that will appear after a viewer enters blacklisted links');
-          default:
-            return $t('The phrase that will appear after a viewer enters unpermitted value');
-        }
-      case 'minimum':
-        switch (protectionType) {
-          case 'caps':
-            return $t('Set the number of capitalized letters before the system starts to detect');
-          case 'symbol':
-            return $t('Set the number of symbols before the system starts to detect');
-        }
-      case 'maximum':
-        switch (protectionType) {
-          case 'caps':
-            return $t('Set the maximum number of capitalized letters permitted');
-          case 'symbol':
-            return $t('Set the maximum number of symbols permitted');
-        }
-      case 'percent':
-        switch (protectionType) {
-          case 'caps':
-            return $t('Set the maximum percent of capitalized letters within a message');
-          case 'symbol':
-            return $t('Set the maximum percent of symbols within a message');
-        }
-      default:
-        break;
-    }
+    return {
+      message: {
+        caps: $t('The phrase that will appear after a viewer enters too many capitalized letters'),
+        symbol: $t('The phrase that will appear after a viewer enters too many symbols'),
+        links: $t('The phrase that will appear after a viewer enters blacklisted links')
+      },
+      minimum: {
+        caps: $t('Set the number of capitalized letters before the system starts to detect'),
+        symbol: $t('Set the number of symbols before the system starts to detect'),
+      },
+      maximum: {
+        caps: $t('Set the maximum number of capitalized letters permitted'),
+        symbol: $t('Set the maximum number of symbols permitted'),
+      },
+      percent: {
+        caps: $t('Set the maximum percent of capitalized letters within a message'),
+        symbol: $t('Set the maximum percent of symbols within a message'),
+      },
+    }[fieldType][protectionType];
   }
 
   // metadata
@@ -168,11 +151,13 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const generalMetadata: IProtectionGeneralMetadata = {
       punishment: {
         type: {
+          type: EInputType.list,
           required: true,
           options: this.chatbotPunishments
         },
         duration: {
           required: true,
+          type: EInputType.number,
           placeholder: $t('Punishment Duration (Value in Minutes)'),
           min: 0
         }
@@ -180,6 +165,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       permit: {
         duration: {
           required: true,
+          type: EInputType.number,
           placeholder: $t('Permission Duration (Value in Minutes)'),
         }
       },
@@ -187,11 +173,13 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         level: {
           required: true,
           options: this.chatbotAutopermitOptions,
+          type: EInputType.list,
           tooltip: $t('Set a user group that will not be punished')
         }
       },
       message: {
         required: true,
+        type: EInputType.textArea,
         placeholder: this.placeholder(protectionType, 'message')
       }
     };
@@ -203,6 +191,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     const advancedMetadata: IProtectionAdvancedMetadata = {
       minimum: {
         required: true,
+        type: EInputType.number,
         placeholder: this.placeholder(protectionType, 'minimum'),
         min: 0,
         max: 500,
@@ -210,6 +199,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       },
       maximum: {
         required: true,
+        type: EInputType.number,
         placeholder: this.placeholder(protectionType, 'maximum'),
         min: 0,
         max: 500,
@@ -217,6 +207,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       },
       percent: {
         required: true,
+        type: EInputType.slider,
         min: 0,
         max: 100,
         tooltip: this.placeholder(protectionType, 'percent')
@@ -230,14 +221,17 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
       permit: {
         command: {
           required: true,
+          type: EInputType.text,
           placeholder: 'Command phrase'
         },
         description: {
           required: true,
+          type: EInputType.textArea,
           placeholder: 'Command description'
         },
         response: {
           required: true,
+          type: EInputType.textArea,
           placeholder: 'Message in chat'
         },
         response_type: {
@@ -245,6 +239,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         },
         new_alias: {
           required: false,
+          type: EInputType.text,
           placeholder: 'New Command Alias'
         }
       }
@@ -256,18 +251,22 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     let wordBlacklistItemMetadata: IWordProtectionBlacklistItem = {
       text: {
         required: true,
+        type: EInputType.text,
         placeholder: 'word to protect'
       },
       is_regex: {
-        required: true
+        required: true,
+        type: EInputType.bool,
       },
       punishment: {
         type: {
           required: true,
+          type: EInputType.list,
           options: this.chatbotPunishments
         },
         duration: {
           required: true,
+          type: EInputType.number,
           placeholder: 'Punishment Duration (Value in Minutes)',
           min: 0
         }
@@ -291,10 +290,12 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         general: this.generalMetadata('links'),
         new_whitelist_item: {
           required: true,
+          type: EInputType.text,
           placeholder: 'Link to whitelist'
         },
         new_blacklist_item: {
           required: true,
+          type: EInputType.text,
           placeholder: 'Link to blacklist'
         }
       },

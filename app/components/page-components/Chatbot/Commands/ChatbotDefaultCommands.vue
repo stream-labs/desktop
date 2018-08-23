@@ -109,12 +109,5 @@ table tr {
       }
     }
   }
-  // tbody tr:nth-child(odd) {
-  //   background-color: @navy-secondary;
-  // }
-  // tbody tr:nth-child(even) {
-  //   background-color: @navy;
-  // }
-
 }
 </style>

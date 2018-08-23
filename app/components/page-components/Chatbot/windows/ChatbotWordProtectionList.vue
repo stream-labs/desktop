@@ -55,7 +55,6 @@
           <div class="small-7 columns">
             <VFormGroup
               :title="$t('Word or Phrase')"
-              type="text"
               :metadata="metadata.text"
               v-model="newListItem.text"
             />
@@ -63,7 +62,6 @@
           <div class="small-5 columns">
             <VFormGroup
               :title="$t('Punishment')"
-              type="list"
               v-model="newListItem.punishment.type"
               :metadata="metadata.punishment.type"
             />
@@ -72,7 +70,6 @@
         <VFormGroup
           v-if="newListItem.punishment.type === 'Timeout'"
           :title="$t('Punishment Duration (Value in Minutes)')"
-          type="type"
           v-model="newListItem.punishment.duration"
           :metadata="metadata.punishment.duration"
         />

@@ -8,13 +8,11 @@
     <div>
       <VFormGroup
         :title="$t('Name')"
-        type="text"
         v-model="newTimer.name"
         :metadata="nameMetadata"
       />
       <VFormGroup
         :title="$t('Response (Line breaks will be ignored)')"
-        type="textArea"
         v-model="newTimer.message"
         :metadata="messageMetadata"
       />
@@ -22,7 +20,6 @@
         <div class="columns small-6">
           <VFormGroup
             :title="$t('Interval (Value in Minutes)')"
-            type="number"
             v-model="newTimer.interval"
             :metadata="intervalMetadata"
           />
@@ -30,7 +27,6 @@
         <div class="columns small-6">
           <VFormGroup
             :title="$t('Line Minimum')"
-            type="number"
             v-model="newTimer.chat_lines"
             :metadata="chatLinesMetadata"
           />

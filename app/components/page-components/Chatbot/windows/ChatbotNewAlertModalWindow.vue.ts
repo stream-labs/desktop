@@ -11,6 +11,7 @@ import {
   IListMetadata,
   ITextMetadata,
   INumberMetadata,
+  EInputType,
 } from 'components/shared/inputs/index';
 
 import {
@@ -146,6 +147,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
       follow: {
         newMessage: {
           message: {
+            type: EInputType.text,
             required: true,
             placeholder: $t('Message to follower')
           }
@@ -155,6 +157,7 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           tier: {
             required: true,
+            type: EInputType.list,
             options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
               value: tier,
               title: $t(tier)
@@ -162,14 +165,17 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           },
           amount: {
             required: true,
+            type: EInputType.number,
             placeholder: $t('Number of months subscribed')
           },
           message: {
+            type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to subscriber')
           },
           is_gifted: {
             required: true,
+            type: EInputType.list,
             options: ['yes', 'no'].map(isGifted => ({
               value: isGifted === 'yes',
               title: $t(isGifted)
@@ -180,11 +186,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
       tip: {
         newMessage: {
           amount: {
+            type: EInputType.number,
             min: 0,
             required: true,
             placeholder: $t('Minimum amount')
           },
           message: {
+            type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to donator')
           }
@@ -194,10 +202,12 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             required: true,
+            type: EInputType.number,
             min: 0,
             placeholder: $t('Minimum viewer count')
           },
           message: {
+            type: EInputType.textArea,
             required: true,
             placeholder: $t('Message to hosts')
           }
@@ -207,11 +217,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             min: 0,
+            type: EInputType.number,
             required: true,
             placeholder: $t('Minimum amount')
           },
           message: {
             required: true,
+            type: EInputType.textArea,
             placeholder: $t('Message to raider')
           }
         }
@@ -220,11 +232,13 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
         newMessage: {
           amount: {
             required: true,
+            type: EInputType.number,
             min: 0,
             placeholder: $t('Minimum bit count')
           },
           message: {
             required: true,
+            type: EInputType.textArea,
             placeholder: $t('Message to Bit donators')
           }
         }

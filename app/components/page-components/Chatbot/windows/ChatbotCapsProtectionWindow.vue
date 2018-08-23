@@ -15,7 +15,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('Auto Permit')"
-              type="list"
               v-model="capsProtection.general.excluded.level"
               :metadata="metadata.caps.general.excluded.level"
             />
@@ -23,7 +22,6 @@
           <div class="small-6 columns">
             <VFormGroup
               :title="$t('Punishment')"
-              type="list"
               v-model="capsProtection.general.punishment.type"
               :metadata="metadata.caps.general.punishment.type"
             />
@@ -32,13 +30,11 @@
         <VFormGroup
           v-if="capsProtection.general.punishment.type === 'Timeout'"
           :title="$t('Punishment Duration (Value in Minutes)')"
-          type="number"
           v-model="capsProtection.general.punishment.duration"
           :metadata="metadata.caps.general.punishment.duration"
         />
         <VFormGroup
           :title="$t('Punishment Response (Line breaks will be ignored)')"
-          type="textArea"
           v-model="capsProtection.general.message"
           :metadata="metadata.caps.general.message"
         />
@@ -46,19 +42,16 @@
       <div v-if="selectedTab === 'advanced'">
         <VFormGroup
           :title="$t('Minimum Amount of Caps')"
-          type="number"
           v-model="capsProtection.advanced.minimum"
           :metadata="metadata.caps.advanced.minimum"
         />
         <VFormGroup
           :title="$t('Maximum Amount of Caps')"
-          type="number"
           v-model="capsProtection.advanced.maximum"
           :metadata="metadata.caps.advanced.maximum"
         />
         <VFormGroup
           :title="$t('Maximum Percent')"
-          type="slider"
           v-model="capsProtection.advanced.percent"
           :metadata="metadata.caps.advanced.percent"
         />

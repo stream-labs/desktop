@@ -10,6 +10,7 @@ import { $t } from 'services/i18n';
 import {
   IListMetadata,
   ITextMetadata,
+  EInputType,
 } from 'components/shared/inputs/index';
 
 
@@ -66,6 +67,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     let metadata: IDefaultCommandMetadata = {
       command: metadataHelper.text({
         required: true,
+        type: EInputType.text,
         placeholder: $t(
           'Enter the text string which will trigger the response'
         ),
@@ -73,32 +75,38 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
       }),
       response: metadataHelper.text({
         required: true,
+        type: EInputType.textArea,
         placeholder: $t(
           'The phrase that will appear after a user enters the command'
         )
       }),
       new_alias: metadataHelper.text({
         required: true,
+        type: EInputType.text,
         placeholder: $t('Add a new command alias')
       }),
       success_response: metadataHelper.text({
         required: true,
+        type: EInputType.textArea,
         placeholder: $t(
           'The phrase that will appear after a successful command'
         )
       }),
       failed_response: metadataHelper.text({
         required: true,
+        type: EInputType.textArea,
         placeholder: $t('The phrase that will appear after a failed command')
       }),
       enabled_response: metadataHelper.text({
         required: true,
+        type: EInputType.textArea,
         placeholder: $t(
           'The phrase that will appear after a command is enabled'
         )
       }),
       disabled_response: metadataHelper.text({
         required: true,
+        type: EInputType.textArea,
         placeholder: $t(
           'The phrase that will appear after a command is disabled'
         )
@@ -110,6 +118,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   get responseTypeMetadata() {
     let responseTypeMetadata: IListMetadata<string> = {
+      type: EInputType.list,
       options: this.chatbotResponseTypes
     };
     return responseTypeMetadata;

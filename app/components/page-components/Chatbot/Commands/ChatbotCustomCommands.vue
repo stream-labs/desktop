@@ -32,13 +32,13 @@
             <th> {{ $t('Response') }} </th>
             <th>
               <div class="flex">
-                {{ $t('GCD') }}
+                GCD
                 <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in minutes')" />
               </div>
             </th>
             <th>
               <div class="flex">
-                {{ $t('UCD') }}
+                UCD
                 <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in minutes')" />
               </div>
             </th>
