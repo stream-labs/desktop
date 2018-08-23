@@ -79,5 +79,3 @@ export default class Chatbot extends Vue {
   }
 }
 
-
-

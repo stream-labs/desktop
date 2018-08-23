@@ -239,6 +239,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  fetchQuotes(page = 1, query = '') {
+    return this.api('GET', `quotes?page=${page}&query=${query}`, {})
+      .then((response: ITimersResponse) => {
+        this.UPDATE_TIMERS(response);
+      });
+  }
+
   //
   // POST, PUT requests
   //
