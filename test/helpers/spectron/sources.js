@@ -27,6 +27,10 @@ export async function selectSource(t, name) {
   await t.context.app.client.click(`.item-title=${name}`);
 }
 
+export async function selectTestSource(t) {
+  await t.context.app.client.click('.item-title*=__')
+}
+
 export async function rightClickSource(t, name) {
   await t.context.app.client.rightClick(`.item-title=${name}`);
 }
@@ -86,4 +90,8 @@ export async function openRenameWindow(t, sourceName) {
 export async function sourceIsExisting(t, sourceName) {
   const app = t.context.app;
   return app.client.isExisting(`.item-title=${sourceName}`);
+}
+
+export async function testSourceExists(t) {
+  return t.context.app.client.isExisting('.item-title*=__')
 }
