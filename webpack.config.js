@@ -80,6 +80,18 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1
+            }
+          }
+        ]
+      },
+      {
         test: /\.less$/,
         use: [
           'style-loader',
