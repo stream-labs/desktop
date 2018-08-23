@@ -94,7 +94,7 @@
   z-index: 1000;
   width: 28%;
   border-left: 1px solid @day-border;
-  padding: 16px 20px 10px;
+  .padding(2);
   .transition();
 
   &.live-dock--left {
