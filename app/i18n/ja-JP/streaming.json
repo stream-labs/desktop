@@ -37,7 +37,9 @@
   },
   "nicoliveProgramSelector": {
     "title": "配信する番組の選択",
-    "description": "配信可能な番組が複数あります。配信する番組を選択してください。"
+    "description": "配信可能な番組が複数あります。<br/>配信する番組を選択してください。",
+    "cancel": "キャンセル",
+    "done": "配信する番組を決定する"
   },
   "FPS": "フレームレート",
   "optimizeAndGoLive": "最適化して配信を開始する",
