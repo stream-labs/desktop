@@ -1,6 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IChatbotTimer } from 'services/chatbot/chatbot-interfaces';
+import { IChatbotTimer, IQuote } from 'services/chatbot/chatbot-interfaces';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
@@ -13,51 +13,38 @@ import ChatbotPagination from 'components/page-components/Chatbot/shared/Chatbot
 export default class ChatbotQuotes extends ChatbotBase {
   searchQuery = '';
 
-  get timers() {
-    return this.chatbotApiService.state.timersResponse.data;
+  get quotes() {
+    return this.chatbotApiService.state.quotesResponse.data;
   }
 
-  get currentPage() {
-    return this.chatbotApiService.state.timersResponse.pagination.current;
+  get currentPage(): number {
+    return this.chatbotApiService.state.quotesResponse.pagination.current;
   }
 
-  get totalPages() {
-    return this.chatbotApiService.state.timersResponse.pagination.total;
+  get totalPages(): number {
+    return this.chatbotApiService.state.quotesResponse.pagination.total;
   }
 
   mounted() {
-    // get list of timers
-    this.fetchTimers(1);
+    // get list of quotes
+    this.fetchQuotes(1);
   }
 
   @Watch('searchQuery')
   @Debounce(1000)
   onQueryChangeHandler(value: string) {
-    this.fetchTimers(this.currentPage, value);
+    this.fetchQuotes(this.currentPage, value);
   }
 
-  fetchTimers(page: number = this.currentPage, query?: string) {
-    this.chatbotApiService.fetchTimers(page, query);
+  fetchQuotes(page = this.currentPage, query?: string) {
+    this.chatbotApiService.fetchQuotes(page, query);
   }
 
-  onOpenTimerWindowHandler(timer?: IChatbotTimer) {
-    this.chatbotCommonService.openTimerWindow(timer);
+  onOpenQuoteWindowHandler(quote?: IQuote) {
+    this.chatbotCommonService.openQuoteWindow(quote);
   }
 
-  onToggleEnableTimerHandler(
-    timerId: string,
-    index: number,
-    isEnabled: boolean
-  ) {
-    const timerToBeUpdated = this.timers[index];
-
-    this.chatbotApiService.updateTimer(timerId, {
-      ...timerToBeUpdated,
-      enabled: isEnabled
-    });
-  }
-
-  onDeleteTimerHandler(timer?: IChatbotTimer) {
-    this.chatbotApiService.deleteTimer(timer.id);
+  onDeleteQuoteHandler(quote?: IQuote) {
+    this.chatbotApiService.deleteQuote(quote.id);
   }
 }

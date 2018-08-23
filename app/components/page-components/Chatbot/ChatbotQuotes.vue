@@ -3,10 +3,10 @@
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <button
-      @click="onOpenTimerWindowHandler"
+      @click="onOpenQuoteWindowHandler"
       class="button button--action margin--10"
     >
-      {{ $t('Add Timer') }}
+      {{ $t('Add Quote') }}
     </button>
     <input
       v-model="searchQuery"
@@ -15,47 +15,39 @@
       placeholder="Search"
     />
   </div>
-  <div v-if="!timers || timers.length === 0" class="chatbot-empty-placeholder__container">
+  <div v-if="!quotes || quotes.length === 0" class="chatbot-empty-placeholder__container">
     <img
       :src="require(`../../../../media/images/chatbot/chatbot-placeholder-timer--${this.nightMode ? 'night' : 'day'}.svg`)"
       width="200"
     />
-    <span>{{ $t('Click add timer to get started.') }}</span>
+    <span>{{ $t('Click add quote to get started.') }}</span>
   </div>
   <div v-else class="padding--10">
     <table>
       <thead>
         <tr>
-          <th> {{ $t("timer") }} </th>
-          <th> {{ $t("interval") }} </th>
-          <th> {{ $t("response") }} </th>
-          <th> {{ $t("line minimum") }} </th>
+          <th> {{ $t("id") }} </th>
+          <th> {{ $t("quote") }} </th>
+          <th> {{ $t("added by") }} </th>
+          <th> {{ $t("game") }} </th>
+          <th> {{ $t("date") }} </th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <tr
-          v-for="(timer, index) in timers"
-          :key="timer.name"
+          v-for="quote in quotes"
+          :key="quote.name"
         >
-          <td> {{ timer.name }} </td>
-          <td> {{ timer.interval }} </td>
-          <td> {{ timer.message }} </td>
-          <td> {{ timer.chat_lines }} </td>
+          <td> {{ quote.id }} </td>
+          <td> {{ quote.message }} </td>
+          <td> {{ quote.added_by }} </td>
+          <td> {{ quote.game }} </td>
+          <td> {{ quote.created_at || '-' }} </td>
           <td>
             <div class="align-items--inline">
-              <ToggleInput
-                :value="timer.enabled"
-                @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
-              />
-              <DropdownMenu
-                :placement="'bottom-end'"
-                class="chatbot-timers__timer-actions__container"
-                :icon="'icon-more'"
-              >
-                <button @click="onOpenTimerWindowHandler(timer)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="onDeleteTimerHandler(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
-              </DropdownMenu>
+              <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5"/>
+              <i @click="onDeleteQuoteHandler(quote)" class="icon-trash padding--5"/>
             </div>
           </td>
         </tr>
@@ -65,7 +57,7 @@
       v-if="totalPages > 1"
       :totalPages="totalPages"
       :currentPage="currentPage"
-      @change="fetchTimers"
+      @change="fetchQuotes"
     />
   </div>
 </div>
@@ -91,7 +83,7 @@ tbody tr {
     color: black;
   }
 
-  td:first-child {
+  td:nth-child(2) {
     width: 300px;
   }
   td:last-child:not(.text-align--center) {

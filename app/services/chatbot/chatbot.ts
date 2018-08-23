@@ -28,7 +28,9 @@ import {
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
   IWordProtectionResponse,
-  ChatbotSettingSlugs
+  IQuotesResponse,
+  ChatbotSettingSlugs,
+  IQuote,
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -82,6 +84,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       enabled: false,
       settings: null
     },
+    quotesResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
+    }
   };
 
   //
@@ -240,16 +249,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   fetchQuotes(page = 1, query = '') {
-    return this.api('GET', `quotes?page=${page}&query=${query}`, {})
-      .then((response: ITimersResponse) => {
-        this.UPDATE_TIMERS(response);
-      });
+    return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
+      (response: IQuotesResponse) => {
+        this.UPDATE_QUOTES(response);
+      }
+    );
   }
 
   //
   // POST, PUT requests
   //
-
   resetSettings(slug: ChatbotSettingSlugs) {
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
@@ -341,6 +350,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+  createQuote(data: IQuote) {
+    debugger;
+    return this.api('POST', 'quotes', data)
+      .then((response: IQuote) => {
+        debugger;
+        this.fetchQuotes();
+        this.chatbotCommonService.closeChildWindow();
+      });
+  }
+
   updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
     return this.api('POST', `settings/${slugName}/commands/${commandName}`, data)
       .then((response: IChatbotAPIPostResponse) => {
@@ -416,6 +435,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  updateQuote(id: number, data: IQuote) {
+    return this.api('PUT', `quotes/${id}`, data)
+      .then((response: IChatbotAPIPutResponse) => {
+        debugger;
+        if (response.success === true) {
+          this.fetchQuotes();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      });
+  }
+
   //
   // DELETE methods
   //
@@ -440,6 +470,15 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  deleteQuote(id: number) {
+    return this.api('DELETE', `quotes/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchQuotes();
+        }
+      }
+    );
+  }
 
   //
   // Mutations
@@ -509,6 +548,12 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'wordProtectionResponse', response);
   }
 
+  @mutation()
+  private UPDATE_QUOTES(response: IQuotesResponse) {
+    Vue.set(this.state, 'quotesResponse', response);
+  }
+
+
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -519,6 +564,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     customCommandToUpdate: null,
     defaultCommandToUpdate: null,
     timerToUpdate: null,
+    quoteToUpdate: null,
     modBannerVisible: true
   };
 
@@ -623,6 +669,19 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openQuoteWindow(quote?: IQuote) {
+    if (quote) {
+      this.SET_QUOTE_TO_UPDATE(quote);
+    }
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQuoteWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
 
   // @mutation()
   // showToast(message: string, options: object) {
@@ -657,5 +716,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private SET_TIMER_TO_UPDATE(timer: IChatbotTimer) {
     Vue.set(this.state, 'timerToUpdate', timer);
+  }
+
+  @mutation()
+  private SET_QUOTE_TO_UPDATE(quote: IQuote) {
+    Vue.set(this.state, 'quoteToUpdate', quote);
   }
 }

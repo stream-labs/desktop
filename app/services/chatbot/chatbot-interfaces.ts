@@ -13,6 +13,9 @@ export interface IChatbotApiServiceState {
   symbolProtectionResponse: ISymbolProtectionResponse;
   linkProtectionResponse: ILinkProtectionResponse;
   wordProtectionResponse: IWordProtectionResponse;
+
+  // v2
+  quotesResponse: IQuotesResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -20,6 +23,7 @@ export interface IChatbotCommonServiceState {
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
   timerToUpdate: IChatbotTimer;
+  quoteToUpdate: IQuote;
   modBannerVisible: boolean;
 }
 
@@ -96,6 +100,10 @@ export interface IWordProtectionResponse {
   enabled: boolean;
 }
 
+export interface IQuotesResponse {
+  pagination: IChatbotPagination;
+  data: IQuotesData;
+}
 
 // shared
 export interface IChatbotPermission {
@@ -299,6 +307,21 @@ export interface IWordProtectionBlackListItem {
   is_regex: boolean;
   punishment: IChatbotPunishment;
 }
+
+export interface IQuotesData {
+  [id: number]: IQuote;
+}
+
+export interface IQuote {
+  id?: number;
+  message: string;
+  game: string;
+  added_by: string;
+  custom_id?: number;
+  updated_at?: string;
+  created_at?: string;
+}
+
 
 // dictionaries
 export enum ChatbotAutopermitEnums {

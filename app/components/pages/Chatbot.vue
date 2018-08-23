@@ -30,6 +30,7 @@
         <ChatbotCommands v-if="selectedTab === 'Commands'"/>
         <ChatbotTimers v-if="selectedTab === 'Timers'"/>
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
+        <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
       </transition>
     </div>
   </div>
