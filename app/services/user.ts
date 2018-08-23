@@ -7,7 +7,7 @@ import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
-import { IChatbotServerApi } from './chatbot';
+import { ChatbotApiService } from './chatbot';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -38,7 +38,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private windowsService: WindowsService;
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
-  @Inject() private chatbotApiService: IChatbotServerApi;
+  @Inject() private chatbotApiService: ChatbotApiService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
