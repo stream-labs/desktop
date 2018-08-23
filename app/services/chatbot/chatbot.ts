@@ -1,15 +1,10 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from '../persistent-stateful-service';
+import { mutation } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation, ServiceHelper } from '../stateful-service';
 import { WindowsService } from 'services/windows';
-import {
-  IChatbotServerApi,
-  IChatbotCommonApi,
-} from 'services/chatbot';
-
 
 import {
   IChatbotApiServiceState,
@@ -36,13 +31,9 @@ import {
   ChatbotSettingSlugs
 } from './index';
 
-export class ChatbotApiService
-  extends PersistentStatefulService<IChatbotApiServiceState>
-  implements IChatbotServerApi {
-  @Inject()
-  userService: UserService;
-  @Inject()
-  chatbotCommonService: ChatbotCommonService;
+export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
+  @Inject() userService: UserService;
+  @Inject() chatbotCommonService: ChatbotCommonService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
   version = 'api/v1/';
@@ -133,7 +124,7 @@ export class ChatbotApiService
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
     let options: {
-      headers: any;
+      headers: Headers;
       method: string;
       body?: string;
     } = {
@@ -528,9 +519,7 @@ export class ChatbotApiService
   }
 }
 
-export class ChatbotCommonService
-  extends PersistentStatefulService<IChatbotCommonServiceState>
-  implements IChatbotCommonApi {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {

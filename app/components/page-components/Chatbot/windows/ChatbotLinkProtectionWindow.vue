@@ -56,18 +56,26 @@
             :metadata="metadata.link.general.message"
           />
         </div>
-        <div v-if="selectedTab === 'whitelist'">
+        <ChatbotLinkProtectionList
+          v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
+          :title="$t(`Add to ${selectedTab}`)"
+          :type="selectedTab"
+          v-model="linkProtection[selectedTab]"
+        />
+        <!-- <div v-if="selectedTab === 'whitelist'">
           <ChatbotLinkProtectionList
             :title="$t('Add to Whitelist')"
+            :type="'whitelist'"
             v-model="linkProtection.whitelist"
           />
         </div>
         <div v-if="selectedTab === 'blacklist'">
           <ChatbotLinkProtectionList
             :title="$t('Add to Blacklist')"
+            :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />
-        </div>
+        </div> -->
       </transition>
     </div>
   </div>

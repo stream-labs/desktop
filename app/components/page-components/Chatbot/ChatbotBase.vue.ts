@@ -3,8 +3,8 @@ import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 
 import {
-  IChatbotCommonApi,
-  IChatbotServerApi,
+  ChatbotApiService,
+  ChatbotCommonService,
 } from 'services/chatbot';
 
 import { CustomizationService } from 'services/customization';
@@ -31,8 +31,8 @@ import { IListOption } from 'components/shared/inputs'
   }
 })
 export default class ChatbotBase extends Vue {
-  @Inject() chatbotApiService: IChatbotServerApi;
-  @Inject() chatbotCommonService: IChatbotCommonApi;
+  @Inject() chatbotApiService: ChatbotApiService;
+  @Inject() chatbotCommonService: ChatbotCommonService;
   @Inject() customizationService: CustomizationService;
 
   mounted() {
