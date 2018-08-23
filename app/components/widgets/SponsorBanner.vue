@@ -14,19 +14,6 @@
       <span>{{ $t('secs') }}</span>
     </form-group>
 
-    <form-group :title="$t('Banner Width')">
-      <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
-    </form-group>
-    <form-group :title="$t('Banner Height')">
-      <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
-    </form-group>
-    <form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
-      <animation-input v-model="wData.settings.show_animation" />
-    </form-group>
-    <form-group :title="$t('Background Color')">
-      <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
-      <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
-    </form-group>
     <form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
     </form-group>
@@ -43,6 +30,22 @@
         <span>{{ $t('Seconds') }}</span>
       </div>
       <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
+    </form-group>
+  </div>
+
+  <div slot="visual-properties">
+    <form-group :title="$t('Banner Width')">
+      <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
+    </form-group>
+    <form-group :title="$t('Banner Height')">
+      <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
+    </form-group>
+    <form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
+      <animation-input v-model="wData.settings.show_animation" />
+    </form-group>
+    <form-group :title="$t('Background Color')">
+      <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
+      <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
     </form-group>
   </div>
 

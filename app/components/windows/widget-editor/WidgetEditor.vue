@@ -24,7 +24,7 @@
       </div>
       <div class="subsection">
         <span class="subsection__title">{{ $t('Selected Properties') }}</span>
-        <slot name="properties"></slot>
+        <slot v-for="setting in settings" :key="`${setting.value}-properties`" :name="`${setting.value}-properties`"></slot>
       </div>
     </div>
   </div>
