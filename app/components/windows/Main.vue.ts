@@ -22,6 +22,7 @@ import StudioFooter from '../StudioFooter.vue';
 import CustomLoader from '../CustomLoader.vue';
 import PatchNotes from '../pages/PatchNotes.vue';
 import DesignSystem from '../pages/DesignSystem.vue';
+import PlatformAppContainer from '../pages/PlatformAppContainer.vue';
 import electron from 'electron';
 
 @Component({
@@ -38,7 +39,8 @@ import electron from 'electron';
     CustomLoader,
     PatchNotes,
     Chatbot,
-    DesignSystem
+    DesignSystem,
+    PlatformAppContainer
   }
 })
 export default class Main extends Vue {

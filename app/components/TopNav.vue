@@ -43,6 +43,14 @@
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-live-dashboard"/> <span>{{ $t('Live') }}</span>
     </button>
+    <button
+      v-for="app in platformApps"
+      :key="app.manifest.id"
+      @click="navigateApp(app.manifest.id)"
+      class="tab-button"
+      :class="{ 'is-active': page === 'TODO' }">
+      <i class="fas fa-drafting-compass" /><span>{{ app.manifest.name }}</span>
+    </button>
   </div>
 
   <div class="top-nav-right">

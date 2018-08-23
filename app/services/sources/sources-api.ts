@@ -26,6 +26,8 @@ export interface ISourceComparison {
   propertiesManager: TPropertiesManager;
   widgetType?: WidgetType;
   isStreamlabel?: boolean;
+  appId?: string;
+  appSourceId?: string;
 }
 
 export interface ISourceApi extends ISource {

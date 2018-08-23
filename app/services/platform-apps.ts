@@ -1,4 +1,4 @@
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
+import { StatefulService } from 'services/stateful-service';
 import { mutation } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
@@ -21,18 +21,19 @@ enum EAppSourceType {
  */
 interface IAppSourceAbout {
   description: string;
-  supportList: string[];
+  bullets: string[];
   bannerImage?: string;
 }
 
-interface IAppSource {
+export interface IAppSource {
   type: EAppSourceType;
+  id: string; // A unique id for this source
   name: string;
   about: IAppSourceAbout;
   file: string; // Relative path to HTML file
 }
 
-enum EAppPageSlot {
+export enum EAppPageSlot {
   TopNav = 'top_nav'
 }
 
@@ -45,6 +46,7 @@ interface IAppPage {
 interface IAppManifest {
   id: string; // unique, e.g. com.streamlabs.alertbox
   name: string; // display name for the app
+  version: string;
   permissions: EAppPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
@@ -52,6 +54,9 @@ interface IAppManifest {
 
 interface ILoadedApp {
   manifest: IAppManifest;
+  unpacked: boolean;
+  appPath?: string; // The path on disk to the app if unpacked
+  appToken: string;
 }
 
 interface IPlatformAppServiceState {
@@ -59,16 +64,25 @@ interface IPlatformAppServiceState {
 }
 
 export class PlatformAppsService extends
-  PersistentStatefulService<IPlatformAppServiceState> {
+  StatefulService<IPlatformAppServiceState> {
+
+  static initialState: IPlatformAppServiceState = {
+    loadedApps: []
+  };
 
   /**
    * For now, there can only be 1 unpacked app at a time
    * TODO: Check this app for common structural problems
    */
-  async installUnpackedApp(appPath: string) {
+  async installUnpackedApp(appPath: string, appToken: string) {
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
-    this.ADD_APP({ manifest });
+    console.log(manifest);
+    this.ADD_APP({ manifest, unpacked: true, appPath, appToken });
+  }
+
+  unloadApps() {
+    this.REMOVE_APPS();
   }
 
   loadManifestFromDisk(manifestPath: string): Promise<string> {
@@ -84,6 +98,35 @@ export class PlatformAppsService extends
     });
   }
 
+  getPageUrlForSlot(appId: string, slot: EAppPageSlot) {
+    const app = this.getApp(appId);
+    const page = app.manifest.pages.find(page => page.slot === slot);
+    return this.getPageUrl(appId, page.file);
+  }
+
+  getPageUrl(appId: string, page: string) {
+    const app = this.getApp(appId);
+    const url = this.getAssetUrl(appId, page);
+    return `${url}?app_token=${app.appToken}`;
+  }
+
+  getAssetUrl(appId: string, asset: string) {
+    const app = this.getApp(appId);
+    let url: string;
+
+    if (app.unpacked) {
+      url = `file://${path.join(app.appPath, asset)}`;
+    } else {
+      // TODO
+    }
+
+    return url;
+  }
+
+  getApp(appId: string) {
+    return this.state.loadedApps.find(app => app.manifest.id === appId);
+  }
+
   /**
    * Replace for now
    * @param app the app
@@ -91,6 +134,11 @@ export class PlatformAppsService extends
   @mutation()
   private ADD_APP(app: ILoadedApp) {
     this.state.loadedApps = [app];
+  }
+
+  @mutation()
+  private REMOVE_APPS() {
+    this.state.loadedApps = [];
   }
 
 }

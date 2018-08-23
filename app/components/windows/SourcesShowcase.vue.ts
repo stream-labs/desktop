@@ -8,13 +8,15 @@ import { SourcesService, TSourceType, TPropertiesManager, SourceDisplayData } fr
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
+import { PlatformAppsService, IAppSource } from 'services/platform-apps'
 
-
-type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
+type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source';
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
   widgetType?: WidgetType;
+  appId?: string;
+  appSourceId?: string;
 }
 
 @Component({
@@ -29,6 +31,7 @@ export default class SourcesShowcase extends Vue {
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
@@ -48,7 +51,9 @@ export default class SourcesShowcase extends Vue {
         return source.isSameType({
           type: sourceType,
           propertiesManager: managerType,
-          widgetType: options.widgetType
+          widgetType: options.widgetType,
+          appId: options.appId ? options.appId : void 0,
+          appSourceId: options.appSourceId ? options.appSourceId : void 0
         });
       })
       .length;
@@ -85,9 +90,13 @@ export default class SourcesShowcase extends Vue {
   }
 
   inspectedSource: TInspectableSource = null;
+  inspectedAppId: string = '';
+  inspectedAppSourceId: string = '';
 
-  inspectSource(inspectedSource: TInspectableSource) {
+  inspectSource(inspectedSource: TInspectableSource, appId?: string, appSourceId?: string) {
     this.inspectedSource = inspectedSource;
+    if (appId) this.inspectedAppId = appId;
+    if (appSourceId) this.inspectedAppSourceId = appSourceId;
   }
 
   get loggedIn() {
@@ -114,6 +123,24 @@ export default class SourcesShowcase extends Vue {
       if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
       return true;
     });
+  }
+
+  get availableAppSources(): {
+    appId: string;
+    source: IAppSource;
+  }[] {
+    return this.platformAppsService.state.loadedApps.reduce((sources, app) => {
+      if (app.manifest.sources) {
+        app.manifest.sources.forEach(source => {
+          sources.push({
+            appId: app.manifest.id,
+            source
+          });
+        });
+      }
+
+      return sources;
+    }, []);
   }
 
 }
