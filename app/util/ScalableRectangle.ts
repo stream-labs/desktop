@@ -4,7 +4,7 @@ import { get, set, invert } from 'lodash';
 // with rectangles that can be scaled, including
 // negative scales.
 
-export enum AnchorPoint {
+export enum ResizeBoxPoint {
   North,
   NorthEast,
   East,
@@ -24,15 +24,15 @@ export enum CenteringAxis {
 
 // Positions on a positive unit grid
 const AnchorPositions = {
-  [AnchorPoint.North]: { x: 0.5, y: 0 },
-  [AnchorPoint.NorthEast]: { x: 1, y: 0 },
-  [AnchorPoint.East]: { x: 1, y: 0.5 },
-  [AnchorPoint.SouthEast]: { x: 1, y: 1 },
-  [AnchorPoint.South]: { x: 0.5, y: 1 },
-  [AnchorPoint.SouthWest]: { x: 0, y: 1 },
-  [AnchorPoint.West]: { x: 0, y: 0.5 },
-  [AnchorPoint.NorthWest]: { x: 0, y: 0 },
-  [AnchorPoint.Center]: { x: 0.5, y: 0.5 }
+  [ResizeBoxPoint.North]: { x: 0.5, y: 0 },
+  [ResizeBoxPoint.NorthEast]: { x: 1, y: 0 },
+  [ResizeBoxPoint.East]: { x: 1, y: 0.5 },
+  [ResizeBoxPoint.SouthEast]: { x: 1, y: 1 },
+  [ResizeBoxPoint.South]: { x: 0.5, y: 1 },
+  [ResizeBoxPoint.SouthWest]: { x: 0, y: 1 },
+  [ResizeBoxPoint.West]: { x: 0, y: 0.5 },
+  [ResizeBoxPoint.NorthWest]: { x: 0, y: 0 },
+  [ResizeBoxPoint.Center]: { x: 0.5, y: 0.5 }
 };
 
 
@@ -47,7 +47,7 @@ export class ScalableRectangle implements IScalableRectangle {
   crop: ICrop;
   rotation: number;
 
-  private anchor: AnchorPoint;
+  private anchor: ResizeBoxPoint;
 
 
   constructor(options: IScalableRectangle) {
@@ -68,7 +68,7 @@ export class ScalableRectangle implements IScalableRectangle {
 
     this.rotation = options.rotation || 0;
 
-    this.anchor = AnchorPoint.NorthWest;
+    this.anchor = ResizeBoxPoint.NorthWest;
   }
 
 
@@ -102,7 +102,7 @@ export class ScalableRectangle implements IScalableRectangle {
   }
 
 
-  setAnchor(anchor: AnchorPoint) {
+  setAnchor(anchor: ResizeBoxPoint) {
     // We need to calculate the distance to the new anchor point
     const currentPosition = AnchorPositions[this.anchor];
     const newPosition = AnchorPositions[anchor];
@@ -128,7 +128,7 @@ export class ScalableRectangle implements IScalableRectangle {
 
     // This is where the anchor point would actually be if this
     // were a zero rotated object
-    let anchor = AnchorPoint.NorthWest;
+    let anchor = ResizeBoxPoint.NorthWest;
 
     if (this.rotation === 90) {
       mapFields['width'] = 'height';
@@ -139,13 +139,13 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.top';
       mapFields['crop.bottom'] = 'crop.right';
       mapFields['crop.left'] = 'crop.bottom';
-      anchor = AnchorPoint.NorthEast;
+      anchor = ResizeBoxPoint.NorthEast;
     } else if (this.rotation === 180) {
       mapFields['crop.top'] = 'crop.bottom';
       mapFields['crop.right'] = 'crop.left';
       mapFields['crop.bottom'] = 'crop.top';
       mapFields['crop.left'] = 'crop.right';
-      anchor = AnchorPoint.SouthEast;
+      anchor = ResizeBoxPoint.SouthEast;
     } else if (this.rotation === 270) {
       mapFields['width'] = 'height';
       mapFields['height'] = 'width';
@@ -155,7 +155,7 @@ export class ScalableRectangle implements IScalableRectangle {
       mapFields['crop.right'] = 'crop.bottom';
       mapFields['crop.bottom'] = 'crop.left';
       mapFields['crop.left'] = 'crop.top';
-      anchor = AnchorPoint.SouthWest;
+      anchor = ResizeBoxPoint.SouthWest;
     }
 
     this.mapFields(mapFields);
@@ -164,7 +164,7 @@ export class ScalableRectangle implements IScalableRectangle {
 
     // Return the anchor to the NW, since the editor code assumes
     // that all rectangles are anchored from the NW
-    this.setAnchor(AnchorPoint.NorthWest);
+    this.setAnchor(ResizeBoxPoint.NorthWest);
 
     const rotation = this.rotation;
     this.rotation = 0;
@@ -195,7 +195,7 @@ export class ScalableRectangle implements IScalableRectangle {
    * Executes the function with a specific anchor point, after
    * which it is returned to its original anchor point.
    */
-  withAnchor(anchor: AnchorPoint, fun: Function) {
+  withAnchor(anchor: ResizeBoxPoint, fun: Function) {
     const oldAnchor = this.anchor;
     this.setAnchor(anchor);
 
@@ -304,8 +304,8 @@ export class ScalableRectangle implements IScalableRectangle {
     // Normalize both rectangles for this operation
     this.normalized(() => rect.normalized(() => {
       // Anchor both rectangles in the axis center
-      this.withAnchor(AnchorPoint.Center, () => {
-        rect.withAnchor(AnchorPoint.Center, () => {
+      this.withAnchor(ResizeBoxPoint.Center, () => {
+        rect.withAnchor(ResizeBoxPoint.Center, () => {
           switch (axis) {
             case CenteringAxis.X:
               this.x = rect.x;
