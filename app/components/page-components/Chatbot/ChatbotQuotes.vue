@@ -8,12 +8,20 @@
     >
       {{ $t('Add Quote') }}
     </button>
-    <input
-      v-model="searchQuery"
-      type="text"
-      class="chatbot__input--search width--auto margin--10"
-      placeholder="Search"
-    />
+    <div class="flex">
+      <button
+        @click="onOpenQuotePreferencesHandler"
+        class="button button--default margin--10"
+      >
+        {{ $t('Quote Preferences') }}
+      </button>
+      <input
+        v-model="searchQuery"
+        type="text"
+        class="chatbot__input--search width--auto margin--10"
+        placeholder="Search"
+      />
+    </div>
   </div>
   <div v-if="!quotes || quotes.length === 0" class="chatbot-empty-placeholder__container">
     <img

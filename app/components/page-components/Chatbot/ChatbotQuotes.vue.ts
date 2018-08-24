@@ -28,6 +28,7 @@ export default class ChatbotQuotes extends ChatbotBase {
   mounted() {
     // get list of quotes
     this.fetchQuotes(1);
+    this.chatbotApiService.fetchQuotePreferences();
   }
 
   @Watch('searchQuery')
@@ -42,6 +43,10 @@ export default class ChatbotQuotes extends ChatbotBase {
 
   onOpenQuoteWindowHandler(quote?: IQuote) {
     this.chatbotCommonService.openQuoteWindow(quote);
+  }
+
+  onOpenQuotePreferencesHandler() {
+    this.chatbotCommonService.openQuotePreferenceWindow();
   }
 
   onDeleteQuoteHandler(quote?: IQuote) {

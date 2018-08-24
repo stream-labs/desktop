@@ -16,6 +16,7 @@ export interface IChatbotApiServiceState {
 
   // v2
   quotesResponse: IQuotesResponse;
+  quotePreferencesResponse: IQuotePreferencesResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -103,6 +104,11 @@ export interface IWordProtectionResponse {
 export interface IQuotesResponse {
   pagination: IChatbotPagination;
   data: IQuotesData;
+}
+
+export interface IQuotePreferencesResponse {
+  settings: IQuotePreferencesData;
+  enabled: boolean;
 }
 
 // shared
@@ -313,6 +319,7 @@ export interface IWordProtectionBlackListItem {
   punishment: IChatbotPunishment;
 }
 
+// quotes
 export interface IQuotesData {
   [id: number]: IQuote;
 }
@@ -327,6 +334,14 @@ export interface IQuote {
   created_at?: string;
 }
 
+export interface IQuotePreferencesData {
+  commands: IDafaultCommandsSlug;
+  general: IQuotePreferencesGeneralSettings;
+}
+
+export interface IQuotePreferencesGeneralSettings {
+  date_format: string;
+}
 
 // dictionaries
 export enum ChatbotAutopermitEnums {

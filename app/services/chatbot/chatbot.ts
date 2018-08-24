@@ -31,6 +31,7 @@ import {
   IQuotesResponse,
   ChatbotSettingSlugs,
   IQuote,
+  IQuotePreferencesResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -90,6 +91,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         total: 1
       },
       data: []
+    },
+    quotePreferencesResponse: {
+      enabled: false,
+      settings: null
     }
   };
 
@@ -256,6 +261,14 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  fetchQuotePreferences() {
+    return this.api('GET', 'settings/quotes', {}).then(
+      (response: IQuotePreferencesResponse) => {
+        this.UPDATE_QUOTE_PREFERENCES(response);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
@@ -290,6 +303,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'words-protection':
+            debugger;
             this.UPDATE_WORD_PROTECTION(
               response as IWordProtectionResponse
             );
@@ -444,6 +458,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+  updateQuotePreferences(data: IQuotePreferencesResponse) {
+    return this.api('POST', 'settings/quotes', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchQuotePreferences();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      })
+  }
+
+
   //
   // DELETE methods
   //
@@ -549,6 +574,11 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   @mutation()
   private UPDATE_QUOTES(response: IQuotesResponse) {
     Vue.set(this.state, 'quotesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUOTE_PREFERENCES(response: IQuotePreferencesResponse) {
+    Vue.set(this.state, 'quotePreferencesResponse', response);
   }
 
 
@@ -676,6 +706,16 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       size: {
         width: 650,
         height: 500
+      }
+    });
+  }
+
+  openQuotePreferenceWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQuotePreferencesWindow',
+      size: {
+        width: 650,
+        height: 300
       }
     });
   }

@@ -35,4 +35,24 @@ export default class ChatbotWindowsBase extends ChatbotBase {
         break;
     }
   }
+
+  onToggleQuoteWindowHandler() {
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions().componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotCommonService.openQuotePreferenceWindow();
+        break;
+      case 'ChatbotQuotePreferencesWindow':
+        const quotePreferencesCommand =
+          this.chatbotApiService.state.defaultCommandsResponse['quotes'].get;
+
+        this.chatbotCommonService.openDefaultCommandWindow({
+          ...quotePreferencesCommand,
+          slugName: 'quotes',
+          commandName: 'get'
+        });
+        break;
+    }
+  }
 }
