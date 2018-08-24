@@ -6,7 +6,9 @@
       <webview class="mission-control" id="recentEventsWebview" ref="webview" :src="recenteventsUrl"></webview>
     </div>
 
-    <div class="flex__item studio-controls" :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
+    <div
+      class="flex__item studio-controls"
+      :style="{ flex: '0 0 ' + (previewSize * .75) + 'px' }">
       <scene-selector class="studio-controls-panel" />
 
       <mixer class="studio-controls-panel" />
@@ -52,7 +54,7 @@
             <div class="sizer-items">
               <Slider
                 v-model="previewSize"
-                :min="270"
+                :min="275"
                 :max="600"
                 :interval="1"
                 tooltip="false"
@@ -111,13 +113,13 @@
   display: flex;
   height: 100%;
   width: 100%;
-  padding: 20px;
+  .padding(2);
   box-sizing: border-box;
 }
 
 .mission-control-container {
   flex: 1;
-  margin-bottom: 20px;
+  .margin-bottom(2);
   .radius();
   overflow: hidden;
   position: relative;
@@ -130,13 +132,13 @@
 .studio-controls {
   display: flex;
   position: relative;
-  flex: 0 0 200px;
+  flex: 0 0 208px;
 }
 
 .studio-controls-panel {
   flex-basis: 50%;
   padding-left: 0;
-  padding-right: 20px;
+  .padding-right(2);
 }
 
 .sizer-container {
@@ -153,8 +155,8 @@
 }
 
 .sizer-items {
-  bottom: 4px;
-  right: 12px;
+  bottom: 8px;
+  right: 8px;
 }
 
 .live-preview-container {

@@ -55,23 +55,4 @@ tbody tr {
   }
 }
 
-
-.night-theme {
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
-}
 </style>

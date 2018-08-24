@@ -2,13 +2,15 @@ import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { cloneDeep } from 'lodash';
 import { ITab } from 'components/Tabs.vue';
-import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
+import { IDefaultCommand } from 'services/chatbot';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
+import { $t } from 'services/i18n';
 
 import {
   IListMetadata,
   ITextMetadata,
+  EInputType,
 } from 'components/shared/inputs/index';
 
 
@@ -34,11 +36,11 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Advanced',
+      name: $t('Advanced'),
       value: 'advanced'
     }
   ];
@@ -65,32 +67,49 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     let metadata: IDefaultCommandMetadata = {
       command: metadataHelper.text({
         required: true,
-        placeholder: 'Enter the text string which will trigger the response'
+        type: EInputType.text,
+        placeholder: $t(
+          'Enter the text string which will trigger the response'
+        ),
+        tooltip: $t('Enter a word used to trigger a response')
       }),
       response: metadataHelper.text({
         required: true,
-        placeholder:
+        type: EInputType.textArea,
+        placeholder: $t(
           'The phrase that will appear after a user enters the command'
+        )
       }),
       new_alias: metadataHelper.text({
         required: true,
-        placeholder: 'Add a new command alias'
+        type: EInputType.text,
+        placeholder: $t('Add a new command alias')
       }),
       success_response: metadataHelper.text({
         required: true,
-        placeholder: 'The phrase that will appear after a successful command'
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear after a successful command'
+        )
       }),
       failed_response: metadataHelper.text({
         required: true,
-        placeholder: 'The phrase that will appear after a failed command'
+        type: EInputType.textArea,
+        placeholder: $t('The phrase that will appear after a failed command')
       }),
       enabled_response: metadataHelper.text({
         required: true,
-        placeholder: 'The phrase that will appear after a command is enabled'
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear after a command is enabled'
+        )
       }),
       disabled_response: metadataHelper.text({
         required: true,
-        placeholder: 'The phrase that will appear after a command is disabled'
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear after a command is disabled'
+        )
       }),
       response_type: this.responseTypeMetadata
     };
@@ -99,6 +118,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   get responseTypeMetadata() {
     let responseTypeMetadata: IListMetadata<string> = {
+      type: EInputType.list,
       options: this.chatbotResponseTypes
     };
     return responseTypeMetadata;

@@ -1,7 +1,7 @@
 import test from 'ava';
 import { useSpectron } from '../helpers/spectron/index';
 import { addSource } from '../helpers/spectron/sources';
-import { logIn } from '../helpers/spectron/user';
+import { logIn, blankSlate } from '../helpers/spectron/user';
 
 useSpectron();
 
@@ -11,7 +11,8 @@ test('Set stream-boss health', async t => {
 
   const client = t.context.app.client;
   await logIn(t);
-  await addSource(t, 'Stream Boss', 'Stream Boss');
+  await blankSlate(t);
+  await addSource(t, 'Stream Boss', '__Stream Boss', false);
 
   const setButtonSelector = 'button=Set Stream Boss Health';
   const resetButtonSelector = 'button=Reset Stream Boss';
@@ -24,7 +25,7 @@ test('Set stream-boss health', async t => {
   await client.click(setButtonSelector);
   await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
 
+  await blankSlate(t);
   t.pass();
 
 });
-
