@@ -30,8 +30,18 @@
           <tr>
             <th> {{ $t('Command') }} </th>
             <th> {{ $t('Response') }} </th>
-            <th> {{ $t('Global Cooldown in mins') }} </th>
-            <th> {{ $t('User Cooldown in mins') }} </th>
+            <th>
+              <div class="flex">
+                GCD
+                <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in minutes')" />
+              </div>
+            </th>
+            <th>
+              <div class="flex">
+                UCD
+                <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in minutes')" />
+              </div>
+            </th>
             <th> {{ $t('Permission') }} </th>
             <th></th>
           </tr>
@@ -58,7 +68,7 @@
                 >
                   <div class="chatbot-custom-commands__command-actions__container">
                     <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                  <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                    <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
                   </div>
                 </DropdownMenu>
               </div>
@@ -80,6 +90,10 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
+
+.icon-question {
+  .icon-hover();
+}
 
 table tr {
   .transition;
@@ -123,17 +137,9 @@ table tr {
 
 
 .night-theme {
-  tbody tr {
-    border: 2px solid transparent;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
+  .icon-question {
+    .night-icon-hover();
+    padding-left: 3px;
   }
 
 }

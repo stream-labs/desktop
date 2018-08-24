@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 
 import {
   IChatbotModule,
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({
   components: {

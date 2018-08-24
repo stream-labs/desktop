@@ -1,8 +1,13 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
-import { CustomizationService } from 'services/customization';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
+
+import {
+  ChatbotApiService,
+  ChatbotCommonService,
+} from 'services/chatbot';
+
+import { CustomizationService } from 'services/customization';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
@@ -13,7 +18,7 @@ import {
   ChatbotAutopermitEnums,
   ChatbotResponseTypes,
   ChatbotPunishments,
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import { IListOption } from 'components/shared/inputs'
 
@@ -22,7 +27,7 @@ import { IListOption } from 'components/shared/inputs'
     ...inputComponents,
     VFormGroup,
     Tabs,
-    DropdownMenu,
+    DropdownMenu
   }
 })
 export default class ChatbotBase extends Vue {
@@ -75,7 +80,6 @@ export default class ChatbotBase extends Vue {
     );
     return permissions;
   }
-
 
   get chatbotResponseTypes() {
     return Object.keys(ChatbotResponseTypes).map(responseType => {

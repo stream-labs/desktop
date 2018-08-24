@@ -11,20 +11,16 @@
   <div slot="content" class="chatbot-word-protection__container">
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general' && wordProtection">
-        <div>
-          <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
-          <ListInput
-            v-model="wordProtection.general.excluded.level"
-            :metadata="metadata.word.general.excluded.level"
-          />
-        </div>
-        <div>
-          <label for="message" class="margin-vertical--10"> {{ $t('Punishment Message') }} </label>
-          <TextAreaInput
-            v-model="wordProtection.general.message"
-            :metadata="metadata.word.general.message"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Auto Permit')"
+          v-model="wordProtection.general.excluded.level"
+          :metadata="metadata.word.general.excluded.level"
+        />
+        <VFormGroup
+          :title="$t('Punishment Message')"
+          v-model="wordProtection.general.message"
+          :metadata="metadata.word.general.message"
+        />
       </div>
       <div v-if="selectedTab === 'blacklist'">
         <ChatbotWordProtectionList

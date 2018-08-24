@@ -91,6 +91,16 @@
   }
 }
 
+.button--warn {
+  background-color: @warning;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: lighten(@warning, 4%);
+  }
+}
+
 .icon-button {
   font-size: 14px;
   cursor: pointer;

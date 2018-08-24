@@ -8,9 +8,10 @@ import { $t } from 'services/i18n';
 import {
   ICustomCommand,
   IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import {
+  EInputType,
   IListMetadata,
   ITextMetadata,
   INumberMetadata
@@ -41,28 +42,16 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   tabs: ITab[] = [
     {
-      name: 'General',
+      name: $t('General'),
       value: 'general'
     },
     {
-      name: 'Advanced',
+      name: $t('Advanced'),
       value: 'advanced'
     }
   ];
 
   selectedTab: string = 'general';
-
-  // metadata
-  commandMetadata: ITextMetadata = {
-    required: true,
-    placeholder: $t('Enter the text string which will trigger the response')
-  };
-  responseMetadata: ITextMetadata = {
-    required: true,
-    placeholder: $t(
-      'The phrase that will appear after a user enters the command'
-    )
-  };
 
   mounted() {
     // if editing existing custom command
@@ -79,9 +68,25 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     return this.chatbotCommonService.state.customCommandToUpdate;
   }
 
+  // metadata
+  commandMetadata: ITextMetadata = {
+    required: true,
+    type: EInputType.text,
+    placeholder: $t('Enter the text string which will trigger the response'),
+    tooltip: $t('Enter a word used to trigger a response')
+  };
+  responseMetadata: ITextMetadata = {
+    required: true,
+    type: EInputType.textArea,
+    placeholder: $t(
+      'The phrase that will appear after a user enters the command'
+    )
+  };
+
   get permissionMetadata() {
     let permissionMetadata: IListMetadata<number> = {
       required: true,
+      type: EInputType.list,
       options: this.chatbotPermissions
     };
     return permissionMetadata;
@@ -90,6 +95,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   get replyTypeMetadata() {
     let replyTypeMetadata: IListMetadata<string> = {
       required: true,
+      type: EInputType.list,
       options: this.chatbotResponseTypes
     };
     return replyTypeMetadata;
@@ -97,6 +103,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
+      type: EInputType.number,
       placeholder: $t('Cooldown (Value in Minutes)'),
       min: 0
     };
