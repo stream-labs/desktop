@@ -65,7 +65,6 @@
       <div class="columns small-12 buttons">
         <button
           @click="addExisting"
-          :disabled="false"
           class="button button--action">
           {{ $t('Add Existing Source') }}
         </button>
