@@ -12,9 +12,7 @@
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
-      <div class="selector-item-text">
-        {{item.name}}
-      </div>
+      <div class="selector-item-text">{{item.name}}</div>
       <div class="selector-actions">
         <slot name="actions" :item="item"/>
       </div>
