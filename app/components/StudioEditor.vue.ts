@@ -25,7 +25,7 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  lockedAnchor: AnchorPoint; // 操作中のアンカーの真逆位置のアンカー
+  anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
   verticalEdge?: AnchorPoint; // 鉛直方向に動く辺に対応する方角
   horizontalEdge?: AnchorPoint; // 水平方向に動く辺に対応する方角
 }
@@ -201,14 +201,14 @@ export default class StudioEditor extends Vue {
       const name = this.resizeRegion.name;
 
       const optionsMap = Object.freeze({
-        nw: { lockedAnchor: AnchorPoint.SouthEast, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.West },
-        sw: { lockedAnchor: AnchorPoint.NorthEast, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.West },
-        ne: { lockedAnchor: AnchorPoint.SouthWest, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.East },
-        se: { lockedAnchor: AnchorPoint.NorthWest, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.East },
-        n: { lockedAnchor: AnchorPoint.South, verticalEdge: AnchorPoint.North },
-        s: { lockedAnchor: AnchorPoint.North, verticalEdge: AnchorPoint.South },
-        e: { lockedAnchor: AnchorPoint.West, horizontalEdge: AnchorPoint.East },
-        w: { lockedAnchor: AnchorPoint.East, horizontalEdge: AnchorPoint.West },
+        nw: { anchor: AnchorPoint.SouthEast, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.West },
+        sw: { anchor: AnchorPoint.NorthEast, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.West },
+        ne: { anchor: AnchorPoint.SouthWest, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.East },
+        se: { anchor: AnchorPoint.NorthWest, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.East },
+        n: { anchor: AnchorPoint.South, verticalEdge: AnchorPoint.North },
+        s: { anchor: AnchorPoint.North, verticalEdge: AnchorPoint.South },
+        e: { anchor: AnchorPoint.West, horizontalEdge: AnchorPoint.East },
+        w: { anchor: AnchorPoint.East, horizontalEdge: AnchorPoint.West },
       });
 
       const options = {
@@ -260,7 +260,7 @@ export default class StudioEditor extends Vue {
     const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
-      rect.withAnchor(options.lockedAnchor, () => {
+      rect.withAnchor(options.anchor, () => {
         if (options.horizontalEdge === AnchorPoint.West) {
           const croppableWidth = rect.width - rect.crop.right - 2;
           const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
@@ -307,7 +307,7 @@ export default class StudioEditor extends Vue {
     const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
-      rect.withAnchor(opts.lockedAnchor, () => {
+      rect.withAnchor(opts.anchor, () => {
         const distanceX = Math.abs(x - rect.x);
         const distanceY = Math.abs(y - rect.y);
 
