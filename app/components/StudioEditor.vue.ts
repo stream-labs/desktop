@@ -25,7 +25,7 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
+  anchor: AnchorPoint; // リサイズの中心となるResizeBoxの方角
   verticalEdge?: AnchorPoint; // 鉛直方向に動く辺に対応する方角
   horizontalEdge?: AnchorPoint; // 水平方向に動く辺に対応する方角
 }
