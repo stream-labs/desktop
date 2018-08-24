@@ -190,7 +190,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
-  fetchCustomCommands(page = 1, query = '') {
+  fetchCustomCommands(page = this.state.customCommandsResponse.pagination.current, query = '') {
     return this.api('GET', `commands?page=${page}&query=${query}`, {})
       .then((response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
@@ -205,7 +205,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-  fetchTimers(page = 1, query = '') {
+  fetchTimers(page = this.state.timersResponse.pagination.current, query = '') {
     return this.api('GET', `timers?page=${page}&query=${query}`, {})
       .then((response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
@@ -248,7 +248,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-  fetchQuotes(page = 1, query = '') {
+  fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
     return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
       (response: IQuotesResponse) => {
         this.UPDATE_QUOTES(response);
@@ -351,10 +351,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   createQuote(data: IQuote) {
-    debugger;
     return this.api('POST', 'quotes', data)
       .then((response: IQuote) => {
-        debugger;
         this.fetchQuotes();
         this.chatbotCommonService.closeChildWindow();
       });
