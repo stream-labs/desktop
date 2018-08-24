@@ -8,7 +8,7 @@ import { ITab } from 'components/Tabs.vue';
   components: {
     ChatbotDefaultCommands,
     ChatbotCustomCommands,
-    ChatbotCommandVariables
+    ChatbotCommandVariables,
   }
 })
 export default class ChatbotCommands extends ChatbotBase {

@@ -178,7 +178,7 @@
 @import "../../styles/index";
 
 .source-info {
-  padding: 20px;
+  .padding(2);
   border-bottom: 1px solid @day-border;
   display: flex;
   flex-direction: row;
@@ -217,21 +217,21 @@ h2 {
 }
 
 .sources {
-  padding: 20px;
+  .padding(2);
   display: flex;
   flex: 1 0 auto;
 
   .source-group {
     &:last-child {
-      padding: 20px 0 20px 20px;
+      padding: 16px 0 16px 16px;
       border-right: none;
     }
   }
 }
 
 .source-group {
-  margin: -20px 0px -20px 0px;
-  padding: 20px 20px 20px 0;
+  margin: -16px 0px -16px 0px;
+  padding: 16px 16px 16px 0;
   flex: 0 0 33%;
 }
 
@@ -288,7 +288,7 @@ h2 {
   .radius;
   overflow: hidden;
   text-align: center;
-  padding-left: 20px;
+  .padding-left(2);
   align-items: center;
   align-content: center;
   max-height: 150px;

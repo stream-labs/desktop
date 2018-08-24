@@ -8,7 +8,7 @@ import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import NameSceneCollection from 'components/windows/NameSceneCollection.vue';
-import NameSource from 'components/windows/NameSource.vue';
+import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -66,7 +66,7 @@ export function getComponents() {
     Settings,
     SceneTransitions,
     SourcesShowcase,
-    NameSource,
+    RenameSource,
     AddSource,
     NameScene,
     NameSceneCollection,
