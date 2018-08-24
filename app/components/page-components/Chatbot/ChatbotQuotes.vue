@@ -47,7 +47,7 @@
           v-for="quote in quotes"
           :key="quote.name"
         >
-          <td> {{ quote.id }} </td>
+          <td> {{ quote.custom_id }} </td>
           <td> {{ quote.message }} </td>
           <td> {{ quote.added_by }} </td>
           <td> {{ quote.game }} </td>

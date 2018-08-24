@@ -256,6 +256,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
     return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
       (response: IQuotesResponse) => {
+        console.log(response);
         this.UPDATE_QUOTES(response);
       }
     );
