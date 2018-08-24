@@ -27,7 +27,7 @@ interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
   lockX: boolean; // prevent changes to the X scale (default: false)
   lockY: boolean; // lockY: prevent changes to the Y scale (default: false)
-  anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
+  lockedAnchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
 }
 
 @Component({
@@ -202,14 +202,14 @@ export default class StudioEditor extends Vue {
 
       // We choose an anchor point opposite the resize region
       const optionsMap = {
-        nw: { anchor: AnchorPoint.SouthEast },
-        sw: { anchor: AnchorPoint.NorthEast },
-        ne: { anchor: AnchorPoint.SouthWest },
-        se: { anchor: AnchorPoint.NorthWest },
-        n: { anchor: AnchorPoint.South, lockX: true },
-        s: { anchor: AnchorPoint.North, lockX: true },
-        e: { anchor: AnchorPoint.West, lockY: true },
-        w: { anchor: AnchorPoint.East, lockY: true }
+        nw: { lockedAnchor: AnchorPoint.SouthEast },
+        sw: { lockedAnchor: AnchorPoint.NorthEast },
+        ne: { lockedAnchor: AnchorPoint.SouthWest },
+        se: { lockedAnchor: AnchorPoint.NorthWest },
+        n: { lockedAnchor: AnchorPoint.South, lockX: true },
+        s: { lockedAnchor: AnchorPoint.North, lockX: true },
+        e: { lockedAnchor: AnchorPoint.West, lockY: true },
+        w: { lockedAnchor: AnchorPoint.East, lockY: true }
       };
 
       const options = {
@@ -261,21 +261,21 @@ export default class StudioEditor extends Vue {
     const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
-      rect.withAnchor(options.anchor, () => {
+      rect.withAnchor(options.lockedAnchor, () => {
         // There's probably a more generic way to do this math
-        if (options.anchor === AnchorPoint.East) {
+        if (options.lockedAnchor === AnchorPoint.East) {
           const croppableWidth = rect.width - rect.crop.right - 2;
           const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
           rect.crop.left = _.clamp(distance / rect.scaleX, 0, croppableWidth);
-        } else if (options.anchor === AnchorPoint.West) {
+        } else if (options.lockedAnchor === AnchorPoint.West) {
           const croppableWidth = rect.width - rect.crop.left - 2;
           const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
           rect.crop.right = _.clamp(distance / rect.scaleX, 0, croppableWidth);
-        } else if (options.anchor === AnchorPoint.South) {
+        } else if (options.lockedAnchor === AnchorPoint.South) {
           const croppableHeight = rect.height - rect.crop.bottom - 2;
           const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
           rect.crop.top = _.clamp(distance / rect.scaleY, 0, croppableHeight);
-        } else if (options.anchor === AnchorPoint.North) {
+        } else if (options.lockedAnchor === AnchorPoint.North) {
           const croppableHeight = rect.height - rect.crop.top - 2;
           const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
           rect.crop.bottom = _.clamp(distance / rect.scaleY, 0, croppableHeight);
@@ -307,7 +307,7 @@ export default class StudioEditor extends Vue {
     const rect = new ScalableRectangle(source.getRectangle());
 
     rect.normalized(() => {
-      rect.withAnchor(opts.anchor, () => {
+      rect.withAnchor(opts.lockedAnchor, () => {
         const distanceX = Math.abs(x - rect.x);
         const distanceY = Math.abs(y - rect.y);
 
