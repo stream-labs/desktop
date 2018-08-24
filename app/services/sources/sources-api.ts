@@ -65,8 +65,6 @@ export interface ISourcesServiceApi {
   showSourceProperties(sourceId: string): void;
   showShowcase(): void;
   showAddSource(sourceType: TSourceType): void;
-  showNameSource(sourceType: TSourceType): void;
-  showNameWidget(widgetType: WidgetType): void;
   sourceAdded: Observable<ISource>;
   sourceUpdated: Observable<ISource>;
   sourceRemoved: Observable<ISource>;
