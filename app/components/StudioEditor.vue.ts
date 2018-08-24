@@ -25,9 +25,9 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  lockX: boolean; // prevent changes to the X scale (default: false)
-  lockY: boolean; // lockY: prevent changes to the Y scale (default: false)
-  lockedAnchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
+  lockedAnchor: AnchorPoint; // 操作中のアンカーの真逆位置のアンカー
+  verticalEdge?: AnchorPoint; // 鉛直方向に動く辺に対応する方角
+  horizontalEdge?: AnchorPoint; // 水平方向に動く辺に対応する方角
 }
 
 @Component({
@@ -200,17 +200,16 @@ export default class StudioEditor extends Vue {
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
 
-      // We choose an anchor point opposite the resize region
-      const optionsMap = {
-        nw: { lockedAnchor: AnchorPoint.SouthEast },
-        sw: { lockedAnchor: AnchorPoint.NorthEast },
-        ne: { lockedAnchor: AnchorPoint.SouthWest },
-        se: { lockedAnchor: AnchorPoint.NorthWest },
-        n: { lockedAnchor: AnchorPoint.South, lockX: true },
-        s: { lockedAnchor: AnchorPoint.North, lockX: true },
-        e: { lockedAnchor: AnchorPoint.West, lockY: true },
-        w: { lockedAnchor: AnchorPoint.East, lockY: true }
-      };
+      const optionsMap = Object.freeze({
+        nw: { lockedAnchor: AnchorPoint.SouthEast, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.West },
+        sw: { lockedAnchor: AnchorPoint.NorthEast, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.West },
+        ne: { lockedAnchor: AnchorPoint.SouthWest, verticalEdge: AnchorPoint.North, horizontalEdge: AnchorPoint.East },
+        se: { lockedAnchor: AnchorPoint.NorthWest, verticalEdge: AnchorPoint.South, horizontalEdge: AnchorPoint.East },
+        n: { lockedAnchor: AnchorPoint.South, verticalEdge: AnchorPoint.North },
+        s: { lockedAnchor: AnchorPoint.North, verticalEdge: AnchorPoint.South },
+        e: { lockedAnchor: AnchorPoint.West, horizontalEdge: AnchorPoint.East },
+        w: { lockedAnchor: AnchorPoint.East, horizontalEdge: AnchorPoint.West },
+      });
 
       const options = {
         ...optionsMap[name],
@@ -325,8 +324,8 @@ export default class StudioEditor extends Vue {
         }
 
         // Aspect ratio preservation overrides lockX and lockY
-        if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
-        if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
+        if (AnchorPoint[opts.horizontalEdge] || opts.lockRatio) rect.scaleX = newScaleX;
+        if (AnchorPoint[opts.verticalEdge] || opts.lockRatio) rect.scaleY = newScaleY;
       });
     });
 
