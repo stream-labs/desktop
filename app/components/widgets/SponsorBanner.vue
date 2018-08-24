@@ -7,18 +7,6 @@
   :settings="[{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }]"
 >
   <!-- <div slot="settings" >
-    <form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
-      <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
-      <span>{{ $t('mins') }}</span>
-      <div class="duration"><number-input v-model="wData.settings.hide_duration_secs" :metadata="{}" /></div>
-      <span>{{ $t('secs') }}</span>
-    </form-group>
-    <form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
-      <div class="duration"><number-input v-model="wData.settings.show_duration" :metadata="{}" /></div>
-      <span>{{ $t('mins') }}</span>
-      <div class="duration"><number-input v-model="wData.settings.show_duration_secs" :metadata="{}" /></div>
-      <span>{{ $t('secs') }}</span>
-    </form-group>
 
     <form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
@@ -40,19 +28,31 @@
   </div> -->
 
   <div slot="visual-properties">
-    <form-group :title="$t('Banner Width')">
+    <v-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
+      <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
+      <span>{{ $t('mins') }}</span>
+      <div class="duration"><number-input v-model="wData.settings.hide_duration_secs" :metadata="{}" /></div>
+      <span>{{ $t('secs') }}</span>
+    </v-form-group>
+    <v-form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
+      <div class="duration"><number-input v-model="wData.settings.show_duration" :metadata="{}" /></div>
+      <span>{{ $t('mins') }}</span>
+      <div class="duration"><number-input v-model="wData.settings.show_duration_secs" :metadata="{}" /></div>
+      <span>{{ $t('secs') }}</span>
+    </v-form-group>
+    <v-form-group :title="$t('Banner Width')">
       <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
-    </form-group>
-    <form-group :title="$t('Banner Height')">
+    </v-form-group>
+    <v-form-group :title="$t('Banner Height')">
       <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
-    </form-group>
-    <form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
+    </v-form-group>
+    <v-form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
       <animation-input v-model="wData.settings.show_animation" />
-    </form-group>
-    <form-group :title="$t('Background Color')">
+    </v-form-group>
+    <v-form-group :title="$t('Background Color')">
       <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
-    </form-group>
+    </v-form-group>
   </div>
 </widget-editor>
 </template>
