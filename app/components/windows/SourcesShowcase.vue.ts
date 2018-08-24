@@ -42,26 +42,7 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-
-    const sameTypeCount = this.sourcesService.getSources()
-      .filter((source) => {
-        return source.isSameType({
-          type: sourceType,
-          propertiesManager: managerType,
-          widgetType: options.widgetType
-        });
-      })
-      .length;
-
-    if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
-    } else {
-      if (managerType === 'widget') {
-        this.sourcesService.showNameWidget(options.widgetType);
-      } else {
-        this.sourcesService.showNameSource(sourceType, managerType);
-      }
-    }
+    this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
   }
 
   getSrc(type: string, theme: string) {
