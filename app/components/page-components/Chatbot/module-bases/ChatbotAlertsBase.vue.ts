@@ -6,7 +6,7 @@ import {
   IAlertMessage,
   ChatbotAlertTypes,
   NEW_ALERT_MODAL_ID
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {

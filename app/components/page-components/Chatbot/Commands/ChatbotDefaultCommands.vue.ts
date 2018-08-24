@@ -1,25 +1,16 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component } from 'vue-property-decorator';
-import { IDefaultCommand } from 'services/chatbot/chatbot-interfaces';
+import { IDefaultCommand } from 'services/chatbot';
 import { $t } from 'services/i18n';
+import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 
-@Component({})
+@Component({
+  components: {
+    CollapsibleSection
+  }
+})
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
-
-  visible: {
-    commands: boolean;
-    'link-protection': boolean;
-    giveaway: boolean;
-  } = {
-    commands: true,
-    'link-protection': true,
-    giveaway: true
-  };
-
-  onToggleVisibleHandler(tab: 'commands' | 'link-protection' | 'giveaway') {
-    this.visible[tab] = !this.visible[tab];
-  }
 
   get commandSlugs() {
     return this.chatbotApiService.state.defaultCommandsResponse;
