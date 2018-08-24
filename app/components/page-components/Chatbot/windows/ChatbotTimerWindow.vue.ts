@@ -6,11 +6,12 @@ import { $t } from 'services/i18n';
 import {
   IChatbotTimer,
   IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import {
   ITextMetadata,
-  INumberMetadata
+  INumberMetadata,
+  EInputType
 } from 'components/shared/inputs/index';
 
 @Component({})
@@ -27,16 +28,19 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   // metadata
   nameMetadata: ITextMetadata = {
     required: true,
+    type: EInputType.text,
     placeholder: $t('Name of the timer'),
     alphaNum: true
   };
   messageMetadata: ITextMetadata = {
     required: true,
+    type: EInputType.textArea,
     placeholder: $t('This phrase will appear after the timer has ended')
   };
 
   intervalMetadata: INumberMetadata = {
     required: true,
+    type: EInputType.number,
     min: 0,
     max: 1440,
     placeholder: $t('Interval (Value in Minutes)')
@@ -44,9 +48,13 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
 
   chatLinesMetadata: INumberMetadata = {
     required: true,
+    type: EInputType.number,
     min: 0,
     max: 1000,
-    placeholder: $t('Minimum chat lines')
+    placeholder: $t('Minimum chat lines'),
+    tooltip: $t(
+      'Set the number of chat lines that need to appear when the timer ends before the response appears.'
+    )
   };
 
   mounted() {

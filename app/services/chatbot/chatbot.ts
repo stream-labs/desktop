@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from '../persistent-stateful-service';
+import { mutation } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 
 import {
@@ -29,7 +29,7 @@ import {
   ILinkProtectionResponse,
   IWordProtectionResponse,
   ChatbotSettingSlugs
-} from './chatbot-interfaces';
+} from './index';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
   @Inject() userService: UserService;
@@ -81,7 +81,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     wordProtectionResponse: {
       enabled: false,
       settings: null
-    },
+    }
   };
 
   //
@@ -116,20 +116,20 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     this.LOGOUT();
   }
 
-  apiEndpoint(route: String, versionIncluded?: Boolean) {
+  private apiEndpoint(route: String, versionIncluded?: Boolean) {
     return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
 
-  api(method: string, endpoint: string, data: any) {
+  private api(method: string, endpoint: string, data: any) {
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
     let options: {
-      headers: any,
-      method: string,
-      body?: string
+      headers: Headers;
+      method: string;
+      body?: string;
     } = {
       headers,
-      method,
+      method
     };
     if (method.toLowerCase() === 'post' || method.toLowerCase() === 'put') {
       options.headers.append('Content-Type', 'application/json');
@@ -145,11 +145,12 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       .catch(error => {
         // errors contain string response. Need to json()
         // and return the promised error
-        return error.json()
+        return error
+          .json()
           .then((errJson: Promise<IChatbotErrorResponse>) =>
             Promise.reject(errJson)
           );
-      })
+      });
   }
 
   //
@@ -157,35 +158,37 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
 
   fetchChatbotGlobalEnabled() {
-    return this.api('GET', 'status', {})
-      .then((response: IChatbotStatusResponse) => {
-
+    return this.api('GET', 'status', {}).then(
+      (response: IChatbotStatusResponse) => {
         // check for clients
         const allclientsOnline = ChatbotClients.every((client: string) => {
           return response.clients.services.indexOf(client) > -1;
         });
         // all status online.
-        this.UPDATE_GLOBALLY_ENABLED((
+        this.UPDATE_GLOBALLY_ENABLED(
           response.worker.status === 'Online' &&
-          response.worker.type === 'Full' &&
-          response.clients.status === 'Online' &&
-          allclientsOnline
-        ))
-      })
+            response.worker.type === 'Full' &&
+            response.clients.status === 'Online' &&
+            allclientsOnline
+        );
+      }
+    );
   }
 
   fetchDefaultCommands() {
-    return this.api('GET', 'commands/default', {})
-      .then((response: IDafaultCommandsResponse) => {
+    return this.api('GET', 'commands/default', {}).then(
+      (response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
-      });
+      }
+    );
   }
 
   fetchCustomCommands(page = 1, query = '') {
-    return this.api('GET', `commands?page=${page}&query=${query}`, {})
-      .then((response: ICustomCommandsResponse) => {
+    return this.api('GET', `commands?page=${page}&query=${query}`, {}).then(
+      (response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
-      });
+      }
+    );
   }
 
   fetchCommandVariables() {
@@ -197,38 +200,43 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   fetchTimers(page = 1, query = '') {
-    return this.api('GET', `timers?page=${page}&query=${query}`, {})
-      .then((response: ITimersResponse) => {
+    return this.api('GET', `timers?page=${page}&query=${query}`, {}).then(
+      (response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
-      });
+      }
+    );
   }
 
   fetchChatAlerts() {
-    return this.api('GET', 'settings/chat-notifications', {})
-      .then((response: IChatAlertsResponse) => {
+    return this.api('GET', 'settings/chat-notifications', {}).then(
+      (response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
-      })
+      }
+    );
   }
 
   fetchCapsProtection() {
-    return this.api('GET', 'settings/caps-protection', {})
-      .then((response: ICapsProtectionResponse) => {
+    return this.api('GET', 'settings/caps-protection', {}).then(
+      (response: ICapsProtectionResponse) => {
         this.UPDATE_CAPS_PROTECTION(response);
-      })
+      }
+    );
   }
 
   fetchSymbolProtection() {
-    return this.api('GET', 'settings/symbol-protection', {})
-      .then((response: ISymbolProtectionResponse) => {
+    return this.api('GET', 'settings/symbol-protection', {}).then(
+      (response: ISymbolProtectionResponse) => {
         this.UPDATE_SYMBOL_PROTECTION(response);
-      })
+      }
+    );
   }
 
   fetchLinkProtection() {
-    return this.api('GET', 'settings/link-protection', {})
-      .then((response: ILinkProtectionResponse) => {
+    return this.api('GET', 'settings/link-protection', {}).then(
+      (response: ILinkProtectionResponse) => {
         this.UPDATE_LINK_PROTECTION(response);
-      })
+      }
+    );
   }
 
   fetchWordProtection() {
@@ -247,7 +255,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
-          IChatAlertsResponse
+          | IChatAlertsResponse
           | ICapsProtectionResponse
           | ISymbolProtectionResponse
           | ILinkProtectionResponse
@@ -255,13 +263,9 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       ) => {
         switch (slug) {
           case 'chat-notifications':
-            this.UPDATE_CHAT_ALERTS(
-              response as IChatAlertsResponse
-            )
+            this.UPDATE_CHAT_ALERTS(response as IChatAlertsResponse);
           case 'caps-protection':
-            this.UPDATE_CAPS_PROTECTION(
-              response as ICapsProtectionResponse
-            );
+            this.UPDATE_CAPS_PROTECTION(response as ICapsProtectionResponse);
             break;
           case 'symbol-protection':
             this.UPDATE_SYMBOL_PROTECTION(
@@ -269,14 +273,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'link-protection':
-            this.UPDATE_LINK_PROTECTION(
-              response as ILinkProtectionResponse
-            );
+            this.UPDATE_LINK_PROTECTION(response as ILinkProtectionResponse);
             break;
           case 'words-protection':
-            this.UPDATE_WORD_PROTECTION(
-              response as IWordProtectionResponse
-            );
+            this.UPDATE_WORD_PROTECTION(response as IWordProtectionResponse);
             break;
         }
         return Promise.resolve(response);
@@ -286,14 +286,15 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
   toggleEnableChatbot() {
     const platforms = ChatbotClients.map(client => client.toLowerCase());
-    return Promise.all(platforms.map(platform => {
-      return this.state.globallyEnabled
-        ? this.leavePlatformChannel(platform)
-        : this.joinPlatformChannel(platform);
-    }))
-      .then((response: IChatbotAPIPostResponse[]) => {
-        this.fetchChatbotGlobalEnabled();
-      });
+    return Promise.all(
+      platforms.map(platform => {
+        return this.state.globallyEnabled
+          ? this.leavePlatformChannel(platform)
+          : this.joinPlatformChannel(platform);
+      })
+    ).then((response: IChatbotAPIPostResponse[]) => {
+      this.fetchChatbotGlobalEnabled();
+    });
   }
 
   joinPlatformChannel(platform: string) {
@@ -305,108 +306,126 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   resetDefaultCommands() {
-    return this.api('POST', 'commands/default/reset', {})
-      .then((response: IDafaultCommandsResponse) => {
+    return this.api('POST', 'commands/default/reset', {}).then(
+      (response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
-      });
+      }
+    );
   }
 
   resetDefaultCommand(slugName: string, commandName: string) {
-    return this.api('POST', `settings/${slugName}/commands/${commandName}/reset`, {})
-      .then((response: IDefaultCommand) => {
-        return Promise.resolve(response);
-      });
+    return this.api(
+      'POST',
+      `settings/${slugName}/commands/${commandName}/reset`,
+      {}
+    ).then((response: IDefaultCommand) => {
+      return Promise.resolve(response);
+    });
   }
 
   createCustomCommand(data: ICustomCommand) {
-    return this.api('POST', 'commands', data)
-      .then((response: ICustomCommand) => {
+    return this.api('POST', 'commands', data).then(
+      (response: ICustomCommand) => {
         this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
-      });
+      }
+    );
   }
 
   createTimer(data: IChatbotTimer) {
-    return this.api('POST', 'timers', data)
-      .then((response: IChatbotTimer) => {
-        this.fetchTimers();
-        this.chatbotCommonService.closeChildWindow();
-      });
+    return this.api('POST', 'timers', data).then((response: IChatbotTimer) => {
+      this.fetchTimers();
+      this.chatbotCommonService.closeChildWindow();
+    });
   }
 
-  updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
-    return this.api('POST', `settings/${slugName}/commands/${commandName}`, data)
-      .then((response: IChatbotAPIPostResponse) => {
-        if (response.success === true) {
-          this.fetchDefaultCommands();
-          this.chatbotCommonService.closeChildWindow();
-        }
-      });
+  updateDefaultCommand(
+    slugName: string,
+    commandName: string,
+    data: IDefaultCommand
+  ) {
+    return this.api(
+      'POST',
+      `settings/${slugName}/commands/${commandName}`,
+      data
+    ).then((response: IChatbotAPIPostResponse) => {
+      if (response.success === true) {
+        this.fetchDefaultCommands();
+        this.chatbotCommonService.closeChildWindow();
+      }
+    });
   }
 
   updateCustomCommand(id: string, data: ICustomCommand) {
-    return this.api('PUT', `commands/${id}`, data)
-      .then((response: IChatbotAPIPutResponse) => {
+    return this.api('PUT', `commands/${id}`, data).then(
+      (response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
           this.chatbotCommonService.closeChildWindow();
         }
-      });
+      }
+    );
   }
 
   updateTimer(id: string, data: IChatbotTimer) {
-    return this.api('PUT', `timers/${id}`, data)
-      .then((response: IChatbotAPIPutResponse) => {
+    return this.api('PUT', `timers/${id}`, data).then(
+      (response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchTimers();
           this.chatbotCommonService.closeChildWindow();
         }
-      });
+      }
+    );
   }
 
   updateChatAlerts(data: IChatAlertsResponse) {
-    return this.api('POST', 'settings/chat-notifications', data)
-      .then((response: IChatbotAPIPostResponse) => {
+    return this.api('POST', 'settings/chat-notifications', data).then(
+      (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchChatAlerts();
         }
-      })
+      }
+    );
   }
 
   updateCapsProtection(data: ICapsProtectionResponse) {
-    return this.api('POST', 'settings/caps-protection', data)
-      .then((response: IChatbotAPIPostResponse) => {
+    return this.api('POST', 'settings/caps-protection', data).then(
+      (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchCapsProtection();
         }
-      })
+      }
+    );
   }
 
   updateSymbolProtection(data: ISymbolProtectionResponse) {
-    return this.api('POST', 'settings/symbol-protection', data)
-      .then((response: IChatbotAPIPostResponse) => {
+    return this.api('POST', 'settings/symbol-protection', data).then(
+      (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchSymbolProtection();
         }
-      })
+      }
+    );
   }
 
   updateLinkProtection(data: ILinkProtectionResponse) {
-    return this.api('POST', 'settings/link-protection', data)
-      .then((response: IChatbotAPIPostResponse) => {
+    return this.api('POST', 'settings/link-protection', data).then(
+      (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchLinkProtection();
         }
-      })
+      }
+    );
   }
 
   updateWordProtection(data: IWordProtectionResponse) {
-    return this.api('POST', 'settings/words-protection', data)
-      .then((response: IChatbotAPIPostResponse) => {
+    return this.api('POST', 'settings/words-protection', data).then(
+      (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchWordProtection();
         }
-      })
+      }
+    );
   }
 
   //
@@ -433,7 +452,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-
   //
   // Mutations
   //
@@ -450,12 +468,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'socketToken', null);
   }
 
-
   @mutation()
   private UPDATE_GLOBALLY_ENABLED(enabled: boolean) {
     Vue.set(this.state, 'globallyEnabled', enabled);
   }
-
 
   @mutation()
   private UPDATE_DEFAULT_COMMANDS(response: IDafaultCommandsResponse) {
@@ -501,7 +517,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   private UPDATE_WORD_PROTECTION(response: IWordProtectionResponse) {
     Vue.set(this.state, 'wordProtectionResponse', response);
   }
-
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -615,17 +630,6 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       }
     });
   }
-
-
-  // @mutation()
-  // showToast(message: string, options: object) {
-  //   this.state.toasted.show(message, options);
-  // }
-
-  // @mutation()
-  // private BINDS_TOASTED(toasted: object) {
-  //   Vue.set(this.state, 'toasted', toasted);
-  // }
 
   @mutation()
   private HIDE_MOD_BANNER() {
