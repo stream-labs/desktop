@@ -295,7 +295,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
         }
-        return Promise.resolve(response);
+        return Promise.resolve(response) ;
       }
     );
   }

@@ -134,6 +134,10 @@ export interface IChatbotPunishment {
   type: string;
 }
 
+export interface IChatbotPermit {
+  duration: number;
+}
+
 
 export interface IChatbotExcluded extends IChatbotPermission {}
 
@@ -250,6 +254,7 @@ export interface IAlertMessage {
 // protections
 export interface IProtectionGeneral {
   punishment?: IChatbotPunishment;
+  permit?: IChatbotPermit;
   excluded: IChatbotExcluded;
   message: string;
 }

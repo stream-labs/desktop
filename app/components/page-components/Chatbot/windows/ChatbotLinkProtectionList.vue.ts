@@ -5,7 +5,7 @@ import { ITextMetadata } from 'components/shared/inputs/index';
 
 import {
   NEW_LINK_PROTECTION_LIST_MODAL_ID
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {

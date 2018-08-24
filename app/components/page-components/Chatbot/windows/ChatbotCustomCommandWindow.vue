@@ -11,31 +11,27 @@
   <div slot="content" class="chatbot-add-command__container">
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general'">
-        <div>
-          <label for="command" class="margin-vertical--10"> {{ $t('Command') }} </label>
-          <TextInput
-            v-model="newCommand.command"
-            :metadata="commandMetadata"
-          />
-        </div>
-        <div>
-          <label for="response" class="margin-vertical--10"> {{ $t('Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="newCommand.response"
-            :metadata="responseMetadata"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Command')"
+          v-model="newCommand.command"
+          :metadata="commandMetadata"
+        />
+        <VFormGroup
+          :title="$t('Response (Line breaks will be ignored)')"
+          v-model="newCommand.response"
+          :metadata="responseMetadata"
+        />
         <div class="row">
           <div class="small-6 columns">
-            <label for="permission" class="margin-vertical--10"> {{ $t('Permission') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Permission')"
               v-model="newCommand.permission.level"
               :metadata="permissionMetadata"
             />
           </div>
           <div class="small-6 columns">
-            <label for="reply in" class="margin-vertical--10"> {{ $t('Reply In') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Reply In')"
               v-model="newCommand.response_type"
               :metadata="replyTypeMetadata"
             />
@@ -45,15 +41,15 @@
       <div v-if="selectedTab === 'advanced'">
         <div class="row">
           <div class="small-6 columns">
-            <label for="global_cooldown" class="margin-vertical--10"> {{ $t('Global Command Cooldown (Value in Minutes)') }} </label>
-            <NumberInput
+            <VFormGroup
+              :title="$t('Global Command Cooldown (Value in Minutes)')"
               v-model="newCommand.cooldowns.global"
               :metadata="cooldownsMetadata"
             />
           </div>
           <div class="small-6 columns">
-            <label for="user_cooldown" class="margin-vertical--10"> {{ $t('User Command Cooldown (Value in Minutes)') }} </label>
-            <NumberInput
+            <VFormGroup
+              :title="$t('User Command Cooldown (Value in Minutes)')"
               v-model="newCommand.cooldowns.user"
               :metadata="cooldownsMetadata"
             />
