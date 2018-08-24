@@ -154,7 +154,7 @@
                 inspectedAppSourceId === appSource.source.id
             }"
             @click="inspectSource('app_source', appSource.appId, appSource.source.id)"
-            @dblclick="selectSource('app_source', appSource.appId, appSource.source.id)">
+            @dblclick="selectAppSource(appSource.appId, appSource.source.id)">
             {{ appSource.source.name }}
           </li>
         </ul>

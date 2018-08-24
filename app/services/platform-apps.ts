@@ -104,6 +104,15 @@ export class PlatformAppsService extends
     return this.getPageUrl(appId, page.file);
   }
 
+  getPageUrlForSource(appId: string, appSourceId: string) {
+    const app = this.getApp(appId);
+
+    if (!app) return null;
+
+    const source = app.manifest.sources.find(source => source.id === appSourceId);
+    return this.getPageUrl(appId, source.file);
+  }
+
   getPageUrl(appId: string, page: string) {
     const app = this.getApp(appId);
     const url = this.getAssetUrl(appId, page);

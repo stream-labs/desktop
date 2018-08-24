@@ -33,7 +33,7 @@
         <h4>
           {{ $t('Add Existing Source') }}
           <span
-            v-if="propertiesManager === 'widget' && existingSources.length"
+            v-if="sourceAddOptions.propertiesManager === 'widget' && existingSources.length"
             class="recommended-label">
             {{ $t('Recommended') }}
           </span>

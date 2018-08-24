@@ -13,13 +13,15 @@ import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
+import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager
+  TPropertiesManager,
+  ISourceAddOptions
 } from './index';
 import uuid from 'uuid/v4';
 
@@ -36,7 +38,8 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   widget: WidgetManager,
-  streamlabels: StreamlabelsManager
+  streamlabels: StreamlabelsManager,
+  platformApp: PlatformAppManager
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
@@ -433,10 +436,10 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager, widgetType?: WidgetType) {
+  showAddSource(sourceType: TSourceType, sourceAddOptions?: ISourceAddOptions) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
-      queryParams: { sourceType, propertiesManager, widgetType },
+      queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
         height: 540

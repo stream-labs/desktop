@@ -9,6 +9,7 @@ import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { PlatformAppsService, IAppSource } from 'services/platform-apps'
+import { omit } from 'lodash';
 
 type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source';
 
@@ -45,7 +46,13 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-    this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
+    const propertiesManagerSettings: Dictionary<any> =
+      { ...omit(options, 'propertiesManager') };
+
+    this.sourcesService.showAddSource(sourceType, {
+      propertiesManager: managerType,
+      propertiesManagerSettings
+    });
   }
 
   getSrc(type: string, theme: string) {
@@ -57,6 +64,15 @@ export default class SourcesShowcase extends Vue {
     this.selectSource('browser_source', {
       propertiesManager: 'widget',
       widgetType: type
+    });
+  }
+
+  selectAppSource(appId: string, appSourceId: string) {
+    // TODO: Could be other source type
+    this.selectSource('browser_source', {
+      propertiesManager: 'platformApp',
+      appId,
+      appSourceId
     });
   }
 
@@ -91,6 +107,8 @@ export default class SourcesShowcase extends Vue {
       this.selectSource(this.inspectedSource as TSourceType);
     } else if (this.inspectedSource === 'streamlabel') {
       this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
+    } else if (this.inspectedSource === 'app_source') {
+      this.selectAppSource(this.inspectedAppId, this.inspectedAppSourceId);
     } else {
       this.selectWidget(this.inspectedSource as WidgetType);
     }

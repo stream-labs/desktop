@@ -283,7 +283,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state.child;
   }
 
-  getChildWindowQueryParams(): Dictionary<string> {
+  getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 

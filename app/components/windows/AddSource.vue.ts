@@ -3,7 +3,7 @@ import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { IScenesServiceApi } from 'services/scenes';
-import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi } from 'services/sources';
+import { ISourcesServiceApi, TSourceType, TPropertiesManager, ISourceApi, ISourceAddOptions } from 'services/sources';
 import ModalLayout from 'components/ModalLayout.vue';
 import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
@@ -22,21 +22,19 @@ export default class AddSource extends Vue {
   name = '';
   error = '';
   sourceType = this.windowsService.getChildWindowQueryParams().sourceType as TSourceType;
-  propertiesManager = this.windowsService.getChildWindowQueryParams().propertiesManager as TPropertiesManager;
+  sourceAddOptions = this.windowsService.getChildWindowQueryParams().sourceAddOptions as ISourceAddOptions;
 
   get widgetType() {
-    const val = this.windowsService.getChildWindowQueryParams().widgetType;
-
-    if (val != null) {
-      return parseInt(val, 10);
-    }
+    return this.sourceAddOptions.propertiesManagerSettings.widgetType;
   }
 
   sources = this.sourcesService.getSources().filter(source => {
     return source.isSameType({
       type: this.sourceType,
-      propertiesManager: this.propertiesManager,
-      widgetType: this.widgetType
+      propertiesManager: this.sourceAddOptions.propertiesManager,
+      widgetType: this.widgetType,
+      appId: this.sourceAddOptions.propertiesManagerSettings.appId,
+      appSourceId: this.sourceAddOptions.propertiesManagerSettings.appSourceId
     }) && source.sourceId !== this.scenesService.activeSceneId;
   });
 
@@ -47,8 +45,12 @@ export default class AddSource extends Vue {
   selectedSourceId = this.sources[0] ? this.sources[0].sourceId : null;
 
   mounted() {
-    if (this.propertiesManager === 'widget') {
-      this.name = this.sourcesService.suggestName(WidgetDefinitions[this.widgetType].name);
+    if (this.sourceAddOptions.propertiesManager === 'widget') {
+      this.name = this.sourcesService.suggestName(
+        WidgetDefinitions[this.widgetType].name
+      );
+    } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
+      this.name = 'TODO Default App Name';
     } else {
       const sourceType =
         this.sourceType &&
@@ -81,7 +83,7 @@ export default class AddSource extends Vue {
     } else {
       let source: ISourceApi;
 
-      if (this.propertiesManager === 'widget') {
+      if (this.sourceAddOptions.propertiesManager === 'widget') {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
       } else {
@@ -90,7 +92,8 @@ export default class AddSource extends Vue {
           this.sourceType,
           {},
           {
-            propertiesManager: this.propertiesManager ? this.propertiesManager : void 0
+            propertiesManager: this.sourceAddOptions.propertiesManager,
+            propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
           }
         );
 
