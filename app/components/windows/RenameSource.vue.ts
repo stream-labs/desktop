@@ -24,8 +24,6 @@ export default class RenameSource extends Vue {
   name = '';
   error = '';
 
-  disabled = false;
-
   mounted() {
     const source = this.sourcesService.getSource(this.options.sourceId);
     this.name = source.name;
