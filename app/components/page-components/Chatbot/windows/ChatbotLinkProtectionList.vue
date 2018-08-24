@@ -30,8 +30,8 @@
         <td> {{ item }} </td>
         <td>
           <div class="align-items--inline">
-            <i @click="onDeleteAliasHandler(index)" class="icon-trash padding--5" />
             <i @click="onAddingNewItemHandler(item, index)" class="icon-edit padding--5" />
+            <i @click="onDeleteAliasHandler(index)" class="icon-trash padding--5" />
           </div>
         </td>
       </tr>
