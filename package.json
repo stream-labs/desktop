@@ -3,7 +3,7 @@
   "description": "Streamlabs streaming software",
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
-  "version": "0.10.0-preview.6",
+  "version": "0.10.0-preview.7",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -67,7 +67,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "2.0.6",
+    "runtimeVersion": "2.0.8",
     "arch": "x64"
   },
   "dependencies": {
@@ -111,7 +111,7 @@
     "circular-dependency-plugin": "3.0.0",
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
-    "electron": "2.0.6",
+    "electron": "2.0.8",
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
     "eslint": "3.19.0",
