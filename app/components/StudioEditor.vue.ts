@@ -188,10 +188,10 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseMove(event: MouseEvent) {
-    const mousePosX = event.offsetX - this.renderedOffsetX;
-    const mousePosY = event.offsetY - this.renderedOffsetY;
-
     const factor = this.windowsService.state.main.scaleFactor;
+    const mousePosX = event.offsetX - this.renderedOffsetX / factor;
+    const mousePosY = event.offsetY - this.renderedOffsetY / factor;
+
     const converted = this.convertScalarToBaseSpace(
       mousePosX * factor,
       mousePosY * factor
