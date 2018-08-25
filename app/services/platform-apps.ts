@@ -2,6 +2,7 @@ import { StatefulService } from 'services/stateful-service';
 import { mutation } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
+import { Subject } from 'rxjs/Subject';
 
 /**
  * TODO
@@ -70,6 +71,8 @@ export class PlatformAppsService extends
     loadedApps: []
   };
 
+  appReload = new Subject<string>();
+
   /**
    * For now, there can only be 1 unpacked app at a time
    * TODO: Check this app for common structural problems
@@ -77,12 +80,21 @@ export class PlatformAppsService extends
   async installUnpackedApp(appPath: string, appToken: string) {
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
-    console.log(manifest);
     this.ADD_APP({ manifest, unpacked: true, appPath, appToken });
   }
 
   unloadApps() {
     this.REMOVE_APPS();
+  }
+
+  async reloadApp(appId: string) {
+    // TODO Support Multiple Apps
+    const app = this.getApp(appId);
+    this.UPDATE_APP_MANIFEST(
+      appId,
+      JSON.parse(await this.loadManifestFromDisk(path.join(app.appPath, 'manifest.json')))
+    );
+    this.appReload.next(appId);
   }
 
   loadManifestFromDisk(manifestPath: string): Promise<string> {
@@ -148,6 +160,15 @@ export class PlatformAppsService extends
   @mutation()
   private REMOVE_APPS() {
     this.state.loadedApps = [];
+  }
+
+  @mutation()
+  private UPDATE_APP_MANIFEST(appId: string, manifest: IAppManifest) {
+    this.state.loadedApps.forEach(app => {
+      if (app.manifest.id === appId) {
+        app.manifest = manifest;
+      }
+    })
   }
 
 }

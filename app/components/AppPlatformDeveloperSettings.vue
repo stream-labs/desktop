@@ -15,7 +15,7 @@
       <p class="app-platform-details">
         {{ currentlyLoadedUnpackedApp.appToken }}
       </p>
-      <button class="button button--action">
+      <button @click="reloadApp" class="button button--action">
         Reload
       </button>
       <button @click="unloadApp" class="button button--action">

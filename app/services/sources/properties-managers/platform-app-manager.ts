@@ -1,6 +1,8 @@
 import { PropertiesManager } from './properties-manager';
 import { Inject } from 'util/injector';
 import { PlatformAppsService } from 'services/platform-apps';
+import { Subscription } from 'rxjs/Subscription';
+import * as obs from '../../../../obs-api';
 
 export interface IPlatformAppManagerSettings {
   appId: string;
@@ -15,6 +17,27 @@ export class PlatformAppManager extends PropertiesManager {
   customUIComponent = 'PlatformAppProperties';
 
   settings: IPlatformAppManagerSettings;
+
+  reloadSub: Subscription;
+
+  init() {
+    this.reloadSub = this.platformAppsService.appReload.subscribe(appId => {
+      if (appId === this.settings.appId) {
+        this.obsSource.update({
+          url: this.platformAppsService.getPageUrlForSource(
+            this.settings.appId,
+            this.settings.appSourceId
+          )
+        });
+        (this.obsSource.properties.get('refreshnocache') as obs.IButtonProperty)
+          .buttonClicked(this.obsSource);
+      }
+    });
+  }
+
+  destroy() {
+    this.reloadSub.unsubscribe();
+  }
 
   applySettings(settings: Dictionary<any>) {
     super.applySettings(settings);
