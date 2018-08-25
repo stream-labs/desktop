@@ -25,7 +25,7 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  anchor: ResizeBoxPoint; // リサイズの中心となるResizeBoxの方角
+  anchor: ResizeBoxPoint; // リサイズの基準として固定するResizeBoxの方角、操作中のResizeBoxからソースの中心に対して反対側
   verticalEdge?: ResizeBoxPoint; // 鉛直方向に動く辺に対応する方角
   horizontalEdge?: ResizeBoxPoint; // 水平方向に動く辺に対応する方角
 }
