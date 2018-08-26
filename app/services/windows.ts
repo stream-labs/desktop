@@ -20,6 +20,7 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import Projector from 'components/windows/Projector.vue';
 import OptimizeForNiconico from 'components/windows/OptimizeForNiconico.vue';
+import CroppingOverlay from 'components/windows/CroppingOverlay.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';

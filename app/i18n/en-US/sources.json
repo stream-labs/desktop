@@ -54,5 +54,6 @@
   "ungroupScene": "Ungroup Scene",
   "createSourceProjector": "Create Source Projector",
   "useGoogleFont": "Use Google Font",
-  "unhideAll": "Unhide All"
+  "unhideAll": "Unhide All",
+  "interactiveCrop": "Crop on display"
 }
