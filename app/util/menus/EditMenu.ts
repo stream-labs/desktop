@@ -15,6 +15,7 @@ import { $t } from 'services/i18n';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
+  sceneNodeId?: string;
   showSceneItemMenu?: boolean;
   selectedSceneId?: string;
   showAudioMixerMenu?: boolean;
