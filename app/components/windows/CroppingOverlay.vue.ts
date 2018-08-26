@@ -24,6 +24,11 @@ export default class CroppingOverlay extends Vue {
         window.close();
       }
     });
+
+    window.addEventListener('blur', e => {
+      window.close();
+    });
+    window.focus();
   }
 
   get croppingArea() {

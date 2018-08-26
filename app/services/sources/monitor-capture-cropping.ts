@@ -42,9 +42,9 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     this.START_CROPPING(sceneId, sceneItemId, sourceId);
 
     const source = this.sourcesService.getSource(sourceId);
-    const currentDisplayId = source.getSettings().monitor;
+    const targetDisplayId = source.getSettings().monitor;
     const displays = electron.remote.screen.getAllDisplays();
-    const display = displays[currentDisplayId];
+    const display = displays[targetDisplayId];
 
     const windowId = this.windowsService.createOneOffWindow({
       componentName: 'CroppingOverlay',
@@ -58,8 +58,6 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
 
     const windowObj = this.windowsService.getWindow(windowId);
     windowObj.on('close', () => this.endCropping());
-
-    this.callNext();
   }
 
   private endCropping() {
@@ -94,25 +92,6 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
       position: { x: rect.x, y: rect.y },
       crop: rect.crop
     });
-  }
-
-  updateTargetWindow() {
-    if (!this.isCropping) return;
-
-    const screen = electron.remote.screen;
-    const globalMousePoint = screen.getCursorScreenPoint();
-    const nearestDisplay = screen.getDisplayNearestPoint(globalMousePoint);
-    const windowObj = this.windowsService.getWindow(this.state.windowId);
-
-    const { workArea } = nearestDisplay;
-    windowObj.setSize(workArea.width, workArea.height);
-    windowObj.setPosition(workArea.x, workArea.y);
-
-    this.callNext();
-  }
-
-  callNext() {
-    this.timer = window.setTimeout(() => this.updateTargetWindow(), 200);
   }
 
   @mutation()
