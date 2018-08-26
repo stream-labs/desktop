@@ -139,6 +139,33 @@ function getTagCommitId(tag) {
     return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, {silent: true}).stdout;
 }
 
+async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
+    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, {silent: true}).stdout;
+
+    let promises = [];
+    for (const line of merges.split(/\r?\n/)) {
+        info(line);
+        const pr = line.match(/.*Merge pull request #([0-9]*).*/);
+        if (!pr || pr.length < 2) {
+            continue;
+        }
+        const number = parseInt(pr[1], 10);
+        info(number);
+        promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+    }
+
+    return Promise.all(promises).then(results => {
+        let summary = [];
+        for (const result of results) {
+            const data = result.data;
+            if ('title' in data) {
+                summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
+            }
+        }
+        return summary.join('');
+    });
+}
+
 /**
  * This is the main function of the script
  */
@@ -227,7 +254,22 @@ async function runScript() {
     }
 
     if (!notes) {
-        notes = executeCmd(`git log --oneline --graph --decorate ${previousTag}.. --boundary`).stdout;
+        // get pull request description from github.com
+        const github = new OctoKit({baseUrl: 'https://api.github.com'});
+        github.authenticate({
+            type: 'token',
+            token: process.env.NAIR_GITHUB_TOKEN
+        });
+        const prMerges = await collectPullRequestMerges({
+            octokit: github,
+            owner: 'n-air-app',
+            repo: 'n-air-app'
+        }, previousTag);
+        info(prMerges);
+
+        const merges = executeCmd('git log -1 --merges --pretty=format:%P', {silent: true}).stdout.trim();
+        const mergeBase = executeCmd(`git merge-base --octopus ${merges} ${previousTag}`, {silent: true}).stdout.trim();
+        notes = prMerges + executeCmd(`git log --oneline --graph --decorate ${mergeBase}.. --boundary`).stdout;
 
         writePatchNoteFile(patchNoteFileName, newVersion, notes);
         info(`generated ${patchNoteFileName}.`);
