@@ -33,12 +33,17 @@ export interface IWindowOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {
+    x?: number;
+    y?: number;
     width: number;
     height: number;
   };
   scaleFactor: number;
   title?: string;
   center?: boolean;
+  transparent?: boolean;
+  resizable?: boolean;
+  alwaysOnTop?: boolean;
 }
 
 interface IWindowsState {
@@ -85,7 +90,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
     Troubleshooter,
     ManageSceneCollections,
     Projector,
-    OptimizeForNiconico
+    OptimizeForNiconico,
+    CroppingOverlay,
   };
 
   private windows: Dictionary<Electron.BrowserWindow> = {};
@@ -155,9 +161,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = this.windows[windowId] = new BrowserWindow({
       frame: false,
+      x: (options.size && options.size.x) || undefined,
+      y: (options.size && options.size.y) || undefined,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
-      title: options.title || 'New Window'
+      title: options.title || 'New Window',
+      transparent: options.transparent,
+      resizable: options.resizable,
+      alwaysOnTop: options.alwaysOnTop,
     });
 
     newWindow.setMenu(null);
@@ -204,6 +215,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
+  getWindow(windowId: string) {
+    return this.windows[windowId];
+  }
 
   updateChildWindowOptions(options: Partial<IWindowOptions>) {
     this.UPDATE_CHILD_WINDOW_OPTIONS(options);
