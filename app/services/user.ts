@@ -66,6 +66,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
     this.setRavenContext();
     this.validateLogin();
+    this.fetchAvailableFeatures();
   }
 
   mounted() {
@@ -194,8 +195,9 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   fetchAvailableFeatures() {
     // const host = this.hostsService.streamlabs;
+    debugger;
     const host = 'streamlabs.site';
-    const url = `https://${host}/api/v5/slobs/available-features`;
+    const url = `http://${host}/api/v5/slobs/available-features`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
 
