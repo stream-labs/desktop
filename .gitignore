@@ -19,3 +19,4 @@ electron.VC.db
 .vs/
 plugins/
 AGREEMENT.sjis
+patch-note.txt

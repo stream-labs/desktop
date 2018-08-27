@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const OctoKit = require('@octokit/rest');
 
 let sh;
 let moment;
@@ -38,8 +39,8 @@ function error(msg) {
     sh.echo(colors.red(`ERROR: ${msg}`));
 }
 
-function executeCmd(cmd) {
-    const result = sh.exec(cmd);
+function executeCmd(cmd, options) {
+    const result = sh.exec(cmd, options);
 
     if (result.code !== 0) {
         error(`Command Failed >>> ${cmd}`);
@@ -89,6 +90,82 @@ function generateNewVersion(previousTag, now = Date.now()) {
     return `${major}.${minor}.${date}-${ord}`;
 }
 
+function generateNotesTsContent(version, title, notes) {
+    const patchNote = `import { IPatchNotes } from '.';
+
+export const notes: IPatchNotes = {
+  version: '${version}',
+  title: '${title}',
+  notes: [
+${notes.trim().split('\n').map(s => `    '${s}'`).join(',\n')}
+  ]
+};
+`;
+    info(`patch-note: '${patchNote}'`);
+    return patchNote;
+}
+
+function splitToLines(lines) {
+    if (typeof lines === 'string') {
+        lines = lines.split(/\r?\n/g);
+    }
+    return lines;
+}
+
+function readPatchNoteFile(patchNoteFileName) {
+    try {
+        const lines = splitToLines(fs.readFileSync(patchNoteFileName, {encoding: 'utf8'}));
+        const version = lines.shift();
+        return {
+            version,
+            lines
+        };
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
+        return {
+            version: '',
+            lines: []
+        };
+    }
+}
+
+function writePatchNoteFile(patchNoteFileName, version, lines) {
+    lines = splitToLines(lines);
+    const body = [version, ...lines].join('\n');
+    fs.writeFileSync(patchNoteFileName, body);
+}
+
+function getTagCommitId(tag) {
+    return executeCmd(`git rev-parse -q --verify "refs/tags/${tag}" || cat /dev/null`, {silent: true}).stdout;
+}
+
+async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
+    const merges = executeCmd(`git log --oneline --merges ${previousTag}..`, {silent: true}).stdout;
+
+    let promises = [];
+    for (const line of merges.split(/\r?\n/)) {
+        info(line);
+        const pr = line.match(/.*Merge pull request #([0-9]*).*/);
+        if (!pr || pr.length < 2) {
+            continue;
+        }
+        const number = parseInt(pr[1], 10);
+        info(number);
+        promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+    }
+
+    return Promise.all(promises).then(results => {
+        let summary = [];
+        for (const result of results) {
+            const data = result.data;
+            if ('title' in data) {
+                summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
+            }
+        }
+        return summary.join('');
+    });
+}
+
 /**
  * This is the main function of the script
  */
@@ -98,27 +175,36 @@ async function runScript() {
     info(colors.magenta('|----------------------------------|'));
 
     const githubApiServer = 'https://api.github.com';
-    const githubWebServer = 'https://github.com';
-    const githubApi = `${githubApiServer}/api/v3`;
 
     const organization = 'n-air-app';
     const repository = 'n-air-app';
     const remote = 'origin';
 
     const targetBranch = 'n-air_development';
+    const draft = true;
+    const prerelease = true;
+
+    const generateNoteTs = true; // generate note.ts from git logs
+
+    const skipLocalModificationCheck = false; // for DEBUG
+    const skipBuild = false; // for DEBUG
 
     // Start by figuring out if this environment is configured properly
     // for releasing.
     checkEnv('CSC_LINK');
     checkEnv('CSC_KEY_PASSWORD');
     checkEnv('NAIR_LICENSE_API_KEY');
+    checkEnv('NAIR_GITHUB_TOKEN');
 
     info(`check whether remote ${remote} exists`);
     executeCmd(`git remote get-url ${remote}`)
 
-    info('make sure there is nothing to commit on local directory');
-    executeCmd('git status'); // there should be nothing to commit
-    executeCmd('git diff -s --exit-code'); // and nothing changed
+    if (skipLocalModificationCheck) {
+        info('make sure there is nothing to commit on local directory');
+
+        executeCmd('git status'); // there should be nothing to commit
+        executeCmd('git diff -s --exit-code'); // and nothing changed
+    }
 
     info('checking current branch...')
     const currentBranch = executeCmd('git rev-parse --abbrev-ref HEAD').stdout.trim()
@@ -134,56 +220,111 @@ async function runScript() {
     info('checking current tag...');
     const previousTag = executeCmd('git describe --tags --abbrev=0').stdout.trim();
 
-    let nothingChanged = sh.exec(`git diff -s --exit-code ${previousTag}`).code == 0;
+    const baseDir = executeCmd('git rev-parse --show-cdup', {silent: true}).stdout.trim();
 
-    let newVersion;
-    let rebuild = false;
-    if (nothingChanged) {
-        newVersion = previousTag.substr(1);
+    let defaultVersion = generateNewVersion(previousTag);
+    let notes = '';
 
-        if (!await confirm(`Are you sure you want to REBUILD as version v${newVersion} (nothing Changed)?`)) sh.exit(0);
-        rebuild = true;
+    info('checking patch-note.txt...');
+    const patchNoteFileName = `${baseDir}patch-note.txt`;
+    const patchNote = readPatchNoteFile(patchNoteFileName);
+    if (patchNote.version) {
+        if (patchNote.version === defaultVersion || !getTagCommitId(patchNote.version)) {
+            defaultVersion = patchNote.version;
+            notes = patchNote.lines.join('\n');
+            info(`${patchNoteFileName} loaded: ${defaultVersion}\n${notes}`);
+        } else {
+            info(`${patchNoteFileName} 's version ${patchNote.version} already exists.`);
+        }
     } else {
-        const defaultVersion = generateNewVersion(previousTag);
-
-        newVersion = (await inq.prompt({
-            type: 'input',
-            name: 'newVersion',
-            message: 'What should the new version number be?',
-            default: defaultVersion
-        })).newVersion;
-        if (!await confirm(`Are you sure you want to release as version v${newVersion}?`, false)) sh.exit(0);
-
-        // update package.json with newVersion and git tag
-        executeCmd(`yarn version --new-version=${newVersion}`);
+        info(`${patchNoteFileName} not found.`);
     }
 
-    if (!await confirm('skip cleaning node_modules?')) {
-        // clean
-        info('Removing old packages...');
-        sh.rm('-rf', 'node_modules');
+    const newVersion = (await inq.prompt({
+        type: 'input',
+        name: 'newVersion',
+        message: 'What should the new version number be?',
+        default: defaultVersion
+    })).newVersion;
+
+    const newTag = `v${newVersion}`;
+    if (getTagCommitId(newTag)) {
+        error(`tag ${newTag} already exists!`);
+        sh.exit(1);
     }
 
-    info('Installing yarn packages...');
-    executeCmd('yarn install');
+    if (!notes) {
+        // get pull request description from github.com
+        const github = new OctoKit({baseUrl: 'https://api.github.com'});
+        github.authenticate({
+            type: 'token',
+            token: process.env.NAIR_GITHUB_TOKEN
+        });
+        const prMerges = await collectPullRequestMerges({
+            octokit: github,
+            owner: 'n-air-app',
+            repo: 'n-air-app'
+        }, previousTag);
+        info(prMerges);
 
-    info('Compiling assets...');
-    executeCmd('yarn compile:production');
+        const merges = executeCmd('git log -1 --merges --pretty=format:%P', {silent: true}).stdout.trim();
+        const mergeBase = executeCmd(`git merge-base --octopus ${merges} ${previousTag}`, {silent: true}).stdout.trim();
+        notes = prMerges + executeCmd(`git log --oneline --graph --decorate ${mergeBase}.. --boundary`).stdout;
 
-    info('Making the package...');
-    executeCmd('yarn package');
+        writePatchNoteFile(patchNoteFileName, newVersion, notes);
+        info(`generated ${patchNoteFileName}.`);
+        if (await confirm(`Do you want to edit ${patchNoteFileName}?`, true)) sh.exit(0);
+    } else if (newVersion !== defaultVersion) {
+        writePatchNoteFile(patchNoteFileName, newVersion, notes);
+        info(`updated version ${newVersion} to  ${patchNoteFileName}.`);
+    }
+
+    if (draft) {
+        info('draft is true.');
+    }
+    if (prerelease) {
+        info(`prerelease is true.`);
+    }
+    if (!await confirm(`Are you sure you want to release as version ${newVersion}?`, false)) sh.exit(0);
+
+    if (!generateNoteTs) {
+        info('skipping to generate notes.ts...');
+    } else {
+        const noteFilename = `${baseDir}app/services/patch-notes/notes.ts`;
+        const patchNote = generateNotesTsContent(newVersion, newVersion, notes);
+
+        fs.writeFileSync(noteFilename, patchNote);
+        info(`generated patch-note file: ${noteFilename}.`)
+        executeCmd(`git commit -m "note.ts ${newVersion}" ${noteFilename}`);
+    }
+
+    // update package.json with newVersion and git tag
+    executeCmd(`yarn version --new-version=${newVersion}`);
+
+    if (skipBuild) {
+        info('SKIP build process since skipBuild is set...');
+    } else {
+        if (!await confirm('skip cleaning node_modules?')) {
+            // clean
+            info('Removing old packages...');
+            sh.rm('-rf', 'node_modules');
+        }
+
+        info('Installing yarn packages...');
+        executeCmd('yarn install');
+
+        info('Compiling assets...');
+        executeCmd('yarn compile:production');
+
+        info('Making the package...');
+        executeCmd('yarn package');
+    }
 
     info('Pushing to the repository...')
     executeCmd(`git push ${remote} ${targetBranch}`);
-    executeCmd(`git push ${remote} v${newVersion}`);
+    executeCmd(`git push ${remote} ${newTag}`);
 
-    info(`version: v${newVersion}`);
-
-    if (!rebuild) {
-        info(`log since ${previousTag}:`);
-        executeCmd(`git log --oneline --graph --decorate --ancestry-path ${previousTag}..`);
-        info('');
-    }
+    info(`version: ${newVersion}`);
 
     const distDir = path.resolve('.', 'dist');
     const latestYml = path.join(distDir, 'latest.yml');
@@ -199,18 +340,57 @@ async function runScript() {
 
     // TODO upload to the github directly via API...
 
-    info(`please upload latest.yml and ${binaryFile} to the release!`);
-    // open release page on github
-    if (rebuild) {
-        executeCmd(`start ${githubWebServer}/${organization}/${repository}/releases/edit/${previousTag}`);
-    } else {
-        executeCmd(`start ${githubWebServer}/${organization}/${repository}/releases/new`);
-    }
-    // open dist files directory
-    executeCmd('start dist');
+    const octokit = OctoKit({
+        baseUrl: githubApiServer
+    });
 
+    octokit.authenticate({
+        type: 'token',
+        token: process.env.NAIR_GITHUB_TOKEN_INTERNAL
+    });
+
+    info(`creating release ${newTag}...`);
+    const result = await octokit.repos.createRelease({
+        owner: organization,
+        repo: repository,
+        tag_name: newTag,
+        name: newTag,
+        body: notes,
+        draft,
+        prerelease
+    });
+
+    info(`uploading ${latestYml}...`);
+    const ymlResult = await octokit.repos.uploadAsset({
+        url: result.data.upload_url,
+        file: fs.createReadStream(latestYml),
+        name: path.basename(latestYml),
+        contentLength: fs.statSync(latestYml).size,
+        contentType: 'application/json',
+    });
+    info(`uploading ${binaryFile}...`);
+
+    await octokit.repos.uploadAsset({
+        url: result.data.upload_url,
+        name: binaryFile,
+        file: fs.createReadStream(binaryFilePath),
+        contentLength: fs.statSync(binaryFilePath).size,
+        contentType: 'application/octet-stream',
+    });
+
+    if (draft) {
+        // open release edit page on github
+        const editUrl = result.data.html_url.replace('/tag/', '/edit/');
+        executeCmd(`start ${editUrl}`);
+
+        info(`finally, release Version ${newVersion} on the browser!`);
+    } else {
+        // open release page on github
+        executeCmd(`start ${result.data.html_url}`);
+
+        info(`Version ${newVersion} is released!`);
+    }
     // done.
-    info(`Version ${newVersion} released successfully!`);
 }
 
 runScript().then(() => {
