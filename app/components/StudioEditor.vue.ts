@@ -6,7 +6,7 @@ import { Inject } from 'util/injector';
 import { ScenesService, SceneItem, Scene, TSceneNode } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { EditMenu } from 'util/menus/EditMenu';
-import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
+import { ScalableRectangle, ResizeBoxPoint } from 'util/ScalableRectangle';
 import { WindowsService } from 'services/windows';
 import { SelectionService } from 'services/selection/selection';
 import Display from 'components/shared/Display.vue';
@@ -25,9 +25,9 @@ interface IResizeRegion {
 
 interface IResizeOptions {
   lockRatio: boolean; // preserve the aspect ratio (default: true)
-  lockX: boolean; // prevent changes to the X scale (default: false)
-  lockY: boolean; // lockY: prevent changes to the Y scale (default: false)
-  anchor: AnchorPoint; // anchor: an AnchorPoint enum to resize around
+  anchor: ResizeBoxPoint; // リサイズの基準として固定するResizeBoxの方角、操作中のResizeBoxからソースの中心に対して反対側
+  verticalEdge?: ResizeBoxPoint; // 鉛直方向に動く辺に対応する方角
+  horizontalEdge?: ResizeBoxPoint; // 水平方向に動く辺に対応する方角
 }
 
 @Component({
@@ -189,10 +189,10 @@ export default class StudioEditor extends Vue {
   }
 
   handleMouseMove(event: MouseEvent) {
-    const mousePosX = event.offsetX - this.renderedOffsetX;
-    const mousePosY = event.offsetY - this.renderedOffsetY;
-
     const factor = this.windowsService.state.main.scaleFactor;
+    const mousePosX = event.offsetX - this.renderedOffsetX / factor;
+    const mousePosY = event.offsetY - this.renderedOffsetY / factor;
+
     const converted = this.convertScalarToBaseSpace(
       mousePosX * factor,
       mousePosY * factor
@@ -201,17 +201,44 @@ export default class StudioEditor extends Vue {
     if (this.resizeRegion) {
       const name = this.resizeRegion.name;
 
-      // We choose an anchor point opposite the resize region
-      const optionsMap = {
-        nw: { anchor: AnchorPoint.SouthEast },
-        sw: { anchor: AnchorPoint.NorthEast },
-        ne: { anchor: AnchorPoint.SouthWest },
-        se: { anchor: AnchorPoint.NorthWest },
-        n: { anchor: AnchorPoint.South, lockX: true },
-        s: { anchor: AnchorPoint.North, lockX: true },
-        e: { anchor: AnchorPoint.West, lockY: true },
-        w: { anchor: AnchorPoint.East, lockY: true }
-      };
+      const optionsMap = Object.freeze({
+        nw: {
+          anchor: ResizeBoxPoint.SouthEast,
+          verticalEdge: ResizeBoxPoint.North,
+          horizontalEdge: ResizeBoxPoint.West,
+        },
+        sw: {
+          anchor: ResizeBoxPoint.NorthEast,
+          verticalEdge: ResizeBoxPoint.South,
+          horizontalEdge: ResizeBoxPoint.West,
+        },
+        ne: {
+          anchor: ResizeBoxPoint.SouthWest,
+          verticalEdge: ResizeBoxPoint.North,
+          horizontalEdge: ResizeBoxPoint.East,
+        },
+        se: {
+          anchor: ResizeBoxPoint.NorthWest,
+          verticalEdge: ResizeBoxPoint.South,
+          horizontalEdge: ResizeBoxPoint.East,
+        },
+        n: {
+          anchor: ResizeBoxPoint.South,
+          verticalEdge: ResizeBoxPoint.North,
+        },
+        s: {
+          anchor: ResizeBoxPoint.North,
+          verticalEdge: ResizeBoxPoint.South,
+        },
+        e: {
+          anchor: ResizeBoxPoint.West,
+          horizontalEdge: ResizeBoxPoint.East,
+        },
+        w: {
+          anchor: ResizeBoxPoint.East,
+          horizontalEdge: ResizeBoxPoint.West,
+        },
+      });
 
       const options = {
         ...optionsMap[name],
@@ -263,20 +290,21 @@ export default class StudioEditor extends Vue {
 
     rect.normalized(() => {
       rect.withAnchor(options.anchor, () => {
-        // There's probably a more generic way to do this math
-        if (options.anchor === AnchorPoint.East) {
+        if (options.horizontalEdge === ResizeBoxPoint.West) {
           const croppableWidth = rect.width - rect.crop.right - 2;
           const distance = (croppableWidth * rect.scaleX) - (rect.x - x);
           rect.crop.left = _.clamp(distance / rect.scaleX, 0, croppableWidth);
-        } else if (options.anchor === AnchorPoint.West) {
+        } else if (options.horizontalEdge === ResizeBoxPoint.East) {
           const croppableWidth = rect.width - rect.crop.left - 2;
           const distance = (croppableWidth * rect.scaleX) + (rect.x - x);
           rect.crop.right = _.clamp(distance / rect.scaleX, 0, croppableWidth);
-        } else if (options.anchor === AnchorPoint.South) {
+        }
+
+        if (options.verticalEdge === ResizeBoxPoint.North) {
           const croppableHeight = rect.height - rect.crop.bottom - 2;
           const distance = (croppableHeight * rect.scaleY) - (rect.y - y);
           rect.crop.top = _.clamp(distance / rect.scaleY, 0, croppableHeight);
-        } else if (options.anchor === AnchorPoint.North) {
+        } else if (options.verticalEdge === ResizeBoxPoint.South) {
           const croppableHeight = rect.height - rect.crop.top - 2;
           const distance = (croppableHeight * rect.scaleY) + (rect.y - y);
           rect.crop.bottom = _.clamp(distance / rect.scaleY, 0, croppableHeight);
@@ -326,8 +354,8 @@ export default class StudioEditor extends Vue {
         }
 
         // Aspect ratio preservation overrides lockX and lockY
-        if (!opts.lockX || opts.lockRatio) rect.scaleX = newScaleX;
-        if (!opts.lockY || opts.lockRatio) rect.scaleY = newScaleY;
+        if (ResizeBoxPoint[opts.horizontalEdge] || opts.lockRatio) rect.scaleX = newScaleX;
+        if (ResizeBoxPoint[opts.verticalEdge] || opts.lockRatio) rect.scaleY = newScaleY;
       });
     });
 

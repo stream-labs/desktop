@@ -134,7 +134,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://site.nicovideo.jp/nicolive/n-air-app/browser-source/';
+      if (settings.url === void 0) settings.url = 'https://n-air-app.nicovideo.jp/browser-source/';
     }
 
     if (type === 'text_gdiplus') {

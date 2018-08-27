@@ -3,7 +3,7 @@ import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
 import { StatefulService, mutation } from '../stateful-service';
-import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
+import { ScalableRectangle, ResizeBoxPoint } from 'util/ScalableRectangle';
 import { SceneItem } from '../scenes';
 
 interface IMonitorCaptureCroppingServiceState {
@@ -80,7 +80,7 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     const factor = display.scaleFactor;
 
     rect.normalized(() => {
-      rect.withAnchor(AnchorPoint.Center, () => {
+      rect.withAnchor(ResizeBoxPoint.Center, () => {
         rect.crop.top = targetArea.top * factor;
         rect.crop.left = targetArea.left * factor;
         rect.crop.bottom = (displayHeight - (targetArea.top + targetArea.height)) * factor;
