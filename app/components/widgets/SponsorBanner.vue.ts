@@ -32,6 +32,11 @@ export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, Sp
     return this.wData.settings.placement_options === 'double' ? ['1', '2'] : ['1']
   }
 
+  get settings() {
+    const baseSettings = [{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }];
+    return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: `Image Set ${pos}` })));
+  }
+
   fileNameFromHref(href: string) {
     if (!href) return null;
     return decodeURIComponent(href.split(/[\\/]/).pop());

@@ -20,14 +20,14 @@
               class="subsection__content settings-title"
               v-for="setting in settings"
               :key="setting.value"
-              @input="value => $emit('input', value)"
+              @click="$emit('input', setting.value)"
             >{{ setting.label }}</li>
           </ul>
         </div>
         <div class="subsection">
           <span class="subsection__title">{{ $t('Selected Properties') }}</span>
-          <div class="subsection__content" v-for="setting in settings" :key="`${setting.value}-properties`">
-            <slot :name="`${setting.value}-properties`"></slot>
+          <div class="subsection__content">
+            <slot :name="`${value}-properties`"></slot>
           </div>
         </div>
       </div>
@@ -60,7 +60,6 @@
     width: 100%;
   }
 
-
   .content-container {
     display: flex;
     width: 100%;
@@ -84,11 +83,12 @@
   .subsection {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex-grow: 0;
     flex-shrink: 0;
 
     &:last-of-type {
       flex-shrink: 1;
+      flex-grow: 1;
     }
   }
 

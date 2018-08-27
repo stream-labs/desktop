@@ -32,6 +32,7 @@ export default class WidgetWindow extends Vue {
 
   @Prop() slots: any[];
   @Prop() settings: any[];
+  @Prop() value: string;
 
   canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
