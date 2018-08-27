@@ -33,8 +33,8 @@
   display: flex;
   align-items: center;
   text-transform: capitalize;
-  font-size: 16px;
-  .weight--medium();
+  font-size: 14px;
+  .weight(@medium);
   color: @day-title;
 
   span {
@@ -49,6 +49,7 @@
     margin-left: 8px;
     font-size: 10px;
     padding: 3px; // easier to click
+    .icon-hover();
 
     &.icon-down {
       font-size: 6px;
@@ -86,6 +87,17 @@
   .dropdown-menu {
     background-color: @night-primary;
     .night-shadow();
+  }
+
+  .dropdown-menu__toggle {
+    .fa,
+    i {
+      .night-icon-hover();
+    }
+
+    &:focus {
+      outline: 0;
+    }
   }
 
   .dropdown-menu__item {

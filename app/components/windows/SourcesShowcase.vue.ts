@@ -31,7 +31,7 @@ export default class SourcesShowcase extends Vue {
   @Inject() windowsService: WindowsService;
 
   widgetTypes = WidgetType;
-  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox, this.widgetTypes.EventList, this.widgetTypes.TipJar]);
+  essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
 
   iterableWidgetTypes = Object.keys(this.widgetTypes)
     .filter((type: string) => isNaN(Number(type)))
@@ -42,26 +42,7 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-
-    const sameTypeCount = this.sourcesService.getSources()
-      .filter((source) => {
-        return source.isSameType({
-          type: sourceType,
-          propertiesManager: managerType,
-          widgetType: options.widgetType
-        });
-      })
-      .length;
-
-    if (sameTypeCount > 0) {
-      this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
-    } else {
-      if (managerType === 'widget') {
-        this.sourcesService.showNameWidget(options.widgetType);
-      } else {
-        this.sourcesService.showNameSource(sourceType, managerType);
-      }
-    }
+    this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
   }
 
   getSrc(type: string, theme: string) {

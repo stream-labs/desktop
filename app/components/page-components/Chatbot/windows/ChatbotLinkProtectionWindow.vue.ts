@@ -27,15 +27,15 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
 
   selectedTab: string = 'general';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
-  onReset() {
-    this.onResetSlug('link-protection');
+  onResetHandler() {
+    this.onResetSlugHandler('link-protection');
   }
 
-  onSave() {
+  onSaveHandler() {
     this.chatbotApiService
       .updateLinkProtection({
         enabled: this.linkProtectionResponse.enabled,

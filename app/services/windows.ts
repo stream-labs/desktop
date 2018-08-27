@@ -8,7 +8,7 @@ import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
 import NameSceneCollection from 'components/windows/NameSceneCollection.vue';
-import NameSource from 'components/windows/NameSource.vue';
+import RenameSource from 'components/windows/RenameSource.vue';
 import NameScene from 'components/windows/NameScene.vue';
 import NameFolder from 'components/windows/NameFolder.vue';
 import SourceProperties from 'components/windows/SourceProperties.vue';
@@ -50,6 +50,9 @@ import ChatbotLinkProtectionWindow
   from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionWindow.vue';
 import ChatbotWordProtectionWindow
   from 'components/page-components/Chatbot/windows/ChatbotWordProtectionWindow.vue';
+import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
+import ChatbotQuotePreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
 
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
@@ -66,7 +69,7 @@ export function getComponents() {
     Settings,
     SceneTransitions,
     SourcesShowcase,
-    NameSource,
+    RenameSource,
     AddSource,
     NameScene,
     NameSceneCollection,
@@ -104,6 +107,8 @@ export function getComponents() {
     ChatbotSymbolProtectionWindow,
     ChatbotLinkProtectionWindow,
     ChatbotWordProtectionWindow,
+    ChatbotQuoteWindow,
+    ChatbotQuotePreferencesWindow,
   };
 }
 

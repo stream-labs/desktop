@@ -13,6 +13,10 @@ export interface IChatbotApiServiceState {
   symbolProtectionResponse: ISymbolProtectionResponse;
   linkProtectionResponse: ILinkProtectionResponse;
   wordProtectionResponse: IWordProtectionResponse;
+
+  // v2
+  quotesResponse: IQuotesResponse;
+  quotePreferencesResponse: IQuotePreferencesResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -20,6 +24,7 @@ export interface IChatbotCommonServiceState {
   customCommandToUpdate: ICustomCommand;
   defaultCommandToUpdate: IDefaultCommand;
   timerToUpdate: IChatbotTimer;
+  quoteToUpdate: IQuote;
   modBannerVisible: boolean;
 }
 
@@ -27,6 +32,10 @@ export interface IChatbotCommonServiceState {
 export interface IChatbotAuthResponse {
   api_token: string;
   socket_token: string;
+}
+
+export interface IChatbotErrorResponse {
+  error?: 'Duplicate' | 'Bad Request'
 }
 
 export interface IChatbotStatusResponse {
@@ -92,6 +101,15 @@ export interface IWordProtectionResponse {
   enabled: boolean;
 }
 
+export interface IQuotesResponse {
+  pagination: IChatbotPagination;
+  data: IQuotesData;
+}
+
+export interface IQuotePreferencesResponse {
+  settings: IQuotePreferencesData;
+  enabled: boolean;
+}
 
 // shared
 export interface IChatbotPermission {
@@ -120,6 +138,10 @@ export interface IChatbotPagination {
 export interface IChatbotPunishment {
   duration: number;
   type: string;
+}
+
+export interface IChatbotPermit {
+  duration: number;
 }
 
 
@@ -213,6 +235,7 @@ export interface IChatbotModule {
   enabled: boolean;
   onToggleEnabled: Function;
   onExpand: Function;
+  comingSoon?: boolean;
 }
 
 // chat alerts
@@ -237,6 +260,7 @@ export interface IAlertMessage {
 // protections
 export interface IProtectionGeneral {
   punishment?: IChatbotPunishment;
+  permit?: IChatbotPermit;
   excluded: IChatbotExcluded;
   message: string;
 }
@@ -295,10 +319,33 @@ export interface IWordProtectionBlackListItem {
   punishment: IChatbotPunishment;
 }
 
+// quotes
+export interface IQuotesData {
+  [id: number]: IQuote;
+}
+
+export interface IQuote {
+  id?: number;
+  message: string;
+  game: string;
+  added_by: string;
+  custom_id?: number;
+  updated_at?: string;
+  created_at?: string;
+}
+
+export interface IQuotePreferencesData {
+  commands: IDafaultCommandsSlug;
+  general: IQuotePreferencesGeneralSettings;
+}
+
+export interface IQuotePreferencesGeneralSettings {
+  date_format: string;
+}
+
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Everyone' = 1,
   'Subscriber Only' = 1 << 1,
 }
 
@@ -329,7 +376,8 @@ export const ChatbotClients = [
   'Twitch'
 ]
 
-export type ChatbotSettingSlugs = 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
+export type ChatbotSettingSlugs =
+  'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 
 // modals (inside child window)

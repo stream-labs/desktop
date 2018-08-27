@@ -1,12 +1,21 @@
 <template>
 <div>
   <div class="flex flex--end">
-    <button @click="onAddingNewItem(null, -1)" class="button button--action">
+    <button @click="onAddingNewItemHandler(null, -1)" class="button button--action">
       {{ $t('Add Word / Phrase') }}
     </button>
   </div>
-
-  <table v-if="value.length > 0">
+  <div
+    v-if="value.length === 0"
+    class="chatbot-empty-placeholder__container"
+  >
+    <img
+      :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-blacklist--${this.nightMode ? 'night' : 'day'}.svg`)"
+      width="200"
+    />
+    {{ $t('No items in list. Add new.') }}
+  </div>
+  <table v-else>
     <thead>
       <tr>
         <th> {{ $t('Word') }} </th>
@@ -24,14 +33,13 @@
         <td> {{ item.punishment.type === 'Timeout' ? item.punishment.duration : '-' }} </td>
         <td>
           <div class="align-items--inline">
-            <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
-            <i @click="onAddingNewItem(item, index)" class="icon-edit padding--5" />
+            <i @click="onAddingNewItemHandler(item, index)" class="icon-edit padding--5" />
+            <i @click="onDeleteAliasHandler(index)" class="icon-trash padding--5" />
           </div>
         </td>
       </tr>
     </tbody>
   </table>
-  <label v-else> {{ $t('No items in list. Add new.') }} </label>
   <modal
     :name="NEW_WORD_PROTECTION_LIST_MODAL_ID"
     :height="'auto'"
@@ -45,47 +53,42 @@
       <div class="new-list-item-modal__body">
         <div class="row">
           <div class="small-7 columns">
-            <label for="text" class="margin-vertical--10"> {{ $t('Word or Phrase') }} </label>
-            <TextInput
-              class="width--100"
+            <VFormGroup
+              :title="$t('Word or Phrase')"
               :metadata="metadata.text"
               v-model="newListItem.text"
             />
           </div>
           <div class="small-5 columns">
-            <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
-            <ListInput
+            <VFormGroup
+              :title="$t('Punishment')"
               v-model="newListItem.punishment.type"
               :metadata="metadata.punishment.type"
             />
           </div>
         </div>
-        <div v-if="newListItem.punishment.type === 'Timeout'">
-          <label for="punishment duration" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
-          <NumberInput
-            v-model="newListItem.punishment.duration"
-            :metadata="metadata.punishment.duration"
-          />
-        </div>
-        <div>
-          <label for="is regex">
-            <label for="is regex" class="margin-vertical--10"> {{ $t('This word contains Regular Expression') }} </label>
-            <BoolInput
-              v-model="newListItem.is_regex"
-              :metadata="metadata.is_regex"
-            />
-          </label>
-        </div>
+        <VFormGroup
+          v-if="newListItem.punishment.type === 'Timeout'"
+          :title="$t('Punishment Duration (Value in Minutes)')"
+          v-model="newListItem.punishment.duration"
+          :metadata="metadata.punishment.duration"
+        />
+        <BoolInput
+          class="margin-top--10"
+          :title="$t('This word contains Regular Expression')"
+          v-model="newListItem.is_regex"
+          :metadata="metadata.is_regex"
+        />
       </div>
       <div class="new-list-item-modal__controls">
         <button
           class="button button--default"
-          @click="onCancelNewItemModal">
+          @click="onCancelNewItemModalHandler">
           {{ $t('Cancel') }}
         </button>
         <button
           class="button button--action"
-          @click="onAddNewItem"
+          @click="onAddNewItemHandler"
           :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
@@ -100,11 +103,13 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 tbody tr {
-
-  td {
-    color: black;
-  }
 
   td:last-child {
     width: 100px;
@@ -136,9 +141,9 @@ tbody tr {
   }
 
   .new-list-item-modal__header__title {
-    .text-transform--capitalize();
+    .text-transform();
     flex-grow: 1;
-    padding-left: 10px;
+    .padding-left();
   }
 }
 
@@ -147,9 +152,9 @@ tbody tr {
 }
 
 .new-list-item-modal__controls {
-  background-color: @day-secondary;
+  background-color: @day-section;
   border-top: 1px solid @day-border;
-  padding: 10px 20px;
+  padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
@@ -160,22 +165,6 @@ tbody tr {
 }
 
 .night-theme {
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    color: white;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
   .new-list-item-modal__header {
     border-bottom: 1px solid @night-border;
   }

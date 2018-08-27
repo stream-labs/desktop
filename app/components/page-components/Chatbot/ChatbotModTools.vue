@@ -7,7 +7,7 @@
         Don't forget to mod streamlabs chatbot by typing <span class="mod-chat-banner__code-highlight">/mod streamlabs</span> in your chat.
       </span>
     </div>
-    <i class="icon-close cursor--pointer" @click="onCloseBanner"></i>
+    <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
   </div>
   <div class="align-items--inline">
     <ChatbotModule
@@ -24,13 +24,13 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 .mod-chat-banner {
-  margin: 10px;
+  .margin();
   display: flex;
   .radius();
-  padding: 10px;
+  .padding();
   text-align: center;
-  background-color: @yellow-light-opac;
-  border: @yellow;
+  background-color: @info-light;
+  color: @info-dark;
 
   .icon-close {
     .padding--5;
@@ -43,18 +43,13 @@
   }
 
   .mod-chat-banner__code-highlight {
-    padding: 4px 7px;
-    margin: 0 5px;
+    padding: 4px @spacing;
+    margin: 0 4px;
     .radius();
-    .weight--bold();
+    .weight(@medium);
     background-color: @yellow-med-opac;
     user-select: all;
   }
 }
 
-.night-theme {
-  .mod-chat-banner {
-    color: white;
-  }
-}
 </style>

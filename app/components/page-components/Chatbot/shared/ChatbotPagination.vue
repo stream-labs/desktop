@@ -4,7 +4,7 @@
     <div
       v-for="i in totalPages"
       :class="{'chatbot-pagination__page--current': i === currentPage}"
-      @click="emitPageChange(i)"
+      @click="onEmitPageChangeHandler(i)"
       class="chatbot-pagination__page"
       :key="i"
     >
@@ -22,12 +22,12 @@
   .flex();
 
   .chatbot-pagination__page {
-    .padding--10;
+    .padding(1);
     cursor: pointer;
 
     &.chatbot-pagination__page--current {
       color: @day-title;
-      .weight--bold();
+      .weight(@bold);
     }
   }
 }

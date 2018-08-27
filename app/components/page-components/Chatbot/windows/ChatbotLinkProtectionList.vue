@@ -1,12 +1,21 @@
 <template>
 <div>
   <div class="flex flex--end">
-    <button @click="onAddingNewItem(null, -1)" class="button button--action">
+    <button @click="onAddingNewItemHandler(null, -1)" class="button button--action">
       {{ $t('Add Link') }}
     </button>
   </div>
-
-  <table v-if="value.length > 0">
+  <div
+    v-if="value.length === 0"
+    class="chatbot-empty-placeholder__container"
+  >
+    <img
+      :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-${type}--${this.nightMode ? 'night' : 'day'}.svg`)"
+      width="200"
+    />
+    {{ $t('No items in list. Add new.') }}
+  </div>
+  <table v-else>
     <thead>
       <tr>
         <th> {{ $t('Link') }} </th>
@@ -21,20 +30,20 @@
         <td> {{ item }} </td>
         <td>
           <div class="align-items--inline">
-            <i @click="onDeleteAlias(index)" class="icon-trash padding--5" />
-            <i @click="onAddingNewItem(item, index)" class="icon-edit padding--5" />
+            <i @click="onAddingNewItemHandler(item, index)" class="icon-edit padding--5" />
+            <i @click="onDeleteAliasHandler(index)" class="icon-trash padding--5" />
           </div>
         </td>
       </tr>
     </tbody>
   </table>
-  <label v-else> {{ $t('No items in list. Add new.') }} </label>
+
   <modal
     :name="NEW_LINK_PROTECTION_LIST_MODAL_ID"
     :height="'auto'"
     :maxHeight="300"
   >
-    <form @submit.prevent="onAddNewItem" class="new-list-item__container">
+    <form @submit.prevent="onAddNewItemHandler" class="new-list-item__container">
       <div class="new-list-item-modal__header">
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
         <div class="new-list-item-modal__header__title">{{ $t(title) }}</div>
@@ -49,7 +58,7 @@
       <div class="new-list-item-modal__controls">
         <button
           class="button button--default"
-          @click="onCancelNewItemModal">
+          @click="onCancelNewItemModalHandler">
           {{ $t('Cancel') }}
         </button>
         <button
@@ -69,11 +78,14 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
-tbody tr {
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 
-  td {
-    color: black;
-  }
+tbody tr {
 
   td:last-child {
     width: 100px;
@@ -100,12 +112,12 @@ tbody tr {
   border-bottom: 1px solid @day-border;
 
   .new-list-item-modal__header__icon {
-    padding-left: 10px;
+    .padding-left();
     width: 32px;
   }
 
   .new-list-item-modal__header__title {
-    .text-transform--capitalize();
+    .text-transform();
     flex-grow: 1;
     padding-left: 10px;
   }
@@ -129,22 +141,6 @@ tbody tr {
 }
 
 .night-theme {
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    color: white;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
   .new-list-item-modal__header {
     border-bottom: 1px solid @night-border;
   }

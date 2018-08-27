@@ -23,15 +23,15 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
 
   selectedTab: string = 'general';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 
-  onReset() {
-    this.onResetSlug('words-protection');
+  onResetHandler() {
+    this.onResetSlugHandler('words-protection');
   }
 
-  onSave() {
+  onSaveHandler() {
     this.chatbotApiService
       .updateWordProtection({
         enabled: this.wordProtectionResponse.enabled,

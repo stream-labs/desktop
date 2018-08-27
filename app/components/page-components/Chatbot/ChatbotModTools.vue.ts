@@ -5,7 +5,7 @@ import { $t } from 'services/i18n';
 
 import {
   IChatbotModule,
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({
   components: {
@@ -21,8 +21,8 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchWordProtection();
   }
 
-  onCloseBanner() {
-    this.chatbotCommonService.closeModBanner();
+  onCloseBannerHandler() {
+    this.chatbotCommonService.hideModBanner();
   }
 
   get modBannerVisible() {

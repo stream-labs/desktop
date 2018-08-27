@@ -1,28 +1,33 @@
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot/chatbot';
-import { CustomizationService } from 'services/customization';
+import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
+
+import {
+  ChatbotApiService,
+  ChatbotCommonService,
+} from 'services/chatbot';
+
+import { CustomizationService } from 'services/customization';
 import Tabs from 'components/Tabs.vue';
 import DropdownMenu from 'components/shared/DropdownMenu.vue';
 import { inputComponents } from 'components/widgets/inputs';
-import FormWrapper from 'components/shared/inputs/FormWrapper.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import {
   ChatbotPermissionsEnums,
   ChatbotAutopermitEnums,
   ChatbotResponseTypes,
   ChatbotPunishments,
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 import { IListOption } from 'components/shared/inputs'
 
 @Component({
   components: {
     ...inputComponents,
-    FormWrapper,
+    VFormGroup,
     Tabs,
-    DropdownMenu,
+    DropdownMenu
   }
 })
 export default class ChatbotBase extends Vue {
@@ -31,9 +36,10 @@ export default class ChatbotBase extends Vue {
   @Inject() customizationService: CustomizationService;
 
   mounted() {
-    // pre-load them to switch between 2 windows
+    // pre-load them to switch between multiple windows
     this.chatbotApiService.fetchDefaultCommands();
     this.chatbotApiService.fetchLinkProtection();
+    this.chatbotApiService.fetchQuotePreferences();
   }
 
   get nightMode() {
@@ -75,7 +81,6 @@ export default class ChatbotBase extends Vue {
     );
     return permissions;
   }
-
 
   get chatbotResponseTypes() {
     return Object.keys(ChatbotResponseTypes).map(responseType => {

@@ -1,6 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IChatbotTimer } from 'services/chatbot/chatbot-interfaces';
+import { IChatbotTimer } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
@@ -40,11 +40,15 @@ export default class ChatbotTimers extends ChatbotBase {
     this.chatbotApiService.fetchTimers(page, query);
   }
 
-  openTimerWindow(timer?: IChatbotTimer) {
+  onOpenTimerWindowHandler(timer?: IChatbotTimer) {
     this.chatbotCommonService.openTimerWindow(timer);
   }
 
-  toggleEnableTimer(timerId: string, index: number, isEnabled: boolean) {
+  onToggleEnableTimerHandler(
+    timerId: string,
+    index: number,
+    isEnabled: boolean
+  ) {
     const timerToBeUpdated = this.timers[index];
 
     this.chatbotApiService.updateTimer(timerId, {
@@ -53,7 +57,7 @@ export default class ChatbotTimers extends ChatbotBase {
     });
   }
 
-  deleteTimer(timer?: IChatbotTimer) {
+  onDeleteTimerHandler(timer?: IChatbotTimer) {
     this.chatbotApiService.deleteTimer(timer.id);
   }
 }

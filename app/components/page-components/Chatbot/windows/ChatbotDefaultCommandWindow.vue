@@ -7,15 +7,22 @@
   <div slot="fixed">
     <div class="row">
       <div class="small-6 columns position--relative">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
           <div
-            @click="toggleLinkProtectionWindow"
+            @click="onToggleLinkProtectionWindowHandler"
             v-if="isLinkProtectionPermitCommand"
           >
-            <span class="text-transform--uppercase"> {{ $t('link protection preferences') }} </span>
+            <span> {{ $t('Link Protection Preferences') }} </span>
+            <i class="icon-transition window-toggle__icon"></i>
+          </div>
+          <div
+            @click="onToggleQuoteWindowHandler"
+            v-if="isQuoteCommand"
+          >
+            <span> {{ $t('Quote Preferences') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
         </div>
@@ -29,55 +36,47 @@
   >
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general'">
-        <div>
-          <label for="command" class="margin-vertical--10"> {{ $t('Command') }} </label>
-          <TextInput
-            v-model="editedCommand.command"
-            :metadata="metadata.command"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.response">
-          <label for="response" class="margin-vertical--10"> {{ $t('Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.response"
-            :metadata="metadata.response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.success_response">
-          <label for="success_response" class="margin-vertical--10"> {{ $t('Success Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.success_response"
-            :metadata="metadata.success_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.failed_response">
-          <label for="failed_response" class="margin-vertical--10"> {{ $t('Failed Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.failed_response"
-            :metadata="metadata.failed_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.enabled_response">
-          <label for="enabled_response" class="margin-vertical--10"> {{ $t('Enabled Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.enabled_response"
-            :metadata="metadata.enabled_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.disabled_response">
-          <label for="disabled_response" class="margin-vertical--10"> {{ $t('Disabled Response (Line breaks will be ignored)') }} </label>
-          <TextAreaInput
-            v-model="editedCommand.disabled_response"
-            :metadata="metadata.disabled_response"
-          />
-        </div>
-        <div v-if="defaultCommandToUpdate.response_type">
-          <label for="reply in" class="margin-vertical--10"> {{ $t('Reply in') }} </label>
-          <ListInput
-            v-model="editedCommand.response_type"
-            :metadata="metadata.response_type"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Command')"
+          v-model="editedCommand.command"
+          :metadata="metadata.command"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.response"
+          :title="$t('Response (Line breaks will be ignored)')"
+          v-model="editedCommand.response"
+          :metadata="metadata.response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.success_response"
+          :title="$t('Success Response (Line breaks will be ignored)')"
+          v-model="editedCommand.success_response"
+          :metadata="metadata.success_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.failed_response"
+          :title="$t('Failed Response (Line breaks will be ignored)')"
+          v-model="editedCommand.failed_response"
+          :metadata="metadata.failed_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.enabled_response"
+          :title="$t('Enabled Response (Line breaks will be ignored)')"
+          v-model="editedCommand.enabled_response"
+          :metadata="metadata.enabled_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.disabled_response"
+          :title="$t('Disabled Response (Line breaks will be ignored)')"
+          v-model="editedCommand.disabled_response"
+          :metadata="metadata.disabled_response"
+        />
+        <VFormGroup
+          v-if="defaultCommandToUpdate.response_type"
+          :title="$t('Reply in')"
+          v-model="editedCommand.response_type"
+          :metadata="metadata.response_type"
+        />
       </div>
       <div v-if="selectedTab === 'advanced'">
         <ChatbotAliases v-model="editedCommand.aliases" />
@@ -85,11 +84,11 @@
     </transition>
   </div>
   <div slot="controls" class="flex flex--space-between">
-    <button class="button button--default" @click="resetCommand">
+    <button class="button button--default" @click="onResetCommandHandler">
       {{ $t('Reset Command') }}
     </button>
     <div>
-      <button class="button button--default" @click="onCancel">
+      <button class="button button--default" @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button

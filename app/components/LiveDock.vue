@@ -94,7 +94,7 @@
   z-index: 1000;
   width: 28%;
   border-left: 1px solid @day-border;
-  padding: 16px 20px 10px;
+  .padding(2);
   .transition();
 
   &.live-dock--left {
@@ -151,7 +151,7 @@
 
 .live-dock-text {
   margin: 0 2px 0 4px;
-  .weight--medium();
+  .weight(@medium);
 }
 
 .live-dock-expanded-contents {

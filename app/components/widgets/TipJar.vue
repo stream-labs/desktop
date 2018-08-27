@@ -17,7 +17,7 @@
     </form-group>
     <form-group type="fontFamily" :value="wData.settings.text.font"/>
     <form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
-    <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size"/>
+    <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text.size"/>
     <form-group v-if="wData.settings.types.twitch_bits" :title="$t('Minimum Bits')">
       <number-input v-model="wData.settings.types.twitch_bits.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </form-group>

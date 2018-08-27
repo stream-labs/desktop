@@ -6,7 +6,7 @@ import {
   IAlertMessage,
   ChatbotAlertTypes,
   NEW_ALERT_MODAL_ID
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
@@ -58,7 +58,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // toggle enable type
-  async toggleEnableAlert(type: ChatbotAlertTypes) {
+  async onToggleEnableAlertHandler(type: ChatbotAlertTypes) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 

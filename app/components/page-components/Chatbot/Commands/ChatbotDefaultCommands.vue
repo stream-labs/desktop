@@ -3,7 +3,7 @@
     <!-- batch actions -->
     <div class="align-items--inline align-items--top text-align--right padding--10">
       <button
-        @click="onResetDefaultCommands"
+        @click="onResetDefaultCommandsHandler"
         class="chatbot__button--reset button button--default margin--10"
       >
         {{ $t('Reset Commands') }}
@@ -17,22 +17,14 @@
     </div>
 
     <!-- slugs -->
-    <div
-      class="padding--10"
+    <CollapsibleSection
+      class="margin--20"
       v-for="(commands, slugName, index) in commandSlugs"
+      :title="$t(slugName)"
       :key="index"
     >
-      <div
-        class="chatbot__dropdown-header"
-        :class="{'chatbot__dropdown-header--hidden': !visible[slugName]}"
-        @click="toggleVisible(slugName)"
-      >
-        <i class="icon-down cursor--pointer"></i>
-        <span>{{ $t(slugName) }}</span>
-      </div>
-
       <!-- commands in slug -->
-      <table v-if="visible[slugName]">
+      <table>
         <thead>
           <tr>
             <th> {{ $t('Command') }} </th>
@@ -55,18 +47,18 @@
                 <ToggleInput
                   v-if="typeof command.enabled === 'boolean'"
                   :value="command.enabled"
-                  @input="toggleEnableCommand(slugName, commandName, !command.enabled)"
+                  @input="onToggleEnableCommandHandler(slugName, commandName, !command.enabled)"
                 />
                 <i
                   class="icon-edit padding--5 cursor--pointer"
-                  @click="openCommandWindow(slugName, commandName, command)"
+                  @click="onOpenCommandWindowHandler(slugName, commandName, command)"
                 />
               </div>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
+    </CollapsibleSection>
   </div>
 </template>
 
@@ -74,31 +66,6 @@
 
 <style lang="less" scoped>
 @import "../../../../styles/index";
-
-
-.chatbot__dropdown-header {
-  .align-items--inline;
-  .padding--10;
-  .text-transform--uppercase;
-  border-color: @teal;
-  background-color: #eaf9f5;
-  color: @teal;
-  border-style: solid;
-  border-width: 1px 0;
-  margin-bottom: 15px;
-
-  &.chatbot__dropdown-header--hidden {
-    .icon-down {
-      transform: rotate(180deg);
-    }
-  }
-
-  .icon-down {
-    font-size: 5px;
-    .icon--margin;
-    .transition();
-  }
-}
 
 table tr {
 
@@ -114,17 +81,13 @@ table tr {
   td:last-child {
     width: 100px;
     .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
-    color: white;
+    .text-align(@right);
+    .padding-right();
+    color: @white;
 
     .icon-edit {
       font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
+      .icon-hover();
     }
   }
 }
@@ -132,26 +95,19 @@ table tr {
 
 .night-theme {
 
-  .chatbot__dropdown-header {
-    border-color: #274959;
-    background-color: rgba(27, 47,57, 0.68);
-    color: white;
-  }
-
   tbody tr {
     border: 2px solid transparent;
-    .transition;
+    .transition();
 
     td {
       color: white;
     }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
 
+    td:last-child {
+      .icon-edit {
+        .night-icon-hover();
+      }
+    }
+  }
 }
 </style>

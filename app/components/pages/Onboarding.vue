@@ -10,7 +10,7 @@
 @import "../../styles/index";
 
 .onboarding {
-  background-color: @onboarding-bg;
+  background-color: @night-bg;
 }
 </style>
 
@@ -73,7 +73,7 @@
 
 .onboarding-title--sm {
   font-size: 15px;
-  .weight--medium();
+  .weight(@medium);
   color: @white;
 }
 

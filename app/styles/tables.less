@@ -14,7 +14,7 @@ table {
   }
 
   tbody {
-    border: 1px solid @light-1;
+    border: none;
     background-color: transparent;
 
     tr {
@@ -24,7 +24,7 @@ table {
       }
 
       &:nth-child(even) {
-        background-color: white;
+        background-color: transparent;
         border: 0;
       }
     }
@@ -47,12 +47,20 @@ table {
     .input-wrapper {
       width: 100%;
     }
+
+    &:first-child {
+      border-radius: 3px 0 0 3px;
+    }
+
+    &:last-child {
+      border-radius: 0 3px 3px 0;
+    }
   }
 
   th {
     color: @grey;
     text-transform: uppercase;
-    .weight--medium();
+    .weight(@medium);
     letter-spacing: 1.5px;
     font-size: 11px;
   }
@@ -69,13 +77,12 @@ table {
 
   tbody {
     background-color: transparent;
-    border-color: @dark-2;
 
     tr {
       border: 0;
 
       &:nth-child(odd) {
-        background-color: @dark-2;
+        background-color: @dark-4;
         border-color: transparent;
 
         td {
@@ -84,7 +91,7 @@ table {
       }
 
       &:nth-child(even) {
-        background-color: #121F27;
+        background-color: transparent;
       }
 
       td {

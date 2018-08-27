@@ -6,31 +6,27 @@
 >
   <div slot="content">
     <div>
-      <div>
-        <label for="timer" class="margin-vertical--10"> {{ $t('Name') }} </label>
-        <TextInput
-          v-model="newTimer.name"
-          :metadata="nameMetadata"
-        />
-      </div>
-      <div>
-        <label for="response" class="margin-vertical--10"> {{ $t('Response (Line breaks will be ignored)') }} </label>
-        <TextAreaInput
-          v-model="newTimer.message"
-          :metadata="messageMetadata"
-        />
-      </div>
+      <VFormGroup
+        :title="$t('Name')"
+        v-model="newTimer.name"
+        :metadata="nameMetadata"
+      />
+      <VFormGroup
+        :title="$t('Response (Line breaks will be ignored)')"
+        v-model="newTimer.message"
+        :metadata="messageMetadata"
+      />
       <div class="row">
         <div class="columns small-6">
-          <label for="interval" class="margin-vertical--10"> {{ $t('Interval (Value in Minutes)') }} </label>
-          <NumberInput
+          <VFormGroup
+            :title="$t('Interval (Value in Minutes)')"
             v-model="newTimer.interval"
             :metadata="intervalMetadata"
           />
         </div>
         <div class="columns small-6">
-          <label for="line" class="margin-vertical--10"> {{ $t('Line Minimum') }} </label>
-          <NumberInput
+          <VFormGroup
+            :title="$t('Line Minimum')"
             v-model="newTimer.chat_lines"
             :metadata="chatLinesMetadata"
           />
@@ -41,13 +37,13 @@
   <div slot="controls">
     <button
       class="button button--default"
-      @click="onCancel">
+      @click="onCancelHandler">
       {{ $t('Cancel') }}
     </button>
     <button
       class="button button--action"
-      @click="onSave"
-      :disabled="errors.items.length > 0"
+      @click="onSaveHandler"
+      :disabled="errors.items.length > 0 || !newTimer.name || !newTimer.message"
     >
       {{ $t('Save') }}
     </button>

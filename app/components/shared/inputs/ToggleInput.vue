@@ -21,17 +21,16 @@
 @import "../../../styles/index";
 
 .toggleinput__container {
-  padding: 5px;
   margin: 0 2px;
   position: relative;
-  width: 44px;
-  height: 22px;
+  width: 24px;
+  height: 16px;
   .cursor--pointer();
 }
 .toggleinput__track {
   .transition;
-  background-color: @grey;
-  border-radius: 30px;
+  background-color: @light-3;
+  border-radius: 20px;
   width: 100%;
   height: 100%;
 }
@@ -39,31 +38,33 @@
 .toggleinput__handle {
   .transition();
   position: absolute;
-  z-index: 2;
-  width: 22px;
-  height: 22px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  top: 0;
-  left: 0;
-  box-shadow: 0 2px 6px 0 rgba(0,0,0,0.76);
-  background-color: #37474f;
+  top: 2px;
+  left: 2px;
+  background-color: @white;
 
-  &:hover {
-    background-color: #303f47;
+}
+.night-theme {
+  .toggleinput__track {
+    .transition;
+    background-color: @dark-5;
+    border-radius: 20px;
+    width: 100%;
+    height: 100%;
   }
-
 }
 
 .toggleinput__container--active {
   .toggleinput__handle {
-    transform: translateX(22px);
+    transform: translateX(8px);
   }
 
   .toggleinput__track {
     background-color: @teal;
   }
 }
-
 
 
 </style>

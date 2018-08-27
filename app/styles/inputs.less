@@ -1,5 +1,5 @@
 .input-container {
-  margin-bottom: 24px;
+  .margin-bottom(2);
   position: relative;
   display: flex;
   align-items: flex-start;
@@ -23,13 +23,19 @@
 
 .input-label {
   width: 30%;
-  padding-right: 16px;
+  .padding-right(2);
 }
 
 .input-wrapper {
   width: 70%;
 
   .checkbox {
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .button {
     &:last-child {
       margin-right: 0;
     }
@@ -44,7 +50,7 @@
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
-    line-height: 36px;
+    line-height: 34px;
   }
 }
 
@@ -63,13 +69,19 @@ textarea {
   color: @day-paragraph;
   .radius();
   box-shadow: none;
-  height: 36px;
-  padding: 0 10px;
+  height: 34px;
+  padding: 0 @spacing;
 
   &:focus {
     box-shadow: none;
     background: @day-input-bg;
     border-color: @day-focus-border;
+  }
+
+  &:disabled,
+  .is-disabled {
+    background-color: @light-2;
+    border-color: @light-2;
   }
 
   &.input--transparent {
@@ -83,12 +95,18 @@ textarea {
 }
 
 textarea {
-  padding: 8px 10px;
+  .padding();
   line-height: 20px;
 }
 
+
 .multiselect {
-  min-height: 36px;
+  min-height: 34px;
+}
+
+.multiselect__input {
+  background: @day-dropdown-bg;
+  border-color: @day-dropdown-border;
 }
 
 .multiselect__select {
@@ -100,6 +118,7 @@ textarea {
   top: 0px;
   line-height: 32px;
   position: relative;
+  min-width: 220px;
 
   &:before {
     font-family: "Font Awesome 5 Free";
@@ -108,7 +127,7 @@ textarea {
     border: none;
     font-size: 9px;
     position: absolute;
-    right: 0;
+    right: 2px;
     top: 2px;
   }
 }
@@ -125,11 +144,17 @@ textarea {
   }
 }
 
-.multiselect__input,
-.multiselect__single {
-  &:hover, &:focus {
-    background: @day-input-bg;
-    border-color: @day-focus-border;
+.multiselect {
+  .multiselect__input,
+  .multiselect__single {
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+
+    &:hover,
+    &:focus {
+      background: @day-dropdown-bg;
+      border-color: @day-dropdown-border;
+    }
   }
 }
 
@@ -138,11 +163,10 @@ textarea {
 }
 
 .multiselect__content {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  border: 1px solid @day-focus-border;
-  top: 35px;
-  background: @day-input-bg;
+  border-bottom-left-radius: @radius;
+  border-bottom-right-radius: @radius;
+  top: 30px;
+  background: @day-dropdown-bg;
   list-style-type: none;
   margin: 0;
   width: 100%;
@@ -150,6 +174,8 @@ textarea {
   position: absolute;
   max-height: 300px;
   overflow-y: auto;
+  .padding-top();
+  .day-shadow();
 }
 
 .multiselect__element {
@@ -160,14 +186,18 @@ textarea {
 }
 
 .multiselect__option {
-  padding: 0px 8px;
-  height: 36px;
+  padding: 4px @spacing;
+  height: auto;
   min-height: 0;
-  line-height: 36px;
-  .transition;
-  display: block;
+  .transition();
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   color: @day-paragraph;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 
   &:after {
     display: none;
@@ -175,7 +205,7 @@ textarea {
 }
 
 .multiselect__option--highlight {
-  background: @day-hover;
+  background: @light-1;
   color: @day-title;
 
   &:after {
@@ -184,11 +214,11 @@ textarea {
 }
 
 .multiselect__option--selected {
-  background: @teal;
-  color: @white;
+  background: @light-1;
+  color: @day-title;
 
   &.multiselect__option--highlight {
-    background: @teal;
+    background: @light-1;
 
     &:after {
       display: none;
@@ -218,6 +248,102 @@ textarea {
   }
 }
 
+// Rule to change background color when the section has a bg
+.section {
+  .multiselect__input,
+  .multiselect__content {
+    background: @white;
+    border-color: @white;
+
+    &:hover,
+    &:focus {
+      background: @white;
+      border-color: @white;
+    }
+  }
+}
+
+.colorpicker {
+  position: relative;
+  width: 220px;
+
+  .colorpicker__input {
+    cursor: pointer !important;
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+
+    &:focus,
+    &:visited,
+    &:active {
+      background: @day-dropdown-bg;
+      border-color: @day-dropdown-border;
+    }
+  }
+
+  .colorpicker__text {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .colorpicker__swatch {
+    position: absolute;
+    top: 7px;
+    right: @spacing;
+    .radius();
+    border: 1px solid #ccc;
+    width: 20px;
+    height: 20px;
+  }
+
+  .colorpicker-menu {
+    top: -2px;
+    z-index: 10;
+    border-bottom-right-radius: @radius;
+    border-bottom-left-radius: @radius;
+    background: @day-dropdown-bg;
+    border-color: @day-dropdown-border;
+    .day-shadow() !important;
+  }
+
+  // hide alpha input
+  .vc-alpha {
+    display: none;
+  }
+  .vc-sketch-field > div:last-child {
+    display: none;
+  }
+
+  .vc-sketch-presets {
+    margin-right: -8px;
+    margin-left: -8px;
+    padding-left: 8px;
+    padding-top: 8px;
+    border-top: 1px solid @day-border;
+  }
+
+  .vc-sketch-field .vc-input__label {
+    color: @icon;
+  }
+
+  .vc-checkerboard {
+    display: none;
+  }
+}
+
+// Path inputs
+.path__input {
+  flex-grow: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.path__browse-button {
+  flex-shrink: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -1px;
+}
+
 .night-theme {
   input[type="text"],
   input[type="password"],
@@ -227,15 +353,35 @@ textarea {
     color: @night-paragraph;
     border-color: @night-input-border;
 
+    &:disabled,
+    .is-disabled {
+      background-color: @dark-4;
+      border-color: @dark-4;
+    }
+
     &.input--transparent {
       border-bottom: 1px dashed @grey;
     }
   }
 
+  .multiselect {
+    .multiselect__input,
+    .multiselect__single {
+      background: @night-dropdown-bg;
+      border-color: @night-dropdown-border;
+
+      &:hover,
+      &:focus {
+        background: @night-dropdown-bg;
+        border-color: @night-dropdown-border;
+      }
+    }
+  }
+
   .multiselect__content {
-    background: @night-input-bg;
-    border-color: @night-input-border;
+    background: @night-dropdown-bg;
     color: @white;
+    .night-shadow();
   }
 
   .multiselect__option {
@@ -244,10 +390,61 @@ textarea {
 
   .multiselect__option--selected {
     color: @white;
+    background: @night-hover;
+
+    &.multiselect__option--highlight {
+      background: @night-hover;
+    }
   }
 
   .multiselect__option--highlight {
-    background: @night-hover;
+    background: transparent;
     color: @night-title;
+  }
+
+  .section {
+    .multiselect__input,
+    .multiselect__content {
+      background: @night-dropdown-bg;
+      border-color: @night-dropdown-border;
+
+      &:hover,
+      &:focus {
+        background: @night-dropdown-bg;
+        border-color: @night-dropdown-border;
+      }
+    }
+  }
+
+  .colorpicker {
+    .colorpicker__input {
+      background: @night-dropdown-bg;
+      border-color: @night-dropdown-border;
+
+      &:focus,
+      &:visited,
+      &:active {
+        background: @night-dropdown-bg;
+        border-color: @night-dropdown-border;
+      }
+    }
+
+    .colorpicker-menu {
+      background: @night-dropdown-bg!important;
+      border-color: @night-dropdown-border!important;
+      .night-shadow() !important;
+    }
+
+    .vue-color__editable-input__label {
+      color: @grey !important;
+    }
+
+    .vue-color__sketch__presets {
+      border-color: @night-border;
+    }
+
+    .vc-sketch-presets {
+      border-color: @night-border;
+    }
   }
 }

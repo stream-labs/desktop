@@ -3,7 +3,7 @@
   <!-- batch actions -->
   <div class="flex flex--space-between padding--10">
     <button
-      @click="openTimerWindow"
+      @click="onOpenTimerWindowHandler"
       class="button button--action margin--10"
     >
       {{ $t('Add Timer') }}
@@ -15,7 +15,14 @@
       placeholder="Search"
     />
   </div>
-  <div class="padding--10">
+  <div v-if="!timers || timers.length === 0" class="chatbot-empty-placeholder__container">
+    <img
+      :src="require(`../../../../media/images/chatbot/chatbot-placeholder-timer--${this.nightMode ? 'night' : 'day'}.svg`)"
+      width="200"
+    />
+    <span>{{ $t('Click add timer to get started.') }}</span>
+  </div>
+  <div v-else class="padding--10">
     <table>
       <thead>
         <tr>
@@ -26,7 +33,7 @@
           <th></th>
         </tr>
       </thead>
-      <tbody v-if="timers && timers.length > 0">
+      <tbody>
         <tr
           v-for="(timer, index) in timers"
           :key="timer.name"
@@ -39,23 +46,18 @@
             <div class="align-items--inline">
               <ToggleInput
                 :value="timer.enabled"
-                @input="toggleEnableTimer(timer.id, index, !timer.enabled)"
+                @input="onToggleEnableTimerHandler(timer.id, index, !timer.enabled)"
               />
               <DropdownMenu
                 :placement="'bottom-end'"
                 class="chatbot-timers__timer-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="openTimerWindow(timer)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="deleteTimer(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                <button @click="onOpenTimerWindowHandler(timer)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="onDeleteTimerHandler(timer)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </div>
           </td>
-        </tr>
-      </tbody>
-      <tbody v-else>
-        <tr>
-          <td colspan="5" class="text-align--center"> {{ $t('Click add timer to get started.') }} </td>
         </tr>
       </tbody>
     </table>
@@ -74,14 +76,16 @@
 <style lang="less" scoped>
 @import "../../../styles/index";
 
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 
 tbody tr {
   .transition;
   .cursor--pointer;
-
-  td {
-    color: black;
-  }
 
   td:first-child {
     width: 300px;
@@ -107,10 +111,9 @@ tbody tr {
   button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &:first-child {
+      margin-bottom: 10px;
     }
   }
 
@@ -119,25 +122,4 @@ tbody tr {
   }
 }
 
-
-
-.night-theme {
-  td {
-    .transition;
-    color: white;
-  }
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    color: white;
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-}
 </style>

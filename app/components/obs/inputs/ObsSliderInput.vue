@@ -28,7 +28,7 @@
 @import "../../../styles/index";
 
 .slider-container {
-  height: 45px;
+  height: 36px;
   position: relative;
 }
 

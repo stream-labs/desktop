@@ -37,13 +37,13 @@
 }
 
 .slider-input {
-  margin-left: 10px;
+  .margin-left(3);
   width: 60px;
 }
 
 .slider {
   background: transparent;
-  padding:8px 0 !important;
+  padding: 8px 0 0 !important;
   margin: 0;
   flex-grow: 1;
   height: auto;

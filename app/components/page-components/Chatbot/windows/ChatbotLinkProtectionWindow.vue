@@ -7,12 +7,12 @@
   <div slot="fixed">
     <div class="row">
       <div class="small-6 columns position--relative">
-        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab"></Tabs>
+        <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
-          <div @click="toggleLinkProtectionWindow">
-            <span class="text-transform--uppercase"> {{ $t('edit command') }} </span>
+          <div @click="onToggleLinkProtectionWindowHandler">
+            <span> {{ $t('Edit Command') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
         </div>
@@ -25,65 +25,75 @@
         <div v-if="selectedTab === 'general' && linkProtection">
           <div class="row">
             <div class="small-6 columns">
-              <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
-              <ListInput
+              <VFormGroup
+                :title="$t('Auto Permit')"
                 v-model="linkProtection.general.excluded.level"
                 :metadata="metadata.link.general.excluded.level"
               />
             </div>
             <div class="small-6 columns">
-              <label for="punishment" class="margin-vertical--10"> {{ $t('Punishment') }} </label>
-              <ListInput
+              <VFormGroup
+                :title="$t('Punishment')"
                 v-model="linkProtection.general.punishment.type"
                 :metadata="metadata.link.general.punishment.type"
               />
             </div>
           </div>
-          <div v-if="linkProtection.general.punishment.type === 'Timeout'">
-            <label for="response" class="margin-vertical--10"> {{ $t('Punishment Duration (Value in Minutes)') }} </label>
-            <NumberInput
-              v-model="linkProtection.general.punishment.duration"
-              :metadata="metadata.link.general.punishment.duration"
-            />
-          </div>
-          <div>
-            <label for="response" class="margin-vertical--10"> {{ $t('Punishment Response (Line breaks will be ignored)') }} </label>
-            <TextAreaInput
-              v-model="linkProtection.general.message"
-              :metadata="metadata.link.general.message"
-            />
-          </div>
+          <VFormGroup
+            :title="$t('Permit Duration (Value in Minutes)')"
+            v-model="linkProtection.general.permit.duration"
+            :metadata="metadata.link.general.permit.duration"
+          />
+          <VFormGroup
+            v-if="linkProtection.general.punishment.type === 'Timeout'"
+            :title="$t('Punishment Duration (Value in Minutes)')"
+            v-model="linkProtection.general.punishment.duration"
+            :metadata="metadata.link.general.punishment.duration"
+          />
+          <VFormGroup
+            :title="$t('Punishment Response (Line breaks will be ignored)')"
+            v-model="linkProtection.general.message"
+            :metadata="metadata.link.general.message"
+          />
         </div>
-        <div v-if="selectedTab === 'whitelist'">
+        <ChatbotLinkProtectionList
+          v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
+          :title="$t(`Add to ${selectedTab}`)"
+          :type="selectedTab"
+          v-model="linkProtection[selectedTab]"
+        />
+        <!-- <div v-if="selectedTab === 'whitelist'">
           <ChatbotLinkProtectionList
-            :title="'Add to Whitelist'"
+            :title="$t('Add to Whitelist')"
+            :type="'whitelist'"
             v-model="linkProtection.whitelist"
           />
         </div>
         <div v-if="selectedTab === 'blacklist'">
           <ChatbotLinkProtectionList
-            :title="'Add to Blacklist'"
+            :title="$t('Add to Blacklist')"
+            :type="'blacklist'"
             v-model="linkProtection.blacklist"
           />
-        </div>
+        </div> -->
       </transition>
     </div>
   </div>
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onReset">
+      @click="onResetHandler">
       {{ $t('Reset') }}
     </button>
     <div>
       <button
         class="button button--default"
-        @click="onCancel">
+        @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button
         class="button button--action"
-        @click="onSave"
+        @click="onSaveHandler"
         :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}

@@ -18,16 +18,17 @@
   cursor: pointer;
   list-style: none;
   border-left: 1px solid transparent;
-  padding-left: 50px;
+  padding-left: 46px;
   font-size: 14px;
-  margin-bottom: 8px;
+  .margin-bottom();
+  .text-transform();
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
 
   &.active {
     opacity: 1;
-    .weight--medium();
+    .weight(@medium);
     border-color: @navy;
     color: @day-title;
 
@@ -53,6 +54,7 @@
     margin-right: -16px;
     left: -24px;
     width: 16px;
+    padding: 3px 0;
   }
 }
 

@@ -100,7 +100,7 @@
 }
 
 .widget__name {
-  .weight--medium();
+  .weight(@medium);
   color: @white;
   font-size: 14px;
 }

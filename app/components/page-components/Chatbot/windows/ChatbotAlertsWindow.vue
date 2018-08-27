@@ -14,12 +14,12 @@
           class="chatbot-alerts-window__sidebar__tab"
         >
           <div class="chatbot-alerts-window__sidebar__tab__content">
-            <span>{{ $t(alertTypeName) }}</span>
+            <span>{{ $t(alertTypeFormattedName(alertTypeName)) }}</span>
             <ToggleInput
               :value="isEnabled(alertTypeName)"
               @input="(enabled, event) => {
                 event.stopPropagation();
-                toggleEnableAlert(alertTypeName);
+                onToggleEnableAlertHandler(alertTypeName);
               }"
             />
           </div>
@@ -29,8 +29,8 @@
     <div class="chatbot-alerts-window__content">
       <div class="chatbot-alerts-window__actions">
         <button
-          class="button button--action text-transform--uppercase"
-          @click="showNewChatAlertWindow"
+          class="button button--action"
+          @click="onShowNewChatAlertWindowHandler"
         >
           {{ $t('add alert') }}
         </button>
@@ -42,7 +42,6 @@
             <th
               v-for="column in selectedTypeTableColumns"
               :key="column"
-              class="text-transform--capitalize"
               :class="`column--${column}`"
             >
               {{ $t(formatHeader(column)) }}
@@ -67,8 +66,8 @@
                 class="chatbot-alerts__alert-actions__container"
                 :icon="'icon-more'"
               >
-                <button @click="onEdit(message, index)" class="button button--action"> {{  $t('Edit') }} </button>
-                <button @click="onDelete(index)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                <button @click="onEditHandler(message, index)" class="button button--action"> {{  $t('Edit') }} </button>
+                <button @click="onDeleteHandler(index)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
               </DropdownMenu>
             </td>
           </tr>
@@ -79,10 +78,16 @@
       :selectedType="selectedType"
     />
   </div>
-  <div slot="controls">
+  <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onDone"
+      @click="onResetHandler"
+    >
+      {{ $t('RESET') }}
+    </button>
+    <button
+      class="button button--default"
+      @click="onDoneHandler"
     >
       {{ $t('DONE') }}
     </button>
@@ -96,18 +101,15 @@
 @import "../../../../styles/index";
 
 .chatbot-alerts-window__container {
-  margin: -20px;
+  margin: -16px;
   width: calc(~"100% + 40px") !important;
 
   .chatbot-alerts-window__sidebar {
     width: 250px;
-    .padding--10();
-    background: @day-secondary;
     border-right: 1px solid @day-border;
 
     .chatbot-alerts-window__sidebar__tab {
-      .margin--10();
-      .text-transform--capitalize();
+      .text-transform();
       padding-left: 20px;
 
       .chatbot-alerts-window__sidebar__tab__content {
@@ -122,7 +124,7 @@
   .chatbot-alerts-window__content {
     width: 100%;
     .overflow--auto();
-    .padding--20();
+    .padding(2);
 
     .chatbot-alerts-window__actions {
       .align-items--inline();
@@ -135,15 +137,10 @@
   button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &:first-child {
+      margin-bottom: 10px;
     }
-  }
-
-  .icon-more {
-    font-size: 15px;
   }
 }
 
@@ -161,34 +158,15 @@ tbody tr {
     color: black;
   }
 
-  &:hover {
-    td {
-      color: black;
-    }
-  }
-
   td:last-child {
     width: 100px;
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
 }
 
 .night-theme {
-  .chatbot-alerts-window__sidebar {
-    border-color: @night-secondary;
-    background-color: @night-secondary;
-  }
 
   tbody tr {
     border: 2px solid transparent;
@@ -199,22 +177,16 @@ tbody tr {
     td {
       color: white;
     }
-
-    &:hover {
-      td {
-        color: white;
-      }
-    }
-
-    td:last-child {
-      color: white;
-    }
   }
   tbody tr:nth-child(odd) {
     background-color: @navy-secondary;
   }
   tbody tr:nth-child(even) {
     background-color: @navy;
+  }
+
+  .chatbot-alerts-window__sidebar {
+    border-right: 1px solid @night-border;
   }
 }
 

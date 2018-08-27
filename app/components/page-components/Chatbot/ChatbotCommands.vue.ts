@@ -8,7 +8,7 @@ import { ITab } from 'components/Tabs.vue';
   components: {
     ChatbotDefaultCommands,
     ChatbotCustomCommands,
-    ChatbotCommandVariables
+    ChatbotCommandVariables,
   }
 })
 export default class ChatbotCommands extends ChatbotBase {
@@ -29,7 +29,7 @@ export default class ChatbotCommands extends ChatbotBase {
 
   selectedTab = 'custom';
 
-  onSelectTab(tab: string) {
+  onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
   }
 }

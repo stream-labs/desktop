@@ -10,6 +10,7 @@ import {
   IChatbotApiServiceState,
   IChatbotCommonServiceState,
   IChatbotAuthResponse,
+  IChatbotErrorResponse,
   IChatbotStatusResponse,
   ChatbotClients,
   ICustomCommand,
@@ -27,7 +28,10 @@ import {
   ISymbolProtectionResponse,
   ILinkProtectionResponse,
   IWordProtectionResponse,
-  ChatbotSettingSlugs
+  IQuotesResponse,
+  ChatbotSettingSlugs,
+  IQuote,
+  IQuotePreferencesResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -81,6 +85,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       enabled: false,
       settings: null
     },
+    quotesResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
+    },
+    quotePreferencesResponse: {
+      enabled: false,
+      settings: null
+    }
   };
 
   //
@@ -138,7 +153,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
     return fetch(request)
       .then(handleErrors)
-      .then(response => response.json());
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        // errors contain string response. Need to json()
+        // and return the promised error
+        return error.json()
+          .then((errJson: Promise<IChatbotErrorResponse>) =>
+            Promise.reject(errJson)
+          );
+      })
   }
 
   //
@@ -170,7 +195,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
-  fetchCustomCommands(page = 1, query = '') {
+  fetchCustomCommands(page = this.state.customCommandsResponse.pagination.current, query = '') {
     return this.api('GET', `commands?page=${page}&query=${query}`, {})
       .then((response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
@@ -185,7 +210,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-  fetchTimers(page = 1, query = '') {
+  fetchTimers(page = this.state.timersResponse.pagination.current, query = '') {
     return this.api('GET', `timers?page=${page}&query=${query}`, {})
       .then((response: ITimersResponse) => {
         this.UPDATE_TIMERS(response);
@@ -228,20 +253,41 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
+    return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
+      (response: IQuotesResponse) => {
+        console.log(response);
+        this.UPDATE_QUOTES(response);
+      }
+    );
+  }
+
+  fetchQuotePreferences() {
+    return this.api('GET', 'settings/quotes', {}).then(
+      (response: IQuotePreferencesResponse) => {
+        this.UPDATE_QUOTE_PREFERENCES(response);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
-
   resetSettings(slug: ChatbotSettingSlugs) {
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
+          IChatAlertsResponse
           | ICapsProtectionResponse
           | ISymbolProtectionResponse
           | ILinkProtectionResponse
           | IWordProtectionResponse
       ) => {
         switch (slug) {
+          case 'chat-notifications':
+            this.UPDATE_CHAT_ALERTS(
+              response as IChatAlertsResponse
+            )
           case 'caps-protection':
             this.UPDATE_CAPS_PROTECTION(
               response as ICapsProtectionResponse
@@ -258,12 +304,13 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'words-protection':
+            debugger;
             this.UPDATE_WORD_PROTECTION(
               response as IWordProtectionResponse
             );
             break;
         }
-        return Promise.resolve(response);
+        return Promise.resolve(response) ;
       }
     );
   }
@@ -314,6 +361,14 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return this.api('POST', 'timers', data)
       .then((response: IChatbotTimer) => {
         this.fetchTimers();
+        this.chatbotCommonService.closeChildWindow();
+      });
+  }
+
+  createQuote(data: IQuote) {
+    return this.api('POST', 'quotes', data)
+      .then((response: IQuote) => {
+        this.fetchQuotes();
         this.chatbotCommonService.closeChildWindow();
       });
   }
@@ -393,6 +448,28 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  updateQuote(id: number, data: IQuote) {
+    return this.api('PUT', `quotes/${id}`, data)
+      .then((response: IChatbotAPIPutResponse) => {
+        debugger;
+        if (response.success === true) {
+          this.fetchQuotes();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      });
+  }
+
+  updateQuotePreferences(data: IQuotePreferencesResponse) {
+    return this.api('POST', 'settings/quotes', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchQuotePreferences();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      })
+  }
+
+
   //
   // DELETE methods
   //
@@ -417,6 +494,15 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  deleteQuote(id: number) {
+    return this.api('DELETE', `quotes/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchQuotes();
+        }
+      }
+    );
+  }
 
   //
   // Mutations
@@ -486,6 +572,17 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'wordProtectionResponse', response);
   }
 
+  @mutation()
+  private UPDATE_QUOTES(response: IQuotesResponse) {
+    Vue.set(this.state, 'quotesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUOTE_PREFERENCES(response: IQuotePreferencesResponse) {
+    Vue.set(this.state, 'quotePreferencesResponse', response);
+  }
+
+
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -496,11 +593,16 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     customCommandToUpdate: null,
     defaultCommandToUpdate: null,
     timerToUpdate: null,
+    quoteToUpdate: null,
     modBannerVisible: true
   };
 
-  closeModBanner() {
-    this.CLOSE_MOD_BANNER();
+  hideModBanner() {
+    this.HIDE_MOD_BANNER();
+  }
+
+  showModBanner() {
+    this.SHOW_MOD_BANNER();
   }
 
   closeChildWindow() {
@@ -528,7 +630,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotDefaultCommandWindow',
       size: {
         width: 650,
-        height: 500
+        height: 650
       }
     });
   }
@@ -581,7 +683,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotLinkProtectionWindow',
       size: {
         width: 650,
-        height: 500
+        height: 650
       }
     });
   }
@@ -592,6 +694,29 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       size: {
         width: 650,
         height: 500
+      }
+    });
+  }
+
+  openQuoteWindow(quote?: IQuote) {
+    if (quote) {
+      this.SET_QUOTE_TO_UPDATE(quote);
+    }
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQuoteWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openQuotePreferenceWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQuotePreferencesWindow',
+      size: {
+        width: 650,
+        height: 300
       }
     });
   }
@@ -608,8 +733,13 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   // }
 
   @mutation()
-  private CLOSE_MOD_BANNER() {
+  private HIDE_MOD_BANNER() {
     Vue.set(this.state, 'modBannerVisible', false);
+  }
+
+  @mutation()
+  private SHOW_MOD_BANNER() {
+    Vue.set(this.state, 'modBannerVisible', true);
   }
 
   @mutation()
@@ -625,5 +755,10 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
   @mutation()
   private SET_TIMER_TO_UPDATE(timer: IChatbotTimer) {
     Vue.set(this.state, 'timerToUpdate', timer);
+  }
+
+  @mutation()
+  private SET_QUOTE_TO_UPDATE(quote: IQuote) {
+    Vue.set(this.state, 'quoteToUpdate', quote);
   }
 }

@@ -3,7 +3,7 @@
     <!-- batch actions -->
     <div class="flex flex--space-between padding--10">
       <button
-        @click="openCommandWindow"
+        @click="onOpenCommandWindowHandler"
         class="button button--action margin--10"
       >
         {{ $t('Add Command') }}
@@ -17,19 +17,36 @@
     </div>
 
     <!-- custom commands -->
-    <div class="padding--10">
+    <div v-if="!commands || commands.length === 0" class="chatbot-empty-placeholder__container">
+      <img
+        :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-command--${this.nightMode ? 'night' : 'day'}.svg`)"
+        width="200"
+      />
+      <span>{{ $t('Click add command to get started.') }}</span>
+    </div>
+    <div v-else class="padding--10">
       <table>
         <thead>
           <tr>
             <th> {{ $t('Command') }} </th>
             <th> {{ $t('Response') }} </th>
-            <th> {{ $t('Global Cooldown in mins') }} </th>
-            <th> {{ $t('User Cooldown in mins') }} </th>
+            <th>
+              <div class="flex">
+                GCD
+                <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in minutes')" />
+              </div>
+            </th>
+            <th>
+              <div class="flex">
+                UCD
+                <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in minutes')" />
+              </div>
+            </th>
             <th> {{ $t('Permission') }} </th>
             <th></th>
           </tr>
         </thead>
-        <tbody v-if="commands && commands.length > 0">
+        <tbody>
           <tr
             v-for="(command, index) in commands"
             :key="command.id"
@@ -43,23 +60,19 @@
               <div class="align-items--inline">
                 <ToggleInput
                   :value="command.enabled"
-                  @input="toggleEnableCommand(command.id, index, !command.enabled)"
+                  @input="onToggleEnableCommandHandler(command.id, index, !command.enabled)"
                 />
                 <DropdownMenu
                   :placement="'bottom-end'"
-                  class="chatbot-custom-commands__command-actions__container"
                   :icon="'icon-more'"
                 >
-                  <button @click="openCommandWindow(command)" class="button button--action"> {{  $t('Edit') }} </button>
-                  <button @click="deleteCommand(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                  <div class="chatbot-custom-commands__command-actions__container">
+                    <button @click="onOpenCommandWindowHandler(command)" class="button button--action"> {{  $t('Edit') }} </button>
+                    <button @click="onDeleteCommandHandler(command)" class="button button--soft-warning"> {{  $t('Delete') }} </button>
+                  </div>
                 </DropdownMenu>
               </div>
             </td>
-          </tr>
-        </tbody>
-        <tbody v-else>
-          <tr>
-            <td colspan="6" class="text-align--center"> {{ $t('Click add command to get started.') }} </td>
           </tr>
         </tbody>
       </table>
@@ -78,11 +91,15 @@
 <style lang="less" scoped>
 @import "../../../../styles/index";
 
+.icon-question {
+  .icon-hover();
+}
+
 table tr {
   .transition;
 
   td:first-child {
-    width: 300px;
+    width: 200px;
   }
 
   td:nth-child(5),
@@ -96,48 +113,33 @@ table tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
+}
+
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
 }
 
 .chatbot-custom-commands__command-actions__container {
   button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
 
-    &:last-child {
-      margin-bottom: 0;
+    &:first-child {
+      margin-bottom: 10px;
     }
-  }
 
-  .icon-more {
-    font-size: 15px;
   }
 }
 
 
 .night-theme {
-
-  tbody tr {
-    border: 2px solid transparent;
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
+  .icon-question {
+    .night-icon-hover();
+    padding-left: 3px;
   }
 
 }

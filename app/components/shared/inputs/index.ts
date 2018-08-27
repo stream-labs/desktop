@@ -36,13 +36,14 @@ export interface INumberMetadata extends IInputMetadata {
 
 export interface IListMetadata<TValueType> extends IInputMetadata {
   options: IListOption<TValueType>[];
+  allowEmpty?: boolean;
 }
 
 export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
   dateFormat?: string;
-  alpha?: boolean;
+  alphaNum?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -73,7 +74,7 @@ export const metadata = {
   list: (options: IListMetadata<string>) => ({ type: EInputType.list, ...options } as IListMetadata<string>),
   color: (options: IInputMetadata) => ({ type: EInputType.color, ...options } as IInputMetadata),
   slider: (options: ISliderMetadata) => ({ type: EInputType.slider, ...options } as ISliderMetadata),
-  textArea: (options: IInputMetadata) => ({ type: EInputType.textArea, ...options } as ITextMetadata),
+  textArea: (options: ITextMetadata) => ({ type: EInputType.textArea, ...options } as ITextMetadata),
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
@@ -87,7 +88,7 @@ const validationMessages = {
       min_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or larger`,
       max_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or less`,
       date_format: (fieldName: string, params: number[]) => `The date must be in ${ params[0] } format`,
-      alpha: () => $t('This field may only contain alphabetic characters')
+      alpha_num: () => $t('This field may only contain alphabetic characters or numbers')
     }
   }
 };

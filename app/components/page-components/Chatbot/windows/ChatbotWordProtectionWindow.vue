@@ -5,26 +5,22 @@
   :title="$t('Word Protection Preferences')"
 >
   <div slot="fixed">
-    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTab">
+    <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     </Tabs>
   </div>
   <div slot="content" class="chatbot-word-protection__container">
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general' && wordProtection">
-        <div>
-          <label for="excluded" class="margin-vertical--10"> {{ $t('Auto Permit') }} </label>
-          <ListInput
-            v-model="wordProtection.general.excluded.level"
-            :metadata="metadata.word.general.excluded.level"
-          />
-        </div>
-        <div>
-          <label for="message" class="margin-vertical--10"> {{ $t('Punishment Message') }} </label>
-          <TextAreaInput
-            v-model="wordProtection.general.message"
-            :metadata="metadata.word.general.message"
-          />
-        </div>
+        <VFormGroup
+          :title="$t('Auto Permit')"
+          v-model="wordProtection.general.excluded.level"
+          :metadata="metadata.word.general.excluded.level"
+        />
+        <VFormGroup
+          :title="$t('Punishment Message')"
+          v-model="wordProtection.general.message"
+          :metadata="metadata.word.general.message"
+        />
       </div>
       <div v-if="selectedTab === 'blacklist'">
         <ChatbotWordProtectionList
@@ -36,18 +32,18 @@
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
-      @click="onReset">
+      @click="onResetHandler">
       {{ $t('Reset') }}
     </button>
     <div>
       <button
         class="button button--default"
-        @click="onCancel">
+        @click="onCancelHandler">
         {{ $t('Cancel') }}
       </button>
       <button
         class="button button--action"
-        @click="onSave"
+        @click="onSaveHandler"
         :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}

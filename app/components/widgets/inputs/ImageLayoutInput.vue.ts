@@ -9,10 +9,10 @@ import ImagePickerInput from '../../shared/inputs/ImagePickerInput.vue';
 export default class ImageLayoutInput extends BaseInput<string, IListMetadata<string>> {
 
   @Prop()
-  value: string;
+  readonly value: string;
 
   @Prop()
-  metadata: IListMetadata<string>;
+  readonly metadata: IListMetadata<string>;
 
   layoutOptions = [
     { description: './media/images/layout-image-side.png', value: 'side' },

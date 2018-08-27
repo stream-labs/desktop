@@ -1,6 +1,6 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { ICustomCommand } from 'services/chatbot/chatbot-interfaces';
+import { ICustomCommand } from 'services/chatbot';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
 
@@ -40,15 +40,19 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
     this.chatbotApiService.fetchCustomCommands(page, query);
   }
 
-  openCommandWindow(command?: ICustomCommand) {
+  onOpenCommandWindowHandler(command?: ICustomCommand) {
     this.chatbotCommonService.openCustomCommandWindow(command);
   }
 
-  deleteCommand(command: ICustomCommand) {
+  onDeleteCommandHandler(command: ICustomCommand) {
     this.chatbotApiService.deleteCustomCommand(command.id);
   }
 
-  toggleEnableCommand(commandId: string, index: number, isEnabled: boolean) {
+  onToggleEnableCommandHandler(
+    commandId: string,
+    index: number,
+    isEnabled: boolean
+  ) {
     const commandToBeUpdated = this.commands[index];
 
     this.chatbotApiService.updateCustomCommand(commandId, {

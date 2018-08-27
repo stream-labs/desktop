@@ -81,7 +81,7 @@
   font-size: 11px;
   text-transform: uppercase;
   .letter-spacing();
-  .weight--medium();
+  .weight(@medium);
   margin-bottom: 5px;
 }
 
