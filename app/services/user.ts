@@ -192,6 +192,21 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
+  fetchAvailableFeatures() {
+    debugger;
+    const host = this.hostsService.streamlabs;
+    const url = `https://${host}/api/v5/slobs/available-features`;
+    const headers = authorizedHeaders(this.apiToken);
+    const request = new Request(url, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(response => {
+        debugger;
+      });
+  }
+
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/donation/settings`;
