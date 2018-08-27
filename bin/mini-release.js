@@ -346,7 +346,7 @@ async function runScript() {
 
     octokit.authenticate({
         type: 'token',
-        token: process.env.NAIR_GITHUB_TOKEN_INTERNAL
+        token: process.env.NAIR_GITHUB_TOKEN
     });
 
     info(`creating release ${newTag}...`);
