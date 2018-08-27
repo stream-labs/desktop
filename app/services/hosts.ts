@@ -8,8 +8,10 @@ export class HostsService extends Service {
 
   get streamlabs() {
     if (Util.useLocalHost()) {
+      alert('is local host!!!');
       return 'streamlabs.site';
     }
+    alert(':(');
     return 'streamlabs.com';
   }
 
