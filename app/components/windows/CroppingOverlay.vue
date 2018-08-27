@@ -30,7 +30,7 @@ body {
 }
 </style>
 
-<style lang="less">
+<style lang="less" scoped>
 .container {
   position: relative;
   margin: 0;
