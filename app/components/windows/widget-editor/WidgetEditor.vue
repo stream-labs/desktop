@@ -1,12 +1,13 @@
 <template>
 <modal-layout
-  title="windowTitle"
+  :title="windowTitle"
+  v-if="previewSource"
 >
   <div class="container" slot="content">
     <div class="top-settings"><button class="button button--action test-button">{{ $t('Test Widget') }}</button></div>
     <div class="tabs" />
     <div class="content-container">
-      <display class="display" :sourceId="previewSource.id" @click="createProjector"/>
+      <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
       <div class="sidebar">
         <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">\
           <span class="subsection__title">{{ slot.label }}</span>
