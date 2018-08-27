@@ -3,17 +3,20 @@
   v-if="wData"
   ref="layout"
   v-model="tabName"
-  :slots="[]"
+  :slots="[{ value: 'layout', label: 'Ad Layout' }]"
   :settings="[{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }]"
 >
+
+  <div slot="layout">
+    <v-form-group :title="$t('Placement')">
+      <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
+    </v-form-group>
+    <v-form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
+      <image-layout-input v-model="wData.settings.layout" />
+    </v-form-group>
+  </div>
   <!-- <div slot="settings" >
 
-    <form-group :title="$t('Placement')">
-      <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
-    </form-group>
-    <form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
-      <image-layout-input v-model="wData.settings.layout" />
-    </form-group>
 
     <form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
       <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">

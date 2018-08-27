@@ -9,9 +9,9 @@
     <div class="content-container">
       <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
       <div class="sidebar">
-        <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">\
+        <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
           <span class="subsection__title">{{ slot.label }}</span>
-          <slot :name="slot.value"></slot>
+          <div class="subsection__content"><slot :name="slot.value"></slot></div>
         </div>
         <div class="subsection">
           <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
