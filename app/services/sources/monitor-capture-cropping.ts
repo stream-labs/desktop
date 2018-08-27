@@ -72,12 +72,12 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     const sceneItem = new SceneItem(this.state.sceneId, this.state.sceneItemId, this.state.sourceId);
     const rect = new ScalableRectangle(sceneItem.getRectangle());
 
-    const screen = electron.remote.screen;
-    const globalMousePoint = screen.getCursorScreenPoint();
-    const nearestDisplay = screen.getDisplayNearestPoint(globalMousePoint);
-    const { width: displayWidth, height: displayHeight } = nearestDisplay.bounds;
-
-    const factor = this.windowsService.state.main.scaleFactor;
+    const source = sceneItem.getSource();
+    const targetDisplayId = source.getSettings().monitor;
+    const displays = electron.remote.screen.getAllDisplays();
+    const display = displays[targetDisplayId];
+    const { width: displayWidth, height: displayHeight } = display.bounds;
+    const factor = display.scaleFactor;
 
     rect.normalized(() => {
       rect.withAnchor(AnchorPoint.Center, () => {
