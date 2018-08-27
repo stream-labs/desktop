@@ -7,8 +7,8 @@
   @mouseup="handleMouseUp"
 >
   <div class="message">
-    キャプチャする領域をドラッグして指定してください<br />
-    Escキーでキャンセルします
+    {{ $t('sources.selectCroppingArea') }}<br />
+    {{ $t('sources.pressEscapeToCancel') }}
   </div>
   <div
     v-if="isCropping"
