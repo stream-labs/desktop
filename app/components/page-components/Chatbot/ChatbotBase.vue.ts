@@ -36,9 +36,10 @@ export default class ChatbotBase extends Vue {
   @Inject() customizationService: CustomizationService;
 
   mounted() {
-    // pre-load them to switch between 2 windows
+    // pre-load them to switch between multiple windows
     this.chatbotApiService.fetchDefaultCommands();
     this.chatbotApiService.fetchLinkProtection();
+    this.chatbotApiService.fetchQuotePreferences();
   }
 
   get nightMode() {

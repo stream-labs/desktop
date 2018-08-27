@@ -15,7 +15,7 @@
       </div>
       <div v-if="status === 'initial'">
         <div v-if="profiles.length > 1">
-          {{ $t('Select an OBS profile to import') }}
+          <span class="profile-select__title">{{ $t('Select an OBS profile to import') }}</span>
           <multiselect
             v-if="profiles.length > 1"
             v-model="selectedProfile"
@@ -40,9 +40,23 @@
 
 <script lang="ts" src="./ObsImport.vue.ts"></script>
 
+<style lang="less">
+@import '../../../styles/index';
+// 3rd Party Component
+.multiselect__content-wrapper {
+  left: -50%;
+  border-radius: 0 0 3px 3px;
+}
+</style>
+
 <style lang="less" scoped>
 label {
   text-align: left;
+}
+
+.profile-select__title {
+  display: block;
+  margin-bottom: 8px;
 }
 
 .importing-spinner {

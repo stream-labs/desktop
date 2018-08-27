@@ -23,7 +23,7 @@
 </modal-layout>
 </template>
 
-<script lang="ts" src="./NameSource.vue.ts"></script>
+<script lang="ts" src="./RenameSource.vue.ts"></script>
 
 <style lang="less" scoped>
 .NameSource-label {
