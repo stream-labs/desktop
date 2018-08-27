@@ -121,9 +121,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   refreshPreview() {
-    // little hack: update url property to trigger browser_source refreshing
-    const url = this.service.getWidgetUrl() + '&' + uuid();
-    this.source.updateSettings( { url });
+    this.source.refresh();
   }
 
   afterFetch() {
