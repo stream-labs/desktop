@@ -3,6 +3,8 @@ import { mutation } from 'services/stateful-service';
 import path from 'path';
 import fs from 'fs';
 import { Subject } from 'rxjs/Subject';
+import { WindowsService } from 'services/windows';
+import { Inject } from 'util/injector';
 
 /**
  * TODO
@@ -67,11 +69,30 @@ interface IPlatformAppServiceState {
 export class PlatformAppsService extends
   StatefulService<IPlatformAppServiceState> {
 
+  @Inject() windowsService: WindowsService;
+
   static initialState: IPlatformAppServiceState = {
     loadedApps: []
   };
 
+  appLoad = new Subject<ILoadedApp>();
   appReload = new Subject<string>();
+  appUnload = new Subject<string>();
+
+  // TODO: Gate this to a whitelist
+  devMode = true;
+
+  private localStorageKey = 'PlatformAppsUnpacked';
+
+  init() {
+    if (localStorage.getItem(this.localStorageKey)) {
+      const data = JSON.parse(localStorage.getItem(this.localStorageKey));
+
+      if (data.appPath && data.appToken) {
+        this.installUnpackedApp(data.appPath, data.appToken);
+      }
+    }
+  }
 
   /**
    * For now, there can only be 1 unpacked app at a time
@@ -81,10 +102,19 @@ export class PlatformAppsService extends
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
     this.ADD_APP({ manifest, unpacked: true, appPath, appToken });
+    localStorage.setItem(this.localStorageKey, JSON.stringify({
+      appPath, appToken
+    }));
+    this.appLoad.next(this.getApp(manifest.id));
   }
 
   unloadApps() {
-    this.REMOVE_APPS();
+    this.state.loadedApps.forEach(app => {
+      const appId = app.manifest.id;
+      this.REMOVE_APP(appId);
+      this.appUnload.next(appId);
+    });
+    localStorage.removeItem(this.localStorageKey);
   }
 
   async reloadApp(appId: string) {
@@ -148,6 +178,21 @@ export class PlatformAppsService extends
     return this.state.loadedApps.find(app => app.manifest.id === appId);
   }
 
+  popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
+    // TODO Disable original page?
+
+    // We use a generated window Id to prevent someobody popping out the
+    // same winow multiple times.
+    this.windowsService.createOneOffWindow({
+      componentName: 'PlatformAppPopOut',
+      queryParams: { appId, pageSlot },
+      size: {
+        width: 600,
+        height: 500
+      }
+    }, `${appId}-${pageSlot}`);
+  }
+
   /**
    * Replace for now
    * @param app the app
@@ -158,8 +203,8 @@ export class PlatformAppsService extends
   }
 
   @mutation()
-  private REMOVE_APPS() {
-    this.state.loadedApps = [];
+  private REMOVE_APP(appId: string) {
+    this.state.loadedApps = this.state.loadedApps.filter(app => app.manifest.id !== appId);
   }
 
   @mutation()

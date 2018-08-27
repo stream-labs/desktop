@@ -19,7 +19,7 @@ import {
 } from '../video-encoding-optimizations';
 import { ISettingsSubCategory, ISettingsServiceApi } from './settings-api';
 import { $t } from 'services/i18n';
-import electron from 'electron';
+import { PlatformAppsService } from 'services/platform-apps';
 
 export interface ISettingsState {
   General: {
@@ -72,12 +72,10 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   @Inject() private sourcesService: SourcesService;
-
   @Inject() private audioService: AudioService;
-
   @Inject() private windowsService: WindowsService;
-
   @Inject() private appService: AppService;
+  @Inject() private platformAppsService: PlatformAppsService;
 
   @Inject()
   private videoEncodingOptimizationService: VideoEncodingOptimizationService;
@@ -120,8 +118,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
-    // TODO: Add developer flag
-    if (Utils.isDevMode()) {
+    if (this.platformAppsService.devMode) {
       categories = categories.concat('Developer');
     }
 

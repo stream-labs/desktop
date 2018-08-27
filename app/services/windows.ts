@@ -23,6 +23,7 @@ import ManageSceneCollections from 'components/windows/ManageSceneCollections.vu
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
+import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -86,6 +87,7 @@ export function getComponents() {
     Projector,
     RecentEvents,
     MediaGallery,
+    PlatformAppPopOut,
 
     BitGoal,
     DonationGoal,

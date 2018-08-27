@@ -28,8 +28,16 @@ export default class PlatformAppProperties extends Vue {
     return this.managerSettings.appId;
   }
 
+  get app() {
+    return this.platformAppsService.getApp(this.appId);
+  }
+
   get appName() {
-    return this.platformAppsService.getApp(this.appId).manifest.name;
+    return this.app ? this.app.manifest.name : '';
+  }
+
+  get isDev() {
+    return this.platformAppsService.devMode;
   }
 
 }

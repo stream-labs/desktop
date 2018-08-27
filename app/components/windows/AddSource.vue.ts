@@ -9,6 +9,7 @@ import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { PlatformAppsService } from 'services/platform-apps';
 
 @Component({
   components: { ModalLayout, Selector, Display }
@@ -18,6 +19,7 @@ export default class AddSource extends Vue {
   @Inject() scenesService: IScenesServiceApi;
   @Inject() windowsService: WindowsService;
   @Inject() widgetsService: WidgetsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   name = '';
   error = '';
@@ -50,7 +52,12 @@ export default class AddSource extends Vue {
         WidgetDefinitions[this.widgetType].name
       );
     } else if (this.sourceAddOptions.propertiesManager === 'platformApp') {
-      this.name = 'TODO Default App Name';
+      const app = this.platformAppsService
+        .getApp(this.sourceAddOptions.propertiesManagerSettings.appId);
+      const sourceName = app.manifest.sources
+        .find(source => source.id === this.sourceAddOptions.propertiesManagerSettings.appSourceId).name;
+
+      this.name = this.sourcesService.suggestName(sourceName);
     } else {
       const sourceType =
         this.sourceType &&
