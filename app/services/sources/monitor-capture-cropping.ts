@@ -36,7 +36,7 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     return Boolean(this.state.sourceId);
   }
 
-  async startCropping(sceneId: string, sceneItemId: string, sourceId: string) {
+  startCropping(sceneId: string, sceneItemId: string, sourceId: string) {
     if (this.isCropping) return;
 
     this.START_CROPPING(sceneId, sceneItemId, sourceId);
