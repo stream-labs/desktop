@@ -16,7 +16,12 @@
         <div class="subsection">
           <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
           <ul style="margin: 0;">
-            <li class="subsection__content settings-title" v-for="setting in settings" :key="setting.value">{{ setting.label }}</li>
+            <li
+              class="subsection__content settings-title"
+              v-for="setting in settings"
+              :key="setting.value"
+              @input="value => $emit('input', value)"
+            >{{ setting.label }}</li>
           </ul>
         </div>
         <div class="subsection">
@@ -71,6 +76,20 @@
     width: 25%;
     height: 100%;
     font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .subsection {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    &:last-of-type {
+      flex-shrink: 1;
+    }
   }
 
   .subsection__title {
@@ -82,6 +101,8 @@
 
   .subsection__content {
     padding: 8px;
+    overflow: hidden;
+    overflow-y: auto;
   }
 
   .settings-title {

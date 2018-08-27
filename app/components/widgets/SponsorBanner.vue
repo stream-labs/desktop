@@ -6,7 +6,6 @@
   :slots="[{ value: 'layout', label: 'Ad Layout' }]"
   :settings="[{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }]"
 >
-
   <div slot="layout">
     <v-form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
@@ -15,20 +14,6 @@
       <image-layout-input v-model="wData.settings.layout" />
     </v-form-group>
   </div>
-  <!-- <div slot="settings" >
-
-
-    <form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
-      <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
-        <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
-        <button class="close-button" @click="removeImage(image.href, position)"><i class="icon-close" /></button>
-        <div>{{ $t('Image Duration') }}</div>
-        <div class="duration"><number-input v-model="image.duration" :metadata="{}" /></div>
-        <span>{{ $t('Seconds') }}</span>
-      </div>
-      <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
-    </form-group>
-  </div> -->
 
   <div slot="visual-properties">
     <v-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
@@ -55,6 +40,16 @@
     <v-form-group :title="$t('Background Color')">
       <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
+    </v-form-group>
+    <v-form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
+      <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
+        <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
+        <button class="close-button" @click="removeImage(image.href, position)"><i class="icon-close" /></button>
+        <div>{{ $t('Image Duration') }}</div>
+        <div class="duration"><number-input v-model="image.duration" :metadata="{}" /></div>
+        <span>{{ $t('Seconds') }}</span>
+      </div>
+      <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
     </v-form-group>
   </div>
 </widget-editor>
