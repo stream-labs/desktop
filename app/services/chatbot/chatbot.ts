@@ -104,8 +104,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
 
   logIn() {
-    debugger;
-    this.userService.fetchAvailableFeatures();
     return new Promise((resolve, reject) => {
       const url = this.apiEndpoint('login');
       const headers = authorizedHeaders(this.userService.apiToken);

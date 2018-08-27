@@ -193,8 +193,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   fetchAvailableFeatures() {
-    debugger;
-    const host = this.hostsService.streamlabs;
+    // const host = this.hostsService.streamlabs;
+    const host = 'streamlabs.site';
     const url = `https://${host}/api/v5/slobs/available-features`;
     const headers = authorizedHeaders(this.apiToken);
     const request = new Request(url, { headers });
