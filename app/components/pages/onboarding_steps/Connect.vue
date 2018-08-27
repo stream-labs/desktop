@@ -14,19 +14,19 @@
           class="button button--twitch"
           :disabled="loadingState"
           @click="authPlatform('twitch')">
-          <i class="fa" :class="iconForPlatform('twitch')" /> Twitch
+          <i :class="iconForPlatform('twitch')" /> Twitch
         </button>
         <button
           class="button button--yt"
           :disabled="loadingState"
           @click="authPlatform('youtube')">
-          <i class="fa" :class="iconForPlatform('youtube')" /> Youtube
+          <i :class="iconForPlatform('youtube')" /> Youtube
         </button>
         <button
           class="button button--mixer"
           :disabled="loadingState"
           @click="authPlatform('mixer')">
-          <i class="fa" :class="iconForPlatform('mixer')" /> Mixer
+          <i :class="iconForPlatform('mixer')" /> Mixer
         </button>
       </div>
       <div class="setup-later" v-if="!isSecurityUpgrade">
@@ -46,7 +46,8 @@
     align-items: center;
 
     button {
-      margin: 5px 0;
+      margin: 8px 0;
+      width: 100%;
     }
   }
 </style>

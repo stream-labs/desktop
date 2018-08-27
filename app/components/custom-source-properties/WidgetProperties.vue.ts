@@ -8,6 +8,7 @@ import { NavigationService } from 'services/navigation';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
+import { UserService } from 'services/user';
 
 @Component({
   components: {
@@ -19,8 +20,13 @@ export default class WidgetProperties extends Vue {
 
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
+  @Inject() userService: UserService;
 
   widgetModel: IObsListInput<string> = null;
+
+  get isLoggedIn() {
+    return this.userService.isLoggedIn();
+  }
 
   created() {
     this.refreshWidgetModel();
@@ -54,6 +60,11 @@ export default class WidgetProperties extends Vue {
     };
   }
 
+  login() {
+    this.windowsService.closeChildWindow();
+    this.userService.showLogin();
+  }
+
   navigateDashboard() {
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',
@@ -64,7 +75,7 @@ export default class WidgetProperties extends Vue {
       [WidgetType.DonationTicker]: 'donationticker',
       [WidgetType.ChatBox]: 'chatbox',
       [WidgetType.EventList]: 'eventlist',
-      [WidgetType.TheJar]: 'jar',
+      [WidgetType.TipJar]: 'jar',
       [WidgetType.ViewerCount]: 'viewercount',
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',

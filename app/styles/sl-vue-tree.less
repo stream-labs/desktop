@@ -1,0 +1,107 @@
+.sl-vue-tree-toggle {
+  width: 16px;
+  margin-right: 8px;
+  display: inline-block;
+
+  i {
+    font-size: 7px;
+    text-align: center;
+  }
+}
+
+.sl-vue-tree.sl-vue-tree-root {
+  background-color: @day-section!important;
+  border: 1px solid @day-section;
+  color: @day-paragraph!important;
+}
+
+.sl-vue-tree-selected>.sl-vue-tree-node-item {
+  background-color: @white!important;
+  color: @day-title!important;
+}
+
+.sl-vue-tree-root > .sl-vue-tree-nodes-list {
+  padding-bottom: 0;
+}
+
+.sl-vue-tree-node-item {
+  color: @day-paragraph!important;
+  border: 1px solid @day-section;
+  height: 32px;
+  margin-top: 0;
+
+  &:hover {
+    color: @day-paragraph;
+  }
+}
+
+.sl-vue-tree-cursor {
+  border: 0!important;
+  background-color: @day-input-border;
+  z-index: 10;
+}
+
+.sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+  border-color: @day-input-border;
+}
+
+// sl-vue-tree styles within a window
+.modal-layout {
+  .sl-vue-tree.sl-vue-tree-root {
+    background-color: transparent!important;
+    border: 0;
+  }
+
+  .sl-vue-tree-node-item {
+    border: 0;
+    padding: 0 0 0 24px;
+  }
+
+  .sl-vue-tree-selected>.sl-vue-tree-node-item {
+    background-color: transparent!important;
+  }
+}
+
+.night-theme {
+  .sl-vue-tree.sl-vue-tree-root {
+    background-color: @night-section!important;
+    border-color: @night-section!important;
+    color: @icon!important;
+  }
+
+  .sl-vue-tree-selected>.sl-vue-tree-node-item {
+    background-color: @night-hover!important;
+    color: @white!important;
+  }
+
+  .sl-vue-tree-node-item {
+    color: @night-paragraph!important;
+    border-color: @night-section;
+  }
+
+  .sl-vue-tree-toggle {
+    i {
+      color: @icon;
+    }
+  }
+
+  .sl-vue-tree-cursor {
+    border: 0!important;
+    background-color: @night-border;
+  }
+
+  .sl-vue-tree-node-item.sl-vue-tree-cursor-inside {
+    border-color: @night-border;
+  }
+
+  // sl-vue-tree styles within a window
+  &.modal-layout {
+    .sl-vue-tree.sl-vue-tree-root {
+      background-color: transparent!important;
+    }
+
+    .sl-vue-tree-selected>.sl-vue-tree-node-item {
+      background-color: transparent!important;
+    }
+  }
+}

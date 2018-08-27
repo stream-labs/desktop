@@ -5,9 +5,10 @@
     :options="{draggable: draggableSelector}"
     @change="handleChange">
     <li
+      v-for="(item, index) in normalizedItems"
+      :key="item.value"
       class="selector-item"
       :class="{ 'selector-item--active': activeItems.includes(item.value) }"
-      v-for="(item, index) in normalizedItems"
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
@@ -55,16 +56,14 @@
   padding: 4px 12px;
   cursor: pointer;
   justify-content: space-between;
-  border-top: 1px solid transparent;
-  border-bottom: 1px solid transparent;
-  color: @navy;
+  border: 1px solid @day-section;
+  color: @day-paragraph;
   .transition;
-  margin-top: -1px;
 
   &.selector-item--active {
     background-color: @white;
-    border-color: @day-border;
-    color: @navy-secondary;
+    border-color: @day-section;
+    color: @day-title;
 
     .selector-actions {
       opacity: 1;
@@ -96,21 +95,21 @@
 
 .selector-drag-handle {
   cursor: move;
-  .icon-hover;
+  .icon-hover();
 }
 
 .night-theme {
   .sortable-ghost,
   .sortable-chosen {
-    background: @night-accent-light;
+    background: @night-hover;
   }
 
   .selector-item {
     color: @grey;
+    border-color: @night-section;
 
     &.selector-item--active {
       background-color: @night-hover;
-      border-color: transparent;
       color: @white;
     }
   }

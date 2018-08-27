@@ -19,7 +19,7 @@ test('Changing transition options', async t => {
   await focusMain(t);
   await clickSceneTransitions(t);
   await focusChild(t);
-  await app.client.click('.fa-pencil');
+  await app.client.click('.icon-edit');
   await setFormDropdown(t, 'Type', transitionType);
   await setFormInput(t, 'Duration', transitionDuration);
   await dismissModal(t);
@@ -28,7 +28,7 @@ test('Changing transition options', async t => {
   await clickSceneTransitions(t);
   await focusChild(t);
 
-  await app.client.click('.fa-pencil');
+  await app.client.click('.icon-edit');
   const durationValue = await getFormInput(t,'Duration');
   t.true(durationValue == transitionDuration);
 

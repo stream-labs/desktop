@@ -27,6 +27,10 @@ export interface IMediaGalleryInfo extends IMediaGalleryLimits {
   totalUsage: number;
 }
 
+interface IMediaGalleryProps {
+  filter: 'audio' | 'image';
+}
+
 const fileTypeMap = {
   mp3: 'audio',
   wav: 'audio',
@@ -53,13 +57,6 @@ export class MediaGalleryService extends Service {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
   @Inject() private windowsService: WindowsService;
-
-  static initialState: IMediaGalleryInfo = {
-    files: [],
-    totalUsage: 0,
-    maxUsage: null,
-    maxFileSize: null
-  };
 
   private promises: Dictionary<{
     resolve: (value?: IMediaGalleryFile) => void;
@@ -90,12 +87,12 @@ export class MediaGalleryService extends Service {
     return { files, totalUsage, ...limits };
   }
 
-  async pickFile(): Promise<IMediaGalleryFile> {
+  async pickFile(props?: IMediaGalleryProps): Promise<IMediaGalleryFile> {
     const promiseId = uuid();
     const promise = new Promise<IMediaGalleryFile> ((resolve, reject) => {
       this.promises[promiseId] = { resolve, reject };
     });
-    this.showMediaGallery(promiseId);
+    this.showMediaGallery(promiseId, props);
     return promise;
   }
 
@@ -159,10 +156,11 @@ export class MediaGalleryService extends Service {
     return this.fetchGalleryInfo();
   }
 
-  private showMediaGallery(promiseId: string) {
+  private showMediaGallery(promiseId: string, props?: IMediaGalleryProps) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
-      queryParams: { promiseId },
+      preservePrevWindow: true,
+      queryParams: { promiseId, ...props },
       size: {
         width: 1100,
         height: 680

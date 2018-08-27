@@ -9,13 +9,14 @@
       {{ $t('You don\'t have any notifications') }}
     </h4>
 
-    <div v-for="(notificationsService, groupName) in notificationGroups">
+    <div v-for="(notificationsService, groupName) in notificationGroups" :key="groupName">
       <h4 v-if="notificationsService.length">
         {{ groupName == 'unread' ? $t('New Notifications') : $t('Log') }}
       </h4>
       <div
         class="notification"
         v-for="notify in notificationsService"
+        :key="notify.id"
         @click="onNotificationClickHandler(notify.id)"
         :class = "{
           'unread': notify.unread,
@@ -48,7 +49,7 @@
   display: grid;
   grid-template-columns: 30px 1fr 130px;
   background: @day-primary;
-  .border;
+  .border();
 
   &.has-action:hover {
     color: @navy;

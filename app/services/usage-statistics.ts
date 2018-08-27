@@ -11,7 +11,8 @@ export type TUsageEvent =
   'stream_start' |
   'stream_end' |
   'app_start' |
-  'app_close';
+  'app_close' |
+  'crash';
 
 interface IUsageApiData {
   installer_id?: string;

@@ -5,7 +5,7 @@
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
-  <span class="nav-item__name"><slot></slot></span>
+  <div class="nav-item__name"><slot></slot></div>
 </li>
 </template>
 
@@ -19,22 +19,21 @@
   list-style: none;
   border-left: 1px solid transparent;
   padding-left: 50px;
-  opacity: 0.7;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
   &.active {
     opacity: 1;
-    .semibold;
+    .weight--medium();
     border-color: @navy;
-    color: @navy;
+    color: @day-title;
 
     .fa,
     i {
-      color: @navy;
+      color: @day-title;
     }
   }
 
@@ -49,17 +48,19 @@
 
   .fa,
   i {
-    color: #999;
+    color: @icon;
     position: relative;
-    margin-right: -15px;
-    left: -25px;
+    margin-right: -16px;
+    left: -24px;
     width: 16px;
   }
 }
 
 .nav-item__name {
   overflow: hidden;
-  max-width: calc(~"100% - 20px");
+  // max-width: calc(~"100% - 20px");
+  width: 100%;
+  max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

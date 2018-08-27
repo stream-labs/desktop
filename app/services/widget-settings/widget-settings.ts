@@ -5,10 +5,11 @@ import {
   handleErrors,
   authorizedHeaders
 } from '../../util/requests';
-import { WidgetType } from 'services/widgets';
+import { WidgetsService, WidgetType } from 'services/widgets';
 import { Service } from 'services/service';
 import { Subject } from 'rxjs/Subject';
 import { IInputMetadata } from 'components/shared/inputs';
+import { Source, SourcesService } from 'services/sources';
 
 
 export interface IWidgetTab {
@@ -50,6 +51,11 @@ export const CODE_EDITOR_TABS: (Partial<IWidgetTab> & { name: string })[] = [
   { name: 'JS', showControls: false, autosave: false }
 ];
 
+export const CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS: (Partial<IWidgetTab> & { name: string })[] = [
+  ...CODE_EDITOR_TABS,
+  { name: 'customFields', title: 'Custom Fields', showControls: false, autosave: false }
+];
+
 /**
  * base class for widget settings
  * TODO: join this service with WidgetsService.ts after widgets rewrite
@@ -59,6 +65,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
 
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
+  @Inject() private widgetsService: WidgetsService;
+  @Inject() private sourcesService: SourcesService;
 
   dataUpdated = new Subject<TWidgetData>();
 
@@ -66,8 +74,11 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   abstract getDataUrl(): string;
   abstract getWidgetType(): WidgetType;
 
-
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
+
+  getWidgetUrl(): string {
+    return this.widgetsService.getWidgetUrl(this.getWidgetType());
+  }
 
   getTabs(): IWidgetTab[] {
     return this.tabs.map(tab => {
@@ -107,8 +118,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   protected handleDataAfterFetch(data: any): TWidgetData {
 
     // patch fetched data to have the same data format
-
     if (data.custom) data.custom_defaults = data.custom;
+
     data.type = this.getWidgetType();
 
 
@@ -184,50 +195,5 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   protected getApiToken(): string {
     return this.userService.apiToken;
   }
-
-  //
-  // // Get widget url's for the webview previews
-  // getWidgetUrl(widgetType: string) {
-  //   const host = this.hostsService.streamlabs;
-  //   const token = this.userService.widgetToken;
-  //
-  //   switch (widgetType) {
-  //     case 'AlertBox':
-  //       return `https://${host}/alert-box/v4?token=${token}`;
-  //
-  //     case 'BitGoal':
-  //       return `https://${host}/widgets/bit-goal?token=${token}`;
-  //
-  //     case 'ChatBox':
-  //       return `https://${host}/widgets/chat-box/v1?token=${token}`;
-  //
-  //     case 'DonationGoal':
-  //       return `https://${host}/widgets/donation-goal?token=${token}`;
-  //
-  //     case 'DonationTicker':
-  //       return `https://${host}/widgets/donation-ticker?token=${token}`;
-  //
-  //     case 'Credits':
-  //       return `https://${host}/widgets/end-credits?token=${token}`;
-  //
-  //     case 'EventList':
-  //       return `https://${host}/widgets/event-list/v1?token=${token}`;
-  //
-  //     case 'FollowerGoal':
-  //       return `https://${host}/widgets/follower-goal?token=${token}`;
-  //
-  //     case 'StreamBoss':
-  //       return `https://${host}/widgets/streamboss?token=${token}`;
-  //
-  //     case 'TheJar':
-  //       return `https://${host}/widgets/tip-jar/v1?token=${token}`;
-  //
-  //     case 'ViewerCount':
-  //       return `https://${host}/widgets/viewer-count?token=${token}`;
-  //
-  //     case 'Wheel':
-  //       return `https://${host}/widgets/wheel?token=${token}`;
-  //   }
-  // }
 
 }

@@ -1,8 +1,5 @@
 <template>
 <widget-window v-if="wData" v-model="tabName">
-
-  <div slot="description">{{ $t('Set a goal for your viewers to help you reach below.') }}</div>
-
   <!-- goal setup -->
   <div slot="goal" >
     <div v-if="hasGoal">
@@ -19,41 +16,11 @@
       <div class="section__body" v-if="loadingState !== 'pending'">
 
         <validated-form ref="form">
-          <div class="row">
-            <div class="col-xs-12">
-              <label>{{ $t("Title") }} *</label>
-              <text-input v-model="goalCreateOptions.title" :metadata="{required: true, max: 60}"/>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-12">
-              <label>{{ $t("Goal Amount") }} *</label>
-              <number-input v-model="goalCreateOptions.goal_amount" :metadata="{required: true, min: 1}"/>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-12">
-              <label>{{ $t("Starting Amount") }} *</label>
-              <number-input
-                  v-model="goalCreateOptions.manual_goal_amount"
-                  :metadata="{ required: true, min: 0, max: goalCreateOptions.goal_amount || undefined}"/>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-xs-12">
-              <label>{{ $t("End After") }} *</label>
-              <text-input
-                  v-model="goalCreateOptions.ends_at"
-                  :metadata="{ required: true, dateFormat: 'MM/DD/YYYY', placeholder:'MM/DD/YYYY'}"/>
-            </div>
-          </div>
-
-
+          <form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
+          <form-group v-model="goalCreateOptions.goal_amount" :metadata="metadata.goal_amount"/>
+          <form-group v-model="goalCreateOptions.manual_goal_amount" :metadata="metadata.manual_goal_amount"/>
+          <form-group v-model="goalCreateOptions.ends_at" :metadata="metadata.ends_at"/>
         </validated-form>
-
 
       </div>
       <div v-else class="loading-spinner">
@@ -73,7 +40,7 @@
       {{ $t('Start Goal') }}
     </button>
     <button
-        class="button button--warn"
+        class="button button--soft-warning"
         v-show="hasGoal"
         @click="reset()"
     >
@@ -94,7 +61,7 @@
         v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
     />
-    <form-group type="fontFamily" :value="wData.settings.font"/>
+    <form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
   </div>
 
 
@@ -108,6 +75,10 @@
 
   <div slot="JS" >
     <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
+
+  <div slot="customFields" >
+    <custom-fields-editor :value="wData"/>
   </div>
 
 

@@ -1,7 +1,7 @@
 <template>
 <div class="main" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}" id="mainWrapper" @drop="onDropHandler">
   <title-bar :title="title" />
-  <div class="main-spacer bgColor-teal"></div>
+  <div class="main-spacer"></div>
   <div class="main-contents">
     <live-dock v-if="isLoggedIn && leftDock && !isOnboarding" :onLeft="true" />
 
@@ -49,6 +49,8 @@
 
 .main-spacer {
   height: 4px;
+  flex: 0 0 4px;
+  .bg--teal();
 }
 
 .main-page-container {

@@ -5,9 +5,9 @@
     {{ title }}
   </div>
   <div class="titlebar-actions">
-    <i class="fa fa-window-minimize titlebar-action" @click="minimize" />
-    <i class="fa fa-window-maximize titlebar-action" @click="maximize" />
-    <i class="fa fa-window-close titlebar-action" @click="close" />
+    <i class="icon-subtract titlebar-action" @click="minimize" />
+    <i class="icon-system-expand titlebar-action" @click="maximize" />
+    <i class="icon-close titlebar-action" @click="close" />
   </div>
 </div>
 </template>
@@ -22,11 +22,12 @@
   flex-direction: row;
   align-items: center;
   height: 30px;
+  flex: 0 0 30px;
   border-bottom: 1px solid @day-border;
 }
 
 .titlebar-icon {
-  padding-left: 10px;
+  padding-left: 16px;
   width: 32px;
 }
 
@@ -42,18 +43,17 @@
 
 .titlebar-action {
   cursor: pointer;
-  opacity: 0.6;
-  font-size: 16px;
-  margin: 0 8px;
-
-  &:hover {
-    opacity: 1.0;
-  }
+  .icon-hover();
+  margin-right: 16px;
 }
 
 .night-theme {
   .titlebar {
     border-color: @night-border;
+  }
+
+  .titlebar-action {
+    .night-icon-hover();
   }
 }
 </style>

@@ -22,6 +22,7 @@ import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
+import { CrashReporterService } from 'services/crash-reporter';
 
 interface IAppState {
   loading: boolean;
@@ -61,6 +62,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private performanceMonitorService: PerformanceMonitorService;
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
+  @Inject() private crashReporterService: CrashReporterService;
 
   @track('app_start')
   load() {
@@ -70,6 +72,11 @@ export class AppService extends StatefulService<IAppState> {
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
     this.userService;
+
+    // Second, we want to start the crash reporter service.  We do this
+    // after the user service because we want crashes to be associated
+    // with a particular user if possible.
+    this.crashReporterService.beginStartup();
 
     this.sceneCollectionsService.initialize().then(() => {
       const onboarded = this.onboardingService.startOnboardingIfRequired();
@@ -95,6 +102,8 @@ export class AppService extends StatefulService<IAppState> {
       this.patchNotesService.showPatchNotesIfRequired(onboarded);
       this.outageNotificationsService;
 
+      this.crashReporterService.endStartup();
+
       this.FINISH_LOADING();
     });
   }
@@ -111,6 +120,8 @@ export class AppService extends StatefulService<IAppState> {
   private shutdownHandler() {
     this.START_LOADING();
 
+    this.crashReporterService.beginShutdown();
+
     this.ipcServerService.stopListening();
     this.tcpServerService.stopListening();
 
@@ -120,6 +131,7 @@ export class AppService extends StatefulService<IAppState> {
       this.transitionsService.shutdown();
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
+      this.crashReporterService.endShutdown();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

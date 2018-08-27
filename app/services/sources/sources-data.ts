@@ -70,7 +70,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
       $t('Capture cards (Elgato, Avermedia, BlackMagic)')
     ]
   },
-  ndi_input: {
+  ndi_source: {
     name: $t('NDI source'),
     description: $t('Allow you to capture NDI output streams.')
   },

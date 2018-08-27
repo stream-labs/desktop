@@ -8,6 +8,7 @@
         <select @change="setSimpleValue">
           <option
             v-for="(option, index) in simpleOptions"
+            :key="option.name"
             :value="index"
             :selected="selectedSimpleOptionIndex === index">
             {{ option.name }}

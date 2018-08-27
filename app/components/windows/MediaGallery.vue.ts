@@ -8,7 +8,6 @@ import {
   IMediaGalleryFile,
   IMediaGalleryInfo
 } from 'services/media-gallery';
-import windowMixin from '../mixins/window';
 import { $t } from 'services/i18n';
 import ModalLayout from '../ModalLayout.vue';
 
@@ -34,8 +33,7 @@ interface IToast {
 }
 
 @Component({
-  components: { ModalLayout },
-  mixins: [windowMixin]
+  components: { ModalLayout }
 })
 export default class MediaGallery extends Vue {
   @Inject() windowsService: WindowsService;
@@ -48,18 +46,25 @@ export default class MediaGallery extends Vue {
   galleryInfo: IMediaGalleryInfo = null;
   busy: IToast = null;
 
-  private promiseId = this.windowsService.getChildWindowQueryParams().promiseId;
   private typeMap = getTypeMap();
 
   async mounted() {
     this.galleryInfo = await this.mediaGalleryService.fetchGalleryInfo();
   }
 
+  get promiseId() {
+    return this.windowsService.state.child.queryParams.promiseId;
+  }
+
+  get filter() {
+    return this.windowsService.state.child.queryParams.filter;
+  }
+
   get files() {
     if (!this.galleryInfo) return [];
 
     return this.galleryInfo.files.filter(file => {
-      if (!this.category && file.isStock) return false;
+      if (this.category !== 'stock' && file.isStock) return false;
       if (this.type && file.type !== this.type) return false;
       return true;
     });
@@ -152,6 +157,13 @@ export default class MediaGallery extends Vue {
   }
 
   selectFile(file: IMediaGalleryFile, select: boolean) {
+    if (this.filter && file.type !== this.filter) {
+      return this.$toasted.show($t('Not a supported file type'), {
+        duration: 1000,
+        position: 'top-right',
+        className: 'toast-alert'
+      });
+    }
     this.selectedFile = file;
 
     if (file.type === 'audio') {

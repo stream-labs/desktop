@@ -36,10 +36,9 @@ export class CustomizationService
     enableBTTVEmotes: false,
     enableFFZEmotes: false,
     mediaBackupOptOut: false,
-    folderSelection: true,
+    folderSelection: false,
     experimental: {
       // put experimental features here
-      newWidgets: false
     }
   };
 
@@ -188,14 +187,6 @@ export class CustomizationService
 
   getExperimentalSettingsFormData(): TObsFormData {
     return [
-      <IObsInput<boolean>>  {
-        value: this.state.experimental.newWidgets,
-        name: 'newWidgets',
-        description: 'New Widgets',
-        type: 'OBS_PROPERTY_BOOL',
-        visible: true,
-        enabled: true,
-      }
     ];
   }
 

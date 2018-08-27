@@ -27,7 +27,6 @@
 @import "../../styles/index";
 
 .studio-page {
-  display: flex;
   flex-direction: column;
 }
 
@@ -64,9 +63,7 @@
 .no-preview {
   position: relative;
   flex-grow: 1;
-  background-color: @navy-secondary;
   display: flex;
-  align-items: center;
   justify-content: center;
 
   .message {

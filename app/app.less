@@ -1,7 +1,21 @@
 @import "./styles/index";
+@import "./styles/checkboxes";
+@import "./styles/tables";
+@import "./styles/buttons";
+@import "./styles/classes";
+@import "./styles/custom-icons";
+@import "./styles/inputs";
+@import "./styles/sl-vue-tree";
+@import "./styles/tooltips";
 
 body {
-  color: @navy;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 :not(input):not(textarea),
@@ -13,11 +27,7 @@ body {
 
 .main {
   background: @white;
-}
-
-a {
-  .transition;
-  text-decoration: underline;
+  color: @day-paragraph;
 }
 
 // Layout
@@ -30,59 +40,76 @@ a {
 }
 
 // Type
+h2 {
+  font-family: 'Roboto';
+  font-size: 16px;
+  .weight--medium();
+  text-transform: capitalize;
+  color: @day-title;
+  margin-bottom: 24px;
+}
+
 h3 {
   font-family: 'Roboto';
   font-size: 14px;
-  .semibold;
+  .weight--medium();
+  color: @day-title;
 }
 
 h4 {
   font-family: 'Roboto';
   text-transform: uppercase;
   font-size: 13px;
-  .letter-spacing;
-  .semibold;
+  .weight--medium();
   margin-bottom: 20px;
   color: @day-title;
 }
 
+label {
+  color: @day-paragraph;
+}
+
 .label--essential {
-  background: @purple;
+  background: @secondary;
   .radius;
-  .semibold;
-  text-transform: uppercase;
-  font-size: 9px;
-  color: white;
-  letter-spacing: .5px;
+  .weight--medium;
+  font-size: 12px;
+  color: @white;
   padding: 0px 4px;
   margin-left: 10px;
   line-height: 16px
 }
 
+a,
 .link {
-  .semibold;
-  color: @grey;
   .transition;
+  text-decoration: underline;
+  .weight--medium;
+  color: @day-link;
   text-decoration: none;
   display: flex;
   align-items: center;
 
   &:hover {
-    color: @navy;
+    color: @day-link-active;
+
+    .fa,
+    i {
+      color: @day-link-active;
+    }
   }
 
   .fa,
   i {
-    margin-right: 6px;
+    margin-right: 8px;
     font-size: 15px;
+    color: @icon;
   }
 }
 
-.link--underlined {
-  span {
-    text-decoration: underline;
-    font-weight: 400;
-  }
+.link--capitalize() {
+  .link();
+  text-transform: capitalize;
 }
 
 .link--pointer {
@@ -90,8 +117,9 @@ h4 {
 }
 
 .link--uppercase {
+  .link;
   text-transform: uppercase;
-  letter-spacing: .7px;
+  .letter-spacing;
   font-size: 12px;
 }
 
@@ -200,49 +228,47 @@ h4 {
   padding: 0px 12px;
   display: flex;
   z-index: 10;
-  .radius;
-  .border;
-  .shadow;
+  .radius();
+  .day-shadow();
 }
 
 .tabs {
   background: transparent;
   padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  border: 0;
 }
 
 .tab-button {
   border-bottom: 1px solid transparent;
   height: 54px;
   margin-right: 20px;
-  text-transform: uppercase;
-  font-size: 12px;
-  .semibold;
-  letter-spacing: .7px;
-  color: @grey;
-  .transition;
+  .link--capitalize();
+
+  &:focus {
+    outline: 0;
+  }
 
   .fa,
   i {
-    margin-right: 4px;
+    margin-right: 8px;
     font-size: 15px;
     vertical-align: middle;
+    color: @icon;
   }
 
-  &.active,
-  &:hover {
-    border-color: @navy;
-    color: @navy;
+  &.is-active,
+  &.active {
+    color: @day-link-active;
+    border-bottom-color: @dark-2;
 
     .fa,
     i {
-      color: @navy;
+      color: @day-link-active;
     }
   }
-}
-
-// TODO: eventuall use LESS variables from twitchalerts
-.bgColor-teal {
-  background-color: @teal;
 }
 
 // TODO: add "disable" and "enable" styles for form controls to styleguide
@@ -253,18 +279,12 @@ h4 {
     &.checkbox input:checked~label,
     &.checkbox input~label {
       &:before {
-        border-color: gray;
+        border-color: @day-input-border;
         background: transparent;
       }
 
-      &:after {color: gray}
+      &:after {color: @day-paragraph}
     }
-  }
-}
-
-.checkbox {
-  label {
-    text-transform: none;
   }
 }
 
@@ -272,45 +292,6 @@ h4 {
 select {
   .radius;
   height: 36px;
-}
-
-table {
-  tr {
-    td,
-    th {
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-  }
-}
-
-td,
-th {
-  padding-right: 20px;
-
-  .input-container {
-    width: 100%;
-    margin-bottom: 0;
-    display: block;
-  }
-
-  .input-label {
-    display: none;
-  }
-
-  .input-wrapper {
-    width: 100%;
-  }
-}
-
-th {
-  color: @grey;
-  text-transform: uppercase;
-  .semibold;
-  letter-spacing: 1.5px;
-  font-size: 11px;
-  padding-bottom: 10px;
 }
 
 // Scrolls
@@ -343,23 +324,43 @@ th {
   opacity: 0;
 }
 
+.fade-enter-active {
+  transition: all .4s ease;
+}
+
+.fade-leave-active {
+  transition: all .2s ease;
+}
+
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .v--modal-overlay {
   background: rgba(0, 0, 0, 0.3);
 }
 
 .v--modal {
-  background-color: @day-primary;
+  background-color: @day-bg;
 }
+
+
 
 // Night theme rules
 .night-theme {
   &.main {
-    background: @night-primary;
-    color: @night-text;
+    background: @night-bg;
+    color: @night-paragraph;
   }
 
   .v--modal {
-    background-color: @night-primary;
+    background-color: @night-bg;
+  }
+
+  .v--modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
   }
 
   a {
@@ -372,12 +373,20 @@ th {
     border: 1px solid transparent;
   }
 
+  h2 {
+    color: @night-title;
+  }
+
   h3 {
-    color: @grey;
+    color: @night-title;
   }
 
   h4 {
-    color: @white;
+    color: @night-title;
+  }
+
+  label {
+    color: @night-paragraph;
   }
 
   ::placeholder {
@@ -397,15 +406,29 @@ th {
     }
   }
 
+  a,
   .link {
-    &:hover {
-      color: @white;
+    color: @night-link;
+
+    &:hover,
+    &:focus,
+    &.active {
+      color: @night-link-active;
+
+      .fa,
+      i {
+        color: @night-link-active;
+      }
     }
   }
 
+  .tab-button {
+    color: @night-link;
+  }
+
   .slide-open__menu {
-    background-color: @night-secondary;
-    border-color: @night-secondary;
+    background-color: @night-section;
+    border-color: @night-section;
     .night-shadow;
   }
 
@@ -419,14 +442,15 @@ th {
   }
 
   .tab-button{
+    &.is-active,
     &.active,
     &:hover {
-      color: @white;
+      color: @night-link-active;
       border-bottom-color: @white;
 
       .fa,
       i {
-        color: @white;
+        color: @night-link-active;
       }
     }
   }

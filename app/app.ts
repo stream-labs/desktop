@@ -23,6 +23,7 @@ import Toasted from 'vue-toasted';
 import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
+import ChildWindow from 'components/windows/ChildWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 
@@ -135,31 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
       i18n,
       store,
       render: h => {
-        const componentName = windowsService.state[windowId].componentName;
+        if (windowId === 'child') return h(ChildWindow);
 
+        const componentName = windowsService.state[windowId].componentName;
         return h(windowsService.components[componentName]);
       }
     });
 
   });
-
-  // Used for replacing the contents of this window with
-  // a new top level component
-  ipcRenderer.on(
-    'window-setContents',
-    (event: Electron.Event, options: IWindowOptions) => {
-      windowsService.updateChildWindowOptions(options);
-
-      // This is purely for developer convencience.  Changing the URL
-      // to match the current contents, as well as pulling the options
-      // from the URL, allows child windows to be refreshed without
-      // losing their contents.
-      const newOptions: any = Object.assign({ windowId: 'child' }, options);
-      const newURL: string = URI(window.location.href)
-        .query(newOptions)
-        .toString();
-
-      window.history.replaceState({}, '', newURL);
-    }
-  );
 });

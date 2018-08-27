@@ -7,6 +7,10 @@
   justify-content: center;
 }
 
+.flex--wrap {
+  flex-wrap: wrap;
+}
+
 .flex--space-between {
   justify-content: space-between;
 }
@@ -34,83 +38,51 @@
   width: 100%;
 }
 
-// Margins
-.margin-bot--20 {
-  margin-bottom: 20px;
-}
-
 .margin-right--20 {
   margin-right: 20px;
 }
 
 .section {
-  padding: 20px 20px 0;
-  background: @day-primary;
-  border-bottom: 1px solid @day-border;
+  padding: 16px;
+  margin-bottom: 24px;
+  background: @day-section;
+  .radius();
 
   .button {
-    margin-bottom: 20px;
+    .margin-right--16();
   }
 }
 
 .section-title--dropdown {
-  h4 {
-    margin-bottom: 20px;
-    cursor: pointer;
-  }
+  cursor: pointer;
+  margin-bottom: 0;
 }
 
-.section-content--dropdown {
-  > div {
-    div {
-      &:last-child {
-        .input {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
+.section-title--opened {
+  margin-bottom: 24px;
 }
 
-.text--sm {
-  font-size: 11px;
+.section-title__icon {
+  background-color: @light-2;
+  color: @icon;
+  .radius();
+  .margin-right();
+  font-size: 10px;
+  padding: 4px;
+  vertical-align: text-bottom;
+}
+
+.section-content {
+  margin-bottom: -24px;
 }
 
 .noselect {
   user-select: none;
 }
 
-// Backgrounds
-.gradient--teal {
-  background: #31c3a2; /* Old browsers */
-  background: -moz-linear-gradient(-45deg, #31c3a2 1%, #20e5be 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(-45deg, #31c3a2 1%,#20e5be 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(135deg, #31c3a2 1%,#20e5be 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#31c3a2', endColorstr='#20e5be',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-}
-
-.night-theme {
-  .section {
-    background: @night-primary;
-    border-color: @night-border;
-  }
-}
-
-
 .input-error {
   color: @red;
 }
-
-
-// Tooltip for widgets
-.w-tooltip {
-  position: relative;
-  margin-left: 4px;
-  font-size: 24px;
-  align-self: center;
-  display: inline-block;
-}
-
 
 // Toasts
 .toast-alert {
@@ -124,4 +96,14 @@
 
 .toast-success {
   background-color: @teal !important;
+}
+
+.night-theme {
+  .section {
+    background: @night-section;
+  }
+
+  .section-title__icon {
+    background-color: @dark-3;
+  }
 }

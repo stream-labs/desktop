@@ -14,7 +14,7 @@ export enum EInputType {
   textArea = 'textArea',
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
-  code = 'code'
+  code = 'code',
 }
 
 /**
@@ -23,9 +23,9 @@ export enum EInputType {
 export interface IInputMetadata {
   required?: boolean;
   description?: string;
-  hint?: string;
   type?: EInputType;
   title?: string;
+  tooltip?: string;
 }
 
 export interface INumberMetadata extends IInputMetadata {
@@ -42,6 +42,7 @@ export interface ITextMetadata extends IInputMetadata {
   placeholder?: string;
   max?: number;
   dateFormat?: string;
+  alpha?: boolean;
 }
 
 export interface ISliderMetadata extends IInputMetadata {
@@ -58,6 +59,12 @@ export interface IListOption<TValue> {
   description?: string;
 }
 
+export interface IMediaGalleryMetadata extends IInputMetadata {
+  clearImage: string;
+  filter?: 'audio' | 'image';
+}
+
+
 // a helper for creating metadata
 export const metadata = {
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
@@ -69,7 +76,7 @@ export const metadata = {
   textArea: (options: IInputMetadata) => ({ type: EInputType.textArea, ...options } as ITextMetadata),
   fontSize: (options: IInputMetadata) => ({ type: EInputType.fontSize, ...options } as IInputMetadata),
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
-  code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata)
+  code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
 };
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html
@@ -79,7 +86,8 @@ const validationMessages = {
       required: () => $t('The field is required'),
       min_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or larger`,
       max_value: (fieldName: string, params: number[]) => `The field value must be ${ params[0] } or less`,
-      date_format: (fieldName: string, params: number[]) => `The date must be in ${ params[0] } format`
+      date_format: (fieldName: string, params: number[]) => `The date must be in ${ params[0] } format`,
+      alpha: () => $t('This field may only contain alphabetic characters')
     }
   }
 };

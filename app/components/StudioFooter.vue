@@ -47,10 +47,10 @@
   align-items: center;
   position: relative;
   padding: 10px 20px;
-  background-color: @day-secondary;
-  border-top: 1px solid @day-border;
+  background-color: @day-section;
   max-width: none;
   flex: 0 0 auto;
+  border-top: 1px solid transparent;
 }
 
 .nav-right {
@@ -111,7 +111,7 @@
   border-radius: 100%;
   opacity: .6;
   .transition;
-  .bold;
+  .weight--bold;
   border: 1px solid #c4c5c5;
   box-sizing: content-box;
   letter-spacing: .2px;
@@ -160,6 +160,10 @@
 
     &.active {
       border-color: @red;
+    }
+
+    &:focus {
+      outline: none;
     }
   }
 }

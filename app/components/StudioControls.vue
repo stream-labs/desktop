@@ -41,14 +41,14 @@
 
 .studio-controls__label {
   margin-bottom: 0;
-  .semibold;
+  .weight--medium();
   color: @day-title;
 }
 
 .studio-controls-selector {
   background: @day-secondary;
-  .border;
-  .radius;
+  .border();
+  .radius();
   flex-grow: 1;
   overflow-y: auto;
 }

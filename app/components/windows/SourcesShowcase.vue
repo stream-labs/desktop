@@ -87,7 +87,7 @@
 
     <div class="sources">
       <div class="source-group">
-        <h4>{{ $t('Standard') }}</h4>
+        <h2>{{ $t('Standard') }}</h2>
         <ul class="source-list">
           <li
             v-for="source in availableSources"
@@ -102,12 +102,12 @@
       </div>
 
       <div class="source-group" v-if="loggedIn">
-        <h4>{{ $t('Widgets') }}</h4>
+        <h2>{{ $t('Widgets') }}</h2>
         <div class="source-list">
           <div
             v-for="type in iterableWidgetTypes"
             :key="type"
-            v-show="!widgetData(type).platform || widgetData(type).platform === platform"
+            v-show="!widgetData(type).platforms || widgetData(type).platforms.has(platform)"
             class="source source--widget"
             :class="{'source--active': inspectedSource === widgetTypes[type]}"
             @click="inspectSource(widgetTypes[type])"
@@ -165,12 +165,11 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-h4 {
-  color: @grey;
+h2 {
+  .margin-bottom--16();
 }
 
 .add-source {
-  color: @navy;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -198,7 +197,6 @@ h4 {
 }
 
 .source-group {
-  border-right: 1px solid @day-border;
   margin: -20px 0px -20px 0px;
   padding: 20px 20px 20px 0;
   flex: 0 0 50%;
@@ -220,20 +218,18 @@ h4 {
 }
 
 .source {
-  color: @navy;
   cursor: pointer;
-  .transition;
-  border: 1px solid @day-border;
-  padding: 4px 10px;
-  margin-top: 10px;
+  .transition();
+  padding: 4px 8px;
+  margin-top: 8px;
+  background-color: @day-section;
   width: 49%;
 
   &:hover,
   &.source--active {
-    color: @navy-secondary;
-    .semibold;
-    border-color: @day-border;
-    background-color: @day-secondary;
+    color: @day-title;
+    .weight--medium();
+    background-color: @light-2;
   }
 
   >div {
@@ -252,8 +248,8 @@ h4 {
 .source--widget {
   display: flex;
   align-items: center;
-  .radius;
-  .transition;
+  .radius();
+  .transition();
 }
 
 .source-info__media {
@@ -273,7 +269,7 @@ h4 {
     width: auto;
     max-height: 150px;
     max-width: 100%;
-    .radius;
+    .radius();
   }
 }
 
@@ -291,25 +287,15 @@ h4 {
 }
 
 .night-theme {
-  .add-source {
-    color: @grey;
-  }
-
   .source {
-    color: @grey;
     background: @night-hover;
     border-color: @night-hover;
 
     &:hover,
     &.source--active {
-      color: @white;
-      border-color: @night-secondary;
+      color: @night-title;
       background: @night-secondary;
     }
-  }
-
-  .source-group {
-    border-color: @night-border;
   }
 
   .source__demo--day {
@@ -319,7 +305,6 @@ h4 {
   .source__demo--night {
     display: block;
   }
-
 }
 
 </style>

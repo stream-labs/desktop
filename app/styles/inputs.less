@@ -1,7 +1,8 @@
 .input-container {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative;
   display: flex;
+  align-items: flex-start;
 
   &.input-container--no-label {
     width: 100%;
@@ -22,7 +23,7 @@
 
 .input-label {
   width: 30%;
-  padding-right: 15px;
+  padding-right: 16px;
 }
 
 .input-wrapper {
@@ -40,7 +41,8 @@
 
   &:after {
     content: '\f002';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     .absolute(@top: 0, @right: 8px, @bottom: 0);
     line-height: 36px;
   }
@@ -54,10 +56,15 @@ input[type=text],
 input[type=number],
 input[type=password],
 textarea {
-  font-size: 13px;
   border: 1px solid @day-input-border;
   background: @day-input-bg;
   margin-bottom: 0;
+  font-size: 13px;
+  color: @day-paragraph;
+  .radius();
+  box-shadow: none;
+  height: 36px;
+  padding: 0 10px;
 
   &:focus {
     box-shadow: none;
@@ -75,32 +82,9 @@ textarea {
   }
 }
 
-.checkbox {
-  margin-bottom: 0;
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
-  }
-}
-
-.radio {
-  margin-bottom: 0;
-
-  label {
-    line-height: 20px;
-    cursor: pointer;
-
-    &:before {
-      background: transparent;
-      border-color: @day-input-border;
-    }
-  }
+textarea {
+  padding: 8px 10px;
+  line-height: 20px;
 }
 
 .multiselect {
@@ -118,7 +102,8 @@ textarea {
   position: relative;
 
   &:before {
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
     content: '\f078';
     border: none;
     font-size: 9px;
@@ -133,7 +118,7 @@ textarea {
   border: none;
   height: 0;
   min-height: 0;
-  .radius;
+  .radius();
 
   input[type="text"] {
     cursor: pointer;
@@ -182,6 +167,7 @@ textarea {
   .transition;
   display: block;
   cursor: pointer;
+  color: @day-paragraph;
 
   &:after {
     display: none;
@@ -190,7 +176,7 @@ textarea {
 
 .multiselect__option--highlight {
   background: @day-hover;
-  color: @navy;
+  color: @day-title;
 
   &:after {
     display: none;
@@ -237,9 +223,9 @@ textarea {
   input[type="password"],
   input[type="number"],
   textarea {
-    background: @night-secondary;
-    color: @white;
-    border-color: transparent;
+    background: @night-input-bg;
+    color: @night-paragraph;
+    border-color: @night-input-border;
 
     &.input--transparent {
       border-bottom: 1px dashed @grey;
@@ -247,23 +233,21 @@ textarea {
   }
 
   .multiselect__content {
-    background: @night-secondary;
-    border-color: @night-secondary;
+    background: @night-input-bg;
+    border-color: @night-input-border;
+    color: @white;
+  }
+
+  .multiselect__option {
+    color: @night-paragraph;
+  }
+
+  .multiselect__option--selected {
     color: @white;
   }
 
   .multiselect__option--highlight {
     background: @night-hover;
-    color: @white;
-  }
-
-  .input-wrapper--inverted {
-    input[type="text"] {
-      background: @night-bg;
-    }
-
-    .multiselect__content {
-      background: @night-bg;
-    }
+    color: @night-title;
   }
 }

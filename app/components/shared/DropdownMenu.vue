@@ -8,7 +8,7 @@
     </div>
 
     <button slot="reference" class="dropdown-menu__toggle">
-      {{ title }} <i :class="icon || 'icon-down'"/>
+      <span>{{ title }}</span> <i :class="icon || 'icon-down'"/>
     </button>
 
   </popper>
@@ -18,31 +18,45 @@
 
 <style lang="less">
 @import "../../styles/index";
-
 .dropdown-menu {
   top: 5px !important;
   background-color: @day-primary;
-  .border;
-  .radius;
+  .radius();
   padding: 10px;
   max-height: 166px;
   overflow-y: auto;
   z-index: 200000;
+  .day-shadow();
 }
 
 .dropdown-menu__toggle {
   display: flex;
   align-items: center;
-  text-transform: uppercase;
-  font-size: 13px;
-  .semibold;
+  text-transform: capitalize;
+  font-size: 16px;
+  .weight--medium();
   color: @day-title;
-  letter-spacing: .7px;
+
+  span {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .fa,
   i {
-    margin-left: 6px;
-    font-size: 6px;
+    margin-left: 8px;
+    font-size: 10px;
+    padding: 3px; // easier to click
+
+    &.icon-down {
+      font-size: 6px;
+    }
+  }
+
+  &:focus {
+    outline: 0;
   }
 }
 
@@ -56,6 +70,9 @@
 
 .dropdown-menu__item {
   white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
   color: @grey;
 
@@ -68,7 +85,7 @@
 .night-theme {
   .dropdown-menu {
     background-color: @night-primary;
-    border-color: @night-secondary;
+    .night-shadow();
   }
 
   .dropdown-menu__item {

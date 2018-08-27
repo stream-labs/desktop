@@ -8,7 +8,7 @@
     <div
       v-else>
       <a class="link link--uppercase" @click="login">
-        <i class="fa fa-sign-in"/> {{ $t('Login') }}
+        <i class="fas fa-sign-in-alt"/> {{ $t('Login') }}
       </a>
     </div>
   </div>
@@ -20,7 +20,7 @@
 @import "../styles/index";
 
 .user__name {
-  .semibold;
+  .weight--medium();
 
   @media(max-width: 1600px) {
     display: none;

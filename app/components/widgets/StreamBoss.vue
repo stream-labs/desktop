@@ -1,10 +1,5 @@
 <template>
   <widget-window v-if="wData" v-model="tabName">
-
-    <div slot="description">
-      {{ $t('Let your viewers seize the opportunity of becoming a boss in your channel by interacting with the stream. Works with tips, follows, subscriptions and cheers.') }}
-    </div>
-
     <!-- streamboss setup -->
     <div slot="goal" >
       <div v-if="hasGoal">
@@ -18,10 +13,10 @@
 
       <div v-if="!hasGoal">
 
-        <form ref="form" class="section__body" v-if="loadingState !== 'pending'">
+        <validated-form ref="form" class="section__body" v-if="loadingState !== 'pending'">
           <form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
-        </form>
+        </validated-form>
 
         <div v-else class="loading-spinner">
           <img src="../../../media/images/loader.svg" />

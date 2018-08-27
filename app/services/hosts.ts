@@ -42,4 +42,9 @@ export class HostsService extends Service {
     }
     return 'https://aws-io.streamlabs.com';
   }
+
+  get cdn() {
+    return 'cdn.streamlabs.com';
+  }
+
 }

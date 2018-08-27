@@ -65,30 +65,30 @@ export default class StartStreamingButton extends Vue {
 
   getStreamButtonLabel() {
     if (this.streamingStatus === EStreamingState.Live) {
-      return $t('END STREAM');
+      return $t('End Stream');
     }
 
     if (this.streamingStatus === EStreamingState.Starting) {
       if (this.streamingService.delayEnabled) {
-        return `STARTING ${this.streamingService.delaySecondsRemaining}s`;
+        return `Starting ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return $t('STARTING');
+      return $t('Starting');
     }
 
     if (this.streamingStatus === EStreamingState.Ending) {
       if (this.streamingService.delayEnabled) {
-        return `DISCARD ${this.streamingService.delaySecondsRemaining}s`;
+        return `Discard ${this.streamingService.delaySecondsRemaining}s`;
       }
 
-      return $t('ENDING');
+      return $t('Ending');
     }
 
     if (this.streamingStatus === EStreamingState.Reconnecting) {
-      return $t('RECONNECTING');
+      return $t('Reconnecting');
     }
 
-    return $t('GO LIVE');
+    return $t('Go Live');
   }
 
   getIsRedButton() {

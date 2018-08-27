@@ -14,6 +14,7 @@ import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { CustomizationService } from 'services/customization';
+import { UserService } from 'services/user';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
@@ -51,6 +52,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private scenesService: ScenesService;
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: WidgetsService;
+  @Inject() private userService: UserService;
   @Inject() private customizationService: CustomizationService;
 
   /**
@@ -373,43 +375,41 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   showSourceProperties(sourceId: string) {
-    this.windowsService.closeChildWindow();
+    const source = this.getSource(sourceId);
+    const isWidget = source.getPropertiesManagerType() === 'widget';
 
-    if (this.customizationService.getSettings().experimental.newWidgets) {
-      const source = this.getSource(sourceId);
-      const isWidget = source.getPropertiesManagerType() === 'widget';
+    // show a custom component for widgets below
+    const widgetsWhitelist = [
+      WidgetType.BitGoal,
+      WidgetType.DonationGoal,
+      WidgetType.FollowerGoal,
+      WidgetType.ChatBox,
+      WidgetType.ViewerCount,
+      WidgetType.DonationTicker,
+      WidgetType.Credits,
+      WidgetType.EventList,
+      WidgetType.StreamBoss,
+      WidgetType.TipJar,
+      WidgetType.SponsorBanner
+    ];
 
-      // show a custom component for widgets below
-      const widgetsWhitelist = [
-        WidgetType.BitGoal,
-        WidgetType.DonationGoal,
-        WidgetType.FollowerGoal,
-        WidgetType.ChatBox,
-        WidgetType.ViewerCount,
-        WidgetType.Credits,
-        WidgetType.EventList,
-        WidgetType.StreamBoss
-      ];
+    if (isWidget && this.userService.isLoggedIn()) {
+      const widgetType = source.getPropertiesManagerSettings().widgetType;
+      if (widgetsWhitelist.includes(widgetType)) {
+        const componentName = this.widgetsService.getWidgetComponent(widgetType);
 
-      if (isWidget) {
-        const widgetType = source.getPropertiesManagerSettings().widgetType;
-        if (widgetsWhitelist.includes(widgetType)) {
-          const componentName = this.widgetsService.getWidgetComponent(widgetType);
+        this.windowsService.showWindow({
+          componentName,
+          queryParams: { sourceId },
+          size: {
+            width: 600,
+            height: 800
+          }
+        });
 
-          this.windowsService.showWindow({
-            componentName,
-            queryParams: { sourceId },
-            size: {
-              width: 600,
-              height: 800
-            }
-          });
-
-          return;
-        }
+        return;
       }
     }
-
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
@@ -448,6 +448,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showNameSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager) {
     this.windowsService.showWindow({
       componentName: 'NameSource',
+      preservePrevWindow: true,
       queryParams: { sourceType, propertiesManager },
       size: {
         width: 400,

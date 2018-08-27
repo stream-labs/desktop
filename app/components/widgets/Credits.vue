@@ -1,10 +1,5 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
-
-  <div slot="description">
-    {{ $t('Set up a rolling credit to show all the supporters during the session.') }}
-  </div>
-
   <div slot="settings" >
     <form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <form-group :title="$t('Credit Title')" type="text" v-model="wData.settings.credit_title" />
@@ -15,7 +10,7 @@
       :metadata="{ tooltip: creditsSubtitleTooltip }"
     />
     <form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
-    <form-group type="fontFamily" :value="wData.settings.font"/>
+    <form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
     <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.font_size"/>
     <form-group type="color" :title="$t('Text Color')" v-model="wData.settings.font_color" :metadata="{ tooltip: textColorTooltip }"/>
 

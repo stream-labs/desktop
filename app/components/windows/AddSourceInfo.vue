@@ -80,8 +80,8 @@
 .source-support__label {
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: .7px;
-  .semibold;
+  .letter-spacing();
+  .weight--medium();
   margin-bottom: 5px;
 }
 

@@ -28,9 +28,9 @@ test('Streaming to Twitch', async t => {
   await app.client.click('button=Done');
 
   await focusMain(t);
-  await app.client.click('button=GO LIVE');
+  await app.client.click('button=Go Live');
 
   // TODO: Rewrite this test to use the logged in state and the live dock
-  await app.client.waitForExist('button=END STREAM', 10 * 1000);
+  await app.client.waitForExist('button=End Stream', 10 * 1000);
   t.pass();
 });

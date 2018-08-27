@@ -8,6 +8,9 @@
         :name="uuid"
         v-validate="validate"
     />
+    <div v-if="metadata && metadata.tooltip" class="w-tooltip">
+      <i class="icon-question icon-btn" v-tooltip="metadata.tooltip" />
+    </div>
     <span class="input-error" v-show="errors.first(uuid)">
       {{ errors.first(uuid) }}
     </span>
@@ -17,10 +20,14 @@
 <script lang="ts" src="./TextInput.vue.ts"></script>
 
 <style lang="less" scoped>
+  @import "../../../styles/index";
+
   .text-input {
     position: relative;
+    display: flex;
+
     .input-error {
-      position: absolute;
+      .absolute(100%);
       white-space: nowrap;
     }
   }

@@ -11,16 +11,16 @@
           <div class="dropzone" @click="openFilePicker">
             <i class="icon-cloud-backup"></i>{{ $t('Drag & Drop Upload') }}
           </div>
-          <ul v-for="(category, i) in [null, 'stock']" :key="i" class="nav-list">
+          <ul v-for="(category) in ['uploads', 'stock']" :key="category" class="nav-list">
             <div>
-              <div class="bold">{{ category ? $t('Stock Files') : $t('My Uploads') }}</div>
-              <li class="list__item semibold" @click="handleTypeFilter(null, category)">
+              <div class="bold">{{ category === 'stock' ? $t('Stock Files') : $t('My Uploads') }}</div>
+              <li class="list__item" @click="handleTypeFilter(null, category)">
                 <i class="fa fa-file"></i>{{ $t('All Files') }}
               </li>
-              <li class="list__item semibold" @click="handleTypeFilter('image', category)">
+              <li class="list__item" @click="handleTypeFilter('image', category)">
                 <i class="icon-image"></i>{{ $t('Images') }}
               </li>
-              <li class="list__item semibold" @click="handleTypeFilter('audio', category)">
+              <li class="list__item" @click="handleTypeFilter('audio', category)">
                 <i class="icon-music"></i>{{ $t('Sounds') }}
               </li>
             </div>
@@ -46,7 +46,7 @@
             <div v-if="dragOver" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" class="drag-overlay radius"></div>
             <div v-if="busy" class="busy-overlay"></div>
             <ul v-if="files.length" class="uploads-manager__list">
-              <li v-for="(file, i) in files" :key="i" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
+              <li v-for="file in files" :key="file.href" :class="[selectedFile && selectedFile.href === file.href ? 'selected' : '']" class="uploads-manager__item radius" @click.prevent="selectFile(file)" @dblclick.prevent="selectFile(file, true)">
                 <div>
                   <div v-if="file.type == 'image' && /\.webm$/.test(file.href)">
                     <video loop :src="file.href" style="height: 100%; width: 100%"></video>
@@ -137,6 +137,7 @@
 .list__item {
   padding: 3px 0;
   color: @white;
+  .weight--medium();
 
   i {
     color: @grey;
@@ -234,7 +235,7 @@
   width: 100%;
   height: 100%;
   border: 1px solid @night-secondary;
-  background: @shadow;
+  background: @day-shadow;
   z-index: 99999;
   border-radius: 3px;
 }

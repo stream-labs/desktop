@@ -1,7 +1,15 @@
-import { IWidgetTester, IWidget, IWidgetDisplayData } from './widgets-api';
+import { IWidgetTester, IWidget } from './widgets-api';
 import { AnchorPoint } from 'util/ScalableRectangle';
 import { $t } from 'services/i18n';
 
+export interface IWidgetDisplayData {
+  name: string;
+  description: string;
+  platforms?: Set<string>;
+  demoVideo: boolean;
+  demoFilename: string;
+  supportList: string[];
+}
 // Do not alter the order of this enum, it is coupled to the user's local config
 export enum WidgetType {
   AlertBox = 0,
@@ -12,11 +20,12 @@ export enum WidgetType {
   DonationTicker = 5,
   ChatBox = 6,
   EventList = 7,
-  TheJar = 8,
+  TipJar = 8,
   ViewerCount = 9,
   StreamBoss = 10,
   Credits = 11,
-  SpinWheel = 12
+  SpinWheel = 12,
+  SponsorBanner = 13
 }
 
 
@@ -214,7 +223,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.NorthEast
   },
 
-  [WidgetType.TheJar]: {
+  [WidgetType.TipJar]: {
     name: 'The Jar',
     url(host, token) {
       return `https://${host}/widgets/tip-jar/v1/${token}`;
@@ -274,6 +283,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     anchor: AnchorPoint.Center
   },
 
+  [WidgetType.SponsorBanner]: {
+    name: 'Sponsor Banner',
+    url(host, token) {
+      return `https://${host}/widgets/sponsor-banner?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest
+  },
+
   [WidgetType.SpinWheel]: {
     name: 'Spin Wheel',
     url(host, token) {
@@ -316,9 +340,9 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     description: $t('Set a goal for your viewers to help you reach.'),
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
+    platforms: new Set(['twitch', 'mixer']),
     supportList: [
       $t('Twitch Follows'),
-      $t('Youtube Follows'),
       $t('Mixer Follows')
     ]
   },
@@ -328,7 +352,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: false,
     demoFilename: 'source-follower-goal.png',
     supportList: [$t('Youtube Subscribers')],
-    platform: 'youtube'
+    platforms: new Set(['youtube'])
   },
   [WidgetType.BitGoal]: {
     name: $t('Bit Goal'),
@@ -336,7 +360,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: false,
     demoFilename: 'source-bit-goal.png',
     supportList: [$t('Twitch Bits')],
-    platform: 'twitch'
+    platforms: new Set(['twitch'])
   },
   [WidgetType.DonationTicker]: {
     name: $t('Donation Ticker'),
@@ -352,7 +376,8 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoFilename: 'source-chatbox.mp4',
     supportList: [
       $t('Twitch chat'),
-      $t('Youtube chat')
+      $t('Youtube chat'),
+      $t('Mixer chat')
     ]
   },
   [WidgetType.EventList]: {
@@ -369,7 +394,7 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
       $t('Redemptions')
     ]
   },
-  [WidgetType.TheJar]: {
+  [WidgetType.TipJar]: {
     name: $t('The Jar'),
     description: $t('The jar that catches bits, tips, and more.'),
     demoVideo: true,
@@ -407,6 +432,15 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
       $t('Cheers'),
       $t('Donations')
     ]
+  },
+  [WidgetType.SponsorBanner]: {
+    name: $t('Sponsor Banner'),
+    description: $t(
+      'Set up a sponsor banner to be able to edit (add, remove, update) rotating sponsor logos on streamer channel.'
+    ),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: [$t('The streamer manually adds images of sponsors.')]
   },
   [WidgetType.SpinWheel]: {
     name: $t('Spin Wheel'),

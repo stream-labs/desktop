@@ -34,6 +34,10 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('Studio');
   }
 
+  navigateChatBot() {
+    this.navigationService.navigate('Chatbot');
+  }
+
   navigateDashboard() {
     this.navigationService.navigate('Dashboard');
   }
@@ -48,6 +52,10 @@ export default class TopNav extends Vue {
 
   navigateOnboarding() {
     this.navigationService.navigate('Onboarding');
+  }
+
+  navigateDesignSystem() {
+    this.navigationService.navigate('DesignSystem');
   }
 
   studioMode() {

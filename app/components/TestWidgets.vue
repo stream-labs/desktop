@@ -1,7 +1,7 @@
 <template>
   <div class="slide-open">
     <a
-      class="slide-open__open link link--uppercase"
+      class="slide-open__open link"
       @click="slideOpen = !slideOpen">
       {{$t('Test Widgets') }}
     </a>

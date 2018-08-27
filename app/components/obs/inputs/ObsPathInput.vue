@@ -13,7 +13,7 @@
         @change="handleChange">
       <button
         @click="showFileDialog"
-        class="path__browse-button button button--dark">
+        class="path__browse-button button button--default">
         {{ $t('Browse') }}
       </button>
     </div>
