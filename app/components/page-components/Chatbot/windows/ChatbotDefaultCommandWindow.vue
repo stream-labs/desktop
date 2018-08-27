@@ -18,6 +18,13 @@
             <span> {{ $t('Link Protection Preferences') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
+          <div
+            @click="onToggleQuoteWindowHandler"
+            v-if="isQuoteCommand"
+          >
+            <span> {{ $t('Quote Preferences') }} </span>
+            <i class="icon-transition window-toggle__icon"></i>
+          </div>
         </div>
       </div>
     </div>

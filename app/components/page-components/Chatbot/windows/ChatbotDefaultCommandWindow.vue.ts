@@ -58,6 +58,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     );
   }
 
+  get isQuoteCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'quotes' &&
+      this.defaultCommandToUpdate.commandName === 'get'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotCommonService.state.defaultCommandToUpdate;
   }
