@@ -36,6 +36,12 @@
     "title": "Optimize simple settings",
     "description": "Optimize simple settings to deliver Nicolive."
   },
+  "nicoliveProgramSelector": {
+    "title": "Select a programs to start streaming on",
+    "description": "There is more than one candidate program.<br/>Select one of the programs to start streaming on.",
+    "cancel": "Cancel",
+    "done": "Select a program"
+  },
   "FPS": "FPS",
   "optimizeAndGoLive": "Optimize & Go Live",
   "skipOptimization": "Skip Optimization",

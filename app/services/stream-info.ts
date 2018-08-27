@@ -1,5 +1,5 @@
 import { StatefulService, mutation } from 'services/stateful-service';
-import { IChannelInfo, getPlatformService } from 'services/platforms';
+import { getPlatformService } from 'services/platforms';
 import { UserService } from './user';
 import { Inject } from 'util/injector';
 import { StreamingService } from '../services/streaming';
