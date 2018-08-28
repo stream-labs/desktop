@@ -17,4 +17,3 @@ electron.VC.db
 .vs/
 plugins/
 yarn-error.log
-rootCA.key
