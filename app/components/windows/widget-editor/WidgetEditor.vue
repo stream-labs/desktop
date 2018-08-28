@@ -5,7 +5,7 @@
 >
   <div class="container" slot="content">
     <div class="top-settings"><button class="button button--action test-button">{{ $t('Test Widget') }}</button></div>
-    <div class="tabs" />
+    <tabs :showContent="false" className="widget-editor__top-tabs" :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]" />
     <div class="content-container">
       <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
       <div class="sidebar">
@@ -38,6 +38,28 @@
 
 <script lang="ts" src="./WidgetEditor.vue.ts"></script>
 
+<style lang="less">
+  @import "../../../styles/index";
+
+  .widget-editor__top-tabs {
+    height: 36px !important;
+    width: 100%;
+
+    .tab-button {
+      height: 36px;
+      position: relative;
+      bottom: -1px;
+    }
+  }
+
+  .night-theme {
+    .widget-editor__top-tabs {
+      background-color: @night-section !important;
+      border-bottom: 1px solid #274959 !important;
+    }
+  }
+</style>
+
 <style lang="less" scoped>
   @import "../../../styles/index";
 
@@ -53,11 +75,6 @@
 
   .test-button {
     margin-left: auto;
-  }
-
-  .tabs {
-    height: 36px;
-    width: 100%;
   }
 
   .content-container {
@@ -116,10 +133,6 @@
   }
 
   .night-theme {
-    .tabs {
-      background-color: @night-section;
-      border-bottom: 1px solid #274959;
-    }
     .sidebar {
       background-color: @night-section;
       border-left: 1px solid #274959;
