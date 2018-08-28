@@ -724,7 +724,7 @@
           <table>
             <thead>
               <tr>
-                <th>Class Name</th>
+                <th>Mixin name</th>
                 <th>Attributes</th>
                 <th>Default (Base)</th>
                 <th>Description</th>
@@ -741,7 +741,7 @@
                 <td class="design-system__code">.margin()</td>
                 <td>1, 2, 3, 4</td>
                 <td>1 (8px)</td>
-                <td>Add right margin to any element. 2 = 16px, 3 = 24px, etc</td>
+                <td>Add margin to any element. 2 = 16px, 3 = 24px, etc</td>
               </tr>
               <tr>
                 <td class="design-system__code">.margin-top()</td>
