@@ -45,7 +45,7 @@ export class IncrementalRolloutService extends PersistentStatefulService<IIncrem
   fetchAvailableFeatures() {
     if (this.userService.isLoggedIn()) {
       const host = this.hostsService.streamlabs;
-      const url = `http://${host}/api/v5/slobs/available-features`;
+      const url = `https://${host}/api/v5/slobs/available-features`;
       const headers = authorizedHeaders(this.userService.apiToken);
       const request = new Request(url, { headers });
 
