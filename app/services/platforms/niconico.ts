@@ -234,10 +234,10 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
             height: 400
           }
         });
-        return { asking: true, url: '', key: '', bitrate: undefined }; // ダイアログでたから無視してね
+        return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
       }
       if (num < 1) {
-        return { asking: false, url: '', key: '', bitrate: undefined }; // 番組がない
+        return NiconicoService.emptyStreamingSetting(false); // 番組がない
       }
       const id = Object.keys(info)[0];
       const selected = info[id];
@@ -265,8 +265,18 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
       });
       this.settingsService.setSettings('Stream', settings);
 
-      return { asking: false, url, key, bitrate }; // 有効な番組が選択されているので stream keyを返す
+      // 有効な番組が選択されているので stream keyを返す
+      return NiconicoService.createStreamingSetting(false, url, key, bitrate);
     });
+  }
+
+  private static emptyStreamingSetting(asking: boolean): IStreamingSetting {
+    return NiconicoService.createStreamingSetting(asking, '', '');
+  }
+
+  private static createStreamingSetting(asking: boolean, url: string, key: string, bitrate?: number)
+    : IStreamingSetting {
+    return { asking, url, key, bitrate };
   }
 
   // TODO ニコニコOAuthのtoken更新に使う
