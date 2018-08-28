@@ -40,6 +40,7 @@ export default class WidgetWindow extends Vue {
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
   widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
+  currentTopTab = 'editor';
   properties: TObsFormData = [];
   tabs: IWidgetTab[] = [];
   tabsList: { name: string, value: string}[] = [];
@@ -81,6 +82,10 @@ export default class WidgetWindow extends Vue {
 
   createProjector() {
     this.projectorService.createProjector(this.previewSource.sourceId);
+  }
+
+  updateTopTab(value: string) {
+    this.currentTopTab = value;
   }
 
   private onSourceUpdatedHandler(sourceModel: ISource) {

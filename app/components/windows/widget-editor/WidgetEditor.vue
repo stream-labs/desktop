@@ -5,7 +5,13 @@
 >
   <div class="container" slot="content">
     <div class="top-settings"><button class="button button--action test-button">{{ $t('Test Widget') }}</button></div>
-    <tabs :showContent="false" className="widget-editor__top-tabs" :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]" />
+    <tabs
+      :showContent="false"
+      className="widget-editor__top-tabs"
+      :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]"
+      @input="value => updateTopTab(value)"
+      :value="currentTopTab"
+    />
     <div class="content-container">
       <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
       <div class="sidebar">
