@@ -1,0 +1,13 @@
+{
+    "disable": "Disable",
+    "discard": "Discard",
+    "retro": "Retro",
+    "blend": "Blend",
+    "blend2x": "Blend 2x",
+    "linear": "Linear",
+    "linear2x": "Linear 2x",
+    "yadif": "Yadif",
+    "yadif2x": "Yadif 2x",
+    "top_field_first": "Top field first",
+    "bottom_field_first": "Bottom field first"
+}

@@ -15,6 +15,7 @@ import { TFormData } from 'components/shared/forms/Input';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
+import { EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 
 
 @ServiceHelper()
@@ -24,6 +25,7 @@ export class Source implements ISourceApi {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
@@ -51,6 +53,22 @@ export class Source implements ISourceApi {
 
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
+  }
+
+  get deinterlaceMode(): EDeinterlaceMode {
+    return this.getObsInput().deinterlaceMode;
+  }
+
+  set deinterlaceMode(val: EDeinterlaceMode) {
+    this.getObsInput().deinterlaceMode = val;
+  }
+
+  get deinterlaceFieldOrder(): EDeinterlaceFieldOrder {
+    return this.getObsInput().deinterlaceFieldOrder;
+  }
+
+  set deinterlaceFieldOrder(val: EDeinterlaceFieldOrder) {
+    this.getObsInput().deinterlaceFieldOrder = val;
   }
 
   /**

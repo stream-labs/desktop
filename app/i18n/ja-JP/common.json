@@ -26,6 +26,7 @@
   "duplicate": "複製",
   "rename": "名前の変更",
   "remove": "削除",
+  "deinterlacing": "インターレース解除",
   "filters": "フィルター",
   "cpu": "CPU使用率",
   "droppedFrames": "ドロップしたフレーム",
