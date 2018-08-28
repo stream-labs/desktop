@@ -10,6 +10,7 @@ import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
+import CustomFieldsEditor from './CustomFieldsEditor.vue';
 
 import { $t } from 'services/i18n';
 
@@ -18,6 +19,7 @@ import { $t } from 'services/i18n';
     WidgetEditor,
     VFormGroup,
     CodeEditor,
+    CustomFieldsEditor,
     ...inputComponents
   }
 })

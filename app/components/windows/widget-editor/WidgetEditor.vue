@@ -14,6 +14,7 @@
     />
     <div class="content-container" ref="content">
       <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
+
       <div class="sidebar" ref="sidebar">
         <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
           <span class="subsection__title">{{ slot.label }}</span>
@@ -37,11 +38,12 @@
           </div>
         </div>
       </div>
+
       <div class="code-editor hidden" ref="code">
         <tabs
           :showContent="false"
           className="widget-editor__top-tabs"
-          :tabs="[{ value: 'HTML', name: $t('HTML') }, { value: 'CSS', name: $t('CSS') }, { value: 'JS', name: $t('JS') }]"
+          :tabs="[{ value: 'HTML', name: $t('HTML') }, { value: 'CSS', name: $t('CSS') }, { value: 'JS', name: $t('JS') }, { value: 'customFields', name: $t('Custom Fields') }]"
           @input="value => updateCodeTab(value)"
           :value="currentCodeTab"
         />

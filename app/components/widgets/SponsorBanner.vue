@@ -67,6 +67,10 @@
   <div slot="JS" >
     <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
   </div>
+
+  <div slot="customFields" >
+    <custom-fields-editor :value="wData"/>
+  </div>
 </widget-editor>
 </template>
 
