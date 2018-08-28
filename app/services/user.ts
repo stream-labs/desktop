@@ -333,7 +333,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   isNiconicoLoggedIn() {
-    return this.isLoggedIn() && this.platform.type === 'niconico';
+    return this.isLoggedIn() && this.platform && this.platform.type === 'niconico';
   }
 }
 
