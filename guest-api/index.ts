@@ -47,11 +47,19 @@ import {
     }
   );
 
-  global['streamlabsOBS'] = new Proxy(
-    {},
-    {
-      get(target, key) {
-        return (...args: any[]) => {
+  /**
+   * Returns a proxy rooted at the given path
+   * @param path the current path
+   */
+  function getProxy(path: string[] = []): any {
+    return new Proxy(
+      () => {},
+      {
+        get(target, key) {
+          return getProxy(path.concat([key.toString()]));
+        },
+
+        apply(target, thisArg, args: any[]) {
           const requestId = getUniqueId();
           requests[requestId] = {
             resolve: null,
@@ -79,15 +87,17 @@ import {
 
           const apiRequest: IGuestApiRequest = {
             id: requestId,
-            method: key.toString(),
+            methodPath: path,
             args: mappedArgs
           };
 
           electron.ipcRenderer.sendToHost('guestApiRequest', apiRequest);
 
           return promise;
-        };
+        }
       }
-    }
-  );
+    );
+  }
+
+  global['streamlabsOBS'] = getProxy();
 })();

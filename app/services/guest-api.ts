@@ -5,7 +5,7 @@ import { Service } from 'services/service';
  */
 export interface IGuestApiRequest {
   id: string;
-  method: string;
+  methodPath: string[];
   args: any[];
 }
 
@@ -21,11 +21,13 @@ export interface IGuestApiCallback {
   args: any[];
 }
 
+type RequestHandlerMethod = (...args: any[]) => Promise<any>;
+
 /**
  * A dictionary of functions to expose to the guest content
  */
 export interface IRequestHandler {
-  [key: string]: (...args: any[]) => Promise<any>;
+  [key: string]: RequestHandlerMethod | IRequestHandler;
 }
 
 /**
@@ -61,7 +63,15 @@ export class GuestApiService extends Service {
           return arg;
         });
 
-        requestHandler[apiRequest.method](...mappedArgs)
+        const method = this.getMethodFromPath(requestHandler, apiRequest.methodPath);
+
+        if (!method) {
+          // Handle invalid path
+          console.warn('Got invalid path from webview: ', apiRequest.methodPath);
+          return;
+        }
+
+        method(...mappedArgs)
           .then(result => {
             const response: IGuestApiResponse = {
               id: apiRequest.id,
@@ -82,5 +92,16 @@ export class GuestApiService extends Service {
           });
       }
     });
+  }
+
+  private getMethodFromPath(handler: IRequestHandler | RequestHandlerMethod, path: string[]): RequestHandlerMethod {
+    if (!handler) return;
+
+    if (path.length === 0) {
+      if (handler instanceof Function) return handler;
+      return;
+    }
+
+    return this.getMethodFromPath(handler[path[0]], path.slice(1));
   }
 }
