@@ -27,7 +27,7 @@
   .button--lg {
     width: 300px;
     padding: 0 0;
-    margin-top: 16px;
+    .margin-top(2);
   }
 }
 
@@ -68,7 +68,7 @@
 .onboarding-title {
   color: @white;
   font-size: 22px;
-  margin-bottom: 20px;
+  .margin-bottom(3);
 }
 
 .onboarding-title--sm {
@@ -79,13 +79,17 @@
 
 .onboarding-desc {
   color: @light-3;
-  margin-bottom: 20px;
-  padding: 0 20px;
+  .margin-bottom(3);
+  padding: 0 16px;
 }
 
 .setup-later {
-  margin-top: 20px;
-  color: @light-3;
+  .margin-top(3);
+  color: @night-paragraph;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   span {
     display: block;
@@ -95,6 +99,7 @@
   a {
     text-decoration: underline;
     .transition();
+    color: @night-paragraph;
 
     &:hover {
       color: @white;
@@ -106,11 +111,11 @@
   width: 100%;
   padding: 30px;
   color: @white;
-  background-color: @night-primary;
-  margin-bottom: 20px;
+  background-color: @night-section;
+  .margin-bottom(2);
   height: 270px;
   position: relative;
-  .radius;
+  .radius();
 
   &.optimizing {
     .running-setup-row {
@@ -144,7 +149,7 @@
 }
 
 .running-setup-row--complete {
-  color: @primary;
+  color: @night-paragraph;
 }
 
 .running-setup-percent {
