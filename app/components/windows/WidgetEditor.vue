@@ -125,7 +125,7 @@
   }
 
   .sidebar {
-    width: 25%;
+    width: 35%;
     height: 100%;
     font-size: 12px;
     display: flex;
