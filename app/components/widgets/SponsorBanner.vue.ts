@@ -4,7 +4,7 @@ import {
   ISponsorBannerData
 } from 'services/widget-settings/sponsor-banner';
 
-import WidgetEditor from 'components/windows/widget-editor/WidgetEditor.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';

@@ -2,7 +2,7 @@
 <widget-editor
   v-if="wData"
   ref="layout"
-  v-model="tabName"
+  v-model="wData.settings.custom_enabled"
   :slots="[{ value: 'layout', label: $t('Ad Layout') }]"
   :settings="settings"
 >

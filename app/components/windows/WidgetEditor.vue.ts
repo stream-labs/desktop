@@ -16,11 +16,13 @@ import uuid from 'uuid';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
 import Display from 'components/shared/Display.vue';
+import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 
 @Component({
   components: {
     ModalLayout,
     Tabs,
+    ToggleInput,
     Display
   }
 })
@@ -32,7 +34,7 @@ export default class WidgetWindow extends Vue {
 
   @Prop() slots: any[];
   @Prop() settings: any[];
-  @Prop() value: string;
+  @Prop() value: boolean;
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
   canRender = false; // prevents window flickering
@@ -43,6 +45,7 @@ export default class WidgetWindow extends Vue {
   previewSource: ISourceApi = null;
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
+  currentSetting = '';
   properties: TObsFormData = [];
   tabs: IWidgetTab[] = [];
   tabsList: { name: string, value: string}[] = [];
@@ -106,6 +109,14 @@ export default class WidgetWindow extends Vue {
 
   updateCodeTab(value: string) {
     this.currentCodeTab = value;
+  }
+
+  updateCurrentSetting(value: string) {
+    this.currentSetting = value;
+  }
+
+  updateValue(value: boolean) {
+    this.$emit('input', value);
   }
 
   private onSourceUpdatedHandler(sourceModel: ISource) {
