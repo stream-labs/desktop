@@ -34,6 +34,7 @@ export default class WidgetWindow extends Vue {
   @Prop() settings: any[];
   @Prop() value: string;
 
+  $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
   canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
@@ -85,6 +86,20 @@ export default class WidgetWindow extends Vue {
   }
 
   updateTopTab(value: string) {
+    // We do animations in JS here because flex-direction is not an animate-able attribute
+    if (value === 'code') {
+      this.$refs.sidebar.classList.toggle('hidden');
+      setTimeout( () => {
+        this.$refs.content.classList.toggle('vertical');
+        this.$refs.code.classList.toggle('hidden');
+      }, 300);
+    } else if (this.$refs.content.classList.contains('vertical')) {
+      this.$refs.code.classList.toggle('hidden');
+      setTimeout( () => {
+        this.$refs.content.classList.toggle('vertical');
+        this.$refs.sidebar.classList.toggle('hidden');
+      }, 300);
+    }
     this.currentTopTab = value;
   }
 
