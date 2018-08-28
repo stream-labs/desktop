@@ -12,7 +12,7 @@ export interface IPlatformAppManagerSettings {
 export class PlatformAppManager extends PropertiesManager {
   @Inject() platformAppsService: PlatformAppsService;
 
-  blacklist = ['is_local_file'];
+  blacklist = ['url', 'is_local_file'];
 
   customUIComponent = 'PlatformAppProperties';
 

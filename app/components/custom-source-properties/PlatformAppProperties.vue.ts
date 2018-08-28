@@ -6,6 +6,7 @@ import { PlatformAppsService } from 'services/platform-apps';
 import { Inject } from 'util/injector';
 import { IPlatformAppManagerSettings } from 'services/sources/properties-managers/platform-app-manager';
 import { WindowsService } from 'services/windows';
+import electron from 'electron';
 
 @Component({})
 export default class PlatformAppProperties extends Vue {
@@ -36,8 +37,16 @@ export default class PlatformAppProperties extends Vue {
     return this.app ? this.app.manifest.name : '';
   }
 
-  get isDev() {
-    return this.platformAppsService.devMode;
+  copyUrl() {
+    electron.clipboard.writeText(this.browserUrl);
+  }
+
+  get browserUrl() {
+    return this.source.getSettings().url;
+  }
+
+  get isUnpacked() {
+    return this.app.unpacked;
   }
 
 }
