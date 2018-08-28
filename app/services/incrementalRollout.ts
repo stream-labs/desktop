@@ -28,7 +28,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
   }
 
   get availableFeatures() {
-    return this.state.availableFeatures;
+    return this.state.availableFeatures || [];
   }
 
 
@@ -43,7 +43,7 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
         .then(handleErrors)
         .then(response => response.json())
         .then(response => {
-          this.SET_AVAILABLE_FEATURES(response);
+          this.SET_AVAILABLE_FEATURES(response.features);
         });
     }
   }
