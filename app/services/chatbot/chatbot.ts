@@ -102,7 +102,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   // service methods
   //
 
-
   logIn() {
     return new Promise((resolve, reject) => {
       const url = this.apiEndpoint('login');

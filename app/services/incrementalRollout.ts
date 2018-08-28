@@ -7,7 +7,7 @@ import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 
 
-export enum AvailableFeatures {
+export enum AvailableFeaturesEnum {
   chatbot = 'slobs--chatbot'
 }
 
