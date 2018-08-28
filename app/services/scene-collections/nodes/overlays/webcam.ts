@@ -53,6 +53,8 @@ export class WebcamNode extends Node<ISchema, IContext> {
       resolution = this.performInitialSetup(context.sceneItem);
     }
 
+    if (!resolution) return;
+
     const currentAspect = resolution.width / resolution.height;
     const crop: ICrop = {
       top: 0,
