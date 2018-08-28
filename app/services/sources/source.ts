@@ -15,7 +15,6 @@ import { TFormData } from 'components/shared/forms/Input';
 import Utils from 'services/utils';
 import * as obs from '../../../obs-api';
 import { isEqual } from 'lodash';
-import { EDeinterlaceMode, EDeinterlaceFieldOrder } from '../../../obs-api';
 
 
 @ServiceHelper()
@@ -31,6 +30,8 @@ export class Source implements ISourceApi {
   height: number;
   doNotDuplicate: boolean;
   channel?: number;
+  deinterlaceMode: obs.EDeinterlaceMode;
+  deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
   resourceId: string;
 
   sourceState: ISource;
@@ -53,22 +54,6 @@ export class Source implements ISourceApi {
 
   getSettings(): Dictionary<any> {
     return this.getObsInput().settings;
-  }
-
-  get deinterlaceMode(): EDeinterlaceMode {
-    return this.getObsInput().deinterlaceMode;
-  }
-
-  set deinterlaceMode(val: EDeinterlaceMode) {
-    this.getObsInput().deinterlaceMode = val;
-  }
-
-  get deinterlaceFieldOrder(): EDeinterlaceFieldOrder {
-    return this.getObsInput().deinterlaceFieldOrder;
-  }
-
-  set deinterlaceFieldOrder(val: EDeinterlaceFieldOrder) {
-    this.getObsInput().deinterlaceFieldOrder = val;
   }
 
   /**
@@ -162,6 +147,16 @@ export class Source implements ISourceApi {
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
+  setDeinterlaceMode(newMode: obs.EDeinterlaceMode) {
+    this.SET_DEINTERLACE_MODE(newMode);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
+  }
+
+  setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder) {
+    this.SET_DEINTERLACE_FIELD_ORDER(newOrder);
+    this.sourcesService.sourceUpdated.next(this.sourceState);
+  }
+
   hasProps(): boolean {
     return this.getObsInput().configurable;
   }
@@ -182,5 +177,17 @@ export class Source implements ISourceApi {
   @mutation()
   private SET_NAME(newName: string) {
     this.sourceState.name = newName;
+  }
+
+  @mutation()
+  private SET_DEINTERLACE_MODE(newMode: obs.EDeinterlaceMode) {
+    this.getObsInput().deinterlaceMode = newMode;
+    this.sourceState.deinterlaceMode = newMode;
+  }
+
+  @mutation()
+  private SET_DEINTERLACE_FIELD_ORDER(newOrder: obs.EDeinterlaceFieldOrder) {
+    this.getObsInput().deinterlaceFieldOrder = newOrder;
+    this.sourceState.deinterlaceFieldOrder = newOrder;
   }
 }

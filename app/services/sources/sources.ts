@@ -106,7 +106,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel
+      channel,
+      deinterlaceMode: obs.EDeinterlaceMode.Disable,
+      deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder.Top,
     };
 
     Vue.set(this.state.sources, id, sourceModel);

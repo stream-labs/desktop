@@ -25,7 +25,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Disable,
       label: $t('deinterlace.disable'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Disable },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Disable) },
     });
 
     this.append({
@@ -33,7 +33,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Discard,
       label: $t('deinterlace.discard'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Discard },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Discard) },
     });
 
     this.append({
@@ -41,7 +41,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Retro,
       label: $t('deinterlace.retro'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Retro },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Retro) },
     });
 
     this.append({
@@ -49,7 +49,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Blend,
       label: $t('deinterlace.blend'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Blend },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Blend) },
     });
 
     this.append({
@@ -57,7 +57,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Blend2X,
       label: $t('deinterlace.blend2x'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Blend2X },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Blend2X) },
     });
 
     this.append({
@@ -65,7 +65,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Linear,
       label: $t('deinterlace.linear'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Linear },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Linear) },
     });
 
     this.append({
@@ -73,7 +73,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Linear2X,
       label: $t('deinterlace.linear2x'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Linear2X },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Linear2X) },
     });
 
     this.append({
@@ -81,7 +81,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Yadif,
       label: $t('deinterlace.yadif'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Yadif },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Yadif) },
     });
 
     this.append({
@@ -89,7 +89,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceMode === EDeinterlaceMode.Yadif2X,
       label: $t('deinterlace.yadif2x'),
-      click: () => { this.source.deinterlaceMode = EDeinterlaceMode.Yadif2X },
+      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Yadif2X) },
     });
 
     this.append({ type: 'separator' });
@@ -99,7 +99,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceFieldOrder === EDeinterlaceFieldOrder.Top,
       label: $t('deinterlace.top_field_first'),
-      click: () => { this.source.deinterlaceFieldOrder = EDeinterlaceFieldOrder.Top },
+      click: () => { this.source.setDeinterlaceFieldOrder(EDeinterlaceFieldOrder.Top) },
     });
 
     this.append({
@@ -107,7 +107,7 @@ export class DeinterlaceMenu extends Menu {
       type: 'checkbox',
       checked: this.source.deinterlaceFieldOrder === EDeinterlaceFieldOrder.Bottom,
       label: $t('deinterlace.bottom_field_first'),
-      click: () => { this.source.deinterlaceFieldOrder = EDeinterlaceFieldOrder.Bottom },
+      click: () => { this.source.setDeinterlaceFieldOrder(EDeinterlaceFieldOrder.Bottom) },
     });
   }
 }
