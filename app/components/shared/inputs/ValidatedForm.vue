@@ -1,5 +1,5 @@
 <template>
-<form>
+<form :data-vv-scope="validationScopeId">
   <slot></slot>
 </form>
 </template>

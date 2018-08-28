@@ -42,6 +42,8 @@ export abstract class GenericGoalService extends WidgetSettingsService<IGoalData
       title: metadata.text({
         title: $t('Title'),
         required: true,
+        description: 'Some description here',
+        tooltip: 'Some tooltip here',
         max: 60
       }),
 

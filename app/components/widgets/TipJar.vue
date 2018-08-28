@@ -1,37 +1,37 @@
 <template>
 <widget-window v-if="wData" ref="layout" v-model="tabName">
   <div slot="settings">
-    <form-group :title="$t('Enabled Events')">
+    <h-form-group :title="$t('Enabled Events')">
       <bool-input
         v-for="key in Object.keys(wData.settings.types)"
         :key="key"
         :title="titleFromKey(key)"
         v-model="wData.settings.types[key].enabled"
       />
-    </form-group>
-    <form-group :title="$t('Jar Image')">
+    </h-form-group>
+    <h-form-group :title="$t('Jar Image')">
       <image-picker-input :metadata="{ options: inputOptions }" v-model="wData.settings.jar.type"/>
-    </form-group>
-    <form-group :title="$t('Text')">
+    </h-form-group>
+    <h-form-group :title="$t('Text')">
       <bool-input :title="$t('Show Text')" v-model="wData.settings.text.show"/>
-    </form-group>
-    <form-group type="fontFamily" :value="wData.settings.text.font"/>
-    <form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
-    <form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text.size"/>
-    <form-group v-if="wData.settings.types.twitch_bits" :title="$t('Minimum Bits')">
+    </h-form-group>
+    <h-form-group type="fontFamily" :value="wData.settings.text.font"/>
+    <h-form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
+    <h-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text.size"/>
+    <h-form-group v-if="wData.settings.types.twitch_bits" :title="$t('Minimum Bits')">
       <number-input v-model="wData.settings.types.twitch_bits.minimum_amount" :metadata="{ required: true, min: 1 }"/>
-    </form-group>
-    <form-group :title="$t('Minimum Tips')">
+    </h-form-group>
+    <h-form-group :title="$t('Minimum Tips')">
       <number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
-    </form-group>
-    <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
-    <form-group v-for="key in mediaGalleryInputs" :key="key" :title="titleFromKey(key)">
+    </h-form-group>
+    <h-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
+    <h-form-group v-for="key in mediaGalleryInputs" :key="key" :title="titleFromKey(key)">
       <media-gallery-input
         :metadata="{ clearImage: wData.defaultImage[`${platform}_account`] }"
         v-model="wData.settings.types[key].image_src"
       />
-    </form-group>
-    <form-group
+    </h-form-group>
+    <h-form-group
       v-for="tier in wData.settings.types.tips.tiers"
       :key="tier.minimum_amount"
       :title="`${$t('Tips over')} ${tier.minimum_amount}`"
@@ -40,7 +40,7 @@
         :metadata="{ clearImage: tier.clear_image }"
         v-model="tier.image_src"
       />
-    </form-group>
+    </h-form-group>
   </div>
 
   <div slot="HTML" >

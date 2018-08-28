@@ -2,17 +2,17 @@
   <widget-window v-if="wData" ref="layout" v-model="tabName">
     <div slot="settings">
 
-      <form-group title="Background Color" type="color" v-model="wData.settings.background_color" />
+      <h-form-group title="Background Color" type="color" v-model="wData.settings.background_color" />
 
-      <form-group title="Enabled Streams">
+      <h-form-group title="Enabled Streams">
         <bool-input title="Twitch Viewers" v-model="wData.settings.twitch "/>
         <bool-input title="Youtube Viewers" v-model="wData.settings.youtube"/>
         <bool-input title="Mixer Viewers" v-model="wData.settings.mixer"/>
-      </form-group>
+      </h-form-group>
 
-      <form-group title="Font" type="fontFamily" v-model="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
-      <form-group title="Text Color" type="color" v-model="wData.settings.font_color"/>
-      <form-group title="Font Size" type="fontSize" v-model="wData.settings.font_size"/>
+      <h-form-group title="Font" type="fontFamily" v-model="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }"/>
+      <h-form-group title="Text Color" type="color" v-model="wData.settings.font_color"/>
+      <h-form-group title="Font Size" type="fontSize" v-model="wData.settings.font_size"/>
 
     </div>
 

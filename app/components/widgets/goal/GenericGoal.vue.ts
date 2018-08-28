@@ -7,7 +7,7 @@ import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -23,7 +23,7 @@ interface IGoalCreateOptions {
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     ValidatedForm,
     CodeEditor,
     CustomFieldsEditor,
