@@ -118,7 +118,8 @@ export default class WidgetWindow extends Vue {
     if (sourceModel.sourceId !== this.sourceId) return;
     const newPreviewSettings = this.source.getSettings();
     delete newPreviewSettings.shutdown;
-    newPreviewSettings.url = this.service.getPreviewUrl() + '&' + uuid();
+    newPreviewSettings.url = this.service.getPreviewUrl();
     this.previewSource.updateSettings(newPreviewSettings);
+    this.previewSource.refresh();
   }
 }

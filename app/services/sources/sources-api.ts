@@ -42,6 +42,7 @@ export interface ISourceApi extends ISource {
   setPropertiesManagerSettings(settings: Dictionary<any>): void;
   hasProps(): boolean;
   setName(newName: string): void;
+  refresh(): void;
 }
 
 export interface ISourcesServiceApi {

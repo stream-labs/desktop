@@ -163,6 +163,15 @@ export class Source implements ISourceApi {
     return this.getObsInput().configurable;
   }
 
+  /**
+   * works only for browser_source
+   */
+  refresh() {
+    const obsInput = this.getObsInput();
+    (obsInput.properties.get('refreshnocache') as obs.IButtonProperty)
+      .buttonClicked(obsInput);
+  }
+
 
   @Inject()
   protected sourcesService: SourcesService;

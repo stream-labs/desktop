@@ -34,13 +34,14 @@ import LanguageSettings from 'components/LanguageSettings.vue';
     LanguageSettings
   }
 })
-export default class SceneTransitions extends Vue {
+export default class Settings extends Vue {
   @Inject() settingsService: ISettingsServiceApi;
   @Inject() windowsService: WindowsService;
 
   $refs: { settingsContainer: HTMLElement }
 
-  settingsData = this.settingsService.getSettingsFormData(this.categoryName);
+  categoryName: string = 'General';
+  settingsData: ISettingsSubCategory[] = [];
   icons: Dictionary<string> = {
     General: 'icon-overview',
     Stream: 'fas fa-globe',
@@ -57,12 +58,16 @@ export default class SceneTransitions extends Vue {
     Experimental: 'fas fa-flask'
   };
 
-  get categoryName() {
-    return this.windowsService.state.child.queryParams.categoryName || 'General';
+  mounted() {
+    this.categoryName = this.getInitialCategoryName();
+    this.settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   }
 
-  set categoryName(name) {
-    this.settingsService.showSettings(name);
+  getInitialCategoryName() {
+    if (this.windowsService.state.child.queryParams) {
+      return this.windowsService.state.child.queryParams.categoryName || 'General';
+    }
+    return 'General';
   }
 
   get categoryNames() {
