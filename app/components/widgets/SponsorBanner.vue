@@ -55,6 +55,18 @@
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
     </v-form-group>
   </div>
+
+  <div slot="HTML" >
+    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+  </div>
+
+  <div slot="CSS" >
+    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+  </div>
+
+  <div slot="JS" >
+    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+  </div>
 </widget-editor>
 </template>
 

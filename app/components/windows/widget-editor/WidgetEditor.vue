@@ -17,7 +17,7 @@
       <div class="sidebar" ref="sidebar">
         <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
           <span class="subsection__title">{{ slot.label }}</span>
-          <div class="subsection__content"><slot :name="slot.value"></slot></div>
+          <div class="subsection__content"><slot :name="slot.value" /></div>
         </div>
         <div class="subsection">
           <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
@@ -33,11 +33,19 @@
         <div class="subsection">
           <span class="subsection__title">{{ $t('Selected Properties') }}</span>
           <div class="subsection__content">
-            <slot :name="`${value}-properties`"></slot>
+            <slot :name="`${value}-properties`" />
           </div>
         </div>
       </div>
       <div class="code-editor hidden" ref="code">
+        <tabs
+          :showContent="false"
+          className="widget-editor__top-tabs"
+          :tabs="[{ value: 'HTML', name: $t('HTML') }, { value: 'CSS', name: $t('CSS') }, { value: 'JS', name: $t('JS') }]"
+          @input="value => updateCodeTab(value)"
+          :value="currentCodeTab"
+        />
+        <slot :name="currentCodeTab" />
       </div>
     </div>
   </div>
@@ -160,6 +168,7 @@
   .code-editor.hidden {
     height: 0;
     width: 0;
+    visibility: collapse;
   }
 
   .night-theme {

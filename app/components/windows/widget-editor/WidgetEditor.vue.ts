@@ -42,6 +42,7 @@ export default class WidgetWindow extends Vue {
   widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
   currentTopTab = 'editor';
+  currentCodeTab = 'HTML';
   properties: TObsFormData = [];
   tabs: IWidgetTab[] = [];
   tabsList: { name: string, value: string}[] = [];
@@ -101,6 +102,10 @@ export default class WidgetWindow extends Vue {
       }, 300);
     }
     this.currentTopTab = value;
+  }
+
+  updateCodeTab(value: string) {
+    this.currentCodeTab = value;
   }
 
   private onSourceUpdatedHandler(sourceModel: ISource) {
