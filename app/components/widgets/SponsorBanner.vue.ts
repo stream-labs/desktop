@@ -33,8 +33,8 @@ export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, Sp
   }
 
   get settings() {
-    const baseSettings = [{ value: 'visual', label: 'Visual Settings' }, { value: 'source', label: 'Source' }];
-    return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: `Image Set ${pos}` })));
+    const baseSettings = [{ value: 'visual', label: $t('Visual Settings') }, { value: 'source', label: $t('Source') }];
+    return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: $t('Image Set ') + pos })));
   }
 
   fileNameFromHref(href: string) {

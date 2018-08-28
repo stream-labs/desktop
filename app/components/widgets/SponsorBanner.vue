@@ -3,7 +3,7 @@
   v-if="wData"
   ref="layout"
   v-model="tabName"
-  :slots="[{ value: 'layout', label: 'Ad Layout' }]"
+  :slots="[{ value: 'layout', label: $t('Ad Layout') }]"
   :settings="settings"
 >
   <div slot="layout">
