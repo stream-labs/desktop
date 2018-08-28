@@ -8,6 +8,7 @@ import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
+import { IncrementalRolloutService } from 'services/incrementalRollout';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -39,6 +40,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
   @Inject() private chatbotApiService: ChatbotApiService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -66,7 +68,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
     this.setRavenContext();
     this.validateLogin();
-    this.fetchAvailableFeatures();
+    this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
   mounted() {
@@ -193,22 +195,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return url;
   }
 
-  fetchAvailableFeatures() {
-    // const host = this.hostsService.streamlabs;
-    debugger;
-    const host = 'streamlabs.site';
-    const url = `http://${host}/api/v5/slobs/available-features`;
-    const headers = authorizedHeaders(this.apiToken);
-    const request = new Request(url, { headers });
-
-    return fetch(request)
-      .then(handleErrors)
-      .then(response => response.json())
-      .then(response => {
-        debugger;
-      });
-  }
-
   getDonationSettings() {
     const host = this.hostsService.streamlabs;
     const url = `https://${host}/api/v5/slobs/donation/settings`;
@@ -240,6 +226,8 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.sceneCollectionsService.safeSync();
     // signs out of chatbot
     await this.chatbotApiService.logOut();
+    // clear available features
+    await this.incrementalRolloutService.clearAvailableFeatures();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
     this.LOGOUT();

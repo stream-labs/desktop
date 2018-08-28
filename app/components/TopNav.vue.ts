@@ -10,6 +10,8 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
+import { AvailableFeatures } from 'services/incrementalRollout';
+import { IncrementalRolloutService } from 'services/incrementalRollout';
 
 @Component({
   components: {
@@ -23,12 +25,18 @@ export default class TopNav extends Vue {
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   slideOpen = false;
 
   studioModeTooltip = 'Studio Mode';
 
-  @Prop() locked: boolean;
+  get AvailableFeatures() {
+    return AvailableFeatures;
+  }
+
+  @Prop()
+  locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
@@ -56,6 +64,10 @@ export default class TopNav extends Vue {
 
   navigateDesignSystem() {
     this.navigationService.navigate('DesignSystem');
+  }
+
+  enabledFeature(feature: AvailableFeatures) {
+    return this.incrementalRolloutService.availableFeatures.indexOf(feature) > -1;
   }
 
   studioMode() {
