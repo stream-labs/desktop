@@ -18,7 +18,7 @@
     <button
       @click="navigateChatBot"
       class="tab-button"
-      v-if="enabledFeature(availableFeaturesEnum.chatbot)"
+      v-if="enabledFeature(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-chatbot"/> <span>{{ $t('Chatbot') }}</span>

@@ -226,8 +226,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     await this.sceneCollectionsService.safeSync();
     // signs out of chatbot
     await this.chatbotApiService.logOut();
-    // clear available features
-    await this.incrementalRolloutService.clearAvailableFeatures();
     // Navigate away from disabled tabs on logout
     this.navigationService.navigate('Studio');
     this.LOGOUT();

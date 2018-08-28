@@ -1,13 +1,12 @@
 
-import { PersistentStatefulService } from 'services/persistent-stateful-service';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
-import { mutation } from 'services/stateful-service';
+import { mutation, StatefulService } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
 
 
-export enum AvailableFeaturesEnum {
+export enum EAvailableFeatures {
   chatbot = 'slobs--chatbot'
 }
 
@@ -15,7 +14,7 @@ interface IIncrementalRolloutServiceState {
   availableFeatures: string[];
 }
 
-export class IncrementalRolloutService extends PersistentStatefulService<IIncrementalRolloutServiceState> {
+export class IncrementalRolloutService extends StatefulService<IIncrementalRolloutServiceState> {
   @Inject() private userService: UserService;
   @Inject() private hostsService: HostsService;
 
@@ -26,15 +25,6 @@ export class IncrementalRolloutService extends PersistentStatefulService<IIncrem
   @mutation()
   private SET_AVAILABLE_FEATURES(features: string[]) {
     this.state.availableFeatures = features;
-  }
-
-  @mutation()
-  private CLEAR_AVAILABLE_FEATURES() {
-    this.state.availableFeatures = [];
-  }
-
-  clearAvailableFeatures() {
-    this.CLEAR_AVAILABLE_FEATURES();
   }
 
   get availableFeatures() {
