@@ -72,7 +72,7 @@
       v-if="(inspectedSource === 'app_source') && (inspectedAppId === appSource.appId) && (inspectedAppSourceId === appSource.source.id)"
       :name="appSource.source.name"
       :description="appSource.source.about.description">
-      <img class="source__demo source__demo--night" slot="media" src="TODO" />
+      <img class="source__demo source__demo--night" slot="media" :src="getAppAssetUrl(appSource.appId, appSource.source.about.bannerImage)" />
       <ul slot="support-list">
         <li v-for="(bullet, index) in appSource.source.about.bullets" :key="index">
           {{ bullet }}
