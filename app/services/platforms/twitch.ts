@@ -118,7 +118,7 @@ export class TwitchService extends Service implements IPlatformService {
     return fetch(request)
       .then(handleErrors)
       .then(response => response.json())
-      .then(json => json.stream.viewers);
+      .then(json => json.stream ? json.stream.viewers : 0);
   }
 
   @requiresToken()
