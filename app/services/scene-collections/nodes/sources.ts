@@ -239,8 +239,12 @@ export class SourcesNode extends Node<ISchema, {}> {
 
       let newSource = this.sourcesService.getSource(sourceInfo.id);
       if (newSource.async && newSource.video) {
-        newSource.setDeinterlaceMode(sourceInfo.deinterlaceMode);
-        newSource.setDeinterlaceFieldOrder(sourceInfo.deinterlaceFieldOrder);
+        if (sourceInfo.deinterlaceMode !== void 0) {
+          newSource.setDeinterlaceMode(sourceInfo.deinterlaceMode);
+        }
+        if (sourceInfo.deinterlaceFieldOrder !== void 0) {
+          newSource.setDeinterlaceFieldOrder(sourceInfo.deinterlaceFieldOrder);
+        }
       }
 
       if (source.audioMixers) {
