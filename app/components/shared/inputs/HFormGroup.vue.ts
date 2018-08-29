@@ -7,7 +7,9 @@ import { BaseInput } from './BaseInput';
 import FormInput from './FormInput.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-
+/**
+ * Horizontal layout for input-component
+ */
 @Component({
   components: { FormInput }
 })
@@ -24,11 +26,6 @@ export default class HFormGroup extends BaseInput<any, IInputMetadata> {
 
   @Prop()
   readonly title: string;
-
-  /**
-   * uuid serves to link input field and validator message
-   */
-  readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
 
   inputErrors: ErrorField[] = [];
 

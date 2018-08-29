@@ -23,6 +23,7 @@ export default class SliderInput extends Vue {
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => {
       if (this.$refs.slider) this.$refs.slider.refresh();
+      window['slider'] = this.$refs.slider;
     }, 500);
   }
 
