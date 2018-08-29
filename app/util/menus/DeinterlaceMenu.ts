@@ -20,94 +20,42 @@ export class DeinterlaceMenu extends Menu {
   }
 
   appendMenuItems() {
-    this.append({
-      id: 'Disable',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Disable,
-      label: $t('deinterlace.disable'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Disable) },
-    });
+    const DEINTERLACE_MODES = [
+      { id: 'Disable',   value: EDeinterlaceMode.Disable,  label: $t('deinterlace.disable')  },
+      { id: 'Discard',   value: EDeinterlaceMode.Discard,  label: $t('deinterlace.discard')  },
+      { id: 'Retro',     value: EDeinterlaceMode.Retro,    label: $t('deinterlace.retro')    },
+      { id: 'Blend',     value: EDeinterlaceMode.Blend,    label: $t('deinterlace.blend')    },
+      { id: 'Blend 2x',  value: EDeinterlaceMode.Blend2X,  label: $t('deinterlace.blend2x')  },
+      { id: 'Linear',    value: EDeinterlaceMode.Linear,   label: $t('deinterlace.linear')   },
+      { id: 'Linear 2x', value: EDeinterlaceMode.Linear2X, label: $t('deinterlace.linear2x') },
+      { id: 'Yadif',     value: EDeinterlaceMode.Yadif,    label: $t('deinterlace.yadif')    },
+      { id: 'Yadif 2x',  value: EDeinterlaceMode.Yadif2X,  label: $t('deinterlace.yadif2x')  },
+    ];
+    const DEINTERLACE_FIELD_ORDERS = [
+      { id: 'Top field first',    value: EDeinterlaceFieldOrder.Top,    label: $t('deinterlace.top_field_first')    },
+      { id: 'Bottom field first', value: EDeinterlaceFieldOrder.Bottom, label: $t('deinterlace.bottom_field_first') },
+    ];
 
-    this.append({
-      id: 'Discard',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Discard,
-      label: $t('deinterlace.discard'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Discard) },
-    });
-
-    this.append({
-      id: 'Retro',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Retro,
-      label: $t('deinterlace.retro'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Retro) },
-    });
-
-    this.append({
-      id: 'Blend',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Blend,
-      label: $t('deinterlace.blend'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Blend) },
-    });
-
-    this.append({
-      id: 'Blend 2x',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Blend2X,
-      label: $t('deinterlace.blend2x'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Blend2X) },
-    });
-
-    this.append({
-      id: 'Linear',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Linear,
-      label: $t('deinterlace.linear'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Linear) },
-    });
-
-    this.append({
-      id: 'Linear 2x',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Linear2X,
-      label: $t('deinterlace.linear2x'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Linear2X) },
-    });
-
-    this.append({
-      id: 'Yadif',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Yadif,
-      label: $t('deinterlace.yadif'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Yadif) },
-    });
-
-    this.append({
-      id: 'Yadif 2x',
-      type: 'checkbox',
-      checked: this.source.deinterlaceMode === EDeinterlaceMode.Yadif2X,
-      label: $t('deinterlace.yadif2x'),
-      click: () => { this.source.setDeinterlaceMode(EDeinterlaceMode.Yadif2X) },
-    });
+    for (const mode of DEINTERLACE_MODES) {
+      this.append({
+        id: mode.id,
+        type: 'checkbox',
+        checked: this.source.deinterlaceMode === mode.value,
+        label: mode.label,
+        click: () => { this.source.setDeinterlaceMode(mode.value) },
+      });
+    }
 
     this.append({ type: 'separator' });
 
-    this.append({
-      id: 'Top field first',
-      type: 'checkbox',
-      checked: this.source.deinterlaceFieldOrder === EDeinterlaceFieldOrder.Top,
-      label: $t('deinterlace.top_field_first'),
-      click: () => { this.source.setDeinterlaceFieldOrder(EDeinterlaceFieldOrder.Top) },
-    });
-
-    this.append({
-      id: 'Bottom field first',
-      type: 'checkbox',
-      checked: this.source.deinterlaceFieldOrder === EDeinterlaceFieldOrder.Bottom,
-      label: $t('deinterlace.bottom_field_first'),
-      click: () => { this.source.setDeinterlaceFieldOrder(EDeinterlaceFieldOrder.Bottom) },
-    });
+    for (const mode of DEINTERLACE_FIELD_ORDERS) {
+      this.append({
+        id: mode.id,
+        type: 'checkbox',
+        checked: this.source.deinterlaceFieldOrder === mode.value,
+        label: mode.label,
+        click: () => { this.source.setDeinterlaceFieldOrder(mode.value) },
+      });
+    }
   }
 }
