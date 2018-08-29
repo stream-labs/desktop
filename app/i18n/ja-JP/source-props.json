@@ -353,6 +353,10 @@
     "name": "シーン",
     "description": "既存のシーンをソースとして新たに追加します。"
   },
+  "ndi_source": {
+    "name": "NDIソース",
+    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。"
+  },
   "blackmagicDevice": {
     "name": "Blackmagicデバイス"
   },

@@ -107,10 +107,18 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === 'ndi_source'"
+      @clickAdd="selectSource('ndi_source')"
+      sourceType="ndi_source"
+      key="13">
+     <NdiSourceIcon slot="media" />
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
       sourceType="scene"
-      key="27">
+      key="14">
       <AddSceneIcon slot="media" />
     </add-source-info>
 
@@ -255,7 +263,6 @@
 }
 
 .source-info__media {
-  .radius;
   overflow: hidden;
   text-align: center;
   padding-left: 20px;

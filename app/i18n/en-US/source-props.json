@@ -351,6 +351,10 @@
     "name": "Scene",
     "description": "Allows you to add existing scene as a source"
   },
+  "ndi_source": {
+    "name": "NDI Source",
+    "description": "Allow you capture NDI output streams."
+  },
   "blackmagicDevice": {
     "name": "Blackmagic Device"
   },

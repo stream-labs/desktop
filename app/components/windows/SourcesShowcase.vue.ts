@@ -22,6 +22,7 @@ const FfmpegSourceIcon = require('../../../media/images/ffmpeg-source-icon.svg')
 const SlideshowIcon = require('../../../media/images/slideshow-icon.svg');
 const WasapiOutputIcon = require('../../../media/images/wasapi-output-icon.svg');
 const MonitorCaptureIcon = require('../../../media/images/monitor-capture-icon.svg');
+const NdiSourceIcon = require('../../../media/images/ndi-icon.svg');
 
 type TInspectableSource = TSourceType;
 
@@ -46,7 +47,8 @@ interface ISelectSourceOptions {
     FfmpegSourceIcon,
     SlideshowIcon,
     WasapiOutputIcon,
-    MonitorCaptureIcon
+    MonitorCaptureIcon,
+    NdiSourceIcon
   },
   mixins: [windowMixin],
 })
