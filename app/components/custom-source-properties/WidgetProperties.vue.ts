@@ -28,44 +28,17 @@ export default class WidgetProperties extends Vue {
     return this.userService.isLoggedIn();
   }
 
-  created() {
-    this.refreshWidgetModel();
-  }
-
-  handleInput(value: IObsListInput<string>) {
-    this.source.setPropertiesManagerSettings({
-      widgetType: value.value
-    });
-    this.refreshWidgetModel();
-    this.$emit('update');
-  }
-
-  refreshWidgetModel() {
-    const value = this.source
-      .getPropertiesManagerSettings()
-      .widgetType.toString();
-
-    this.widgetModel = {
-      value,
-      description: $t('Widget Type'),
-      name: 'widgetType',
-      options: Object.keys(WidgetDefinitions).map(type => {
-        const widget = WidgetDefinitions[type] as IWidget;
-
-        return {
-          description: widget.name,
-          value: type
-        };
-      })
-    };
-  }
-
   login() {
     this.windowsService.closeChildWindow();
     this.userService.showLogin();
   }
 
   navigateDashboard() {
+
+    const widgetType = this.source
+      .getPropertiesManagerSettings()
+      .widgetType.toString();
+
     const subPage = {
       [WidgetType.AlertBox]: 'alertbox',
       [WidgetType.DonationGoal]: 'donationgoal',
@@ -80,7 +53,7 @@ export default class WidgetProperties extends Vue {
       [WidgetType.StreamBoss]: 'streamboss',
       [WidgetType.Credits]: 'credits',
       [WidgetType.SpinWheel]: 'wheel'
-    }[this.widgetModel.value];
+    }[widgetType];
 
     this.navigationService.navigate('Dashboard', { subPage });
     this.windowsService.closeChildWindow();

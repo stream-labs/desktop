@@ -15,14 +15,14 @@
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
     </button>
-    <button
+    <!-- <button
       @click="navigateChatBot"
       class="tab-button"
       v-if="enabledFeature(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-chatbot"/> <span>{{ $t('Chatbot') }}</span>
-    </button>
+    </button> -->
     <button
       @click="navigateOverlays"
       class="tab-button"

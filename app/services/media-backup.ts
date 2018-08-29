@@ -81,15 +81,24 @@ export class MediaBackupService extends StatefulService<IMediaBackupState> {
       return null;
     }
 
-    const stats = await new Promise<fs.Stats>((resolve, reject) => {
-      fs.lstat(filePath, (err, stats) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(stats);
-        }
+    let stats: fs.Stats;
+
+    try {
+      stats = await new Promise<fs.Stats>((resolve, reject) => {
+        fs.lstat(filePath, (err, stats) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(stats);
+          }
+        });
       });
-    });
+    } catch (e) {
+      // Lots of people have media sources that point to files that no
+      // longer exist.  We want to silently do nothing in this scenario.
+      console.warn(`[Media Backup] Error fetching stats for: ${filePath}`);
+      return null;
+    }
 
     if (stats.size > ONE_GIGABYTE) {
       // We don't upload files larger than 1 gigabyte
