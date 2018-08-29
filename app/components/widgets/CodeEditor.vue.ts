@@ -58,7 +58,6 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
-
     try {
       await this.settingsService.saveData(newData.settings);
     } catch (e) {

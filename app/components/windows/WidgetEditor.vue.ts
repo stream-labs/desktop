@@ -116,7 +116,6 @@ export default class WidgetWindow extends Vue {
   }
 
   updateValue(value: boolean) {
-    console.log(this.value);
     this.$emit('input', value);
   }
 
