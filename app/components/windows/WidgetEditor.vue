@@ -4,8 +4,11 @@
   v-if="previewSource"
 >
   <div class="container" slot="content">
-    <div class="top-settings"><button class="button button--action test-button">{{ $t('Test Widget') }}</button></div>
-      <div class="window-container">
+    <div class="top-settings">
+      <button class="button button--action test-button">{{ $t('Test Widget') }}</button>
+    </div>
+
+    <div class="window-container">
       <div style="position: relative;">
         <tabs
           :showContent="false"
@@ -19,9 +22,9 @@
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
       </div>
+
       <div class="content-container" ref="content">
         <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
-
         <div class="sidebar" ref="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
@@ -41,9 +44,7 @@
           </div>
           <div class="subsection">
             <span class="subsection__title">{{ $t('Selected Properties') }}</span>
-            <div class="subsection__content">
-              <slot :name="`${currentSetting}-properties`" />
-            </div>
+            <div class="subsection__content"><slot :name="`${currentSetting}-properties`" /></div>
           </div>
         </div>
 
