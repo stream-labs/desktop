@@ -10,7 +10,7 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
-import { IncrementalRolloutService, EAvailableFeatures } from 'services/incrementalRollout';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 @Component({
   components: {

@@ -8,7 +8,7 @@ import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
-import { IncrementalRolloutService } from 'services/incrementalRollout';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   getPlatformService,
   IPlatformAuth,
