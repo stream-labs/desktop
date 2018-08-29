@@ -69,6 +69,8 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   }
 
   crop(targetArea: Area) {
+    if (!this.isCropping) return;
+
     const sceneItem = new SceneItem(this.state.sceneId, this.state.sceneItemId, this.state.sourceId);
     const rect = new ScalableRectangle(sceneItem.getRectangle());
 
