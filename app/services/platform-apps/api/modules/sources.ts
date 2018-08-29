@@ -30,7 +30,7 @@ interface ISource {
 export class SourcesModule extends Module implements ISourcesApi {
 
   moduleName = 'Sources';
-  permissions = [EApiPermissions.Sources]
+  permissions = [EApiPermissions.ScenesSources]
 
   @Inject() private sourcesService: SourcesService;
 
@@ -40,10 +40,23 @@ export class SourcesModule extends Module implements ISourcesApi {
       const source = this.sourcesService.getSourceById(sourceData.sourceId);
       this.sourceAdded.next(this.serializeSource(source));
     });
+    this.sourcesService.sourceUpdated.subscribe(sourceData => {
+      const source = this.sourcesService.getSourceById(sourceData.sourceId);
+      this.sourceUpdated.next(this.serializeSource(source));
+    })
+    this.sourcesService.sourceRemoved.subscribe(sourceData => {
+      this.sourceRemoved.next(sourceData.sourceId);
+    });
   }
 
   @apiEvent()
   sourceAdded = new Subject<ISource>();
+
+  @apiEvent()
+  sourceUpdated = new Subject<ISource>();
+
+  @apiEvent()
+  sourceRemoved = new Subject<string>();
 
   @apiMethod()
   getSources() {

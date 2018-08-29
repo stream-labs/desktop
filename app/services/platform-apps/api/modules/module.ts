@@ -1,7 +1,7 @@
 
 export enum EApiPermissions {
   Example = 'slobs.example',
-  Sources = 'slobs.sources'
+  ScenesSources = 'slobs.scenes-sources'
 }
 
 type TApiHandler = (...args: any[]) => Promise<any>;
