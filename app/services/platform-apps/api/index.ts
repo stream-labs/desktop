@@ -1,6 +1,6 @@
 import { Module, EApiPermissions, TApiModule } from './modules/module';
 import { ExampleModule } from './modules/example';
-import { every } from 'lodash';
+import { SourcesModule } from './modules/sources';
 
 export class PlatformAppsApi {
 
@@ -9,6 +9,7 @@ export class PlatformAppsApi {
   constructor() {
     // Register all modules
     this.registerModule(new ExampleModule());
+    this.registerModule(new SourcesModule());
   }
 
   private registerModule(module: Module) {
@@ -44,6 +45,17 @@ export class PlatformAppsApi {
               `Required permissions: ${this.modules[moduleName].permissions}`);
           }
         };
+      });
+
+      (this.modules[moduleName].constructor as typeof Module).apiEvents.forEach(eventName => {
+        if (authorized) {
+          api[moduleName][eventName] = this.modules[moduleName][eventName];
+        } else {
+          api[moduleName][eventName] = async () => {
+            throw new Error('This app does not have permission to access this API. ' +
+              `Required permissions: ${this.modules[moduleName].permissions}`);
+          }
+        }
       });
     });
 

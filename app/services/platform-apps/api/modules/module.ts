@@ -1,6 +1,7 @@
 
 export enum EApiPermissions {
-  Example = 'example'
+  Example = 'slobs.example',
+  Sources = 'slobs.sources'
 }
 
 type TApiHandler = (...args: any[]) => Promise<any>;
@@ -11,6 +12,13 @@ export function apiMethod() {
 
     (target.constructor as typeof Module).apiMethods.push(methodName);
     return descriptor;
+  };
+}
+
+export function apiEvent() {
+  return (target: Module, methodName: string) => {
+
+    (target.constructor as typeof Module).apiEvents.push(methodName);
   };
 }
 
@@ -31,5 +39,11 @@ export abstract class Module {
    * edit this directly, and instead us the @apiMethod decorator.
    */
   static apiMethods: string[] = [];
+
+  /**
+   * Contains a list of public API event observables.  Generally you should not
+   * edit this directly, and instead us the @apiEvent decorator.
+   */
+  static apiEvents: string[] = [];
 
 }

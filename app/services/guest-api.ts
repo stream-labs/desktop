@@ -1,6 +1,7 @@
 import { Service } from 'services/service';
-import uuid from 'uuid/v4';
 import electron from 'electron';
+import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * Shared message interchange format
@@ -25,12 +26,15 @@ export interface IGuestApiCallback {
 }
 
 type RequestHandlerMethod = (...args: any[]) => Promise<any>;
+type RequestHandlerObservable = Observable<any>;
+
+type RequestHandlerEndpoint = RequestHandlerMethod | RequestHandlerObservable;
 
 /**
  * A dictionary of functions to expose to the guest content
  */
 export interface IRequestHandler {
-  [key: string]: RequestHandlerMethod | IRequestHandler;
+  [key: string]: RequestHandlerEndpoint | IRequestHandler;
 }
 
 /**
@@ -62,12 +66,20 @@ export class GuestApiService extends Service {
     // Do not expose an API twice for the same webview
     if (this.handlers[webContentsId]) return;
 
+    // Tracks rxjs subscriptions for this webview so they can be unsubscribed
+    const subscriptions: Subscription[] = [];
+
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
     const webContents = electron.remote.webContents.fromId(webContentsId)
     webContents.on('destroyed', () => {
       console.log('Destroying API for webcontents', webContentsId);
       delete this.handlers[webContentsId];
+
+      subscriptions.forEach(sub => {
+        console.log('unsubscribing for webview', sub);
+        sub.unsubscribe();
+      });
     });
 
     this.handlers[webContentsId] = (request: IGuestApiRequest) => {
@@ -91,9 +103,9 @@ export class GuestApiService extends Service {
         return arg;
       });
 
-      const method = this.getMethodFromPath(requestHandler, request.methodPath);
+      const endpoint = this.getEndpointFromPath(requestHandler, request.methodPath);
 
-      if (!method) {
+      if (!endpoint) {
         // The path requested does not exist
         const response: IGuestApiResponse = {
           id: request.id,
@@ -104,27 +116,31 @@ export class GuestApiService extends Service {
         return;
       }
 
-      method(...mappedArgs)
-        .then(result => {
-          const response: IGuestApiResponse = {
-            id: request.id,
-            error: false,
-            result
-          };
+      if (endpoint instanceof Observable) {
+        subscriptions.push(endpoint.subscribe(mappedArgs[0]));
+      } else {
+        endpoint(...mappedArgs)
+          .then(result => {
+            const response: IGuestApiResponse = {
+              id: request.id,
+              error: false,
+              result
+            };
 
-          this.safeSend(contents, 'guestApiResponse', response);
-        })
-        .catch(rawResult => {
-          const result = rawResult instanceof Error ? rawResult.message : rawResult;
+            this.safeSend(contents, 'guestApiResponse', response);
+          })
+          .catch(rawResult => {
+            const result = rawResult instanceof Error ? rawResult.message : rawResult;
 
-          const response: IGuestApiResponse = {
-            id: request.id,
-            error: true,
-            result
-          };
+            const response: IGuestApiResponse = {
+              id: request.id,
+              error: true,
+              result
+            };
 
-          this.safeSend(contents, 'guestApiResponse', response);
-        });
+            this.safeSend(contents, 'guestApiResponse', response);
+          });
+      }
     }
   }
 
@@ -134,19 +150,28 @@ export class GuestApiService extends Service {
     }
   }
 
-  private getMethodFromPath(handler: IRequestHandler | RequestHandlerMethod, path: string[]): RequestHandlerMethod {
+  /**
+   * Traverses a request handler looking for an endpoint at the provided path
+   * @param handler the handler containing the endpoints
+   * @param path an array of keys describing the location of the endpoint
+   */
+  private getEndpointFromPath(handler: IRequestHandler, path: string[]): RequestHandlerEndpoint {
     if (!handler) return;
-
-    if (path.length === 0) {
-      if (handler instanceof Function) return handler;
-      return;
-    }
+    if (path.length === 0) return;
 
     // This is an extra level of security that ensures any key being
     // accessed is actually an enumerable property on the object and
     // not something dangerous.
     if (!handler.propertyIsEnumerable(path[0])) return;
 
-    return this.getMethodFromPath(handler[path[0]], path.slice(1));
+    if (path.length === 1) {
+      const endpoint = handler[path[0]];
+
+      // Make sure this actually looks like an endpoint
+      if ((endpoint instanceof Function) || (endpoint instanceof Observable)) return endpoint;
+      return;
+    }
+
+    return this.getEndpointFromPath(handler[path[0]] as IRequestHandler, path.slice(1));
   }
 }
