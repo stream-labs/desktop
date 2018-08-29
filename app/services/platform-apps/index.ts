@@ -5,12 +5,8 @@ import fs from 'fs';
 import { Subject } from 'rxjs/Subject';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
-
-/**
- * TODO
- */
-enum EAppPermissions {
-}
+import { EApiPermissions } from './api/modules/module';
+import { PlatformAppsApi } from './api';
 
 /**
  * The type of source to create, for V1 only supports browser
@@ -50,7 +46,7 @@ interface IAppManifest {
   id: string; // unique, e.g. com.streamlabs.alertbox
   name: string; // display name for the app
   version: string;
-  permissions: EAppPermissions[];
+  permissions: EApiPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
 }
@@ -83,6 +79,8 @@ export class PlatformAppsService extends
   devMode = true;
 
   private localStorageKey = 'PlatformAppsUnpacked';
+
+  apiManager = new PlatformAppsApi();
 
   init() {
     if (localStorage.getItem(this.localStorageKey)) {
@@ -138,6 +136,11 @@ export class PlatformAppsService extends
         resolve(data.toString());
       });
     });
+  }
+
+  getAppApi(appId: string) {
+    const app = this.getApp(appId);
+    return this.apiManager.getApi(app.manifest.permissions);
   }
 
   getPageUrlForSlot(appId: string, slot: EAppPageSlot) {

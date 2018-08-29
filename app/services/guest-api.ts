@@ -86,7 +86,9 @@ export class GuestApiService extends Service {
 
             webview.send('guestApiResponse', response);
           })
-          .catch(result => {
+          .catch(rawResult => {
+            const result = rawResult instanceof Error ? rawResult.message : rawResult;
+
             const response: IGuestApiResponse = {
               id: apiRequest.id,
               error: true,
