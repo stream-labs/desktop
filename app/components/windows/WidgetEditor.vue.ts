@@ -16,13 +16,16 @@ import uuid from 'uuid';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
 import Display from 'components/shared/Display.vue';
-import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
 
 @Component({
   components: {
     ModalLayout,
     Tabs,
     ToggleInput,
+    NumberInput,
+    VFormGroup,
     Display
   }
 })
@@ -65,6 +68,7 @@ export default class WidgetWindow extends Vue {
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
+    console.log(this.properties);
 
     // create a temporary previewSource
     // the previewSource could have a different url for simulating widget's activity

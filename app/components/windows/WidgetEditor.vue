@@ -4,7 +4,18 @@
   v-if="previewSource"
 >
   <div class="container" slot="content">
-    <div class="top-settings">
+    <div class="top-settings" v-if="properties">
+      <v-form-group :title="$t('Widget Size')">
+        <div class="top-input">
+          <span>W</span><number-input v-model="properties[1].value" :metadata="{}" />
+          <span>H</span><number-input v-model="properties[2].value" :metadata="{}" />
+        </div>
+      </v-form-group>
+      <v-form-group :title="$t('FPS')">
+        <div class="top-input">
+          <number-input v-model="properties[3].value" :metadata="{}" />
+        </div>
+      </v-form-group>
       <button class="button button--action test-button">{{ $t('Test Widget') }}</button>
     </div>
 
@@ -101,6 +112,22 @@
     height: 50px;
     width: 100%;
     display: flex;
+    align-items: center;
+  }
+
+  .top-input {
+    display: flex;
+    position: relative;
+    top: -12px;
+    align-items: center;
+
+    span {
+      margin-left: 8px;
+    }
+
+    .number-input {
+      width: 60px !important;
+    }
   }
 
   .window-container {
