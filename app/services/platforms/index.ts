@@ -3,7 +3,8 @@ import { NiconicoService } from './niconico';
 export type IStreamingSetting = {
   asking: boolean,
   url: string,
-  key: string
+  key: string,
+  bitrate: number | undefined
 }
 
 // All platform services should implement

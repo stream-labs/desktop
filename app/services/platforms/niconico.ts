@@ -234,15 +234,16 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
             height: 400
           }
         });
-        return { asking: true, url: '', key: '' }; // ダイアログでたから無視してね
+        return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
       }
       if (num < 1) {
-        return { asking: false, url: '', key: '' }; // 番組がない
+        return NiconicoService.emptyStreamingSetting(false); // 番組がない
       }
       const id = Object.keys(info)[0];
       const selected = info[id];
       const url = selected.url;
       const key = selected.key;
+      const bitrate = selected.bitrate;
       this.userService.updatePlatformChannelId(id);
 
       const settings = this.settingsService.getSettingsFormData('Stream');
@@ -264,8 +265,18 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
       });
       this.settingsService.setSettings('Stream', settings);
 
-      return { asking: false, url, key }; // 有効な番組が選択されているので stream keyを返す
+      // 有効な番組が選択されているので stream keyを返す
+      return NiconicoService.createStreamingSetting(false, url, key, bitrate);
     });
+  }
+
+  private static emptyStreamingSetting(asking: boolean): IStreamingSetting {
+    return NiconicoService.createStreamingSetting(asking, '', '');
+  }
+
+  private static createStreamingSetting(asking: boolean, url: string, key: string, bitrate?: number)
+    : IStreamingSetting {
+    return { asking, url, key, bitrate };
   }
 
   // TODO ニコニコOAuthのtoken更新に使う
@@ -328,17 +339,6 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
         }
       }
       return r;
-    });
-  }
-
-  fetchBitrate(): Promise<number | undefined> {
-    return this.fetchLiveProgramInfo(this.channelId).then(result => {
-      const status = result.status;
-      console.log('getpublishstatus status=' + status);
-      if (Object.keys(result).length === 1) {
-        return result[Object.keys(result)[0]].bitrate;
-      }
-      return undefined;
     });
   }
 

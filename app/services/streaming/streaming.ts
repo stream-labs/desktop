@@ -18,7 +18,7 @@ import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
 import { StreamInfoService }from 'services/stream-info';
 import { UserService } from 'services/user';
-import { getPlatformService } from '../platforms';
+import { getPlatformService, IStreamingSetting } from '../platforms';
 import { NiconicoService } from '../platforms/niconico';
 
 enum EOBSOutputType {
@@ -132,13 +132,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          const platform = getPlatformService(this.userService.platform.type);
-          if (platform instanceof NiconicoService) {
-            // FIXME: `this.userService.updateStreamSettings`とあわせて
-            //       2度 `getpublishstatus` を呼んでいるが
-            //       不整合回避のために1回だけにしたい
-            return this.optimizeForNiconico(platform);
-          }
+          return this.optimizeForNiconico(setting);
         }
       } catch (e) {
         const message = e instanceof Response
@@ -223,9 +217,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  private async optimizeForNiconico(platform: NiconicoService) {
-    const bitrate = await platform.fetchBitrate();
-    if (bitrate === undefined) {
+  private async optimizeForNiconico(streamingSetting: IStreamingSetting) {
+    if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
           electron.remote.getCurrentWindow(),
@@ -240,7 +233,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       });
     }
-    const settings = this.settingsService.diffOptimizedSettings(bitrate);
+    const settings = this.settingsService.diffOptimizedSettings(streamingSetting.bitrate);
     if (settings) {
       if (this.customizationService.showOptimizationDialogForNiconico) {
         this.windowsService.showWindow({
