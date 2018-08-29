@@ -7,6 +7,7 @@ import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { EApiPermissions } from './api/modules/module';
 import { PlatformAppsApi } from './api';
+import { GuestApiService } from 'services/guest-api';
 
 /**
  * The type of source to create, for V1 only supports browser
@@ -66,6 +67,7 @@ export class PlatformAppsService extends
   StatefulService<IPlatformAppServiceState> {
 
   @Inject() windowsService: WindowsService;
+  @Inject() guestApiService: GuestApiService;
 
   static initialState: IPlatformAppServiceState = {
     loadedApps: []
@@ -138,9 +140,10 @@ export class PlatformAppsService extends
     });
   }
 
-  getAppApi(appId: string) {
+  exposeAppApi(appId: string, webContentsId: number) {
     const app = this.getApp(appId);
-    return this.apiManager.getApi(app.manifest.permissions);
+    const api = this.apiManager.getApi(app.manifest.permissions);
+    this.guestApiService.exposeApi(webContentsId, api);
   }
 
   getPageUrlForSlot(appId: string, slot: EAppPageSlot) {

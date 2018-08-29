@@ -1,10 +1,13 @@
 import { Service } from 'services/service';
+import uuid from 'uuid/v4';
+import electron from 'electron';
 
 /**
  * Shared message interchange format
  */
 export interface IGuestApiRequest {
   id: string;
+  webContentsId: number;
   methodPath: string[];
   args: any[];
 }
@@ -34,71 +37,101 @@ export interface IRequestHandler {
  * This class allows injection of functions into webviews.
  */
 export class GuestApiService extends Service {
+
+  handlers: Dictionary<Function> = {};
+
+  init() {
+    electron.ipcRenderer.on('guestApiRequest', (event: Electron.Event, request: IGuestApiRequest) => {
+      const { webContentsId } = request;
+
+      if (this.handlers[webContentsId]) {
+        this.handlers[webContentsId](request);
+      } else {
+        console.error(`Received guest API request from unregistered webContents ${webContentsId}`);
+      }
+    });
+  }
+
   /**
    * Exposes the passed functions to the webview.  You should be careful
    * what functions you expose, as the caller is considered un-trusted.
-   * @param webview the target webview
+   * @param webContentsId the webContents id of the target webview
    * @param requestHandler an object with the API you want to expose
    */
-  exposeApi(webview: Electron.WebviewTag, requestHandler: IRequestHandler) {
-    webview.addEventListener('ipc-message', msg => {
-      if (msg.channel === 'guestApiRequest') {
-        const apiRequest: IGuestApiRequest = msg.args[0];
+  exposeApi(webContentsId: number, requestHandler: IRequestHandler) {
+    // Do not expose an API twice for the same webview
+    if (this.handlers[webContentsId]) return;
 
-        const mappedArgs = apiRequest.args.map(arg => {
-          const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__guestApiCallback;
+    // To avoid leaks, automatically unregister this API when the webContents
+    // is destroyed.
+    const webContents = electron.remote.webContents.fromId(webContentsId)
+    webContents.on('destroyed', () => {
+      console.log('Destroying API for webcontents', webContentsId);
+      delete this.handlers[webContentsId];
+    });
 
-          if (isCallbackPlaceholder) {
-            return (...args: any[]) => {
-              const callbackObj: IGuestApiCallback = {
-                requestId: apiRequest.id,
-                callbackId: arg.id,
-                args
-              };
+    this.handlers[webContentsId] = (request: IGuestApiRequest) => {
+      const contents = electron.remote.webContents.fromId(webContentsId);
 
-              webview.send('guestApiCallback', callbackObj);
+      const mappedArgs = request.args.map(arg => {
+        const isCallbackPlaceholder = (typeof arg === 'object') && arg && arg.__guestApiCallback;
+
+        if (isCallbackPlaceholder) {
+          return (...args: any[]) => {
+            const callbackObj: IGuestApiCallback = {
+              requestId: request.id,
+              callbackId: arg.id,
+              args
             };
-          }
 
-          return arg;
-        });
-
-        const method = this.getMethodFromPath(requestHandler, apiRequest.methodPath);
-
-        if (!method) {
-          // The path requested does not exist
-          const response: IGuestApiResponse = {
-            id: apiRequest.id,
-            error: true,
-            result: `Error: The function ${apiRequest.methodPath.join('.')} does not exist!`
+            this.safeSend(contents, 'guestApiCallback', callbackObj);
           };
-          webview.send('guestApiResponse', response);
-          return;
         }
 
-        method(...mappedArgs)
-          .then(result => {
-            const response: IGuestApiResponse = {
-              id: apiRequest.id,
-              error: false,
-              result
-            };
+        return arg;
+      });
 
-            webview.send('guestApiResponse', response);
-          })
-          .catch(rawResult => {
-            const result = rawResult instanceof Error ? rawResult.message : rawResult;
+      const method = this.getMethodFromPath(requestHandler, request.methodPath);
 
-            const response: IGuestApiResponse = {
-              id: apiRequest.id,
-              error: true,
-              result
-            };
-
-            webview.send('guestApiResponse', response);
-          });
+      if (!method) {
+        // The path requested does not exist
+        const response: IGuestApiResponse = {
+          id: request.id,
+          error: true,
+          result: `Error: The function ${request.methodPath.join('.')} does not exist!`
+        };
+        this.safeSend(contents, 'guestApiResponse', response);
+        return;
       }
-    });
+
+      method(...mappedArgs)
+        .then(result => {
+          const response: IGuestApiResponse = {
+            id: request.id,
+            error: false,
+            result
+          };
+
+          this.safeSend(contents, 'guestApiResponse', response);
+        })
+        .catch(rawResult => {
+          const result = rawResult instanceof Error ? rawResult.message : rawResult;
+
+          const response: IGuestApiResponse = {
+            id: request.id,
+            error: true,
+            result
+          };
+
+          this.safeSend(contents, 'guestApiResponse', response);
+        });
+    }
+  }
+
+  private safeSend(contents: Electron.WebContents, channel: string, msg: any) {
+    if (!contents.isDestroyed()) {
+      contents.send(channel, msg);
+    }
   }
 
   private getMethodFromPath(handler: IRequestHandler | RequestHandlerMethod, path: string[]): RequestHandlerMethod {

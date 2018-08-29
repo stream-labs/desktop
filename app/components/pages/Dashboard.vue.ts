@@ -20,13 +20,16 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.guestApiService.exposeApi(this.$refs.dashboard, {
-      testAudio: this.testAudio,
-      getStatus: this.getStatus,
-      getDevices: this.getDevices,
-      enableMask: this.enableMask,
-      updateSettings: this.updateSettings,
+    this.$refs.dashboard.addEventListener('dom-ready', () => {
+      this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
+        testAudio: this.testAudio,
+        getStatus: this.getStatus,
+        getDevices: this.getDevices,
+        enableMask: this.enableMask,
+        updateSettings: this.updateSettings,
+      });
     });
+
     this.i18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
       electron.remote.shell.openExternal(e.url);

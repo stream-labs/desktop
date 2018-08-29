@@ -47,6 +47,10 @@ import {
     }
   );
 
+  // TODO: Assuming the main window is always contents id 1 may not be safe.
+  const mainWindowContents = electron.remote.webContents.fromId(1);
+  const webContentsId = electron.remote.getCurrentWebContents().id;
+
   /**
    * Returns a proxy rooted at the given path
    * @param path the current path
@@ -87,11 +91,12 @@ import {
 
           const apiRequest: IGuestApiRequest = {
             id: requestId,
+            webContentsId,
             methodPath: path,
             args: mappedArgs
           };
 
-          electron.ipcRenderer.sendToHost('guestApiRequest', apiRequest);
+          mainWindowContents.send('guestApiRequest', apiRequest);
 
           return promise;
         }
