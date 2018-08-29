@@ -37,6 +37,13 @@ export default class WidgetWindow extends Vue {
   @Prop() value: boolean;
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
+
+  codeTabs = [
+    { value: 'HTML', name: $t('HTML') },
+    { value: 'CSS', name: $t('CSS') },
+    { value: 'JS', name: $t('JS') },
+    { value: 'customFields', name: $t('Custom Fields') }
+  ];
   canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);

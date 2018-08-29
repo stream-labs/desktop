@@ -51,11 +51,13 @@
           <tabs
             :showContent="false"
             className="widget-editor__top-tabs"
-            :tabs="[{ value: 'HTML', name: $t('HTML') }, { value: 'CSS', name: $t('CSS') }, { value: 'JS', name: $t('JS') }, { value: 'customFields', name: $t('Custom Fields') }]"
+            :tabs="codeTabs"
             @input="value => updateCodeTab(value)"
             :value="currentCodeTab"
           />
-          <slot :name="currentCodeTab" />
+          <div v-for="tab in codeTabs" :key="tab.value">
+            <slot :name="tab.value" v-if="tab.value === currentCodeTab" />
+          </div>
         </div>
       </div>
     </div>
