@@ -66,8 +66,13 @@ export class GuestApiService extends Service {
         const method = this.getMethodFromPath(requestHandler, apiRequest.methodPath);
 
         if (!method) {
-          // Handle invalid path
-          console.warn('Got invalid path from webview: ', apiRequest.methodPath);
+          // The path requested does not exist
+          const response: IGuestApiResponse = {
+            id: apiRequest.id,
+            error: true,
+            result: `Error: The function ${apiRequest.methodPath.join('.')} does not exist!`
+          };
+          webview.send('guestApiResponse', response);
           return;
         }
 
@@ -101,6 +106,11 @@ export class GuestApiService extends Service {
       if (handler instanceof Function) return handler;
       return;
     }
+
+    // This is an extra level of security that ensures any key being
+    // accessed is actually an enumerable property on the object and
+    // not something dangerous.
+    if (!handler.propertyIsEnumerable(path[0])) return;
 
     return this.getMethodFromPath(handler[path[0]], path.slice(1));
   }
