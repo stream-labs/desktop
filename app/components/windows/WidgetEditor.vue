@@ -58,6 +58,18 @@
           <div class="subsection">
             <span class="subsection__title">{{ $t('Selected Properties') }}</span>
             <div class="subsection__content"><slot :name="`${currentSetting}-properties`" /></div>
+            <div class="subsection__content" v-if="currentSetting === 'source'">
+              <div class="source-property">
+                <toggle-input v-model="properties[4].value" :metadata="{}" /><span>{{ properties[4].description }}</span>
+              </div>
+              <div class="source-property">
+                <toggle-input v-model="properties[5].value" :metadata="{}" /><span>{{ properties[5].description }}</span>
+              </div>
+              <div class="source-property">
+                <toggle-input v-model="properties[6].value" :metadata="{}" /><span>{{ properties[6].description }}</span>
+              </div>
+              <span>{{ properties[7].description }}</span>
+            </div>
           </div>
         </div>
 
@@ -205,6 +217,10 @@
     padding: 8px;
     overflow: hidden;
     overflow-y: auto;
+  }
+
+  .source-property {
+    display: flex;
   }
 
   .settings-title {
