@@ -151,10 +151,6 @@ export default class StudioEditor extends Vue {
           }
         } else if (event.button === 0) {
           overNode.select();
-        } else if (event.button === 2) {
-          if (!overNode.isSelected()) {
-            overNode.select();
-          }
         }
       } else if (event.button === 0) {
         this.selectionService.reset();
@@ -164,7 +160,9 @@ export default class StudioEditor extends Vue {
       if ((event.button === 2)) {
         let menu: EditMenu;
         if (overSource) {
-          this.selectionService.add(overSource.sceneItemId);
+          if (!overSource.isSelected()) {
+            overSource.select();
+          }
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
