@@ -151,6 +151,10 @@ export default class StudioEditor extends Vue {
           }
         } else if (event.button === 0) {
           overNode.select();
+        } else if (event.button === 2) {
+          if (!overNode.isSelected()) {
+            overNode.select();
+          }
         }
       } else if (event.button === 0) {
         this.selectionService.reset();
