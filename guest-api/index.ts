@@ -29,6 +29,11 @@ import {
     return idCounter.toString();
   };
 
+  let ready: Function;
+  const readyPromise = new Promise<boolean>(resolve => {
+    ready = resolve;
+  });
+
   electron.ipcRenderer.on(
     'guestApiCallback',
     (event: any, response: IGuestApiCallback) => {
@@ -47,6 +52,11 @@ import {
     }
   );
 
+  electron.ipcRenderer.on(
+    'guestApiReady',
+    () => ready()
+  );
+
   // TODO: Assuming the main window is always contents id 1 may not be safe.
   const mainWindowContents = electron.remote.webContents.fromId(1);
   const webContentsId = electron.remote.getCurrentWebContents().id;
@@ -60,6 +70,10 @@ import {
       () => {},
       {
         get(target, key) {
+          if (key === 'apiReady') {
+            return readyPromise;
+          }
+
           return getProxy(path.concat([key.toString()]));
         },
 

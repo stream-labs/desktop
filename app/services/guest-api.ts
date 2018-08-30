@@ -67,7 +67,7 @@ export class GuestApiService extends Service {
     if (this.handlers[webContentsId]) return;
 
     // Tracks rxjs subscriptions for this webview so they can be unsubscribed
-    const subscriptions: Subscription[] = [];
+    let subscriptions: Subscription[] = [];
 
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
@@ -80,6 +80,7 @@ export class GuestApiService extends Service {
         console.log('unsubscribing for webview', sub);
         sub.unsubscribe();
       });
+      subscriptions = [];
     });
 
     this.handlers[webContentsId] = (request: IGuestApiRequest) => {
@@ -142,6 +143,8 @@ export class GuestApiService extends Service {
           });
       }
     }
+
+    webContents.send('guestApiReady');
   }
 
   private safeSend(contents: Electron.WebContents, channel: string, msg: any) {

@@ -63,6 +63,11 @@ export class SourcesModule extends Module implements ISourcesApi {
     return this.sourcesService.getSources().map(source => this.serializeSource(source));
   }
 
+  @apiMethod()
+  updateSource(patch: Partial<ISource>) {
+
+  }
+
   private serializeSource(source: Source): ISource {
     const serialized: ISource = {
       id: source.sourceId,

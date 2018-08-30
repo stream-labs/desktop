@@ -8,6 +8,7 @@ import { Inject } from 'util/injector';
 import { EApiPermissions } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
+import electron from 'electron';
 
 /**
  * The type of source to create, for V1 only supports browser
@@ -144,6 +145,30 @@ export class PlatformAppsService extends
     const app = this.getApp(appId);
     const api = this.apiManager.getApi(app.manifest.permissions);
     this.guestApiService.exposeApi(webContentsId, api);
+  }
+
+  sessionsInitialized: Dictionary<boolean> = {};
+
+  /**
+   * Returns a session partition id for the app id.
+   * These are non-persistent for now
+   */
+  getAppPartition(appId: string) {
+    const partition = `platformApp-${appId}`;
+
+    if (!this.sessionsInitialized[partition]) {
+      const session = electron.remote.session.fromPartition(partition);
+
+      session.webRequest.onBeforeRequest((details, cb) => {
+        // TODO: Handle domain whitelisting
+        console.log('Web Request', details);
+        cb({});
+      });
+
+      this.sessionsInitialized[partition] = true;
+    }
+
+    return partition;
   }
 
   getPageUrlForSlot(appId: string, slot: EAppPageSlot) {
