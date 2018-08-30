@@ -22,4 +22,9 @@ export default class HFormGroup extends BaseFormGroup {
 
   @Prop()
   readonly title: string;
+
+  created() {
+    // vue-class-component doesn't inherit lifecycle hooks
+    super.created();
+  }
 }

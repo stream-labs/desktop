@@ -13,9 +13,17 @@ import {
   INumberMetadata,
   EInputType
 } from 'components/shared/inputs/index';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-@Component({})
+@Component({
+  components: { ValidatedForm }
+})
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
+
+  $refs: {
+    form: ValidatedForm;
+  };
+
   newTimer: IChatbotTimer = {
     name: null,
     interval: 5,
@@ -76,7 +84,10 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onSaveHandler() {
+  async onSaveHandler() {
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
+
     if (this.isEdit) {
       this.chatbotApiService
         .updateTimer(this.timerToUpdate.id, this.newTimer)
