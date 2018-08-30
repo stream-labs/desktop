@@ -49,7 +49,14 @@ export class EditMenu extends Menu {
   }
 
   private appendEditMenuItems() {
-    if (this.scene && this.source && this.source.type === 'monitor_capture') {
+    const isMultipleSelection = this.selectionService.getSize() > 1;
+
+    if (
+      this.scene &&
+      !isMultipleSelection &&
+      this.source &&
+      this.source.type === 'monitor_capture'
+    ) {
       this.append({
         id: 'Interactive Crop',
         label: $t('sources.interactiveCrop'),
@@ -81,8 +88,6 @@ export class EditMenu extends Menu {
         click: () => this.clipboardService.paste(true)
       });
     }
-
-    const isMultipleSelection = this.selectionService.getSize() > 1;
 
     if (this.options.showSceneItemMenu) {
 
