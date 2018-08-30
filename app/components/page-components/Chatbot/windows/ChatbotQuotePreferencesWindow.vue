@@ -2,7 +2,7 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t(`${isEdit ? 'Edit' : 'Add'} Timer`)"
+  :title="$t(`${isEdit ? 'Edit' : 'Add'} Quote`)"
 >
   <div slot="fixed">
    <div class="window-toggle__wrapper">

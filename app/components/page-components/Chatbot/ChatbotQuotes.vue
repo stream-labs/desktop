@@ -84,8 +84,6 @@
 }
 
 tbody tr {
-  .transition;
-  .cursor--pointer;
 
   td {
     color: black;
@@ -99,16 +97,12 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
+}
+
+.icon-edit,
+.icon-trash {
+  .icon-hover();
 }
 
 .chatbot-timers__timer-actions__container {
@@ -129,22 +123,9 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-    color: white;
-  }
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    color: white;
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
+  .icon-edit,
+  .icon-trash {
+    .night-icon-hover();
   }
 }
 </style>
