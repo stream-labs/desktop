@@ -4,7 +4,7 @@ import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
 
 interface ISourcesApi {
-  getSources: () => ISource[];
+  // TODO Will this be useful for docs?
 }
 
 interface ISourceFlags {
@@ -65,7 +65,18 @@ export class SourcesModule extends Module implements ISourcesApi {
 
   @apiMethod()
   updateSource(patch: Partial<ISource>) {
+    const requiredKeys = ['id'];
+    const mutableKeys = ['name'];
 
+    const slicedPatch = this.validatePatch(requiredKeys, mutableKeys, patch);
+    const source = this.sourcesService.getSource(patch.id);
+
+    if (slicedPatch.name) source.setName(slicedPatch.name);
+  }
+
+  @apiMethod()
+  removeSource(id: string) {
+    this.sourcesService.removeSource(id);
   }
 
   private serializeSource(source: Source): ISource {
