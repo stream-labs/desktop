@@ -5,17 +5,19 @@
 >
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
-      <v-form-group :title="$t('Widget Size')">
+      <div class="top-input__container">
+        {{ $t('Widget Size') }}
         <div class="top-input">
           <span>W</span><number-input v-model="properties[1].value" :metadata="{}" />
           <span>H</span><number-input v-model="properties[2].value" :metadata="{}" />
         </div>
-      </v-form-group>
-      <v-form-group :title="$t('FPS')">
+      </div>
+      <div class="top-input__container">
+        {{ $t('FPS') }}
         <div class="top-input">
           <number-input v-model="properties[3].value" :metadata="{}" />
         </div>
-      </v-form-group>
+      </div>
       <button class="button button--action test-button">{{ $t('Test Widget') }}</button>
     </div>
 
@@ -99,6 +101,16 @@
       border-bottom: 1px solid #274959 !important;
     }
   }
+
+  .top-input__container {
+    margin-right: 16px;
+  }
+
+  .top-input {
+    input[type=number] {
+      height: 22px;
+    }
+  }
 </style>
 
 <style lang="less" scoped>
@@ -113,16 +125,17 @@
     width: 100%;
     display: flex;
     align-items: center;
+    color: #8b9195;
+    font-size: 12px;
   }
 
   .top-input {
     display: flex;
     position: relative;
-    top: -12px;
     align-items: center;
 
     span {
-      margin-left: 8px;
+      margin-left: 4px;
     }
 
     .number-input {
