@@ -2907,6 +2907,10 @@ css-color-names@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/css-color-names/-/css-color-names-0.0.4.tgz#808adc2e79cf84738069b646cb20ec27beb629e0"
 
+css-element-queries@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.0.2.tgz#a32edfee4a5023688ef4d45f402077306d51d44c"
+
 css-loader@0.28.11:
   version "0.28.11"
   resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-0.28.11.tgz#c3f9864a700be2711bb5a2462b2389b1a392dab7"
@@ -6737,9 +6741,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.8/iojs-v2.0.4-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.9/iojs-v2.0.4-signed.tar.gz":
   version "0.3.4"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.8/iojs-v2.0.4-signed.tar.gz#8d0b235dd4907efc3e01bd9659980f3b890ba84d"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.9/iojs-v2.0.4-signed.tar.gz#3a61e36590aee39bc77a21d1395914b724842dd3"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
