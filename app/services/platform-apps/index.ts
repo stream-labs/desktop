@@ -8,6 +8,7 @@ import { Inject } from 'util/injector';
 import { EApiPermissions } from './api/modules/module';
 import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
+import { VideoService } from 'services/video';
 import electron from 'electron';
 
 /**
@@ -26,12 +27,22 @@ interface IAppSourceAbout {
   bannerImage?: string;
 }
 
+enum ESourceSizeType {
+  Absolute = 'absolute',
+  Relative = 'relative'
+}
+
 export interface IAppSource {
   type: EAppSourceType;
   id: string; // A unique id for this source
   name: string;
   about: IAppSourceAbout;
   file: string; // Relative path to HTML file
+  initialSize?: {
+    type: ESourceSizeType;
+    width: number;
+    height: number;
+  }
 }
 
 export enum EAppPageSlot {
@@ -69,6 +80,7 @@ export class PlatformAppsService extends
 
   @Inject() windowsService: WindowsService;
   @Inject() guestApiService: GuestApiService;
+  @Inject() videoService: VideoService;
 
   static initialState: IPlatformAppServiceState = {
     loadedApps: []
@@ -203,6 +215,28 @@ export class PlatformAppsService extends
     }
 
     return url;
+  }
+
+  getAppSourceSize(appId: string, sourceId: string) {
+    const app = this.getApp(appId);
+    const source = app.manifest.sources.find(source => source.id === sourceId);
+
+    if (source.initialSize) {
+      if (source.initialSize.type === ESourceSizeType.Absolute) {
+        return {
+          width: source.initialSize.width,
+          height: source.initialSize.height
+        }
+      } else if (source.initialSize.type === ESourceSizeType.Relative) {
+        return {
+          width: source.initialSize.width * this.videoService.baseWidth,
+          height: source.initialSize.height * this.videoService.baseHeight
+        }
+      }
+    }
+
+    // Default to 800x600
+    return { width: 800, height: 600 };
   }
 
   getApp(appId: string) {

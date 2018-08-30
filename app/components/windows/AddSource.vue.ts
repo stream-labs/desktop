@@ -94,10 +94,21 @@ export default class AddSource extends Vue {
         const widget = this.widgetsService.createWidget(this.widgetType, this.name);
         source = widget.getSource();
       } else {
+        const settings: Dictionary<any> = {};
+
+        if (this.sourceAddOptions.propertiesManager === 'platformApp') {
+          const size = this.platformAppsService.getAppSourceSize(
+            this.sourceAddOptions.propertiesManagerSettings.appId,
+            this.sourceAddOptions.propertiesManagerSettings.appSourceId
+          );
+          settings.width = size.width;
+          settings.height = size.height;
+        }
+
         source = this.sourcesService.createSource(
           this.name,
           this.sourceType,
-          {},
+          settings,
           {
             propertiesManager: this.sourceAddOptions.propertiesManager,
             propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
