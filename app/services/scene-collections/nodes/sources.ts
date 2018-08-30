@@ -31,6 +31,9 @@ export interface ISourceInfo {
   volume: number;
   forceMono?: boolean;
   syncOffset?: obs.ITimeSpec;
+  deinterlaceMode?: obs.EDeinterlaceMode;
+  deinterlaceFieldOrder?: obs.EDeinterlaceFieldOrder;
+
   audioMixers?: number;
   monitoringType?: obs.EMonitoringType;
   mixerHidden?: boolean;
@@ -101,6 +104,14 @@ export class SourcesNode extends Node<ISchema, {}> {
             propertiesManager: source.getPropertiesManagerType(),
             propertiesManagerSettings: source.getPropertiesManagerSettings()
           };
+
+          if (source.video && source.async) {
+            data = {
+              ...data,
+              deinterlaceMode: source.deinterlaceMode,
+              deinterlaceFieldOrder: source.deinterlaceFieldOrder,
+            }
+          }
 
           if (audioSource) {
             data = {
@@ -222,9 +233,19 @@ export class SourcesNode extends Node<ISchema, {}> {
         {
           channel: sourceInfo.channel,
           propertiesManager: sourceInfo.propertiesManager,
-          propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {}
+          propertiesManagerSettings: sourceInfo.propertiesManagerSettings || {},
         }
       );
+
+      let newSource = this.sourcesService.getSource(sourceInfo.id);
+      if (newSource.async && newSource.video) {
+        if (sourceInfo.deinterlaceMode !== void 0) {
+          newSource.setDeinterlaceMode(sourceInfo.deinterlaceMode);
+        }
+        if (sourceInfo.deinterlaceFieldOrder !== void 0) {
+          newSource.setDeinterlaceFieldOrder(sourceInfo.deinterlaceFieldOrder);
+        }
+      }
 
       if (source.audioMixers) {
         this.audioService.getSource(sourceInfo.id).setMul((sourceInfo.volume != null) ? sourceInfo.volume : 1);

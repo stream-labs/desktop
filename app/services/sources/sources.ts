@@ -25,6 +25,7 @@ const { ipcRenderer } = electron;
 
 const AudioFlag = obs.ESourceOutputFlags.Audio;
 const VideoFlag = obs.ESourceOutputFlags.Video;
+const AsyncFlag = obs.ESourceOutputFlags.Async;
 const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 
 export const PROPERTIES_MANAGER_TYPES = {
@@ -96,6 +97,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       // Will be updated periodically
       audio: false,
       video: false,
+      async: false,
       doNotDuplicate: false,
 
       // Unscaled width and height
@@ -104,7 +106,9 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
       muted: false,
       resourceId: 'Source' + JSON.stringify([id]),
-      channel
+      channel,
+      deinterlaceMode: obs.EDeinterlaceMode.Disable,
+      deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder.Top,
     };
 
     Vue.set(this.state.sources, id, sourceModel);
@@ -134,7 +138,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (type === 'browser_source') {
       if (settings.shutdown === void 0) settings.shutdown = true;
-      if (settings.url === void 0) settings.url = 'https://site.nicovideo.jp/nicolive/n-air-app/browser-source/';
+      if (settings.url === void 0) settings.url = 'https://n-air-app.nicovideo.jp/browser-source/';
     }
 
     if (type === 'text_gdiplus') {
@@ -320,10 +324,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   private updateSourceFlags(source: ISource, flags: number, doNotEmit? : boolean) {
     const audio = !!(AudioFlag & flags);
     const video = !!(VideoFlag & flags);
+    const async = !!(AsyncFlag & flags);
     const doNotDuplicate = !!(DoNotDuplicateFlag & flags);
 
-    if ((source.audio !== audio) || (source.video !== video)) {
-      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, doNotDuplicate });
+    if ((source.audio !== audio) || (source.video !== video) || (source.async !== async)) {
+      this.UPDATE_SOURCE({ id: source.sourceId, audio, video, async, doNotDuplicate });
 
       if (!doNotEmit) this.sourceUpdated.next(source);
     }

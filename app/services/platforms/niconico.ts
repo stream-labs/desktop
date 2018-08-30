@@ -1,16 +1,19 @@
 import { StatefulService, mutation } from './../stateful-service';
-import { IPlatformService, IPlatformAuth, IChannelInfo } from '.';
+import { IPlatformService, IStreamingSetting } from '.';
 import { HostsService } from '../hosts';
 import { SettingsService } from '../settings';
 import { Inject } from '../../util/injector';
 import { handleErrors, requiresToken, authorizedHeaders } from '../../util/requests';
 import { UserService } from '../user';
-import { integer } from 'aws-sdk/clients/cloudfront';
-import { parseString } from 'xml2js';
+import { Builder, parseString } from 'xml2js';
 import { StreamingService, EStreamingState } from '../streaming';
+import { WindowsService } from 'services/windows';
 
 interface INiconicoServiceState {
-  typeIdMap: object;
+}
+export type INiconicoProgramSelection = {
+  info: LiveProgramInfo
+  selectedId: string
 }
 
 function parseXml(xml: String): Promise<object> {
@@ -55,6 +58,14 @@ class UserInfo {
   }
 }
 
+export type LiveProgramInfo = Dictionary<{
+  title: string,
+  description: string,
+  bitrate: number | undefined,
+  url: string,
+  key: string
+}>
+
 class GetPublishStatusResult {
   attrib: object;
   items?: ProgramInfo[];
@@ -86,6 +97,17 @@ class GetPublishStatusResult {
         this.items = [getpublishstatus as ProgramInfo];
       }
       this.user = new UserInfo(getpublishstatus['user'][0]);
+
+      // convert items[].stream[].description to XML string
+      const xml = new Builder({rootName: 'root', headless: true});
+      const removeRoot = (s: string): string => s.replace(/^<root>([\s\S]*)<\/root>$/, '$1');
+      for (const p of this.items) {
+        for (const s of p.stream) {
+          if ('description' in s) {
+            s.description = s.description.map(d => removeRoot(xml.buildObject(d)));
+          }
+        }
+      }
     }
     console.log(this);
   }
@@ -101,6 +123,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   @Inject() settingsService: SettingsService;
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
+  @Inject() windowsService: WindowsService;
 
   authWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 800,
@@ -108,13 +131,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   };
 
   static initialState: INiconicoServiceState = {
-    typeIdMap: {},
   };
-
-  @mutation()
-  private ADD_GAME_MAPPING(game: string, id: integer) {
-    this.state.typeIdMap[game] = id;
-  }
 
   getUserKey(): Promise<string> {
     const url = `${this.hostsService.niconicoFlapi}/getuserkey`;
@@ -139,7 +156,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     const request = new Request(url, { credentials: 'same-origin' });
     return fetch(request)
       .then(handleErrors)
-      .then(() => {});
+      .then(() => { });
   }
 
   get authUrl() {
@@ -159,6 +176,8 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     return this.userService.platform.id;
   }
 
+  /** 配信中番組ID
+   */
   get channelId() {
     return this.userService.channelId;
   }
@@ -181,7 +200,11 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
       console.log('streamingService.streamingStatusChange! ', this.streamingStatus);
       if (this.streamingStatus === EStreamingState.Reconnecting) {
         console.log('reconnecting - checking stream key');
-        this.fetchStreamUrlAndKey().then(({ url, key }) => {
+        this.fetchLiveProgramInfo(this.channelId).then(info => {
+          let key = '';
+          if (this.channelId && this.channelId in info) {
+            key = info[this.channelId].key;
+          }
           if (key === '') {
             console.log('niconico programas has ended! stopping streaming.');
             this.streamingService.stopStreaming();
@@ -191,30 +214,72 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     });
   }
 
-  setupStreamSettings(auth: IPlatformAuth) {
-    return this.fetchStreamUrlAndKey().then(({ url, key }) => {
-      const settings = this.settingsService.getSettingsFormData('Stream');
-      console.log('fetchStreamUrlAndKey: ' + JSON.stringify({ url, key }));
-      settings.forEach(subCategory => {
-        subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'service') {
-            parameter.value = 'niconico ニコニコ生放送';
-          }
+  /**
+   * 有効な番組が選択されていれば、stream URL/key を設定し、その値を返す。
+   * そうでなければ、ダイアログを出して選択を促すか、配信していない旨返す。
+   * @param programId ユーザーが選択した番組ID(省略は未選択)
+   */
+  setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
+    return this.fetchLiveProgramInfo(programId).then(info => {
+      console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
 
-          if (parameter.name === 'server') {
-            parameter.value = url;
+      const num = Object.keys(info).length;
+      if (num > 1) {
+        // show dialog and select
+        this.windowsService.showWindow({
+          componentName: 'NicoliveProgramSelector',
+          queryParams: info,
+          size: {
+            width: 700,
+            height: 400
           }
-          if (parameter.name === 'key') {
-            parameter.value = key;
+        });
+        return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
+      }
+      if (num < 1) {
+        return NiconicoService.emptyStreamingSetting(false); // 番組がない
+      }
+      const id = Object.keys(info)[0];
+      const selected = info[id];
+      const url = selected.url;
+      const key = selected.key;
+      const bitrate = selected.bitrate;
+      this.userService.updatePlatformChannelId(id);
+
+      const settings = this.settingsService.getSettingsFormData('Stream');
+      settings.forEach(subCategory => {
+        if (subCategory.nameSubCategory !== 'Untitled') return;
+        subCategory.parameters.forEach(parameter => {
+          switch (parameter.name) {
+            case 'service':
+              parameter.value = 'niconico ニコニコ生放送';
+              break;
+            case 'server':
+              parameter.value = url;
+              break;
+            case 'key':
+              parameter.value = key;
+              break;
           }
         });
       });
-
       this.settingsService.setSettings('Stream', settings);
+
+      // 有効な番組が選択されているので stream keyを返す
+      return NiconicoService.createStreamingSetting(false, url, key, bitrate);
     });
   }
 
-  // TODO ニゴニコOAuthのtoken更新に使う
+  private static emptyStreamingSetting(asking: boolean): IStreamingSetting {
+    return NiconicoService.createStreamingSetting(asking, '', '');
+  }
+
+  private static createStreamingSetting(asking: boolean, url: string, key: string, bitrate?: number)
+    : IStreamingSetting {
+    return { asking, url, key, bitrate };
+  }
+
+  // TODO ニコニコOAuthのtoken更新に使う
   fetchNewToken(): Promise<void> {
     const url = `${this.hostsService.niconicoOAuth}/token`;
     const headers = authorizedHeaders(this.userService.apiToken);
@@ -243,47 +308,37 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   @requiresToken()
   fetchRawChannelInfo(): Promise<GetPublishStatusResult> {
     return this.fetchGetPublishStatus()
-      .then(xml => GetPublishStatusResult.fromXml(xml))
-      .then(result => {
-        if (result.ok) {
-          this.userService.updatePlatformChannelId(result.items[0].stream[0].id[0]); // lv-id
+      .then(xml => GetPublishStatusResult.fromXml(xml));
+  }
+
+  /**
+   * 配信可能番組情報を取得する。
+   * @param programId 与えた場合、一致する番組があればその情報だけを返す。
+   *   無い場合と与えない場合、配信可能な全番組を返す。
+   */
+  fetchLiveProgramInfo(programId: string = ''): Promise<LiveProgramInfo> {
+    return this.fetchRawChannelInfo().then(result => {
+      const status = result.status;
+      console.log('getpublishstatus status=' + status);
+      let r: LiveProgramInfo = {};
+      if (status === 'ok') {
+        for (const item of result.items) {
+          const rtmp = item.rtmp[0];
+          const stream = item.stream[0];
+          const id = stream.id[0];
+          r[id] = {
+            title: stream.title[0],
+            description: stream.description[0],
+            bitrate: rtmp.bitrate.length > 0 ? parseInt(rtmp.bitrate[0], 10) : undefined,
+            url: rtmp.url[0].trim(),
+            key: rtmp.stream[0].trim()
+          };
+        };
+        if (programId && programId in r) {
+          r = { [programId]: r[programId] };
         }
-        return result;
-      });
-  }
-
-  fetchStreamUrlAndKey(): Promise<{ url: string, key: string }> {
-    return this.fetchRawChannelInfo().then(result => {
-      const status = result.status;
-      console.log('getpublishstatus status=' + status);
-      if (status === 'ok') {
-        const rtmp = result.items[0].rtmp[0];
-        return { url: rtmp.url[0], key: rtmp.stream[0] };
       }
-      return { url: '', key: '' };
-    });
-  }
-  fetchStreamKey(): Promise<string> {
-    return this.fetchStreamUrlAndKey().then(urlkey => urlkey.key);
-  }
-
-  fetchBitrate(): Promise<number | undefined> {
-    return this.fetchRawChannelInfo().then(result => {
-      const status = result.status;
-      console.log('getpublishstatus status=' + status);
-      if (status === 'ok') {
-        return parseInt(result.items[0].rtmp[0].bitrate[0], 10);
-      }
-      return undefined;
-    });
-  }
-
-  fetchChannelInfo(): Promise<IChannelInfo> {
-    return this.fetchRawChannelInfo().then(json => {
-      return {
-        title: '', // TODO
-        game: ''
-      };
+      return r;
     });
   }
 
@@ -323,16 +378,6 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   fetchCommentCount(): Promise<number> {
     return this.fetchPlayerStatus()
       .then(o => o['stream'][0]['comment_count'][0]);
-  }
-
-  @requiresToken()
-  putChannelInfo(streamTitle: string, streamGame: string): Promise<boolean> {
-    // dummy. ignore it.
-    return Promise.resolve(false);
-  }
-
-  searchGames(searchString: string) {
-    return Promise.resolve(JSON.parse(''));
   }
 
   getChatUrl(mode: string): Promise<string> {

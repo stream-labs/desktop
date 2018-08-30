@@ -4,7 +4,9 @@
   "author": "General Workings, Inc.",
   "license": "GPL-3.0",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "@octokit/rest": "^15.9.5"
+  },
   "devDependencies": {
     "7zip-bin": "^2.2.7",
     "aws-sdk": "^2.157.0",

@@ -35,6 +35,12 @@
     "title": "設定の最適化",
     "description": "ニコニコ生放送に最適化した設定で配信します。"
   },
+  "nicoliveProgramSelector": {
+    "title": "配信する番組の選択",
+    "description": "配信可能な番組が複数あります。<br/>配信する番組を選択してください。",
+    "cancel": "キャンセル",
+    "done": "配信する番組を決定する"
+  },
   "FPS": "フレームレート",
   "optimizeAndGoLive": "最適化して配信を開始する",
   "skipOptimization": "最適化しないで配信を開始する",

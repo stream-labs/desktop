@@ -24,6 +24,7 @@
   "duplicate": "Duplicate",
   "rename": "Rename",
   "remove": "Remove",
+  "deinterlacing": "Deinterlacing",
   "filters": "Filters",
   "cpu": "CPU",
   "droppedFrames": "Dropped Frames",

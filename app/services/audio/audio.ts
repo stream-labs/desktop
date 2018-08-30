@@ -331,7 +331,7 @@ export class AudioSource implements IAudioSourceApi {
         name: 'syncOffset',
         description: $t('audio.syncOffsetInMs'),
         showDescription: false,
-        type: 'OBS_PROPERTY_INT',
+        type: 'OBS_PROPERTY_UINT',
         visible: true,
         enabled: true,
       },

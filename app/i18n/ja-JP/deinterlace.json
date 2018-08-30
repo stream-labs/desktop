@@ -1,0 +1,13 @@
+{
+    "disable": "なし",
+    "discard": "Discard",
+    "retro": "Retro",
+    "blend": "Blend",
+    "blend2x": "Blend 2x",
+    "linear": "Linear",
+    "linear2x": "Linear 2x",
+    "yadif": "Yadif",
+    "yadif2x": "Yadif 2x",
+    "top_field_first": "上位フィールド優先",
+    "bottom_field_first": "下位フィールド優先"
+}

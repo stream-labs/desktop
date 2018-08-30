@@ -3,7 +3,6 @@ import URI from 'urijs';
 import { defer } from 'lodash';
 import { PersistentStatefulService } from './persistent-stateful-service';
 import { Inject } from '../util/injector';
-import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from './stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
@@ -11,7 +10,8 @@ import {
   getPlatformService,
   IPlatformAuth,
   TPlatform,
-  IPlatformService
+  IPlatformService,
+  IStreamingSetting
 } from './platforms';
 import { CustomizationService } from './customization';
 import Raven from 'raven-js';
@@ -20,7 +20,6 @@ import { SceneCollectionsService } from 'services/scene-collections';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { mergeStatic } from 'rxjs/operator/merge';
-import Util from 'services/utils';
 import { WindowsService } from 'services/windows';
 import { SettingsService } from 'services/settings';
 
@@ -166,7 +165,6 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGIN(auth);
     this.userLogin.next(auth);
     this.setRavenContext();
-    service.setupStreamSettings(auth);
     await this.sceneCollectionsService.setupNewUser();
   }
 
@@ -330,23 +328,12 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     }, 'RecentEvents');
   }
 
-  async updateStreamSettings(): Promise<string> {
-    return getPlatformService(this.platform.type).setupStreamSettings({} as IPlatformAuth).then(() => {
-      const settings = this.settingsService.getSettingsFormData('Stream');
-      let key = '';
-      settings.forEach(subCategory => {
-        subCategory.parameters.forEach(parameter => {
-          if (parameter.name === 'key') {
-            key = parameter.value as string;
-          }
-        });
-      });
-      return key;
-    });
+  async updateStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
+    return await getPlatformService(this.platform.type).setupStreamSettings(programId);
   }
 
   isNiconicoLoggedIn() {
-    return this.isLoggedIn() && this.platform.type === 'niconico';
+    return this.isLoggedIn() && this.platform && this.platform.type === 'niconico';
   }
 }
 

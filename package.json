@@ -6,7 +6,7 @@
   "//": {
     "version": "0.9.3-preview.3"
   },
-  "version": "0.1.20180809-1",
+  "version": "0.1.20180830-1",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
@@ -77,7 +77,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "2.0.5",
+    "runtimeVersion": "2.0.8",
     "arch": "x64"
   },
   "lint-staged": {
@@ -129,7 +129,7 @@
     "cross-env": "^5.2.0",
     "css-loader": "^0.28.7",
     "devtron": "^1.4.0",
-    "electron": "2.0.5",
+    "electron": "2.0.8",
     "electron-builder": "20.26.0",
     "electron-devtools-installer": "2.2.4",
     "eslint": "^3.19.0",

@@ -18,7 +18,7 @@ import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
 import { StreamInfoService }from 'services/stream-info';
 import { UserService } from 'services/user';
-import { getPlatformService } from '../platforms';
+import { getPlatformService, IStreamingSetting } from '../platforms';
 import { NiconicoService } from '../platforms/niconico';
 
 enum EOBSOutputType {
@@ -101,7 +101,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     this.toggleStreaming();
   }
 
-  async toggleStreamingAsync() {
+  // 配信開始ボタンまたはショートカットキーによる配信開始(対話可能)
+  async toggleStreamingAsync(programId: string = '') {
     if (this.isStreaming) {
       this.toggleStreaming();
       return;
@@ -110,7 +111,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     console.log('Start Streaming button: platform=' + JSON.stringify(this.userService.platform));
     if (this.userService.isNiconicoLoggedIn()) {
       try {
-        const streamkey = await this.userService.updateStreamSettings();
+        const setting = await this.userService.updateStreamSettings(programId);
+        if (setting.asking) {
+          return;
+        }
+        const streamkey = setting.key;
         if (streamkey === '') {
           return new Promise(resolve => {
             electron.remote.dialog.showMessageBox(
@@ -127,13 +132,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           });
         }
         if (this.customizationService.optimizeForNiconico) {
-          const platform = getPlatformService(this.userService.platform.type);
-          if (platform instanceof NiconicoService) {
-            // FIXME: `this.userService.updateStreamSettings`とあわせて
-            //       2度 `getpublishstatus` を呼んでいるが
-            //       不整合回避のために1回だけにしたい
-            return this.optimizeForNiconico(platform);
-          }
+          return this.optimizeForNiconico(setting);
         }
       } catch (e) {
         const message = e instanceof Response
@@ -218,9 +217,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
   }
 
-  private async optimizeForNiconico(platform: NiconicoService) {
-    const bitrate = await platform.fetchBitrate();
-    if (bitrate === undefined) {
+  private async optimizeForNiconico(streamingSetting: IStreamingSetting) {
+    if (streamingSetting.bitrate === undefined) {
       return new Promise(resolve => {
         electron.remote.dialog.showMessageBox(
           electron.remote.getCurrentWindow(),
@@ -235,7 +233,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         );
       });
     }
-    const settings = this.settingsService.diffOptimizedSettings(bitrate);
+    const settings = this.settingsService.diffOptimizedSettings(streamingSetting.bitrate);
     if (settings) {
       if (this.customizationService.showOptimizationDialogForNiconico) {
         this.windowsService.showWindow({

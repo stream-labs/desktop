@@ -3,7 +3,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/0vvxc20s1re3094d?svg=true)](https://ci.appveyor.com/project/n-air-app/n-air-app)
 
 N AirはStreamlabs OBSをベースにした、生放送に便利な機能が豊富に組み込まれた高画質配信ソフトです。NLE（Niconico Live Encoder）よりも、さらに便利になって生まれ変わりました。
-![N Air](https://site.nicovideo.jp/nicolive/n-air-app/image/screenshot.png)
+![N Air](https://n-air-app.nicovideo.jp/image/screenshot.png)
 
 ## 動作条件
 * DirectX 10.1 互換のGPU
@@ -13,7 +13,7 @@ N AirはStreamlabs OBSをベースにした、生放送に便利な機能が豊�
 * インターネット接続環境が必要です。
 
 ## インストール
-<http://site.nicovideo.jp/nicolive/n-air-app/>
+<https://n-air-app.nicovideo.jp/>
 
 ## ビルド方法
 ### Node.js
