@@ -64,21 +64,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   protected init() {
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
 
-    ipcRenderer.on('notifySourceAttributes', (e: Electron.Event, data: obs.ISourceSize[]) => {
-      data.forEach(update => {
-        const source = this.getSource(update.name);
-
-        if (!source) return;
-
-        if ((source.width !== update.width) || (source.height !== update.height)) {
-          const size = { id: source.sourceId, width: update.width,
-            height: update.height };
-          this.UPDATE_SOURCE(size);
-        }
-        this.updateSourceFlags(source, update.outputFlags);
-      });
-    });
-
     this.scenesService.itemRemoved.subscribe(
       (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
     );
@@ -314,7 +299,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       activeItems.forEach(activeItem => {
         sourcesNames.push(activeItem.sourceId);
       });
-      ipcRenderer.send('requestSourceAttributes', sourcesNames);
+
+      const sizes: obs.ISourceSize[] = obs.getSourcesSize(sourcesNames);
+      sizes.forEach(update => {
+        const source = this.getSource(update.name);
+
+        if (!source) return;
+
+        if ((source.width !== update.width) || (source.height !== update.height)) {
+          const size = { id: source.sourceId, width: update.width,
+            height: update.height };
+          this.UPDATE_SOURCE(size);
+        }
+        this.updateSourceFlags(source, update.outputFlags);
+      });      
     }
   }
 

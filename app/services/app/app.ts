@@ -20,6 +20,7 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
@@ -67,6 +68,9 @@ export class AppService extends StatefulService<IAppState> {
   @track('app_start')
   load() {
     this.START_LOADING();
+
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
@@ -132,6 +136,8 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

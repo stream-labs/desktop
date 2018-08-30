@@ -13,7 +13,7 @@ import {
   ISceneItemNode
 } from './index';
 import Utils from 'services/utils';
-import * as obs from 'services/obs-api';
+import * as obs from '../../../obs-api';
 import electron from 'electron';
 import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
