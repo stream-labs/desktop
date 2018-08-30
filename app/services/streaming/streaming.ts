@@ -184,6 +184,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showEditStreamInfo() {
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
+      title: $t('Update Stream Info'),
       queryParams: {},
       size: {
         width: 500,

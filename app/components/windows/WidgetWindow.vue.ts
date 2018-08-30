@@ -80,10 +80,6 @@ export default class WidgetWindow extends Vue {
     return this.$refs.webview;
   }
 
-  get windowTitle() {
-    return this.source ? $t('Settings for ') + this.source.name : '';
-  }
-
   get tab(): IWidgetTab {
     return this.tabs.find(tab => tab.name === this.value);
   }
