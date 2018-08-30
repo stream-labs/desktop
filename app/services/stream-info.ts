@@ -35,7 +35,7 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   init() {
     this.platformStatusInterval = window.setInterval(() => {
-      if (this.streamingService.isStreaming) {
+      if (this.streamingService.isStreaming && this.userService.isLoggedIn()) {
         const platform = getPlatformService(this.userService.platform.type);
 
         platform.fetchViewerCount().then(viewers => {
