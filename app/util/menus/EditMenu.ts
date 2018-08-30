@@ -5,6 +5,7 @@ import { ScenesService } from '../../services/scenes';
 import { ClipboardService } from '../../services/clipboard';
 import { SourceTransformMenu } from './SourceTransformMenu';
 import { GroupMenu } from './GroupMenu';
+import { DeinterlaceMenu } from './DeinterlaceMenu';
 import { SourceFiltersService } from '../../services/source-filters';
 import { CustomizationService } from 'services/customization';
 import { SelectionService } from 'services/selection/selection';
@@ -173,6 +174,14 @@ export class EditMenu extends Menu {
 
       this.append({ type: 'separator' });
 
+      if (this.source.async && this.source.video) {
+        this.append({
+          id: 'Deinterlacing',
+          label: $t('common.deinterlacing'),
+          submenu: this.deinterlaceSubmenu().menu
+        });
+      }
+
       const filtersCount = this.sourceFiltersService.getFilters(this.source.sourceId).length;
 
       this.append({
@@ -276,5 +285,9 @@ export class EditMenu extends Menu {
 
   private groupSubmenu() {
     return new GroupMenu();
+  }
+
+  private deinterlaceSubmenu() {
+    return new DeinterlaceMenu(this.source);
   }
 }

@@ -34,6 +34,7 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
@@ -46,6 +47,8 @@ export class SceneItem extends SceneItemNode implements ISceneItemApi {
   transform: ITransform;
   visible: boolean;
   locked: boolean;
+  deinterlaceMode: obs.EDeinterlaceMode;
+  deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
 
   // Some computed attributes
 

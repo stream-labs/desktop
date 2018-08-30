@@ -1,6 +1,7 @@
 import { IPropertyManager } from './properties-managers/properties-manager';
 import { IListOption, TFormData } from '../../components/shared/forms/Input';
 import { Observable } from 'rxjs/Observable';
+import * as obs from '../../../obs-api';
 
 export interface ISource extends IResource {
   sourceId: string;
@@ -8,11 +9,14 @@ export interface ISource extends IResource {
   type: TSourceType;
   audio: boolean;
   video: boolean;
+  async: boolean;
   muted: boolean;
   width: number;
   height: number;
   doNotDuplicate: boolean;
   channel?: number;
+  deinterlaceMode: obs.EDeinterlaceMode;
+  deinterlaceFieldOrder: obs.EDeinterlaceFieldOrder;
 }
 
 /**
@@ -37,6 +41,8 @@ export interface ISourceApi extends ISource {
   setPropertiesManagerSettings(settings: Dictionary<any>): void;
   hasProps(): boolean;
   setName(newName: string): void;
+  setDeinterlaceMode(newMode: obs.EDeinterlaceMode): void;
+  setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder): void;
 }
 
 
