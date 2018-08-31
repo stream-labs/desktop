@@ -100,6 +100,10 @@ export default class WidgetWindow extends Vue {
     return this.properties.slice(5);
   }
 
+  get topProperties() {
+    return this.properties.slice(1, 4);
+  }
+
   createProjector() {
     this.projectorService.createProjector(this.previewSource.sourceId);
   }

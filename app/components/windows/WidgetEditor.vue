@@ -5,19 +5,7 @@
 >
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
-      <div class="top-input__container">
-        {{ $t('Widget Size') }}
-        <div class="top-input">
-          <span>W</span><number-input v-model="properties[1].value" :metadata="{}" />
-          <span>H</span><number-input v-model="properties[2].value" :metadata="{}" />
-        </div>
-      </div>
-      <div class="top-input__container">
-        {{ $t('FPS') }}
-        <div class="top-input">
-          <number-input v-model="properties[3].value" :metadata="{}" />
-        </div>
-      </div>
+      <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
       <button class="button button--action test-button">{{ $t('Test Widget') }}</button>
     </div>
 
@@ -107,13 +95,9 @@
     }
   }
 
-  .top-input__container {
-    margin-right: 16px;
-  }
-
-  .top-input {
-    input[type=number] {
-      height: 22px;
+  .top-settings {
+    .input-container {
+      margin-bottom: 0;
     }
   }
 
@@ -142,6 +126,11 @@
     align-items: center;
     color: #8b9195;
     font-size: 12px;
+
+    > div {
+      display: flex;
+      align-items: center;
+    }
   }
 
   .top-input {
