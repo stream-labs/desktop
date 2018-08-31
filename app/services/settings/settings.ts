@@ -629,6 +629,10 @@ export class SettingsService extends StatefulService<ISettingsState>
       } else if (deviceForm.value !== null) {
 
         const device = audioDevices.find(device => device.id === deviceForm.value);
+        if (device === undefined) {
+          this.sourcesService.removeSource(source.sourceId);
+          return;
+        }
         const displayName = device.id === 'default' ? deviceForm.name : device.description;
 
         if (!source) {
