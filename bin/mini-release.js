@@ -11,7 +11,7 @@ let moment;
 let inq;
 let colors;
 let ProgressBar;
-let yml;
+let yaml;
 
 try {
     sh = require('shelljs');
@@ -19,7 +19,7 @@ try {
     inq = require('inquirer');
     colors = require('colors/safe');
     ProgressBar = require('progress');
-    yml = require('js-yaml');
+    yaml = require('js-yaml');
 } catch (e) {
     if (e.message.startsWith('Cannot find module')) {
         throw new Error(`先に\`yarn install\`を実行する必要があります: ${e.message}`);
@@ -328,17 +328,28 @@ async function runScript() {
 
     const distDir = path.resolve('.', 'dist');
     const latestYml = path.join(distDir, 'latest.yml');
-    const parsedLatestYml = yml.safeLoad(fs.readFileSync(latestYml));
+    const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml));
+
+    // add releaseNotes into latest.yml
+    parsedLatestYml.releaseNotes = notes;
+    fs.writeFileSync(latestYml, yaml.safeDump(parsedLatestYml));
+
     const binaryFile = parsedLatestYml.path;
     const binaryFilePath = path.join(distDir, binaryFile);
     if (!fs.existsSync(binaryFilePath)) {
         error(`Counld not find ${path.resolve(binaryFilePath)}`);
         sh.exit(1);
     }
+    const blockmapFile = binaryFile + '.blockmap';
+    const blockmapFilePath = path.join(distDir, blockmapFile);
+    if (!fs.existsSync(blockmapFilePath)) {
+        error(`Counld not find ${path.resolve(blockmapFilePath)}`);
+        sh.exit(1);
+    }
 
-    executeCmd(`ls -l ${binaryFilePath} ${latestYml}`);
+    executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
 
-    // TODO upload to the github directly via API...
+    // upload to the github directly via GitHub API...
 
     const octokit = OctoKit({
         baseUrl: githubApiServer
@@ -368,8 +379,17 @@ async function runScript() {
         contentLength: fs.statSync(latestYml).size,
         contentType: 'application/json',
     });
-    info(`uploading ${binaryFile}...`);
 
+    info(`uploading ${blockmapFilePath}...`);
+    await octokit.repos.uploadAsset({
+        url: result.data.upload_url,
+        name: blockmapFile,
+        file: fs.createReadStream(blockmapFilePath),
+        contentLength: fs.statSync(blockmapFilePath).size,
+        contentType: 'application/octet-stream',
+    });
+
+    info(`uploading ${binaryFile}...`);
     await octokit.repos.uploadAsset({
         url: result.data.upload_url,
         name: binaryFile,
