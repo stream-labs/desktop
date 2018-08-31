@@ -56,7 +56,7 @@ export default class WidgetWindow extends Vue {
   previewSource: ISourceApi = null;
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
-  currentSetting = '';
+  currentSetting = 'source';
   properties: TObsFormData = [];
   tabs: IWidgetTab[] = [];
   tabsList: { name: string, value: string}[] = [];

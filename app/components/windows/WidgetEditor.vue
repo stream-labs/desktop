@@ -98,6 +98,16 @@
   .top-settings {
     .input-container {
       margin-bottom: 0;
+      width: auto;
+      flex-direction: column;
+      margin-right: 8px;
+      margin-bottom: 16px;
+    }
+    .int-input{
+      width: 60px;
+    }
+    input[type=text] {
+      height: 28px;
     }
   }
 
