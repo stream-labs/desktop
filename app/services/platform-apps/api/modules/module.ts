@@ -1,5 +1,3 @@
-import { pick } from 'lodash';
-
 export enum EApiPermissions {
   Example = 'slobs.example',
   ScenesSources = 'slobs.scenes-sources'
@@ -21,6 +19,15 @@ export function apiEvent() {
 
     (target.constructor as typeof Module).apiEvents.push(methodName);
   };
+}
+
+export class NotImplementedError extends Error {
+  constructor() {
+    super(
+      'This function is not yet implemented.  It you are interested in ' +
+      'using it, please reach out to the Streamlabs dev team.  Thanks!'
+    );
+  }
 }
 
 export abstract class Module {
@@ -48,19 +55,15 @@ export abstract class Module {
   static apiEvents: string[] = [];
 
   /**
-   * Takes a patch object and validates it against the required keys,
-   * and then slices it down to the list of mutable keys.
+   * Takes a patch object and validates it against the required keys.
    * @param requiredKeys keys required in the original object
-   * @param mutableKeys keys that sohuld be left after slicing
    */
-  validatePatch(requiredKeys: string[], mutableKeys: string[], patch: Dictionary<any>) {
+  validatePatch(requiredKeys: string[], patch: Dictionary<any>) {
     requiredKeys.forEach(key => {
       if (!patch[key]) {
         throw new Error(`Missing required key in patch: ${key}`);
       }
     });
-
-    return pick(patch, mutableKeys);
   }
 
 }

@@ -1,11 +1,7 @@
-import { Module, EApiPermissions, apiMethod, apiEvent } from './module';
+import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError } from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
-
-interface ISourcesApi {
-  // TODO Will this be useful for docs?
-}
 
 interface ISourceFlags {
   audio: boolean;
@@ -27,7 +23,7 @@ interface ISource {
   appId?: string;
 }
 
-export class SourcesModule extends Module implements ISourcesApi {
+export class SourcesModule extends Module {
 
   moduleName = 'Sources';
   permissions = [EApiPermissions.ScenesSources]
@@ -64,19 +60,33 @@ export class SourcesModule extends Module implements ISourcesApi {
   }
 
   @apiMethod()
+  createSource(name: string) {
+    throw new NotImplementedError();
+  }
+
+  @apiMethod()
   updateSource(patch: Partial<ISource>) {
     const requiredKeys = ['id'];
-    const mutableKeys = ['name'];
+    this.validatePatch(requiredKeys, patch);
 
-    const slicedPatch = this.validatePatch(requiredKeys, mutableKeys, patch);
     const source = this.sourcesService.getSource(patch.id);
 
-    if (slicedPatch.name) source.setName(slicedPatch.name);
+    if (patch.name) source.setName(patch.name);
   }
 
   @apiMethod()
   removeSource(id: string) {
-    this.sourcesService.removeSource(id);
+    throw new NotImplementedError();
+  }
+
+  @apiMethod()
+  getObsSettings(sourceId: string) {
+    return this.sourcesService.getSource(sourceId).getSettings();
+  }
+
+  @apiMethod()
+  setObsSettings(sourceId: string, settingsPatch: Dictionary<any>) {
+    return this.sourcesService.getSource(sourceId).updateSettings(settingsPatch);
   }
 
   private serializeSource(source: Source): ISource {

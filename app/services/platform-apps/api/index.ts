@@ -1,6 +1,7 @@
 import { Module, EApiPermissions, TApiModule } from './modules/module';
 import { ExampleModule } from './modules/example';
 import { SourcesModule } from './modules/sources';
+import { ScenesModule} from './modules/scenes';
 
 export class PlatformAppsApi {
 
@@ -10,6 +11,7 @@ export class PlatformAppsApi {
     // Register all modules
     this.registerModule(new ExampleModule());
     this.registerModule(new SourcesModule());
+    this.registerModule(new ScenesModule());
   }
 
   private registerModule(module: Module) {
