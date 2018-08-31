@@ -35,7 +35,10 @@
   <!-- buttons -->
   <div slot="controls">
     <div v-for="tabItem in tabsList" :key="tabItem.value" v-if="tabItem.value === value">
-      <slot :name="tabItem.value + '-controls'" v-if="(tab && tab.showControls) || tabItem.value === 'source'">
+      <slot
+        :name="tabItem.value + '-controls'"
+        v-if="(tab && tab.showControls && loaded) || tabItem.value === 'source'"
+      >
         <button
             class="button button--default"
             @click="close">
