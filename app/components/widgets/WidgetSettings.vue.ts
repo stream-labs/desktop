@@ -70,11 +70,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     }
   }
 
-  async retry() {
-    this.requestState = 'pending';
-    await this.refresh();
-  }
-
   @debounce(1000)
   @Watch('wData', { deep: true })
   async onDataChangeHandler() {
