@@ -15,7 +15,7 @@
   <div slot="content" class="chatbot-quote-preferences__container">
     <div>
       <VFormGroup
-        :title="$t('Name')"
+        :title="$t('Date Format')"
         v-model="generalSettings.date_format"
         :metadata="metadata.date_format"
       />

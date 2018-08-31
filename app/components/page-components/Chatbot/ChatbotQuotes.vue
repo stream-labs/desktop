@@ -51,7 +51,7 @@
           <td> {{ quote.message }} </td>
           <td> {{ quote.added_by }} </td>
           <td> {{ quote.game }} </td>
-          <td> {{ quote.created_at || '-' }} </td>
+          <td> {{ formatDate(quote.created_at) || '-' }} </td>
           <td>
             <div class="align-items--inline">
               <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5"/>
@@ -84,10 +84,6 @@
 }
 
 tbody tr {
-
-  td {
-    color: black;
-  }
 
   td:nth-child(2) {
     width: 300px;

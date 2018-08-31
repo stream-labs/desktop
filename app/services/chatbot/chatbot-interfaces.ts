@@ -1,6 +1,7 @@
 
 // state
 export interface IChatbotApiServiceState {
+  // v1
   apiToken: string;
   socketToken: string;
   globallyEnabled: boolean;
@@ -17,6 +18,10 @@ export interface IChatbotApiServiceState {
   // v2
   quotesResponse: IQuotesResponse;
   quotePreferencesResponse: IQuotePreferencesResponse;
+  queuePreferencesResponse: IQueuePreferencesResponse;
+  queueStateResponse: IQueueStateResponse;
+  queueEntriesResponse: IQueueEntriesResponse;
+  queuePickedResponse: IQueuePickedResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -110,6 +115,27 @@ export interface IQuotePreferencesResponse {
   settings: IQuotePreferencesData;
   enabled: boolean;
 }
+
+export interface IQueuePreferencesResponse {
+  settings: IQueuePreferencesData;
+  enabled: boolean;
+}
+
+export interface IQueueStateResponse {
+  status: 'Open' | 'Closed';
+  title?: string;
+}
+
+export interface IQueueEntriesResponse {
+  pagination: IChatbotPagination;
+  data: IQueuedUser[];
+}
+
+export interface IQueuePickedResponse {
+  pagination: IChatbotPagination;
+  data: IQueuedUser[];
+}
+
 
 // shared
 export interface IChatbotPermission {
@@ -342,6 +368,33 @@ export interface IQuotePreferencesData {
 export interface IQuotePreferencesGeneralSettings {
   date_format: string;
 }
+
+
+// queue
+export interface IQueuePreferencesData {
+  commands: IDafaultCommandsSlug;
+  general: IQueuePreferencesGeneralSettings;
+}
+
+export interface IQueuePreferencesGeneralSettings {
+  maximum: number;
+  messages: {
+    picked: string;
+  }
+}
+
+export interface IQueuedUser {
+  id: number;
+  user_id: number;
+  viewer_id: string;
+  name: string;
+  platform: string;
+  roles: number[];
+  note: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
 
 // dictionaries
 export enum ChatbotAutopermitEnums {

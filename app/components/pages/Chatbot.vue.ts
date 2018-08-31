@@ -7,6 +7,7 @@ import ChatbotCommands from 'components/page-components/Chatbot/ChatbotCommands.
 import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.vue';
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import ChatbotQuotes from 'components/page-components/Chatbot/ChatbotQuotes.vue';
+import ChatbotQueue from 'components/page-components/Chatbot/ChatbotQueue.vue';
 import { ChatbotApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue'
@@ -20,6 +21,7 @@ import ToggleInput from 'components/shared/inputs/ToggleInput.vue'
     ChatbotTimers,
     ChatbotModTools,
     ChatbotQuotes,
+    ChatbotQueue,
     ToggleInput
   }
 })
@@ -32,7 +34,7 @@ export default class Chatbot extends Vue {
     { title: 'Timers', enabled: true },
     { title: 'Mod Tools', enabled: true },
     { title: 'Quotes', enabled: true },
-    { title: 'Queue', enabled: false },
+    { title: 'Queue', enabled: true },
     { title: 'Currency', enabled: false },
     { title: 'Poll', enabled: false },
     { title: 'Betting', enabled: false }

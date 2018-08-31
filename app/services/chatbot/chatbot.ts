@@ -31,7 +31,11 @@ import {
   IQuotesResponse,
   ChatbotSettingSlugs,
   IQuote,
-  IQuotePreferencesResponse
+  IQuotePreferencesResponse,
+  IQueueStateResponse,
+  IQueueEntriesResponse,
+  IQueuePickedResponse,
+  IQueuedUser
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -95,6 +99,27 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     quotePreferencesResponse: {
       enabled: false,
       settings: null
+    },
+    queuePreferencesResponse: {
+      enabled: false,
+      settings: null
+    },
+    queueStateResponse: {
+      status: 'Closed',
+    },
+    queueEntriesResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
+    },
+    queuePickedResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
     }
   };
 
@@ -256,7 +281,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
     return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
       (response: IQuotesResponse) => {
-        console.log(response);
         this.UPDATE_QUOTES(response);
       }
     );
@@ -266,6 +290,38 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     return this.api('GET', 'settings/quotes', {}).then(
       (response: IQuotePreferencesResponse) => {
         this.UPDATE_QUOTE_PREFERENCES(response);
+      }
+    );
+  }
+
+  fetchQueuePreferences() {
+    return this.api('GET', 'settings/queue', {}).then(
+      (response: IQuotePreferencesResponse) => {
+        this.UPDATE_QUOTE_PREFERENCES(response);
+      }
+    );
+  }
+
+  fetchQueueState() {
+    return this.api('GET', 'queue', {}).then(
+      (response: IQueueStateResponse) => {
+        this.UPDATE_QUEUE_STATE(response);
+      }
+    )
+  }
+
+  fetchQueueEntries(page = this.state.queueEntriesResponse.pagination.current, query = '') {
+    return this.api('GET', `queue/entries?page=${page}&query=${query}`, {}).then(
+      (response: IQueueEntriesResponse) => {
+        this.UPDATE_QUEUE_ENTRIES(response);
+      }
+    )
+  }
+
+  fetchQueuePicked(page = this.state.queuePickedResponse.pagination.current) {
+    return this.api('GET', `queue/picked?page=${page}`, {}).then(
+      (response: IQueuePickedResponse) => {
+        this.UPDATE_QUEUE_PICKED(response);
       }
     );
   }
@@ -304,7 +360,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'words-protection':
-            debugger;
             this.UPDATE_WORD_PROTECTION(
               response as IWordProtectionResponse
             );
@@ -349,6 +404,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+  // create
   createCustomCommand(data: ICustomCommand) {
     return this.api('POST', 'commands', data)
       .then((response: ICustomCommand) => {
@@ -373,6 +429,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+
+  // Update
   updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
     return this.api('POST', `settings/${slugName}/commands/${commandName}`, data)
       .then((response: IChatbotAPIPostResponse) => {
@@ -451,7 +509,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   updateQuote(id: number, data: IQuote) {
     return this.api('PUT', `quotes/${id}`, data)
       .then((response: IChatbotAPIPutResponse) => {
-        debugger;
         if (response.success === true) {
           this.fetchQuotes();
           this.chatbotCommonService.closeChildWindow();
@@ -469,11 +526,50 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  openQueue(title: string) {
+    return this.api('PUT', 'queue/open', { title }).then(
+      (response: IChatbotAPIPutResponse) => {
+        if (response.success === true) {
+          this.fetchQueueState();
+        }
+      }
+    );
+  }
+
+  closeQueue() {
+    return this.api('PUT', 'queue/close', {}).then(
+      (response: IChatbotAPIPutResponse) => {
+        if (response.success === true) {
+          this.fetchQueueState();
+        }
+      }
+    );
+  }
+
+  pickQueueEntry(id: number) {
+    return this.api('PUT', `queue/pick/${id}`, {}).then(
+      (response: IChatbotAPIPutResponse) => {
+        // should just get from socket
+        this.fetchQueueEntries();
+        this.fetchQueuePicked();
+      }
+    );
+  }
+
+  pickQueueEntryRandom() {
+    return this.api('PUT', 'queue/pick/random', {}).then(
+      (response: IChatbotAPIPutResponse) => {
+        // should just get from socket
+        this.fetchQueueEntries();
+        this.fetchQueuePicked();
+      }
+    );
+  }
+
 
   //
   // DELETE methods
   //
-
   deleteCustomCommand(id: string) {
     return this.api('DELETE', `commands/${id}`, {}).then(
       (response: IChatbotAPIDeleteResponse) => {
@@ -499,6 +595,37 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       (response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchQuotes();
+        }
+      }
+    );
+  }
+
+  clearQueueEntries() {
+    return this.api('DELETE', 'queue/entries', {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchQueueEntries();
+        }
+      }
+    );
+  }
+
+  clearQueuePicked() {
+    return this.api('DELETE', 'queue/picked', {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchQueuePicked();
+        }
+      }
+    );
+  }
+
+  removeQueueEntry(id: number) {
+    return this.api('DELETE', `queue/${id}`, {}).then(
+      (response: IChatbotAPIDeleteResponse) => {
+        if (response.success === true) {
+          this.fetchQueueEntries();
+          this.fetchQueuePicked();
         }
       }
     );
@@ -582,6 +709,20 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'quotePreferencesResponse', response);
   }
 
+  @mutation()
+  private UPDATE_QUEUE_STATE(response: IQueueStateResponse) {
+    Vue.set(this.state, 'queueStateResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUEUE_ENTRIES(response: IQueueEntriesResponse) {
+    Vue.set(this.state, 'queueEntriesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUEUE_PICKED(response: IQueuePickedResponse) {
+    Vue.set(this.state, 'queuePickedResponse', response);
+  }
 
 }
 
