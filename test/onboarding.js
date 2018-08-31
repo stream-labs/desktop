@@ -56,5 +56,5 @@ test('Adding some starter widgets', async t => {
   await clickSourceProperties(t);
   await focusChild(t);
 
-  t.true(await app.client.isExisting('label=Widget Type'));
+  t.true(await app.client.isExisting('label=Custom CSS'));
 });
