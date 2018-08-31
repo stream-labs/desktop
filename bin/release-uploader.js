@@ -15,7 +15,7 @@ const readdir = util.promisify(fs.readdir);
 async function traverse_directory(directory, callback) {
   const files = await readdir(directory);
 
-  for (for file of files) {
+  for (file of files) {
     const filepath = path.resolve(directory, file);
     console.log(filepath);
 
@@ -207,6 +207,8 @@ async function main() {
       return unlink(path);
     }
   });
+
+  await rmdir(tmp_dir);
 }
 
 main().then(() => { });
