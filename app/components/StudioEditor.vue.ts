@@ -164,6 +164,7 @@ export default class StudioEditor extends Vue {
           menu = new EditMenu({
             selectedSceneId: this.scene.id,
             showSceneItemMenu: true,
+            sceneNodeId: overSource.sceneItemId,
             selectedSourceId: overSource.sourceId
           });
         } else {

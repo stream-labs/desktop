@@ -20,6 +20,7 @@ import Blank from 'components/windows/Blank.vue';
 import ManageSceneCollections from 'components/windows/ManageSceneCollections.vue';
 import Projector from 'components/windows/Projector.vue';
 import OptimizeForNiconico from 'components/windows/OptimizeForNiconico.vue';
+import CroppingOverlay from 'components/windows/CroppingOverlay.vue';
 import NicoliveProgramSelector from 'components/windows/NicoliveProgramSelector.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
@@ -34,12 +35,17 @@ export interface IWindowOptions {
   componentName: string;
   queryParams?: Dictionary<any>;
   size?: {
+    x?: number;
+    y?: number;
     width: number;
     height: number;
   };
   scaleFactor: number;
   title?: string;
   center?: boolean;
+  transparent?: boolean;
+  resizable?: boolean;
+  alwaysOnTop?: boolean;
 }
 
 interface IWindowsState {
@@ -87,6 +93,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     ManageSceneCollections,
     Projector,
     OptimizeForNiconico,
+    CroppingOverlay,
     NicoliveProgramSelector
   };
 
@@ -157,9 +164,14 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = this.windows[windowId] = new BrowserWindow({
       frame: false,
+      x: (options.size && options.size.x) || undefined,
+      y: (options.size && options.size.y) || undefined,
       width: (options.size && options.size.width) || 400,
       height: (options.size && options.size.height) || 400,
-      title: options.title || 'New Window'
+      title: options.title || 'New Window',
+      transparent: options.transparent,
+      resizable: options.resizable,
+      alwaysOnTop: options.alwaysOnTop,
     });
 
     newWindow.setMenu(null);
@@ -206,6 +218,9 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return this.state[windowId].queryParams || {};
   }
 
+  getWindow(windowId: string) {
+    return this.windows[windowId];
+  }
 
   updateChildWindowOptions(options: Partial<IWindowOptions>) {
     this.UPDATE_CHILD_WINDOW_OPTIONS(options);
