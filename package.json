@@ -73,7 +73,6 @@
   "dependencies": {
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
-    "electron-updater": "^3.0.1",
     "electron-window-state": "^4.1.1",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz",
