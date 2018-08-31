@@ -33,7 +33,7 @@
       "vendor",
       "app/i18n",
       "updater/index.html",
-      "updater/Updater.js",
+      "updater/bootstrap.js",
       "index.html",
       "main.js",
       "obs-api"
