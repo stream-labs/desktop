@@ -18,26 +18,44 @@ class Updater {
 
   run() {
     this.updateState = {};
+    this.cancellationToken = undefined;
 
     this.bindListeners();
 
     this.browserWindow = this.initWindow();
 
+    autoUpdater.autoDownload = false;
+
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
       // In this case, we shouldn't prevent starting the app.
-      this.startApp();
-      this.finished = true;
-      this.browserWindow.close();
+      this.skipUpdateAndContinue();
     });
+  }
+
+  skipUpdateAndContinue() {
+    this.startApp();
+    this.finished = true;
+    this.browserWindow.close();
   }
 
   // PRIVATE
 
   bindListeners() {
     autoUpdater.on('update-available', info => {
+      this.updateState.asking = true;
+      this.updateState.releaseNotes = info.releaseNotes;
+      this.updateState.releaseDate = info.releaseDate;
+      this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
       this.updateState.percent = 0;
+      this.cancellationToken = info.cancellationToken;
+      this.pushState();
+    });
+
+    ipcMain.on('autoUpdate-startDownload', () => {
+      this.updateState.asking = false;
+      autoUpdater.downloadUpdate(this.cancellationToken);
       this.pushState();
     });
 
@@ -56,6 +74,15 @@ class Updater {
       }
 
       this.pushState();
+    });
+
+    ipcMain.on('autoUpdate-cancelDownload', () => {
+      if (this.cancellationToken) {
+        this.cancellationToken.cancel();
+        this.cancellationToken = null;
+      }
+      this.finished = true;
+      this.skipUpdateAndContinue();
     });
 
     autoUpdater.on('update-downloaded', () => {
@@ -77,11 +104,14 @@ class Updater {
   initWindow() {
     const browserWindow = new BrowserWindow({
       width: 400,
-      height: 180,
-      frame: false,
+      height: 250,
+      frame: true,
+      closable: true,
       resizable: false,
       show: false
     });
+
+    browserWindow.setMenuBarVisibility(false);
 
     browserWindow.on('ready-to-show', () => {
       browserWindow.show();
@@ -89,6 +119,10 @@ class Updater {
 
     browserWindow.on('closed', () => {
       // Prevent leaving a zombie process
+      if (this.cancellationToken) {
+        this.cancellationToken.cancel();
+        this.cancellationToken = null;
+      }
       if (!this.finished) app.quit();
     });
 

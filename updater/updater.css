@@ -21,7 +21,7 @@ html {
     color: #9eeaf9;
     font-size: 18px;
     text-align: center;
-    -webkit-app-region: drag;
+    -webkit-app-region: no-drag;
     box-sizing: border-box;
 }
 .message {
@@ -85,4 +85,16 @@ html {
     100% {
         transform: rotate(359deg);
     }
+}
+
+.modal-layout-controls {
+  /* background-color: @bg-primary; */
+  box-shadow: 0 -5px 10px 2px #2F3340;
+  padding: 8px 16px;
+  text-align: right;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.modal-layout-controls.button {
+  margin-left: 8px;
 }
