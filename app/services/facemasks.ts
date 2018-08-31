@@ -51,14 +51,10 @@ interface IProfanitySettings {
 
 interface IFacemaskSettings {
   enabled: boolean;
-  initialized: boolean;
-  facemasks: Dictionary<number>;
-  transitions_enabled: boolean;
-  transition: Dictionary<string>;
+  facemasks: IFacemask[];
   audio_volume: number;
   duration: number;
-  data?: IFacemask[];
-  device?: IInputDeviceSelection;
+  device: IInputDeviceSelection;
 }
 
 interface IFacemaskAlertMessage {
@@ -66,6 +62,11 @@ interface IFacemaskAlertMessage {
   amount: string;
   facemask: string;
   message: string;
+}
+
+interface IDownloadProgress {
+  uuid: string;
+  progress: number;
 }
 
 export class FacemasksService extends PersistentStatefulService<IFacemasksServiceState> {
@@ -85,13 +86,16 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   settings: IFacemaskSettings = {
     enabled: false,
-    initialized: false,
-    facemasks: {},
-    transitions_enabled: false,
+    facemasks: [],
     audio_volume: 50,
-    transition: {},
     duration: 10,
+    device: {
+      name: null,
+      value: null
+    }
   };
+
+  downloadProgress: IDownloadProgress[] = [];
 
   profanitySettings: IProfanitySettings = {
     profanity_custom_words: '',
@@ -233,8 +237,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   playTestAlert() {
     if (this.active && this.socketConnectionActive) {
       const availableMasks = Object.keys(this.state.modtimeMap).filter(uuid  => {
-        return Object.keys(this.settings.facemasks).includes(uuid) && !this.state.modtimeMap[uuid].intro;
+        return this.settings.facemasks.some(mask => mask.uuid === uuid) && !this.state.modtimeMap[uuid].intro;
       });
+
 
       if (availableMasks.length) {
         const testMask = availableMasks[Math.floor(Math.random() * availableMasks.length)];
@@ -351,34 +356,15 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   updateSettings(settings: IFacemaskSettings) {
-    this.settings = settings;
-    if (settings.enabled) {
-      const promises = Object.keys(settings.facemasks).map(uuid => {
-        return this.downloadAndSaveModtime(uuid, false, false);
-      });
-
-      if (settings.transitions_enabled) {
-        promises.push(this.downloadAndSaveModtime(settings.transition.uuid, true, false));
-      }
-
-      Promise.all(promises).then(() => {
-        this.setupFilter();
-        this.activate();
-      }).catch(err => {
-        this.notifyFailure();
-      });
-
-      this.SET_DEVICE(settings.device.name, settings.device.value);
-    } else {
-      this.SET_ACTIVE(false);
-    }
+    this.startup();
   }
 
   checkFacemaskSettings(settings:IFacemaskSettings) {
     this.settings = settings;
     if (settings.enabled) {
+      this.SET_DEVICE(settings.device.name, settings.device.value);
       this.configureProfanityFilter();
-      const uuids = settings.data.map((mask: IFacemask) => {
+      const uuids = settings.facemasks.map((mask: IFacemask) => {
         return { uuid: mask.uuid, intro: mask.is_intro };
       });
 
@@ -387,8 +373,10 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
       const downloads = missingMasks.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, false));
 
+      this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
+
       Promise.all(downloads).then((responses) => {
-        this.ensureModtimes(settings.data);
+        this.ensureModtimes(settings.facemasks);
       }).catch(err => {
         console.log(err);
         this.notifyFailure();
@@ -399,6 +387,25 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
   }
 
+  setDownloadProgress(downloads: string[]) {
+    this.settings.facemasks.forEach(mask => {
+      this.downloadProgress.push({ uuid: mask.uuid, progress: 1 });
+    });
+    downloads.forEach(uuid => {
+      this.downloadProgress[uuid] = 0;
+    });
+  }
+
+  getDownloadProgress() {
+    let current = 0;
+    this.downloadProgress.forEach(mask => {
+      current += mask.progress;
+    });
+    if (current / this.downloadProgress.length === 1) {
+      return 'Ready';
+    }
+    return 'Downloading Masks';
+  }
 
   getEnabledDevice() {
     return this.state.device;
@@ -578,15 +585,26 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     }
 
     let fileContent = '';
+
     return new Promise((resolve, reject) => {
       this.ensureFacemasksDirectory();
 
       https.get(this.libraryUrl(uuid), response => {
         const writeStream = fs.createWriteStream(maskPath);
-        response.on('data', chunk => fileContent += chunk);
+
+        let length = parseInt(response.headers['content-length'], 10);
+        let current = 0;
+
+        response.on('data', chunk => {
+          current += chunk.length;
+          this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] = current / length;
+          fileContent += chunk;
+        });
+
         writeStream.on('finish', () => {
           try {
             const data = JSON.parse(fileContent) as IFacemask;
+            this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] = 1;
             resolve(data.modtime);
           } catch (err) {
             reject(err);
