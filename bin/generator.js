@@ -33,7 +33,7 @@ async function handle_file_lstat(stats, file_path, context) {
             hash.update(chunk);
         });
 
-        file_stream.on('end', () => {
+        file_stream.on('close', () => {
             resolve(hash.digest('hex'));
         });
 
