@@ -25,6 +25,7 @@ import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
     Tabs,
     ToggleInput,
     NumberInput,
+    GenericForm,
     VFormGroup,
     Display
   }
@@ -68,7 +69,6 @@ export default class WidgetWindow extends Vue {
 
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
-    console.log(this.properties);
 
     // create a temporary previewSource
     // the previewSource could have a different url for simulating widget's activity
@@ -96,8 +96,24 @@ export default class WidgetWindow extends Vue {
     return this.source ? $t('Settings for ') + this.source.name : '';
   }
 
+  get sourceProperties() {
+    return this.properties.slice(5);
+  }
+
   createProjector() {
     this.projectorService.createProjector(this.previewSource.sourceId);
+  }
+
+  onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
+    const source = this.sourcesService.getSource(this.sourceId);
+    source.setPropertiesFormData(
+      [properties[changedIndex]]
+    );
+    this.refresh();
+  }
+
+  refresh() {
+    this.properties = this.source.getPropertiesFormData();
   }
 
   updateTopTab(value: string) {

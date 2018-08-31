@@ -57,18 +57,11 @@
           </div>
           <div class="subsection">
             <span class="subsection__title">{{ $t('Selected Properties') }}</span>
-            <div class="subsection__content"><slot :name="`${currentSetting}-properties`" /></div>
+            <div class="subsection__content" v-if="currentSetting !== 'source'">
+              <slot :name="`${currentSetting}-properties`" />
+            </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
-              <div class="source-property">
-                <toggle-input v-model="properties[4].value" :metadata="{}" /><span>{{ properties[4].description }}</span>
-              </div>
-              <div class="source-property">
-                <toggle-input v-model="properties[5].value" :metadata="{}" /><span>{{ properties[5].description }}</span>
-              </div>
-              <div class="source-property">
-                <toggle-input v-model="properties[6].value" :metadata="{}" /><span>{{ properties[6].description }}</span>
-              </div>
-              <span>{{ properties[7].description }}</span>
+              <generic-form v-model="sourceProperties" @input="onPropsInputHandler"/>
             </div>
           </div>
         </div>
@@ -123,6 +116,16 @@
       height: 22px;
     }
   }
+
+  .subsection__content {
+    .input-wrapper {
+      width: 100%;
+    }
+    .input-label {
+      width: 0;
+      padding: 0;
+    }
+  }
 </style>
 
 <style lang="less" scoped>
@@ -156,7 +159,7 @@
   }
 
   .window-container {
-    height: calc(~"100% - 50px");
+    height: calc(~"100% - 51px");
   }
 
   .test-button {
