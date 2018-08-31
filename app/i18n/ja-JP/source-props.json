@@ -353,15 +353,12 @@
     "name": "シーン",
     "description": "既存のシーンをソースとして新たに追加します。"
   },
-  "ndi_source": {
-    "name": "NDIソース",
-    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。"
-  },
   "blackmagicDevice": {
     "name": "Blackmagicデバイス"
   },
-  "ndiSource": {
-    "name": "NDIソース"
+  "ndi_source": {
+    "name": "NDI™ ソース",
+    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。"
   },
   "openvr_capture": {
     "name": "OpenVR Capture"
