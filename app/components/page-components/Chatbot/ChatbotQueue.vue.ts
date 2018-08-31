@@ -13,9 +13,13 @@ export default class ChatbotQueue extends ChatbotBase {
   waitlistTitle = '';
 
   async mounted() {
+    await this.chatbotApiService.logInToSocket(['queue']);
     await this.chatbotApiService.fetchQueueState();
-    await this.chatbotApiService.fetchQueueEntries();
-    await this.chatbotApiService.fetchQueuePicked();
+
+    this.chatbotApiService.connectToQueueSocketChannels();
+    this.chatbotApiService.fetchQueueEntries();
+    this.chatbotApiService.fetchQueuePicked();
+
     this.waitlistTitle = this.chatbotApiService.state.queueStateResponse.title;
   }
 

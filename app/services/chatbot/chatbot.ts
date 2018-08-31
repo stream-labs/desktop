@@ -36,7 +36,8 @@ import {
   IQueueStateResponse,
   IQueueEntriesResponse,
   IQueuePickedResponse,
-  IQueuedUser
+  IChatbotSocketAuthResponse,
+  ChatbotSocketRooms
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
@@ -157,6 +158,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     this.LOGOUT();
   }
 
+
   apiEndpoint(route: String, versionIncluded?: Boolean) {
     return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
@@ -193,30 +195,57 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
-  get socket() {
-    let socket = io.connect(this.socketUrl);
-    socket.emit('authenticate', {
-      token: this.state.socketToken
-    })
-    return socket;
-  }
-
   //
   // sockets
   //
-  connectToQuoteSocketChannels() {
-    this.socket.on('queue.join', (data: IQueuedUser) => {
+  logInToSocket(rooms: ChatbotSocketRooms[]) {
+    // requires log in
+    return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {})
+      .then((response: IChatbotSocketAuthResponse) => {
+        this.LOGIN_TO_SOCKET(response);
+      })
+  }
+
+  connectToQueueSocketChannels() {
+    let socket = io.connect(this.socketUrl);
+    socket.emit('authenticate', { token: this.state.socketToken });
+
+    socket.on('authenticate.success', () => {
+      alert('Connected!');
+    })
+
+    socket.on('queue.open', (response: IQueueStateResponse) => {
+      // queue open
+      this.UPDATE_QUEUE_STATE(response);
+    });
+    socket.on('queue.close', (response: IQueueStateResponse) => {
+      // queue open
+      this.UPDATE_QUEUE_STATE(response);
+    });
+    socket.on('queue.join', () => {
+      // someone joins queue, refetch queue entries
       this.fetchQueueEntries();
     });
-    this.socket.on('queue.leave', (data: IQueuedUser) => {
-      this.fetchQueueEntries();
-    });
-    this.socket.on('queue.pick', (data: IQueuedUser) => {
+    socket.on('queue.pick', () => {
+      // someone got selected, refetch queue entries and picked entries
       this.fetchQueueEntries();
       this.fetchQueuePicked();
     });
-    this.socket.on('queue.deleted', (data: IQueuedUser) => {
+    socket.on('queue.leave', () => {
+      // someone leaves queue, refetch queue entries
       this.fetchQueueEntries();
+    });
+    socket.on('queue.deleted', () => {
+      // queue deleted, refresh both entries
+      this.fetchQueueEntries();
+      this.fetchQueuePicked();
+    });
+    socket.on('queue.entries.clear', () => {
+      // Clear entries
+      this.fetchQueueEntries();
+    });
+    socket.on('queue.picked.clear', () => {
+      // Clear entries
       this.fetchQueuePicked();
     });
   }
@@ -557,43 +586,19 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   openQueue(title: string) {
-    return this.api('PUT', 'queue/open', { title }).then(
-      (response: IChatbotAPIPutResponse) => {
-        if (response.success === true) {
-          this.fetchQueueState();
-        }
-      }
-    );
+    return this.api('PUT', 'queue/open', { title });
   }
 
   closeQueue() {
-    return this.api('PUT', 'queue/close', {}).then(
-      (response: IChatbotAPIPutResponse) => {
-        if (response.success === true) {
-          this.fetchQueueState();
-        }
-      }
-    );
+    return this.api('PUT', 'queue/close', {});
   }
 
   pickQueueEntry(id: number) {
-    return this.api('PUT', `queue/pick/${id}`, {}).then(
-      (response: IChatbotAPIPutResponse) => {
-        // should just get from socket
-        this.fetchQueueEntries();
-        this.fetchQueuePicked();
-      }
-    );
+    return this.api('PUT', `queue/pick/${id}`, {});
   }
 
   pickQueueEntryRandom() {
-    return this.api('PUT', 'queue/pick/random', {}).then(
-      (response: IChatbotAPIPutResponse) => {
-        // should just get from socket
-        this.fetchQueueEntries();
-        this.fetchQueuePicked();
-      }
-    );
+    return this.api('PUT', 'queue/pick/random', {});
   }
 
 
@@ -631,34 +636,15 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   clearQueueEntries() {
-    return this.api('DELETE', 'queue/entries', {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchQueueEntries();
-        }
-      }
-    );
+    return this.api('DELETE', 'queue/entries', {});
   }
 
   clearQueuePicked() {
-    return this.api('DELETE', 'queue/picked', {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchQueuePicked();
-        }
-      }
-    );
+    return this.api('DELETE', 'queue/picked', {});
   }
 
   removeQueueEntry(id: number) {
-    return this.api('DELETE', `queue/${id}`, {}).then(
-      (response: IChatbotAPIDeleteResponse) => {
-        if (response.success === true) {
-          this.fetchQueueEntries();
-          this.fetchQueuePicked();
-        }
-      }
-    );
+    return this.api('DELETE', `queue/${id}`, {});
   }
 
   //
@@ -668,6 +654,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);
+  }
+
+  @mutation()
+  private LOGIN_TO_SOCKET(response: IChatbotSocketAuthResponse) {
     Vue.set(this.state, 'socketToken', response.socket_token);
   }
 

@@ -36,6 +36,9 @@ export interface IChatbotCommonServiceState {
 // responses
 export interface IChatbotAuthResponse {
   api_token: string;
+}
+
+export interface IChatbotSocketAuthResponse {
   socket_token: string;
 }
 
@@ -424,6 +427,8 @@ export enum ChatbotResponseTypes {
 }
 
 export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits';
+
+export type ChatbotSocketRooms = 'queue' | 'giveaway';
 
 export const ChatbotClients = [
   'Twitch'

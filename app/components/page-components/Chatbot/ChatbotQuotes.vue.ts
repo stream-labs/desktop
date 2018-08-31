@@ -30,7 +30,6 @@ export default class ChatbotQuotes extends ChatbotBase {
     // get list of quotes
     this.fetchQuotes(1);
     this.chatbotApiService.fetchQuotePreferences();
-    this.chatbotApiService.connectToQuoteSocketChannels();
   }
 
   @Watch('searchQuery')

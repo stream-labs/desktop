@@ -72,9 +72,6 @@ export default class Chatbot extends Vue {
     this.chatbotApiService
       .logIn()
       .then(response => {
-        // user has authenticated chatbot api,
-        // opening commands tab which will internally call
-        // chatbotApiService interally to fetch chatbot data
         this.authenticated = true;
       })
       .catch(err => {
