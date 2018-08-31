@@ -5,6 +5,7 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
+import io from 'socket.io-client';
 
 import {
   IChatbotApiServiceState,
@@ -43,6 +44,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   @Inject() chatbotCommonService: ChatbotCommonService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
+  socketUrl = 'https://chatbot-io.streamlabs.com';
   version = 'api/v1/';
 
   static defaultState: IChatbotApiServiceState = {
@@ -189,6 +191,34 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             Promise.reject(errJson)
           );
       })
+  }
+
+  get socket() {
+    let socket = io.connect(this.socketUrl);
+    socket.emit('authenticate', {
+      token: this.state.socketToken
+    })
+    return socket;
+  }
+
+  //
+  // sockets
+  //
+  connectToQuoteSocketChannels() {
+    this.socket.on('queue.join', (data: IQueuedUser) => {
+      this.fetchQueueEntries();
+    });
+    this.socket.on('queue.leave', (data: IQueuedUser) => {
+      this.fetchQueueEntries();
+    });
+    this.socket.on('queue.pick', (data: IQueuedUser) => {
+      this.fetchQueueEntries();
+      this.fetchQueuePicked();
+    });
+    this.socket.on('queue.deleted', (data: IQueuedUser) => {
+      this.fetchQueueEntries();
+      this.fetchQueuePicked();
+    });
   }
 
   //
