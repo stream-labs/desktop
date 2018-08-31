@@ -10,6 +10,7 @@ import { PlatformAppsApi } from './api';
 import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
 import electron from 'electron';
+import { DevServer } from './dev-server';
 
 /**
  * The type of source to create, for V1 only supports browser
@@ -62,6 +63,8 @@ interface IAppManifest {
   permissions: EApiPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
+  xhrWhitelist: string[];
+  mediaWhitelist: string[];
 }
 
 interface ILoadedApp {
@@ -69,6 +72,7 @@ interface ILoadedApp {
   unpacked: boolean;
   appPath?: string; // The path on disk to the app if unpacked
   appToken: string;
+  devPort?: number; // The port the dev server is running on if unpacked
 }
 
 interface IPlatformAppServiceState {
@@ -97,6 +101,8 @@ export class PlatformAppsService extends
 
   apiManager = new PlatformAppsApi();
 
+  devServer: DevServer;
+
   init() {
     if (localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
@@ -114,7 +120,12 @@ export class PlatformAppsService extends
   async installUnpackedApp(appPath: string, appToken: string) {
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
-    this.ADD_APP({ manifest, unpacked: true, appPath, appToken });
+
+    // Make this configurable?
+    const devPort = 8081;
+    this.devServer = new DevServer(appPath, devPort);
+
+    this.ADD_APP({ manifest, unpacked: true, appPath, appToken, devPort });
     localStorage.setItem(this.localStorageKey, JSON.stringify({
       appPath, appToken
     }));
@@ -127,6 +138,12 @@ export class PlatformAppsService extends
       this.REMOVE_APP(appId);
       this.appUnload.next(appId);
     });
+
+    if (this.devServer) {
+      this.devServer.stopListening();
+      this.devServer = null;
+    }
+
     localStorage.removeItem(this.localStorageKey);
   }
 
@@ -166,10 +183,18 @@ export class PlatformAppsService extends
    * These are non-persistent for now
    */
   getAppPartition(appId: string) {
+    const app = this.getApp(appId);
     const partition = `platformApp-${appId}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
+
+      // For some strange reason, electron doesn't have types proper
+      // types for this function.
+      session.webRequest.onHeadersReceived((details: any, cb: Function) => {
+        console.log('Headers', details);
+        cb({});
+      });
 
       session.webRequest.onBeforeRequest((details, cb) => {
         // TODO: Handle domain whitelisting
@@ -209,7 +234,7 @@ export class PlatformAppsService extends
     let url: string;
 
     if (app.unpacked) {
-      url = `file://${path.join(app.appPath, asset)}`;
+      url = `http://localhost:${app.devPort}/${asset}`;
     } else {
       // TODO
     }

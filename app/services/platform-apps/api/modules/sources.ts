@@ -60,7 +60,7 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  createSource(name: string) {
+  createSource() {
     throw new NotImplementedError();
   }
 
@@ -75,7 +75,7 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  removeSource(id: string) {
+  removeSource() {
     throw new NotImplementedError();
   }
 
