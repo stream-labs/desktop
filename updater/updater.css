@@ -19,14 +19,14 @@ html {
     margin: 0;
     background-color: #2F3340;
     color: #9eeaf9;
-    font-size: 18px;
+    font-size: 16px;
     text-align: center;
     -webkit-app-region: no-drag;
     box-sizing: border-box;
 }
 .message {
     color: #9eeaf9;
-    vertical-align: middle
+    vertical-align: middle;
 }
 .error {
     color: #ff6952;
@@ -88,13 +88,84 @@ html {
 }
 
 .modal-layout-controls {
-  /* background-color: @bg-primary; */
   box-shadow: 0 -5px 10px 2px #2F3340;
   padding: 8px 16px;
   text-align: right;
   flex-shrink: 0;
   z-index: 10;
 }
-.modal-layout-controls.button {
-  margin-left: 8px;
+
+.caption {
+  font-size: 16px;
+  color: #9eeaf9;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  margin-top: 24px;
+}
+
+.patch-notes-wrap {
+  width: 514px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.patch-notes {
+  font-size: 14px;
+  color: #70A0AF;
+  text-align: left;
+  line-height: 1.8em;
+  width: 532px;
+  max-height: 160px;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.patch-notes a {
+  color: #9eeaf9;
+  text-decoration: underline;
+}
+.patch-notes a:hover {
+  text-decoration: none;
+}
+
+.button--action {
+  display: inline-block;
+  color: #fff;
+  background-color: #ff6952;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+.button--action:hover {
+  background-color:rgba(#ff6952,.1);
+}
+
+.button--dark {
+  display: inline-block;
+  color: #fff;
+  background-color: #37474f;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  white-space: nowrap;
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  transition: all .3s ease;
+}
+.button--dark:hover {
+  background-color:rgba(#37474f,.1);
 }

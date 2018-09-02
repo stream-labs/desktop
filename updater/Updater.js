@@ -103,8 +103,8 @@ class Updater {
 
   initWindow() {
     const browserWindow = new BrowserWindow({
-      width: 400,
-      height: 250,
+      width: 600,
+      height: 350,
       frame: true,
       closable: true,
       resizable: false,
