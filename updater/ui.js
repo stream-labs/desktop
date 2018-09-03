@@ -21,7 +21,7 @@ const i18n = new VueI18n({
       },
       asking: {
         message: 'There is an update. download?',
-        changeLog: `Change log`,
+        changeLog: `Update contents`,
         download: 'Download',
         skip: 'skip'
       },
@@ -46,7 +46,7 @@ const i18n = new VueI18n({
       },
       asking: {
         message: 'アップデート {version} があります。{br}更新しますか?',
-        changeLog: `更新履歴`,
+        changeLog: `更新内容`,
         download: 'ダウンロードして更新',
         skip: '更新せずに N Air を起動'
       },
