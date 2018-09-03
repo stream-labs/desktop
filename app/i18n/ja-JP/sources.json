@@ -55,7 +55,7 @@
   "createSourceProjector": "ソースプロジェクターを作成する",
   "useGoogleFont": "Googleのフォントを使う",
   "unhideAll": "すべて表示する",
-  "interactiveCrop": "画面上でクロップする",
+  "interactiveCrop": "領域を指定してキャプチャする（実験的機能）",
   "selectCroppingArea": "キャプチャする領域をドラッグして指定してください",
   "pressEscapeToCancel": "Escキーでキャンセルします"
 }
