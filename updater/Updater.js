@@ -105,6 +105,7 @@ class Updater {
     const browserWindow = new BrowserWindow({
       width: 600,
       height: 350,
+      title: `${process.env.NAIR_PRODUCT_NAME} - Ver: ${process.env.NAIR_VERSION}`,
       frame: true,
       closable: true,
       resizable: false,
