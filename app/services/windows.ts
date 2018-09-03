@@ -63,7 +63,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     main: {
       componentName: 'Main',
       scaleFactor: 1,
-      title: `N Air - Ver: ${remote.process.env.NAIR_VERSION}`
+      title: `${remote.process.env.NAIR_PRODUCT_NAME} - Ver: ${remote.process.env.NAIR_VERSION}`
     },
     child: {
       componentName: 'Blank',

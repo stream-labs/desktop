@@ -14,6 +14,7 @@ if (pjson.name === 'n-air-app-ipc') {
   process.env.NAIR_IPC = true;
 }
 process.env.NAIR_VERSION = pjson.version;
+process.env.NAIR_PRODUCT_NAME = pjson.build.productName;
 
 if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
   process.env.NAIR_LICENSE_API_KEY = pjson.getlicensenair_key;
@@ -146,7 +147,7 @@ function startApp() {
     height: mainWindowState.height,
     show: false,
     frame: false,
-    title: 'N Air',
+    title: process.env.NAIR_PRODUCT_NAME,
     ...(mainWindowIsVisible ? {
       x: mainWindowState.x,
       y: mainWindowState.y
