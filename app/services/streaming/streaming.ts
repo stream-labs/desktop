@@ -18,8 +18,7 @@ import { $t } from 'services/i18n';
 import { CustomizationService } from 'services/customization';
 import { StreamInfoService }from 'services/stream-info';
 import { UserService } from 'services/user';
-import { getPlatformService, IStreamingSetting } from '../platforms';
-import { NiconicoService } from '../platforms/niconico';
+import { IStreamingSetting } from '../platforms';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -274,6 +273,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     }
 
     if (this.state.recordingStatus === ERecordingState.Offline) {
+      if (!this.settingsService.isValidOutputRecordingPath()) {
+        alert($t('streaming.badPathError'));
+        return;
+      }
       this.obsApiService.nodeObs.OBS_service_startRecording();
       return;
     }

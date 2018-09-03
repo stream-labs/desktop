@@ -25,6 +25,7 @@ import {
   OptimizedSettings
 } from './settings-api';
 import { $t } from 'services/i18n';
+import fs from 'fs';
 
 
 export interface ISettingsState {
@@ -325,6 +326,52 @@ export class SettingsService extends StatefulService<ISettingsState>
     // これ以上消すものが増えるなら、フィルタリング機構は整備したほうがよいかもしれない
 
     return settings;
+  }
+
+  getOutputMode(output: ISettingsSubCategory[] = this.getSettingsFormData('Output')): ('Simple' | 'Advanced' | null) {
+    return this.findSettingValue(output, 'Untitled', 'Mode');
+  }
+
+  isValidOutputRecordingPath(): boolean {
+      const path = this.getOutputRecordingPath();
+      console.log('getOutputRecordingPath: ', path);
+
+      if (!path) {
+        return false;
+      }
+
+      if (path.length < 2) {
+        return false;
+      }
+
+      if (!fs.existsSync(path) || !fs.statSync(path).isDirectory()) {
+        return false;
+      }
+
+      return true;
+  }
+
+  getOutputRecordingPath(): string | undefined {
+    const output = this.getSettingsFormData('Output');
+    const outputMode = this.getOutputMode(output);
+    switch (outputMode) {
+    case 'Simple':
+      return this.findSettingValue(output, 'Recording', 'FilePath');
+
+    case 'Advanced':
+      {
+        const recType = this.findSettingValue(output, 'Recording', 'RecType');
+        console.log(`Output/Recording RecType: ${recType}`);
+        switch (recType) {
+          case 'Standard':
+            return this.findSettingValue(output, 'Recording', 'RecFilePath');
+
+          case 'Custom Output (FFmpeg)':
+            return this.findSettingValue(output, 'Recording', 'FFFilePath');
+        }
+      }
+    }
+    return undefined;
   }
 
   /**
