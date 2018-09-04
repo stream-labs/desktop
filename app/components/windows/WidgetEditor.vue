@@ -18,6 +18,7 @@
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
+        <div class="custom-code__alert" :class="{ active: value }" />
         <div class="custom-code" :class="{ hidden: currentTopTab !== 'code' }">
           <toggle-input :value="value" @input="value => updateValue(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
@@ -263,6 +264,21 @@
   .custom-code.hidden {
     top: -19px;
     transform: scaleY(0);
+  }
+
+  .custom-code__alert {
+    border-radius: 100%;
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    top: 50%;
+    left: 190px;
+    transform: translate(0, -50%);
+    background-color: #2e383f;
+  }
+
+  .custom-code__alert.active {
+    background-color: @teal;
   }
 
   .night-theme {
