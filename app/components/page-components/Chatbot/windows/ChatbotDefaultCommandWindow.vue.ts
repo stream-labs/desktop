@@ -161,8 +161,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   }
 
   async onSaveHandler() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService.updateDefaultCommand(
       this.defaultCommandToUpdate.slugName,

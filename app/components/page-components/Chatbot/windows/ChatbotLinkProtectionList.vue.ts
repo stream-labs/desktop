@@ -58,9 +58,7 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
   }
 
   async onAddNewItemHandler() {
-    if (!this.newListItem) return;
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     let newListItemArray = this.value.slice(0);
 

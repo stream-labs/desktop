@@ -37,10 +37,14 @@ export default class ValidatedForm extends Vue {
     this.validated.next(this.$validator.errors.items);
   }
 
-  async validateAndCheckErrors(): Promise<boolean> {
+  async validateAndGetErrors(): Promise<ErrorField[]> {
     await this.validate();
-    const errorsCount = this.$validator.errors.items.length;
-    return !!errorsCount;
+    return this.$validator.errors.items;
+  }
+
+  async validateAndGetErrorsCount(): Promise<number> {
+    const errors = await this.validateAndGetErrors();
+    return errors.length;
   }
 
 }

@@ -85,8 +85,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   }
 
   async onSaveHandler() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     if (this.isEdit) {
       this.chatbotApiService

@@ -10,7 +10,7 @@
   </div>
   <div slot="content" class="chatbot-caps-protection__container">
     <transition name='fade' mode="out-in" appear>
-      <validated-form>
+      <validated-form ref="form">
         <div v-if="selectedTab === 'general' && capsProtection">
           <div class="row">
             <div class="small-6 columns">

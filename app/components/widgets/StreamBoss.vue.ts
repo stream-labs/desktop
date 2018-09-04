@@ -38,8 +38,7 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
   }
 
   async saveGoal() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     await this.save(this.bossCreateOptions);
   }
 

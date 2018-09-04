@@ -10,7 +10,7 @@
   </div>
   <div slot="content" class="chatbot-add-command__container">
     <transition name='fade' mode="out-in" appear>
-      <validated-form>
+      <validated-form ref="form">
         <div v-if="selectedTab === 'general'">
           <VFormGroup
             :title="$t('Command')"

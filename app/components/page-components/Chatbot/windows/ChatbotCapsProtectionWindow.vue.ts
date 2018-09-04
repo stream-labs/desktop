@@ -38,8 +38,7 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
   }
 
   async onSaveHandler() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
       .updateCapsProtection({
