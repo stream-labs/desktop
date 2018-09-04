@@ -65,6 +65,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     )
   }
 
+  get isQueueJoinCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'queue' &&
+      this.defaultCommandToUpdate.commandName === 'join'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotCommonService.state.defaultCommandToUpdate;
   }

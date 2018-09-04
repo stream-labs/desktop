@@ -19,8 +19,17 @@ export default class ChatbotQueue extends ChatbotBase {
     this.chatbotApiService.connectToQueueSocketChannels();
     this.chatbotApiService.fetchQueueEntries();
     this.chatbotApiService.fetchQueuePicked();
+    this.chatbotApiService.fetchQueuePreferences();
 
     this.waitlistTitle = this.chatbotApiService.state.queueStateResponse.title;
+  }
+
+  get noUsersInList() {
+    return this.chatbotApiService.state.queueEntriesResponse.data.length === 0;
+  }
+
+  onOpenQueuePreferencesHandler() {
+    this.chatbotCommonService.openQueuePreferencesWindow();
   }
 
   onToggleQueueOpenHandler() {

@@ -2,12 +2,12 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Add Quote')"
->
+  :title="$t('Queue Settings')"
+ >
   <div slot="fixed">
    <div class="window-toggle__wrapper">
-    <div @click="onToggleQuoteWindowHandler">
-      <span> {{ $t('Edit Command') }} </span>
+    <div @click="onToggleQueueWindowHandler">
+      <span> {{ $t('Edit Primary Command') }} </span>
       <i class="icon-transition window-toggle__icon"></i>
     </div>
   </div>
@@ -15,9 +15,14 @@
   <div slot="content" class="chatbot-quote-preferences__container">
     <div>
       <VFormGroup
-        :title="$t('Date Format')"
-        v-model="generalSettings.date_format"
-        :metadata="metadata.date_format"
+        :title="$t('Maximum Queue Size')"
+        v-model="generalSettings.maximum"
+        :metadata="metadata.maximum"
+      />
+      <VFormGroup
+        :title="$t('Pick User Message')"
+        v-model="generalSettings.messages.picked"
+        :metadata="metadata.messages.picked"
       />
     </div>
   </div>
@@ -30,7 +35,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !generalSettings.date_format"
+      :disabled="errors.items.length > 0 || !generalSettings.messages.picked"
     >
       {{ $t('Save') }}
     </button>
@@ -38,7 +43,7 @@
 </ModalLayout>
 </template>
 
-<script lang="ts" src="./ChatbotQuotePreferencesWindow.vue.ts"></script>
+<script lang="ts" src="./ChatbotQueuePreferencesWindow.vue.ts"></script>
 
 <style <style lang="less" scoped>
 @import "../../../../styles/index";

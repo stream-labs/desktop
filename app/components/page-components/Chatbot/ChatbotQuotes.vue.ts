@@ -55,7 +55,7 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   onOpenQuotePreferencesHandler() {
-    this.chatbotCommonService.openQuotePreferenceWindow();
+    this.chatbotCommonService.openQuotePreferencesWindow();
   }
 
   onDeleteQuoteHandler(quote?: IQuote) {

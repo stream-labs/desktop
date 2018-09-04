@@ -16,6 +16,7 @@
       </button>
       <button
         @click="onPickRandomEntryHandler"
+        :disabled="noUsersInList"
         class="button button--default margin--10"
       >
         {{ $t('Pick Random User') }}
@@ -30,7 +31,7 @@
         class="chatbot__input--search width--auto margin--10"
         placeholder="Waitlist Title"
       />
-      <div class="queue-settings__button">
+      <div @click="onOpenQueuePreferencesHandler" class="queue-settings__button">
         <i class="icon-settings"></i> <span> {{ $t('Queue Settings') }} </span>
       </div>
     </div>
@@ -54,6 +55,7 @@
 
 .queue-settings__button {
   .padding-left();
+  .cursor--pointer;
 }
 
 .chatbot-empty-placeholder__container {

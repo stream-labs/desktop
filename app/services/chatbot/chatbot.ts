@@ -33,6 +33,7 @@ import {
   ChatbotSettingSlugs,
   IQuote,
   IQuotePreferencesResponse,
+  IQueuePreferencesResponse,
   IQueueStateResponse,
   IQueueEntriesResponse,
   IQueuePickedResponse,
@@ -210,10 +211,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     let socket = io.connect(this.socketUrl);
     socket.emit('authenticate', { token: this.state.socketToken });
 
-    socket.on('authenticate.success', () => {
-      alert('Connected!');
-    })
-
     socket.on('queue.open', (response: IQueueStateResponse) => {
       // queue open
       this.UPDATE_QUEUE_STATE(response);
@@ -355,8 +352,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
   fetchQueuePreferences() {
     return this.api('GET', 'settings/queue', {}).then(
-      (response: IQuotePreferencesResponse) => {
-        this.UPDATE_QUOTE_PREFERENCES(response);
+      (response: IQueuePreferencesResponse) => {
+        this.UPDATE_QUEUE_PREFERENCES(response);
       }
     );
   }
@@ -585,6 +582,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  updateQueuePreferences(data: IQueuePreferencesResponse) {
+    return this.api('POST', 'settings/queue', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchQueuePreferences();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      })
+  }
+
   openQueue(title: string) {
     return this.api('PUT', 'queue/open', { title });
   }
@@ -730,6 +737,11 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   @mutation()
+  private UPDATE_QUEUE_PREFERENCES(response: IQueuePreferencesResponse) {
+    Vue.set(this.state, 'queuePreferencesResponse', response);
+  }
+
+  @mutation()
   private UPDATE_QUEUE_STATE(response: IQueueStateResponse) {
     Vue.set(this.state, 'queueStateResponse', response);
   }
@@ -872,7 +884,17 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openQuotePreferenceWindow() {
+  openQueuePreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQueuePreferencesWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
       size: {

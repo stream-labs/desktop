@@ -53,7 +53,8 @@ import ChatbotWordProtectionWindow
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow
   from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
-
+import ChatbotQueuePreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 
@@ -109,6 +110,7 @@ export function getComponents() {
     ChatbotWordProtectionWindow,
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
+    ChatbotQueuePreferencesWindow,
   };
 }
 

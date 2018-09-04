@@ -58,7 +58,7 @@
         </div>
         <ChatbotLinkProtectionList
           v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
-          :title="$t(`Add to ${selectedTab}`)"
+          :title="selectedTab === 'whitelist' ? $t('Add to whitelist') : $t('Add to blacklist')"
           :type="selectedTab"
           v-model="linkProtection[selectedTab]"
         />

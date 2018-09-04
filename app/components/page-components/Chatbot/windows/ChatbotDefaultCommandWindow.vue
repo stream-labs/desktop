@@ -25,6 +25,13 @@
             <span> {{ $t('Quote Preferences') }} </span>
             <i class="icon-transition window-toggle__icon"></i>
           </div>
+          <div
+            @click="onToggleQueueWindowHandler"
+            v-if="isQueueJoinCommand"
+          >
+            <span> {{ $t('Queue Settings') }} </span>
+            <i class="icon-transition window-toggle__icon"></i>
+          </div>
         </div>
       </div>
     </div>
