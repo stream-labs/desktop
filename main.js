@@ -530,7 +530,7 @@ ipcMain.on('restartApp', () => {
   // prevent unexpected cache clear
   const args = process.argv.slice(1).filter(x => x !== '--clearCacheDir');
 
-  app.relaunch( args );
+  app.relaunch( {args} );
   // Closing the main window starts the shut down sequence
   mainWindow.close();
 });
