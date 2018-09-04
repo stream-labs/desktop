@@ -14,6 +14,7 @@ if (pjson.name === 'n-air-app-ipc') {
   process.env.NAIR_IPC = true;
 }
 process.env.NAIR_VERSION = pjson.version;
+process.env.NAIR_PRODUCT_NAME = pjson.build.productName;
 
 if (!process.env.NAIR_LICENSE_API_KEY && pjson.getlicensenair_key) {
   process.env.NAIR_LICENSE_API_KEY = pjson.getlicensenair_key;
@@ -146,7 +147,7 @@ function startApp() {
     height: mainWindowState.height,
     show: false,
     frame: false,
-    title: 'N Air',
+    title: process.env.NAIR_PRODUCT_NAME,
     ...(mainWindowIsVisible ? {
       x: mainWindowState.x,
       y: mainWindowState.y
@@ -327,8 +328,40 @@ if (shouldQuit) {
   app.exit();
 }
 
+function copyFile(src, dest) {
+  if (!fs.existsSync(src)) {
+    log(`copyFile: ${src} not found!`);
+    return;
+  }
+
+  const stat = fs.statSync(src);
+
+  if (fs.existsSync(dest)) {
+    const cache = fs.statSync(dest);
+    if (stat.size === cache.size && stat.mtime === cache.mtime) {
+      log('copyFile: the same file exists. skip.');
+      return;
+    }
+  }
+
+  try {
+    fs.copyFileSync(src, dest);
+    fs.utimesSync(dest, stat.atime, stat.mtime);
+  } catch (e) {
+    log(`copyFile Error: ${e.name}: ${e.message}`);
+  }
+}
+
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.NAIR_FORCE_AUTO_UPDATE) {
+
+    // copy the original installer file so that it can be found for differential updating
+    const nsisInstallerFileName = '__installer.exe';
+    const installerPath = path.join(app.getPath('appData'), process.env.NAIR_PRODUCT_NAME, nsisInstallerFileName);
+    const cachePath = path.join(app.getPath('userData'), nsisInstallerFileName);
+    log(`copying ${installerPath} to ${cachePath}...`);
+    copyFile(installerPath, cachePath);
+
     (new Updater(startApp)).run();
   } else {
     startApp();
