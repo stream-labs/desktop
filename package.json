@@ -27,6 +27,7 @@
     "compile-tests": "tsc -p test",
     "screentest": "node test/screentest/runner.js"
   },
+  "buildProductName": "N Air",
   "build": {
     "appId": "jp.nicovideo.nair",
     "productName": "N Air",
