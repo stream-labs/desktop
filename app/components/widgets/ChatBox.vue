@@ -1,6 +1,6 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
-  <div slot="settings" >
+<widget-window :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
+  <div slot="settings" v-if="loaded">
 
     <h-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>
 

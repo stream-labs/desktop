@@ -1,7 +1,7 @@
 <template>
-<widget-window v-if="wData" v-model="tabName">
+<widget-window :requestState="requestState" :loaded="loaded" v-model="tabName">
   <!-- goal setup -->
-  <div slot="goal" >
+  <div slot="goal" v-if="loaded">
     <div v-if="hasGoal">
       <div class="section__body">
         <h-form-group :title="$t('Title')">{{ wData.goal.title }}</h-form-group>
@@ -13,7 +13,7 @@
 
     <div v-if="!hasGoal">
 
-      <div class="section__body" v-if="loadingState !== 'pending'">
+      <div class="section__body" v-if="requestState !== 'pending'">
 
         <validated-form ref="form">
           <h-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
@@ -48,7 +48,7 @@
     </button>
   </div>
 
-  <div slot="settings">
+  <div slot="settings" v-if="loaded">
     <h-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
     <h-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <h-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>

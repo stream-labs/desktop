@@ -46,7 +46,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   textColorTooltip = $t('A hex code for the base text color.');
 
   get hasGoal() {
-    return this.wData.goal && this.wData.goal.title;
+    return this.loaded && this.wData.goal && this.wData.goal.title;
   }
 
   async saveGoal() {

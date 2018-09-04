@@ -1,6 +1,6 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
-  <div slot="settings" >
+<widget-window :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
+  <div slot="settings" v-if="loaded">
     <h-form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <h-form-group :title="$t('Theme Color')" type="color" v-model="wData.settings.theme_color" />
     <h-form-group :title="$t('Enable Events')">

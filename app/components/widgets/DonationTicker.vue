@@ -1,6 +1,6 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
-  <div slot="settings">
+<widget-window :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
+  <div slot="settings" v-if="loaded">
     <h-form-group :title="$t('Message Format')" type="text" v-model="wData.settings.message_format" :metadata="{ tooltip: messageFormatTooltip }" />
     <h-form-group :title="$t('Max Donations')" type="number" v-model="wData.settings.max_donations" :metadata="{ tooltip: maxDonationsTooltip }" />
     <h-form-group :title="$t('Text Scroll Speed')" type="slider" v-model="wData.settings.scroll_speed" :metadata="{ max: 10, interval: 1, tooltip: scrollSpeedTooltip }" />

@@ -1,5 +1,5 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
+<widget-window :requestState="requestState" :loaded="loaded"  ref="layout" v-model="tabName">
   <div slot="settings" >
     <h-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
