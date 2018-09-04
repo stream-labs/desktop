@@ -45,8 +45,8 @@
     </button>
     <button
       v-for="app in platformApps"
-      :key="app.manifest.id"
-      @click="navigateApp(app.manifest.id)"
+      :key="app.id"
+      @click="navigateApp(app.id)"
       class="tab-button"
       :class="{ 'is-active': page === 'TODO' }">
       <i class="fas fa-drafting-compass" /><span>{{ app.manifest.name }}</span>

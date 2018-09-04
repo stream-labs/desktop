@@ -26,7 +26,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
   appTokenMetadata = metadata.text({
     title: 'App Token',
     description: 'This token allows you app to authenticate with the ' +
-      'streamlabs API.  Visit <TBD> to create a developer account ' +
+      'streamlabs API.  Visit dev-platform.streamlabs.com to create a developer account ' +
       'and get a test app token.'
   });
 
@@ -39,6 +39,9 @@ export default class AppPlatformDeveloperSettings extends Vue {
     return this.platformAppsService.state.loadedApps[0];
   }
 
+  loading = false;
+  error = '';
+
   async loadApp() {
     // TODO Validation surfacing
     if (!this.appPathValue) return;
@@ -48,14 +51,23 @@ export default class AppPlatformDeveloperSettings extends Vue {
       this.platformAppsService.unloadApps();
     }
 
-    await this.platformAppsService.installUnpackedApp(
-      this.appPathValue,
-      this.appTokenValue
-    );
+    this.loading = true;
+
+    try {
+      await this.platformAppsService.installUnpackedApp(
+        this.appPathValue,
+        this.appTokenValue
+      );
+      this.loading = false;
+    } catch (e) {
+      this.loading = false;
+      this.error = 'There was an error loading this app, please try again ' +
+        'or contact the Streamlabs development team for assistance.';
+    }
   }
 
   reloadApp() {
-    this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.manifest.id);
+    this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
   }
 
   unloadApp() {

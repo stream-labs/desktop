@@ -26,7 +26,7 @@ export class PlatformAppManager extends PropertiesManager {
     this.loadSub = this.platformAppsService.appLoad.subscribe(app => {
       // This is mostly an edge case, but this will reactive an old source
       // when the app is re-installed.
-      if (app.manifest.id === this.settings.appId) {
+      if (app.id === this.settings.appId) {
         this.updateUrl();
       }
     });

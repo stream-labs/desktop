@@ -25,9 +25,11 @@
     <div v-else>
       <VFormGroup :metadata="appPathMetadata" v-model="appPathValue" />
       <VFormGroup :metadata="appTokenMetadata" v-model="appTokenValue" />
-      <button @click="loadApp" class="button button--action">
+      <button @click="loadApp" class="button button--action" :disabled="loading">
         Load App
+        <i v-if="loading" class="fa fa-spinner fa-pulse" />
       </button>
+      <div v-if="error" class="app-platform-error">{{ error }}</div>
     </div>
   </div>
 </template>
@@ -35,7 +37,14 @@
 <script lang="ts" src="./AppPlatformDeveloperSettings.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../styles/index";
+
 .app-platform-details {
   word-wrap: break-word;
+}
+
+.app-platform-error {
+  color: @red;
+  font-size: 12px;
 }
 </style>

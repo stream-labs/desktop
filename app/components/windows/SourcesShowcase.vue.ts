@@ -130,7 +130,7 @@ export default class SourcesShowcase extends Vue {
       if (app.manifest.sources) {
         app.manifest.sources.forEach(source => {
           sources.push({
-            appId: app.manifest.id,
+            appId: app.id,
             source
           });
         });

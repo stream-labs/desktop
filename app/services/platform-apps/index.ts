@@ -12,6 +12,9 @@ import { VideoService } from 'services/video';
 import electron from 'electron';
 import { DevServer } from './dev-server';
 import url from 'url';
+import { HostsService } from 'services/hosts';
+import { handleErrors, authorizedHeaders } from 'util/requests';
+import { UserService } from 'services/user';
 
 const DEV_PORT = 8081;
 
@@ -60,17 +63,15 @@ interface IAppPage {
 }
 
 interface IAppManifest {
-  id: string; // unique, e.g. com.streamlabs.alertbox
   name: string; // display name for the app
   version: string;
   permissions: EApiPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
-  xhrWhitelist: string[];
-  mediaWhitelist: string[];
 }
 
 interface ILoadedApp {
+  id: string;
   manifest: IAppManifest;
   unpacked: boolean;
   appPath?: string; // The path on disk to the app if unpacked
@@ -88,6 +89,8 @@ export class PlatformAppsService extends
   @Inject() windowsService: WindowsService;
   @Inject() guestApiService: GuestApiService;
   @Inject() videoService: VideoService;
+  @Inject() hostsService: HostsService;
+  @Inject() userService: UserService;
 
   static initialState: IPlatformAppServiceState = {
     loadedApps: []
@@ -121,6 +124,7 @@ export class PlatformAppsService extends
    * TODO: Check this app for common structural problems
    */
   async installUnpackedApp(appPath: string, appToken: string) {
+    const id = await this.getAppIdFromServer(appToken);
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
 
@@ -132,16 +136,23 @@ export class PlatformAppsService extends
 
     this.devServer = new DevServer(appPath, DEV_PORT);
 
-    this.ADD_APP({ manifest, unpacked: true, appPath, appToken, devPort: DEV_PORT });
+    this.ADD_APP({
+      id,
+      manifest,
+      unpacked: true,
+      appPath,
+      appToken,
+      devPort: DEV_PORT
+    });
     localStorage.setItem(this.localStorageKey, JSON.stringify({
       appPath, appToken
     }));
-    this.appLoad.next(this.getApp(manifest.id));
+    this.appLoad.next(this.getApp(id));
   }
 
   unloadApps() {
     this.state.loadedApps.forEach(app => {
-      const appId = app.manifest.id;
+      const appId = app.id;
       this.REMOVE_APP(appId);
       this.appUnload.next(appId);
     });
@@ -162,6 +173,19 @@ export class PlatformAppsService extends
       JSON.parse(await this.loadManifestFromDisk(path.join(app.appPath, 'manifest.json')))
     );
     this.appReload.next(appId);
+  }
+
+  getAppIdFromServer(appToken: string): Promise<string> {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(
+      `https://${this.hostsService.devPlatform}/api/v1/sdk/app_id?app_token=${appToken}`,
+      { headers }
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json())
+      .then(json => json.id_hash);
   }
 
   loadManifestFromDisk(manifestPath: string): Promise<string> {
@@ -291,7 +315,7 @@ export class PlatformAppsService extends
   }
 
   getApp(appId: string) {
-    return this.state.loadedApps.find(app => app.manifest.id === appId);
+    return this.state.loadedApps.find(app => app.id === appId);
   }
 
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
@@ -320,13 +344,13 @@ export class PlatformAppsService extends
 
   @mutation()
   private REMOVE_APP(appId: string) {
-    this.state.loadedApps = this.state.loadedApps.filter(app => app.manifest.id !== appId);
+    this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
   }
 
   @mutation()
   private UPDATE_APP_MANIFEST(appId: string, manifest: IAppManifest) {
     this.state.loadedApps.forEach(app => {
-      if (app.manifest.id === appId) {
+      if (app.id === appId) {
         app.manifest = manifest;
       }
     })
