@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
+import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
 
 // Pages
@@ -38,6 +39,7 @@ import electron from 'electron';
     StudioFooter,
     CustomLoader,
     PatchNotes,
+    NewsBanner,
     Chatbot,
     DesignSystem,
     PlatformAppContainer

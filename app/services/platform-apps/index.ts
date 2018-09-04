@@ -189,17 +189,22 @@ export class PlatformAppsService extends
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
 
+      // TODO: cdn.streamlabs.com is NOT safe
+      const csp = `default-src 'none'; script-src 'none';`;
+
       // For some strange reason, electron doesn't have types proper
       // types for this function.
       session.webRequest.onHeadersReceived((details: any, cb: Function) => {
         console.log('Headers', details);
-        cb({});
-      });
+        if (details.resourceType === 'mainFrame') {
+          details.responseHeaders['Content-Security-Policy'] = csp;
+        }
+        console.log(details.responseHeaders);
 
-      session.webRequest.onBeforeRequest((details, cb) => {
-        // TODO: Handle domain whitelisting
-        console.log('Web Request', details);
-        cb({});
+        cb({
+          cancel: false,
+          responseHeaders: details.responseHeaders
+        });
       });
 
       this.sessionsInitialized[partition] = true;

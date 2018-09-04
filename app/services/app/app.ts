@@ -24,6 +24,7 @@ import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
 import { PlatformAppsService } from 'services/platform-apps';
+import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
   loading: boolean;
@@ -65,6 +66,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private fileManagerService: FileManagerService;
   @Inject() private protocolLinksService: ProtocolLinksService;
   @Inject() private crashReporterService: CrashReporterService;
+  @Inject() private announcementsService: AnnouncementsService;
 
   @track('app_start')
   load() {
@@ -106,6 +108,7 @@ export class AppService extends StatefulService<IAppState> {
       this.tcpServerService.listen();
 
       this.patchNotesService.showPatchNotesIfRequired(onboarded);
+      this.announcementsService.updateBanner();
       this.outageNotificationsService;
 
       this.crashReporterService.endStartup();
