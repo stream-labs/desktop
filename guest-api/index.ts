@@ -11,6 +11,10 @@ import {
 } from '../app/services/guest-api';
 
 (() => {
+  global.eval = function() {
+    throw new Error('Eval is disabled for security');
+  }
+
   interface IRequest {
     resolve: (val: any) => void;
     reject: (val: any) => void;
