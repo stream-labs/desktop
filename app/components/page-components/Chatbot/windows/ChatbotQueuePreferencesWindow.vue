@@ -8,7 +8,7 @@
    <div class="window-toggle__wrapper">
     <div @click="onToggleQueueWindowHandler">
       <span> {{ $t('Edit Primary Command') }} </span>
-      <i class="icon-transition window-toggle__icon"></i>
+      <i class="fas fa-chevron-right window-toggle__icon"></i>
     </div>
   </div>
   </div>
