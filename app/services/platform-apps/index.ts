@@ -100,8 +100,7 @@ export class PlatformAppsService extends
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
-  // TODO: Gate this to a whitelist
-  devMode = true;
+  devMode = false;
 
   private localStorageKey = 'PlatformAppsUnpacked';
 
@@ -109,8 +108,13 @@ export class PlatformAppsService extends
 
   devServer: DevServer;
 
-  init() {
-    if (localStorage.getItem(this.localStorageKey)) {
+  /**
+   * Using initialize because it needs to be async
+   */
+  async initialize() {
+    this.devMode = await this.getIsDevMode();
+
+    if (this.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
       if (data.appPath && data.appToken) {
@@ -178,7 +182,7 @@ export class PlatformAppsService extends
   getAppIdFromServer(appToken: string): Promise<string> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
-      `https://${this.hostsService.devPlatform}/api/v1/sdk/app_id?app_token=${appToken}`,
+      `https://${this.hostsService.platform}/api/v1/sdk/app_id?app_token=${appToken}`,
       { headers }
     );
 
@@ -186,6 +190,19 @@ export class PlatformAppsService extends
       .then(handleErrors)
       .then(res => res.json())
       .then(json => json.id_hash);
+  }
+
+  getIsDevMode(): Promise<boolean> {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(
+      `https://${this.hostsService.platform}/api/v1/sdk/dev_mode`,
+      { headers }
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json())
+      .then(json => json.dev_mode);
   }
 
   loadManifestFromDisk(manifestPath: string): Promise<string> {

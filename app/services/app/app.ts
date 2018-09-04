@@ -69,7 +69,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
 
   @track('app_start')
-  load() {
+  async load() {
     this.START_LOADING();
 
     // We want to start this as early as possible so that any
@@ -84,37 +84,37 @@ export class AppService extends StatefulService<IAppState> {
 
     // Initialize any apps before loading the scene collection.  This allows
     // the apps to already be in place when their sources are created.
-    this.platformAppsService;
+    await this.platformAppsService.initialize();
 
-    this.sceneCollectionsService.initialize().then(() => {
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
+    await this.sceneCollectionsService.initialize()
 
-      electron.ipcRenderer.on('shutdown', () => {
-        electron.ipcRenderer.send('acknowledgeShutdown');
-        this.shutdownHandler();
-      });
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
 
-      this.facemasksService;
-
-      this.shortcutsService;
-      this.streamlabelsService;
-
-      // Pre-fetch stream info
-      this.streamInfoService;
-
-      this.performanceMonitorService.start();
-
-      this.ipcServerService.listen();
-      this.tcpServerService.listen();
-
-      this.patchNotesService.showPatchNotesIfRequired(onboarded);
-      this.announcementsService.updateBanner();
-      this.outageNotificationsService;
-
-      this.crashReporterService.endStartup();
-
-      this.FINISH_LOADING();
+    electron.ipcRenderer.on('shutdown', () => {
+      electron.ipcRenderer.send('acknowledgeShutdown');
+      this.shutdownHandler();
     });
+
+    this.facemasksService;
+
+    this.shortcutsService;
+    this.streamlabelsService;
+
+    // Pre-fetch stream info
+    this.streamInfoService;
+
+    this.performanceMonitorService.start();
+
+    this.ipcServerService.listen();
+    this.tcpServerService.listen();
+
+    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.announcementsService.updateBanner();
+    this.outageNotificationsService;
+
+    this.crashReporterService.endStartup();
+
+    this.FINISH_LOADING();
   }
 
   /**
