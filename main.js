@@ -330,7 +330,7 @@ if (shouldQuit) {
 
 function copyFile(src, dest) {
   if (!fs.existsSync(src)) {
-    console.log(`copyFile: ${src} not found!`);
+    log(`copyFile: ${src} not found!`);
     return;
   }
 
@@ -339,7 +339,7 @@ function copyFile(src, dest) {
   if (fs.existsSync(dest)) {
     const cache = fs.statSync(dest);
     if (stat.size === cache.size && stat.mtime === cache.mtime) {
-      console.log('copyFile: the same file exists. skip.');
+      log('copyFile: the same file exists. skip.');
       return;
     }
   }
@@ -348,7 +348,7 @@ function copyFile(src, dest) {
     fs.copyFileSync(src, dest);
     fs.utimesSync(dest, stat.atime, stat.mtime);
   } catch (e) {
-    console.log(`copyFile Error: ${e.name}: ${e.message}`);
+    log(`copyFile Error: ${e.name}: ${e.message}`);
   }
 }
 
@@ -359,7 +359,7 @@ app.on('ready', () => {
     const nsisInstallerFileName = '__installer.exe';
     const installerPath = path.join(app.getPath('appData'), process.env.NAIR_PRODUCT_NAME, nsisInstallerFileName);
     const cachePath = path.join(app.getPath('userData'), nsisInstallerFileName);
-    console.log(`copying ${installerPath} to ${cachePath}...`);
+    log(`copying ${installerPath} to ${cachePath}...`);
     copyFile(installerPath, cachePath);
 
     (new Updater(startApp)).run();
