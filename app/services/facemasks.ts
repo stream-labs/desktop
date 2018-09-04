@@ -188,7 +188,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   playQueuedAlert() {
-    if (this.queue.length) {
+    if (this.queue.length && this.facemaskFilter) {
       const alert = this.queue.shift();
       this.trigger(alert.facemask, alert.message, alert.name);
     } else {
@@ -360,22 +360,30 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   checkFacemaskSettings(settings:IFacemaskSettings) {
+    console.log('checking fm settings', settings);
     this.settings = settings;
     if (settings.enabled) {
-      this.SET_DEVICE(settings.device.name, settings.device.value);
       this.configureProfanityFilter();
       const uuids = settings.facemasks.map((mask: IFacemask) => {
         return { uuid: mask.uuid, intro: mask.is_intro };
       });
 
-      this.setupFilter();
+      if (settings.device.name && settings.device.value) {
+        this.SET_DEVICE(settings.device.name, settings.device.value);
+        this.setupFilter();
+      } else {
+        this.SET_ACTIVE(false);
+      }
 
       const missingMasks = uuids.filter(mask => this.checkDownloaded(mask.uuid));
       const downloads = missingMasks.map(mask => this.downloadAndSaveModtime(mask.uuid, mask.intro, false));
 
+      console.log('downloads are:', downloads);
+
       this.setDownloadProgress(missingMasks.map(mask => mask.uuid));
 
       Promise.all(downloads).then((responses) => {
+        console.log('promise completed', responses);
         this.ensureModtimes(settings.facemasks);
       }).catch(err => {
         console.log(err);
@@ -397,12 +405,16 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   getDownloadProgress() {
+    if (!this.settings.enabled) {
+      return 'Not Enabled';
+    }
+
     let current = 0;
     this.downloadProgress.forEach(mask => {
       current += mask.progress;
     });
     if (current / this.downloadProgress.length === 1) {
-      return 'Ready';
+      return this.state.active ? 'Ready' : 'Loading';
     }
     return 'Downloading Masks';
   }
@@ -549,6 +561,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   checkDownloaded(uuid: string) {
+    console.log('checking downloaded', uuid);
     const maskPath = this.libraryPath(uuid);
     return !fs.existsSync(maskPath);
   }
@@ -562,6 +575,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   // Try to download a mask, resolve whether operation was successful or not
   downloadAndSaveModtime(uuid: string, intro: boolean, update = false): Promise<any> {
+    console.log('download and save modtime', uuid, intro, update);
     return new Promise((resolve, reject) => {
       this.downloadMask(uuid, update).then(modtime => {
         if (modtime) {
@@ -577,6 +591,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
 
   // Returns a promise that resolves with a masks modtime or false if it is already downloaded
   downloadMask(uuid: string, update = false): Promise<number> {
+    console.log('downloading', uuid);
     const maskPath = this.libraryPath(uuid);
 
     // Don't re-download the facemassk if we have already downloaded it unless it needs to be updated
@@ -602,11 +617,13 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         });
 
         writeStream.on('finish', () => {
+          console.log('writestream finish', uuid);
           try {
             const data = JSON.parse(fileContent) as IFacemask;
             this.downloadProgress.filter(mask => mask.uuid === uuid)[0]['progress'] = 1;
             resolve(data.modtime);
           } catch (err) {
+            console.log('parsing error');
             reject(err);
           }
         });
@@ -635,6 +652,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   private ensureFacemasksDirectory() {
+    console.log('checking plugin directory');
     if (!fs.existsSync(this.facemasksDirectory)) {
       fs.mkdirSync(this.facemasksDirectory);
     }
