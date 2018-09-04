@@ -11,6 +11,9 @@ import { GuestApiService } from 'services/guest-api';
 import { VideoService } from 'services/video';
 import electron from 'electron';
 import { DevServer } from './dev-server';
+import url from 'url';
+
+const DEV_PORT = 8081;
 
 /**
  * The type of source to create, for V1 only supports browser
@@ -121,11 +124,15 @@ export class PlatformAppsService extends
     const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
     const manifest = JSON.parse(manifestData) as IAppManifest;
 
-    // Make this configurable?
-    const devPort = 8081;
-    this.devServer = new DevServer(appPath, devPort);
+    // Make sure there isn't already a dev server
+    if (this.devServer) {
+      this.devServer.stopListening();
+      this.devServer = null;
+    }
 
-    this.ADD_APP({ manifest, unpacked: true, appPath, appToken, devPort });
+    this.devServer = new DevServer(appPath, DEV_PORT);
+
+    this.ADD_APP({ manifest, unpacked: true, appPath, appToken, devPort: DEV_PORT });
     localStorage.setItem(this.localStorageKey, JSON.stringify({
       appPath, appToken
     }));
@@ -183,28 +190,42 @@ export class PlatformAppsService extends
    * These are non-persistent for now
    */
   getAppPartition(appId: string) {
-    const app = this.getApp(appId);
     const partition = `platformApp-${appId}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
 
-      // TODO: cdn.streamlabs.com is NOT safe
-      const csp = `default-src 'none'; script-src 'none';`;
+      session.webRequest.onBeforeRequest((details, cb) => {
+        console.log('Request', details);
 
-      // For some strange reason, electron doesn't have types proper
-      // types for this function.
-      session.webRequest.onHeadersReceived((details: any, cb: Function) => {
-        console.log('Headers', details);
-        if (details.resourceType === 'mainFrame') {
-          details.responseHeaders['Content-Security-Policy'] = csp;
+        if (details.resourceType === 'script') {
+          if (details.url === 'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js') {
+            cb({});
+            return;
+          }
+
+          const parsed = url.parse(details.url);
+
+          if (parsed.host === `localhost:${DEV_PORT}`) {
+            cb({});
+            return;
+          }
+
+          // Let through all chrome dev tools requests
+          if (parsed.protocol === 'chrome-devtools:') {
+            cb({});
+            return;
+          }
+
+          // Cancel all other script requests.
+          // TODO: Handle production apps
+          console.log('canceling', parsed);
+          cb({ cancel: true });
+          return;
         }
-        console.log(details.responseHeaders);
 
-        cb({
-          cancel: false,
-          responseHeaders: details.responseHeaders
-        });
+        // Let through all other requests (XHR, assets, etc)
+        cb({});
       });
 
       this.sessionsInitialized[partition] = true;
