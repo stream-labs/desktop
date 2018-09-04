@@ -80,6 +80,7 @@ interface ILoadedApp {
 }
 
 interface IPlatformAppServiceState {
+  devMode: boolean;
   loadedApps: ILoadedApp[];
 }
 
@@ -93,14 +94,13 @@ export class PlatformAppsService extends
   @Inject() userService: UserService;
 
   static initialState: IPlatformAppServiceState = {
+    devMode: false,
     loadedApps: []
   };
 
   appLoad = new Subject<ILoadedApp>();
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
-
-  devMode = false;
 
   private localStorageKey = 'PlatformAppsUnpacked';
 
@@ -112,9 +112,16 @@ export class PlatformAppsService extends
    * Using initialize because it needs to be async
    */
   async initialize() {
-    this.devMode = await this.getIsDevMode();
+    this.userService.userLogin.subscribe(async () => {
+      this.unloadApps();
+      this.SET_DEV_MODE(await this.getIsDevMode());
+    });
 
-    if (this.devMode && localStorage.getItem(this.localStorageKey)) {
+    if (!this.userService.isLoggedIn()) return;
+
+    this.SET_DEV_MODE(await this.getIsDevMode());
+
+    if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
       if (data.appPath && data.appToken) {
@@ -371,6 +378,11 @@ export class PlatformAppsService extends
         app.manifest = manifest;
       }
     })
+  }
+
+  @mutation()
+  private SET_DEV_MODE(devMode: boolean) {
+    this.state.devMode = devMode;
   }
 
 }

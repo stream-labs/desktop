@@ -1,6 +1,7 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError } from './module';
 import { ScenesService, Scene } from 'services/scenes';
 import { Inject } from 'util/injector';
+import { Subject } from 'rxjs/Subject';
 
 enum ESceneNodeType {
   Folder = 'folder',
@@ -48,8 +49,29 @@ export class ScenesModule extends Module {
 
   constructor() {
     super();
-    // Event subscriptions
+    this.scenesService.sceneAdded.subscribe(sceneData => {
+      const scene = this.scenesService.getScene(sceneData.id);
+      this.sceneAdded.next(this.serializeScene(scene));
+    });
+    this.scenesService.sceneSwitched.subscribe(sceneData => {
+      const scene = this.scenesService.getScene(sceneData.id);
+      this.sceneSwitched.next(this.serializeScene(scene));
+    });
+    this.scenesService.sceneRemoved.subscribe(sceneData => {
+      this.sceneRemoved.next(sceneData.id);
+    });
   }
+
+  @apiEvent()
+  sceneAdded = new Subject<IScene>();
+
+  @apiEvent()
+  sceneSwitched = new Subject<IScene>();
+
+  @apiEvent()
+  sceneRemoved = new Subject<string>();
+
+  // TODO Events for scene items
 
   @apiMethod()
   getScenes() {

@@ -43,7 +43,7 @@ export default class PlatformAppWebview extends Vue {
 
   attachWebviewListeners() {
     this.$refs.appView.addEventListener('dom-ready', () => {
-      if (this.platformAppsService.devMode) {
+      if (this.platformAppsService.state.devMode) {
         this.$refs.appView.openDevTools();
       }
 

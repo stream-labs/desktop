@@ -118,7 +118,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     // we decided to not expose API settings for production version yet
     if (this.advancedSettingEnabled()) categories = categories.concat(['Experimental']);
 
-    if (this.platformAppsService.devMode) {
+    if (this.platformAppsService.state.devMode) {
       categories = categories.concat('Developer');
     }
 
