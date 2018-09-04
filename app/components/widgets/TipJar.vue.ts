@@ -1,6 +1,6 @@
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import {
   TipJarService,
@@ -10,7 +10,7 @@ import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
 import TestButtons from './TestButtons.vue';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
@@ -39,9 +39,9 @@ const mediaGalleryInputs = {
 
 @Component({
   components: {
-    WidgetWindow,
+    WidgetEditor,
     TestButtons,
-    FormGroup,
+    VFormGroup,
     CodeEditor,
     ...inputComponents
   }
@@ -58,6 +58,12 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string, value: string }[] = [];
+  settings = [
+    { value: 'manage-jar', label: $t('Manage Jar') },
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'images', label: $t('Bit Images') },
+    { value: 'source', label: $t('Source') }
+  ];
 
   titleFromKey(key: string) {
     return nameMap()[key];
