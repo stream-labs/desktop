@@ -48,7 +48,7 @@
       :key="app.id"
       @click="navigateApp(app.id)"
       class="tab-button"
-      :class="{ 'is-active': page === 'TODO' }">
+      :class="{ 'is-active': page === 'PlatformAppContainer' && navigationService.state.params.appId === app.id }">
       <i class="fas fa-drafting-compass" /><span>{{ app.manifest.name }}</span>
     </button>
   </div>

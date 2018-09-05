@@ -59,6 +59,7 @@ export enum EAppPageSlot {
 
 interface IAppPage {
   slot: EAppPageSlot;
+  persistent?: boolean;
   file: string; // Relative path to HTML file
 }
 
@@ -325,7 +326,10 @@ export class PlatformAppsService extends
   exposeAppApi(appId: string, webContentsId: number) {
     const app = this.getApp(appId);
     const api = this.apiManager.getApi(app.manifest.permissions);
-    this.guestApiService.exposeApi(webContentsId, api);
+
+    // Namespace under v1 for now.  Eventually we may want to add
+    // a v2 API.
+    this.guestApiService.exposeApi(webContentsId, { v1: api });
   }
 
   sessionsInitialized: Dictionary<boolean> = {};
@@ -383,6 +387,12 @@ export class PlatformAppsService extends
     const app = this.getApp(appId);
     const page = app.manifest.pages.find(page => page.slot === slot);
     return this.getPageUrl(appId, page.file);
+  }
+
+  isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
+    const app = this.getApp(appId);
+    const page = app.manifest.pages.find(page => page.slot === slot);
+    return !!page.persistent;
   }
 
   getPageUrlForSource(appId: string, appSourceId: string) {

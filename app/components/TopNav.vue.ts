@@ -89,7 +89,6 @@ export default class TopNav extends Vue {
   }
 
   navigateApp(appId: string) {
-    console.log('Navigate App', appId);
     this.navigationService.navigate('PlatformAppContainer', { appId });
   }
 

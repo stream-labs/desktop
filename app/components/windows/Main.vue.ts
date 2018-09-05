@@ -3,6 +3,7 @@ import { Component } from 'vue-property-decorator';
 import TopNav from '../TopNav.vue';
 import NewsBanner from '../NewsBanner.vue';
 import { ScenesService } from 'services/scenes';
+import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 
 // Pages
 import Studio from '../pages/Studio.vue';
@@ -52,6 +53,7 @@ export default class Main extends Vue {
   @Inject() userService: UserService;
   @Inject() windowsService: WindowsService;
   @Inject() scenesService: ScenesService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   mounted() {
     electron.remote.getCurrentWindow().show();
@@ -87,6 +89,25 @@ export default class Main extends Vue {
 
   get isOnboarding() {
     return this.navigationService.state.currentPage === 'Onboarding';
+  }
+
+  get platformApps() {
+    return this.platformAppsService.state.loadedApps;
+  }
+
+  isAppPersistent(appId: string) {
+    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
+  }
+
+  appStyles(appId: string) {
+    if (this.page === 'PlatformAppContainer' && this.params.appId === appId) {
+      return {};
+    } else {
+      return {
+        position: 'absolute',
+        top: '-10000px'
+      };
+    }
   }
 
   /**
