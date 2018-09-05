@@ -426,7 +426,7 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits';
+export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits' | 'sub_mystery_gift';
 
 export type ChatbotSocketRooms = 'queue' | 'giveaway';
 

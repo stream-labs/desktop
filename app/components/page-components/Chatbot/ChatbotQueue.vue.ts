@@ -10,7 +10,7 @@ import ChatbotQueueList from 'components/page-components/Chatbot/Queue/ChatbotQu
   }
 })
 export default class ChatbotQueue extends ChatbotBase {
-  waitlistTitle = '';
+  queueTitle = 'The Current Game';
 
   async mounted() {
     await this.chatbotApiService.logInToSocket(['queue']);
@@ -21,7 +21,7 @@ export default class ChatbotQueue extends ChatbotBase {
     this.chatbotApiService.fetchQueuePicked();
     this.chatbotApiService.fetchQueuePreferences();
 
-    this.waitlistTitle = this.chatbotApiService.state.queueStateResponse.title;
+    this.queueTitle = this.chatbotApiService.state.queueStateResponse.title;
   }
 
   get noUsersInList() {
@@ -38,8 +38,8 @@ export default class ChatbotQueue extends ChatbotBase {
       return;
     }
 
-    if (!this.waitlistTitle) return;
-    this.chatbotApiService.openQueue(this.waitlistTitle);
+    if (!this.queueTitle) return;
+    this.chatbotApiService.openQueue(this.queueTitle);
   }
 
   onPickRandomEntryHandler() {

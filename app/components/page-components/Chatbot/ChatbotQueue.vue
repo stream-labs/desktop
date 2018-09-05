@@ -5,7 +5,7 @@
     <div class="flex">
       <button
         @click="onToggleQueueOpenHandler"
-        :disabled="!waitlistTitle"
+        :disabled="!queueTitle"
         class="button margin--10"
         :class="{
           'button--action' : !queueIsOpen,
@@ -23,13 +23,13 @@
       </button>
     </div>
     <div class="flex flex--center">
-      <span> {{ $t('Waitlist Title') }} </span>
+      <span> {{ $t('Queue Title') }} </span>
       <input
         type="text"
         :disabled="queueIsOpen"
-        v-model="waitlistTitle"
+        v-model="queueTitle"
         class="chatbot__input--search width--auto margin--10"
-        placeholder="Waitlist Title"
+        :placeholder="$t('Queue Title')"
       />
       <div @click="onOpenQueuePreferencesHandler" class="queue-settings__button">
         <i class="icon-settings"></i> <span> {{ $t('Queue Settings') }} </span>

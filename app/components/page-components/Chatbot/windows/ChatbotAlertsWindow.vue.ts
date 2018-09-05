@@ -43,6 +43,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
 
   alertTypeFormattedName(type: ChatbotAlertTypes) {
     if (type === 'tip') return 'donation';
+    if (type === 'sub_mystery_gift') return 'sub mystery gift';
     return type;
   };
 

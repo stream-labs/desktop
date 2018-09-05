@@ -41,12 +41,13 @@ export default class ChatbotModules extends ChatbotBase {
       },
       {
         title: $t('Song Request'),
-        description: comingSoonText,
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        description: $t('Request songs!!'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: false,
-        onExpand: () => {},
+        onExpand: () => {
+          this.chatbotCommonService.openSongRequestPreferencesWindow();
+        },
         onToggleEnabled: () => {},
-        comingSoon: true
       },
       {
         title: $t('Mini Games'),

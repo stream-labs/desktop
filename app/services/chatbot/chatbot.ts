@@ -904,16 +904,15 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-
-  // @mutation()
-  // showToast(message: string, options: object) {
-  //   this.state.toasted.show(message, options);
-  // }
-
-  // @mutation()
-  // private BINDS_TOASTED(toasted: object) {
-  //   Vue.set(this.state, 'toasted', toasted);
-  // }
+  openSongRequestPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSongRequestPreferencesWindow',
+      size: {
+        width: 650,
+        height: 400
+      }
+    });
+  }
 
   @mutation()
   private HIDE_MOD_BANNER() {
