@@ -371,13 +371,25 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   @requiresToken()
   fetchViewerCount(): Promise<number> {
     return this.fetchPlayerStatus()
-      .then(o => o['stream'][0]['watch_count'][0]);
+      .then(o => {
+        try {
+          return o['stream'][0]['watch_count'][0]
+        } catch {
+          return 0;
+        }
+      });
   }
 
   @requiresToken()
   fetchCommentCount(): Promise<number> {
     return this.fetchPlayerStatus()
-      .then(o => o['stream'][0]['comment_count'][0]);
+      .then(o => {
+        try {
+          return o['stream'][0]['comment_count'][0];
+        } catch {
+          return 0;
+        }
+      });
   }
 
   getChatUrl(mode: string): Promise<string> {
