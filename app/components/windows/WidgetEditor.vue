@@ -18,11 +18,12 @@
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
-        <div class="custom-code__alert" :class="{ active: value }" />
         <div class="custom-code" :class="{ hidden: currentTopTab !== 'code' }">
           <toggle-input :value="value" @input="value => updateValue(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
+        <div class="custom-code__divider" :class="{ hidden: currentTopTab !== 'code' }" />
+        <div class="custom-code__alert" :class="{ active: value }" />
       </div>
 
       <div class="content-container" ref="content">
@@ -86,6 +87,7 @@
       height: 36px;
       position: relative;
       bottom: -1px;
+      z-index: 1;
     }
   }
 
@@ -251,19 +253,38 @@
   .custom-code {
     position: absolute;
     display: flex;
-    padding: 8px;
-    border-radius: 0 0 3px 3px;
-    top: -1px;
-    left: 30%;
-    border: 1px solid @teal;
-    border-top: none;
-    height: 37px;
+    margin: 8px;
+    top: 0;
+    left: 200px;
+    padding-left: 8px;
+    align-items: center;
+    height: 24px;
     .transition();
+
+    span {
+      padding-left: 8px;
+    }
   }
 
   .custom-code.hidden {
-    top: -19px;
-    transform: scaleY(0);
+    left: 100px;
+    opacity: 0;
+    border-left: none;
+    transition: none;
+  }
+
+  .custom-code__divider {
+    position: absolute;
+    left: 100px;
+    border-right: 1px solid #274959;
+    width: 100px;
+    margin: 8px;
+    height: 24px;
+    top: 0;
+  }
+
+  .custom-code__divider.hidden {
+    border-right: none;
   }
 
   .custom-code__alert {
@@ -285,7 +306,7 @@
     .window-container {
       border: 1px solid @night-slider-bg;
     }
-    .custom-code {
+    .custom-code__divider {
       background-color: @night-section;
     }
     .sidebar {
