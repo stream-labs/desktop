@@ -320,7 +320,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
     this.windowUpdated.next({ windowId: 'child', options: newOptions });
   }
 
-  updateMainWindowOptions(options: IWindowOptions) {
+  updateMainWindowOptions(options: Partial<IWindowOptions>) {
     this.UPDATE_MAIN_WINDOW_OPTIONS(options);
   }
 
