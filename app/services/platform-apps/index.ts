@@ -137,8 +137,20 @@ export class PlatformAppsService extends
    */
   async installUnpackedApp(appPath: string, appToken: string) {
     const id = await this.getAppIdFromServer(appToken);
-    const manifestData = await this.loadManifestFromDisk(path.join(appPath, 'manifest.json'));
+    const manifestPath = path.join(appPath, 'manifest.json');
+
+    if (!await this.fileExists(manifestPath)) {
+      return 'Error: manifest.json is missing!';
+    }
+
+    const manifestData = await this.loadManifestFromDisk(manifestPath);
     const manifest = JSON.parse(manifestData) as IAppManifest;
+
+    try {
+      await this.validateManifest(manifest, appPath);
+    } catch (e) {
+      return e.message;
+    }
 
     // Make sure there isn't already a dev server
     if (this.devServer) {
@@ -162,6 +174,75 @@ export class PlatformAppsService extends
     this.appLoad.next(this.getApp(id));
   }
 
+  async validateManifest(manifest: IAppManifest, appPath: string) {
+    // Validate top level of the manifest
+    this.validateObject(manifest, 'manifest', [
+      'name',
+      'version',
+      'permissions',
+      'sources',
+      'pages'
+    ]);
+
+    // Validate sources
+    for (let i = 0; i < manifest.sources.length; i++) {
+      const source = manifest.sources[i];
+
+      this.validateObject(source, `manifest.sources[${i}]`, [
+        'type',
+        'name',
+        'id',
+        'about',
+        'file'
+      ]);
+
+      // Validate about
+      this.validateObject(source.about, `manifest.sources[${i}].about`, [
+        'description'
+      ]);
+
+      // Check for existence of file
+      const filePath = path.join(appPath, trim(manifest.buildPath), source.file);
+      const exists = await this.fileExists(filePath);
+
+      if (!exists) {
+        throw new Error(`Missing file: manfiest.sources[${i}].file does not exist. Searching at path: ${filePath}`);
+      }
+    }
+
+    // Validate pages
+    for (let i = 0; i < manifest.pages.length; i++) {
+      const page = manifest.pages[i];
+
+      this.validateObject(page, `manifest.pages[${i}]`, [
+        'slot',
+        'file'
+      ]);
+
+      // Check for existence of file
+      const filePath = path.join(appPath, trim(manifest.buildPath), page.file);
+      const exists = await this.fileExists(filePath);
+
+      if (!exists) {
+        throw new Error(`Missing file: manfiest.pages[${i}].file does not exist. Searching at path: ${filePath}`);
+      }
+    }
+  }
+
+  validateObject(obj: Dictionary<any>, objName: string, requiredFields: string[]) {
+    requiredFields.forEach(field => {
+      if (obj[field] == null) {
+        throw new Error(`Missing property: ${objName} is missing required field "${field}"`);
+      }
+    });
+  }
+
+  fileExists(filePath: string): Promise<boolean> {
+    return new Promise(resolve => {
+      fs.exists(filePath, exists => resolve(exists));
+    });
+  }
+
   unloadApps() {
     this.state.loadedApps.forEach(app => {
       this.REMOVE_APP(app.id);
@@ -179,9 +260,25 @@ export class PlatformAppsService extends
   async reloadApp(appId: string) {
     // TODO Support Multiple Apps
     const app = this.getApp(appId);
+    const manifestPath = path.join(app.appPath, 'manifest.json');
+
+    if (!await this.fileExists(manifestPath)) {
+      this.unloadApps();
+      return 'Error: manifest.json is missing!';
+    }
+
+    const manifest = JSON.parse(await this.loadManifestFromDisk(manifestPath));
+
+    try {
+      await this.validateManifest(manifest, app.appPath);
+    } catch (e) {
+      this.unloadApps();
+      return e.message;
+    }
+
     this.UPDATE_APP_MANIFEST(
       appId,
-      JSON.parse(await this.loadManifestFromDisk(path.join(app.appPath, 'manifest.json')))
+      manifest
     );
     this.appReload.next(appId);
   }

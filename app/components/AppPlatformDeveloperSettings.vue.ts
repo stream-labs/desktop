@@ -54,24 +54,35 @@ export default class AppPlatformDeveloperSettings extends Vue {
     this.loading = true;
 
     try {
-      await this.platformAppsService.installUnpackedApp(
+      const error = await this.platformAppsService.installUnpackedApp(
         this.appPathValue,
         this.appTokenValue
       );
-      this.loading = false;
+      this.error = error;
     } catch (e) {
-      this.loading = false;
       this.error = 'There was an error loading this app, please try again ' +
         'or contact the Streamlabs development team for assistance.';
     }
+
+    this.loading = false;
   }
 
-  reloadApp() {
+  async reloadApp() {
     this.loading = true;
-    this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
+    this.error = '';
 
-    // This prevents spamming the button
-    setTimeout(() => this.loading = false, 2000);
+    try {
+      const error = await this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
+      this.error = error;
+    } catch (e) {
+      this.error = 'There was an error loading this app, please try again ' +
+        'or contact the Streamlabs development team for assistance.';
+    }
+
+    this.loading = false;
+
+    // // This prevents spamming the button
+    // setTimeout(() => this.loading = false, 2000);
   }
 
   unloadApp() {
