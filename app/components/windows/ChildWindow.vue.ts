@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
@@ -21,7 +21,6 @@ export default class ChildWindow extends Vue {
     this.onWindowUpdatedHandler(this.options);
     this.windowsService.windowUpdated.subscribe(windowInfo => {
       if (windowInfo.windowId !== 'child') return;
-
       this.onWindowUpdatedHandler(windowInfo.options);
     });
   }
