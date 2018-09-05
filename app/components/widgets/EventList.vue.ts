@@ -4,19 +4,19 @@ import {
   IEventListData
 } from 'services/widget-settings/event-list';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
 import { AnimationInput } from './inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    FormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
     TestButtons,
     AnimationInput,
@@ -43,4 +43,11 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
   );
 
   fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
+
+  settings = [
+    { value: 'manage-list', label: $t('Manage List') },
+    { value: 'font', label: 'Font Settings' },
+    { value: 'visual', label: 'Visual Settings' },
+    { value: 'source', label: 'Source' }
+  ];
 }
