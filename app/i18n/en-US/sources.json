@@ -3,6 +3,7 @@
   "addSourceButton": "Add Source",
 
   "windowCaptureMessage": "If you can not capture please turn off hardware acceleration from Google Chrome settings.",
+  "gameCaptureMessage": "Some games may not properly be captured. Try window capture in such case.",
 
   "sourcesWelcomeMessage": "Welcome to sources!",
   "addSourceProcess1": "Browse through our sources",
