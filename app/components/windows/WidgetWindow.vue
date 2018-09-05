@@ -23,7 +23,7 @@
       <div v-if="tabItem.value !== 'source' && tabItem.value === value">
 
         <slot :name="tabItem.value" v-if="!loadingFailed"></slot>
-        <div v-else="loadingFailed">
+        <div v-else>
           {{ $t('Failed to load settings') }}
         </div>
 
