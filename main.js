@@ -352,12 +352,12 @@ if (!gotTheLock) {
   const haDisableFile = path.join(app.getPath('userData'), 'HADisable');
   if (fs.existsSync(haDisableFile)) app.disableHardwareAcceleration();
 
-  app.setAsDefaultProtocolClient('nair');
+  app.setAsDefaultProtocolClient('n-air-app');
 
   app.on('second-instance', (event, argv, cwd) => {
     // Check for protocol links in the argv of the other process
     argv.forEach(arg => {
-      if (arg.match(/^nair:\/\//)) {
+      if (arg.match(/^n-air-app:\/\//)) {
         mainWindow.send('protocolLink', arg);
       }
     });
