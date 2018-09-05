@@ -350,7 +350,12 @@ export class PlatformAppsService extends
         console.log('Request', details);
 
         if (details.resourceType === 'script') {
-          if (details.url === 'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js') {
+          const scriptWhitelist = [
+            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
+            'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
+          ];
+
+          if (scriptWhitelist.includes(details.url)) {
             cb({});
             return;
           }
