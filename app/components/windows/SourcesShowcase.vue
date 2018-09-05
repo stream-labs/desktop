@@ -96,6 +96,9 @@
       sourceType="game_capture"
       key="11">
       <GameCaptureIcon slot="media" />
+      <p slot="attention-text" class="attention">
+         {{$t('sources.gameCaptureMessage') }}
+      </p>
     </add-source-info>
 
     <add-source-info
