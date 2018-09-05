@@ -24,7 +24,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   metadata = this.service.getMetadata();
 
   requestState: 'success' | 'pending' | 'fail' = 'pending';
-  loaded = false;
 
   tabs = this.service.getTabs();
 
@@ -54,6 +53,10 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     await this.refresh();
   }
 
+  get loaded() {
+    return !!this.wData;
+  }
+
   destroyed() {
     this.dataUpdatedSubscr.unsubscribe();
   }
@@ -62,7 +65,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     try {
       await this.service.fetchData();
       this.requestState = 'success';
-      this.loaded = true;
       this.skipNextDatachangeHandler = true;
       this.afterFetch();
     } catch (e) {

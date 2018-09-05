@@ -167,7 +167,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // top level components in new child windows.
   components = getComponents();
 
-  windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
+  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -287,17 +287,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
-  @ExecuteInCurrentWindow()
+  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
-  @ExecuteInCurrentWindow()
+  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
-  @ExecuteInCurrentWindow()
+  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }
