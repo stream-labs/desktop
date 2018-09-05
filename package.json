@@ -6,7 +6,7 @@
   "//": {
     "version": "0.9.3-preview.3"
   },
-  "version": "0.1.20180905-1",
+  "version": "0.1.20180905-2",
   "main": "main.js",
   "scripts": {
     "compile": "yarn clear && webpack-cli --progress --mode development",
