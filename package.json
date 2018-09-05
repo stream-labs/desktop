@@ -25,7 +25,8 @@
     "clear": "rimraf bundles/media",
     "typedoc": "typedoc --out docs/dist ./app/services --mode modules --theme ./docs/theme --readme ./docs/README.md --ignoreCompilerErrors --excludePrivate --excludeExternals --hideGenerator",
     "compile-tests": "tsc -p test",
-    "screentest": "node test/screentest/runner.js"
+    "screentest": "node test/screentest/runner.js",
+    "version": "git add app/services/patch-notes/notes.ts"
   },
   "buildProductName": "N Air",
   "build": {

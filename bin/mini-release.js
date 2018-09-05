@@ -295,7 +295,6 @@ async function runScript() {
 
         fs.writeFileSync(noteFilename, patchNote);
         info(`generated patch-note file: ${noteFilename}.`)
-        executeCmd(`git commit -m "note.ts ${newVersion}" ${noteFilename}`);
     }
 
     // update package.json with newVersion and git tag
