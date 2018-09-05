@@ -1,5 +1,4 @@
 import { Module, EApiPermissions, TApiModule } from './modules/module';
-import { ExampleModule } from './modules/example';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
@@ -10,7 +9,6 @@ export class PlatformAppsApi {
 
   constructor() {
     // Register all modules
-    this.registerModule(new ExampleModule());
     this.registerModule(new SourcesModule());
     this.registerModule(new ScenesModule());
     this.registerModule(new ObsSettingsModule());

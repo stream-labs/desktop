@@ -15,6 +15,7 @@ import url from 'url';
 import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
+import { trim, compact } from 'lodash';
 
 const DEV_PORT = 8081;
 
@@ -58,13 +59,13 @@ export enum EAppPageSlot {
 
 interface IAppPage {
   slot: EAppPageSlot;
-  persistent?: boolean;
   file: string; // Relative path to HTML file
 }
 
 interface IAppManifest {
-  name: string; // display name for the app
+  name: string;
   version: string;
+  buildPath: string;
   permissions: EApiPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
@@ -308,7 +309,9 @@ export class PlatformAppsService extends
     let url: string;
 
     if (app.unpacked) {
-      url = `http://localhost:${app.devPort}/${asset}`;
+      const trimmed = trim(app.manifest.buildPath, '/ ');
+
+      url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
     } else {
       // TODO
     }
