@@ -31,7 +31,6 @@
 }
 
 .source-info__media {
-  .radius;
   text-align: center;
   align-items: center;
   align-content: center;
@@ -39,7 +38,6 @@
   justify-content: center;
   display: flex;
   flex: 1;
-
 }
 
 .source-info__text {
