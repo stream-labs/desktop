@@ -4,18 +4,18 @@ import {
   IDonationTickerData
 } from 'services/widget-settings/donation-ticker';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    FormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
     TestButtons,
     ...inputComponents
@@ -45,4 +45,10 @@ export default class DonationTicker extends WidgetSettings<IDonationTickerData, 
   textColorTooltip = $t('A hex code for the base text color.');
   nameColorTooltip = $t('A hex color for the text of the') + ' {name} ' + $t('token');
   amountColorTooltip = $t('A hex color for the text of the') + ' {amount} ' + $t('token');
+
+  settings = [
+    { value: 'manage-list', label: $t('Manage List') },
+    { value: 'font', label: 'Font Settings' },
+    { value: 'source', label: 'Source' }
+  ];
 }
