@@ -48,7 +48,7 @@ export default class DonationTicker extends WidgetSettings<IDonationTickerData, 
 
   settings = [
     { value: 'manage-list', label: $t('Manage List') },
-    { value: 'font', label: 'Font Settings' },
-    { value: 'source', label: 'Source' }
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'source', label: $t('Source') }
   ];
 }

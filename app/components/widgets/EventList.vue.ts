@@ -46,8 +46,8 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
 
   settings = [
     { value: 'manage-list', label: $t('Manage List') },
-    { value: 'font', label: 'Font Settings' },
-    { value: 'visual', label: 'Visual Settings' },
-    { value: 'source', label: 'Source' }
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
   ];
 }
