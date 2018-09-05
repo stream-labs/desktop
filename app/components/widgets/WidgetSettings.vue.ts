@@ -8,7 +8,6 @@ import { WidgetsService, WidgetType } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
-import uuid from 'uuid';
 
 @Component({})
 export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
@@ -23,7 +22,10 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   source = this.sourcesService.getSource(this.sourceId);
   wData: TData = null;
   metadata = this.service.getMetadata();
-  loadingState: 'success' | 'pending' | 'fail' = 'pending';
+
+  requestState: 'success' | 'pending' | 'fail' = 'pending';
+  loaded = false;
+
   tabs = this.service.getTabs();
 
   fontFamilyTooltip = $t(
@@ -59,11 +61,12 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   async refresh() {
     try {
       await this.service.fetchData();
-      this.loadingState = 'success';
+      this.requestState = 'success';
+      this.loaded = true;
       this.skipNextDatachangeHandler = true;
       this.afterFetch();
     } catch (e) {
-      this.loadingState = 'fail';
+      this.requestState = 'fail';
     }
   }
 
@@ -86,36 +89,36 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   async save(dataToSave?: any) {
-    if (this.loadingState === 'pending') return;
+    if (this.requestState === 'pending') return;
 
     const tab = this.service.getTab(this.tabName);
     if (!tab) return;
 
-    this.loadingState = 'pending';
+    this.requestState = 'pending';
 
     try {
       await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
-      this.loadingState = 'success';
+      this.requestState = 'success';
       this.afterFetch();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
-      this.loadingState = 'fail';
+      this.requestState = 'fail';
       this.onFailHandler();
     }
   }
 
   async reset() {
-    if (this.loadingState === 'pending') return;
+    if (this.requestState === 'pending') return;
 
-    this.loadingState = 'pending';
+    this.requestState = 'pending';
 
     try {
       this.wData = await this.service.reset(this.tabName);
-      this.loadingState = 'success';
+      this.requestState = 'success';
       this.afterFetch();
       this.skipNextDatachangeHandler = true;
     } catch (e) {
-      this.loadingState = 'fail';
+      this.requestState = 'fail';
       this.onFailHandler();
     }
   }
