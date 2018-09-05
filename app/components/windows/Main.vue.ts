@@ -99,6 +99,10 @@ export default class Main extends Vue {
     return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.TopNav);
   }
 
+  isAppPoppedOut(appId: string) {
+    return this.platformAppsService.getApp(appId).poppedOutSlots.includes(EAppPageSlot.TopNav);
+  }
+
   appStyles(appId: string) {
     if (this.page === 'PlatformAppContainer' && this.params.appId === appId) {
       return {};

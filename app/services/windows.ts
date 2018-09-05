@@ -168,6 +168,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   components = getComponents();
 
   windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
+  windowDestroyed = new Subject<string>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -257,6 +258,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     newWindow.setMenu(null);
     newWindow.on('closed', () => {
+      this.windowDestroyed.next(windowId);
       delete this.windows[windowId];
       this.DELETE_ONE_OFF_WINDOW(windowId);
     });

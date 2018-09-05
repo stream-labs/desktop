@@ -79,6 +79,7 @@ interface ILoadedApp {
   appPath?: string; // The path on disk to the app if unpacked
   appToken: string;
   devPort?: number; // The port the dev server is running on if unpacked
+  poppedOutSlots: EAppPageSlot[];
 }
 
 interface IPlatformAppServiceState {
@@ -167,7 +168,8 @@ export class PlatformAppsService extends
       unpacked: true,
       appPath,
       appToken,
-      devPort: DEV_PORT
+      devPort: DEV_PORT,
+      poppedOutSlots: []
     });
     localStorage.setItem(this.localStorageKey, JSON.stringify({
       appPath, appToken
@@ -454,6 +456,8 @@ export class PlatformAppsService extends
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
     // TODO Disable original page?
 
+    const windowId =  `${appId}-${pageSlot}`;
+
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
     this.windowsService.createOneOffWindow({
@@ -463,7 +467,16 @@ export class PlatformAppsService extends
         width: 600,
         height: 500
       }
-    }, `${appId}-${pageSlot}`);
+    }, windowId);
+
+    this.POP_OUT_SLOT(appId, pageSlot);
+
+    const sub = this.windowsService.windowDestroyed.subscribe(winId => {
+      if (winId === windowId) {
+        this.POP_IN_SLOT(appId, pageSlot)
+        sub.unsubscribe();
+      }
+    });
   }
 
   /**
@@ -486,12 +499,30 @@ export class PlatformAppsService extends
       if (app.id === appId) {
         app.manifest = manifest;
       }
-    })
+    });
   }
 
   @mutation()
   private SET_DEV_MODE(devMode: boolean) {
     this.state.devMode = devMode;
+  }
+
+  @mutation()
+  private POP_OUT_SLOT(appId: string, slot: EAppPageSlot) {
+    this.state.loadedApps.forEach(app => {
+      if (app.id === appId) {
+        app.poppedOutSlots.push(slot);
+      }
+    });
+  }
+
+  @mutation()
+  private POP_IN_SLOT(appId: string, slot:EAppPageSlot) {
+    this.state.loadedApps.forEach(app => {
+      if (app.id === appId) {
+        app.poppedOutSlots = app.poppedOutSlots.filter(s => s !== slot);
+      }
+    });
   }
 
 }

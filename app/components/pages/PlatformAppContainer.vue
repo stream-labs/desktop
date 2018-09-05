@@ -1,12 +1,16 @@
 <template>
 <div class="platform-app-container">
   <div class="platform-app-controls">
-    <button @click="popOut" class="button button--default">Pop Out</button>
+    <button @click="popOut" class="button button--default" :disabled="params.poppedOut">Pop Out</button>
   </div>
   <PlatformAppWebview
+    v-if="!params.poppedOut"
     class="platform-app-webview"
     :appId="params.appId"
     :pageSlot="slot" />
+  <div v-else>
+    This app is currently popped out into an external window.
+  </div>
 </div>
 </template>
 

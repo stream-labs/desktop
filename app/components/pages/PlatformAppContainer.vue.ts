@@ -7,6 +7,7 @@ import { Inject } from 'util/injector';
 
 interface IPlatformAppContainerParams {
   appId: string;
+  poppedOut: boolean;
 }
 
 @Component({
