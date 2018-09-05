@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { getComponents, WindowsService } from 'services/windows';
+import { getComponents, IWindowOptions, WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 
 @Component({
@@ -15,11 +15,13 @@ export default class ChildWindow extends Vue {
 
   components: { name: string; isShown: boolean; }[] = [];
 
+  private refreshingTimeout = 0;
+
   mounted() {
-    this.onWindowUpdatedHandler();
-    this.windowsService.windowUpdated.subscribe(params => {
-      if (params.windowId !== 'child') return;
-      this.onWindowUpdatedHandler();
+    this.onWindowUpdatedHandler(this.options);
+    this.windowsService.windowUpdated.subscribe(windowInfo => {
+      if (windowInfo.windowId !== 'child') return;
+      this.onWindowUpdatedHandler(windowInfo.options);
     });
   }
 
@@ -39,20 +41,20 @@ export default class ChildWindow extends Vue {
     this.components = [];
   }
 
-  private onWindowUpdatedHandler() {
+  private onWindowUpdatedHandler(options: IWindowOptions) {
     // If the window was closed, just clear the stack
-    if (!this.options.isShown) {
+    if (!options.isShown) {
       this.clearComponentStack();
       return;
     }
 
-    if (this.options.preservePrevWindow) {
+    if (options.preservePrevWindow) {
       this.currentComponent.isShown = false;
-      this.components.push({ name: this.options.componentName, isShown: true });
+      this.components.push({ name: options.componentName, isShown: true });
       return;
     }
 
-    if (this.options.isPreserved) {
+    if (options.isPreserved) {
       this.components.pop();
       this.currentComponent.isShown = true;
       return;
@@ -63,8 +65,9 @@ export default class ChildWindow extends Vue {
     // This is essentially a race condition, but make a best effort
     // at having a successful paint cycle before loading a component
     // that will do a bunch of synchronous IO.
-    setTimeout(() => {
-      this.components.push({ name: this.options.componentName, isShown: true });
+    clearTimeout(this.refreshingTimeout);
+    this.refreshingTimeout = window.setTimeout(() => {
+      this.components.push({ name: options.componentName, isShown: true });
     }, 50);
   }
 }

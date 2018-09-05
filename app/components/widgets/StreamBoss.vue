@@ -1,7 +1,7 @@
 <template>
-  <widget-window v-if="wData" v-model="tabName">
+  <widget-window :requestState="requestState" :loaded="loaded" v-model="tabName">
     <!-- streamboss setup -->
-    <div slot="goal" >
+    <div slot="goal" v-if="loaded">
       <div v-if="hasGoal">
         <div class="section__body">
           <form-group :title="$t('Current Boss Name')">{{ wData.goal.boss_name }}</form-group>
@@ -13,7 +13,7 @@
 
       <div v-if="!hasGoal">
 
-        <validated-form ref="form" class="section__body" v-if="loadingState !== 'pending'">
+        <validated-form ref="form" class="section__body" v-if="requestState !== 'pending'">
           <form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
         </validated-form>
@@ -41,7 +41,7 @@
 
     </div>
 
-    <div slot="settings">
+    <div slot="settings" v-if="loaded">
       <form-group v-model="wData.settings.fade_time" :metadata="metadata.fade_time"/>
 
       <form-group >
