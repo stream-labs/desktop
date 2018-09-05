@@ -164,9 +164,8 @@ export class PlatformAppsService extends
 
   unloadApps() {
     this.state.loadedApps.forEach(app => {
-      const appId = app.id;
-      this.REMOVE_APP(appId);
-      this.appUnload.next(appId);
+      this.REMOVE_APP(app.id);
+      this.appUnload.next(app.id);
     });
 
     if (this.devServer) {

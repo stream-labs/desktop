@@ -15,11 +15,13 @@
       <p class="app-platform-details">
         {{ currentlyLoadedUnpackedApp.appToken }}
       </p>
-      <button @click="reloadApp" class="button button--action">
+      <button @click="reloadApp" class="button button--action" :disabled="loading">
         Reload
+        <i v-if="loading" class="fa fa-spinner fa-pulse" />
       </button>
-      <button @click="unloadApp" class="button button--action">
+      <button @click="unloadApp" class="button button--action" :disabled="loading">
         Unload
+        <i v-if="loading" class="fa fa-spinner fa-pulse" />
       </button>
     </div>
     <div v-else>

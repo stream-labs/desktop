@@ -67,7 +67,11 @@ export default class AppPlatformDeveloperSettings extends Vue {
   }
 
   reloadApp() {
+    this.loading = true;
     this.platformAppsService.reloadApp(this.currentlyLoadedUnpackedApp.id);
+
+    // This prevents spamming the button
+    setTimeout(() => this.loading = false, 2000);
   }
 
   unloadApp() {
