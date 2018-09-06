@@ -96,6 +96,11 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
+  makeSceneActive(id: string) {
+    this.scenesService.makeSceneActive(id);
+  }
+
+  @apiMethod()
   createSceneItem() {
     throw new NotImplementedError();
   }
