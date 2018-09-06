@@ -44,7 +44,7 @@
       <i class="icon-live-dashboard"/> <span>{{ $t('Live') }}</span>
     </button>
     <button
-      v-for="app in platformApps"
+      v-for="app in topNavApps"
       :key="app.id"
       @click="navigateApp(app.id)"
       class="tab-button"

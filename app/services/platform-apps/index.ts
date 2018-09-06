@@ -139,6 +139,11 @@ export class PlatformAppsService extends
    */
   async installUnpackedApp(appPath: string, appToken: string) {
     const id = await this.getAppIdFromServer(appToken);
+
+    if (id == null) {
+      return 'Error: please check that your App Token is valid';
+    }
+
     const manifestPath = path.join(appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
@@ -209,11 +214,14 @@ export class PlatformAppsService extends
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
-        throw new Error(`Missing file: manfiest.sources[${i}].file does not exist. Searching at path: ${filePath}`);
+        throw new Error(`Missing file: manifest.sources[${i}].file does not exist. Searching at path: ${filePath}`);
       }
     }
 
     // Validate pages
+    // Only 1 page per slot top is allowed
+    const seenSlots: Dictionary<boolean> = {};
+
     for (let i = 0; i < manifest.pages.length; i++) {
       const page = manifest.pages[i];
 
@@ -222,12 +230,19 @@ export class PlatformAppsService extends
         'file'
       ]);
 
+      if (seenSlots[page.slot]) {
+        throw new Error(`Error: manifest.pages[${i}].slot "${page.slot}" ` +
+          'is already taken. There can only be 1 page per slot.');
+      }
+
+      seenSlots[page.slot] = true;
+
       // Check for existence of file
       const filePath = path.join(appPath, trim(manifest.buildPath), page.file);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
-        throw new Error(`Missing file: manfiest.pages[${i}].file does not exist. Searching at path: ${filePath}`);
+        throw new Error(`Missing file: manifest.pages[${i}].file does not exist. Searching at path: ${filePath}`);
       }
     }
   }
@@ -398,7 +413,11 @@ export class PlatformAppsService extends
 
   isAppSlotPersistent(appId: string, slot: EAppPageSlot) {
     const app = this.getApp(appId);
+    if (!app) return false;
+
     const page = app.manifest.pages.find(page => page.slot === slot);
+    if (!page) return false;
+
     return !!page.persistent;
   }
 
