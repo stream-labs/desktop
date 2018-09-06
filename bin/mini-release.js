@@ -144,14 +144,25 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
 
     let promises = [];
     for (const line of merges.split(/\r?\n/)) {
-        info(line);
         const pr = line.match(/.*Merge pull request #([0-9]*).*/);
         if (!pr || pr.length < 2) {
             continue;
         }
         const number = parseInt(pr[1], 10);
-        info(number);
         promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+    }
+
+    function level(line) {
+        if (line.startsWith('追加:')) {
+            return 0;
+        }
+        if (line.startsWith('変更:')) {
+            return 1;
+        }
+        if (line.startsWith('修正:')) {
+            return 2;
+        }
+        return 3;
     }
 
     return Promise.all(promises).then(results => {
@@ -162,6 +173,21 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
                 summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
             }
         }
+
+        summary.sort((a,b) => {
+            const d = level(a) - level(b);
+            if (d) {
+                return d;
+            }
+            if (a < b) {
+                return -1;
+            } else if (a === b) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+
         return summary.join('');
     });
 }
@@ -277,11 +303,14 @@ async function runScript() {
             owner: 'n-air-app',
             repo: 'n-air-app'
         }, previousTag);
-        info(prMerges);
+        notes = prMerges;
 
-        const merges = executeCmd('git log -1 --merges --pretty=format:%P', {silent: true}).stdout.trim();
-        const mergeBase = executeCmd(`git merge-base --octopus ${merges} ${previousTag}`, {silent: true}).stdout.trim();
-        notes = prMerges + executeCmd(`git log --oneline --graph --decorate ${mergeBase}.. --boundary`).stdout;
+        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {silent: true}).stdout;
+	if (directCommits) {
+            notes = prMerges + '\nDirect Commits:\n' + directCommits;
+	}
+
+        info(notes);
 
         writePatchNoteFile(patchNoteFileName, newVersion, notes);
         info(`generated ${patchNoteFileName}.`);
@@ -298,6 +327,7 @@ async function runScript() {
         info(`prerelease is true.`);
     }
     if (!await confirm(`Are you sure you want to release as version ${newVersion}?`, false)) sh.exit(0);
+    const skipCleaningNodeModules = !skipBuild && !await confirm('skip cleaning node_modules?');
 
     if (!generateNoteTs) {
         info('skipping to generate notes.ts...');
@@ -315,7 +345,7 @@ async function runScript() {
     if (skipBuild) {
         info('SKIP build process since skipBuild is set...');
     } else {
-        if (!await confirm('skip cleaning node_modules?')) {
+        if (skipCleaningNodeModules) {
             // clean
             info('Removing old packages...');
             sh.rm('-rf', 'node_modules');
