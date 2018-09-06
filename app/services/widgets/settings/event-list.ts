@@ -1,6 +1,6 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets';
-import { metadata } from 'components/widgets/inputs';
+import { WidgetType } from 'services/widgets/index';
+import { metadata } from 'components/widgets/inputs/index';
 
 export interface IEventListSettings extends IWidgetSettings {
   animation_speed: number;

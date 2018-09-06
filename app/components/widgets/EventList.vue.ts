@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   EventListService,
   IEventListData
-} from 'services/widget-settings/event-list';
+} from 'services/widgets/settings/event-list';
 
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';

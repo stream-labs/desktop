@@ -9,12 +9,13 @@ import { HostsService } from '../hosts';
 import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
-import { WidgetSettingsService } from '../widget-settings/widget-settings';
+import { WidgetSettingsService } from './settings/widget-settings';
 import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
 import { ISerializableWidget } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
 import { ServiceHelper } from '../stateful-service';
+import { WidgetSource } from './widget-source';
 
 @ServiceHelper()
 export class WidgetTester {
@@ -90,6 +91,10 @@ export class WidgetsService extends Service {
     }, 1500);
 
     return sceneItem;
+  }
+
+  getWidget(sourceId: string): WidgetSource {
+    return this.sourcesService.state.sources[sourceId] ? new WidgetSource(sourceId) : null;
   }
 
   getWidgetUrl(type: WidgetType) {

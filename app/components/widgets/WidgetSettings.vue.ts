@@ -5,7 +5,7 @@ import { WindowsService } from 'services/windows';
 import { debounce } from 'lodash-decorators';
 import { SourcesService } from 'services/sources/index';
 import { WidgetsService, WidgetType } from 'services/widgets';
-import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets/settings/widget-settings';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
 

@@ -1,6 +1,6 @@
 import { CODE_EDITOR_TABS, IWidgetData, WidgetSettingsService, IWidgetSettings } from './widget-settings';
 import { ISliderMetadata, IListMetadata } from 'components/shared/inputs/index';
-import { WidgetType } from 'services/widgets';
+import { WidgetType } from 'services/widgets/index';
 import { createInterface } from 'readline';
 
 

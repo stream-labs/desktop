@@ -11,7 +11,8 @@ export type TSocketEvent =
   IDonationSocketEvent |
   IFacemaskSocketEvent |
   IFollowSocketEvent |
-  ISubscriptionSocketEvent;
+  ISubscriptionSocketEvent |
+  IWidgetSoketEvent;
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -50,6 +51,11 @@ interface ISubscriptionSocketEvent {
   message: {
     name: string;
   }[];
+}
+
+interface IWidgetSoketEvent {
+  type: 'streambossSettingsUpdate',
+  message: Dictionary<any>
 }
 
 export class WebsocketService extends Service {

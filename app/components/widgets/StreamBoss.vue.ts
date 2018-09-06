@@ -6,7 +6,7 @@ import { inputComponents } from 'components/widgets/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
+import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widgets/settings/stream-boss';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
 

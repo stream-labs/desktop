@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
 import { CodeInput, BoolInput } from 'components/shared/inputs/inputs';
-import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets/settings/widget-settings';
 import { Inject } from '../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';

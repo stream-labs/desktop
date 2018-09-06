@@ -1,6 +1,7 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
-import { metadata } from 'components/widgets/inputs';
+import { metadata } from 'components/widgets/inputs/index';
+import { InheritMutations } from 'services/stateful-service';
 
 export interface IChatBoxSettings extends IWidgetSettings {
   theme: string;
@@ -27,7 +28,13 @@ export interface IChatBoxData extends IWidgetData {
   settings: IChatBoxSettings;
 }
 
+@InheritMutations()
 export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
+
+  static initialState: {isChatBox: boolean; data: any} = {
+    isChatBox: true,
+    data: null
+  };
 
   getWidgetType() {
     return WidgetType.ChatBox;

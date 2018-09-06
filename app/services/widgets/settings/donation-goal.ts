@@ -1,6 +1,6 @@
 import { GenericGoalService } from './generic-goal';
 import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS, THttpMethod } from './widget-settings';
-import { WidgetType } from 'services/widgets';
+import { WidgetType } from 'services/widgets/index';
 
 
 export class DonationGoalService extends GenericGoalService {

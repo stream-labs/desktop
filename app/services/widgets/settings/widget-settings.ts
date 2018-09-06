@@ -1,15 +1,17 @@
-import { HostsService } from '../hosts';
-import { Inject } from '../../util/injector';
+import { HostsService } from '../../hosts';
+import { Inject } from '../../../util/injector';
 import { UserService } from 'services/user';
 import {
   handleErrors,
   authorizedHeaders
-} from '../../util/requests';
-import { WidgetsService, WidgetType } from 'services/widgets';
+} from '../../../util/requests';
+import { WidgetsService, WidgetType } from 'services/widgets/index';
 import { Service } from 'services/service';
 import { Subject } from 'rxjs/Subject';
-import { IInputMetadata } from 'components/shared/inputs';
-import { Source, SourcesService } from 'services/sources';
+import { IInputMetadata } from 'components/shared/inputs/index';
+import { Source, SourcesService } from 'services/sources/index';
+import { mutation, StatefulService } from 'services/stateful-service';
+import { WebsocketService } from 'services/websocket';
 
 
 export interface IWidgetTab {
@@ -30,6 +32,10 @@ export interface IWidgetSettings {
   custom_js: string;
 }
 
+export interface IWidgetApiSettings {
+  settingsUpdatedEvent: string;
+}
+
 export interface IWidgetData {
 
   type: WidgetType;
@@ -41,6 +47,10 @@ export interface IWidgetData {
     css: string;
     js: string;
   };
+}
+
+export interface IWidgetState {
+  data: IWidgetData;
 }
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
@@ -56,25 +66,48 @@ export const CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS: (Partial<IWidgetTab> & { name:
   { name: 'customFields', title: 'Custom Fields', showControls: false, autosave: false }
 ];
 
+interface ISocketEvent<TMessage> {
+  type: string;
+  message: TMessage;
+}
+
 /**
  * base class for widget settings
- * TODO: join this service with WidgetsService.ts after widgets rewrite
  */
-export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends Service {
-  static initialState = {};
+export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends StatefulService<IWidgetState> {
+  static initialState: IWidgetState = {
+    data: null
+  };
 
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() private sourcesService: SourcesService;
+  @Inject() protected websocketService: WebsocketService;
 
   dataUpdated = new Subject<TWidgetData>();
+
+  abstract getApiSettings(): IWidgetApiSettings;
+
 
   abstract getPreviewUrl(): string;
   abstract getDataUrl(): string;
   abstract getWidgetType(): WidgetType;
 
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
+
+  init() {
+
+    this.websocketService.socketEvent.subscribe(event  => {
+      this.onSocketEventHandler(event as ISocketEvent<TWidgetData>)
+    });
+  }
+
+  private onSocketEventHandler(event: ISocketEvent<TWidgetData>) {
+    const apiSettings = this.getApiSettings();
+
+  }
+
 
   getWidgetUrl(): string {
     return this.widgetsService.getWidgetUrl(this.getWidgetType());
@@ -111,6 +144,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
       method: 'GET'
     });
     data = this.handleDataAfterFetch(data);
+    this.SET_WIDGET_DATA(data);
     this.dataUpdated.next(data);
     return data;
   }
@@ -196,4 +230,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     return this.userService.apiToken;
   }
 
+  @mutation()
+  SET_WIDGET_DATA(data: IWidgetData) {
+    this.state.data = data;
+  }
 }

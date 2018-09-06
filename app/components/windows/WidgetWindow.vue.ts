@@ -14,7 +14,7 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
-import { IWidgetTab } from 'services/widget-settings/widget-settings';
+import { IWidgetTab } from 'services/widgets/settings/widget-settings';
 
 @Component({
   components: {

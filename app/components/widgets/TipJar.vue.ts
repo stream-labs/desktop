@@ -5,7 +5,7 @@ import WidgetSettings from './WidgetSettings.vue';
 import {
   TipJarService,
   ITipJarData
-} from 'services/widget-settings/tip-jar';
+} from 'services/widgets/settings/tip-jar';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';

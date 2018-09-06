@@ -5,7 +5,7 @@ import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
 import FormGroup from 'components/shared/inputs/FormGroup.vue';
-import { IViewerCountData, ViewerCountService } from 'services/widget-settings/viewer-count';
+import { IViewerCountData, ViewerCountService } from 'services/widgets/settings/viewer-count';
 import CodeEditor from './CodeEditor.vue';
 
 @Component({

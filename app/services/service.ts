@@ -64,7 +64,11 @@ export abstract class Service {
 
     const mustInit = this.initFn ? !this.initFn(instance) : true;
 
-    if (mustInit) instance.init();
+    if (mustInit) {
+      instance.beforeInit();
+      instance.init();
+    }
+
     instance.mounted();
     Service.serviceAfterInit.next(instance);
     if (mustInit) instance.afterInit();
@@ -80,6 +84,11 @@ export abstract class Service {
   constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) throw 'Cannot construct singleton';
   }
+
+  /**
+   * calls only once per application life
+   */
+  protected beforeInit() {}
 
   /**
    * calls only once per application life

@@ -1,5 +1,5 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets';
+import { WidgetType } from 'services/widgets/index';
 
 export interface IDonationTickerSettings extends IWidgetSettings {
   background_color: string;

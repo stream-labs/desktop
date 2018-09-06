@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   GenericGoalService,
   IGoalData
-} from 'services/widget-settings/generic-goal';
+} from 'services/widgets/settings/generic-goal';
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 

@@ -1,5 +1,5 @@
 import { GenericGoalService } from './generic-goal';
-import { WidgetType } from 'services/widgets';
+import { WidgetType } from 'services/widgets/index';
 import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS } from './widget-settings';
 
 

@@ -1,8 +1,11 @@
 import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets';
+import { WidgetType } from 'services/widgets/index';
 import { IGoalData } from './generic-goal';
-import { $t } from 'services/i18n';
-import { metadata } from 'components/widgets/inputs';
+import { $t } from 'services/i18n/index';
+import { metadata } from 'components/widgets/inputs/index';
+import { InheritMutations } from 'services/stateful-service';
+import { Inject } from "../../../util/injector";
+import { WebsocketService } from "../../websocket";
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;
@@ -46,7 +49,12 @@ export interface IStreamBossCreateOptions {
   total_health: number;
 }
 
+@InheritMutations()
 export abstract class StreamBossService extends WidgetSettingsService<IStreamBossData> {
+
+  static initialState: { data: IStreamBossData } = {
+    data: null
+  };
 
   getWidgetType() {
     return WidgetType.StreamBoss;
@@ -70,6 +78,13 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
     }
 
   ];
+
+  init() {
+    this.websocketService.socketEvent.subscribe(event => {
+      if (event.type !== 'streambossSettingsUpdate') return;
+
+    });
+  }
 
   getVersion() {
     return 5;

@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   CreditsService,
   ICreditsData
-} from 'services/widget-settings/credits';
+} from 'services/widgets/settings/credits';
 
 import { inputComponents } from 'components/widgets/inputs';
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
