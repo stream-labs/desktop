@@ -59,7 +59,7 @@ interface IFacemaskSettings {
 
 interface IFacemaskAlertMessage {
   name: string;
-  amount: string;
+  formattedAmount: string;
   facemask: string;
   message: string;
 }
@@ -168,7 +168,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   }
 
   onSocketEvent(event: TSocketEvent) {
-    if (event.type === 'facemask') {
+    if (event.type === 'donation' && event.message[0].facemask) {
       this.enqueueAlert(event.message[0]);
     }
   }
@@ -190,7 +190,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   playQueuedAlert() {
     if (this.queue.length && this.facemaskFilter) {
       const alert = this.queue.shift();
-      this.trigger(alert.facemask, alert.message, alert.name);
+      this.trigger(alert.facemask, alert.message, alert.name, alert.formattedAmount);
     } else {
       this.playing = false;
       clearInterval(this.interval);
@@ -216,12 +216,12 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.playAlerts();
   }
 
-  trigger(mask: string, message: string, name: string) {
+  trigger(mask: string, message: string, name: string, formattedAmount: string) {
     const clean = this.profanitize(message, name);
     this.updateFilter({
       Mask: `${mask}.json`,
       alertText: clean['message'],
-      donorName: clean['name'],
+      donorName: `${clean['name']} donated ${formattedAmount}`,
       alertActivate: true
     });
     this.playAudio();
@@ -245,7 +245,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
         const testMask = availableMasks[Math.floor(Math.random() * availableMasks.length)];
         this.enqueueAlert({
           name: 'Streamlabs',
-          amount: '10',
+          formattedAmount: '$10.00',
           facemask: testMask,
           message: 'This is a test Face Mask donation alert'
         });
