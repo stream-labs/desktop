@@ -34,7 +34,7 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
   textColorTooltip = $t('A hex code for the base text color.');
 
   get hasGoal() {
-    return this.wData.goal;
+    return this.loaded && this.wData.goal;
   }
 
   async saveGoal() {

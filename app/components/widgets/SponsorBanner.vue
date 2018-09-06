@@ -5,6 +5,8 @@
   v-model="wData.settings.custom_enabled"
   :slots="[{ value: 'layout', label: $t('Ad Layout') }]"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
   <div slot="layout">
     <v-form-group :title="$t('Placement')">

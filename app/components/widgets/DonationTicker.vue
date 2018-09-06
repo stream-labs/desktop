@@ -4,6 +4,8 @@
   ref="layout"
   v-model="wData.settings.custom_enabled"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
   <div slot="manage-list-properties">
     <v-form-group :title="$t('Message Format')" type="text" v-model="wData.settings.message_format" :metadata="{ tooltip: messageFormatTooltip }" />

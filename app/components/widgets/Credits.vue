@@ -4,6 +4,8 @@
   ref="layout"
   v-model="wData.settings.custom_enabled"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
   <div slot="manage-credits-properties">
     <v-form-group :title="$t('Credit Title')" type="text" v-model="wData.settings.credit_title" />

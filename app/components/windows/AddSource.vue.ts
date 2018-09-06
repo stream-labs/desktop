@@ -97,8 +97,11 @@ export default class AddSource extends Vue {
         this.scenesService.activeScene.addSource(source.sourceId);
       }
 
-      this.close();
-      if (source.hasProps()) this.sourcesService.showSourceProperties(source.sourceId);
+      if (source.hasProps()) {
+        this.sourcesService.showSourceProperties(source.sourceId);
+      } else {
+        this.close();
+      }
     }
   }
 

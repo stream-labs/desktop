@@ -2,6 +2,8 @@
 <widget-editor
   v-if="wData"
   ref="layout"
+  :requestState="requestState"
+  :loaded="loaded"
   v-model="wData.settings.custom_enabled"
   :slots="[{ value: 'jar', label: $t('Jar Image') }]"
   :settings="settings"

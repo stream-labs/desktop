@@ -52,7 +52,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   ];
 
   get hasGoal() {
-    return this.wData.goal && this.wData.goal.title;
+    return this.loaded && this.wData.goal && this.wData.goal.title;
   }
 
   async saveGoal() {

@@ -4,6 +4,8 @@
   ref="layout"
   v-model="wData.settings.custom_enabled"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
     <!-- streamboss setup -->
     <div slot="goal-properties" >
@@ -21,7 +23,7 @@
       </div>
 
       <div v-if="!hasGoal">
-        <validated-form ref="form" class="section__body" v-if="loadingState !== 'pending'">
+        <validated-form ref="form" class="section__body" v-if="requestState !== 'pending'">
           <v-form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <v-form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
         </validated-form>

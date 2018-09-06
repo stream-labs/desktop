@@ -4,6 +4,8 @@
   ref="layout"
   v-model="wData.settings.custom_enabled"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
   <div slot="visual-properties" >
     <v-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>
