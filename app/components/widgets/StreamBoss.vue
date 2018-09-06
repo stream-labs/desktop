@@ -24,14 +24,14 @@
         <validated-form ref="form" class="section__body" v-if="loadingState !== 'pending'">
           <v-form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <v-form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
-          <button
-              @click="saveGoal()"
-              class="button button--action"
-          >{{ $t('Set Stream Boss Health') }}</button>
         </validated-form>
         <div v-else class="loading-spinner">
           <img src="../../../media/images/loader.svg" />
         </div>
+        <button
+            @click="saveGoal()"
+            class="button button--action"
+        >{{ $t('Set Stream Boss Health') }}</button>
       </div>
     </div>
 
