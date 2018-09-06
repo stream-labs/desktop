@@ -148,11 +148,13 @@ export class Source implements ISourceApi {
   }
 
   setDeinterlaceMode(newMode: obs.EDeinterlaceMode) {
+    this.getObsInput().deinterlaceMode = newMode;
     this.SET_DEINTERLACE_MODE(newMode);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
 
   setDeinterlaceFieldOrder(newOrder: obs.EDeinterlaceFieldOrder) {
+    this.getObsInput().deinterlaceFieldOrder = newOrder;
     this.SET_DEINTERLACE_FIELD_ORDER(newOrder);
     this.sourcesService.sourceUpdated.next(this.sourceState);
   }
@@ -181,13 +183,11 @@ export class Source implements ISourceApi {
 
   @mutation()
   private SET_DEINTERLACE_MODE(newMode: obs.EDeinterlaceMode) {
-    this.getObsInput().deinterlaceMode = newMode;
     this.sourceState.deinterlaceMode = newMode;
   }
 
   @mutation()
   private SET_DEINTERLACE_FIELD_ORDER(newOrder: obs.EDeinterlaceFieldOrder) {
-    this.getObsInput().deinterlaceFieldOrder = newOrder;
     this.sourceState.deinterlaceFieldOrder = newOrder;
   }
 }
