@@ -48,7 +48,10 @@
           <div class="subsection">
             <span class="subsection__title">{{ $t('Selected Properties') }}</span>
             <div class="subsection__content" v-if="currentSetting !== 'source'">
-              <slot :name="`${currentSetting}-properties`" />
+              <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed"/>
+              <div v-else>
+                {{ $t('Failed to load settings') }}
+              </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
               <generic-form v-model="sourceProperties" @input="onPropsInputHandler"/>

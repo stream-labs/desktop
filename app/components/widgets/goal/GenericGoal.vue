@@ -4,6 +4,8 @@
   ref="layout"
   v-model="wData.settings.custom_enabled"
   :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
 >
   <!-- goal setup -->
   <div slot="goal-properties" >
@@ -18,7 +20,7 @@
     </div>
 
     <div v-if="!hasGoal">
-      <div class="section__body" v-if="loadingState !== 'pending'">
+      <div class="section__body" v-if="requestState !== 'pending'">
         <validated-form ref="form">
           <v-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
           <v-form-group v-model="goalCreateOptions.goal_amount" :metadata="metadata.goal_amount"/>

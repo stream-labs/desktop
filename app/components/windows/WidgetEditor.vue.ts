@@ -39,6 +39,8 @@ export default class WidgetWindow extends Vue {
   @Prop() slots: any[];
   @Prop() settings: any[];
   @Prop() value: boolean;
+  @Prop() requestState: 'fail' | 'success' | 'pending';
+  @Prop() loaded: boolean;
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
 
@@ -65,6 +67,10 @@ export default class WidgetWindow extends Vue {
 
   get service() {
     return this.widgetsService.getWidgetSettingsService(this.widgetType);
+  }
+
+  get loadingFailed() {
+    return this.requestState === 'fail' && !this.loaded;
   }
 
   mounted() {
