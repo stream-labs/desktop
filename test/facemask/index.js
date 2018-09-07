@@ -18,7 +18,10 @@ var receivedTestData = {
   lastPixelR : 0,
   lastPixelG : 0,
   lastPixelB : 0,
-  lastPixelA : 0
+  lastPixelA : 0,
+  poseX 	 : 0,
+  poseY 	 : 0,
+  poseZ 	 : 0
 };
 
 
@@ -57,6 +60,14 @@ function parseTestData(d) {
     receivedTestData.lastPixelB = parseInt(color[2]);
     receivedTestData.lastPixelA = parseInt(color[3]);
   }
+  if (d.includes("Pose Translations")) {
+    const ts = d.split(' ');
+    var t = ts[ts.length  - 1];
+    var translations = t.split(',');
+    receivedTestData.poseX = parseInt(translations[0]);
+    receivedTestData.poseY = parseInt(translations[1]);
+    receivedTestData.poseZ = parseInt(translations[2]);
+  }
 }
 
 
@@ -92,11 +103,16 @@ function getFacemaskDataDir() {
   var dirString = path.dirname(fs.realpathSync(__filename));
   dirString = path.dirname(dirString);
   dirString = path.dirname(dirString);
-  dirString += '\\face-mask\\';
+  dirString += '\\facemask\\';
 
   return dirString;
 }
 
+// ---------------------------------------------------------------------------
+// getFacemaskMasksDataDir : Gets the path to the obs-facemask-plugin test masks data dir
+function getFacemaskMasksDataDir() {
+  return getFacemaskDataDir() + "masks\\";
+}
 
 // ---------------------------------------------------------------------------
 // addMediaSource : Create a Media Source and set it to play a video
@@ -158,6 +174,7 @@ async function addFacemaskFilter(t, sourceName, filterName) {
   await openFilterProperties(t, sourceName, filterName);
   await clickFormInput(t, 'Show Advanced Settings');
   await clickFormInput(t, 'Enable Testing Mode');
+  await clickFormInput(t, 'Draw Mask');
   await closeFilterProperties(t);
 }
 
@@ -174,48 +191,13 @@ async function setDetectionFull(t, sourceName, filterName) {
 }
 
 // ---------------------------------------------------------------------------
-// setMaskImage
-async function setMaskImage(t, sourceName, filterName, color) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "dot.png";
-  await focusChild(t);
-  await setFormInput(t, 'Face Mask Image', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
 // setMaskJson
-async function setMaskJson(t, sourceName, filterName, color) {
+async function setMaskJson(t, sourceName, filterName, maskName) {
   // set some params
   await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "sphere.json";
+  var f = getFacemaskMasksDataDir() +"masks//" + maskName;
   await focusChild(t);
-  await setFormInput(t, 'Mask', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
-// setMaskImage
-async function setGlassesImage(t, sourceName, filterName, color) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskDataDir() + color + "dot.png";
-  await focusChild(t);
-  await setFormInput(t, 'Eye Glasses Image', f);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
-
-// ---------------------------------------------------------------------------
-// setDrawMode
-async function setDrawMode(t, sourceName, filterName, drawMode) {
-  // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  await focusChild(t);
-  await setFormDropdown(t, 'Drawing Mode', drawMode);
+  await setFormInput(t, 'Browse to mask', f);
   await focusChild(t);
   await closeFilterProperties(t);
 }
@@ -295,45 +277,7 @@ async function updatePerformanceStats(t) {
 // ---------------------------------------------------------------------------
 // drawingModeTest : used for all the drawing tests
 async function drawingModeTest(t, drawMode) {
-    const sourceName = 'Example Source';
-  const filterName = 'Example Filter';
-
-  // start the test pipe server
-  startTestPipeServer();
-
-  // media source
-  await addImageSource(t, sourceName);
-
-  // facemask filter
-  await addFacemaskFilter(t, sourceName, filterName);
-
-  // set draw mode
-  await setDrawMode(t, sourceName, filterName, drawMode);
-
-  // tests
-  var testColors = ["red", "green", "blue"];
-  var testValues = [[255,0,0,255], [0,255,0,255], [0,0,255,255]];
-  for(var i = 0; i < testColors.length; i++) {
-    // set to color dot
-    if (drawMode == '2D Face Mask')
-      await setMaskImage(t, sourceName, filterName, testColors[i]);
-    else
-      await setMaskJson(t, sourceName, filterName, testColors[i]);
-    await sleep(100);
-    // check color at detected pixel
-    const startTime = Date.now();
-    while((Date.now() - startTime) < 3000) {
-      if ((receivedTestData.lastPixelR != testValues[i][0]) ||
-        (receivedTestData.lastPixelG != testValues[i][1]) ||
-        (receivedTestData.lastPixelB != testValues[i][2]) ||
-        (receivedTestData.lastPixelA != testValues[i][3])) {
-          t.fail();
-          break;
-        }
-
-      await sleep(10);
-    }
-  }
+ 
 }
 
 
@@ -403,8 +347,8 @@ test('Face Detection - Basic', async t => {
   while((Date.now() - startTime) < 1000) {
 
     // be a little lax on the exact position
-    if (receivedTestData.lastFaceX < 690 || (receivedTestData.lastFaceX > 710)
-		|| (receivedTestData.lastFaceY < 325) || (receivedTestData.lastFaceY > 335)) {
+    if (receivedTestData.lastFaceX < 540 || (receivedTestData.lastFaceX > 650)
+		|| (receivedTestData.lastFaceY < 455) || (receivedTestData.lastFaceY > 465)) {
 			console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
 			t.fail();
 			break;
@@ -458,6 +402,89 @@ test('Face Detection - Advanced', async t => {
     t.fail();
 });
 
+// ---------------------------------------------------------------------------
+// TEST : testEachMask : Tests each mask and verifies results
+//
+async function testEachMask(t, sourceName, filterName, maskName) {
+	
+  // set draw mode
+  await setMaskJson(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
+
+  await sleep(100);
+    // check color at detected pixel
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 3000) {
+	  // be a wider lax on the exact position (Since it is moving face)
+	if (receivedTestData.lastFaceX < 200 || (receivedTestData.lastFaceX > 650)
+		|| (receivedTestData.lastFaceY < 255) || (receivedTestData.lastFaceY > 455)) {
+		console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
+		t.fail();
+		break;
+	}
+		
+	if (receivedTestData.poseX < -100 || (receivedTestData.poseX > 100)
+		|| (receivedTestData.poseY < -50) || (receivedTestData.poseY > 50)
+		|| (receivedTestData.poseZ < -50) || (receivedTestData.poseZ > 150)) {
+		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
+		t.fail();
+		break;
+	}
+
+    await sleep(10);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TEST : Drawing : Mask Basic
+// ---------------------------------------------------------------------------
+test('Drawing : Mask Json Basic', async t => {
+
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+  testEachMask(t, sourceName, filterName, maskName);
+
+  t.pass();
+});
+*/
+
+// ---------------------------------------------------------------------------
+// TEST : Drawing : Mask Advanced
+// ---------------------------------------------------------------------------
+test('Drawing : Mask Json Advanced', async t => {
+
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+  var fs = require('fs');
+  var maskDir = getFacemaskMasksDataDir();
+  var masks = fs.readdirSync(maskDir);
+  console.log("masks", masks);
+  for (var maskName in masks)  {
+	testEachMask(t, sourceName, filterName, maskName);
+  }
+
+  t.pass();
+});
+
 
 // ---------------------------------------------------------------------------
 // TEST : Performance
@@ -467,28 +494,3 @@ test('Performance', async t => {
 
   t.pass();
 });
-
-
-// ---------------------------------------------------------------------------
-// TEST : Drawing : 2D Mask
-// ---------------------------------------------------------------------------
-test('Drawing : 2D Mask', async t => {
-
-  // draw mode test
-  //TODO
-
-  t.pass();
-});
-
-
-// ---------------------------------------------------------------------------
-// TEST : Drawing : JSON Mask
-// ---------------------------------------------------------------------------
-test('Drawing : Mask Json', async t => {
-
-  // draw mode test
-  //TODO
-
-  t.pass();
-});
-
