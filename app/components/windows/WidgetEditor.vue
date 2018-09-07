@@ -87,7 +87,9 @@
     width: 100%;
 
     .tab-button {
+      text-transform: uppercase;
       height: 36px;
+      font-size: 12px;
       position: relative;
       bottom: -1px;
       z-index: 1;
