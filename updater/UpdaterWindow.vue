@@ -10,7 +10,9 @@
     <div class="patch-notes-wrap">
       <p v-html="releaseNotes" class="patch-notes"/>
     </div>
-    <button
+    <p v-if="isUnskippable">必須アップデートです</p>
+    <p v-if="!isUnskippable">スキップ可能なアップデートです</p>
+    <button v-if="!isUnskippable"
       class="button--dark"
       @click="cancel"
       data-test="Cancel">
@@ -30,7 +32,7 @@
         :style="{ width: percentComplete + '%' }"/>
         <div class="progressPercent">{{ percentComplete }}%</div>
       </div>
-      <button
+      <button v-if="!isUnskippable"
         class="button--dark"
         @click="cancel"
         data-test="Cancel">
@@ -82,10 +84,15 @@ export default {
     }
   },
   mounted() {
+    this.isUnskippable = null;
+
     ipcRenderer.on('autoUpdate-pushState', (event, data) => {
       this.currentState = 'checking';
       this.version = null,
       this.percentComplete = null;
+      if (data.isUnkippable) {
+        this.isUnskippable = data.isUnskippable;
+      }
       if (data.version) {
         this.currentState = 'downloading';
         this.version = data.version;

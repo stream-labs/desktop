@@ -3,6 +3,7 @@
 
 const { autoUpdater } = require('electron-updater');
 const { app, BrowserWindow, ipcMain } = require('electron');
+const semver = require('semver');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -41,6 +42,21 @@ class Updater {
 
   // PRIVATE
 
+  isUnskippableUpdate(currentVersion, newVersion) {
+    const currentVer = semver.parse(currentVersion);
+    const newVer = semver.parse(newVersion);
+    if (!currentVer || !newVer) {
+      return true;
+    }
+    if (currentVer.major != newVer.major) {
+      return true;
+    }
+    if (currentVer.minor != newVer.minor) {
+      return true;
+    }
+    return false;
+  }
+
   bindListeners() {
     autoUpdater.on('update-available', info => {
       this.updateState.asking = true;
@@ -49,6 +65,10 @@ class Updater {
       this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
       this.updateState.percent = 0;
+      this.updateState.isUnskippable = this.isUnskippableUpdate(process.env.NAIR_VERSION, info.version);
+      console.log(`oldVersion: ${process.env.NAIR_VERSION}
+newVersion: ${info.version}
+isUnskippable: ${this.updateState.isUnskippable}`);
       this.cancellationToken = info.cancellationToken;
       this.pushState();
     });
