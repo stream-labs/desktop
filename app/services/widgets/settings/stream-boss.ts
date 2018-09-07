@@ -60,6 +60,12 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
     return WidgetType.StreamBoss;
   }
 
+  getApiSettings() {
+    return {
+      settingsUpdatedEvent: 'streambossSettingsUpdate'
+    }
+  }
+
   protected tabs = [
     {
       name: 'goal',

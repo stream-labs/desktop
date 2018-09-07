@@ -49,8 +49,8 @@ export interface IWidgetData {
   };
 }
 
-export interface IWidgetState {
-  data: IWidgetData;
+export interface IWidgetState<TWidgetData> {
+  data: TWidgetData;
 }
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
@@ -74,8 +74,10 @@ interface ISocketEvent<TMessage> {
 /**
  * base class for widget settings
  */
-export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> extends StatefulService<IWidgetState> {
-  static initialState: IWidgetState = {
+export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
+  extends StatefulService<IWidgetState<TWidgetData>>
+{
+  static initialState: any= {
     data: null
   };
 
@@ -87,7 +89,11 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
 
   dataUpdated = new Subject<TWidgetData>();
 
-  abstract getApiSettings(): IWidgetApiSettings;
+  getApiSettings(): IWidgetApiSettings {
+    return {
+      settingsUpdatedEvent: ''
+    }
+  }
 
 
   abstract getPreviewUrl(): string;
@@ -105,7 +111,14 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
 
   private onSocketEventHandler(event: ISocketEvent<TWidgetData>) {
     const apiSettings = this.getApiSettings();
+    if (event.type !== apiSettings.settingsUpdatedEvent) return;
+    this.onDataUpdatedHandler(event.message);
+  }
 
+  private onDataUpdatedHandler(data: any) {
+    data = this.handleDataAfterFetch(data);
+    this.SET_WIDGET_DATA(data);
+    this.dataUpdated.next(data);
   }
 
 
@@ -139,14 +152,15 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   }
 
   async fetchData(): Promise<TWidgetData> {
-    let data = await this.request({
-      url: this.getDataUrl(),
-      method: 'GET'
-    });
-    data = this.handleDataAfterFetch(data);
-    this.SET_WIDGET_DATA(data);
-    this.dataUpdated.next(data);
-    return data;
+    if (!this.state.data) {
+      let data = await this.request({
+        url: this.getDataUrl(),
+        method: 'GET'
+      });
+      this.onDataUpdatedHandler(data);
+    }
+
+    return this.state.data;
   }
 
   protected handleDataAfterFetch(data: any): TWidgetData {
@@ -231,7 +245,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   }
 
   @mutation()
-  SET_WIDGET_DATA(data: IWidgetData) {
+  SET_WIDGET_DATA(data: TWidgetData) {
     this.state.data = data;
   }
 }
