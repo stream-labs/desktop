@@ -37,4 +37,8 @@ export class HostsService extends Service {
     return 'cdn.streamlabs.com';
   }
 
+  get platform() {
+    return 'platform.streamlabs.com';
+  }
+
 }

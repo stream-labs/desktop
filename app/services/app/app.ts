@@ -23,6 +23,7 @@ import { WindowsService } from 'services/windows';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
+import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
@@ -45,6 +46,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() windowsService: WindowsService;
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -67,7 +69,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
 
   @track('app_start')
-  load() {
+  async load() {
     this.START_LOADING();
 
     // We want to start this as early as possible so that any
@@ -80,35 +82,39 @@ export class AppService extends StatefulService<IAppState> {
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    this.sceneCollectionsService.initialize().then(() => {
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
+    // Initialize any apps before loading the scene collection.  This allows
+    // the apps to already be in place when their sources are created.
+    await this.platformAppsService.initialize();
 
-      electron.ipcRenderer.on('shutdown', () => {
-        electron.ipcRenderer.send('acknowledgeShutdown');
-        this.shutdownHandler();
-      });
+    await this.sceneCollectionsService.initialize()
 
-      this.facemasksService;
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
 
-      this.shortcutsService;
-      this.streamlabelsService;
-
-      // Pre-fetch stream info
-      this.streamInfoService;
-
-      this.performanceMonitorService.start();
-
-      this.ipcServerService.listen();
-      this.tcpServerService.listen();
-
-      this.patchNotesService.showPatchNotesIfRequired(onboarded);
-      this.announcementsService.updateBanner();
-      this.outageNotificationsService;
-
-      this.crashReporterService.endStartup();
-
-      this.FINISH_LOADING();
+    electron.ipcRenderer.on('shutdown', () => {
+      electron.ipcRenderer.send('acknowledgeShutdown');
+      this.shutdownHandler();
     });
+
+    this.facemasksService;
+
+    this.shortcutsService;
+    this.streamlabelsService;
+
+    // Pre-fetch stream info
+    this.streamInfoService;
+
+    this.performanceMonitorService.start();
+
+    this.ipcServerService.listen();
+    this.tcpServerService.listen();
+
+    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.announcementsService.updateBanner();
+    this.outageNotificationsService;
+
+    this.crashReporterService.endStartup();
+
+    this.FINISH_LOADING();
   }
 
   /**

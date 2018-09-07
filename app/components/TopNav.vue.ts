@@ -10,6 +10,7 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
+import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 
 @Component({
   components: {
@@ -23,6 +24,7 @@ export default class TopNav extends Vue {
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   slideOpen = false;
 
@@ -80,6 +82,18 @@ export default class TopNav extends Vue {
 
   openDiscord() {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
+  }
+
+  get topNavApps() {
+    return this.platformAppsService.state.loadedApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    });
+  }
+
+  navigateApp(appId: string) {
+    this.navigationService.navigate('PlatformAppContainer', { appId });
   }
 
   get isDevMode() {

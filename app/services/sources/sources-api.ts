@@ -26,6 +26,8 @@ export interface ISourceComparison {
   propertiesManager: TPropertiesManager;
   widgetType?: WidgetType;
   isStreamlabel?: boolean;
+  appId?: string;
+  appSourceId?: string;
 }
 
 export interface ISourceApi extends ISource {
@@ -100,8 +102,12 @@ export type TSourceType =
   'liv_capture'
   ;
 
-// Register new properties manager here
-export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
+// Register new properties managers here
+export type TPropertiesManager =
+  | 'default'
+  | 'widget'
+  | 'streamlabels'
+  | 'platformApp';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;
@@ -117,4 +123,9 @@ export interface ISourceDisplayData {
   description: string;
   demoFilename?: string;
   supportList?: string[];
+}
+
+export interface ISourceAddOptions {
+  propertiesManager: TPropertiesManager;
+  propertiesManagerSettings: Dictionary<any>;
 }

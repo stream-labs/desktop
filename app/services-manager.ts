@@ -40,6 +40,7 @@ import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
+import { PlatformAppsService } from 'services/platform-apps';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -145,6 +146,7 @@ export class ServicesManager extends Service {
     TcpServerService,
     StreamInfoService,
     StreamlabelsService,
+    PlatformAppsService,
     GuestApiService,
     VideoEncodingOptimizationService,
     CrashReporterService,

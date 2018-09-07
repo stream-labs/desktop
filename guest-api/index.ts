@@ -11,6 +11,10 @@ import {
 } from '../app/services/guest-api';
 
 (() => {
+  global.eval = function() {
+    throw new Error('Eval is disabled for security');
+  }
+
   interface IRequest {
     resolve: (val: any) => void;
     reject: (val: any) => void;
@@ -28,6 +32,11 @@ import {
     idCounter += 1;
     return idCounter.toString();
   };
+
+  let ready: Function;
+  const readyPromise = new Promise<boolean>(resolve => {
+    ready = resolve;
+  });
 
   electron.ipcRenderer.on(
     'guestApiCallback',
@@ -47,11 +56,32 @@ import {
     }
   );
 
-  global['streamlabsOBS'] = new Proxy(
-    {},
-    {
-      get(target, key) {
-        return (...args: any[]) => {
+  electron.ipcRenderer.on(
+    'guestApiReady',
+    () => ready()
+  );
+
+  // TODO: Assuming the main window is always contents id 1 may not be safe.
+  const mainWindowContents = electron.remote.webContents.fromId(1);
+  const webContentsId = electron.remote.getCurrentWebContents().id;
+
+  /**
+   * Returns a proxy rooted at the given path
+   * @param path the current path
+   */
+  function getProxy(path: string[] = []): any {
+    return new Proxy(
+      () => {},
+      {
+        get(target, key) {
+          if (key === 'apiReady') {
+            return readyPromise;
+          }
+
+          return getProxy(path.concat([key.toString()]));
+        },
+
+        apply(target, thisArg, args: any[]) {
           const requestId = getUniqueId();
           requests[requestId] = {
             resolve: null,
@@ -79,15 +109,18 @@ import {
 
           const apiRequest: IGuestApiRequest = {
             id: requestId,
-            method: key.toString(),
+            webContentsId,
+            methodPath: path,
             args: mappedArgs
           };
 
-          electron.ipcRenderer.sendToHost('guestApiRequest', apiRequest);
+          mainWindowContents.send('guestApiRequest', apiRequest);
 
           return promise;
-        };
+        }
       }
-    }
-  );
+    );
+  }
+
+  global['streamlabsOBS'] = getProxy();
 })();
