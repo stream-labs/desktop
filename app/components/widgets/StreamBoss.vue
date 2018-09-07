@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div v-if="!hasGoal">
+      <div v-else>
         <validated-form ref="form" class="section__body" v-if="requestState !== 'pending'">
           <v-form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
           <v-form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>

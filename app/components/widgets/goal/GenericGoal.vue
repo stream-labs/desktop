@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <div v-if="!hasGoal">
+    <div v-else>
       <div class="section__body" v-if="requestState !== 'pending'">
         <validated-form ref="form">
           <v-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
