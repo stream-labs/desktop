@@ -214,7 +214,7 @@
   },
   "monitor_capture": {
     "name": "画面キャプチャ",
-    "description": "PCの画面をキャプチャします。",
+    "description": "ディスプレイの画面全体、もしくは一部の領域をキャプチャします。",
     "capture_cursor": {
       "name": "カーソルをキャプチャ"
     },

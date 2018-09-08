@@ -213,13 +213,13 @@
     "name": "Text (FreeType 2)"
   },
   "monitor_capture": {
-    "name": "Display Capture",
+    "name": "Monitor Capture",
     "description": "Capture your computer monitor.",
     "capture_cursor": {
       "name": "Capture Cursor"
     },
     "monitor": {
-      "name": "Display"
+      "name": "Monitor"
     }
   },
   "window_capture": {
