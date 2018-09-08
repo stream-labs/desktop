@@ -214,7 +214,7 @@
   },
   "monitor_capture": {
     "name": "Display Capture",
-    "description": "Capture your entire computer monitor.",
+    "description": "Capture your computer monitor.",
     "capture_cursor": {
       "name": "Capture Cursor"
     },
