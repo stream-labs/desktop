@@ -9,6 +9,14 @@ export class BitGoalService extends GenericGoalService {
     return WidgetType.BitGoal;
   }
 
+  getApiSettings() {
+    return {
+      settingsUpdatedEvent: 'bitgoalSettingsUpdate',
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal/settings`,
+      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal`
+    }
+  }
+
   protected tabs = [
     {
       name: 'goal',

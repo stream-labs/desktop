@@ -34,6 +34,7 @@ export interface IWidgetSettings {
 
 export interface IWidgetApiSettings {
   settingsUpdatedEvent: string;
+  settingsSaveUrl: string;
 }
 
 export interface IWidgetData {
@@ -49,7 +50,7 @@ export interface IWidgetData {
   };
 }
 
-export interface IWidgetState<TWidgetData> {
+export interface IWidgetSettingsState<TWidgetData> {
   data: TWidgetData;
 }
 
@@ -75,11 +76,8 @@ interface ISocketEvent<TMessage> {
  * base class for widget settings
  */
 export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
-  extends StatefulService<IWidgetState<TWidgetData>>
+  extends StatefulService<IWidgetSettingsState<TWidgetData>>
 {
-  static initialState: any= {
-    data: null
-  };
 
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
@@ -91,7 +89,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 
   getApiSettings(): IWidgetApiSettings {
     return {
-      settingsUpdatedEvent: ''
+      settingsUpdatedEvent: '',
+      settingsSaveUrl: ''
     }
   }
 
@@ -102,25 +101,22 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
 
   protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
 
-  init() {
+  async init() {
 
     this.websocketService.socketEvent.subscribe(event  => {
-      this.onSocketEventHandler(event as ISocketEvent<TWidgetData>)
+      this.onSettingsUpdatedHandler(event as ISocketEvent<IWidgetSettings>)
     });
   }
 
-  private onSocketEventHandler(event: ISocketEvent<TWidgetData>) {
+  private onSettingsUpdatedHandler(event: ISocketEvent<IWidgetSettings>) {
     const apiSettings = this.getApiSettings();
     if (event.type !== apiSettings.settingsUpdatedEvent) return;
-    this.onDataUpdatedHandler(event.message);
+    if (!this.state.data) return;
+    const newSettings = this.patchAfterFetch(event.message as any as TWidgetData);
+    const data = Object.assign({}, this.state.data);
+    const newData = Object.assign({}, data, { settings: newSettings });
+    this.setWidgetData(newData as TWidgetData);
   }
-
-  private onDataUpdatedHandler(data: any) {
-    data = this.handleDataAfterFetch(data);
-    this.SET_WIDGET_DATA(data);
-    this.dataUpdated.next(data);
-  }
-
 
   getWidgetUrl(): string {
     return this.widgetsService.getWidgetUrl(this.getWidgetType());
@@ -157,9 +153,9 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
         url: this.getDataUrl(),
         method: 'GET'
       });
-      this.onDataUpdatedHandler(data);
+      data = this.handleDataAfterFetch(data);
+      this.SET_WIDGET_DATA(data);
     }
-
     return this.state.data;
   }
 
@@ -205,16 +201,16 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return this.fetchData();
   }
 
-  async reset(tabName?: string): Promise<TWidgetData> {
-    const tab = this.getTab(tabName);
-    const url = tab ? tab.resetUrl : this.getDataUrl();
-    const method = tab ? tab.resetMethod : 'DELETE';
+  async saveSettings(settings: IWidgetSettings) {
+    const body = this.patchBeforeSend(settings);
+    const apiSettings = this.getApiSettings();
     await this.request({
-      url,
-      method
+      url: apiSettings.settingsSaveUrl,
+      method: 'POST',
+      body
     });
-    return this.fetchData();
   }
+
 
   async request(req: { url: string, method?: THttpMethod, body?: any }): Promise<TWidgetData> {
     const method = req.method || 'GET';
@@ -244,8 +240,13 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return this.userService.apiToken;
   }
 
+  protected setWidgetData(data: TWidgetData) {
+    this.SET_WIDGET_DATA(data);
+    this.dataUpdated.next(this.state.data);
+  }
+
   @mutation()
-  SET_WIDGET_DATA(data: TWidgetData) {
+  protected SET_WIDGET_DATA(data: TWidgetData) {
     this.state.data = data;
   }
 }

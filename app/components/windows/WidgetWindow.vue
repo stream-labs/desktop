@@ -18,17 +18,63 @@
       <GenericForm v-model="properties" @input="onPropsInputHandler"/>
     </div>
 
-    <!-- other tabs -->
-    <div v-for="tabItem in tabsList" :key="tabItem.value">
-      <div v-if="tabItem.value !== 'source' && tabItem.value === value">
+    <div v-if="value !== 'source'">
 
-        <slot :name="tabItem.value" v-if="!loadingFailed"></slot>
-        <div v-else>
-          {{ $t('Failed to load settings') }}
-        </div>
-
+      <div v-if="!loadingFailed">
+        <slot :name="settings" v-if="value === 'settings'"></slot>
+        <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
+        <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
+        <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
+        <slot :name="test" v-if="value === 'test'"></slot>
       </div>
+      <div v-else>
+        {{ $t('Failed to load settings') }}
+      </div>
+
     </div>
+
+    <!--<div v-if="value === 'settings'">-->
+      <!--<GenericForm v-model="properties" @input="onPropsInputHandler"/>-->
+    <!--</div>-->
+    <!--<div v-else>-->
+      <!--{{ $t('Failed to load settings') }}-->
+    <!--</div>-->
+
+    <!--&lt;!&ndash; other tabs &ndash;&gt;-->
+    <!--<div v-for="tabItem in tabsList" :key="tabItem.value">-->
+      <!--<div v-if="tabItem.value !== 'source' && tabItem.value === value">-->
+
+        <!--<slot :name="tabItem.value" v-if="!loadingFailed"></slot>-->
+        <!--<div v-else>-->
+          <!--{{ $t('Failed to load settings') }}-->
+        <!--</div>-->
+
+      <!--</div>-->
+    <!--</div>-->
+
+    <!--&lt;!&ndash; common tabs &ndash;&gt;-->
+    <!--<div v-for="tabItem in commonTabs" :key="tabItem.value">-->
+      <!--<div v-if="tabItem.value !== 'source' && tabItem.value === value">-->
+
+        <!--<slot :name="tabItem.value" v-if="!loadingFailed"></slot>-->
+        <!--<div v-else>-->
+          <!--{{ $t('Failed to load settings') }}-->
+        <!--</div>-->
+
+      <!--</div>-->
+    <!--</div>-->
+
+
+    <!--<div v-for="tabItem in tabsList" :key="tabItem.value">-->
+      <!--<div v-if="tabItem.value !== 'source' && tabItem.value === value">-->
+
+        <!--<slot :name="tabItem.value" v-if="!loadingFailed"></slot>-->
+        <!--<div v-else>-->
+          <!--{{ $t('Failed to load settings') }}-->
+        <!--</div>-->
+
+      <!--</div>-->
+    <!--</div>-->
 
   </div>
 

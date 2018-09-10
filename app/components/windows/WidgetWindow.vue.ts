@@ -16,6 +16,11 @@ import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
 import { IWidgetTab } from 'services/widgets/settings/widget-settings';
 
+interface ITab {
+ name: string;
+ value: string;
+}
+
 @Component({
   components: {
     ModalLayout,
@@ -32,17 +37,19 @@ export default class WidgetWindow extends Vue {
   @Inject() private projectorService: ProjectorService;
 
   @Prop() value: string; // selected tab
+  @Prop({ default: []}) extraTabs: ITab[];
   @Prop() requestState: 'fail' | 'success' | 'pending';
   @Prop() loaded: boolean;
+
 
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
   widgetUrl = this.service.getPreviewUrl();
+  settingsService = this.widgetsService.getWidgetSettingsService(this.widgetType);
   previewSource: ISourceApi = null;
   properties: TObsFormData = [];
-  tabs: IWidgetTab[] = [];
-  tabsList: { name: string, value: string}[] = [];
+  commonTabs: ITab[] = [];
 
   sourceUpdatedSubscr: Subscription;
 
@@ -52,6 +59,10 @@ export default class WidgetWindow extends Vue {
 
   get loadingFailed() {
     return this.requestState === 'fail' && !this.loaded;
+  }
+
+  get wData() {
+    return this.settingsService.state.data;
   }
 
   mounted() {
@@ -73,9 +84,15 @@ export default class WidgetWindow extends Vue {
     const widgetType = this.source.getPropertiesManagerSettings().widgetType;
     const settingsService = this.widgetsService.getWidgetSettingsService(widgetType);
 
-    this.tabs = settingsService.getTabs();
-    this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
-      .concat({ name: 'Source', value: 'source' });
+    this.commonTabs = [
+      { name: 'Settings', value: 'settings'},
+      { name: 'HTML', value: 'html'},
+      { name: 'CSS', value: 'css'},
+      { name: 'JS', value: 'js'},
+      { name: 'Source', value: 'source' }
+    ];
+
+    // TODO add custom code editor & test buttons
   }
 
   get webview() {
@@ -84,10 +101,6 @@ export default class WidgetWindow extends Vue {
 
   get windowTitle() {
     return this.source ? $t('Settings for ') + this.source.name : '';
-  }
-
-  get tab(): IWidgetTab {
-    return this.tabs.find(tab => tab.name === this.value);
   }
 
   destroyed() {

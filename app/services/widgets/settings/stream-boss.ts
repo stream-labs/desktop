@@ -6,6 +6,7 @@ import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/stateful-service';
 import { Inject } from "../../../util/injector";
 import { WebsocketService } from "../../websocket";
+import { BaseGoalService } from "./base-goal";
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;
@@ -50,7 +51,7 @@ export interface IStreamBossCreateOptions {
 }
 
 @InheritMutations()
-export abstract class StreamBossService extends WidgetSettingsService<IStreamBossData> {
+export abstract class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
 
   static initialState: { data: IStreamBossData } = {
     data: null
@@ -62,7 +63,9 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
 
   getApiSettings() {
     return {
-      settingsUpdatedEvent: 'streambossSettingsUpdate'
+      settingsUpdatedEvent: 'streambossSettingsUpdate',
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
+      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
     }
   }
 
@@ -70,7 +73,7 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
     {
       name: 'goal',
       title: 'Manage Battle',
-      saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/streamboss`,
+      saveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
       autosave: false
     },
     {
@@ -85,19 +88,8 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
 
   ];
 
-  init() {
-    this.websocketService.socketEvent.subscribe(event => {
-      if (event.type !== 'streambossSettingsUpdate') return;
-
-    });
-  }
-
-  getVersion() {
-    return 5;
-  }
-
   getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/streamboss/settings`;
+    return `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`;
   }
 
   getPreviewUrl() {
@@ -213,12 +205,6 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
       })
 
     };
-  }
-
-  protected patchAfterFetch(data: any): IGoalData {
-    // fix a bug when API returning an empty array instead of null
-    if (Array.isArray(data.goal)) data.goal = null;
-    return data;
   }
 
 }

@@ -699,24 +699,24 @@
             </div>
           </div>
 
-          <form-group title="Form Group">
+          <h-form-group title="Form Group">
             <bool-input title="Example 1" v-model="exampleSettings.checkbox_1"/>
             <bool-input title="Example 2" v-model="exampleSettings.checkbox_2"/>
             <bool-input title="Example 3" v-model="exampleSettings.checkbox_3"/>
             <bool-input title="Example 4" v-model="exampleSettings.checkbox_4"/>
-          </form-group>
+          </h-form-group>
 
-          <form-group title="Form Group">
+          <h-form-group title="Form Group">
             <slider-input v-model="exampleSettings.slider" :metadata="{min: 0, max: 100}"/>
-          </form-group>
+          </h-form-group>
 
-          <form-group title="Text Input">
+          <h-form-group title="Text Input">
             <input type="text" placeholder="Example Text Input">
-          </form-group>
+          </h-form-group>
 
-          <form-group title="Text Input - Disabled">
+          <h-form-group title="Text Input - Disabled">
             <input type="text" disabled placeholder="Example Text Input">
-          </form-group>
+          </h-form-group>
         </div>
 
         <div id="mixins" class="design-system__section">

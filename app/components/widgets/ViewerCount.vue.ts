@@ -4,14 +4,14 @@ import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { IViewerCountData, ViewerCountService } from 'services/widgets/settings/viewer-count';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
     ...inputComponents
   }

@@ -43,14 +43,20 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     return this.widgetsService.getWidgetSettingsService(this.widgetType) as TService;
   }
 
-  protected skipNextDatachangeHandler: boolean;
 
   async created() {
     this.tabName = this.tabName || this.tabs[0].name;
     this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
       this.onDataUpdatedHandler(newData);
     });
-    await this.refresh();
+    // await this.refresh();
+
+    try {
+      this.wData = await this.service.fetchData();
+      this.requestState = 'success';
+    } catch (e) {
+      this.requestState = 'fail';
+    }
   }
 
   get loaded() {
@@ -61,48 +67,46 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.dataUpdatedSubscr.unsubscribe();
   }
 
-  async refresh() {
-    try {
-      await this.service.fetchData();
-      this.requestState = 'success';
-      this.skipNextDatachangeHandler = true;
-      this.afterFetch();
-    } catch (e) {
-      this.requestState = 'fail';
-    }
-  }
 
-  @debounce(1000)
-  @Watch('wData', { deep: true })
-  async onDataChangeHandler() {
-    const tab = this.service.getTab(this.tabName);
-    if (!tab) return;
-
-    const needToSave = tab.autosave && !this.skipNextDatachangeHandler;
-    if (this.skipNextDatachangeHandler) this.skipNextDatachangeHandler = false;
-
-    if (!needToSave) return;
-    await this.save();
-  }
-
-  private onDataUpdatedHandler(newData: TData) {
-    this.wData = newData;
+  private onDataUpdatedHandler(data: TData) {
+    this.wData = data;
     this.refreshPreview();
   }
 
-  async save(dataToSave?: any) {
+  // async refresh() {
+  //   try {
+  //     this.wData = await this.service.fetchData();
+  //     this.requestState = 'success';
+  //     // this.skipNextDatachangeHandler = true;
+  //     this.afterFetch();
+  //   } catch (e) {
+  //     this.requestState = 'fail';
+  //   }
+  // }
+
+  // @debounce(1000)
+  // @Watch('wData', { deep: true })
+  // async onDataChangeHandler() {
+  //   const tab = this.service.getTab(this.tabName);
+  //   if (!tab) return;
+  //
+  //   const needToSave = tab.autosave && !this.skipNextDatachangeHandler;
+  //   if (this.skipNextDatachangeHandler) this.skipNextDatachangeHandler = false;
+  //
+  //   if (!needToSave) return;
+  //   await this.save();
+  // }
+
+  // private onDataUpdatedHandler(newData: TData) {
+  //   this.wData = newData;
+  //   this.refreshPreview();
+  // }
+
+  async save() {
     if (this.requestState === 'pending') return;
-
-    const tab = this.service.getTab(this.tabName);
-    if (!tab) return;
-
-    this.requestState = 'pending';
-
     try {
-      await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
+      await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
-      this.afterFetch();
-      this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.requestState = 'fail';
       this.onFailHandler();
@@ -110,27 +114,23 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   async reset() {
-    if (this.requestState === 'pending') return;
-
-    this.requestState = 'pending';
-
-    try {
-      this.wData = await this.service.reset(this.tabName);
-      this.requestState = 'success';
-      this.afterFetch();
-      this.skipNextDatachangeHandler = true;
-    } catch (e) {
-      this.requestState = 'fail';
-      this.onFailHandler();
-    }
+    // if (this.requestState === 'pending') return;
+    //
+    // this.requestState = 'pending';
+    //
+    // try {
+    //   this.wData = await this.service.reset(this.tabName);
+    //   this.requestState = 'success';
+    //   this.afterFetch();
+    //   this.skipNextDatachangeHandler = true;
+    // } catch (e) {
+    //   this.requestState = 'fail';
+    //   this.onFailHandler();
+    // }
   }
 
   refreshPreview() {
     this.source.refresh();
-  }
-
-  afterFetch() {
-
   }
 
   onFailHandler() {

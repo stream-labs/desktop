@@ -10,7 +10,7 @@
   </div>
   <div slot="content" class="chatbot-word-protection__container">
     <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general' && wordProtection">
+      <validated-form ref="form" v-if="selectedTab === 'general' && wordProtection">
         <VFormGroup
           :title="$t('Auto Permit')"
           v-model="wordProtection.general.excluded.level"
@@ -21,7 +21,7 @@
           v-model="wordProtection.general.message"
           :metadata="metadata.word.general.message"
         />
-      </div>
+      </validated-form>
       <div v-if="selectedTab === 'blacklist'">
         <ChatbotWordProtectionList
           v-model="wordProtection.blacklist"
@@ -55,7 +55,7 @@
 
 <script lang="ts" src="./ChatbotWordProtectionWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 .chatbot-word-protection__container {
   padding-top: 45px;
 }

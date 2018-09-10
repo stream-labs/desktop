@@ -35,52 +35,54 @@
     class="chatbot-add-command__container"
   >
     <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general'">
-        <VFormGroup
-          :title="$t('Command')"
-          v-model="editedCommand.command"
-          :metadata="metadata.command"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.response"
-          :title="$t('Response (Line breaks will be ignored)')"
-          v-model="editedCommand.response"
-          :metadata="metadata.response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.success_response"
-          :title="$t('Success Response (Line breaks will be ignored)')"
-          v-model="editedCommand.success_response"
-          :metadata="metadata.success_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.failed_response"
-          :title="$t('Failed Response (Line breaks will be ignored)')"
-          v-model="editedCommand.failed_response"
-          :metadata="metadata.failed_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.enabled_response"
-          :title="$t('Enabled Response (Line breaks will be ignored)')"
-          v-model="editedCommand.enabled_response"
-          :metadata="metadata.enabled_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.disabled_response"
-          :title="$t('Disabled Response (Line breaks will be ignored)')"
-          v-model="editedCommand.disabled_response"
-          :metadata="metadata.disabled_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.response_type"
-          :title="$t('Reply in')"
-          v-model="editedCommand.response_type"
-          :metadata="metadata.response_type"
-        />
-      </div>
-      <div v-if="selectedTab === 'advanced'">
-        <ChatbotAliases v-model="editedCommand.aliases" />
-      </div>
+      <validated-form ref="form">
+        <div v-if="selectedTab === 'general'">
+          <VFormGroup
+            :title="$t('Command')"
+            v-model="editedCommand.command"
+            :metadata="metadata.command"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response"
+            :title="$t('Response (Line breaks will be ignored)')"
+            v-model="editedCommand.response"
+            :metadata="metadata.response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.success_response"
+            :title="$t('Success Response (Line breaks will be ignored)')"
+            v-model="editedCommand.success_response"
+            :metadata="metadata.success_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.failed_response"
+            :title="$t('Failed Response (Line breaks will be ignored)')"
+            v-model="editedCommand.failed_response"
+            :metadata="metadata.failed_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.enabled_response"
+            :title="$t('Enabled Response (Line breaks will be ignored)')"
+            v-model="editedCommand.enabled_response"
+            :metadata="metadata.enabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.disabled_response"
+            :title="$t('Disabled Response (Line breaks will be ignored)')"
+            v-model="editedCommand.disabled_response"
+            :metadata="metadata.disabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response_type"
+            :title="$t('Reply in')"
+            v-model="editedCommand.response_type"
+            :metadata="metadata.response_type"
+          />
+        </div>
+        <div v-if="selectedTab === 'advanced'">
+          <ChatbotAliases v-model="editedCommand.aliases" />
+        </div>
+      </validated-form>
     </transition>
   </div>
   <div slot="controls" class="flex flex--space-between">
@@ -93,8 +95,7 @@
       </button>
       <button
         class="button button--action"
-        :disabled="errors.items.length > 0"
-        @click="onSave"
+        @click="onSaveHandler"
       >
         {{ $t("Save") }}
       </button>

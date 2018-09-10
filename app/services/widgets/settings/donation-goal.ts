@@ -24,6 +24,15 @@ export class DonationGoalService extends GenericGoalService {
     ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
   ];
 
+  getApiSettings() {
+    return {
+      settingsUpdatedEvent: 'donationgoalSettingsUpdate',
+      settingsSaveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/donationgoal`,
+      goalUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/donation/goal`,
+      goalResetUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/donation/goal/end`
+    }
+  }
+
   getVersion() {
     return 5;
   }

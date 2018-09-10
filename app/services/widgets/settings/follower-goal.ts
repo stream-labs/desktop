@@ -22,6 +22,14 @@ export class FollowerGoalService extends GenericGoalService {
     ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
   ];
 
+  getApiSettings() {
+    return {
+      settingsUpdatedEvent: 'followergoalSettingsUpdate',
+      settingsSaveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal/settings`,
+      goalUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal`
+    }
+  }
+
   getVersion() {
     return 5;
   }

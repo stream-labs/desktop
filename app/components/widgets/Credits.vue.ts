@@ -7,14 +7,14 @@ import {
 import { inputComponents } from 'components/widgets/inputs';
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import CodeEditor from './CodeEditor.vue';
 
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
     ...inputComponents
   }
