@@ -22,6 +22,8 @@ const i18n = new VueI18n({
       asking: {
         message: 'There is an update. download?',
         changeLog: `Update contents`,
+        mandatoryUpdate: `Mandatory Update`,
+        skippableUpdate: `Skippable updates`,
         download: 'Download',
         skip: 'skip'
       },
@@ -47,6 +49,8 @@ const i18n = new VueI18n({
       asking: {
         message: 'アップデート {version} があります。{br}更新しますか?',
         changeLog: `更新内容`,
+        mandatoryUpdate: `必須アップデートです`,
+        skippableUpdate: `スキップ可能なアップデートです`,
         download: 'ダウンロードして更新',
         skip: '更新せずに N Air を起動'
       },
