@@ -421,32 +421,27 @@ test('Tracking', async t => {
   await sleep(1000);
 
   var arrayLength = testTrackingAreas.length;
-  console.log("Track length", arrayLength);
   // run for 5 second
   const startTime = Date.now();
   while((Date.now() - startTime) < 10*1000) {
-	console.log("tried", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
 	for (var i = 0; i < arrayLength; i++) {
 		var x = testTrackingAreas[i][0];
 		var y = testTrackingAreas[i][1];
 		if(Math.abs(receivedTestData.lastFaceX - x) < testTrackingAreaError &&
 			Math.abs(receivedTestData.lastFaceY - y) < testTrackingAreaError){
 			testTrackingAreas[i][2] = true;
-			console.log("Tracked");
 		}
 	}
   }
 
   // we should have tracked all area
   for (var i = 0; i < arrayLength; i++) {
-	  console.log("ech", testTrackingAreas[i]);
 	if(!testTrackingAreas[i][2]) {
 		console.log("Missing area of tracking, X Y :",testTrackingAreas[0], testTrackingAreas[1]);
 		t.fail();
     }
   }
-  console.log("Ttrar", testTrackingAreas);
-
+  
   t.pass();
 });
 
