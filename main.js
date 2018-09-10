@@ -447,6 +447,22 @@ ipcMain.on('window-focusMain', () => {
   mainWindow.focus();
 });
 
+function preventClose(e) {
+  if (!shutdownStarted) {
+    e.preventDefault();
+  }
+}
+
+ipcMain.on('window-preventClose', (event, id) => {
+  const window = BrowserWindow.fromId(id);
+  window.addListener('close', preventClose);
+});
+
+ipcMain.on('window-allowClose', (event, id) => {
+  const window = BrowserWindow.fromId(id);
+  window.removeListener('close', preventClose);
+});
+
 // The main process acts as a hub for various windows
 // syncing their vuex stores.
 let registeredStores = {};

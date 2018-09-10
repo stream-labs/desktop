@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import base64 from 'base64-js';
 import uuidv4 from 'uuid/v4';
 import querystring from 'querystring';
+import { $t } from './i18n';
 
 type TQuestionaireStep =
   | 'Enquete';
@@ -195,20 +196,45 @@ export class QuestionaireService extends StatefulService<
       }
     });
 
+    electron.ipcRenderer.send('window-preventClose', enqueteWindow.id);
+    function setAnswered() {
+      if (!answered) {
+        electron.ipcRenderer.send('window-allowClose', enqueteWindow.id);
+        answered = true;
+      }
+    }
+
     enqueteWindow.webContents.on('did-navigate', (e, url) => {
       console.log('did-navigate', url);
       if (this.checkIfEnqueteCompleted(url)) {
         console.log('answered!');
-        answered = true;
+        setAnswered();
         enqueteWindow.close();
         this.finish();
       }
     });
 
-    enqueteWindow.on('closed', () => {
+    enqueteWindow.on('close', (e) => {
       // 完了以外で閉じたらアプリ終了
       if (!answered) {
-        electron.remote.app.quit();
+        electron.remote.dialog.showMessageBox(
+          electron.remote.getCurrentWindow(), // enqueteWindowにするとダイアログ自体出ない
+          {
+            type: 'warning',
+            buttons: [$t('common.cancel'), $t('common.ok')],
+            title: $t('onboarding.questionaireSkipWarningTitle'),
+            message: $t('onboarding.questionaireSkipWarning'),
+            noLink: true,
+          },
+          ok => {
+            if (!ok) {
+              enqueteWindow.focus();
+              return;
+            }
+            setAnswered();
+            electron.remote.app.quit();
+          }
+        );
       }
     });
 

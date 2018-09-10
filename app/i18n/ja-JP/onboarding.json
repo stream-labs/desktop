@@ -19,5 +19,8 @@
   "sceneCollectionsImportDescription": "シーンコレクションはインポートされました。",
 
   "updateHeader": "更新内容のお知らせ",
-  "updateDone": "確認"
+  "updateDone": "確認",
+
+  "questionaireSkipWarningTitle": "終了確認",
+  "questionaireSkipWarning": "アンケートを答えずに閉じると、N Air自体を終了します。"
 }
