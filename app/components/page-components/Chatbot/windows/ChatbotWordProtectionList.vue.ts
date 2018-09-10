@@ -13,17 +13,8 @@ import {
   NEW_WORD_PROTECTION_LIST_MODAL_ID
 } from 'services/chatbot';
 
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-
-@Component({
-  components: { ValidatedForm }
-})
+@Component({})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
-
-  $refs: {
-    form: ValidatedForm;
-  };
-
   @Prop()
   value: IWordProtectionBlackListItem[];
 
@@ -98,8 +89,8 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$emit('input', newListItemArray);
   }
 
-  async onAddNewItemHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+  onAddNewItemHandler() {
+    if (!this.newListItem.text) return;
 
     let newListItemArray = this.value.slice(0);
 

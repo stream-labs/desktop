@@ -2,9 +2,9 @@
   <div>
     <div class="media-box">
       <div class="url-uploader" v-if="showUrlUpload">
-        <h-form-group :title="$t('Image URL')" >
+        <form-group :title="$t('Image URL')" >
           <text-input v-model="url" :metadata="{ placeholder: `${$t('Example')}: https://yoururl.com/image/Streamlabs` }" />
-        </h-form-group>
+        </form-group>
         <button class="button button--action" @click="uploadUrl">{{ $t('Submit') }}</button>
       </div>
       <div class="footer">

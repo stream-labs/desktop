@@ -43,16 +43,15 @@
     :height="'auto'"
     :maxHeight="300"
   >
-    <validated-form ref="form" @submit="onAddNewItemHandler" class="new-list-item__container">
+    <form @submit.prevent="onAddNewItemHandler" class="new-list-item__container">
       <div class="new-list-item-modal__header">
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
         <div class="new-list-item-modal__header__title">{{ $t(title) }}</div>
       </div>
       <div class="new-list-item-modal__body">
-        <v-form-group
+        <TextInput
           class="width--100"
           :metadata="textInputMetadata"
-          type="text"
           v-model="newListItem"
         />
       </div>
@@ -65,11 +64,12 @@
         <button
           class="button button--action"
           type="submit"
+          :disabled="!newListItem || errors.items.length > 0"
         >
           {{ $t('Done') }}
         </button>
       </div>
-    </validated-form>
+    </form>
   </modal>
 </div>
 </template>

@@ -7,7 +7,7 @@ import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -23,7 +23,7 @@ interface IGoalCreateOptions {
 @Component({
   components: {
     WidgetWindow,
-    HFormGroup,
+    FormGroup,
     ValidatedForm,
     CodeEditor,
     CustomFieldsEditor,
@@ -50,7 +50,8 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   }
 
   async saveGoal() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
     await this.save(this.goalCreateOptions);
   }
 

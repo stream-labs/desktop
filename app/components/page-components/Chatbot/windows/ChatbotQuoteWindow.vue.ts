@@ -3,22 +3,19 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import {
   IQuote,
   IChatbotErrorResponse
 } from 'services/chatbot/chatbot-interfaces';
 
-@Component({
-  components: { ValidatedForm }
-})
+import {
+  ITextMetadata,
+  INumberMetadata
+} from 'components/shared/inputs/index';
+
+@Component({})
 export default class ChatbotTimerWindow extends ChatbotWindowsBase {
-
-  $refs: {
-    form: ValidatedForm;
-  };
-
   newQuote: IQuote = {
     message: null,
     game: null,
@@ -62,8 +59,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  async onSaveHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+  onSaveHandler() {
     if (this.isEdit) {
       this.chatbotApiService
         .updateQuote(this.quoteToUpdate.id, this.newQuote)
