@@ -56,11 +56,20 @@ export class QuestionaireService extends StatefulService<
   };
 
   localStorageKey = 'InstallationUuidv4';
+  private _uuid: string = null;
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
 
   init() {
+    this._uuid = this.getUuid();
+  }
+
+  get uuid() {
+    if (this._uuid === null) {
+      this._uuid = this.getUuid();
+    }
+    return this._uuid;
   }
 
   @mutation()
@@ -249,7 +258,7 @@ export class QuestionaireService extends StatefulService<
         return false;
       }
 
-      const uuid = this.getUuid();
+      const uuid = this.uuid;
       const hash = this.makeHash({ uuid, key });
       console.log('uuid = ', uuid);
       console.log('hash = ', hash);

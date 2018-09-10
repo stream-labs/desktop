@@ -11,6 +11,7 @@ import { UserService } from 'services/user';
 import { StreamingService } from 'services/streaming';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
+import { QuestionaireService } from 'services/questionaire';
 
 @Component({
   components: { BoolInput }
@@ -22,8 +23,17 @@ export default class ExtraSettings extends Vue {
   @Inject() userService: UserService;
   @Inject() streamingService: StreamingService;
   @Inject() appService: AppService;
+  @Inject() questionaireService: QuestionaireService;
 
   cacheUploading = false;
+
+  get cacheId() : string {
+     return this.questionaireService.uuid;
+  }
+
+  copyToClipboard(text: string) {
+    electron.clipboard.writeText(text);
+  }
 
   get optimizeForNiconicoModel(): IFormInput<boolean> {
     return {

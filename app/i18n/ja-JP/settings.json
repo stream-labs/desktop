@@ -501,6 +501,7 @@
   "addDirectory": "ディレクトリを追加する",
   "optimizationForNiconicoLiveService": "ニコニコ生放送への最適化",
   "cacheClearDescription": "不具合が発生した場合、キャッシュディレクトリを削除すると改善する可能性があります。ただしシーン設定が初期化されますのでご注意ください。",
+  "cacheId": "お問い合わせ用キャッシュID:",
   "cacheManagement": "キャッシュ管理",
   "noticeWhileStreaming": "現在配信中のため、一部の設定は変更できません。",
   "showCacheDirectory": "キャッシュディレクトリを表示",

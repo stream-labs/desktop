@@ -20,6 +20,14 @@
     </div>
 
     <p>{{ $t('settings.cacheClearDescription')}}</p>
+    <label for="cacheId">{{ $t('settings.cacheId')}}
+      <a
+        class="button"
+        id="cacheId"
+        ref="cacheId"
+        @click="copyToClipboard(cacheId);"
+      >{{ cacheId }}</a>
+    </label>
 
     <a class="button button--action" @click="showCacheDir">
       {{ $t('settings.showCacheDirectory')}}
@@ -37,5 +45,8 @@
 <style lang="less" scoped>
 .optional-item {
   margin-left: 24px;
+}
+#cacheId {
+  user-select: text;
 }
 </style>
