@@ -13,13 +13,13 @@
   </div>
   </div>
   <div slot="content" class="chatbot-quote-preferences__container">
-    <div>
+    <validated-form ref="form">
       <VFormGroup
         :title="$t('Name')"
         v-model="generalSettings.date_format"
         :metadata="metadata.date_format"
       />
-    </div>
+    </validated-form>
   </div>
   <div slot="controls">
     <button
@@ -30,7 +30,6 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !generalSettings.date_format"
     >
       {{ $t('Save') }}
     </button>
