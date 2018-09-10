@@ -13,6 +13,7 @@ var receivedTestData = {
   faceDetectedCount : 0,
   faceNotDetectedCount : 0,
   numFacesDetected : 0,
+  mask		: "",
   lastFaceX : 0,
   lastFaceY : 0,
   lastPixelR : 0,
@@ -67,6 +68,11 @@ function parseTestData(d) {
     receivedTestData.poseX = parseInt(translations[0]);
     receivedTestData.poseY = parseInt(translations[1]);
     receivedTestData.poseZ = parseInt(translations[2]);
+  }
+  if (d.includes("Mask")) {
+    const ts = d.split(' ');
+    var t = ts[ts.length  - 1];
+    receivedTestData.mask = t;
   }
 }
 
@@ -172,23 +178,11 @@ async function addFacemaskFilter(t, sourceName, filterName) {
 
   // set some params
   await openFilterProperties(t, sourceName, filterName);
-  await clickFormInput(t, 'Show Advanced Settings');
   await clickFormInput(t, 'Enable Testing Mode');
   await clickFormInput(t, 'Draw Mask');
   await closeFilterProperties(t);
 }
 
-// ---------------------------------------------------------------------------
-// setDetectionFull : disables face detection/tracking cropping 
-async function setDetectionFull(t, sourceName, filterName) {
-    // set some params
-  await openFilterProperties(t, sourceName, filterName);
-  await setSliderPercent(t, 'Face Detect Crop Width', 1);
-  await setSliderPercent(t, 'Face Detect Crop Height', 1);
-  await setSliderPercent(t, 'Face Detection Frequency', 0);
-  await focusChild(t);
-  await closeFilterProperties(t);
-}
 
 // ---------------------------------------------------------------------------
 // setMaskJson
@@ -239,14 +233,6 @@ async function updatePerformanceStats(t) {
   fps = parseFloat(fpstext);
 }
 
-
-// ---------------------------------------------------------------------------
-// drawingModeTest : used for all the drawing tests
-async function drawingModeTest(t, drawMode) {
- 
-}
-
-
 // ---------------------------------------------------------------------------
 // TEST : testEachMask : Tests each mask and verifies results
 //
@@ -255,26 +241,34 @@ async function testEachMask(t, sourceName, filterName, maskName) {
   // set draw mode
   await setMaskJson(t, sourceName, filterName, maskName);
 
-  await sleep(100);
-    // check color at detected pixel
+  //wait for apply
+  await sleep(3000);
+  
+  // check color at detected pixel
   const startTime = Date.now();
-  while((Date.now() - startTime) < 3000) {
+  while((Date.now() - startTime) < 5000) {
 	  // be a wider lax on the exact position (Since it is moving face)
-	if (receivedTestData.lastFaceX < 200 || (receivedTestData.lastFaceX > 650)
-		|| (receivedTestData.lastFaceY < 255) || (receivedTestData.lastFaceY > 455)) {
+	if (receivedTestData.lastFaceX < 350 || (receivedTestData.lastFaceX > 700)
+		|| (receivedTestData.lastFaceY < 250) || (receivedTestData.lastFaceY > 500)) {
 		console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
 		t.fail();
 		break;
 	}
 		
-	if (receivedTestData.poseX < -100 || (receivedTestData.poseX > 100)
-		|| (receivedTestData.poseY < -50) || (receivedTestData.poseY > 50)
-		|| (receivedTestData.poseZ < -50) || (receivedTestData.poseZ > 150)) {
+	if (receivedTestData.poseX < -15 || (receivedTestData.poseX > 5)
+		|| (receivedTestData.poseY < -5) || (receivedTestData.poseY > 5)
+		|| (receivedTestData.poseZ < 40) || (receivedTestData.poseZ > 550)) {
 		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
 		t.fail();
 		break;
 	}
-
+	
+	//Check if applied mask is correct
+	if(receivedTestData.mask.localeCompare(maskName) != 0){
+		console.log("Invalid Mask, Expected: ", maskName, " Actual:", receivedTestData.mask);
+		t.fail();
+		break;
+	}
     await sleep(10);
   }
 }
@@ -286,7 +280,6 @@ async function testEachMask(t, sourceName, filterName, maskName) {
 
 // Turn Spectron On
 useSpectron();
-
 
 // ---------------------------------------------------------------------------
 // TEST : Remove Filter
@@ -377,7 +370,6 @@ test('Face Detection - Advanced', async t => {
 
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
-  await setDetectionFull(t, sourceName, filterName);
 
   // wait for a few seconds
   await sleep(60 * 1000);
@@ -399,6 +391,64 @@ test('Face Detection - Advanced', async t => {
     t.fail();
 });
 
+// ---------------------------------------------------------------------------
+// TEST : Tracking
+// ---------------------------------------------------------------------------
+var testTrackingAreas = [
+   // x y status
+	[ 650, 390, false],
+	[ 500, 295, false],
+	[ 560, 345, false],
+	[ 500, 450, false],
+	[ 380, 380, false]
+];
+var testTrackingAreaError = 20;
+
+test('Tracking', async t => {
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+   // wait for data to arrive
+  await sleep(1000);
+
+  var arrayLength = testTrackingAreas.length;
+  console.log("Track length", arrayLength);
+  // run for 5 second
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 10*1000) {
+	console.log("tried", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
+	for (var i = 0; i < arrayLength; i++) {
+		var x = testTrackingAreas[i][0];
+		var y = testTrackingAreas[i][1];
+		if(Math.abs(receivedTestData.lastFaceX - x) < testTrackingAreaError &&
+			Math.abs(receivedTestData.lastFaceY - y) < testTrackingAreaError){
+			testTrackingAreas[i][2] = true;
+			console.log("Tracked");
+		}
+	}
+  }
+
+  // we should have tracked all area
+  for (var i = 0; i < arrayLength; i++) {
+	  console.log("ech", testTrackingAreas[i]);
+	if(!testTrackingAreas[i][2]) {
+		console.log("Missing area of tracking, X Y :",testTrackingAreas[0], testTrackingAreas[1]);
+		t.fail();
+    }
+  }
+  console.log("Ttrar", testTrackingAreas);
+
+  t.pass();
+});
 
 // ---------------------------------------------------------------------------
 // TEST : Drawing : Mask Basic
@@ -443,9 +493,8 @@ test('Drawing : Mask Json Advanced', async t => {
   var fs = require('fs');
   var maskDir = getFacemaskMasksDataDir();
   var masks = fs.readdirSync(maskDir);
-  console.log("masks", masks);
   for (var maskName of masks)  {
-	  console.log("m1", maskName);
+	console.log("Testing mask: ", maskName);
 	await testEachMask(t, sourceName, filterName, maskName);
   }
 
@@ -494,8 +543,3 @@ test('Performance', async t => {
 
   t.pass();
 });
-
-
-
-
-
