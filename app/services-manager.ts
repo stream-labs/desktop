@@ -181,13 +181,9 @@ export class ServicesManager extends Service {
     EventListService,
     TipJarService,
     SponsorBannerService,
-<<<<<<< HEAD
     MediaGalleryService,
-    AnnouncementsService
-=======
+    AnnouncementsService,
     MediaShareService,
-    MediaGalleryService
->>>>>>> cdb35f9eaea41201aa8f11a47a52ac55d51fba5a
   };
 
   private instances: Dictionary<Service> = {};
