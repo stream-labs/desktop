@@ -54,7 +54,7 @@
             <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"/>
             <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"/>
             <i v-else-if="node.data.type === 'ndi_source'" class="icon-ndi"/>
-            <i v-else-if="node.data.type === 'blackmagic_source'" class="icon-blackmagic"/>
+            <i v-else-if="node.data.type === 'decklink-input'" class="icon-blackmagic"/>
             <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"/>
             <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"/>
             <i v-else-if="node.data.type === 'game_capture'" class="icon-game-capture"/>

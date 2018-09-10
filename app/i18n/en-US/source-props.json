@@ -351,7 +351,7 @@
     "name": "Scene",
     "description": "Allows you to add existing scene as a source"
   },
-  "blackmagicDevice": {
+  "decklink-input": {
     "name": "Blackmagic Device",
     "description": "Allow you capture Blackmagic streams."
   },
