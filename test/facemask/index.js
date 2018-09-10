@@ -195,7 +195,7 @@ async function setDetectionFull(t, sourceName, filterName) {
 async function setMaskJson(t, sourceName, filterName, maskName) {
   // set some params
   await openFilterProperties(t, sourceName, filterName);
-  var f = getFacemaskMasksDataDir() +"masks//" + maskName;
+  var f = getFacemaskMasksDataDir() + maskName;
   await focusChild(t);
   await setFormInput(t, 'Browse to mask', f);
   await focusChild(t);
@@ -218,35 +218,6 @@ async function killFilter(t, sourceName, filterName) {
   await removeFilter(t, sourceName, filterName);
 }
 
-
-// ---------------------------------------------------------------------------
-// setFps60 : go into the settings and set video output to 60 fps
-async function setFps60(t) {
-    const app = t.context.app;
-
-  // open settings
-  await focusMain(t);
-  await app.client.click('.top-nav .fa-cog');
-
-  // video section
-  await focusChild(t);
-  await app.client.click('li=Video');
-
-  // set fps to 60
-  await focusChild(t);
-  setFormDropdown(t, "Common FPS Values", "60");
-
-  // yes, we need this, otherwise we close the window before
-  // the dropdown is finishsed selecting.
-  // 1 second is probably lots, but I'm going with 2
-  await sleep(2000);
-
-  // close settings
-  await focusChild(t);
-  await app.client.click('button=Done');
-}
-
-
 // ---------------------------------------------------------------------------
 // updatePerformanceStats : updates performance statistics from the statsu bar
 //                          includes cpu usage and fps
@@ -256,18 +227,13 @@ async function updatePerformanceStats(t) {
   // get the full status string
   await focusMain(t);
   const texts = await t.context.app.client.getText('div*=FPS');
-
   var text = texts[texts.length - 1];
-
   // parse out cpu usage
   var cputext = text.split('\n')[0];
-  cputext = cputext.split(':')[1];
   cputext = cputext.split('%')[0];
-
   // parse out fps
   var fpstext = text.split('\n')[1];
   fpstext = fpstext.split(' ')[0];
-
   // convert and save
   cpuUsage = parseFloat(cputext);
   fps = parseFloat(fpstext);
@@ -281,6 +247,37 @@ async function drawingModeTest(t, drawMode) {
 }
 
 
+// ---------------------------------------------------------------------------
+// TEST : testEachMask : Tests each mask and verifies results
+//
+async function testEachMask(t, sourceName, filterName, maskName) {
+	
+  // set draw mode
+  await setMaskJson(t, sourceName, filterName, maskName);
+
+  await sleep(100);
+    // check color at detected pixel
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 3000) {
+	  // be a wider lax on the exact position (Since it is moving face)
+	if (receivedTestData.lastFaceX < 200 || (receivedTestData.lastFaceX > 650)
+		|| (receivedTestData.lastFaceY < 255) || (receivedTestData.lastFaceY > 455)) {
+		console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
+		t.fail();
+		break;
+	}
+		
+	if (receivedTestData.poseX < -100 || (receivedTestData.poseX > 100)
+		|| (receivedTestData.poseY < -50) || (receivedTestData.poseY > 50)
+		|| (receivedTestData.poseZ < -50) || (receivedTestData.poseZ > 150)) {
+		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
+		t.fail();
+		break;
+	}
+
+    await sleep(10);
+  }
+}
 
 // ---------------------------------------------------------------------------
 // ---------------------======= TESTS ======----------------------------------
@@ -402,37 +399,6 @@ test('Face Detection - Advanced', async t => {
     t.fail();
 });
 
-// ---------------------------------------------------------------------------
-// TEST : testEachMask : Tests each mask and verifies results
-//
-async function testEachMask(t, sourceName, filterName, maskName) {
-	
-  // set draw mode
-  await setMaskJson(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
-
-  await sleep(100);
-    // check color at detected pixel
-  const startTime = Date.now();
-  while((Date.now() - startTime) < 3000) {
-	  // be a wider lax on the exact position (Since it is moving face)
-	if (receivedTestData.lastFaceX < 200 || (receivedTestData.lastFaceX > 650)
-		|| (receivedTestData.lastFaceY < 255) || (receivedTestData.lastFaceY > 455)) {
-		console.log("Wrong face X, Y : ", receivedTestData.lastFaceX, receivedTestData.lastFaceY);
-		t.fail();
-		break;
-	}
-		
-	if (receivedTestData.poseX < -100 || (receivedTestData.poseX > 100)
-		|| (receivedTestData.poseY < -50) || (receivedTestData.poseY > 50)
-		|| (receivedTestData.poseZ < -50) || (receivedTestData.poseZ > 150)) {
-		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
-		t.fail();
-		break;
-	}
-
-    await sleep(10);
-  }
-}
 
 // ---------------------------------------------------------------------------
 // TEST : Drawing : Mask Basic
@@ -451,11 +417,11 @@ test('Drawing : Mask Json Basic', async t => {
   // facemask filter
   await addFacemaskFilter(t, sourceName, filterName);
 
-  testEachMask(t, sourceName, filterName, maskName);
+  await testEachMask(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
 
   t.pass();
 });
-*/
+
 
 // ---------------------------------------------------------------------------
 // TEST : Drawing : Mask Advanced
@@ -478,8 +444,9 @@ test('Drawing : Mask Json Advanced', async t => {
   var maskDir = getFacemaskMasksDataDir();
   var masks = fs.readdirSync(maskDir);
   console.log("masks", masks);
-  for (var maskName in masks)  {
-	testEachMask(t, sourceName, filterName, maskName);
+  for (var maskName of masks)  {
+	  console.log("m1", maskName);
+	await testEachMask(t, sourceName, filterName, maskName);
   }
 
   t.pass();
@@ -490,7 +457,45 @@ test('Drawing : Mask Json Advanced', async t => {
 // TEST : Performance
 // ---------------------------------------------------------------------------
 test('Performance', async t => {
-  //TODO
+  const sourceName = 'Example Source';
+  const filterName = 'Example Filter';
+
+  // start the test pipe server
+  startTestPipeServer();
+
+  // media source
+  await addMediaSource(t, sourceName);
+
+  // facemask filter
+  await addFacemaskFilter(t, sourceName, filterName);
+
+  // add test mask
+  await setMaskJson(t, sourceName, filterName, "b41214ab-8ef1-4842-924d-be113e2b5566.json");
+
+  // wait for the cpu to settle down. Setting params in the UI
+  // lowers the FPS
+  await sleep(3000);
+
+  // run for a while, check the fps
+  const startTime = Date.now();
+  while((Date.now() - startTime) < 10000) {
+    await updatePerformanceStats(t);
+    if (fps < 25) {
+      console.log("FPS DROPPED TO ", fps.toString());
+      t.fail();
+      break;
+    }
+	if(cpuUsage >= 50) {
+	  console.log("CPU exceed the limit: ", cpuUsage.toString());
+      t.fail();
+      break;
+	}
+  }
 
   t.pass();
 });
+
+
+
+
+
