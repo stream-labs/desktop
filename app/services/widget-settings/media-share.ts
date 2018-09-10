@@ -44,7 +44,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   }
 
   getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/media`;
+    return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
 
   protected tabs = [
