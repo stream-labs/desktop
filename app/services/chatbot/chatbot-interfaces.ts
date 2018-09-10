@@ -22,6 +22,7 @@ export interface IChatbotApiServiceState {
   queueStateResponse: IQueueStateResponse;
   queueEntriesResponse: IQueueEntriesResponse;
   queuePickedResponse: IQueuePickedResponse;
+  songRequestResponse: ISongRequestResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -137,6 +138,11 @@ export interface IQueueEntriesResponse {
 export interface IQueuePickedResponse {
   pagination: IChatbotPagination;
   data: IQueuedUser[];
+}
+
+export interface ISongRequestResponse {
+  banned_media: string[];
+  settings: ISongRequestData;
 }
 
 
@@ -398,6 +404,12 @@ export interface IQueuedUser {
   created_at?: string;
 }
 
+// song requests
+export interface ISongRequestData {
+  max_duration: number;
+  security: number;
+}
+
 
 // dictionaries
 export enum ChatbotAutopermitEnums {
@@ -426,15 +438,15 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits' | 'sub_mystery_gift';
+export type ChatbotAlertType = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits' | 'sub_mystery_gift';
 
-export type ChatbotSocketRooms = 'queue' | 'giveaway';
+export type ChatbotSocketRoom = 'queue' | 'giveaway';
 
 export const ChatbotClients = [
   'Twitch'
 ]
 
-export type ChatbotSettingSlugs =
+export type ChatbotSettingSlug =
   'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 

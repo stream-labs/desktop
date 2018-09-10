@@ -22,18 +22,18 @@
     </div>
   </div>
   <div slot="content" class="chatbot-song-request__container">
-    <div>
+    <div v-if="songRequestResponse">
       <transition name='fade' mode="out-in" appear>
         <div v-if="selectedTab === 'general'">
           <VFormGroup
             :title="$t('Max Duration (Value in Seconds)')"
-            v-model="settings.advanced_settings.max_duration"
-            :metadata="metadata.advanced_settings.max_duration"
+            v-model="songRequestResponse.settings.max_duration"
+            :metadata="metadata.settings.max_duration"
           />
           <VFormGroup
             :title="$t('Spam Security')"
-            v-model="settings.advanced_settings.security"
-            :metadata="metadata.advanced_settings.security"
+            v-model="songRequestResponse.settings.security"
+            :metadata="metadata.settings.security"
           />
         </div>
         <div v-else>

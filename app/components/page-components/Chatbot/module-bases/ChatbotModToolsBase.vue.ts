@@ -11,7 +11,7 @@ import {
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
-  ChatbotSettingSlugs,
+  ChatbotSettingSlug,
 } from 'services/chatbot';
 
 import {
@@ -311,7 +311,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onResetSlugHandler(slug: ChatbotSettingSlugs) {
+  onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
       this.chatbotApiService.resetSettings(slug)
         .then((response: (

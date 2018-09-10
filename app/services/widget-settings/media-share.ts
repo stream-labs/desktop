@@ -27,6 +27,7 @@ export interface IMediaShareSettings extends IWidgetSettings {
 
 export interface IMediaShareData extends IWidgetData {
   settings: IMediaShareSettings;
+  banned_media: string[];
 }
 
 export class MediaShareService extends WidgetSettingsService<IMediaShareData> {

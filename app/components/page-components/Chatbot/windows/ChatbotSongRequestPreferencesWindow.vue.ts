@@ -8,10 +8,8 @@ import {
 } from 'components/shared/inputs/index';
 
 interface ISongRequestSettings {
-  advanced_settings: {
-    max_duration: number;
-    security: number;
-  }
+  max_duration: number;
+  security: number;
 }
 
 @Component({})
@@ -29,27 +27,32 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
 
   selectedTab: string = 'general';
 
-  settings: ISongRequestSettings = {
-    advanced_settings: {
-      max_duration: 0,
-      security: 1
-    }
-  };
+  mounted() {
+    this.chatbotApiService.fetchSongRequest();
+  }
+
+  get songRequestResponse() {
+    return this.chatbotApiService.state.songRequestResponse;
+  }
 
   get metadata() {
     return {
-      advanced_settings: {
+      settings: {
         max_duration: metadataHelper.number({
           required: true,
           min: 0,
-          placeholder: 'Max Duration'
+          placeholder: $t('Max Duration')
         }),
         security: metadataHelper.slider({
           min: 0,
           max: 4,
           interval: 1
         })
-      }
+      },
+      new_banned_media: metadataHelper.text({
+        required: true,
+        placeholder: $t('New Banned Media')
+      })
     };
   }
 
@@ -57,7 +60,7 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     this.selectedTab = tab;
   }
 
-  onSaveHandler() {}
+  onSaveHandler() { }
 
   onCancelHandler() {
     this.chatbotCommonService.closeChildWindow();

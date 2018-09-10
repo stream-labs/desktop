@@ -17,7 +17,7 @@ import {
 import {
   IAlertMessage,
   NEW_ALERT_MODAL_ID,
-  ChatbotAlertTypes
+  ChatbotAlertType
 } from 'services/chatbot';
 
 interface INewAlertMetadata {
@@ -104,7 +104,7 @@ interface INewAlertData {
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop()
-  selectedType: ChatbotAlertTypes;
+  selectedType: ChatbotAlertType;
 
   onSubmitHandler: Function = () => {};
 

@@ -5,6 +5,7 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
+import { MediaShareService, IMediaShareData } from 'services/widget-settings/media-share';
 import io from 'socket.io-client';
 
 import {
@@ -30,7 +31,7 @@ import {
   ILinkProtectionResponse,
   IWordProtectionResponse,
   IQuotesResponse,
-  ChatbotSettingSlugs,
+  ChatbotSettingSlug,
   IQuote,
   IQuotePreferencesResponse,
   IQueuePreferencesResponse,
@@ -38,12 +39,14 @@ import {
   IQueueEntriesResponse,
   IQueuePickedResponse,
   IChatbotSocketAuthResponse,
-  ChatbotSocketRooms
+  ChatbotSocketRoom,
+  ISongRequestResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
   @Inject() userService: UserService;
   @Inject() chatbotCommonService: ChatbotCommonService;
+  @Inject() mediaShareService: MediaShareService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
   socketUrl = 'https://chatbot-io.streamlabs.com';
@@ -124,6 +127,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
         total: 1
       },
       data: []
+    },
+    songRequestResponse: {
+      banned_media: [],
+      settings: null
     }
   };
 
@@ -199,7 +206,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   //
   // sockets
   //
-  logInToSocket(rooms: ChatbotSocketRooms[]) {
+  logInToSocket(rooms: ChatbotSocketRoom[]) {
     // requires log in
     return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {})
       .then((response: IChatbotSocketAuthResponse) => {
@@ -382,10 +389,18 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  fetchSongRequest() {
+    this.mediaShareService.fetchData().then(
+      (response: IMediaShareData) => {
+        this.UPDATE_SONG_REQUEST(response as ISongRequestResponse);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
-  resetSettings(slug: ChatbotSettingSlugs) {
+  resetSettings(slug: ChatbotSettingSlug) {
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
@@ -754,6 +769,11 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   @mutation()
   private UPDATE_QUEUE_PICKED(response: IQueuePickedResponse) {
     Vue.set(this.state, 'queuePickedResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SONG_REQUEST(response: ISongRequestResponse) {
+    Vue.set(this.state, 'songRequestResponse', response);
   }
 
 }
