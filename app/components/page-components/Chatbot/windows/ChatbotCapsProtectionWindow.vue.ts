@@ -2,18 +2,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 
-@Component({
-  components: { ValidatedForm }
-})
+@Component({})
 export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
-
-  $refs: {
-    form: ValidatedForm;
-  };
-
   modToolSlug = 'caps-protection';
 
   tabs: ITab[] = [
@@ -37,9 +29,7 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('caps-protection');
   }
 
-  async onSaveHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
-
+  onSaveHandler() {
     this.chatbotApiService
       .updateCapsProtection({
         enabled: this.capsProtectionResponse.enabled,

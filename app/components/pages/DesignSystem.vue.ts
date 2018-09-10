@@ -4,13 +4,13 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import DropdownMenu from './../shared/DropdownMenu.vue';
 
 import { inputComponents } from 'components/shared/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { metadata } from 'components/shared/inputs';
 
 @Component({
   components: {
     DropdownMenu,
-    HFormGroup,
+    FormGroup,
     ...inputComponents
   }
 })

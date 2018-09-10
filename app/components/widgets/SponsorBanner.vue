@@ -1,40 +1,40 @@
 <template>
 <widget-window :requestState="requestState" :loaded="loaded"  ref="layout" v-model="tabName">
   <div slot="settings" >
-    <h-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
+    <form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
       <span>{{ $t('mins') }}</span>
       <div class="duration"><number-input v-model="wData.settings.hide_duration_secs" :metadata="{}" /></div>
       <span>{{ $t('secs') }}</span>
-    </h-form-group>
-    <h-form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
+    </form-group>
+    <form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.show_duration" :metadata="{}" /></div>
       <span>{{ $t('mins') }}</span>
       <div class="duration"><number-input v-model="wData.settings.show_duration_secs" :metadata="{}" /></div>
       <span>{{ $t('secs') }}</span>
-    </h-form-group>
+    </form-group>
 
-    <h-form-group :title="$t('Banner Width')">
+    <form-group :title="$t('Banner Width')">
       <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
-    </h-form-group>
-    <h-form-group :title="$t('Banner Height')">
+    </form-group>
+    <form-group :title="$t('Banner Height')">
       <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
-    </h-form-group>
-    <h-form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
+    </form-group>
+    <form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
       <animation-input v-model="wData.settings.show_animation" />
-    </h-form-group>
-    <h-form-group :title="$t('Background Color')">
+    </form-group>
+    <form-group :title="$t('Background Color')">
       <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
-    </h-form-group>
-    <h-form-group :title="$t('Placement')">
+    </form-group>
+    <form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
-    </h-form-group>
-    <h-form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
+    </form-group>
+    <form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
       <image-layout-input v-model="wData.settings.layout" />
-    </h-form-group>
+    </form-group>
 
-    <h-form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
+    <form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
       <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
         <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
         <button class="close-button" @click="removeImage(image.href, position)"><i class="icon-close" /></button>
@@ -43,7 +43,7 @@
         <span>{{ $t('Seconds') }}</span>
       </div>
       <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
-    </h-form-group>
+    </form-group>
   </div>
 
   <div slot="HTML" >

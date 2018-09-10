@@ -2,8 +2,8 @@
 
   <div>
     <!-- title -->
-    <div class="flex margin-vertical--10">
-      <div>
+    <div>
+      <div class="margin-vertical--10">
         {{ options.title }}
       </div>
       <div v-if="options.tooltip" class="tooltip">
@@ -32,7 +32,7 @@
 </template>
 
 
-<script lang="ts" src="./VFormGroup.vue.ts"></script>
+<script lang="ts" src="./FormWrapper.vue.ts"></script>
 
 <style lang="less" scoped>
   @import "../../../styles/index";
@@ -56,7 +56,6 @@
     display: inline-block;
     z-index: 1;
     color: @icon;
-    line-height: 0;
   }
 
   .whisper {
