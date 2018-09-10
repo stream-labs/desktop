@@ -13,9 +13,11 @@ import { ProjectorService } from 'services/projector';
 import { AudioService } from 'services/audio';
 import electron from 'electron';
 import { $t } from 'services/i18n';
+import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 
 interface IEditMenuOptions {
   selectedSourceId?: string;
+  sceneNodeId?: string;
   showSceneItemMenu?: boolean;
   selectedSceneId?: string;
   showAudioMixerMenu?: boolean;
@@ -30,6 +32,7 @@ export class EditMenu extends Menu {
   @Inject() private selectionService: SelectionService;
   @Inject() private projectorService: ProjectorService;
   @Inject() private audioService: AudioService;
+  @Inject() private monitorCaptureCroppingService: MonitorCaptureCroppingService;
 
   private scene = this.scenesService.getScene(this.options.selectedSceneId);
   private source: Source;
@@ -47,6 +50,29 @@ export class EditMenu extends Menu {
   }
 
   private appendEditMenuItems() {
+    const isMultipleSelection = this.selectionService.getSize() > 1;
+
+    if (
+      this.scene &&
+      !isMultipleSelection &&
+      this.source &&
+      this.source.type === 'monitor_capture'
+    ) {
+      this.append({
+        id: 'Interactive Crop',
+        label: $t('sources.interactiveCrop'),
+        enabled: true,
+        click: () => {
+          const sceneId = this.scene.id;
+          const sceneItemId = this.options.sceneNodeId;
+          const sourceId = this.source.sourceId;
+          this.monitorCaptureCroppingService.startCropping(sceneId, sceneItemId, sourceId);
+        },
+      });
+
+      this.append({ type: 'separator' });
+    }
+
     if (this.scene) {
       this.append({
         id: 'Paste (Reference)',
@@ -63,8 +89,6 @@ export class EditMenu extends Menu {
         click: () => this.clipboardService.paste(true)
       });
     }
-
-    const isMultipleSelection = this.selectionService.getSize() > 1;
 
     if (this.options.showSceneItemMenu) {
 

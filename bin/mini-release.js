@@ -11,7 +11,7 @@ let moment;
 let inq;
 let colors;
 let ProgressBar;
-let yml;
+let yaml;
 
 try {
     sh = require('shelljs');
@@ -19,7 +19,7 @@ try {
     inq = require('inquirer');
     colors = require('colors/safe');
     ProgressBar = require('progress');
-    yml = require('js-yaml');
+    yaml = require('js-yaml');
 } catch (e) {
     if (e.message.startsWith('Cannot find module')) {
         throw new Error(`先に\`yarn install\`を実行する必要があります: ${e.message}`);
@@ -144,14 +144,25 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
 
     let promises = [];
     for (const line of merges.split(/\r?\n/)) {
-        info(line);
         const pr = line.match(/.*Merge pull request #([0-9]*).*/);
         if (!pr || pr.length < 2) {
             continue;
         }
         const number = parseInt(pr[1], 10);
-        info(number);
         promises.push(octokit.pullRequests.get({owner, repo, number}).catch(e => { info(e); return {data: {}}}));
+    }
+
+    function level(line) {
+        if (line.startsWith('追加:')) {
+            return 0;
+        }
+        if (line.startsWith('変更:')) {
+            return 1;
+        }
+        if (line.startsWith('修正:')) {
+            return 2;
+        }
+        return 3;
     }
 
     return Promise.all(promises).then(results => {
@@ -162,8 +173,30 @@ async function collectPullRequestMerges({octokit, owner, repo}, previousTag) {
                 summary.push(`${data.title} (#${data.number}) by ${data.user.login}\n`);
             }
         }
+
+        summary.sort((a,b) => {
+            const d = level(a) - level(b);
+            if (d) {
+                return d;
+            }
+            if (a < b) {
+                return -1;
+            } else if (a === b) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+
         return summary.join('');
     });
+}
+
+function uploadToSentry(org, project, release, artifactPath) {
+    const sentryCli = path.resolve('bin', 'node_modules/.bin/sentry-cli');
+    executeCmd(`${sentryCli} releases -o ${org} -p ${project} new ${release}`);
+    executeCmd(`${sentryCli} releases -o ${org} -p ${project} files ${release} upload-sourcemaps ${artifactPath}`);
+    executeCmd(`${sentryCli} releases -o ${org} -p ${project} finalize ${release}`);
 }
 
 /**
@@ -181,6 +214,10 @@ async function runScript() {
     const remote = 'origin';
 
     const targetBranch = 'n-air_development';
+
+    const sentryOrganization = 'n-air-app';
+    const sentryProject = 'n-air-app';
+
     const draft = true;
     const prerelease = true;
 
@@ -195,6 +232,7 @@ async function runScript() {
     checkEnv('CSC_KEY_PASSWORD');
     checkEnv('NAIR_LICENSE_API_KEY');
     checkEnv('NAIR_GITHUB_TOKEN');
+    checkEnv('SENTRY_AUTH_TOKEN');
 
     info(`check whether remote ${remote} exists`);
     executeCmd(`git remote get-url ${remote}`)
@@ -265,11 +303,14 @@ async function runScript() {
             owner: 'n-air-app',
             repo: 'n-air-app'
         }, previousTag);
-        info(prMerges);
+        notes = prMerges;
 
-        const merges = executeCmd('git log -1 --merges --pretty=format:%P', {silent: true}).stdout.trim();
-        const mergeBase = executeCmd(`git merge-base --octopus ${merges} ${previousTag}`, {silent: true}).stdout.trim();
-        notes = prMerges + executeCmd(`git log --oneline --graph --decorate ${mergeBase}.. --boundary`).stdout;
+        const directCommits = executeCmd(`git log --no-merges --first-parent --pretty=format:"%s (%t)" ${previousTag}..`, {silent: true}).stdout;
+	if (directCommits) {
+            notes = prMerges + '\nDirect Commits:\n' + directCommits;
+	}
+
+        info(notes);
 
         writePatchNoteFile(patchNoteFileName, newVersion, notes);
         info(`generated ${patchNoteFileName}.`);
@@ -286,6 +327,7 @@ async function runScript() {
         info(`prerelease is true.`);
     }
     if (!await confirm(`Are you sure you want to release as version ${newVersion}?`, false)) sh.exit(0);
+    const skipCleaningNodeModules = !skipBuild && !await confirm('skip cleaning node_modules?');
 
     if (!generateNoteTs) {
         info('skipping to generate notes.ts...');
@@ -295,7 +337,6 @@ async function runScript() {
 
         fs.writeFileSync(noteFilename, patchNote);
         info(`generated patch-note file: ${noteFilename}.`)
-        executeCmd(`git commit -m "note.ts ${newVersion}" ${noteFilename}`);
     }
 
     // update package.json with newVersion and git tag
@@ -304,7 +345,7 @@ async function runScript() {
     if (skipBuild) {
         info('SKIP build process since skipBuild is set...');
     } else {
-        if (!await confirm('skip cleaning node_modules?')) {
+        if (skipCleaningNodeModules) {
             // clean
             info('Removing old packages...');
             sh.rm('-rf', 'node_modules');
@@ -328,17 +369,28 @@ async function runScript() {
 
     const distDir = path.resolve('.', 'dist');
     const latestYml = path.join(distDir, 'latest.yml');
-    const parsedLatestYml = yml.safeLoad(fs.readFileSync(latestYml));
+    const parsedLatestYml = yaml.safeLoad(fs.readFileSync(latestYml));
+
+    // add releaseNotes into latest.yml
+    parsedLatestYml.releaseNotes = notes;
+    fs.writeFileSync(latestYml, yaml.safeDump(parsedLatestYml));
+
     const binaryFile = parsedLatestYml.path;
     const binaryFilePath = path.join(distDir, binaryFile);
     if (!fs.existsSync(binaryFilePath)) {
         error(`Counld not find ${path.resolve(binaryFilePath)}`);
         sh.exit(1);
     }
+    const blockmapFile = binaryFile + '.blockmap';
+    const blockmapFilePath = path.join(distDir, blockmapFile);
+    if (!fs.existsSync(blockmapFilePath)) {
+        error(`Counld not find ${path.resolve(blockmapFilePath)}`);
+        sh.exit(1);
+    }
 
-    executeCmd(`ls -l ${binaryFilePath} ${latestYml}`);
+    executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
 
-    // TODO upload to the github directly via API...
+    // upload to the github directly via GitHub API...
 
     const octokit = OctoKit({
         baseUrl: githubApiServer
@@ -368,8 +420,17 @@ async function runScript() {
         contentLength: fs.statSync(latestYml).size,
         contentType: 'application/json',
     });
-    info(`uploading ${binaryFile}...`);
 
+    info(`uploading ${blockmapFilePath}...`);
+    await octokit.repos.uploadAsset({
+        url: result.data.upload_url,
+        name: blockmapFile,
+        file: fs.createReadStream(blockmapFilePath),
+        contentLength: fs.statSync(blockmapFilePath).size,
+        contentType: 'application/octet-stream',
+    });
+
+    info(`uploading ${binaryFile}...`);
     await octokit.repos.uploadAsset({
         url: result.data.upload_url,
         name: binaryFile,
@@ -390,6 +451,10 @@ async function runScript() {
 
         info(`Version ${newVersion} is released!`);
     }
+
+    info('uploading to sentry...');
+    uploadToSentry(sentryOrganization, sentryProject, newVersion, path.resolve('.', 'bundles'));
+
     // done.
 }
 

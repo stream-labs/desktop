@@ -79,6 +79,7 @@ export default class SourceSelector extends Vue {
     const menuOptions = sceneNode
       ? {
           selectedSceneId: this.scene.id,
+          sceneNodeId,
           showSceneItemMenu: true
         }
       : { selectedSceneId: this.scene.id };

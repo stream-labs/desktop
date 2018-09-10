@@ -3,6 +3,7 @@
   "addSourceButton": "ソースの追加",
 
   "windowCaptureMessage": "※Google Chromeの場合、設定のハードウェアアクセラレーションが有効だとキャプチャできないことがあります。",
+  "gameCaptureMessage": "※PCゲームの種類によってはキャプチャできない場合があります。その際はウィンドウキャプチャをお試しください。",
 
   "sourcesWelcomeMessage": "ここではシーンに追加するソースを選択できます。",
   "addSourceProcess1": "追加したいソースを下記の中から選んでください。",
@@ -54,5 +55,8 @@
   "ungroupScene": "シーンへのグループ化を解除する",
   "createSourceProjector": "ソースプロジェクターを作成する",
   "useGoogleFont": "Googleのフォントを使う",
-  "unhideAll": "すべて表示する"
+  "unhideAll": "すべて表示する",
+  "interactiveCrop": "領域を指定してキャプチャする（実験的機能）",
+  "selectCroppingArea": "キャプチャする領域をドラッグして指定してください",
+  "pressEscapeToCancel": "Escキーでキャンセルします"
 }

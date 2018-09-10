@@ -354,8 +354,9 @@
   "blackmagicDevice": {
     "name": "Blackmagic Device"
   },
-  "ndiSource": {
-    "name": "NDI Source"
+  "ndi_source": {
+    "name": "NDI™ Source",
+    "description": "Allow you capture NDI output streams."
   },
   "openvr_capture": {
     "name": "OpenVR Capture"

@@ -3,6 +3,7 @@
   "addSourceButton": "Add Source",
 
   "windowCaptureMessage": "If you can not capture please turn off hardware acceleration from Google Chrome settings.",
+  "gameCaptureMessage": "Some games may not properly be captured. Try window capture in such case.",
 
   "sourcesWelcomeMessage": "Welcome to sources!",
   "addSourceProcess1": "Browse through our sources",
@@ -54,5 +55,8 @@
   "ungroupScene": "Ungroup Scene",
   "createSourceProjector": "Create Source Projector",
   "useGoogleFont": "Use Google Font",
-  "unhideAll": "Unhide All"
+  "unhideAll": "Unhide All",
+  "interactiveCrop": "Crop on display",
+  "selectCroppingArea": "Drag the area to capture",
+  "pressEscapeToCancel": "Press Esc to cancel"
 }

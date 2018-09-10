@@ -60,6 +60,7 @@ import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { QuestionaireService } from 'services/questionaire';
+import { MonitorCaptureCroppingService } from 'services/sources/monitor-capture-cropping';
 
 const { ipcRenderer } = electron;
 
@@ -123,6 +124,7 @@ export class ServicesManager extends Service {
     I18nService,
     OutageNotificationsService,
     QuestionaireService,
+    MonitorCaptureCroppingService,
   };
 
   private instances: Dictionary<Service> = {};

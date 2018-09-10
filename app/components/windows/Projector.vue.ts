@@ -8,6 +8,7 @@ import { ISourcesServiceApi } from 'services/sources';
 import electron from 'electron';
 import Util from 'services/utils';
 import { $t } from 'services/i18n';
+import { Subscription } from 'rxjs/subscription';
 
 @Component({
   components: {
@@ -21,6 +22,20 @@ export default class Projector extends Vue {
 
   fullscreen = false;
   oldBounds: electron.Rectangle;
+
+  sourcesSubscription: Subscription;
+
+  mounted() {
+    this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
+      if (source.sourceId === this.sourceId) {
+        electron.remote.getCurrentWindow().close();
+      }
+    });
+  }
+
+  destroyed() {
+    this.sourcesSubscription.unsubscribe();
+  }
 
   get sourceId() {
     const windowId = Util.getCurrentUrlParams().windowId;

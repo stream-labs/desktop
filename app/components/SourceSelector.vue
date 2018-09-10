@@ -45,23 +45,24 @@
       <template slot="title" slot-scope="{ node }">
         <div class="title-container">
           <span class="layer-icon">
-            <i v-if="!node.isLeaf" class="icon-folder"></i>
-            <i v-else-if="node.data.type === 'ffmpeg_source'" class="icon-media"></i>
-            <i v-else-if="node.data.type === 'image_source'" class="icon-image"></i>
-            <i v-else-if="node.data.type === 'slideshow'" class="icon-slideshow"></i>
-            <i v-else-if="node.data.type === 'text_gdiplus'" class="icon-text"></i>
-            <i v-else-if="node.data.type === 'text_ft2_source'" class="icon-text"></i>
-            <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"></i>
-            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"></i>
-            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"></i>
-            <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"></i>
-            <i v-else-if="node.data.type === 'game_capture'" class="icon-game-capture"></i>
-            <i v-else-if="node.data.type === 'browser_source'" class="icon-browser"></i>
-            <i v-else-if="node.data.type === 'scene'" class="icon-studio-mode"></i>
-            <i v-else-if="node.data.type === 'color_source'" class="icon-color"></i>
-            <i v-else-if="node.data.type === 'openvr_capture'" class="icon-vr-google"></i>
-            <i v-else-if="node.data.type === 'liv_capture'" class="icon-vr-google"></i>
-            <i v-else class="icon-file"></i>
+            <i v-if="!node.isLeaf" class="icon-folder"/>
+            <i v-else-if="node.data.type === 'ffmpeg_source'" class="icon-media"/>
+            <i v-else-if="node.data.type === 'image_source'" class="icon-image"/>
+            <i v-else-if="node.data.type === 'slideshow'" class="icon-slideshow"/>
+            <i v-else-if="node.data.type === 'text_gdiplus'" class="icon-text"/>
+            <i v-else-if="node.data.type === 'text_ft2_source'" class="icon-text"/>
+            <i v-else-if="node.data.type === 'dshow_input'" class="icon-video-capture"/>
+            <i v-else-if="node.data.type === 'wasapi_input_capture'" class="icon-mic"/>
+            <i v-else-if="node.data.type === 'ndi_source'" class="icon-ndi"/>
+            <i v-else-if="node.data.type === 'wasapi_output_capture'" class="icon-speaker"/>
+            <i v-else-if="node.data.type === 'monitor_capture'" class="icon-display"/>
+            <i v-else-if="node.data.type === 'game_capture'" class="icon-game-capture"/>
+            <i v-else-if="node.data.type === 'browser_source'" class="icon-browser"/>
+            <i v-else-if="node.data.type === 'scene'" class="icon-studio-mode"/>
+            <i v-else-if="node.data.type === 'color_source'" class="icon-color"/>
+            <i v-else-if="node.data.type === 'openvr_capture'" class="icon-vr-google"/>
+            <i v-else-if="node.data.type === 'liv_capture'" class="icon-vr-google"/>
+            <i v-else class="icon-file"/>
           </span>
           <span class="item-title" :data-test="node.title">{{ node.title }}</span>
         </div>
@@ -69,14 +70,14 @@
 
       <template slot="toggle" slot-scope="{ node }">
         <span v-if="!node.isLeaf && node.children.length">
-          <i v-if="node.isExpanded" class="icon-down-arrow"></i>
-          <i v-if="!node.isExpanded" class="icon-down-arrow icon-right"></i>
+          <i v-if="node.isExpanded" class="icon-down-arrow"/>
+          <i v-if="!node.isExpanded" class="icon-down-arrow icon-right"/>
         </span>
       </template>
 
       <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
-        <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
-        <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
+        <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"/>
+        <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"/>
       </template>
 
     </sl-vue-tree>
