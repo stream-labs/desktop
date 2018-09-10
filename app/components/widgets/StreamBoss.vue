@@ -4,19 +4,18 @@
     <div slot="goal" v-if="loaded">
       <div v-if="hasGoal">
         <div class="section__body">
-          <h-form-group :title="$t('Current Boss Name')">{{ wData.goal.boss_name }}</h-form-group>
-          <h-form-group :title="$t('Total Health')">{{ wData.goal.total_health }}</h-form-group>
-          <h-form-group :title="$t('Current Health')">{{ wData.goal.current_health }}</h-form-group>
-          <h-form-group :title="$t('Mode')">{{ wData.goal.mode }}</h-form-group>
+          <form-group :title="$t('Current Boss Name')">{{ wData.goal.boss_name }}</form-group>
+          <form-group :title="$t('Total Health')">{{ wData.goal.total_health }}</form-group>
+          <form-group :title="$t('Current Health')">{{ wData.goal.current_health }}</form-group>
+          <form-group :title="$t('Mode')">{{ wData.goal.mode }}</form-group>
         </div>
       </div>
 
       <div v-if="!hasGoal">
 
-
         <validated-form ref="form" class="section__body" v-if="requestState !== 'pending'">
-          <h-form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
-          <h-form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
+          <form-group v-model="bossCreateOptions.total_health" :metadata="metadata.total_health"/>
+          <form-group v-model="bossCreateOptions.mode" :metadata="metadata.mode"/>
         </validated-form>
 
         <div v-else class="loading-spinner">
@@ -43,28 +42,28 @@
     </div>
 
     <div slot="settings" v-if="loaded">
-      <h-form-group v-model="wData.settings.fade_time" :metadata="metadata.fade_time"/>
+      <form-group v-model="wData.settings.fade_time" :metadata="metadata.fade_time"/>
 
-      <h-form-group >
+      <form-group >
         <bool-input v-model="wData.settings.boss_heal" :metadata="metadata.boss_heal"/>
-      </h-form-group>
+      </form-group>
 
-      <h-form-group v-model="wData.settings.skin" :metadata="metadata.skin"/>
-      <h-form-group v-model="wData.settings.kill_animation" :metadata="metadata.kill_animation"/>
+      <form-group v-model="wData.settings.skin" :metadata="metadata.skin"/>
+      <form-group v-model="wData.settings.kill_animation" :metadata="metadata.kill_animation"/>
 
-      <h-form-group >
+      <form-group >
         <bool-input v-model="wData.settings.bg_transparent" :metadata="metadata.bg_transparent"/>
-      </h-form-group>
+      </form-group>
 
-      <h-form-group v-model="wData.settings.follow_multiplier" :metadata="metadata.follow_multiplier"/>
-      <h-form-group v-model="wData.settings.bit_multiplier" :metadata="metadata.bit_multiplier"/>
-      <h-form-group v-model="wData.settings.sub_multiplier" :metadata="metadata.sub_multiplier"/>
-      <h-form-group v-model="wData.settings.donation_multiplier" :metadata="metadata.donation_multiplier"/>
-      <h-form-group v-model="wData.settings.background_color" :metadata="metadata.background_color"/>
-      <h-form-group v-model="wData.settings.text_color" :metadata="metadata.text_color"/>
-      <h-form-group v-model="wData.settings.bar_text_color" :metadata="metadata.bar_text_color"/>
-      <h-form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
-      <h-form-group v-model="wData.settings.font" :metadata="metadata.font"/>
+      <form-group v-model="wData.settings.follow_multiplier" :metadata="metadata.follow_multiplier"/>
+      <form-group v-model="wData.settings.bit_multiplier" :metadata="metadata.bit_multiplier"/>
+      <form-group v-model="wData.settings.sub_multiplier" :metadata="metadata.sub_multiplier"/>
+      <form-group v-model="wData.settings.donation_multiplier" :metadata="metadata.donation_multiplier"/>
+      <form-group v-model="wData.settings.background_color" :metadata="metadata.background_color"/>
+      <form-group v-model="wData.settings.text_color" :metadata="metadata.text_color"/>
+      <form-group v-model="wData.settings.bar_text_color" :metadata="metadata.bar_text_color"/>
+      <form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
+      <form-group v-model="wData.settings.font" :metadata="metadata.font"/>
     </div>
 
 

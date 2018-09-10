@@ -3,19 +3,13 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import ChatbotLinkProtectionList from 'components/page-components/Chatbot/windows/ChatbotLinkProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
-    ChatbotLinkProtectionList,
-    ValidatedForm
+    ChatbotLinkProtectionList
   }
 })
 export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
-  $refs: {
-    form: ValidatedForm;
-  };
-
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -41,9 +35,7 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('link-protection');
   }
 
-  async onSaveHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
-
+  onSaveHandler() {
     this.chatbotApiService
       .updateLinkProtection({
         enabled: this.linkProtectionResponse.enabled,

@@ -5,7 +5,7 @@
   :title="$t(`${isEdit ? 'Edit' : 'Add'} Quote`)"
 >
   <div slot="content">
-    <validated-form ref="form">
+    <div>
       <div>
         <VFormGroup
           :title="$t('Quote (Line breaks will be ignored)')"
@@ -32,7 +32,7 @@
           />
         </div>
       </div>
-    </validated-form>
+    </div>
   </div>
   <div slot="controls">
     <button
@@ -43,6 +43,7 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
+      :disabled="errors.items.length > 0 || !newQuote.message || !newQuote.game || !newQuote.added_by"
     >
       {{ $t('Save') }}
     </button>

@@ -3,24 +3,19 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { cloneDeep } from 'lodash';
 import { $t } from 'services/i18n';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import {
   IQuotePreferencesGeneralSettings
 } from 'services/chatbot';
 
 import {
+  ITextMetadata,
+  INumberMetadata,
   EInputType
 } from 'components/shared/inputs/index';
 
-@Component({
-  components: { ValidatedForm }
-})
+@Component({})
 export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
-
-  $refs: {
-    form: ValidatedForm;
-  };
 
   generalSettings: IQuotePreferencesGeneralSettings = {
     date_format: null
@@ -51,8 +46,7 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
     this.chatbotCommonService.closeChildWindow();
   }
 
-  async onSaveHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+  onSaveHandler() {
     const newPreferences = cloneDeep(this.quotePreferences);
     newPreferences.settings.general = this.generalSettings;
     this.chatbotApiService.updateQuotePreferences(newPreferences);
