@@ -8,26 +8,26 @@ import FormInput from './FormInput.vue';
   components: { FormInput }
 })
 
-export default class VFormGroup extends BaseInput<any, IInputMetadata> {
+export default class FormWrapper extends BaseInput<any, IInputMetadata> {
 
   @Prop()
-  type: EInputType;
+  readonly type: EInputType;
 
   @Prop()
-  value: undefined;
+  readonly value: undefined;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly metadata: IInputMetadata;
 
   @Prop()
-  title: string;
+  readonly title: string;
 
   get formInputMetadata() {
     const options = this.options;
     if (!options.type) return {};
     const inputMetadata = options;
 
-    // VFormGroup handle the render of the FormInput title
+    // FormWrapper handle the render of the FormInput title
     // so remove the title from FormInput metadata
     delete inputMetadata.title;
     delete inputMetadata.tooltip;
