@@ -60,6 +60,7 @@ import ChatbotSongRequestPreferencesWindow
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
+import MediaShare from 'components/widgets/MediaShare.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -115,6 +116,7 @@ export function getComponents() {
     ChatbotQuotePreferencesWindow,
     ChatbotQueuePreferencesWindow,
     ChatbotSongRequestPreferencesWindow,
+    MediaShare,
   };
 }
 
