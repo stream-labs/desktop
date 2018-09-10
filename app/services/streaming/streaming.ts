@@ -246,6 +246,13 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     });
   }
 
+  private clearReconnectingNotification() {
+    const notice = this.notificationsService.getAll()
+      .find((notice: INotification) => notice.message === $t('Stream has disconnected, attempting to reconnect.'));
+    if (!notice) return;
+    this.notificationsService.markAsRead(notice.id);
+  }
+
   private formattedDurationSince(timestamp: moment.Moment) {
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = padStart(duration.seconds().toString(), 2, '0');
@@ -298,6 +305,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
         this.SET_STREAMING_STATUS(EStreamingState.Live);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
       const time = new Date().toISOString();
