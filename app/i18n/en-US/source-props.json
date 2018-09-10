@@ -352,7 +352,8 @@
     "description": "Allows you to add existing scene as a source"
   },
   "blackmagicDevice": {
-    "name": "Blackmagic Device"
+    "name": "Blackmagic Device",
+    "description": "Allow you capture Blackmagic streams."
   },
   "ndi_source": {
     "name": "NDI™ Source",

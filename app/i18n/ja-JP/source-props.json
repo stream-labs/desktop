@@ -354,7 +354,8 @@
     "description": "既存のシーンをソースとして新たに追加します。"
   },
   "blackmagicDevice": {
-    "name": "Blackmagicデバイス"
+    "name": "Blackmagicデバイス",
+    "description": "Blackmagicデバイスをキャプチャーして配信することができます。"
   },
   "ndi_source": {
     "name": "NDI™ ソース",

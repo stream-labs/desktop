@@ -118,10 +118,18 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === 'blackmagic_source'"
+      @clickAdd="selectSource('blackmagic_source')"
+      sourceType="blackmagic_source"
+      key="14">
+     <BlackmagicSourceIcon slot="media" />
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
       sourceType="scene"
-      key="14">
+      key="15">
       <AddSceneIcon slot="media" />
     </add-source-info>
 
