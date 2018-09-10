@@ -17,6 +17,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
 import { AnnouncementsService } from 'services/announcements';
+import { NotificationsService, ENotificationType } from 'services/notifications';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -46,6 +47,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() notificationsService: NotificationsService;
   @Inject() private announcementsService: AnnouncementsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
@@ -231,6 +233,15 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
     return moment(this.state.streamingStatusTime);
   }
 
+  private sendReconnectingNotification() {
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      showTime: true,
+      message: $t('Stream has disconnected, attempting to reconnect.')
+    });
+  }
+
   private formattedDurationSince(timestamp: moment.Moment) {
     const duration = moment.duration(moment().diff(timestamp));
     const seconds = padStart(duration.seconds().toString(), 2, '0');
@@ -279,6 +290,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
+        this.sendReconnectingNotification();
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
         this.SET_STREAMING_STATUS(EStreamingState.Live);
         this.streamingStatusChange.next(EStreamingState.Live);
