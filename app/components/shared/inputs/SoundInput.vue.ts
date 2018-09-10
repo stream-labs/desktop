@@ -6,11 +6,11 @@ import { BaseInput } from './BaseInput';
 import { IMediaGalleryMetadata } from './index';
 import { MediaGalleryService } from 'services/media-gallery';
 import { TextInput } from './inputs';
-import FormGroup from './FormGroup.vue';
+import HFormGroup from './HFormGroup.vue';
 import { $t } from 'services/i18n';
 
 @Component({
-  components: { TextInput, FormGroup }
+  components: { TextInput, HFormGroup }
 })
 export default class SoundInput extends BaseInput<string, IMediaGalleryMetadata>{
   @Inject() mediaGalleryService: MediaGalleryService;
