@@ -1,4 +1,3 @@
-
 // state
 export interface IChatbotApiServiceState {
   // v1
@@ -43,7 +42,7 @@ export interface IChatbotSocketAuthResponse {
 }
 
 export interface IChatbotErrorResponse {
-  error?: 'Duplicate' | 'Bad Request'
+  error?: 'Duplicate' | 'Bad Request';
 }
 
 export interface IChatbotStatusResponse {
@@ -63,7 +62,6 @@ export interface IChatbotAPIDeleteResponse {
   success: boolean;
 }
 
-
 export interface IDafaultCommandsResponse {
   commands: IDafaultCommandsSlug;
   'link-protection': IDafaultCommandsSlug;
@@ -76,7 +74,7 @@ export interface ICustomCommandsResponse {
 }
 
 export interface ICommandVariablesResponse {
-  [id: number] : ICommandVariable;
+  [id: number]: ICommandVariable;
 }
 
 export interface ITimersResponse {
@@ -139,7 +137,6 @@ export interface IQueuePickedResponse {
   data: IQueuedUser[];
 }
 
-
 // shared
 export interface IChatbotPermission {
   level: number;
@@ -173,9 +170,7 @@ export interface IChatbotPermit {
   duration: number;
 }
 
-
 export interface IChatbotExcluded extends IChatbotPermission {}
-
 
 // status
 export interface IChatbotWorkerStatus {
@@ -271,7 +266,7 @@ export interface IChatbotModule {
 export interface IChatAlertsData {
   [id: string]: {
     [id: string]: IAlertType;
-  }
+  };
 }
 
 export interface IAlertType {
@@ -303,7 +298,6 @@ export interface IProtectionAdvanced {
 export interface IProtectionList<type> {
   [id: number]: type;
 }
-
 
 // caps protection data
 export interface ICapsProtectionData {
@@ -372,7 +366,6 @@ export interface IQuotePreferencesGeneralSettings {
   date_format: string;
 }
 
-
 // queue
 export interface IQueuePreferencesData {
   commands: IDafaultCommandsSlug;
@@ -383,7 +376,7 @@ export interface IQueuePreferencesGeneralSettings {
   maximum: number;
   messages: {
     picked: string;
-  }
+  };
 }
 
 export interface IQueuedUser {
@@ -398,11 +391,10 @@ export interface IQueuedUser {
   created_at?: string;
 }
 
-
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
-  'Subscriber Only' = 1 << 1,
+  'Subscriber Only' = 1 << 1
 }
 
 export enum ChatbotPermissionsEnums {
@@ -413,7 +405,6 @@ export enum ChatbotPermissionsEnums {
   'Streamer Only' = 1 << 7,
   'Subscribers & Moderators Only' = (1 << 1) | (1 << 5)
 }
-
 
 export enum ChatbotPunishments {
   Purge = 'Purge',
@@ -426,17 +417,25 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits' | 'sub_mystery_gift';
+export type ChatbotAlertTypes =
+  | 'tip'
+  | 'follow'
+  | 'host'
+  | 'raid'
+  | 'sub'
+  | 'bits'
+  | 'sub_mystery_gift';
 
 export type ChatbotSocketRooms = 'queue' | 'giveaway';
 
-export const ChatbotClients = [
-  'Twitch'
-]
+export const ChatbotClients = ['Twitch', 'Mixer', 'Youtube'];
 
 export type ChatbotSettingSlugs =
-  'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
-
+  | 'chat-notifications'
+  | 'caps-protection'
+  | 'symbol-protection'
+  | 'link-protection'
+  | 'words-protection';
 
 // modals (inside child window)
 export const NEW_ALERT_MODAL_ID = 'new-alert';
