@@ -17,7 +17,7 @@ import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
 import { StreamInfoService } from 'services/stream-info';
 import { AnnouncementsService } from 'services/announcements';
-import { NotificationsService, ENotificationType } from 'services/notifications';
+import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -234,6 +234,10 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   }
 
   private sendReconnectingNotification() {
+    const msg = $t('Stream has disconnected, attempting to reconnect.');
+    const existingReconnectNotif = this.notificationsService.getUnread()
+      .filter((notice: INotification) => notice.message === msg);
+    if (existingReconnectNotif.length !== 0) return;
     this.notificationsService.push({
       type: ENotificationType.WARNING,
       lifeTime: -1,
