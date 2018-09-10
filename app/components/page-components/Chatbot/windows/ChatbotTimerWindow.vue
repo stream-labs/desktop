@@ -5,7 +5,7 @@
   :title="isEdit ? $t('Edit Timer') : $t('Add Timer')"
 >
   <div slot="content">
-    <div>
+    <validated-form ref="form">
       <VFormGroup
         :title="$t('Name')"
         v-model="newTimer.name"
@@ -32,7 +32,7 @@
           />
         </div>
       </div>
-    </div>
+    </validated-form>
   </div>
   <div slot="controls">
     <button
@@ -43,7 +43,6 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !newTimer.name || !newTimer.message"
     >
       {{ $t('Save') }}
     </button>

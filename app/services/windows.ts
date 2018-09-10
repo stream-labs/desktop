@@ -59,6 +59,7 @@ import ChatbotSongRequestPreferencesWindow
   from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
+import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -169,7 +170,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // top level components in new child windows.
   components = getComponents();
 
-  windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
+  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -289,14 +290,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
+  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<string> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
+  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }
