@@ -12,10 +12,15 @@ import { StreamingService } from 'services/streaming';
 import { AppService } from 'services/app';
 import { $t } from 'services/i18n';
 import { QuestionaireService } from 'services/questionaire';
+const ClipBoardCopy = require('../../media/images/clipboard-copy.svg');
 
 @Component({
-  components: { BoolInput }
+  components: {
+    BoolInput,
+    ClipBoardCopy
+  }
 })
+
 export default class ExtraSettings extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() onboardingService: OnboardingService;
@@ -26,6 +31,7 @@ export default class ExtraSettings extends Vue {
   @Inject() questionaireService: QuestionaireService;
 
   cacheUploading = false;
+  showCacheId = false;
 
   get cacheId() : string {
      return this.questionaireService.uuid;
