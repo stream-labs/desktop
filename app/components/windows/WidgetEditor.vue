@@ -130,6 +130,10 @@
       padding: 0;
     }
   }
+
+  .test-button .link {
+    color: @white;
+  }
 </style>
 
 <style lang="less" scoped>
@@ -173,7 +177,6 @@
 
   .test-button {
     margin-left: auto;
-    color: @white !important;
   }
 
   .content-container {
