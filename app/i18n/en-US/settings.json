@@ -522,5 +522,9 @@
   "fontStyle": "Font Style",
   "fontSize": "Font Size",
   "optimizeForNiconico": "optimize settings for niconico live service",
-  "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams"
+  "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams",
+  "videoBitrate": "Video Bitrate (kbps)",
+  "audioBitrate": "Audio Bitrate (kbps)",
+  "keyframeInterval": "Keyframe Interval (in seconds)",
+  "encoderPreset": "Encoder Preset"
 }

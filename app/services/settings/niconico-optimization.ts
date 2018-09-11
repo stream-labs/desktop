@@ -8,6 +8,12 @@ export enum OptimizationKey {
     quality = 'quality',
     colorSpace = 'colorSpace',
     fps = 'fps',
+    encoder = 'encoder',
+    keyframeInterval = 'keyframeInterval',
+    encoderPreset = 'encoderPreset',
+    profile = 'profile',
+    tune = 'tune',
+    audioTrackIndex = 'audioTrackIndex',
 }
 
 enum CategoryName {
@@ -37,13 +43,15 @@ const definitionParams: DefinitionParam[] = [
         key: OptimizationKey.videoBitrate,
         category: CategoryName.output,
         subCategory: 'Streaming',
-        setting: 'VBitrate'
+        setting: 'bitrate',
+        label: 'settings.videoBitrate',
     },
     {
         key: OptimizationKey.audioBitrate,
         category: CategoryName.output,
-        subCategory: 'Streaming',
-        setting: 'ABitrate'
+        subCategory: 'Audio - Track 1',
+        setting: 'Track1Bitrate',
+        label: 'settings.audioBitrate',
     },
     {
         key: OptimizationKey.quality,
@@ -57,14 +65,56 @@ const definitionParams: DefinitionParam[] = [
         key: OptimizationKey.colorSpace,
         category: CategoryName.advanced,
         subCategory: 'Video',
-        setting: 'ColorSpace'
+        setting: 'ColorSpace',
     },
     {
         key: OptimizationKey.fps,
         category: CategoryName.video,
         subCategory: 'Untitled',
         setting: 'FPSCommon',
-        label: 'streaming.FPS'
+        label: 'streaming.FPS',
+    },
+    {
+        key: OptimizationKey.encoder,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        setting: 'Encoder',
+        lookupValueName: true,
+    },
+    {
+        key: OptimizationKey.keyframeInterval,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        label: 'settings.keyframeInterval',
+        setting: 'keyint_sec',
+    },
+    {
+        key: OptimizationKey.encoderPreset,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        setting: 'preset',
+        label: 'settings.encoderPreset',
+        lookupValueName: true,
+    },
+    {
+        key: OptimizationKey.profile,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        setting: 'profile',
+        lookupValueName: true,
+    },
+    {
+        key: OptimizationKey.tune,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        setting: 'tune',
+        lookupValueName: true,
+    },
+    {
+        key: OptimizationKey.audioTrackIndex,
+        category: CategoryName.output,
+        subCategory: 'Streaming',
+        setting: 'TrackIndex'
     },
 ];
 
@@ -79,6 +129,19 @@ export interface OptimizedSettings {
         currentValue: string,
         newValue?: string
     }[];
+}
+
+/**
+ * i18n用pathを組み立てる。
+ * 空白を含む階層はドット記法で接続出来ないので置き換える
+ */
+function i18nPath(top: string, ...args: string[]): string {
+    return top + [...args].map(s => {
+        if (s.match(/\s/)) {
+            return `['${s}']`;
+        }
+        return `.${s}`;
+    }).join('');
 }
 
 class OptKeyProperty {
@@ -98,7 +161,7 @@ class OptKeyProperty {
         if (options.label) {
             this._label = options.label;
         } else {
-            this._label = ['settings', options.category, options.subCategory, options.setting, 'name'].join('.');
+            this._label = i18nPath('settings', options.category, options.subCategory, options.setting, 'name');
         }
         this.lookupValueName = options.lookupValueName;
     }
@@ -108,17 +171,17 @@ class OptKeyProperty {
         if (t !== this._label) {
             return t;
         }
-        return this._label;
+        console.log(`label '${this._label}' not found for ${this.key}`);
+        return this.setting;
     }
 
     value(v: any): string {
         if (this.lookupValueName) {
-            const t = ['settings', this.category, this.subCategory, this.setting, v].join('.');
+            const t = i18nPath('settings', this.category, this.subCategory, this.setting, v);
             const name = $t(t);
             if (t !== name) {
                 return name;
             }
-            return t;
         }
         return v;
     }
@@ -178,12 +241,18 @@ export class NiconicoOptimization {
         }
 
         return {
+            outputMode: 'Advanced',
             videoBitrate: (options.bitrate - audioBitrate),
             audioBitrate: audioBitrate.toString(10),
             quality: quality,
             colorSpace: '709',
             fps: '30',
-            outputMode: 'Simple',
+            encoder: 'obs_x264',
+            keyFramePeriod: 300,
+            encoderPreset: 'ultrafast',
+            profile: 'high',
+            tune: 'zerolatency',
+            audioTrackIndex: '1',
         };
     }
 }
@@ -207,6 +276,9 @@ export class NiconicoOptimizer {
     getCategory(category: CategoryName, reload: boolean = false): ISettingsSubCategory[] {
         if (reload || !this.categoryCache.has(category)) {
             this.categoryCache.set(category, this.accessor.getSettingsFormData(category));
+            /* console.log(`load category ${category} ->
+${JSON.stringify(this.categoryCache.get(category), null, 2)}`
+            ); // DEBUG */
         }
         return this.categoryCache.get(category);
     }
