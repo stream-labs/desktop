@@ -6,7 +6,9 @@
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
-      <button class="button button--action test-button">{{ $t('Test Widget') }}</button>
+      <div class="button button--action test-button">
+        <test-widgets />
+      </div>
     </div>
 
     <div class="window-container">
@@ -171,6 +173,7 @@
 
   .test-button {
     margin-left: auto;
+    color: @white !important;
   }
 
   .content-container {
