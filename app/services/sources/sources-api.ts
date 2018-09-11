@@ -97,7 +97,8 @@ export type TSourceType =
   'scene' |
   'ndi_source' |
   'openvr_capture' |
-  'liv_capture'
+  'liv_capture' |
+  'media_share'
   ;
 
 // Register new properties manager here

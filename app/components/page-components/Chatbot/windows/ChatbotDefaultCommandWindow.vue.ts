@@ -6,7 +6,6 @@ import { IDefaultCommand } from 'services/chatbot';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { $t } from 'services/i18n';
-import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import {
   IListMetadata,
@@ -29,16 +28,10 @@ interface IDefaultCommandMetadata {
 
 @Component({
   components: {
-    ChatbotAliases,
-    ValidatedForm
+    ChatbotAliases
   }
 })
 export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
-
-  $refs: {
-    form: ValidatedForm;
-  };
-
   editedCommand: IDefaultCommand = null;
 
   tabs: ITab[] = [
@@ -167,9 +160,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     });
   }
 
-  async onSaveHandler() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
-
+  onSave() {
     this.chatbotApiService.updateDefaultCommand(
       this.defaultCommandToUpdate.slugName,
       this.defaultCommandToUpdate.commandName,

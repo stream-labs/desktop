@@ -22,7 +22,7 @@
   <div slot="content" class="chatbot-link-protection__container">
     <div>
       <transition name='fade' mode="out-in" appear>
-        <validated-form ref="form" v-if="selectedTab === 'general' && linkProtection">
+        <div v-if="selectedTab === 'general' && linkProtection">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
@@ -55,7 +55,7 @@
             v-model="linkProtection.general.message"
             :metadata="metadata.link.general.message"
           />
-        </validated-form>
+        </div>
         <ChatbotLinkProtectionList
           v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
           :title="selectedTab === 'whitelist' ? $t('Add to whitelist') : $t('Add to blacklist')"
@@ -94,6 +94,7 @@
       <button
         class="button button--action"
         @click="onSaveHandler"
+        :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
       </button>
@@ -104,7 +105,7 @@
 
 <script lang="ts" src="./ChatbotLinkProtectionWindow.vue.ts"></script>
 
-<style lang="less" scoped>
+<style <style lang="less" scoped>
 @import "../../../../styles/index";
 
 .window-toggle__wrapper {

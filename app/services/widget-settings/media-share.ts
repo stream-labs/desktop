@@ -1,5 +1,7 @@
 import { IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
+import { clone } from 'lodash';
+import { $t } from 'services/i18n';
 
 export interface IMediaShareSettings extends IWidgetSettings {
   advanced_settings: {
@@ -27,7 +29,18 @@ export interface IMediaShareSettings extends IWidgetSettings {
 
 export interface IMediaShareData extends IWidgetData {
   settings: IMediaShareSettings;
-  banned_media: string[];
+  banned_media: IMediaShareBan[];
+}
+
+export interface IMediaShareBan {
+  id: number;
+  user_id: number;
+  media_type: string;
+  media: string;
+  media_title: string;
+  action_by: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
@@ -45,10 +58,42 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   }
 
   getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/media`;
+    return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
+  }
+
+  async unbanMedia(media: IMediaShareBan) {
+    const url = `${this.getDataUrl()}/unban`;
+    await this.request({
+      url,
+      method: 'POST',
+      body: {
+        media: media.media
+      }
+    });
+    return this.fetchData();
   }
 
   protected tabs = [
-    { name: 'settings' },
+    { name: 'settings', title: $t('Settings') },
+    { name: 'banned_media', title: $t('Banned Media') },
   ];
+
+  protected patchAfterFetch(response: IMediaShareData): any {
+    // we should be using settings.advanced settings values instead, similar to sl.com
+    // so overwrite values for all keys in settings with settings.advance_settings
+    return {
+      ...response,
+      settings: {
+        ...response.settings,
+        ...response.settings.advanced_settings
+      }
+    }
+  }
+
+  protected patchBeforeSend(settings: IMediaShareSettings): any {
+    // backend makes settings into advanced.settings and store in json
+    // without deleting, it will nest settings.advanced_settings.advanced_settings x infinity
+    delete settings.advanced_settings;
+    return { settings };
+  }
 }

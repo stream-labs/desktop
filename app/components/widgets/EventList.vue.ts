@@ -8,7 +8,7 @@ import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
 import { AnimationInput } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
@@ -16,7 +16,7 @@ import TestButtons from './TestButtons.vue';
 @Component({
   components: {
     WidgetWindow,
-    HFormGroup,
+    FormGroup,
     CodeEditor,
     TestButtons,
     AnimationInput,

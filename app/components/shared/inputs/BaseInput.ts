@@ -3,22 +3,20 @@ import { cloneDeep } from 'lodash';
 import { Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
+import { $t } from 'services/i18n';
 
 export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
   @Prop()
-  readonly value: TValueType;
+  value: TValueType;
 
   @Prop()
-  readonly title: string;
+  title: string;
 
   @Prop()
-  readonly metadata: TMetadataType;
+  metadata: TMetadataType;
 
-  /**
-   * uuid serves to link input field and validator message
-   */
-  readonly uuid = (this.metadata && this.metadata.uuid) || uuid();
+  uuid = uuid(); // uuid serves to link input field and validator message
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
@@ -53,6 +51,5 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
   get options(): TMetadataType {
     return this.getOptions();
   }
-
 }
 

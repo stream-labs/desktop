@@ -3,7 +3,7 @@ import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import FormGroup from 'components/shared/inputs/FormGroup.vue';
 import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
@@ -13,7 +13,7 @@ import TestButtons from './TestButtons.vue';
 @Component({
   components: {
     WidgetWindow,
-    HFormGroup,
+    FormGroup,
     ValidatedForm,
     CodeEditor,
     TestButtons,
@@ -38,7 +38,8 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
   }
 
   async saveGoal() {
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    const hasErrors = await this.$refs.form.validateAndCheckErrors();
+    if (hasErrors) return;
     await this.save(this.bossCreateOptions);
   }
 
