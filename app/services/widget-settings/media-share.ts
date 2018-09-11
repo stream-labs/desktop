@@ -58,7 +58,7 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   }
 
   getDataUrl() {
-    return `http://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
+    return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
 
   async unbanMedia(media: IMediaShareBan) {
