@@ -112,6 +112,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     });
     data = this.handleDataAfterFetch(data);
     this.dataUpdated.next(data);
+    debugger;
     return data;
   }
 
@@ -146,7 +147,6 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   }
 
   async saveData(data: TWidgetData, tabName? :string, method: THttpMethod = 'POST'): Promise<TWidgetData> {
-    debugger;
     const tab = this.getTab(tabName);
     const url = tab && tab.saveUrl ? tab.saveUrl : this.getDataUrl();
     const bodyData = this.patchBeforeSend(data);
