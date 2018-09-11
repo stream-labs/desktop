@@ -154,7 +154,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
-      title: 'Streamlabs OBS - App Developer Build 1'
+      title: 'Streamlabs OBS - App Developer Build 2'
     },
     child: {
       componentName: '',
