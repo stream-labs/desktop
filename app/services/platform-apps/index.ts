@@ -362,8 +362,6 @@ export class PlatformAppsService extends
       const session = electron.remote.session.fromPartition(partition);
 
       session.webRequest.onBeforeRequest((details, cb) => {
-        console.log('Request', details);
-
         if (details.resourceType === 'script') {
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',

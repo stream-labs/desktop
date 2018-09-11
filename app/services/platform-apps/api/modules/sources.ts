@@ -26,7 +26,7 @@ interface ISource {
 export class SourcesModule extends Module {
 
   moduleName = 'Sources';
-  permissions = [EApiPermissions.ScenesSources]
+  permissions = [EApiPermissions.ScenesSources];
 
   @Inject() private sourcesService: SourcesService;
 

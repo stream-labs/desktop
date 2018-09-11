@@ -2,6 +2,7 @@ import { Module, EApiPermissions, TApiModule } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
+import { StreamingRecordingModule } from './modules/streaming-recording';
 
 export class PlatformAppsApi {
 
@@ -12,6 +13,7 @@ export class PlatformAppsApi {
     this.registerModule(new SourcesModule());
     this.registerModule(new ScenesModule());
     this.registerModule(new ObsSettingsModule());
+    this.registerModule(new StreamingRecordingModule());
   }
 
   private registerModule(module: Module) {
@@ -38,7 +40,7 @@ export class PlatformAppsApi {
         if (!authorized) break;
       }
 
-      (this.modules[moduleName].constructor as typeof Module).apiMethods.forEach(methodName => {
+      ((this.modules[moduleName].constructor as typeof Module).apiMethods || []).forEach(methodName => {
         api[moduleName][methodName] = async (...args: any[]) => {
           if (authorized) {
             return await this.modules[moduleName][methodName](...args);
@@ -49,7 +51,7 @@ export class PlatformAppsApi {
         };
       });
 
-      (this.modules[moduleName].constructor as typeof Module).apiEvents.forEach(eventName => {
+      ((this.modules[moduleName].constructor as typeof Module).apiEvents || []).forEach(eventName => {
         if (authorized) {
           api[moduleName][eventName] = this.modules[moduleName][eventName];
         } else {

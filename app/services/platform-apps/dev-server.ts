@@ -32,8 +32,6 @@ export class DevServer {
 
   listen() {
     this.server = http.createServer((request, response) => {
-      console.log('Incoming Request:', request.url);
-
       const parsedUrl = url.parse(request.url);
       const filePath = path.join(this.directory, parsedUrl.pathname);
       const ext = path.extname(filePath).toLowerCase();

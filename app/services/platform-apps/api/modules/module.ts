@@ -1,6 +1,7 @@
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',
-  ObsSettings = 'slobs.obs-settings'
+  ObsSettings = 'slobs.obs-settings',
+  Streaming = 'slobs.streaming'
 }
 
 type TApiHandler = (...args: any[]) => Promise<any>;
@@ -9,7 +10,9 @@ export type TApiModule = Dictionary<TApiHandler>;
 export function apiMethod() {
   return (target: Module, methodName: string, descriptor: PropertyDescriptor) => {
 
-    (target.constructor as typeof Module).apiMethods.push(methodName);
+    const klass = (target.constructor as typeof Module);
+    klass.apiMethods = klass.apiMethods || [];
+    klass.apiMethods.push(methodName);
     return descriptor;
   };
 }
@@ -17,7 +20,9 @@ export function apiMethod() {
 export function apiEvent() {
   return (target: Module, methodName: string) => {
 
-    (target.constructor as typeof Module).apiEvents.push(methodName);
+    const klass = (target.constructor as typeof Module);
+    klass.apiEvents = klass.apiEvents || [];
+    klass.apiEvents.push(methodName);
   };
 }
 
@@ -46,13 +51,13 @@ export abstract class Module {
    * Contains a list of public API methods.  Generally you should not
    * edit this directly, and instead us the @apiMethod decorator.
    */
-  static apiMethods: string[] = [];
+  static apiMethods: string[];
 
   /**
    * Contains a list of public API event observables.  Generally you should not
    * edit this directly, and instead us the @apiEvent decorator.
    */
-  static apiEvents: string[] = [];
+  static apiEvents: string[];
 
   /**
    * Takes a patch object and validates it against the required keys.
