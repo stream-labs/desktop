@@ -8,8 +8,9 @@ import { CustomizationService } from '../../services/customization';
 import { IFormInput } from '../../components/shared/forms/Input';
 import { StreamingService } from '../../services/streaming';
 import { WindowsService } from '../../services/windows';
-import { OptimizedSettings, SettingsService } from '../../services/settings';
+import { SettingsService } from '../../services/settings';
 import { $t } from '../../services/i18n';
+import { OptimizedSettings } from 'services/settings/niconico-optimization';
 
 @Component({
   components: {
@@ -24,7 +25,7 @@ export default class OptimizeNiconico extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() settingsService: SettingsService;
 
-  settings: OptimizedSettings = this.windowsService.getChildWindowQueryParams();
+  settings: OptimizedSettings = this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
 
   get doNotShowAgain(): IFormInput<boolean> {
     return {
@@ -34,24 +35,12 @@ export default class OptimizeNiconico extends Vue {
     };
   }
 
-  qualityName(value: string): string {
-    const arg = `settings.Video.Untitled.Output.${value}`;
-    const name = $t(arg);
-    return name !== arg ? name : value;
-  }
-
-  outputModeName(value: string): string {
-    const arg = `settings.Output.Untitled.Mode.${value}`;
-    const name = $t(arg);
-    return name !== arg ? name : value;
-  }
-
   setDoNotShowAgain(model: IFormInput<boolean>) {
     this.customizationService.setShowOptimizationDialogForNiconico(!model.value);
   }
 
   optimizeAndGoLive() {
-    this.settingsService.optimizeForNiconico(this.settings);
+    this.settingsService.optimizeForNiconico(this.settings.delta);
     this.streamingService.toggleStreaming();
     this.windowsService.closeChildWindow();
   }

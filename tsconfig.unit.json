@@ -18,6 +18,7 @@
     "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
     "baseUrl": "./app"
   },
   "exclude": [

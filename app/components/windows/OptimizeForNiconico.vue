@@ -7,29 +7,9 @@
 
     {{ $t('streaming.optimizationForNiconico.description') }}
     <ul>
-      <li>
-        {{ $t('settings.Output.Streaming.VBitrate.name') }}: {{ settings.currentVideoBitrate }}
-        <span v-if="settings.optimizedVideoBitrate"> -&gt; {{ settings.optimizedVideoBitrate }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.Streaming.ABitrate.name') }}: {{ settings.currentAudioBitrate }}
-        <span v-if="settings.optimizedAudioBitrate"> -&gt; {{ settings.optimizedAudioBitrate }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.name') }}: {{ qualityName(settings.currentQuality) }}
-        <span v-if="settings.optimizedQuality"> -&gt; {{ qualityName(settings.optimizedQuality) }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Advanced.Video.ColorSpace.name') }}: {{ settings.currentColorSpace }}
-        <span v-if="settings.optimizedColorSpace"> -&gt; {{ settings.optimizedColorSpace }}</span>
-      </li>
-      <li>
-        {{ $t('streaming.FPS') }}: {{ settings.currentFps }}
-        <span v-if="settings.optimizedFps"> -&gt; {{ settings.optimizedFps }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.Untitled.Mode.name') }}: {{ outputModeName(settings.currentOutputMode) }}
-        <span v-if="settings.optimizedOutputMode"> -&gt; {{ outputModeName(settings.optimizedOutputMode) }}</span>
+      <li v-for="o in settings.info" :key="o.key">
+        {{ o.name }}: {{ o.currentValue }}
+        <span v-if="o.newValue"> -&gt; {{ o.newValue }}</span>
       </li>
     </ul>
     <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
