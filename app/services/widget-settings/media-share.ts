@@ -1,6 +1,7 @@
 import { IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
 import { clone } from 'lodash';
+import { $t } from 'services/i18n';
 
 export interface IMediaShareSettings extends IWidgetSettings {
   advanced_settings: {
@@ -28,6 +29,18 @@ export interface IMediaShareSettings extends IWidgetSettings {
 
 export interface IMediaShareData extends IWidgetData {
   settings: IMediaShareSettings;
+  banned_media: IMediaShareBan[];
+}
+
+export interface IMediaShareBan {
+  id: number;
+  user_id: number;
+  media_type: string;
+  media: string;
+  media_title: string;
+  action_by: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
@@ -48,36 +61,39 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
     return `http://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
 
+  async unbanMedia(media: IMediaShareBan) {
+    const url = `${this.getDataUrl()}/unban`;
+    await this.request({
+      url,
+      method: 'POST',
+      body: {
+        media: media.media
+      }
+    });
+    return this.fetchData();
+  }
+
   protected tabs = [
-    { name: 'settings' },
+    { name: 'settings', title: $t('Settings') },
+    { name: 'banned_media', title: $t('Banned Media') },
   ];
 
+  protected patchAfterFetch(response: IMediaShareData): any {
+    // we should be using settings.advanced settings values instead, similar to sl.com
+    // so overwrite values for all keys in settings with settings.advance_settings
+    return {
+      ...response,
+      settings: {
+        ...response.settings,
+        ...response.settings.advanced_settings
+      }
+    }
+  }
 
   protected patchBeforeSend(settings: IMediaShareSettings): any {
-    return {
-      settings: {
-        allowed_types: settings.allowed_types,
-        auto_show_video: settings.auto_show_video,
-        enabled: settings.enabled,
-        max_duration: settings.max_duration,
-        min_amount_to_share: settings.min_amount_to_share,
-        price_per_second: settings.price_per_second,
-        security: settings.security,
-        volume: settings.volume,
-        advanced_settings: {
-          auto_play: settings.advanced_settings.auto_play,
-          auto_show: settings.advanced_settings.auto_show,
-          buffer_time: settings.advanced_settings.buffer_time,
-          enabled: settings.advanced_settings.enabled,
-          max_duration: settings.advanced_settings.max_duration,
-          min_amount_to_share: settings.advanced_settings.min_amount_to_share,
-          moderation_queue: settings.advanced_settings.moderation_queue,
-          price_per_second: settings.advanced_settings.price_per_second,
-          requests_enabled: settings.advanced_settings.requests_enabled,
-          security: settings.advanced_settings.security,
-          volume: settings.advanced_settings.volume,
-        }
-      }
-    };
+    // backend makes settings into advanced.settings and store in json
+    // without deleting, it will nest settings.advanced_settings.advanced_settings x infinity
+    delete settings.advanced_settings;
+    return { settings };
   }
 }

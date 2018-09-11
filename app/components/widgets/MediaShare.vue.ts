@@ -1,7 +1,8 @@
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   MediaShareService,
-  IMediaShareData
+  IMediaShareData,
+  IMediaShareBan
 } from 'services/widget-settings/media-share';
 
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
@@ -22,6 +23,11 @@ import { $t } from 'services/i18n';
   }
 })
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
+
+  onUnbanMediaHandler(media: IMediaShareBan) {
+    this.service.unbanMedia(media);
+  }
+
   pricePerSecTooltip = $t(
     'In order to control length, you can decide how much it costs per second to share media. Setting this to 0.30' +
     ' would mean that for $10, media would play for 30 seconds. The default value is 0.10.'
