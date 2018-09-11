@@ -257,7 +257,7 @@ async function testEachMask(t, sourceName, filterName, maskName) {
 		
 	if (receivedTestData.poseX < -15 || (receivedTestData.poseX > 5)
 		|| (receivedTestData.poseY < -5) || (receivedTestData.poseY > 5)
-		|| (receivedTestData.poseZ < 40) || (receivedTestData.poseZ > 550)) {
+		|| (receivedTestData.poseZ < 35) || (receivedTestData.poseZ > 550)) {
 		console.log("Wrong face poses X, Y, Z : ", receivedTestData.poseX, receivedTestData.poseY, receivedTestData.poseZ);
 		t.fail();
 		break;
@@ -343,6 +343,7 @@ test('Face Detection - Basic', async t => {
 			t.fail();
 			break;
 		}
+	await sleep(10);
   }
 
   // we should have detected kappa at least once by now
@@ -399,7 +400,7 @@ var testTrackingAreas = [
 	[ 650, 390, false],
 	[ 500, 295, false],
 	[ 560, 345, false],
-	[ 500, 450, false],
+	[ 505, 374, false],
 	[ 380, 380, false]
 ];
 var testTrackingAreaError = 20;
@@ -432,19 +433,20 @@ test('Tracking', async t => {
 			testTrackingAreas[i][2] = true;
 		}
 	}
+	await sleep(10);
   }
 
   // we should have tracked all area
   for (var i = 0; i < arrayLength; i++) {
 	if(!testTrackingAreas[i][2]) {
-		console.log("Missing area of tracking, X Y :",testTrackingAreas[0], testTrackingAreas[1]);
-		t.fail();
-    }
-  }
-  
-  t.pass();
-});
-
+		console.log("Missing area of tracking, X Y :",testTrackingAreas[i][0], testTrackingAreas[i][1]);
+		t.fail();                 
+    }                             
+  }                               
+                                  
+  t.pass();                       
+});                               
+                                
 // ---------------------------------------------------------------------------
 // TEST : Drawing : Mask Basic
 // ---------------------------------------------------------------------------
