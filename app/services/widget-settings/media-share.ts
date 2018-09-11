@@ -50,4 +50,9 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   protected tabs = [
     { name: 'settings' },
   ];
+
+
+  protected patchBeforeSend(settings: IMediaShareSettings): any {
+    return { settings };
+  }
 }
