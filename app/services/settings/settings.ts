@@ -548,10 +548,14 @@ export class SettingsService extends StatefulService<ISettingsState>
   private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
     const param = this.findSetting(settings, category, setting);
     if (param) {
-      return param.value || (param as IListInput<string>).options[0].value;
-    } else {
-      return undefined;
+      if (typeof param.value !== 'undefined') {
+        return param.value;
+      }
+      if (typeof param.options !== 'undefined' && Array.isArray(param.options)) {
+        return (param as IListInput<string>).options[0].value;
+      }
     }
+    return undefined;
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
