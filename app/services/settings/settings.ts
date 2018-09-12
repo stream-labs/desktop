@@ -344,11 +344,7 @@ export class SettingsService extends StatefulService<ISettingsState>
         return false;
       }
 
-      if (!fs.existsSync(path) || !fs.statSync(path).isDirectory()) {
-        return false;
-      }
-
-      return true;
+      return fs.existsSync(path) && fs.statSync(path).isDirectory();
   }
 
   getOutputRecordingPath(): string | undefined {
