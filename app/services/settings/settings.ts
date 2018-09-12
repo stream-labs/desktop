@@ -25,6 +25,7 @@ import {
   OptimizedSettings
 } from './settings-api';
 import { $t } from 'services/i18n';
+import fs from 'fs';
 
 
 export interface ISettingsState {
@@ -327,6 +328,48 @@ export class SettingsService extends StatefulService<ISettingsState>
     return settings;
   }
 
+  getOutputMode(output: ISettingsSubCategory[] = this.getSettingsFormData('Output')): ('Simple' | 'Advanced' | null) {
+    return this.findSettingValue(output, 'Untitled', 'Mode');
+  }
+
+  isValidOutputRecordingPath(): boolean {
+      const path = this.getOutputRecordingPath();
+      console.log('getOutputRecordingPath: ', path);
+
+      if (!path) {
+        return false;
+      }
+
+      if (path.length < 2) {
+        return false;
+      }
+
+      return fs.existsSync(path) && fs.statSync(path).isDirectory();
+  }
+
+  getOutputRecordingPath(): string | undefined {
+    const output = this.getSettingsFormData('Output');
+    const outputMode = this.getOutputMode(output);
+    switch (outputMode) {
+    case 'Simple':
+      return this.findSettingValue(output, 'Recording', 'FilePath');
+
+    case 'Advanced':
+      {
+        const recType = this.findSettingValue(output, 'Recording', 'RecType');
+        console.log(`Output/Recording RecType: ${recType}`);
+        switch (recType) {
+          case 'Standard':
+            return this.findSettingValue(output, 'Recording', 'RecFilePath');
+
+          case 'Custom Output (FFmpeg)':
+            return this.findSettingValue(output, 'Recording', 'FFFilePath');
+        }
+      }
+    }
+    return undefined;
+  }
+
   /**
    * Returns some information about the user's streaming settings.
    * This is used in aggregate to improve our optimized video encoding.
@@ -505,10 +548,14 @@ export class SettingsService extends StatefulService<ISettingsState>
   private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
     const param = this.findSetting(settings, category, setting);
     if (param) {
-      return param.value || (param as IListInput<string>).options[0].value;
-    } else {
-      return undefined;
+      if (typeof param.value !== 'undefined') {
+        return param.value;
+      }
+      if (typeof param.options !== 'undefined' && Array.isArray(param.options)) {
+        return (param as IListInput<string>).options[0].value;
+      }
     }
+    return undefined;
   }
 
   private getAudioSettingsFormData(): ISettingsSubCategory[] {
