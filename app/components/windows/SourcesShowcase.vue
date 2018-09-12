@@ -118,9 +118,9 @@
     </add-source-info>
 
     <add-source-info
-      v-if="inspectedSource === 'blackmagic_source'"
-      @clickAdd="selectSource('blackmagic_source')"
-      sourceType="blackmagic_source"
+      v-if="inspectedSource === 'decklink-input'"
+      @clickAdd="selectSource('decklink-input')"
+      sourceType="decklink-input"
       key="14">
      <BlackmagicSourceIcon slot="media" />
     </add-source-info>
