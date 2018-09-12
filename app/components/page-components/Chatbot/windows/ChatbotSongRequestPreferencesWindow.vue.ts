@@ -42,7 +42,11 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
 
   songRequestPreferences: ISongRequestResponse = null;
 
-  async mounted() {
+  mounted() {
+    this.fetchSongRequest();
+  }
+
+  async fetchSongRequest() {
     await this.chatbotApiService.fetchSongRequest();
     this.songRequestPreferences = cloneDeep(this.songRequestResponse);
   }
@@ -82,8 +86,9 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     this.chatbotCommonService.closeChildWindow();
   }
 
-  onUnbanMediaHandler(media: IMediaShareBan) {
-    this.chatbotApiService.unbanMedia(media);
+  async onUnbanMediaHandler(media: IMediaShareBan) {
+    await this.chatbotApiService.unbanMedia(media);
+    this.fetchSongRequest();
   }
 
   onCancelHandler() {
