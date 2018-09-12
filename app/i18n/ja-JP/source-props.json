@@ -213,8 +213,8 @@
     "name": "テキスト(FreeType 2)"
   },
   "monitor_capture": {
-    "name": "ディスプレイキャプチャ",
-    "description": "PCの画面全体をキャプチャします。",
+    "name": "画面キャプチャ",
+    "description": "ディスプレイの画面全体、もしくは一部の領域をキャプチャします。",
     "capture_cursor": {
       "name": "カーソルをキャプチャ"
     },
