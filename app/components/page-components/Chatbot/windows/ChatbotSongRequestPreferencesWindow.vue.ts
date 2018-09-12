@@ -3,14 +3,18 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
+import { cloneDeep } from 'lodash';
+import {
+  IMediaShareBan
+} from 'services/widget-settings/media-share';
 import {
   EInputType,
 } from 'components/shared/inputs/index';
 
-interface ISongRequestSettings {
-  max_duration: number;
-  security: number;
-}
+import {
+  ISongRequestResponse,
+} from 'services/chatbot';
+
 
 @Component({})
 export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
@@ -25,10 +29,22 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     }
   ];
 
+  securityDescription = $t(
+    'This slider helps you filter shared media before it can be submitted.\n' +
+      '1: No security\n' +
+      '2: 65%+ rating, 5k+ views\n' +
+      '3: 75%+ rating, 40k+ views\n' +
+      '4: 80%+ rating, 300k+ views\n' +
+      '5: 85%+ rating, 900k+ views'
+  );
+
   selectedTab: string = 'general';
 
-  mounted() {
-    this.chatbotApiService.fetchSongRequest();
+  songRequestPreferences: ISongRequestResponse = null;
+
+  async mounted() {
+    await this.chatbotApiService.fetchSongRequest();
+    this.songRequestPreferences = cloneDeep(this.songRequestResponse);
   }
 
   get songRequestResponse() {
@@ -46,7 +62,8 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
         security: metadataHelper.slider({
           min: 0,
           max: 4,
-          interval: 1
+          interval: 1,
+          description: this.securityDescription
         })
       },
       new_banned_media: metadataHelper.text({
@@ -60,7 +77,14 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     this.selectedTab = tab;
   }
 
-  onSaveHandler() { }
+  async onSaveHandler() {
+    await this.chatbotApiService.updateSongRequest(this.songRequestPreferences);
+    this.chatbotCommonService.closeChildWindow();
+  }
+
+  onUnbanMediaHandler(media: IMediaShareBan) {
+    this.chatbotApiService.unbanMedia(media);
+  }
 
   onCancelHandler() {
     this.chatbotCommonService.closeChildWindow();

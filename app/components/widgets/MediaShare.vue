@@ -31,7 +31,7 @@
           v-for="media in wData.banned_media"
           :key="media.id"
         >
-          <td> {{ media.media_title}} </td>
+          <td> {{ media.media_title }} </td>
           <td> {{ media.action_by }} </td>
           <td>
             <button

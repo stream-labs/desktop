@@ -5,7 +5,7 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
-import { MediaShareService, IMediaShareData } from 'services/widget-settings/media-share';
+import { MediaShareService, IMediaShareData, IMediaShareBan } from 'services/widget-settings/media-share';
 import io from 'socket.io-client';
 
 import {
@@ -390,7 +390,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   fetchSongRequest() {
-    this.mediaShareService.fetchData().then(
+    return this.mediaShareService.fetchData().then(
       (response: IMediaShareData) => {
         this.UPDATE_SONG_REQUEST(response as ISongRequestResponse);
       }
@@ -621,6 +621,16 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
 
   pickQueueEntryRandom() {
     return this.api('PUT', 'queue/pick/random', {});
+  }
+
+  unbanMedia(media: IMediaShareBan) {
+    // NOTE: should update type
+    this.mediaShareService.unbanMedia(media);
+  }
+
+  updateSongRequest(data: any) {
+    // NOTE: should update type
+    this.mediaShareService.saveData(data.settings);
   }
 
 
@@ -929,7 +939,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
       componentName: 'ChatbotSongRequestPreferencesWindow',
       size: {
         width: 650,
-        height: 400
+        height: 500
       }
     });
   }
