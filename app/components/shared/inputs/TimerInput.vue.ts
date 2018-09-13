@@ -25,6 +25,10 @@ export default class TimerInput extends BaseInput<number, INumberMetadata> {
     return this.generateTime(60);
   }
 
+  get seconds() {
+    return this.generateTime(60);
+ }
+
   hideTimerDropdown(){
     this.showTimerDropdown = false;
   }
@@ -41,31 +45,35 @@ export default class TimerInput extends BaseInput<number, INumberMetadata> {
   }
 
   isActiveHour(hour: number) {
-    const current_hour = Math.floor(this.value / 3600);
-    return (hour == current_hour);
+    const currentHour = Math.floor(this.value / 3600);
+    return (hour == currentHour);
   }
 
   isActiveMinute(minute: number) {
-    const current_minute = Math.floor((this.value % 3600) / 60);
-    return (minute == current_minute);
+    const currentMinute = Math.floor((this.value % 3600) / 60);
+    return (minute == currentMinute);
+  }
+
+  isActiveSecond(second: number) {
+    const currentSecond = Math.floor(((this.value % 3600) % 60) /60);
+    return second == currentSecond;
   }
 
   setHour(val: number) {
-    const current_value = this.value; // extract the minutes for later
-    const current_minutes_in_seconds = Math.floor(current_value % 3600);
+    const currentMinsInSecs = Math.floor(this.value % 3600);
     const hour = val * 3600;
-    const new_time = current_minutes_in_seconds + hour;
-
-    this.updateValue(new_time);
+    this.updateValue(currentMinsInSecs + hour);
   }
 
   setMinute(val: number) {
-    const current_value = this.value;
-    const current_hours_in_seconds = Math.floor(current_value / 3600) * 3600;
+    const currentHrsInSecs = Math.floor(this.value / 3600) * 3600;
     const minute = val * 60;
-    const new_time = current_hours_in_seconds + minute;
+    this.updateValue(currentHrsInSecs + minute);
+  }
 
-    this.updateValue(new_time);
+  setSecond(val: number) {
+    const currentMinsInSecs = Math.floor(this.value % 3600);
+    this.updateValue(currentMinsInSecs + val);
   }
 
   updateValue(value: number) {
@@ -73,13 +81,18 @@ export default class TimerInput extends BaseInput<number, INumberMetadata> {
   }
 
   getHours(seconds: number) {
-    const hou = Math.floor(seconds / 3600);
-    return `${hou < 10 ? '0' : ''}${hou}`;
+    const hour = Math.floor(seconds / 3600);
+    return `${hour < 10 ? '0' : ''}${hour}`;
   }
 
   getMinutes(seconds: number) {
     const min = Math.floor((seconds % 3600) / 60);
     return `${min < 10 ? '0' : ''}${min}`;
+  }
+
+  getSeconds(seconds: number) {
+    const sec = Math.floor(((seconds % 3600) % 60) / 60);
+    return `${sec < 10 ? '0' : ''}${sec}`;
   }
 
   increment(unitInSeconds: number) {

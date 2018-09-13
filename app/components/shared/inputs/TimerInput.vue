@@ -13,6 +13,12 @@
           <div>
             {{ getMinutes(max >= value && value >= min ? value : min) }}
           </div>
+          <div>
+            :
+          </div>
+          <div>
+            {{ getSeconds(max >= value && value >= min ? value : min) }}
+          </div>
           <div class="timer-icon-top" @mousedown="beginHold(increment, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
           <div class="timer-icon-bottom" @mousedown="beginHold(decrement, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-down"></i></div>
         </div>
@@ -35,20 +41,33 @@
             v-for="minute in minutes"
             :key="minute"
             @click="setMinute(minute)"
-            :class= "{ active: isActiveMinute(minute) }">
+            :class="{ active: isActiveMinute(minute) }">
             {{minute}}
+          </a>
+        </div>
+        <div class="time-slot-box">
+          <p class="text-center bold">Sec</p>
+          <a class="text-center time-slot"
+            v-for="second in seconds"
+            :key="second"
+            @click="setSecond(second)"
+            :class="{ active: isActiveSecond(second) }">
+            {{second}}
           </a>
         </div>
       </div>
 
-      <div class="row">
-        <div class="small-4 columns grey text--end">
+      <div class="timer-footer">
+        <div>
           Hr
         </div>
-        <div class="small-4 columns grey text--start">
+        <div>
           Min
         </div>
-        <div class="small-4 columns">
+        <div>
+          Sec
+        </div>
+        <div>
           &nbsp;
         </div>
       </div>
@@ -72,7 +91,7 @@
     position: relative;
     display: flex;
     justify-content: flex-start;
-    width: 100px;
+    width: 120px;
     padding-left: 8px;
     .radius();
 
@@ -115,7 +134,7 @@
   .timer-dropdown {
     position: absolute;
     overflow-y: hidden;
-    width: 100px;
+    width: 120px;
     margin-top: 2px;
     padding: 0;
     z-index: 1;
@@ -127,6 +146,7 @@
     overflow-y: auto;
     height: 200px;
     padding: 10px;
+    margin: 0 !important;
   }
 
   .time-slot {
@@ -145,6 +165,11 @@
 
   .inline-block {
     display: inline-block;
+  }
+
+  .timer-footer {
+    display: flex;
+    justify-content: space-around;
   }
 
   .night-theme {
