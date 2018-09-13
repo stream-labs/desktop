@@ -5,15 +5,13 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
 
 export type TSocketEvent =
   IStreamlabelsSocketEvent |
   IDonationSocketEvent |
   IFacemaskSocketEvent |
   IFollowSocketEvent |
-  ISubscriptionSocketEvent |
-  IWidgetSoketEvent;
+  ISubscriptionSocketEvent
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';
@@ -52,11 +50,6 @@ interface ISubscriptionSocketEvent {
   message: {
     name: string;
   }[];
-}
-
-interface IWidgetSoketEvent {
-  type: 'streambossSettingsUpdate',
-  message: Dictionary<any>
 }
 
 export class WebsocketService extends Service {

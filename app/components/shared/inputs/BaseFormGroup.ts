@@ -1,10 +1,8 @@
-import { Component, Prop } from 'vue-property-decorator';
-import uuid from 'uuid';
+import { Prop } from 'vue-property-decorator';
 import Vue from 'vue';
 import { ErrorField } from 'vee-validate';
 import { EInputType, IInputMetadata } from './index';
 import { BaseInput } from './BaseInput';
-import FormInput from './FormInput.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 /**
@@ -67,7 +65,7 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
 
   emitInput(eventData: any, event?: any) {
     this.$emit('input', eventData, event);
-    // https://github.com/vuejs/vue/issues/4332#issuecomment-263444492
+    // throw an event to ValidatedForm if exist
     if (this.form) this.form.emitInput(eventData, event);
   }
 }

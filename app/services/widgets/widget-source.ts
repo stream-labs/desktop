@@ -38,7 +38,7 @@ export class WidgetSource implements IWidgetSource {
 
   /**
    * create a previewSource for widget
-   * the previewSource could have a different url for simulating widget's activity
+   * the previewSource may have a different url for simulating widget's activity
    */
   createPreviewSource(): Source {
 

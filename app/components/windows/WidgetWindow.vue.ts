@@ -83,12 +83,12 @@ export default class WidgetWindow extends Vue {
       { name: 'JS', value: 'js'}
     ];
 
-    if (apiSettings.hasTestButtons) {
-      this.commonTabs.push({ name: 'Test', value: 'test' });
-    }
-
     if (apiSettings.customFieldsAllowed) {
       this.commonTabs.push({ name: 'Custom Fields', value: 'customFields' });
+    }
+
+    if (apiSettings.hasTestButtons) {
+      this.commonTabs.push({ name: 'Test', value: 'test' });
     }
 
     this.commonTabs.push( { name: 'Source', value: 'source' });
