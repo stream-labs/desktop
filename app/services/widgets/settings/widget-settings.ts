@@ -17,18 +17,6 @@ import { IInputMetadata } from 'components/shared/inputs/index';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { WebsocketService } from 'services/websocket';
 
-
-export interface IWidgetTab {
-  title: string;
-  name: string;
-  fetchUrl: string;
-  saveUrl: string;
-  resetUrl: string;
-  resetMethod: THttpMethod;
-  autosave: boolean;
-  showControls: boolean;
-}
-
 export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
   loadingState: 'none',
   data: null,
