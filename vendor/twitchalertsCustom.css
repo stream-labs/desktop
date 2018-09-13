@@ -27,3 +27,15 @@ vendor分離前暫定対応
 .checkbox input:checked~label:before {
     background-color: rgba(252,80,53,.2);
 }
+
+/* fontアイコンの追加に伴うunicode指定の上書き
+※vendorからcssスタイル参照していることで設定パネルの調整が複雑なので、twitchalerts.cssの参照を辞める予定 */
+
+/*checkboxのアイコンのunicode指定変更*/
+.checkbox input:checked~label:after {
+    content: '\e905';
+}
+/*select menu の下向き↓のunicode指定変更*/
+.custom-select-trigger:after {
+    content: '\e910';
+}
