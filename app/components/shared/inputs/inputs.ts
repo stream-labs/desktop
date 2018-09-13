@@ -13,3 +13,4 @@ export { default as ImagePickerInput } from './ImagePickerInput.vue';
 export { default as SoundInput } from './SoundInput.vue';
 export { default as ToggleInput } from './ToggleInput.vue';
 export { default as ImageMediaInput } from './ImageMediaInput.vue';
+export { default as TimerInput } from './TimerInput.vue';

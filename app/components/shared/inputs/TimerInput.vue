@@ -1,0 +1,165 @@
+<template id="timer__setter__alt__template">
+  <span class="text-center" v-click-outside="hideTimerDropdown">
+    <div class="timer-wrapper inline-block">
+
+      <div style="padding-right: 2px;" @click="showTimerDropdown = ! showTimerDropdown">
+        <div class="timer cursor-pointer">
+          <div>
+            {{ getHours(max >= value && value >= min ? value : min) }}
+          </div>
+          <div>
+            :
+          </div>
+          <div>
+            {{ getMinutes(max >= value && value >= min ? value : min) }}
+          </div>
+          <div class="timer-icon-top" @mousedown="beginHold(increment, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
+          <div class="timer-icon-bottom" @mousedown="beginHold(decrement, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-down"></i></div>
+        </div>
+      </div>
+
+      <div v-if="showTimerDropdown" class="timer timer-dropdown">
+        <div class="time-slot-box">
+          <p class="text-center bold">Hr</p>
+          <a class="text-center time-slot"
+            v-for="hour in hours"
+            :key="hour"
+            :class="{ active: isActiveHour(hour) }"
+            @click="setHour(hour)">
+            {{hour}}
+          </a>
+        </div>
+        <div class="time-slot-box">
+          <p class="text-center bold">Min</p>
+          <a class="text-center time-slot"
+            v-for="minute in minutes"
+            :key="minute"
+            @click="setMinute(minute)"
+            :class= "{ active: isActiveMinute(minute) }">
+            {{minute}}
+          </a>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="small-4 columns grey text--end">
+          Hr
+        </div>
+        <div class="small-4 columns grey text--start">
+          Min
+        </div>
+        <div class="small-4 columns">
+          &nbsp;
+        </div>
+      </div>
+
+    </div>
+  </span>
+</template>
+
+<script lang="ts" src="./TimerInput.vue.ts"></script>
+
+<style lang="less" scoped>
+  @import "../../../styles/index";
+
+  .timer {
+    box-shadow: none;
+    font-size: 14px;
+    background: @day-button;
+    font-family: 'Roboto';
+    padding: 5px 0px;
+    border: 1px solid transparent;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    width: 100px;
+    padding-left: 8px;
+    .radius();
+
+    &:active,
+    &:focus {
+      box-shadow: none;
+      border-color: transparent;
+      background-color: @day-button;
+      outline: none;
+    }
+
+    i {
+      font-size:12px;
+      cursor: pointer;
+    }
+
+    div {
+      margin-right: 8px;
+    }
+  }
+
+  .timer-icon-top,
+  .timer-icon-bottom {
+    position: absolute;
+    right: -6px;
+  }
+
+  .timer-icon-top {
+    top: -3px;
+  }
+
+  .timer-icon-bottom {
+    bottom: -3px;
+  }
+
+  .fa-xs {
+    font-size: .75em !important;
+  }
+
+  .timer-dropdown {
+    position: absolute;
+    overflow-y: hidden;
+    width: 100px;
+    margin-top: 2px;
+    padding: 0;
+    z-index: 1;
+    left: 0;
+    .radius();
+  }
+
+  .time-slot-box {
+    overflow-y: auto;
+    height: 200px;
+    padding: 10px;
+  }
+
+  .time-slot {
+    padding: 5px 0;
+    display: block;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .active {
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px;
+  }
+
+  .inline-block {
+    display: inline-block;
+  }
+
+  .night-theme {
+    .timer {
+      border-color: transparent;
+      box-shadow: none;
+      background: @night-button;
+      color: @white;
+
+      &:active,
+      &:focus {
+        box-shadow: none;
+        border-color: transparent;
+        background: @night-button;
+      }
+    }
+  }
+</style>
