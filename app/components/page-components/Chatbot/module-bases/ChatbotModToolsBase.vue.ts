@@ -307,10 +307,6 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return metadata;
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
   onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
       this.chatbotApiService.resetSettings(slug)

@@ -12,12 +12,12 @@ import {
 } from 'components/shared/inputs/index';
 
 import {
-  ISongRequestResponse,
+  ISongRequestPreferencesResponse,
 } from 'services/chatbot';
 
 
 @Component({})
-export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
+export default class ChatbotSongRequestPreferencesPreferencesWindow extends ChatbotWindowsBase {
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -40,19 +40,15 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
 
   selectedTab: string = 'general';
 
-  songRequestPreferences: ISongRequestResponse = null;
+  songRequestPreferencesData: ISongRequestPreferencesResponse = null;
 
   mounted() {
-    this.fetchSongRequest();
+    this.fetchSongRequestPreferencesData();
   }
 
-  async fetchSongRequest() {
-    await this.chatbotApiService.fetchSongRequest();
-    this.songRequestPreferences = cloneDeep(this.songRequestResponse);
-  }
-
-  get songRequestResponse() {
-    return this.chatbotApiService.state.songRequestResponse;
+  async fetchSongRequestPreferencesData() {
+    await this.chatbotApiService.fetchSongRequestPreferencesData();
+    this.songRequestPreferencesData = cloneDeep(this.chatbotApiService.state.songRequestPreferencesResponse);
   }
 
   get metadata() {
@@ -82,16 +78,12 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
   }
 
   async onSaveHandler() {
-    await this.chatbotApiService.updateSongRequest(this.songRequestPreferences);
+    await this.chatbotApiService.updateSongRequestPreferencesData(this.songRequestPreferencesData);
     this.chatbotCommonService.closeChildWindow();
   }
 
   async onUnbanMediaHandler(media: IMediaShareBan) {
     await this.chatbotApiService.unbanMedia(media);
-    this.fetchSongRequest();
-  }
-
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
+    this.fetchSongRequestPreferencesData();
   }
 }

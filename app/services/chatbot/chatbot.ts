@@ -40,6 +40,7 @@ import {
   IQueuePickedResponse,
   IChatbotSocketAuthResponse,
   ChatbotSocketRoom,
+  ISongRequestPreferencesResponse,
   ISongRequestResponse
 } from './chatbot-interfaces';
 
@@ -128,9 +129,12 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       },
       data: []
     },
-    songRequestResponse: {
+    songRequestPreferencesResponse: {
       banned_media: [],
       settings: null
+    },
+    songRequestResponse: {
+      enabled: false
     }
   };
 
@@ -389,10 +393,20 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
-  fetchSongRequest() {
+  fetchSongRequestPreferencesData() {
     return this.mediaShareService.fetchData().then(
       (response: IMediaShareData) => {
-        this.UPDATE_SONG_REQUEST(response as ISongRequestResponse);
+        this.UPDATE_SONG_REQUEST_PREFERENCES(response as ISongRequestPreferencesResponse);
+      }
+    );
+  }
+
+  fetchSongRequest() {
+    // mostly used for enable/disable only
+    return this.api('GET', 'settings/songrequest', {}).then(
+      (response: ISongRequestResponse) => {
+        debugger;
+        this.UPDATE_SONG_REQUEST(response);
       }
     );
   }
@@ -624,13 +638,21 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   unbanMedia(media: IMediaShareBan) {
-    // NOTE: should update type
     this.mediaShareService.unbanMedia(media);
   }
 
-  updateSongRequest(data: any) {
+  updateSongRequestPreferencesData(data: any) {
     // NOTE: should update type
     this.mediaShareService.saveData(data.settings);
+  }
+
+  updateSongRequest(data: ISongRequestResponse) {
+    return this.api('POST', 'settings/songrequest', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchSongRequest();
+        }
+      })
   }
 
 
@@ -782,10 +804,14 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   }
 
   @mutation()
+  private UPDATE_SONG_REQUEST_PREFERENCES(response: ISongRequestPreferencesResponse) {
+    Vue.set(this.state, 'songRequestPreferencesResponse', response);
+  }
+
+  @mutation()
   private UPDATE_SONG_REQUEST(response: ISongRequestResponse) {
     Vue.set(this.state, 'songRequestResponse', response);
   }
-
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -934,12 +960,22 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openSongRequestPreferencesWindow() {
+  openSongRequestWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
       size: {
         width: 650,
         height: 500
+      }
+    });
+  }
+
+  openSongRequestOnboardingWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSongRequestOnboardingWindow',
+      size: {
+        width: 650,
+        height: 650
       }
     });
   }

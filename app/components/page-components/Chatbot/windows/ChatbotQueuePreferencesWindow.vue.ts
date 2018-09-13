@@ -45,10 +45,6 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
     this.generalSettings = cloneDeep(this.queuePreferences.settings.general);
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
   onSaveHandler() {
     const newPreferences = cloneDeep(this.queuePreferences);
     newPreferences.settings.general = this.generalSettings;

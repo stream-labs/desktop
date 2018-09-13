@@ -143,10 +143,6 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     this.selectedTab = tab;
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
   async onResetCommandHandler() {
     const { slugName, commandName } = this.defaultCommandToUpdate;
     const resettedCommand = await this.chatbotApiService.resetDefaultCommand(

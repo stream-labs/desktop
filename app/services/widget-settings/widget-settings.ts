@@ -112,7 +112,6 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
     });
     data = this.handleDataAfterFetch(data);
     this.dataUpdated.next(data);
-    debugger;
     return data;
   }
 

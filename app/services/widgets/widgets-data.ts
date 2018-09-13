@@ -317,7 +317,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   [WidgetType.MediaShare]: {
     name: 'Media Share',
     url(host, token) {
-      return `https://${host}/media/v3/${token}`;
+      return `https://${host}/widgets/media/v1/${token}`;
     },
 
     width: 800,

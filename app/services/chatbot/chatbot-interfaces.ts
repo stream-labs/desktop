@@ -23,6 +23,7 @@ export interface IChatbotApiServiceState {
   queueStateResponse: IQueueStateResponse;
   queueEntriesResponse: IQueueEntriesResponse;
   queuePickedResponse: IQueuePickedResponse;
+  songRequestPreferencesResponse: ISongRequestPreferencesResponse;
   songRequestResponse: ISongRequestResponse;
 }
 
@@ -141,8 +142,13 @@ export interface IQueuePickedResponse {
   data: IQueuedUser[];
 }
 
-export interface ISongRequestResponse {
+export interface ISongRequestPreferencesResponse {
   banned_media: IMediaShareBan[];
+  settings: ISongRequestPreferencesData;
+}
+
+export interface ISongRequestResponse {
+  enabled: boolean;
   settings: ISongRequestData;
 }
 
@@ -406,9 +412,13 @@ export interface IQueuedUser {
 }
 
 // song requests
-export interface ISongRequestData {
+export interface ISongRequestPreferencesData {
   max_duration: number;
   security: number;
+}
+
+export interface ISongRequestData {
+  commands: IDafaultCommandsSlug;
 }
 
 
