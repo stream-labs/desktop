@@ -1,3 +1,5 @@
+import { IMediaShareBan } from 'services/widget-settings/media-share';
+
 // state
 export interface IChatbotApiServiceState {
   // v1
@@ -21,6 +23,8 @@ export interface IChatbotApiServiceState {
   queueStateResponse: IQueueStateResponse;
   queueEntriesResponse: IQueueEntriesResponse;
   queuePickedResponse: IQueuePickedResponse;
+  songRequestPreferencesResponse: ISongRequestPreferencesResponse;
+  songRequestResponse: ISongRequestResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -135,6 +139,16 @@ export interface IQueueEntriesResponse {
 export interface IQueuePickedResponse {
   pagination: IChatbotPagination;
   data: IQueuedUser[];
+}
+
+export interface ISongRequestPreferencesResponse {
+  banned_media: IMediaShareBan[];
+  settings: ISongRequestPreferencesData;
+}
+
+export interface ISongRequestResponse {
+  enabled: boolean;
+  settings: ISongRequestData;
 }
 
 // shared
@@ -391,6 +405,16 @@ export interface IQueuedUser {
   created_at?: string;
 }
 
+// song requests
+export interface ISongRequestPreferencesData {
+  max_duration: number;
+  security: number;
+}
+
+export interface ISongRequestData {
+  commands: IDafaultCommandsSlug;
+}
+
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
@@ -417,7 +441,7 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes =
+export type ChatbotAlertType =
   | 'tip'
   | 'follow'
   | 'host'
@@ -426,11 +450,11 @@ export type ChatbotAlertTypes =
   | 'bits'
   | 'sub_mystery_gift';
 
-export type ChatbotSocketRooms = 'queue' | 'giveaway';
+export type ChatbotSocketRoom = 'queue' | 'giveaway';
 
 export const ChatbotClients = ['Twitch', 'Mixer', 'Youtube'];
 
-export type ChatbotSettingSlugs =
+export type ChatbotSettingSlug =
   | 'chat-notifications'
   | 'caps-protection'
   | 'symbol-protection'

@@ -4253,9 +4253,9 @@ fn-name@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
 
-"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz":
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz":
   version "0.4.0"
-  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.0/iojs-v2.0.5-font-manager.tar.gz#33174403d765aab3151a88360d5e3fa4caa78c40"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz#bef49d76b44e6309c12ba45b1be46c859cb36c70"
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -6506,9 +6506,9 @@ node-dir@0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
 
-"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz":
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz":
   version "0.0.2"
-  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.3/iojs-v2.0.5-node-fontinfo.tar.gz#5a8b2cfadf001c440f1024de5954dc535878504a"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz#14d72d13faab5db8b61b3ff52b6ccaef14256245"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -6538,9 +6538,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.1/iojs-v2.0.5-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.1/iojs-v2.0.5-node-libuiohook.tar.gz#fb54cdeb62208699b812d844003d621dc192fa96"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz#451c29370e8aa2fd197a1b3c6a11086612283ebf"
 
 node-pre-gyp@^0.10.0:
   version "0.10.0"
@@ -6745,9 +6745,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.10/iojs-v2.0.4-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.13/iojs-v2.0.4-signed.tar.gz":
   version "0.3.4"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.10/iojs-v2.0.4-signed.tar.gz#3a48541c0ce77897c721d2d42253668ad9f17d5b"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.13/iojs-v2.0.4-signed.tar.gz#65490256b14d9107b94ed7408c8d65946961bb10"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"

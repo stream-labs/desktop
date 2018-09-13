@@ -15,7 +15,6 @@ import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
 import { IWidgetTab } from 'services/widget-settings/widget-settings';
-import uuid from 'uuid';
 
 @Component({
   components: {
@@ -32,10 +31,10 @@ export default class WidgetWindow extends Vue {
   @Inject() private widgetsService: WidgetsService;
   @Inject() private projectorService: ProjectorService;
 
-  @Prop()
-  value: string; // selected tab
+  @Prop() value: string; // selected tab
+  @Prop() requestState: 'fail' | 'success' | 'pending';
+  @Prop() loaded: boolean;
 
-  canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
@@ -51,6 +50,10 @@ export default class WidgetWindow extends Vue {
     return this.widgetsService.getWidgetSettingsService(this.widgetType);
   }
 
+  get loadingFailed() {
+    return this.requestState === 'fail' && !this.loaded;
+  }
+
   mounted() {
     this.properties = this.source ? this.source.getPropertiesFormData() : [];
 
@@ -63,6 +66,7 @@ export default class WidgetWindow extends Vue {
       url: this.widgetUrl
     };
     this.previewSource = this.sourcesService.createSource(source.name, source.type, previewSettings);
+    console.log('PREVIEW SOURCE');
     this.sourceUpdatedSubscr = this.sourcesService.sourceUpdated.subscribe(
       sourceModel => this.onSourceUpdatedHandler(sourceModel)
     );
@@ -73,7 +77,6 @@ export default class WidgetWindow extends Vue {
     this.tabs = settingsService.getTabs();
     this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
       .concat({ name: 'Source', value: 'source' });
-    this.canRender = true;
   }
 
   get webview() {

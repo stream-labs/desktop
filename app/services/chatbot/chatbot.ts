@@ -5,6 +5,11 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
+import {
+  MediaShareService,
+  IMediaShareData,
+  IMediaShareBan
+} from 'services/widget-settings/media-share';
 import io from 'socket.io-client';
 
 import {
@@ -30,7 +35,7 @@ import {
   ILinkProtectionResponse,
   IWordProtectionResponse,
   IQuotesResponse,
-  ChatbotSettingSlugs,
+  ChatbotSettingSlug,
   IQuote,
   IQuotePreferencesResponse,
   IQueuePreferencesResponse,
@@ -38,7 +43,9 @@ import {
   IQueueEntriesResponse,
   IQueuePickedResponse,
   IChatbotSocketAuthResponse,
-  ChatbotSocketRooms
+  ChatbotSocketRoom,
+  ISongRequestPreferencesResponse,
+  ISongRequestResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<
@@ -46,6 +53,7 @@ export class ChatbotApiService extends PersistentStatefulService<
 > {
   @Inject() userService: UserService;
   @Inject() chatbotCommonService: ChatbotCommonService;
+  @Inject() mediaShareService: MediaShareService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
   socketUrl = 'https://chatbot-io.streamlabs.com';
@@ -126,6 +134,14 @@ export class ChatbotApiService extends PersistentStatefulService<
         total: 1
       },
       data: []
+    },
+    songRequestPreferencesResponse: {
+      banned_media: [],
+      settings: null
+    },
+    songRequestResponse: {
+      enabled: false,
+      settings: null
     }
   };
 
@@ -201,7 +217,7 @@ export class ChatbotApiService extends PersistentStatefulService<
   //
   // sockets
   //
-  logInToSocket(rooms: ChatbotSocketRooms[]) {
+  logInToSocket(rooms: ChatbotSocketRoom[]) {
     // requires log in
     return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {}).then(
       (response: IChatbotSocketAuthResponse) => {
@@ -402,10 +418,30 @@ export class ChatbotApiService extends PersistentStatefulService<
     );
   }
 
+  fetchSongRequestPreferencesData() {
+    return this.mediaShareService
+      .fetchData()
+      .then((response: IMediaShareData) => {
+        this.UPDATE_SONG_REQUEST_PREFERENCES(
+          response as ISongRequestPreferencesResponse
+        );
+      });
+  }
+
+  fetchSongRequest() {
+    // mostly used for enable/disable only
+    return this.api('GET', 'settings/songrequest', {}).then(
+      (response: ISongRequestResponse) => {
+        debugger;
+        this.UPDATE_SONG_REQUEST(response);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
-  resetSettings(slug: ChatbotSettingSlugs) {
+  resetSettings(slug: ChatbotSettingSlug) {
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
@@ -645,6 +681,25 @@ export class ChatbotApiService extends PersistentStatefulService<
     return this.api('PUT', 'queue/pick/random', {});
   }
 
+  unbanMedia(media: IMediaShareBan) {
+    this.mediaShareService.unbanMedia(media);
+  }
+
+  updateSongRequestPreferencesData(data: any) {
+    // NOTE: should update type
+    this.mediaShareService.saveData(data.settings);
+  }
+
+  updateSongRequest(data: ISongRequestResponse) {
+    return this.api('POST', 'settings/songrequest', data).then(
+      (response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchSongRequest();
+        }
+      }
+    );
+  }
+
   //
   // DELETE methods
   //
@@ -788,6 +843,18 @@ export class ChatbotApiService extends PersistentStatefulService<
   @mutation()
   private UPDATE_QUEUE_PICKED(response: IQueuePickedResponse) {
     Vue.set(this.state, 'queuePickedResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SONG_REQUEST_PREFERENCES(
+    response: ISongRequestPreferencesResponse
+  ) {
+    Vue.set(this.state, 'songRequestPreferencesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SONG_REQUEST(response: ISongRequestResponse) {
+    Vue.set(this.state, 'songRequestResponse', response);
   }
 }
 
@@ -939,12 +1006,22 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
-  openSongRequestPreferencesWindow() {
+  openSongRequestWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
       size: {
         width: 650,
-        height: 400
+        height: 500
+      }
+    });
+  }
+
+  openSongRequestOnboardingWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSongRequestOnboardingWindow',
+      size: {
+        width: 650,
+        height: 650
       }
     });
   }

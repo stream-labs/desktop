@@ -26,7 +26,8 @@ const widgetIconMap = {
   [WidgetType.SponsorBanner]: 'fas fa-heart',
   [WidgetType.DonationGoal]: 'fas fa-calendar',
   [WidgetType.BitGoal]: 'fas fa-calendar',
-  [WidgetType.FollowerGoal]: 'fas fa-calendar'
+  [WidgetType.FollowerGoal]: 'fas fa-calendar',
+  [WidgetType.MediaShare]: 'icon-share'
 };
 
 const sourceIconMap = {
@@ -44,7 +45,7 @@ const sourceIconMap = {
   scene: 'far fa-object-group',
   color_source: 'fas fa-fill',
   openvr_capture: 'fab fa-simplybuilt fa-rotate-180',
-  liv_capture: 'fab fa-simplybuilt fa-rotate-180'
+  liv_capture: 'fab fa-simplybuilt fa-rotate-180',
 };
 
 @Component({

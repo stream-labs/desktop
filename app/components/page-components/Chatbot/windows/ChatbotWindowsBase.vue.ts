@@ -14,6 +14,13 @@ Vue.use(VModal);
   }
 })
 export default class ChatbotWindowsBase extends ChatbotBase {
+
+  onCancelHandler(): void {
+    this.chatbotCommonService.closeChildWindow();
+  }
+
+  onSaveHandler(): void {}
+
   // switching between 2 child windows, link protection and default command(to edit link protection command)
   onToggleLinkProtectionWindowHandler() {
     const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()

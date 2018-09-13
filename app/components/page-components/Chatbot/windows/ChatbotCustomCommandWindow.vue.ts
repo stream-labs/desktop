@@ -114,10 +114,6 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     this.selectedTab = tab;
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
   onSaveHandler() {
     if (this.isEdit) {
       this.chatbotApiService

@@ -3,7 +3,7 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Link Protection Preferences')"
+  :title="$t('Song Request Preferences')"
 >
   <div slot="fixed">
     <div class="row">
@@ -22,22 +22,52 @@
     </div>
   </div>
   <div slot="content" class="chatbot-song-request__container">
-    <div>
+    <div v-if="songRequestPreferencesData">
       <transition name='fade' mode="out-in" appear>
-        <div v-if="selectedTab === 'general'">
+        <div v-if="selectedTab === 'general' && !!songRequestPreferencesData.settings">
           <VFormGroup
             :title="$t('Max Duration (Value in Seconds)')"
-            v-model="settings.advanced_settings.max_duration"
-            :metadata="metadata.advanced_settings.max_duration"
+            v-model="songRequestPreferencesData.settings.max_duration"
+            :metadata="metadata.settings.max_duration"
           />
           <VFormGroup
             :title="$t('Spam Security')"
-            v-model="settings.advanced_settings.security"
-            :metadata="metadata.advanced_settings.security"
+            v-model="songRequestPreferencesData.settings.security"
+            :metadata="metadata.settings.security"
           />
         </div>
         <div v-else>
-          Blacklist stuff
+          <table v-if="songRequestPreferencesData.banned_media && songRequestPreferencesData.banned_media.length > 0">
+            <thead>
+              <tr>
+                <th> {{ $t('Video') }} </th>
+                <th> {{ $t('Banned By') }} </th>
+                <th> {{ $t('Unban') }} </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="media in songRequestPreferencesData.banned_media"
+                :key="media.id"
+              >
+                <td> {{ media.media_title }} </td>
+                <td> {{ media.action_by }} </td>
+                <td>
+                  <button
+                    @click="onUnbanMediaHandler(media)"
+                    class="button button--default"
+                  >{{ $t('Unban') }}</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-else class="chatbot-empty-placeholder__container">
+            <img
+              :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-blacklist--${this.nightMode ? 'night' : 'day'}.svg`)"
+              width="200"
+            />
+            {{ $t('No items in list. Add new.') }}
+          </div>
         </div>
       </transition>
     </div>
@@ -65,7 +95,12 @@
 
 <style <style lang="less" scoped>
 @import "../../../../styles/index";
-
+.chatbot-empty-placeholder__container {
+  .flex();
+  .flex--column();
+  .flex--center();
+  .padding-vertical--20;
+}
 .window-toggle__wrapper {
   background-color: @day-primary;
   z-index: 1;
