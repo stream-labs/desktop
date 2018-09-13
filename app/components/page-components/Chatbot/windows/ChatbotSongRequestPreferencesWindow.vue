@@ -12,8 +12,7 @@
       </div>
       <div class="small-6 columns position--relative">
         <div class="window-toggle__wrapper">
-          <!-- <div @click="onToggleLinkProtectionWindowHandler"> -->
-          <div>
+          <div @click="onToggleSongRequestWindowHandler">
             <span> {{ $t('Edit Primary Command') }} </span>
             <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>

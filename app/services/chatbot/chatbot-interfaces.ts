@@ -68,9 +68,7 @@ export interface IChatbotAPIDeleteResponse {
 
 
 export interface IDafaultCommandsResponse {
-  commands: IDafaultCommandsSlug;
-  'link-protection': IDafaultCommandsSlug;
-  giveaway: IDafaultCommandsSlug;
+  [id: string]: IDafaultCommandsSlug;
 }
 
 export interface ICustomCommandsResponse {

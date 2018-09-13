@@ -46,7 +46,7 @@ export default class ChatbotModules extends ChatbotBase {
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.songRequestCurrentlyEnabled,
         onExpand: () => {
-          this.chatbotCommonService.openSongRequestWindow();
+          this.chatbotCommonService.openSongRequestPreferencesWindow();
         },
         onToggleEnabled: () => {
           this.chatbotApiService.updateSongRequest({

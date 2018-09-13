@@ -134,7 +134,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       settings: null
     },
     songRequestResponse: {
-      enabled: false
+      enabled: false,
+      settings: null
     }
   };
 
@@ -960,7 +961,7 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openSongRequestWindow() {
+  openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
       size: {
