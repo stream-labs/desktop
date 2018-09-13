@@ -34,6 +34,10 @@ export interface INumberMetadata extends IInputMetadata {
   placeholder?: string;
 }
 
+export interface ITimerMetadata extends INumberMetadata {
+  format?: 'hms' | 'hm' | 'ms';
+}
+
 export interface IListMetadata<TValueType> extends IInputMetadata {
   options: IListOption<TValueType>[];
   allowEmpty?: boolean;

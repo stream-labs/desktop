@@ -3,20 +3,20 @@
     <div class="timer-wrapper inline-block">
 
       <div style="padding-right: 2px;" @click="showTimerDropdown = ! showTimerDropdown">
-        <div class="timer cursor-pointer">
-          <div>
+        <div class="timer cursor-pointer" :class="{ wide: hasHours && hasSeconds }">
+          <div v-if="hasHours">
             {{ getHours(max >= value && value >= min ? value : min) }}
           </div>
-          <div>
+          <div v-if="hasHours">
             :
           </div>
           <div>
             {{ getMinutes(max >= value && value >= min ? value : min) }}
           </div>
-          <div>
+          <div v-if="hasSeconds">
             :
           </div>
-          <div>
+          <div v-if="hasSeconds">
             {{ getSeconds(max >= value && value >= min ? value : min) }}
           </div>
           <div class="timer-icon-top" @mousedown="beginHold(increment, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
@@ -24,8 +24,8 @@
         </div>
       </div>
 
-      <div v-if="showTimerDropdown" class="timer timer-dropdown">
-        <div class="time-slot-box">
+      <div v-if="showTimerDropdown" class="timer timer-dropdown" :class="{ wide: hasHours && hasSeconds }">
+        <div v-if="hasHours" class="time-slot-box">
           <p class="text-center bold">Hr</p>
           <a class="text-center time-slot"
             v-for="hour in hours"
@@ -45,7 +45,7 @@
             {{minute}}
           </a>
         </div>
-        <div class="time-slot-box">
+        <div v-if="hasSeconds" class="time-slot-box">
           <p class="text-center bold">Sec</p>
           <a class="text-center time-slot"
             v-for="second in seconds"
@@ -58,13 +58,13 @@
       </div>
 
       <div class="timer-footer">
-        <div>
+        <div v-if="hasHours">
           Hr
         </div>
         <div>
           Min
         </div>
-        <div>
+        <div v-if="hasSeconds">
           Sec
         </div>
         <div>
@@ -91,7 +91,7 @@
     position: relative;
     display: flex;
     justify-content: flex-start;
-    width: 120px;
+    width: 90px;
     padding-left: 8px;
     .radius();
 
@@ -134,12 +134,17 @@
   .timer-dropdown {
     position: absolute;
     overflow-y: hidden;
-    width: 120px;
+    width: 90px;
     margin-top: 2px;
     padding: 0;
     z-index: 1;
     left: 0;
     .radius();
+  }
+
+  .timer.wide,
+  .timer-dropdown.wide {
+    width: 120px;
   }
 
   .time-slot-box {

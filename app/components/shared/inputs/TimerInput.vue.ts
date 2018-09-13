@@ -1,21 +1,24 @@
 import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
-import { INumberMetadata } from './index';
+import { ITimerMetadata } from './index';
 
 let holdTimeout: number = null;
 let holdInterval: number = null;
 
 @Component({})
-export default class TimerInput extends BaseInput<number, INumberMetadata> {
+export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   @Prop() value: number;
-  @Prop() metadata: INumberMetadata;
+  @Prop() metadata: ITimerMetadata;
 
   hour = 3600;
   minute = 60;
   showTimerDropdown = false;
   max = this.metadata.max;
   min = this.metadata.min;
+  format = this.metadata.format || 'ms';
+  hasHours = /h/.test(this.format);
+  hasSeconds = /s/.test(this.format);
 
   get hours() {
     return this.generateTime(this.max / 3600);
