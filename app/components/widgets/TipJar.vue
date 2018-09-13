@@ -25,9 +25,6 @@
       <number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </form-group>
     <form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
-    <form-group title="timer">
-      <timer-input :metadata="{ min: 0, max: 3600 }" />
-    </form-group>
     <form-group v-for="key in mediaGalleryInputs" :key="key" :title="titleFromKey(key)">
       <media-gallery-input
         :metadata="{ clearImage: wData.defaultImage[`${platform}_account`] }"

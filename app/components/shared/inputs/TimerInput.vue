@@ -1,5 +1,5 @@
-<template id="timer__setter__alt__template">
-  <span class="text-center" v-click-outside="hideTimerDropdown">
+<template>
+  <span class="text-center">
     <div class="timer-wrapper inline-block">
 
       <div style="padding-right: 2px;" @click="showTimerDropdown = ! showTimerDropdown">
