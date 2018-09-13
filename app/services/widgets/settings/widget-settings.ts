@@ -37,9 +37,9 @@ export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
 
-interface ISocketEvent<TMessage> {
+interface ISocketEvent{
   type: string;
-  message: TMessage;
+  message: Dictionary<any>;
 }
 
 /**
@@ -63,11 +63,11 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     this.websocketService.socketEvent.subscribe(event  => {
       const apiSettings = this.getApiSettings();
       if (event.type !== apiSettings.settingsUpdateEvent) return;
-      this.onSettingsUpdatedHandler(event as ISocketEvent<IWidgetSettings>)
+      this.onSettingsUpdatedHandler(event as ISocketEvent)
     });
   }
 
-  private onSettingsUpdatedHandler(event: ISocketEvent<IWidgetSettings>) {
+  private onSettingsUpdatedHandler(event: ISocketEvent) {
     if (!this.state.data) return;
     const rawData = cloneDeep(this.state.rawData);
     rawData.settings = event.message;
