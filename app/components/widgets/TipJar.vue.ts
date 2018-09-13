@@ -14,6 +14,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 const nameMap = () => ({
   tips: $t('Tips & Donations'),
@@ -43,6 +44,7 @@ const mediaGalleryInputs = {
     TestButtons,
     HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

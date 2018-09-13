@@ -132,7 +132,7 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
-    Widget: WidgetSource,
+    WidgetSource,
     WidgetTester,
     WindowsService,
     FontLibraryService,

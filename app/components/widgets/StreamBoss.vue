@@ -1,9 +1,7 @@
 <template>
   <widget-window
-    :requestState="requestState"
-    :loaded="loaded"
-    :extraTabs="[ { name: $t('Manage Battle'), title: 'goal'} ]"
-    v-model="tabName"
+    :extraTabs="[ { name: $t('Manage Battle'), value: 'goal'} ]"
+    v-model="tab"
   >
     <!-- streamboss setup -->
     <div slot="goal" v-if="loaded">
@@ -42,7 +40,7 @@
       <button
           class="button button--warn"
           v-show="hasGoal"
-          @click="reset()"
+          @click="resetGoal()"
       >{{ $t('Reset Stream Boss') }}</button>
 
     </div>
@@ -75,18 +73,6 @@
 
     </div>
 
-
-    <!--<div slot="HTML" >-->
-      <!--<code-editor v-model="wData" :metadata="{ type: 'html' }"/>-->
-    <!--</div>-->
-
-    <!--<div slot="CSS" >-->
-      <!--<code-editor v-model="wData" :metadata="{ type: 'css' }"/>-->
-    <!--</div>-->
-
-    <!--<div slot="JS" >-->
-      <!--<code-editor v-model="wData" :metadata="{ type: 'js' }"/>-->
-    <!--</div>-->
 
     <div slot="test" >
       <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>

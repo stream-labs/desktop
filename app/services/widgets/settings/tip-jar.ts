@@ -1,8 +1,7 @@
-import { CODE_EDITOR_TABS, IWidgetData, WidgetSettingsService, IWidgetSettings } from './widget-settings';
-import { ISliderMetadata, IListMetadata } from 'components/shared/inputs/index';
-import { WidgetType } from 'services/widgets/index';
-import { createInterface } from 'readline';
-
+import { IWidgetData, WidgetSettingsService, IWidgetSettings } from 'services/widgets';
+import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 interface ITipDarTierData {
   clear_image: string;
@@ -35,29 +34,22 @@ export interface ITipJarData extends IWidgetData {
   settings: ITipJarSettings;
 }
 
+@InheritMutations()
 export class TipJarService extends WidgetSettingsService<ITipJarData> {
 
-  getWidgetType() {
-    return WidgetType.TipJar;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
+  getApiSettings() {
+    return {
+      type: WidgetType.TipJar,
+      url: `https://${this.getHost()}/widgets/tip-jar/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
+      settingsUpdateEvent: 'tipJarSettingsUpdate',
+      hasTestButtons: true
+    }
   }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/tip-jar/v1/${this.getWidgetToken()}?simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/tipjar`;
-  }
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS,
-    { name: 'test' }
-  ];
 
   protected patchAfterFetch(data: any): ITipJarData {
     data.settings.custom_enabled = data.settings.custom_html_enabled;

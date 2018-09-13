@@ -1,15 +1,19 @@
-import { HostsService } from '../../hosts';
+import { cloneDeep } from 'lodash';
+import { HostsService } from 'services/hosts';
 import { Inject } from '../../../util/injector';
 import { UserService } from 'services/user';
 import {
   handleErrors,
   authorizedHeaders
 } from '../../../util/requests';
-import { WidgetsService, WidgetType } from 'services/widgets/index';
-import { Service } from 'services/service';
+import {
+  IWidgetApiSettings, IWidgetData, IWidgetSettings,
+  IWidgetSettingsGenericState,
+  IWidgetSettingsState, TWIdgetLoadingState,
+  WidgetsService
+} from 'services/widgets';
 import { Subject } from 'rxjs/Subject';
 import { IInputMetadata } from 'components/shared/inputs/index';
-import { Source, SourcesService } from 'services/sources/index';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { WebsocketService } from 'services/websocket';
 
@@ -25,47 +29,13 @@ export interface IWidgetTab {
   showControls: boolean;
 }
 
-export interface IWidgetSettings {
-  custom_enabled: boolean;
-  custom_html: string;
-  custom_css: string;
-  custom_js: string;
-}
-
-export interface IWidgetApiSettings {
-  settingsUpdatedEvent: string;
-  settingsSaveUrl: string;
-}
-
-export interface IWidgetData {
-
-  type: WidgetType;
-
-  settings: IWidgetSettings;
-
-  custom_defaults?: {
-    html: string;
-    css: string;
-    js: string;
-  };
-}
-
-export interface IWidgetSettingsState<TWidgetData> {
-  data: TWidgetData;
-}
+export const WIDGET_INITIAL_STATE: IWidgetSettingsGenericState = {
+  loadingState: 'none',
+  data: null,
+  rawData: null
+};
 
 export type THttpMethod = 'GET' | 'POST' | 'DELETE';
-
-export const CODE_EDITOR_TABS: (Partial<IWidgetTab> & { name: string })[] = [
-  { name: 'HTML', showControls: false, autosave: false },
-  { name: 'CSS', showControls: false, autosave: false },
-  { name: 'JS', showControls: false, autosave: false }
-];
-
-export const CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS: (Partial<IWidgetTab> & { name: string })[] = [
-  ...CODE_EDITOR_TABS,
-  { name: 'customFields', title: 'Custom Fields', showControls: false, autosave: false }
-];
 
 interface ISocketEvent<TMessage> {
   type: string;
@@ -82,90 +52,68 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   @Inject() private hostsService: HostsService;
   @Inject() private userService: UserService;
   @Inject() private widgetsService: WidgetsService;
-  @Inject() private sourcesService: SourcesService;
   @Inject() protected websocketService: WebsocketService;
 
   dataUpdated = new Subject<TWidgetData>();
 
-  getApiSettings(): IWidgetApiSettings {
-    return {
-      settingsUpdatedEvent: '',
-      settingsSaveUrl: ''
-    }
-  }
+  abstract getApiSettings(): IWidgetApiSettings;
 
 
-  abstract getPreviewUrl(): string;
-  abstract getDataUrl(): string;
-  abstract getWidgetType(): WidgetType;
-
-  protected tabs: ({ name: string } & Partial<IWidgetTab>)[] = [{ name: 'settings' }];
-
-  async init() {
-
+  init() {
     this.websocketService.socketEvent.subscribe(event  => {
+      const apiSettings = this.getApiSettings();
+      if (event.type !== apiSettings.settingsUpdateEvent) return;
       this.onSettingsUpdatedHandler(event as ISocketEvent<IWidgetSettings>)
     });
   }
 
   private onSettingsUpdatedHandler(event: ISocketEvent<IWidgetSettings>) {
-    const apiSettings = this.getApiSettings();
-    if (event.type !== apiSettings.settingsUpdatedEvent) return;
     if (!this.state.data) return;
-    const newSettings = this.patchAfterFetch(event.message as any as TWidgetData);
-    const data = Object.assign({}, this.state.data);
-    const newData = Object.assign({}, data, { settings: newSettings });
-    this.setWidgetData(newData as TWidgetData);
-  }
-
-  getWidgetUrl(): string {
-    return this.widgetsService.getWidgetUrl(this.getWidgetType());
-  }
-
-  getTabs(): IWidgetTab[] {
-    return this.tabs.map(tab => {
-      const resetMethod: THttpMethod = 'DELETE';
-
-      const fetchUrl = this.getDataUrl() || tab.fetchUrl;
-      const saveUrl = tab.saveUrl || fetchUrl;
-      const resetUrl = tab.resetUrl || saveUrl;
-
-      return {
-        autosave: true,
-        title: tab.name.charAt(0).toUpperCase() + tab.name.substr(1),
-        fetchUrl,
-        saveUrl,
-        resetUrl,
-        resetMethod,
-        showControls: true,
-        ...tab
-      };
-    });
-  }
-
-  getTab(name: string) {
-    return this.getTabs().find(tab => tab.name === name);
+    const rawData = cloneDeep(this.state.rawData);
+    rawData.settings = event.message;
+    const data = this.patchAfterFetch(rawData);
+    this.SET_WIDGET_DATA(data, rawData);
+    this.dataUpdated.next(this.state.data);
   }
 
   async fetchData(): Promise<TWidgetData> {
-    if (!this.state.data) {
-      let data = await this.request({
-        url: this.getDataUrl(),
-        method: 'GET'
-      });
-      data = this.handleDataAfterFetch(data);
-      this.SET_WIDGET_DATA(data);
-    }
+    if (!this.state.data) await this.loadData();
     return this.state.data;
   }
 
-  protected handleDataAfterFetch(data: any): TWidgetData {
+  protected async loadData() {
+    // load widget settings data into state
+    const isFirstLoading = !this.state.data;
+    if (isFirstLoading) this.SET_LOADING_STATE('pending');
+    const apiSettings = this.getApiSettings();
+    let rawData: any;
+    try {
+      rawData = await this.request({
+        url: apiSettings.dataFetchUrl,
+        method: 'GET'
+      });
+    } catch (e) {
+      if (isFirstLoading) this.SET_LOADING_STATE('fail');
+      throw e;
+    }
+    this.SET_LOADING_STATE('success');
+    const data: TWidgetData = this.handleDataAfterFetch(rawData);
+    this.SET_WIDGET_DATA(data, rawData);
+    this.dataUpdated.next(this.state.data);
+  }
+
+  protected async refreshData() {
+    await this.loadData();
+    this.dataUpdated.next(this.state.data);
+  }
+
+  protected handleDataAfterFetch(rawData: any): TWidgetData {
+    const data = cloneDeep(rawData);
 
     // patch fetched data to have the same data format
     if (data.custom) data.custom_defaults = data.custom;
 
-    data.type = this.getWidgetType();
-
+    data.type = this.getApiSettings().type;
 
     // widget-specific patching
     return this.patchAfterFetch(data);
@@ -174,31 +122,19 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   /**
    * override this method to patch data after fetching
    */
-  protected patchAfterFetch(data: TWidgetData): any {
+  protected patchAfterFetch(data: any): any {
     return data;
   }
 
   /**
    * override this method to patch data before save
    */
-  protected patchBeforeSend(data: any): any {
-    return data;
+  protected patchBeforeSend(settings: IWidgetSettings): any {
+    return settings;
   }
 
   getMetadata(): Dictionary<IInputMetadata>  {
     return {};
-  }
-
-  async saveData(data: TWidgetData, tabName? :string, method: THttpMethod = 'POST'): Promise<TWidgetData> {
-    const tab = this.getTab(tabName);
-    const url = tab && tab.saveUrl ? tab.saveUrl : this.getDataUrl();
-    const bodyData = this.patchBeforeSend(data);
-    await this.request({
-      url,
-      method,
-      body: bodyData
-    });
-    return this.fetchData();
   }
 
   async saveSettings(settings: IWidgetSettings) {
@@ -240,13 +176,14 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     return this.userService.apiToken;
   }
 
-  protected setWidgetData(data: TWidgetData) {
-    this.SET_WIDGET_DATA(data);
-    this.dataUpdated.next(this.state.data);
+  @mutation()
+  protected SET_LOADING_STATE(loadingState: TWIdgetLoadingState) {
+    this.state.loadingState = loadingState;
   }
 
   @mutation()
-  protected SET_WIDGET_DATA(data: TWidgetData) {
+  protected SET_WIDGET_DATA(data: TWidgetData, rawData: any) {
     this.state.data = data;
+    this.state.rawData = rawData;
   }
 }

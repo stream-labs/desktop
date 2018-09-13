@@ -1,5 +1,7 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets/index';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
+import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 
 interface IViewerCountSettings extends IWidgetSettings {
@@ -17,22 +19,20 @@ export interface IViewerCountData extends IWidgetData {
   settings: IViewerCountSettings;
 }
 
+@InheritMutations()
 export class ViewerCountService extends WidgetSettingsService<IViewerCountData> {
 
-  getWidgetType() {
-    return WidgetType.ViewerCount;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/viewer-count?token=${this.getWidgetToken()}&simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/viewercount`;
+  getApiSettings() {
+    return {
+      type: WidgetType.ViewerCount,
+      url: `https://${this.getHost()}/widgets/viewer-count?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/viewer-count?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/viewercount`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/viewercount`,
+      settingsUpdateEvent: 'viewerCountSettingsUpdate'
+    }
   }
 
   patchAfterFetch(data: any): IViewerCountData {
@@ -59,11 +59,5 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
       }
     };
   }
-
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS
-  ];
 
 }

@@ -1,12 +1,11 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets/index';
-import { IGoalData } from './generic-goal';
-import { $t } from 'services/i18n/index';
+import {
+  WIDGET_INITIAL_STATE
+} from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
+import { $t } from 'services/i18n';
 import { metadata } from 'components/widgets/inputs/index';
 import { InheritMutations } from 'services/stateful-service';
-import { Inject } from "../../../util/injector";
-import { WebsocketService } from "../../websocket";
-import { BaseGoalService } from "./base-goal";
+import { BaseGoalService } from './base-goal';
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;
@@ -53,47 +52,21 @@ export interface IStreamBossCreateOptions {
 @InheritMutations()
 export abstract class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
 
-  static initialState: { data: IStreamBossData } = {
-    data: null
-  };
-
-  getWidgetType() {
-    return WidgetType.StreamBoss;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
-      settingsUpdatedEvent: 'streambossSettingsUpdate',
+      type: WidgetType.StreamBoss,
+      url: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/streamboss?token=${this.getWidgetToken()}`,
+      settingsUpdateEvent: 'streambossSettingsUpdate',
+      goalCreateEvent: 'newStreamboss',
+      goalResetEvent: 'streambossEnd',
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
       goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
+      hasTestButtons: true
     }
-  }
-
-  protected tabs = [
-    {
-      name: 'goal',
-      title: 'Manage Battle',
-      saveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
-      autosave: false
-    },
-    {
-      name: 'settings',
-    },
-
-    ...CODE_EDITOR_TABS,
-
-    {
-      name: 'test',
-    }
-
-  ];
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/streamboss?token=${this.getWidgetToken()}`;
   }
 
   getMetadata() {

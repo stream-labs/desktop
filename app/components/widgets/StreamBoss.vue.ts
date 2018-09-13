@@ -22,6 +22,8 @@ import TestButtons from './TestButtons.vue';
 })
 export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBossService> {
 
+  tab = 'goal';
+
   $refs: {
     form: ValidatedForm;
   };
@@ -39,7 +41,10 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
 
   async saveGoal() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
-    // await this.save(this.bossCreateOptions);
+    await this.service.saveGoal(this.bossCreateOptions);
   }
 
+  async resetGoal() {
+    await this.service.resetGoal();
+  }
 }

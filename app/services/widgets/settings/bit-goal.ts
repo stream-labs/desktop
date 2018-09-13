@@ -1,44 +1,27 @@
 import { GenericGoalService } from './generic-goal';
-import { WidgetType } from 'services/widgets/index';
-import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS } from './widget-settings';
+import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
-
+@InheritMutations()
 export class BitGoalService extends GenericGoalService {
 
-  getWidgetType() {
-    return WidgetType.BitGoal;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
-      settingsUpdatedEvent: 'bitgoalSettingsUpdate',
+      type: WidgetType.BitGoal,
+      url: `https://${this.getHost()}/widgets/bit-goal?token=${this.getWidgetToken()}`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal/settings`,
+      previewUrl: `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal/settings`,
-      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal`
+      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/bitgoal`,
+      settingsUpdateEvent: 'bitGoalSettingsUpdate',
+      goalCreateEvent: 'bitGoalStart',
+      goalResetEvent: 'bitGoalEnd',
+      hasTestButtons: true,
+      customFieldsAllowed: true
     }
-  }
-
-  protected tabs = [
-    {
-      name: 'goal',
-      saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/bitgoal`,
-      autosave: false
-    },
-    {
-      name: 'settings',
-    },
-    ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
-  ];
-
-  getVersion() {
-    return 5;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/bitgoal/settings`;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`;
   }
 
 }

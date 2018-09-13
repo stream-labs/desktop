@@ -12,6 +12,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -20,6 +21,7 @@ import TestButtons from './TestButtons.vue';
     CodeEditor,
     TestButtons,
     AnimationInput,
+    ValidatedForm,
     ...inputComponents
   }
 })

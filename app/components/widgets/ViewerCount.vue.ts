@@ -7,12 +7,14 @@ import { inputComponents } from 'components/widgets/inputs';
 import { IViewerCountData, ViewerCountService } from 'services/widgets/settings/viewer-count';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetWindow,
     HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

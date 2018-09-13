@@ -5,6 +5,7 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import io from 'socket.io-client';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
 
 export type TSocketEvent =
   IStreamlabelsSocketEvent |

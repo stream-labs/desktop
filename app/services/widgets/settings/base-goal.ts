@@ -1,4 +1,6 @@
-import { IWidgetApiSettings, IWidgetData, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets';
+import { IWidgetApiSettings } from 'services/widgets';
+import { InheritMutations } from 'services/stateful-service';
 
 
 interface IBaseGoalData extends IWidgetData {
@@ -8,11 +10,25 @@ interface IBaseGoalData extends IWidgetData {
 interface IGoalWidgetApiSettings extends IWidgetApiSettings {
   goalUrl: string;
   goalResetUrl?: string; // if not set use `goalUrl`
+  goalCreateEvent: string;
+  goalResetEvent: string;
 }
 
+@InheritMutations()
 export abstract class BaseGoalService<TGoalData extends IBaseGoalData, TGoalCreateOptions>
   extends WidgetSettingsService<TGoalData>
 {
+
+  init() {
+    super.init();
+
+    this.websocketService.socketEvent.subscribe(event  => {
+      const apiSettings = this.getApiSettings();
+      if (event.type === apiSettings.goalCreateEvent || event.type === apiSettings.goalResetEvent) {
+        this.refreshData();
+      }
+    });
+  }
 
   abstract getApiSettings(): IGoalWidgetApiSettings;
 

@@ -10,12 +10,14 @@ import { inputComponents } from 'components/shared/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
+import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetWindow,
     HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

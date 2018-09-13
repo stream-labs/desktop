@@ -1,45 +1,27 @@
 import { GenericGoalService } from './generic-goal';
-import { WidgetType } from 'services/widgets/index';
-import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS } from 'services/widgets/settings/widget-settings';
+import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
-
+@InheritMutations()
 export class FollowerGoalService extends GenericGoalService {
 
-  getWidgetType() {
-    return WidgetType.FollowerGoal;
-  }
-
-  protected tabs = [
-    {
-      name: 'goal',
-      saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal`,
-      autosave: false
-    },
-    {
-      name: 'settings',
-    },
-
-    ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
-  ];
+  static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
     return {
-      settingsUpdatedEvent: 'followergoalSettingsUpdate',
-      settingsSaveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal/settings`,
-      goalUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal`
+      type: WidgetType.FollowerGoal,
+      url: `https://${ this.getHost() }/widgets/follower-goal?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/followergoal/settings`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/followergoal/settings`,
+      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/followergoal`,
+      settingsUpdateEvent: 'followerGoalSettingsUpdate',
+      goalCreateEvent: 'followerGoalStart',
+      goalResetEvent: 'followerGoalEnd',
+      hasTestButtons: true,
+      customFieldsAllowed: true
     }
-  }
-
-  getVersion() {
-    return 5;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/followergoal/settings`;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/bit-goal?token=${this.getWidgetToken()}`;
   }
 
 }

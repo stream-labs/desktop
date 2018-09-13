@@ -1,5 +1,7 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets/index';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
+import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 export interface ICreditsSettings extends IWidgetSettings {
   theme: string;
@@ -29,27 +31,20 @@ export interface ICreditsData extends IWidgetData {
   settings: ICreditsSettings;
 }
 
+@InheritMutations()
 export class CreditsService extends WidgetSettingsService<ICreditsData> {
 
-  getWidgetType() {
-    return WidgetType.Credits;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
+  getApiSettings() {
+    return {
+      type: WidgetType.Credits,
+      url: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
+      settingsUpdateEvent: 'endCreditsSettingsUpdate'
+    }
   }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/endcredits`;
-  }
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS
-  ];
 
 }

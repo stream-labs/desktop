@@ -26,6 +26,8 @@ import CustomFieldsEditor from '../CustomFieldsEditor.vue';
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
 
+  tab = 'goal';
+
   $refs: {
     form: ValidatedForm;
   };
@@ -45,7 +47,11 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
 
   async saveGoal() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
-    // await this.save(this.goalCreateOptions);
+    await this.service.saveGoal(this.goalCreateOptions);
+  }
+
+  resetGoal() {
+    this.service.resetGoal();
   }
 
 }

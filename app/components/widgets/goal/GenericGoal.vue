@@ -1,5 +1,5 @@
 <template>
-<widget-window :requestState="requestState" :loaded="loaded" v-model="tabName">
+<widget-window v-model="tab" :extraTabs="[ { name: $t('Goal'), value: 'goal'} ]">
   <!-- goal setup -->
   <div slot="goal" v-if="loaded">
     <div v-if="hasGoal">
@@ -42,43 +42,28 @@
     <button
         class="button button--soft-warning"
         v-show="hasGoal"
-        @click="reset()"
+        @click="resetGoal()"
     >
       {{ $t("End Goal") }}
     </button>
   </div>
 
   <div slot="settings" v-if="loaded">
-    <h-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
-    <h-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
-    <h-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
-    <h-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <h-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
-    <h-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
-    <h-form-group
+    <validated-form @input="save()">
+      <h-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
+      <h-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
+      <h-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
+      <h-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
+      <h-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+      <h-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
+      <h-form-group
         type="slider"
         title="Bar Thickness"
         v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
-    />
-    <h-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
-  </div>
-
-
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-  <div slot="customFields" >
-    <custom-fields-editor :value="wData"/>
+      />
+      <h-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
+    </validated-form>
   </div>
 
 
