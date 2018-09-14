@@ -1,9 +1,11 @@
 import { ArrayNode } from '../array-node';
 import { ScenesService, Scene } from '../../../scenes';
 import { IFolderSchema, SlotsNode, TSlotSchema } from './slots';
+import uuid from 'uuid';
 
 interface ISchema {
   name: string;
+  sceneId: string;
   slots: SlotsNode;
 }
 
@@ -26,14 +28,24 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
 
     return {
       name: scene.name,
+      sceneId: scene.getSource().sourceId,
       slots
     };
   }
 
   async loadItem(obj: ISchema, context: IContext): Promise<void> {
-    const scene = this.scenesService.createScene(obj.name, {
-      makeActive: true
-    });
+
+    // scene can be already created if it is a scene-source of previous loaded scene
+    let scene = this.scenesService.getScene(obj.sceneId);
+
+    // if it's not created than create it now
+    if (!scene) {
+      scene = this.scenesService.createScene(obj.name, {
+        makeActive: true,
+        sceneId: obj.sceneId
+      });
+    }
+
     await obj.slots.load({ scene, assetsPath: context.assetsPath });
 
     // append children to folders
@@ -46,5 +58,15 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
       const childrenIds = (foldersSchemas[ind] as IFolderSchema).childrenIds;
       scene.getSelection(childrenIds).moveTo(scene.id, folder.id);
     });
+
+    console.log('FinishLoadScene', obj.name);
+  }
+
+  migrate(version: number) {
+    console.log('migrate from', version);
+    if (version == 1) {
+      // version 1 doesn't have sceneId, so generate a random id
+      this.data.items = this.data.items.map(item => ({...item, sceneId: uuid()}))
+    }
   }
 }

@@ -74,7 +74,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     const id = options.sceneId || `scene_${uuid()}`;
     this.ADD_SCENE(id, name);
     const obsScene = obs.SceneFactory.create(id);
-    this.sourcesService.addSource(obsScene.source, name);
+    this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
       const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
@@ -88,7 +88,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
     this.sceneAdded.next(this.state.scenes[id]);
     if (options.makeActive) this.makeSceneActive(id);
-    return this.getSceneByName(name);
+    return this.getScene(id);
   }
 
 
