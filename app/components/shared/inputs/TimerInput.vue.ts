@@ -13,9 +13,10 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   hour = 3600;
   minute = 60;
+  second = 1;
   showTimerDropdown = false;
-  max = this.metadata.max;
-  min = this.metadata.min;
+  max = this.metadata.max || 3600;
+  min = this.metadata.min || 0;
   format = this.metadata.format || 'ms';
   hasHours = /h/.test(this.format);
   hasSeconds = /s/.test(this.format);
@@ -75,8 +76,8 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   }
 
   setSecond(val: number) {
-    const currentMinsInSecs = Math.floor(this.value % 3600);
-    this.updateValue(currentMinsInSecs + val);
+    const currentMinsInSecs = Math.floor((this.value % 3600) / 60) * 60;
+    this.updateValue(currentMinsInSecs + (val * 1));
   }
 
   updateValue(value: number) {
@@ -94,7 +95,7 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   }
 
   getSeconds(seconds: number) {
-    const sec = Math.floor(((seconds % 3600) % 60) / 60);
+    const sec = Math.floor((seconds % 3600) % 60);
     return `${sec < 10 ? '0' : ''}${sec}`;
   }
 

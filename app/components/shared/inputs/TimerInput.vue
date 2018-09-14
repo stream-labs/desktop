@@ -2,8 +2,8 @@
   <span class="text-center">
     <div class="timer-wrapper inline-block">
 
-      <div style="padding-right: 2px;" @click="showTimerDropdown = ! showTimerDropdown">
-        <div class="timer cursor-pointer" :class="{ wide: hasHours && hasSeconds }">
+      <div style="padding-right: 2px;">
+        <div class="timer cursor-pointer" :class="{ wide: hasHours && hasSeconds }" @click="showTimerDropdown = !showTimerDropdown">
           <div v-if="hasHours">
             {{ getHours(max >= value && value >= min ? value : min) }}
           </div>
@@ -19,9 +19,17 @@
           <div v-if="hasSeconds">
             {{ getSeconds(max >= value && value >= min ? value : min) }}
           </div>
-          <div class="timer-icon-top" @mousedown="beginHold(increment, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
-          <div class="timer-icon-bottom" @mousedown="beginHold(decrement, minute)" @mouseup="releaseHold()" @mouseout="releaseHold()"><i class="fas fa-chevron-down"></i></div>
         </div>
+        <div
+          class="timer-icon-top"
+          @mousedown="beginHold(increment, hasSeconds ? second : minute)"
+          @mouseup="releaseHold()"
+          @mouseout="releaseHold()"><i class="fas fa-chevron-up"></i></div>
+        <div
+          class="timer-icon-bottom"
+          @mousedown="beginHold(decrement, hasSeconds ? second : minute)"
+          @mouseup="releaseHold()"
+          @mouseout="releaseHold()"><i class="fas fa-chevron-down"></i></div>
       </div>
 
       <div v-if="showTimerDropdown" class="timer timer-dropdown" :class="{ wide: hasHours && hasSeconds }">
@@ -81,6 +89,11 @@
 <style lang="less" scoped>
   @import "../../../styles/index";
 
+  .timer-wrapper {
+    width: auto;
+    position: relative;
+  }
+
   .timer {
     box-shadow: none;
     font-size: 14px;
@@ -116,15 +129,19 @@
   .timer-icon-top,
   .timer-icon-bottom {
     position: absolute;
-    right: -6px;
+    right: 6px;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .timer-icon-top {
-    top: -3px;
+    top: -2px;
   }
 
   .timer-icon-bottom {
-    bottom: -3px;
+    bottom: 17px;
   }
 
   .fa-xs {
@@ -137,7 +154,7 @@
     width: 90px;
     margin-top: 2px;
     padding: 0;
-    z-index: 1;
+    z-index: 10;
     left: 0;
     .radius();
   }
