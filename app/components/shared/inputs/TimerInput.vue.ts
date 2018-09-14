@@ -112,8 +112,8 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   beginHold(callback: Function, param: any) {
     callback(param);
-    holdTimeout = setTimeout(() => {
-      holdInterval = setInterval(function() {
+    holdTimeout = window.setTimeout(() => {
+      holdInterval = window.setInterval(function() {
         callback(param);
       }, 100);
     }, 500);
