@@ -165,8 +165,6 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   async loadItem(obj: TSlotSchema, context: IContext): Promise<void> {
     let sceneItem: SceneItem;
 
-    console.log('LoadItem', obj.name);
-
     const id = obj.id;
 
     if (obj.sceneNodeType === 'folder') {

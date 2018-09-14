@@ -77,7 +77,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
     this.sourcesService.addSource(obsScene.source, name, { sourceId: id });
 
     if (options.duplicateSourcesFromScene) {
-      const oldScene = this.getSceneByName(options.duplicateSourcesFromScene);
+      const oldScene = this.getScene(options.duplicateSourcesFromScene);
       const newScene = this.getScene(id);
 
       oldScene.getItems().slice().reverse().forEach(item => {
@@ -159,20 +159,6 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
 
 
   // Utility functions / getters
-
-  getSceneByName(name: string): Scene {
-    let foundScene: IScene;
-
-    Object.keys(this.state.scenes).forEach(id => {
-      const scene = this.state.scenes[id];
-
-      if (scene.name === name) {
-        foundScene = scene;
-      }
-    });
-
-    return foundScene ? this.getScene(foundScene.id) : null;
-  }
 
 
   getModel(): IScenesState  {

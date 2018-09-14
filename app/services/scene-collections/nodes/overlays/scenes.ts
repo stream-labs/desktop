@@ -58,15 +58,15 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
       const childrenIds = (foldersSchemas[ind] as IFolderSchema).childrenIds;
       scene.getSelection(childrenIds).moveTo(scene.id, folder.id);
     });
-
-    console.log('FinishLoadScene', obj.name);
   }
 
   migrate(version: number) {
-    console.log('migrate from', version);
     if (version == 1) {
       // version 1 doesn't have sceneId, so generate a random id
-      this.data.items = this.data.items.map(item => ({...item, sceneId: uuid()}))
+      this.data.items = this.data.items.map(item => {
+        if (item.sceneId) return item;
+        return ({ ...item, sceneId: uuid()});
+      })
     }
   }
 }
