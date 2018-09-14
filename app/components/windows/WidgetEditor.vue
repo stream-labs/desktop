@@ -143,6 +143,10 @@
     position: relative;
   }
 
+  .window-container {
+    border: 1px solid #c9cbcb;
+  }
+
   .top-settings {
     height: 50px;
     width: 100%;
@@ -202,6 +206,8 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    border: 1px solid #c9cbcb;
+    background-color: @day-section;
     .transition();
   }
 
@@ -222,11 +228,17 @@
     }
   }
 
+  .subsection:not(:first-of-type) .subsection__title {
+    border-top: 1px solid #c9cbcb;
+  }
+
   .subsection__title {
     display: block;
     width: 100%;
     padding: 8px;
     text-transform: uppercase;
+    background-color: #dee1e2;
+    border-bottom: 1px solid #c9cbcb;
   }
 
   .subsection__content {
@@ -242,16 +254,21 @@
   .settings-title {
     margin: 0;
     list-style: none;
+    border-bottom: 1px solid @day-secondary;
     .transition();
 
-    &:hover {
+    &:hover,
+    &.active {
       cursor: pointer;
+      background-color: @teal-light-opac;
     }
   }
 
   .code-editor {
     height: 60%;
     width: 100%;
+    border-top: 1px solid #c9cbcb;
+    background-color: @day-section;
     .transition();
   }
 
@@ -292,6 +309,7 @@
     margin: 8px;
     height: 24px;
     top: 0;
+    background-color: @day-section;
   }
 
   .custom-code__divider.hidden {
@@ -315,31 +333,31 @@
 
   .night-theme {
     .window-container {
-      border: 1px solid @night-slider-bg;
+      border-color: @night-slider-bg;
     }
     .custom-code__divider {
       background-color: @night-section;
     }
     .sidebar {
       background-color: @night-section;
-      border-left: 1px solid #274959;
+      border-color: #274959;
     }
     .subsection:not(:first-of-type) .subsection__title {
-      border-top: 1px solid #274959;
+      border-color: #274959;
     }
     .subsection__title {
       background-color: @night-accent-dark;
-      border-bottom: 1px solid #274959;
+      border-color: #274959;
     }
     .settings-title {
-      border-bottom: 1px solid @night-accent-dark;
+      border-color: @night-accent-dark;
       &:hover,
       &.active {
         background-color: #10222c;
       }
     }
     .code-editor {
-      border-top: 1px solid #274959;
+      border-color: #274959;
       background-color: @night-section-bg;
     }
   }
