@@ -1,10 +1,18 @@
+import { ILoadedApp } from '../..';
+
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',
   ObsSettings = 'slobs.obs-settings',
-  Streaming = 'slobs.streaming'
+  Streaming = 'slobs.streaming',
+  Authorization = 'slobs.authorization'
 }
 
-type TApiHandler = (...args: any[]) => Promise<any>;
+// TODO: What else should be included here?
+export interface IApiContext {
+  app: ILoadedApp;
+}
+
+type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;
 export type TApiModule = Dictionary<TApiHandler>;
 
 export function apiMethod() {

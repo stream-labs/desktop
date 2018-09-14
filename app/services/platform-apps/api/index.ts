@@ -1,8 +1,10 @@
-import { Module, EApiPermissions, TApiModule } from './modules/module';
+import { Module, EApiPermissions, TApiModule, IApiContext } from './modules/module';
 import { SourcesModule } from './modules/sources';
 import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
 import { StreamingRecordingModule } from './modules/streaming-recording';
+import { AuthorizationModule } from './modules/authorization';
+import { ILoadedApp } from '..';
 
 export class PlatformAppsApi {
 
@@ -14,6 +16,7 @@ export class PlatformAppsApi {
     this.registerModule(new ScenesModule());
     this.registerModule(new ObsSettingsModule());
     this.registerModule(new StreamingRecordingModule());
+    this.registerModule(new AuthorizationModule());
   }
 
   private registerModule(module: Module) {
@@ -26,8 +29,10 @@ export class PlatformAppsApi {
    * replaced with a method that returns a rejected promise
    * explaining the lack of permissions.
    */
-  getApi(permissions: EApiPermissions[]) {
+  getApi(app: ILoadedApp, permissions: EApiPermissions[]) {
     const api: Dictionary<TApiModule> = {};
+
+    const context: IApiContext = { app };
 
     Object.keys(this.modules).forEach(moduleName => {
       api[moduleName] = {};
@@ -43,7 +48,7 @@ export class PlatformAppsApi {
       ((this.modules[moduleName].constructor as typeof Module).apiMethods || []).forEach(methodName => {
         api[moduleName][methodName] = async (...args: any[]) => {
           if (authorized) {
-            return await this.modules[moduleName][methodName](...args);
+            return await this.modules[moduleName][methodName](context, ...args);
           } else {
             throw new Error('This app does not have permission to access this API. ' +
               `Required permissions: ${this.modules[moduleName].permissions}`);

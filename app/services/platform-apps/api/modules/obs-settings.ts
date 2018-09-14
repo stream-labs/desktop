@@ -1,5 +1,5 @@
-import { Module, EApiPermissions, apiMethod, NotImplementedError } from './module';
-import { SettingsService, ISettingsState, ISettingsSubCategory } from 'services/settings';
+import { Module, EApiPermissions, apiMethod, IApiContext } from './module';
+import { SettingsService, ISettingsState } from 'services/settings';
 import { Inject } from 'util/injector';
 
 
@@ -16,7 +16,7 @@ export class ObsSettingsModule extends Module {
   }
 
   @apiMethod()
-  setSettings(settingsPatch: Partial<ISettingsState>) {
+  setSettings(ctx: IApiContext, settingsPatch: Partial<ISettingsState>) {
     // Tech Debt: This is a product of our awful settings API.
     // We can clean all this up when we get off node-obs.
     // For now, I would rather do the data munging here than

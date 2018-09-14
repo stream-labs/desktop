@@ -1,4 +1,4 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError } from './module';
+import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
@@ -65,7 +65,7 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  updateSource(patch: Partial<ISource>) {
+  updateSource(ctx: IApiContext, patch: Partial<ISource>) {
     const requiredKeys = ['id'];
     this.validatePatch(requiredKeys, patch);
 
@@ -80,12 +80,12 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  getObsSettings(sourceId: string) {
+  getObsSettings(ctx: IApiContext, sourceId: string) {
     return this.sourcesService.getSource(sourceId).getSettings();
   }
 
   @apiMethod()
-  setObsSettings(sourceId: string, settingsPatch: Dictionary<any>) {
+  setObsSettings(ctx: IApiContext, sourceId: string, settingsPatch: Dictionary<any>) {
     return this.sourcesService.getSource(sourceId).updateSettings(settingsPatch);
   }
 

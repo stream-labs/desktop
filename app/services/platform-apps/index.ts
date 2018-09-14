@@ -70,9 +70,10 @@ interface IAppManifest {
   permissions: EApiPermissions[];
   sources: IAppSource[];
   pages: IAppPage[];
+  authorizationUrls: string[];
 }
 
-interface ILoadedApp {
+export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
@@ -342,7 +343,7 @@ export class PlatformAppsService extends
 
   exposeAppApi(appId: string, webContentsId: number) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app.manifest.permissions);
+    const api = this.apiManager.getApi(app, app.manifest.permissions);
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.

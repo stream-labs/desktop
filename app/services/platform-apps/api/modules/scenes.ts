@@ -1,4 +1,4 @@
-import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError } from './module';
+import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
 import { ScenesService, Scene } from 'services/scenes';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
@@ -84,7 +84,7 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
-  updateScene(patch: Partial<IScene>) {
+  updateScene(ctx: IApiContext, patch: Partial<IScene>) {
     this.validatePatch(['id'], patch);
 
     if (patch.name) this.scenesService.getScene(patch.id).setName(patch.name);
@@ -96,7 +96,7 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
-  makeSceneActive(id: string) {
+  makeSceneActive(ctx: IApiContext, id: string) {
     this.scenesService.makeSceneActive(id);
   }
 
@@ -106,7 +106,7 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
-  updateSceneItem(patch: Partial<ISceneItem>) {
+  updateSceneItem(ctx: IApiContext, patch: Partial<ISceneItem>) {
     this.validatePatch(['id'], patch);
     const sceneItem = this.scenesService.getSceneItem(patch.id);
 
