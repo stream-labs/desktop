@@ -203,7 +203,7 @@ test('Copy/paste scenes between scene collections', async t => {
       Item2: image_source
   `));
 
-  scenesService.getSceneByName('Scene2').makeActive();
+  scenesService.getScenes().find(scene => scene.name == 'Scene2').makeActive();
 
   t.true(sceneBuilder.isEqualTo(`
     Folder2
