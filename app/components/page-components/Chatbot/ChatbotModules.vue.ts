@@ -42,7 +42,7 @@ export default class ChatbotModules extends ChatbotBase {
       },
       {
         title: $t('Song Request'),
-        description: $t('Request songs!!'),
+        description: $t('Allow your viewers to to request songs from Youtube and play the songs on stream.'),
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
         enabled: this.songRequestCurrentlyEnabled,
         onExpand: () => {

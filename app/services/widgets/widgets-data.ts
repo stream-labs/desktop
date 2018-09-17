@@ -26,7 +26,8 @@ export enum WidgetType {
   Credits = 11,
   SpinWheel = 12,
   SponsorBanner = 13,
-  MediaShare = 14
+  MediaShare = 14,
+  Chatbot = 15
 }
 
 
@@ -327,6 +328,20 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 0,
 
     anchor: AnchorPoint.North
+  },
+  [WidgetType.Chatbot]: {
+    name: 'Chatbot',
+    url(host, token) {
+      return `https://${host}/widgets/chatbot/v1/${token}`;
+    },
+
+    width: 800,
+    height: 600,
+
+    x: 0.5,
+    y: 0,
+
+    anchor: AnchorPoint.North
   }
 };
 
@@ -475,5 +490,12 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: false,
     demoFilename: 'source-sponsor-banner.png',
     supportList: []
-  }
+  },
+  [WidgetType.Chatbot]: {
+    name: $t('Chatbot'),
+    description: $t('Set up chatbot widget to enable chatbot song requests and other features.'),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: []
+  },
 });
