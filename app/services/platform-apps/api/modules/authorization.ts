@@ -4,7 +4,7 @@ import url from 'url';
 import uuid from 'uuid/v4';
 
 enum EAuthWindowEventType {
-  Navigation = 'navigation',
+  AuthRedirect = 'auth_redirect',
   Show = 'show',
   Close = 'close'
 }
@@ -60,11 +60,9 @@ export class AuthorizationModule extends Module {
       }
     });
 
-    win.webContents.on('did-navigate', (e, url) => {
-      eventHandler({
-        type: EAuthWindowEventType.Navigation,
-        url
-      });
+    win.webContents.session.protocol.registerFileProtocol('slobs-oauth', (req) => {
+      eventHandler({ type: EAuthWindowEventType.AuthRedirect, url: req.url });
+      win.close();
     });
 
     win.on('closed', () => {
