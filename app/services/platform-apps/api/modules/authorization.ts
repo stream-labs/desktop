@@ -36,6 +36,10 @@ export class AuthorizationModule extends Module {
     options: IAuthWIndowOptions,
     eventHandler: TEventHandler
   ) {
+    if (this.windowHandles[ctx.app.id]) {
+      throw new Error('This application already has an open authorization window!');
+    }
+
     // First, make sure they are requesting a whitelisted URL
     const parsed = url.parse(authUrl);
     const valid = !!(ctx.app.manifest.authorizationUrls || []).find(whitelistUrl => {

@@ -357,7 +357,7 @@ export class PlatformAppsService extends
    * These are non-persistent for now
    */
   getAppPartition(appId: string) {
-    const partition = `platformApp-${appId}`;
+    const partition = `persist:platformApp-${appId}`;
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
