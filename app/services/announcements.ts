@@ -35,8 +35,8 @@ export class AnnouncementsService extends StatefulService<IAnnouncementsInfo> {
     return this.state.id !== null;
   }
 
-  closeBanner() {
-    this.postBannerClose();
+  async closeBanner() {
+    await this.postBannerClose();
   }
 
   private async fetchBanner() {
