@@ -117,7 +117,7 @@
     }
 
     i {
-      font-size:12px;
+      font-size: 11px;
       cursor: pointer;
     }
 
