@@ -14,7 +14,7 @@ interface IContext {
 }
 
 export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
-  schemaVersion = 1;
+  schemaVersion = 2;
 
   scenesService: ScenesService = ScenesService.instance;
 
@@ -28,7 +28,7 @@ export class ScenesNode extends ArrayNode<ISchema, IContext, Scene> {
 
     return {
       name: scene.name,
-      sceneId: scene.getSource().sourceId,
+      sceneId: scene.id,
       slots
     };
   }
