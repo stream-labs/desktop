@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   :title="windowTitle"
-  v-if="previewSource"
+  v-if="widget.previewSourceId"
 >
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">

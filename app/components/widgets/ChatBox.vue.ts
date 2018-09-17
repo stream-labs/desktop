@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   ChatBoxService,
   IChatBoxData
-} from 'services/widget-settings/chat-box';
+} from 'services/widgets/settings/chat-box';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';

@@ -6,7 +6,7 @@ import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
+import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widgets/settings/stream-boss';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
 
@@ -21,6 +21,8 @@ import TestButtons from './TestButtons.vue';
   }
 })
 export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBossService> {
+
+  tab = 'goal';
 
   $refs: {
     form: ValidatedForm;
@@ -38,9 +40,8 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
   }
 
   async saveGoal() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
-    await this.save(this.bossCreateOptions);
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    await this.service.saveGoal(this.bossCreateOptions);
   }
 
   settings = [
@@ -50,4 +51,7 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
     { value: 'source', label: $t('Source') }
   ];
 
+  async resetGoal() {
+    await this.service.resetGoal();
+  }
 }

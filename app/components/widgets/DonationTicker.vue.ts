@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   DonationTickerService,
   IDonationTickerData
-} from 'services/widget-settings/donation-ticker';
+} from 'services/widgets/settings/donation-ticker';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';

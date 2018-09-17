@@ -2,23 +2,25 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
-import { ISource, ISourceApi, ISourcesServiceApi } from 'services/sources';
-
+import { ISourceApi, ISourcesServiceApi } from 'services/sources';
 import { $t } from 'services/i18n';
-import { WidgetsService } from 'services/widgets';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
-import { IWidgetTab } from 'services/widget-settings/widget-settings';
-import uuid from 'uuid';
-
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
 import Display from 'components/shared/Display.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import TestWidgets from 'components/TestWidgets.vue';
 import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
+import { IWidgetsServiceApi } from 'services/widgets';
+import { cloneDeep } from 'lodash';
+
+interface ITab {
+  name: string;
+  value: string;
+}
 
 @Component({
   components: {
@@ -35,16 +37,22 @@ import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
 export default class WidgetWindow extends Vue {
   @Inject() private sourcesService: ISourcesServiceApi;
   @Inject() private windowsService: WindowsService;
-  @Inject() private widgetsService: WidgetsService;
+  @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private projectorService: ProjectorService;
 
   @Prop() slots: any[];
   @Prop() settings: any[];
   @Prop() value: boolean;
-  @Prop() requestState: 'fail' | 'success' | 'pending';
-  @Prop() loaded: boolean;
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
+
+  extraTabs: ITab[];
+  sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
+  widget = this.widgetsService.getWidgetSource(this.sourceId);
+  properties: TObsFormData = [];
+  commonTabs: ITab[] = [];
+  tabs: ITab[] = [];
+
 
   codeTabs = [
     { value: 'HTML', name: $t('HTML') },
@@ -52,56 +60,60 @@ export default class WidgetWindow extends Vue {
     { value: 'JS', name: $t('JS') },
     { value: 'customFields', name: $t('Custom Fields') }
   ];
-  canRender = false; // prevents window flickering
-  sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
-  widgetUrl = this.service.getPreviewUrl();
   previewSource: ISourceApi = null;
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
   currentSetting = 'source';
-  properties: TObsFormData = [];
-  tabs: IWidgetTab[] = [];
-  tabsList: { name: string, value: string}[] = [];
 
-  sourceUpdatedSubscr: Subscription;
+  get loadingState() {
+    return this.widget.getSettingsService().state.loadingState;
+  }
 
-  get service() {
-    return this.widgetsService.getWidgetSettingsService(this.widgetType);
+  get loaded() {
+    return this.loadingState == 'success';
   }
 
   get loadingFailed() {
-    return this.requestState === 'fail' && !this.loaded;
+    return this.loadingState == 'fail';
+  }
+
+  get wData() {
+    return cloneDeep(this.widget.getSettingsService().state.data);
   }
 
   mounted() {
-    this.properties = this.source ? this.source.getPropertiesFormData() : [];
+    const source = this.widget.getSource();
+    this.properties = source ? source.getPropertiesFormData() : [];
 
-    // create a temporary previewSource
-    // the previewSource could have a different url for simulating widget's activity
-    const source = this.source;
-    const previewSettings = {
-      ...source.getSettings(),
-      shutdown: false,
-      url: this.widgetUrl
-    };
-    this.previewSource = this.sourcesService.createSource(source.name, source.type, previewSettings);
-    this.sourceUpdatedSubscr = this.sourcesService.sourceUpdated.subscribe(
-      sourceModel => this.onSourceUpdatedHandler(sourceModel)
-    );
+    const apiSettings = this.widget.getSettingsService().getApiSettings();
 
-    const widgetType = this.source.getPropertiesManagerSettings().widgetType;
-    const settingsService = this.widgetsService.getWidgetSettingsService(widgetType);
+    // create a temporary previewSource while current window is shown
+    this.widget.createPreviewSource();
 
-    this.tabs = settingsService.getTabs();
-    this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
-      .concat({ name: 'Source', value: 'source' });
-    this.canRender = true;
+    this.commonTabs = [
+      { name: 'Settings', value: 'settings'},
+      { name: 'HTML', value: 'html'},
+      { name: 'CSS', value: 'css'},
+      { name: 'JS', value: 'js'}
+    ];
+
+    if (apiSettings.customFieldsAllowed) {
+      this.commonTabs.push({ name: 'Custom Fields', value: 'customFields' });
+    }
+
+    if (apiSettings.hasTestButtons) {
+      this.commonTabs.push({ name: 'Test', value: 'test' });
+    }
+
+    this.commonTabs.push( { name: 'Source', value: 'source' });
+    this.tabs = this.extraTabs.concat(this.commonTabs);
   }
 
   get windowTitle() {
-    return this.source ? $t('Settings for ') + this.source.name : '';
+    const source = this.widget.getSource();
+    return $t('Settings for ') + source.name;
   }
 
   get sourceProperties() {
@@ -121,12 +133,9 @@ export default class WidgetWindow extends Vue {
     source.setPropertiesFormData(
       [properties[changedIndex]]
     );
-    this.refresh();
+    this.properties = this.widget.getSource().getPropertiesFormData();
   }
 
-  refresh() {
-    this.properties = this.source.getPropertiesFormData();
-  }
 
   updateTopTab(value: string) {
     // We do animations in JS here because flex-direction is not an animate-able attribute
@@ -156,14 +165,5 @@ export default class WidgetWindow extends Vue {
 
   updateValue(value: boolean) {
     this.$emit('input', value);
-  }
-
-  private onSourceUpdatedHandler(sourceModel: ISource) {
-    // sync settings between source and previewSource
-    if (sourceModel.sourceId !== this.sourceId) return;
-    const newPreviewSettings = this.source.getSettings();
-    delete newPreviewSettings.shutdown;
-    newPreviewSettings.url = this.service.getPreviewUrl() + '&' + uuid();
-    this.previewSource.updateSettings(newPreviewSettings);
   }
 }

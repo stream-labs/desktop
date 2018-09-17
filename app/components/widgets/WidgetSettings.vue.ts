@@ -1,11 +1,9 @@
 import Vue from 'vue';
 import { Inject } from '../../util/injector';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { WindowsService } from 'services/windows';
-import { debounce } from 'lodash-decorators';
-import { SourcesService } from 'services/sources/index';
-import { WidgetsService, WidgetType } from 'services/widgets';
-import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetsServiceApi } from 'services/widgets';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
 
@@ -14,43 +12,40 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   extends Vue {
 
   @Inject() private windowsService: WindowsService;
-  @Inject() private sourcesService: SourcesService;
-  @Inject() private widgetsService: WidgetsService;
+  @Inject() private widgetsService: IWidgetsServiceApi;
 
-  tabName: string = '';
+  service: TService;
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
-  source = this.sourcesService.getSource(this.sourceId);
+  widget = this.widgetsService.getWidgetSource(this.sourceId);
   wData: TData = null;
-  metadata = this.service.getMetadata();
-
+  tab = 'settings';
   requestState: 'success' | 'pending' | 'fail' = 'pending';
-
-  tabs = this.service.getTabs();
 
   fontFamilyTooltip = $t(
     'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' + 
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
   );
 
-
   private dataUpdatedSubscr: Subscription;
 
-  get widgetType(): WidgetType {
-    return this.source.getPropertiesManagerSettings().widgetType;
+  get metadata() {
+    return this.service.getMetadata();
   }
-
-  get service(): TService {
-    return this.widgetsService.getWidgetSettingsService(this.widgetType) as TService;
-  }
-
-  protected skipNextDatachangeHandler: boolean;
 
   async created() {
-    this.tabName = this.tabName || this.tabs[0].name;
+    this.service = this.widget.getSettingsService() as TService;
+    try {
+      this.wData = await this.service.fetchData();
+      this.requestState = 'success';
+    } catch (e) {
+      this.requestState = 'fail';
+    }
+  }
+
+  mounted() {
     this.dataUpdatedSubscr = this.service.dataUpdated.subscribe(newData => {
       this.onDataUpdatedHandler(newData);
     });
-    await this.refresh();
   }
 
   get loaded() {
@@ -61,76 +56,20 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     this.dataUpdatedSubscr.unsubscribe();
   }
 
-  async refresh() {
-    try {
-      await this.service.fetchData();
-      this.requestState = 'success';
-      this.skipNextDatachangeHandler = true;
-      this.afterFetch();
-    } catch (e) {
-      this.requestState = 'fail';
-    }
+  private onDataUpdatedHandler(data: TData) {
+    this.wData = data;
+    this.widget.refresh();
   }
 
-  @debounce(1000)
-  @Watch('wData', { deep: true })
-  async onDataChangeHandler() {
-    const tab = this.service.getTab(this.tabName);
-    if (!tab) return;
-
-    const needToSave = tab.autosave && !this.skipNextDatachangeHandler;
-    if (this.skipNextDatachangeHandler) this.skipNextDatachangeHandler = false;
-
-    if (!needToSave) return;
-    await this.save();
-  }
-
-  private onDataUpdatedHandler(newData: TData) {
-    this.wData = newData;
-    this.refreshPreview();
-  }
-
-  async save(dataToSave?: any) {
+  async save() {
     if (this.requestState === 'pending') return;
-
-    const tab = this.service.getTab(this.tabName);
-    if (!tab) return;
-
-    this.requestState = 'pending';
-
     try {
-      await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
+      await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
-      this.afterFetch();
-      this.skipNextDatachangeHandler = true;
     } catch (e) {
       this.requestState = 'fail';
       this.onFailHandler();
     }
-  }
-
-  async reset() {
-    if (this.requestState === 'pending') return;
-
-    this.requestState = 'pending';
-
-    try {
-      this.wData = await this.service.reset(this.tabName);
-      this.requestState = 'success';
-      this.afterFetch();
-      this.skipNextDatachangeHandler = true;
-    } catch (e) {
-      this.requestState = 'fail';
-      this.onFailHandler();
-    }
-  }
-
-  refreshPreview() {
-    this.source.refresh();
-  }
-
-  afterFetch() {
-
   }
 
   onFailHandler() {

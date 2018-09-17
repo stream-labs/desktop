@@ -2,7 +2,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   SponsorBannerService,
   ISponsorBannerData
-} from 'services/widget-settings/sponsor-banner';
+} from 'services/widgets/settings/sponsor-banner';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -13,6 +13,7 @@ import CodeEditor from './CodeEditor.vue';
 import CustomFieldsEditor from './CustomFieldsEditor.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -20,6 +21,7 @@ import { $t } from 'services/i18n';
     VFormGroup,
     CodeEditor,
     CustomFieldsEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

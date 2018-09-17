@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   EventListService,
   IEventListData
-} from 'services/widget-settings/event-list';
+} from 'services/widgets/settings/event-list';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -12,6 +12,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -20,6 +21,7 @@ import TestButtons from './TestButtons.vue';
     CodeEditor,
     TestButtons,
     AnimationInput,
+    ValidatedForm,
     ...inputComponents
   }
 })

@@ -3,13 +3,19 @@ import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases
 import { $t } from 'services/i18n';
 import ChatbotWordProtectionList from 'components/page-components/Chatbot/windows/ChatbotWordProtectionList.vue';
 import { ITab } from 'components/Tabs.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
-    ChatbotWordProtectionList
+    ChatbotWordProtectionList,
+    ValidatedForm
   }
 })
 export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
+  $refs: {
+    form: ValidatedForm;
+  };
+
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -31,7 +37,10 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('words-protection');
   }
 
-  onSaveHandler() {
+  async onSaveHandler() {
+
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+
     this.chatbotApiService
       .updateWordProtection({
         enabled: this.wordProtectionResponse.enabled,

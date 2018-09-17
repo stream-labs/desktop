@@ -1,8 +1,11 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
-import { WidgetType } from 'services/widgets';
-import { IGoalData } from './generic-goal';
+import {
+  WIDGET_INITIAL_STATE
+} from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetType } from 'services/widgets';
 import { $t } from 'services/i18n';
-import { metadata } from 'components/widgets/inputs';
+import { metadata } from 'components/widgets/inputs/index';
+import { InheritMutations } from 'services/stateful-service';
+import { BaseGoalService } from './base-goal';
 
 export interface IStreamBossSettings extends IWidgetSettings {
   background_color: string;
@@ -46,41 +49,24 @@ export interface IStreamBossCreateOptions {
   total_health: number;
 }
 
-export abstract class StreamBossService extends WidgetSettingsService<IStreamBossData> {
+@InheritMutations()
+export abstract class StreamBossService extends BaseGoalService<IStreamBossData, IStreamBossCreateOptions> {
 
-  getWidgetType() {
-    return WidgetType.StreamBoss;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  protected tabs = [
-    {
-      name: 'goal',
-      title: 'Manage Battle',
-      saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/streamboss`,
-      autosave: false
-    },
-    {
-      name: 'settings',
-    },
-
-    ...CODE_EDITOR_TABS,
-
-    {
-      name: 'test',
+  getApiSettings() {
+    return {
+      type: WidgetType.StreamBoss,
+      url: `https://${this.getHost()}/widgets/streamboss?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/streamboss?token=${this.getWidgetToken()}`,
+      settingsUpdateEvent: 'streambossSettingsUpdate',
+      goalCreateEvent: 'newStreamboss',
+      goalResetEvent: 'streambossEnd',
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
+      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
+      hasTestButtons: true
     }
-
-  ];
-
-  getVersion() {
-    return 5;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/streamboss/settings`;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/streamboss?token=${this.getWidgetToken()}`;
   }
 
   getMetadata() {
@@ -192,12 +178,6 @@ export abstract class StreamBossService extends WidgetSettingsService<IStreamBos
       })
 
     };
-  }
-
-  protected patchAfterFetch(data: any): IGoalData {
-    // fix a bug when API returning an empty array instead of null
-    if (Array.isArray(data.goal)) data.goal = null;
-    return data;
   }
 
 }
