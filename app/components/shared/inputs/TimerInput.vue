@@ -34,7 +34,7 @@
 
       <div v-if="showTimerDropdown" class="timer timer-dropdown" :class="{ wide: hasHours && hasSeconds }">
         <div v-if="hasHours" class="time-slot-box">
-          <p class="text-center bold">Hr</p>
+          <p class="text-center bold">{{ $t('Hr') }}</p>
           <a class="text-center time-slot"
             v-for="hour in hours"
             :key="hour"
@@ -44,7 +44,7 @@
           </a>
         </div>
         <div class="time-slot-box">
-          <p class="text-center bold">Min</p>
+          <p class="text-center bold">{{ $t('Min') }}</p>
           <a class="text-center time-slot"
             v-for="minute in minutes"
             :key="minute"
@@ -54,7 +54,7 @@
           </a>
         </div>
         <div v-if="hasSeconds" class="time-slot-box">
-          <p class="text-center bold">Sec</p>
+          <p class="text-center bold">{{ $t('Sec') }}</p>
           <a class="text-center time-slot"
             v-for="second in seconds"
             :key="second"
@@ -67,13 +67,13 @@
 
       <div class="timer-footer">
         <div v-if="hasHours">
-          Hr
+          {{ $t('Hr') }}
         </div>
         <div>
-          Min
+          {{ $t('Min') }}
         </div>
         <div v-if="hasSeconds">
-          Sec
+          {{ $t('Sec') }}
         </div>
         <div>
           &nbsp;
@@ -129,7 +129,7 @@
   .timer-icon-top,
   .timer-icon-bottom {
     position: absolute;
-    right: 6px;
+    right: 8px;
 
     &:hover {
       cursor: pointer;

@@ -2,15 +2,14 @@ import { Component, Prop } from 'vue-property-decorator';
 import { BaseInput } from './BaseInput';
 import { ITimerMetadata } from './index';
 
-let holdTimeout: number = null;
-let holdInterval: number = null;
-
 @Component({})
 export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   @Prop() value: number;
   @Prop() metadata: ITimerMetadata;
 
+  holdTimeout: number = null;
+  holdInterval: number = null;
   hour = 3600;
   minute = 60;
   second = 1;
@@ -81,7 +80,7 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
   }
 
   updateValue(value: number) {
-    this.$emit('input', value);
+    this.emitInput(value);
   }
 
   getHours(seconds: number) {
@@ -112,21 +111,21 @@ export default class TimerInput extends BaseInput<number, ITimerMetadata> {
 
   beginHold(callback: Function, param: any) {
     callback(param);
-    holdTimeout = window.setTimeout(() => {
-      holdInterval = window.setInterval(function() {
+    this.holdTimeout = window.setTimeout(() => {
+      this.holdInterval = window.setInterval(function() {
         callback(param);
       }, 100);
     }, 500);
   }
 
   releaseHold() {
-    if(holdTimeout !== null) {
-      clearTimeout(holdTimeout);
-      holdTimeout = null;
+    if(this.holdTimeout !== null) {
+      clearTimeout(this.holdTimeout);
+      this.holdTimeout = null;
     }
-    if(holdInterval !== null) {
-      clearInterval(holdInterval);
-      holdInterval = null;
+    if(this.holdInterval !== null) {
+      clearInterval(this.holdInterval);
+      this.holdInterval = null;
     }
   }
 }
