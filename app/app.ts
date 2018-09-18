@@ -21,7 +21,6 @@ import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import VueI18n from 'vue-i18n';
 import moment from 'moment';
-import { isString } from 'lodash';
 
 const { ipcRenderer, remote } = electron;
 
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
       missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]): string  => {
-        if (values[0] && isString(values[0].fallback)) {
+        if (values[0] && typeof values[0].fallback === 'string') {
           return values[0].fallback;
         }
 
