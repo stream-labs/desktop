@@ -66,19 +66,19 @@ export default class WidgetWindow extends Vue {
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
   currentSetting = 'source';
+  readonly settingsState = this.widget.getSettingsService().state;
 
   get loaded() {
-    return !!this.widget.getSettingsService().state.data;
+    return !!this.settingsState.data;
   }
 
   get loadingFailed() {
-    return !this.loaded && this.widget.getSettingsService().state.loadingState == 'fail';
+    return !this.loaded && this.settingsState.loadingState == 'fail';
   }
 
   get wData(): IWidgetData {
-    const data = this.widget.getSettingsService().state.data;
-    if (!data) return null;
-    return cloneDeep(data) as IWidgetData;
+    if (!this.settingsState.data) return null;
+    return cloneDeep(this.settingsState.data) as IWidgetData;
   }
 
   get customCodeIsEnabled() {

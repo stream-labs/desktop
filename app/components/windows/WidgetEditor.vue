@@ -62,17 +62,19 @@
         </div>
 
         <div class="code-editor hidden" ref="code" v-if="loaded">
-          <tabs
-            :showContent="false"
-            className="widget-editor__top-tabs"
-            :tabs="codeTabs"
-            v-model="currentCodeTab"
-            @input="value => updateCodeTab(value)"
-          />
-          <code-editor v-if="currentCodeTab === 'HTML'" key="html" :value="wData" :metadata="{ type: 'html' }"/>
-          <code-editor v-if="currentCodeTab === 'CSS'"  key="css" :value="wData" :metadata="{ type: 'css' }"/>
-          <code-editor v-if="currentCodeTab === 'JS'" key="js" :value="wData" :metadata="{ type: 'js' }"/>
-          <custom-fields-editor  v-if="currentCodeTab === 'customFields'" key="customFields" :value="wData"/>
+          <div v-if="customCodeIsEnabled">
+            <tabs
+              :showContent="false"
+              className="widget-editor__top-tabs"
+              :tabs="codeTabs"
+              v-model="currentCodeTab"
+              @input="value => updateCodeTab(value)"
+            />
+            <code-editor v-if="currentCodeTab === 'HTML'" key="html" :value="wData" :metadata="{ type: 'html' }"/>
+            <code-editor v-if="currentCodeTab === 'CSS'"  key="css" :value="wData" :metadata="{ type: 'css' }"/>
+            <code-editor v-if="currentCodeTab === 'JS'" key="js" :value="wData" :metadata="{ type: 'js' }"/>
+            <custom-fields-editor  v-if="currentCodeTab === 'customFields'" key="customFields" :value="wData"/>
+          </div>
         </div>
 
       </div>
