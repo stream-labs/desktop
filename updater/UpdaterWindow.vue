@@ -61,7 +61,8 @@ export default {
       version: null,
       percentComplete: null,
       releaseNotes: null,
-      releaseDate: null
+      releaseDate: null,
+      isUnskippable: null
     };
   },
   computed: {
@@ -93,7 +94,7 @@ export default {
       this.currentState = 'checking';
       this.version = null,
       this.percentComplete = null;
-      if (data.isUnkippable) {
+      if (data.isUnskippable) {
         this.isUnskippable = data.isUnskippable;
       }
       if (data.version) {

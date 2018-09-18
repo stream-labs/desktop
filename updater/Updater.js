@@ -57,10 +57,14 @@ class Updater {
     return false;
   }
 
+  textToHtml(text) {
+    return text.split('\n').map(s => `${s}</br>`).join('\n');
+  }
+
   bindListeners() {
     autoUpdater.on('update-available', info => {
       this.updateState.asking = true;
-      this.updateState.releaseNotes = info.releaseNotes;
+      this.updateState.releaseNotes = this.textToHtml(info.releaseNotes);
       this.updateState.releaseDate = info.releaseDate;
       this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
@@ -123,8 +127,9 @@ isUnskippable: ${this.updateState.isUnskippable}`);
 
   initWindow() {
     const browserWindow = new BrowserWindow({
-      width: 600,
-      height: 350,
+      width: 596,
+      height: 369,
+      useContentSize: true,
       title: `${process.env.NAIR_PRODUCT_NAME} - Ver: ${process.env.NAIR_VERSION}`,
       frame: true,
       closable: true,
