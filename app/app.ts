@@ -21,6 +21,7 @@ import RavenConsole from 'raven-js/plugins/console';
 import VTooltip from 'v-tooltip';
 import VueI18n from 'vue-i18n';
 import moment from 'moment';
+import { isString } from 'lodash';
 
 const { ipcRenderer, remote } = electron;
 
@@ -118,10 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
       locale: i18nService.state.locale,
       fallbackLocale: i18nService.getFallbackLocale(),
       messages: i18nService.getLoadedDictionaries(),
-      missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]) => {
-        return (values[0] && values[0].fallback) || key;
-        // return key + (values[0] && values[0].fallback ? ': ' + values[0].fallback : '');
-      }) as any, // 型定義と実装が異なっている
+      missing: ((locale: VueI18n.Locale, key: VueI18n.Path, vm: Vue, values: any[]): string  => {
+        if (values[0] && isString(values[0].fallback)) {
+          return values[0].fallback;
+        }
+
+        // 返すべきものがないときは何も返さずデフォルト動作に任せる
+        // ref. https://github.com/kazupon/vue-i18n/blob/79e3bfe537d28b11a3119ff9ed0704e5dfa72cf3/src/index.js#L172-L188
+      }) as any, // 型定義と実装が異なっているのでanyに飛ばす
       silentTranslationWarn: true
     });
 
