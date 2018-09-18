@@ -353,7 +353,7 @@
   },
   "decklink-input": {
     "name": "Blackmagic Device",
-    "description": "Allow you capture Blackmagic streams."
+    "description": "Add video / audio from Blackmagic device."
   },
   "ndi_source": {
     "name": "NDI™ Source",
