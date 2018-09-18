@@ -1,4 +1,8 @@
-import { IMediaShareBan } from 'services/widget-settings/media-share';
+import {
+  MediaShareService,
+  IMediaShareData,
+  IMediaShareBan
+} from 'services/widget-settings/media-share';
 
 // state
 export interface IChatbotApiServiceState {
@@ -142,6 +146,11 @@ export interface IQueuePickedResponse {
 // this is from media share
 export interface ISongRequestPreferencesResponse {
   banned_media: IMediaShareBan[];
+  settings: {
+    advanced_settings: {
+      auto_play: boolean;
+    }
+  }
 }
 
 export interface ISongRequestResponse {

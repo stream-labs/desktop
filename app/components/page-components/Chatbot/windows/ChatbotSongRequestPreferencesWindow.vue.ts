@@ -45,10 +45,10 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
   songRequestBannedMedia: IMediaShareBan[] = [];
 
   mounted() {
-    this.fetchSongRequestPreferencesData();
+    this.fetchSongRequest();
   }
 
-  async fetchSongRequestPreferencesData() {
+  async fetchSongRequest() {
     await this.chatbotApiService.fetchSongRequestPreferencesData();
     await this.chatbotApiService.fetchSongRequest();
     this.songRequestBannedMedia = cloneDeep(
@@ -109,6 +109,6 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
 
   async onUnbanMediaHandler(media: IMediaShareBan) {
     await this.chatbotApiService.unbanMedia(media);
-    this.fetchSongRequestPreferencesData();
+    this.fetchSongRequest();
   }
 }

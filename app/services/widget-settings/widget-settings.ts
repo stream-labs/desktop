@@ -185,7 +185,8 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData> ext
   }
 
   protected getHost(): string {
-    return this.hostsService.streamlabs;
+    // return this.hostsService.streamlabs;
+    return this.hostsService.beta3;
   }
 
   protected getWidgetToken(): string {

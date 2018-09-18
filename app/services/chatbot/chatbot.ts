@@ -137,6 +137,7 @@ export class ChatbotApiService extends PersistentStatefulService<
     },
     songRequestPreferencesResponse: {
       banned_media: [],
+      settings: null
     },
     songRequestResponse: {
       enabled: false,
@@ -431,7 +432,6 @@ export class ChatbotApiService extends PersistentStatefulService<
     // mostly used for enable/disable only
     return this.api('GET', 'settings/songrequest', {}).then(
       (response: ISongRequestResponse) => {
-        debugger;
         this.UPDATE_SONG_REQUEST(response);
       }
     );
@@ -686,6 +686,7 @@ export class ChatbotApiService extends PersistentStatefulService<
 
   updateSongRequestPreferencesData(data: any) {
     // NOTE: should update type
+    debugger;
     this.mediaShareService.saveData(data.settings);
   }
 
@@ -1019,8 +1020,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestOnboardingWindow',
       size: {
-        width: 650,
-        height: 650
+        width: 750,
+        height: 550
       }
     });
   }

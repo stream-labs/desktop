@@ -49,14 +49,15 @@ export default class ChatbotModules extends ChatbotBase {
           this.chatbotCommonService.openSongRequestPreferencesWindow();
         },
         onToggleEnabled: () => {
+          if (!this.songRequestCurrentlyEnabled) {
+            // enabling, show onboarding
+            this.chatbotCommonService.openSongRequestOnboardingWindow();
+          }
+
           this.chatbotApiService.updateSongRequest({
             ...this.songRequest,
             enabled: !this.songRequestCurrentlyEnabled
           });
-          // if (!this.songRequestCurrentlyEnabled) {
-          //   // enabling, show onboarding
-          //   this.chatbotCommonService.openSongRequestOnboardingWindow();
-          // }
         },
       },
       {
