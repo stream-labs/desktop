@@ -75,6 +75,7 @@ export interface IWidgetsServiceApi {
 
 export interface IWidgetSettingsServiceApi {
   getApiSettings(): IWidgetApiSettings;
+  saveSettings(settings: IWidgetSettings): Promise<any>;
   state: IWidgetSettingsGenericState;
 }
 
@@ -103,10 +104,10 @@ export type TWIdgetLoadingState = 'none' | 'pending' | 'success' | 'fail';
 
 export interface IWidgetSettingsGenericState {
   loadingState: TWIdgetLoadingState;
-  data: Dictionary<any>;
+  data: IWidgetData;
   rawData: Dictionary<any>; // widget data before patching
 }
 
-export interface IWidgetSettingsState<TWidgetData> extends IWidgetSettingsGenericState {
+export interface IWidgetSettingsState<TWidgetData extends IWidgetData> extends IWidgetSettingsGenericState {
   data: TWidgetData;
 }

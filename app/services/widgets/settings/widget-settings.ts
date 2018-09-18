@@ -8,7 +8,7 @@ import {
 } from '../../../util/requests';
 import {
   IWidgetApiSettings, IWidgetData, IWidgetSettings,
-  IWidgetSettingsGenericState,
+  IWidgetSettingsGenericState, IWidgetSettingsServiceApi,
   IWidgetSettingsState, TWIdgetLoadingState,
   WidgetsService
 } from 'services/widgets';
@@ -35,6 +35,7 @@ interface ISocketEvent{
  */
 export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   extends StatefulService<IWidgetSettingsState<TWidgetData>>
+  implements IWidgetSettingsServiceApi
 {
 
   @Inject() private hostsService: HostsService;
@@ -128,7 +129,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   async saveSettings(settings: IWidgetSettings) {
     const body = this.patchBeforeSend(settings);
     const apiSettings = this.getApiSettings();
-    await this.request({
+    return await this.request({
       url: apiSettings.settingsSaveUrl,
       method: 'POST',
       body
@@ -136,7 +137,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
   }
 
 
-  async request(req: { url: string, method?: THttpMethod, body?: any }): Promise<TWidgetData> {
+  async request(req: { url: string, method?: THttpMethod, body?: any }): Promise<any> {
     const method = req.method || 'GET';
     const headers = authorizedHeaders(this.getApiToken());
     headers.append('Content-Type', 'application/json');

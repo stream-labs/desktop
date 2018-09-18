@@ -6,7 +6,7 @@
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
-      <div class="button button--action test-button">
+      <div v-if="apiSettings.hasTestButtons" class="button button--action test-button">
         <test-widgets />
       </div>
     </div>
@@ -20,12 +20,12 @@
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
-        <div class="custom-code" :class="{ hidden: currentTopTab !== 'code' }">
-          <toggle-input :value="value" @input="value => updateValue(value)" />
+        <div class="custom-code" v-if="loaded" :class="{ hidden: currentTopTab !== 'code' }">
+          <toggle-input :value="customCodeIsEnabled" @input="value => toggleCustomCode(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
         <div class="custom-code__divider" :class="{ hidden: currentTopTab !== 'code' }" />
-        <div class="custom-code__alert" :class="{ active: value }" />
+        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
       <div class="content-container" ref="content">
@@ -61,18 +61,20 @@
           </div>
         </div>
 
-        <div class="code-editor hidden" ref="code">
+        <div class="code-editor hidden" ref="code" v-if="loaded">
           <tabs
             :showContent="false"
             className="widget-editor__top-tabs"
             :tabs="codeTabs"
+            v-model="currentCodeTab"
             @input="value => updateCodeTab(value)"
-            :value="currentCodeTab"
           />
-          <div v-for="tab in codeTabs" :key="tab.value">
-            <slot :name="tab.value" v-if="tab.value === currentCodeTab" />
-          </div>
+          <code-editor v-if="currentCodeTab === 'HTML'" key="html" :value="wData" :metadata="{ type: 'html' }"/>
+          <code-editor v-if="currentCodeTab === 'CSS'"  key="css" :value="wData" :metadata="{ type: 'css' }"/>
+          <code-editor v-if="currentCodeTab === 'JS'" key="js" :value="wData" :metadata="{ type: 'js' }"/>
+          <custom-fields-editor  v-if="currentCodeTab === 'customFields'" key="customFields" :value="wData"/>
         </div>
+
       </div>
     </div>
   </div>

@@ -6,7 +6,6 @@ import { ISourceApi, ISourcesServiceApi } from 'services/sources';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
-import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
 import ModalLayout from 'components/ModalLayout.vue';
 import Tabs from 'components/Tabs.vue';
@@ -14,9 +13,11 @@ import Display from 'components/shared/Display.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import TestWidgets from 'components/TestWidgets.vue';
 import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
-import { IWidgetsServiceApi } from 'services/widgets';
+import { IWidgetData, IWidgetsServiceApi } from 'services/widgets';
 import { cloneDeep } from 'lodash';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
+import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
+import CodeEditor from 'components/widgets/CodeEditor.vue';
 
 interface ITab {
   name: string;
@@ -32,7 +33,9 @@ interface ITab {
     GenericForm,
     VFormGroup,
     TestWidgets,
-    Display
+    Display,
+    CustomFieldsEditor,
+    CodeEditor
   }
 })
 export default class WidgetWindow extends Vue {
@@ -49,17 +52,14 @@ export default class WidgetWindow extends Vue {
   extraTabs: ITab[];
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   widget = this.widgetsService.getWidgetSource(this.sourceId);
+  apiSettings = this.widget.getSettingsService().getApiSettings();
   properties: TObsFormData = [];
-  commonTabs: ITab[] = [];
-  tabs: ITab[] = [];
-
-
   codeTabs = [
     { value: 'HTML', name: $t('HTML') },
     { value: 'CSS', name: $t('CSS') },
-    { value: 'JS', name: $t('JS') },
-    { value: 'customFields', name: $t('Custom Fields') }
+    { value: 'JS', name: $t('JS') }
   ];
+
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
   previewSource: ISourceApi = null;
@@ -67,50 +67,35 @@ export default class WidgetWindow extends Vue {
   currentCodeTab = 'HTML';
   currentSetting = 'source';
 
-  get loadingState() {
-    return this.widget.getSettingsService().state.loadingState;
-  }
-
   get loaded() {
-    return this.loadingState == 'success';
+    return !!this.widget.getSettingsService().state.data;
   }
 
   get loadingFailed() {
-    return this.loadingState == 'fail';
+    return !this.loaded && this.widget.getSettingsService().state.loadingState == 'fail';
   }
 
-  get wData() {
-    return cloneDeep(this.widget.getSettingsService().state.data);
+  get wData(): IWidgetData {
+    const data = this.widget.getSettingsService().state.data;
+    if (!data) return null;
+    return cloneDeep(data) as IWidgetData;
+  }
+
+  get customCodeIsEnabled() {
+    return this.wData && this.wData.settings.custom_enabled;
   }
 
   mounted() {
     const source = this.widget.getSource();
     this.properties = source ? source.getPropertiesFormData() : [];
+
     // create a temporary previewSource while current window is shown
     this.widget.createPreviewSource();
 
-    // const apiSettings = this.widget.getSettingsService().getApiSettings();
-    //
-    // // create a temporary previewSource while current window is shown
-    // this.widget.createPreviewSource();
-    //
-    // this.commonTabs = [
-    //   { name: 'Settings', value: 'settings'},
-    //   { name: 'HTML', value: 'html'},
-    //   { name: 'CSS', value: 'css'},
-    //   { name: 'JS', value: 'js'}
-    // ];
-    //
-    // if (apiSettings.customFieldsAllowed) {
-    //   this.commonTabs.push({ name: 'Custom Fields', value: 'customFields' });
-    // }
-    //
-    // if (apiSettings.hasTestButtons) {
-    //   this.commonTabs.push({ name: 'Test', value: 'test' });
-    // }
-    //
-    // this.commonTabs.push( { name: 'Source', value: 'source' });
-    // this.tabs = this.extraTabs.concat(this.commonTabs);
+    // some widgets have CustomFieldsEditor
+    if (this.apiSettings.customFieldsAllowed) {
+      this.codeTabs.push({ value: 'customFields', name: $t('Custom Fields') });
+    }
   }
 
   destroyed() {
@@ -169,7 +154,8 @@ export default class WidgetWindow extends Vue {
     this.currentSetting = value;
   }
 
-  updateValue(value: boolean) {
-    this.$emit('input', value);
+  toggleCustomCode(enabled: boolean) {
+    const newSettings = { ...this.wData.settings, custom_enabled: enabled };
+    this.widget.getSettingsService().saveSettings(newSettings)
   }
 }
