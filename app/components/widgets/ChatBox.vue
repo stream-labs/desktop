@@ -1,11 +1,6 @@
 <template>
-<widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
-  :settings="settings"
->
-  <div slot="visual-properties" >
+<widget-editor :navItems="navItems">
+  <div slot="visual-properties" v-if="loaded">
     <v-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>
     <v-form-group title="Badges">
       <bool-input title="Show Moderator Badges" v-model="wData.settings.show_moderator_icons"/>
@@ -27,12 +22,12 @@
     </v-form-group>
   </div>
 
-  <div slot="font-properties">
+  <div slot="font-properties" v-if="loaded">
     <v-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <v-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
   </div>
 
-  <div slot="chatter-properties">
+  <div slot="chatter-properties" v-if="loaded">
     <v-form-group title="Hide Characters">
       <bool-input title="Hide Common Chat Bots" v-model="wData.settings.hide_common_chat_bots"/>
       <bool-input title="Hide commands starting with `!`" v-model="wData.settings.hide_commands"/>

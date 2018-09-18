@@ -18,7 +18,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
   }
 })
 export default class ViewerCount extends WidgetSettings<IViewerCountData, ViewerCountService> {
-  settings = [
+  navItems = [
     { value: 'manage-count', label: $t('Manage Viewer Count') },
     { value: 'font', label: $t('Font Settings') },
     { value: 'source', label: $t('Source') }

@@ -16,6 +16,7 @@ import TestWidgets from 'components/TestWidgets.vue';
 import { ToggleInput, NumberInput } from 'components/shared/inputs/inputs';
 import { IWidgetsServiceApi } from 'services/widgets';
 import { cloneDeep } from 'lodash';
+import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 
 interface ITab {
   name: string;
@@ -40,9 +41,8 @@ export default class WidgetWindow extends Vue {
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private projectorService: ProjectorService;
 
-  @Prop() slots: any[];
-  @Prop() settings: any[];
-  @Prop() value: boolean;
+  @Prop() slots: IWidgetNavItem[];
+  @Prop() navItems: IWidgetNavItem[];
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
 
@@ -86,29 +86,35 @@ export default class WidgetWindow extends Vue {
   mounted() {
     const source = this.widget.getSource();
     this.properties = source ? source.getPropertiesFormData() : [];
-
-    const apiSettings = this.widget.getSettingsService().getApiSettings();
-
     // create a temporary previewSource while current window is shown
     this.widget.createPreviewSource();
 
-    this.commonTabs = [
-      { name: 'Settings', value: 'settings'},
-      { name: 'HTML', value: 'html'},
-      { name: 'CSS', value: 'css'},
-      { name: 'JS', value: 'js'}
-    ];
+    // const apiSettings = this.widget.getSettingsService().getApiSettings();
+    //
+    // // create a temporary previewSource while current window is shown
+    // this.widget.createPreviewSource();
+    //
+    // this.commonTabs = [
+    //   { name: 'Settings', value: 'settings'},
+    //   { name: 'HTML', value: 'html'},
+    //   { name: 'CSS', value: 'css'},
+    //   { name: 'JS', value: 'js'}
+    // ];
+    //
+    // if (apiSettings.customFieldsAllowed) {
+    //   this.commonTabs.push({ name: 'Custom Fields', value: 'customFields' });
+    // }
+    //
+    // if (apiSettings.hasTestButtons) {
+    //   this.commonTabs.push({ name: 'Test', value: 'test' });
+    // }
+    //
+    // this.commonTabs.push( { name: 'Source', value: 'source' });
+    // this.tabs = this.extraTabs.concat(this.commonTabs);
+  }
 
-    if (apiSettings.customFieldsAllowed) {
-      this.commonTabs.push({ name: 'Custom Fields', value: 'customFields' });
-    }
-
-    if (apiSettings.hasTestButtons) {
-      this.commonTabs.push({ name: 'Test', value: 'test' });
-    }
-
-    this.commonTabs.push( { name: 'Source', value: 'source' });
-    this.tabs = this.extraTabs.concat(this.commonTabs);
+  destroyed() {
+    this.widget.destroyPreviewSource();
   }
 
   get windowTitle() {

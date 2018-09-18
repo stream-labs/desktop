@@ -30,7 +30,7 @@ export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService
     'Note: This background color is for preview purposes only. It will not be shown in your stream.'
   );
 
-  settings = [
+  navItems = [
     { value: 'visual', label: $t('Visual Settings') },
     { value: 'font', label: $t('Font Settings') },
     { value: 'chatter', label: $t('Chatter') },

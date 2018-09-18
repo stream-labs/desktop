@@ -7,6 +7,11 @@ import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
 
+export interface IWidgetNavItem {
+  value: string;
+  label: string;
+}
+
 @Component({})
 export default class WidgetSettings<TData extends IWidgetData, TService extends WidgetSettingsService<TData>>
   extends Vue {
@@ -25,6 +30,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
     'The Google Font to use for the text. Visit http://google.com/fonts to find one! Popular Fonts include:' + 
       ' Open Sans, Roboto, Oswald, Lato, and Droid Sans.'
   );
+
+  navItems: IWidgetNavItem[];
 
   private dataUpdatedSubscr: Subscription;
 

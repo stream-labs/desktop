@@ -29,7 +29,7 @@
       </div>
 
       <div class="content-container" ref="content">
-        <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
+        <display class="display" :sourceId="widget.previewSourceId" @click="createProjector"/>
         <div class="sidebar" ref="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
@@ -40,7 +40,7 @@
             <ul style="margin: 0;">
               <li
                 class="subsection__content settings-title"
-                v-for="setting in settings"
+                v-for="setting in navItems"
                 :class="{ active: currentSetting === setting.value }"
                 :key="setting.value"
                 @click="updateCurrentSetting(setting.value)"
