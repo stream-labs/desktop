@@ -140,9 +140,9 @@ export interface IQueuePickedResponse {
   data: IQueuedUser[];
 }
 
+// this is from media share
 export interface ISongRequestPreferencesResponse {
   banned_media: IMediaShareBan[];
-  settings: ISongRequestPreferencesData;
 }
 
 export interface ISongRequestResponse {
@@ -410,15 +410,19 @@ export interface IQueuedUser {
 }
 
 // song requests
-export interface ISongRequestPreferencesData {
-  max_duration: number;
-  security: number;
-}
-
 export interface ISongRequestData {
   commands: IDafaultCommandsSlug;
+  general: ISongRequestGeneral;
 }
 
+export interface ISongRequestGeneral {
+  limit: number;
+  max_duration: number;
+  max_requests_per_user: number;
+  skip_votes: number;
+  filter_level: number;
+  music_only: boolean;
+}
 
 // dictionaries
 export enum ChatbotAutopermitEnums {

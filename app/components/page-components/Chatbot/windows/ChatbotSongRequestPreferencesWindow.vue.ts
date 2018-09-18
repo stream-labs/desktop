@@ -13,6 +13,7 @@ import {
 
 import {
   ISongRequestPreferencesResponse,
+  ISongRequestData
 } from 'services/chatbot';
 
 
@@ -40,7 +41,8 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
 
   selectedTab: string = 'general';
 
-  songRequestPreferencesData: ISongRequestPreferencesResponse = null;
+  songRequestData: ISongRequestData = null;
+  songRequestBannedMedia: IMediaShareBan[] = [];
 
   mounted() {
     this.fetchSongRequestPreferencesData();
@@ -48,18 +50,38 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
 
   async fetchSongRequestPreferencesData() {
     await this.chatbotApiService.fetchSongRequestPreferencesData();
-    this.songRequestPreferencesData = cloneDeep(this.chatbotApiService.state.songRequestPreferencesResponse);
+    await this.chatbotApiService.fetchSongRequest();
+    this.songRequestBannedMedia = cloneDeep(
+      this.chatbotApiService.state.songRequestPreferencesResponse.banned_media
+    );
+    this.songRequestData = cloneDeep(
+      this.songRequestResponse.settings
+    );
+  }
+
+  get songRequestResponse() {
+    return this.chatbotApiService.state.songRequestResponse;
   }
 
   get metadata() {
     return {
-      settings: {
+      general: {
         max_duration: metadataHelper.number({
           required: true,
           min: 0,
           placeholder: $t('Max Duration')
         }),
-        security: metadataHelper.slider({
+        max_requests_per_user: metadataHelper.number({
+          required: true,
+          min: 0,
+          placeholder: $t('Max Requests per user')
+        }),
+        skip_votes: metadataHelper.number({
+          required: true,
+          min: 0,
+          placeholder: $t('Number of votes to skip song')
+        }),
+        filter_level: metadataHelper.slider({
           min: 0,
           max: 4,
           interval: 1,
@@ -78,7 +100,10 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
   }
 
   async onSaveHandler() {
-    await this.chatbotApiService.updateSongRequestPreferencesData(this.songRequestPreferencesData);
+    await this.chatbotApiService.updateSongRequest({
+      ...this.songRequestResponse,
+      settings: this.songRequestData
+    });
     this.chatbotCommonService.closeChildWindow();
   }
 

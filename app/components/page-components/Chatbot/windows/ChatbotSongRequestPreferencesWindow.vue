@@ -21,22 +21,22 @@
     </div>
   </div>
   <div slot="content" class="chatbot-song-request__container">
-    <div v-if="songRequestPreferencesData">
+    <div v-if="songRequestData">
       <transition name='fade' mode="out-in" appear>
-        <div v-if="selectedTab === 'general' && !!songRequestPreferencesData.settings">
+        <div v-if="selectedTab === 'general' && !!songRequestData.general">
           <VFormGroup
             :title="$t('Max Duration (Value in Seconds)')"
-            v-model="songRequestPreferencesData.settings.max_duration"
-            :metadata="metadata.settings.max_duration"
+            v-model="songRequestData.general.max_duration"
+            :metadata="metadata.general.max_duration"
           />
           <VFormGroup
             :title="$t('Spam Security')"
-            v-model="songRequestPreferencesData.settings.security"
-            :metadata="metadata.settings.security"
+            v-model="songRequestData.general.filter_level"
+            :metadata="metadata.general.filter_level"
           />
         </div>
         <div v-else>
-          <table v-if="songRequestPreferencesData.banned_media && songRequestPreferencesData.banned_media.length > 0">
+          <table v-if="songRequestBannedMedia.length > 0">
             <thead>
               <tr>
                 <th> {{ $t('Video') }} </th>
@@ -46,7 +46,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="media in songRequestPreferencesData.banned_media"
+                v-for="media in songRequestBannedMedia"
                 :key="media.id"
               >
                 <td> {{ media.media_title }} </td>

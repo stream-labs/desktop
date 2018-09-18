@@ -131,7 +131,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     },
     songRequestPreferencesResponse: {
       banned_media: [],
-      settings: null
     },
     songRequestResponse: {
       enabled: false,
