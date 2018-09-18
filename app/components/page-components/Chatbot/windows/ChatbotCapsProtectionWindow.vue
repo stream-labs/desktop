@@ -29,7 +29,7 @@
         </div>
         <VFormGroup
           v-if="capsProtection.general.punishment.type === 'Timeout'"
-          :title="$t('Punishment Duration (Value in Minutes)')"
+          :title="$t('Punishment Duration (Value in Seconds)')"
           v-model="capsProtection.general.punishment.duration"
           :metadata="metadata.caps.general.punishment.duration"
         />

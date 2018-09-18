@@ -16,14 +16,28 @@
             v-if="isLinkProtectionPermitCommand"
           >
             <span> {{ $t('Link Protection Preferences') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
           <div
             @click="onToggleQuoteWindowHandler"
             v-if="isQuoteCommand"
           >
             <span> {{ $t('Quote Preferences') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
+          </div>
+          <div
+            @click="onToggleQueueWindowHandler"
+            v-if="isQueueJoinCommand"
+          >
+            <span> {{ $t('Queue Settings') }} </span>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
+          </div>
+          <div
+            @click="onToggleSongRequestWindowHandler"
+            v-if="isSongRequestCommand"
+          >
+            <span> {{ $t('Song Request Preferences') }} </span>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
         </div>
       </div>

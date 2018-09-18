@@ -10,22 +10,28 @@ Vue.use(VModal);
 
 @Component({
   components: {
-    ModalLayout,
+    ModalLayout
   }
 })
 export default class ChatbotWindowsBase extends ChatbotBase {
+  onCancelHandler(): void {
+    this.chatbotCommonService.closeChildWindow();
+  }
+
+  onSaveHandler(): void {}
 
   // switching between 2 child windows, link protection and default command(to edit link protection command)
   onToggleLinkProtectionWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions().componentName;
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+      .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
         this.chatbotCommonService.openLinkProtectionWindow();
         break;
       case 'ChatbotLinkProtectionWindow':
-        const linkProtectionPermitCommand =
-          this.chatbotApiService.state.defaultCommandsResponse['link-protection'].permit;
+        const linkProtectionPermitCommand = this.chatbotApiService.state
+          .defaultCommandsResponse['link-protection'].permit;
 
         this.chatbotCommonService.openDefaultCommandWindow({
           ...linkProtectionPermitCommand,
@@ -37,20 +43,63 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleQuoteWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions().componentName;
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+      .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotCommonService.openQuotePreferenceWindow();
+        this.chatbotCommonService.openQuotePreferencesWindow();
         break;
       case 'ChatbotQuotePreferencesWindow':
-        const quotePreferencesCommand =
-          this.chatbotApiService.state.defaultCommandsResponse['quotes'].get;
+        const quotePreferencesCommand = this.chatbotApiService.state
+          .defaultCommandsResponse['quotes'].get;
 
         this.chatbotCommonService.openDefaultCommandWindow({
           ...quotePreferencesCommand,
           slugName: 'quotes',
           commandName: 'get'
+        });
+        break;
+    }
+  }
+
+  onToggleQueueWindowHandler() {
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotCommonService.openQueuePreferencesWindow();
+        break;
+      case 'ChatbotQueuePreferencesWindow':
+        const queuePreferencesCommand = this.chatbotApiService.state
+          .defaultCommandsResponse['queue'].join;
+
+        this.chatbotCommonService.openDefaultCommandWindow({
+          ...queuePreferencesCommand,
+          slugName: 'queue',
+          commandName: 'join'
+        });
+        break;
+    }
+  }
+
+  onToggleSongRequestWindowHandler() {
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotCommonService.openSongRequestPreferencesWindow();
+        break;
+      case 'ChatbotSongRequestPreferencesWindow':
+        const queuePreferencesCommand = this.chatbotApiService.state
+          .defaultCommandsResponse['songrequest'].songrequest;
+
+        this.chatbotCommonService.openDefaultCommandWindow({
+          ...queuePreferencesCommand,
+          slugName: 'songrequest',
+          commandName: 'songrequest'
         });
         break;
     }

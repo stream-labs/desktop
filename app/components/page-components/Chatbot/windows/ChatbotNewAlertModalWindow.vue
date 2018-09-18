@@ -42,7 +42,7 @@
             :title="$t('Is Gifted')"
             v-model="newAlert.sub.newMessage.is_gifted"
             :metadata="metadata.sub.newMessage.is_gifted"
-          />
+          /> 
         </div>
       </div>
       <div v-if="isDonation">
@@ -98,6 +98,25 @@
             :title="$t('Bit Donator Message')"
             v-model="newAlert.bits.newMessage.message"
             :metadata="metadata.bits.newMessage.message"
+          />
+        </div>
+      </div>
+      <div v-if="isSubMysteryGift">
+        <div>
+          <VFormGroup
+            :title="$t('Subscription Tier')"
+            v-model="newAlert.sub_mystery_gift.newMessage.tier"
+            :metadata="metadata.sub_mystery_gift.newMessage.tier"
+          />
+          <VFormGroup
+            :title="$t('Subscription Months')"
+            v-model="newAlert.sub_mystery_gift.newMessage.amount"
+            :metadata="metadata.sub_mystery_gift.newMessage.amount"
+          />
+          <VFormGroup
+            :title="$t('Subscription Message')"
+            v-model="newAlert.sub_mystery_gift.newMessage.message"
+            :metadata="metadata.sub_mystery_gift.newMessage.message"
           />
         </div>
       </div>

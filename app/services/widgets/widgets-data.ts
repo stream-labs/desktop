@@ -25,7 +25,9 @@ export enum WidgetType {
   StreamBoss = 10,
   Credits = 11,
   SpinWheel = 12,
-  SponsorBanner = 13
+  SponsorBanner = 13,
+  MediaShare = 14,
+  Chatbot = 15
 }
 
 
@@ -311,6 +313,35 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 1,
 
     anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.MediaShare]: {
+    name: 'Media Share',
+    url(host, token) {
+      return `https://${host}/widgets/media/v1/${token}`;
+    },
+
+    width: 800,
+    height: 600,
+
+    x: 0.5,
+    y: 0,
+
+    anchor: AnchorPoint.North
+  },
+  [WidgetType.Chatbot]: {
+    name: 'Chatbot',
+    url(host, token) {
+      return `https://${host}/widgets/chatbot/v1/${token}`;
+    },
+
+    width: 800,
+    height: 600,
+
+    x: 0.5,
+    y: 0,
+
+    anchor: AnchorPoint.North
   }
 };
 
@@ -448,5 +479,23 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: true,
     demoFilename: 'source-wheel.mp4',
     supportList: [$t('The streamer manually triggers a spin anytime while they are live.')]
-  }
+  },
+  [WidgetType.MediaShare]: {
+    name: $t('Media Share'),
+    description: $t(
+      'Please note that when advanced media share is enabled,' +
+      ' media will no longer play through your alert box widget.' +
+      ' Media will only play through this media share widget.'
+    ),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: []
+  },
+  [WidgetType.Chatbot]: {
+    name: $t('Chatbot'),
+    description: $t('Set up chatbot widget to enable chatbot song requests and other features.'),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: []
+  },
 });

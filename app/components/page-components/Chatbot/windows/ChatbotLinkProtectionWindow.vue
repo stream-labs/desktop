@@ -13,7 +13,7 @@
         <div class="window-toggle__wrapper">
           <div @click="onToggleLinkProtectionWindowHandler">
             <span> {{ $t('Edit Command') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
         </div>
       </div>
@@ -40,13 +40,13 @@
             </div>
           </div>
           <VFormGroup
-            :title="$t('Permit Duration (Value in Minutes)')"
+            :title="$t('Permit Duration (Value in Seconds)')"
             v-model="linkProtection.general.permit.duration"
             :metadata="metadata.link.general.permit.duration"
           />
           <VFormGroup
             v-if="linkProtection.general.punishment.type === 'Timeout'"
-            :title="$t('Punishment Duration (Value in Minutes)')"
+            :title="$t('Punishment Duration (Value in Seconds)')"
             v-model="linkProtection.general.punishment.duration"
             :metadata="metadata.link.general.punishment.duration"
           />
@@ -58,7 +58,7 @@
         </div>
         <ChatbotLinkProtectionList
           v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
-          :title="$t(`Add to ${selectedTab}`)"
+          :title="selectedTab === 'whitelist' ? $t('Add to whitelist') : $t('Add to blacklist')"
           :type="selectedTab"
           v-model="linkProtection[selectedTab]"
         />

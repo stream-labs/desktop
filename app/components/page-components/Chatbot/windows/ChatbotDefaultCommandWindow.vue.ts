@@ -65,6 +65,20 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     )
   }
 
+  get isQueueJoinCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'queue' &&
+      this.defaultCommandToUpdate.commandName === 'join'
+    )
+  }
+
+  get isSongRequestCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'songrequest' &&
+      this.defaultCommandToUpdate.commandName === 'songrequest'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotCommonService.state.defaultCommandToUpdate;
   }
@@ -134,10 +148,6 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   // methods
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
-  }
-
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
   }
 
   async onResetCommandHandler() {

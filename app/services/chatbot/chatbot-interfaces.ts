@@ -1,6 +1,8 @@
+import { IMediaShareBan } from 'services/widget-settings/media-share';
 
 // state
 export interface IChatbotApiServiceState {
+  // v1
   apiToken: string;
   socketToken: string;
   globallyEnabled: boolean;
@@ -17,6 +19,12 @@ export interface IChatbotApiServiceState {
   // v2
   quotesResponse: IQuotesResponse;
   quotePreferencesResponse: IQuotePreferencesResponse;
+  queuePreferencesResponse: IQueuePreferencesResponse;
+  queueStateResponse: IQueueStateResponse;
+  queueEntriesResponse: IQueueEntriesResponse;
+  queuePickedResponse: IQueuePickedResponse;
+  songRequestPreferencesResponse: ISongRequestPreferencesResponse;
+  songRequestResponse: ISongRequestResponse;
 }
 
 export interface IChatbotCommonServiceState {
@@ -31,6 +39,9 @@ export interface IChatbotCommonServiceState {
 // responses
 export interface IChatbotAuthResponse {
   api_token: string;
+}
+
+export interface IChatbotSocketAuthResponse {
   socket_token: string;
 }
 
@@ -57,9 +68,7 @@ export interface IChatbotAPIDeleteResponse {
 
 
 export interface IDafaultCommandsResponse {
-  commands: IDafaultCommandsSlug;
-  'link-protection': IDafaultCommandsSlug;
-  giveaway: IDafaultCommandsSlug;
+  [id: string]: IDafaultCommandsSlug;
 }
 
 export interface ICustomCommandsResponse {
@@ -110,6 +119,37 @@ export interface IQuotePreferencesResponse {
   settings: IQuotePreferencesData;
   enabled: boolean;
 }
+
+export interface IQueuePreferencesResponse {
+  settings: IQueuePreferencesData;
+  enabled: boolean;
+}
+
+export interface IQueueStateResponse {
+  status: 'Open' | 'Closed';
+  title?: string;
+}
+
+export interface IQueueEntriesResponse {
+  pagination: IChatbotPagination;
+  data: IQueuedUser[];
+}
+
+export interface IQueuePickedResponse {
+  pagination: IChatbotPagination;
+  data: IQueuedUser[];
+}
+
+// this is from media share
+export interface ISongRequestPreferencesResponse {
+  banned_media: IMediaShareBan[];
+}
+
+export interface ISongRequestResponse {
+  enabled: boolean;
+  settings: ISongRequestData;
+}
+
 
 // shared
 export interface IChatbotPermission {
@@ -343,6 +383,47 @@ export interface IQuotePreferencesGeneralSettings {
   date_format: string;
 }
 
+
+// queue
+export interface IQueuePreferencesData {
+  commands: IDafaultCommandsSlug;
+  general: IQueuePreferencesGeneralSettings;
+}
+
+export interface IQueuePreferencesGeneralSettings {
+  maximum: number;
+  messages: {
+    picked: string;
+  }
+}
+
+export interface IQueuedUser {
+  id: number;
+  user_id: number;
+  viewer_id: string;
+  name: string;
+  platform: string;
+  roles: number[];
+  note: string;
+  updated_at?: string;
+  created_at?: string;
+}
+
+// song requests
+export interface ISongRequestData {
+  commands: IDafaultCommandsSlug;
+  general: ISongRequestGeneral;
+}
+
+export interface ISongRequestGeneral {
+  limit: number;
+  max_duration: number;
+  max_requests_per_user: number;
+  skip_votes: number;
+  filter_level: number;
+  music_only: boolean;
+}
+
 // dictionaries
 export enum ChatbotAutopermitEnums {
   'None' = 0,
@@ -370,13 +451,15 @@ export enum ChatbotResponseTypes {
   Whisper = 'Whisper'
 }
 
-export type ChatbotAlertTypes = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits';
+export type ChatbotAlertType = 'tip' | 'follow' | 'host' | 'raid' | 'sub' | 'bits' | 'sub_mystery_gift';
+
+export type ChatbotSocketRoom = 'queue' | 'giveaway';
 
 export const ChatbotClients = [
   'Twitch'
 ]
 
-export type ChatbotSettingSlugs =
+export type ChatbotSettingSlug =
   'chat-notifications' | 'caps-protection' | 'symbol-protection' | 'link-protection' | 'words-protection'
 
 

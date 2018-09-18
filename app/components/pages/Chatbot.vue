@@ -3,7 +3,7 @@
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span>
-          {{ $t(`Chatbot ${globallyEnabled ? 'Enabled' : 'Disabled'}`) }}
+          {{ globallyEnabled ? $t('Chatbot Enabled') : $t('Chatbot Disabled') }}
         </span>
         <ToggleInput
           :value="globallyEnabled"
@@ -31,6 +31,7 @@
         <ChatbotTimers v-if="selectedTab === 'Timers'"/>
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
         <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
+        <ChatbotQueue v-if="selectedTab === 'Queue'"/>
       </transition>
     </div>
   </div>
@@ -43,10 +44,10 @@
 
 
 .chatbot__content {
-  width: calc(~"100% - 250px");
+  width: calc(~"100% - 200px");
 }
 .chatbot__side-menu {
-  width: 250px;
+  width: 200px;
   background: @day-secondary;
   border-right: 1px solid @day-border;
 

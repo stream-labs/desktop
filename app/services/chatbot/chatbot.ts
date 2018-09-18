@@ -5,6 +5,8 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
+import { MediaShareService, IMediaShareData, IMediaShareBan } from 'services/widget-settings/media-share';
+import io from 'socket.io-client';
 
 import {
   IChatbotApiServiceState,
@@ -29,16 +31,26 @@ import {
   ILinkProtectionResponse,
   IWordProtectionResponse,
   IQuotesResponse,
-  ChatbotSettingSlugs,
+  ChatbotSettingSlug,
   IQuote,
-  IQuotePreferencesResponse
+  IQuotePreferencesResponse,
+  IQueuePreferencesResponse,
+  IQueueStateResponse,
+  IQueueEntriesResponse,
+  IQueuePickedResponse,
+  IChatbotSocketAuthResponse,
+  ChatbotSocketRoom,
+  ISongRequestPreferencesResponse,
+  ISongRequestResponse
 } from './chatbot-interfaces';
 
 export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServiceState> {
   @Inject() userService: UserService;
   @Inject() chatbotCommonService: ChatbotCommonService;
+  @Inject() mediaShareService: MediaShareService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
+  socketUrl = 'https://chatbot-io.streamlabs.com';
   version = 'api/v1/';
 
   static defaultState: IChatbotApiServiceState = {
@@ -95,6 +107,34 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     quotePreferencesResponse: {
       enabled: false,
       settings: null
+    },
+    queuePreferencesResponse: {
+      enabled: false,
+      settings: null
+    },
+    queueStateResponse: {
+      status: 'Closed',
+    },
+    queueEntriesResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
+    },
+    queuePickedResponse: {
+      pagination: {
+        current: 1,
+        total: 1
+      },
+      data: []
+    },
+    songRequestPreferencesResponse: {
+      banned_media: [],
+    },
+    songRequestResponse: {
+      enabled: false,
+      settings: null
     }
   };
 
@@ -130,6 +170,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     this.LOGOUT();
   }
 
+
   apiEndpoint(route: String, versionIncluded?: Boolean) {
     return `${this.apiUrl}${versionIncluded ? this.version : ''}${route}`;
   }
@@ -164,6 +205,57 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             Promise.reject(errJson)
           );
       })
+  }
+
+  //
+  // sockets
+  //
+  logInToSocket(rooms: ChatbotSocketRoom[]) {
+    // requires log in
+    return this.api('GET', `socket-token?rooms=${rooms.join(',')}`, {})
+      .then((response: IChatbotSocketAuthResponse) => {
+        this.LOGIN_TO_SOCKET(response);
+      })
+  }
+
+  connectToQueueSocketChannels() {
+    let socket = io.connect(this.socketUrl);
+    socket.emit('authenticate', { token: this.state.socketToken });
+
+    socket.on('queue.open', (response: IQueueStateResponse) => {
+      // queue open
+      this.UPDATE_QUEUE_STATE(response);
+    });
+    socket.on('queue.close', (response: IQueueStateResponse) => {
+      // queue open
+      this.UPDATE_QUEUE_STATE(response);
+    });
+    socket.on('queue.join', () => {
+      // someone joins queue, refetch queue entries
+      this.fetchQueueEntries();
+    });
+    socket.on('queue.pick', () => {
+      // someone got selected, refetch queue entries and picked entries
+      this.fetchQueueEntries();
+      this.fetchQueuePicked();
+    });
+    socket.on('queue.leave', () => {
+      // someone leaves queue, refetch queue entries
+      this.fetchQueueEntries();
+    });
+    socket.on('queue.deleted', () => {
+      // queue deleted, refresh both entries
+      this.fetchQueueEntries();
+      this.fetchQueuePicked();
+    });
+    socket.on('queue.entries.clear', () => {
+      // Clear entries
+      this.fetchQueueEntries();
+    });
+    socket.on('queue.picked.clear', () => {
+      // Clear entries
+      this.fetchQueuePicked();
+    });
   }
 
   //
@@ -256,7 +348,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   fetchQuotes(page = this.state.quotesResponse.pagination.current, query = '') {
     return this.api('GET', `quotes?page=${page}&query=${query}`, {}).then(
       (response: IQuotesResponse) => {
-        console.log(response);
         this.UPDATE_QUOTES(response);
       }
     );
@@ -270,10 +361,60 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  fetchQueuePreferences() {
+    return this.api('GET', 'settings/queue', {}).then(
+      (response: IQueuePreferencesResponse) => {
+        this.UPDATE_QUEUE_PREFERENCES(response);
+      }
+    );
+  }
+
+  fetchQueueState() {
+    return this.api('GET', 'queue', {}).then(
+      (response: IQueueStateResponse) => {
+        this.UPDATE_QUEUE_STATE(response);
+      }
+    )
+  }
+
+  fetchQueueEntries(page = this.state.queueEntriesResponse.pagination.current, query = '') {
+    return this.api('GET', `queue/entries?page=${page}&query=${query}`, {}).then(
+      (response: IQueueEntriesResponse) => {
+        this.UPDATE_QUEUE_ENTRIES(response);
+      }
+    )
+  }
+
+  fetchQueuePicked(page = this.state.queuePickedResponse.pagination.current) {
+    return this.api('GET', `queue/picked?page=${page}`, {}).then(
+      (response: IQueuePickedResponse) => {
+        this.UPDATE_QUEUE_PICKED(response);
+      }
+    );
+  }
+
+  fetchSongRequestPreferencesData() {
+    return this.mediaShareService.fetchData().then(
+      (response: IMediaShareData) => {
+        this.UPDATE_SONG_REQUEST_PREFERENCES(response as ISongRequestPreferencesResponse);
+      }
+    );
+  }
+
+  fetchSongRequest() {
+    // mostly used for enable/disable only
+    return this.api('GET', 'settings/songrequest', {}).then(
+      (response: ISongRequestResponse) => {
+        debugger;
+        this.UPDATE_SONG_REQUEST(response);
+      }
+    );
+  }
+
   //
   // POST, PUT requests
   //
-  resetSettings(slug: ChatbotSettingSlugs) {
+  resetSettings(slug: ChatbotSettingSlug) {
     return this.api('POST', `settings/${slug}/reset`, {}).then(
       (
         response:
@@ -304,7 +445,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'words-protection':
-            debugger;
             this.UPDATE_WORD_PROTECTION(
               response as IWordProtectionResponse
             );
@@ -349,6 +489,7 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+  // create
   createCustomCommand(data: ICustomCommand) {
     return this.api('POST', 'commands', data)
       .then((response: ICustomCommand) => {
@@ -373,6 +514,8 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       });
   }
 
+
+  // Update
   updateDefaultCommand(slugName: string, commandName: string, data: IDefaultCommand) {
     return this.api('POST', `settings/${slugName}/commands/${commandName}`, data)
       .then((response: IChatbotAPIPostResponse) => {
@@ -451,7 +594,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   updateQuote(id: number, data: IQuote) {
     return this.api('PUT', `quotes/${id}`, data)
       .then((response: IChatbotAPIPutResponse) => {
-        debugger;
         if (response.success === true) {
           this.fetchQuotes();
           this.chatbotCommonService.closeChildWindow();
@@ -469,11 +611,54 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
       })
   }
 
+  updateQueuePreferences(data: IQueuePreferencesResponse) {
+    return this.api('POST', 'settings/queue', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchQueuePreferences();
+          this.chatbotCommonService.closeChildWindow();
+        }
+      })
+  }
+
+  openQueue(title: string) {
+    return this.api('PUT', 'queue/open', { title });
+  }
+
+  closeQueue() {
+    return this.api('PUT', 'queue/close', {});
+  }
+
+  pickQueueEntry(id: number) {
+    return this.api('PUT', `queue/pick/${id}`, {});
+  }
+
+  pickQueueEntryRandom() {
+    return this.api('PUT', 'queue/pick/random', {});
+  }
+
+  unbanMedia(media: IMediaShareBan) {
+    this.mediaShareService.unbanMedia(media);
+  }
+
+  updateSongRequestPreferencesData(data: any) {
+    // NOTE: should update type
+    this.mediaShareService.saveData(data.settings);
+  }
+
+  updateSongRequest(data: ISongRequestResponse) {
+    return this.api('POST', 'settings/songrequest', data)
+      .then((response: IChatbotAPIPostResponse) => {
+        if (response.success === true) {
+          this.fetchSongRequest();
+        }
+      })
+  }
+
 
   //
   // DELETE methods
   //
-
   deleteCustomCommand(id: string) {
     return this.api('DELETE', `commands/${id}`, {}).then(
       (response: IChatbotAPIDeleteResponse) => {
@@ -504,6 +689,18 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     );
   }
 
+  clearQueueEntries() {
+    return this.api('DELETE', 'queue/entries', {});
+  }
+
+  clearQueuePicked() {
+    return this.api('DELETE', 'queue/picked', {});
+  }
+
+  removeQueueEntry(id: number) {
+    return this.api('DELETE', `queue/${id}`, {});
+  }
+
   //
   // Mutations
   //
@@ -511,6 +708,10 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);
+  }
+
+  @mutation()
+  private LOGIN_TO_SOCKET(response: IChatbotSocketAuthResponse) {
     Vue.set(this.state, 'socketToken', response.socket_token);
   }
 
@@ -582,7 +783,35 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
     Vue.set(this.state, 'quotePreferencesResponse', response);
   }
 
+  @mutation()
+  private UPDATE_QUEUE_PREFERENCES(response: IQueuePreferencesResponse) {
+    Vue.set(this.state, 'queuePreferencesResponse', response);
+  }
 
+  @mutation()
+  private UPDATE_QUEUE_STATE(response: IQueueStateResponse) {
+    Vue.set(this.state, 'queueStateResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUEUE_ENTRIES(response: IQueueEntriesResponse) {
+    Vue.set(this.state, 'queueEntriesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_QUEUE_PICKED(response: IQueuePickedResponse) {
+    Vue.set(this.state, 'queuePickedResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SONG_REQUEST_PREFERENCES(response: ISongRequestPreferencesResponse) {
+    Vue.set(this.state, 'songRequestPreferencesResponse', response);
+  }
+
+  @mutation()
+  private UPDATE_SONG_REQUEST(response: ISongRequestResponse) {
+    Vue.set(this.state, 'songRequestResponse', response);
+  }
 }
 
 export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
@@ -711,7 +940,17 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
-  openQuotePreferenceWindow() {
+  openQueuePreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotQueuePreferencesWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
+
+  openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
       size: {
@@ -721,16 +960,25 @@ export class ChatbotCommonService extends PersistentStatefulService<IChatbotComm
     });
   }
 
+  openSongRequestPreferencesWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSongRequestPreferencesWindow',
+      size: {
+        width: 650,
+        height: 500
+      }
+    });
+  }
 
-  // @mutation()
-  // showToast(message: string, options: object) {
-  //   this.state.toasted.show(message, options);
-  // }
-
-  // @mutation()
-  // private BINDS_TOASTED(toasted: object) {
-  //   Vue.set(this.state, 'toasted', toasted);
-  // }
+  openSongRequestOnboardingWindow() {
+    this.windowsService.showWindow({
+      componentName: 'ChatbotSongRequestOnboardingWindow',
+      size: {
+        width: 650,
+        height: 650
+      }
+    });
+  }
 
   @mutation()
   private HIDE_MOD_BANNER() {

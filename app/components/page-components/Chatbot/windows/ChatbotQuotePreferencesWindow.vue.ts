@@ -41,11 +41,6 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
     this.generalSettings = cloneDeep(this.quotePreferences.settings.general);
   }
 
-
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
   onSaveHandler() {
     const newPreferences = cloneDeep(this.quotePreferences);
     newPreferences.settings.general = this.generalSettings;

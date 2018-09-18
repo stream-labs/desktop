@@ -9,6 +9,7 @@ import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { log } from 'lodash-decorators/utils';
 
 @Component({
   components: { ModalLayout, Selector, Display }

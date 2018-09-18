@@ -16,6 +16,7 @@ export default class ChatbotModules extends ChatbotBase {
 
   mounted() {
     this.chatbotApiService.fetchChatAlerts();
+    this.chatbotApiService.fetchSongRequest();
   }
 
   get modules() {
@@ -41,12 +42,22 @@ export default class ChatbotModules extends ChatbotBase {
       },
       {
         title: $t('Song Request'),
-        description: comingSoonText,
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
-        enabled: false,
-        onExpand: () => {},
-        onToggleEnabled: () => {},
-        comingSoon: true
+        description: $t('Allow your viewers to to request songs from Youtube and play the songs on stream.'),
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
+        enabled: this.songRequestCurrentlyEnabled,
+        onExpand: () => {
+          this.chatbotCommonService.openSongRequestPreferencesWindow();
+        },
+        onToggleEnabled: () => {
+          this.chatbotApiService.updateSongRequest({
+            ...this.songRequest,
+            enabled: !this.songRequestCurrentlyEnabled
+          });
+          // if (!this.songRequestCurrentlyEnabled) {
+          //   // enabling, show onboarding
+          //   this.chatbotCommonService.openSongRequestOnboardingWindow();
+          // }
+        },
       },
       {
         title: $t('Mini Games'),
@@ -76,5 +87,13 @@ export default class ChatbotModules extends ChatbotBase {
 
   get chatAlertCurrentlyEnabled() {
     return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
+  }
+
+  get songRequest() {
+    return this.chatbotApiService.state.songRequestResponse;
+  }
+
+  get songRequestCurrentlyEnabled() {
+    return this.chatbotApiService.state.songRequestResponse.enabled === true;
   }
 }

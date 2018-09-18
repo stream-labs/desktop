@@ -66,6 +66,7 @@ export default class WidgetWindow extends Vue {
       url: this.widgetUrl
     };
     this.previewSource = this.sourcesService.createSource(source.name, source.type, previewSettings);
+    console.log('PREVIEW SOURCE');
     this.sourceUpdatedSubscr = this.sourcesService.sourceUpdated.subscribe(
       sourceModel => this.onSourceUpdatedHandler(sourceModel)
     );
