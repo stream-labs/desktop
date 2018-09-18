@@ -349,14 +349,14 @@
   },
   "scene": {
     "name": "Scene",
-    "description": "Allows you to add existing scene as a source"
+    "description": "Allows you to add existing scene as a source."
   },
   "blackmagicDevice": {
     "name": "Blackmagic Device"
   },
   "ndi_source": {
     "name": "NDI™ Source",
-    "description": "Allow you capture NDI output streams."
+    "description": "Allow you to capture NDI output streams."
   },
   "openvr_capture": {
     "name": "OpenVR Capture"
