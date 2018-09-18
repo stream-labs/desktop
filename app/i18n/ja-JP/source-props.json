@@ -358,7 +358,7 @@
   },
   "ndi_source": {
     "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。"
+    "description": "NDIの出力ストリームをキャプチャします。"
   },
   "openvr_capture": {
     "name": "OpenVR Capture"
