@@ -95,7 +95,7 @@ export class WidgetsService extends Service {
   getWidgetUrl(type: WidgetType) {
     if (!this.userService.isLoggedIn()) return;
     return WidgetDefinitions[type].url(
-      this.hostsService.streamlabs,
+      this.hostsService.beta3,
       this.userService.widgetToken,
       this.userService.platform.type
     );

@@ -137,7 +137,6 @@ export class ChatbotApiService extends PersistentStatefulService<
     },
     songRequestPreferencesResponse: {
       banned_media: [],
-      settings: null
     },
     songRequestResponse: {
       enabled: false,
@@ -1006,7 +1005,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     });
   }
 
-  openSongRequestWindow() {
+  openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
       size: {

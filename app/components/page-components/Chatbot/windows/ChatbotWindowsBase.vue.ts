@@ -14,7 +14,6 @@ Vue.use(VModal);
   }
 })
 export default class ChatbotWindowsBase extends ChatbotBase {
-
   onCancelHandler(): void {
     this.chatbotCommonService.closeChildWindow();
   }
@@ -80,6 +79,27 @@ export default class ChatbotWindowsBase extends ChatbotBase {
           ...queuePreferencesCommand,
           slugName: 'queue',
           commandName: 'join'
+        });
+        break;
+    }
+  }
+
+  onToggleSongRequestWindowHandler() {
+    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+      .componentName;
+
+    switch (currentWindow) {
+      case 'ChatbotDefaultCommandWindow':
+        this.chatbotCommonService.openSongRequestPreferencesWindow();
+        break;
+      case 'ChatbotSongRequestPreferencesWindow':
+        const queuePreferencesCommand = this.chatbotApiService.state
+          .defaultCommandsResponse['songrequest'].songrequest;
+
+        this.chatbotCommonService.openDefaultCommandWindow({
+          ...queuePreferencesCommand,
+          slugName: 'songrequest',
+          commandName: 'songrequest'
         });
         break;
     }

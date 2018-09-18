@@ -72,6 +72,13 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     )
   }
 
+  get isSongRequestCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'songrequest' &&
+      this.defaultCommandToUpdate.commandName === 'songrequest'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotCommonService.state.defaultCommandToUpdate;
   }
