@@ -188,6 +188,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     if (options.size && typeof options.size.x === 'number' && typeof options.size.y === 'number') {
       newWindow.setPosition(options.size.x, options.size.y);
+
+      // サブモニタの座標がそれぞれ負のときに異常な値になる問題があり
+      // 非同期にもう一回座標を与えてやるといい感じに画面内に収めてくれる
+      setTimeout(() => newWindow.setPosition(options.size.x, options.size.y), 200);
     }
 
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
