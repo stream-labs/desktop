@@ -57,14 +57,14 @@ class Updater {
     return false;
   }
 
-  textToHtml(text) {
-    return text.split('\n').map(s => `${s}</br>`).join('\n');
+  textToLines(text) {
+    return text.split('\n')
   }
 
   bindListeners() {
     autoUpdater.on('update-available', info => {
       this.updateState.asking = true;
-      this.updateState.releaseNotes = this.textToHtml(info.releaseNotes);
+      this.updateState.releaseNotes = this.textToLines(info.releaseNotes);
       this.updateState.releaseDate = info.releaseDate;
       this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
@@ -151,6 +151,10 @@ isUnskippable: ${this.updateState.isUnskippable}`);
       }
       if (!this.finished) app.quit();
     });
+
+    if (process.env.NODE_ENV !== 'production') {
+      browserWindow.webContents.openDevTools({ mode: 'undocked' });
+    }
 
     browserWindow.loadURL('file://' + __dirname + '/index.html');
 

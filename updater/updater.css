@@ -79,6 +79,10 @@ html {
     overflow-y: auto;
     box-sizing: border-box;
 }
+.patch-notes p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+}
 .patch-notes a {
     color: #70A0AF;
     pointer-events: none;

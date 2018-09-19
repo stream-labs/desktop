@@ -13,7 +13,9 @@
     </p>
     <p class="caption">{{ $t('asking.changeLog') }}</p>
     <div class="patch-notes-wrap">
-      <p v-html="releaseNotes" class="patch-notes"/>
+      <div class="patch-notes">
+        <p v-for="(line,index) in releaseNotes" v-bind:key="index" v-text="line" />
+      </div>
     </div>
     <button v-if="!isUnskippable"
       class="button--dark"
