@@ -358,7 +358,30 @@
   },
   "ndi_source": {
     "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。"
+    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。",
+    "ndi_source_name": {
+      "name": "ソース名"
+    },
+    "ndi_bw_mode": {
+      "name": "帯域",
+      "0": "最高",
+      "1": "最低",
+      "2": "音声のみ"
+    },
+    "ndi_sync": {
+      "name": "同期",
+      "0": "内部",
+      "1": "ネットワーク"
+    },
+    "ndi_recv_hw_accel": {
+      "name": "ハードウェアアクセラレーションの使用を許可する"
+    },
+    "ndi_fix_alpha_blending": {
+      "name": "アルファブレンドを固定する（このソースにフィルターを追加する）"
+    },
+    "ndi_website": {
+      "name": "NDI.NewTek.com"
+    }
   },
   "openvr_capture": {
     "name": "OpenVR Capture"
