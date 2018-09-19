@@ -1,7 +1,7 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.10.2',
+  version: '0.10.3',
   title: 'Various fixes and integrated Widgets',
   showChest: false,
   notes: [
