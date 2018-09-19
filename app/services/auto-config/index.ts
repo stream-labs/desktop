@@ -23,10 +23,6 @@ export interface IConfigProgress {
 
 type TConfigProgressCallback = (progress: IConfigProgress) => void;
 
-const steps = {
-
-};
-
 export class AutoConfigService extends Service {
 
   start(cb: TConfigProgressCallback) {
@@ -65,6 +61,10 @@ export class AutoConfigService extends Service {
 
     if (progress.event === 'error') {
       nodeObs.StartSetDefaultSettings();
+    }
+
+    if (progress.event === 'done') {
+      nodeObs.TerminateAutoConfig();
     }
   }
 
