@@ -164,10 +164,6 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const newWindow = this.windows[windowId] = new BrowserWindow({
       frame: false,
-      x: (options.size && options.size.x) || undefined,
-      y: (options.size && options.size.y) || undefined,
-      width: (options.size && options.size.width) || 400,
-      height: (options.size && options.size.height) || 400,
       title: options.title || 'New Window',
       transparent: options.transparent,
       resizable: options.resizable,
@@ -185,6 +181,15 @@ export class WindowsService extends StatefulService<IWindowsState> {
     }
 
     const indexUrl = remote.getGlobal('indexUrl');
+
+    const width = options.size && typeof options.size.width === 'number' ? options.size.width : 400;
+    const height = options.size && typeof options.size.height === 'number' ? options.size.height : 400;
+    newWindow.setSize(width, height);
+
+    if (options.size && typeof options.size.x === 'number' && typeof options.size.y === 'number') {
+      newWindow.setPosition(options.size.x, options.size.y);
+    }
+
     newWindow.loadURL(`${indexUrl}?windowId=${windowId}`);
 
     return windowId;
