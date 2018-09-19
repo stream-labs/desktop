@@ -332,7 +332,7 @@
     "description": "内蔵マイクや外付けマイクなど、PCに接続されているデバイスからの音声をキャプチャします。",
     "device_id": {
       "name": "デバイス",
-      "default": "標準"
+      "default": "既定"
     },
     "use_device_timing": {
       "name": "デバイスのタイムスタンプを使用"
@@ -343,7 +343,7 @@
     "description": "デスクトップ上で再生中の音声をキャプチャします。",
     "device_id": {
       "name": "デバイス",
-      "default": "標準"
+      "default": "既定"
     },
     "use_device_timing": {
       "name": "デバイスのタイムスタンプを使用"
@@ -358,7 +358,7 @@
   },
   "ndi_source": {
     "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャ－して配信することができます。",
+    "description": "NDIの出力ストリームをキャプチャします。"
     "ndi_source_name": {
       "name": "ソース名"
     },
