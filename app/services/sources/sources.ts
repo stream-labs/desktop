@@ -272,7 +272,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
-      { description: 'LIV Client Capture', value: 'liv_capture' }
+      { description: 'LIV Client Capture', value: 'liv_capture' },
+      { description: 'OvrStream', value: 'ovrstream_dc_source' }
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));

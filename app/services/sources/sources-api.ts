@@ -99,7 +99,8 @@ export type TSourceType =
   'scene' |
   'ndi_source' |
   'openvr_capture' |
-  'liv_capture'
+  'liv_capture' |
+  'ovrstream_dc_source'
   ;
 
 // Register new properties managers here
