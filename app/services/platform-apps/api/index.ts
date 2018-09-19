@@ -5,6 +5,7 @@ import { ObsSettingsModule } from './modules/obs-settings';
 import { StreamingRecordingModule } from './modules/streaming-recording';
 import { AuthorizationModule } from './modules/authorization';
 import { ILoadedApp } from '..';
+import { ThemeModule } from './modules/theme';
 
 export class PlatformAppsApi {
 
@@ -17,6 +18,7 @@ export class PlatformAppsApi {
     this.registerModule(new ObsSettingsModule());
     this.registerModule(new StreamingRecordingModule());
     this.registerModule(new AuthorizationModule());
+    this.registerModule(new ThemeModule());
   }
 
   private registerModule(module: Module) {
