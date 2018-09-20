@@ -2,16 +2,10 @@
 <widget-window :requestState="requestState" :loaded="loaded"  ref="layout" v-model="tabName">
   <div slot="settings" >
     <h-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
-      <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
-      <span>{{ $t('mins') }}</span>
-      <div class="duration"><number-input v-model="wData.settings.hide_duration_secs" :metadata="{}" /></div>
-      <span>{{ $t('secs') }}</span>
+      <timer-input v-model="wData.settings.hide_duration_in_seconds" :metadata="{}" />
     </h-form-group>
     <h-form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
-      <div class="duration"><number-input v-model="wData.settings.show_duration" :metadata="{}" /></div>
-      <span>{{ $t('mins') }}</span>
-      <div class="duration"><number-input v-model="wData.settings.show_duration_secs" :metadata="{}" /></div>
-      <span>{{ $t('secs') }}</span>
+      <timer-input v-model="wData.settings.show_duration_in_seconds" :metadata="{}" />
     </h-form-group>
 
     <h-form-group :title="$t('Banner Width')">

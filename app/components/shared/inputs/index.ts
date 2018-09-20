@@ -15,6 +15,7 @@ export enum EInputType {
   fontSize = 'fontSize',
   fontFamily = 'fontFamily',
   code = 'code',
+  timer = 'timer',
 }
 
 /**
@@ -33,6 +34,10 @@ export interface INumberMetadata extends IInputMetadata {
   min?: number;
   max?: number;
   placeholder?: string;
+}
+
+export interface ITimerMetadata extends INumberMetadata {
+  format?: 'hms' | 'hm' | 'ms';
 }
 
 export interface IListMetadata<TValueType> extends IInputMetadata {
@@ -69,6 +74,7 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
 
 // a helper for creating metadata
 export const metadata = {
+  timer: (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata),
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
   number: (options: INumberMetadata) => ({ type: EInputType.number, ...options } as INumberMetadata),
   text: (options: ITextMetadata) => ({ type: EInputType.text, ...options } as ITextMetadata),
