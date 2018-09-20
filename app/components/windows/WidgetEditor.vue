@@ -14,7 +14,7 @@
     <div class="window-container">
       <div style="position: relative;">
         <tabs
-          :showContent="false"
+          :hideContent="true"
           className="widget-editor__top-tabs"
           :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]"
           @input="value => updateTopTab(value)"
@@ -63,7 +63,7 @@
 
         <div class="code-editor hidden" ref="code">
           <tabs
-            :showContent="false"
+            :hideContent="true"
             className="widget-editor__top-tabs"
             :tabs="codeTabs"
             @input="value => updateCodeTab(value)"
