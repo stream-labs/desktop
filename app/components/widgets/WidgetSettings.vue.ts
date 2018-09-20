@@ -42,15 +42,11 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   async created() {
-    console.log('call created');
     this.service = this.widget.getSettingsService() as TService;
     try {
-      console.log('try loading');
       this.wData = await this.service.fetchData();
       this.lastSuccessfullySavedWData = cloneDeep(this.wData);
       this.requestState = 'success';
-
-      console.log('success, call afterFetch');
       this.afterFetch();
     } catch (e) {
       this.requestState = 'fail';
@@ -103,8 +99,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   protected afterFetch() {
-    // override me
-
-    console.log('not overrode afterFetch');
+    // override me if you need
   };
 }
