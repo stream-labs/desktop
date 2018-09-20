@@ -189,7 +189,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged && node ./bin/i18n-early-check.js"
     }
   }
 }
