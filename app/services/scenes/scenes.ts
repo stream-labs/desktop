@@ -17,6 +17,7 @@ import electron from 'electron';
 import { Subject } from 'rxjs/Subject';
 import { Inject } from 'util/injector';
 import * as obs from 'services/obs-api';
+import { $t } from 'services/i18n';
 import namingHelpers from 'util/NamingHelpers';
 import uuid from 'uuid/v4';
 
@@ -217,6 +218,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showNameScene(options: {rename?: string, itemsToGroup?: string[] } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
+      title: options.rename ? $t('Rename Scene') : $t('Name Scene'),
       queryParams: options,
       size: {
         width: 400,
@@ -229,6 +231,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showNameFolder(options: { renameId?: string, itemsToGroup?: string[], parentId?: string } = {}) {
     this.windowsService.showWindow({
       componentName: 'NameFolder',
+      title: options.renameId ? $t('Rename Folder') : $t('Name Folder'),
       queryParams: options,
       size: {
         width: 400,
@@ -241,6 +244,7 @@ export class ScenesService extends StatefulService<IScenesState> implements ISce
   showDuplicateScene(sceneName: string) {
     this.windowsService.showWindow({
       componentName: 'NameScene',
+      title: $t('Name Scene'),
       queryParams: { sceneToDuplicate: sceneName },
       size: {
         width: 400,

@@ -3,13 +3,10 @@ import { Component, Prop } from 'vue-property-decorator';
 import { WindowsService } from 'services/windows';
 import { CustomizationService } from 'services/customization';
 import { Inject } from 'util/injector';
-import TitleBar from './TitleBar.vue';
 import { AppService } from 'services/app';
 import electron from 'electron';
 
-@Component({
-  components: { TitleBar }
-})
+@Component({})
 export default class ModalLayout extends Vue {
 
   contentStyle: Object = {};
@@ -18,9 +15,6 @@ export default class ModalLayout extends Vue {
   @Inject() customizationService: CustomizationService;
   @Inject() windowsService: WindowsService;
   @Inject() appService: AppService;
-
-  // The title shown at the top of the window
-  @Prop() title: string;
 
   // Whether the "cancel" and "done" controls should be
   // shown at the bottom of the modal.
@@ -66,8 +60,6 @@ export default class ModalLayout extends Vue {
 
     this.contentStyle = contentStyle;
     this.fixedStyle = fixedStyle;
-
-    electron.remote.getCurrentWindow().setTitle(this.title);
   }
 
   get nightTheme() {
