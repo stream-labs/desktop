@@ -42,23 +42,12 @@ export default class ChatbotModules extends ChatbotBase {
       },
       {
         title: $t('Song Request'),
-        description: $t('Allow your viewers to to request songs from Youtube and play the songs on stream.'),
-        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-alert--${backgroundUrlSuffix}.png`),
-        enabled: this.songRequestCurrentlyEnabled,
-        onExpand: () => {
-          this.chatbotCommonService.openSongRequestPreferencesWindow();
-        },
-        onToggleEnabled: () => {
-          if (!this.songRequestCurrentlyEnabled) {
-            // enabling, show onboarding
-            this.chatbotCommonService.openSongRequestOnboardingWindow();
-          }
-
-          this.chatbotApiService.updateSongRequest({
-            ...this.songRequest,
-            enabled: !this.songRequestCurrentlyEnabled
-          });
-        },
+        description: comingSoonText,
+        backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
+        enabled: false,
+        onExpand: () => { },
+        onToggleEnabled: () => { },
+        comingSoon: true
       },
       {
         title: $t('Mini Games'),
