@@ -8,7 +8,7 @@
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     </Tabs>
   </div>
-  <div slot="content" class="chatbot-symbol-protection__container">
+  <validated-form ref="form" slot="content" class="chatbot-symbol-protection__container">
     <transition name='fade' mode="out-in" appear>
       <div v-if="selectedTab === 'general' && symbolProtection">
         <div class="row">
@@ -57,7 +57,7 @@
         />
       </div>
     </transition>
-  </div>
+  </validated-form>
   <div slot="controls" class="flex flex--space-between">
     <button
       class="button button--default"
