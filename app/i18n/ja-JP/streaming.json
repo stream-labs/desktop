@@ -16,6 +16,7 @@
   "starting": "配信開始中",
   "startingWithDelay": "配信開始中 %{delaySeconds}s",
   "ending": "配信終了中",
+  "endingWithDelay": "%{delaySeconds}秒間破棄しています",
   "reconnecting": "再接続中",
   "goLive": "配信開始",
   "endStreamInStreamingConfirm": "配信中ですが、N Airを終了してもよろしいですか？",

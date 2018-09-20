@@ -92,7 +92,32 @@ function checkKeys(localeJsons) {
   const allLocales = Array.from(localeJsons.reduce((acc, cur) => acc.add(cur.locale), new Set()));
 
   const optionalKeys = new Set([
-
+    'Output.Untitled.Mode.Simple',
+    'Output.Untitled.Mode.Advanced',
+    'Output.Streaming.StreamEncoder.obs_x264',
+    'Output.Streaming.StreamEncoder.obs_qsv11',
+    'Output.Streaming.rate_control.CBR',
+    'Output.Streaming.rate_control.ABR',
+    'Output.Streaming.rate_control.VBR',
+    'Output.Streaming.rate_control.CRF',
+    'Output.Recording.RecQuality.Stream',
+    'Output.Recording.RecQuality.Small',
+    'Output.Recording.RecQuality.HQ',
+    'Output.Recording.RecQuality.Lossless',
+    'Video.Untitled.ScaleType.bilinear',
+    'Video.Untitled.ScaleType.bicubic',
+    'Video.Untitled.ScaleType.lanczos',
+    'Video.Untitled.FPSType.Common FPS Values',
+    'Video.Untitled.FPSType.Integer FPS Value',
+    'Video.Untitled.FPSType.Fractional FPS Value',
+    'Advanced.Audio.MonitoringDeviceName.Default',
+    'wasapi_input_capture.device_id.default',
+    'wasapi_output_capture.device_id.default',
+    'ndi_source.ndi_bw_mode.0',
+    'ndi_source.ndi_bw_mode.1',
+    'ndi_source.ndi_bw_mode.2',
+    'ndi_source.ndi_sync.0',
+    'ndi_source.ndi_sync.1',
   ]);
 
   const localesOfFiles = localeJsons
@@ -123,14 +148,13 @@ function checkKeys(localeJsons) {
         }
       }
       for (let [key, localesOfAKey] of localesOfKeys) {
-        if (optionalKeys.has(key)) {
-          continue;
-        }
         if (localesOfAKey.length !== allLocales.length) {
+          if (key.endsWith('.name') || optionalKeys.has(key)) {
+            continue;
+          }
           const missingLocales = allLocales.filter(v => localesOfAKey.indexOf(v) < 0);
           const message = `${filename}: '${key}' is only in (${localesOfAKey}), not in (${missingLocales})`;
-          console.log(message); /* DEBUG
-          result.push(new Error(message)); /*/
+          result.push(new Error(message));
         }
       }
     }

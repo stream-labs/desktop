@@ -2,7 +2,7 @@
   "noNotification": "通知がありません",
   "enableNotifications": "通知を有効にします。",
   "enableSound": "サウンドを有効にします。",
-  "skippedFramesDetected:": "スキップされたフレームを検出しました。",
+  "skippedFramesDetected": "スキップされたフレームを検出しました。",
   "detectSkippedFrames": "スキップされたフレームを検出します。",
   "skippedFramesThreshold": "スキップされたフレームの限界値",
   "detectLaggedFrames": "時間差フレームを検出します。",
