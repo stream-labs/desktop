@@ -118,10 +118,18 @@
     </add-source-info>
 
     <add-source-info
+      v-if="inspectedSource === 'decklink-input'"
+      @clickAdd="selectSource('decklink-input')"
+      sourceType="decklink-input"
+      key="14">
+     <BlackmagicSourceIcon slot="media" />
+    </add-source-info>
+
+    <add-source-info
       v-if="inspectedSource === 'scene'"
       @clickAdd="selectSource('scene')"
       sourceType="scene"
-      key="14">
+      key="15">
       <AddSceneIcon slot="media" />
     </add-source-info>
 

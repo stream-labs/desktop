@@ -353,8 +353,9 @@
     "name": "シーン",
     "description": "既存のシーンをソースとして新たに追加します。"
   },
-  "blackmagicDevice": {
-    "name": "Blackmagicデバイス"
+  "decklink-input": {
+    "name": "Blackmagicデバイス",
+    "description": "シーンにBlackmagicデバイスからの映像・音声を追加します"
   },
   "ndi_source": {
     "name": "NDI™ ソース",

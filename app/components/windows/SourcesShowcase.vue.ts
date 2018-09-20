@@ -23,6 +23,7 @@ const SlideshowIcon = require('../../../media/images/slideshow-icon.svg');
 const WasapiOutputIcon = require('../../../media/images/wasapi-output-icon.svg');
 const MonitorCaptureIcon = require('../../../media/images/monitor-capture-icon.svg');
 const NdiSourceIcon = require('../../../media/images/ndi-icon.svg');
+const BlackmagicSourceIcon = require('../../../media/images/blackmagic-icon.svg');
 
 type TInspectableSource = TSourceType;
 
@@ -48,7 +49,8 @@ interface ISelectSourceOptions {
     SlideshowIcon,
     WasapiOutputIcon,
     MonitorCaptureIcon,
-    NdiSourceIcon
+    NdiSourceIcon,
+    BlackmagicSourceIcon
   },
   mixins: [windowMixin],
 })

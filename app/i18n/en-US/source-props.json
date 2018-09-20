@@ -351,8 +351,9 @@
     "name": "Scene",
     "description": "Allows you to add existing scene as a source."
   },
-  "blackmagicDevice": {
-    "name": "Blackmagic Device"
+  "decklink-input": {
+    "name": "Blackmagic Device",
+    "description": "Add video / audio from Blackmagic device."
   },
   "ndi_source": {
     "name": "NDI™ Source",
