@@ -98,7 +98,6 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
     this.requestState = 'pending';
 
-
     try {
       await this.service.saveData(dataToSave || this.wData[tab.name], tab.name);
       this.requestState = 'success';
