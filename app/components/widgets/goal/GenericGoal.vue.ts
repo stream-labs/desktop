@@ -56,8 +56,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   }
 
   async saveGoal() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     await this.save(this.goalCreateOptions);
   }
 

@@ -244,8 +244,10 @@ export class SourceFiltersService extends Service {
 
 
   showSourceFilters(sourceId: string, selectedFilterName = '') {
+    const sourceDisplayName = this.sourcesService.getSource(sourceId).name;
     this.windowsService.showWindow({
       componentName: 'SourceFilters',
+      title: $t('Source filters') + ' (' + sourceDisplayName + ')',
       queryParams: { sourceId, selectedFilterName },
       size: {
         width: 800,
@@ -258,6 +260,7 @@ export class SourceFiltersService extends Service {
   showAddSourceFilter(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'AddSourceFilter',
+      title: $t('Add source filter'),
       queryParams: { sourceId },
       size: {
         width: 600,

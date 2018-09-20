@@ -1,7 +1,6 @@
 import { Service } from 'services/service';
 import path from 'path';
 import fs from 'fs';
-import Utils from './utils';
 
 interface IFile {
   data: string;
@@ -128,17 +127,6 @@ export class FileManagerService extends Service {
     });
 
     await promises;
-  }
-
-  /**
-   * simple file resolver for searching files in the .asar archive
-   */
-  resolve(filePath: string) {
-    if (
-      Utils.isDevMode() ||
-      filePath.split('/')[0] !== 'app'
-    ) return filePath;
-    return `resources/app.asar/${filePath}`;
   }
 
   private async flush(filePath: string, tries = 10) {
