@@ -205,7 +205,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid @day-editor-border;
+    border-left: 1px solid @day-editor-border;
     background-color: @day-section;
     .transition();
   }
