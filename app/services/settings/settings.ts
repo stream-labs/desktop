@@ -96,6 +96,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   showSettings(categoryName?: string) {
     this.windowsService.showWindow({
       componentName: 'Settings',
+      title: $t('Settings'),
       queryParams: { categoryName },
       size: {
         width: 800,

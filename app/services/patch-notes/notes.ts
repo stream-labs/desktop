@@ -1,7 +1,7 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.0.0',
+  version: '0.10.3',
   title: 'Various fixes and integrated Widgets',
   showChest: false,
   notes: [
@@ -17,6 +17,8 @@ export const notes: IPatchNotes = {
     'Fixed wrong default server when importing from OBS',
     'Temporarily disabled the QSV encoder as it\'s causing a crash on start streaming on some cases. The QSV encoder will be renabled once the issue is fixed',
     'Renamed a background process to workaround certain devices not capturing audio, most notably certain capture cards and audio centers',
-    'Added unicode support in the install path directory'
+    'Added unicode support in the install path directory',
+    'Fixed stream not correctly reconnecting itself in some cases after a disconnection occurred',
+    'Fixed game capture not capturing in some cases'
   ]
 };
