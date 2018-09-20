@@ -1,5 +1,6 @@
 import { Component, Prop } from 'vue-property-decorator';
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import { ITextMetadata } from 'components/shared/inputs/index';
 
@@ -7,8 +8,14 @@ import {
   NEW_LINK_PROTECTION_LIST_MODAL_ID
 } from 'services/chatbot';
 
-@Component({})
+@Component({
+  components: { ValidatedForm }
+})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
+  $refs: {
+    form: ValidatedForm;
+  };
+
   @Prop()
   value: string[];
   @Prop()
@@ -50,8 +57,8 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$emit('input', newListItemArray);
   }
 
-  onAddNewItemHandler() {
-    if (!this.newListItem) return;
+  async onAddNewItemHandler() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     let newListItemArray = this.value.slice(0);
 

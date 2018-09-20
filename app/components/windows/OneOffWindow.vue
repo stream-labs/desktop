@@ -1,21 +1,16 @@
 <template>
 <div style="height: 100%" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}">
-  <title-bar :title="options.title" class="child-window-titlebar" />
+  <title-bar :title="options.title" class="child-window-titlebar" v-if="!isFullScreen" />
   <div class="blank-slate">
     <div class="spinner-spacer" />
     <i class="fa fa-spinner fa-pulse" />
     <div class="spinner-spacer" />
   </div>
-  <component
-    v-for="(component, index) in components"
-    :key="`${component.name}-${index}`"
-    v-if="component.name"
-    v-show="component.isShown"
-    :is="component.name"/>
+  <component :is="options.componentName"/>
 </div>
 </template>
 
-<script lang="ts" src="./ChildWindow.vue.ts"></script>
+<script lang="ts" src="./OneOffWindow.vue.ts"></script>
 
 <style lang="less">
 @import "../../styles/index";
@@ -43,8 +38,8 @@
 }
 
 .night-theme {
-  .blank-slate,
-  .child-window-titlebar {
+  .child-window-titlebar,
+  .blank-slate {
     background-color: @night-primary;
     color: @night-text;
   }

@@ -50,7 +50,7 @@
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
         <div class="new-list-item-modal__header__title">{{ $t('Add to Blacklist') }}</div>
       </div>
-      <div class="new-list-item-modal__body">
+      <validated-form ref="form" class="new-list-item-modal__body">
         <div class="row">
           <div class="small-7 columns">
             <VFormGroup
@@ -79,7 +79,7 @@
           v-model="newListItem.is_regex"
           :metadata="metadata.is_regex"
         />
-      </div>
+      </validated-form>
       <div class="new-list-item-modal__controls">
         <button
           class="button button--default"
@@ -89,7 +89,6 @@
         <button
           class="button button--action"
           @click="onAddNewItemHandler"
-          :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
         </button>

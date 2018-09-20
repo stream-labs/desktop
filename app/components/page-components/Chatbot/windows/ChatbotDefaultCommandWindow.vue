@@ -49,94 +49,96 @@
     class="chatbot-add-command__container"
   >
     <transition name='fade' mode="out-in" appear>
-      <div v-if="selectedTab === 'general'">
-        <VFormGroup
-          :title="$t('Command')"
-          v-model="editedCommand.command"
-          :metadata="metadata.command"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.response"
-          :title="$t('Response (Line breaks will be ignored)')"
-          v-model="editedCommand.response"
-          :metadata="metadata.response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.success_response"
-          :title="$t('Success Response (Line breaks will be ignored)')"
-          v-model="editedCommand.success_response"
-          :metadata="metadata.success_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.failed_response"
-          :title="$t('Failed Response (Line breaks will be ignored)')"
-          v-model="editedCommand.failed_response"
-          :metadata="metadata.failed_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.enabled_response"
-          :title="$t('Enabled Response (Line breaks will be ignored)')"
-          v-model="editedCommand.enabled_response"
-          :metadata="metadata.enabled_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.disabled_response"
-          :title="$t('Disabled Response (Line breaks will be ignored)')"
-          v-model="editedCommand.disabled_response"
-          :metadata="metadata.disabled_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.duration_response"
-          :title="$t('Duration Response (Line breaks will be ignored)')"
-          v-model="editedCommand.duration_response"
-          :metadata="metadata.duration_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.rating_response"
-          :title="$t('Rating Response (Line breaks will be ignored)')"
-          v-model="editedCommand.rating_response"
-          :metadata="metadata.rating_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.views_response"
-          :title="$t('Views Response (Line breaks will be ignored)')"
-          v-model="editedCommand.views_response"
-          :metadata="metadata.views_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.banned_response"
-          :title="$t('Banned Response (Line breaks will be ignored)')"
-          v-model="editedCommand.banned_response"
-          :metadata="metadata.banned_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.music_response"
-          :title="$t('Banned Response (Line breaks will be ignored)')"
-          v-model="editedCommand.music_response"
-          :metadata="metadata.music_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.max_response"
-          :title="$t('Max Response (Line breaks will be ignored)')"
-          v-model="editedCommand.max_response"
-          :metadata="metadata.max_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.full_response"
-          :title="$t('Full Response (Line breaks will be ignored)')"
-          v-model="editedCommand.full_response"
-          :metadata="metadata.full_response"
-        />
-        <VFormGroup
-          v-if="defaultCommandToUpdate.response_type"
-          :title="$t('Reply in')"
-          v-model="editedCommand.response_type"
-          :metadata="metadata.response_type"
-        />
-      </div>
-      <div v-if="selectedTab === 'advanced'">
-        <ChatbotAliases v-model="editedCommand.aliases" />
-      </div>
+      <validated-form ref="form">
+        <div v-if="selectedTab === 'general'">
+          <VFormGroup
+            :title="$t('Command')"
+            v-model="editedCommand.command"
+            :metadata="metadata.command"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response"
+            :title="$t('Response (Line breaks will be ignored)')"
+            v-model="editedCommand.response"
+            :metadata="metadata.response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.success_response"
+            :title="$t('Success Response (Line breaks will be ignored)')"
+            v-model="editedCommand.success_response"
+            :metadata="metadata.success_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.failed_response"
+            :title="$t('Failed Response (Line breaks will be ignored)')"
+            v-model="editedCommand.failed_response"
+            :metadata="metadata.failed_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.enabled_response"
+            :title="$t('Enabled Response (Line breaks will be ignored)')"
+            v-model="editedCommand.enabled_response"
+            :metadata="metadata.enabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.disabled_response"
+            :title="$t('Disabled Response (Line breaks will be ignored)')"
+            v-model="editedCommand.disabled_response"
+            :metadata="metadata.disabled_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.duration_response"
+            :title="$t('Duration Response (Line breaks will be ignored)')"
+            v-model="editedCommand.duration_response"
+            :metadata="metadata.duration_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.rating_response"
+            :title="$t('Rating Response (Line breaks will be ignored)')"
+            v-model="editedCommand.rating_response"
+            :metadata="metadata.rating_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.views_response"
+            :title="$t('Views Response (Line breaks will be ignored)')"
+            v-model="editedCommand.views_response"
+            :metadata="metadata.views_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.banned_response"
+            :title="$t('Banned Response (Line breaks will be ignored)')"
+            v-model="editedCommand.banned_response"
+            :metadata="metadata.banned_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.music_response"
+            :title="$t('Banned Response (Line breaks will be ignored)')"
+            v-model="editedCommand.music_response"
+            :metadata="metadata.music_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.max_response"
+            :title="$t('Max Response (Line breaks will be ignored)')"
+            v-model="editedCommand.max_response"
+            :metadata="metadata.max_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.full_response"
+            :title="$t('Full Response (Line breaks will be ignored)')"
+            v-model="editedCommand.full_response"
+            :metadata="metadata.full_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.response_type"
+            :title="$t('Reply in')"
+            v-model="editedCommand.response_type"
+            :metadata="metadata.response_type"
+          />
+        </div>
+        <div v-if="selectedTab === 'advanced'">
+          <ChatbotAliases v-model="editedCommand.aliases" />
+        </div>
+      </validated-form>
     </transition>
   </div>
   <div slot="controls" class="flex flex--space-between">
@@ -149,8 +151,7 @@
       </button>
       <button
         class="button button--action"
-        :disabled="errors.items.length > 0"
-        @click="onSave"
+        @click="onSaveHandler"
       >
         {{ $t("Save") }}
       </button>

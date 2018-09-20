@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="windowTitle"
   :showControls="false"
   :customControls="true"
   :fixedSectionHeight="254"

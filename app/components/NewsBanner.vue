@@ -12,8 +12,8 @@
     <p class="subheading">{{ currentBanner.subHeader }}</p>
   </div>
   <div class="cta-container">
-    <button class="button learn-more" @click="followLink()">{{ currentBanner.linkTitle }}</button>
-    <button class="dismiss-button" @click="closeBanner()">{{ $t('Dismiss') }}</button>
+    <button class="button learn-more" @click="followLink()" :disabled="!bannerExists">{{ currentBanner.linkTitle }}</button>
+    <button class="dismiss-button" @click="closeBanner()" :disabled="!bannerExists || processingClose">{{ $t('Dismiss') }}</button>
   </div>
 </div>
 </template>

@@ -119,6 +119,7 @@ export class TroubleshooterService
   showTroubleshooter(issueCode: TIssueCode) {
     this.windowsService.showWindow({
       componentName: 'Troubleshooter',
+      title: $t('Troubleshooter'),
       queryParams: { issueCode },
       size: {
         width: 500,
