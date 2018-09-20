@@ -356,7 +356,30 @@
   },
   "ndi_source": {
     "name": "NDI™ Source",
-    "description": "Allow you to capture NDI output streams."
+    "description": "Allow you to capture NDI output streams.",
+    "ndi_source_name": {
+      "name": null
+    },
+    "ndi_bw_mode": {
+      "name": null,
+      "0": null,
+      "1": null,
+      "2": null
+    },
+    "ndi_sync": {
+      "name": null,
+      "0": null,
+      "1": null
+    },
+    "ndi_recv_hw_accel": {
+      "name": null
+    },
+    "ndi_fix_alpha_blending": {
+      "name": null
+    },
+    "ndi_website": {
+      "name": null
+    }
   },
   "openvr_capture": {
     "name": "OpenVR Capture"
