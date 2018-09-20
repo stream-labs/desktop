@@ -6,7 +6,7 @@
         <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
       </div>
       <div v-else>
-        <form-group
+        <h-form-group
           v-for="inputData in inputsData"
           v-if="inputData.metadata"
           :key="inputData.fieldName"

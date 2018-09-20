@@ -1,29 +1,23 @@
 import { Component } from 'vue-property-decorator';
 import {
-  GenericGoalService,
+  GenericGoalService, IGoalCreateOptions,
   IGoalData
-} from 'services/widget-settings/generic-goal';
+} from 'services/widgets/settings/generic-goal';
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
 import CustomFieldsEditor from '../CustomFieldsEditor.vue';
 
-interface IGoalCreateOptions {
-  title: string;
-  goal_amount: number;
-  manual_goal_amount: number;
-  ends_at: string;
-}
 
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     ValidatedForm,
     CodeEditor,
     CustomFieldsEditor,
@@ -31,6 +25,8 @@ interface IGoalCreateOptions {
   }
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
+
+  tab = 'goal';
 
   $refs: {
     form: ValidatedForm;
@@ -50,9 +46,12 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   }
 
   async saveGoal() {
-    const hasErrors = await this.$refs.form.validateAndCheckErrors();
-    if (hasErrors) return;
-    await this.save(this.goalCreateOptions);
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    await this.service.saveGoal(this.goalCreateOptions);
+  }
+
+  resetGoal() {
+    this.service.resetGoal();
   }
 
 }

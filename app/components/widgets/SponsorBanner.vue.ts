@@ -2,22 +2,24 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   SponsorBannerService,
   ISponsorBannerData
-} from 'services/widget-settings/sponsor-banner';
+} from 'services/widgets/settings/sponsor-banner';
 
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

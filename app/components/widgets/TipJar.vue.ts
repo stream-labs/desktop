@@ -5,15 +5,16 @@ import WidgetSettings from './WidgetSettings.vue';
 import {
   TipJarService,
   ITipJarData
-} from 'services/widget-settings/tip-jar';
+} from 'services/widgets/settings/tip-jar';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
 import TestButtons from './TestButtons.vue';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 const nameMap = () => ({
   tips: $t('Tips & Donations'),
@@ -41,8 +42,9 @@ const mediaGalleryInputs = {
   components: {
     WidgetWindow,
     TestButtons,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })

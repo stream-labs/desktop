@@ -2,12 +2,12 @@ import { Component } from 'vue-property-decorator';
 import {
   DonationTickerService,
   IDonationTickerData
-} from 'services/widget-settings/donation-ticker';
+} from 'services/widgets/settings/donation-ticker';
 
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
@@ -15,7 +15,7 @@ import TestButtons from './TestButtons.vue';
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
     TestButtons,
     ...inputComponents

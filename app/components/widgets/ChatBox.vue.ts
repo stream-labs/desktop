@@ -2,20 +2,22 @@ import { Component } from 'vue-property-decorator';
 import {
   ChatBoxService,
   IChatBoxData
-} from 'services/widget-settings/chat-box';
+} from 'services/widgets/settings/chat-box';
 
 import WidgetWindow from 'components/windows/WidgetWindow.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
-import FormGroup from 'components/shared/inputs/FormGroup.vue';
+import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
+import ValidatedForm from '../shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetWindow,
-    FormGroup,
+    HFormGroup,
     CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })
