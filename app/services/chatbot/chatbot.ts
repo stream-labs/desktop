@@ -686,7 +686,6 @@ export class ChatbotApiService extends PersistentStatefulService<
 
   updateSongRequestPreferencesData(data: any) {
     // NOTE: should update type
-    debugger;
     this.mediaShareService.saveData(data.settings);
   }
 

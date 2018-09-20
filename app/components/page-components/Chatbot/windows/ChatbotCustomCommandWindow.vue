@@ -37,22 +37,22 @@
             />
           </div>
         </div>
-        <div v-if="selectedTab === 'advanced'">
-          <div class="row">
-            <div class="small-6 columns">
-              <VFormGroup
-                :title="$t('Global Command Cooldown (Value in Seconds)')"
-                v-model="newCommand.cooldowns.global"
-                :metadata="cooldownsMetadata"
-              />
-            </div>
-            <div class="small-6 columns">
-              <VFormGroup
-                :title="$t('User Command Cooldown (Value in Seconds)')"
-                v-model="newCommand.cooldowns.user"
-                :metadata="cooldownsMetadata"
-              />
-            </div>
+      </div>
+      <div v-if="selectedTab === 'advanced'">
+        <div class="row">
+          <div class="small-6 columns">
+            <VFormGroup
+              :title="$t('Global Command Cooldown (Value in Seconds)')"
+              v-model="newCommand.cooldowns.global"
+              :metadata="cooldownsMetadata"
+            />
+          </div>
+          <div class="small-6 columns">
+            <VFormGroup
+              :title="$t('User Command Cooldown (Value in Seconds)')"
+              v-model="newCommand.cooldowns.user"
+              :metadata="cooldownsMetadata"
+            />
           </div>
         </div>
         <ChatbotAliases v-model="newCommand.aliases" />

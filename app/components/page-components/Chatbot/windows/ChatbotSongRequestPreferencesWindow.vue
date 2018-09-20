@@ -7,10 +7,10 @@
 >
   <div slot="fixed">
     <div class="row">
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <div class="window-toggle__wrapper">
           <div @click="onToggleSongRequestWindowHandler">
             <span> {{ $t('Edit Primary Command') }} </span>
@@ -94,6 +94,14 @@
 
 <style <style lang="less" scoped>
 @import "../../../../styles/index";
+.window-tab {
+  &:first-child {
+    padding-right: 0;
+  }
+  &:last-child {
+    padding-left: 0;
+  }
+}
 .chatbot-empty-placeholder__container {
   .flex();
   .flex--column();

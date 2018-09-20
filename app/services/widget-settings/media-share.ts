@@ -81,7 +81,6 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
   protected patchAfterFetch(response: IMediaShareData): any {
     // we should be using settings.advanced settings values instead, similar to sl.com
     // so overwrite values for all keys in settings with settings.advance_settings
-    debugger;
     return {
       ...response,
       settings: {

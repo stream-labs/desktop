@@ -14,13 +14,11 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
 
   async mounted() {
     await this.chatbotApiService.fetchSongRequestPreferencesData();
-    debugger;
     this.settings = cloneDeep(this.chatbotApiService.state.songRequestPreferencesResponse.settings);
   }
 
   async onToggleNextHandler() {
     if (this.step === 1) {
-      debugger;
       await this.chatbotApiService.updateSongRequestPreferencesData({settings: this.settings});
       this.step++;
     }

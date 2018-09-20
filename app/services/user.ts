@@ -156,7 +156,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
 
   recentEventsUrl() {
     if (this.isLoggedIn()) {
-      const host = this.hostsService.streamlabs;
+      const host = this.hostsService.beta3;
       const token = this.widgetToken;
       const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
@@ -167,7 +167,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   dashboardUrl(subPage: string) {
     const host = Util.isPreview()
       ? this.hostsService.beta3
-      : this.hostsService.streamlabs;
+      : this.hostsService.beta3;
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 

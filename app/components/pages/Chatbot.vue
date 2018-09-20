@@ -17,7 +17,7 @@
           :to="tab.title"
           :ico="icons[tab.title]"
           :enabled="tab.enabled"
-          class="padding--10 text-transform--capitalize chatbot__side-menu__tab"
+          class="padding--10 text-transform chatbot__side-menu__tab"
         >
           <div>{{ $t(tab.title) }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
