@@ -28,7 +28,7 @@ const widgetIconMap = {
   [WidgetType.BitGoal]: 'fas fa-calendar',
   [WidgetType.FollowerGoal]: 'fas fa-calendar',
   [WidgetType.MediaShare]: 'icon-share',
-  [WidgetType.Chatbot]: 'fas fa-comments'
+  // [WidgetType.Chatbot]: 'fas fa-comments'
 };
 
 const sourceIconMap = {
