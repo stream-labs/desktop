@@ -76,7 +76,8 @@ import { ProfanityFilterService } from 'util/profanity';
 import { I18nService } from 'services/i18n';
 import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
-import { MediaGalleryService } from './services/media-gallery';
+import { MediaGalleryService } from 'services/media-gallery';
+import { AnnouncementsService } from 'services/announcements';
 
 import { BitGoalService } from 'services/widget-settings/bit-goal';
 import { ChatBoxService } from 'services/widget-settings/chat-box';
@@ -179,7 +180,8 @@ export class ServicesManager extends Service {
     EventListService,
     TipJarService,
     SponsorBannerService,
-    MediaGalleryService
+    MediaGalleryService,
+    AnnouncementsService
   };
 
   private instances: Dictionary<Service> = {};
@@ -532,6 +534,10 @@ export class ServicesManager extends Service {
 
         if (target[property].isHelper) {
           return this.applyIpcProxy(target[property]);
+        }
+
+        if (Reflect.getMetadata('executeInCurrentWindow', target, property as string)) {
+          return target[property];
         }
 
         if (typeof target[property] !== 'function' && !(target[property] instanceof Observable)) {

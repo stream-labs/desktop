@@ -15,7 +15,8 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import { StreamInfoService }from 'services/stream-info';
+import { StreamInfoService } from 'services/stream-info';
+import { AnnouncementsService } from 'services/announcements';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -45,6 +46,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() private announcementsService: AnnouncementsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -145,6 +147,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       ) {
         this.toggleRecording();
       }
+
+      this.announcementsService.updateBanner();
 
       return;
     }
