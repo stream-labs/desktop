@@ -33,10 +33,12 @@ export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, Sp
   animationTooltip = $t('These are the animations that are used to show your banner.');
 
   get positions() {
+    if (!this.loaded) return [];
     return this.wData.settings.placement_options === 'double' ? ['1', '2'] : ['1']
   }
 
-  get settings() {
+  get navItems() {
+    if (!this.loaded) return [];
     const baseSettings = [{ value: 'visual', label: $t('Visual Settings') }, { value: 'source', label: $t('Source') }];
     return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: $t('Image Set ') + pos })));
   }

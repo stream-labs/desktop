@@ -51,7 +51,7 @@ export interface IWidgetApiSettings {
   settingsSaveUrl: string;
   previewUrl: string;
   settingsUpdateEvent: string;
-  hasTestButtons?: boolean;
+  testers?: string[];
   customFieldsAllowed?: boolean;
 }
 

@@ -46,7 +46,7 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
 
   fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
 
-  settings = [
+  navItems = [
     { value: 'manage-list', label: $t('Manage List') },
     { value: 'font', label: $t('Font Settings') },
     { value: 'visual', label: $t('Visual Settings') },

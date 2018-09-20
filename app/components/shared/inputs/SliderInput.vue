@@ -26,7 +26,7 @@
     class="slider-input"
     type="text"
     :value="value"
-    @change="updateValue(parseFloat($event.target.value))"
+    @input="updateValue(parseFloat($event.target.value))"
     @keydown="handleKeydown"
   />
 </div>

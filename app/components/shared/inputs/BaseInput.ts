@@ -1,10 +1,14 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
-import { Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 
-export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
+/**
+ * @abstract
+ */
+@Component({})
+export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
   @Prop()
   readonly value: TValueType;

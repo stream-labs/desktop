@@ -1,11 +1,12 @@
 import Vue from 'vue';
+import { cloneDeep } from 'lodash';
 import { Inject } from '../../util/injector';
-import { Component } from 'vue-property-decorator';
 import { WindowsService } from 'services/windows';
 import { IWidgetsServiceApi } from 'services/widgets';
 import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Subscription } from 'rxjs/Subscription';
 import { $t } from 'services/i18n/index';
+import { Component } from 'vue-property-decorator';
 
 export interface IWidgetNavItem {
   value: string;
@@ -33,6 +34,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
   navItems: IWidgetNavItem[];
 
+  private lastSuccessfullySavedWData: TData = null;
   private dataUpdatedSubscr: Subscription;
 
   get metadata() {
@@ -40,10 +42,16 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
   }
 
   async created() {
+    console.log('call created');
     this.service = this.widget.getSettingsService() as TService;
     try {
+      console.log('try loading');
       this.wData = await this.service.fetchData();
+      this.lastSuccessfullySavedWData = cloneDeep(this.wData);
       this.requestState = 'success';
+
+      console.log('success, call afterFetch');
+      this.afterFetch();
     } catch (e) {
       this.requestState = 'fail';
     }
@@ -65,6 +73,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
 
   private onDataUpdatedHandler(data: TData) {
     this.wData = data;
+    this.lastSuccessfullySavedWData = cloneDeep(this.wData);
     this.widget.refresh();
   }
 
@@ -74,6 +83,8 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       await this.service.saveSettings(this.wData.settings);
       this.requestState = 'success';
     } catch (e) {
+      // rollback settings
+      this.wData = cloneDeep(this.lastSuccessfullySavedWData);
       this.requestState = 'fail';
       this.onFailHandler();
     }
@@ -90,4 +101,10 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       }
     );
   }
+
+  protected afterFetch() {
+    // override me
+
+    console.log('not overrode afterFetch');
+  };
 }

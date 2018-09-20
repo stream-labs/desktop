@@ -1,23 +1,24 @@
 <template>
 <widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
   :slots="[{ value: 'layout', label: $t('Ad Layout') }]"
-  :settings="settings"
-  :requestState="requestState"
-  :loaded="loaded"
+  :navItems="navItems"
 >
-  <div slot="layout">
+  <validated-form slot="layout" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
     </v-form-group>
     <v-form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
       <image-layout-input v-model="wData.settings.layout" />
     </v-form-group>
-  </div>
+  </validated-form>
 
-  <div v-for="position in positions" :key="position" :slot="`set-${position}-properties`">
+  <validated-form
+    @input="save()"
+    v-if="loaded"
+    v-for="position in positions"
+    :key="position"
+    :slot="`set-${position}-properties`"
+  >
     <v-form-group :title="`${$t('Placement')} ${position} ${$t('Images')}`">
       <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
         <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
@@ -28,9 +29,9 @@
       </div>
       <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
     </v-form-group>
-  </div>
+  </validated-form>
 
-  <div slot="visual-properties">
+  <validated-form slot="visual-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
       <div class="duration"><number-input v-model="wData.settings.hide_duration" :metadata="{}" /></div>
       <span>{{ $t('mins') }}</span>
@@ -56,23 +57,8 @@
       <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
       <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
     </v-form-group>
-  </div>
+  </validated-form>
 
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-  <div slot="customFields" >
-    <custom-fields-editor :value="wData"/>
-  </div>
 </widget-editor>
 </template>
 

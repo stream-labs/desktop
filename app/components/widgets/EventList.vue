@@ -1,13 +1,6 @@
 <template>
-<widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
-  :settings="settings"
-  :requestState="requestState"
-  :loaded="loaded"
->
-  <div slot="manage-list-properties">
+<widget-editor :navItems="navItems">
+  <validated-form slot="manage-list-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Enable Events')">
       <bool-input :title="$t('Donations')" v-model="wData.settings.show_donations"/>
       <bool-input :title="$t('Follows')" v-model="wData.settings.show_follows"/>
@@ -21,15 +14,15 @@
     </v-form-group>
     <v-form-group :title="$t('Min. Bits')" type="number" v-model="wData.settings.bits_minimum" :metadata="{ tooltip: minBitsTooltip }" />
     <v-form-group :title="$t('Max Events')" type="slider" v-model="wData.settings.max_events" :metadata="{ max: 10, interval: 1 }" />
-  </div>
+  </validated-form>
 
-  <div slot="font-properties">
+  <validated-form slot="font-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }" />
     <v-form-group :title="$t('Font')" type="fontFamily" v-model="wData.settings.font_family" :metadata="{ tooltip: fontFamilyTooltip }" />
     <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text_size" :metadata="{ tooltip: fontSizeTooltip }" />
-  </div>
+  </validated-form>
 
-  <div slot="visual-properties" >
+  <validated-form slot="visual-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Theme')" type="list" v-model="wData.settings.theme" :metadata="{ options: themeMetadata }"/>
     <v-form-group :title="$t('Theme Color')" type="color" v-model="wData.settings.theme_color" />
     <v-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ tooltip: backgroundColorTooltip }" />
@@ -46,23 +39,7 @@
       <bool-input :title="$t('Flip Y')" v-model="wData.settings.flip_y" />
       <bool-input :title="$t('Keep Events History')" v-model="wData.settings.keep_history" />
     </v-form-group>
-  </div>
-
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-  <div slot="test" >
-    <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>
-  </div>
+  </validated-form>
 
 
 </widget-editor>

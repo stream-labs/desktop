@@ -60,7 +60,7 @@ export abstract class WidgetSettingsService<TWidgetData extends IWidgetData>
     if (!this.state.data) return;
     const rawData = cloneDeep(this.state.rawData);
     rawData.settings = event.message;
-    const data = this.patchAfterFetch(rawData);
+    const data = this.handleDataAfterFetch(rawData);
     this.SET_WIDGET_DATA(data, rawData);
     this.dataUpdated.next(this.state.data);
   }

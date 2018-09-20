@@ -6,7 +6,7 @@
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
-      <div v-if="apiSettings.hasTestButtons" class="button button--action test-button">
+      <div v-if="apiSettings.testers" class="button button--action test-button">
         <test-widgets />
       </div>
     </div>

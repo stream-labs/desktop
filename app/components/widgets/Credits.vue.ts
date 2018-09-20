@@ -39,7 +39,7 @@ export default class Credits extends WidgetSettings<ICreditsData, CreditsService
     ' {total_donated_amount}, {total_cheer_amount}, {top_donor}, {top_donated_amount}, {top_cheer_donor}, {username},' +
     ' {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.';
 
-  settings = [
+  navItems = [
     { value: 'manage-credits', label: $t('Manage Credits') },
     { value: 'visual', label: $t('Visual Settings') },
     { value: 'source', label: $t('Source') }

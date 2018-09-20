@@ -47,7 +47,7 @@ export class TipJarService extends WidgetSettingsService<ITipJarData> {
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/tipjar`,
       settingsUpdateEvent: 'tipJarSettingsUpdate',
-      hasTestButtons: true
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
     }
   }
 

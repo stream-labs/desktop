@@ -44,7 +44,15 @@ export default class WidgetWindow extends Vue {
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private projectorService: ProjectorService;
 
-  @Prop() slots: IWidgetNavItem[];
+  /**
+   * Declaration of additional sections in the right panel
+   * @see example of usage in TipJar.vue.ts
+   */
+  @Prop() slots?: IWidgetNavItem[];
+
+  /**
+   * Navigation items for the right panel
+   */
   @Prop() navItems: IWidgetNavItem[];
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
@@ -62,7 +70,6 @@ export default class WidgetWindow extends Vue {
 
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
-  previewSource: ISourceApi = null;
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
   currentSetting = 'source';
@@ -116,7 +123,7 @@ export default class WidgetWindow extends Vue {
   }
 
   createProjector() {
-    this.projectorService.createProjector(this.previewSource.sourceId);
+    this.projectorService.createProjector(this.widget.previewSourceId);
   }
 
   onPropsInputHandler(properties: TObsFormData, changedIndex: number) {

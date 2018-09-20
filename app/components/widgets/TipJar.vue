@@ -1,18 +1,13 @@
 <template>
 <widget-editor
-  v-if="wData"
-  ref="layout"
-  :requestState="requestState"
-  :loaded="loaded"
-  v-model="wData.settings.custom_enabled"
   :slots="[{ value: 'jar', label: $t('Jar Image') }]"
-  :settings="settings"
+  :navItems="navItems"
 >
-  <div slot="jar">
+  <validated-form slot="jar" @input="save()" v-if="loaded">
       <image-picker-input :metadata="{ options: inputOptions }" v-model="wData.settings.jar.type"/>
-  </div>
+  </validated-form>
 
-  <div slot="manage-jar-properties">
+  <validated-form slot="manage-jar-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Enabled Events')">
       <bool-input
         v-for="key in Object.keys(wData.settings.types)"
@@ -28,18 +23,18 @@
       <number-input v-model="wData.settings.types.tips.minimum_amount" :metadata="{ required: true, min: 1 }"/>
     </v-form-group>
     <v-form-group :title="$t('Background Color')" type="color" v-model="wData.settings.background_color" :metadata="{ description: backgroundColorDescription }" />
-  </div>
+  </validated-form>
 
-  <div slot="font-properties">
+  <validated-form slot="font-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Text')">
       <bool-input :title="$t('Show Text')" v-model="wData.settings.text.show"/>
     </v-form-group>
     <v-form-group type="fontFamily" :value="wData.settings.text.font"/>
     <v-form-group :title="$t('Text Color')" type="color" v-model="wData.settings.text.color" :metadata="{ tooltip: textColorTooltip }"/>
     <v-form-group :title="$t('Font Size')" type="fontSize" v-model="wData.settings.text.size"/>
-  </div>
+  </validated-form>
 
-  <div slot="images-properties">
+  <validated-form slot="images-properties" @input="save()" v-if="loaded">
     <v-form-group v-for="key in mediaGalleryInputs" :key="key" :title="titleFromKey(key)">
       <media-gallery-input
         :metadata="{ clearImage: wData.defaultImage[`${platform}_account`] }"
@@ -56,23 +51,8 @@
         v-model="tier.image_src"
       />
     </v-form-group>
-  </div>
+  </validated-form>
 
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-  <div slot="test" >
-    <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>
-  </div>
 </widget-editor>
 </template>
 

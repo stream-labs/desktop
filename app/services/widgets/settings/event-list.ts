@@ -64,7 +64,7 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
       settingsUpdateEvent: 'eventListSettingsUpdate',
-      hasTestButtons: true
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
     }
   }
 

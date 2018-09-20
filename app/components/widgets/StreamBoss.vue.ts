@@ -44,7 +44,7 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
     await this.service.saveGoal(this.bossCreateOptions);
   }
 
-  settings = [
+  navItems = [
     { value: 'goal', label: $t('Goal') },
     { value: 'manage-battle', label: $t('Manage Battle') },
     { value: 'visual', label: $t('Visual Settings') },

@@ -36,10 +36,11 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
     return {
       type: WidgetType.SponsorBanner,
       url: `https://${ this.getHost() }/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
-      previewUrl: `https://${this.getHost()}/widgets/sponsor-banner/v1/${this.getWidgetToken()}?simulate=1`,
+      previewUrl: `https://${ this.getHost() }/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
-      settingsUpdateEvent: 'sponsorBannerSettingsUpdate'
+      settingsUpdateEvent: 'sponsorBannerSettingsUpdate',
+      customFieldsAllowed: true
     }
   }
 
