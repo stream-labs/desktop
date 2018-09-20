@@ -60,6 +60,43 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
+  getAppSources(ctx: IApiContext) {
+    return this.getSources().filter(source => {
+      return source.appId === ctx.app.id;
+    });
+  }
+
+  @apiMethod()
+  getAppSourceSettings(ctx: IApiContext, sourceId: string) {
+    const source = this.getAppSourceForApp(sourceId, ctx.app.id);
+
+    return source.getPropertiesManagerSettings().appSettings;
+  }
+
+  @apiMethod()
+  setAppSourceSettings(ctx: IApiContext, sourceId: string, settings: string) {
+    const source = this.getAppSourceForApp(sourceId, ctx.app.id);
+
+    source.setPropertiesManagerSettings({
+      appSettings: settings
+    });
+  }
+
+  private getAppSourceForApp(sourceId: string, appId: string) {
+    const source = this.sourcesService.getSource(sourceId);
+
+    if (!source) {
+      throw new Error(`The source with id ${sourceId} does not exist!`);
+    }
+
+    if (source.getPropertiesManagerSettings().appId !== appId) {
+      throw new Error(`The source ${sourceId} does not belong to this app!`);
+    }
+
+    return source;
+  }
+
+  @apiMethod()
   createSource() {
     throw new NotImplementedError();
   }

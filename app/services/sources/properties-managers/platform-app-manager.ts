@@ -7,6 +7,7 @@ import * as obs from '../../../../obs-api';
 export interface IPlatformAppManagerSettings {
   appId: string;
   appSourceId: string;
+  appSettings: string;
 }
 
 export class PlatformAppManager extends PropertiesManager {
@@ -61,7 +62,7 @@ export class PlatformAppManager extends PropertiesManager {
   }
 
   updateUrl() {
-    const url = this.platformAppsService.getPageUrlForSource(
+    let url = this.platformAppsService.getPageUrlForSource(
       this.settings.appId,
       this.settings.appSourceId
     );
@@ -70,6 +71,11 @@ export class PlatformAppManager extends PropertiesManager {
     if (!url) {
       this.obsSource.update({ url: '' });
       return;
+    }
+
+    // Append app settings to URL
+    if (this.settings.appSettings) {
+      url = `${url}&settings=${encodeURIComponent(this.settings.appSettings)}`
     }
 
     if (this.obsSource.settings['url'] !== url) {
