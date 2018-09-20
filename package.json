@@ -85,6 +85,9 @@
   "lint-staged": {
     "*.ts": [
       "tslint"
+    ],
+    "app/i18n/*/*.json": [
+      "node ./bin/i18n-early-check.js"
     ]
   },
   "dependencies": {
@@ -189,7 +192,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && node ./bin/i18n-early-check.js"
+      "pre-commit": "lint-staged"
     }
   }
 }

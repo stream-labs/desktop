@@ -331,7 +331,8 @@
     "name": "Audio Input Capture",
     "description": "Any device that attaches to a computer for the purpose of capturing sound, such as music or speech.",
     "device_id": {
-      "name": "Device"
+      "name": "Device",
+      "default": null
     },
     "use_device_timing": {
       "name": "Use Device Timestamps"
@@ -341,7 +342,8 @@
     "name": "Audio Output Capture",
     "description": "Captures your desktop audio for the purpose of playing sound, such as music or speech.",
     "device_id": {
-      "name": "Device"
+      "name": "Device",
+      "default": null
     },
     "use_device_timing": {
       "name": "Use Device Timestamps"
