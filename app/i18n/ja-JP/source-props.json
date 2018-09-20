@@ -358,7 +358,7 @@
   },
   "ndi_source": {
     "name": "NDI™ ソース",
-    "description": "NDIの出力ストリームをキャプチャします。"
+    "description": "NDIの出力ストリームをキャプチャします。",
     "ndi_source_name": {
       "name": "ソース名"
     },
