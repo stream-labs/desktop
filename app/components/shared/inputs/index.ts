@@ -27,6 +27,7 @@ export interface IInputMetadata {
   type?: EInputType;
   title?: string;
   tooltip?: string;
+  uuid?: string;
 }
 
 export interface INumberMetadata extends IInputMetadata {

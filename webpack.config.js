@@ -117,7 +117,7 @@ module.exports = {
   },
 
   optimization: {
-    minimizer: [new UglifyJsPlugin({ uglifyOptions: { mangle: false } })]
+    minimizer: [new UglifyJsPlugin({ sourceMap: true, uglifyOptions: { mangle: false } })]
   },
 
   plugins
