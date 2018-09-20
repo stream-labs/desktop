@@ -182,6 +182,8 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     const indexUrl = remote.getGlobal('indexUrl');
 
+    // サイズ指定をコンストラクタで行うと、メインモニタより大きなウィンドウを作れない
+    // enableLargerThanScreenを指定しても効かなかったので後から明示的に与える
     const width = options.size && typeof options.size.width === 'number' ? options.size.width : 400;
     const height = options.size && typeof options.size.height === 'number' ? options.size.height : 400;
     newWindow.setSize(width, height);
