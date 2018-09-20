@@ -88,7 +88,7 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
           title: $t('Go To Recent Events'),
           subtitle: $t('step 3'),
           backgroundUrl: require(
-            `../../../../../media/images/chatbot/chatbot-songrequest-step2--${
+            `../../../../../media/images/chatbot/chatbot-songrequest-step3--${
             backgroundUrlSuffix
             }.png`
           ),
