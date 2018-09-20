@@ -129,7 +129,7 @@ export class ApiClient {
     const process = spawnSync(
       'node',
       ['./test-dist/test/helpers/cmd-client.js', resourceId, methodName, ...stringifiedArgs],
-      { timeout: 5000 }
+      { timeout: 10000 }
     );
 
     const err = process.stderr.toString();
