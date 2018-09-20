@@ -219,6 +219,13 @@ export interface IDefaultCommand {
   disabled_response?: string;
   slugName?: string;
   commandName?: string;
+  duration_response?: string;
+  rating_response?: string;
+  views_response?: string;
+  banned_response?: string;
+  music_response?: string;
+  max_response?: string;
+  full_response?: string;
 }
 
 export interface IDafaultCommandsSlug {

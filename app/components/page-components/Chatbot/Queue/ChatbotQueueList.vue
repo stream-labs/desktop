@@ -25,7 +25,7 @@
       <tr>
         <th>#</th>
         <th> {{ $t('Users') }} </th>
-        <th v-if="!isPicked"> {{ $t('Note') }} </th>
+        <th> {{ $t('Note') }} </th>
         <th v-if="!isPicked"> {{ $t('Time Entered') }} </th>
         <th
           @click="onClearListHandler"
@@ -42,7 +42,7 @@
       >
         <td> {{ index + 1 }} </td>
         <td> {{ queueUser.name}} </td>
-        <td v-if="!isPicked"> {{ queueUser.note || '-' }} </td>
+        <td> {{ queueUser.note || '-' }} </td>
         <td v-if="!isPicked"> {{ formatDate(queueUser.created_at) }} </td>
         <td class="text-align--right">
           <i
