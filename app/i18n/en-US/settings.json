@@ -504,7 +504,7 @@
   "cacheId": "Cache ID",
   "cacheIdDescription": "Copy the Cache ID to clipboard.",
   "cacheIdCopy": "Copy",
-  "cacheManagement": "Management of the cashe",
+  "cacheManagement": "Management of the cache",
   "noticeWhileStreaming": "Some settings cannot be changed while streaming.",
   "showCacheDirectory": "Show Cache Directory",
   "deleteCacheAndRestart": "Delete Cache and Restart",
