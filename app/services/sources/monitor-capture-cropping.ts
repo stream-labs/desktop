@@ -1,4 +1,4 @@
-import electron from 'electron';
+import electron, { BrowserWindow } from 'electron';
 import { Inject } from 'util/injector';
 import { WindowsService } from 'services/windows';
 import { ISourcesServiceApi } from 'services/sources';
@@ -24,6 +24,7 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: ISourcesServiceApi;
   timer: number;
+  currentWindow: BrowserWindow | null;
 
   static initialState = {
     sceneId: null,
@@ -34,6 +35,13 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
 
   get isCropping(): boolean {
     return Boolean(this.state.sourceId);
+  }
+
+  init() {
+    const screen = electron.remote.screen;
+    screen.on('display-added', () => this.endCropping());
+    screen.on('display-metrics-changed', () => this.endCropping());
+    screen.on('display-removed', () => this.endCropping());
   }
 
   startCropping(sceneId: string, sceneItemId: string, sourceId: string) {
@@ -58,9 +66,17 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
 
     const windowObj = this.windowsService.getWindow(windowId);
     windowObj.on('close', () => this.endCropping());
+
+    if (this.currentWindow && !this.currentWindow.isDestroyed()) {
+      this.currentWindow.close();
+    }
+    this.currentWindow = windowObj;
   }
 
   private endCropping() {
+    if (this.currentWindow && !this.currentWindow.isDestroyed()) {
+      this.currentWindow.close();
+    }
     if (!this.isCropping) return;
 
     clearTimeout(this.timer);
