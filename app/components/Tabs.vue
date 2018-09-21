@@ -1,5 +1,5 @@
 <template>
-<div class="tabs__container" :class="[showContent ? '' : 'condensed']">
+<div class="tabs__container">
   <div class="tabs" :class="className">
     <button
       v-for="tab in tabs"
@@ -23,10 +23,6 @@
 
 .tabs__container {
   height: 100%;
-}
-
-.tabs__container.condensed {
-  height: auto;
 }
 
 .tabs {
