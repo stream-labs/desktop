@@ -56,9 +56,9 @@ export interface IWidgetApiSettings {
 }
 
 export interface IWidgetSource {
-  readonly type: WidgetType;
-  readonly sourceId: string;
-  readonly previewSourceId: string;
+  type: WidgetType;
+  sourceId: string;
+  previewSourceId: string;
 }
 
 export interface IWidgetApi extends IWidgetSource {

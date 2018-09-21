@@ -12,7 +12,7 @@ export default class Tabs extends Vue {
   @Prop() tabs: ITab[];
   @Prop() value: string;
   @Prop() className: string;
-  @Prop() showContent: boolean;
+  @Prop() hideContent: boolean;
 
   showTab(tab: string) {
     this.$emit('input', tab);
