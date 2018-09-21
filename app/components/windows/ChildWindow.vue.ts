@@ -17,12 +17,8 @@ export default class ChildWindow extends Vue {
   @Inject() private customizationService: CustomizationService;
 
   components: { name: string; isShown: boolean; }[] = [];
- 
-  private refreshingTimeout = 0;
 
-  created() {
-    electron.remote.getCurrentWindow().setTitle(this.options.title);
-  }
+  private refreshingTimeout = 0;
 
   mounted() {
     this.onWindowUpdatedHandler(this.options);
@@ -75,6 +71,7 @@ export default class ChildWindow extends Vue {
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(() => {
       this.components.push({ name: options.componentName, isShown: true });
+      electron.remote.getCurrentWindow().setTitle(this.options.title);
     }, 50);
   }
 }
