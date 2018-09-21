@@ -16,7 +16,7 @@ export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private customizationService: CustomizationService;
 
-  components: { name: string; isShown: boolean; }[] = [];
+  components: { name: string; isShown: boolean; title: string; }[] = [];
 
   private refreshingTimeout = 0;
 
@@ -44,6 +44,10 @@ export default class ChildWindow extends Vue {
     this.components = [];
   }
 
+  private setWindowTitle() {
+    electron.remote.getCurrentWindow().setTitle(this.currentComponent.title);
+  }
+
   private onWindowUpdatedHandler(options: IWindowOptions) {
     // If the window was closed, just clear the stack
     if (!options.isShown) {
@@ -53,13 +57,15 @@ export default class ChildWindow extends Vue {
 
     if (options.preservePrevWindow) {
       this.currentComponent.isShown = false;
-      this.components.push({ name: options.componentName, isShown: true });
+      this.components.push({ name: options.componentName, isShown: true, title: options.title });
+      this.setWindowTitle();
       return;
     }
 
     if (options.isPreserved) {
       this.components.pop();
       this.currentComponent.isShown = true;
+      this.setWindowTitle();
       return;
     }
 
@@ -70,8 +76,8 @@ export default class ChildWindow extends Vue {
     // that will do a bunch of synchronous IO.
     clearTimeout(this.refreshingTimeout);
     this.refreshingTimeout = window.setTimeout(() => {
-      this.components.push({ name: options.componentName, isShown: true });
-      electron.remote.getCurrentWindow().setTitle(this.options.title);
+      this.components.push({ name: options.componentName, isShown: true, title: options.title });
+      this.setWindowTitle();
     }, 50);
   }
 }
