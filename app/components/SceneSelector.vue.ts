@@ -42,7 +42,7 @@ export default class SceneSelector extends Vue {
     menu.append({
       label: $t('Rename'),
       click: () => this.scenesService.showNameScene({
-        rename: this.scenesService.activeScene.name
+        rename: this.scenesService.activeScene.id
       })
     });
     menu.append({

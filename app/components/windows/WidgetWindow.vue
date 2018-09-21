@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="windowTitle"
   :showControls="false"
   :customControls="true"
   :fixedSectionHeight="254"
@@ -23,7 +22,7 @@
       <div v-if="tabItem.value !== 'source' && tabItem.value === value">
 
         <slot :name="tabItem.value" v-if="!loadingFailed"></slot>
-        <div v-else="loadingFailed">
+        <div v-else>
           {{ $t('Failed to load settings') }}
         </div>
 
