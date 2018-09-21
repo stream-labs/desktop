@@ -20,6 +20,7 @@ const zlib = require('zlib');
 const cp = require('child_process');
 const { BrowserWindow } = require('electron');
 const prequest = util.promisify(request);
+const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
 
@@ -43,6 +44,75 @@ async function ensureDir(dirPath) {
     }
 }
 
+async function getPreviousRoll(cacheFile, version) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(cacheFile, (err, data) => {
+            if (err) {
+                console.log("Roll cache not found!");
+                resolve(0);
+                return;
+            }
+
+            let roll = parseInt(data);
+
+            if (!roll) {
+                roll = 0;
+            }
+
+            resolve(roll);
+        });
+    });
+}
+
+async function checkChance(info, version) {
+    const reqInfo = {
+        baseUrl: info.baseUrl,
+        uri: `/${version}.chance`,
+    };
+
+    const response = await prequest(reqInfo);
+
+    if (response.statusCode !== 200) {
+        console.log(`No chance file found! Assuming 100...`);
+        return Promise.resolve(true);
+    }
+
+    const rollCache = path.join(info.cacheDir, 'rolls', version);
+    const body = JSON.parse(response.body);
+    const chance = body.chance;
+
+    console.log(`Chance to update is ${chance}...`);
+
+    /* Check for a cached roll. Caching the roll prevents incorrect
+     * chance in the case we change the percentage chance to update. */
+     let roll = await getPreviousRoll(rollCache, version);
+
+    /* The above can return 0. Remember that 0 is an invalid roll meaning
+     * it either doesn't exist or something went wrong. */
+
+    /* Our D100 roll, 1 - 100
+     * Math.random() gives 0.0 through 0.9999 repeating.
+     * Multiply that by 100 to get a number between 0.0 and 99.9999 repeating.
+     * Truncate that to make an integer to get between 0 and 99.
+     * Add 1 so our result is between 1 and 100. */
+    if (roll === 0) {
+        roll = Math.trunc(Math.random() * 100) + 1;
+
+        /* Even if we don't need to, just cache the roll,
+         * it helps simplify the logic */
+        await ensureDir(path.dirname(rollCache));
+        await writeFile(rollCache, `${roll}`);
+    }
+
+    console.log(`You rolled ${roll}`);
+
+    if (roll <= chance) {
+        return Promise.resolve(true);
+    }
+
+    return Promise.resolve(false);
+}
+
 /* Note that latest-updater.exe never changes
  * in name regardless of what version of the
  * application we're using. The base url should
@@ -50,21 +120,20 @@ async function ensureDir(dirPath) {
  * that points to the updater executable or at
  * least redirects to it. */
 async function fetchUpdater(info, progress) {
-
     const reqInfo = {
         baseUrl: info.baseUrl,
         uri: '/latest-updater.exe'
-    }
+    };
 
     const updaterPath = path.resolve(info.tempDir, 'latest-updater.exe');
     const outStream = fs.createWriteStream(updaterPath);
 
     /* It's more convenient to use the piping functionality of
      * native request than using a promise here. */
-    const handleResponse = (response) => {
+    const handleResponse = (response, reject) => {
         if (response.statusCode !== 200) {
-            throw Error(
-                `Failed to fetch updater: status ${response.statusCode}`);
+            reject(`Failed to fetch updater: status ${response.statusCode}`);
+            return;
         }
 
         const contentLength = response.headers['content-length'];
@@ -79,7 +148,7 @@ async function fetchUpdater(info, progress) {
 
     return new Promise((resolve, reject) => {
         const outPipe = request(reqInfo)
-            .on('response', handleResponse)
+            .on('response', (response) => handleResponse(response, reject))
             .pipe(outStream);
 
         outPipe.on('close', () => {
@@ -137,6 +206,11 @@ async function entry(info) {
         return Promise.resolve(false);
     }
 
+    if (!await checkChance(info, latestVersion)) {
+        console.log('Failed the chance lottery. Better luck next time!');
+        return Promise.resolve(false);
+    }
+
     /* The user needs a visual queue to know there's
      * nothing wrong with the application. So we use
      * the currently distributed version of Electron
@@ -144,7 +218,6 @@ async function entry(info) {
      * the status of the bootstrap. That said, if
      * anything goes wrong, just don't spawn a window
      * for safety. */
-
     let statusWindow = null;
 
     try {
@@ -178,15 +251,11 @@ async function entry(info) {
         statusWindow.webContents.send('bootstrap-progress', progress);
     });
 
-    /* Updater config is in the style of command line arguments.
-     * Unfortunately, due to limitations of the updater, we can't
-     * just pass execution arguments. */
-
     /* Node, for whatever reason, decided that when you execute via
      * shell, all arguments shouldn't be quoted... it still does
      * spacing for us I guess */
     const updaterArgs = [
-        '--base-url', 'http://s3-us-west-2.amazonaws.com/streamlabs-obs-dev',
+        '--base-url', `"${info.baseUrl}"`,
         '--version', `"${latestVersion}"`,
         '--exec', `"${info.exec}"`,
         '--cwd', `"${info.cwd}"`,
@@ -194,12 +263,12 @@ async function entry(info) {
         '--force-temp'
     ];
 
-    console.log(updaterArgs);
-
     for (pid in info.waitPids) {
         updaterArgs.push_back('-p');
         updaterArgs.push_back(pid);
     }
+
+    console.log(updaterArgs);
 
     cp.spawn(`${updaterPath}`, updaterArgs, {
         cwd: info.tempDir,

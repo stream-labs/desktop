@@ -319,6 +319,7 @@ app.on('ready', () => {
       waitPid: [ process.pid ],
       appDir: path.dirname(app.getPath('exe')),
       tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
       versionFileName: 'latest.json'
     };
 
