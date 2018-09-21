@@ -485,8 +485,7 @@
     "Network": {
       "name": null,
       "BindIP": {
-        "name": null,
-        "Default": null
+        "name": null
       },
       "NewSocketLoopEnable": {
         "name": null
