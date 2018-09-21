@@ -64,7 +64,7 @@
         <div class="code-editor hidden" ref="code" v-if="loaded">
           <div v-if="customCodeIsEnabled">
             <tabs
-              :showContent="false"
+              :hideConent="true"
               className="widget-editor__top-tabs"
               :tabs="codeTabs"
               v-model="currentCodeTab"
@@ -209,7 +209,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 1px solid @day-editor-border;
+    border-left: 1px solid @day-editor-border;
     background-color: @day-section;
     .transition();
   }

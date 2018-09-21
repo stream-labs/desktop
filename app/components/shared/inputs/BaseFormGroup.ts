@@ -62,10 +62,4 @@ export default abstract class BaseFormGroup extends BaseInput<any, IInputMetadat
     options.title = this.title || options.title;
     return options;
   }
-
-  emitInput(eventData: any, event?: any) {
-    this.$emit('input', eventData, event);
-    // throw an event to ValidatedForm if exist
-    if (this.form) this.form.emitInput(eventData, event);
-  }
 }

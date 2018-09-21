@@ -4,10 +4,6 @@ import { Component, Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 
-/**
- * @abstract
- */
-@Component({})
 export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
   @Prop()

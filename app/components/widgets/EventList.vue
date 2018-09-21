@@ -40,8 +40,6 @@
       <bool-input :title="$t('Keep Events History')" v-model="wData.settings.keep_history" />
     </v-form-group>
   </validated-form>
-
-
 </widget-editor>
 </template>
 

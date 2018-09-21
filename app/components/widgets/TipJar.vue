@@ -52,7 +52,6 @@
       />
     </v-form-group>
   </validated-form>
-
 </widget-editor>
 </template>
 

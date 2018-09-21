@@ -36,6 +36,7 @@
     <v-form-group title="Muted Chatters" type="textArea" v-model="wData.settings.muted_chatters" />
   </validated-form>
 
+
 </widget-editor>
 
 </template>

@@ -406,6 +406,7 @@ export class TransitionsService extends StatefulService<ITransitionsState> {
   showSceneTransitions() {
     this.windowsService.showWindow({
       componentName: 'SceneTransitions',
+      title: $t('Scene Transitions'),
       size: {
         width: 800,
         height: 650

@@ -29,8 +29,8 @@ export default class NameScene extends Vue {
   selectionService: ISelectionServiceApi;
 
   options: {
-    sceneToDuplicate?: string,
-    rename?: string,
+    sceneToDuplicate?: string, // id of scene
+    rename?: string, // id of scene
     itemsToGroup?: string[]
   } = this.windowsService.getChildWindowQueryParams();
 
@@ -38,9 +38,9 @@ export default class NameScene extends Vue {
     let name = '';
 
     if (this.options.rename) {
-      name = this.options.rename;
+      name = this.scenesService.getScene(this.options.rename).name;
     } else if (this.options.sceneToDuplicate) {
-      name = this.options.sceneToDuplicate;
+      name = this.scenesService.getScene(this.options.sceneToDuplicate).name;
     } else if (this.options.itemsToGroup) {
       name = `${this.scenesService.activeScene.name} Group`;
     } else {
@@ -56,7 +56,7 @@ export default class NameScene extends Vue {
     if (!this.name) {
       this.error = $t('The scene name is required');
     } else if (this.options.rename) {
-      this.scenesService.getSceneByName(this.options.rename).setName(this.name);
+      this.scenesService.getScene(this.options.rename).setName(this.name);
       this.windowsService.closeChildWindow();
     } else {
       const newScene = this.scenesService.createScene(

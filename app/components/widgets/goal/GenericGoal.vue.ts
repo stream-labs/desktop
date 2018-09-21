@@ -1,8 +1,8 @@
 import { Component } from 'vue-property-decorator';
-import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import { inputComponents } from 'components/widgets/inputs';
-import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -37,7 +37,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
 
   textColorTooltip = $t('A hex code for the base text color.');
 
-  navItems = [
+  settings = [
     { value: 'goal', label: $t('Goal') },
     { value: 'visual', label: $t('Visual Settings') },
     { value: 'source', label: $t('Source') }

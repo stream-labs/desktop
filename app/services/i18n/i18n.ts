@@ -8,7 +8,7 @@ import { IObsListInput, TObsFormData } from 'components/obs/inputs/ObsInput';
 import { I18nServiceApi } from './i18n-api';
 import * as obs from '../../../obs-api';
 import * as fs from 'fs';
-
+import path from 'path';
 
 interface II18nState {
   locale: string;
@@ -165,7 +165,7 @@ export class I18nService extends PersistentStatefulService<II18nState> implement
   }
 
   private getI18nPath() {
-    return this.fileManagerService.resolve('app/i18n');
+    return path.join(electron.remote.app.getAppPath(),'app/i18n');
   }
 
   private async loadDictionary(locale: string): Promise<Dictionary<string>> {

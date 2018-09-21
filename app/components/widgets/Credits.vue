@@ -51,7 +51,6 @@
       :metadata="{ tooltip: rollTimeTooltip, max: 150, interval: 5 }"
     />
   </validated-form>
-
 </widget-editor>
 </template>
 

@@ -8,7 +8,6 @@ import { inputComponents } from 'components/widgets/inputs';
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import CodeEditor from './CodeEditor.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -17,7 +16,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
   components: {
     WidgetEditor,
     VFormGroup,
-    HFormGroup,
     CodeEditor,
     ValidatedForm,
     ...inputComponents

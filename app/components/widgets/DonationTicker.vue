@@ -15,7 +15,6 @@
     <v-form-group :title="$t('Name Text Color')" type="color" v-model="wData.settings.font_color2" :metadata="{ tooltip: nameColorTooltip }" />
     <v-form-group :title="$t('Amount Text Color')" type="color" v-model="wData.settings.font_color3" :metadata="{ tooltip: amountColorTooltip }" />
   </validated-form>
-
 </widget-editor>
 </template>
 

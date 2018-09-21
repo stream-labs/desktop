@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { WindowsService } from 'services/windows';
 import { ISourceApi, ISourcesServiceApi } from 'services/sources';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
@@ -18,6 +17,7 @@ import { cloneDeep } from 'lodash';
 import { IWidgetNavItem } from 'components/widgets/WidgetSettings.vue';
 import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
+import { WindowsService } from 'services/windows';
 
 interface ITab {
   name: string;
@@ -39,9 +39,8 @@ interface ITab {
   }
 })
 export default class WidgetWindow extends Vue {
-  @Inject() private sourcesService: ISourcesServiceApi;
-  @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: IWidgetsServiceApi;
+  @Inject() private windowsService: WindowsService;
   @Inject() private projectorService: ProjectorService;
 
   /**
@@ -57,7 +56,6 @@ export default class WidgetWindow extends Vue {
 
   $refs: { content: HTMLElement, sidebar: HTMLElement, code: HTMLElement };
 
-  extraTabs: ITab[];
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   widget = this.widgetsService.getWidgetSource(this.sourceId);
   apiSettings = this.widget.getSettingsService().getApiSettings();
@@ -67,9 +65,6 @@ export default class WidgetWindow extends Vue {
     { value: 'CSS', name: $t('CSS') },
     { value: 'JS', name: $t('JS') }
   ];
-
-  source = this.sourcesService.getSource(this.sourceId);
-  widgetType = this.source.getPropertiesManagerSettings().widgetType;
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
   currentSetting = 'source';
@@ -112,6 +107,7 @@ export default class WidgetWindow extends Vue {
   get windowTitle() {
     const source = this.widget.getSource();
     return $t('Settings for ') + source.name;
+
   }
 
   get sourceProperties() {
@@ -127,13 +123,12 @@ export default class WidgetWindow extends Vue {
   }
 
   onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
-    const source = this.sourcesService.getSource(this.sourceId);
+    const source = this.widget.getSource();
     source.setPropertiesFormData(
       [properties[changedIndex]]
     );
     this.properties = this.widget.getSource().getPropertiesFormData();
   }
-
 
   updateTopTab(value: string) {
     // We do animations in JS here because flex-direction is not an animate-able attribute

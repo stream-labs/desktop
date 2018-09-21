@@ -8,7 +8,6 @@
   </div>
   <modal-layout
     v-else
-    :title="title"
     :content-styles="{ padding: 0 }"
     :showControls="false">
     <div slot="content" class="projector-windowed">
