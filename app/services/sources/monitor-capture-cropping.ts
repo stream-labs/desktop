@@ -24,7 +24,14 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: ISourcesServiceApi;
   timer: number;
-  currentWindow: BrowserWindow | null;
+
+  private _currentWindow: BrowserWindow | null;
+  set currentWindow(windowObj: BrowserWindow | null) {
+    if (this._currentWindow && !this._currentWindow.isDestroyed()) {
+      this._currentWindow.close();
+    }
+    this._currentWindow = windowObj;
+  }
 
   static initialState = {
     sceneId: null,
@@ -71,16 +78,11 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     const windowObj = this.windowsService.getWindow(windowId);
     windowObj.on('close', () => this.endCropping());
 
-    if (this.currentWindow && !this.currentWindow.isDestroyed()) {
-      this.currentWindow.close();
-    }
     this.currentWindow = windowObj;
   }
 
   private endCropping() {
-    if (this.currentWindow && !this.currentWindow.isDestroyed()) {
-      this.currentWindow.close();
-    }
+    this.currentWindow = null;
     if (!this.isCropping) return;
 
     clearTimeout(this.timer);
