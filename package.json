@@ -85,6 +85,9 @@
   "lint-staged": {
     "*.ts": [
       "tslint"
+    ],
+    "app/i18n/*/*.json": [
+      "node ./bin/i18n-early-check.js"
     ]
   },
   "dependencies": {
