@@ -4,17 +4,17 @@ import {
   IChatBoxData
 } from 'services/widget-settings/chat-box';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
     ...inputComponents
   }
@@ -29,4 +29,11 @@ export default class ChatBox extends WidgetSettings<IChatBoxData, ChatBoxService
   backgroundColorDescription = $t(
     'Note: This background color is for preview purposes only. It will not be shown in your stream.'
   );
+
+  settings = [
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'chatter', label: $t('Chatter') },
+    { value: 'source', label: $t('Source') }
+  ];
 }

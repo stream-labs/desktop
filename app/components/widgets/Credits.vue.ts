@@ -5,16 +5,16 @@ import {
 } from 'services/widget-settings/credits';
 
 import { inputComponents } from 'components/widgets/inputs';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import CodeEditor from './CodeEditor.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
     ...inputComponents
   }
@@ -33,5 +33,11 @@ export default class Credits extends WidgetSettings<ICreditsData, CreditsService
   rollTimeTooltip = $t('Duration of the rolling credits.');
   creditsSubtitleTooltip = $t('When the credits roll, this will be the format of the subtitle. Available tokens:') +
     ' {total_donated_amount}, {total_cheer_amount}, {top_donor}, {top_donated_amount}, {top_cheer_donor}, {username},' +
-    ' {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.'
+    ' {top_cheer_amount}, {new_subscriber_count}, {new_follower_count}.';
+
+  settings = [
+    { value: 'manage-credits', label: $t('Manage Credits') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
+  ];
 }

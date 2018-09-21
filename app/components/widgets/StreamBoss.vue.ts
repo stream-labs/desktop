@@ -1,9 +1,9 @@
 import { Component } from 'vue-property-decorator';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widget-settings/stream-boss';
@@ -12,8 +12,8 @@ import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     ValidatedForm,
     CodeEditor,
     TestButtons,
@@ -41,5 +41,12 @@ export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBo
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     await this.save(this.bossCreateOptions);
   }
+
+  settings = [
+    { value: 'goal', label: $t('Goal') },
+    { value: 'manage-battle', label: $t('Manage Battle') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
+  ];
 
 }

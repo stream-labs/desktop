@@ -4,20 +4,22 @@ import {
   ISponsorBannerData
 } from 'services/widget-settings/sponsor-banner';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
+import CustomFieldsEditor from './CustomFieldsEditor.vue';
 
 import { $t } from 'services/i18n';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
+    CustomFieldsEditor,
     ...inputComponents
   }
 })
@@ -30,6 +32,11 @@ export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, Sp
 
   get positions() {
     return this.wData.settings.placement_options === 'double' ? ['1', '2'] : ['1']
+  }
+
+  get settings() {
+    const baseSettings = [{ value: 'visual', label: $t('Visual Settings') }, { value: 'source', label: $t('Source') }];
+    return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: $t('Image Set ') + pos })));
   }
 
   fileNameFromHref(href: string) {
