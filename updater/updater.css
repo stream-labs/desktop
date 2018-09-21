@@ -7,36 +7,108 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Meiryo", "メイリオ", sans-serif;
     font-weight: 400;
     line-height: 1.5;
+    background-color: #2F3340;
     -webkit-font-smoothing: antialiased;
 }
 body,
 html {
     height: 100%;
 }
+
 .UpdaterWindow {
-    height: 100%;
     padding: 24px;
     margin: 0;
     background-color: #2F3340;
     color: #9eeaf9;
-    font-size: 18px;
+    font-size: 16px;
     text-align: center;
-    -webkit-app-region: drag;
+    -webkit-app-region: no-drag;
     box-sizing: border-box;
 }
 .message {
     color: #9eeaf9;
-    vertical-align: middle
+    vertical-align: middle;
 }
 .error {
     color: #ff6952;
 }
+
+.asking {
+    width: 546px;
+    padding: 0;
+    text-align: right;
+    z-index: 10;
+}
+
+.caption {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    margin-top: 24px;
+}
+
+.caption .supplement {
+    font-size: 12px;
+    color: #9eeaf9;
+    border: solid 1px #9eeaf9;
+    border-radius: 2px;
+    padding: 2px 4px;
+}
+ .caption .mandatory {
+    color: #ff6952;
+    border: solid 1px #ff6952;
+}
+
+.patch-notes-wrap {
+    width: 546px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.patch-notes {
+    font-size: 14px;
+    color: #70A0AF;
+    text-align: left;
+    line-height: 1.7em;
+    width: 564px;
+    height: 160px;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.patch-notes p {
+    -webkit-margin-before: 0;
+    -webkit-margin-after: 0;
+}
+.patch-notes a {
+    color: #70A0AF;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+.downloading {
+    margin: 0;
+    position: absolute;
+    width: 546px;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    text-align: right;
+}
+
 .progressBarContainer {
     position: relative;
-    margin-top: 36px;
+    width: 546px;
+    margin-bottom: 16px;
     background-color: #050e18;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
+    text-align: center;
 }
 .progressBar {
     height: 24px;
@@ -55,6 +127,7 @@ html {
 .issues {
     font-size: 12px;
     font-weight: 300;
+    text-align: center;
     padding-top: 24px;
     -webkit-app-region: no-drag;
 }
@@ -85,4 +158,36 @@ html {
     100% {
         transform: rotate(359deg);
     }
+}
+
+button {
+    display: inline-block;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 3px;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    white-space: nowrap;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: all .3s ease;
+}
+
+.button--action {
+    background-color: #ff6952;
+    margin-left: 16px;
+}
+.button--action:hover {
+    background-color:rgba(#fc5035,.25);
+}
+
+.button--dark {
+    background-color: #050F14;
+}
+.button--dark:hover {
+    background-color:rgba(#2b383f,.25);
 }

@@ -3,6 +3,7 @@
 
 const { autoUpdater } = require('electron-updater');
 const { app, BrowserWindow, ipcMain } = require('electron');
+const semver = require('semver');
 
 class Updater {
   // startApp is a callback that will start the app.  Ideally this
@@ -18,26 +19,67 @@ class Updater {
 
   run() {
     this.updateState = {};
+    this.cancellationToken = undefined;
 
     this.bindListeners();
 
     this.browserWindow = this.initWindow();
 
+    autoUpdater.autoDownload = false;
+
     autoUpdater.checkForUpdates().catch(() => {
       // This usually means there is no internet connection.
       // In this case, we shouldn't prevent starting the app.
-      this.startApp();
-      this.finished = true;
-      this.browserWindow.close();
+      this.skipUpdateAndContinue();
     });
+  }
+
+  skipUpdateAndContinue() {
+    this.startApp();
+    this.finished = true;
+    this.browserWindow.close();
   }
 
   // PRIVATE
 
+  isUnskippableUpdate(currentVersion, newVersion) {
+    const currentVer = semver.parse(currentVersion);
+    const newVer = semver.parse(newVersion);
+    if (!currentVer || !newVer) {
+      return true;
+    }
+    if (currentVer.major != newVer.major) {
+      return true;
+    }
+    if (currentVer.minor != newVer.minor) {
+      return true;
+    }
+    return false;
+  }
+
+  textToLines(text) {
+    return text.split('\n')
+  }
+
   bindListeners() {
     autoUpdater.on('update-available', info => {
+      this.updateState.asking = true;
+      this.updateState.releaseNotes = this.textToLines(info.releaseNotes);
+      this.updateState.releaseDate = info.releaseDate;
+      this.updateState.fileSize = info.files[0].size;
       this.updateState.version = info.version;
       this.updateState.percent = 0;
+      this.updateState.isUnskippable = this.isUnskippableUpdate(process.env.NAIR_VERSION, info.version);
+      console.log(`oldVersion: ${process.env.NAIR_VERSION}
+newVersion: ${info.version}
+isUnskippable: ${this.updateState.isUnskippable}`);
+      this.cancellationToken = info.cancellationToken;
+      this.pushState();
+    });
+
+    ipcMain.on('autoUpdate-startDownload', () => {
+      this.updateState.asking = false;
+      autoUpdater.downloadUpdate(this.cancellationToken);
       this.pushState();
     });
 
@@ -58,6 +100,15 @@ class Updater {
       this.pushState();
     });
 
+    ipcMain.on('autoUpdate-cancelDownload', () => {
+      if (this.cancellationToken) {
+        this.cancellationToken.cancel();
+        this.cancellationToken = null;
+      }
+      this.finished = true;
+      this.skipUpdateAndContinue();
+    });
+
     autoUpdater.on('update-downloaded', () => {
       this.updateState.installing = true;
       this.pushState();
@@ -76,12 +127,17 @@ class Updater {
 
   initWindow() {
     const browserWindow = new BrowserWindow({
-      width: 400,
-      height: 180,
-      frame: false,
+      width: 596,
+      height: 369,
+      useContentSize: true,
+      title: `${process.env.NAIR_PRODUCT_NAME} - Ver: ${process.env.NAIR_VERSION}`,
+      frame: true,
+      closable: true,
       resizable: false,
       show: false
     });
+
+    browserWindow.setMenuBarVisibility(false);
 
     browserWindow.on('ready-to-show', () => {
       browserWindow.show();
@@ -89,8 +145,16 @@ class Updater {
 
     browserWindow.on('closed', () => {
       // Prevent leaving a zombie process
+      if (this.cancellationToken) {
+        this.cancellationToken.cancel();
+        this.cancellationToken = null;
+      }
       if (!this.finished) app.quit();
     });
+
+    if (process.env.NODE_ENV !== 'production') {
+      browserWindow.webContents.openDevTools({ mode: 'undocked' });
+    }
 
     browserWindow.loadURL('file://' + __dirname + '/index.html');
 

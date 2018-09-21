@@ -19,6 +19,14 @@ const i18n = new VueI18n({
       checking: {
         message: 'Checking for updates'
       },
+      asking: {
+        message: 'There is an update. download?',
+        changeLog: `Update contents`,
+        mandatoryUpdate: `Mandatory Update`,
+        skippableUpdate: `Skippable updates`,
+        download: 'Download',
+        skip: 'skip'
+      },
       downloading: {
         message: 'Downloading version {version}'
       },
@@ -31,11 +39,20 @@ const i18n = new VueI18n({
         message: 'Something went wrong',
         description: 'There was an error updating. Please {linkText}',
         linkText: 'download a fresh installer.'
-      }
+      },
+      cancel: 'Cancel'
     },
     'ja': {
       checking: {
         message: 'アップデート情報を確認しています'
+      },
+      asking: {
+        message: 'アップデート {version} があります。{br}更新しますか?',
+        changeLog: `更新内容`,
+        mandatoryUpdate: `必須アップデートです`,
+        skippableUpdate: `スキップ可能なアップデートです`,
+        download: 'ダウンロードして更新',
+        skip: '更新せずに N Air を起動'
       },
       downloading: {
         message: 'バージョン{version}を{br}ダウンロードしています'
@@ -49,7 +66,8 @@ const i18n = new VueI18n({
         message: '問題が発生しました',
         description: 'アップデートに失敗しました。{br}{linkText}',
         linkText: '最新のインストーラーをダウンロードしてください。'
-      }
+      },
+      cancel: 'キャンセル'
     }
   },
   silentTranslationWarn: true
