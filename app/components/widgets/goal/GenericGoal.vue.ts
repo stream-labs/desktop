@@ -3,11 +3,11 @@ import {
   GenericGoalService,
   IGoalData
 } from 'services/widget-settings/generic-goal';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 
 import { inputComponents } from 'components/widgets/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import CodeEditor from '../CodeEditor.vue';
@@ -22,8 +22,8 @@ interface IGoalCreateOptions {
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     ValidatedForm,
     CodeEditor,
     CustomFieldsEditor,
@@ -44,6 +44,12 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
   };
 
   textColorTooltip = $t('A hex code for the base text color.');
+
+  settings = [
+    { value: 'goal', label: $t('Goal') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
+  ];
 
   get hasGoal() {
     return this.loaded && this.wData.goal && this.wData.goal.title;

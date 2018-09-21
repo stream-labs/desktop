@@ -1,67 +1,55 @@
 <template>
-<widget-window :requestState="requestState" :loaded="loaded" v-model="tabName">
+<widget-editor
+  v-if="wData"
+  ref="layout"
+  v-model="wData.settings.custom_enabled"
+  :settings="settings"
+  :requestState="requestState"
+  :loaded="loaded"
+>
   <!-- goal setup -->
-  <div slot="goal" v-if="loaded">
+  <div slot="goal-properties" >
     <div v-if="hasGoal">
       <div class="section__body">
-        <h-form-group :title="$t('Title')">{{ wData.goal.title }}</h-form-group>
-        <h-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</h-form-group>
-        <h-form-group :title="$t('Current Amount')">{{ wData.goal.current_amount }}</h-form-group>
-        <h-form-group :title="$t('Days Remaining')">{{ wData.goal.to_go }}</h-form-group>
+        <v-form-group :title="$t('Title')">{{ wData.goal.title }}</v-form-group>
+        <v-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</v-form-group>
+        <v-form-group :title="$t('Current Amount')">{{ wData.goal.current_amount }}</v-form-group>
+        <v-form-group :title="$t('Days Remaining')">{{ wData.goal.to_go }}</v-form-group>
+        <button class="button button--soft-warning" @click="reset()">{{ $t("End Goal") }}</button>
       </div>
     </div>
 
-    <div v-if="!hasGoal">
-
+    <div v-else>
       <div class="section__body" v-if="requestState !== 'pending'">
-
         <validated-form ref="form">
-          <h-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
-          <h-form-group v-model="goalCreateOptions.goal_amount" :metadata="metadata.goal_amount"/>
-          <h-form-group v-model="goalCreateOptions.manual_goal_amount" :metadata="metadata.manual_goal_amount"/>
-          <h-form-group v-model="goalCreateOptions.ends_at" :metadata="metadata.ends_at"/>
+          <v-form-group v-model="goalCreateOptions.title" :metadata="metadata.title"/>
+          <v-form-group v-model="goalCreateOptions.goal_amount" :metadata="metadata.goal_amount"/>
+          <v-form-group v-model="goalCreateOptions.manual_goal_amount" :metadata="metadata.manual_goal_amount"/>
+          <v-form-group v-model="goalCreateOptions.ends_at" :metadata="metadata.ends_at"/>
         </validated-form>
-
       </div>
       <div v-else class="loading-spinner">
         <img src="../../../../media/images/loader.svg" />
       </div>
+      <button @click="saveGoal()" class="button button--action">{{ $t('Start Goal') }}</button>
     </div>
-
   </div>
 
-  <div slot="goal-controls">
 
-    <button
-        v-show="!hasGoal"
-        @click="saveGoal()"
-        class="button button--action"
-    >
-      {{ $t('Start Goal') }}
-    </button>
-    <button
-        class="button button--soft-warning"
-        v-show="hasGoal"
-        @click="reset()"
-    >
-      {{ $t("End Goal") }}
-    </button>
-  </div>
-
-  <div slot="settings" v-if="loaded">
-    <h-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
-    <h-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
-    <h-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
-    <h-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <h-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
-    <h-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
-    <h-form-group
+  <div slot="visual-properties">
+    <v-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
+    <v-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
+    <v-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
+    <v-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
+    <v-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <v-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
+    <v-form-group
         type="slider"
         title="Bar Thickness"
         v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
     />
-    <h-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
+    <v-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
   </div>
 
 
@@ -82,7 +70,7 @@
   </div>
 
 
-</widget-window>
+</widget-editor>
 
 </template>
 

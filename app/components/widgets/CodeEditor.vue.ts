@@ -27,12 +27,9 @@ export default class CodeEditor extends Vue {
   value: IWidgetData;
 
   editorInputValue = this.value.settings['custom_' + this.metadata.type];
-  customEnabled =  this.value.settings.custom_enabled;
 
   private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
-  private initialCustomEnabled = this.customEnabled;
-  private serverCustomEnabled = this.initialCustomEnabled;
 
   isLoading = false;
 
@@ -43,8 +40,7 @@ export default class CodeEditor extends Vue {
   }
 
   get hasChanges() {
-    return (this.serverInputValue !== this.editorInputValue) ||
-      this.customEnabled !== this.serverCustomEnabled;
+    return (this.serverInputValue !== this.editorInputValue);
   }
 
   get canSave() {
@@ -62,8 +58,6 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
-    newData.settings.custom_enabled = this.customEnabled;
-
     try {
       await this.settingsService.saveData(newData.settings);
     } catch (e) {
@@ -73,7 +67,6 @@ export default class CodeEditor extends Vue {
     }
 
     this.serverInputValue = this.editorInputValue;
-    this.serverCustomEnabled = this.customEnabled;
     this.isLoading = false;
   }
 
@@ -81,7 +74,6 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.initialInputValue;
-    newData.settings.custom_enabled = this.customEnabled = this.initialCustomEnabled;
     this.emitInput(newData);
   }
 
