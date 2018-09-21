@@ -23,7 +23,6 @@ interface Area {
 export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptureCroppingServiceState> {
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: ISourcesServiceApi;
-  timer: number;
 
   private _currentWindow: BrowserWindow | null;
   set currentWindow(windowObj: BrowserWindow | null) {
@@ -85,7 +84,6 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     this.currentWindow = null;
     if (!this.isCropping) return;
 
-    clearTimeout(this.timer);
     this.END_CROPPING();
     this.CLEAR_WINDOW_ID();
   }
