@@ -6,6 +6,7 @@ import { StreamingRecordingModule } from './modules/streaming-recording';
 import { AuthorizationModule } from './modules/authorization';
 import { ILoadedApp } from '..';
 import { ThemeModule } from './modules/theme';
+import { SceneCollectionsModule } from './modules/scene-collections';
 
 export class PlatformAppsApi {
 
@@ -19,6 +20,7 @@ export class PlatformAppsApi {
     this.registerModule(new StreamingRecordingModule());
     this.registerModule(new AuthorizationModule());
     this.registerModule(new ThemeModule());
+    this.registerModule(new SceneCollectionsModule());
   }
 
   private registerModule(module: Module) {
