@@ -10,7 +10,7 @@
           <v-form-group :title="$t('Mode')">{{ wData.goal.mode }}</v-form-group>
           <button
               class="button button--warn"
-              @click="reset()"
+              @click="resetGoal()"
           >{{ $t('Reset Stream Boss') }}</button>
         </div>
       </div>

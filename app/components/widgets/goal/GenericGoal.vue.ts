@@ -37,7 +37,7 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
 
   textColorTooltip = $t('A hex code for the base text color.');
 
-  settings = [
+  navItems = [
     { value: 'goal', label: $t('Goal') },
     { value: 'visual', label: $t('Visual Settings') },
     { value: 'source', label: $t('Source') }
