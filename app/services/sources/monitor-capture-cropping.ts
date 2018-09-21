@@ -47,12 +47,16 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   startCropping(sceneId: string, sceneItemId: string, sourceId: string) {
     if (this.isCropping) return;
 
-    this.START_CROPPING(sceneId, sceneItemId, sourceId);
-
     const source = this.sourcesService.getSource(sourceId);
     const targetDisplayId = source.getSettings().monitor;
     const displays = electron.remote.screen.getAllDisplays();
     const display = displays[targetDisplayId];
+    if (!display) {
+      console.error('クロップ対象のソースが指定するモニタが存在しません');
+      return;
+    }
+
+    this.START_CROPPING(sceneId, sceneItemId, sourceId);
 
     const windowId = this.windowsService.createOneOffWindow({
       componentName: 'CroppingOverlay',
@@ -95,12 +99,16 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
     const sceneItem = new SceneItem(this.state.sceneId, this.state.sceneItemId, this.state.sourceId);
     const rect = new ScalableRectangle(sceneItem.getRectangle());
 
-    const { width: displayWidth, height: displayHeight } = display.bounds;
-
     const source = sceneItem.getSource();
     const targetDisplayId = source.getSettings().monitor;
     const displays = electron.remote.screen.getAllDisplays();
     const display = displays[targetDisplayId];
+    if (!display) {
+      console.error('クロップ対象のソースが指定するモニタが存在しません');
+      return;
+    }
+
+    const { width: displayWidth, height: displayHeight } = display.bounds;
     const factor = display.scaleFactor;
 
     rect.normalized(() => {
