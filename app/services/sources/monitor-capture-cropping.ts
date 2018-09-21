@@ -87,14 +87,20 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   crop(targetArea: Area) {
     if (!this.isCropping) return;
 
+    // 面積がゼロになるとOBS側に触れない像が残るので無視
+    if (targetArea.width === 0 || targetArea.height === 0) {
+      return;
+    }
+
     const sceneItem = new SceneItem(this.state.sceneId, this.state.sceneItemId, this.state.sourceId);
     const rect = new ScalableRectangle(sceneItem.getRectangle());
+
+    const { width: displayWidth, height: displayHeight } = display.bounds;
 
     const source = sceneItem.getSource();
     const targetDisplayId = source.getSettings().monitor;
     const displays = electron.remote.screen.getAllDisplays();
     const display = displays[targetDisplayId];
-    const { width: displayWidth, height: displayHeight } = display.bounds;
     const factor = display.scaleFactor;
 
     rect.normalized(() => {
