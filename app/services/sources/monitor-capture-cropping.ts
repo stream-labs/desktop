@@ -51,7 +51,11 @@ export class MonitorCaptureCroppingService extends StatefulService<IMonitorCaptu
   }
 
   startCropping(sceneId: string, sceneItemId: string, sourceId: string) {
-    if (this.isCropping) return;
+    if (this.isCropping) {
+      // 後勝ち
+      this.endCropping();
+      return;
+    }
 
     const source = this.sourcesService.getSource(sourceId);
     const targetDisplayId = source.getSettings().monitor;
