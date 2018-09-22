@@ -42,6 +42,7 @@ export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerDa
       dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
       settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
       settingsUpdateEvent: 'sponsorBannerSettingsUpdate',
+      customCodeAllowed: true,
       customFieldsAllowed: true
     }
   }

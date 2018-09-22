@@ -35,6 +35,8 @@ export class DonationTickerService extends WidgetSettingsService<IDonationTicker
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
       settingsUpdateEvent: 'donationtickerSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
       hasTestButtons: true
     }
   }

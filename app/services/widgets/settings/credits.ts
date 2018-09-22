@@ -43,7 +43,9 @@ export class CreditsService extends WidgetSettingsService<ICreditsData> {
       previewUrl: `https://${ this.getHost() }/widgets/end-credits?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/endcredits`,
-      settingsUpdateEvent: 'endCreditsSettingsUpdate'
+      settingsUpdateEvent: 'endCreditsSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true
     }
   }
 

@@ -65,7 +65,9 @@ export abstract class StreamBossService extends BaseGoalService<IStreamBossData,
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss/settings`,
       goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/streamboss`,
-      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+      customCodeAllowed: true,
+      customFieldsAllowed: true
     }
   }
 

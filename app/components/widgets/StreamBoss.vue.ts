@@ -22,8 +22,6 @@ import TestButtons from './TestButtons.vue';
 })
 export default class StreamBoss extends WidgetSettings<IStreamBossData, StreamBossService> {
 
-  tab = 'goal';
-
   $refs: {
     form: ValidatedForm;
   };

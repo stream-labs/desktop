@@ -20,6 +20,7 @@ export class BitGoalService extends GenericGoalService {
       goalCreateEvent: 'bitGoalStart',
       goalResetEvent: 'bitGoalEnd',
       hasTestButtons: true,
+      customCodeAllowed: true,
       customFieldsAllowed: true
     }
   }

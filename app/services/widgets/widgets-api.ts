@@ -52,6 +52,7 @@ export interface IWidgetApiSettings {
   previewUrl: string;
   settingsUpdateEvent: string;
   testers?: string[];
+  customCodeAllowed?: boolean;
   customFieldsAllowed?: boolean;
 }
 

@@ -21,6 +21,7 @@ export class DonationGoalService extends GenericGoalService {
       goalCreateEvent: 'donationGoalStart',
       goalResetEvent: 'donationGoalEnd',
       hasTestButtons: true,
+      customCodeAllowed: true,
       customFieldsAllowed: true
     }
   }

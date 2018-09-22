@@ -31,7 +31,9 @@ export class ViewerCountService extends WidgetSettingsService<IViewerCountData> 
       previewUrl: `https://${ this.getHost() }/widgets/viewer-count?token=${this.getWidgetToken()}&simulate=1`,
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/viewercount`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/viewercount`,
-      settingsUpdateEvent: 'viewerCountSettingsUpdate'
+      settingsUpdateEvent: 'viewerCountSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true
     }
   }
 

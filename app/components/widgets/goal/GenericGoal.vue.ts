@@ -22,8 +22,6 @@ import { GenericGoalService, IGoalCreateOptions, IGoalData } from '../../../serv
 })
 export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalService> {
 
-  tab = 'goal';
-
   $refs: {
     form: ValidatedForm;
   };

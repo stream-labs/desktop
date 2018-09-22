@@ -41,7 +41,9 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       previewUrl: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}?simulate=1`,
       dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/chatbox`,
       settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/chatbox`,
-      settingsUpdateEvent: 'chatBoxSettingsUpdate'
+      settingsUpdateEvent: 'chatBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true
     }
   }
 

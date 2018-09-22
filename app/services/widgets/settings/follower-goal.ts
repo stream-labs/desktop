@@ -20,6 +20,7 @@ export class FollowerGoalService extends GenericGoalService {
       goalCreateEvent: 'followerGoalStart',
       goalResetEvent: 'followerGoalEnd',
       hasTestButtons: true,
+      customCodeAllowed: true,
       customFieldsAllowed: true
     }
   }

@@ -70,10 +70,29 @@
               v-model="currentCodeTab"
               @input="value => updateCodeTab(value)"
             />
-            <code-editor v-if="currentCodeTab === 'HTML'" key="html" :value="wData" :metadata="{ type: 'html' }"/>
-            <code-editor v-if="currentCodeTab === 'CSS'"  key="css" :value="wData" :metadata="{ type: 'css' }"/>
-            <code-editor v-if="currentCodeTab === 'JS'" key="js" :value="wData" :metadata="{ type: 'js' }"/>
-            <custom-fields-editor  v-if="currentCodeTab === 'customFields'" key="customFields" :value="wData"/>
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+              key="html"
+              :value="wData"
+              :metadata="{ type: 'html' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+              key="css"
+              :value="wData"
+              :metadata="{ type: 'css' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+              key="js"
+              :value="wData"
+              :metadata="{ type: 'js' }"
+            />
+            <custom-fields-editor
+              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+              key="customFields"
+              :value="wData"
+            />
           </div>
         </div>
 

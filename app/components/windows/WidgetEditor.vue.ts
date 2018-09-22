@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
-import { ISourceApi, ISourcesServiceApi } from 'services/sources';
 import { $t } from 'services/i18n';
 import { TObsFormData } from 'components/obs/inputs/ObsInput';
 import GenericForm from 'components/obs/inputs/GenericForm.vue';
@@ -19,11 +18,6 @@ import CustomFieldsEditor from 'components/widgets/CustomFieldsEditor.vue';
 import CodeEditor from 'components/widgets/CodeEditor.vue';
 import { WindowsService } from 'services/windows';
 
-interface ITab {
-  name: string;
-  value: string;
-}
-
 @Component({
   components: {
     ModalLayout,
@@ -38,7 +32,7 @@ interface ITab {
     CodeEditor
   }
 })
-export default class WidgetWindow extends Vue {
+export default class WidgetEditor extends Vue {
   @Inject() private widgetsService: IWidgetsServiceApi;
   @Inject() private windowsService: WindowsService;
   @Inject() private projectorService: ProjectorService;
