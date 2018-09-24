@@ -29,7 +29,9 @@
       </div>
 
       <div class="content-container" ref="content">
-        <display class="display" :sourceId="widget.previewSourceId" @click="createProjector"/>
+        <div class="display">
+          <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
+        </div>
         <div class="sidebar" ref="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
@@ -61,7 +63,7 @@
           </div>
         </div>
 
-        <div class="code-editor hidden" ref="code" v-if="loaded">
+        <div class="code-editor hidden zero-width" ref="code" v-if="loaded">
           <div v-if="customCodeIsEnabled">
             <tabs
               :hideConent="true"
@@ -219,6 +221,7 @@
     width: 100%;
     height: 100%;
     flex-shrink: 2;
+    background-color: @day-section;
   }
 
   .sidebar {
@@ -261,12 +264,15 @@
     text-transform: uppercase;
     background-color: @day-editor-accent;
     border-bottom: 1px solid @day-editor-border;
+    white-space: nowrap;
   }
 
   .subsection__content {
     padding: 8px;
     overflow: hidden;
     overflow-y: auto;
+    width: 100%;
+    min-width: 260px;
   }
 
   .source-property {
@@ -291,13 +297,17 @@
     width: 100%;
     border-top: 1px solid @day-editor-border;
     background-color: @day-section;
-    .transition();
+    transition: height 275ms;
   }
 
   .code-editor.hidden {
     height: 0;
-    width: 0;
     visibility: collapse;
+  }
+
+  .code-editor.zero-width {
+    width: 0;
+    transition: none;
   }
 
   .custom-code {
@@ -356,6 +366,9 @@
   .night-theme {
     .window-container {
       border-color: @night-slider-bg;
+    }
+    .display {
+      background-color: @night-section-bg;
     }
     .custom-code__divider {
       background-color: @night-section;
