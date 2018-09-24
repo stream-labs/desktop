@@ -5,7 +5,8 @@ export enum EApiPermissions {
   ObsSettings = 'slobs.obs-settings',
   Streaming = 'slobs.streaming',
   Authorization = 'slobs.authorization',
-  SceneCollections = 'slobs.scene-collections'
+  SceneCollections = 'slobs.scene-collections',
+  ExternalLinks = 'slobs.external-links'
 }
 
 // TODO: What else should be included here?

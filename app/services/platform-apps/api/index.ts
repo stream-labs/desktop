@@ -7,6 +7,7 @@ import { AuthorizationModule } from './modules/authorization';
 import { ILoadedApp } from '..';
 import { ThemeModule } from './modules/theme';
 import { SceneCollectionsModule } from './modules/scene-collections';
+import { ExternalModule } from './modules/external';
 
 export class PlatformAppsApi {
 
@@ -21,6 +22,7 @@ export class PlatformAppsApi {
     this.registerModule(new AuthorizationModule());
     this.registerModule(new ThemeModule());
     this.registerModule(new SceneCollectionsModule());
+    this.registerModule(new ExternalModule());
   }
 
   private registerModule(module: Module) {
