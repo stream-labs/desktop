@@ -73,7 +73,7 @@ interface IAppManifest {
   authorizationUrls: string[];
 }
 
-interface IProductionApp {
+interface IProductionAppResponse {
   app_token: string;
   cdn_url: string;
   description: string;
@@ -83,7 +83,7 @@ interface IProductionApp {
   manifest: IAppManifest;
   name: string;
   screenshots: string[];
-  subscription: ISubscription;
+  subscription: ISubscriptionResponse;
   version: string;
 }
 
@@ -103,7 +103,7 @@ interface IPlatformAppServiceState {
   loadedApps: ILoadedApp[];
 }
 
-interface ISubscription {
+interface ISubscriptionResponse {
   id: number;
   user_id: number;
   app_id: number;
@@ -164,7 +164,7 @@ export class PlatformAppsService extends
   /**
    * Get production apps
    */
-  async fetchProductionApps(): Promise<IProductionApp[]> {
+  async fetchProductionApps(): Promise<IProductionAppResponse[]> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/installed_apps`,

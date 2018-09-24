@@ -115,7 +115,6 @@ export default class AddSource extends Vue {
             propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
           }
         );
-        
 
         this.scenesService.activeScene.addSource(source.sourceId);
       }
