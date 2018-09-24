@@ -15,7 +15,9 @@ import {
 } from './streaming-api';
 import { UsageStatisticsService } from 'services/usage-statistics';
 import { $t } from 'services/i18n';
-import { StreamInfoService }from 'services/stream-info';
+import { StreamInfoService } from 'services/stream-info';
+import { AnnouncementsService } from 'services/announcements';
+import { NotificationsService, ENotificationType, INotification } from 'services/notifications';
 
 enum EOBSOutputType {
   Streaming = 'streaming',
@@ -45,6 +47,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   @Inject() windowsService: WindowsService;
   @Inject() usageStatisticsService: UsageStatisticsService;
   @Inject() streamInfoService: StreamInfoService;
+  @Inject() notificationsService: NotificationsService;
+  @Inject() private announcementsService: AnnouncementsService;
 
   streamingStatusChange = new Subject<EStreamingState>();
   recordingStatusChange = new Subject<ERecordingState>();
@@ -146,6 +150,8 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
         this.toggleRecording();
       }
 
+      this.announcementsService.updateBanner();
+
       return;
     }
 
@@ -184,6 +190,7 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
   showEditStreamInfo() {
     this.windowsService.showWindow({
       componentName: 'EditStreamInfo',
+      title: $t('Update Stream Info'),
       queryParams: {},
       size: {
         width: 500,
@@ -225,6 +232,26 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
 
   get streamingStateChangeTime() {
     return moment(this.state.streamingStatusTime);
+  }
+
+  private sendReconnectingNotification() {
+    const msg = $t('Stream has disconnected, attempting to reconnect.');
+    const existingReconnectNotif = this.notificationsService.getUnread()
+      .filter((notice: INotification) => notice.message === msg);
+    if (existingReconnectNotif.length !== 0) return;
+    this.notificationsService.push({
+      type: ENotificationType.WARNING,
+      lifeTime: -1,
+      showTime: true,
+      message: $t('Stream has disconnected, attempting to reconnect.')
+    });
+  }
+
+  private clearReconnectingNotification() {
+    const notice = this.notificationsService.getAll()
+      .find((notice: INotification) => notice.message === $t('Stream has disconnected, attempting to reconnect.'));
+    if (!notice) return;
+    this.notificationsService.markAsRead(notice.id);
   }
 
   private formattedDurationSince(timestamp: moment.Moment) {
@@ -275,9 +302,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
       } else if (info.signal === EOBSOutputSignal.Reconnect) {
         this.SET_STREAMING_STATUS(EStreamingState.Reconnecting);
         this.streamingStatusChange.next(EStreamingState.Reconnecting);
+        this.sendReconnectingNotification();
       } else if (info.signal === EOBSOutputSignal.ReconnectSuccess) {
         this.SET_STREAMING_STATUS(EStreamingState.Live);
         this.streamingStatusChange.next(EStreamingState.Live);
+        this.clearReconnectingNotification();
       }
     } else if (info.type === EOBSOutputType.Recording) {
       const time = new Date().toISOString();

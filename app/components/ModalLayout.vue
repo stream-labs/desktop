@@ -1,6 +1,5 @@
 <template>
 <div id="mainWrapper" class="modal-layout" :class="{'night-theme': nightTheme}">
-  <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -10,7 +9,9 @@
     class="modal-layout-content"
     :style="contentStyle">
     <slot name="content" v-if="!loading"/>
-    <i class="fa fa-spinner fa-pulse modal-layout-spinner" v-else/>
+    <div class="spinner-container" v-else>
+      <i class="fa fa-spinner fa-pulse modal-layout-spinner"/>
+    </div>
   </div>
   <div v-if="showControls" class="modal-layout-controls">
     <button
@@ -37,7 +38,7 @@
 @import "../styles/index";
 
 .modal-layout {
-  height: 100%;
+  height: calc(~"100% - 30px"); // Compensate for titlebar living in ChildWindow
   display: flex;
   flex-direction: column;
   color: @day-paragraph;
@@ -50,18 +51,16 @@
   }
 }
 
-.modal-layout-titlebar {
-  flex-shrink: 0;
-}
-
 .ModalLayout-fixed {
   flex-shrink: 0;
+  z-index: 1;
 }
 
 .modal-layout-content {
   flex-grow: 1;
   height: 100%;
   display: flex;
+  position: relative;
   overflow-x: hidden;
   .padding(2);
 
@@ -70,12 +69,18 @@
   }
 }
 
+.spinner-container {
+  position: absolute;
+  width: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .modal-layout-spinner {
   font-size: 36px;
   display: inline-block;
-  width: 100%;
-  text-align: center;
-  margin: 100px 0;
+  height: 36px;
 }
 
 .modal-layout-controls {

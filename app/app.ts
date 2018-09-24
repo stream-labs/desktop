@@ -24,6 +24,7 @@ import VueI18n from 'vue-i18n';
 import VModal from 'vue-js-modal';
 import VeeValidate from 'vee-validate';
 import ChildWindow from 'components/windows/ChildWindow.vue';
+import OneOffWindow from 'components/windows/OneOffWindow.vue';
 
 const { ipcRenderer, remote } = electron;
 
@@ -137,9 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
       store,
       render: h => {
         if (windowId === 'child') return h(ChildWindow);
-
-        const componentName = windowsService.state[windowId].componentName;
-        return h(windowsService.components[componentName]);
+        if (windowId === 'main') {
+          const componentName = windowsService.state[windowId].componentName;
+          return h(windowsService.components[componentName]);
+        }
+        return h(OneOffWindow);
       }
     });
 

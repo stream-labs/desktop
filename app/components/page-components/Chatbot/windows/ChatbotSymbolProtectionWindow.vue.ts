@@ -2,9 +2,16 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotModToolsBase from 'components/page-components/Chatbot/module-bases/ChatbotModToolsBase.vue';
 import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
-@Component({})
+@Component({
+  components: { ValidatedForm }
+})
 export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
+  $refs: {
+    form: ValidatedForm;
+  };
+
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -26,7 +33,9 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
     this.onResetSlugHandler('symbol-protection');
   }
 
-  onSaveHandler() {
+  async onSaveHandler() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+
     this.chatbotApiService
       .updateSymbolProtection({
         enabled: this.symbolProtectionResponse.enabled,

@@ -27,7 +27,12 @@
       <thead>
         <tr>
           <th> {{ $t("timer") }} </th>
-          <th> {{ $t("interval") }} </th>
+          <th>
+            <div class="flex">
+              {{ $t("interval in minutes") }}
+               <i class="icon-question icon-btn" v-tooltip="$t('interval in minutes')" />
+            </div>
+          </th>
           <th> {{ $t("response") }} </th>
           <th> {{ $t("line minimum") }} </th>
           <th></th>
@@ -84,9 +89,6 @@
 }
 
 tbody tr {
-  .transition;
-  .cursor--pointer;
-
   td:first-child {
     width: 300px;
   }
@@ -95,15 +97,6 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
 }
 

@@ -1,5 +1,6 @@
 <template>
 <div style="height: 100%" :class="{'night-theme': nightTheme, 'day-theme': !nightTheme}">
+  <title-bar :title="options.title" class="child-window-titlebar" />
   <div class="blank-slate">
     <div class="spinner-spacer" />
     <i class="fa fa-spinner fa-pulse" />
@@ -33,12 +34,17 @@
   text-align: center;
 }
 
+.child-window-titlebar {
+  flex-shrink: 0;
+}
+
 .spinner-spacer {
   flex-grow: 1;
 }
 
 .night-theme {
-  .blank-slate {
+  .blank-slate,
+  .child-window-titlebar {
     background-color: @night-primary;
     color: @night-text;
   }

@@ -5,7 +5,8 @@ import {
   IInputMetadata,
   ITextMetadata,
   IListMetadata,
-  INumberMetadata
+  INumberMetadata,
+  EInputType
 } from 'components/shared/inputs/index';
 
 import {
@@ -13,8 +14,17 @@ import {
   NEW_WORD_PROTECTION_LIST_MODAL_ID
 } from 'services/chatbot';
 
-@Component({})
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+
+@Component({
+  components: { ValidatedForm }
+})
 export default class ChatbotLinkProtectionList extends ChatbotBase {
+
+  $refs: {
+    form: ValidatedForm;
+  };
+
   @Prop()
   value: IWordProtectionBlackListItem[];
 
@@ -39,21 +49,25 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     } = {
       text: {
         required: true,
+        type: EInputType.text,
         placeholder: 'Add a link to add to list'
       },
       punishment: {
         duration: {
+          type: EInputType.number,
           required: true,
-          placeholder: 'Punishment Duration (Value in Minutes)',
+          placeholder: 'Punishment Duration (Value in Seconds)',
           min: 0
         },
         type: {
           required: true,
+          type: EInputType.list,
           options: this.chatbotPunishments
         }
       },
       is_regex: {
         required: true,
+        type: EInputType.bool,
         title: 'This word / phrase contains a regular expression.'
       }
     };
@@ -89,8 +103,8 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     this.$emit('input', newListItemArray);
   }
 
-  onAddNewItemHandler() {
-    if (!this.newListItem.text) return;
+  async onAddNewItemHandler() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     let newListItemArray = this.value.slice(0);
 
