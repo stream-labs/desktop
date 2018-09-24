@@ -1,6 +1,5 @@
 <template>
   <modal-layout
-    :title="$t('Add source filter')"
     :done-handler="done"
     :cancel-handler="cancel"
   >

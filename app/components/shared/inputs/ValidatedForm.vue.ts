@@ -1,7 +1,10 @@
 import { Component } from 'vue-property-decorator';
 import Vue from 'vue';
+import uuid from 'uuid';
+import { ErrorField } from 'vee-validate';
 import { BaseInput } from './BaseInput';
 import { IInputMetadata } from './index';
+import { Subject } from 'rxjs/Subject';
 
 /**
  * VeeValidate doesn't support slots https://github.com/baianat/vee-validate/issues/325
@@ -9,6 +12,9 @@ import { IInputMetadata } from './index';
  */
 @Component({})
 export default class ValidatedForm extends Vue {
+
+  validated = new Subject<ErrorField[]>();
+  validationScopeId = uuid();
 
   getInputs(children?: Vue[]): BaseInput<any, IInputMetadata>[] {
     children = children || this.$children;
@@ -26,20 +32,19 @@ export default class ValidatedForm extends Vue {
   async validate() {
     const inputs = this.getInputs();
     for (let i = 0; i < inputs.length; i++) {
-      await inputs[i].$validator.validateAll();
+      await inputs[i].$validator.validateAll(this.validationScopeId);
     }
+    this.validated.next(this.$validator.errors.items);
   }
 
-  async validateAndCheckErrors(): Promise<boolean> {
+  async validateAndGetErrors(): Promise<ErrorField[]> {
     await this.validate();
-    const inputs = this.getInputs();
-    let hasErrors = false;
-    for (let i = 0; i < inputs.length; i++) {
-      if (inputs[i].$validator.errors.count()) {
-        hasErrors = true;
-      }
-    }
-    return hasErrors;
+    return this.$validator.errors.items;
+  }
+
+  async validateAndGetErrorsCount(): Promise<number> {
+    const errors = await this.validateAndGetErrors();
+    return errors.length;
   }
 
 }

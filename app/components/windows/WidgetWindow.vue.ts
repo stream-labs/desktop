@@ -15,7 +15,6 @@ import GenericForm from 'components/obs/inputs/GenericForm.vue';
 import { Subscription } from 'rxjs/Subscription';
 import { ProjectorService } from 'services/projector';
 import { IWidgetTab } from 'services/widget-settings/widget-settings';
-import uuid from 'uuid';
 
 @Component({
   components: {
@@ -32,10 +31,10 @@ export default class WidgetWindow extends Vue {
   @Inject() private widgetsService: WidgetsService;
   @Inject() private projectorService: ProjectorService;
 
-  @Prop()
-  value: string; // selected tab
+  @Prop() value: string; // selected tab
+  @Prop() requestState: 'fail' | 'success' | 'pending';
+  @Prop() loaded: boolean;
 
-  canRender = false; // prevents window flickering
   sourceId = this.windowsService.getChildWindowOptions().queryParams.sourceId;
   source = this.sourcesService.getSource(this.sourceId);
   widgetType = this.source.getPropertiesManagerSettings().widgetType;
@@ -49,6 +48,10 @@ export default class WidgetWindow extends Vue {
 
   get service() {
     return this.widgetsService.getWidgetSettingsService(this.widgetType);
+  }
+
+  get loadingFailed() {
+    return this.requestState === 'fail' && !this.loaded;
   }
 
   mounted() {
@@ -73,15 +76,10 @@ export default class WidgetWindow extends Vue {
     this.tabs = settingsService.getTabs();
     this.tabsList = this.tabs.map(tab => ({ name: tab.title, value: tab.name }))
       .concat({ name: 'Source', value: 'source' });
-    this.canRender = true;
   }
 
   get webview() {
     return this.$refs.webview;
-  }
-
-  get windowTitle() {
-    return this.source ? $t('Settings for ') + this.source.name : '';
   }
 
   get tab(): IWidgetTab {

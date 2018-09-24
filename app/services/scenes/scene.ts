@@ -14,14 +14,12 @@ import {
 } from './index';
 import Utils from 'services/utils';
 import * as obs from 'services/obs-api';
-import electron from 'electron';
 import { Inject } from 'util/injector';
 import { SelectionService, Selection, TNodesList } from 'services/selection';
 import { uniqBy } from 'lodash';
 import { TSceneNodeInfo } from 'services/scene-collections/nodes/scene-items';
 import * as fs from 'fs';
 import uuid from 'uuid/v4';
-const { ipcRenderer } = electron;
 
 
 export type TSceneNode = SceneItem | SceneItemFolder;
@@ -243,7 +241,6 @@ export class Scene implements ISceneApi {
   }
 
 
-  // TODO write tests for this method
   placeAfter(sourceNodeId: string, destNodeId?: string) {
     const sourceNode = this.getNode(sourceNodeId);
     const destNode = this.getNode(destNodeId);

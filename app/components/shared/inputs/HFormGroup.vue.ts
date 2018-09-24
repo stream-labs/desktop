@@ -3,24 +3,25 @@ import { EInputType, IInputMetadata } from './index';
 import FormInput from './FormInput.vue';
 import BaseFormGroup from './BaseFormGroup';
 
-
+/**
+ * Horizontal layout for input-component
+ */
 @Component({
   components: { FormInput }
 })
-
-export default class VFormGroup extends BaseFormGroup {
-
-  @Prop()
-  type: EInputType;
+export default class HFormGroup extends BaseFormGroup {
 
   @Prop()
-  value: undefined;
+  readonly type: EInputType;
 
   @Prop()
-  metadata: IInputMetadata;
+  readonly value: undefined;
 
   @Prop()
-  title: string;
+  readonly metadata: IInputMetadata;
+
+  @Prop()
+  readonly title: string;
 
   created() {
     // vue-class-component doesn't inherit lifecycle hooks

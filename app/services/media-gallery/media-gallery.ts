@@ -7,6 +7,7 @@ import { HostsService } from 'services/hosts';
 import { WindowsService } from 'services/windows';
 import uuid from 'uuid';
 import { stockImages, stockSounds } from './stock-library';
+import { $t } from '../i18n';
 
 
 export interface IMediaGalleryFile {
@@ -159,6 +160,7 @@ export class MediaGalleryService extends Service {
   private showMediaGallery(promiseId: string, props?: IMediaGalleryProps) {
     this.windowsService.showWindow({
       componentName: 'MediaGallery',
+      title: $t('Media Gallery'),
       preservePrevWindow: true,
       queryParams: { promiseId, ...props },
       size: {

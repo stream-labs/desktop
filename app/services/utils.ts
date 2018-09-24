@@ -46,7 +46,7 @@ export default class Utils {
   }
 
   static useLocalHost(): boolean {
-    return electron.remote.process.env.USE_LOCAL_HOST;
+    return electron.remote.process.env.SLOBS_USE_LOCAL_HOST;
   }
 
   /**
