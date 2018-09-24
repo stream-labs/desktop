@@ -2,7 +2,7 @@ import { Component } from 'vue-property-decorator';
 import {
   DonationTickerService,
   IDonationTickerData
-} from 'services/widget-settings/donation-ticker';
+} from 'services/widgets/settings/donation-ticker';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
@@ -11,6 +11,7 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import CodeEditor from './CodeEditor.vue';
 import TestButtons from './TestButtons.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
@@ -18,6 +19,7 @@ import TestButtons from './TestButtons.vue';
     VFormGroup,
     CodeEditor,
     TestButtons,
+    ValidatedForm,
     ...inputComponents
   }
 })
@@ -46,7 +48,7 @@ export default class DonationTicker extends WidgetSettings<IDonationTickerData, 
   nameColorTooltip = $t('A hex color for the text of the') + ' {name} ' + $t('token');
   amountColorTooltip = $t('A hex color for the text of the') + ' {amount} ' + $t('token');
 
-  settings = [
+  navItems = [
     { value: 'manage-list', label: $t('Manage List') },
     { value: 'font', label: $t('Font Settings') },
     { value: 'source', label: $t('Source') }

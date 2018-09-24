@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
 import { codemirror } from 'vue-codemirror';
 import { CodeInput, BoolInput } from 'components/shared/inputs/inputs';
-import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
@@ -59,7 +59,7 @@ export default class CodeEditor extends Vue {
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
     try {
-      await this.settingsService.saveData(newData.settings);
+      await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
       alert($t('Something went wrong'));
       this.isLoading = false;
@@ -74,7 +74,7 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.initialInputValue;
-    this.emitInput(newData);
+    this.editorInputValue = newData.settings['custom_' + this.metadata.type];
   }
 
   restoreDefaults() {
@@ -82,12 +82,6 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.value.custom_defaults[type];
-    this.emitInput(newData);
-  }
-
-  emitInput(newValue: IWidgetData) {
-    this.$emit('input', newValue);
-    this.editorInputValue = newValue.settings['custom_' + this.metadata.type];
   }
 
 }

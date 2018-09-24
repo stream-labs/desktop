@@ -1,12 +1,12 @@
 <template>
 <modal-layout
   :title="windowTitle"
-  v-if="previewSource"
+  v-if="widget.previewSourceId"
 >
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
-      <div class="button button--action test-button">
+      <div v-if="apiSettings.testers" class="button button--action test-button">
         <test-widgets />
       </div>
     </div>
@@ -20,16 +20,16 @@
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
-        <div class="custom-code" :class="{ hidden: currentTopTab !== 'code' }">
-          <toggle-input :value="value" @input="value => updateValue(value)" />
+        <div class="custom-code" v-if="loaded" :class="{ hidden: currentTopTab !== 'code' }">
+          <toggle-input :value="customCodeIsEnabled" @input="value => toggleCustomCode(value)" />
           <span>{{ $t('Enable Custom Code') }}</span>
         </div>
         <div class="custom-code__divider" :class="{ hidden: currentTopTab !== 'code' }" />
-        <div class="custom-code__alert" :class="{ active: value }" />
+        <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
       <div class="content-container" ref="content">
-        <display class="display" :sourceId="previewSource.sourceId" @click="createProjector"/>
+        <display class="display" :sourceId="widget.previewSourceId" @click="createProjector"/>
         <div class="sidebar" ref="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
@@ -40,7 +40,7 @@
             <ul style="margin: 0;">
               <li
                 class="subsection__content settings-title"
-                v-for="setting in settings"
+                v-for="setting in navItems"
                 :class="{ active: currentSetting === setting.value }"
                 :key="setting.value"
                 @click="updateCurrentSetting(setting.value)"
@@ -61,18 +61,41 @@
           </div>
         </div>
 
-        <div class="code-editor hidden" ref="code">
-          <tabs
-            :hideContent="true"
-            className="widget-editor__top-tabs"
-            :tabs="codeTabs"
-            @input="value => updateCodeTab(value)"
-            :value="currentCodeTab"
-          />
-          <div v-for="tab in codeTabs" :key="tab.value">
-            <slot :name="tab.value" v-if="tab.value === currentCodeTab" />
+        <div class="code-editor hidden" ref="code" v-if="loaded">
+          <div v-if="customCodeIsEnabled">
+            <tabs
+              :hideConent="true"
+              className="widget-editor__top-tabs"
+              :tabs="codeTabs"
+              v-model="currentCodeTab"
+              @input="value => updateCodeTab(value)"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'HTML'"
+              key="html"
+              :value="wData"
+              :metadata="{ type: 'html' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'CSS'"
+              key="css"
+              :value="wData"
+              :metadata="{ type: 'css' }"
+            />
+            <code-editor
+              v-if="apiSettings.customCodeAllowed && currentCodeTab === 'JS'"
+              key="js"
+              :value="wData"
+              :metadata="{ type: 'js' }"
+            />
+            <custom-fields-editor
+              v-if="apiSettings.customFieldsAllowed && currentCodeTab === 'customFields'"
+              key="customFields"
+              :value="wData"
+            />
           </div>
         </div>
+
       </div>
     </div>
   </div>

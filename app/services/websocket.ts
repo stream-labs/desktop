@@ -11,7 +11,7 @@ export type TSocketEvent =
   IDonationSocketEvent |
   IFacemaskSocketEvent |
   IFollowSocketEvent |
-  ISubscriptionSocketEvent;
+  ISubscriptionSocketEvent
 
 interface IStreamlabelsSocketEvent {
   type: 'streamlabels';

@@ -1,13 +1,7 @@
 <template>
-<widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
-  :settings="settings"
-  :requestState="requestState"
-  :loaded="loaded"
->
-  <div slot="visual-properties" >
+<widget-editor :navItems="navItems">
+
+  <validated-form slot="visual-properties" v-if="loaded" @input="save()">
     <v-form-group title="Theme" type="list" v-model="wData.settings.theme" :metadata="metadata.theme"/>
     <v-form-group title="Badges">
       <bool-input title="Show Moderator Badges" v-model="wData.settings.show_moderator_icons"/>
@@ -27,32 +21,22 @@
       <bool-input title="Always Show Messages" v-model="wData.settings.always_show_messages"/>
       <slider-input v-model="wData.settings.message_hide_delay" :metadata="metadata.message_hide_delay"/>
     </v-form-group>
-  </div>
+  </validated-form>
 
-  <div slot="font-properties">
+  <validated-form slot="font-properties" v-if="loaded" @input="save()">
     <v-form-group title="Text Color" type="color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
     <v-form-group title="Font Size" type="fontSize" v-model="wData.settings.text_size"/>
-  </div>
+  </validated-form>
 
-  <div slot="chatter-properties">
+  <validated-form slot="chatter-properties" v-if="loaded" @input="save()">
     <v-form-group title="Hide Characters">
       <bool-input title="Hide Common Chat Bots" v-model="wData.settings.hide_common_chat_bots"/>
       <bool-input title="Hide commands starting with `!`" v-model="wData.settings.hide_commands"/>
     </v-form-group>
     <v-form-group title="Muted Chatters" type="textArea" v-model="wData.settings.muted_chatters" />
-  </div>
+  </validated-form>
 
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
 
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
 </widget-editor>
 
 </template>
