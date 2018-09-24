@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const slash = require('slash');
 const fl_compress = require('./compressor');
@@ -17,7 +18,6 @@ async function traverse_directory(directory, callback) {
 
   for (file of files) {
     const filepath = path.resolve(directory, file);
-    console.log(filepath);
 
     const stats = await stat(filepath);
 
@@ -116,7 +116,10 @@ function validate_args(args) {
   arg_required('secret-access-key');
   arg_required('version');
   arg_required('release-dir');
-  arg_required('tmp-dir');
+
+  if (!args['tmp-dir']) {
+    args['tmp-dir'] = path.join(os.tmpdir(), 'slobs-release', args['version']);
+  }
 
   return args_valid;
 }
