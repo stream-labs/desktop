@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('Settings')"
   :show-cancel="false"
   :done-handler="done"
   class="modal-layout--w-side-menu">

@@ -55,7 +55,7 @@
                   <div v-if="file.type == 'audio'" style="height: 132">
                     <i class="icon-music" style="line-height: 132px; fontSize: 28px; textAlign: center; display: block"></i>
                   </div>
-                  <button class="copy-button button button--action" :key="i" @click="handleCopy(file.href)">
+                  <button class="copy-button button button--action" @click="handleCopy(file.href)">
                     <i class="icon-copy"></i> {{ $t('Copy URL') }}
                   </button>
                   <div class="upload__footer" :class="[file.type === 'image' ? 'image' : '']">

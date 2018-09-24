@@ -2,8 +2,7 @@ import test from 'ava';
 import { useSpectron } from '../helpers/spectron';
 import { getClient } from '../helpers/api-client';
 import { IScenesServiceApi } from '../../app/services/scenes/scenes-api';
-import { sleep } from '../helpers/sleep';
-import { SceneBuilder } from "../helpers/scene-builder";
+import { SceneBuilder } from '../helpers/scene-builder';
 const path = require('path');
 
 useSpectron({ restartAppAfterEachTest: false });
@@ -44,7 +43,7 @@ test('Switching between scenes', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
   const scene2 = scenesService.createScene('Scene2');
 
 
@@ -65,7 +64,7 @@ test('Creating, fetching and removing scene-items', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
 
-  const scene = scenesService.getSceneByName('Scene');
+  const scene = scenesService.getScenes().find(scene => scene.name == 'Scene');
   const image1 = scene.createAndAddSource('Image1', 'image_source');
   const image2 = scene.createAndAddSource('Image2', 'image_source');
   t.is(image1['name'], 'Image1');
