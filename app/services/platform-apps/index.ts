@@ -60,6 +60,7 @@ export enum EAppPageSlot {
 interface IAppPage {
   slot: EAppPageSlot;
   persistent?: boolean;
+  allowPopout?: boolean; // Default true
   file: string; // Relative path to HTML file
 }
 
