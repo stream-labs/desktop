@@ -506,7 +506,6 @@ export class PlatformAppsService extends
 
     const trimmed = trim(app.manifest.buildPath, '/ ');
     if (app.unpacked) {
-
       url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
     } else {
       url = compact([app.appUrl, trimmed, asset]).join('/');
