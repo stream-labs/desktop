@@ -392,6 +392,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.EventList,
       WidgetType.StreamBoss,
       WidgetType.TipJar,
+      WidgetType.SubGoal,
       WidgetType.SponsorBanner
     ];
 
