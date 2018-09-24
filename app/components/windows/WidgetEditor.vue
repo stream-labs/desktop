@@ -344,7 +344,7 @@
     height: 6px;
     position: absolute;
     top: 50%;
-    left: 190px;
+    left: 194px;
     transform: translate(0, -50%);
     background-color: @light-4;
   }
@@ -385,6 +385,9 @@
     }
     .custom-code__alert {
       background-color: @dark-4;
+    }
+    .custom-code__alert.active {
+      background-color: @teal;
     }
   }
 </style>
