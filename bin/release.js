@@ -15,9 +15,9 @@ const yml = require('js-yaml');
 /**
  * CONFIGURATION
  */
-const s3Bucket = 'streamlabs-obs';
+const s3Bucket = 'streamlabs-obs-dev';
 const sentryOrg = 'streamlabs-obs';
-const sentryProject = 'streamlabs-obs';
+const sentryProject = 'streamlabs-obs-dev';
 
 
 function info(msg) {
@@ -37,11 +37,11 @@ function executeCmd(cmd) {
   }
 }
 
-function sentryCli(cmd) {
-  const sentryPath = path.join('bin', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
+// function sentryCli(cmd) {
+//   const sentryPath = path.join('bin', 'node_modules', 'sentry-cli-binary', 'bin', 'sentry-cli');
 
-  executeCmd(`${sentryPath} releases --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
-}
+//   executeCmd(`${sentryPath} releases --org "${sentryOrg}" --project "${sentryProject}" ${cmd}`);
+// }
 
 async function confirm(msg) {
   const result = await inq.prompt({
@@ -110,6 +110,9 @@ async function runScript() {
   checkEnv('CSC_KEY_PASSWORD');
   checkEnv('SENTRY_AUTH_TOKEN');
 
+  /* Technically speaking, we allow any number of
+   * channels. Maybe in the future, we allow custom
+   * options here? */
   const isPreview = (await inq.prompt({
     type: 'list',
     name: 'releaseType',
@@ -254,16 +257,16 @@ async function runScript() {
   executeCmd(`git tag -f v${newVersion}`);
   executeCmd('git push --tags');
 
-  info(`Registering ${newVersion} with sentry...`);
-  sentryCli(`new "${newVersion}"`);
-  sentryCli(`set-commits --auto "${newVersion}"`);
+  // info(`Registering ${newVersion} with sentry...`);
+  // sentryCli(`new "${newVersion}"`);
+  // sentryCli(`set-commits --auto "${newVersion}"`);
 
-  info('Uploading compiled source to sentry...');
-  const sourcePath = path.join('bundles', 'renderer.js');
-  const sourceMapPath = path.join('bundles', 'renderer.js.map');
-  sentryCli(`files "${newVersion}" delete --all`);
-  sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
-  sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
+  // info('Uploading compiled source to sentry...');
+  // const sourcePath = path.join('bundles', 'renderer.js');
+  // const sourceMapPath = path.join('bundles', 'renderer.js.map');
+  // sentryCli(`files "${newVersion}" delete --all`);
+  // sentryCli(`files "${newVersion}" upload "${sourcePath}"`);
+  // sentryCli(`files "${newVersion}" upload "${sourceMapPath}"`);
 
   info('Discovering publishing artifacts...');
   const distDir = path.resolve('.', 'dist');
@@ -287,8 +290,8 @@ async function runScript() {
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
-  info('Finalizing release with sentry...');
-  sentryCli(`finalize "${newVersion}`);
+  // info('Finalizing release with sentry...');
+  // sentryCli(`finalize "${newVersion}`);
 
   info(`Merging ${targetBranch} back into staging...`);
   executeCmd(`git checkout staging`);
