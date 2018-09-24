@@ -9,7 +9,8 @@ type TAppPage =
   | 'PatchNotes'
   | 'Chatbot'
   | 'DesignSystem'
-  | 'PlatformAppContainer';
+  | 'PlatformAppContainer'
+  | 'PlatformAppStore';
 
 interface INavigationState {
   currentPage: TAppPage;

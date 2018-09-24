@@ -1,4 +1,4 @@
-import { ILoadedApp } from '../..';
+import { IUnpackedLoadedApp, IProductionLoadedApp } from '../..';
 
 export enum EApiPermissions {
   ScenesSources = 'slobs.scenes-sources',
@@ -9,7 +9,7 @@ export enum EApiPermissions {
 
 // TODO: What else should be included here?
 export interface IApiContext {
-  app: ILoadedApp;
+  app: IUnpackedLoadedApp | IProductionLoadedApp;
 }
 
 type TApiHandler = (context: IApiContext, ...args: any[]) => Promise<any>;

@@ -91,23 +91,24 @@ export interface IBaseLoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
-  appPath?: string; // The path on disk to the app if unpacked
-  appUrl?: string; // the cdn url to the unzipped build
   appToken: string;
-  devPort?: number; // The port the dev server is running on if unpacked
   poppedOutSlots: EAppPageSlot[];
 }
 
 export interface IUnpackedLoadedApp extends IBaseLoadedApp {
   unpacked: true;
   appPath: string;
+  appUrl?: null;
   devPort: number;
 }
 
 export interface IProductionLoadedApp extends IBaseLoadedApp {
   unpacked: false;
+  appPath?: null;
   appUrl: string;
+  devPort?: null;
 }
+
 
 interface IPlatformAppServiceState {
   devMode: boolean;
@@ -193,6 +194,7 @@ export class PlatformAppsService extends
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
+      if (app.is_beta && !app.manifest) return;
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -250,12 +252,13 @@ export class PlatformAppsService extends
   }
 
   addApp(app: IUnpackedLoadedApp | IProductionLoadedApp) {
-    const { id, appPath, appToken } = app;
+    const { id, appToken } = app;
     this.ADD_APP(app);
-    if (app.unpacked) {
+    if (app.unpacked && app.appPath) {
       // store app in local storage
       localStorage.setItem(this.localStorageKey, JSON.stringify({
-        appPath, appToken
+        appPath: app.appPath,
+        appToken
       }));
     }
     this.appLoad.next(this.getApp(id));
@@ -584,7 +587,7 @@ export class PlatformAppsService extends
    * @param app the app
    */
   @mutation()
-  private ADD_APP(app: ILoadedApp) {
+  private ADD_APP(app: IUnpackedLoadedApp | IProductionLoadedApp) {
     this.state.loadedApps.push(app);
   }
 
