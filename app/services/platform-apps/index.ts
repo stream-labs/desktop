@@ -73,11 +73,26 @@ interface IAppManifest {
   authorizationUrls: string[];
 }
 
+interface IProductionApp {
+  app_token: string;
+  cdn_url: string;
+  description: string;
+  icon: string;
+  id_hash: string;
+  is_beta: boolean;
+  manifest: IAppManifest;
+  name: string;
+  screenshots: string[];
+  subscription: ISubscription;
+  version: string;
+}
+
 export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
   appPath?: string; // The path on disk to the app if unpacked
+  appUrl?: string; // the cdn url to the unzipped build
   appToken: string;
   devPort?: number; // The port the dev server is running on if unpacked
   poppedOutSlots: EAppPageSlot[];
@@ -86,6 +101,16 @@ export interface ILoadedApp {
 interface IPlatformAppServiceState {
   devMode: boolean;
   loadedApps: ILoadedApp[];
+}
+
+interface ISubscription {
+  id: number;
+  user_id: number;
+  app_id: number;
+  subscription_id: string;
+  status: string;
+  plan_id: number;
+  expires_at: string;
 }
 
 export class PlatformAppsService extends
@@ -125,6 +150,8 @@ export class PlatformAppsService extends
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 
+    this.installProductionApps();
+
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
@@ -132,6 +159,39 @@ export class PlatformAppsService extends
         this.installUnpackedApp(data.appPath, data.appToken);
       }
     }
+  }
+
+  /**
+   * Get production apps
+   */
+  async fetchProductionApps(): Promise<IProductionApp[]> {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(
+      `https://${this.hostsService.platform}/api/v1/sdk/installed_apps`,
+      { headers }
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json())
+  }
+
+  /**
+ * Install production apps
+ */
+  async installProductionApps() {
+    const productionApps = await this.fetchProductionApps();
+    console.log(productionApps);
+    productionApps.forEach(app => {
+      this.addApp({
+        id: app.id_hash,
+        manifest: app.manifest,
+        unpacked: false,
+        appUrl: app.cdn_url,
+        appToken: app.app_token,
+        poppedOutSlots: []
+      });
+    });
   }
 
   /**
@@ -168,7 +228,7 @@ export class PlatformAppsService extends
 
     this.devServer = new DevServer(appPath, DEV_PORT);
 
-    this.ADD_APP({
+    this.addApp({
       id,
       manifest,
       unpacked: true,
@@ -177,6 +237,11 @@ export class PlatformAppsService extends
       devPort: DEV_PORT,
       poppedOutSlots: []
     });
+  }
+
+  addApp(app: ILoadedApp) {
+    const { id, appPath, appToken } = app;
+    this.ADD_APP(app);
     localStorage.setItem(this.localStorageKey, JSON.stringify({
       appPath, appToken
     }));
@@ -439,12 +504,12 @@ export class PlatformAppsService extends
     const app = this.getApp(appId);
     let url: string;
 
+    const trimmed = trim(app.manifest.buildPath, '/ ');
     if (app.unpacked) {
-      const trimmed = trim(app.manifest.buildPath, '/ ');
 
       url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
     } else {
-      // TODO
+      url = compact([app.appUrl, trimmed, asset]).join('/');
     }
 
     return url;
@@ -508,7 +573,7 @@ export class PlatformAppsService extends
    */
   @mutation()
   private ADD_APP(app: ILoadedApp) {
-    this.state.loadedApps = [app];
+    this.state.loadedApps.push(app);
   }
 
   @mutation()

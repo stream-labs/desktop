@@ -141,6 +141,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     settings: Dictionary<any> = {},
     options: ISourceCreateOptions = {}
   ): Source {
+    
 
     const id: string = options.sourceId || `${type}_${uuid()}`;
 
@@ -161,6 +162,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
+    
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }

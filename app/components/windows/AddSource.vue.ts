@@ -97,6 +97,7 @@ export default class AddSource extends Vue {
         const settings: Dictionary<any> = {};
 
         if (this.sourceAddOptions.propertiesManager === 'platformApp') {
+          
           const size = this.platformAppsService.getAppSourceSize(
             this.sourceAddOptions.propertiesManagerSettings.appId,
             this.sourceAddOptions.propertiesManagerSettings.appSourceId
@@ -114,6 +115,7 @@ export default class AddSource extends Vue {
             propertiesManagerSettings: this.sourceAddOptions.propertiesManagerSettings
           }
         );
+        
 
         this.scenesService.activeScene.addSource(source.sourceId);
       }
