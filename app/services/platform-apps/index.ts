@@ -181,7 +181,6 @@ export class PlatformAppsService extends
  */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
-    console.log(productionApps);
     productionApps.forEach(app => {
       this.addApp({
         id: app.id_hash,
@@ -242,10 +241,13 @@ export class PlatformAppsService extends
   addApp(app: ILoadedApp) {
     const { id, appPath, appToken } = app;
     this.ADD_APP(app);
-    localStorage.setItem(this.localStorageKey, JSON.stringify({
-      appPath, appToken
-    }));
-    this.appLoad.next(this.getApp(id));
+    if (app.unpacked) {
+      // store app in local storage
+      localStorage.setItem(this.localStorageKey, JSON.stringify({
+        appPath, appToken
+      }));
+      this.appLoad.next(this.getApp(id));
+    }
   }
 
   async validateManifest(manifest: IAppManifest, appPath: string) {
