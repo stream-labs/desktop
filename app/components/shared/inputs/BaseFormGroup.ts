@@ -1,10 +1,8 @@
-import { Component, Prop } from 'vue-property-decorator';
-import uuid from 'uuid';
+import { Prop } from 'vue-property-decorator';
 import Vue from 'vue';
 import { ErrorField } from 'vee-validate';
 import { EInputType, IInputMetadata } from './index';
 import { BaseInput } from './BaseInput';
-import FormInput from './FormInput.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 /**

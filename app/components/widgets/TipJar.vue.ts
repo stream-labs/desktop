@@ -5,7 +5,7 @@ import WidgetSettings from './WidgetSettings.vue';
 import {
   TipJarService,
   ITipJarData
-} from 'services/widget-settings/tip-jar';
+} from 'services/widgets/settings/tip-jar';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
@@ -14,6 +14,8 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ImagePickerInput from 'components/shared/inputs/ImagePickerInput.vue';
 
 const nameMap = () => ({
   tips: $t('Tips & Donations'),
@@ -43,6 +45,8 @@ const mediaGalleryInputs = {
     TestButtons,
     VFormGroup,
     CodeEditor,
+    ValidatedForm,
+    ImagePickerInput,
     ...inputComponents
   }
 })
@@ -58,7 +62,7 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string, value: string }[] = [];
-  settings = [
+  navItems = [
     { value: 'manage-jar', label: $t('Manage Jar') },
     { value: 'font', label: $t('Font Settings') },
     { value: 'images', label: $t('Bit Images') },

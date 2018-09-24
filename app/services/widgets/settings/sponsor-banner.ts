@@ -1,5 +1,7 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 export interface ISponsorBannerSettings extends IWidgetSettings {
   background_color_option: boolean;
@@ -27,28 +29,23 @@ export interface ISponsorBannerData extends IWidgetData {
   settings: ISponsorBannerSettings;
 }
 
+@InheritMutations()
 export class SponsorBannerService extends WidgetSettingsService<ISponsorBannerData> {
 
-  getWidgetType() {
-    return WidgetType.SponsorBanner;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
+  getApiSettings() {
+    return {
+      type: WidgetType.SponsorBanner,
+      url: `https://${ this.getHost() }/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/sponsor-banner?token=${this.getWidgetToken()}`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/sponsorbanner`,
+      settingsUpdateEvent: 'sponsorBannerSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true
+    }
   }
-
-  getPreviewUrl() {
-    return `https://${this.getHost()}/widgets/sponsor-banner/v1/${this.getWidgetToken()}?simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/sponsorbanner`;
-  }
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS
-  ];
 
   protected patchAfterFetch(data: any): ISponsorBannerData {
     data.settings.hide_duration_in_seconds = data.settings.hide_duration_secs + (data.settings.hide_duration * 60);

@@ -1,21 +1,14 @@
 <template>
-<widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
-  :settings="settings"
-  :requestState="requestState"
-  :loaded="loaded"
->
+<widget-editor :navItems="navItems">
   <!-- goal setup -->
-  <div slot="goal-properties" >
+  <validated-form slot="goal-properties" v-if="loaded">
     <div v-if="hasGoal">
       <div class="section__body">
         <v-form-group :title="$t('Title')">{{ wData.goal.title }}</v-form-group>
         <v-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</v-form-group>
         <v-form-group :title="$t('Current Amount')">{{ wData.goal.current_amount }}</v-form-group>
         <v-form-group :title="$t('Days Remaining')">{{ wData.goal.to_go }}</v-form-group>
-        <button class="button button--soft-warning" @click="reset()">{{ $t("End Goal") }}</button>
+        <button class="button button--soft-warning" @click="resetGoal()">{{ $t("End Goal") }}</button>
       </div>
     </div>
 
@@ -33,10 +26,10 @@
       </div>
       <button @click="saveGoal()" class="button button--action">{{ $t('Start Goal') }}</button>
     </div>
-  </div>
+  </validated-form>
 
 
-  <div slot="visual-properties">
+  <validated-form slot="visual-properties" v-if="loaded" @input="save()">
     <v-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
     <v-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
     <v-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
@@ -50,24 +43,7 @@
         :metadata="metadata.bar_thickness"
     />
     <v-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
-  </div>
-
-
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
-
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-  <div slot="customFields" >
-    <custom-fields-editor :value="wData"/>
-  </div>
+  </validated-form>
 
 
 </widget-editor>

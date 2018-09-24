@@ -1,12 +1,5 @@
 <template>
-<widget-editor
-  v-if="wData"
-  ref="layout"
-  v-model="wData.settings.custom_enabled"
-  :settings="settings"
-  :requestState="requestState"
-  :loaded="loaded"
->
+<widget-editor :navItems="navItems">
     <!-- streamboss setup -->
     <div slot="goal-properties" >
       <div v-if="hasGoal">
@@ -17,7 +10,7 @@
           <v-form-group :title="$t('Mode')">{{ wData.goal.mode }}</v-form-group>
           <button
               class="button button--warn"
-              @click="reset()"
+              @click="resetGoal()"
           >{{ $t('Reset Stream Boss') }}</button>
         </div>
       </div>
@@ -37,7 +30,7 @@
       </div>
     </div>
 
-    <div slot="manage-battle-properties">
+    <validated-form slot="manage-battle-properties" @input="save()" v-if="loaded">
       <v-form-group v-model="wData.settings.fade_time" :metadata="metadata.fade_time"/>
       <v-form-group>
         <bool-input v-model="wData.settings.boss_heal" :metadata="metadata.boss_heal"/>
@@ -47,9 +40,9 @@
       <v-form-group v-model="wData.settings.bit_multiplier" :metadata="metadata.bit_multiplier"/>
       <v-form-group v-model="wData.settings.sub_multiplier" :metadata="metadata.sub_multiplier"/>
       <v-form-group v-model="wData.settings.donation_multiplier" :metadata="metadata.donation_multiplier"/>
-    </div>
+    </validated-form>
 
-    <div slot="visual-properties">
+    <div slot="visual-properties" @input="save()" v-if="loaded">
       <v-form-group v-model="wData.settings.kill_animation" :metadata="metadata.kill_animation"/>
       <v-form-group>
         <bool-input v-model="wData.settings.bg_transparent" :metadata="metadata.bg_transparent"/>
@@ -59,22 +52,6 @@
       <v-form-group v-model="wData.settings.bar_text_color" :metadata="metadata.bar_text_color"/>
       <v-form-group v-model="wData.settings.bar_color" :metadata="metadata.bar_color"/>
       <v-form-group v-model="wData.settings.font" :metadata="metadata.font"/>
-    </div>
-
-    <div slot="HTML" >
-      <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-    </div>
-
-    <div slot="CSS" >
-      <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-    </div>
-
-    <div slot="JS" >
-      <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-    </div>
-
-    <div slot="test" >
-      <test-buttons :testers="['Follow', 'Subscription', 'Donation', 'Bits', 'Host']"/>
     </div>
   </widget-editor>
 </template>
