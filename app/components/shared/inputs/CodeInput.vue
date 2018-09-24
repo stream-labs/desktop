@@ -15,5 +15,6 @@
   @import '~codemirror/lib/codemirror.css';
   .CodeMirror {
     font-size: 10pt;
+    min-height: 371px;
   }
 </style>
