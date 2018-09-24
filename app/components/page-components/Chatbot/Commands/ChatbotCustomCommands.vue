@@ -33,13 +33,13 @@
             <th>
               <div class="flex">
                 GCD
-                <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in minutes')" />
+                <i class="icon-question icon-btn" v-tooltip="$t('Global Cooldown in seconds')" />
               </div>
             </th>
             <th>
               <div class="flex">
                 UCD
-                <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in minutes')" />
+                <i class="icon-question icon-btn" v-tooltip="$t('User Cooldown in seconds')" />
               </div>
             </th>
             <th> {{ $t('Permission') }} </th>

@@ -12,6 +12,8 @@ import CollapsibleSection from 'components/shared/CollapsibleSection.vue';
 export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
+  v1CommandSlugs = ['commands', 'link-protection', 'giveaway'];
+
   get commandSlugs() {
     return this.chatbotApiService.state.defaultCommandsResponse;
   }

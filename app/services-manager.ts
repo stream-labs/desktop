@@ -90,6 +90,8 @@ import { CreditsService } from 'services/widget-settings/credits';
 import { EventListService } from 'services/widget-settings/event-list';
 import { TipJarService } from 'services/widget-settings/tip-jar';
 import { SponsorBannerService } from 'services/widget-settings/sponsor-banner';
+import { MediaShareService } from 'services/widget-settings/media-share';
+import { ChatbotService } from 'services/widget-settings/chatbot';
 
 const { ipcRenderer } = electron;
 
@@ -181,7 +183,9 @@ export class ServicesManager extends Service {
     TipJarService,
     SponsorBannerService,
     MediaGalleryService,
-    AnnouncementsService
+    AnnouncementsService,
+    MediaShareService,
+    ChatbotService,
   };
 
   private instances: Dictionary<Service> = {};

@@ -16,6 +16,7 @@ export default class ChatbotModules extends ChatbotBase {
 
   mounted() {
     this.chatbotApiService.fetchChatAlerts();
+    this.chatbotApiService.fetchSongRequest();
   }
 
   get modules() {
@@ -44,8 +45,8 @@ export default class ChatbotModules extends ChatbotBase {
         description: comingSoonText,
         backgroundUrl: require(`../../../../media/images/chatbot/chatbot-construction--${backgroundUrlSuffix}.svg`),
         enabled: false,
-        onExpand: () => {},
-        onToggleEnabled: () => {},
+        onExpand: () => { },
+        onToggleEnabled: () => { },
         comingSoon: true
       },
       {
@@ -76,5 +77,13 @@ export default class ChatbotModules extends ChatbotBase {
 
   get chatAlertCurrentlyEnabled() {
     return this.chatbotApiService.state.chatAlertsResponse.enabled == true;
+  }
+
+  get songRequest() {
+    return this.chatbotApiService.state.songRequestResponse;
+  }
+
+  get songRequestCurrentlyEnabled() {
+    return this.chatbotApiService.state.songRequestResponse.enabled === true;
   }
 }

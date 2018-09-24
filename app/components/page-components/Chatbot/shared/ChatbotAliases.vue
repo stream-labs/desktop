@@ -3,7 +3,7 @@
   class="chatbot-aliases__container"
   @submit.prevent="onAddAliasHandler"
 >
-  <label for="alias" class="margin-vertical--10"> {{ $t('Enter Aliases') }} </label>
+  <div class="margin-vertical--10"> {{ $t('Enter Aliases') }} </div>
   <div class="row">
     <div class="small-9 columns">
       <TextInput

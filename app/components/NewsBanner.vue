@@ -1,6 +1,7 @@
 <template>
 <div class="banner" :class="[bannerExists ? 'show' : '']">
   <img class="bg-image" :src="currentBanner.thumbnail" />
+  
   <div class="image-container">
     <img class="shadow-image__left" :src="currentBanner.thumbnail" />
     <img class="shadow-image__right" :src="currentBanner.thumbnail" />

@@ -29,7 +29,7 @@
         </div>
         <VFormGroup
           v-if="symbolProtection.general.punishment.type === 'Timeout'"
-          :title="$t('Punishment Duration (Value in Minutes)')"
+          :title="$t('Punishment Duration (Value in Seconds)')"
           v-model="symbolProtection.general.punishment.duration"
           :metadata="metadata.symbol.general.punishment.duration"
         />
