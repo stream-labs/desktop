@@ -87,7 +87,7 @@ interface IProductionAppResponse {
   version: string;
 }
 
-export interface ILoadedApp {
+export interface IBaseLoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
@@ -98,9 +98,20 @@ export interface ILoadedApp {
   poppedOutSlots: EAppPageSlot[];
 }
 
+export interface IUnpackedLoadedApp extends IBaseLoadedApp {
+  unpacked: true;
+  appPath: string;
+  devPort: number;
+}
+
+export interface IProductionLoadedApp extends IBaseLoadedApp {
+  unpacked: false;
+  appUrl: string;
+}
+
 interface IPlatformAppServiceState {
   devMode: boolean;
-  loadedApps: ILoadedApp[];
+  loadedApps: (IUnpackedLoadedApp | IProductionLoadedApp)[];
 }
 
 interface ISubscriptionResponse {
@@ -127,7 +138,7 @@ export class PlatformAppsService extends
     loadedApps: []
   };
 
-  appLoad = new Subject<ILoadedApp>();
+  appLoad = new Subject<IUnpackedLoadedApp | IProductionLoadedApp>();
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
@@ -238,7 +249,7 @@ export class PlatformAppsService extends
     });
   }
 
-  addApp(app: ILoadedApp) {
+  addApp(app: IUnpackedLoadedApp | IProductionLoadedApp) {
     const { id, appPath, appToken } = app;
     this.ADD_APP(app);
     if (app.unpacked) {
@@ -246,8 +257,8 @@ export class PlatformAppsService extends
       localStorage.setItem(this.localStorageKey, JSON.stringify({
         appPath, appToken
       }));
-      this.appLoad.next(this.getApp(id));
     }
+    this.appLoad.next(this.getApp(id));
   }
 
   async validateManifest(manifest: IAppManifest, appPath: string) {
