@@ -2,7 +2,6 @@ import test from 'ava';
 import { useSpectron, } from './helpers/spectron/index';
 import { getClient } from './helpers/api-client';
 
-
 useSpectron();
 
 
