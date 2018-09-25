@@ -10,7 +10,7 @@
   <validated-form slot="manage-jar-properties" @input="save()" v-if="loaded">
     <v-form-group :title="$t('Enabled Events')">
       <bool-input
-        v-for="key in Object.keys(wData.settings.types)"
+        v-for="key in iterableTypes"
         :key="key"
         :title="titleFromKey(key)"
         v-model="wData.settings.types[key].enabled"
