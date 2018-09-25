@@ -2,20 +2,20 @@
 <widget-window v-if="wData" :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
 
   <div slot="settings" >
-    <form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
+    <h-form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
       <number-input v-model="wData.settings.price_per_second" />
       <span>{{ $t('USD') }}</span>
-    </form-group>
-    <form-group :title="$t('Min. Amount to Share')" :metadata="{ tooltip: minAmountTooltip }">
+    </h-form-group>
+    <h-form-group :title="$t('Min. Amount to Share')" :metadata="{ tooltip: minAmountTooltip }">
       <number-input v-model="wData.settings.min_amount_to_share" />
       <span>{{ $t('USD') }}</span>
-    </form-group>
-    <form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
+    </h-form-group>
+    <h-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
       <number-input v-model="wData.settings.max_duration" />
       <span>{{ $t('seconds') }}</span>
-    </form-group>
-    <form-group :title="$t('Buffer Time')" type="slider" v-model="wData.settings.buffer_time" :metadata="bufferMeta" />
-    <form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
+    </h-form-group>
+    <h-form-group :title="$t('Buffer Time')" type="slider" v-model="wData.settings.buffer_time" :metadata="bufferMeta" />
+    <h-form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
   </div>
   <div slot="banned_media">
     <table v-if="wData.banned_media && wData.banned_media.length > 0">
