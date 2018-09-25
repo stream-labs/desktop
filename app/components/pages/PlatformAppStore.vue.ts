@@ -15,15 +15,22 @@ export default class PlatformAppStore extends Vue {
   @Inject() i18nService: I18nService;
 
   $refs: {
-    appStore: Electron.WebviewTag;
+    appStoreWebview: Electron.WebviewTag;
   };
 
   mounted() {
-    this.$refs.appStore.addEventListener('dom-ready', () => {
-      // if (this.platformAppsService.state.devMode) {
-      //   this.$refs.appStore.openDevTools();
-      // }
+    this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
+      this.guestApiService.exposeApi(
+        this.$refs.appStoreWebview.getWebContents().id,
+        {
+          onInstallApp: this.onInstallAppHandler
+        }
+      );
     });
+  }
+
+  async onInstallAppHandler() {
+    this.platformAppsService.installProductionApps();
   }
 
   get loggedIn() {
