@@ -38,6 +38,7 @@ export default class PlatformAppStore extends Vue {
   }
 
   get appStoreUrl() {
+    console.log(this.userService.appStoreUrl());
     return this.userService.appStoreUrl();
   }
 }
