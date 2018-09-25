@@ -5,10 +5,12 @@ import { Inject } from 'util/injector';
 import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
+import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 
 @Component({})
-export default class Dashboard extends Vue {
+export default class PlatformAppStore extends Vue {
   @Inject() userService: UserService;
+  @Inject() platformAppsService: PlatformAppsService;
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
 
@@ -18,12 +20,9 @@ export default class Dashboard extends Vue {
 
   mounted() {
     this.$refs.appStore.addEventListener('dom-ready', () => {
-      // do something?
-    });
-
-    this.i18nService.setWebviewLocale(this.$refs.appStore);
-    this.$refs.appStore.addEventListener('new-window', e => {
-      electron.remote.shell.openExternal(e.url);
+      // if (this.platformAppsService.state.devMode) {
+      //   this.$refs.appStore.openDevTools();
+      // }
     });
   }
 
@@ -32,6 +31,6 @@ export default class Dashboard extends Vue {
   }
 
   get appStoreUrl() {
-    return `https://platform.streamlabs.com/slobs-store?token=${this.userService.apiToken}`
+    return this.userService.appStoreUrl();
   }
 }

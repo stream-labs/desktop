@@ -175,6 +175,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
+  appStoreUrl() {
+    const host = this.hostsService.platform;
+    const token = this.apiToken;
+    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+
+    return `https://${host}/slobs-store?token=${token}`;
+  }
+
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const host = Util.isPreview()
       ? this.hostsService.beta3

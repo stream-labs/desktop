@@ -3,13 +3,12 @@
   <div class="app-store-container">
     <webview
       class="app-store"
-      v-show="loggedIn"
+      v-if="loggedIn"
       id="appStoreWebview"
       :src="appStoreUrl"
       ref="appStore"
       preload="bundles/guest-api">
     </webview>
-    <!-- <p v-else>User Not Logged In, Display something here????</p> -->
   </div>
 </div>
 </template>
