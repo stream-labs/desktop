@@ -355,10 +355,6 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     return this.settings.enabled && availableDeviceSelected;
   }
 
-  updateSettings(settings: IFacemaskSettings) {
-    this.startup();
-  }
-
   checkFacemaskSettings(settings:IFacemaskSettings) {
     this.settings = settings;
     if (settings.enabled) {
