@@ -1,5 +1,5 @@
 <template>
-<widget-window v-if="wData" ref="layout" v-model="tabName">
+<widget-window v-if="wData" :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
 
   <div slot="settings" >
     <form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
