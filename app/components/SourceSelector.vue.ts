@@ -27,6 +27,7 @@ const widgetIconMap = {
   [WidgetType.DonationGoal]: 'fas fa-calendar',
   [WidgetType.BitGoal]: 'fas fa-calendar',
   [WidgetType.FollowerGoal]: 'fas fa-calendar',
+  [WidgetType.SubGoal]: 'fas fa-calendar',
   [WidgetType.MediaShare]: 'icon-share'
 };
 

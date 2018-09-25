@@ -31,6 +31,7 @@ import { Subject } from 'rxjs/Subject';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
+import SubGoal from 'components/widgets/goal/SubGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -106,6 +107,7 @@ export function getComponents() {
     TipJar,
     SponsorBanner,
     StreamBoss,
+    SubGoal,
     MediaShare,
 
     ChatbotCustomCommandWindow,
