@@ -2,24 +2,24 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t(`${isEdit ? 'Edit' : 'Add'} Timer`)"
+  :title="$t('Add Quote')"
 >
   <div slot="fixed">
    <div class="window-toggle__wrapper">
     <div @click="onToggleQuoteWindowHandler">
       <span> {{ $t('Edit Command') }} </span>
-      <i class="icon-transition window-toggle__icon"></i>
+      <i class="fas fa-chevron-right window-toggle__icon"></i>
     </div>
   </div>
   </div>
   <div slot="content" class="chatbot-quote-preferences__container">
-    <div>
+    <validated-form ref="form">
       <VFormGroup
-        :title="$t('Name')"
+        :title="$t('Date Format')"
         v-model="generalSettings.date_format"
         :metadata="metadata.date_format"
       />
-    </div>
+    </validated-form>
   </div>
   <div slot="controls">
     <button
@@ -30,7 +30,6 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !generalSettings.date_format"
     >
       {{ $t('Save') }}
     </button>

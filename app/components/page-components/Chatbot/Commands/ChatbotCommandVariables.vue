@@ -35,6 +35,10 @@
 @import "../../../../styles/index";
 tbody tr {
 
+  td {
+    user-select: all;
+  }
+
   td:first-child {
     width: 300px;
   }

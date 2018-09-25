@@ -2,6 +2,7 @@ import { Component } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import ChatbotAliases from 'components/page-components/Chatbot/shared/ChatbotAliases.vue';
 import { cloneDeep } from 'lodash';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { ITab } from 'components/Tabs.vue';
 import { $t } from 'services/i18n';
 
@@ -14,15 +15,21 @@ import {
   EInputType,
   IListMetadata,
   ITextMetadata,
-  INumberMetadata
+  INumberMetadata,
 } from 'components/shared/inputs/index';
 
 @Component({
   components: {
-    ChatbotAliases
+    ChatbotAliases,
+    ValidatedForm
   }
 })
 export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
+
+  $refs: {
+    form: ValidatedForm;
+  };
+
   newCommand: ICustomCommand = {
     command: null,
     response: null,
@@ -104,7 +111,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
       type: EInputType.number,
-      placeholder: $t('Cooldown (Value in Minutes)'),
+      placeholder: $t('Cooldown (Value in Seconds)'),
       min: 0
     };
     return timerMetadata;
@@ -114,11 +121,9 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
     this.selectedTab = tab;
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
+  async onSaveHandler() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-  onSaveHandler() {
     if (this.isEdit) {
       this.chatbotApiService
         .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)

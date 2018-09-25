@@ -136,6 +136,7 @@ export class NotificationsService extends PersistentStatefulService<
   showNotifications() {
     this.windowsService.showWindow({
       componentName: 'Notifications',
+      title: $t('Notifications'),
       size: {
         width: 600,
         height: 600

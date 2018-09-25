@@ -1,6 +1,5 @@
 <template>
 <div id="mainWrapper" class="modal-layout" :class="{'night-theme': nightTheme}">
-  <title-bar :title="title" class="modal-layout-titlebar" />
   <div
     class="ModalLayout-fixed"
     :style="fixedStyle">
@@ -39,7 +38,7 @@
 @import "../styles/index";
 
 .modal-layout {
-  height: 100%;
+  height: calc(~"100% - 30px"); // Compensate for titlebar living in ChildWindow
   display: flex;
   flex-direction: column;
   color: @day-paragraph;
@@ -52,12 +51,9 @@
   }
 }
 
-.modal-layout-titlebar {
-  flex-shrink: 0;
-}
-
 .ModalLayout-fixed {
   flex-shrink: 0;
+  z-index: 1;
 }
 
 .modal-layout-content {

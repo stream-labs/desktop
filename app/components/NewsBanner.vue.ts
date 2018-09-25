@@ -7,6 +7,8 @@ import { Inject } from 'util/injector';
 export default class NewsBanner extends Vue {
   @Inject() announcementsService: AnnouncementsService;
 
+  proceessingClose = false;
+
   get currentBanner() {
     return this.announcementsService.state;
   }
@@ -19,8 +21,10 @@ export default class NewsBanner extends Vue {
     return emojione.shortnameToUnicode(this.currentBanner.header);
   }
 
-  closeBanner() {
-    this.announcementsService.closeBanner();
+  async closeBanner() {
+    this.proceessingClose = true;
+    await this.announcementsService.closeBanner();
+    this.proceessingClose = false;
   }
 
   followLink() {

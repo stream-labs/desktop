@@ -1,9 +1,5 @@
 <template>
-<modal-layout
-    :title="$t('Troubleshooter')"
-    :showControls="false"
-    :customControls="true"
->
+<modal-layout :showControls="false" :customControls="true">
   <div slot="controls">
     <button
         class="button button--action"

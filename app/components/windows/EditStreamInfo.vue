@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('Update Stream Info')"
   :show-controls="false"
   :customControls="true">
   <div slot="content">

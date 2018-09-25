@@ -1,5 +1,5 @@
 import { ArrayNode } from '../array-node';
-import { SceneItem, Scene, TSceneNode, TSceneNodeType } from 'services/scenes';
+import { SceneItem, Scene, TSceneNode, TSceneNodeType, ScenesService } from 'services/scenes';
 import { VideoService } from 'services/video';
 import { SourcesService } from 'services/sources';
 import { SourceFiltersService, TSourceFilterType } from 'services/source-filters';
@@ -10,6 +10,7 @@ import { WebcamNode } from './webcam';
 import { VideoNode } from './video';
 import { StreamlabelNode } from './streamlabel';
 import { WidgetNode } from './widget';
+import { SceneSourceNode } from './scene';
 import { AudioService } from 'services/audio';
 import * as obs from '../../../../../obs-api';
 import { WidgetType } from '../../../widgets';
@@ -20,7 +21,8 @@ type TContent =
   | WebcamNode
   | VideoNode
   | StreamlabelNode
-  | WidgetNode;
+  | WidgetNode
+  | SceneSourceNode
 
 interface IFilterInfo {
   name: string;
@@ -69,6 +71,7 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
   @Inject() videoService: VideoService;
   @Inject() sourceFiltersService: SourceFiltersService;
   @Inject() sourcesService: SourcesService;
+  @Inject() scenesService: ScenesService;
   @Inject() audioService: AudioService;
 
   getItems(context: IContext) {
@@ -151,6 +154,12 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
       return { ...details, content } as IItemSchema;
     }
+
+    if (sceneNode.type === 'scene') {
+      const content = new SceneSourceNode();
+      await content.save({ sceneItem: sceneNode, assetsPath: context.assetsPath });
+      return { ...details, content } as IItemSchema;
+    }
   }
 
   async loadItem(obj: TSlotSchema, context: IContext): Promise<void> {
@@ -216,6 +225,16 @@ export class SlotsNode extends ArrayNode<TSlotSchema, IContext, TSceneNode> {
       if (!sceneItem) {
         sceneItem = context.scene.createAndAddSource(obj.name, 'browser_source', {}, { id });
       }
+    } else if (obj.content instanceof SceneSourceNode) {
+
+      // Add a new scene to scenesServices if this scene is not exist.
+      // It is not the best way to create a scene here instead of `./scenes.ts` file,
+      // but the other way requires to much refactoring
+      const sceneId = obj.content.data.sceneId;
+      if (!this.scenesService.getScene(sceneId)) {
+        this.scenesService.createScene(obj.name, { sceneId });
+      }
+      sceneItem = context.scene.addSource(sceneId);
     }
 
     this.adjustTransform(sceneItem, obj);
