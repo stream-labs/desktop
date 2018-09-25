@@ -40,7 +40,7 @@ import electron from 'electron';
     PatchNotes,
     NewsBanner,
     Chatbot,
-    DesignSystem
+    DesignSystem,
   }
 })
 export default class Main extends Vue {

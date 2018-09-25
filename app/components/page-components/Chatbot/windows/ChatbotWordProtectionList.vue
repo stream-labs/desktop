@@ -20,7 +20,7 @@
       <tr>
         <th> {{ $t('Word') }} </th>
         <th> {{ $t('Punishment') }} </th>
-        <th> {{ $t('Duration (Value in Minutes).') }} </th>
+        <th> {{ $t('Duration (Value in Seconds).') }} </th>
       </tr>
     </thead>
     <tbody>
@@ -69,7 +69,7 @@
         </div>
         <VFormGroup
           v-if="newListItem.punishment.type === 'Timeout'"
-          :title="$t('Punishment Duration (Value in Minutes)')"
+          :title="$t('Punishment Duration (Value in Seconds)')"
           v-model="newListItem.punishment.duration"
           :metadata="metadata.punishment.duration"
         />
