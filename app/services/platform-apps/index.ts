@@ -87,29 +87,20 @@ interface IProductionAppResponse {
   version: string;
 }
 
-export interface IBaseLoadedApp {
+export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
   appToken: string;
   poppedOutSlots: EAppPageSlot[];
+  appPath?: string;
+  appUrl?: string;
+  devPort?: number;
 }
-
-export interface IUnpackedLoadedApp extends IBaseLoadedApp {
-  unpacked: true;
-  appPath: string;
-  devPort: number;
-}
-
-export interface IProductionLoadedApp extends IBaseLoadedApp {
-  unpacked: false;
-  appUrl: string;
-}
-
 
 interface IPlatformAppServiceState {
   devMode: boolean;
-  loadedApps: (IBaseLoadedApp)[];
+  loadedApps: ILoadedApp[];
 }
 
 interface ISubscriptionResponse {
@@ -136,7 +127,7 @@ export class PlatformAppsService extends
     loadedApps: []
   };
 
-  appLoad = new Subject<IBaseLoadedApp>();
+  appLoad = new Subject<ILoadedApp>();
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
@@ -248,7 +239,7 @@ export class PlatformAppsService extends
     });
   }
 
-  addApp(app: IUnpackedLoadedApp | IProductionLoadedApp) {
+  addApp(app: ILoadedApp) {
     const { id, appToken } = app;
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
@@ -356,7 +347,7 @@ export class PlatformAppsService extends
 
   async reloadApp(appId: string) {
     // TODO Support Multiple Apps
-    const app = this.getApp(appId); // this is returning IBaseLoadedApp
+    const app = this.getApp(appId);
     if (app.unpacked === true) {
       console.log(app.appPath);
     } else {
@@ -555,7 +546,7 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
-  getApp(appId: string) : IBaseLoadedApp {
+  getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
 
@@ -590,7 +581,7 @@ export class PlatformAppsService extends
    * @param app the app
    */
   @mutation()
-  private ADD_APP(app: IBaseLoadedApp) {
+  private ADD_APP(app: ILoadedApp) {
     this.state.loadedApps.push(app);
   }
 

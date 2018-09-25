@@ -4,7 +4,7 @@ import { ScenesModule} from './modules/scenes';
 import { ObsSettingsModule } from './modules/obs-settings';
 import { StreamingRecordingModule } from './modules/streaming-recording';
 import { AuthorizationModule } from './modules/authorization';
-import { IUnpackedLoadedApp, IProductionLoadedApp } from '..';
+import { ILoadedApp } from '..';
 import { ThemeModule } from './modules/theme';
 
 export class PlatformAppsApi {
@@ -31,7 +31,7 @@ export class PlatformAppsApi {
    * replaced with a method that returns a rejected promise
    * explaining the lack of permissions.
    */
-  getApi(app: IUnpackedLoadedApp | IProductionLoadedApp, permissions: EApiPermissions[]) {
+  getApi(app: ILoadedApp, permissions: EApiPermissions[]) {
     const api: Dictionary<TApiModule> = {};
 
     const context: IApiContext = { app };
