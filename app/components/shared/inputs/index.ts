@@ -1,6 +1,7 @@
 import * as inputs from './inputs';
 import { Validator } from 'vee-validate';
 import { $t } from 'services/i18n';
+import { cloneDeep } from 'lodash';
 
 export const inputComponents = inputs;
 
@@ -28,6 +29,7 @@ export interface IInputMetadata {
   title?: string;
   tooltip?: string;
   uuid?: string;
+  name?: string;
 }
 
 export interface INumberMetadata extends IInputMetadata {
@@ -72,7 +74,7 @@ export interface IMediaGalleryMetadata extends IInputMetadata {
 }
 
 
-// a helper for creating metadata
+// a helper for creating metadata for inputs
 export const metadata = {
   timer: (options: ITimerMetadata) => ({ type: EInputType.timer, ...options } as ITimerMetadata),
   bool: (options: IInputMetadata) => ({ type: EInputType.bool, ...options } as IInputMetadata),
@@ -86,6 +88,20 @@ export const metadata = {
   fontFamily: (options: IInputMetadata) => ({ type: EInputType.fontFamily, ...options } as IInputMetadata),
   code: (options: IInputMetadata) => ({ type: EInputType.code, ...options } as IInputMetadata),
 };
+
+// a helper for creating metadata for forms
+export function formMetadata<TMetadataType extends Dictionary<IInputMetadata>>
+(inputsMetadata: TMetadataType): TMetadataType {
+
+  // setup object key as a name property
+  const formMetadata = cloneDeep(inputsMetadata);
+  Object.keys(inputsMetadata).forEach((key) => {
+    if (formMetadata[key]['name']) return;
+    formMetadata[key]['name'] = key;
+  });
+
+  return formMetadata;
+}
 
 // rules https://baianat.github.io/vee-validate/guide/rules.html
 const validationMessages = {
