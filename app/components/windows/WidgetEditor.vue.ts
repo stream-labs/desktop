@@ -126,6 +126,7 @@ export default class WidgetEditor extends Vue {
   }
 
   updateTopTab(value: string) {
+    if (value === this.currentTopTab) return;
     this.animating = true;
     this.currentTopTab = value;
     // Animation takes 600ms to complete before we can re-render the OBS display
