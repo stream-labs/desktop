@@ -72,6 +72,7 @@ export default class SourcesShowcase extends Vue {
   }
 
   get platform() {
+    if (!this.loggedIn) return null;
     return this.userService.platform.type;
   }
 
