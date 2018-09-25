@@ -98,21 +98,18 @@ export interface IBaseLoadedApp {
 export interface IUnpackedLoadedApp extends IBaseLoadedApp {
   unpacked: true;
   appPath: string;
-  appUrl?: null;
   devPort: number;
 }
 
 export interface IProductionLoadedApp extends IBaseLoadedApp {
   unpacked: false;
-  appPath?: null;
   appUrl: string;
-  devPort?: null;
 }
 
 
 interface IPlatformAppServiceState {
   devMode: boolean;
-  loadedApps: (IUnpackedLoadedApp | IProductionLoadedApp)[];
+  loadedApps: (IBaseLoadedApp)[];
 }
 
 interface ISubscriptionResponse {
@@ -139,7 +136,7 @@ export class PlatformAppsService extends
     loadedApps: []
   };
 
-  appLoad = new Subject<IUnpackedLoadedApp | IProductionLoadedApp>();
+  appLoad = new Subject<IBaseLoadedApp>();
   appReload = new Subject<string>();
   appUnload = new Subject<string>();
 
@@ -359,7 +356,13 @@ export class PlatformAppsService extends
 
   async reloadApp(appId: string) {
     // TODO Support Multiple Apps
-    const app = this.getApp(appId);
+    const app = this.getApp(appId); // this is returning IBaseLoadedApp
+    if (app.unpacked === true) {
+      console.log(app.appPath);
+    } else {
+      console.log(app.appUrl);
+    }
+
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
@@ -552,7 +555,7 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
-  getApp(appId: string) {
+  getApp(appId: string) : IBaseLoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
 
@@ -587,7 +590,7 @@ export class PlatformAppsService extends
    * @param app the app
    */
   @mutation()
-  private ADD_APP(app: IUnpackedLoadedApp | IProductionLoadedApp) {
+  private ADD_APP(app: IBaseLoadedApp) {
     this.state.loadedApps.push(app);
   }
 
