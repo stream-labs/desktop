@@ -27,7 +27,7 @@
       class="tab-button"
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-themes"/> <span>{{ $t('App Store') }}</span>
+      <i class="icon-store"/> <span>{{ $t('App Store') }}</span>
     </button>
     <button
       @click="navigateOverlays"
