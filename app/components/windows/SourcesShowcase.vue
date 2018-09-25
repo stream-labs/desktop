@@ -2,7 +2,7 @@
 <modal-layout
   :show-controls="false"
   :content-styles="{ padding: 0 }"
-  :title="$t('Add Source')">
+>
 
   <div slot="content"
     class="add-source">

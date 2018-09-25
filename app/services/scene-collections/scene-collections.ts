@@ -31,6 +31,7 @@ import {
 import { SceneCollectionsStateService } from './state';
 import { Subject } from 'rxjs/Subject';
 import { TransitionsService, ETransitionType } from 'services/transitions';
+import { $t } from '../i18n';
 
 const uuid = window['require']('uuid/v4');
 
@@ -355,6 +356,7 @@ export class SceneCollectionsService extends Service
   ) {
     this.windowsService.showWindow({
       componentName: 'NameSceneCollection',
+      title: $t('Name Scene Collection'),
       queryParams: {
         sceneCollectionToDuplicate: options.sceneCollectionToDuplicate,
         rename: options.rename ? 'true' : ''
@@ -372,6 +374,7 @@ export class SceneCollectionsService extends Service
   showManageWindow() {
     this.windowsService.showWindow({
       componentName: 'ManageSceneCollections',
+      title: $t('Manage Scene Collections'),
       size: {
         width: 700,
         height: 800

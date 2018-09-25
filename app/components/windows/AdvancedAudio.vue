@@ -1,7 +1,7 @@
 <template>
 <modal-layout
   :show-controls="false"
-  :title="$t('Advanced Audio Settings')">
+>
 
   <div slot="content">
 
