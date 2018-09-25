@@ -30,19 +30,24 @@
 
 
   <validated-form slot="visual-properties" v-if="loaded" @input="save()">
-    <v-form-group type="list" title="Layout" v-model="wData.settings.layout" :metadata="metadata.layout"/>
-    <v-form-group type="color" title="Background Color" v-model="wData.settings.background_color"/>
-    <v-form-group type="color" title="Bar Color" v-model="wData.settings.bar_color"/>
-    <v-form-group type="color" title="Bar Background Color" v-model="wData.settings.bar_bg_color"/>
-    <v-form-group type="color" title="Text Color" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
-    <v-form-group type="color" title="Bar Text Color" v-model="wData.settings.bar_text_color"/>
+    <v-form-group type="list" :title="$t('Layout')" v-model="wData.settings.layout" :metadata="metadata.layout"/>
+    <v-form-group type="color" :title="$t('Background Color')" v-model="wData.settings.background_color"/>
+    <v-form-group type="color" :title="$t('Bar Color')" v-model="wData.settings.bar_color"/>
+    <v-form-group type="color" :title="$t('Bar Background Color')" v-model="wData.settings.bar_bg_color"/>
+    <v-form-group type="color" :title="$t('Text Color')" v-model="wData.settings.text_color" :metadata="{ tooltip: textColorTooltip }"/>
+    <v-form-group type="color" :title="$t('Bar Text Color')" v-model="wData.settings.bar_text_color"/>
     <v-form-group
         type="slider"
-        title="Bar Thickness"
+        :title="$t('Bar Thickness')"
         v-model="wData.settings.bar_thickness"
         :metadata="metadata.bar_thickness"
     />
-    <v-form-group type="fontFamily" :value="wData.settings.font" :metadata="{ tooltip: fontFamilyTooltip }" />
+    <v-form-group
+      :title="$t('Font Family')"
+      type="fontFamily"
+      :value="wData.settings.font"
+      :metadata="{ tooltip: fontFamilyTooltip }"
+    />
   </validated-form>
 
 
