@@ -73,6 +73,10 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
     return nameMap()[key];
   }
 
+  get iterableTypes() {
+    return Object.keys(this.wData.settings.types).filter((key) => key !== '_id');
+  }
+
   get platform() {
     return this.userService.platform.type;
   }
