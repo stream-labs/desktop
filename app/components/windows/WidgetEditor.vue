@@ -28,11 +28,11 @@
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
-      <div class="content-container" ref="content">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code' }">
         <div class="display">
           <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
         </div>
-        <div class="sidebar" ref="sidebar">
+        <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
             <div class="subsection__content"><slot :name="slot.value" /></div>
@@ -63,7 +63,7 @@
           </div>
         </div>
 
-        <div class="code-editor hidden zero-width" ref="code" v-if="loaded">
+        <div class="code-editor" v-if="loaded">
           <div v-if="customCodeIsEnabled">
             <tabs
               :hideConent="true"
@@ -211,34 +211,54 @@
     display: flex;
     width: 100%;
     height: calc(~"100% - 36px");
+    position: relative;
+    background-color: @day-section;
+    overflow: hidden;
+
+    .code-editor {
+      transform: translate(0, 100%);
+    }
+    .display {
+      transform: scale(0.82, .8) translate(-10%);
+    }
   }
 
   .content-container.vertical {
-    flex-direction: column;
+    .sidebar {
+      transform: translate(100%);
+      transition-delay: 0ms;
+    }
+    .code-editor {
+      transform: translate(0, 0);
+      transition-delay: 300ms;
+    }
+    .display {
+      transform: scale(1, 0.63) translate(0, -29%);
+    }
   }
 
   .display {
     width: 100%;
     height: 100%;
-    flex-shrink: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
     background-color: @day-section;
   }
 
   .sidebar {
-    width: 35%;
+    width: 30%;
     height: 100%;
     font-size: 12px;
+    position: absolute;
+    right: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border-left: 1px solid @day-editor-border;
     background-color: @day-section;
     .transition();
-  }
-
-  .sidebar.hidden {
-    width: 0;
-    height: 0;
+    transition-delay: 300ms;
   }
 
   .subsection {
@@ -295,19 +315,11 @@
   .code-editor {
     height: 60%;
     width: 100%;
+    position: absolute;
+    bottom: 0;
     border-top: 1px solid @day-editor-border;
     background-color: @day-section;
-    transition: height 275ms;
-  }
-
-  .code-editor.hidden {
-    height: 0;
-    visibility: collapse;
-  }
-
-  .code-editor.zero-width {
-    width: 0;
-    transition: none;
+    .transition();
   }
 
   .custom-code {
@@ -320,6 +332,7 @@
     align-items: center;
     height: 24px;
     .transition();
+    transition-delay: 600ms;
 
     span {
       padding-left: 8px;
@@ -331,6 +344,7 @@
     opacity: 0;
     border-left: none;
     transition: none;
+    transition-delay: 0ms;
   }
 
   .custom-code__divider {
@@ -342,10 +356,12 @@
     height: 24px;
     top: 0;
     background-color: @day-section;
+    transition-delay: 600ms;
   }
 
   .custom-code__divider.hidden {
     border-right: none;
+    transition-delay: 0ms;
   }
 
   .custom-code__alert {
@@ -367,7 +383,7 @@
     .window-container {
       border-color: @night-slider-bg;
     }
-    .display {
+    .display, .content-container {
       background-color: @night-section-bg;
     }
     .custom-code__divider {

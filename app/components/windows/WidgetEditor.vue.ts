@@ -126,25 +126,10 @@ export default class WidgetEditor extends Vue {
   }
 
   updateTopTab(value: string) {
-    // We do animations in JS here because flex-direction is not an animate-able attribute
     this.animating = true;
-    if (value === 'code') {
-      this.$refs.sidebar.classList.toggle('hidden');
-      setTimeout(() => {
-        this.$refs.content.classList.toggle('vertical');
-        this.$refs.code.classList.toggle('zero-width');
-        this.$refs.code.classList.toggle('hidden');
-      }, 300);
-    } else if (this.$refs.content.classList.contains('vertical')) {
-      this.$refs.code.classList.toggle('hidden');
-      setTimeout(() => {
-        this.$refs.code.classList.toggle('zero-width');
-        this.$refs.content.classList.toggle('vertical');
-        this.$refs.sidebar.classList.toggle('hidden');
-      }, 300);
-    }
-    setTimeout(() => this.animating = false, 600);
     this.currentTopTab = value;
+    // Animation takes 600ms to complete before we can re-render the OBS display
+    setTimeout(() => this.animating = false, 600);
   }
 
   updateCodeTab(value: string) {
