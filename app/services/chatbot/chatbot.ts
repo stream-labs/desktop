@@ -304,7 +304,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
             );
             break;
           case 'words-protection':
-            debugger;
             this.UPDATE_WORD_PROTECTION(
               response as IWordProtectionResponse
             );
@@ -451,7 +450,6 @@ export class ChatbotApiService extends PersistentStatefulService<IChatbotApiServ
   updateQuote(id: number, data: IQuote) {
     return this.api('PUT', `quotes/${id}`, data)
       .then((response: IChatbotAPIPutResponse) => {
-        debugger;
         if (response.success === true) {
           this.fetchQuotes();
           this.chatbotCommonService.closeChildWindow();
