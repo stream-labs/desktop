@@ -20,7 +20,7 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
 const fs = require('fs');
-const { Updater } = require('./updater/Updater.js');
+const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
@@ -55,7 +55,6 @@ let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
 
-
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -71,7 +70,6 @@ function getObs() {
 
   return _obs;
 }
-
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
@@ -313,7 +311,27 @@ if (shouldQuit) {
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    (new Updater(startApp)).run();
+    const updateInfo = {
+      baseUrl: 'https://s3-us-west-2.amazonaws.com/streamlabs-obs-dev',
+      version: pjson.version,
+      exec: process.argv,
+      cwd: process.cwd(),
+      waitPid: [ process.pid ],
+      appDir: path.dirname(app.getPath('exe')),
+      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
+      versionFileName: 'latest.json'
+    };
+
+    console.log(updateInfo);
+    bootstrap(updateInfo).then((updating) => {
+      if (updating) {
+        console.log('Closing for update...');
+        app.exit();
+      } else {
+        startApp();
+      }
+    });
   } else {
     startApp();
   }

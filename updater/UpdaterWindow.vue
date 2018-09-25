@@ -1,21 +1,15 @@
 <template>
 <div class="UpdaterWindow">
-  <div>
-    <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
-    {{ message }}
-  </div>
-
-  <div v-if="(percentComplete !== null) && !installing && !error">
+  <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
+  {{ message }}
+  <div v-if="(percentComplete !== null) && !installing && !error" class="UpdaterWindow-progressBarContainer">
+    <div
+      class="UpdaterWindow-progressBar"
+      :style="{ width: percentComplete + '%' }"/>
     <div class="UpdaterWindow-progressPercent">
-      {{ percentComplete }}% complete
-    </div>
-    <div class="UpdaterWindow-progressBarContainer">
-      <div
-        class="UpdaterWindow-progressBar"
-        :style="{ width: percentComplete + '%' }"/>
+      {{ percentComplete }}%
     </div>
   </div>
-
   <div class="UpdaterWindow-issues" v-if="installing">
     This may take a few minutes.  If you are having issues updating, please
     <span class="UpdaterWindow-link" @click="download">
@@ -38,7 +32,7 @@ export default {
 
   data() {
     return {
-      message: 'Checking for updates',
+      message: 'Downloading updater...',
       installing: false,
       error: false,
       percentComplete: null
@@ -46,27 +40,9 @@ export default {
   },
 
   mounted() {
-    ipcRenderer.on('autoUpdate-pushState', (event, data) => {
-      if (data.version) {
-        this.message = `Downloading version ${data.version}`;
-      }
-
-      if (data.percent) {
-        this.percentComplete = Math.floor(data.percent);
-      }
-
-      if (data.installing) {
-        this.installing = true;
-        this.message = `Installing version ${data.version}`;
-      }
-
-      if (data.error) {
-        this.error = true;
-        this.message = 'Something went wrong';
-      }
+    ipcRenderer.on('bootstrap-progress', (event, data) => {
+      this.percentComplete = Math.floor(data);
     });
-
-    ipcRenderer.send('autoUpdate-getState');
   },
 
   methods: {
@@ -82,41 +58,39 @@ export default {
 <style lang="less" scoped>
 .UpdaterWindow {
   height: 100%;
-  padding: 32px;
-  background-color: #17242D;
-  color: #ffffff;
+  padding: 40px;
+  background-color: #2b383f;
+  color: #f3f3f4;
   font-size: 18px;
   text-align: center;
   -webkit-app-region: drag
 }
 
-.updater-window__img {
-  width: 48px;
-}
-
 .UpdaterWindow-icon {
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
 .UpdaterWindow-progressBarContainer {
   position: relative;
   margin-top: 40px;
-  background-color: #09161D;
-  border-radius: 4px;
+  background-color: #13242d;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .UpdaterWindow-progressBar {
-  height: 8px;
+  height: 30px;
   background-color: #31c3a2;
 }
 
 .UpdaterWindow-progressPercent {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   text-align: center;
-  color: #BDC2C4;
-  font-size: 14px;
-  margin: 16px 0 24px 0;
+  line-height: 30px;
+  font-size: 15px;
 }
 
 .UpdaterWindow-issues {
