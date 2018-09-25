@@ -185,7 +185,7 @@ export class ServicesManager extends Service {
     MediaGalleryService,
     AnnouncementsService,
     MediaShareService,
-    ChatbotWidgetService,
+    ChatbotWidgetService
   };
 
   private instances: Dictionary<Service> = {};
