@@ -2,7 +2,16 @@ import { Component, Prop } from 'vue-property-decorator';
 import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/ChatbotWindowsBase.vue';
 import { $t } from 'services/i18n';
 import { cloneDeep } from 'lodash';
-import { IMediaShareSettings } from 'services/widget-settings/media-share';
+
+interface ChatbotOnboardingData {
+  [id: number]: {
+    title: string;
+    subtitle?: string;
+    backgroundUrl: string;
+    description: string;
+    onChooseHandler?: () => void;
+  }
+}
 
 @Component({})
 export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBase {
@@ -29,7 +38,7 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
     if (this.step > 1) this.step --;
   }
 
-  get onboardingData() {
+  get onboardingData(): ChatbotOnboardingData {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     const isAutoPlay = this.settings.auto_play === true;
     return {

@@ -69,7 +69,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // add new alert
-  async addNewAlert(type: ChatbotAlertType, newAlert: any) {
+  async addNewAlert(type: ChatbotAlertType, newAlert: IAlertMessage) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 

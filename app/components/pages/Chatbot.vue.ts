@@ -40,7 +40,6 @@ export default class Chatbot extends Vue {
     { title: 'Betting', enabled: false }
   ];
 
-  test = false;
   //
   // Default State
   //
