@@ -20,6 +20,7 @@ export default class PlatformAppStore extends Vue {
 
   mounted() {
     this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
+      this.$refs.appStoreWebview.openDevTools();
       this.guestApiService.exposeApi(
         this.$refs.appStoreWebview.getWebContents().id,
         {

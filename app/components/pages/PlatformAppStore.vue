@@ -7,6 +7,8 @@
       id="appStoreWebview"
       :src="appStoreUrl"
       ref="appStoreWebview"
+      allowpopups
+      webpreferences="nativeWindowOpen=yes"
       preload="bundles/guest-api">
     </webview>
   </div>
