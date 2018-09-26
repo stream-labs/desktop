@@ -14,7 +14,6 @@ import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
 import { PlatformAppManager } from './properties-managers/platform-app-manager';
-import { CustomizationService } from 'services/customization';
 import { UserService } from 'services/user';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
@@ -26,6 +25,8 @@ import {
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
+import { NavigationService } from 'services/navigation';
+import { PlatformAppsService } from 'services/platform-apps';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -58,7 +59,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() private userService: UserService;
-  @Inject() private customizationService: CustomizationService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private platformAppsService: PlatformAppsService;
 
   /**
    * Maps a source id to a property manager
@@ -418,7 +420,30 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         return;
       }
     }
-    console.log(sourceId);
+
+    // Figure out if we should redirect to settings
+    if (propertiesManagerType === 'platformApp') {
+      const settings = source.getPropertiesManagerSettings();
+      const app = this.platformAppsService.getApp(settings.appId);
+
+      if (app) {
+        const page = app.manifest.sources.find(appSource => {
+          return appSource.id === settings.appSourceId;
+        });
+
+        if (page && page.redirectPropertiesToTopNavSlot) {
+          this.navigationService.navigate('PlatformAppContainer', {
+            appId: app.id,
+            sourceId: source.sourceId
+          });
+
+          // If we navigated, we don't want to open source properties,
+          // and should close any open child windows instead
+          this.windowsService.closeChildWindow();
+          return;
+        }
+      }
+    }
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',

@@ -50,7 +50,8 @@ export interface IAppSource {
     type: ESourceSizeType;
     width: number;
     height: number;
-  }
+  },
+  redirectPropertiesToTopNavSlot: boolean;
 }
 
 export enum EAppPageSlot {

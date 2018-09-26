@@ -8,6 +8,7 @@ import { ILoadedApp } from '..';
 import { ThemeModule } from './modules/theme';
 import { SceneCollectionsModule } from './modules/scene-collections';
 import { ExternalModule } from './modules/external';
+import { AppModule } from './modules/app';
 
 export class PlatformAppsApi {
 
@@ -23,6 +24,7 @@ export class PlatformAppsApi {
     this.registerModule(new ThemeModule());
     this.registerModule(new SceneCollectionsModule());
     this.registerModule(new ExternalModule());
+    this.registerModule(new AppModule());
   }
 
   private registerModule(module: Module) {
