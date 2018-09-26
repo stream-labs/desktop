@@ -20,7 +20,7 @@
           class="button button--trans"
           v-if="facemasksActive"
           @click="playTestFacemask()">
-          Face Mask
+          Mask
         </button>
       </div>
     </transition>

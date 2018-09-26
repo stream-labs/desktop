@@ -26,6 +26,7 @@ export default class Dashboard extends Vue {
       getDevices: this.getDevices,
       enableMask: this.enableMask,
       updateSettings: this.updateSettings,
+      getDownloadProgress: this.getDownloadProgress
     });
     this.i18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
@@ -57,8 +58,12 @@ export default class Dashboard extends Vue {
     return this.facemasksService.enableMask(uuid);
   }
 
-  async updateSettings(settings: any) {
-    return this.facemasksService.updateSettings(settings);
+  async updateSettings() {
+    return this.facemasksService.startup();
+  }
+
+  async getDownloadProgress() {
+    return this.facemasksService.getDownloadProgress();
   }
 
   async testAudio(volume: number) {
