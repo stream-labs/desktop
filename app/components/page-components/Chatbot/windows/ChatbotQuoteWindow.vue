@@ -2,10 +2,10 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t(`${isEdit ? 'Edit' : 'Add'} Quote`)"
+  :title="isEdit ? $t('Edit Quote') : $t('Add Quote')"
 >
   <div slot="content">
-    <div>
+    <validated-form ref="form">
       <div>
         <VFormGroup
           :title="$t('Quote (Line breaks will be ignored)')"
@@ -32,7 +32,7 @@
           />
         </div>
       </div>
-    </div>
+    </validated-form>
   </div>
   <div slot="controls">
     <button
@@ -43,7 +43,6 @@
     <button
       class="button button--action"
       @click="onSaveHandler"
-      :disabled="errors.items.length > 0 || !newQuote.message || !newQuote.game || !newQuote.added_by"
     >
       {{ $t('Save') }}
     </button>

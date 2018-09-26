@@ -20,7 +20,7 @@
       <tr>
         <th> {{ $t('Word') }} </th>
         <th> {{ $t('Punishment') }} </th>
-        <th> {{ $t('Duration (Value in Minutes).') }} </th>
+        <th> {{ $t('Duration (Value in Seconds).') }} </th>
       </tr>
     </thead>
     <tbody>
@@ -50,7 +50,7 @@
         <img class="new-list-item-modal__header__icon" src="../../../../../media/images/icon.ico" />
         <div class="new-list-item-modal__header__title">{{ $t('Add to Blacklist') }}</div>
       </div>
-      <div class="new-list-item-modal__body">
+      <validated-form ref="form" class="new-list-item-modal__body">
         <div class="row">
           <div class="small-7 columns">
             <VFormGroup
@@ -69,7 +69,7 @@
         </div>
         <VFormGroup
           v-if="newListItem.punishment.type === 'Timeout'"
-          :title="$t('Punishment Duration (Value in Minutes)')"
+          :title="$t('Punishment Duration (Value in Seconds)')"
           v-model="newListItem.punishment.duration"
           :metadata="metadata.punishment.duration"
         />
@@ -79,7 +79,7 @@
           v-model="newListItem.is_regex"
           :metadata="metadata.is_regex"
         />
-      </div>
+      </validated-form>
       <div class="new-list-item-modal__controls">
         <button
           class="button button--default"
@@ -89,7 +89,6 @@
         <button
           class="button button--action"
           @click="onAddNewItemHandler"
-          :disabled="errors.items.length > 0 || !newListItem.text"
         >
           {{ $t('Done') }}
         </button>

@@ -31,6 +31,7 @@ import { Subject } from 'rxjs/Subject';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
+import SubGoal from 'components/widgets/goal/SubGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -53,9 +54,17 @@ import ChatbotWordProtectionWindow
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow
   from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
+import ChatbotQueuePreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
+import ChatbotSongRequestPreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
+import ChatbotSongRequestOnboardingWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
 
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
+import ExecuteInCurrentWindow from '../util/execute-in-current-window';
+import MediaShare from 'components/widgets/MediaShare.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -98,6 +107,8 @@ export function getComponents() {
     TipJar,
     SponsorBanner,
     StreamBoss,
+    SubGoal,
+    MediaShare,
 
     ChatbotCustomCommandWindow,
     ChatbotDefaultCommandWindow,
@@ -109,6 +120,9 @@ export function getComponents() {
     ChatbotWordProtectionWindow,
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
+    ChatbotQueuePreferencesWindow,
+    ChatbotSongRequestPreferencesWindow,
+    ChatbotSongRequestOnboardingWindow,
   };
 }
 
@@ -164,7 +178,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   // top level components in new child windows.
   components = getComponents();
 
-  windowUpdated = new Subject<{windowId: string, options:  Partial<IWindowOptions>}>();
+  windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -284,14 +298,17 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
 
+  // @ExecuteInCurrentWindow()
   getChildWindowOptions(): IWindowOptions {
     return this.state.child;
   }
 
+  // @ExecuteInCurrentWindow()
   getChildWindowQueryParams(): Dictionary<string> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
+  // @ExecuteInCurrentWindow()
   getWindowOptions(windowId: string) {
     return this.state[windowId].queryParams || {};
   }

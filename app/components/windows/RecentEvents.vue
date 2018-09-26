@@ -1,6 +1,5 @@
 <template>
 <modal-layout
-  :title="$t('Recent Events')"
   :show-controls="false">
   <webview
     class="recent-events"

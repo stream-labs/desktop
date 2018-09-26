@@ -17,7 +17,7 @@ import {
 import {
   IAlertMessage,
   NEW_ALERT_MODAL_ID,
-  ChatbotAlertTypes
+  ChatbotAlertType
 } from 'services/chatbot';
 
 interface INewAlertMetadata {
@@ -57,13 +57,20 @@ interface INewAlertMetadata {
       amount: INumberMetadata;
       message: ITextMetadata;
     }
+  },
+  sub_mystery_gift: {
+    newMessage: {
+      tier: IListMetadata<string>;
+      amount: INumberMetadata;
+      message: ITextMetadata;
+    }
   }
 }
 
 interface INewAlertData {
   [id: string] : {
     newMessage: IAlertMessage;
-  }
+  };
   follow: {
     newMessage: IAlertMessage;
   };
@@ -81,6 +88,9 @@ interface INewAlertData {
   };
   bits: {
     newMessage: IAlertMessage;
+  };
+  sub_mystery_gift: {
+    newMessage: IAlertMessage;
   }
 }
 
@@ -94,7 +104,7 @@ interface INewAlertData {
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop()
-  selectedType: ChatbotAlertTypes;
+  selectedType: ChatbotAlertType;
 
   onSubmitHandler: Function = () => {};
 
@@ -130,6 +140,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   get isBit() {
     return this.selectedType === 'bits';
+  }
+
+  get isSubMysteryGift() {
+    return this.selectedType === 'sub_mystery_gift';
   }
 
   get disabledSubmit() {
@@ -242,7 +256,29 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
             placeholder: $t('Message to Bit donators')
           }
         }
-      }
+      },
+      sub_mystery_gift: {
+        newMessage: {
+          tier: {
+            required: true,
+            type: EInputType.list,
+            options: ['Prime', 'Tier 1', 'Tier 2', 'Tier 3'].map(tier => ({
+              value: tier,
+              title: $t(tier)
+            }))
+          },
+          amount: {
+            required: true,
+            type: EInputType.number,
+            placeholder: $t('Number of months subscribed')
+          },
+          message: {
+            type: EInputType.textArea,
+            required: true,
+            placeholder: $t('Message to subscriber')
+          },
+        }
+      },
     };
     return metadata;
   }
@@ -285,7 +321,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
           amount: null,
           message: null
         }
-      }
+      },
+      sub_mystery_gift: {
+        newMessage: {
+          amount: null,
+          message: null,
+          tier: $t('Prime')
+        }
+      },
     };
     return initialState;
   }

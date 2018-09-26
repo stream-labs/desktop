@@ -6,14 +6,14 @@
 >
   <div slot="fixed">
     <div class="row">
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <div class="window-toggle__wrapper">
           <div @click="onToggleLinkProtectionWindowHandler">
             <span> {{ $t('Edit Command') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
         </div>
       </div>
@@ -22,7 +22,7 @@
   <div slot="content" class="chatbot-link-protection__container">
     <div>
       <transition name='fade' mode="out-in" appear>
-        <div v-if="selectedTab === 'general' && linkProtection">
+        <validated-form ref="form" v-if="selectedTab === 'general' && linkProtection">
           <div class="row">
             <div class="small-6 columns">
               <VFormGroup
@@ -40,13 +40,13 @@
             </div>
           </div>
           <VFormGroup
-            :title="$t('Permit Duration (Value in Minutes)')"
+            :title="$t('Permit Duration (Value in Seconds)')"
             v-model="linkProtection.general.permit.duration"
             :metadata="metadata.link.general.permit.duration"
           />
           <VFormGroup
             v-if="linkProtection.general.punishment.type === 'Timeout'"
-            :title="$t('Punishment Duration (Value in Minutes)')"
+            :title="$t('Punishment Duration (Value in Seconds)')"
             v-model="linkProtection.general.punishment.duration"
             :metadata="metadata.link.general.punishment.duration"
           />
@@ -55,10 +55,10 @@
             v-model="linkProtection.general.message"
             :metadata="metadata.link.general.message"
           />
-        </div>
+        </validated-form>
         <ChatbotLinkProtectionList
           v-if="selectedTab === 'whitelist' || selectedTab === 'blacklist'"
-          :title="$t(`Add to ${selectedTab}`)"
+          :title="selectedTab === 'whitelist' ? $t('Add to whitelist') : $t('Add to blacklist')"
           :type="selectedTab"
           v-model="linkProtection[selectedTab]"
         />
@@ -94,7 +94,6 @@
       <button
         class="button button--action"
         @click="onSaveHandler"
-        :disabled="errors.items.length > 0"
       >
         {{ $t("Save") }}
       </button>
@@ -105,8 +104,16 @@
 
 <script lang="ts" src="./ChatbotLinkProtectionWindow.vue.ts"></script>
 
-<style <style lang="less" scoped>
+<style lang="less" scoped>
 @import "../../../../styles/index";
+.window-tab {
+  &:first-child {
+    padding-right: 0;
+  }
+  &:last-child {
+    padding-left: 0;
+  }
+}
 
 .window-toggle__wrapper {
   background-color: @day-primary;

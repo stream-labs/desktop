@@ -8,7 +8,7 @@ import electron from 'electron';
 import { Inject } from 'util/injector';
 import namingHelpers from 'util/NamingHelpers';
 import { WindowsService } from 'services/windows';
-import { WidgetsService, WidgetType } from 'services/widgets';
+import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
 import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
@@ -22,6 +22,8 @@ import {
   TPropertiesManager
 } from './index';
 import uuid from 'uuid/v4';
+import { $t } from 'services/i18n';
+import { SourceDisplayData } from './sources-data';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -390,6 +392,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.EventList,
       WidgetType.StreamBoss,
       WidgetType.TipJar,
+      WidgetType.SubGoal,
+      WidgetType.MediaShare,
       WidgetType.SponsorBanner
     ];
 
@@ -400,6 +404,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
         this.windowsService.showWindow({
           componentName,
+          title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
           queryParams: { sourceId },
           size: {
             width: 600,
@@ -410,9 +415,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         return;
       }
     }
+    console.log(sourceId);
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
+      title: $t('Settings for ') + SourceDisplayData()[source.type].name,
       queryParams: { sourceId },
       size: {
         width: 600,
@@ -425,6 +432,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showShowcase() {
     this.windowsService.showWindow({
       componentName: 'SourcesShowcase',
+      title: $t('Add Source'),
       size: {
         width: 1000,
         height: 650
@@ -436,6 +444,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager, widgetType?: WidgetType) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
+      title: $t('Add Source'),
       queryParams: { sourceType, propertiesManager, widgetType },
       size: {
         width: 600,
@@ -447,6 +456,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   showRenameSource(sourceId: string) {
     this.windowsService.showWindow({
       componentName: 'RenameSource',
+      title: $t('Rename Source'),
       queryParams: { sourceId },
       size: {
         width: 400,

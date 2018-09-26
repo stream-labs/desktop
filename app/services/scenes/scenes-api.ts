@@ -12,7 +12,7 @@ export interface IScenesServiceApi {
   scenes: ISceneApi[];
   activeScene: ISceneApi;
   activeSceneId: string;
-  getSceneByName(name: string): ISceneApi;
+  getScene(id: string): ISceneApi;
   getScenes(): ISceneApi[];
   getModel(): IScenesState;
   suggestName(name: string): string;

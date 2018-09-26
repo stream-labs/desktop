@@ -8,7 +8,7 @@
   <div class="new-alert-modal">
     <div class="new-alert-modal__header">
       <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico" />
-      <div class="new-alert-modal__header__title">{{ $t(title) }}</div>
+      <div class="new-alert-modal__header__title">{{ title.split('_').join(' ') }}</div>
     </div>
     <div class="new-alert-modal__body">
       <div v-if="isFollower">
@@ -98,6 +98,25 @@
             :title="$t('Bit Donator Message')"
             v-model="newAlert.bits.newMessage.message"
             :metadata="metadata.bits.newMessage.message"
+          />
+        </div>
+      </div>
+      <div v-if="isSubMysteryGift">
+        <div>
+          <VFormGroup
+            :title="$t('Subscription Tier')"
+            v-model="newAlert.sub_mystery_gift.newMessage.tier"
+            :metadata="metadata.sub_mystery_gift.newMessage.tier"
+          />
+          <VFormGroup
+            :title="$t('Amount of Gifted Subs')"
+            v-model="newAlert.sub_mystery_gift.newMessage.amount"
+            :metadata="metadata.sub_mystery_gift.newMessage.amount"
+          />
+          <VFormGroup
+            :title="$t('Subscription Message')"
+            v-model="newAlert.sub_mystery_gift.newMessage.message"
+            :metadata="metadata.sub_mystery_gift.newMessage.message"
           />
         </div>
       </div>

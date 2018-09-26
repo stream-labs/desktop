@@ -9,6 +9,7 @@ import Selector from 'components/Selector.vue';
 import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
+import { log } from 'lodash-decorators/utils';
 
 @Component({
   components: { ModalLayout, Selector, Display }
@@ -97,8 +98,11 @@ export default class AddSource extends Vue {
         this.scenesService.activeScene.addSource(source.sourceId);
       }
 
-      this.close();
-      if (source.hasProps()) this.sourcesService.showSourceProperties(source.sourceId);
+      if (source.hasProps()) {
+        this.sourcesService.showSourceProperties(source.sourceId);
+      } else {
+        this.close();
+      }
     }
   }
 
