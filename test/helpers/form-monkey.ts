@@ -20,6 +20,9 @@ export class FormMonkey {
   fill(formName: string, formData: Dictionary<any>, options = {}) {
     const $form = this.client.$(`[name=${formName}`);
 
+    if (!$form) throw new Error(`form not found: ${formName}`);
+
+
   }
 
 }
