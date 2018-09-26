@@ -92,7 +92,7 @@ export default class WidgetSettings<TData extends IWidgetData, TService extends 
       {
         position: 'bottom-center',
         className: 'toast-alert',
-        duration: 1000,
+        duration: 3000,
         singleton: true
       }
     );

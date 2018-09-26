@@ -20,11 +20,11 @@
           <v-form-group v-model="goalCreateOptions.manual_goal_amount" :metadata="metadata.manual_goal_amount"/>
           <v-form-group v-model="goalCreateOptions.ends_at" :metadata="metadata.ends_at"/>
         </validated-form>
+        <button @click="saveGoal()" class="button button--action">{{ $t('Start Goal') }}</button>
       </div>
       <div v-else class="loading-spinner">
         <img src="../../../../media/images/loader.svg" />
       </div>
-      <button @click="saveGoal()" class="button button--action">{{ $t('Start Goal') }}</button>
     </div>
   </validated-form>
 
