@@ -7,9 +7,11 @@ import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
-import { IInputMetadata, metadata } from 'components/shared/inputs';
+import { IInputMetadata, metadata, inputComponents } from 'components/shared/inputs';
 import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import { debounce } from 'lodash-decorators';
+
+const { ToggleInput } = inputComponents;
 
 type TCustomFieldType =
   'colorpicker' |
@@ -90,6 +92,7 @@ const DEFAULT_CUSTOM_FIELDS: Dictionary<ICustomField> = {
 @Component({
   components: {
     CodeInput,
+    ToggleInput,
     HFormGroup
   }
 })
@@ -213,6 +216,10 @@ export default class CustomFieldsEditor extends Vue {
 
   removeFields() {
     this.customFields = null;
+  }
+
+  toggleCustomFields() {
+    !!this.customFields ? this.removeFields() : this.addDefaultFields();
   }
 
 

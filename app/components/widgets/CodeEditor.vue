@@ -1,57 +1,37 @@
 <template>
   <div>
-    <code-input v-if="value.settings.custom_enabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
-
-    <div class="modal-layout-controls">
-      <button v-if="hasDefaults" class="button button--default restore-button" @click="restoreDefaults">
-        {{ $t('Restore Defaults') }}
-      </button>
-      <button
-        class="button button--soft-warning discard-button"
-        @click="hasChanges && discardChanges()"
-        :class="{ 'is-disabled': !hasChanges }"
-      >
-        {{ $t('Discard Changes') }}
-      </button>
-      <button
-          class="button"
-          :class="{'button--action': canSave, 'button--default is-disabled': !canSave }"
-          @click="canSave && save()">
-        {{ $t('Save') }}
-      </button>
+    <div class="toolbar">
+      <i class="icon-reset" v-tooltip="$t('Restore Defaults')" @click="restoreDefaults" />
+      <i class="icon-trash" v-tooltip="$t('Discard Changes')" @click="hasChanges && discardChanges()" />
+      <i class="icon-pillow" v-tooltip="$t('Save')" @click="canSave && save()" />
     </div>
-
+    <code-input v-if="value.settings.custom_enabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
   </div>
 </template>
 
 <script lang="ts" src="./CodeEditor.vue.ts"></script>
-<style lang="less" scoped>
 
+<style lang="less" scoped>
   @import '../../styles/index';
 
-  .modal-layout-controls {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    background-color: @day-section;
-    .padding-v-sides();
-    .padding-h-sides(2);
-    .text-align(@right);
-    flex-shrink: 0;
-    z-index: 11;
-  }
+  .toolbar {
+    height: 32px;
+    padding-top: 8px;
+    border-bottom: 1px solid @day-editor-border;
 
-  .restore-button,
-  .discard-button {
-    float: left;
-    .margin-right();
-  }
+    i {
+      font-size: 16px;
+      margin-left: 16px;
 
-  .night-theme {
-    .modal-layout-controls {
-      background-color: @night-section;
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 
+  .night-theme {
+    .toolbar {
+      border-color: @night-editor-border;
+    }
+  }
 </style>
