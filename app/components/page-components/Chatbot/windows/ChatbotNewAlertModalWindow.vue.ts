@@ -116,12 +116,14 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
 
   newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
 
+  isEdit = false;
+
   get NEW_ALERT_MODAL_ID() {
     return NEW_ALERT_MODAL_ID;
   }
 
   get title() {
-    return `New ${this.selectedType} Alert`;
+    return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
   }
 
   get isDonation() {
@@ -343,8 +345,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     const { onSubmitHandler, editedAlert } = event.params;
     this.onSubmitHandler = onSubmitHandler;
     if (editedAlert) {
+      this.isEdit = true;
       this.newAlert[this.selectedType].newMessage = cloneDeep(editedAlert);
     } else {
+      this.isEdit = false;
       this.newAlert = cloneDeep(this.initialNewAlertState);
     }
   }
