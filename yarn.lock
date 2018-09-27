@@ -3428,20 +3428,6 @@ electron-devtools-installer@2.2.4:
     rimraf "^2.5.2"
     semver "^5.3.0"
 
-electron-download@^3.0.1:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-3.3.0.tgz#2cfd54d6966c019c4d49ad65fbe65cc9cdef68c8"
-  dependencies:
-    debug "^2.2.0"
-    fs-extra "^0.30.0"
-    home-path "^1.0.1"
-    minimist "^1.2.0"
-    nugget "^2.0.0"
-    path-exists "^2.1.0"
-    rc "^1.1.2"
-    semver "^5.3.0"
-    sumchecker "^1.2.0"
-
 electron-download@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/electron-download/-/electron-download-4.1.0.tgz#bf932c746f2f87ffcc09d1dd472f2ff6b9187845"
@@ -3509,12 +3495,12 @@ electron-window-state@^4.1.1:
     jsonfile "^2.2.3"
     mkdirp "^0.5.1"
 
-electron@2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-2.0.8.tgz#6ec7113b356e09cc9899797e0d41ebff8163e962"
+electron@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-3.0.1.tgz#4e98c19da83180a0240069eaf6a4bed0edd92602"
   dependencies:
     "@types/node" "^8.0.24"
-    electron-download "^3.0.1"
+    electron-download "^4.1.0"
     extract-zip "^1.0.3"
 
 elegant-spinner@^1.0.1:
@@ -3689,10 +3675,6 @@ es6-map@^0.1.3:
 es6-object-assign@^1.0.3:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/es6-object-assign/-/es6-object-assign-1.1.0.tgz#c2c3582656247c39ea107cb1e6652b6f9f24523c"
-
-es6-promise@^4.0.5:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.1.1.tgz#8811e90915d9a0dba36274f0b242dbda78f9c92a"
 
 es6-set@~0.1.5:
   version "0.1.5"
@@ -4253,9 +4235,9 @@ fn-name@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/fn-name/-/fn-name-2.0.1.tgz#5214d7537a4d06a4a301c0cc262feb84188002e7"
 
-"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz":
+"font-manager@https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v3.0.1-font-manager.tar.gz":
   version "0.4.0"
-  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz#bef49d76b44e6309c12ba45b1be46c859cb36c70"
+  resolved "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v3.0.1-font-manager.tar.gz#b58a7c84a8a25288c01a14399ff884cfbb8bf72f"
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -4310,16 +4292,6 @@ fs-extra-p@^4.6.1:
   dependencies:
     bluebird-lst "^1.0.5"
     fs-extra "^6.0.1"
-
-fs-extra@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-0.30.0.tgz#f233ffcc08d4da7d432daa449776989db1df93f0"
-  dependencies:
-    graceful-fs "^4.1.2"
-    jsonfile "^2.1.0"
-    klaw "^1.0.0"
-    path-is-absolute "^1.0.0"
-    rimraf "^2.2.8"
 
 fs-extra@^2.0.0:
   version "2.1.2"
@@ -4694,7 +4666,7 @@ got@^8.2.0:
     url-parse-lax "^3.0.0"
     url-to-options "^1.0.1"
 
-graceful-fs@^4.1.0, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
+graceful-fs@^4.1.0, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
@@ -4892,10 +4864,6 @@ home-or-tmp@^2.0.0:
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.1"
-
-home-path@^1.0.1:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/home-path/-/home-path-1.0.5.tgz#788b29815b12d53bacf575648476e6f9041d133f"
 
 homedir-polyfill@^1.0.1:
   version "1.0.1"
@@ -5807,12 +5775,6 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
-klaw@^1.0.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/klaw/-/klaw-1.3.1.tgz#4088433b46b3b1ba259d78785d8e96f73ba02439"
-  optionalDependencies:
-    graceful-fs "^4.1.9"
-
 last-line-stream@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/last-line-stream/-/last-line-stream-1.0.0.tgz#d1b64d69f86ff24af2d04883a2ceee14520a5600"
@@ -6506,9 +6468,9 @@ node-dir@0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/node-dir/-/node-dir-0.1.8.tgz#55fb8deb699070707fb67f91a460f0448294c77d"
 
-"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz":
+"node-fontinfo@https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v3.0.1-node-fontinfo.tar.gz":
   version "0.0.2"
-  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz#14d72d13faab5db8b61b3ff52b6ccaef14256245"
+  resolved "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v3.0.1-node-fontinfo.tar.gz#d73ecd27d08ed2122b442afa0d0389f4b9dcccf5"
 
 node-libs-browser@^2.0.0:
   version "2.0.0"
@@ -6538,9 +6500,9 @@ node-libs-browser@^2.0.0:
     util "^0.10.3"
     vm-browserify "0.0.4"
 
-"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz":
+"node-libuiohook@https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.4/iojs-v3.0.1-node-libuiohook.tar.gz":
   version "0.0.1"
-  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz#451c29370e8aa2fd197a1b3c6a11086612283ebf"
+  resolved "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.4/iojs-v3.0.1-node-libuiohook.tar.gz#e345664c2c9a7f1a68b796531f700b6b36e7bcaa"
 
 node-pre-gyp@^0.10.0:
   version "0.10.0"
@@ -6745,9 +6707,9 @@ object.pick@^1.3.0:
   dependencies:
     isobject "^3.0.1"
 
-"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v2.0.8-signed.tar.gz":
+"obs-studio-node@https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v3.0.0-signed.tar.gz":
   version "0.3.18"
-  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v2.0.8-signed.tar.gz#dc7ab88a15b4af2641074e1fa8ce73a8e20cd5b0"
+  resolved "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v3.0.0-signed.tar.gz#37e5716dc4fca26c1866412a37f48e49d8bdba00"
 
 observable-to-promise@^0.5.0:
   version "0.5.0"
@@ -7024,7 +6986,7 @@ path-dirname@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/path-dirname/-/path-dirname-1.0.2.tgz#cc33d24d525e099a5388c0336c6e32b9160609e0"
 
-path-exists@^2.0.0, path-exists@^2.1.0:
+path-exists@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-2.1.0.tgz#0feb6c64f0fc518d9a754dd5efb62c7022761f4b"
   dependencies:
@@ -8893,13 +8855,6 @@ style-loader@0.21.0:
   dependencies:
     loader-utils "^1.1.0"
     schema-utils "^0.4.5"
-
-sumchecker@^1.2.0:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/sumchecker/-/sumchecker-1.3.1.tgz#79bb3b4456dd04f18ebdbc0d703a1d1daec5105d"
-  dependencies:
-    debug "^2.2.0"
-    es6-promise "^4.0.5"
 
 sumchecker@^2.0.1, sumchecker@^2.0.2:
   version "2.0.2"

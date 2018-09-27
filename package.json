@@ -67,7 +67,7 @@
   },
   "cmake-js": {
     "runtime": "electron",
-    "runtimeVersion": "2.0.8",
+    "runtimeVersion": "3.0.1",
     "arch": "x64"
   },
   "dependencies": {
@@ -75,10 +75,10 @@
     "backtrace-node": "^0.7.3",
     "electron-updater": "^3.0.1",
     "electron-window-state": "^4.1.1",
-    "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz",
-    "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz",
-    "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.2/iojs-v2.0.5-node-libuiohook.tar.gz",
-    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v2.0.8-signed.tar.gz",
+    "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.4/iojs-v3.0.1-font-manager.tar.gz",
+    "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.7/iojs-v3.0.1-node-fontinfo.tar.gz",
+    "node-libuiohook": "https://github.com/stream-labs/node-libuiohook/releases/download/v0.0.4/iojs-v3.0.1-node-libuiohook.tar.gz",
+    "obs-studio-node": "https://github.com/stream-labs/obs-studio-node/releases/download/v0.3.20/iojs-v3.0.0-signed.tar.gz",
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
@@ -112,7 +112,7 @@
     "css-element-queries": "^1.0.2",
     "css-loader": "0.28.11",
     "devtron": "1.4.0",
-    "electron": "2.0.8",
+    "electron": "3.0.1",
     "electron-builder": "20.22.0",
     "electron-devtools-installer": "2.2.4",
     "emojione": "3.1.7",
