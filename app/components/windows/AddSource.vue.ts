@@ -10,6 +10,7 @@ import Display from 'components/shared/Display.vue';
 import { WidgetsService, WidgetType, WidgetDefinitions } from 'services/widgets';
 import { $t } from 'services/i18n';
 import { PlatformAppsService } from 'services/platform-apps';
+import { log } from 'lodash-decorators/utils';
 
 @Component({
   components: { ModalLayout, Selector, Display }

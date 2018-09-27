@@ -15,13 +15,14 @@
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
     </button>
-    <!-- <button
+    <button
       @click="navigateChatBot"
       class="tab-button"
-      :class="{ active: page === 'Chatbot' }"
+      v-if="enabledFeature(availableFeatures.chatbot)"
+      :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-chatbot"/> {{ $t('Chatbot') }}
-    </button> -->
+      <i class="icon-chatbot"/> <span>{{ $t('Chatbot') }}</span>
+    </button>
     <button
       @click="navigatePlatformAppStore"
       class="tab-button"
@@ -134,7 +135,6 @@
 
 <style lang="less" scoped>
 @import "../styles/index";
-
 .top-nav {
   display: flex;
   flex-direction: row;

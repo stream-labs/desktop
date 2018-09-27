@@ -25,7 +25,9 @@ export enum WidgetType {
   StreamBoss = 10,
   Credits = 11,
   SpinWheel = 12,
-  SponsorBanner = 13
+  SponsorBanner = 13,
+  MediaShare = 14,
+  SubGoal = 15
 }
 
 
@@ -152,6 +154,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     name: 'Subscriber Goal',
     url(host, token) {
       return `https://${host}/widgets/follower-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest,
+  },
+
+  [WidgetType.SubGoal]: {
+    name: 'Sub Goal',
+    url(host, token) {
+      return `https://${host}/widgets/sub-goal?token=${token}`;
     },
 
     width: 600,
@@ -311,10 +328,25 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     y: 1,
 
     anchor: AnchorPoint.SouthWest
+  },
+
+  [WidgetType.MediaShare]: {
+    name: 'Media Share',
+    url(host, token) {
+      return `https://${host}/widgets/media/v1/${token}`;
+    },
+
+    width: 800,
+    height: 600,
+
+    x: 0.5,
+    y: 0,
+
+    anchor: AnchorPoint.North
   }
 };
 
-export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
+export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
   [WidgetType.AlertBox]: {
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
@@ -353,6 +385,14 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoFilename: 'source-follower-goal.png',
     supportList: [$t('Youtube Subscribers')],
     platforms: new Set(['youtube'])
+  },
+  [WidgetType.SubGoal]: {
+    name: platform === 'youtube' ? $t('Member Goal') : $t('Subscription Goal'),
+    description: $t('Set a goal for your viewers to help you reach.'),
+    demoVideo: false,
+    demoFilename: 'source-follower-goal.png',
+    supportList: [$t('Twitch Subscribers'), $t('Youtube Members'), $t('Mixer Subscriptions')],
+    platforms: new Set(['twitch', 'youtube', 'mixer'])
   },
   [WidgetType.BitGoal]: {
     name: $t('Bit Goal'),
@@ -448,5 +488,16 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoVideo: true,
     demoFilename: 'source-wheel.mp4',
     supportList: [$t('The streamer manually triggers a spin anytime while they are live.')]
+  },
+  [WidgetType.MediaShare]: {
+    name: $t('Media Share'),
+    description: $t(
+      'Please note that when advanced media share is enabled,' +
+      ' media will no longer play through your alert box widget.' +
+      ' Media will only play through this media share widget.'
+    ),
+    demoVideo: false,
+    demoFilename: 'source-sponsor-banner.png',
+    supportList: []
   }
 });

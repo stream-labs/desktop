@@ -1,8 +1,9 @@
 import ChatbotBase from 'components/page-components/Chatbot/ChatbotBase.vue';
 import { Component, Watch } from 'vue-property-decorator';
-import { IChatbotTimer, IQuote } from 'services/chatbot/chatbot-interfaces';
+import { IQuote } from 'services/chatbot/chatbot-interfaces';
 import { Debounce } from 'lodash-decorators';
 import ChatbotPagination from 'components/page-components/Chatbot/shared/ChatbotPagination.vue';
+import moment from 'moment';
 
 
 @Component({
@@ -37,8 +38,16 @@ export default class ChatbotQuotes extends ChatbotBase {
     this.fetchQuotes(this.currentPage, value);
   }
 
-  fetchQuotes(page = this.currentPage, query?: string) {
+  get quotePreferences() {
+    return this.chatbotApiService.state.quotePreferencesResponse;
+  }
+
+  fetchQuotes(page = this.currentPage, query = this.searchQuery) {
     this.chatbotApiService.fetchQuotes(page, query);
+  }
+
+  formatDate(dateString: string) {
+    return moment(dateString).format(this.quotePreferences.settings.general.date_format);
   }
 
   onOpenQuoteWindowHandler(quote?: IQuote) {
@@ -46,7 +55,7 @@ export default class ChatbotQuotes extends ChatbotBase {
   }
 
   onOpenQuotePreferencesHandler() {
-    this.chatbotCommonService.openQuotePreferenceWindow();
+    this.chatbotCommonService.openQuotePreferencesWindow();
   }
 
   onDeleteQuoteHandler(quote?: IQuote) {

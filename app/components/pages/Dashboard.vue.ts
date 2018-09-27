@@ -60,8 +60,12 @@ export default class Dashboard extends Vue {
     return this.facemasksService.enableMask(uuid);
   }
 
-  async updateSettings(settings: any) {
-    return this.facemasksService.updateSettings(settings);
+  async updateSettings() {
+    return this.facemasksService.startup();
+  }
+
+  async getDownloadProgress() {
+    return this.facemasksService.getDownloadProgress();
   }
 
   async testAudio(volume: number) {
