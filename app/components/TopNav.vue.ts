@@ -65,8 +65,8 @@ export default class TopNav extends Vue {
     this.navigationService.navigate('DesignSystem');
   }
 
-  enabledFeature(feature: EAvailableFeatures) {
-    return this.incrementalRolloutService.availableFeatures.indexOf(feature) > -1;
+  featureIsEnabled(feature: EAvailableFeatures) {
+    return this.incrementalRolloutService.featureIsEnabled(feature);
   }
 
   studioMode() {
