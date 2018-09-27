@@ -7,6 +7,7 @@ import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
   IListMetadata,
   ITextMetadata,
@@ -17,7 +18,7 @@ import {
 import {
   IAlertMessage,
   NEW_ALERT_MODAL_ID,
-  ChatbotAlertType
+  ChatbotAlertType,
 } from 'services/chatbot';
 
 interface INewAlertMetadata {
@@ -99,12 +100,17 @@ interface INewAlertData {
     TextInput,
     TextAreaInput,
     ListInput,
-    NumberInput
+    NumberInput,
+    ValidatedForm
   }
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop()
   selectedType: ChatbotAlertType;
+
+  $refs: {
+    form: ValidatedForm;
+  };
 
   onSubmitHandler: Function = () => {};
 
@@ -347,7 +353,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
-  onSubmit() {
+  async onSubmit() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     this.onSubmitHandler(this.newAlert[this.selectedType].newMessage);
   }
 }
