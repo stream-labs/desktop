@@ -4,7 +4,7 @@
 
 BASEDIR=$(git rev-parse --show-cdup)
 
-SENTRY_PROJECT=$(jq -r .name < ${BASEDIR}package.json)
+export SENTRY_PROJECT=$(jq -r .name < ${BASEDIR}package.json)
 RELEASE=$(jq -r .version < ${BASEDIR}package.json)
 echo Release: $RELEASE
 
