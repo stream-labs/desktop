@@ -126,7 +126,7 @@
   .night-theme {
     .widget-editor__top-tabs {
       background-color: @night-section !important;
-      border-bottom: 1px solid @night-editor-border !important;
+      border-bottom: 1px solid @night-slider-bg !important;
     }
   }
 
@@ -169,7 +169,7 @@
   }
 
   .window-container {
-    border: 1px solid @day-editor-border;
+    border: 1px solid @day-border;
   }
 
   .top-settings {
@@ -255,7 +255,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid @day-editor-border;
+    border-left: 1px solid @day-border;
     background-color: @day-section;
     .transition();
     transition-delay: 300ms;
@@ -274,7 +274,7 @@
   }
 
   .subsection:not(:first-of-type) .subsection__title {
-    border-top: 1px solid @day-editor-border;
+    border-top: 1px solid @day-border;
   }
 
   .subsection__title {
@@ -282,8 +282,8 @@
     width: 100%;
     padding: 8px;
     text-transform: uppercase;
-    background-color: @day-editor-accent;
-    border-bottom: 1px solid @day-editor-border;
+    background-color: @light-2;
+    border-bottom: 1px solid @day-border;
     white-space: nowrap;
   }
 
@@ -317,7 +317,7 @@
     width: 100%;
     position: absolute;
     bottom: 0;
-    border-top: 1px solid @day-editor-border;
+    border-top: 1px solid @day-border;
     background-color: @day-section;
     .transition();
   }
@@ -350,12 +350,12 @@
   .custom-code__divider {
     position: absolute;
     left: 100px;
-    border-right: 1px solid @day-editor-border;
+    border-right: 1px solid @day-border;
     width: 100px;
     margin: 8px;
     height: 24px;
     top: 0;
-    background-color: @day-section;
+    background-color: @white;
     transition-delay: 600ms;
   }
 
@@ -388,28 +388,28 @@
     }
     .custom-code__divider {
       background-color: @night-section;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .sidebar {
       background-color: @night-section;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .subsection:not(:first-of-type) .subsection__title {
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .subsection__title {
       background-color: @night-accent-dark;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .settings-title {
       border-color: @night-accent-dark;
       &:hover,
       &.active {
-        background-color: @night-editor-accent;
+        background-color: @dark-2;
       }
     }
     .code-editor {
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
       background-color: @night-section-bg;
     }
     .custom-code__alert {
