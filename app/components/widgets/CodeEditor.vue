@@ -3,7 +3,7 @@
     <div class="toolbar">
       <i class="icon-reset" v-tooltip="$t('Restore Defaults')" @click="restoreDefaults" />
       <i class="icon-trash" v-tooltip="$t('Discard Changes')" @click="hasChanges && discardChanges()" />
-      <i class="icon-pillow" v-tooltip="$t('Save')" @click="canSave && save()" />
+      <i class="icon-save" v-tooltip="$t('Save')" @click="canSave && save()" />
     </div>
     <code-input v-if="value.settings.custom_enabled" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
   </div>
@@ -17,7 +17,7 @@
   .toolbar {
     height: 32px;
     padding-top: 8px;
-    border-bottom: 1px solid @day-editor-border;
+    border-bottom: 1px solid @day-border;
 
     i {
       font-size: 16px;
@@ -31,7 +31,7 @@
 
   .night-theme {
     .toolbar {
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
   }
 </style>
