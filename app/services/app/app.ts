@@ -48,7 +48,7 @@ export class AppService extends StatefulService<IAppState> {
 
   static initialState: IAppState = {
     loading: true,
-    argv: []
+    argv: electron.remote.process.argv
   };
 
   private autosaveInterval: number;
@@ -111,13 +111,13 @@ export class AppService extends StatefulService<IAppState> {
     });
   }
 
-  /**
-   * the main process sends argv string here
-   */
-  setArgv(argv: string[]) {
-    this.SET_ARGV(argv);
-    this.protocolLinksService.start(argv);
-  }
+  // /**
+  //  * the main process sends argv string here
+  //  */
+  // setArgv(argv: string[]) {
+  //   this.SET_ARGV(argv);
+  //   this.protocolLinksService.start(argv);
+  // }
 
   @track('app_close')
   private shutdownHandler() {

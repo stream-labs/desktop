@@ -70,12 +70,14 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
   },
 
   OptimizeBrandDevice: {
-    isEligible: service => service.brandDeviceService.hasOptimizedSettings
+    isEligible: service => service.brandDeviceService.hasOptimizedSettings,
+    next: 'OptimizeA',
   },
 
   OptimizeA: {
     isEligible: service => {
       if (service.options.isLogin) return false;
+      if (service.completedSteps.includes('OptimizeBrandDevice')) return false;
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB'
@@ -210,11 +212,6 @@ export class OnboardingService extends StatefulService<
   }
 
   startOnboardingIfRequired() {
-
-    // TODO: remove
-    this.start();
-    return true;
-
     if (localStorage.getItem(this.localStorageKey)) {
       this.forceLoginForSecurityUpgradeIfRequired();
       return false;
