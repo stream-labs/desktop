@@ -264,7 +264,7 @@ function startApp() {
 
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
-
+    //
     // setTimeout(() => {
     //   openDevTools();
     // }, 10 * 1000);

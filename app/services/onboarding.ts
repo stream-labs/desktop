@@ -3,6 +3,7 @@ import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
 import electron from 'electron';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 type TOnboardingStep =
   | 'Connect'
@@ -10,6 +11,7 @@ type TOnboardingStep =
   | 'OptimizeA'
   | 'OptimizeB'
   | 'OptimizeC'
+  | 'OptimizeBrandDevice'
   | 'SceneCollectionsImport'
   | 'ObsImport';
 
@@ -64,7 +66,11 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'OptimizeA'
+    next: 'OptimizeBrandDevice'
+  },
+
+  OptimizeBrandDevice: {
+    isEligible: service => service.brandDeviceService.hasOptimizedSettings
   },
 
   OptimizeA: {
@@ -80,6 +86,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       return service.completedSteps.includes('OptimizeA');
     }
   }
+
 };
 
 export class OnboardingService extends StatefulService<
@@ -99,6 +106,7 @@ export class OnboardingService extends StatefulService<
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
+  @Inject() brandDeviceService: BrandDeviceService;
 
   init() {
     // This is used for faking authentication in tests.  We have
@@ -202,6 +210,11 @@ export class OnboardingService extends StatefulService<
   }
 
   startOnboardingIfRequired() {
+
+    // TODO: remove
+    this.start();
+    return true;
+
     if (localStorage.getItem(this.localStorageKey)) {
       this.forceLoginForSecurityUpgradeIfRequired();
       return false;
