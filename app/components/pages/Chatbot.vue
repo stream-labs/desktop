@@ -25,6 +25,7 @@
       </NavMenu>
     </div>
     <div v-if="authenticated" class="small-10 overflow--auto chatbot__content">
+      <ChatbotBanner />
       <transition name="fade" mode="out-in" appear>
         <ChatbotModules v-if="selectedTab === 'Modules'"/>
         <ChatbotCommands v-if="selectedTab === 'Commands'"/>

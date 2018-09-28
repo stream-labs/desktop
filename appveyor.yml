@@ -3,7 +3,6 @@ build: off
 install:
   - ps: Install-Product node 8
   - yarn install --frozen-lockfile --check-files
-  - yarn install-plugins
   - yarn compile:ci
 
 test_script:

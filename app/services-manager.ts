@@ -57,6 +57,7 @@ import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -185,6 +186,7 @@ export class ServicesManager extends Service {
     SponsorBannerService,
     SubGoalService,
     MediaGalleryService,
+    IncrementalRolloutService,
     AnnouncementsService,
     MediaShareService,
     ChatbotWidgetService

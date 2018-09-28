@@ -187,9 +187,6 @@ async function runScript() {
   info('Installing fresh packages...');
   executeCmd('yarn install');
 
-  info('Installing OBS plugins...');
-  executeCmd('yarn install-plugins');
-
   info('Compiling assets...');
   executeCmd('yarn compile:production');
 
