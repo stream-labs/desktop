@@ -40,8 +40,4 @@ export default class FFZSettings extends Vue {
   get popoutURL() {
     return `https://www.twitch.tv/popout/frankerfacez/chat?ffz-settings${this.nightMode ? '&darkpopout' : ''}`
   }
-
-  done() {
-    this.windowsService.closeChildWindow();
-  }
 }
