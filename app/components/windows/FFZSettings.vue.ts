@@ -18,7 +18,7 @@ export default class FFZSettings extends Vue {
     ffzSettings: Electron.WebviewTag
   }
 
-  nightMode: Boolean = false;
+  nightMode = false;
 
   mounted() {
     const webview = this.$refs.ffzSettings;

@@ -16,7 +16,7 @@ export default class AppearanceSettings extends Vue {
   @Inject() private windowsService: WindowsService;
 
   settingsFormData: TObsFormData = null;
-  enableFFZEmotes: Boolean = false;
+  enableFFZEmotes = false;
 
 
   created() {
