@@ -7,7 +7,6 @@
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="icon-warning" v-if="isError"><path d="M126.508,104.516,69.747,18.25a6.576,6.576,0,0,0-9.88-1.7,7.57,7.57,0,0,0-1.512,1.7L1.392,104.742a8.817,8.817,0,0,0,1.466,11.39A6.74,6.74,0,0,0,7.1,117.749l113.724-.236c3.994-.063,7.186-3.753,7.129-8.241A8.8,8.8,0,0,0,126.508,104.516ZM60.824,36.144h6.254A4.825,4.825,0,0,1,71.9,40.968V80.387a4.825,4.825,0,0,1-4.825,4.825H60.824A4.825,4.825,0,0,1,56,80.387V40.968A4.825,4.825,0,0,1,60.824,36.144ZM71.9,103.791a4.825,4.825,0,0,1-4.825,4.825H60.824A4.825,4.825,0,0,1,56,103.791V96.78a4.825,4.825,0,0,1,4.825-4.825h6.254A4.825,4.825,0,0,1,71.9,96.78Z"/></svg>
   <div v-if="isAsking" class="asking">
     <p class="caption">
-      <span>{{ $t('asking.changeLog') }}</span>
       <span class="supplement mandatory" v-if="isUnskippable">{{ $t('asking.mandatoryUpdate') }}</span>
       <span class="supplement" v-if="!isUnskippable">{{ $t('asking.skippableUpdate') }}</span>
     </p>
