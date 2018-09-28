@@ -61,7 +61,7 @@ export default class WidgetEditor extends Vue {
   ];
   currentTopTab = 'editor';
   currentCodeTab = 'HTML';
-  currentSetting = this.navItems[0].value;
+  currentSetting = this.navItems.length > 0 ? this.navItems[0].value : 'visual';
   readonly settingsState = this.widget.getSettingsService().state;
   animating = false;
 

@@ -35,7 +35,7 @@
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
-            <div class="subsection__content"><slot :name="slot.value" /></div>
+            <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
           <div class="subsection">
             <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
@@ -293,6 +293,10 @@
     overflow-y: auto;
     width: 100%;
     min-width: 260px;
+  }
+
+  .subsection__content.custom {
+    overflow: visible;
   }
 
   .source-property {
