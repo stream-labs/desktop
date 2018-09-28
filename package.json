@@ -11,7 +11,6 @@
     "compile:production": "yarn clear && webpack-cli --progress --mode production",
     "watch": "yarn clear && webpack-cli --watch --progress --mode development",
     "start": "electron .",
-    "install-plugins": "yarn install --frozen-lockfile --check-files --cwd bin && node bin/install-plugins.js",
     "clear-plugins": "shx rm -rf plugins",
     "package": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production",
     "package:preview": "shx rm -rf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"slobs-client-preview\" --config.productName=\"Streamlabs OBS Preview\" --config.appId=\"com.streamlabs.slobspreview\"",
