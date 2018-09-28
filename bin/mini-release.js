@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const OctoKit = require('@octokit/rest');
+const AWS = require('aws-sdk');
 
 let sh;
 let moment;
@@ -68,6 +69,37 @@ function checkEnv(varName) {
         sh.exit(1);
     }
 }
+
+async function uploadS3File(name, filePath) {
+    info(`Starting upload of ${name}...`);
+
+    const stream = fs.createReadStream(filePath);
+    const upload = new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: process.env.RELEASE_S3_BUCKET_NAME,
+        Key: name,
+        Body: stream
+      },
+      queueSize: 1
+    });
+
+    const bar = new ProgressBar(`${name} [:bar] :percent :etas`, {
+      total: 100,
+      clear: true
+    });
+
+    upload.on('httpUploadProgress', progress => {
+      bar.update(progress.loaded / progress.total);
+    });
+
+    try {
+      await upload.promise();
+    } catch (err) {
+      error(`Upload of ${name} failed`);
+      sh.echo(err);
+      sh.exit(1);
+    }
+  }
 
 function generateNewVersion(previousTag, now = Date.now()) {
     // previous tag should be following rule:
@@ -233,6 +265,9 @@ async function runScript() {
     checkEnv('NAIR_LICENSE_API_KEY');
     checkEnv('NAIR_GITHUB_TOKEN');
     checkEnv('SENTRY_AUTH_TOKEN');
+    checkEnv('RELEASE_S3_BUCKET_NAME');
+    checkEnv('AWS_ACCESS_KEY_ID');
+    checkEnv('AWS_SECRET_ACCESS_KEY');
 
     info(`check whether remote ${remote} exists`);
     executeCmd(`git remote get-url ${remote}`)
@@ -389,6 +424,16 @@ async function runScript() {
     }
 
     executeCmd(`ls -l ${binaryFilePath} ${blockmapFilePath} ${latestYml}`);
+
+    // upload to releases s3 bucket via aws-sdk...
+    // s3へのアップロードは外部へ即座に公開されるため、latestYmlのアップロードは最後である必要がある
+    // そうでない場合、アップロード中で存在していないファイルをlatestYmlが指す時間が発生し、
+    // electron-updaterがエラーとなってしまう可能性がある
+
+    info(`uploading artifacts to s3...`);
+    await uploadS3File(path.basename(binaryFilePath),binaryFilePath);
+    await uploadS3File(path.basename(blockmapFilePath),blockmapFilePath);
+    await uploadS3File(path.basename(latestYml),latestYml);
 
     // upload to the github directly via GitHub API...
 
