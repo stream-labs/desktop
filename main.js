@@ -261,7 +261,7 @@ function startApp() {
     // Vue dev tools appears to cause strange non-deterministic
     // interference with certain NodeJS APIs, expecially asynchronous
     // IO from the renderer process.  Enable at your own risk.
-
+    //
     // const devtoolsInstaller = require('electron-devtools-installer');
     // devtoolsInstaller.default(devtoolsInstaller.VUEJS_DEVTOOLS);
     //
