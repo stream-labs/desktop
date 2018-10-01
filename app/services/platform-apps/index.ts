@@ -336,13 +336,14 @@ export class PlatformAppsService extends
       this.REMOVE_APP(app.id);
       this.appUnload.next(app.id);
     });
+    localStorage.removeItem(this.localStorageKey);
+    // TODO: navigate to live if on that topnav tab
 
     if (this.devServer) {
       this.devServer.stopListening();
       this.devServer = null;
     }
 
-    localStorage.removeItem(this.localStorageKey);
   }
 
   async reloadApp(appId: string) {
@@ -439,20 +440,22 @@ export class PlatformAppsService extends
 
       session.webRequest.onBeforeRequest((details, cb) => {
         if (details.resourceType === 'script') {
+          console.log('got details', details);
+          console.log('GOT REQUEST', details.url);
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
           ];
+
+          const parsed = url.parse(details.url);
 
           if (scriptWhitelist.includes(details.url)) {
             cb({});
             return;
           }
 
-          const parsed = url.parse(details.url);
-
           if (parsed.host === `localhost:${DEV_PORT}`) {
-            cb({});
+            cb({});({});
             return;
           }
 
