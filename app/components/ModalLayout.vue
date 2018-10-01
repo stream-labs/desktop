@@ -84,19 +84,6 @@
   }
 }
 
-.modal--side-nav {
-  display: flex;
-  align-content: stretch;
-  align-items: stretch;
-  height: 100%;
-}
-
-.modal-container--side-nav {
-  flex-grow: 1;
-  margin: -20px -20px -20px 0;
-  overflow: auto;
-}
-
 .icon-spin {
   animation: icon-spin 2s infinite linear;
 }

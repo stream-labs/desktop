@@ -8,7 +8,7 @@
   >
     <display slot="fixed" :sourceId="sourceId" />
 
-    <div slot="content" class="modal--side-nav" data-test="SourceFilters">
+    <div slot="content" class="container" data-test="SourceFilters">
       <NavMenu v-model="selectedFilterName" class="side-menu">
         <div class="controls">
           <i
@@ -44,7 +44,7 @@
 
       </NavMenu>
 
-      <div class="modal-container--side-nav">
+      <div class="content">
         <div v-if="selectedFilterName">
           <GenericForm v-model="properties" @input="save"></GenericForm>
         </div>
@@ -58,14 +58,23 @@
 
 <script lang="ts" src="./SourceFilters.vue.ts"></script>
 
-<style scoped>
+<style lang="less" scoped>
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
-.modal-container--side-nav {
+.content {
+  flex-grow: 1;
+  overflow: auto;
   padding: 16px;
 }
 
-.modal--side-nav >>> .sl-vue-tree-toggle {
+.container {
+  display: flex;
+  align-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.side-menu > .sl-vue-tree-toggle {
   display: none;
 }
 
