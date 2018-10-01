@@ -22,7 +22,18 @@ export class FormMonkey {
 
     if (!$form) throw new Error(`form not found: ${formName}`);
 
+    $form.$$('.slobs-input').forEach($input => {
+
+      $input.getAttribute('class')
+
+      if ($input.classList.contains('text-input')) {
+
+      }
+
+    })
 
   }
 
 }
+
+
