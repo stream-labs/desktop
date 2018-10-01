@@ -1,100 +1,64 @@
 <template>
   <div>
-
-    <div v-if="customFields">
-      <div v-if="isEditMode">
-        <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
-      </div>
-      <div v-else>
-        <h-form-group
-          v-for="inputData in inputsData"
-          v-if="inputData.metadata"
-          :key="inputData.fieldName"
-          v-model="customFields[inputData.fieldName].value"
-          :metadata="inputData.metadata"
-        />
+    <div class="toolbar">
+      <i class="icon-edit" v-if="customFields && !isEditMode" @click="showJsonEditor()" v-tooltip="$t('Edit')" />
+      <i class="icon-save" v-if="isEditMode" @click="closeJsonEditor(true)" v-tooltip="$t('Save')" />
+      <i class="icon-close" v-if="isEditMode" @click="closeJsonEditor()" v-tooltip="$t('Cancel')" />
+      <div class="toggle">
+        <toggle-input :value="!!customFields" @input="toggleCustomFields()" />{{ $t('Enable Custom Fields') }}
       </div>
     </div>
-    <div v-else>
+    <div v-if="customFields && isEditMode">
+      <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
+    </div>
+    <div class="custom-fields-container" v-else-if="customFields && !isEditMode">
+      <h-form-group
+        v-for="inputData in inputsData"
+        v-if="inputData.metadata"
+        :key="inputData.fieldName"
+        v-model="customFields[inputData.fieldName].value"
+        :metadata="inputData.metadata"
+      />
+    </div>
+    <div class="custom-fields-container" v-else>
       {{ $t('No fields added')}}
     </div>
-
-    <div class="modal-layout-controls">
-
-      <button
-        class="button button--action"
-        v-if="!customFields"
-        @click="addDefaultFields()"
-      >
-        {{ $t('Add Custom Fields') }}
-      </button>
-
-      <button
-        class="button button--default left-button button--action"
-        v-if="customFields && !isEditMode"
-        @click="removeFields()"
-      >
-        {{ $t('Remove Custom Fields') }}
-      </button>
-
-      <button
-        class="button button--action"
-        v-if="customFields && !isEditMode"
-        @click="showJsonEditor()"
-      >
-        {{ $t('Update') }}
-      </button>
-
-      <button
-        class="button button--default"
-        v-if="isEditMode"
-        @click="closeJsonEditor()">
-        {{ $t('Cancel') }}
-      </button>
-
-      <button
-          class="button button--action"
-          v-if="isEditMode"
-          @click="closeJsonEditor(true)">
-        {{ $t('Save') }}
-      </button>
-    </div>
-
   </div>
 </template>
 
 <script lang="ts" src="./CustomFieldsEditor.vue.ts"></script>
-<style lang="less" scoped>
 
+<style lang="less" scoped>
   @import '../../styles/index';
 
-  .modal-layout-controls {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    background-color: @day-secondary;
-    border-top: 1px solid @day-border;
-    padding: 10px 20px;
-    text-align: right;
-    flex-shrink: 0;
-    z-index: 11;
+  .toolbar {
+    height: 32px;
+    padding-top: 8px;
+    border-bottom: 1px solid @day-border;
+    display: flex;
 
-    .button {
-      margin-left: 8px;
+    i {
+      font-size: 16px;
+      margin-left: 16px;
+
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 
-  .left-button {
-    float: left;
+  .toggle {
+    display: flex;
+    margin-left: 16px;
+  }
+
+  .custom-fields-container {
+    padding: 16px;
   }
 
   .night-theme {
-
-    .modal-layout-controls {
-      border-top-color: @night-border;
-      background-color: @night-primary;
+    .toolbar {
+      border-color: @night-slider-bg;
     }
   }
-
 </style>
