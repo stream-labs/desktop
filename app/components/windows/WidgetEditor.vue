@@ -16,7 +16,7 @@
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
-          :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]"
+          :tabs="topTabs"
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
@@ -35,7 +35,7 @@
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
-            <div class="subsection__content"><slot :name="slot.value" /></div>
+            <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
           <div class="subsection">
             <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
@@ -54,7 +54,8 @@
             <div class="subsection__content" v-if="currentSetting !== 'source'">
               <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed"/>
               <div v-else>
-                {{ $t('Failed to load settings') }}
+                <div>{{ $t('Failed to load settings') }}</div>
+                <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
               </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
@@ -64,7 +65,7 @@
         </div>
 
         <div class="code-editor" v-if="loaded">
-          <div v-if="customCodeIsEnabled">
+          <div v-if="customCodeIsEnabled && !loadingFailed">
             <tabs
               :hideConent="true"
               className="widget-editor__top-tabs"
@@ -95,6 +96,10 @@
               key="customFields"
               :value="wData"
             />
+          </div>
+          <div v-else>
+            <div>{{ $t('Failed to load settings') }}</div>
+            <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
           </div>
         </div>
 
@@ -295,6 +300,10 @@
     min-width: 260px;
   }
 
+  .subsection__content.custom {
+    overflow: visible;
+  }
+
   .source-property {
     display: flex;
   }
@@ -377,6 +386,10 @@
 
   .custom-code__alert.active {
     background-color: @teal;
+  }
+
+  .retry-button {
+    margin-top: 16px;
   }
 
   .night-theme {
