@@ -102,7 +102,6 @@ export default class WidgetEditor extends Vue {
   get windowTitle() {
     const source = this.widget.getSource();
     return $t('Settings for ') + source.name;
-
   }
 
   get sourceProperties() {
@@ -117,12 +116,22 @@ export default class WidgetEditor extends Vue {
     this.projectorService.createProjector(this.widget.previewSourceId);
   }
 
+  retryDataFetch() {
+    const service = this.widget.getSettingsService()
+    service.fetchData();
+  }
+
   onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.widget.getSource();
     source.setPropertiesFormData(
       [properties[changedIndex]]
     );
     this.properties = this.widget.getSource().getPropertiesFormData();
+  }
+
+  get topTabs() {
+    const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
+    return this.apiSettings.customCodeAllowed ? firstTab.concat([{ value: 'code', name: $t('HTML CSS') }]) : firstTab;
   }
 
   updateTopTab(value: string) {
