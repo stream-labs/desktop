@@ -216,6 +216,7 @@ export default class CustomFieldsEditor extends Vue {
 
   removeFields() {
     this.customFields = null;
+    this.isEditMode = false;
   }
 
   toggleCustomFields() {
