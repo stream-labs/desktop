@@ -219,7 +219,7 @@ async function runScript() {
     const sentryProject = 'n-air-app';
 
     const draft = true;
-    const prerelease = true;
+    const prerelease = false;
 
     const generateNoteTs = true; // generate note.ts from git logs
 
