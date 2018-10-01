@@ -20,6 +20,7 @@
     <CollapsibleSection
       class="margin--20"
       v-for="(commands, slugName, index) in commandSlugs"
+      v-if="v1CommandSlugs.indexOf(slugName) > -1"
       :title="$t(slugName)"
       :key="index"
     >
