@@ -4,6 +4,7 @@
     :show-cancel="false"
     :done-handler="done"
     :fixedSectionHeight="250"
+    bare-content
   >
     <display slot="fixed" :sourceId="sourceId" />
 

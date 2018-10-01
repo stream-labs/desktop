@@ -1,5 +1,6 @@
 <template>
 <modal-layout
+  bare-content
   :title="$t('common.settings')"
   :show-cancel="false"
   :done-handler="done">
@@ -47,18 +48,27 @@
   align-content: stretch;
   align-items: stretch;
   height: 100%;
+  overflow: hidden;
+}
+
+.side-menu {
+  overflow-y: auto;
 }
 
 .settings-container {
   flex-grow: 1;
-  margin: -20px -20px -20px 0;
-  overflow: auto;
+  margin: 0;
+  overflow-y: auto;
 }
 </style>
 
 <style lang="less">
 @import "../../styles/index";
-/*配信中に設定ダイアログへ表示するメッセージのstyle*/
+
+/*
+配信中に設定ダイアログへ表示するメッセージのstyle
+子コンポーネントのclassを直接参照しているのでscopedにできない
+*/
 .notice-section {
   padding-top: 16px;
 
