@@ -19,11 +19,20 @@
       <label>{{ $t('settings.cacheManagement')}}</label>
     </div>
     <p>{{ $t('settings.cacheClearDescription')}}</p>
+  
+    <a class="button button--action" @click="showCacheDir">
+      {{ $t('settings.showCacheDirectory')}}
+    </a>
+
+    <a class="button button--action" @click="deleteCacheDir">
+      {{ $t('settings.deleteCacheAndRestart') }}
+    </a>
+ 
+ 
     <div class="input-label">
       <label for="cacheId">{{ $t('settings.cacheId')}}</label>
     </div>
     <p>{{ $t('settings.cacheIdDescription')}}</p>
-
 
     <div class="cacheid-view">
         <label>
@@ -36,14 +45,6 @@
         <button class="cacheid-copy" @click="copyToClipboard(cacheId);"><i class="icon-clipboard-copy"/>{{ $t('settings.cacheIdCopy')}}</button>
     </div>
 
-    <a class="button button--action" @click="showCacheDir">
-      {{ $t('settings.showCacheDirectory')}}
-    </a>
-
-    <a class="button button--action" @click="deleteCacheDir">
-      {{ $t('settings.deleteCacheAndRestart') }}
-    </a>
-    
   </div>
 </div>
 </template>
