@@ -1,8 +1,8 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.1.20181001-1',
-  title: '0.1.20181001-1',
+  version: '1.0.20181001-1',
+  title: '1.0.20181001-1',
   notes: [
     '追加: アップデートが必須でない場合、スキップ可能にする (#69)',
     '追加: NDIソースのプロパティに日本語訳を追加 (#93)',
