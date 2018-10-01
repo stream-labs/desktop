@@ -4,9 +4,8 @@
       <i class="icon-edit" v-if="customFields && !isEditMode" @click="showJsonEditor()" v-tooltip="$t('Edit')" />
       <i class="icon-save" v-if="isEditMode" @click="closeJsonEditor(true)" v-tooltip="$t('Save')" />
       <i class="icon-close" v-if="isEditMode" @click="closeJsonEditor()" v-tooltip="$t('Cancel')" />
-      <div class="toggle">
-        <toggle-input :value="!!customFields" @input="toggleCustomFields()" />{{ $t('Enable Custom Fields') }}
-      </div>
+      <i class="icon-add" v-if="!customFields" @click="toggleCustomFields()" v-tooltip="$t('Add Custom Fields')" />
+      <i class="icon-trash" v-if="customFields" @click="toggleCustomFields()" v-tooltip="$t('Remove Custom Fields')" />
     </div>
     <div v-if="customFields && isEditMode">
       <code-input :metadata="{ type: 'js' }" v-model="editorInputValue"/>
@@ -45,11 +44,6 @@
         cursor: pointer;
       }
     }
-  }
-
-  .toggle {
-    display: flex;
-    margin-left: 16px;
   }
 
   .custom-fields-container {

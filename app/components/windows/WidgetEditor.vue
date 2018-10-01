@@ -94,7 +94,7 @@
               :value="wData"
             />
           </div>
-          <div v-else>
+          <div v-else style="padding: 8px;">
             <div>{{ $t('Failed to load settings') }}</div>
             <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
           </div>

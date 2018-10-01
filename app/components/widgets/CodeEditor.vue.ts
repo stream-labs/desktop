@@ -70,13 +70,6 @@ export default class CodeEditor extends Vue {
     this.isLoading = false;
   }
 
-  discardChanges() {
-    const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
-    newData.settings['custom_' + type] = this.initialInputValue;
-    this.editorInputValue = newData.settings['custom_' + this.metadata.type];
-  }
-
   restoreDefaults() {
     if (!this.hasDefaults) return;
     const type = this.metadata.type;
