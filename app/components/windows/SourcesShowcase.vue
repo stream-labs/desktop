@@ -228,9 +228,8 @@
 }
 
 .source-group {
-  border-right: 1px solid @border;
-  margin: -20px 0px -20px 0px;
-  padding: 20px 20px 20px 0;
+  margin: 0;
+  padding: 4px;
   flex: 0 0 100%;
 }
 
