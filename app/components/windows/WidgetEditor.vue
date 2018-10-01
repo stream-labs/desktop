@@ -1,8 +1,5 @@
 <template>
-<modal-layout
-  :title="windowTitle"
-  v-if="widget.previewSourceId"
->
+<modal-layout v-if="widget.previewSourceId">
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
