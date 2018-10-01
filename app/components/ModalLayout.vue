@@ -6,9 +6,7 @@
     :style="fixedStyle">
     <slot name="fixed"/>
   </div>
-  <div
-    class="modal-layout-content"
-    :style="contentStyle">
+  <div class="modal-layout-content" :class="{ bareContent }">
     <slot name="content" v-if="!loading"/>
     <i class="icon-spinner icon-spin modal-layout-spinner" v-else/>
   </div>
@@ -57,6 +55,12 @@
 .modal-layout-content {
   flex-grow: 1;
   height: 100%;
+  padding: 16px;
+  overflow: auto;
+
+  &.bareContent {
+    padding: 0;
+  }
 }
 
 .modal-layout-spinner {

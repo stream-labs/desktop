@@ -1,7 +1,7 @@
 <template>
 <modal-layout
+  bare-content
   :show-controls="false"
-  :content-styles="{ padding: 0 }"
   :title="$t('sources.addSourceTitle')">
 
   <div slot="content"
