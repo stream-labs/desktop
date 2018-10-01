@@ -76,6 +76,7 @@ export interface IWidgetsServiceApi {
 
 export interface IWidgetSettingsServiceApi {
   getApiSettings(): IWidgetApiSettings;
+  fetchData(): Promise<any>;
   saveSettings(settings: IWidgetSettings): Promise<any>;
   state: IWidgetSettingsGenericState;
 }
