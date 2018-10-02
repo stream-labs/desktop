@@ -47,6 +47,7 @@ import {
   ISongRequestPreferencesResponse,
   ISongRequestResponse
 } from './chatbot-interfaces';
+import { $t } from '../i18n';
 
 export class ChatbotApiService extends PersistentStatefulService<
   IChatbotApiServiceState
@@ -1008,6 +1009,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
+      title: $t('Media Share Preferences'),
+      preservePrevWindow: true,
       size: {
         width: 650,
         height: 500

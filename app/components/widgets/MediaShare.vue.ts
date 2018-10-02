@@ -1,4 +1,4 @@
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch, Inject } from 'vue-property-decorator';
 import {
   MediaShareService,
   IMediaShareData,
@@ -13,6 +13,7 @@ import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import { ChatbotCommonService } from 'services/chatbot';
 
 @Component({
   components: {
@@ -23,9 +24,10 @@ import { $t } from 'services/i18n';
   }
 })
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
+  @Inject() chatbotCommonService: ChatbotCommonService;
 
-  onUnbanMediaHandler(media: IMediaShareBan) {
-    this.service.unbanMedia(media);
+  openBlacklist() {
+    this.chatbotCommonService.openSongRequestPreferencesWindow();
   }
 
   pricePerSecTooltip = $t(
@@ -55,4 +57,9 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
 
   securityMeta = { description: this.securityDescription, max: 5, interval: 1 }
   bufferMeta = { tooltip: this.bufferTimeTooltip, max: 30, interval: 1 }
+
+  navItems = [
+    { value: 'media', label: $t('Manage Media Settings') },
+    { value: 'source', label: $t('Source') }
+  ]
 }
