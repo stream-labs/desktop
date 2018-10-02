@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
+import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
@@ -77,6 +78,7 @@ export function getComponents() {
   return {
     Main,
     Settings,
+    FFZSettings,
     SceneTransitions,
     SourcesShowcase,
     RenameSource,
@@ -167,7 +169,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
       componentName: 'Main',
       scaleFactor: 1,
       isShown: true,
-      title: 'Streamlabs OBS - App Developer Build 4'
+      title: 'Streamlabs OBS - App Developer Build 6'
     },
     child: {
       componentName: '',

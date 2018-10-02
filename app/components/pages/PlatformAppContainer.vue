@@ -1,7 +1,12 @@
 <template>
 <div class="platform-app-container">
-  <div class="platform-app-controls">
-    <button @click="popOut" class="button button--default" :disabled="params.poppedOut">Pop Out</button>
+  <div v-if="isPopOutAllowed" class="platform-app-controls">
+    <button
+      @click="popOut"
+      class="button button--default"
+      :disabled="params.poppedOut">
+      Pop Out
+    </button>
   </div>
   <PlatformAppWebview
     v-if="!params.poppedOut"

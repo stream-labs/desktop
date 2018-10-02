@@ -1,9 +1,9 @@
-
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation, StatefulService } from 'services/stateful-service';
 import { UserService } from 'services/user';
 import { HostsService } from './hosts';
+import Utils from 'services/utils';
 
 
 export enum EAvailableFeatures {
@@ -31,6 +31,11 @@ export class IncrementalRolloutService extends StatefulService<IIncrementalRollo
     return this.state.availableFeatures || [];
   }
 
+  featureIsEnabled(feature: EAvailableFeatures): boolean {
+    if (Utils.isDevMode() || Utils.isPreview()) return true; //always show for dev mode and preview
+
+    return this.availableFeatures.indexOf(feature) > -1;
+  }
 
   fetchAvailableFeatures() {
     if (this.userService.isLoggedIn()) {

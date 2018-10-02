@@ -27,6 +27,7 @@ export default class Dashboard extends Vue {
         getDevices: this.getDevices,
         enableMask: this.enableMask,
         updateSettings: this.updateSettings,
+        getDownloadProgress: this.getDownloadProgress
       });
     });
 
