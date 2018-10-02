@@ -10,117 +10,119 @@
       <img class="new-alert-modal__header__icon" src="../../../../../media/images/icon.ico" />
       <div class="new-alert-modal__header__title">{{ title.split('_').join(' ') }}</div>
     </div>
-    <div class="new-alert-modal__body">
-      <div v-if="isFollower">
-        <div>
-          <VFormGroup
-            :title="$t('Message')"
-            type="text"
-            v-model="newAlert.follow.newMessage.message"
-            :metadata="metadata.follow.newMessage.message"
-          />
+    <validated-form ref="form">
+      <div class="new-alert-modal__body">
+        <div v-if="isFollower">
+          <div>
+            <VFormGroup
+              :title="$t('Message')"
+              type="text"
+              v-model="newAlert.follow.newMessage.message"
+              :metadata="metadata.follow.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isSubscription">
+          <div>
+            <VFormGroup
+              :title="$t('Subscription Tier')"
+              v-model="newAlert.sub.newMessage.tier"
+              :metadata="metadata.sub.newMessage.tier"
+            />
+            <VFormGroup
+              :title="$t('Subscription Months')"
+              v-model="newAlert.sub.newMessage.amount"
+              :metadata="metadata.sub.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Subscription Message')"
+              v-model="newAlert.sub.newMessage.message"
+              :metadata="metadata.sub.newMessage.message"
+            />
+            <VFormGroup
+              :title="$t('Is Gifted')"
+              v-model="newAlert.sub.newMessage.is_gifted"
+              :metadata="metadata.sub.newMessage.is_gifted"
+            />
+          </div>
+        </div>
+        <div v-if="isDonation">
+          <div>
+            <VFormGroup
+              :title="$t('Donation Amount')"
+              v-model="newAlert.tip.newMessage.amount"
+              :metadata="metadata.tip.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Donation Message')"
+              v-model="newAlert.tip.newMessage.message"
+              :metadata="metadata.tip.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isHost">
+          <div>
+            <VFormGroup
+              :title="$t('Minimum Viewers')"
+              v-model="newAlert.host.newMessage.amount"
+              :metadata="metadata.host.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Host Message')"
+              v-model="newAlert.host.newMessage.message"
+              :metadata="metadata.host.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isRaid">
+          <div>
+            <VFormGroup
+              :title="$t('Raider Amount')"
+              v-model="newAlert.raid.newMessage.amount"
+              :metadata="metadata.raid.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Raider Message')"
+              v-model="newAlert.raid.newMessage.message"
+              :metadata="metadata.raid.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isBit">
+          <div>
+            <VFormGroup
+              :title="$t('Minimum Bits')"
+              v-model="newAlert.bits.newMessage.amount"
+              :metadata="metadata.bits.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Bit Donator Message')"
+              v-model="newAlert.bits.newMessage.message"
+              :metadata="metadata.bits.newMessage.message"
+            />
+          </div>
+        </div>
+        <div v-if="isSubMysteryGift">
+          <div>
+            <VFormGroup
+              :title="$t('Subscription Tier')"
+              v-model="newAlert.sub_mystery_gift.newMessage.tier"
+              :metadata="metadata.sub_mystery_gift.newMessage.tier"
+            />
+            <VFormGroup
+              :title="$t('Amount of Gifted Subs')"
+              v-model="newAlert.sub_mystery_gift.newMessage.amount"
+              :metadata="metadata.sub_mystery_gift.newMessage.amount"
+            />
+            <VFormGroup
+              :title="$t('Subscription Message')"
+              v-model="newAlert.sub_mystery_gift.newMessage.message"
+              :metadata="metadata.sub_mystery_gift.newMessage.message"
+            />
+          </div>
         </div>
       </div>
-      <div v-if="isSubscription">
-        <div>
-          <VFormGroup
-            :title="$t('Subscription Tier')"
-            v-model="newAlert.sub.newMessage.tier"
-            :metadata="metadata.sub.newMessage.tier"
-          />
-          <VFormGroup
-            :title="$t('Subscription Months')"
-            v-model="newAlert.sub.newMessage.amount"
-            :metadata="metadata.sub.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Subscription Message')"
-            v-model="newAlert.sub.newMessage.message"
-            :metadata="metadata.sub.newMessage.message"
-          />
-          <VFormGroup
-            :title="$t('Is Gifted')"
-            v-model="newAlert.sub.newMessage.is_gifted"
-            :metadata="metadata.sub.newMessage.is_gifted"
-          />
-        </div>
-      </div>
-      <div v-if="isDonation">
-        <div>
-          <VFormGroup
-            :title="$t('Donation Amount')"
-            v-model="newAlert.tip.newMessage.amount"
-            :metadata="metadata.tip.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Donation Message')"
-            v-model="newAlert.tip.newMessage.message"
-            :metadata="metadata.tip.newMessage.message"
-          />
-        </div>
-      </div>
-      <div v-if="isHost">
-        <div>
-          <VFormGroup
-            :title="$t('Minimum Viewers')"
-            v-model="newAlert.host.newMessage.amount"
-            :metadata="metadata.host.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Host Message')"
-            v-model="newAlert.host.newMessage.message"
-            :metadata="metadata.host.newMessage.message"
-          />
-        </div>
-      </div>
-      <div v-if="isRaid">
-        <div>
-          <VFormGroup
-            :title="$t('Raider Amount')"
-            v-model="newAlert.raid.newMessage.amount"
-            :metadata="metadata.raid.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Raider Message')"
-            v-model="newAlert.raid.newMessage.message"
-            :metadata="metadata.raid.newMessage.message"
-          />
-        </div>
-      </div>
-      <div v-if="isBit">
-        <div>
-          <VFormGroup
-            :title="$t('Minimum Bits')"
-            v-model="newAlert.bits.newMessage.amount"
-            :metadata="metadata.bits.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Bit Donator Message')"
-            v-model="newAlert.bits.newMessage.message"
-            :metadata="metadata.bits.newMessage.message"
-          />
-        </div>
-      </div>
-      <div v-if="isSubMysteryGift">
-        <div>
-          <VFormGroup
-            :title="$t('Subscription Tier')"
-            v-model="newAlert.sub_mystery_gift.newMessage.tier"
-            :metadata="metadata.sub_mystery_gift.newMessage.tier"
-          />
-          <VFormGroup
-            :title="$t('Amount of Gifted Subs')"
-            v-model="newAlert.sub_mystery_gift.newMessage.amount"
-            :metadata="metadata.sub_mystery_gift.newMessage.amount"
-          />
-          <VFormGroup
-            :title="$t('Subscription Message')"
-            v-model="newAlert.sub_mystery_gift.newMessage.message"
-            :metadata="metadata.sub_mystery_gift.newMessage.message"
-          />
-        </div>
-      </div>
-    </div>
+    </validated-form>
     <div class="new-alert-modal__controls">
       <button
         class="button button--default"
@@ -129,7 +131,6 @@
       </button>
       <button
         class="button button--action"
-        :disabled="disabledSubmit || errors.items.length > 0"
         @click="onSubmit">
         {{ $t('Done') }}
       </button>

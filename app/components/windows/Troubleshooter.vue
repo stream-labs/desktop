@@ -29,7 +29,7 @@
 
       <ul>
         <li>{{ $t('Check the health of your Internet connection') }}</li>
-        <li>{{ $t('Change your ingest server') }}Change your ingest server</li>
+        <li>{{ $t('Change your ingest server') }}</li>
         <li>{{ $t('If none of these worked, lower your bitrate') }}</li>
       </ul>
 

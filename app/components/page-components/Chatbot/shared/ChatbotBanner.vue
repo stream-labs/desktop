@@ -1,17 +1,19 @@
 <template>
-<div class="align-items--inline">
-  <ChatbotModule
-    v-for="module in modules"
-    :key="module.title"
-    :chatbotModule="module"
-  />
+<div v-if="modBannerVisible" class="mod-chat-banner flex flex--space-between">
+  <div>
+    <i class="icon-information" />
+    <span>
+      Don't forget to mod streamlabs chatbot by typing <span class="mod-chat-banner__code-highlight">/mod streamlabs</span> in your chat.
+    </span>
+  </div>
+  <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
 </div>
 </template>
 
-<script lang='ts' src="./ChatbotModTools.vue.ts"></script>
+<script lang='ts' src="./ChatbotBanner.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../styles/index";
+@import "../../../../styles/index";
 .mod-chat-banner {
   .margin();
   display: flex;

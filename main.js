@@ -270,7 +270,7 @@ function startApp() {
 
   }
 
-  getObs().IPC.ConnectOrHost("slobs" + uuid());
+  getObs().IPC.host("slobs" + uuid());
   // Initialize various OBS services
   getObs().SetWorkingDirectory(
     path.join(app.getAppPath().replace('app.asar', 'app.asar.unpacked') +
