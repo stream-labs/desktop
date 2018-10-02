@@ -64,7 +64,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   }
 
   @mutation()
-  private SET_CHANNEL_USERNAME(name: string) {
+  private SET_USERNAME(name: string) {
     this.state.auth.platform.channelId = name;
   }
 
@@ -125,7 +125,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       const userInfo = await service.fetchUserInfo();
 
       if (userInfo.username) {
-        this.SET_CHANNEL_USERNAME(userInfo.username);
+        this.SET_USERNAME(userInfo.username);
       }
     } catch (e) {
       console.error('Error fetching user info', e);
