@@ -3,6 +3,7 @@ import electron from 'electron';
 import url from 'url';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 
 function protocolHandler(base: string) {
   return (target: any, methodName: string, descriptor: PropertyDescriptor) => {
@@ -23,6 +24,7 @@ interface IProtocolLinkInfo {
 
 export class ProtocolLinksService extends Service {
   @Inject() navigationService: NavigationService;
+  @Inject() platformAppStoreService: PlatformAppStoreService;
 
   // Maps base URL components to handler function names
   private handlers: Dictionary<string>;
@@ -68,5 +70,13 @@ export class ProtocolLinksService extends Service {
         id: parts[2]
       });
     }
+  }
+
+  @protocolHandler('paypalauth')
+  private updateUserBillingInfo(info: IProtocolLinkInfo) {
+    // 1. navigate to store tab
+    // 2. trigger callback to store webview to continue checkout
+    this.navigationService.navigate('PlatformAppStore');
+    this.platformAppStoreService.paypalAuthSuccess();
   }
 }

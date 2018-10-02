@@ -6,11 +6,13 @@ import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 
 @Component({})
 export default class PlatformAppStore extends Vue {
   @Inject() userService: UserService;
   @Inject() platformAppsService: PlatformAppsService;
+  @Inject() platformAppStoreService: PlatformAppStoreService;
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
 
@@ -20,13 +22,24 @@ export default class PlatformAppStore extends Vue {
 
   mounted() {
     this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
+      this.$refs.appStoreWebview.openDevTools();
       this.guestApiService.exposeApi(
         this.$refs.appStoreWebview.getWebContents().id,
         {
-          onInstallApp: this.onInstallAppHandler
+          onInstallApp: this.onInstallAppHandler,
+          openPaypalLinkInOSBrowser: this.openPaypalLinkInOSBrowserHandler,
+          bindsPaypalSuccessCallback: this.bindsPaypalSuccessCallbackHandler,
         }
       );
     });
+  }
+
+  async bindsPaypalSuccessCallbackHandler(callback: Function) {
+    this.platformAppStoreService.bindsPaypalSuccessCallback(callback);
+  }
+
+  async openPaypalLinkInOSBrowserHandler(redirectUrl: string) {
+    electron.remote.shell.openExternal(redirectUrl);
   }
 
   async onInstallAppHandler() {
@@ -38,7 +51,6 @@ export default class PlatformAppStore extends Vue {
   }
 
   get appStoreUrl() {
-    console.log(this.userService.appStoreUrl());
     return this.userService.appStoreUrl();
   }
 }

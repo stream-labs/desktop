@@ -9,6 +9,7 @@
       ref="appStoreWebview"
       allowpopups
       webpreferences="nativeWindowOpen=yes"
+      nodeintegration
       preload="bundles/guest-api">
     </webview>
   </div>
