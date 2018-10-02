@@ -16,6 +16,7 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
+import { cd } from 'shelljs';
 
 const DEV_PORT = 8081;
 
@@ -134,6 +135,7 @@ export class PlatformAppsService extends
   appUnload = new Subject<string>();
 
   private localStorageKey = 'PlatformAppsUnpacked';
+  private baseCdnUrl = 'https://s3.amazonaws.com/streamlabs-platform';
 
   apiManager = new PlatformAppsApi();
 
@@ -183,6 +185,7 @@ export class PlatformAppsService extends
  */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
+    console.log('production apps', productionApps);
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
       this.addApp({
@@ -217,7 +220,7 @@ export class PlatformAppsService extends
     const manifest = JSON.parse(manifestData) as IAppManifest;
 
     try {
-      await this.validateManifest(manifest, appPath);
+      await this.validateManifest(manifest, appPath, true);
     } catch (e) {
       return e.message;
     }
@@ -254,7 +257,7 @@ export class PlatformAppsService extends
     this.appLoad.next(this.getApp(id));
   }
 
-  async validateManifest(manifest: IAppManifest, appPath: string) {
+  async validateManifest(manifest: IAppManifest, appPath: string, isUnpacked = true) {
     // Validate top level of the manifest
     this.validateObject(manifest, 'manifest', [
       'name',
@@ -282,7 +285,7 @@ export class PlatformAppsService extends
       ]);
 
       // Check for existence of file
-      const filePath = path.join(appPath, trim(manifest.buildPath), source.file);
+      const filePath = this.getFilePath(appPath, manifest.buildPath, source.file, isUnpacked);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
@@ -310,13 +313,20 @@ export class PlatformAppsService extends
       seenSlots[page.slot] = true;
 
       // Check for existence of file
-      const filePath = path.join(appPath, trim(manifest.buildPath), page.file);
+      const filePath = this.getFilePath(appPath, manifest.buildPath, page.file, isUnpacked);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
         throw new Error(`Missing file: manifest.pages[${i}].file does not exist. Searching at path: ${filePath}`);
       }
     }
+  }
+
+  getFilePath(appPath: string, buildPath: string, file: string, isUnpacked = false) {
+    if (isUnpacked) {
+      return path.join(appPath, trim(buildPath), file);
+    }
+    return path.join(appPath, file);
   }
 
   validateObject(obj: Dictionary<any>, objName: string, requiredFields: string[]) {
@@ -367,7 +377,7 @@ export class PlatformAppsService extends
     const manifest = JSON.parse(await this.loadManifestFromDisk(manifestPath));
 
     try {
-      await this.validateManifest(manifest, app.appPath);
+      await this.validateManifest(manifest, app.appPath, app.unpacked);
     } catch (e) {
       this.unloadApps();
       return e.message;
@@ -437,12 +447,14 @@ export class PlatformAppsService extends
   getAppPartition(appId: string) {
     const partition = `persist:platformApp-${appId}`;
 
+    console.log(partition);
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
       const frameUrls: string[] = [];
       let mainFrame = '';
 
       session.webRequest.onBeforeRequest((details, cb) => {
+        console.log('GOT SCRIPT REQUEST', details.url);
         const parsed = url.parse(details.url);
 
         if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
@@ -468,8 +480,7 @@ export class PlatformAppsService extends
         }
 
         if (details.resourceType === 'script') {
-          console.log('got details', details);
-          console.log('GOT REQUEST', details.url);
+          // for cdn scripts, resourceType is other
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
@@ -477,7 +488,13 @@ export class PlatformAppsService extends
 
           const parsed = url.parse(details.url);
 
+
           if (scriptWhitelist.includes(details.url)) {
+            cb({});
+            return;
+          }
+
+          if (details.url.includes(this.baseCdnUrl)) {
             cb({});
             return;
           }
@@ -492,7 +509,6 @@ export class PlatformAppsService extends
             cb({});
             return;
           }
-
           // Cancel all other script requests.
           // TODO: Handle production apps
           console.log('canceling', details);
@@ -513,6 +529,8 @@ export class PlatformAppsService extends
   getPageUrlForSlot(appId: string, slot: EAppPageSlot) {
     const app = this.getApp(appId);
     const page = app.manifest.pages.find(page => page.slot === slot);
+    if (!page) return null;
+
     return this.getPageUrl(appId, page.file);
   }
 
@@ -545,11 +563,11 @@ export class PlatformAppsService extends
     const app = this.getApp(appId);
     let url: string;
 
-    const trimmed = trim(app.manifest.buildPath, '/ ');
     if (app.unpacked) {
+      const trimmed = trim(app.manifest.buildPath, '/ ');
       url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
     } else {
-      url = compact([app.appUrl, trimmed, asset]).join('/');
+      url = compact([app.appUrl, asset]).join('/');
     }
 
     return url;
