@@ -7,6 +7,7 @@ import { I18nService } from 'services/i18n';
 import electron from 'electron';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 import { PlatformAppStoreService } from 'services/platform-app-store';
+import Utils from 'services/utils';
 
 @Component({})
 export default class PlatformAppStore extends Vue {
@@ -22,7 +23,9 @@ export default class PlatformAppStore extends Vue {
 
   mounted() {
     this.$refs.appStoreWebview.addEventListener('dom-ready', () => {
-      this.$refs.appStoreWebview.openDevTools();
+      if (Utils.isDevMode()) {
+        this.$refs.appStoreWebview.openDevTools();
+      }
       this.guestApiService.exposeApi(
         this.$refs.appStoreWebview.getWebContents().id,
         {
