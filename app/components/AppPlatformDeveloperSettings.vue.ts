@@ -36,7 +36,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
   get currentlyLoadedUnpackedApp() {
     if (this.platformAppsService.state.loadedApps.length === 0) return null;
 
-    return this.platformAppsService.state.loadedApps[0];
+    return this.platformAppsService.state.loadedApps.find(app => app.unpacked);
   }
 
   loading = false;

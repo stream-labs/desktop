@@ -75,19 +75,44 @@ interface IAppManifest {
   authorizationUrls: string[];
 }
 
+interface IProductionAppResponse {
+  app_token: string;
+  cdn_url: string;
+  description: string;
+  icon: string;
+  id_hash: string;
+  is_beta: boolean;
+  manifest: IAppManifest;
+  name: string;
+  screenshots: string[];
+  subscription: ISubscriptionResponse;
+  version: string;
+}
+
 export interface ILoadedApp {
   id: string;
   manifest: IAppManifest;
   unpacked: boolean;
-  appPath?: string; // The path on disk to the app if unpacked
   appToken: string;
-  devPort?: number; // The port the dev server is running on if unpacked
   poppedOutSlots: EAppPageSlot[];
+  appPath?: string;
+  appUrl?: string;
+  devPort?: number;
 }
 
 interface IPlatformAppServiceState {
   devMode: boolean;
   loadedApps: ILoadedApp[];
+}
+
+interface ISubscriptionResponse {
+  id: number;
+  user_id: number;
+  app_id: number;
+  subscription_id: string;
+  status: string;
+  plan_id: number;
+  expires_at: string;
 }
 
 export class PlatformAppsService extends
@@ -127,6 +152,8 @@ export class PlatformAppsService extends
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 
+    this.installProductionApps();
+
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
@@ -134,6 +161,39 @@ export class PlatformAppsService extends
         this.installUnpackedApp(data.appPath, data.appToken);
       }
     }
+  }
+
+  /**
+   * Get production apps
+   */
+  async fetchProductionApps(): Promise<IProductionAppResponse[]> {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(
+      `https://${this.hostsService.platform}/api/v1/sdk/installed_apps`,
+      { headers }
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json())
+  }
+
+  /**
+ * Install production apps
+ */
+  async installProductionApps() {
+    const productionApps = await this.fetchProductionApps();
+    productionApps.forEach(app => {
+      if (app.is_beta && !app.manifest) return;
+      this.addApp({
+        id: app.id_hash,
+        manifest: app.manifest,
+        unpacked: false,
+        appUrl: app.cdn_url,
+        appToken: app.app_token,
+        poppedOutSlots: []
+      });
+    });
   }
 
   /**
@@ -170,7 +230,7 @@ export class PlatformAppsService extends
 
     this.devServer = new DevServer(appPath, DEV_PORT);
 
-    this.ADD_APP({
+    this.addApp({
       id,
       manifest,
       unpacked: true,
@@ -179,9 +239,18 @@ export class PlatformAppsService extends
       devPort: DEV_PORT,
       poppedOutSlots: []
     });
-    localStorage.setItem(this.localStorageKey, JSON.stringify({
-      appPath, appToken
-    }));
+  }
+
+  addApp(app: ILoadedApp) {
+    const { id, appToken } = app;
+    this.ADD_APP(app);
+    if (app.unpacked && app.appPath) {
+      // store app in local storage
+      localStorage.setItem(this.localStorageKey, JSON.stringify({
+        appPath: app.appPath,
+        appToken
+      }));
+    }
     this.appLoad.next(this.getApp(id));
   }
 
@@ -269,18 +338,25 @@ export class PlatformAppsService extends
       this.REMOVE_APP(app.id);
       this.appUnload.next(app.id);
     });
+    localStorage.removeItem(this.localStorageKey);
+    // TODO: navigate to live if on that topnav tab
 
     if (this.devServer) {
       this.devServer.stopListening();
       this.devServer = null;
     }
 
-    localStorage.removeItem(this.localStorageKey);
   }
 
   async reloadApp(appId: string) {
     // TODO Support Multiple Apps
     const app = this.getApp(appId);
+    if (app.unpacked === true) {
+      console.log(app.appPath);
+    } else {
+      console.log(app.appUrl);
+    }
+
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
@@ -392,10 +468,14 @@ export class PlatformAppsService extends
         }
 
         if (details.resourceType === 'script') {
+          console.log('got details', details);
+          console.log('GOT REQUEST', details.url);
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
           ];
+
+          const parsed = url.parse(details.url);
 
           if (scriptWhitelist.includes(details.url)) {
             cb({});
@@ -403,7 +483,7 @@ export class PlatformAppsService extends
           }
 
           if (parsed.host === `localhost:${DEV_PORT}`) {
-            cb({});
+            cb({});({});
             return;
           }
 
@@ -465,12 +545,11 @@ export class PlatformAppsService extends
     const app = this.getApp(appId);
     let url: string;
 
+    const trimmed = trim(app.manifest.buildPath, '/ ');
     if (app.unpacked) {
-      const trimmed = trim(app.manifest.buildPath, '/ ');
-
       url = compact([`http://localhost:${app.devPort}`, trimmed, asset]).join('/');
     } else {
-      // TODO
+      url = compact([app.appUrl, trimmed, asset]).join('/');
     }
 
     return url;
@@ -498,7 +577,7 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
-  getApp(appId: string) {
+  getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
 
@@ -534,7 +613,7 @@ export class PlatformAppsService extends
    */
   @mutation()
   private ADD_APP(app: ILoadedApp) {
-    this.state.loadedApps = [app];
+    this.state.loadedApps.push(app);
   }
 
   @mutation()
