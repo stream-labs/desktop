@@ -363,8 +363,34 @@ export class PlatformAppsService extends
 
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
+      const frameUrls: string[] = [];
+      let mainFrame = '';
 
       session.webRequest.onBeforeRequest((details, cb) => {
+        const parsed = url.parse(details.url);
+
+        if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
+
+        if ((parsed.hostname === 'cvp.twitch.tv') && (details.resourceType = 'script')) {
+          cb({});
+          return;
+        }
+
+        if (details.resourceType === 'subFrame') {
+          // Subframes from other origins are allowed to load scripts.  The same origin
+          // policy will prevent them from accessing the parent window.
+          if (parsed.hostname !== mainFrame) {
+            frameUrls.push(details.url);
+            cb({});
+            return;
+          }
+        }
+
+        if (details['referrer'] && frameUrls.includes(details['referrer'])) {
+          cb({});
+          return;
+        }
+
         if (details.resourceType === 'script') {
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
@@ -375,8 +401,6 @@ export class PlatformAppsService extends
             cb({});
             return;
           }
-
-          const parsed = url.parse(details.url);
 
           if (parsed.host === `localhost:${DEV_PORT}`) {
             cb({});
@@ -391,7 +415,7 @@ export class PlatformAppsService extends
 
           // Cancel all other script requests.
           // TODO: Handle production apps
-          console.log('canceling', parsed);
+          console.log('canceling', details);
           cb({ cancel: true });
           return;
         }
