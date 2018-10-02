@@ -1,54 +1,32 @@
 <template>
-<widget-window v-if="wData" :requestState="requestState" :loaded="loaded" ref="layout" v-model="tabName">
+<widget-editor :slots="[{ value: 'banlist', label: $t('Banned Media') }]" :navItems="navItems" v-if="wData">
 
-  <div slot="settings" >
-    <h-form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
+  <div slot="banlist">
+    <button
+      @click="openBlacklist()"
+      class="button button--action banned-media-button"
+    >
+      {{ $t('Check Banned Media') }}
+    </button>
+  </div>
+
+  <div slot="media-properties" >
+    <v-form-group :title="$t('Price Per Second')" :metadata="{ tooltip: pricePerSecTooltip }">
       <number-input v-model="wData.settings.price_per_second" />
       <span>{{ $t('USD') }}</span>
-    </h-form-group>
-    <h-form-group :title="$t('Min. Amount to Share')" :metadata="{ tooltip: minAmountTooltip }">
+    </v-form-group>
+    <v-form-group :title="$t('Min. Amount to Share')" :metadata="{ tooltip: minAmountTooltip }">
       <number-input v-model="wData.settings.min_amount_to_share" />
       <span>{{ $t('USD') }}</span>
-    </h-form-group>
-    <h-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
+    </v-form-group>
+    <v-form-group :title="$t('Max Duration')" :metadata="{ tooltip: maxDurationTooltip }">
       <number-input v-model="wData.settings.max_duration" />
       <span>{{ $t('seconds') }}</span>
-    </h-form-group>
-    <h-form-group :title="$t('Buffer Time')" type="slider" v-model="wData.settings.buffer_time" :metadata="bufferMeta" />
-    <h-form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
+    </v-form-group>
+    <v-form-group :title="$t('Buffer Time')" type="slider" v-model="wData.settings.buffer_time" :metadata="bufferMeta" />
+    <v-form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
   </div>
-  <div slot="banned_media">
-    <table v-if="wData.banned_media && wData.banned_media.length > 0">
-      <thead>
-        <tr>
-          <th> {{ $t('Video') }} </th>
-          <th> {{ $t('Banned By') }} </th>
-          <th> {{ $t('Unban') }} </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="media in wData.banned_media"
-          :key="media.id"
-        >
-          <td> {{ media.media_title }} </td>
-          <td> {{ media.action_by }} </td>
-          <td>
-            <button
-              @click="onUnbanMediaHandler(media)"
-              class="button button--default"
-            >{{ $t('Unban') }}</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-else class="media-share-placeholder">
-      <img class="media-share-placeholder__img media-share-placeholder__img--day" src="../../../media/images/sleeping-kevin-day.png">
-      <img class="media-share-placeholder__img media-share-placeholder__img--night" src="../../../media/images/sleeping-kevin-night.png">
-      <span>{{ $t("You have not banned any media yet.") }}</span>
-    </div>
-  </div>
-</widget-window>
+</widget-editor>
 
 </template>
 
@@ -88,5 +66,8 @@
   }
 }
 
-
+.banned-media-button {
+  display: block;
+  margin: 0 auto;
+}
 </style>

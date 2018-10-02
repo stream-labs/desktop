@@ -3,29 +3,32 @@ import {
   MediaShareService,
   IMediaShareData,
   IMediaShareBan
-} from 'services/widget-settings/media-share';
+} from 'services/widgets/settings/media-share';
+import { Inject } from '../../util/injector';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
+import { ChatbotCommonService } from 'services/chatbot';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     CodeEditor,
     ...inputComponents
   }
 })
 export default class MediaShare extends WidgetSettings<IMediaShareData, MediaShareService> {
+  @Inject() chatbotCommonService: ChatbotCommonService;
 
-  onUnbanMediaHandler(media: IMediaShareBan) {
-    this.service.unbanMedia(media);
+  openBlacklist() {
+    this.chatbotCommonService.openSongRequestPreferencesWindow();
   }
 
   pricePerSecTooltip = $t(
@@ -55,4 +58,9 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
 
   securityMeta = { description: this.securityDescription, max: 5, interval: 1 }
   bufferMeta = { tooltip: this.bufferTimeTooltip, max: 30, interval: 1 }
+
+  navItems = [
+    { value: 'media', label: $t('Manage Media Settings') },
+    { value: 'source', label: $t('Source') }
+  ]
 }

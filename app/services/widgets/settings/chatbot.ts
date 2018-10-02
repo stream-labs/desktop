@@ -1,4 +1,4 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
 import { clone } from 'lodash';
 import { $t } from 'services/i18n';
@@ -8,6 +8,20 @@ export interface IMediaShareData extends IWidgetData {
 
 export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData> {
 
+  getApiSettings() {
+    return {
+      type: WidgetType.MediaShare,
+      url: `https://${this.getHost()}/widgets/chatbot?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/chatbot?token=${this.getWidgetToken()}`,
+      settingsUpdateEvent: 'mediaShareSettingsUpdate',
+      goalCreateEvent: 'newmediaShare',
+      goalResetEvent: 'mediaShareEnd',
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      customCodeAllowed: true,
+      customFieldsAllowed: true
+    }
+  }
   getWidgetType() {
     return WidgetType.MediaShare;
   }
@@ -26,6 +40,5 @@ export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData>
     return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
 
-  protected tabs: any[] = [];
 
 }

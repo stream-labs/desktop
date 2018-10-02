@@ -9,7 +9,7 @@ import {
   MediaShareService,
   IMediaShareData,
   IMediaShareBan
-} from 'services/widget-settings/media-share';
+} from 'services/widgets/settings/media-share';
 import io from 'socket.io-client';
 
 import {
@@ -47,6 +47,7 @@ import {
   ISongRequestPreferencesResponse,
   ISongRequestResponse
 } from './chatbot-interfaces';
+import { $t } from '../i18n';
 
 export class ChatbotApiService extends PersistentStatefulService<
   IChatbotApiServiceState
@@ -686,7 +687,7 @@ export class ChatbotApiService extends PersistentStatefulService<
 
   updateSongRequestPreferencesData(data: any) {
     // NOTE: should update type
-    this.mediaShareService.saveData(data.settings);
+    this.mediaShareService.saveSettings(data.settings);
   }
 
   updateSongRequest(data: ISongRequestResponse) {
@@ -1008,6 +1009,8 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
+      title: $t('Media Share Preferences'),
+      preservePrevWindow: true,
       size: {
         width: 650,
         height: 500

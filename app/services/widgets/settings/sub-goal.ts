@@ -1,36 +1,28 @@
 import { GenericGoalService } from './generic-goal';
 import { WidgetType } from 'services/widgets';
-import { CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS } from './widget-settings';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
-
+@InheritMutations()
 export class SubGoalService extends GenericGoalService {
 
-  getWidgetType() {
-    return WidgetType.SubGoal;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  protected tabs = [
-    {
-      name: 'goal',
-      saveUrl: `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/subgoal`,
-      autosave: false
-    },
-    {
-      name: 'settings',
-    },
-    ...CODE_EDITOR_WITH_CUSTOM_FIELDS_TABS
-  ];
-
-  getVersion() {
-    return 5;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/subgoal/settings`;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/sub-goal?token=${this.getWidgetToken()}`;
+  getApiSettings() {
+    return {
+      type: WidgetType.SubGoal,
+      url: `https://${this.getHost()}/widgets/sub-goal?token=${this.getWidgetToken()}`,
+      dataFetchUrl: `https://${this.getHost()}/api/v5/slobs/widget/subgoal/settings`,
+      previewUrl: `https://${this.getHost()}/widgets/sub-goal?token=${this.getWidgetToken()}`,
+      settingsSaveUrl: `https://${this.getHost()}/api/v5/slobs/widget/subgoal/settings`,
+      goalUrl: `https://${this.getHost()}/api/v5/slobs/widget/subgoal`,
+      settingsUpdateEvent: 'subGoalSettingsUpdate',
+      goalCreateEvent: 'subGoalStart',
+      goalResetEvent: 'subGoalEnd',
+      hasTestButtons: true,
+      customCodeAllowed: true,
+      customFieldsAllowed: true
+    }
   }
 
 }

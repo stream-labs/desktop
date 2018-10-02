@@ -6,7 +6,7 @@ import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { cloneDeep } from 'lodash';
 import {
   IMediaShareBan
-} from 'services/widget-settings/media-share';
+} from 'services/widgets/settings/media-share';
 import {
   EInputType,
 } from 'components/shared/inputs/index';
