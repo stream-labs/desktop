@@ -4,7 +4,7 @@
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
       <div v-if="apiSettings.testers" class="button button--action test-button">
-        <test-widgets />
+        <test-widgets :testers="apiSettings.testers" />
       </div>
     </div>
 
