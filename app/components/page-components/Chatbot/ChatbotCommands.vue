@@ -1,5 +1,5 @@
 <template>
-<div class="height--100">
+<div>
   <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
     <div slot='custom'>
       <transition name="fade" mode="out-in" appear>

@@ -11,7 +11,7 @@ import {
   ISymbolProtectionData,
   ILinkProtectionData,
   IWordProtectionData,
-  ChatbotSettingSlugs,
+  ChatbotSettingSlug,
 } from 'services/chatbot';
 
 import {
@@ -158,7 +158,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Punishment Duration (Value in Minutes)'),
+          placeholder: $t('Punishment Duration (Value in Seconds)'),
           min: 0
         }
       },
@@ -166,7 +166,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: $t('Permission Duration (Value in Minutes)'),
+          placeholder: $t('Permission Duration (Value in Seconds)'),
         }
       },
       excluded: {
@@ -267,7 +267,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
         duration: {
           required: true,
           type: EInputType.number,
-          placeholder: 'Punishment Duration (Value in Minutes)',
+          placeholder: 'Punishment Duration (Value in Seconds)',
           min: 0
         }
       }
@@ -307,11 +307,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return metadata;
   }
 
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
-  }
-
-  onResetSlugHandler(slug: ChatbotSettingSlugs) {
+  onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
       this.chatbotApiService.resetSettings(slug)
         .then((response: (
