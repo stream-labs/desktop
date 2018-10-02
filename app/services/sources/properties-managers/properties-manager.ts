@@ -50,7 +50,7 @@ export abstract class PropertiesManager implements IPropertyManager {
    * Will be true when the manager has been destroyed.  This should
    * be checked before accessing the obsInput reference.
    */
-  destroyed = false;
+  protected destroyed = false;
 
 
   /**
