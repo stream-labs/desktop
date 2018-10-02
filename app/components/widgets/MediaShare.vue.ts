@@ -1,15 +1,16 @@
-import { Component, Prop, Watch, Inject } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   MediaShareService,
   IMediaShareData,
   IMediaShareBan
 } from 'services/widgets/settings/media-share';
+import { Inject } from '../../util/injector';
 
 import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
@@ -18,7 +19,7 @@ import { ChatbotCommonService } from 'services/chatbot';
 @Component({
   components: {
     WidgetEditor,
-    HFormGroup,
+    VFormGroup,
     CodeEditor,
     ...inputComponents
   }

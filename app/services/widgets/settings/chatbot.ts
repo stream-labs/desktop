@@ -16,9 +16,8 @@ export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData>
       settingsUpdateEvent: 'mediaShareSettingsUpdate',
       goalCreateEvent: 'newmediaShare',
       goalResetEvent: 'mediaShareEnd',
-      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media/settings`,
-      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media/settings`,
-      goalUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
       customCodeAllowed: true,
       customFieldsAllowed: true
     }

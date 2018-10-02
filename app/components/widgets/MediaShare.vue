@@ -1,8 +1,13 @@
 <template>
-<widget-editor :slots="[{ value: 'banlist', label: $t('Banned Media') }]" :navItems="navItems">
+<widget-editor :slots="[{ value: 'banlist', label: $t('Banned Media') }]" :navItems="navItems" v-if="wData">
 
   <div slot="banlist">
-    <button @click="openBlacklist()" class="button button--active">{{ $t('Check Banned Media') }}</button>
+    <button
+      @click="openBlacklist()"
+      class="button button--action banned-media-button"
+    >
+      {{ $t('Check Banned Media') }}
+    </button>
   </div>
 
   <div slot="media-properties" >
@@ -61,5 +66,8 @@
   }
 }
 
-
+.banned-media-button {
+  display: block;
+  margin: 0 auto;
+}
 </style>
