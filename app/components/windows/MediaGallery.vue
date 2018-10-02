@@ -11,16 +11,16 @@
           <div class="dropzone" @click="openFilePicker">
             <i class="icon-cloud-backup"></i>{{ $t('Drag & Drop Upload') }}
           </div>
-          <ul v-for="(category) in ['uploads', 'stock']" :key="category" class="nav-list">
+          <ul v-for="(cat) in ['uploads', 'stock']" :key="cat" class="nav-list">
             <div>
-              <div class="bold">{{ category === 'stock' ? $t('Stock Files') : $t('My Uploads') }}</div>
-              <li class="list__item" @click="handleTypeFilter(null, category)">
+              <div class="list__title">{{ cat === 'stock' ? $t('Stock Files') : $t('My Uploads') }}</div>
+              <li class="list__item" :class="{ active: type === null && cat === category }" @click="handleTypeFilter(null, cat)">
                 <i class="fa fa-file"></i>{{ $t('All Files') }}
               </li>
-              <li class="list__item" @click="handleTypeFilter('image', category)">
+              <li class="list__item" :class="{ active: type === 'image' && cat === category }" @click="handleTypeFilter('image', cat)">
                 <i class="icon-image"></i>{{ $t('Images') }}
               </li>
-              <li class="list__item" @click="handleTypeFilter('audio', category)">
+              <li class="list__item" :class="{ active: type === 'audio' && cat === category }" @click="handleTypeFilter('audio', cat)">
                 <i class="icon-music"></i>{{ $t('Sounds') }}
               </li>
             </div>
@@ -101,7 +101,7 @@
   font-size: 16px;
   letter-spacing: 0;
   margin-bottom: 30px;
-  color: @white;
+  color: @day-title;
 }
 
 .left-panel {
@@ -134,9 +134,14 @@
   margin-left: 0;
 }
 
+.list__title {
+  padding: 0;
+  .weight(@bold);
+}
+
 .list__item {
-  padding: 3px 0;
-  color: @white;
+  padding: 3px 8px;
+  color: @day-paragraph;
   .weight(@medium);
 
   i {
@@ -149,17 +154,21 @@
   }
 }
 
+.list__item.active {
+  background-color: @teal-light-opac;
+}
+
 .progress-slider {
   position: relative;
   width: 100%;
   height: 6px;
   margin-bottom: 0;
   margin-top: 6px;
-  background-color: @night-slider-bg;
+  background-color: @slider-background-color;
 }
 
 .progress-slider__fill {
-  background-color: @night-text;
+  background-color: @day-paragraph;
   height: 6px;
   position: absolute;
   top: 0;
@@ -172,10 +181,10 @@
 }
 
 .toolbar {
-  border: 1px solid @night-accent-light;
+  border: 1px solid @teal-light-opac;
   .padding();
   .radius;
-  background: @night-secondary;
+  background: @day-secondary;
   width: 100%;
 
   i {
@@ -234,7 +243,7 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  border: 1px solid @night-secondary;
+  border: 1px solid @day-secondary;
   background: @day-shadow;
   z-index: 99999;
   .radius;
@@ -262,7 +271,7 @@
 }
 
 .uploads-manager__item {
-  border: 1px solid @night-border;
+  border: 1px solid @day-border;
   width: 23%;
   margin: 0 14px 14px 0;
   height: 170px;
@@ -315,6 +324,34 @@
     .upload__size {
       color: @grey;
     }
+  }
+}
+
+.night-theme {
+  .uploads-manager__item {
+    border-color: @night-border;
+  }
+  .busy-overlay {
+    border-color: @night-secondary;
+  }
+  .toolbar {
+    background-color: @night-secondary;
+    border-color: @night-accent-light;
+  }
+  .progress-slider__fill {
+    background-color: @night-text;
+  }
+  .progress-slider {
+    background-color: @night-slider-bg;
+  }
+  .list__item.active {
+    background-color: @night-secondary;
+  }
+  .list__item {
+    color: @white;
+  }
+  .header {
+    color: @white;
   }
 }
 </style>

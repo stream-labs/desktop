@@ -5,7 +5,8 @@ import {
   IInputMetadata,
   ITextMetadata,
   IListMetadata,
-  INumberMetadata
+  INumberMetadata,
+  EInputType
 } from 'components/shared/inputs/index';
 
 import {
@@ -48,21 +49,25 @@ export default class ChatbotLinkProtectionList extends ChatbotBase {
     } = {
       text: {
         required: true,
+        type: EInputType.text,
         placeholder: 'Add a link to add to list'
       },
       punishment: {
         duration: {
+          type: EInputType.number,
           required: true,
-          placeholder: 'Punishment Duration (Value in Minutes)',
+          placeholder: 'Punishment Duration (Value in Seconds)',
           min: 0
         },
         type: {
           required: true,
+          type: EInputType.list,
           options: this.chatbotPunishments
         }
       },
       is_regex: {
         required: true,
+        type: EInputType.bool,
         title: 'This word / phrase contains a regular expression.'
       }
     };

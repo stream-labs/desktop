@@ -51,7 +51,7 @@
           <td> {{ quote.message }} </td>
           <td> {{ quote.added_by }} </td>
           <td> {{ quote.game }} </td>
-          <td> {{ quote.created_at || '-' }} </td>
+          <td> {{ formatDate(quote.created_at) || '-' }} </td>
           <td>
             <div class="align-items--inline">
               <i @click="onOpenQuoteWindowHandler(quote)" class="icon-edit padding--5"/>
@@ -84,12 +84,6 @@
 }
 
 tbody tr {
-  .transition;
-  .cursor--pointer;
-
-  td {
-    color: black;
-  }
 
   td:nth-child(2) {
     width: 300px;
@@ -99,16 +93,12 @@ tbody tr {
     .align-items--inline;
     .text-align--right;
     padding-right: 10px;
-
-    .icon-edit {
-      font-size: 10px;
-      .transition;
-
-      &:hover {
-        color: @teal;
-      }
-    }
   }
+}
+
+.icon-edit,
+.icon-trash {
+  .icon-hover();
 }
 
 .chatbot-timers__timer-actions__container {
@@ -129,22 +119,9 @@ tbody tr {
 
 
 .night-theme {
-  td {
-    .transition;
-    color: white;
-  }
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    color: white;
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
+  .icon-edit,
+  .icon-trash {
+    .night-icon-hover();
   }
 }
 </style>

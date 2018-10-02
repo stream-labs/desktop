@@ -25,6 +25,9 @@ interface IDonationSocketEvent {
   message: {
     name: string;
     amount: string;
+    formattedAmount: string;
+    facemask: string;
+    message: string;
   }[];
 }
 
@@ -32,7 +35,7 @@ interface IFacemaskSocketEvent {
   type: 'facemask';
   message: {
     name: string;
-    amount: string;
+    formattedAmount: string;
     facemask: string;
     message: string;
   }[];

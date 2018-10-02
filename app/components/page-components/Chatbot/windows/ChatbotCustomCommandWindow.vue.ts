@@ -111,7 +111,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   get cooldownsMetadata() {
     let timerMetadata: INumberMetadata = {
       type: EInputType.number,
-      placeholder: $t('Cooldown (Value in Minutes)'),
+      placeholder: $t('Cooldown (Value in Seconds)'),
       min: 0
     };
     return timerMetadata;
@@ -119,10 +119,6 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
-  }
-
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
   }
 
   async onSaveHandler() {

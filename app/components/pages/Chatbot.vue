@@ -3,7 +3,7 @@
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span>
-          {{ $t(`Chatbot ${globallyEnabled ? 'Enabled' : 'Disabled'}`) }}
+          {{ globallyEnabled ? $t('Chatbot Enabled') : $t('Chatbot Disabled') }}
         </span>
         <ToggleInput
           :value="globallyEnabled"
@@ -17,7 +17,7 @@
           :to="tab.title"
           :ico="icons[tab.title]"
           :enabled="tab.enabled"
-          class="padding--10 text-transform--capitalize chatbot__side-menu__tab"
+          class="padding--10 text-transform chatbot__side-menu__tab"
         >
           <div>{{ $t(tab.title) }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
@@ -25,12 +25,14 @@
       </NavMenu>
     </div>
     <div v-if="authenticated" class="small-10 overflow--auto chatbot__content">
+      <ChatbotBanner />
       <transition name="fade" mode="out-in" appear>
         <ChatbotModules v-if="selectedTab === 'Modules'"/>
         <ChatbotCommands v-if="selectedTab === 'Commands'"/>
         <ChatbotTimers v-if="selectedTab === 'Timers'"/>
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
         <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
+        <ChatbotQueue v-if="selectedTab === 'Queue'"/>
       </transition>
     </div>
   </div>
@@ -43,10 +45,10 @@
 
 
 .chatbot__content {
-  width: calc(~"100% - 250px");
+  width: calc(~"100% - 200px");
 }
 .chatbot__side-menu {
-  width: 250px;
+  width: 200px;
   background: @day-secondary;
   border-right: 1px solid @day-border;
 

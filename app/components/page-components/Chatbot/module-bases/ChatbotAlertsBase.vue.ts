@@ -4,7 +4,7 @@ import ChatbotWindowsBase from 'components/page-components/Chatbot/windows/Chatb
 import {
   IChatAlertsResponse,
   IAlertMessage,
-  ChatbotAlertTypes,
+  ChatbotAlertType,
   NEW_ALERT_MODAL_ID
 } from 'services/chatbot';
 
@@ -27,7 +27,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
     return alertTypes;
   }
 
-  platformForAlertType(type: ChatbotAlertTypes) {
+  platformForAlertType(type: ChatbotAlertType) {
     if (type === 'tip') return 'streamlabs';
     return 'twitch';
   }
@@ -36,7 +36,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // update/delete alert
   async spliceAlertMessages(
-    type: ChatbotAlertTypes,
+    type: ChatbotAlertType,
     index: number,
     updatedAlert: IAlertMessage,
     tier?: string
@@ -58,7 +58,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // toggle enable type
-  async onToggleEnableAlertHandler(type: ChatbotAlertTypes) {
+  async onToggleEnableAlertHandler(type: ChatbotAlertType) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
@@ -69,7 +69,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   // add new alert
-  async addNewAlert(type: ChatbotAlertTypes, newAlert: any) {
+  async addNewAlert(type: ChatbotAlertType, newAlert: IAlertMessage) {
     const newAlertsObject: IChatAlertsResponse = cloneDeep(this.chatAlerts);
     const platform = this.platformForAlertType(type);
 
