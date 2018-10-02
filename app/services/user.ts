@@ -8,6 +8,7 @@ import { mutation } from 'services/stateful-service';
 import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -40,6 +41,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private onboardingService: OnboardingService;
   @Inject() private navigationService: NavigationService;
   @Inject() private chatbotApiService: ChatbotApiService;
+  @Inject() private incrementalRolloutService: IncrementalRolloutService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -67,6 +69,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     super.init();
     this.setRavenContext();
     this.validateLogin();
+    this.incrementalRolloutService.fetchAvailableFeatures();
   }
 
   mounted() {

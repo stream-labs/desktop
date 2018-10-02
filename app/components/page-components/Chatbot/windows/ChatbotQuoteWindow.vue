@@ -2,7 +2,7 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t(`${isEdit ? 'Edit' : 'Add'} Quote`)"
+  :title="isEdit ? $t('Edit Quote') : $t('Add Quote')"
 >
   <div slot="content">
     <validated-form ref="form">

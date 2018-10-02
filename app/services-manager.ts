@@ -58,6 +58,7 @@ import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -91,6 +92,9 @@ import { CreditsService } from 'services/widget-settings/credits';
 import { EventListService } from 'services/widget-settings/event-list';
 import { TipJarService } from 'services/widget-settings/tip-jar';
 import { SponsorBannerService } from 'services/widget-settings/sponsor-banner';
+import { SubGoalService } from 'services/widget-settings/sub-goal';
+import { MediaShareService } from 'services/widget-settings/media-share';
+import { ChatbotWidgetService } from 'services/widget-settings/chatbot';
 
 const { ipcRenderer } = electron;
 
@@ -182,8 +186,12 @@ export class ServicesManager extends Service {
     EventListService,
     TipJarService,
     SponsorBannerService,
+    SubGoalService,
     MediaGalleryService,
-    AnnouncementsService
+    IncrementalRolloutService,
+    AnnouncementsService,
+    MediaShareService,
+    ChatbotWidgetService
   };
 
   private instances: Dictionary<Service> = {};

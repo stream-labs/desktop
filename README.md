@@ -61,12 +61,6 @@ Install all node modules via yarn:
 yarn install
 ```
 
-Install OBS plugins:
-
-```
-yarn install-plugins
-```
-
 Then, compile assets with webpack:
 
 ```

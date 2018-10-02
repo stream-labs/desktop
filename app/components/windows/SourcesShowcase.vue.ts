@@ -76,10 +76,6 @@ export default class SourcesShowcase extends Vue {
     });
   }
 
-  widgetData(type: string) {
-    return WidgetDisplayData()[this.widgetTypes[type]];
-  }
-
   sourceData(type: string) {
     return SourceDisplayData()[type];
   }
@@ -99,7 +95,12 @@ export default class SourcesShowcase extends Vue {
   }
 
   get platform() {
+    if (!this.loggedIn) return null;
     return this.userService.platform.type;
+  }
+
+  widgetData(type: string) {
+    return WidgetDisplayData(this.platform)[this.widgetTypes[type]];
   }
 
   selectInspectedSource() {

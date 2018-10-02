@@ -6,24 +6,38 @@
 >
   <div slot="fixed">
     <div class="row">
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler"></Tabs>
       </div>
-      <div class="small-6 columns position--relative">
+      <div class="small-6 columns position--relative window-tab">
         <div class="window-toggle__wrapper">
           <div
             @click="onToggleLinkProtectionWindowHandler"
             v-if="isLinkProtectionPermitCommand"
           >
             <span> {{ $t('Link Protection Preferences') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
           <div
             @click="onToggleQuoteWindowHandler"
             v-if="isQuoteCommand"
           >
             <span> {{ $t('Quote Preferences') }} </span>
-            <i class="icon-transition window-toggle__icon"></i>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
+          </div>
+          <div
+            @click="onToggleQueueWindowHandler"
+            v-if="isQueueJoinCommand"
+          >
+            <span> {{ $t('Queue Settings') }} </span>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
+          </div>
+          <div
+            @click="onToggleSongRequestWindowHandler"
+            v-if="isSongRequestCommand"
+          >
+            <span> {{ $t('Song Request Preferences') }} </span>
+            <i class="fas fa-chevron-right window-toggle__icon"></i>
           </div>
         </div>
       </div>
@@ -73,6 +87,48 @@
             :metadata="metadata.disabled_response"
           />
           <VFormGroup
+            v-if="defaultCommandToUpdate.duration_response"
+            :title="$t('Duration Response (Line breaks will be ignored)')"
+            v-model="editedCommand.duration_response"
+            :metadata="metadata.duration_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.rating_response"
+            :title="$t('Rating Response (Line breaks will be ignored)')"
+            v-model="editedCommand.rating_response"
+            :metadata="metadata.rating_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.views_response"
+            :title="$t('Views Response (Line breaks will be ignored)')"
+            v-model="editedCommand.views_response"
+            :metadata="metadata.views_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.banned_response"
+            :title="$t('Banned Response (Line breaks will be ignored)')"
+            v-model="editedCommand.banned_response"
+            :metadata="metadata.banned_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.music_response"
+            :title="$t('Banned Response (Line breaks will be ignored)')"
+            v-model="editedCommand.music_response"
+            :metadata="metadata.music_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.max_response"
+            :title="$t('Max Response (Line breaks will be ignored)')"
+            v-model="editedCommand.max_response"
+            :metadata="metadata.max_response"
+          />
+          <VFormGroup
+            v-if="defaultCommandToUpdate.full_response"
+            :title="$t('Full Response (Line breaks will be ignored)')"
+            v-model="editedCommand.full_response"
+            :metadata="metadata.full_response"
+          />
+          <VFormGroup
             v-if="defaultCommandToUpdate.response_type"
             :title="$t('Reply in')"
             v-model="editedCommand.response_type"
@@ -108,6 +164,14 @@
 
 <style <style lang="less" scoped>
 @import "../../../../styles/index";
+.window-tab {
+  &:first-child {
+    padding-right: 0;
+  }
+  &:last-child {
+    padding-left: 0;
+  }
+}
 .chatbot-add-command__container {
   padding-top: 45px;
 }

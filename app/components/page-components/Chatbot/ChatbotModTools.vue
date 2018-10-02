@@ -1,21 +1,10 @@
 <template>
-<div class="padding--10">
-  <div v-if="modBannerVisible" class="mod-chat-banner flex flex--space-between">
-    <div>
-      <i class="icon-information" />
-      <span>
-        Don't forget to mod streamlabs chatbot by typing <span class="mod-chat-banner__code-highlight">/mod streamlabs</span> in your chat.
-      </span>
-    </div>
-    <i class="icon-close cursor--pointer" @click="onCloseBannerHandler"></i>
-  </div>
-  <div class="align-items--inline">
-    <ChatbotModule
-      v-for="module in modules"
-      :key="module.title"
-      :chatbotModule="module"
-    />
-  </div>
+<div class="align-items--inline">
+  <ChatbotModule
+    v-for="module in modules"
+    :key="module.title"
+    :chatbotModule="module"
+  />
 </div>
 </template>
 

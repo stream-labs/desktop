@@ -55,6 +55,11 @@ export class SourcesModule extends Module {
   sourceRemoved = new Subject<string>();
 
   @apiMethod()
+  getAvailableSourceTypes(): string[] {
+    return this.sourcesService.getAvailableSourcesTypes();
+  }
+
+  @apiMethod()
   getSources() {
     return this.sourcesService.getSources().map(source => this.serializeSource(source));
   }

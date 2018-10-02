@@ -21,14 +21,6 @@ export default class ChatbotModTools extends ChatbotBase {
     this.chatbotApiService.fetchWordProtection();
   }
 
-  onCloseBannerHandler() {
-    this.chatbotCommonService.hideModBanner();
-  }
-
-  get modBannerVisible() {
-    return this.chatbotCommonService.state.modBannerVisible;
-  }
-
   get modules() {
     const backgroundUrlSuffix = this.nightMode ? 'night' : 'day';
     let modules: IChatbotModule[] = [
