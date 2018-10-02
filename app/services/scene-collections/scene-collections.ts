@@ -916,7 +916,6 @@ export class SceneCollectionsService extends Service
   }
 
   canSync(): boolean {
-    alert(JSON.stringify(this.appService.state.argv));
     console.log('canSync call', this.appService.state.argv);
     return this.userService.isLoggedIn() && !this.appService.state.argv.includes('--nosync');
   }

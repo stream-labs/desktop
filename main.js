@@ -232,7 +232,6 @@ function startApp() {
   }
 
   ipcMain.on('services-ready', () => {
-    callService('AppService', 'setArgv', process.argv);
     childWindow.loadURL(`${global.indexUrl}?windowId=child`);
   });
 

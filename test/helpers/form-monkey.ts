@@ -63,11 +63,26 @@ export class FormMonkey {
           .click(`[data-option-value="${value}"]`);
       } else if (type === 'slider') {
 
-        console.log('try to swipe');
-        await this.client
-          .elementIdElement(id, '../..')
-          .swipe('.vue-slider-dot', 100, 0, 1);
+        // console.log('try to swipe');
+        // await this.client
+        //   .elementIdElement(id, '../..')
+        //   .swipe('.vue-slider-dot', 100, 0, 1);
+        //
 
+        const dotSelector = `${selector} .vue-slider-dot`;
+
+        console.log('move slider');
+
+        await this.client.moveToObject(dotSelector);
+        await this.client.buttonDown(0);
+        let i = 10;
+        while (i--) {
+          console.log('move')
+          await this.client.moveTo(null, 5, 0);
+          await sleep(1000);
+        }
+        await this.client.buttonUp(0);
+        console.log('move done');
 
       }
 

@@ -73,21 +73,20 @@ test('Stream Boss Manage Battle settings', async t => {
   await logIn(t);
   await blankSlate(t);
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
-
+  //
   // console.log('wait');
   // await sleep(5000);
-  // console.log('click');
-  // await client.click('li=Manage Battle');
-  // console.log('clicked');
-  await sleep(500000);
-  //
-  // const formMonkey = new FormMonkey(t);
-  //
-  // await formMonkey.fill('manage-battle-form', {
-  //   fade_time: 15
-  // });
+  console.log('click');
+  await client.click('li=Manage Battle');
+  console.log('clicked');
 
-  // await sleep(10000);
+  const formMonkey = new FormMonkey(t);
+
+  await formMonkey.fill('manage-battle-form', {
+    fade_time: 15
+  });
+
+  await sleep(10000);
 
   // const setButtonSelector = 'button=Set Stream Boss Health';
   // const resetButtonSelector = 'button=Reset Stream Boss';
