@@ -48,11 +48,6 @@ export const NODE_TYPES = {
 
 const DEFAULT_COLLECTION_NAME = 'Scenes';
 
-interface ISceneCollectionsManifest {
-  activeId: string;
-  collections: ISceneCollectionsManifestEntry[];
-}
-
 interface ISceneCollectionInternalCreateOptions extends ISceneCollectionCreateOptions {
   setupFunction?: () => boolean;
 }
@@ -129,7 +124,6 @@ export class SceneCollectionsService extends Service
    * the manifest and load from the server.
    */
   async setupNewUser() {
-    const serverCollections = await this.serverApi.fetchSceneCollections();
     await this.initialize();
   }
 
@@ -707,7 +701,7 @@ export class SceneCollectionsService extends Service
    * - Download collections that have newer version on the server
    */
   private async sync() {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.canSync()) return;
 
     const serverCollections = (await this.serverApi.fetchSceneCollections())
       .data;
@@ -919,5 +913,11 @@ export class SceneCollectionsService extends Service
         }
       }
     }
+  }
+
+  canSync(): boolean {
+    alert(JSON.stringify(this.appService.state.argv));
+    console.log('canSync call', this.appService.state.argv);
+    return this.userService.isLoggedIn() && !this.appService.state.argv.includes('--nosync');
   }
 }

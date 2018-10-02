@@ -1,6 +1,7 @@
 import { GenericTestContext } from 'ava';
 import { IInputMetadata } from '../../app/components/shared/inputs';
 import { SpectronClient } from 'spectron';
+import { sleep } from './sleep';
 
 interface IFormMonkeyFillOptions {
   metadata?: Dictionary<IInputMetadata>
@@ -17,22 +18,64 @@ export class FormMonkey {
     this.client = t.context.app.client;
   }
 
-  fill(formName: string, formData: Dictionary<any>, options = {}) {
-    const $form = this.client.$(`[name=${formName}`);
+  async fill(formName: string, formData: Dictionary<any>, options = {}) {
+    const $form = await this.client.$(`[name=${formName}`);
 
     if (!$form) throw new Error(`form not found: ${formName}`);
 
-    $form.$$('.slobs-input').forEach($input => {
+    console.log('fetching inputs')
+    const $inputs = await this.client.$$(`form[name=${formName}] [data-role=input]`);
+    console.log($inputs);
 
-      $input.getAttribute('class')
+    for (const $input of $inputs) {
 
-      if ($input.classList.contains('text-input')) {
+      const id = ($input as any).ELEMENT;
+      const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
+
+      if (!(name in formData)) continue;
+      console.log('found ', name);
+
+      const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
+      const value = formData[name];
+      const selector = `form[name=${formName}] [data-name="${name}"]`;
+
+
+      console.log('name', name, 'value', value);
+
+      if (['number', 'text'].includes(type)) {
+        const inputSelector = selector + ' input';
+        console.log('click');
+        await this.client.click(inputSelector);
+
+        console.log('clear');
+        await this.client.clearElement(selector + ' input');
+        console.log('type');
+        await this.client.setValue(selector + ' input', value);
+
+      } else if (type === 'list') {
+
+        await this.client
+          .elementIdElement(id, '../..')
+          .click('.multiselect');
+
+        await this.client
+          .elementIdElement(id, '../..')
+          .click(`[data-option-value="${value}"]`);
+      } else if (type === 'slider') {
+
+        console.log('try to swipe');
+        await this.client
+          .elementIdElement(id, '../..')
+          .swipe('.vue-slider-dot', 100, 0, 1);
+
 
       }
 
-    })
+
+    }
 
   }
+
 
 }
 
