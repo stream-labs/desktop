@@ -4,10 +4,10 @@
   <validated-form slot="goal-properties" v-if="loaded">
     <div v-if="hasGoal">
       <div class="section__body">
-        <v-form-group :title="$t('Title')">{{ wData.goal.title }}</v-form-group>
-        <v-form-group :title="$t('Goal Amount')">{{ wData.goal.amount }}</v-form-group>
-        <v-form-group :title="$t('Current Amount')">{{ wData.goal.current_amount }}</v-form-group>
-        <v-form-group :title="$t('Days Remaining')">{{ wData.goal.to_go }}</v-form-group>
+        <div class="goal-row"><span>{{ $t('Title') }}</span><span>{{ wData.goal.title }}</span></div>
+        <div class="goal-row"><span>{{ $t('Goal Amount') }}</span><span>{{ wData.goal.amount }}</span></div>
+        <div class="goal-row"><span>{{ $t('Current Amount') }}</span><span>{{ wData.goal.current_amount }}</span></div>
+        <div class="goal-row"><span>{{ $t('Days Remaining') }}</span><span>{{ wData.goal.to_go }}</span></div>
         <button class="button button--soft-warning" @click="resetGoal()">{{ $t("End Goal") }}</button>
       </div>
     </div>
@@ -58,6 +58,19 @@
 <script lang="ts" src="./GenericGoal.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../../styles/index";
+
+.goal-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid @day-secondary;
+}
+
+.goal-row:last-of-type {
+  margin-bottom: 8px;
+}
+
 .loading-spinner {
   position: relative;
   width: 100%;
@@ -68,6 +81,12 @@
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
+  }
+}
+
+.night-theme {
+  .goal-row {
+    border-color: @night-accent-dark;
   }
 }
 </style>
