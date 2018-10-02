@@ -16,13 +16,7 @@ export default class ChildWindow extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private customizationService: CustomizationService;
 
-<<<<<<< HEAD
-  components: { name: string; isShown: boolean; }[] = [];
-
-  private refreshingTimeout = 0;
-=======
   components: { name: string; isShown: boolean; title: string; }[] = [];
->>>>>>> platform_dev_kit
 
   private refreshingTimeout = 0;
 
