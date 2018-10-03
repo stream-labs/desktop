@@ -75,7 +75,7 @@ export class AppService extends StatefulService<IAppState> {
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    this.userService;
+    await this.userService.initialize();
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated

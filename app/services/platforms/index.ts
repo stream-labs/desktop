@@ -30,6 +30,8 @@ export interface IPlatformService {
 
   fetchChannelInfo: () => Promise<IChannelInfo>;
 
+  fetchUserInfo: () => Promise<IUserInfo>;
+
   putChannelInfo: (streamTitle: string, streamGame: string) => Promise<boolean>;
 
   searchGames: (searchString: string) => Promise<IGame[]>;
@@ -47,6 +49,10 @@ export interface IPlatformAuth {
     id: string;
     channelId?: string;
   };
+}
+
+export interface IUserInfo {
+  username?: string;
 }
 
 export type TPlatform = 'twitch' | 'youtube' | 'mixer';
