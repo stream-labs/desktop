@@ -1,4 +1,10 @@
-import { Module, apiMethod, apiEvent, EApiPermissions } from './module';
+import {
+  Module,
+  apiMethod,
+  apiEvent,
+  EApiPermissions,
+  IApiContext
+} from './module';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
 import {
@@ -13,37 +19,49 @@ import { TObsFormData } from 'components/obs/inputs/ObsInput';
 export class NotificationsModule extends Module {
   @Inject() private notificationsService: INotificationsServiceApi;
 
+  constructor() {
+    super();
+
+    this.notificationsService.notificationPushed.subscribe(notification => {
+      this.notificationPushed.next(notification);
+    });
+
+    this.notificationsService.notificationRead.subscribe(ids => {
+      this.notificationRead.next(ids);
+    });
+  }
+
   moduleName = 'Notifications';
   permissions = [EApiPermissions.Notifications];
 
   @apiEvent()
-  sceneAdded = new Subject<INotification>();
+  notificationPushed = new Subject<INotification>();
 
   @apiEvent()
-  sceneSwitched = new Subject<number[]>();
+  notificationRead = new Subject<number[]>();
 
   @apiMethod()
-  push(notification: INotificationOptions): INotification {
+  push(ctx: IApiContext, notification: INotificationOptions): INotification {
     return this.notificationsService.push(notification);
   }
 
   @apiMethod()
-  getNotification(id: number): INotification {
+  getNotification(ctx: IApiContext, id: number): INotification {
     return this.notificationsService.getNotification(id);
   }
 
   @apiMethod()
-  getAll(type?: ENotificationType): INotification[] {
+  getAll(ctx: IApiContext, type?: ENotificationType): INotification[] {
     return this.notificationsService.getAll(type);
   }
 
   @apiMethod()
-  getUnread(type?: ENotificationType): INotification[] {
+  getUnread(ctx: IApiContext, type?: ENotificationType): INotification[] {
     return this.notificationsService.getUnread(type);
   }
 
   @apiMethod()
-  getRead(type?: ENotificationType): INotification[] {
+  getRead(ctx: IApiContext, type?: ENotificationType): INotification[] {
     return this.notificationsService.getRead(type);
   }
 
@@ -58,7 +76,7 @@ export class NotificationsModule extends Module {
   }
 
   @apiMethod()
-  setSettings(patch: Partial<INotificationsSettings>): void {
+  setSettings(ctx: IApiContext, patch: Partial<INotificationsSettings>): void {
     return this.notificationsService.setSettings(patch);
   }
 
@@ -68,7 +86,7 @@ export class NotificationsModule extends Module {
   }
 
   @apiMethod()
-  markAsRead(id: number): void {
+  markAsRead(ctx: IApiContext, id: number): void {
     return this.notificationsService.markAsRead(id);
   }
 
@@ -78,7 +96,7 @@ export class NotificationsModule extends Module {
   }
 
   @apiMethod()
-  applyAction(notificationId: number): void {
+  applyAction(ctx: IApiContext, notificationId: number): void {
     return this.notificationsService.applyAction(notificationId);
   }
 
