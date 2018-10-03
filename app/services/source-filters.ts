@@ -135,7 +135,6 @@ export class SourceFiltersService extends Service {
     const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
 
     source.getObsInput().addFilter(obsFilter);
-    if (settings) obsFilter.update(settings);
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
