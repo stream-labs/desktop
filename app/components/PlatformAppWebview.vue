@@ -1,6 +1,6 @@
 <template>
 <webview
-  v-if="renderWebview && appUrl"
+  v-if="renderWebview"
   class="platform-app-webview"
   ref="appView"
   :src="appUrl"
