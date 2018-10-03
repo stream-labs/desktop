@@ -74,9 +74,6 @@ export class ProtocolLinksService extends Service {
 
   @protocolHandler('paypalauth')
   private updateUserBillingInfo(info: IProtocolLinkInfo) {
-    // 1. navigate to store tab
-    // 2. trigger callback to store webview to continue checkout
-    this.navigationService.navigate('PlatformAppStore');
     this.platformAppStoreService.paypalAuthSuccess();
   }
 }

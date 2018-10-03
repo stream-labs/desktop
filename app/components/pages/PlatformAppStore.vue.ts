@@ -29,23 +29,23 @@ export default class PlatformAppStore extends Vue {
       this.guestApiService.exposeApi(
         this.$refs.appStoreWebview.getWebContents().id,
         {
-          onInstallApp: this.onInstallAppHandler,
-          openPaypalLinkInOSBrowser: this.openPaypalLinkInOSBrowserHandler,
-          bindsPaypalSuccessCallback: this.bindsPaypalSuccessCallbackHandler,
+          reloadProductionApps: this.reloadProductionApps,
+          openLinkInBrowser: this.openLinkInBrowser,
+          onPaypalAuthSuccess: this.onPaypalAuthSuccessHandler
         }
       );
     });
   }
 
-  async bindsPaypalSuccessCallbackHandler(callback: Function) {
+  async onPaypalAuthSuccessHandler(callback: Function) {
     this.platformAppStoreService.bindsPaypalSuccessCallback(callback);
   }
 
-  async openPaypalLinkInOSBrowserHandler(redirectUrl: string) {
-    electron.remote.shell.openExternal(redirectUrl);
+  async openLinkInBrowser(url: string) {
+    electron.remote.shell.openExternal(url);
   }
 
-  async onInstallAppHandler() {
+  async reloadProductionApps() {
     this.platformAppsService.installProductionApps();
   }
 

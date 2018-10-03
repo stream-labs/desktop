@@ -145,6 +145,7 @@ export class PlatformAppsService extends
   async initialize() {
     this.userService.userLogin.subscribe(async () => {
       this.unloadApps();
+      this.installProductionApps();
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
 
