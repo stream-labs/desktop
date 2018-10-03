@@ -16,7 +16,6 @@ import { HostsService } from 'services/hosts';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { UserService } from 'services/user';
 import { trim, compact } from 'lodash';
-import { cd } from 'shelljs';
 
 const DEV_PORT = 8081;
 
@@ -135,7 +134,6 @@ export class PlatformAppsService extends
   appUnload = new Subject<string>();
 
   private localStorageKey = 'PlatformAppsUnpacked';
-  private baseCdnUrl = 'https://s3.amazonaws.com/streamlabs-platform';
 
   apiManager = new PlatformAppsApi();
 
@@ -185,7 +183,6 @@ export class PlatformAppsService extends
  */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
-    console.log('production apps', productionApps);
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
       this.addApp({
@@ -359,13 +356,8 @@ export class PlatformAppsService extends
   }
 
   async reloadApp(appId: string) {
-    // TODO Support Multiple Apps
+    // TODO  Support Multiple Apps
     const app = this.getApp(appId);
-    if (app.unpacked === true) {
-      console.log(app.appPath);
-    } else {
-      console.log(app.appUrl);
-    }
 
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
@@ -445,16 +437,15 @@ export class PlatformAppsService extends
    * These are non-persistent for now
    */
   getAppPartition(appId: string) {
+    const app = this.getApp(appId);
     const partition = `persist:platformApp-${appId}`;
 
-    console.log(partition);
     if (!this.sessionsInitialized[partition]) {
       const session = electron.remote.session.fromPartition(partition);
       const frameUrls: string[] = [];
       let mainFrame = '';
 
       session.webRequest.onBeforeRequest((details, cb) => {
-        console.log('GOT SCRIPT REQUEST', details.url);
         const parsed = url.parse(details.url);
 
         if (details.resourceType === 'mainFrame') mainFrame = url.parse(details.url).hostname;
@@ -494,7 +485,7 @@ export class PlatformAppsService extends
             return;
           }
 
-          if (details.url.includes(this.baseCdnUrl)) {
+          if (details.url.includes(app.appUrl)) {
             cb({});
             return;
           }

@@ -69,10 +69,6 @@ export default class PlatformAppWebview extends Vue {
   }
 
   get appUrl() {
-    console.log('appUrl: ', this.platformAppsService.getPageUrlForSlot(
-      this.appId,
-      this.pageSlot
-    ));
     return this.platformAppsService.getPageUrlForSlot(
       this.appId,
       this.pageSlot
@@ -80,7 +76,6 @@ export default class PlatformAppWebview extends Vue {
   }
 
   get appPartition() {
-    console.log('App partition: ', this.platformAppsService.getAppPartition(this.appId));
     return this.platformAppsService.getAppPartition(this.appId);
   }
 
