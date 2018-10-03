@@ -134,12 +134,15 @@ export class SourceFiltersService extends Service {
     const source = this.sourcesService.getSource(sourceId);
     const obsFilter = obs.FilterFactory.create(filterType, filterName, settings || {});
 
-    source.getObsInput().addFilter(obsFilter);
+    const obsSource = source.getObsInput()
+    obsSource.addFilter(obsFilter);
+    // The filter should be created with the settings provided, is this necessary?
     if (settings) obsFilter.update(settings);
+    const filterReference = obsSource.findFilter(filterName);
     // There is now 2 references to the filter at that point
     // We need to release one
     obsFilter.release();
-    return obsFilter;
+    return filterReference;
   }
 
 
