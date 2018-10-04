@@ -5,8 +5,6 @@ import WidgetSettings from 'components/widgets/WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import CodeEditor from '../CodeEditor.vue';
-import CustomFieldsEditor from '../CustomFieldsEditor.vue';
 import { GenericGoalService, IGoalCreateOptions, IGoalData } from '../../../services/widgets/settings/generic-goal';
 
 
@@ -15,8 +13,6 @@ import { GenericGoalService, IGoalCreateOptions, IGoalData } from '../../../serv
     WidgetEditor,
     VFormGroup,
     ValidatedForm,
-    CodeEditor,
-    CustomFieldsEditor,
     ...inputComponents
   }
 })

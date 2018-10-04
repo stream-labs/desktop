@@ -11,16 +11,16 @@ import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
-import CodeEditor from './CodeEditor.vue';
 
 import { $t } from 'services/i18n';
 import { ChatbotCommonService } from 'services/chatbot';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetEditor,
     VFormGroup,
-    CodeEditor,
+    ValidatedForm,
     ...inputComponents
   }
 })
