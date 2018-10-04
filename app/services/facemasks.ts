@@ -466,9 +466,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       if (matches.length === 1) {
         const slobsSource = matches[0];
         const target = slobsSource.getObsInput();
-        const facemaskFilters = target.filters.filter(filter => filter.id === 'face_mask_filter');
+        let fmFilter = target.findFilter('Face Mask Plugin');
 
-        if (facemaskFilters.length === 0) {
+        if (!fmFilter) {
           this.facemaskFilter = this.sourceFiltersService.add(
             slobsSource.sourceId,
             'face_mask_filter',
@@ -481,7 +481,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
               alertActivate: false
             });
         } else {
-          this.facemaskFilter = facemaskFilters[0];
+          this.facemaskFilter = fmFilter;
           this.updateFilter({
             maskFolder: this.facemasksDirectory,
             alertDuration: this.settings.duration,
