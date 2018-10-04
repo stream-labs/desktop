@@ -27,7 +27,6 @@
     <v-form-group :title="$t('Spam Security')" type="slider" v-model="wData.settings.security" :metadata="securityMeta" />
   </validated-form>
 </widget-editor>
-
 </template>
 
 <script lang="ts" src="./MediaShare.vue.ts"></script>

@@ -91,6 +91,10 @@ export class YoutubeService extends StatefulService<IYoutubeServiceState> implem
       });
   }
 
+  fetchUserInfo() {
+    return Promise.resolve({});
+  }
+
   @requiresToken()
   fetchBoundStreamId(): Promise<string> {
     const endpoint =
