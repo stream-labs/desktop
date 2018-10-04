@@ -4,7 +4,6 @@ import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/widgets/inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { IViewerCountData, ViewerCountService } from 'services/widgets/settings/viewer-count';
-import CodeEditor from './CodeEditor.vue';
 import { $t } from 'services/i18n';
 
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
@@ -12,7 +11,6 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
   components: {
     WidgetEditor,
     VFormGroup,
-    CodeEditor,
     ValidatedForm,
     ...inputComponents
   }
