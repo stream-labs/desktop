@@ -17,7 +17,6 @@
           :to="tab.title"
           :ico="icons[tab.title]"
           :enabled="tab.enabled"
-          :children="tab.children"
           class="padding--10 text-transform chatbot__side-menu__tab"
         >
           <div>{{ $t(tab.title) }}</div>

@@ -19,13 +19,6 @@ export default class NavItem extends Vue {
 
   get value() { return this.navMenu.value; }
 
-  get active() {
-    if (this.isRootItem) {
-
-    }
-    return this.to === this.value;
-  }
-
   onClickHandler(event: MouseEvent) {
     if (!this.enabled) return;
     if (this.expandable) {
@@ -47,7 +40,7 @@ export default class NavItem extends Vue {
   }
 
   get rootItem() {
-    if (!this.isRootItem) return this.$parent;
+    if (!this.isRootItem) return this.$parent['rootItem'];
     return this;
   }
 
