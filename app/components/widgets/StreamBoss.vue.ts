@@ -7,16 +7,12 @@ import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import { IStreamBossCreateOptions, IStreamBossData, StreamBossService } from 'services/widgets/settings/stream-boss';
-import CodeEditor from './CodeEditor.vue';
-import TestButtons from './TestButtons.vue';
 
 @Component({
   components: {
     WidgetEditor,
     VFormGroup,
     ValidatedForm,
-    CodeEditor,
-    TestButtons,
     ...inputComponents
   }
 })
