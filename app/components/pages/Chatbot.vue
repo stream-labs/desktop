@@ -73,6 +73,7 @@
   }
   .side-menu {
     margin-top: 0;
+    padding-right: 5px;
   }
 
   .chatbot__side-menu__tab {

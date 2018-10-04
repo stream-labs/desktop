@@ -11,7 +11,7 @@
       <slot name='children'></slot>
     </div>
   </div>
-  
+  <i v-if="isRootItem && expandable" :class="expanded ? 'icon-subtract' : 'icon-add'" />
 </li>
 </template>
 
