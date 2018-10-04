@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
+import { httpify } from 'caseless';
 
 @Component({})
 
@@ -14,19 +15,48 @@ export default class NavItem extends Vue {
   @Prop({ default: true })
   enabled: boolean;
 
-  navMenu = this.$parent as any as { value: string; setValue: (value: string) => void };
+  expanded = false;
 
   get value() { return this.navMenu.value; }
 
-  onClickHandler() {
+  get active() {
+    if (this.isRootItem) {
+
+    }
+    return this.to === this.value;
+  }
+
+  onClickHandler(event: MouseEvent) {
     if (!this.enabled) return;
+    if (this.expandable) {
+      this.expanded = !this.expanded;
+      return;
+    };
     this.navMenu.setValue(this.to);
+    event.stopPropagation();
   }
 
   onIconClickHandler(event: MouseEvent) {
     if (!this.enabled) return;
     this.$emit('iconClick', this.to);
     event.stopPropagation();
+  }
+
+  get isRootItem() {
+    return !!this.$parent['setValue'];
+  }
+
+  get rootItem() {
+    if (!this.isRootItem) return this.$parent;
+    return this;
+  }
+
+  get navMenu() {
+    return (this.rootItem.$parent as any) as { value: string; setValue: (value: string) => void };
+  }
+
+  get expandable() {
+    return !!this.$slots['children'];
   }
 
 }

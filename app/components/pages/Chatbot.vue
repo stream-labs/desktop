@@ -17,10 +17,22 @@
           :to="tab.title"
           :ico="icons[tab.title]"
           :enabled="tab.enabled"
+          :children="tab.children"
           class="padding--10 text-transform chatbot__side-menu__tab"
         >
           <div>{{ $t(tab.title) }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
+
+          <div v-if="tab.children && tab.children.length" slot="children">
+            <NavItem
+              v-for="child in tab.children"
+              :key="child.title"
+              :to="child.title"
+            >
+              <div>{{ $t(child.title) }}</div>
+            </NavItem>
+          </div>
+
         </NavItem>
       </NavMenu>
     </div>
@@ -28,7 +40,9 @@
       <ChatbotBanner />
       <transition name="fade" mode="out-in" appear>
         <ChatbotModules v-if="selectedTab === 'Modules'"/>
-        <ChatbotCommands v-if="selectedTab === 'Commands'"/>
+        <ChatbotCustomCommands v-if="selectedTab === 'Custom Commands'"/>
+        <ChatbotDefaultCommands v-if="selectedTab === 'Default Commands'"/>
+        <ChatbotCommandVariables v-if="selectedTab === 'Variables'"/>
         <ChatbotTimers v-if="selectedTab === 'Timers'"/>
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
         <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
@@ -62,7 +76,7 @@
   }
 
   .chatbot__side-menu__tab {
-    padding: 5px 40px;
+    padding: 5px 0 5px 40px;
 
     .chatbot__side-menu__tab__description {
       font-size: 12px;

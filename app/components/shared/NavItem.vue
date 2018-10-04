@@ -1,11 +1,17 @@
 <template>
 <li
   class="nav-item"
-  :class="{ active: to === value, disabled: enabled == false }"
+  :class="{ active: to === value, disabled: enabled == false, 'nav-item--child': !isRootItem }"
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
-  <div class="nav-item__name"><slot></slot></div>
+  <div class="nav-item__content">
+    <slot></slot>
+    <div v-if="expanded" class="nav-item__children">
+      <slot name='children'></slot>
+    </div>
+  </div>
+  
 </li>
 </template>
 
@@ -25,6 +31,11 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
+
+  &.nav-item--child {
+    padding-left: 0;
+    border-left: 0;
+  }
 
   &.active {
     opacity: 1;
@@ -58,13 +69,17 @@
   }
 }
 
-.nav-item__name {
+.nav-item__content {
   overflow: hidden;
   // max-width: calc(~"100% - 20px");
   width: 100%;
   max-width: 100%;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.nav-item__children {
+  .margin-top();
 }
 
 .night-theme {
