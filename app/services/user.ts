@@ -185,7 +185,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    return `https://${host}/slobs-store?token=${token}`;
+    return `https://${host}/slobs-store?token=${token}&mode=${nightMode}`;
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
