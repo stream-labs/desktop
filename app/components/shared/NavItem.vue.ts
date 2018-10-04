@@ -35,17 +35,13 @@ export default class NavItem extends Vue {
     event.stopPropagation();
   }
 
-  get isRootItem() {
-    return !!this.$parent['setValue'];
-  }
-
-  get rootItem() {
-    if (!this.isRootItem) return this.$parent['rootItem'];
-    return this;
+  get isChild() {
+    debugger;
+    return this.$parent['isChild'];
   }
 
   get navMenu() {
-    return (this.rootItem.$parent as any) as { value: string; setValue: (value: string) => void };
+    return (this.$parent as any) as { value: string; setValue: (value: string) => void };
   }
 
   get expandable() {

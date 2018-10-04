@@ -22,7 +22,12 @@
           <div>{{ tab.title }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
 
-          <div v-if="tab.children && tab.children.length" slot="children">
+          <NavMenu
+            :isChild="true"
+            v-model="selectedTab"
+            v-if="tab.children && tab.children.length"
+            slot="children"
+          >
             <NavItem
               v-for="child in tab.children"
               :key="child.title"
@@ -30,7 +35,7 @@
             >
               <div>{{ child.title }}</div>
             </NavItem>
-          </div>
+          </NavMenu>
 
         </NavItem>
       </NavMenu>
@@ -72,7 +77,7 @@
   }
   .side-menu {
     margin-top: 0;
-    padding-right: 5px;
+    padding-right: 5px !important;
   }
 
   .chatbot__side-menu__tab {
