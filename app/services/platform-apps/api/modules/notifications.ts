@@ -7,14 +7,57 @@ import {
 } from './module';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
-import {
-  INotificationsServiceApi,
-  INotification,
-  INotificationOptions,
-  INotificationsSettings,
-  ENotificationType
-} from 'services/notifications';
-import { TObsFormData } from 'components/obs/inputs/ObsInput';
+import { INotificationsServiceApi } from 'services/notifications';
+
+type TIssueCode = 'FRAMES_LAGGED' | 'FRAMES_SKIPPED' | 'FRAMES_DROPPED';
+
+interface IJsonRpcRequest {
+  jsonrpc: '2.0';
+  id: string;
+  method: string;
+  params: {
+    resource: string,
+    args?: any[],
+    fetchMutations?: boolean,
+    compactMode?: boolean
+  };
+}
+
+enum ENotificationType {
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  SUCCESS = 'SUCCESS'
+}
+
+interface INotificationsSettings {
+  enabled: boolean;
+  playSound: boolean;
+}
+
+interface INotificationOptions {
+  message: string;
+  code?: TIssueCode | string;
+  unread?: boolean;
+  type?: ENotificationType;
+  action?: IJsonRpcRequest;
+  playSound?: boolean;
+  data?: any;
+
+  /** The notification's life time in ms. Use -1 for infinity */
+  lifeTime?: number;
+  showTime?: boolean;
+}
+
+interface INotification extends INotificationOptions {
+  id: number;
+  type: ENotificationType;
+  message: string;
+  unread: boolean;
+  date: number;
+  playSound: boolean;
+  lifeTime: number;
+  showTime: boolean;
+}
 
 export class NotificationsModule extends Module {
   @Inject() private notificationsService: INotificationsServiceApi;
@@ -68,11 +111,6 @@ export class NotificationsModule extends Module {
   @apiMethod()
   getSettings(): INotificationsSettings {
     return this.notificationsService.getSettings();
-  }
-
-  @apiMethod()
-  getSettingsFormData(): TObsFormData {
-    return this.notificationsService.getSettingsFormData()
   }
 
   @apiMethod()
