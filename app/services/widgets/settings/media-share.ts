@@ -1,7 +1,8 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
 import { clone } from 'lodash';
 import { $t } from 'services/i18n';
+import { InheritMutations } from '../../stateful-service';
 
 export interface IMediaShareSettings extends IWidgetSettings {
   advanced_settings: {
@@ -28,6 +29,7 @@ export interface IMediaShareSettings extends IWidgetSettings {
 }
 
 export interface IMediaShareData extends IWidgetData {
+  type: WidgetType;
   settings: IMediaShareSettings;
   banned_media: IMediaShareBan[];
 }
@@ -43,26 +45,27 @@ export interface IMediaShareBan {
   updated_at?: string;
 }
 
+@InheritMutations()
 export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
 
-  getWidgetType() {
-    return WidgetType.MediaShare;
-  }
-
-  getVersion() {
-    return 5;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/media/v1/${this.getWidgetToken()}?simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
+  getApiSettings() {
+    return {
+      type: WidgetType.MediaShare,
+      url: `https://${this.getHost()}/widgets/media-share?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/media-share?token=${this.getWidgetToken()}`,
+      settingsUpdateEvent: 'mediaShareSettingsUpdate',
+      goalCreateEvent: 'newmediaShare',
+      goalResetEvent: 'mediaShareEnd',
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/media`,
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host'],
+      customCodeAllowed: true,
+      customFieldsAllowed: true
+    }
   }
 
   async unbanMedia(media: IMediaShareBan) {
-    const url = `${this.getDataUrl()}/unban`;
+    const url = `${this.getApiSettings().dataFetchUrl}/unban`;
     await this.request({
       url,
       method: 'POST',
@@ -72,11 +75,6 @@ export class MediaShareService extends WidgetSettingsService<IMediaShareData> {
     });
     return this.fetchData();
   }
-
-  protected tabs = [
-    { name: 'settings', title: $t('Settings') },
-    { name: 'banned_media', title: $t('Banned Media') },
-  ];
 
   protected patchAfterFetch(response: IMediaShareData): any {
     // we should be using settings.advanced settings values instead, similar to sl.com
