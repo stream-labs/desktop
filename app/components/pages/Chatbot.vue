@@ -22,12 +22,7 @@
           <div>{{ tab.title }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
 
-          <NavMenu
-            :isChild="true"
-            v-model="selectedTab"
-            v-if="tab.children && tab.children.length"
-            slot="children"
-          >
+          <NavMenu v-if="tab.children && tab.children.length" slot="children">
             <NavItem
               v-for="child in tab.children"
               :key="child.title"

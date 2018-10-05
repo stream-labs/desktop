@@ -1,9 +1,14 @@
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
-import { httpify } from 'caseless';
+import NavMenu from './NavMenu.vue';
+
+interface INavMenu {
+  value: string;
+  setValue: (value: string) => void,
+  isChild: boolean;
+}
 
 @Component({})
-
 export default class NavItem extends Vue {
 
   @Prop()
@@ -17,7 +22,7 @@ export default class NavItem extends Vue {
 
   expanded = false;
 
-  get value() { return this.navMenu.value; }
+  get value() { return this.rootNavMenu.value; }
 
   onClickHandler(event: MouseEvent) {
     if (!this.enabled) return;
@@ -25,7 +30,7 @@ export default class NavItem extends Vue {
       this.expanded = !this.expanded;
       return;
     };
-    this.navMenu.setValue(this.to);
+    this.rootNavMenu.setValue(this.to);
     event.stopPropagation();
   }
 
@@ -35,13 +40,23 @@ export default class NavItem extends Vue {
     event.stopPropagation();
   }
 
-  get isChild() {
-    debugger;
-    return this.$parent['isChild'];
+  get isSubItem() {
+    // is sub menu item
+    return this.parent.isChild;
   }
 
-  get navMenu() {
-    return (this.$parent as any) as { value: string; setValue: (value: string) => void };
+  get parent() {
+    return (this.$parent as any) as INavMenu;
+  }
+
+  get rootNavMenu() {
+
+    function getRoot(element: Vue): any {
+      if (element instanceof NavMenu && !(element.$parent instanceof NavItem)) return element;
+      return getRoot(element.$parent);
+    }
+
+    return getRoot(this) as INavMenu;
   }
 
   get expandable() {

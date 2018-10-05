@@ -1,7 +1,7 @@
 <template>
 <li
   class="nav-item"
-  :class="{ active: to === value, disabled: enabled == false, 'nav-item--child': isChild }"
+  :class="{ active: to === value, disabled: enabled == false, 'nav-item--child': isSubItem }"
   @click="onClickHandler"
 >
   <i v-if="ico" :class="ico" @click="onIconClickHandler"></i>
@@ -11,7 +11,7 @@
       <slot name='children'></slot>
     </div>
   </div>
-  <i v-if="!isChild && expandable" :class="expanded ? 'icon-subtract' : 'icon-add'" />
+  <i v-if="expandable" :class="expanded ? 'icon-subtract' : 'icon-add'" />
 </li>
 </template>
 
