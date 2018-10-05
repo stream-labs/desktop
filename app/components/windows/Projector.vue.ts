@@ -20,10 +20,17 @@ export default class Projector extends Vue {
   @Inject() windowsService: WindowsService;
   @Inject() sourcesService: ISourcesServiceApi;
 
-  fullscreen = false;
   oldBounds: electron.Rectangle;
 
   sourcesSubscription: Subscription;
+
+  get windowId() {
+    return Util.getCurrentUrlParams().windowId;
+  }
+
+  get fullscreen() {
+    return this.windowsService.state[this.windowId].isFullScreen;
+  }
 
   mounted() {
     this.sourcesSubscription = this.sourcesService.sourceRemoved.subscribe(source => {
@@ -38,8 +45,7 @@ export default class Projector extends Vue {
   }
 
   get sourceId() {
-    const windowId = Util.getCurrentUrlParams().windowId;
-    return this.windowsService.getWindowOptions(windowId).sourceId;
+    return this.windowsService.getWindowOptions(this.windowId).sourceId;
   }
 
   get allDisplays() {
@@ -47,8 +53,8 @@ export default class Projector extends Vue {
   }
 
   enterFullscreen(display: electron.Display) {
-    this.fullscreen = true;
     const currentWindow = electron.remote.getCurrentWindow();
+    this.windowsService.setOneOffFullscreen(this.windowId, true);
     this.oldBounds = currentWindow.getBounds();
     currentWindow.setPosition(
       display.bounds.x,
@@ -61,7 +67,7 @@ export default class Projector extends Vue {
   exitFullscreen(e: KeyboardEvent) {
     if (e.code !== 'Escape') return;
     document.removeEventListener('keydown', this.exitFullscreen);
-    this.fullscreen = false;
+    this.windowsService.setOneOffFullscreen(this.windowId, false);
     const currentWindow = electron.remote.getCurrentWindow();
     currentWindow.setFullScreen(false);
     currentWindow.setBounds(this.oldBounds);
