@@ -219,55 +219,62 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
    * そうでなければ、ダイアログを出して選択を促すか、配信していない旨返す。
    * @param programId ユーザーが選択した番組ID(省略は未選択)
    */
-  setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
-    return this.fetchLiveProgramInfo(programId).then(info => {
-      console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
+  async setupStreamSettings(programId: string = '', retrying = false): Promise<IStreamingSetting> {
+    const info = await this.fetchLiveProgramInfo(programId);
+    console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
 
-      const num = Object.keys(info).length;
-      if (num > 1) {
-        // show dialog and select
-        this.windowsService.showWindow({
-          componentName: 'NicoliveProgramSelector',
-          queryParams: info,
-          size: {
-            width: 700,
-            height: 400
-          }
-        });
-        return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
-      }
-      if (num < 1) {
-        return NiconicoService.emptyStreamingSetting(false); // 番組がない
-      }
-      const id = Object.keys(info)[0];
-      const selected = info[id];
-      const url = selected.url;
-      const key = selected.key;
-      const bitrate = selected.bitrate;
-      this.userService.updatePlatformChannelId(id);
-
-      const settings = this.settingsService.getSettingsFormData('Stream');
-      settings.forEach(subCategory => {
-        if (subCategory.nameSubCategory !== 'Untitled') return;
-        subCategory.parameters.forEach(parameter => {
-          switch (parameter.name) {
-            case 'service':
-              parameter.value = 'niconico ニコニコ生放送';
-              break;
-            case 'server':
-              parameter.value = url;
-              break;
-            case 'key':
-              parameter.value = key;
-              break;
-          }
-        });
+    const num = Object.keys(info).length;
+    if (num > 1) {
+      // show dialog and select
+      this.windowsService.showWindow({
+        componentName: 'NicoliveProgramSelector',
+        queryParams: info,
+        size: {
+          width: 700,
+          height: 400
+        }
       });
-      this.settingsService.setSettings('Stream', settings);
+      return NiconicoService.emptyStreamingSetting(true); // ダイアログでたから無視してね
+    }
+    if (num < 1) {
+      // 番組がない
+      if (retrying) {
+        // リトライするのは1回だけ
+        return NiconicoService.emptyStreamingSetting(false);
+      }
 
-      // 有効な番組が選択されているので stream keyを返す
-      return NiconicoService.createStreamingSetting(false, url, key, bitrate);
+      // 3秒後にリトライする
+      await new Promise(done => setTimeout(done, 3000));
+      return this.setupStreamSettings(programId, true);
+    }
+    const id = Object.keys(info)[0];
+    const selected = info[id];
+    const url = selected.url;
+    const key = selected.key;
+    const bitrate = selected.bitrate;
+    this.userService.updatePlatformChannelId(id);
+
+    const settings = this.settingsService.getSettingsFormData('Stream');
+    settings.forEach(subCategory => {
+      if (subCategory.nameSubCategory !== 'Untitled') return;
+      subCategory.parameters.forEach(parameter => {
+        switch (parameter.name) {
+          case 'service':
+            parameter.value = 'niconico ニコニコ生放送';
+            break;
+          case 'server':
+            parameter.value = url;
+            break;
+          case 'key':
+            parameter.value = key;
+            break;
+        }
+      });
     });
+    this.settingsService.setSettings('Stream', settings);
+
+    // 有効な番組が選択されているので stream keyを返す
+    return NiconicoService.createStreamingSetting(false, url, key, bitrate);
   }
 
   private static emptyStreamingSetting(asking: boolean): IStreamingSetting {
