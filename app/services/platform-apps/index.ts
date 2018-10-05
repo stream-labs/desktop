@@ -185,6 +185,7 @@ export class PlatformAppsService extends
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
+      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -229,6 +230,11 @@ export class PlatformAppsService extends
     }
 
     this.devServer = new DevServer(appPath, DEV_PORT);
+
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id)) {
+      // has prod app with same id
+      this.REMOVE_APP(id);
+    }
 
     this.addApp({
       id,
@@ -346,6 +352,9 @@ export class PlatformAppsService extends
       this.devServer = null;
     }
 
+    // reload prod apps in case it has same id
+    // mostly for debugging, can remove
+    this.installProductionApps();
   }
 
   async reloadApp(appId: string) {
