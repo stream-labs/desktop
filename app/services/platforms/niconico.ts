@@ -372,11 +372,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   fetchViewerCount(): Promise<number> {
     return this.fetchPlayerStatus()
       .then(o => {
-        try {
-          return o['stream'][0]['watch_count'][0]
-        } catch {
-          return 0;
-        }
+        return o['stream'][0]['watch_count'][0]
       });
   }
 
@@ -384,11 +380,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
   fetchCommentCount(): Promise<number> {
     return this.fetchPlayerStatus()
       .then(o => {
-        try {
-          return o['stream'][0]['comment_count'][0];
-        } catch {
-          return 0;
-        }
+        return o['stream'][0]['comment_count'][0];
       });
   }
 
