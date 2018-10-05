@@ -110,6 +110,22 @@ export class TwitchService extends Service implements IPlatformService {
     });
   }
 
+  @requiresToken()
+  fetchUserInfo() {
+    const headers = this.getHeaders();
+    const request = new Request(`https://api.twitch.tv/helix/users?id=${this.twitchId}`, { headers });
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(response => response.json())
+      .then(json => {
+        if (json[0] && json[0].login) {
+          return { username: (json[0].login as string) };
+        } else {
+          return {};
+        }
+      });
+  }
 
   fetchViewerCount(): Promise<number> {
     const headers = this.getHeaders();

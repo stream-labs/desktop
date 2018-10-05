@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
+import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
@@ -31,6 +32,7 @@ import { Subject } from 'rxjs/Subject';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
+import SubGoal from 'components/widgets/goal/SubGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -75,6 +77,7 @@ export function getComponents() {
   return {
     Main,
     Settings,
+    FFZSettings,
     SceneTransitions,
     SourcesShowcase,
     RenameSource,
@@ -106,6 +109,7 @@ export function getComponents() {
     TipJar,
     SponsorBanner,
     StreamBoss,
+    SubGoal,
     MediaShare,
 
     ChatbotCustomCommandWindow,

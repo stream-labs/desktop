@@ -27,7 +27,8 @@ export enum WidgetType {
   SpinWheel = 12,
   SponsorBanner = 13,
   MediaShare = 14,
-  // Chatbot = 15
+  SubGoal = 15,
+  // Chatbot = 16
 }
 
 
@@ -154,6 +155,21 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
     name: 'Subscriber Goal',
     url(host, token) {
       return `https://${host}/widgets/follower-goal?token=${token}`;
+    },
+
+    width: 600,
+    height: 200,
+
+    x: 0,
+    y: 1,
+
+    anchor: AnchorPoint.SouthWest,
+  },
+
+  [WidgetType.SubGoal]: {
+    name: 'Sub Goal',
+    url(host, token) {
+      return `https://${host}/widgets/sub-goal?token=${token}`;
     },
 
     width: 600,
@@ -345,7 +361,7 @@ export const WidgetDefinitions: { [x: number]: IWidget } = {
   // }
 };
 
-export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
+export const WidgetDisplayData = (platform?: string): { [x: number]: IWidgetDisplayData } => ({
   [WidgetType.AlertBox]: {
     name: $t('Alertbox'),
     description: $t('Thanks viewers with notification popups.'),
@@ -384,6 +400,14 @@ export const WidgetDisplayData = (): { [x: number]: IWidgetDisplayData } => ({
     demoFilename: 'source-follower-goal.png',
     supportList: [$t('Youtube Subscribers')],
     platforms: new Set(['youtube'])
+  },
+  [WidgetType.SubGoal]: {
+    name: platform === 'youtube' ? $t('Member Goal') : $t('Subscription Goal'),
+    description: $t('Set a goal for your viewers to help you reach.'),
+    demoVideo: false,
+    demoFilename: 'source-follower-goal.png',
+    supportList: [$t('Twitch Subscribers'), $t('Youtube Members'), $t('Mixer Subscriptions')],
+    platforms: new Set(['twitch', 'youtube', 'mixer'])
   },
   [WidgetType.BitGoal]: {
     name: $t('Bit Goal'),

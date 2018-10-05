@@ -7,6 +7,7 @@ import TextAreaInput from 'components/shared/inputs/TextAreaInput.vue';
 import ListInput from 'components/shared/inputs/ListInput.vue';
 import NumberInput from 'components/shared/inputs/NumberInput.vue';
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
   IListMetadata,
   ITextMetadata,
@@ -17,7 +18,7 @@ import {
 import {
   IAlertMessage,
   NEW_ALERT_MODAL_ID,
-  ChatbotAlertType
+  ChatbotAlertType,
 } from 'services/chatbot';
 
 interface INewAlertMetadata {
@@ -99,23 +100,30 @@ interface INewAlertData {
     TextInput,
     TextAreaInput,
     ListInput,
-    NumberInput
+    NumberInput,
+    ValidatedForm
   }
 })
 export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
   @Prop()
   selectedType: ChatbotAlertType;
 
+  $refs: {
+    form: ValidatedForm;
+  };
+
   onSubmitHandler: Function = () => {};
 
   newAlert: INewAlertData = cloneDeep(this.initialNewAlertState);
+
+  isEdit = false;
 
   get NEW_ALERT_MODAL_ID() {
     return NEW_ALERT_MODAL_ID;
   }
 
   get title() {
-    return `New ${this.selectedType} Alert`;
+    return `${this.isEdit ? 'Edit' : 'New'} ${this.selectedType} Alert`;
   }
 
   get isDonation() {
@@ -337,8 +345,10 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     const { onSubmitHandler, editedAlert } = event.params;
     this.onSubmitHandler = onSubmitHandler;
     if (editedAlert) {
+      this.isEdit = true;
       this.newAlert[this.selectedType].newMessage = cloneDeep(editedAlert);
     } else {
+      this.isEdit = false;
       this.newAlert = cloneDeep(this.initialNewAlertState);
     }
   }
@@ -347,7 +357,8 @@ export default class ChatbotNewAlertModalWindow extends ChatbotAlertsBase {
     this.$modal.hide(NEW_ALERT_MODAL_ID);
   }
 
-  onSubmit() {
+  async onSubmit() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
     this.onSubmitHandler(this.newAlert[this.selectedType].newMessage);
   }
 }

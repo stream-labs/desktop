@@ -10,15 +10,19 @@ import {
 import {
   EInputType,
 } from 'components/shared/inputs/index';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 import {
-  ISongRequestPreferencesResponse,
   ISongRequestData
 } from 'services/chatbot';
 
 
 @Component({})
-export default class ChatbotSongRequestPreferencesPreferencesWindow extends ChatbotWindowsBase {
+export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
+  $refs: {
+    form: ValidatedForm;
+  };
+
   tabs: ITab[] = [
     {
       name: $t('General'),
@@ -100,6 +104,8 @@ export default class ChatbotSongRequestPreferencesPreferencesWindow extends Chat
   }
 
   async onSaveHandler() {
+    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+
     await this.chatbotApiService.updateSongRequest({
       ...this.songRequestResponse,
       settings: this.songRequestData
