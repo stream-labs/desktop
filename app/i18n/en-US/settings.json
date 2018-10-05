@@ -506,6 +506,7 @@
   "cacheIdCopy": "Copy",
   "cacheManagement": "Management of the cache",
   "noticeWhileStreaming": "Some settings cannot be changed while streaming.",
+  "noticeForStreaming": "These settings are filled automatically while logged in to niconico.",
   "showCacheDirectory": "Show Cache Directory",
   "deleteCacheAndRestart": "Delete Cache and Restart",
   "confirmStreamTitleAndGameBeforeGoingLive": "Confirm stream title and game before going live",

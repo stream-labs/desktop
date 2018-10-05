@@ -506,6 +506,7 @@
   "cacheIdCopy": "コピーする",
   "cacheManagement": "キャッシュ管理",
   "noticeWhileStreaming": "現在配信中のため、一部の設定は変更できません。",
+  "noticeForStreaming": "niconicoログイン中は、これらの項目はニコニコ生放送用に自動設定されます。",
   "showCacheDirectory": "キャッシュディレクトリを表示",
   "deleteCacheAndRestart": "キャッシュを削除して再起動",
   "confirmStreamTitleAndGameBeforeGoingLive": "ライブになる前にストリームのタイトルとゲームを確認して下さい。",

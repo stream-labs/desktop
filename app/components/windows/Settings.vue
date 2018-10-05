@@ -22,6 +22,12 @@
           <i class="icon-warning"/>{{ $t('settings.noticeWhileStreaming')}}
         </p>
       </aside>
+      <aside class="notice-section" v-if="categoryName === 'Stream'">
+        <p class="notice-message">
+          <i class="icon-warning"/>{{ $t('settings.noticeForStreaming')}}
+        </p>
+      </aside>
+
       <extra-settings v-if="categoryName === 'General'" />
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
