@@ -485,7 +485,7 @@ export class PlatformAppsService extends
             return;
           }
 
-          if (details.url.includes(app.appUrl)) {
+          if (details.url.startsWith(app.appUrl)) {
             cb({});
             return;
           }
