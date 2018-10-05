@@ -7,6 +7,12 @@
       :disabled="params.poppedOut">
       Pop Out
     </button>
+    <button
+      v-if="isDevMode"
+      @click="refreshApp"
+      class="button button--default">
+      Reload
+    </button>
   </div>
   <PlatformAppWebview
     v-if="!params.poppedOut"

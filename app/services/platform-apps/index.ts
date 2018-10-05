@@ -393,7 +393,7 @@ export class PlatformAppsService extends
       .then(json => json.id_hash);
   }
 
-  getIsDevMode(): Promise<boolean> {
+  private getIsDevMode(): Promise<boolean> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/dev_mode`,
@@ -406,7 +406,7 @@ export class PlatformAppsService extends
       .then(json => json.dev_mode);
   }
 
-  loadManifestFromDisk(manifestPath: string): Promise<string> {
+  private loadManifestFromDisk(manifestPath: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       fs.readFile(manifestPath, (err, data) => {
         if (err) {
@@ -582,15 +582,17 @@ export class PlatformAppsService extends
   }
 
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
-    // TODO Disable original page?
+    const app = this.getApp(appId);
+    if (!app) return;
 
-    const windowId =  `${appId}-${pageSlot}`;
+    const windowId = `${appId}-${pageSlot}`;
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
     this.windowsService.createOneOffWindow({
       componentName: 'PlatformAppPopOut',
       queryParams: { appId, pageSlot },
+      title: app.manifest.name,
       size: {
         width: 600,
         height: 500
