@@ -219,7 +219,25 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
    * そうでなければ、ダイアログを出して選択を促すか、配信していない旨返す。
    * @param programId ユーザーが選択した番組ID(省略は未選択)
    */
-  async setupStreamSettings(programId: string = '', retrying = false): Promise<IStreamingSetting> {
+  async setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
+    try {
+      // 直接returnしてしまうとcatchできないので一度awaitで受ける
+      const result = await this._setupStreamSettings(programId);
+      return result;
+    } catch (e) {
+      // APIのレスポンスに番組状態が反映されるのが遅れる場合があるので、少し待ってリトライ
+      await new Promise(done => setTimeout(done, 3000));
+    }
+
+    try {
+      return this._setupStreamSettings(programId);
+    } catch (e) {
+      // リトライは1回だけ
+      return NiconicoService.emptyStreamingSetting(false);
+    }
+  }
+
+  private async _setupStreamSettings(programId: string = ''): Promise<IStreamingSetting> {
     const info = await this.fetchLiveProgramInfo(programId);
     console.log('fetchLiveProgramInfo: ' + JSON.stringify(info));
 
@@ -238,14 +256,7 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     }
     if (num < 1) {
       // 番組がない
-      if (retrying) {
-        // リトライするのは1回だけ
-        return NiconicoService.emptyStreamingSetting(false);
-      }
-
-      // 3秒後にリトライする
-      await new Promise(done => setTimeout(done, 3000));
-      return this.setupStreamSettings(programId, true);
+      throw new Error('no program');
     }
     const id = Object.keys(info)[0];
     const selected = info[id];
