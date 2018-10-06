@@ -62,5 +62,5 @@ export default class MediaShare extends WidgetSettings<IMediaShareData, MediaSha
   navItems = [
     { value: 'media', label: $t('Manage Media Settings') },
     { value: 'source', label: $t('Source') }
-  ]
+  ];
 }
