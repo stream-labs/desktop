@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Link Protection Preferences')"
 >
   <div slot="fixed">
     <div class="row">

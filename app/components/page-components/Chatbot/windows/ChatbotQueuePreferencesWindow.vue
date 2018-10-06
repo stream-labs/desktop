@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Queue Settings')"
  >
   <div slot="fixed">
    <div class="window-toggle__wrapper">

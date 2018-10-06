@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Chat Alert Preferences')"
 >
   <div slot="content" class="chatbot-alerts-window__container flex">
     <div class="chatbot-alerts-window__sidebar">

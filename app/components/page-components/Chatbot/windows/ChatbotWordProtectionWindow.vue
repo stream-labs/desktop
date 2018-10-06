@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Word Protection Preferences')"
 >
   <div slot="fixed">
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">
