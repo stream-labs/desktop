@@ -17,7 +17,13 @@ import {
 } from 'services/chatbot';
 
 
-@Component({})
+// general tab is all from chatbot api directly
+// banned item is from media share api sl.com
+@Component({
+  components: {
+    ValidatedForm
+  }
+})
 export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsBase {
   $refs: {
     form: ValidatedForm;
@@ -58,9 +64,7 @@ export default class ChatbotSongRequestPreferencesWindow extends ChatbotWindowsB
     this.songRequestBannedMedia = cloneDeep(
       this.chatbotApiService.state.songRequestPreferencesResponse.banned_media
     );
-    this.songRequestData = cloneDeep(
-      this.songRequestResponse.settings
-    );
+    this.songRequestData = cloneDeep(this.songRequestResponse.settings);
   }
 
   get songRequestResponse() {

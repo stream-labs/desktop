@@ -47,8 +47,8 @@ export default class Chatbot extends Vue {
     },
     { title: 'Timers', enabled: true },
     { title: 'Mod Tools', enabled: true },
-    { title: 'Quotes', enabled: false },
-    { title: 'Queue', enabled: false },
+    { title: 'Quotes', enabled: true },
+    { title: 'Queue', enabled: true },
     { title: 'Currency', enabled: false },
     { title: 'Poll', enabled: false },
     { title: 'Betting', enabled: false }

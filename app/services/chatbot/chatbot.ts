@@ -429,7 +429,6 @@ export class ChatbotApiService extends PersistentStatefulService<
   }
 
   fetchSongRequest() {
-    // mostly used for enable/disable only
     return this.api('GET', 'settings/songrequest', {}).then(
       (response: ISongRequestResponse) => {
         this.UPDATE_SONG_REQUEST(response);
