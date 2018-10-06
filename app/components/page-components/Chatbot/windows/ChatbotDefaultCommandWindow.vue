@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Edit Command')"
 >
   <div slot="fixed">
     <div class="row">

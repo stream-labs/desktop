@@ -5,6 +5,7 @@ import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
+import { $t } from 'services/i18n';
 import {
   MediaShareService,
   IMediaShareData,
@@ -889,6 +890,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotCustomCommandWindow',
+      title: $t('Chatbot Custom Command Window'),
       size: {
         width: 650,
         height: 600
@@ -902,6 +904,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotDefaultCommandWindow',
+      title: $t('Chatbot Default Commmand Window'),
       size: {
         width: 650,
         height: 650
@@ -915,6 +918,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotTimerWindow',
+      title: $t('Chatbot Timer Window'),
       size: {
         width: 650,
         height: 500
@@ -925,6 +929,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openChatbotAlertsWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotAlertsWindow',
+      title: $t('Chatbot Alerts Preferences'),
       size: {
         width: 1000,
         height: 700
@@ -935,6 +940,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openCapsProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotCapsProtectionWindow',
+      title: $t('Chatbot Caps Protection Preferences'),
       size: {
         width: 650,
         height: 500
@@ -945,6 +951,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSymbolProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSymbolProtectionWindow',
+      title: $t('Chatbot Symbol Protection Preferences'),
       size: {
         width: 650,
         height: 500
@@ -955,6 +962,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openLinkProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotLinkProtectionWindow',
+      title: $t('Chatbot Link Protection Preferences'),
       size: {
         width: 650,
         height: 650
@@ -965,6 +973,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openWordProtectionWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotWordProtectionWindow',
+      title: $t('Chatbot Word Protection Preferences'),
       size: {
         width: 650,
         height: 500
@@ -978,6 +987,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
     }
     this.windowsService.showWindow({
       componentName: 'ChatbotQuoteWindow',
+      title: $t('Chatbot Quote Window'),
       size: {
         width: 650,
         height: 500
@@ -988,6 +998,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQueuePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQueuePreferencesWindow',
+      title: $t('Chatbot Queue Preferences Window'),
       size: {
         width: 650,
         height: 500
@@ -998,6 +1009,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openQuotePreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotQuotePreferencesWindow',
+      title: $t('Chatbot Quote Preferences Window'),
       size: {
         width: 650,
         height: 300
@@ -1008,6 +1020,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestPreferencesWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestPreferencesWindow',
+      title: $t('Chatbot Song Request Preferences Window'),
       size: {
         width: 650,
         height: 500
@@ -1018,6 +1031,7 @@ export class ChatbotCommonService extends PersistentStatefulService<
   openSongRequestOnboardingWindow() {
     this.windowsService.showWindow({
       componentName: 'ChatbotSongRequestOnboardingWindow',
+      title: $t('Enabling Song Request'),
       size: {
         width: 750,
         height: 550

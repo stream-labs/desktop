@@ -3,7 +3,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Song Request Preferences')"
 >
   <div slot="fixed">
     <div class="row">

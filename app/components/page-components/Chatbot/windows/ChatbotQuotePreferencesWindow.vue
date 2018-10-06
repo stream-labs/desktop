@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="$t('Add Quote')"
 >
   <div slot="fixed">
    <div class="window-toggle__wrapper">
