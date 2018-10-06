@@ -4,11 +4,9 @@ import { $t } from 'services/i18n';
 import { ITab } from 'components/Tabs.vue';
 import { metadata as metadataHelper } from 'components/widgets/inputs';
 import { cloneDeep } from 'lodash';
+import { IMediaShareBan } from 'services/widgets/settings/media-share';
 import {
-  IMediaShareBan
-} from 'services/widgets/settings/media-share';
-import {
-  EInputType,
+ EInputType,
 } from 'components/shared/inputs/index';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 

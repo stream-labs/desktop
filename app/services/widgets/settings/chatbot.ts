@@ -1,7 +1,5 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from '../index';
+import { IWidgetData, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
-import { clone } from 'lodash';
-import { $t } from 'services/i18n';
 
 export interface IMediaShareData extends IWidgetData {
 }
@@ -39,6 +37,4 @@ export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData>
     alert('getting data. shouldnt come here');
     return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
-
-
 }

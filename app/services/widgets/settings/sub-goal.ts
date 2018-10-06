@@ -5,7 +5,6 @@ import { InheritMutations } from 'services/stateful-service';
 
 @InheritMutations()
 export class SubGoalService extends GenericGoalService {
-
   static initialState = WIDGET_INITIAL_STATE;
 
   getApiSettings() {
@@ -24,5 +23,4 @@ export class SubGoalService extends GenericGoalService {
       customFieldsAllowed: true
     }
   }
-
 }
