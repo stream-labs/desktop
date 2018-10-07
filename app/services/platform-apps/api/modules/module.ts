@@ -7,7 +7,8 @@ export enum EApiPermissions {
   Authorization = 'slobs.authorization',
   SceneCollections = 'slobs.scene-collections',
   ExternalLinks = 'slobs.external-links',
-  Notifications = 'slobs.notifications'
+  Notifications = 'slobs.notifications',
+  Hotkeys = 'slobs.hotkeys'
 }
 
 // TODO: What else should be included here?

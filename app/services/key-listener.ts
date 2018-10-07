@@ -10,8 +10,8 @@ import electron from 'electron';
 export type TKeyEventType = 'registerKeydown' | 'registerKeyup';
 
 
-interface INodeLibuiohookBinding {
-  callback: () => void;
+export interface IKeyBinding {
+  callback?: () => void;
   eventType: TKeyEventType;
   key: string; // Is key code
   modifiers: {
@@ -27,28 +27,75 @@ interface INodeLibuiohookBinding {
  * Node libuiohook is a native addon for binding global hotkeys
  */
 interface INodeLibuiohook {
-  registerCallback(binding: INodeLibuiohookBinding): boolean;
+  registerCallback(binding: IKeyBinding): boolean;
+  unregisterCallback(binding: IKeyBinding): void;
   unregisterAllCallbacks(): void;
 }
-
 
 export class KeyListenerService extends Service {
 
   private libuiohook: INodeLibuiohook;
 
+  // key -> namepsace -> function
+  bindings: Dictionary<Dictionary<IKeyBinding>> = {};
+
   init() {
     this.libuiohook = electron.remote.require('node-libuiohook');
   }
 
-  unregisterAll() {
-    this.libuiohook.unregisterAllCallbacks();
+  unregisterAll(namepsace = 'global') {
+    console.log(this.bindings);
+    Object.keys(this.bindings).forEach(keystr => {
+      if (this.bindings[keystr][namepsace]) {
+        this.unregister(this.bindings[keystr][namepsace], namepsace);
+      }
+    });
   }
 
-  register(binding: INodeLibuiohookBinding) {
+  register(binding: IKeyBinding, namepsace = 'global') {
     // An empty string is not valid
     if (!binding.key) return;
+    const keystr = this.getKeyString(binding);
 
-    this.libuiohook.registerCallback(binding);
+    // If no other namespaces have bound this key, create a new key object
+    // and binding it with libuiohook.
+    if (!this.bindings[keystr]) {
+      const success = this.libuiohook.registerCallback({
+        ...binding,
+        callback: () => {
+          Object.keys(this.bindings[keystr]).forEach(namespace => {
+            this.bindings[keystr][namepsace].callback();
+          });
+        }
+      });
+
+      if (!success) return;
+
+      this.bindings[keystr] = {};
+    }
+
+    this.bindings[keystr][namepsace] = binding;
+
+    return true;
+  }
+
+  unregister(binding: IKeyBinding, namepsace = 'global') {
+    const keystr = this.getKeyString(binding);
+    delete this.bindings[keystr][namepsace];
+
+    // TODO: Node-libuiohook unbinding of individual keys does not work.
+    // When that is fixed, this can be uncommented for efficiency.
+
+    // if (Object.keys(this.bindings[keystr]).length === 0) {
+    //   delete this.bindings[keystr];
+    //   this.libuiohook.unregisterCallback(binding);
+    // }
+  }
+
+  // Returns a string used for fast lookup of this keybinding
+  private getKeyString(binding: IKeyBinding) {
+    return `${binding.key}-${binding.eventType}-${!!binding.modifiers.alt}-` +
+      `${!!binding.modifiers.ctrl}-${!!binding.modifiers.shift}-${!!binding.modifiers.meta}`;
   }
 
 }
