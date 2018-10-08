@@ -344,7 +344,27 @@ export class SettingsService extends StatefulService<ISettingsState>
         return false;
       }
 
-      return fs.existsSync(path) && fs.statSync(path).isDirectory();
+      return this.isValidOutputRecordingUri(path) || this.isValidOutputRecordingDirectoryPath(path)
+  }
+
+  isValidOutputRecordingDirectoryPath(recordingPath: string): boolean {
+
+    return fs.existsSync(recordingPath) && fs.statSync(recordingPath).isDirectory();
+  }
+
+  isValidOutputRecordingUri(uri: string): boolean {
+    let parsedUri;
+    try{
+      parsedUri = new URL(uri);
+    }catch(e){
+      if(e instanceof TypeError){
+        return false;
+      }else{
+        console.log('unexpected error thrown:', e);
+        throw e;
+      }
+    }
+    return parsedUri.protocol === 'rtmp:';
   }
 
   getOutputRecordingPath(): string | undefined {
@@ -363,7 +383,13 @@ export class SettingsService extends StatefulService<ISettingsState>
             return this.findSettingValue(output, 'Recording', 'RecFilePath');
 
           case 'Custom Output (FFmpeg)':
-            return this.findSettingValue(output, 'Recording', 'FFFilePath');
+            const ffMpegMode = this.findSettingValue(output,'Recording','FFOutputToFile')
+            switch(ffMpegMode){
+              case 0: // Output to URL
+                return this.findSettingValue(output, 'Recording', 'FFURL');
+              case 1: // Output to File
+                return this.findSettingValue(output, 'Recording', 'FFFilePath');
+            }
         }
       }
     }
