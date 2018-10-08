@@ -41,7 +41,7 @@ export class PlatformAppsApi {
    * replaced with a method that returns a rejected promise
    * explaining the lack of permissions.
    */
-  getApi(app: ILoadedApp, permissions: EApiPermissions[]) {
+  getApi(app: ILoadedApp) {
     const api: Dictionary<TApiModule> = {};
 
     const context: IApiContext = { app };
@@ -53,7 +53,7 @@ export class PlatformAppsApi {
 
       // TODO this is a weird pattern
       for (let permission of this.modules[moduleName].permissions) {
-        authorized = permissions.includes(permission);
+        authorized = app.manifest.permissions.includes(permission);
         if (!authorized) break;
       }
 

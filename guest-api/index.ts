@@ -9,6 +9,7 @@ import {
   IGuestApiResponse,
   IGuestApiCallback
 } from '../app/services/guest-api';
+import uuid from 'uuid/v4';
 
 (() => {
   global.eval = function() {
@@ -26,12 +27,6 @@ import {
   const requests: {
     [requestId: string]: IRequest;
   } = {};
-  let idCounter = 0;
-
-  const getUniqueId = () => {
-    idCounter += 1;
-    return idCounter.toString();
-  };
 
   let ready: Function;
   const readyPromise = new Promise<boolean>(resolve => {
@@ -41,6 +36,8 @@ import {
   electron.ipcRenderer.on(
     'guestApiCallback',
     (event: any, response: IGuestApiCallback) => {
+      // This window was likely reloaded and no longer cares about this callback.
+      if (!requests[response.requestId]) return;
       requests[response.requestId].callbacks[response.callbackId](...response.args);
     }
   );
@@ -48,10 +45,18 @@ import {
   electron.ipcRenderer.on(
     'guestApiResponse',
     (event: any, response: IGuestApiResponse) => {
+      if (!requests[response.id]) return;
+
       if (response.error) {
         requests[response.id].reject(response.result);
       } else {
         requests[response.id].resolve(response.result);
+      }
+
+      // Delete the request object if there aren't any callbacks
+      // to avoid leaking too much memory.
+      if (Object.keys(requests[response.id].callbacks).length === 0) {
+        delete requests[response.id];
       }
     }
   );
@@ -82,7 +87,7 @@ import {
         },
 
         apply(target, thisArg, args: any[]) {
-          const requestId = getUniqueId();
+          const requestId = uuid();
           requests[requestId] = {
             resolve: null,
             reject: null,
@@ -94,7 +99,7 @@ import {
           });
           const mappedArgs = args.map(arg => {
             if (typeof arg === 'function') {
-              const callbackId = getUniqueId();
+              const callbackId = uuid();
 
               requests[requestId].callbacks[callbackId] = arg;
 

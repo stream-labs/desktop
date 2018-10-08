@@ -71,13 +71,11 @@ export class GuestApiService extends Service {
 
     // To avoid leaks, automatically unregister this API when the webContents
     // is destroyed.
-    const webContents = electron.remote.webContents.fromId(webContentsId)
+    const webContents = electron.remote.webContents.fromId(webContentsId);
     webContents.on('destroyed', () => {
-      console.log('Destroying API for webcontents', webContentsId);
       delete this.handlers[webContentsId];
 
       subscriptions.forEach(sub => {
-        console.log('unsubscribing for webview', sub);
         sub.unsubscribe();
       });
       subscriptions = [];
