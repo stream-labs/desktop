@@ -26,7 +26,7 @@ interface IAlertBoxGeneralSettings extends IWidgetSettings {
 }
 
 // ALERT VARIATION
-interface IAlertBoxVariation {
+export interface IAlertBoxVariation {
   condition: string;
   conditionData: any;
   conditions: { type: string, description: string }[];
@@ -514,25 +514,25 @@ IAlertBoxPatreonSettings,
 IAlertBoxTiltifySettings {}
 
 // SLOBS GENERAL SETTINGS
-interface IAlertBoxSlobsSettings {
+export interface IAlertBoxSetting {
   enabled: boolean;
   showMessage: boolean;
   variations: IAlertBoxVariation[]
 }
 
 export interface IAlertBoxSettings extends IAlertBoxGeneralSettings {
-  subs: IAlertBoxSlobsSettings;
-  bits: IAlertBoxSlobsSettings;
-  donations: IAlertBoxSlobsSettings;
-  follows: IAlertBoxSlobsSettings;
-  hosts: IAlertBoxSlobsSettings;
-  raids: IAlertBoxSlobsSettings;
-  merch: IAlertBoxSlobsSettings;
-  treat?: IAlertBoxSlobsSettings;
-  donorDrive?: IAlertBoxSlobsSettings;
-  extraLife?: IAlertBoxSlobsSettings;
-  gamewisp?: IAlertBoxSlobsSettings;
-  justGiving?: IAlertBoxSlobsSettings;
-  patreon?: IAlertBoxSlobsSettings;
-  tiltify?: IAlertBoxSlobsSettings;
+  subs: IAlertBoxSetting;
+  bits: IAlertBoxSetting;
+  donations: IAlertBoxSetting;
+  follows: IAlertBoxSetting;
+  hosts: IAlertBoxSetting;
+  raids: IAlertBoxSetting;
+  merch: IAlertBoxSetting;
+  treat?: IAlertBoxSetting;
+  donorDrive?: IAlertBoxSetting;
+  extraLife?: IAlertBoxSetting;
+  gamewisp?: IAlertBoxSetting;
+  justGiving?: IAlertBoxSetting;
+  patreon?: IAlertBoxSetting;
+  tiltify?: IAlertBoxSetting;
 }
