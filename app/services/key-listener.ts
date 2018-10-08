@@ -43,16 +43,16 @@ export class KeyListenerService extends Service {
     this.libuiohook = electron.remote.require('node-libuiohook');
   }
 
-  unregisterAll(namepsace = 'global') {
+  unregisterAll(namespace = 'global') {
     console.log(this.bindings);
     Object.keys(this.bindings).forEach(keystr => {
-      if (this.bindings[keystr][namepsace]) {
-        this.unregister(this.bindings[keystr][namepsace], namepsace);
+      if (this.bindings[keystr][namespace]) {
+        this.unregister(this.bindings[keystr][namespace], namespace);
       }
     });
   }
 
-  register(binding: IKeyBinding, namepsace = 'global') {
+  register(binding: IKeyBinding, namespace = 'global') {
     // An empty string is not valid
     if (!binding.key) return;
     const keystr = this.getKeyString(binding);
@@ -64,7 +64,7 @@ export class KeyListenerService extends Service {
         ...binding,
         callback: () => {
           Object.keys(this.bindings[keystr]).forEach(namespace => {
-            this.bindings[keystr][namepsace].callback();
+            this.bindings[keystr][namespace].callback();
           });
         }
       });
@@ -74,14 +74,14 @@ export class KeyListenerService extends Service {
       this.bindings[keystr] = {};
     }
 
-    this.bindings[keystr][namepsace] = binding;
+    this.bindings[keystr][namespace] = binding;
 
     return true;
   }
 
-  unregister(binding: IKeyBinding, namepsace = 'global') {
+  unregister(binding: IKeyBinding, namespace = 'global') {
     const keystr = this.getKeyString(binding);
-    delete this.bindings[keystr][namepsace];
+    delete this.bindings[keystr][namespace];
 
     // TODO: Node-libuiohook unbinding of individual keys does not work.
     // When that is fixed, this can be uncommented for efficiency.
