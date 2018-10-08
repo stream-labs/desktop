@@ -394,7 +394,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.TipJar,
       WidgetType.SubGoal,
       WidgetType.MediaShare,
-      WidgetType.SponsorBanner
+      WidgetType.SponsorBanner,
+      WidgetType.AlertBox
     ];
 
     if (isWidget && this.userService.isLoggedIn()) {

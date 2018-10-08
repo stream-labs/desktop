@@ -40,6 +40,10 @@ import StreamBoss from 'components/widgets/StreamBoss.vue';
 import DonationTicker from 'components/widgets/DonationTicker.vue';
 import Credits from 'components/widgets/Credits.vue';
 import EventList from 'components/widgets/EventList.vue';
+import TipJar from 'components/widgets/TipJar.vue';
+import SponsorBanner from 'components/widgets/SponsorBanner.vue';
+import MediaShare from 'components/widgets/MediaShare.vue';
+import AlertBox from 'components/widgets/AlertBox.vue';
 
 import ChatbotCustomCommandWindow from 'components/page-components/Chatbot/windows/ChatbotCustomCommandWindow.vue';
 import ChatbotDefaultCommandWindow from 'components/page-components/Chatbot/windows/ChatbotDefaultCommandWindow.vue';
@@ -62,10 +66,7 @@ import ChatbotSongRequestPreferencesWindow
 import ChatbotSongRequestOnboardingWindow
   from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
 
-import TipJar from 'components/widgets/TipJar.vue';
-import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
-import MediaShare from 'components/widgets/MediaShare.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -111,6 +112,7 @@ export function getComponents() {
     StreamBoss,
     SubGoal,
     MediaShare,
+    AlertBox,
 
     ChatbotCustomCommandWindow,
     ChatbotDefaultCommandWindow,

@@ -37,6 +37,8 @@ export default class WidgetEditor extends Vue {
   @Inject() private windowsService: WindowsService;
   @Inject() private projectorService: ProjectorService;
 
+  @Prop() isAlertBox?: boolean;
+
   /**
    * Declaration of additional sections in the right panel
    * @see example of usage in TipJar.vue.ts

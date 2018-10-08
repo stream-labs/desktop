@@ -20,8 +20,6 @@ const API_NAME_MAP =  {
   raid: 'raids'
 };
 
-const API_NAMES = new Set(Object.keys(API_NAME_MAP).map((key) => API_NAME_MAP[key]));
-
 const REGEX_TESTERS = Object.keys(API_NAME_MAP).map((key) => (
   { name: API_NAME_MAP[key], tester: new RegExp(`^${key}s?_|show_${key}_`) }
 ));
@@ -30,9 +28,14 @@ export interface IAlertBoxData extends IWidgetData {
   settings: IAlertBoxSettings;
 }
 
+
 @InheritMutations()
 export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   static initialState = WIDGET_INITIAL_STATE;
+
+  apiNames() {
+    return Object.keys(API_NAME_MAP).map((key) => API_NAME_MAP[key]);
+  }
 
   getApiSettings() {
     return {
@@ -50,6 +53,7 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
     const { settings, ...rest } = data;
     const newSettings = this.transformSettings(settings);
+    console.log(newSettings);
     return { ...rest, settings: newSettings };
   }
 
@@ -61,7 +65,9 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   private transformSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
     const triagedSettings = this.triageSettings(settings);
     Object.keys(triagedSettings).forEach((key) => {
-      if(API_NAMES.has(key)) triagedSettings[key] = this.varifySetting(triagedSettings[key]);
+      if(this.apiNames().includes(key) && key !== 'resubs') {
+        triagedSettings[key] = this.varifySetting(triagedSettings[key]);
+      }
     })
 
     return triagedSettings;
