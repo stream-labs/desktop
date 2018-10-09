@@ -397,174 +397,175 @@ export class SettingsService extends StatefulService<ISettingsState>
               }
           }
         }
-        return undefined;
     }
+    return undefined;
+  }
 
-    /**
-     * Returns some information about the user's streaming settings.
-     * This is used in aggregate to improve our optimized video encoding.
-     *
-     * P.S. Settings needs a refactor... badly
-     */
-    getStreamEncoderSettings() {
-      const output = this.getSettingsFormData('Output');
-      const video = this.getSettingsFormData('Video');
+  /**
+   * Returns some information about the user's streaming settings.
+   * This is used in aggregate to improve our optimized video encoding.
+   *
+   * P.S. Settings needs a refactor... badly
+   */
+  getStreamEncoderSettings() {
+    const output = this.getSettingsFormData('Output');
+    const video = this.getSettingsFormData('Video');
 
-      const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
-        this.findSettingValue(output, 'Streaming', 'StreamEncoder');
-      const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
-        this.findSettingValue(output, 'Streaming', 'Preset') ||
-        this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
-        this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
-        this.findSettingValue(output, 'Streaming', 'target_usage') ||
-        this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
-        this.findSettingValue(output, 'Streaming', 'AMDPreset');
-      const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
-        this.findSettingValue(output, 'Streaming', 'VBitrate');
-      const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
-      const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
+    const encoder = this.findSettingValue(output, 'Streaming', 'Encoder') ||
+      this.findSettingValue(output, 'Streaming', 'StreamEncoder');
+    const preset = this.findSettingValue(output, 'Streaming', 'preset') ||
+      this.findSettingValue(output, 'Streaming', 'Preset') ||
+      this.findSettingValue(output, 'Streaming', 'NVENCPreset') ||
+      this.findSettingValue(output, 'Streaming', 'QSVPreset') ||
+      this.findSettingValue(output, 'Streaming', 'target_usage') ||
+      this.findSettingValue(output, 'Streaming', 'QualityPreset') ||
+      this.findSettingValue(output, 'Streaming', 'AMDPreset');
+    const bitrate = this.findSettingValue(output, 'Streaming', 'bitrate') ||
+      this.findSettingValue(output, 'Streaming', 'VBitrate');
+    const baseResolution = this.findSettingValue(video, 'Untitled', 'Base');
+    const outputResolution = this.findSettingValue(video, 'Untitled', 'Output');
 
-      return {
-        encoder,
-        preset,
-        bitrate,
-        baseResolution,
-        outputResolution
-      };
+    return {
+      encoder,
+      preset,
+      bitrate,
+      baseResolution,
+      outputResolution
+    };
+  }
+
+  diffOptimizedSettings(bitrate: number): OptimizedSettings {
+    let audioBitrate: number;
+    let quality: string;
+    if (bitrate >= 6000) {
+      audioBitrate = 192;
+      quality = '1280x720';
+    } else if (bitrate >= 2000) {
+      audioBitrate = 192;
+      quality = '800x450';
+    } else if (bitrate >= 1000) {
+      audioBitrate = 96;
+      quality = '800x450';
+    } else if (bitrate >= 384) {
+      audioBitrate = 48;
+      quality = '512x288';
+    } else {
+      audioBitrate = 48;
+      quality = '512x288';
     }
+    const videoBitrate = bitrate - audioBitrate;
+    const colorSpace = '709';
+    const fps = '30';
+    const outputMode = 'Simple';
 
-    diffOptimizedSettings(bitrate: number): OptimizedSettings {
-      let audioBitrate: number;
-      let quality: string;
-      if (bitrate >= 6000) {
-        audioBitrate = 192;
-        quality = '1280x720';
-      } else if (bitrate >= 2000) {
-        audioBitrate = 192;
-        quality = '800x450';
-      } else if (bitrate >= 1000) {
-        audioBitrate = 96;
-        quality = '800x450';
-      } else if (bitrate >= 384) {
-        audioBitrate = 48;
-        quality = '512x288';
-      } else {
-        audioBitrate = 48;
-        quality = '512x288';
-      }
-      const videoBitrate = bitrate - audioBitrate;
-      const colorSpace = '709';
-      const fps = '30';
-      const outputMode = 'Simple';
-
-      // 出力モードが Simple でないときは Simpleに戻した上で現在の値を取得する
-      let output = this.getSettingsFormData('Output');
-      const lastMode = this.findSettingValue(output, 'Untitled', 'Mode');
-      if (lastMode !== outputMode) {
-        const mode = this.findSetting(output, 'Untitled', 'Mode');
-        if (mode) {
-          mode.value = outputMode;
-          this.setSettings('Output', output);
-          output = this.getSettingsFormData('Output');
-        }
-      }
-
-      const video = this.getSettingsFormData('Video');
-      const advanced = this.getSettingsFormData('Advanced');
-
-      const settings: OptimizedSettings = {
-        currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
-        currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
-        currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
-        currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
-        currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
-        currentOutputMode: lastMode
-      };
-      const length = Object.keys(settings).length;
-
-      // 出力モードを元に戻す
-      if (lastMode !== outputMode) {
-        const mode = this.findSetting(output, 'Untitled', 'Mode');
-        if (mode) {
-          mode.value = lastMode;
-          this.setSettings('Output', output);
-        }
-      }
-
-      if (videoBitrate !== settings.currentVideoBitrate) {
-        settings.optimizedVideoBitrate = videoBitrate;
-      }
-      // aBitrateは文字列にする必要がある
-      const audioBitrateValue = audioBitrate.toString(10);
-      if (audioBitrateValue !== settings.currentAudioBitrate) {
-        settings.optimizedAudioBitrate = audioBitrateValue;
-      }
-      if (quality !== settings.currentQuality) {
-        settings.optimizedQuality = quality;
-      }
-      if (colorSpace !== settings.currentColorSpace) {
-        settings.optimizedColorSpace = colorSpace;
-      }
-      if (fps !== settings.currentFps) {
-        settings.optimizedFps = fps;
-      }
-      if (outputMode !== settings.currentOutputMode) {
-        settings.optimizedOutputMode = outputMode;
-      }
-      return Object.keys(settings).length > length ? settings : undefined;
-    }
-
-    optimizeForNiconico(settings: OptimizedSettings) {
-      let output = this.getSettingsFormData('Output');
-      if ('optimizedOutputMode' in settings) {
-        const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
-        if (anOutputMode) {
-          anOutputMode.value = settings.optimizedOutputMode;
-        }
+    // 出力モードが Simple でないときは Simpleに戻した上で現在の値を取得する
+    let output = this.getSettingsFormData('Output');
+    const lastMode = this.findSettingValue(output, 'Untitled', 'Mode');
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = outputMode;
         this.setSettings('Output', output);
         output = this.getSettingsFormData('Output');
       }
+    }
 
-      // https://github.com/n-air-app/n-air-app/issues/3
-      if ('optimizedColorSpace' in settings) {
-        const advanced = this.getSettingsFormData('Advanced');
-        const colorSpaceSetting = this.findSetting(advanced, 'Video', 'ColorSpace');
-        if (colorSpaceSetting) {
-          colorSpaceSetting.value = settings.optimizedColorSpace;
-        }
-        this.setSettings('Advanced', advanced);
-      }
+    const video = this.getSettingsFormData('Video');
+    const advanced = this.getSettingsFormData('Advanced');
 
-      // https://github.com/n-air-app/n-air-app/issues/13
-      if ('optimizedVideoBitrate' in settings) {
-        const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
-        if (vBitrateSetting) {
-          vBitrateSetting.value = settings.optimizedVideoBitrate;
-        }
+    const settings: OptimizedSettings = {
+      currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
+      currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
+      currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
+      currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
+      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
+      currentOutputMode: lastMode
+    };
+    const length = Object.keys(settings).length;
+
+    // 出力モードを元に戻す
+    if (lastMode !== outputMode) {
+      const mode = this.findSetting(output, 'Untitled', 'Mode');
+      if (mode) {
+        mode.value = lastMode;
+        this.setSettings('Output', output);
       }
-      if ('optimizedAudioBitrate' in settings) {
-        const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
-        if (aBitrateSetting) {
-          aBitrateSetting.value = settings.optimizedAudioBitrate;
-        }
+    }
+
+    if (videoBitrate !== settings.currentVideoBitrate) {
+      settings.optimizedVideoBitrate = videoBitrate;
+    }
+    // aBitrateは文字列にする必要がある
+    const audioBitrateValue = audioBitrate.toString(10);
+    if (audioBitrateValue !== settings.currentAudioBitrate) {
+      settings.optimizedAudioBitrate = audioBitrateValue;
+    }
+    if (quality !== settings.currentQuality) {
+      settings.optimizedQuality = quality;
+    }
+    if (colorSpace !== settings.currentColorSpace) {
+      settings.optimizedColorSpace = colorSpace;
+    }
+    if (fps !== settings.currentFps) {
+      settings.optimizedFps = fps;
+    }
+    if (outputMode !== settings.currentOutputMode) {
+      settings.optimizedOutputMode = outputMode;
+    }
+    return Object.keys(settings).length > length ? settings : undefined;
+  }
+
+  optimizeForNiconico(settings: OptimizedSettings) {
+    let output = this.getSettingsFormData('Output');
+    if ('optimizedOutputMode' in settings) {
+      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
+      if (anOutputMode) {
+        anOutputMode.value = settings.optimizedOutputMode;
       }
       this.setSettings('Output', output);
-
-      const video = this.getSettingsFormData('Video');
-      if ('optimizedQuality' in settings) {
-        const outputSetting = this.findSetting(video, 'Untitled', 'Output');
-        if (outputSetting) {
-          outputSetting.value = settings.optimizedQuality;
-        }
-      }
-      if ('optimizedFps' in settings) {
-        const fpsSetting = this.findSetting(video, 'Untitled', 'FPSCommon');
-        if (fpsSetting) {
-          fpsSetting.value = settings.optimizedFps;
-        }
-      }
-      this.setSettings('Video', video);
+      output = this.getSettingsFormData('Output');
     }
+
+    // https://github.com/n-air-app/n-air-app/issues/3
+    if ('optimizedColorSpace' in settings) {
+      const advanced = this.getSettingsFormData('Advanced');
+      const colorSpaceSetting = this.findSetting(advanced, 'Video', 'ColorSpace');
+      if (colorSpaceSetting) {
+        colorSpaceSetting.value = settings.optimizedColorSpace;
+      }
+      this.setSettings('Advanced', advanced);
+    }
+
+    // https://github.com/n-air-app/n-air-app/issues/13
+    if ('optimizedVideoBitrate' in settings) {
+      const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
+      if (vBitrateSetting) {
+        vBitrateSetting.value = settings.optimizedVideoBitrate;
+      }
+    }
+    if ('optimizedAudioBitrate' in settings) {
+      const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
+      if (aBitrateSetting) {
+        aBitrateSetting.value = settings.optimizedAudioBitrate;
+      }
+    }
+    this.setSettings('Output', output);
+
+    const video = this.getSettingsFormData('Video');
+    if ('optimizedQuality' in settings) {
+      const outputSetting = this.findSetting(video, 'Untitled', 'Output');
+      if (outputSetting) {
+        outputSetting.value = settings.optimizedQuality;
+      }
+    }
+    if ('optimizedFps' in settings) {
+      const fpsSetting = this.findSetting(video, 'Untitled', 'FPSCommon');
+      if (fpsSetting) {
+        fpsSetting.value = settings.optimizedFps;
+      }
+    }
+    this.setSettings('Video', video);
+  }
 
   private findSubCategory(settings: ISettingsSubCategory[], category: string): ISettingsSubCategory[] {
     // there are one or more subCategory objects whitch have the same name!

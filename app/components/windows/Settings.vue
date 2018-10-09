@@ -24,7 +24,9 @@
       </aside>
       <aside class="notice-section" v-if="categoryName === 'Stream'">
         <p class="notice-message">
-          <i class="icon-warning"/>{{ $t('settings.noticeForStreaming')}}
+          <i class="icon-warning"/><i18n path="settings.noticeForStreaming">
+            <br place="br" />
+          </i18n>
         </p>
       </aside>
 
