@@ -41,8 +41,8 @@ export default class PlatformAppContainer extends Vue {
     this.platformAppsService.popOutAppPage(this.params.appId, this.slot);
   }
 
-  get isDevMode() {
-    return this.platformAppsService.state.devMode;
+  get isUnpacked() {
+    return this.app.unpacked;
   }
 
   refreshApp() {
