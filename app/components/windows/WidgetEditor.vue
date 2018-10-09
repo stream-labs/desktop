@@ -415,7 +415,7 @@
       border-color: @night-accent-dark;
       &:hover,
       &.active {
-        background-color: @dark-2;
+        background-color: @night-primary;
       }
     }
     .code-editor {
