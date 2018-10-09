@@ -1,7 +1,5 @@
-import { IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, WidgetSettingsService } from './widget-settings';
 import { WidgetType } from 'services/widgets';
-import { clone } from 'lodash';
-import { $t } from 'services/i18n';
 
 export interface IMediaShareData extends IWidgetData {
 }
