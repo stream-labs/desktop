@@ -83,7 +83,7 @@ async function checkChance(info, version) {
 
     if (response.statusCode !== 200) {
         console.log(`No chance file found! Assuming 100...`);
-        return Promise.resolve(true);
+        return true;
     }
 
     const rollCache = path.join(info.cacheDir, 'rolls', version);
@@ -116,10 +116,10 @@ async function checkChance(info, version) {
     console.log(`You rolled ${roll}`);
 
     if (roll <= chance) {
-        return Promise.resolve(true);
+        return true;
     }
 
-    return Promise.resolve(false);
+    return false;
 }
 
 /* Note that latest-updater.exe never changes
@@ -185,10 +185,10 @@ async function getVersion(info) {
             `- ${response.statusCode}`
         );
 
-        return Promise.resolve(null);
+        return null;
     }
 
-    return Promise.resolve(response.body.version);
+    return response.body.version;
 }
 
 /* Note that we return true when we fail to fetch
@@ -207,17 +207,17 @@ async function entry(info) {
     * If it's different, update to latest. */
     if (!latestVersion) {
         console.log('Failed to fetch latest version!');
-        return Promise.resolve(false);
+        return false;
     }
 
     if (info.version === latestVersion) {
         console.log('Already latest version!');
-        return Promise.resolve(false);
+        return false;
     }
 
     if (!await checkChance(info, latestVersion)) {
         console.log('Failed the chance lottery. Better luck next time!');
-        return Promise.resolve(false);
+        return false;
     }
 
     try {
