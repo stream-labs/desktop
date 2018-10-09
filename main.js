@@ -322,10 +322,6 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
-<<<<<<< HEAD
-  if (false && (process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    (new Updater(startApp)).run();
-=======
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
     const updateInfo = {
       baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
@@ -348,7 +344,6 @@ app.on('ready', () => {
         startApp();
       }
     });
->>>>>>> staging
   } else {
     startApp();
   }
