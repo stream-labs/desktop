@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="isEdit ? $t('Edit Command') : $t('Add Command')"
 >
   <div slot="fixed">
     <Tabs :tabs="tabs" :value="selectedTab" @input="onSelectTabHandler">

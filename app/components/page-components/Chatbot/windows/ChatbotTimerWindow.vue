@@ -2,7 +2,6 @@
 <ModalLayout
   :showControls="false"
   :customControls="true"
-  :title="isEdit ? $t('Edit Timer') : $t('Add Timer')"
 >
   <div slot="content">
     <validated-form ref="form">
