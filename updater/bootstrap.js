@@ -18,6 +18,7 @@ const fs = require('fs');
 const request = require('request');
 const zlib = require('zlib');
 const cp = require('child_process');
+const semver = require('semver');
 const { BrowserWindow } = require('electron');
 const prequest = util.promisify(request);
 const readFile = util.promisify(fs.readFile);
@@ -212,6 +213,11 @@ async function entry(info) {
 
     if (info.version === latestVersion) {
         console.log('Already latest version!');
+        return false;
+    }
+
+    if (semver.gt(info.version, latestVersion)) {
+        console.log('Latest version is less than current version!');
         return false;
     }
 
