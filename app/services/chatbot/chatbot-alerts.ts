@@ -47,6 +47,15 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
     );
   }
 
+  // reset
+  resetSettings() {
+    return this.chatbotBaseApiService.resetSettings('chat-notifications').then(
+      (response: IChatAlertsResponse) => {
+        this.UPDATE_CHAT_ALERTS(response);
+      }
+    )
+  }
+
   //
   // Mutations
   //
