@@ -1,5 +1,5 @@
 <template>
-  <ul class="nav-menu">
+  <ul class="nav-menu" :class="{'nav-menu--child': isChild}">
     <slot></slot>
   </ul>
 </template>
@@ -9,12 +9,17 @@
 <style lang="less" scoped>
 @import "../../styles/index";
 
-.nav-menu {
+.nav-menu:not(.nav-menu--child) {
   flex: 0 0 240px;
   display: flex;
   flex-direction: column;
   .padding-top(2);
   .padding-right(2);
   margin-left: @0;
+}
+
+.nav-menu--child {
+  padding: 0;
+  margin: 0;
 }
 </style>
