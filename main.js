@@ -20,10 +20,11 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const { Updater } = require('./updater/Updater.js');
+const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
+const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 
 app.disableHardwareAcceleration();
@@ -31,6 +32,17 @@ app.disableHardwareAcceleration();
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
+
+/* Determine the current release channel we're
+ * on based on name. The channel will always be
+ * the premajor identifier, if it exists.
+ * Otherwise, default to latest. */
+const releaseChannel = (() => {
+  const components = semver.prerelease(pjson.version);
+
+  if (components) return components[0];
+  return 'latest';
+})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -55,7 +67,6 @@ let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
 
-
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -71,7 +82,6 @@ function getObs() {
 
   return _obs;
 }
-
 
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
@@ -312,8 +322,33 @@ if (shouldQuit) {
 }
 
 app.on('ready', () => {
+<<<<<<< HEAD
   if (false && (process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
     (new Updater(startApp)).run();
+=======
+  if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
+    const updateInfo = {
+      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
+      version: pjson.version,
+      exec: process.argv,
+      cwd: process.cwd(),
+      waitPid: [ process.pid ],
+      appDir: path.dirname(app.getPath('exe')),
+      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
+      cacheDir: app.getPath('userData'),
+      versionFileName: `${releaseChannel}.json`
+    };
+
+    console.log(updateInfo);
+    bootstrap(updateInfo).then((updating) => {
+      if (updating) {
+        console.log('Closing for update...');
+        app.exit();
+      } else {
+        startApp();
+      }
+    });
+>>>>>>> staging
   } else {
     startApp();
   }
