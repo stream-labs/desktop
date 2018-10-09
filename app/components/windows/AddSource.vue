@@ -43,7 +43,7 @@
     <div class="sources-browser row" v-if="existingSources.length">
       <div class="small-6 columns">
         <selector
-            class="studio-controls-selector"
+            class="selector-list"
             :draggable="false"
             @dblclick="addExisting"
             @select="sourceId => { selectedSourceId = sourceId }"
@@ -121,7 +121,7 @@
   text-transform: none;
 }
 
-.studio-controls-selector {
+.selector-list {
   width: 100%;
 }
 

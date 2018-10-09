@@ -2,6 +2,7 @@
 @import "./styles/checkboxes";
 @import "./styles/tables";
 @import "./styles/buttons";
+@import "./styles/callouts";
 @import "./styles/classes";
 @import "./styles/custom-icons";
 @import "./styles/inputs";
@@ -10,7 +11,7 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -59,7 +60,7 @@ h3 {
 h4 {
   font-family: 'Roboto';
   .text-transform();
-  font-size: 13px;
+  font-size: 14px;
   .weight(@medium);
   margin-bottom: 20px;
   color: @day-title;
@@ -82,13 +83,11 @@ label {
 
 a,
 .link {
-  .transition;
+  .transition();
   text-decoration: underline;
   .weight(@medium);
   color: @day-link;
   text-decoration: none;
-  display: flex;
-  align-items: center;
 
   &:hover {
     color: @day-link-active;
@@ -116,22 +115,11 @@ a,
   cursor: pointer;
 }
 
-.link--uppercase {
-  .link;
-  text-transform: uppercase;
-  .letter-spacing;
-  font-size: 12px;
-}
-
-.label--icon {
-  margin-right: 4px;
-}
-
 .select {
   position: relative;
 
   select {
-    font-size: 13px;
+    font-size: 14px;
     margin: 0;
     padding: 0 32px 0 8px;
 
@@ -244,7 +232,7 @@ a,
 .tab-button {
   border-bottom: 1px solid transparent;
   height: 48px;
-  margin-right: 20px;
+  .margin-right(2);
   .link--capitalize();
 
   &:focus {
@@ -253,7 +241,7 @@ a,
 
   .fa,
   i {
-    font-size: 15px;
+    font-size: 14px;
     vertical-align: middle;
     color: @icon;
   }

@@ -43,7 +43,6 @@
   </div>
 
   <selector
-    class="studio-controls-selector"
     :items="scenes"
     :activeItems="activeSceneId ? [activeSceneId] : []"
     @select="makeActive"

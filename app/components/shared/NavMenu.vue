@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   .padding-top(2);
-  .padding-right(3);
+  .padding-right(2);
   margin-left: @0;
 }
 </style>

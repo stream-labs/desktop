@@ -27,8 +27,7 @@ export default class DesignSystem extends Vue {
   };
 
   exampleSettings = {
-    checkbox_standard: true,
-    radio_standard: true,
+    radio_1: true,
     checkbox_1: true,
     checkbox_2: false,
     checkbox_3: true,

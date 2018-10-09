@@ -56,30 +56,27 @@
       </button>
     </div>
     <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="openDevTools">Dev Tools</a>
+      <a @click="openDevTools">Dev Tools</a>
     </div>
     <div class="top-nav-item" v-if="isDevMode">
-      <a class="link" @click="navigateDesignSystem">Design System</a>
+      <a @click="navigateDesignSystem">Design System</a>
     </div>
     <div class="top-nav-item" :class="{ 'top-nav-item--active': studioModeEnabled }">
       <a
-        @click="studioMode"
-        class="link">
-        <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" /><span>{{ $t('Studio Mode') }}</span>
+        @click="studioMode">
+        <i class="icon-studio-mode-3" v-tooltip.right="studioModeTooltip" />
       </a>
     </div>
     <div class="top-nav-item">
       <a
-        @click="openDiscord"
-        class="link">
-        <i class="icon-discord"></i><span>Discord</span>
+        @click="openDiscord">
+        <i class="icon-discord"></i>
       </a>
     </div>
     <div class="top-nav-item">
       <a
-        @click="openSettingsWindow"
-        class="link">
-        <i class="icon-settings"/><span>{{ $t('Settings') }}</span>
+        @click="openSettingsWindow">
+        <i class="icon-settings"/>
       </a>
     </div>
     <div class="top-nav-item">
@@ -139,14 +136,6 @@
   text-align: right;
   justify-content: flex-end;
   align-items: center;
-}
-
-.link {
-  @media(max-width: 1500px) {
-    span {
-      display: none;
-    }
-  }
 }
 
 .theme-toggle {

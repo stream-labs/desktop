@@ -36,6 +36,7 @@
   font-size: 14px;
   .weight(@medium);
   color: @day-title;
+  line-height: 16px;
 
   span {
     max-width: 300px;
@@ -46,9 +47,8 @@
 
   .fa,
   i {
-    margin-left: 8px;
+    .margin-left();
     font-size: 10px;
-    padding: 3px; // easier to click
     .icon-hover();
 
     &.icon-down {

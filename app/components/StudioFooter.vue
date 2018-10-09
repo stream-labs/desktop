@@ -23,8 +23,7 @@
         :disabled="locked"
         class="record-button"
         @click="toggleRecording"
-        :class="{ active: streamingService.isRecording }"
-        v-tooltip.left="recordTooltip">
+        :class="{ active: streamingService.isRecording }">
         <span>REC</span>
       </button>
     </div>
@@ -101,34 +100,38 @@
 
 .record-button {
   position: relative;
-  width: 30px;
-  height: 30px;
-  background-color: #dcdfe2;
+  width: 32px;
+  height: 32px;
+  background-color: @day-button;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  opacity: .6;
   .transition();
   .weight(@bold);
-  border: 1px solid #c4c5c5;
+  border: 1px solid @day-button;
   box-sizing: content-box;
-  letter-spacing: .2px;
 
   span {
     font-size: 10px;
-    color: @red;
-  }
-
-  &:hover {
-    opacity: 1;
+    color: @day-title;
+    .weight(@medium);
   }
 
   &.active {
-    opacity: 1;
-    animation: pulse 2.5s infinite;
-    border: 1px solid @red;
+    animation: pulse 2s ease-in-out infinite;
+    border-color: @red;
+    background-color: @red;
+    color: @white;
+
+    span {
+      color: @white;
+    }
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
@@ -137,10 +140,10 @@
     box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(0, 0, 0, 0);
+    box-shadow: 0 0 1px 4px rgba(252, 62, 63, 0.4);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    box-shadow: 0 0 0 0 rgba(252, 62, 63, 0.4);
   }
 }
 
@@ -154,15 +157,16 @@
   }
 
   .record-button {
-    background-color: #3c4c53;
-    border-color: @night-border;
+    background-color: @night-button;
+    border-color: @night-button;
 
     &.active {
       border-color: @red;
+      background-color: @red;
     }
 
-    &:focus {
-      outline: none;
+    span {
+      color: @white;
     }
   }
 }

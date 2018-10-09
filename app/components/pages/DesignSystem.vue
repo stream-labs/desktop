@@ -4,13 +4,14 @@
     <p>All inclusive guide for Streamlabs OBS styles, reusable components, assets, etc</p>
     <div class="design-system__wrapper">
       <div class="design-system__menu">
-        <a class="link link--uppercase" href="#buttons">Buttons</a>
-        <a class="link link--uppercase" href="#colors">Colors</a>
-        <a class="link link--uppercase" href="#dropdowns">Dropdowns</a>
-        <a class="link link--uppercase" href="#icons">Icons</a>
-        <a class="link link--uppercase" href="#inputs">Inputs</a>
-        <a class="link link--uppercase" href="#mixins">Mixins</a>
-        <a class="link link--uppercase" href="#states">States</a>
+        <a class="link" href="#buttons">Buttons</a>
+        <a class="link" href="#callouts">Callouts</a>
+        <a class="link" href="#colors">Colors</a>
+        <a class="link" href="#dropdowns">Dropdowns</a>
+        <a class="link" href="#icons">Icons</a>
+        <a class="link" href="#inputs">Inputs</a>
+        <a class="link" href="#mixins">Mixins</a>
+        <a class="link" href="#states">States</a>
       </div>
 
       <div class="design-system__body">
@@ -38,6 +39,30 @@
         </div>
 
         <div id="colors" class="design-system__section">
+          <h2>Callouts</h2>
+
+          <div class="callout callout--success-alt">
+            <i class="fas fa-check-circle"></i> Success callout. <a href="#0">Link</a>
+          </div>
+
+          <div class="callout callout--success">
+            <i class="fas fa-check-circle"></i> Success callout. <a href="#0">Link</a>
+          </div>
+
+          <div class="callout callout--warning-alt">
+            <i class="fas fa-times-circle"></i>Warning callout. <a href="#0">Link</a>
+          </div>
+
+          <div class="callout callout--warning">
+            <i class="fas fa-times-circle"></i>Warning callout. <a href="#0">Link</a>
+          </div>
+
+          <div class="callout callout--info">
+            <i class="fas fa-info-circle"></i> Info callout. <a href="#0">Link</a>
+          </div>
+        </div>
+
+        <div id="colors" class="design-system__section">
           <h2>Colors</h2>
           <div class="design-system__colors">
             <div class="design-system__color-section">
@@ -52,7 +77,7 @@
                 <div class="design-system__color design-system__color--secondary"></div>
                 <div>
                   <div class="design-system__code">@secondary, @purple</div>
-                  <div>Alt, Tags</div>
+                  <div>New</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
@@ -65,8 +90,8 @@
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--other-1"></div>
                 <div>
-                  <div class="design-systemday-bg__code">@new, @yellow</div>
-                  <div>New</div>
+                  <div class="design-systemday-bg__code">@yellow</div>
+                  <div>All-Stars only</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
@@ -86,37 +111,37 @@
             </div>
             <div class="design-system__color-section">
               <div class="design-system__color-wrapper">
-                <div class="design-system__color design-system__color--white"></div>
-                <div>
-                  <div class="design-system__code">@day-section, @night-title, @white</div>
-                  <div>Day Background, Night Title</div>
-                </div>
-              </div>
-              <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--light-1"></div>
                 <div>
-                  <div class="design-system__code">@day-section, @light-1</div>
-                  <div>Day Sections Background, Day Cards</div>
+                  <div class="design-system__code">@day-section, @night-title, @white, @light-1</div>
+                  <div>Day Background, Night Title</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--light-2"></div>
                 <div>
-                  <div class="design-system__code">@day-button, @day-input-border, @light-2</div>
-                  <div>Day Button Background, Day Input Border</div>
+                  <div class="design-system__code">@day-section, @light-2</div>
+                  <div>Day Sections Background, Day Cards</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--light-3"></div>
                 <div>
-                  <div class="design-system__code">@day-section, @light-3</div>
-                  <div>Night Paragraph</div>
+                  <div class="design-system__code">@day-button, @day-input-border, @light-3</div>
+                  <div>Day Button Background, Day Input Border</div>
                 </div>
               </div>
               <div class="design-system__color-wrapper">
                 <div class="design-system__color design-system__color--light-4"></div>
                 <div>
-                  <div class="design-system__code">@icon, @light-4</div>
+                  <div class="design-system__code">@day-section, @light-4</div>
+                  <div>Night Paragraph</div>
+                </div>
+              </div>
+              <div class="design-system__color-wrapper">
+                <div class="design-system__color design-system__color--light-5"></div>
+                <div>
+                  <div class="design-system__code">@icon, @light-5</div>
                   <div>Day + Night Icons, Day Caption</div>
                 </div>
               </div>
@@ -690,10 +715,18 @@
               Example Checkbox
             </div>
             <div class="input-wrapper">
-              <div class="checkbox">
+              <div class="checkbox radio">
                 <input
-                  type="checkbox"
-                  v-model="exampleSettings.checkbox_standard"/>
+                  type="radio"
+                  value="radio_1"
+                  v-model="exampleSettings.radio"/>
+                <label>{{ $t('Include Resubs') }}</label>
+              </div>
+              <div class="checkbox radio">
+                <input
+                  type="radio"
+                  value="radio_2"
+                  v-model="exampleSettings.radio"/>
                 <label>{{ $t('Include Resubs') }}</label>
               </div>
             </div>
@@ -824,7 +857,7 @@
 
 .design-system {
   flex-direction: column;
-  padding: 20px;
+  .padding(2);
   overflow-y: auto;
 }
 
@@ -840,7 +873,7 @@
   flex-direction: column;
 
   .link {
-    margin-bottom: 16px;
+    .margin-bottom(2);
   }
 }
 
@@ -863,15 +896,15 @@
 .design-system__color-wrapper {
   .flex;
   align-items: center;
-  margin-bottom: 8px;
+  .margin-bottom();
 }
 
 .design-system__color {
-  width: 30px;
-  height: 30px;
-  .radius;
+  width: 24px;
+  height: 24px;
+  .radius();
   border: 1px solid transparent;
-  margin-right: 8px;
+  .margin-right();
 }
 
 .design-system__color--primary {
@@ -945,14 +978,13 @@
   .flex--wrap;
 
   div {
-    padding: 10px;
+    .padding();
     flex: 0 0 20%;
 
     span {
       &:nth-child(1) {
-        margin-right: 8px;
-        font-size: 16px;
-        width: 26px;
+        .margin-right();
+        width: 24px;
         display: inline-block;
       }
     }

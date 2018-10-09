@@ -9,8 +9,7 @@
       </div>
 
       <button class="button button--action" @click="create">
-        <i class="fa fa-plus" />
-        {{ $t('Create New') }}
+        <i class="fa fa-plus" />{{ $t('Create New') }}
       </button>
     </div>
     <editable-scene-collection

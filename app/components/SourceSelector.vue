@@ -1,6 +1,6 @@
 <template>
 
-  <div class="source-selector">
+  <div>
     <div class="studio-controls-top">
       <h2 class="studio-controls__label" v-tooltip.bottom="sourcesTooltip">
         {{ $t('Sources') }}
@@ -36,13 +36,14 @@
       @nodecontextmenu="(node, event) => showContextMenu(node.data.id, event)"
       @nodedblclick="node => sourceProperties(node.data.id)"
       :scrollAreaHeight="50"
-      :maxScrollSpeed="15">
+      :maxScrollSpeed="15"
+      class="selector-list">
 
-      <template slot="title" slot-scope="{ node }">
-        <span class="layer-icon">
+      <template slot="title" slot-scope="{ node }" class="selector-item">
+        <span class="selector-item__icon">
           <i :class="determineIcon(node.isLeaf, node.data.sourceId)"></i>
         </span>
-        <span class="item-title">{{ node.title }}</span>
+        <span class="selector-item__title">{{ node.title }}</span>
       </template>
 
       <template slot="toggle" slot-scope="{ node }">
@@ -83,60 +84,6 @@ i.disabled {
 
    :hover {
     opacity: inherit;
-  }
-}
-
-.sl-vue-tree.sl-vue-tree-root {
-  flex-grow: 1;
-  overflow: auto;
-}
-
-.sl-vue-tree-node {
-  &:hover,
-  &.sl-vue-tree-selected {
-    .transition();
-
-    .source-selector-action {
-      .transition();
-      opacity: 1;
-      color: @grey;
-    }
-  }
-}
-
-.sl-vue-tree.sl-vue-tree-root {
-  border-color: @day-section;
-}
-
-.title-container {
-  display: inline-block;
-  color: @grey;
-}
-
-.layer-icon {
-  display: inline-block;
-  text-align: left;
-  width: 16px;
-  margin-right: 8px;
-
-  i,
-  .fa {
-    font-size: 12px;
-    font-weight: 700;
-  }
-}
-
-.title-container {
-  color: @day-title
-}
-
-.night-theme {
-  .title-container {
-    color: @grey;
-  }
-
-  .sl-vue-tree.sl-vue-tree-root {
-    border-color: @night-section;
   }
 }
 </style>

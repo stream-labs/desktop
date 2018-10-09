@@ -107,7 +107,6 @@
 
 .widget__desc {
   color: @grey;
-  font-size: 13px;
 }
 
 .widget-detail-wrapper {

@@ -89,7 +89,7 @@
       class="button button--default"
       @click="onDoneHandler"
     >
-      {{ $t('DONE') }}
+      {{ $t('Done') }}
     </button>
   </div>
 </ModalLayout>
@@ -144,47 +144,7 @@
   }
 }
 
-table thead tr th {
-  &.column--is_gifted,
-  &.column--months {
-    width: 100px;
-  }
-}
-
-tbody tr {
-  .transition;
-
-  td {
-    color: black;
-  }
-
-  td:last-child {
-    width: 100px;
-    .align-items--inline;
-    .text-align--right;
-    padding-right: 10px;
-  }
-}
-
 .night-theme {
-
-  tbody tr {
-    border: 2px solid transparent;
-    .transition;
-    .cursor--pointer;
-    .transition;
-
-    td {
-      color: white;
-    }
-  }
-  tbody tr:nth-child(odd) {
-    background-color: @navy-secondary;
-  }
-  tbody tr:nth-child(even) {
-    background-color: @navy;
-  }
-
   .chatbot-alerts-window__sidebar {
     border-right: 1px solid @night-border;
   }

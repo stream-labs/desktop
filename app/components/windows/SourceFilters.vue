@@ -19,20 +19,20 @@
         </div>
 
         <sl-vue-tree
-            :value="nodes"
-            ref="slVueTree"
-            @select="makeActive"
-            @drop="handleSort"
-            :allowMultiselect="false"
+          :value="nodes"
+          ref="slVueTree"
+          @select="makeActive"
+          @drop="handleSort"
+          :allowMultiselect="false"
         >
 
           <template slot="title" slot-scope="{ node }">
-            <div class="title-container">
-              <span class="layer-icon">
+            <div class="selector-item">
+              <span class="selector-item__icon">
                 <i @click="toggleVisibility(node.title)" class="icon-view" v-if="node.data.visible"></i>
                 <i @click="toggleVisibility(node.title)" class="icon-hide" v-if="!node.data.visible"></i>
               </span> &nbsp;
-              <span class="item-title">{{ node.title }}</span>
+              <span class="selector-item__title">{{ node.title }}</span>
             </div>
           </template>
 
@@ -60,10 +60,6 @@
 
 .modal-container--side-nav {
   .padding(2);
-}
-
-.modal--side-nav > .sl-vue-tree-toggle {
-  display: none;
 }
 
 .controls {

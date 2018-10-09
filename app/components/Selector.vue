@@ -12,8 +12,8 @@
       @contextmenu.stop="(ev) => handleContextMenu(ev, index)"
       @click="(ev) => handleSelect(ev, index)"
       @dblclick="(ev) => handleDoubleClick(ev, index)">
-      <div class="selector-item-text">{{item.name}}</div>
-      <div class="selector-actions">
+      <div class="selector-item__title">{{item.name}}</div>
+      <div class="selector-item__actions">
         <slot name="actions" :item="item"/>
       </div>
     </li>
@@ -27,7 +27,7 @@
 @import "../styles/index";
 
 .sortable-ghost {
-  opacity: .7;
+  opacity: 0;
   background-image: none;
 }
 
@@ -37,60 +37,7 @@
 }
 
 .sortable-drag {
-  border: 1px solid #ddd;
-  background-color: #eee;
-}
-
-.selector-list {
-  list-style-type: none;
-  margin: 0;
-  overflow: auto;
-  .radius();
-}
-
-.selector-item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  .padding-h-sides();
-  cursor: pointer;
-  justify-content: space-between;
-  color: @day-paragraph;
-  .transition();
-
-  &.selector-item--active {
-    background-color: @light-2;
-    color: @day-title;
-    .weight(@medium);
-
-    .selector-actions {
-      opacity: 1;
-    }
-  }
-
-  &:hover {
-    .selector-actions {
-      opacity: 1;
-    }
-  }
-}
-
-.selector-item-text {
-  text-overflow: ellipsis;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.selector-actions {
-  display: flex;
-  flex-direction: row;
-  font-size: 13px;
-  opacity: .2;
+  border: 1px solid @day-input-border;
 }
 
 .selector-drag-handle {
@@ -104,13 +51,9 @@
     background: @night-hover;
   }
 
-  .selector-item {
-    color: @grey;
-
-    &.selector-item--active {
-      background-color: @night-hover;
-      color: @white;
-    }
+  .selector-item--active {
+    background-color: @night-hover;
+    color: @white;
   }
 }
 </style>

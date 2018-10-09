@@ -1,0 +1,107 @@
+.callout {
+    border: none;
+    .radius();
+    .margin-bottom(3);
+    .padding();
+
+    a {
+      font-weight: normal;
+      text-decoration: underline;
+      color: inherit;
+    }
+
+    .fab,
+    .far,
+    .fas {
+      font-size: 18px;
+      vertical-align: text-top;
+      margin-right: 6px;
+    }
+
+    .callout__close {
+      font-size: 12px;
+      color: inherit;
+      top: 12px;
+      right: 10px;
+      opacity: .5;
+      position: absolute;
+      .transition();
+      cursor: pointer;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .inline-button {
+      .weight(@medium);
+      margin-left: 0;
+      text-decoration: none;
+    }
+
+    .button {
+      margin-top: 10px;
+    }
+
+    .close-button {
+      opacity: .6;
+      .transition();
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .callout--success {
+    background: @teal;
+    color: @white;
+
+    a,
+    .button--default {
+      color: @white;
+    }
+  }
+
+  .callout--success-alt {
+    background: @teal-semi;
+    color: @teal;
+  }
+
+  .callout--warning {
+    background: @warning;
+    color: @white;
+  }
+
+  .callout--warning-alt {
+    color: @warning;
+    background: @red-semi;
+  }
+
+  .callout--info {
+    background: @info-light;
+    color: @info-dark;
+
+    a {
+      color: @info-dark;
+    }
+  }
+
+  .night-theme {
+    .callout {
+      a {
+        color: inherit;
+      }
+    }
+
+    .callout--info {
+      background: @yellow-dark-semi;
+      color: @yellow-dark;
+
+      a {
+        &:hover {
+          color: #C49E34;
+        }
+      }
+    }
+  }

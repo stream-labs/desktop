@@ -13,7 +13,7 @@
         v-tooltip.left="advancedSettingsTooltip"/>
     </div>
   </div>
-  <div class="studio-controls-selector mixer-panel">
+  <div class="selector-list mixer-panel">
     <MixerItem v-for="audioSource in audioSources" :audioSource="audioSource" :key="audioSource.sourceId"/>
   </div>
 </div>
