@@ -158,6 +158,7 @@ export class PlatformAppsService extends
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
       if (data.appPath && data.appToken) {
+        console.log('loading unpacked: ', data);
         this.installUnpackedApp(data.appPath, data.appToken);
       }
     }
@@ -217,7 +218,7 @@ export class PlatformAppsService extends
     const manifest = JSON.parse(manifestData) as IAppManifest;
 
     try {
-      await this.validateManifest(manifest, appPath, true);
+      await this.validateManifest(manifest, appPath);
     } catch (e) {
       return e.message;
     }
@@ -254,7 +255,8 @@ export class PlatformAppsService extends
     this.appLoad.next(this.getApp(id));
   }
 
-  async validateManifest(manifest: IAppManifest, appPath: string, isUnpacked = true) {
+  async validateManifest(manifest: IAppManifest, appPath: string) {
+    console.log('in validate manifest');
     // Validate top level of the manifest
     this.validateObject(manifest, 'manifest', [
       'name',
@@ -282,7 +284,7 @@ export class PlatformAppsService extends
       ]);
 
       // Check for existence of file
-      const filePath = this.getFilePath(appPath, manifest.buildPath, source.file, isUnpacked);
+      const filePath = this.getFilePath(appPath, manifest.buildPath, source.file, true);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
@@ -310,7 +312,7 @@ export class PlatformAppsService extends
       seenSlots[page.slot] = true;
 
       // Check for existence of file
-      const filePath = this.getFilePath(appPath, manifest.buildPath, page.file, isUnpacked);
+      const filePath = this.getFilePath(appPath, manifest.buildPath, page.file, true);
       const exists = await this.fileExists(filePath);
 
       if (!exists) {
@@ -369,7 +371,7 @@ export class PlatformAppsService extends
     const manifest = JSON.parse(await this.loadManifestFromDisk(manifestPath));
 
     try {
-      await this.validateManifest(manifest, app.appPath, app.unpacked);
+      await this.validateManifest(manifest, app.appPath);
     } catch (e) {
       this.unloadApps();
       return e.message;
@@ -421,7 +423,7 @@ export class PlatformAppsService extends
     });
   }
 
-  exposeAppApi(appId: string, webContentsId: number) {
+  exposeAppApi(appId: string, webContentsId: number) { 
     const app = this.getApp(appId);
     const api = this.apiManager.getApi(app, app.manifest.permissions);
 
@@ -471,7 +473,6 @@ export class PlatformAppsService extends
         }
 
         if (details.resourceType === 'script') {
-          // for cdn scripts, resourceType is other
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'
