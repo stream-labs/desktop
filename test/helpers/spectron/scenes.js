@@ -46,3 +46,10 @@ export async function openRenameWindow(t, sourceName) {
   await contextMenuClick(t, 'Rename');
   await focusChild(t);
 }
+
+export async function openDuplicateWindow(t, sourceName) {
+  await focusMain(t);
+  await rightClickScene(t, sourceName);
+  await contextMenuClick(t, 'Duplicate');
+  await focusChild(t);
+}

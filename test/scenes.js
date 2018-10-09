@@ -1,7 +1,13 @@
 import test from 'ava';
 import { useSpectron, focusMain } from './helpers/spectron/index';
 import { addSource, sourceIsExisting } from './helpers/spectron/sources';
-import { addScene, clickRemoveScene, selectScene, openRenameWindow } from './helpers/spectron/scenes';
+import {
+  addScene,
+  clickRemoveScene,
+  selectScene,
+  openRenameWindow,
+  openDuplicateWindow
+} from './helpers/spectron/scenes';
 import { getClient } from './helpers/api-client';
 
 useSpectron();
@@ -89,4 +95,17 @@ test('Rename scene', async t => {
   await focusMain(t);
 
   t.true(await app.client.isExisting(`div=${newSceneName}`));
+});
+
+
+test('Duplicate scene', async t => {
+  const app = t.context.app;
+  const sceneName = 'My Scene';
+  await addScene(t, sceneName);
+  await focusMain(t);
+  t.true(await app.client.isExisting(`div=${sceneName}`));
+  await openDuplicateWindow(t, sceneName);
+  await app.client.click('button=Done');
+  await focusMain(t);
+  t.true(await app.client.isExisting(`div=${sceneName} (1)`));
 });
