@@ -66,6 +66,7 @@ import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 import MediaShare from 'components/widgets/MediaShare.vue';
+import SlVueTree from 'sl-vue-tree';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -143,6 +144,7 @@ export interface IWindowOptions {
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions? : IWindowOptions;
+  isFullScreen?: boolean;
 }
 
 interface IWindowsState {
@@ -284,6 +286,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return windowId;
   }
 
+  setOneOffFullscreen(windowId: string, fullscreen: boolean) {
+    this.UPDATE_ONE_OFF_WINDOW(windowId, { isFullScreen: fullscreen });
+  }
+
   /**
    * Closes all one-off windows
    */
@@ -364,6 +370,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
     };
 
     Vue.set(this.state, windowId, opts);
+  }
+
+  @mutation()
+  private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
+    const oldOpts = this.state[windowId];
+    Vue.set(this.state, windowId, { ...oldOpts, ...options })
   }
 
   @mutation()
