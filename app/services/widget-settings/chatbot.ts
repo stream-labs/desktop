@@ -22,7 +22,6 @@ export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData>
   }
 
   getDataUrl() {
-    alert('getting data. shouldnt come here');
     return `https://${this.getHost()}/api/v${this.getVersion()}/slobs/widget/media`;
   }
 

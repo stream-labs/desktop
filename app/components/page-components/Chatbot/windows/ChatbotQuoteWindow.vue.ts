@@ -8,7 +8,7 @@ import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 import {
   IQuote,
   IChatbotErrorResponse
-} from 'services/chatbot/chatbot-interfaces';
+} from 'services/chatbot';
 
 @Component({
   components: { ValidatedForm }
