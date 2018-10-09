@@ -67,7 +67,7 @@
   line-height: 32px;
 
   &:hover {
-    .selector-actions {
+    .selector-item__action {
       opacity: 1;
     }
   }
@@ -78,7 +78,7 @@
   color: @day-title;
   .weight(@medium);
 
-  .selector-actions {
+  .selector-item__action {
     opacity: 1;
   }
 }
@@ -108,6 +108,9 @@
 .selector-item__actions {
   display: flex;
   flex-direction: row;
+}
+
+.selector-item__action {
   opacity: .2;
 }
 

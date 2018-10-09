@@ -22,6 +22,12 @@
   .weight(@medium);
 }
 
+.sl-vue-tree-selected {
+  .selector-item__action {
+    opacity: 1;
+  }
+}
+
 .sl-vue-tree-root > .sl-vue-tree-nodes-list {
   padding-bottom: 0;
 }
@@ -42,6 +48,10 @@
 
   &:hover {
     color: @day-paragraph;
+
+    .selector-item__action {
+      opacity: 1;
+    }
   }
 }
 

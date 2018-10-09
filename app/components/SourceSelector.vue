@@ -54,8 +54,8 @@
       </template>
 
       <template slot="sidebar" slot-scope="{ node }" v-if="canShowActions(node.data.id)">
-        <i class="source-selector-action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
-        <i class="source-selector-action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
+        <i class="selector-item__action" :class="lockClassesForSource(node.data.id)" @click.stop="toggleLock(node.data.id)" @dblclick.stop="() => {}"></i>
+        <i class="selector-item__action" :class="visibilityClassesForSource(node.data.id)" @click.stop="toggleVisibility(node.data.id)" @dblclick.stop="() => {}"></i>
       </template>
 
     </sl-vue-tree>
@@ -64,17 +64,16 @@
 
 <script lang="ts" src="./SourceSelector.vue.ts"></script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../styles/index";
 @import "~sl-vue-tree/dist/sl-vue-tree-dark.css";
 
-.source-selector-action {
+.selector-item__action {
   display: inline-block;
   width: 16px;
   text-align: center;
-  opacity: .26;
-  margin-left: 8px;
-  color: @grey;
+  .margin-left();
+  color: @icon;
 }
 
 .fa.disabled,
