@@ -66,6 +66,7 @@ import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
 import MediaShare from 'components/widgets/MediaShare.vue';
+import SlVueTree from 'sl-vue-tree';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
