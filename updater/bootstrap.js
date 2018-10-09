@@ -211,7 +211,7 @@ async function entry(info) {
         return false;
     }
 
-    if (info.version === latestVersion) {
+    if (semver.eq(info.version, latestVersion)) {
         console.log('Already latest version!');
         return false;
     }
