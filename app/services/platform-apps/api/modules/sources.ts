@@ -2,6 +2,8 @@ import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApi
 import { SourcesService, TSourceType, Source } from 'services/sources';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
+import { PlatformAppsService } from 'services/platform-apps';
+import { ScenesService } from 'services/scenes';
 
 interface ISourceFlags {
   audio: boolean;
@@ -29,6 +31,8 @@ export class SourcesModule extends Module {
   permissions = [EApiPermissions.ScenesSources];
 
   @Inject() private sourcesService: SourcesService;
+  @Inject() private platformAppsService: PlatformAppsService;
+  @Inject() private scenesService: ScenesService;
 
   constructor() {
     super();
@@ -102,8 +106,42 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  createSource() {
-    throw new NotImplementedError();
+  createSource(ctx: IApiContext, name: string, type: TSourceType, settings: Dictionary<any> = {}) {
+    const source = this.sourcesService.createSource(
+      name,
+      type,
+      settings
+    );
+
+    return this.serializeSource(source);
+  }
+
+  /**
+   * Creates an app source that belongs to this app
+   */
+  @apiMethod()
+  createAppSource(ctx: IApiContext, name: string, appSourceId: string) {
+    const size = this.platformAppsService.getAppSourceSize(
+      ctx.app.id,
+      appSourceId
+    );
+
+    // TODO: We support other app source types in the future
+    const source = this.sourcesService.createSource(
+      name,
+      'browser_source',
+      size,
+      {
+        propertiesManager: 'platformApp',
+        propertiesManagerSettings: {
+          appId: ctx.app.id,
+          appSourceId,
+          appSettings: {}
+        }
+      }
+    );
+
+    return this.serializeSource(source);
   }
 
   @apiMethod()
@@ -117,8 +155,17 @@ export class SourcesModule extends Module {
   }
 
   @apiMethod()
-  removeSource() {
-    throw new NotImplementedError();
+  removeSource(ctx: IApiContext, sourceId: string) {
+    // Make sure this source doesn't exist in any scenes
+    const item = this.scenesService.getSceneItems().find(sceneItem => {
+      return sceneItem.sourceId === sourceId;
+    });
+
+    if (item) {
+      throw new Error(`Source ${sourceId} exists in at least 1 scene and cannot be removed!`);
+    }
+
+    this.sourcesService.removeSource(sourceId);
   }
 
   @apiMethod()

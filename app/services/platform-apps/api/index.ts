@@ -9,6 +9,8 @@ import { ThemeModule } from './modules/theme';
 import { SceneCollectionsModule } from './modules/scene-collections';
 import { ExternalModule } from './modules/external';
 import { AppModule } from './modules/app';
+import { NotificationsModule } from './modules/notifications';
+import { HotkeysModule } from './modules/hotkeys';
 
 export class PlatformAppsApi {
 
@@ -25,6 +27,8 @@ export class PlatformAppsApi {
     this.registerModule(new SceneCollectionsModule());
     this.registerModule(new ExternalModule());
     this.registerModule(new AppModule());
+    this.registerModule(new NotificationsModule());
+    this.registerModule(new HotkeysModule());
   }
 
   private registerModule(module: Module) {
@@ -37,7 +41,7 @@ export class PlatformAppsApi {
    * replaced with a method that returns a rejected promise
    * explaining the lack of permissions.
    */
-  getApi(app: ILoadedApp, permissions: EApiPermissions[]) {
+  getApi(app: ILoadedApp) {
     const api: Dictionary<TApiModule> = {};
 
     const context: IApiContext = { app };
@@ -49,7 +53,7 @@ export class PlatformAppsApi {
 
       // TODO this is a weird pattern
       for (let permission of this.modules[moduleName].permissions) {
-        authorized = permissions.includes(permission);
+        authorized = app.manifest.permissions.includes(permission);
         if (!authorized) break;
       }
 

@@ -1,5 +1,5 @@
 import { Module, EApiPermissions, apiMethod, apiEvent, NotImplementedError, IApiContext } from './module';
-import { ScenesService, Scene } from 'services/scenes';
+import { ScenesService, Scene, TSceneNode } from 'services/scenes';
 import { Inject } from 'util/injector';
 import { Subject } from 'rxjs/Subject';
 
@@ -79,6 +79,11 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
+  getActiveScene() {
+    return this.serializeScene(this.scenesService.activeScene);
+  }
+
+  @apiMethod()
   createScene() {
     throw new NotImplementedError();
   }
@@ -101,8 +106,12 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
-  createSceneItem() {
-    throw new NotImplementedError();
+  createSceneItem(ctx: IApiContext, sceneId: string, sourceId: string) {
+    const scene = this.scenesService.getScene(sceneId);
+    if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
+
+    const sceneItem = scene.addSource(sourceId);
+    return this.serializeNode(sceneItem);
   }
 
   @apiMethod()
@@ -116,8 +125,11 @@ export class ScenesModule extends Module {
   }
 
   @apiMethod()
-  removeSceneItem() {
-    throw new NotImplementedError();
+  removeSceneItem(ctx: IApiContext, sceneId: string, sceneItemId: string) {
+    const scene = this.scenesService.getScene(sceneId);
+    if (!scene) throw new Error(`Scene ${sceneId} does not exist!`);
+
+    scene.removeItem(sceneItemId);
   }
 
   private serializeScene(scene: Scene): IScene {
@@ -125,29 +137,33 @@ export class ScenesModule extends Module {
       id: scene.id,
       name: scene.name,
       nodes: scene.getNodes().map(node => {
-        if (node.isFolder()) {
-          const folder: ISceneItemFolder = {
-            id: node.id,
-            type: ESceneNodeType.Folder,
-            name: node.name,
-            childrenIds: node.childrenIds
-          };
-
-          return folder;
-        } else if (node.isItem()) {
-          const item: ISceneItem = {
-            id: node.id,
-            type: ESceneNodeType.SceneItem,
-            sourceId: node.sourceId,
-            visible: node.visible,
-            locked: node.locked,
-            transform: node.transform
-          };
-
-          return item;
-        }
+        return this.serializeNode(node);
       })
     };
+  }
+
+  private serializeNode(node: TSceneNode) {
+    if (node.isFolder()) {
+      const folder: ISceneItemFolder = {
+        id: node.id,
+        type: ESceneNodeType.Folder,
+        name: node.name,
+        childrenIds: node.childrenIds
+      };
+
+      return folder;
+    } else if (node.isItem()) {
+      const item: ISceneItem = {
+        id: node.id,
+        type: ESceneNodeType.SceneItem,
+        sourceId: node.sourceId,
+        visible: node.visible,
+        locked: node.locked,
+        transform: node.transform
+      };
+
+      return item;
+    }
   }
 
 }

@@ -17,10 +17,6 @@ export default class OneOffWindow extends Vue {
   @Inject() private customizationService: CustomizationService;
   @Inject() private windowsService: WindowsService;
 
-  mounted() {
-    console.log(this.options);
-  }
-
   get options() {
     return this.windowsService.state[this.windowId];
   }
@@ -31,9 +27,5 @@ export default class OneOffWindow extends Vue {
 
   get nightTheme() {
     return this.customizationService.nightMode;
-  }
-
-  get isFullScreen() {
-    return electron.remote.getCurrentWindow().isFullScreen();
   }
 }

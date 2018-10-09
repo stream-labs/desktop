@@ -186,6 +186,7 @@ export class PlatformAppsService extends
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
+      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -230,6 +231,11 @@ export class PlatformAppsService extends
     }
 
     this.devServer = new DevServer(appPath, DEV_PORT);
+
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id)) {
+      // has prod app with same id
+      this.REMOVE_APP(id);
+    }
 
     this.addApp({
       id,
@@ -347,6 +353,9 @@ export class PlatformAppsService extends
       this.devServer = null;
     }
 
+    // reload prod apps in case it has same id
+    // mostly for debugging, can remove
+    this.installProductionApps();
   }
 
   async reloadApp(appId: string) {
@@ -394,7 +403,7 @@ export class PlatformAppsService extends
       .then(json => json.id_hash);
   }
 
-  getIsDevMode(): Promise<boolean> {
+  private getIsDevMode(): Promise<boolean> {
     const headers = authorizedHeaders(this.userService.apiToken);
     const request = new Request(
       `https://${this.hostsService.platform}/api/v1/sdk/dev_mode`,
@@ -407,7 +416,7 @@ export class PlatformAppsService extends
       .then(json => json.dev_mode);
   }
 
-  loadManifestFromDisk(manifestPath: string): Promise<string> {
+  private loadManifestFromDisk(manifestPath: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       fs.readFile(manifestPath, (err, data) => {
         if (err) {
@@ -422,7 +431,7 @@ export class PlatformAppsService extends
 
   exposeAppApi(appId: string, webContentsId: number) {
     const app = this.getApp(appId);
-    const api = this.apiManager.getApi(app, app.manifest.permissions);
+    const api = this.apiManager.getApi(app);
 
     // Namespace under v1 for now.  Eventually we may want to add
     // a v2 API.
@@ -583,15 +592,17 @@ export class PlatformAppsService extends
   }
 
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
-    // TODO Disable original page?
+    const app = this.getApp(appId);
+    if (!app) return;
 
-    const windowId =  `${appId}-${pageSlot}`;
+    const windowId = `${appId}-${pageSlot}`;
 
     // We use a generated window Id to prevent someobody popping out the
     // same winow multiple times.
     this.windowsService.createOneOffWindow({
       componentName: 'PlatformAppPopOut',
       queryParams: { appId, pageSlot },
+      title: app.manifest.name,
       size: {
         width: 600,
         height: 500
