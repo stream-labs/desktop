@@ -255,7 +255,6 @@ export class PlatformAppsService extends
   }
 
   async validateManifest(manifest: IAppManifest, appPath: string) {
-    console.log('in validate manifest', appPath);
     // Validate top level of the manifest
     this.validateObject(manifest, 'manifest', [
       'name',
