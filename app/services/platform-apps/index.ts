@@ -55,7 +55,8 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
-  TopNav = 'top_nav'
+  TopNav = 'top_nav',
+  Chat = 'chat'
 }
 
 interface IAppPage {
@@ -152,7 +153,7 @@ export class PlatformAppsService extends
 
     this.SET_DEV_MODE(await this.getIsDevMode());
 
-    this.installProductionApps();
+    // this.installProductionApps();
 
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
