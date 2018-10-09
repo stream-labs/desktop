@@ -25,10 +25,11 @@
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
-      <div class="content-container" :class="{ vertical: currentTopTab === 'code' }">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code', 'has-leftbar': isAlertBox }">
         <div class="display">
           <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
         </div>
+        <div v-if="isAlertBox" class="left-toolbar"></div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
@@ -239,6 +240,32 @@
     }
   }
 
+  .content-container.has-leftbar {
+    .code-editor {
+      width: 80%;
+      right: 0;
+    }
+    .display {
+      transform: scale(0.7, 0.7) translate(-3.7%);
+    }
+  }
+
+  .content-container.has-leftbar.vertical {
+    .display {
+      transform: scale(0.6, 0.6) translate(5%, -31%);
+    }
+  }
+
+  .left-toolbar {
+    width: 20%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: @day-section;
+    border-right: 1px solid @day-border;
+  }
+
   .display {
     width: 100%;
     height: 100%;
@@ -393,11 +420,14 @@
     .window-container {
       border-color: @night-slider-bg;
     }
-    .display, .content-container {
+    .display, .content-container, .left-toolbar {
       background-color: @night-section-bg;
     }
     .custom-code__divider {
       background-color: @night-section;
+      border-color: @night-slider-bg;
+    }
+    .left-toolbar {
       border-color: @night-slider-bg;
     }
     .sidebar {
