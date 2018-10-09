@@ -24,6 +24,15 @@ const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
 
+/* The user needs a visual queue to know there's
+ * nothing wrong with the application. So we use
+ * the currently distributed version of Electron
+ * to bring up a small status window that indicates
+ * the status of the bootstrap. That said, if
+ * anything goes wrong, just don't spawn a window
+ * for safety. */
+let statusWindow = null;
+
 async function mkdirMaybe(directory) {
     try {
         await mkdir(directory);
@@ -211,15 +220,6 @@ async function entry(info) {
         return Promise.resolve(false);
     }
 
-    /* The user needs a visual queue to know there's
-     * nothing wrong with the application. So we use
-     * the currently distributed version of Electron
-     * to bring up a small status window that indicates
-     * the status of the bootstrap. That said, if
-     * anything goes wrong, just don't spawn a window
-     * for safety. */
-    let statusWindow = null;
-
     try {
         statusWindow = new BrowserWindow({
             width: 400,
@@ -283,7 +283,8 @@ async function entry(info) {
 
 module.exports = async (info) => {
     return entry(info).catch((error) => {
-        console.log(error.message);
+        console.log(error);
+        if (statusWindow) statusWindow.close();
         return Promise.resolve(false);
     });
 }
