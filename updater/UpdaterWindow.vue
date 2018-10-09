@@ -1,21 +1,15 @@
 <template>
 <div class="UpdaterWindow">
-  <div>
-    <i class="UpdaterWindow-icon fas fa-sync-alt fa-spin"/>
-    {{ message }}
-  </div>
-
-  <div v-if="(percentComplete !== null) && !installing && !error">
+  <i class="UpdaterWindow-icon fa fa-refresh fa-spin"/>
+  {{ message }}
+  <div v-if="(percentComplete !== null) && !installing && !error" class="UpdaterWindow-progressBarContainer">
+    <div
+      class="UpdaterWindow-progressBar"
+      :style="{ width: percentComplete + '%' }"/>
     <div class="UpdaterWindow-progressPercent">
-      {{ percentComplete }}% complete
-    </div>
-    <div class="UpdaterWindow-progressBarContainer">
-      <div
-        class="UpdaterWindow-progressBar"
-        :style="{ width: percentComplete + '%' }"/>
+      {{ percentComplete }}%
     </div>
   </div>
-
   <div class="UpdaterWindow-issues" v-if="installing">
     This may take a few minutes.  If you are having issues updating, please
     <span class="UpdaterWindow-link" @click="download">
@@ -38,7 +32,7 @@ export default {
 
   data() {
     return {
-      message: 'Checking for updates',
+      message: 'Downloading updater...',
       installing: false,
       error: false,
       percentComplete: null
@@ -46,27 +40,9 @@ export default {
   },
 
   mounted() {
-    ipcRenderer.on('autoUpdate-pushState', (event, data) => {
-      if (data.version) {
-        this.message = `Downloading version ${data.version}`;
-      }
-
-      if (data.percent) {
-        this.percentComplete = Math.floor(data.percent);
-      }
-
-      if (data.installing) {
-        this.installing = true;
-        this.message = `Installing version ${data.version}`;
-      }
-
-      if (data.error) {
-        this.error = true;
-        this.message = 'Something went wrong';
-      }
+    ipcRenderer.on('bootstrap-progress', (event, data) => {
+      this.percentComplete = Math.floor(data);
     });
-
-    ipcRenderer.send('autoUpdate-getState');
   },
 
   methods: {

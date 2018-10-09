@@ -6,7 +6,11 @@
       v-if="loggedIn"
       id="appStoreWebview"
       :src="appStoreUrl"
+<<<<<<< HEAD
       ref="appStore"
+=======
+      ref="appStoreWebview"
+>>>>>>> platform_dev_kit
       preload="bundles/guest-api">
     </webview>
   </div>

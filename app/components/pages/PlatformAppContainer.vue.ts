@@ -41,4 +41,12 @@ export default class PlatformAppContainer extends Vue {
     this.platformAppsService.popOutAppPage(this.params.appId, this.slot);
   }
 
+  get isUnpacked() {
+    return this.app.unpacked;
+  }
+
+  refreshApp() {
+    this.platformAppsService.reloadApp(this.params.appId);
+  }
+
 }

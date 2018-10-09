@@ -9,6 +9,7 @@ import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -42,6 +43,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private platformAppsService: PlatformAppsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -63,6 +65,11 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.state.auth.platform.channelId = id;
   }
 
+  @mutation()
+  private SET_USERNAME(name: string) {
+    this.state.auth.platform.channelId = name;
+  }
+
   userLogin = new Subject<IPlatformAuth>();
 
   init() {
@@ -70,6 +77,10 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.setRavenContext();
     this.validateLogin();
     this.incrementalRolloutService.fetchAvailableFeatures();
+  }
+
+  async initialize() {
+    await this.refreshUserInfo();
   }
 
   mounted() {
@@ -101,6 +112,26 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
       .then(valid => {
         if (valid.match(/false/)) this.LOGOUT();
       });
+  }
+
+  /**
+   * Attempt to update user info via API.  This is mainly
+   * to support name changes on Twitch.
+   */
+  async refreshUserInfo() {
+    if (!this.isLoggedIn()) return;
+
+    // Make a best attempt to refresh the user data
+    try {
+      const service = getPlatformService(this.platform.type);
+      const userInfo = await service.fetchUserInfo();
+
+      if (userInfo.username) {
+        this.SET_USERNAME(userInfo.username);
+      }
+    } catch (e) {
+      console.error('Error fetching user info', e);
+    }
   }
 
   isLoggedIn() {
@@ -183,7 +214,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     const token = this.apiToken;
     const nightMode = this.customizationService.nightMode ? 'night' : 'day';
 
-    return `https://${host}/slobs-store?token=${token}`;
+    return `https://${host}/slobs-store?token=${token}&mode=${nightMode}`;
   }
 
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
@@ -240,6 +271,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
+    this.platformAppsService.unloadApps();
   }
 
   /**

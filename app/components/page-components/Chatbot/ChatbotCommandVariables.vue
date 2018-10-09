@@ -32,7 +32,7 @@
 <script lang='ts' src="./ChatbotCommandVariables.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../../styles/index";
+@import "../../../styles/index";
 tbody tr {
 
   td {
