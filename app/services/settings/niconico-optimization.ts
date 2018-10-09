@@ -58,7 +58,7 @@ const definitionParams: DefinitionParam[] = [
         category: CategoryName.video,
         subCategory: 'Untitled',
         setting: 'Output',
-        label: 'settings.Output.name',
+        label: 'streaming.resolution',
         lookupValueName: true,
     },
     {
@@ -123,12 +123,12 @@ export type OptimizeSettings = Object;
 export interface OptimizedSettings {
     delta: OptimizeSettings;
     current: OptimizeSettings;
-    info: {
+    info: [CategoryName, {
         key: string,
         name: string,
         currentValue: string,
         newValue?: string
-    }[];
+    }[]][];
 }
 
 /**
@@ -187,6 +187,13 @@ class OptKeyProperty {
     }
 }
 
+type OptimizeItem = {
+    key: string,
+    name: string,
+    currentValue: string,
+    newValue?: string
+};
+
 export class NiconicoOptimization {
     private static definitions: OptKeyProperty[] = definitionParams.map(o => new OptKeyProperty(o));
 
@@ -195,29 +202,38 @@ export class NiconicoOptimization {
         NiconicoOptimization.definitions.map((p) => [p.key, p]) as [OptimizationKey, OptKeyProperty][]
     );
 
-    static optimizeInfo(current: OptimizeSettings, optimized: OptimizeSettings): {
-        key: string,
-        name: string,
-        currentValue: string,
-        newValue?: string
-    }[] {
-        return NiconicoOptimization.definitions.map(opt => {
-            const key = opt.key
+    static optimizeInfo(current: OptimizeSettings, optimized: OptimizeSettings): [CategoryName, OptimizeItem[]][] {
+        return Array.from(NiconicoOptimization.definitions.map(opt => {
+            const key = opt.key;
             if (key in optimized) {
                 return {
-                    key,
-                    name: opt.label,
-                    currentValue: opt.value(current[key]),
-                    newValue: opt.value(optimized[key])
-                }
+                    category: opt.category,
+                    item: {
+                        key,
+                        name: opt.label,
+                        currentValue: opt.value(current[key]),
+                        newValue: opt.value(optimized[key])
+                    }
+                };
             } else {
                 return {
-                    key,
-                    name: opt.label,
-                    currentValue: opt.value(current[key]),
-                }
+                    category: opt.category,
+                    item: {
+                        key,
+                        name: opt.label,
+                        currentValue: opt.value(current[key]),
+                    }
+                };
             }
-        });
+        }).reduce((acc: Map<CategoryName, OptimizeItem[]>, pair: {category: CategoryName, item: OptimizeItem}) => {
+            const {category, item} = pair;
+            if (!acc.has(category)) {
+                acc.set(category, [item]);
+            } else {
+                acc.get(category).push(item);
+            }
+            return acc;
+        }, new Map<CategoryName, OptimizeItem[]>()));
     }
 
     static bestSettings(options: { bitrate: number }): OptimizeSettings {

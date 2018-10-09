@@ -43,6 +43,7 @@
     "done": "Select a program"
   },
   "FPS": "FPS",
+  "resolution": "resolution",
   "optimizeAndGoLive": "Optimize & Go Live",
   "skipOptimization": "Skip Optimization",
   "doNotShowAgainOptimizationDialog": "Do not show this dialog again"

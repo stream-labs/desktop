@@ -7,9 +7,14 @@
 
     {{ $t('streaming.optimizationForNiconico.description') }}
     <ul>
-      <li v-for="o in settings.info" :key="o.key">
-        {{ o.name }}: {{ o.currentValue }}
-        <span v-if="o.newValue"> -&gt; {{ o.newValue }}</span>
+      <li v-for="category in settings.info" :key="category[0]">
+        {{ $t(`settings.${category[0]}.name`, { fallback: category[0] }) }}
+        <ul>
+          <li v-for="o in category[1]" :key="o.key">
+            {{ o.name }}: {{ o.currentValue }}
+            <span v-if="o.newValue"> -&gt; {{ o.newValue }}</span>
+          </li>
+        </ul>
       </li>
     </ul>
     <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
