@@ -158,7 +158,6 @@ export class PlatformAppsService extends
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
       if (data.appPath && data.appToken) {
-        console.log('loading unpacked: ', data);
         this.installUnpackedApp(data.appPath, data.appToken);
       }
     }
@@ -256,7 +255,7 @@ export class PlatformAppsService extends
   }
 
   async validateManifest(manifest: IAppManifest, appPath: string) {
-    console.log('in validate manifest');
+    console.log('in validate manifest', appPath);
     // Validate top level of the manifest
     this.validateObject(manifest, 'manifest', [
       'name',
