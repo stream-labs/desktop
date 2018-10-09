@@ -6,37 +6,18 @@ import { GuestApiService } from 'services/guest-api';
 import { I18nService } from 'services/i18n';
 import electron from 'electron';
 import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
-<<<<<<< HEAD
-=======
 import { PlatformAppStoreService } from 'services/platform-app-store';
 import Utils from 'services/utils';
->>>>>>> platform_dev_kit
 
 @Component({})
 export default class PlatformAppStore extends Vue {
   @Inject() userService: UserService;
   @Inject() platformAppsService: PlatformAppsService;
-<<<<<<< HEAD
-=======
   @Inject() platformAppStoreService: PlatformAppStoreService;
->>>>>>> platform_dev_kit
   @Inject() guestApiService: GuestApiService;
   @Inject() i18nService: I18nService;
 
   $refs: {
-<<<<<<< HEAD
-    appStore: Electron.WebviewTag;
-  };
-
-  mounted() {
-    this.$refs.appStore.addEventListener('dom-ready', () => {
-      // if (this.platformAppsService.state.devMode) {
-      //   this.$refs.appStore.openDevTools();
-      // }
-    });
-  }
-
-=======
     appStoreWebview: Electron.WebviewTag;
   };
 
@@ -68,7 +49,6 @@ export default class PlatformAppStore extends Vue {
     this.platformAppsService.installProductionApps();
   }
 
->>>>>>> platform_dev_kit
   get loggedIn() {
     return this.userService.isLoggedIn();
   }
