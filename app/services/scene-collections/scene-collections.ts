@@ -589,6 +589,8 @@ export class SceneCollectionsService extends Service
    * Should be called before any loading operations
    */
   private startLoadingOperation() {
+    this.windowsService.closeChildWindow();
+    this.windowsService.closeAllOneOffs();
     this.appService.startLoading();
     this.disableAutoSave();
   }

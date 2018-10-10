@@ -77,6 +77,7 @@ export interface ISourceCreateOptions {
   sourceId?: string; // A new ID will be generated if one is not specified
   propertiesManager?: TPropertiesManager;
   propertiesManagerSettings?: Dictionary<any>;
+  isTemporary?: boolean;
 }
 
 export type TSourceType =
@@ -105,6 +106,7 @@ export type TPropertiesManager = 'default' | 'widget' | 'streamlabels';
 
 export interface ISourcesState {
   sources: Dictionary<ISource>;
+  temporarySources: Dictionary<ISource>;
 }
 
 export interface IActivePropertyManager {

@@ -176,8 +176,14 @@ export class Source implements ISourceApi {
     // is always up-to-date, and essentially acts
     // as a view into the store.  It also enforces
     // the read-only nature of this data
-    this.sourceState = this.sourcesService.state.sources[sourceId];
-    Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+    const isTemporarySource = !!this.sourcesService.state.temporarySources[sourceId];
+    if (isTemporarySource) {
+      this.sourceState = this.sourcesService.state.temporarySources[sourceId];
+      Utils.applyProxy(this, this.sourcesService.state.temporarySources[sourceId]);
+    } else {
+      this.sourceState = this.sourcesService.state.sources[sourceId];
+      Utils.applyProxy(this, this.sourcesService.state.sources[sourceId]);
+    }
   }
 
   @mutation()

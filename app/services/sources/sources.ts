@@ -44,7 +44,8 @@ export const PROPERTIES_MANAGER_TYPES = {
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
 
   static initialState = {
-    sources: {}
+    sources: {},
+    temporarySources: {} // don't save temporarySources in the config file
   } as ISourcesState;
 
   sourceAdded = new Subject<ISource>();
@@ -96,7 +97,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number, isTemporary?: boolean) {
     const sourceModel: ISource = {
       sourceId: id,
       name,
@@ -118,7 +119,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       channel
     };
 
-    Vue.set(this.state.sources, id, sourceModel);
+    if (isTemporary) {
+      Vue.set(this.state.temporarySources, id, sourceModel);
+    } else {
+      Vue.set(this.state.sources, id, sourceModel);
+    }
   }
 
   @mutation()
@@ -163,7 +168,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, name, type, options.channel);
+    this.ADD_SOURCE(id, name, type, options.channel, options.isTemporary);
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
@@ -367,7 +372,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   getSource(id: string): Source {
-    return this.state.sources[id] ? new Source(id) : void 0;
+    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
   }
 
 
@@ -415,7 +420,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         return;
       }
     }
-    console.log(sourceId);
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
