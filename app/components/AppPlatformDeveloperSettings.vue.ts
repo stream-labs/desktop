@@ -43,7 +43,6 @@ export default class AppPlatformDeveloperSettings extends Vue {
   error = '';
 
   async loadApp() {
-    // TODO Validation surfacing
     if (!this.appPathValue) return;
     if (!this.appTokenValue) return;
 
@@ -80,9 +79,6 @@ export default class AppPlatformDeveloperSettings extends Vue {
     }
 
     this.loading = false;
-
-    // // This prevents spamming the button
-    // setTimeout(() => this.loading = false, 2000);
   }
 
   unloadApp() {

@@ -124,6 +124,10 @@ export default class TopNav extends Vue {
   }
 
   get isUserLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.state.auth;
+  }
+
+  get appStoreVisible() {
+    return this.platformAppsService.state.storeVisible && this.isUserLoggedIn;
   }
 }
