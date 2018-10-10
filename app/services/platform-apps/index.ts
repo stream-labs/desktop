@@ -596,6 +596,10 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
+  getProductionApps() {
+    return this.state.loadedApps.filter( app => !app.unpacked );
+  }
+
   getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }

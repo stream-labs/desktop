@@ -25,6 +25,7 @@
       <appearance-settings v-if="categoryName === 'Appearance'" />
       <experimental-settings v-if="categoryName === 'Experimental'" />
       <remote-control-settings v-if="categoryName === 'Remote Control'" />
+      <div v-if="categoryName === 'Installed Apps'"></div>
       <GenericFormGroups
         v-if="!['Hotkeys', 'API', 'Overlays', 'Notifications', 'Appearance', 'Experimental', 'Remote Control'].includes(categoryName)"
         v-model="settingsData"

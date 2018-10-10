@@ -55,7 +55,8 @@ export default class Settings extends Vue {
     Notifications: 'icon-notifications',
     Appearance: 'icon-settings-3-1',
     'Remote Control': 'fas fa-play-circle',
-    Experimental: 'fas fa-flask'
+    Experimental: 'fas fa-flask',
+    'Installed Apps': 'icon-store'
   };
 
   mounted() {

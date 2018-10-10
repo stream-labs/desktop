@@ -123,6 +123,10 @@ export class SettingsService extends StatefulService<ISettingsState>
       categories = categories.concat('Developer');
     }
 
+    if (this.platformAppsService.getProductionApps().length > 0) {
+      categories = categories.concat('Installed Apps');
+    }
+
     return categories;
   }
 
