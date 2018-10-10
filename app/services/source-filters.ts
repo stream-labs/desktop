@@ -198,7 +198,7 @@ export class SourceFiltersService extends Service {
     if (!filterName) return [];
     const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
 
-    // Show SLOBS frontend display names for the sidechain source options
+    // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
     formData.forEach(input => {
       if (input.name === 'sidechain_source') {
         (input as IListInput<string>).options.forEach(option => {
