@@ -1,10 +1,14 @@
 import { $t } from 'services/i18n';
 
 enum EncoderType {
-  x264 = 'obs_x264',
-  nvenc = 'ffmpeg_nvenc',
-  amd = 'amd_amf_h264',
-  qsv = 'obs_qsv11'
+  x264 = 'x264',
+  obs_x264 = 'obs_x264',
+  nvenc = 'nvenc',
+  ffmpeg_nvenc = 'ffmpeg_nvenc',
+  amd = 'amd',
+  amd_amf_h264 = 'amd_amf_h264',
+  qsv = 'qsv',
+  obs_qsv11 = 'obs_qsv11'
 }
 
 enum GameType {
@@ -55,7 +59,7 @@ export interface IEncoderPreset {
   profile: IProfile;
   game: GameType;
   settings: string;
-  encoder: EncoderType;
+  encoder: EncoderType[];
 }
 
 export const Presets: IEncoderPreset[] = [
@@ -66,7 +70,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 ' +
       'bframes=3 subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 ' +
       'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: VQ_profile,
@@ -75,7 +79,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=2 chroma-qp-offset=-2 ' +
       'bframes=0 subme=0 b_adapt=2 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 ' +
       'chroma_me=1 psy=0 8x8dct=0 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: CPU_profile,
@@ -84,7 +88,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 ' +
       'bframes=3 subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 ' +
       'chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: VQ_profile,
@@ -95,7 +99,7 @@ export const Presets: IEncoderPreset[] = [
       'trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=0 bframes=0 ' +
       'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 ' +
       'psy=0 8x8dct=0 fast_pskip=1 lookahead_threads=6',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: CPU_profile,
@@ -104,7 +108,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=hex force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=3 ' +
       'subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: VQ_profile,
@@ -113,7 +117,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=-2 bframes=0 subme=1 ' +
       'b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: CPU_profile,
@@ -122,7 +126,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=3 subme=1 ' +
       'b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: VQ_profile,
@@ -131,7 +135,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=0 chroma-qp-offset=-2 bframes=0 subme=1 ' +
       'b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 ' +
       'fast_pskip=1 lookahead_threads=6 deblock=1:0',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: CPU_profile,
@@ -140,7 +144,7 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr deblock=1:0 trellis=0 me=dia force-cfr=1 rc-lookahead=20 ref=1 chroma-qp-offset=0 bframes=2 ' +
       'subme=1 b_adapt=1 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=1 chroma_me=1 psy=1 8x8dct=1 fast_pskip=1 ' +
       'lookahead_threads=6',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   },
   {
     profile: VQ_profile,
@@ -149,6 +153,6 @@ export const Presets: IEncoderPreset[] = [
       'nal-hrd=cbr deblock=1:0 trellis=0 me=tesa force-cfr=1 rc-lookahead=10 ref=0 chroma-qp-offset=-2 bframes=0 ' +
       'subme=0 b_adapt=0 mixed-refs=0 cabac=1 qpstep=4 b_pyramid=2 mbtree=0 chroma_me=1 psy=1 8x8dct=0 fast_pskip=1 ' +
       'lookahead_threads=6',
-    encoder: EncoderType.x264
+    encoder: [EncoderType.x264, EncoderType.obs_x264]
   }
 ];
