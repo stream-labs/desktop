@@ -10,7 +10,7 @@ import ChatbotModTools from 'components/page-components/Chatbot/ChatbotModTools.
 import ChatbotTimers from 'components/page-components/Chatbot/ChatbotTimers.vue';
 import ChatbotQuotes from 'components/page-components/Chatbot/ChatbotQuotes.vue';
 import ChatbotQueue from 'components/page-components/Chatbot/ChatbotQueue.vue';
-import { ChatbotApiService } from 'services/chatbot';
+import { ChatbotApiService, ChatbotBaseApiService } from 'services/chatbot';
 import { Inject } from 'util/injector';
 import ToggleInput from 'components/shared/inputs/ToggleInput.vue';
 import ChatbotBanner from 'components/page-components/Chatbot/shared/ChatbotBanner.vue';
@@ -75,16 +75,15 @@ export default class Chatbot extends Vue {
   enabled = false;
 
   get globallyEnabled() {
-    return this.chatbotApiService.state.globallyEnabled;
+    return this.chatbotApiService.Base.state.globallyEnabled;
   }
 
   onToggleEnableChatbotHandler() {
-    this.chatbotApiService.toggleEnableChatbot();
+    this.chatbotApiService.Base.toggleEnableChatbot();
   }
 
   mounted() {
-
-    this.chatbotApiService
+    this.chatbotApiService.Base
       .logIn()
       .then(response => {
         this.authenticated = true;

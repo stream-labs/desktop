@@ -56,7 +56,18 @@ import { TroubleshooterService } from 'services/troubleshooter';
 import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
-import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
+import {
+  ChatbotApiService,
+  ChatbotBaseApiService,
+  ChatbotCommonService,
+  ChatbotAlertsApiService,
+  ChatbotCommandsApiService,
+  ChatbotTimerApiService,
+  ChatbotModToolsApiService,
+  ChatbotQueueApiService,
+  ChatbotQuotesApiService,
+  ChatbotSongRequestApiService,
+} from 'services/chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
@@ -177,7 +188,15 @@ export class ServicesManager extends Service {
     ChatBoxService,
     ViewerCountService,
     ChatbotApiService,
+    ChatbotBaseApiService,
     ChatbotCommonService,
+    ChatbotAlertsApiService,
+    ChatbotCommandsApiService,
+    ChatbotTimerApiService,
+    ChatbotModToolsApiService,
+    ChatbotQueueApiService,
+    ChatbotQuotesApiService,
+    ChatbotSongRequestApiService,
     StreamBossService,
     DonationTickerService,
     CreditsService,

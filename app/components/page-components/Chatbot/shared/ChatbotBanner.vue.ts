@@ -9,10 +9,10 @@ import ChatbotModule from 'components/page-components/Chatbot/Modules/ChatbotMod
 })
 export default class ChatbotBanner extends ChatbotBase {
   onCloseBannerHandler() {
-    this.chatbotCommonService.hideModBanner();
+    this.chatbotApiService.Common.hideModBanner();
   }
 
   get modBannerVisible() {
-    return this.chatbotCommonService.state.modBannerVisible;
+    return this.chatbotApiService.Common.state.modBannerVisible;
   }
 }

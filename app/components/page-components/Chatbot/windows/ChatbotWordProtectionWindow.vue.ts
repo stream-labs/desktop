@@ -42,12 +42,13 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
+      .ModTools
       .updateWordProtection({
         enabled: this.wordProtectionResponse.enabled,
         settings: this.wordProtection
       })
       .then(() => {
-        this.chatbotCommonService.closeChildWindow();
+        this.chatbotApiService.Common.closeChildWindow();
       });
   }
 }

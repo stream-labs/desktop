@@ -22,16 +22,16 @@ export default class ChatbotSongRequestOnboardingWindow extends ChatbotWindowsBa
   settings: any = null;
 
   async mounted() {
-    await this.chatbotApiService.fetchSongRequestPreferencesData();
-    this.settings = cloneDeep(this.chatbotApiService.state.songRequestPreferencesResponse.settings);
+    await this.chatbotApiService.SongRequest.fetchSongRequestPreferencesData();
+    this.settings = cloneDeep(this.chatbotApiService.SongRequest.state.songRequestPreferencesResponse.settings);
   }
 
   async onToggleNextHandler() {
     if (this.step === 1) {
-      await this.chatbotApiService.updateSongRequestPreferencesData({settings: this.settings});
+      await this.chatbotApiService.SongRequest.updateSongRequestPreferencesData({settings: this.settings});
       this.step++;
     }
-    else this.chatbotCommonService.closeChildWindow();
+    else this.chatbotApiService.Common.closeChildWindow();
   }
 
   onTogglePrevHandler() {

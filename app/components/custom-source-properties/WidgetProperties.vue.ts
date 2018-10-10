@@ -5,7 +5,7 @@ import { ISourceApi } from 'services/sources';
 import { IObsListInput } from 'components/obs/inputs/ObsInput';
 import { WidgetDefinitions, IWidget, WidgetType } from 'services/widgets';
 import { NavigationService } from 'services/navigation';
-import { ChatbotCommonService } from 'services/chatbot';
+import { ChatbotApiService } from 'services/chatbot';
 import { WindowsService } from 'services/windows';
 import { Inject } from 'util/injector';
 import { $t } from 'services/i18n';
@@ -22,7 +22,7 @@ export default class WidgetProperties extends Vue {
   @Inject() navigationService: NavigationService;
   @Inject() windowsService: WindowsService;
   @Inject() userService: UserService;
-  @Inject() chatbotCommonService: ChatbotCommonService;
+  @Inject() chatbotApiChatbotApiService: ChatbotApiService;
 
   widgetModel: IObsListInput<string> = null;
 
@@ -44,7 +44,7 @@ export default class WidgetProperties extends Vue {
     if (widgetType === WidgetType.Chatbot) {
       // chatbot widget doesnt exist on sl.com, but its own chatbot tab
       this.navigationService.navigate('Chatbot');
-      this.chatbotCommonService.openSongRequestPreferencesWindow();
+      this.chatbotApiChatbotApiService.Common.openSongRequestPreferencesWindow();
       return;
     }
 

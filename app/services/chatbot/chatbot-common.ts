@@ -18,9 +18,7 @@ import {
   IQuote,
 } from './chatbot-interfaces';
 
-export class ChatbotCommonService extends PersistentStatefulService<
-  IChatbotCommonServiceState
-  > {
+export class ChatbotCommonService extends PersistentStatefulService<IChatbotCommonServiceState> {
   @Inject() windowsService: WindowsService;
 
   static defaultState: IChatbotCommonServiceState = {
@@ -228,4 +226,4 @@ export class ChatbotCommonService extends PersistentStatefulService<
   private SET_QUOTE_TO_UPDATE(quote: IQuote) {
     Vue.set(this.state, 'quoteToUpdate', quote);
   }
-  }
+}

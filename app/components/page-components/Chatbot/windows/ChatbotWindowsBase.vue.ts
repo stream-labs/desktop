@@ -15,25 +15,25 @@ Vue.use(VModal);
 })
 export default class ChatbotWindowsBase extends ChatbotBase {
   onCancelHandler(): void {
-    this.chatbotCommonService.closeChildWindow();
+    this.chatbotApiService.Common.closeChildWindow();
   }
 
   onSaveHandler(): void {}
 
   // switching between 2 child windows, link protection and default command(to edit link protection command)
   onToggleLinkProtectionWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotCommonService.openLinkProtectionWindow();
+        this.chatbotApiService.Common.openLinkProtectionWindow();
         break;
       case 'ChatbotLinkProtectionWindow':
-        const linkProtectionPermitCommand = this.chatbotApiService.state
+        const linkProtectionPermitCommand = this.chatbotApiService.Commands.state
           .defaultCommandsResponse['link-protection'].permit;
 
-        this.chatbotCommonService.openDefaultCommandWindow({
+        this.chatbotApiService.Common.openDefaultCommandWindow({
           ...linkProtectionPermitCommand,
           slugName: 'link-protection',
           commandName: 'permit'
@@ -43,18 +43,18 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleQuoteWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotCommonService.openQuotePreferencesWindow();
+        this.chatbotApiService.Common.openQuotePreferencesWindow();
         break;
       case 'ChatbotQuotePreferencesWindow':
-        const quotePreferencesCommand = this.chatbotApiService.state
+        const quotePreferencesCommand = this.chatbotApiService.Commands.state
           .defaultCommandsResponse['quotes'].get;
 
-        this.chatbotCommonService.openDefaultCommandWindow({
+        this.chatbotApiService.Common.openDefaultCommandWindow({
           ...quotePreferencesCommand,
           slugName: 'quotes',
           commandName: 'get'
@@ -64,18 +64,18 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleQueueWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotCommonService.openQueuePreferencesWindow();
+        this.chatbotApiService.Common.openQueuePreferencesWindow();
         break;
       case 'ChatbotQueuePreferencesWindow':
-        const queuePreferencesCommand = this.chatbotApiService.state
+        const queuePreferencesCommand = this.chatbotApiService.Commands.state
           .defaultCommandsResponse['queue'].join;
 
-        this.chatbotCommonService.openDefaultCommandWindow({
+        this.chatbotApiService.Common.openDefaultCommandWindow({
           ...queuePreferencesCommand,
           slugName: 'queue',
           commandName: 'join'
@@ -85,18 +85,18 @@ export default class ChatbotWindowsBase extends ChatbotBase {
   }
 
   onToggleSongRequestWindowHandler() {
-    const currentWindow = this.chatbotCommonService.windowsService.getChildWindowOptions()
+    const currentWindow = this.chatbotApiService.Common.windowsService.getChildWindowOptions()
       .componentName;
 
     switch (currentWindow) {
       case 'ChatbotDefaultCommandWindow':
-        this.chatbotCommonService.openSongRequestPreferencesWindow();
+        this.chatbotApiService.Common.openSongRequestPreferencesWindow();
         break;
       case 'ChatbotSongRequestPreferencesWindow':
-        const queuePreferencesCommand = this.chatbotApiService.state
+        const queuePreferencesCommand = this.chatbotApiService.Commands.state
           .defaultCommandsResponse['songrequest'].songrequest;
 
-        this.chatbotCommonService.openDefaultCommandWindow({
+        this.chatbotApiService.Common.openDefaultCommandWindow({
           ...queuePreferencesCommand,
           slugName: 'songrequest',
           commandName: 'songrequest'

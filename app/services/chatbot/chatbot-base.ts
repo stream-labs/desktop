@@ -4,11 +4,6 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { handleErrors, authorizedHeaders } from 'util/requests';
 import { mutation } from '../stateful-service';
-import {
-  MediaShareService,
-  IMediaShareData,
-  IMediaShareBan
-} from 'services/widget-settings/media-share';
 
 import {
   IChatbotAuthResponse,
@@ -28,9 +23,7 @@ interface IChatbotBaseApiServiceState {
   globallyEnabled: boolean;
 }
 
-export class ChatbotBaseApiService extends PersistentStatefulService<
-  IChatbotBaseApiServiceState
-  > {
+export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBaseApiServiceState> {
   @Inject() userService: UserService;
 
   apiUrl = 'https://chatbot-api.streamlabs.com/';
@@ -80,6 +73,7 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   }
 
   api(method: string, endpoint: string, data: any) {
+    debugger;
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
     let options: {
@@ -184,7 +178,6 @@ export class ChatbotBaseApiService extends PersistentStatefulService<
   //
   // Mutations
   //
-
   @mutation()
   private LOGIN(response: IChatbotAuthResponse) {
     Vue.set(this.state, 'apiToken', response.api_token);

@@ -37,12 +37,13 @@ export default class ChatbotSymbolProtectionWindow extends ChatbotModToolsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
+      .ModTools
       .updateSymbolProtection({
         enabled: this.symbolProtectionResponse.enabled,
         settings: this.symbolProtection
       })
       .then(() => {
-        this.chatbotCommonService.closeChildWindow();
+        this.chatbotApiService.Common.closeChildWindow();
       });
   }
 }

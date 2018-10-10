@@ -74,7 +74,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   }
 
   get defaultCommandToUpdate() {
-    return this.chatbotCommonService.state.defaultCommandToUpdate;
+    return this.chatbotApiService.Common.state.defaultCommandToUpdate;
   }
 
   // metadata
@@ -194,7 +194,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
 
   async onResetCommandHandler() {
     const { slugName, commandName } = this.defaultCommandToUpdate;
-    const resettedCommand = await this.chatbotApiService.resetDefaultCommand(
+    const resettedCommand = await this.chatbotApiService.Commands.resetDefaultCommand(
       slugName,
       commandName
     );
@@ -208,7 +208,7 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
-    this.chatbotApiService.updateDefaultCommand(
+    this.chatbotApiService.Commands.updateDefaultCommand(
       this.defaultCommandToUpdate.slugName,
       this.defaultCommandToUpdate.commandName,
       this.editedCommand

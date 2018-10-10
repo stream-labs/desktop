@@ -11,11 +11,11 @@ import {
 @Component({})
 export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   get chatAlerts() {
-    return this.chatbotApiService.state.chatAlertsResponse;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse;
   }
 
   get chatAlertsEnabled() {
-    return this.chatbotApiService.state.chatAlertsResponse.enabled;
+    return this.chatbotApiService.Alerts.state.chatAlertsResponse.enabled;
   }
 
   get alertTypes() {
@@ -81,7 +81,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   // calls to service methods
   updateChatAlerts(newAlertsObject: IChatAlertsResponse) {
-    return this.chatbotApiService.updateChatAlerts(newAlertsObject);
+    return this.chatbotApiService.Alerts.updateChatAlerts(newAlertsObject);
   }
 }
 

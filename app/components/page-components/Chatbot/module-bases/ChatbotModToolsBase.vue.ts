@@ -109,19 +109,19 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
   }
 
   get capsProtectionResponse() {
-    return this.chatbotApiService.state.capsProtectionResponse;
+    return this.chatbotApiService.ModTools.state.capsProtectionResponse;
   }
 
   get symbolProtectionResponse() {
-    return this.chatbotApiService.state.symbolProtectionResponse;
+    return this.chatbotApiService.ModTools.state.symbolProtectionResponse;
   }
 
   get linkProtectionResponse() {
-    return this.chatbotApiService.state.linkProtectionResponse;
+    return this.chatbotApiService.ModTools.state.linkProtectionResponse;
   }
 
   get wordProtectionResponse() {
-    return this.chatbotApiService.state.wordProtectionResponse;
+    return this.chatbotApiService.ModTools.state.wordProtectionResponse;
   }
 
   placeholder(protectionType: string, fieldType: 'message' | 'minimum' | 'maximum' | 'percent') {
@@ -309,7 +309,7 @@ export default class ChatbotAlertsBase extends ChatbotWindowsBase {
 
   onResetSlugHandler(slug: ChatbotSettingSlug) {
     if (confirm($t('Are you sure you want to reset this protection preference?'))) {
-      this.chatbotApiService.resetSettings(slug)
+      this.chatbotApiService.ModTools.resetSettings(slug)
         .then((response: (
           ICapsProtectionResponse |
           ISymbolProtectionResponse |

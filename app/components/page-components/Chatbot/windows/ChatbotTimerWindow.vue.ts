@@ -77,7 +77,7 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   }
 
   get timerToUpdate() {
-    return this.chatbotCommonService.state.timerToUpdate;
+    return this.chatbotApiService.Common.state.timerToUpdate;
   }
 
   async onSaveHandler() {
@@ -85,11 +85,13 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
 
     if (this.isEdit) {
       this.chatbotApiService
+        .Timers
         .updateTimer(this.timerToUpdate.id, this.newTimer)
         .catch(this.onErrorHandler);
       return;
     }
     this.chatbotApiService
+      .Timers
       .createTimer(this.newTimer)
       .catch(this.onErrorHandler);
   }

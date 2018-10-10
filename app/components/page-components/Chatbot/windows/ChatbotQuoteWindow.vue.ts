@@ -55,18 +55,20 @@ export default class ChatbotTimerWindow extends ChatbotWindowsBase {
   }
 
   get quoteToUpdate() {
-    return this.chatbotCommonService.state.quoteToUpdate;
+    return this.chatbotApiService.Common.state.quoteToUpdate;
   }
 
   async onSaveHandler() {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     if (this.isEdit) {
       this.chatbotApiService
+        .Quotes
         .updateQuote(this.quoteToUpdate.id, this.newQuote)
         .catch(this.onErrorHandler);
       return;
     }
     this.chatbotApiService
+      .Quotes
       .createQuote(this.newQuote)
       .catch(this.onErrorHandler);
   }

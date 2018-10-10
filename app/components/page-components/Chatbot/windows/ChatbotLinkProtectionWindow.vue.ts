@@ -45,12 +45,13 @@ export default class ChatbotLinkProtectionWindow extends ChatbotModToolsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
+      .ModTools
       .updateLinkProtection({
         enabled: this.linkProtectionResponse.enabled,
         settings: this.linkProtection
       })
       .then(() => {
-        this.chatbotCommonService.closeChildWindow();
+        this.chatbotApiService.Common.closeChildWindow();
       });
   }
 }

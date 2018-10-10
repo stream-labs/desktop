@@ -37,7 +37,7 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
   }
 
   get queuePreferences() {
-    return this.chatbotApiService.state.queuePreferencesResponse;
+    return this.chatbotApiService.Queue.state.queuePreferencesResponse;
   }
 
   mounted() {
@@ -48,6 +48,6 @@ export default class ChatbotQueuePreferencesWindow extends ChatbotWindowsBase {
   onSaveHandler() {
     const newPreferences = cloneDeep(this.queuePreferences);
     newPreferences.settings.general = this.generalSettings;
-    this.chatbotApiService.updateQueuePreferences(newPreferences);
+    this.chatbotApiService.Queue.updateQueuePreferences(newPreferences);
   }
 }

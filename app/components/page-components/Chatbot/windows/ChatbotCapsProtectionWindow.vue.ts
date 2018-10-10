@@ -41,12 +41,13 @@ export default class ChatbotCapsProtectionWindow extends ChatbotModToolsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
+      .ModTools
       .updateCapsProtection({
         enabled: this.capsProtectionResponse.enabled,
         settings: this.capsProtection
       })
       .then(() => {
-        this.chatbotCommonService.closeChildWindow();
+        this.chatbotApiService.Common.closeChildWindow();
       });
   }
 }

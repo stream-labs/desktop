@@ -14,16 +14,16 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   searchQuery = '';
 
   get commands() {
-    return this.chatbotApiService.state.customCommandsResponse.data;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination
       .current;
   }
 
   get totalPages() {
-    return this.chatbotApiService.state.customCommandsResponse.pagination.total;
+    return this.chatbotApiService.Commands.state.customCommandsResponse.pagination.total;
   }
 
   mounted() {
@@ -37,15 +37,15 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   }
 
   fetchCommands(page: number = this.currentPage, query?: string) {
-    this.chatbotApiService.fetchCustomCommands(page, query);
+    this.chatbotApiService.Commands.fetchCustomCommands(page, query);
   }
 
   onOpenCommandWindowHandler(command?: ICustomCommand) {
-    this.chatbotCommonService.openCustomCommandWindow(command);
+    this.chatbotApiService.Common.openCustomCommandWindow(command);
   }
 
   onDeleteCommandHandler(command: ICustomCommand) {
-    this.chatbotApiService.deleteCustomCommand(command.id);
+    this.chatbotApiService.Commands.deleteCustomCommand(command.id);
   }
 
   onToggleEnableCommandHandler(
@@ -55,7 +55,7 @@ export default class ChatbotDefaultCommands extends ChatbotBase {
   ) {
     const commandToBeUpdated = this.commands[index];
 
-    this.chatbotApiService.updateCustomCommand(commandId, {
+    this.chatbotApiService.Commands.updateCustomCommand(commandId, {
       ...commandToBeUpdated,
       enabled: isEnabled
     });

@@ -13,40 +13,40 @@ export default class ChatbotQueue extends ChatbotBase {
   queueTitle = 'The Current Game';
 
   async mounted() {
-    await this.chatbotApiService.logInToSocket(['queue']);
-    await this.chatbotApiService.fetchQueueState();
+    await this.chatbotApiService.Base.logInToSocket(['queue']);
+    await this.chatbotApiService.Queue.fetchQueueState();
 
-    this.chatbotApiService.connectToQueueSocketChannels();
-    this.chatbotApiService.fetchQueueEntries();
-    this.chatbotApiService.fetchQueuePicked();
-    this.chatbotApiService.fetchQueuePreferences();
+    this.chatbotApiService.Queue.connectToQueueSocketChannels();
+    this.chatbotApiService.Queue.fetchQueueEntries();
+    this.chatbotApiService.Queue.fetchQueuePicked();
+    this.chatbotApiService.Queue.fetchQueuePreferences();
 
-    this.queueTitle = this.chatbotApiService.state.queueStateResponse.title;
+    this.queueTitle = this.chatbotApiService.Queue.state.queueStateResponse.title;
   }
 
   get noUsersInList() {
-    return this.chatbotApiService.state.queueEntriesResponse.data.length === 0;
+    return this.chatbotApiService.Queue.state.queueEntriesResponse.data.length === 0;
   }
 
   onOpenQueuePreferencesHandler() {
-    this.chatbotCommonService.openQueuePreferencesWindow();
+    this.chatbotApiService.Common.openQueuePreferencesWindow();
   }
 
   onToggleQueueOpenHandler() {
     if (this.queueIsOpen) {
-      this.chatbotApiService.closeQueue();
+      this.chatbotApiService.Queue.closeQueue();
       return;
     }
 
     if (!this.queueTitle) return;
-    this.chatbotApiService.openQueue(this.queueTitle);
+    this.chatbotApiService.Queue.openQueue(this.queueTitle);
   }
 
   onPickRandomEntryHandler() {
-    this.chatbotApiService.pickQueueEntryRandom();
+    this.chatbotApiService.Queue.pickQueueEntryRandom();
   }
 
   get queueIsOpen() {
-    return this.chatbotApiService.state.queueStateResponse.status === 'Open';
+    return this.chatbotApiService.Queue.state.queueStateResponse.status === 'Open';
   }
 }

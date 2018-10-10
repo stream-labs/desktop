@@ -15,11 +15,11 @@ export default class ChatbotQueueList extends ChatbotBase {
   searchQuery = '';
 
   get entryList() {
-    return this.chatbotApiService.state.queueEntriesResponse;
+    return this.chatbotApiService.Queue.state.queueEntriesResponse;
   }
 
   get pickedList() {
-    return this.chatbotApiService.state.queuePickedResponse;
+    return this.chatbotApiService.Queue.state.queuePickedResponse;
   }
 
   get dataList() {
@@ -44,20 +44,20 @@ export default class ChatbotQueueList extends ChatbotBase {
 
   fetchList(page = this.currentPage, query = this.searchQuery) {
     this.isPicked ?
-      this.chatbotApiService.fetchQueuePicked(page) :
-      this.chatbotApiService.fetchQueueEntries(page, query);
+      this.chatbotApiService.Queue.fetchQueuePicked(page) :
+      this.chatbotApiService.Queue.fetchQueueEntries(page, query);
   }
 
   @Watch('searchQuery')
   @Debounce(1000)
   onQueryChangeHandler(value: string) {
-    this.chatbotApiService.fetchQueueEntries(this.currentPage, value);
+    this.chatbotApiService.Queue.fetchQueueEntries(this.currentPage, value);
   }
 
   onClearListHandler() {
     this.isPicked ?
-      this.chatbotApiService.clearQueuePicked() :
-      this.chatbotApiService.clearQueueEntries();
+      this.chatbotApiService.Queue.clearQueuePicked() :
+      this.chatbotApiService.Queue.clearQueueEntries();
   }
 
   formatDate(dateString: string) {
@@ -65,10 +65,10 @@ export default class ChatbotQueueList extends ChatbotBase {
   }
 
   onPickEntryHandler(id: number) {
-    this.chatbotApiService.pickQueueEntry(id);
+    this.chatbotApiService.Queue.pickQueueEntry(id);
   }
 
   onRemoveEntryHandler(id: number) {
-    this.chatbotApiService.removeQueueEntry(id);
+    this.chatbotApiService.Queue.removeQueueEntry(id);
   }
 }

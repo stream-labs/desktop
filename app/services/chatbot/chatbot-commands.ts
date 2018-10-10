@@ -30,12 +30,9 @@ interface IChatbotCommandsApiServiceState {
   commandVariablesResponse: ICommandVariablesResponse;
 }
 
-export class ChatbotCommandsApiService extends PersistentStatefulService<
-  IChatbotCommandsApiServiceState
-> {
+export class ChatbotCommandsApiService extends PersistentStatefulService<IChatbotCommandsApiServiceState> {
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
   @Inject() chatbotCommonService: ChatbotCommonService;
-  api = this.chatbotBaseApiService.api;
 
   static defaultState: IChatbotCommandsApiServiceState = {
     defaultCommandsResponse: {
@@ -58,7 +55,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
   //
 
   fetchDefaultCommands() {
-    return this.api('GET', 'commands/default', {}).then(
+    return this.chatbotBaseApiService.api('GET', 'commands/default', {}).then(
       (response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
       }
@@ -69,7 +66,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
     page = this.state.customCommandsResponse.pagination.current,
     query = ''
   ) {
-    return this.api('GET', `commands?page=${page}&query=${query}`, {}).then(
+    return this.chatbotBaseApiService.api('GET', `commands?page=${page}&query=${query}`, {}).then(
       (response: ICustomCommandsResponse) => {
         this.UPDATE_CUSTOM_COMMANDS(response);
       }
@@ -77,19 +74,18 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
   }
 
   fetchCommandVariables() {
-    return this.api('GET', 'commands/variables', {}).then(
+    return this.chatbotBaseApiService.api('GET', 'commands/variables', {}).then(
       (response: ICommandVariablesResponse) => {
         this.UPDATE_COMMAND_VARIABLES(response);
       }
     );
   }
 
-
   //
   // POST, PUT requests
   //
   resetDefaultCommands() {
-    return this.api('POST', 'commands/default/reset', {}).then(
+    return this.chatbotBaseApiService.api('POST', 'commands/default/reset', {}).then(
       (response: IDafaultCommandsResponse) => {
         this.UPDATE_DEFAULT_COMMANDS(response);
       }
@@ -97,7 +93,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
   }
 
   resetDefaultCommand(slugName: string, commandName: string) {
-    return this.api(
+    return this.chatbotBaseApiService.api(
       'POST',
       `settings/${slugName}/commands/${commandName}/reset`,
       {}
@@ -108,7 +104,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
 
   // create
   createCustomCommand(data: ICustomCommand) {
-    return this.api('POST', 'commands', data).then(
+    return this.chatbotBaseApiService.api('POST', 'commands', data).then(
       (response: ICustomCommand) => {
         this.fetchCustomCommands();
         this.chatbotCommonService.closeChildWindow();
@@ -122,7 +118,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
     commandName: string,
     data: IDefaultCommand
   ) {
-    return this.api(
+    return this.chatbotBaseApiService.api(
       'POST',
       `settings/${slugName}/commands/${commandName}`,
       data
@@ -135,7 +131,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
   }
 
   updateCustomCommand(id: string, data: ICustomCommand) {
-    return this.api('PUT', `commands/${id}`, data).then(
+    return this.chatbotBaseApiService.api('PUT', `commands/${id}`, data).then(
       (response: IChatbotAPIPutResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();
@@ -149,7 +145,7 @@ export class ChatbotCommandsApiService extends PersistentStatefulService<
   // DELETE methods
   //
   deleteCustomCommand(id: string) {
-    return this.api('DELETE', `commands/${id}`, {}).then(
+    return this.chatbotBaseApiService.api('DELETE', `commands/${id}`, {}).then(
       (response: IChatbotAPIDeleteResponse) => {
         if (response.success === true) {
           this.fetchCustomCommands();

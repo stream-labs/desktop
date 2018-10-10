@@ -38,7 +38,7 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
   }
 
   get quotePreferences() {
-    return this.chatbotApiService.state.quotePreferencesResponse;
+    return this.chatbotApiService.Quotes.state.quotePreferencesResponse;
   }
 
   mounted() {
@@ -50,7 +50,7 @@ export default class ChatbotQuotePreferencesWindow extends ChatbotWindowsBase {
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
     const newPreferences = cloneDeep(this.quotePreferences);
     newPreferences.settings.general = this.generalSettings;
-    this.chatbotApiService.updateQuotePreferences(newPreferences);
+    this.chatbotApiService.Quotes.updateQuotePreferences(newPreferences);
   }
 
 }

@@ -8,6 +8,7 @@ import {
   IChatbotAPIPostResponse,
   IChatAlertsResponse,
 } from './chatbot-interfaces';
+import { ChatbotApiService } from './chatbot';
 
 // state
 interface IChatbotAlertsApiServiceState {
@@ -16,7 +17,6 @@ interface IChatbotAlertsApiServiceState {
 
 export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotAlertsApiServiceState> {
   @Inject() chatbotBaseApiService: ChatbotBaseApiService;
-  api = this.chatbotBaseApiService.api;
 
   static defaultState: IChatbotAlertsApiServiceState = {
     chatAlertsResponse: {
@@ -29,7 +29,7 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
   // GET requests
   //
   fetchChatAlerts() {
-    return this.api('GET', 'settings/chat-notifications', {}).then(
+    return this.chatbotBaseApiService.api('GET', 'settings/chat-notifications', {}).then(
       (response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
       }
@@ -38,7 +38,7 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
 
   // Update
   updateChatAlerts(data: IChatAlertsResponse) {
-    return this.api('POST', 'settings/chat-notifications', data).then(
+    return this.chatbotBaseApiService.api('POST', 'settings/chat-notifications', data).then(
       (response: IChatbotAPIPostResponse) => {
         if (response.success === true) {
           this.fetchChatAlerts();
@@ -53,7 +53,7 @@ export class ChatbotAlertsApiService extends PersistentStatefulService<IChatbotA
       (response: IChatAlertsResponse) => {
         this.UPDATE_CHAT_ALERTS(response);
       }
-    )
+    );
   }
 
   //

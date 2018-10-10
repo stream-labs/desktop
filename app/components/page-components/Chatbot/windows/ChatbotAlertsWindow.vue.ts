@@ -73,7 +73,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
   }
 
   onDoneHandler() {
-    this.chatbotCommonService.closeChildWindow();
+    this.chatbotApiService.Common.closeChildWindow();
   }
 
   onResetHandler() {
@@ -82,7 +82,7 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
         $t('Are you sure you want to reset chatbot notifications preferences?')
       )
     ) {
-      this.chatbotApiService.resetSettings('chat-notifications');
+      this.chatbotApiService.Alerts.resetSettings();
     }
   }
 

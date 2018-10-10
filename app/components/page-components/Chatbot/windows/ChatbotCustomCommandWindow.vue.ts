@@ -72,7 +72,7 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
   }
 
   get customCommandToUpdate() {
-    return this.chatbotCommonService.state.customCommandToUpdate;
+    return this.chatbotApiService.Common.state.customCommandToUpdate;
   }
 
   // metadata
@@ -126,12 +126,14 @@ export default class ChatbotCustomCommandWindow extends ChatbotWindowsBase {
 
     if (this.isEdit) {
       this.chatbotApiService
+        .Commands
         .updateCustomCommand(this.customCommandToUpdate.id, this.newCommand)
         .catch(this.onErrorHandler);
       return;
     }
 
     this.chatbotApiService
+      .Commands
       .createCustomCommand(this.newCommand)
       .catch(this.onErrorHandler);
   }

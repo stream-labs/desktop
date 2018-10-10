@@ -14,15 +14,15 @@ export default class ChatbotTimers extends ChatbotBase {
   searchQuery = '';
 
   get timers() {
-    return this.chatbotApiService.state.timersResponse.data;
+    return this.chatbotApiService.Timers.state.timersResponse.data;
   }
 
   get currentPage() {
-    return this.chatbotApiService.state.timersResponse.pagination.current;
+    return this.chatbotApiService.Timers.state.timersResponse.pagination.current;
   }
 
   get totalPages() {
-    return this.chatbotApiService.state.timersResponse.pagination.total;
+    return this.chatbotApiService.Timers.state.timersResponse.pagination.total;
   }
 
   mounted() {
@@ -37,11 +37,11 @@ export default class ChatbotTimers extends ChatbotBase {
   }
 
   fetchTimers(page: number = this.currentPage, query?: string) {
-    this.chatbotApiService.fetchTimers(page, query);
+    this.chatbotApiService.Timers.fetchTimers(page, query);
   }
 
   onOpenTimerWindowHandler(timer?: IChatbotTimer) {
-    this.chatbotCommonService.openTimerWindow(timer);
+    this.chatbotApiService.Common.openTimerWindow(timer);
   }
 
   onToggleEnableTimerHandler(
@@ -51,13 +51,13 @@ export default class ChatbotTimers extends ChatbotBase {
   ) {
     const timerToBeUpdated = this.timers[index];
 
-    this.chatbotApiService.updateTimer(timerId, {
+    this.chatbotApiService.Timers.updateTimer(timerId, {
       ...timerToBeUpdated,
       enabled: isEnabled
     });
   }
 
   onDeleteTimerHandler(timer?: IChatbotTimer) {
-    this.chatbotApiService.deleteTimer(timer.id);
+    this.chatbotApiService.Timers.deleteTimer(timer.id);
   }
 }
