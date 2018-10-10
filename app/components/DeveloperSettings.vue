@@ -1,6 +1,10 @@
 <template>
   <div>
     <div class="section">
+      <AppPlatformDeveloperSettings />
+    </div>
+
+    <div class="section">
       <button class="button button--soft-warning" @click="restoreDefaults">
         Restore Defaults
       </button>
@@ -25,5 +29,5 @@
   </div>
 </template>
 
-<script lang="ts" src="./ApiSettings.vue.ts"></script>
+<script lang="ts" src="./DeveloperSettings.vue.ts"></script>
 

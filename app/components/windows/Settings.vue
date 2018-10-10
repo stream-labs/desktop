@@ -19,7 +19,7 @@
       <extra-settings v-if="categoryName === 'General'" />
       <language-settings v-if="categoryName === 'General'" />
       <hotkeys v-if="categoryName === 'Hotkeys'" />
-      <api-settings v-if="categoryName === 'API'" />
+      <developer-settings v-if="categoryName === 'Developer'" />
       <overlay-settings v-if="categoryName === 'Scene Collections'" />
       <notifications-settings v-if="categoryName === 'Notifications'" />
       <appearance-settings v-if="categoryName === 'Appearance'" />

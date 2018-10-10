@@ -8,11 +8,17 @@ import { YoutubeService } from 'services/platforms/youtube';
 import { MixerService } from 'services/platforms/mixer';
 import { HostsService } from 'services/hosts';
 import { authorizedHeaders } from 'util/requests';
+import { Subject } from 'rxjs/Subject';
 
 
 interface IStreamInfoServiceState {
   fetching: boolean;
   error: boolean;
+  viewerCount: number;
+  channelInfo: IChannelInfo;
+}
+
+interface IStreamInfo {
   viewerCount: number;
   channelInfo: IChannelInfo;
 }
@@ -42,6 +48,8 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
   viewerCountInterval: number;
 
+  streamInfoChanged = new Subject<IStreamInfo>();
+
 
   init() {
     this.refreshStreamInfo();
@@ -52,6 +60,10 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
 
         platform.fetchViewerCount().then(viewers => {
           this.SET_VIEWER_COUNT(viewers);
+          this.streamInfoChanged.next({
+            viewerCount: this.state.viewerCount,
+            channelInfo: this.state.channelInfo
+          });
         });
       }
     }, VIEWER_COUNT_UPDATE_INTERVAL);
@@ -67,6 +79,10 @@ export class StreamInfoService extends StatefulService<IStreamInfoServiceState> 
     const platform = getPlatformService(this.userService.platform.type);
     return platform.fetchChannelInfo().then(info => {
       this.SET_CHANNEL_INFO(info);
+      this.streamInfoChanged.next({
+        viewerCount: this.state.viewerCount,
+        channelInfo: this.state.channelInfo
+      });
       this.SET_FETCHING(false);
     }).catch(() => {
       this.SET_FETCHING(false);
