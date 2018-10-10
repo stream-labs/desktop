@@ -55,7 +55,8 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
-  TopNav = 'top_nav'
+  TopNav = 'top_nav',
+  Chat = 'chat'
 }
 
 interface IAppPage {
@@ -189,7 +190,6 @@ export class PlatformAppsService extends
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
-      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -255,6 +255,11 @@ export class PlatformAppsService extends
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
+    if (
+      !app.unpacked &&
+      !this.state.installedApps.find(installedApp => installedApp.id === app.id)
+    ) this.ADD_PRODUCTION_APP(app);
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id)) return;
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
@@ -378,12 +383,15 @@ export class PlatformAppsService extends
   async reloadApp(appId: string) {
     // TODO  Support Multiple Apps
     const app = this.getApp(appId);
-    debugger;
 
+    if (!app.unpacked) {
+      this.appReload.next(appId);
+      return;
+    }
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
-      this.unloadApps();
+      this.unloadApp(appId);
       return 'Error: manifest.json is missing!';
     }
 
@@ -650,7 +658,10 @@ export class PlatformAppsService extends
   @mutation()
   private ADD_APP(app: ILoadedApp) {
     this.state.loadedApps.push(app);
-    if (this.state.installedApps.findIndex(installedApp => installedApp.id === app.id)) return;
+  }
+
+  @mutation()
+  private ADD_PRODUCTION_APP(app: ILoadedApp) {
     this.state.installedApps.push(app);
   }
 
@@ -690,5 +701,4 @@ export class PlatformAppsService extends
       }
     });
   }
-
 }

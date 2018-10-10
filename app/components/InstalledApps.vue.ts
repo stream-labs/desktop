@@ -11,8 +11,14 @@ export default class InstalledApps extends Vue {
     return this.platformAppsService.state.installedApps.filter(app => !app.unpacked);
   }
 
+  get loadedProductionAppIds(): string[] {
+    return this.platformAppsService.state.loadedApps
+      .filter(app => !app.unpacked)
+      .map(app => app.id);
+  }
+
   isEnabled(appId: string) {
-    return this.platformAppsService.state.loadedApps.find(app => app.id === appId);
+    return this.loadedProductionAppIds.includes(appId);
   }
 
   reload(appId: string) {
