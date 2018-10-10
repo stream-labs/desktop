@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="toolbar">
-      <i class="icon-reset" v-tooltip="$t('Restore Defaults')" @click="restoreDefaults" />
+      <!-- <i class="icon-reset" v-tooltip="$t('Restore Defaults')" @click="restoreDefaults" /> -->
     </div>
     <code-input v-if="value.settings.custom_enabled" @input="save()" :metadata="{ type: metadata.type }" v-model="editorInputValue"/>
   </div>
