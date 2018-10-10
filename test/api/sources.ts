@@ -34,8 +34,6 @@ test('Creating, fetching and removing sources', async t => {
   t.deepEqual(sceneItemNames, []);
 });
 
-
-
 test('Source events', async t => {
   const client = await getClient();
   const scenesService = client.getResource<IScenesServiceApi>('ScenesService');
