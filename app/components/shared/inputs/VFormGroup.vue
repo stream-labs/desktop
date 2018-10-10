@@ -43,13 +43,6 @@
 <style lang="less" scoped>
   @import "../../../styles/index";
 
-  .input-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: flex-start;
-  }
-
   .slots {
     width: 100%;
   }

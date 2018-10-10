@@ -193,11 +193,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
     if (!source) throw  new Error(`Source ${id} not found`);
 
-    source.getObsInput().release();
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
     this.sourceRemoved.next(source.sourceState);
+    source.getObsInput().release();
   }
 
   addFile(path: string): Source {
@@ -407,8 +407,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
           title: $t('Settings for ') + WidgetDisplayData()[widgetType].name,
           queryParams: { sourceId },
           size: {
-            width: 600,
-            height: 800
+            width: 900,
+            height: 1024
           }
         });
 

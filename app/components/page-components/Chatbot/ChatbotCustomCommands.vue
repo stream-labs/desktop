@@ -19,7 +19,7 @@
     <!-- custom commands -->
     <div v-if="!commands || commands.length === 0" class="chatbot-empty-placeholder__container">
       <img
-        :src="require(`../../../../../media/images/chatbot/chatbot-placeholder-command--${this.nightMode ? 'night' : 'day'}.svg`)"
+        :src="require(`../../../../media/images/chatbot/chatbot-placeholder-command--${this.nightMode ? 'night' : 'day'}.svg`)"
         width="200"
       />
       <span>{{ $t('Click add command to get started.') }}</span>
@@ -89,7 +89,7 @@
 <script lang='ts' src="./ChatbotCustomCommands.vue.ts"></script>
 
 <style lang="less" scoped>
-@import "../../../../styles/index";
+@import "../../../styles/index";
 
 .icon-question {
   .icon-hover();

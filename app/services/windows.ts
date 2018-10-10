@@ -143,6 +143,7 @@ export interface IWindowOptions {
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions? : IWindowOptions;
+  isFullScreen?: boolean;
 }
 
 interface IWindowsState {
@@ -284,6 +285,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return windowId;
   }
 
+  setOneOffFullscreen(windowId: string, fullscreen: boolean) {
+    this.UPDATE_ONE_OFF_WINDOW(windowId, { isFullScreen: fullscreen });
+  }
+
   /**
    * Closes all one-off windows
    */
@@ -364,6 +369,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
     };
 
     Vue.set(this.state, windowId, opts);
+  }
+
+  @mutation()
+  private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
+    const oldOpts = this.state[windowId];
+    Vue.set(this.state, windowId, { ...oldOpts, ...options })
   }
 
   @mutation()

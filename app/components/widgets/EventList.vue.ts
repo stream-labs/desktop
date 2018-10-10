@@ -2,24 +2,22 @@ import { Component } from 'vue-property-decorator';
 import {
   EventListService,
   IEventListData
-} from 'services/widget-settings/event-list';
+} from 'services/widgets/settings/event-list';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import { inputComponents } from 'components/shared/inputs';
 import { AnimationInput } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import CodeEditor from './CodeEditor.vue';
-import TestButtons from './TestButtons.vue';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
-    CodeEditor,
-    TestButtons,
+    WidgetEditor,
+    VFormGroup,
     AnimationInput,
+    ValidatedForm,
     ...inputComponents
   }
 })
@@ -43,4 +41,11 @@ export default class EventList extends WidgetSettings<IEventListData, EventListS
   );
 
   fontSizeTooltip = $t('The font size in pixels. Reasonable size typically ranges between 24px and 48px.');
+
+  navItems = [
+    { value: 'manage-list', label: $t('Manage List') },
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
+  ];
 }

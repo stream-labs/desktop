@@ -9,11 +9,10 @@ export interface ITab {
 @Component({})
 export default class Tabs extends Vue {
 
-  @Prop()
-  tabs: ITab[];
-
-  @Prop()
-  value: string;
+  @Prop() tabs: ITab[];
+  @Prop() value: string;
+  @Prop() className: string;
+  @Prop() hideContent: boolean;
 
   showTab(tab: string) {
     this.$emit('input', tab);
