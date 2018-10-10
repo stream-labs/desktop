@@ -23,13 +23,14 @@
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-chatbot"/> {{ $t('Chatbot') }}
     </button>
-    <!-- <button
+    <button
+      v-if="appStoreVisible"
       @click="navigatePlatformAppStore"
       class="tab-button"
       :class="{ 'is-active': page === 'PlatformAppStore' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-store"/> <span>{{ $t('App Store') }}</span>
-    </button> -->
+    </button>
     <button
       @click="navigateOverlays"
       class="tab-button"

@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <div class="source-group">
+      <div class="source-group" v-if="showAppSources">
         <h2>{{ $t('Apps') }}</h2>
         <ul class="source-list">
           <li
