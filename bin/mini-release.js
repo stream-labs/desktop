@@ -77,7 +77,7 @@ async function uploadS3File(name, filePath) {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: process.env.RELEASE_S3_BUCKET_NAME,
-        Key: name,
+        Key: `windows/${name}`,
         Body: stream
       },
       queueSize: 1
