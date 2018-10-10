@@ -1,6 +1,8 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
-import { metadata } from 'components/widgets/inputs';
+import { metadata } from 'components/widgets/inputs/index';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 export interface IEventListSettings extends IWidgetSettings {
   animation_speed: number;
@@ -49,22 +51,23 @@ export interface IEventListData extends IWidgetData {
   settings: IEventListSettings;
 }
 
+@InheritMutations()
 export class EventListService extends WidgetSettingsService<IEventListData> {
 
-  getWidgetType() {
-    return WidgetType.EventList;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/eventlist`;
+  getApiSettings() {
+    return {
+      type: WidgetType.EventList,
+      url: `https://${this.getHost()}/widgets/event-list/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/event-list/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/eventlist`,
+      settingsUpdateEvent: 'eventListSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+      testers: ['Follow', 'Subscription', 'Donation', 'Bits', 'Host']
+    }
   }
 
   getMetadata() {
@@ -85,9 +88,4 @@ export class EventListService extends WidgetSettingsService<IEventListData> {
     };
   }
 
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS,
-    { name: 'test' }
-  ];
 }

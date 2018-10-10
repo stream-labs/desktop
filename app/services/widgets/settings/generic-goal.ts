@@ -1,7 +1,8 @@
-import { IWidgetData, WidgetSettingsService } from './widget-settings';
-
-import { metadata } from 'components/shared/inputs';
+import { IWidgetData } from 'services/widgets';
+import { metadata } from 'components/shared/inputs/index';
 import { $t } from 'services/i18n';
+import { BaseGoalService } from './base-goal';
+import { InheritMutations } from 'services/stateful-service';
 
 
 export interface IGoalData extends IWidgetData {
@@ -34,7 +35,15 @@ export interface IGoalData extends IWidgetData {
   show_bar: string;
 }
 
-export abstract class GenericGoalService extends WidgetSettingsService<IGoalData> {
+export interface IGoalCreateOptions {
+  title: string;
+  goal_amount: number;
+  manual_goal_amount: number;
+  ends_at: string;
+}
+
+@InheritMutations()
+export abstract class GenericGoalService extends BaseGoalService<IGoalData, IGoalCreateOptions> {
 
   getMetadata() {
     return {

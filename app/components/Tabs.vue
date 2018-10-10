@@ -1,6 +1,6 @@
 <template>
 <div class="tabs__container">
-  <div class="tabs">
+  <div class="tabs" :class="className">
     <button
       v-for="tab in tabs"
       :key="tab.value"
@@ -10,7 +10,7 @@
       {{ tab.name }}
     </button>
   </div>
-  <div class="tab-content">
+  <div class="tab-content" v-if="!hideContent">
     <slot v-for="tab in tabs" :name="tab.value" v-if="tab.value === value"/>
   </div>
 </div>
