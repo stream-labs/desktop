@@ -24,9 +24,17 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
 
   selectedAlert = 'subs';
 
+  afterFetch() {
+    console.log(this.wData);
+  }
+
   navItems = [
-    { value: 'manage-count', label: $t('Manage Viewer Count') },
-    { value: 'font', label: $t('Font Settings') },
+    { value: 'general', label: $t('General Settings') },
+    { value: 'media', label: $t('Image & Video') },
+    { value: 'meessage', label: $t('Donor Message') },
+    { value: 'audio', label: $t('Audio') },
+    { value: 'animation', label: $t('Animation') },
+    { value: 'alert', label: $t('Alert Settings') },
     { value: 'source', label: $t('Source') }
   ];
 }

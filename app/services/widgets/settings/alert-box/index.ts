@@ -53,7 +53,6 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
   protected patchAfterFetch(data: { settings: IAlertBoxApiSettings, type: WidgetType }): IAlertBoxData {
     const { settings, ...rest } = data;
     const newSettings = this.transformSettings(settings);
-    console.log(newSettings);
     return { ...rest, settings: newSettings };
   }
 
@@ -77,13 +76,14 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
     const newSettings= {} as IAlertBoxSettings;
     REGEX_TESTERS.forEach((test) => {
       Object.keys(settings).forEach((key) => {
+        let newKey = key;
         if (test.tester.test(key)) {
-          const newKey = /^show/.test(key) ? key.replace(test.tester, 'show_') : key.replace(test.tester, '');
-          if (!newSettings[test.name]) {
-            newSettings[test.name] = { [newKey]: settings[key] };
-          } else {
-            newSettings[test.name][newKey] = settings[key];
-          }
+          newKey = /^show/.test(key) ? key.replace(test.tester, 'show_') : key.replace(test.tester, '');
+        }
+        if (!newSettings[test.name]) {
+          newSettings[test.name] = { [newKey]: settings[key] };
+        } else {
+          newSettings[test.name][newKey] = settings[key];
         }
       });
     });
