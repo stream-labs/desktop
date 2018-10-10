@@ -20,10 +20,10 @@ interface IBrandDeviceUrls {
 }
 
 interface IMsSystemInfo {
-  SystemSKU: string;
   SystemManufacturer: string;
   SystemProductName: string;
-  PSComputerName: string;
+  SystemSKU: string;
+  SystemVersion: string;
 }
 
 interface IBrandDeviceState extends IMsSystemInfo {
@@ -37,7 +37,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     SystemSKU: '',
     SystemManufacturer: '',
     SystemProductName: '',
-    PSComputerName: '',
+    SystemVersion: '',
     urls: null
   };
 
@@ -48,7 +48,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
 
   serviceEnabled() {
     return true;
-    return this.appService.state.argv.includes('--enable-brand-onboarding');
   }
 
   async init() {
@@ -66,11 +65,6 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       if (!key) return;
       if (this.state[key] !== void 0) this.SET_SYSTEM_PARAM(key, value);
     });
-
-    // TODO:
-    // for now we handle only one device
-    this.SET_SYSTEM_PARAM('SystemManufacturer', 'Shuttle Inc.');
-    this.SET_SYSTEM_PARAM('SystemProductName', 'NC03U');
 
     this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
   }
@@ -122,7 +116,16 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   }
 
   private async fetchDeviceUrls(): Promise<IBrandDeviceUrls> {
-    const id = this.state.SystemManufacturer + this.state.SystemProductName;
+
+    // this combination of system params must be unique for each device type
+    // so use it as ID
+    const id = [
+      this.state.SystemManufacturer,
+      this.state.SystemProductName,
+      this.state.SystemSKU,
+      this.state.SystemVersion
+    ].join(' ');
+
     const res = await fetch(`https://${ this.hostsService.streamlabs}/api/v5/slobs/intelconfig/${id}`);
     if (!res.ok) return null;
     return res.json();
