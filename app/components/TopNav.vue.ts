@@ -101,7 +101,7 @@ export default class TopNav extends Vue {
 
   get topNavApps() {
     return this.platformAppsService.state.loadedApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
+      return app.enabled && !!app.manifest.pages.find(page => {
         return page.slot === EAppPageSlot.TopNav;
       });
     });

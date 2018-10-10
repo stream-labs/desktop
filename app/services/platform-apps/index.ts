@@ -98,6 +98,7 @@ export interface ILoadedApp {
   appPath?: string;
   appUrl?: string;
   devPort?: number;
+  enabled: boolean;
 }
 
 interface IPlatformAppServiceState {
@@ -193,7 +194,8 @@ export class PlatformAppsService extends
         unpacked: false,
         appUrl: app.cdn_url,
         appToken: app.app_token,
-        poppedOutSlots: []
+        poppedOutSlots: [],
+        enabled: true
       });
     });
   }
@@ -244,7 +246,8 @@ export class PlatformAppsService extends
       appPath,
       appToken,
       devPort: DEV_PORT,
-      poppedOutSlots: []
+      poppedOutSlots: [],
+      enabled: true
     });
   }
 
@@ -365,9 +368,14 @@ export class PlatformAppsService extends
     this.installProductionApps();
   }
 
+  toggleEnableApp(appId: string) {
+    this.TOGGLE_ENABLE_APP(appId);
+  }
+
   async reloadApp(appId: string) {
     // TODO  Support Multiple Apps
     const app = this.getApp(appId);
+    debugger;
 
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
@@ -596,10 +604,6 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
-  getProductionApps() {
-    return this.state.loadedApps.filter( app => !app.unpacked );
-  }
-
   getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
@@ -644,6 +648,13 @@ export class PlatformAppsService extends
   @mutation()
   private REMOVE_APP(appId: string) {
     this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
+  }
+
+  @mutation()
+  private TOGGLE_ENABLE_APP(appId: string) {
+    this.state.loadedApps.forEach(app => {
+      if (app.id === appId) app.enabled = !app.enabled;
+    });
   }
 
   @mutation()
