@@ -21,7 +21,7 @@
       v-if="featureIsEnabled(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-chatbot"/> <span>{{ $t('Chatbot') }}</span>
+      <i class="icon-community"/> <span>{{ $t('Chatbot') }}</span>
     </button>
     <button
       @click="navigateOverlays"
