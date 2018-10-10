@@ -11,11 +11,21 @@ import electron from 'electron';
 import { getPlatformService } from 'services/platforms';
 import { YoutubeService } from 'services/platforms/youtube';
 import { $t } from 'services/i18n';
+import PlatformAppWebview from 'components/PlatformAppWebview.vue';
+import {
+  PlatformAppsService,
+  EAppPageSlot,
+  ILoadedApp
+} from 'services/platform-apps';
+import ListInput from 'components/shared/inputs/ListInput.vue';
+import { metadata as metadataHelper } from 'components/widgets/inputs';
 
 @Component({
   components: {
     Chat,
-    Slider
+    Slider,
+    ListInput,
+    PlatformAppWebview
   }
 })
 export default class LiveDock extends Vue {
@@ -23,6 +33,7 @@ export default class LiveDock extends Vue {
   @Inject() streamInfoService: StreamInfoService;
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   @Prop({ default: false })
   onLeft: boolean;
@@ -33,6 +44,10 @@ export default class LiveDock extends Vue {
   $refs: {
     chat: Chat;
   };
+
+  slot = EAppPageSlot.Chat;
+
+  selectedChat = 'default';
 
   viewStreamTooltip = $t('Go to Youtube to view your live stream');
   editStreamInfoTooltip = $t('Edit your stream title and description');
@@ -94,8 +109,7 @@ export default class LiveDock extends Vue {
     if (this.streamingStatus === EStreamingState.Live) return 'Live';
     if (this.streamingStatus === EStreamingState.Starting) return 'Starting';
     if (this.streamingStatus === EStreamingState.Ending) return 'Ending';
-    if (this.streamingStatus === EStreamingState.Reconnecting)
-      return 'Reconnecting';
+    if (this.streamingStatus === EStreamingState.Reconnecting) return 'Reconnecting';
     return 'Offline';
   }
 
@@ -158,6 +172,74 @@ export default class LiveDock extends Vue {
   }
 
   refreshChat() {
+    if (!this.showDefaultPlatformChat) {
+      this.platformAppsService.reloadApp(this.selectedChat);
+      return;
+    }
     this.$refs.chat.refresh();
+  }
+
+  get hasChatApps() {
+    return this.chatApps.length > 0;
+  }
+
+  get showDefaultPlatformChat() {
+    return this.selectedChat === 'default';
+  }
+
+  get chatApps(): ILoadedApp[] {
+    return this.platformAppsService.state.loadedApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.Chat;
+      });
+    });
+  }
+
+  get chatAppsListMetadata() {
+    let options = [
+      {
+        title: this.userService.platform.type as string,
+        value: 'default'
+      }
+    ];
+    this.chatApps.forEach(chatApp => {
+      options.push({
+        title: chatApp.manifest.name,
+        value: chatApp.id
+      })
+    });
+    return metadataHelper.list({ options })
+  }
+
+  get isPopOutAllowed() {
+    if (this.showDefaultPlatformChat) return false;
+
+    const chatPage = this.platformAppsService
+      .getApp(this.selectedChat)
+      .manifest.pages.find(page => page.slot === EAppPageSlot.Chat);
+    if (!chatPage) return false;
+
+    // Default result is true
+    return chatPage.allowPopout == null ? true : chatPage.allowPopout;
+  }
+
+  popOut() {
+    this.platformAppsService.popOutAppPage(this.selectedChat, this.slot);
+    this.selectedChat = 'default';
+  }
+
+  isAppPersistent(appId: string) {
+    return this.platformAppsService.isAppSlotPersistent(appId, EAppPageSlot.Chat);
+  }
+
+  chatStyles(appId = 'default') {
+    if (this.selectedChat === appId) {
+      return {};
+    } else {
+      return {
+        position: 'absolute',
+        top: '-10000px'
+      };
+    }
   }
 }
