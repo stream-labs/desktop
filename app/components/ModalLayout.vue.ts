@@ -38,9 +38,6 @@ export default class ModalLayout extends Vue {
   // this will just close the window.
   @Prop() cancelHandler: Function;
 
-  // Additional CSS styles for the content section
-  @Prop() contentStyles: Dictionary<string>;
-
   // The height of the fixed section
   @Prop() fixedSectionHeight: number;
 
@@ -51,20 +48,15 @@ export default class ModalLayout extends Vue {
   @Prop({ default: false })
   customControls: boolean;
 
+  /** Contentにpaddingを持たせない場合 */
+  @Prop({ default: false })
+  bareContent: boolean;
 
   created() {
-    const contentStyle = {
-      padding: '16px',
-      overflow: 'auto'
-    };
-
-    Object.assign(contentStyle, this.contentStyles);
-
     const fixedStyle = {
       height: (this.fixedSectionHeight || 0).toString() + 'px'
     };
 
-    this.contentStyle = contentStyle;
     this.fixedStyle = fixedStyle;
 
     electron.remote.getCurrentWindow().setTitle(this.title);
