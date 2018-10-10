@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
-import { Prop } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 import uuid from 'uuid/v4';
 import { IInputMetadata } from './index';
 
-export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
+export class BaseInput<TValueType, TMetadataType extends IInputMetadata> extends Vue {
 
   @Prop()
   readonly value: TValueType;
@@ -22,6 +22,7 @@ export abstract class BaseInput<TValueType, TMetadataType extends IInputMetadata
 
   emitInput(eventData: TValueType, event?: any) {
     this.$emit('input', eventData, event);
+    if (this.$parent['emitInput']) this.$parent['emitInput'](eventData, event);
   }
 
   getValidations() {

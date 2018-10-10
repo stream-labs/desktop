@@ -17,6 +17,7 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
 
   usePercentages: boolean;
   interval: number;
+  isFullyMounted = false;
 
   $refs: { slider: any };
 
@@ -29,12 +30,14 @@ export default class SliderInput extends BaseInput<number, ISliderMetadata>  {
     // Hack to prevent transitions from messing up slider width
     setTimeout(() => {
       if (this.$refs.slider) this.$refs.slider.refresh();
+      this.isFullyMounted = true;
     }, 500);
   }
 
   @throttle(500)
   updateValue(value: number) {
-    this.$emit('input', this.roundNumber(value));
+    if (!this.isFullyMounted) return;
+    this.emitInput(this.roundNumber(value));
   }
 
   get nightMode() {

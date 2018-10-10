@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
-import { codemirror } from 'vue-codemirror';
 import { CodeInput, BoolInput } from 'components/shared/inputs/inputs';
-import { IWidgetData, WidgetSettingsService } from 'services/widget-settings/widget-settings';
+import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
+import { debounce } from 'lodash-decorators';
 
 
 @Component({
@@ -27,12 +27,9 @@ export default class CodeEditor extends Vue {
   value: IWidgetData;
 
   editorInputValue = this.value.settings['custom_' + this.metadata.type];
-  customEnabled =  this.value.settings.custom_enabled;
 
   private initialInputValue = this.editorInputValue;
   private serverInputValue = this.editorInputValue;
-  private initialCustomEnabled = this.customEnabled;
-  private serverCustomEnabled = this.initialCustomEnabled;
 
   isLoading = false;
 
@@ -43,8 +40,7 @@ export default class CodeEditor extends Vue {
   }
 
   get hasChanges() {
-    return (this.serverInputValue !== this.editorInputValue) ||
-      this.customEnabled !== this.serverCustomEnabled;
+    return (this.serverInputValue !== this.editorInputValue);
   }
 
   get canSave() {
@@ -55,6 +51,7 @@ export default class CodeEditor extends Vue {
     return !!this.value.custom_defaults;
   }
 
+  @debounce(2000)
   async save() {
     if (!this.canSave) return;
     this.isLoading = true;
@@ -62,10 +59,8 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.editorInputValue;
-    newData.settings.custom_enabled = this.customEnabled;
-
     try {
-      await this.settingsService.saveData(newData.settings);
+      await this.settingsService.saveSettings(newData.settings);
     } catch (e) {
       alert($t('Something went wrong'));
       this.isLoading = false;
@@ -73,16 +68,7 @@ export default class CodeEditor extends Vue {
     }
 
     this.serverInputValue = this.editorInputValue;
-    this.serverCustomEnabled = this.customEnabled;
     this.isLoading = false;
-  }
-
-  discardChanges() {
-    const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
-    newData.settings['custom_' + type] = this.initialInputValue;
-    newData.settings.custom_enabled = this.customEnabled = this.initialCustomEnabled;
-    this.emitInput(newData);
   }
 
   restoreDefaults() {
@@ -90,12 +76,5 @@ export default class CodeEditor extends Vue {
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.value.custom_defaults[type];
-    this.emitInput(newData);
   }
-
-  emitInput(newValue: IWidgetData) {
-    this.$emit('input', newValue);
-    this.editorInputValue = newValue.settings['custom_' + this.metadata.type];
-  }
-
 }

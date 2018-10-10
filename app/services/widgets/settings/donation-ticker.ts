@@ -1,5 +1,7 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
+import { InheritMutations } from 'services/stateful-service';
 
 export interface IDonationTickerSettings extends IWidgetSettings {
   background_color: string;
@@ -20,29 +22,24 @@ export interface IDonationTickerData extends IWidgetData {
   settings: IDonationTickerSettings;
 }
 
+@InheritMutations()
 export class DonationTickerService extends WidgetSettingsService<IDonationTickerData> {
 
-  getWidgetType() {
-    return WidgetType.DonationTicker;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
+  getApiSettings() {
+    return {
+      type: WidgetType.DonationTicker,
+      url: `https://${ this.getHost() }/widgets/donation-ticker?token=${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/donation-ticker?token=${this.getWidgetToken()}&simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/ticker`,
+      settingsUpdateEvent: 'donationtickerSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true,
+      hasTestButtons: true
+    }
   }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/donation-ticker?token=${this.getWidgetToken()}&simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/ticker`;
-  }
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS,
-    { name: 'test' }
-  ];
 
   protected patchAfterFetch(data: any): IDonationTickerData {
     // backend accepts and returns some numerical values as strings
