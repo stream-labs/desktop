@@ -108,16 +108,10 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endStartup();
 
       this.FINISH_LOADING();
+
+      this.protocolLinksService.start(this.state.argv);
     });
   }
-
-  // /**
-  //  * the main process sends argv string here
-  //  */
-  // setArgv(argv: string[]) {
-  //   this.SET_ARGV(argv);
-  //   this.protocolLinksService.start(argv);
-  // }
 
   @track('app_close')
   private shutdownHandler() {

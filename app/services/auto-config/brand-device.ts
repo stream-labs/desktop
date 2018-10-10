@@ -47,6 +47,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
 
 
   serviceEnabled() {
+    return true;
     return this.appService.state.argv.includes('--enable-brand-onboarding');
   }
 
