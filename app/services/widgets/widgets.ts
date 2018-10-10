@@ -134,7 +134,7 @@ export class WidgetsService extends StatefulService<IWidgetSourcesState> impleme
   }
 
   getWidgetSource(sourceId: string): WidgetSource {
-    return this.sourcesService.state.sources[sourceId] ? new WidgetSource(sourceId) : null;
+    return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
 
   getWidgetUrl(type: WidgetType) {
