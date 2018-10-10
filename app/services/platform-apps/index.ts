@@ -55,8 +55,7 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
-  TopNav = 'top_nav',
-  Chat = 'chat'
+  TopNav = 'top_nav'
 }
 
 interface IAppPage {
@@ -104,7 +103,8 @@ export interface ILoadedApp {
 
 interface IPlatformAppServiceState {
   devMode: boolean;
-  loadedApps: ILoadedApp[];
+  loadedApps: ILoadedApp[]; //loaded apps ,can be combination of installed/unpacked
+  installedApps: ILoadedApp[]; //all prod apps
 }
 
 interface ISubscriptionResponse {
@@ -128,7 +128,8 @@ export class PlatformAppsService extends
 
   static initialState: IPlatformAppServiceState = {
     devMode: false,
-    loadedApps: []
+    loadedApps: [],
+    installedApps: []
   };
 
   appLoad = new Subject<ILoadedApp>();
@@ -369,8 +370,9 @@ export class PlatformAppsService extends
     this.installProductionApps();
   }
 
-  toggleEnableApp(appId: string) {
-    this.TOGGLE_ENABLE_APP(appId);
+  unloadApp(appId: string) {
+    this.REMOVE_APP(appId);
+    this.appUnload.next(appId);
   }
 
   async reloadApp(appId: string) {
@@ -605,6 +607,10 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
+  getProductionApps() {
+    return this.state.loadedApps.filter( app => !app.unpacked );
+  }
+
   getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
@@ -644,18 +650,13 @@ export class PlatformAppsService extends
   @mutation()
   private ADD_APP(app: ILoadedApp) {
     this.state.loadedApps.push(app);
+    if (this.state.installedApps.findIndex(installedApp => installedApp.id === app.id)) return;
+    this.state.installedApps.push(app);
   }
 
   @mutation()
   private REMOVE_APP(appId: string) {
     this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
-  }
-
-  @mutation()
-  private TOGGLE_ENABLE_APP(appId: string) {
-    this.state.loadedApps.forEach(app => {
-      if (app.id === appId) app.enabled = !app.enabled;
-    });
   }
 
   @mutation()

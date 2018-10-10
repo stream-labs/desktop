@@ -17,8 +17,8 @@
           <td> {{ app.manifest.version }} </td>
           <td>
             <button @click="reload(app.id)" class="button button--action">Reload</button>
-            <button @click="toggleEnable(app.id)" class="button button--default">
-              {{ app.enabled ? 'Disable' : 'Enable' }}
+            <button @click="toggleLoad(app)" class="button button--default">
+              {{ isEnabled ? 'Disable' : 'Enable' }}
             </button>
           </td>
         </tr>
