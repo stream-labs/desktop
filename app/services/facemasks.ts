@@ -122,8 +122,8 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
       this.startup();
     });
     this.streamingService.streamingStatusChange.subscribe((status) => {
-      if (status === 'starting') this.startup();
-    })
+      if (status === 'starting' && this.userService.isLoggedIn()) this.startup();
+    });
   }
 
   startup() {
