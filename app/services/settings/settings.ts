@@ -617,7 +617,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('settings.desktopAudioDevice')} ${deviceInd}`,
-        name: `Desktop Audio ${deviceInd > 1 ? deviceInd : ''}`,
+        // 「既定」にしたときこの名前がミキサーにソース名として出てくる
+        name: `${$t('sources.desktopAudio')} ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,
@@ -648,7 +649,8 @@ export class SettingsService extends StatefulService<ISettingsState>
       parameters.push({
         value: source ? source.getObsInput().settings['device_id'] : null,
         description: `${$t('settings.micAuxDevice')} ${deviceInd}`,
-        name: `Mic/Aux ${deviceInd > 1 ? deviceInd : ''}`,
+        // 「既定」にしたときこの名前がミキサーにソース名として出てくる
+        name: `${$t('sources.micAux')} ${deviceInd > 1 ? deviceInd : ''}`,
         type: 'OBS_PROPERTY_LIST',
         enabled: true,
         visible: true,

@@ -58,5 +58,7 @@
   "unhideAll": "Unhide All",
   "interactiveCrop": "Crop on display",
   "selectCroppingArea": "Drag the area to capture",
-  "pressEscapeToCancel": "Press Esc to cancel"
+  "pressEscapeToCancel": "Press Esc to cancel",
+  "desktopAudio": "Desktop Audio",
+  "micAux": "Mic/Aux"
 }

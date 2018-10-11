@@ -10,6 +10,7 @@ import { AudioService } from 'services/audio';
 import { Inject } from '../../../util/injector';
 import * as obs from '../../../../obs-api';
 import * as fi from 'node-fontinfo';
+import { $t } from 'services/i18n';
 
 interface ISchema {
   items: ISourceInfo[];
@@ -281,14 +282,14 @@ export class SourcesNode extends Node<ISchema, {}> {
         const desktopDeviceMatch = /^DesktopAudioDevice(\d)$/.exec(source.name);
         if (desktopDeviceMatch) {
           const index = parseInt(desktopDeviceMatch[1], 10);
-          source.name = 'Desktop Audio' + (index > 1 ? ' ' + index : '');
+          source.name = $t('sources.desktopAudio') + (index > 1 ? ' ' + index : '');
           return;
         }
 
         const auxDeviceMatch = /^AuxAudioDevice(\d)$/.exec(source.name);
         if (auxDeviceMatch) {
           const index = parseInt(auxDeviceMatch[1], 10);
-          source.name = 'Mic/Aux' + (index > 1 ? ' ' + index : '');
+          source.name = $t('sources.micAux') + (index > 1 ? ' ' + index : '');
           return;
         }
 
