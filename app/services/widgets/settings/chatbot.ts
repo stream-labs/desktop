@@ -1,9 +1,11 @@
 import { IWidgetData, WidgetSettingsService } from '../index';
 import { WidgetType } from 'services/widgets';
+import { InheritMutations } from '../../stateful-service';
 
 export interface IMediaShareData extends IWidgetData {
 }
 
+@InheritMutations()
 export class ChatbotWidgetService extends WidgetSettingsService<IMediaShareData> {
 
   getApiSettings() {

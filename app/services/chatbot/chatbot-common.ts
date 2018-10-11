@@ -5,12 +5,6 @@ import { mutation } from '../stateful-service';
 import { WindowsService } from 'services/windows';
 import { $t } from 'services/i18n';
 import {
-  MediaShareService,
-  IMediaShareData,
-  IMediaShareBan
-} from 'services/widget-settings/media-share';
-
-import {
   IChatbotCommonServiceState,
   ICustomCommand,
   IDefaultCommand,

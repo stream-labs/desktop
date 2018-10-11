@@ -4,12 +4,6 @@ import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotBaseApiService } from './chatbot-base';
 import {
-  MediaShareService,
-  IMediaShareData,
-  IMediaShareBan
-} from 'services/widget-settings/media-share';
-
-import {
   IChatbotAPIPostResponse,
   ICapsProtectionResponse,
   ISymbolProtectionResponse,

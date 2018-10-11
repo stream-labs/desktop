@@ -7,7 +7,7 @@ import {
   MediaShareService,
   IMediaShareData,
   IMediaShareBan
-} from 'services/widget-settings/media-share';
+} from 'services/widgets/settings/media-share';
 
 import {
   IChatbotAPIPostResponse,

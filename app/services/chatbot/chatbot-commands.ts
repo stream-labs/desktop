@@ -1,16 +1,9 @@
 import Vue from 'vue';
 import { PersistentStatefulService } from '../persistent-stateful-service';
-import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { mutation } from '../stateful-service';
 import { ChatbotCommonService } from './chatbot-common';
 import { ChatbotBaseApiService } from './chatbot-base';
-import {
-  MediaShareService,
-  IMediaShareData,
-  IMediaShareBan
-} from 'services/widget-settings/media-share';
-import io from 'socket.io-client';
 
 import {
   ICustomCommand,
