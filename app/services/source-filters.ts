@@ -1,7 +1,8 @@
 import { Service } from './service';
 import {
   TFormData, getPropertiesFormData, setPropertiesFormData, IListOption,
-  TObsValue
+  TObsValue,
+  IListInput
 } from '../components/shared/forms/Input';
 import { Inject } from '../util/injector';
 import { SourcesService } from './sources';
@@ -195,7 +196,21 @@ export class SourceFiltersService extends Service {
 
   getPropertiesFormData(sourceId: string, filterName: string): TFormData {
     if (!filterName) return [];
-    return getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+    const formData = getPropertiesFormData(this.getObsFilter(sourceId, filterName));
+
+    // サイドチェーンのトリガーにする音声ソースがIDしかもらえないので、名前に変換する
+    formData.forEach(input => {
+      if (input.name === 'sidechain_source') {
+        (input as IListInput<string>).options.forEach(option => {
+          if (option.value === 'none') return;
+
+          const source = this.sourcesService.getSourceById(option.value);
+          if (source) option.description = source.name;
+        });
+      }
+    });
+
+    return formData;
   }
 
 
