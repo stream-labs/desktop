@@ -188,7 +188,7 @@ export default class LiveDock extends Vue {
   }
 
   get chatApps(): ILoadedApp[] {
-    return this.platformAppsService.state.loadedApps.filter(app => {
+    return this.platformAppsService.enabledApps.filter(app => {
       return !!app.manifest.pages.find(page => {
         return page.slot === EAppPageSlot.Chat;
       });

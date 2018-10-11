@@ -24,7 +24,7 @@
               class="button button--action">Reload</button>
             <button
               v-if="noUnpackedVersionLoaded(app.id)"
-              @click="toggleLoad(app)"
+              @click="toggleEnable(app)"
               class="button button--default">
               {{ isEnabled(app.id) ? 'Disable' : 'Enable' }}
             </button>

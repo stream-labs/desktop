@@ -9,3 +9,10 @@
 </template>
 
 <script lang="ts" src="./PlatformAppWebview.vue.ts"></script>
+<style lang="less" scoped>
+@import "../styles/index";
+
+.platform-app-webview {
+  flex-grow: 1;
+}
+</style>

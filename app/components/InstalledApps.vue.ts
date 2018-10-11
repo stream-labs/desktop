@@ -8,32 +8,30 @@ export default class InstalledApps extends Vue {
   @Inject() platformAppsService: PlatformAppsService;
 
   get installedApps() {
-    return this.platformAppsService.state.installedApps.filter(app => !app.unpacked);
+    // installed == production apps
+    console.log('production apps', this.platformAppsService.productionApps);
+    return this.platformAppsService.productionApps;
   }
 
-  get loadedProductionAppIds(): string[] {
-    return this.platformAppsService.state.loadedApps
-      .filter(app => !app.unpacked)
+  get enabledInstalledAppIds(): string[] {
+    return this.installedApps
+      .filter(app => app.enabled)
       .map(app => app.id);
   }
 
   isEnabled(appId: string) {
-    return this.loadedProductionAppIds.includes(appId);
+    return this.enabledInstalledAppIds.includes(appId);
   }
 
   reload(appId: string) {
     this.platformAppsService.reloadApp(appId);
   }
 
-  toggleLoad(app: ILoadedApp) {
-    if (this.isEnabled(app.id)) {
-      this.platformAppsService.unloadApp(app.id);
-    } else {
-      this.platformAppsService.addApp(app);
-    }
+  toggleEnable(app: ILoadedApp) {
+    this.platformAppsService.toggleEnable(app.id);
   }
 
   noUnpackedVersionLoaded(appId: string) {
-    return !this.platformAppsService.state.loadedApps.find(app => app.id === appId && app.unpacked);
+    return !this.platformAppsService.enabledApps.find(app => app.id === appId && app.unpacked);
   }
 }

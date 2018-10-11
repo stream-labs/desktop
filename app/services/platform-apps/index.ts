@@ -100,12 +100,12 @@ export interface ILoadedApp {
   appUrl?: string;
   devPort?: number;
   icon?: string;
+  enabled: boolean;
 }
 
 interface IPlatformAppServiceState {
   devMode: boolean;
-  loadedApps: ILoadedApp[]; //loaded apps ,can be combination of installed/unpacked
-  installedApps: ILoadedApp[]; //all prod apps
+  loadedApps: ILoadedApp[];
   storeVisible: boolean;
 }
 
@@ -131,7 +131,6 @@ export class PlatformAppsService extends
   static initialState: IPlatformAppServiceState = {
     devMode: false,
     loadedApps: [],
-    installedApps: [],
     storeVisible: false
   };
 
@@ -202,7 +201,8 @@ export class PlatformAppsService extends
         appUrl: app.cdn_url,
         appToken: app.app_token,
         poppedOutSlots: [],
-        icon: app.icon
+        icon: app.icon,
+        enabled: true
       });
     });
   }
@@ -266,16 +266,21 @@ export class PlatformAppsService extends
       appPath,
       appToken,
       devPort: DEV_PORT,
-      poppedOutSlots: []
+      poppedOutSlots: [],
+      enabled: true
     });
+  }
+
+  get enabledApps() {
+    return this.state.loadedApps.filter(app => app.enabled);
+  }
+
+  get productionApps() {
+    return this.state.loadedApps.filter(app => !app.unpacked);
   }
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    if (
-      !app.unpacked &&
-      !this.state.installedApps.find(installedApp => installedApp.id === app.id)
-    ) this.ADD_PRODUCTION_APP(app);
     if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id)) return;
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
@@ -640,7 +645,7 @@ export class PlatformAppsService extends
 
   popOutAppPage(appId: string, pageSlot: EAppPageSlot) {
     const app = this.getApp(appId);
-    if (!app) return;
+    if (!app || !app.enabled) return;
 
     const windowId = `${appId}-${pageSlot}`;
 
@@ -666,6 +671,18 @@ export class PlatformAppsService extends
     });
   }
 
+  toggleEnable(appId: string) {
+    const app = this.getApp(appId);
+    if (app.enabled) {
+      // disabling
+      this.appUnload.next(appId);
+    }
+    else {
+      this.appLoad.next(app);
+    }
+    this.TOGGLE_ENABLE(appId);
+  }
+
   /**
    * Replace for now
    * @param app the app
@@ -673,11 +690,6 @@ export class PlatformAppsService extends
   @mutation()
   private ADD_APP(app: ILoadedApp) {
     this.state.loadedApps.push(app);
-  }
-
-  @mutation()
-  private ADD_PRODUCTION_APP(app: ILoadedApp) {
-    this.state.installedApps.push(app);
   }
 
   @mutation()
@@ -720,6 +732,15 @@ export class PlatformAppsService extends
   @mutation()
   private SET_APP_STORE_VISIBILITY(visibility: boolean) {
     this.state.storeVisible = visibility;
+  }
+
+  @mutation()
+  private TOGGLE_ENABLE(appId: string) {
+    this.state.loadedApps.forEach(app => {
+      if (app.id === appId) {
+        app.enabled = !app.enabled;
+      }
+    });
   }
 
 }
