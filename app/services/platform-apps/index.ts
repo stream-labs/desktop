@@ -55,7 +55,8 @@ export interface IAppSource {
 }
 
 export enum EAppPageSlot {
-  TopNav = 'top_nav'
+  TopNav = 'top_nav',
+  Chat = 'chat'
 }
 
 interface IAppPage {
