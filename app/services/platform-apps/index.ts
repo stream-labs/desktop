@@ -63,6 +63,10 @@ interface IAppPage {
   persistent?: boolean;
   allowPopout?: boolean; // Default true
   file: string; // Relative path to HTML file
+  popOutSize?: {
+    width: number;
+    height: number;
+  }
 }
 
 interface IAppManifest {
@@ -613,6 +617,20 @@ export class PlatformAppsService extends
     return { width: 800, height: 600 };
   }
 
+  getPagePopOutSize(appId: string, slot: EAppPageSlot) {
+    const app = this.getApp(appId);
+    const page = app.manifest.pages.find(page => page.slot === slot);
+    if (page.popOutSize) {
+      return {
+        width: page.popOutSize.width,
+        height: page.popOutSize.height
+      }
+    }
+
+    // Default to 600x500
+    return { width: 600, height: 500 };
+  }
+
   getApp(appId: string) : ILoadedApp {
     return this.state.loadedApps.find(app => app.id === appId);
   }
@@ -629,10 +647,7 @@ export class PlatformAppsService extends
       componentName: 'PlatformAppPopOut',
       queryParams: { appId, pageSlot },
       title: app.manifest.name,
-      size: {
-        width: 600,
-        height: 500
-      }
+      size: this.getPagePopOutSize(appId, pageSlot)
     }, windowId);
 
     this.POP_OUT_SLOT(appId, pageSlot);
