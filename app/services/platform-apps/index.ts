@@ -99,7 +99,7 @@ export interface ILoadedApp {
   appPath?: string;
   appUrl?: string;
   devPort?: number;
-  enabled: boolean;
+  icon?: string;
 }
 
 interface IPlatformAppServiceState {
@@ -197,7 +197,7 @@ export class PlatformAppsService extends
         appUrl: app.cdn_url,
         appToken: app.app_token,
         poppedOutSlots: [],
-        enabled: true
+        icon: app.icon
       });
     });
   }
@@ -248,8 +248,7 @@ export class PlatformAppsService extends
       appPath,
       appToken,
       devPort: DEV_PORT,
-      poppedOutSlots: [],
-      enabled: true
+      poppedOutSlots: []
     });
   }
 
@@ -500,8 +499,6 @@ export class PlatformAppsService extends
         }
 
         if (details.resourceType === 'script') {
-          console.log('got details', details);
-          console.log('GOT REQUEST', details.url);
           const scriptWhitelist = [
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.js',
             'https://cdn.streamlabs.com/slobs-platform/lib/streamlabs-platform.min.js'

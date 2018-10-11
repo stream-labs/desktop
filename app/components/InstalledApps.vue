@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="section">
     <table>
       <thead>
         <tr>
+          <th> {{ $t('icon') }} </th>
           <th> {{ $t('name')}} </th>
-          <th> {{ $t('version')}} </th>
+          <th> {{ $t('vers')}} </th>
           <th></th>
         </tr>
       </thead>
@@ -13,6 +14,7 @@
           v-for="app in installedApps"
           :key="app.id"
         >
+          <td> <img :src="app.icon" alt="-" width='50'> </td>
           <td> {{ app.manifest.name }} </td>
           <td> {{ app.manifest.version }} </td>
           <td>
@@ -30,7 +32,7 @@
               <button
                 disabled
                 class="button button--default">
-                {{ $t('Unpacked vers. loaded') }}
+                {{ $t('Unpacked vers loaded') }}
               </button>
               <i
                 v-tooltip.left=" $t('You must unload unpacked version before enabling this app.') "
