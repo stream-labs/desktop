@@ -257,10 +257,8 @@ export class PlatformAppsService extends
     }
 
     this.devServer = new DevServer(appPath, DEV_PORT);
-    debugger;
 
     if (this.state.loadedApps.find(loadedApp => loadedApp.id === id && !loadedApp.unpacked)) {
-      debugger;
       // has prod app with same id
       // disable prod app
       this.SET_PROD_APP_ENABLED(id, false);
@@ -692,14 +690,16 @@ export class PlatformAppsService extends
     });
   }
 
-  setEnabled(appId: string, enabled: boolean) {
+  setEnabled(appId: string, enabling: boolean) {
     const app = this.getApp(appId);
-    if (app.enabled) {
-      this.appUnload.next(appId);
-    } else {
+    if (app.enabled === enabling) return;
+
+    if (enabling) {
       this.appLoad.next(app);
+    } else {
+      this.appUnload.next(appId);
     }
-    this.SET_PROD_APP_ENABLED(appId, enabled);
+    this.SET_PROD_APP_ENABLED(appId, enabling);
   }
 
   /**
