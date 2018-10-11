@@ -8,7 +8,7 @@
     <p class="optimize-title">{{ $t('streaming.optimizationForNiconico.description') }}</p>
     <ul class="optimize-category-list">
       <li class="optimize-category-list-item" v-for="category in settings.info" :key="category[0]">
-        <p class="optimize-category-name">{{ $t(`settings.${category[0]}.name`, { fallback: category[0] }) }}</p>
+        <p class="optimize-category-name"><i class="icon-settings"></i>{{ $t(`settings.${category[0]}.name`, { fallback: category[0] }) }}</p>
         <ul class="optimize-setting-list">
           <li class="optimize-setting-list-item" v-for="o in category[1]" :key="o.key">
             <span class="item-name">{{ o.name }}: </span><span class="item-value">{{ o.currentValue }}
@@ -52,6 +52,10 @@
 }
 .optimize-category-name {
   margin-bottom: 4px;
+
+  i {
+    margin-right: 8px;
+  }
 }
 .optimize-setting-list {
   list-style: none;
