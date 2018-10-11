@@ -17,6 +17,7 @@ import electron from 'electron';
 import { WebsocketService, TSocketEvent } from 'services/websocket';
 import { ProfanityFilterService } from 'util/profanity';
 import { TObsValue } from 'components/obs/inputs/ObsInput';
+import { StreamingService } from 'services/streaming';
 const notificationAudio = require('../../media/sound/facemask4.wav');
 
 interface IFacemasksServiceState {
@@ -76,6 +77,7 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
   @Inject() profanityFilterService: ProfanityFilterService;
   @Inject() sourcesService: SourcesService;
   @Inject() sourceFiltersService: SourceFiltersService;
+  @Inject() streamingService: StreamingService;
 
   cdn = `https://${this.hostsService.facemaskCDN}`;
   queue: IFacemaskAlertMessage[] = [];
@@ -119,6 +121,9 @@ export class FacemasksService extends PersistentStatefulService<IFacemasksServic
     this.userService.userLogin.subscribe(() => {
       this.startup();
     });
+    this.streamingService.streamingStatusChange.subscribe((status) => {
+      if (status === 'starting') this.startup();
+    })
   }
 
   startup() {
