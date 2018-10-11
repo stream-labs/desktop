@@ -4,7 +4,7 @@
     <div class="flex flex--space-between padding--10">
       <button
         @click="onOpenCommandWindowHandler"
-        class="button button--action margin--10"
+        class="button button--action margin--10 button--add-command"
       >
         {{ $t('Add Command') }}
       </button>

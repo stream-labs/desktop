@@ -5,7 +5,7 @@
       v-for="tab in tabs"
       :key="tab.value"
       class="tab-button"
-      :class="{ active: tab.value === value }"
+      :class="[{ active: tab.value === value }, tab.name.split(' ').join('_')]"
       @click="showTab(tab.value)">
       {{ tab.name }}
     </button>
