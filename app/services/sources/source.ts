@@ -79,6 +79,11 @@ export class Source implements ISourceApi {
       details.widgetType = this.getPropertiesManagerSettings().widgetType;
     }
 
+    if (this.getPropertiesManagerType() === 'platformApp') {
+      details.appId = this.getPropertiesManagerSettings().appId;
+      details.appSourceId = this.getPropertiesManagerSettings().appSourceId;
+    }
+
     return details;
   }
 

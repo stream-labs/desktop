@@ -391,7 +391,8 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Used by StreamDeck
+   * Used by StreamDeck and platform API.
+   * This method is potentially *very* expensive
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     const promises: Promise<ISceneCollectionSchema>[] = [];

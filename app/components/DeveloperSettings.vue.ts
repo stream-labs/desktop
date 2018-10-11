@@ -1,15 +1,20 @@
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Inject } from '../util/injector';
-import GenericFormGroups from 'components/obs/inputs/GenericFormGroups.vue';
-import ObsTextInput from 'components/obs/inputs/ObsTextInput.vue';
-import { ITcpServerServiceApi, ITcpServersSettings } from '../services/tcp-server';
-import { ISettingsSubCategory } from '../services/settings';
+import { Inject } from 'util/injector';
+import GenericFormGroups from './obs/inputs/GenericFormGroups.vue';
+import ObsTextInput from './obs/inputs/ObsTextInput.vue';
+import { ITcpServerServiceApi, ITcpServersSettings } from 'services/tcp-server';
+import { ISettingsSubCategory } from 'services/settings';
+import AppPlatformDeveloperSettings from 'components/AppPlatformDeveloperSettings.vue';
 
 @Component({
-  components: { GenericFormGroups, ObsTextInput }
+  components: {
+    GenericFormGroups,
+    ObsTextInput,
+    AppPlatformDeveloperSettings
+  }
 })
-export default class ApiSettings extends Vue {
+export default class DeveloperSettings extends Vue {
 
   @Inject()
   tcpServerService: ITcpServerServiceApi;

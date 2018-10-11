@@ -18,7 +18,7 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 // Modules and other Requires
 ////////////////////////////////////////////////////////////////////////////////
-const { app, BrowserWindow, ipcMain, session, crashReporter, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
 const bootstrap = require('./updater/bootstrap.js');
 const uuid = require('uuid/v4');
@@ -535,5 +535,11 @@ ipcMain.on('streamlabels-writeFile', (e, info) => {
     if (err) {
       console.log('Streamlabels: Error writing file', err);
     }
+  });
+});
+
+ipcMain.on('webContents-preventNavigation', (e, id) => {
+  webContents.fromId(id).on('will-navigate', e => {
+    e.preventDefault();
   });
 });

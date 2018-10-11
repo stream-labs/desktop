@@ -121,5 +121,9 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
   text_ft2_source: {
     name: $t('Text (FreeType 2)'),
     description: ''
+  },
+  ovrstream_dc_source: {
+    name: 'OvrStream',
+    description: ''
   }
 });
