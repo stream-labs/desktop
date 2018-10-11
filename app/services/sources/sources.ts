@@ -149,7 +149,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     options: ISourceCreateOptions = {}
   ): Source {
 
-
     const id: string = options.sourceId || `${type}_${uuid()}`;
 
     if (type === 'browser_source') {
@@ -169,7 +168,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   addSource(obsInput: obs.IInput, name: string, options: ISourceCreateOptions = {}) {
-
     if (options.channel !== void 0) {
       obs.Global.setOutputSource(options.channel, obsInput);
     }

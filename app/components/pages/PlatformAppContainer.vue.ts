@@ -22,7 +22,7 @@ export default class PlatformAppContainer extends Vue {
   slot = EAppPageSlot.TopNav;
 
   get app() {
-    return this.platformAppsService.state.loadedApps.find(app => {
+    return this.platformAppsService.enabledApps.find(app => {
       return app.id === this.params.appId;
     });
   }

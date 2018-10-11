@@ -94,7 +94,7 @@ export default class Main extends Vue {
   }
 
   get platformApps() {
-    return this.platformAppsService.state.loadedApps;
+    return this.platformAppsService.enabledApps;
   }
 
   isAppPersistent(appId: string) {
