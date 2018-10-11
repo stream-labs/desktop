@@ -73,7 +73,6 @@ export class ChatbotBaseApiService extends PersistentStatefulService<IChatbotBas
   }
 
   api(method: string, endpoint: string, data: any) {
-    debugger;
     const url = this.apiEndpoint(endpoint, true);
     const headers = authorizedHeaders(this.state.apiToken);
     let options: {

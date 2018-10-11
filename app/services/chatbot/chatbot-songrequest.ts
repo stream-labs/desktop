@@ -66,7 +66,7 @@ export class ChatbotSongRequestApiService extends PersistentStatefulService<ICha
 
   updateSongRequestPreferencesData(data: any) {
     // NOTE: should update type
-    this.mediaShareService.saveData(data.settings);
+    this.mediaShareService.saveSettings(data.settings);
   }
 
   updateSongRequest(data: ISongRequestResponse) {
