@@ -9,7 +9,6 @@ export default class InstalledApps extends Vue {
 
   get installedApps() {
     // installed == production apps
-    console.log('production apps', this.platformAppsService.productionApps);
     return this.platformAppsService.productionApps;
   }
 
@@ -28,7 +27,8 @@ export default class InstalledApps extends Vue {
   }
 
   toggleEnable(app: ILoadedApp) {
-    this.platformAppsService.toggleEnable(app.id);
+    if (this.isEnabled(app.id)) this.platformAppsService.setEnabled(app.id, false);
+    else this.platformAppsService.setEnabled(app.id, true);
   }
 
   noUnpackedVersionLoaded(appId: string) {

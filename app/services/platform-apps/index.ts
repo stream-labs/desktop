@@ -197,7 +197,7 @@ export class PlatformAppsService extends
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
-      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
+      const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -206,7 +206,7 @@ export class PlatformAppsService extends
         appToken: app.app_token,
         poppedOutSlots: [],
         icon: app.icon,
-        enabled: true
+        enabled: !unpackedVersionLoaded
       });
     });
   }
@@ -257,10 +257,13 @@ export class PlatformAppsService extends
     }
 
     this.devServer = new DevServer(appPath, DEV_PORT);
+    debugger;
 
-    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id)) {
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === id && !loadedApp.unpacked)) {
+      debugger;
       // has prod app with same id
-      this.REMOVE_APP(id);
+      // disable prod app
+      this.SET_PROD_APP_ENABLED(id, false);
     }
 
     this.addApp({
@@ -285,7 +288,6 @@ export class PlatformAppsService extends
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id)) return;
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
@@ -407,7 +409,6 @@ export class PlatformAppsService extends
   }
 
   async reloadApp(appId: string) {
-    // TODO  Support Multiple Apps
     const app = this.getApp(appId);
 
     if (!app.unpacked) {
@@ -658,6 +659,11 @@ export class PlatformAppsService extends
   }
 
   getApp(appId: string) : ILoadedApp {
+    // edge case for when there are 2 apps with same id
+    // when one is unpacked and one is prod
+    // generally we want to do actions with enabled one first
+    const enabledApp = this.state.loadedApps.find(app => app.id === appId && app.enabled === true);
+    if (enabledApp) return enabledApp;
     return this.state.loadedApps.find(app => app.id === appId);
   }
 
@@ -686,16 +692,14 @@ export class PlatformAppsService extends
     });
   }
 
-  toggleEnable(appId: string) {
+  setEnabled(appId: string, enabled: boolean) {
     const app = this.getApp(appId);
     if (app.enabled) {
-      // disabling
       this.appUnload.next(appId);
-    }
-    else {
+    } else {
       this.appLoad.next(app);
     }
-    this.TOGGLE_ENABLE(appId);
+    this.SET_PROD_APP_ENABLED(appId, enabled);
   }
 
   /**
@@ -750,12 +754,11 @@ export class PlatformAppsService extends
   }
 
   @mutation()
-  private TOGGLE_ENABLE(appId: string) {
+  private SET_PROD_APP_ENABLED(appId: string, enabled: boolean) {
     this.state.loadedApps.forEach(app => {
-      if (app.id === appId) {
-        app.enabled = !app.enabled;
+      if (app.id === appId && !app.unpacked) {
+        app.enabled = enabled;
       }
     });
   }
-
 }
