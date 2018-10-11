@@ -109,9 +109,9 @@
         "name": null
       },
       "StreamEncoder": {
-        "name": null,
-        "obs_x264": null,
-        "obs_qsv11": null
+        "name": "Encoder",
+        "obs_x264": "Software (x364)",
+        "obs_qsv11": "Hardware (QSV)"
       },
       "ABitrate": {
         "name": null
