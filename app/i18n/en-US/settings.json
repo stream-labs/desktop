@@ -110,7 +110,7 @@
       },
       "StreamEncoder": {
         "name": "Encoder",
-        "obs_x264": "Software (x364)",
+        "obs_x264": "Software (x264)",
         "obs_qsv11": "Hardware (QSV)"
       },
       "ABitrate": {
