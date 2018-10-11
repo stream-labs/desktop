@@ -32,4 +32,8 @@ export default class InstalledApps extends Vue {
       this.platformAppsService.addApp(app);
     }
   }
+
+  noUnpackedVersionLoaded(appId: string) {
+    return !this.platformAppsService.state.loadedApps.find(app => app.id === appId && app.unpacked);
+  }
 }
