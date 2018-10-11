@@ -497,7 +497,6 @@ export class Selection implements ISelection {
 
     for (let ind = 0; ind < minPathLength; ind++) {
       const parents = paths.map(path => path[ind]);
-      console.log('parents', parents);
       if (uniq(parents).length === 1) {
         closestParentId = parents[0];
       } else {

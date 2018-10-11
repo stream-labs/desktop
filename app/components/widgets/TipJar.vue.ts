@@ -1,19 +1,19 @@
 import { Component } from 'vue-property-decorator';
 import { Inject } from '../../util/injector';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import {
   TipJarService,
   ITipJarData
-} from 'services/widget-settings/tip-jar';
+} from 'services/widgets/settings/tip-jar';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
 import { inputComponents } from 'components/shared/inputs';
-import TestButtons from './TestButtons.vue';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import CodeEditor from './CodeEditor.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
+import ImagePickerInput from 'components/shared/inputs/ImagePickerInput.vue';
 
 const nameMap = () => ({
   tips: $t('Tips & Donations'),
@@ -39,10 +39,10 @@ const mediaGalleryInputs = {
 
 @Component({
   components: {
-    WidgetWindow,
-    TestButtons,
-    HFormGroup,
-    CodeEditor,
+    WidgetEditor,
+    VFormGroup,
+    ValidatedForm,
+    ImagePickerInput,
     ...inputComponents
   }
 })
@@ -58,9 +58,19 @@ export default class TipJar extends WidgetSettings<ITipJarData, TipJarService> {
 
   jarSrc = `https://${this.hostsService.cdn}/static/tip-jar/jars/glass-`;
   inputOptions: { description: string, value: string }[] = [];
+  navItems = [
+    { value: 'manage-jar', label: $t('Manage Jar') },
+    { value: 'font', label: $t('Font Settings') },
+    { value: 'images', label: $t('Bit Images') },
+    { value: 'source', label: $t('Source') }
+  ];
 
   titleFromKey(key: string) {
     return nameMap()[key];
+  }
+
+  get iterableTypes() {
+    return Object.keys(this.wData.settings.types).filter((key) => key !== '_id');
   }
 
   get platform() {

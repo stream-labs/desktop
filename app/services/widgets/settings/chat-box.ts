@@ -1,6 +1,8 @@
-import { CODE_EDITOR_TABS, IWidgetData, IWidgetSettings, WidgetSettingsService } from './widget-settings';
+import { IWidgetData, IWidgetSettings, WidgetSettingsService } from 'services/widgets';
 import { WidgetType } from 'services/widgets';
-import { metadata } from 'components/widgets/inputs';
+import { metadata } from 'components/widgets/inputs/index';
+import { InheritMutations } from 'services/stateful-service';
+import { WIDGET_INITIAL_STATE } from './widget-settings';
 
 export interface IChatBoxSettings extends IWidgetSettings {
   theme: string;
@@ -27,22 +29,22 @@ export interface IChatBoxData extends IWidgetData {
   settings: IChatBoxSettings;
 }
 
+@InheritMutations()
 export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
 
-  getWidgetType() {
-    return WidgetType.ChatBox;
-  }
+  static initialState = WIDGET_INITIAL_STATE;
 
-  getVersion() {
-    return 5;
-  }
-
-  getPreviewUrl() {
-    return `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}?simulate=1`;
-  }
-
-  getDataUrl() {
-    return `https://${ this.getHost() }/api/v${ this.getVersion() }/slobs/widget/chatbox`;
+  getApiSettings() {
+    return {
+      type: WidgetType.ChatBox,
+      url: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}`,
+      previewUrl: `https://${ this.getHost() }/widgets/chat-box/v1/${this.getWidgetToken()}?simulate=1`,
+      dataFetchUrl: `https://${ this.getHost() }/api/v5/slobs/widget/chatbox`,
+      settingsSaveUrl: `https://${ this.getHost() }/api/v5/slobs/widget/chatbox`,
+      settingsUpdateEvent: 'chatBoxSettingsUpdate',
+      customCodeAllowed: true,
+      customFieldsAllowed: true
+    }
   }
 
   getMetadata() {
@@ -62,11 +64,6 @@ export class ChatBoxService extends WidgetSettingsService<IChatBoxData> {
       })
     };
   }
-
-  protected tabs = [
-    { name: 'settings' },
-    ...CODE_EDITOR_TABS
-  ];
 
   protected patchAfterFetch(data: IChatBoxData): IChatBoxData {
     // backend accepts and returns message_hide_delay in different precision

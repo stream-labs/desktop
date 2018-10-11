@@ -21,9 +21,10 @@
       v-if="featureIsEnabled(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-chatbot"/> {{ $t('Chatbot') }}
+      <i class="icon-community"/> <span>{{ $t('Chatbot') }}</span>
     </button>
     <button
+      v-if="appStoreVisible"
       @click="navigatePlatformAppStore"
       class="tab-button"
       :class="{ 'is-active': page === 'PlatformAppStore' }"

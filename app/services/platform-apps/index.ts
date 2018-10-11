@@ -106,6 +106,7 @@ interface IPlatformAppServiceState {
   devMode: boolean;
   loadedApps: ILoadedApp[]; //loaded apps ,can be combination of installed/unpacked
   installedApps: ILoadedApp[]; //all prod apps
+  storeVisible: boolean;
 }
 
 interface ISubscriptionResponse {
@@ -130,7 +131,8 @@ export class PlatformAppsService extends
   static initialState: IPlatformAppServiceState = {
     devMode: false,
     loadedApps: [],
-    installedApps: []
+    installedApps: [],
+    storeVisible: false
   };
 
   appLoad = new Subject<ILoadedApp>();
@@ -150,6 +152,7 @@ export class PlatformAppsService extends
     this.userService.userLogin.subscribe(async () => {
       this.unloadApps();
       this.installProductionApps();
+      this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
       this.SET_DEV_MODE(await this.getIsDevMode());
     });
 
@@ -158,6 +161,7 @@ export class PlatformAppsService extends
     this.SET_DEV_MODE(await this.getIsDevMode());
 
     this.installProductionApps();
+    this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
 
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
@@ -184,12 +188,13 @@ export class PlatformAppsService extends
   }
 
   /**
- * Install production apps
- */
+   * Install production apps
+   */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
+      if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash)) return;
       this.addApp({
         id: app.id_hash,
         manifest: app.manifest,
@@ -202,9 +207,22 @@ export class PlatformAppsService extends
     });
   }
 
+  fetchAppStoreVisibility(): Promise<boolean> {
+    const headers = authorizedHeaders(this.userService.apiToken);
+    const request = new Request(
+      `https://${this.hostsService.platform}/api/v1/sdk/is_app_store_visible`,
+      { headers }
+    );
+
+    return fetch(request)
+      .then(handleErrors)
+      .then(res => res.json())
+      .then(json => json.is_app_store_visible)
+      .catch(() => false)
+  }
+
   /**
    * For now, there can only be 1 unpacked app at a time
-   * TODO: Check this app for common structural problems
    */
   async installUnpackedApp(appPath: string, appToken: string) {
     const id = await this.getAppIdFromServer(appToken);
@@ -698,4 +716,10 @@ export class PlatformAppsService extends
       }
     });
   }
+
+  @mutation()
+  private SET_APP_STORE_VISIBILITY(visibility: boolean) {
+    this.state.storeVisible = visibility;
+  }
+
 }

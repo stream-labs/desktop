@@ -1,20 +1,24 @@
 import { throttle } from 'lodash-decorators';
-import { Service } from '../service';
 import { Inject } from 'util/injector';
 import { UserService } from '../user';
 import { ScenesService, SceneItem, Scene } from '../scenes';
 import { SourcesService } from '../sources';
 import { VideoService } from '../video';
 import { HostsService } from '../hosts';
-import { ScalableRectangle, AnchorPoint } from 'util/ScalableRectangle';
+import { ScalableRectangle } from 'util/ScalableRectangle';
 import namingHelpers from 'util/NamingHelpers';
 import fs from 'fs';
-import { WidgetSettingsService } from '../widget-settings/widget-settings';
+import { WidgetSettingsService } from './settings/widget-settings';
 import { ServicesManager } from 'services-manager';
 import { authorizedHeaders } from 'util/requests';
-import { ISerializableWidget } from './widgets-api';
+import { ISerializableWidget, IWidgetSource, IWidgetsServiceApi } from './widgets-api';
 import { WidgetType, WidgetDefinitions, WidgetTesters } from './widgets-data';
-import { ServiceHelper } from '../stateful-service';
+import { mutation, ServiceHelper, StatefulService } from '../stateful-service';
+import { WidgetSource } from './widget-source';
+import { InitAfter } from '../../util/service-observer';
+import Vue from 'vue';
+import { cloneDeep } from 'lodash';
+import { Subscription } from 'rxjs/Subscription';
 
 @ServiceHelper()
 export class WidgetTester {
@@ -29,12 +33,48 @@ export class WidgetTester {
   }
 }
 
-export class WidgetsService extends Service {
+
+export interface IWidgetSourcesState {
+  widgetSources: Dictionary<IWidgetSource>;
+}
+
+@InitAfter('SourcesService')
+export class WidgetsService extends StatefulService<IWidgetSourcesState> implements IWidgetsServiceApi {
+
+  static initialState: IWidgetSourcesState = {
+    widgetSources: {}
+  };
+
   @Inject() userService: UserService;
   @Inject() scenesService: ScenesService;
   @Inject() sourcesService: SourcesService;
   @Inject() hostsService: HostsService;
   @Inject() videoService: VideoService;
+
+  protected init() {
+
+    // sync widgetSources with sources
+
+    this.sourcesService.sourceAdded.subscribe(sourceModel => {
+      const source = this.sourcesService.getSource(sourceModel.sourceId);
+      const widgetType = source.getPropertiesManagerSettings().widgetType;
+      const isWidget = typeof widgetType === 'number';
+      if (!isWidget) return;
+
+      this.ADD_WIDGET_SOURCE({
+        sourceId: source.sourceId,
+        type: widgetType,
+        previewSourceId: ''
+      });
+    });
+
+    this.sourcesService.sourceRemoved.subscribe(sourceModel => {
+      if (!this.state.widgetSources[sourceModel.sourceId]) return;
+      const widgetSource = this.getWidgetSource(sourceModel.sourceId);
+      if (widgetSource.previewSourceId) widgetSource.destroyPreviewSource();
+      this.REMOVE_WIDGET_SOURCE(sourceModel.sourceId);
+    });
+  }
 
   createWidget(type: WidgetType, name?: string): SceneItem {
     if (!this.userService.isLoggedIn()) return;
@@ -67,6 +107,7 @@ export class WidgetsService extends Service {
         }
       }
     );
+
     const sceneItem = scene.addSource(source.sourceId);
 
     // Give a couple seconds for the resize to propagate
@@ -90,6 +131,10 @@ export class WidgetsService extends Service {
     }, 1500);
 
     return sceneItem;
+  }
+
+  getWidgetSource(sourceId: string): WidgetSource {
+    return this.state.widgetSources[sourceId] ? new WidgetSource(sourceId) : null;
   }
 
   getWidgetUrl(type: WidgetType) {
@@ -124,6 +169,34 @@ export class WidgetsService extends Service {
         )
       );
     });
+  }
+
+  private previewSourceWatchers: Dictionary<Subscription> = {};
+
+  /**
+   * sync widget previewSource settings with widget source
+   */
+  syncPreviewSource(sourceId: string, previewSourceId: string) {
+    if (this.previewSourceWatchers[previewSourceId]) {
+      throw new Error('PreviewSource is already watching');
+    }
+
+    this.previewSourceWatchers[previewSourceId] = this.sourcesService.sourceUpdated.subscribe(sourceModel => {
+      if (sourceModel.sourceId !== sourceId) return;
+      const widget = this.getWidgetSource(sourceId);
+      const source = widget.getSource();
+      const newPreviewSettings = cloneDeep(source.getSettings());
+      delete newPreviewSettings.shutdown;
+      newPreviewSettings.url = widget.getSettingsService().getApiSettings().previewUrl;
+      const previewSource = widget.getPreviewSource();
+      previewSource.updateSettings(newPreviewSettings);
+      previewSource.refresh();
+    });
+  }
+
+  stopSyncPreviewSource(previewSourceId: string) {
+    this.previewSourceWatchers[previewSourceId].unsubscribe();
+    delete this.previewSourceWatchers[previewSourceId];
   }
 
   /**
@@ -232,5 +305,15 @@ export class WidgetsService extends Service {
         y: widget.scaleY * this.videoService.baseHeight
       }
     });
+  }
+
+  @mutation()
+  private ADD_WIDGET_SOURCE(widgetSource: IWidgetSource) {
+    Vue.set(this.state.widgetSources, widgetSource.sourceId, widgetSource);
+  }
+
+  @mutation()
+  private REMOVE_WIDGET_SOURCE(sourceId: string) {
+    Vue.delete(this.state.widgetSources, sourceId);
   }
 }

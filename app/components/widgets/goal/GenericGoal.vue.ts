@@ -1,32 +1,18 @@
 import { Component } from 'vue-property-decorator';
-import {
-  GenericGoalService,
-  IGoalData
-} from 'services/widget-settings/generic-goal';
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
-import WidgetSettings from 'components/widgets/WidgetSettings.vue';
-
 import { inputComponents } from 'components/widgets/inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
+import WidgetSettings from 'components/widgets/WidgetSettings.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
-import CodeEditor from '../CodeEditor.vue';
-import CustomFieldsEditor from '../CustomFieldsEditor.vue';
+import { GenericGoalService, IGoalCreateOptions, IGoalData } from '../../../services/widgets/settings/generic-goal';
 
-interface IGoalCreateOptions {
-  title: string;
-  goal_amount: number;
-  manual_goal_amount: number;
-  ends_at: string;
-}
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
+    WidgetEditor,
+    VFormGroup,
     ValidatedForm,
-    CodeEditor,
-    CustomFieldsEditor,
     ...inputComponents
   }
 })
@@ -45,13 +31,25 @@ export default class GenericGoal extends WidgetSettings<IGoalData, GenericGoalSe
 
   textColorTooltip = $t('A hex code for the base text color.');
 
+  navItems = [
+    { value: 'goal', label: $t('Goal') },
+    { value: 'visual', label: $t('Visual Settings') },
+    { value: 'source', label: $t('Source') }
+  ];
+
   get hasGoal() {
-    return this.loaded && this.wData.goal && this.wData.goal.title;
+    return this.loaded && this.wData.goal;
   }
 
   async saveGoal() {
+    this.requestState = 'pending';
     if (await this.$refs.form.validateAndGetErrorsCount()) return;
-    await this.save(this.goalCreateOptions);
+    await this.service.saveGoal(this.goalCreateOptions);
+    this.requestState = 'success';
+  }
+
+  resetGoal() {
+    this.service.resetGoal();
   }
 
 }

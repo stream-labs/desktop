@@ -44,7 +44,6 @@ export class KeyListenerService extends Service {
   }
 
   unregisterAll(namespace = 'global') {
-    console.log(this.bindings);
     Object.keys(this.bindings).forEach(keystr => {
       if (this.bindings[keystr][namespace]) {
         this.unregister(this.bindings[keystr][namespace], namespace);
