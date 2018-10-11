@@ -1,6 +1,6 @@
 import {
   IMediaShareBan
-} from 'services/widget-settings/media-share';
+} from 'services/widgets/settings/media-share';
 
 export interface IChatbotCommonServiceState {
   toasted: any;

@@ -21,7 +21,15 @@
       v-if="featureIsEnabled(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
-      <i class="icon-chatbot"/> <span>{{ $t('Chatbot') }}</span>
+      <i class="icon-community"/> <span>{{ $t('Chatbot') }}</span>
+    </button>
+    <button
+      v-if="appStoreVisible"
+      @click="navigatePlatformAppStore"
+      class="tab-button"
+      :class="{ 'is-active': page === 'PlatformAppStore' }"
+      :disabled="!isUserLoggedIn || locked">
+      <i class="icon-store"/> <span>{{ $t('App Store') }}</span>
     </button>
     <button
       @click="navigateOverlays"
@@ -43,6 +51,14 @@
       :class="{ 'is-active': page === 'Live' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-live-dashboard"/> <span>{{ $t('Live') }}</span>
+    </button>
+    <button
+      v-for="app in topNavApps"
+      :key="app.id"
+      @click="navigateApp(app.id)"
+      class="tab-button"
+      :class="{ 'is-active': page === 'PlatformAppContainer' && navigationService.state.params.appId === app.id }">
+      <i class="fas fa-drafting-compass" /><span>{{ app.manifest.name }}</span>
     </button>
   </div>
 

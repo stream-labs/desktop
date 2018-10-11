@@ -2,22 +2,22 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 import {
   SponsorBannerService,
   ISponsorBannerData
-} from 'services/widget-settings/sponsor-banner';
+} from 'services/widgets/settings/sponsor-banner';
 
-import WidgetWindow from 'components/windows/WidgetWindow.vue';
+import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 
 import { inputComponents } from './inputs';
-import HFormGroup from 'components/shared/inputs/HFormGroup.vue';
-import CodeEditor from './CodeEditor.vue';
+import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 
 import { $t } from 'services/i18n';
+import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
-    WidgetWindow,
-    HFormGroup,
-    CodeEditor,
+    WidgetEditor,
+    VFormGroup,
+    ValidatedForm,
     ...inputComponents
   }
 })
@@ -29,7 +29,13 @@ export default class SponsorBanner extends WidgetSettings<ISponsorBannerData, Sp
   animationTooltip = $t('These are the animations that are used to show your banner.');
 
   get positions() {
+    if (!this.loaded) return ['1'];
     return this.wData.settings.placement_options === 'double' ? ['1', '2'] : ['1']
+  }
+
+  get navItems() {
+    const baseSettings = [{ value: 'visual', label: $t('Visual Settings') }, { value: 'source', label: $t('Source') }];
+    return baseSettings.concat(this.positions.map(pos => ({ value: `set-${pos}`, label: $t('Image Set ') + pos })));
   }
 
   fileNameFromHref(href: string) {

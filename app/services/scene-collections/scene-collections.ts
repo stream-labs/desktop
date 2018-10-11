@@ -391,7 +391,8 @@ export class SceneCollectionsService extends Service
   }
 
   /**
-   * Used by StreamDeck
+   * Used by StreamDeck and platform API.
+   * This method is potentially *very* expensive
    */
   fetchSceneCollectionsSchema(): Promise<ISceneCollectionSchema[]> {
     const promises: Promise<ISceneCollectionSchema>[] = [];
@@ -589,6 +590,8 @@ export class SceneCollectionsService extends Service
    * Should be called before any loading operations
    */
   private startLoadingOperation() {
+    this.windowsService.closeChildWindow();
+    this.windowsService.closeAllOneOffs();
     this.appService.startLoading();
     this.disableAutoSave();
   }

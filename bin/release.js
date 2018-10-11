@@ -11,6 +11,7 @@ const path = require('path');
 const AWS = require('aws-sdk');
 const ProgressBar = require('progress');
 const yml = require('js-yaml');
+const cp = require('child_process');
 
 /**
  * CONFIGURATION
@@ -58,6 +59,63 @@ function checkEnv(varName) {
     error(`Missing environment variable ${varName}`);
     sh.exit(1);
   }
+}
+
+async function callSubmodule(moduleName, args) {
+  if (!Array.isArray(args)) args = [];
+
+  return new Promise((resolve, reject) => {
+    const submodule = cp.fork(moduleName, args);
+
+    submodule.on('close', (code) => {
+      if (code !== 0) {
+        reject(code);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+/* We can change the release script to export a function instead.
+ * I already made this into a separate script so I think this is fine */
+async function uploadUpdateFiles(version, appDir) {
+  return callSubmodule(
+    'bin/release-uploader.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--release-dir', appDir,
+    ]
+  );
+}
+
+async function setLatestVersion(version, fileName) {
+  return callSubmodule(
+    'bin/set-latest.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--version-file', fileName
+    ]
+  );
+}
+
+async function setChance(version, chance) {
+  return callSubmodule(
+    'bin/set-chance.js',
+    [
+      '--s3-bucket', s3Bucket,
+      '--access-key', process.env['AWS_ACCESS_KEY_ID'],
+      '--secret-access-key', process.env['AWS_SECRET_ACCESS_KEY'],
+      '--version', version,
+      '--chance', chance
+    ]
+  );
 }
 
 async function uploadS3File(name, filePath) {
@@ -110,6 +168,9 @@ async function runScript() {
   checkEnv('CSC_KEY_PASSWORD');
   checkEnv('SENTRY_AUTH_TOKEN');
 
+  /* Technically speaking, we allow any number of
+   * channels. Maybe in the future, we allow custom
+   * options here? */
   const isPreview = (await inq.prompt({
     type: 'list',
     name: 'releaseType',
@@ -222,6 +283,13 @@ async function runScript() {
     choices: versionOptions
   })).newVersion;
 
+  const channel = (() => {
+    const components = semver.prerelease(newVersion);
+
+    if (components) return components[0];
+    return 'latest';
+  })();
+
   if (!await confirm(`Are you sure you want to package version ${newVersion}?`)) sh.exit(0);
 
   pjson.version = newVersion;
@@ -239,6 +307,12 @@ async function runScript() {
   info('can continue with the deploy.');
 
   if (!await confirm('Are you ready to deploy?')) sh.exit(0);
+
+  const chance = (await inq.prompt({
+    type: 'input',
+    name: 'chance',
+    message: 'What percentage of the userbase would you like to recieve the update?'
+  })).chance;
 
   info('Committing changes...');
   executeCmd('git add -A');
@@ -279,8 +353,11 @@ async function runScript() {
   }
 
   info(`Disovered ${installerFileName}`);
-
   info('Uploading publishing artifacts...');
+
+    /* Use the separate release-uploader script to upload our
+   * win-unpacked content. */
+  await uploadUpdateFiles(newVersion, path.resolve('dist', 'win-unpacked'));
   await uploadS3File(installerFileName, installerFilePath);
   await uploadS3File(channelFileName, channelFilePath);
 
@@ -291,6 +368,11 @@ async function runScript() {
   executeCmd(`git checkout staging`);
   executeCmd(`git merge ${targetBranch}`);
   executeCmd('git push origin HEAD');
+
+  info(`Setting latest version...`);
+
+  await setLatestVersion(newVersion, channel);
+  await setChance(newVersion, chance);
 
   info(`Version ${newVersion} released successfully!`);
 }

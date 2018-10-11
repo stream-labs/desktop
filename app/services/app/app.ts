@@ -23,6 +23,7 @@ import { WindowsService } from 'services/windows';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
+import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
@@ -45,6 +46,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() windowsService: WindowsService;
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -80,7 +82,11 @@ export class AppService extends StatefulService<IAppState> {
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    await this.sceneCollectionsService.initialize();
+    // Initialize any apps before loading the scene collection.  This allows
+    // the apps to already be in place when their sources are created.
+    await this.platformAppsService.initialize();
+
+    await this.sceneCollectionsService.initialize()
 
     const onboarded = this.onboardingService.startOnboardingIfRequired();
 

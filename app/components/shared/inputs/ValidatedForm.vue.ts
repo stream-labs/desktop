@@ -47,4 +47,7 @@ export default class ValidatedForm extends Vue {
     return errors.length;
   }
 
+  emitInput(data: any, event: Event) {
+    this.$emit('input', data, event);
+  }
 }

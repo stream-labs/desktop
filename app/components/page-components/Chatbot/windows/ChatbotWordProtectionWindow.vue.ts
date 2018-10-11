@@ -29,7 +29,12 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
 
   selectedTab: string = 'general';
 
-  onSelectTabHandler(tab: string) {
+  async onSelectTabHandler(tab: string) {
+    if (tab === 'blacklist') {
+      // moving to blacklist
+      // validate form first
+      if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    }
     this.selectedTab = tab;
   }
 
@@ -39,7 +44,7 @@ export default class ChatbotWordProtectionWindow extends ChatbotModToolsBase {
 
   async onSaveHandler() {
 
-    if (await this.$refs.form.validateAndGetErrorsCount()) return;
+    if (this.$refs.form && await this.$refs.form.validateAndGetErrorsCount()) return;
 
     this.chatbotApiService
       .ModTools

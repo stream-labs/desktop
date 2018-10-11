@@ -38,7 +38,7 @@ export const WidgetTesters: IWidgetTester[] = [
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
     },
-    platforms: ['twitch']
+    platforms: ['twitch', 'mixer']
   },
   {
     name: 'Subscriber',
@@ -48,18 +48,11 @@ export const WidgetTesters: IWidgetTester[] = [
     platforms: ['youtube']
   },
   {
-    name: 'Follow',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/follow`;
-    },
-    platforms: ['mixer']
-  },
-  {
     name: 'Subscription',
     url(host, platform) {
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
-    platforms: ['twitch']
+    platforms: ['twitch', 'mixer']
   },
   {
     name: 'Sponsor',
@@ -67,13 +60,6 @@ export const WidgetTesters: IWidgetTester[] = [
       return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
     },
     platforms: ['youtube']
-  },
-  {
-    name: 'Subscription',
-    url(host, platform) {
-      return `https://${host}/api/v5/slobs/test/${platform}_account/subscription`;
-    },
-    platforms: ['mixer']
   },
   {
     name: 'Donation',

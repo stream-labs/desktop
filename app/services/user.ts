@@ -9,6 +9,7 @@ import electron from 'electron';
 import { HostsService } from './hosts';
 import { ChatbotApiService } from './chatbot';
 import { IncrementalRolloutService } from 'services/incremental-rollout';
+import { PlatformAppsService } from 'services/platform-apps';
 import {
   getPlatformService,
   IPlatformAuth,
@@ -42,6 +43,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
   @Inject() private navigationService: NavigationService;
   @Inject() private chatbotApiService: ChatbotApiService;
   @Inject() private incrementalRolloutService: IncrementalRolloutService;
+  @Inject() private platformAppsService: PlatformAppsService;
 
   @mutation()
   LOGIN(auth: IPlatformAuth) {
@@ -207,6 +209,14 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     return `https://${host}/slobs/dashboard?oauth_token=${token}&mode=${nightMode}&r=${subPage}`;
   }
 
+  appStoreUrl() {
+    const host = this.hostsService.platform;
+    const token = this.apiToken;
+    const nightMode = this.customizationService.nightMode ? 'night' : 'day';
+
+    return `https://${host}/slobs-store?token=${token}&mode=${nightMode}`;
+  }
+
   overlaysUrl(type?: 'overlay' | 'widget-theme', id?: string) {
     const host = Util.isPreview()
       ? this.hostsService.beta3
@@ -261,6 +271,7 @@ export class UserService extends PersistentStatefulService<IUserServiceState> {
     this.LOGOUT();
     electron.remote.session.defaultSession.clearStorageData({ storages: ['cookies'] });
     this.appService.finishLoading();
+    this.platformAppsService.unloadApps();
   }
 
   /**
