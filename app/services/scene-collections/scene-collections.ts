@@ -229,13 +229,13 @@ export class SceneCollectionsService extends Service
 
     const removingActiveCollection = id === this.activeCollection.id;
 
-    this.removeCollection(id);
+    await this.removeCollection(id);
 
     if (removingActiveCollection) {
       if (this.collections.length > 0) {
-        this.load(this.collections[0].id);
+        await this.load(this.collections[0].id);
       } else {
-        this.create();
+        await this.create();
       }
     }
   }
@@ -245,13 +245,13 @@ export class SceneCollectionsService extends Service
    * @param name the name of the new scene collection
    * @param id if not present, will operate on the current collection
    */
-  rename(name: string, id?: string) {
+  async rename(name: string, id?: string) {
     this.stateService.RENAME_COLLECTION(
       id || this.activeCollection.id,
       name,
       new Date().toISOString()
     );
-    this.safeSync();
+    await this.safeSync();
     this.collectionUpdated.next(this.getCollection(id));
   }
 
@@ -647,10 +647,10 @@ export class SceneCollectionsService extends Service
   /**
    * Deletes on the server and removes from the store
    */
-  private removeCollection(id: string) {
+  private async removeCollection(id: string) {
     this.collectionRemoved.next(this.collections.find(coll => coll.id === id));
     this.stateService.DELETE_COLLECTION(id);
-    this.safeSync();
+    await this.safeSync();
 
     // Currently we don't remove files on disk in case we need to recover them
     // manually at a later point in time.  Once we are more comfortable with
