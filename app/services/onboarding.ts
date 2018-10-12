@@ -66,7 +66,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'OptimizeBrandDevice'
+    next: 'OptimizeA'
   },
 
   OptimizeBrandDevice: {
