@@ -188,6 +188,7 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
+      .catch(() => []);
   }
 
   /**
@@ -446,7 +447,8 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
-      .then(json => json.id_hash);
+      .then(json => json.id_hash)
+      .catch(() => null);
   }
 
   private getIsDevMode(): Promise<boolean> {
@@ -459,7 +461,8 @@ export class PlatformAppsService extends
     return fetch(request)
       .then(handleErrors)
       .then(res => res.json())
-      .then(json => json.dev_mode);
+      .then(json => json.dev_mode)
+      .catch(() => false);
   }
 
   private loadManifestFromDisk(manifestPath: string): Promise<string> {
