@@ -51,6 +51,7 @@
     "detectUpdateChannel": false,
     "publish": {
       "provider": "generic",
+      "useMultipleRangeRequest": false,
       "channel": "latest",
       "url": "https://n-air-app.nicovideo.jp/download/windows"
     },
