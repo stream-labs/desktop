@@ -96,6 +96,11 @@ export class SceneCollectionsService extends Service
   private collectionLoaded = false;
 
   /**
+   * true if the scene-collections sync in progress
+   */
+  private syncPending = false;
+
+  /**
    * Does not use the standard init function so we can have asynchronous
    * initialization.
    */
@@ -260,12 +265,20 @@ export class SceneCollectionsService extends Service
    * Instead, it will log an error and continue.
    */
   async safeSync(retries = 2) {
+
+    if (this.syncPending) {
+      throw new Error('Unable to start the scenes-collection sync process while prev process is not finished');
+    }
+
+    this.syncPending = true;
     try {
       await this.sync();
     } catch (e) {
       console.error(`Scene collection sync failed (Attempt ${3 - retries}/3)`, e);
       if (retries > 0) await this.safeSync(retries - 1);
     }
+
+    this.syncPending = false;
   }
 
   /**
