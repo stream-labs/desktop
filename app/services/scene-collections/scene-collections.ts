@@ -267,7 +267,8 @@ export class SceneCollectionsService extends Service
   async safeSync(retries = 2) {
 
     if (this.syncPending) {
-      throw new Error('Unable to start the scenes-collection sync process while prev process is not finished');
+      console.error('Unable to start the scenes-collection sync process while prev process is not finished');
+      return;
     }
 
     this.syncPending = true;
