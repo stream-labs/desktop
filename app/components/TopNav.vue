@@ -10,14 +10,14 @@
   <div class="tabs">
     <button
       @click="navigateDashboard"
-      class="tab-button"
+      class="tab-button tab-button--dashboard"
       :class="{ active: page === 'Dashboard' }"
       :disabled="!isUserLoggedIn || locked">
       <i class="icon-dashboard"/> <span>{{ $t('Dashboard') }}</span>
     </button>
     <button
       @click="navigateChatBot"
-      class="tab-button"
+      class="tab-button tab-button--chatbot"
       v-if="featureIsEnabled(availableFeatures.chatbot)"
       :class="{ active: page === 'Chatbot'}"
       :disabled="!isUserLoggedIn || locked">
