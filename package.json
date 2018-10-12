@@ -19,6 +19,7 @@
     "package:preview": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-preview\" --config.productName=\"N Air Preview\" --config.appId=\"jp.nicovideo.n-air-app.preview\"",
     "package:ipc": "rimraf dist && build -w --x64 --config.extraMetadata.env=production --config.extraMetadata.name=\"nair-client-ipc\" --config.productName=\"N Air IPC\" --config.appId=\"jp.nicovideo.n-air-app.ipc\"",
     "release": "yarn install --cwd bin && node bin/mini-release.js",
+    "webfont": "yarn install --cwd bin && node bin/generate-webfont.js",
     "test": "node bin/i18n-early-check.js && tsc -p test && ava -v",
     "test:unit": "tsc -p tsconfig.unit.json && cross-env NODE_PATH=./test-unit-dist ava --serial false -v test-unit-dist/**/*.test.js",
     "lint": "tslint -p . -c tslint.json",
@@ -88,6 +89,10 @@
     ],
     "app/i18n/*/*.json": [
       "node ./bin/i18n-early-check.js"
+    ],
+    "{app/fonts/glyphs/*.svg,app/styles/custom-icons.less.template}": [
+      "yarn webfont",
+      "git add app/fonts/n-air.woff app/styles/custom-icons.less"
     ]
   },
   "dependencies": {
