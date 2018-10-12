@@ -11,6 +11,7 @@ import { WindowsService } from '../../services/windows';
 import { SettingsService } from '../../services/settings';
 import { $t } from '../../services/i18n';
 import { OptimizedSettings } from 'services/settings/niconico-optimization';
+import { CategoryIcons } from './CategoryIcons';
 
 @Component({
   components: {
@@ -26,6 +27,7 @@ export default class OptimizeNiconico extends Vue {
   @Inject() settingsService: SettingsService;
 
   settings: OptimizedSettings = this.windowsService.getChildWindowQueryParams() as any as OptimizedSettings;
+  icons = CategoryIcons;
 
   get doNotShowAgain(): IFormInput<boolean> {
     return {
