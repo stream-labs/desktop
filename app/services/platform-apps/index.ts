@@ -587,13 +587,21 @@ export class PlatformAppsService extends
     return !!page.persistent;
   }
 
-  getPageUrlForSource(appId: string, appSourceId: string) {
+  getPageUrlForSource(appId: string, appSourceId: string, settings = '') {
     const app = this.getApp(appId);
 
     if (!app) return null;
 
     const source = app.manifest.sources.find(source => source.id === appSourceId);
-    return this.getPageUrl(appId, source.file);
+    let url = this.getPageUrl(appId, source.file);
+
+    if (settings) {
+      url = `${url}&settings=${encodeURIComponent(settings)}`;
+    }
+
+    url = `${url}&source=true`;
+
+    return url;
   }
 
   getPageUrl(appId: string, page: string) {
