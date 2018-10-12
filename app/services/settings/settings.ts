@@ -27,9 +27,7 @@ import { $t } from 'services/i18n';
 import fs from 'fs';
 import {
   ISettingsAccessor,
-  NiconicoOptimization,
   NiconicoOptimizer,
-  OptimizationKey,
   OptimizeSettings,
   OptimizedSettings
 } from './niconico-optimization';
@@ -442,14 +440,14 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
-    const best = NiconicoOptimization.bestSettings({bitrate});
+    const best = NiconicoOptimizer.bestSettings({bitrate});
     const opt = new NiconicoOptimizer(this);
 
-    const current = opt.getCurrent(best[OptimizationKey.outputMode]);
+    const current = opt.getCurrentSettings();
 
     // 最適化の必要な値を抽出する
     let delta: OptimizeSettings = {}
-    for (let key of NiconicoOptimization.keys) {
+    for (const key of Object.getOwnPropertyNames(best)) {
       if (current[key] !== best[key]) {
         delta[key] = best[key];
       }
@@ -458,7 +456,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     return Object.keys(delta).length > 0 ? {
       current,
       delta,
-      info: NiconicoOptimization.optimizeInfo(current, delta)
+      info: opt.optimizeInfo(current, delta)
     } : undefined;
   }
 
