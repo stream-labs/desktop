@@ -396,10 +396,6 @@ export class PlatformAppsService extends
       this.devServer.stopListening();
       this.devServer = null;
     }
-
-    // reload prod apps in case it has same id
-    // mostly for debugging, can remove
-    this.installProductionApps();
   }
 
   unloadApp(appId: string) {
@@ -716,7 +712,14 @@ export class PlatformAppsService extends
 
   @mutation()
   private REMOVE_APP(appId: string) {
-    this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
+    // edge case for when there are 2 apps with same id
+    // when one is unpacked and one is prod
+    // generally we want to do actions with enabled one first
+    if (this.state.loadedApps.find(app => app.id === appId && app.unpacked)) {
+      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId && app.unpacked);
+    } else {
+      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
+    }
   }
 
   @mutation()
