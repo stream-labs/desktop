@@ -54,7 +54,7 @@
   margin-bottom: 4px;
 
   i {
-    margin-right: 4px;
+    margin-right: 8px;
   }
 }
 .optimize-setting-list {
