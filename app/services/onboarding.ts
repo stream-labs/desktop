@@ -3,6 +3,7 @@ import { NavigationService } from './navigation';
 import { UserService } from './user';
 import { Inject } from '../util/injector';
 import electron from 'electron';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 type TOnboardingStep =
   | 'Connect'
@@ -10,6 +11,7 @@ type TOnboardingStep =
   | 'OptimizeA'
   | 'OptimizeB'
   | 'OptimizeC'
+  | 'OptimizeBrandDevice'
   | 'SceneCollectionsImport'
   | 'ObsImport';
 
@@ -64,12 +66,18 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'OptimizeA'
+    next: 'OptimizeBrandDevice'
+  },
+
+  OptimizeBrandDevice: {
+    isEligible: service => service.brandDeviceService.hasOptimizedSettings,
+    next: 'OptimizeA',
   },
 
   OptimizeA: {
     isEligible: service => {
       if (service.options.isLogin) return false;
+      if (service.completedSteps.includes('OptimizeBrandDevice')) return false;
       return service.isTwitchAuthed;
     },
     next: 'OptimizeB'
@@ -80,6 +88,7 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       return service.completedSteps.includes('OptimizeA');
     }
   }
+
 };
 
 export class OnboardingService extends StatefulService<
@@ -99,6 +108,7 @@ export class OnboardingService extends StatefulService<
 
   @Inject() navigationService: NavigationService;
   @Inject() userService: UserService;
+  @Inject() brandDeviceService: BrandDeviceService;
 
   init() {
     // This is used for faking authentication in tests.  We have
