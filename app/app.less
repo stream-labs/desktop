@@ -206,13 +206,14 @@ a,
 
 .slide-open {
   position: relative;
+  display: flex;
 }
 
 .slide-open__menu {
   position: absolute;
   background: @day-bg;
   right: calc(~'100% + 20px');
-  bottom: -8px;
+  align-self: center;
   display: flex;
   z-index: 10;
   .padding-h-sides();

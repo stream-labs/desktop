@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Inject } from '../../util/injector';
-import { authorizedHeaders } from '../../util/requests';
+import { authorizedHeaders, downloadFile } from '../../util/requests';
 import { Service } from 'services/service';
 import { UserService } from 'services/user';
 import { HostsService } from 'services/hosts';
@@ -47,12 +47,6 @@ const fileTypeMap = {
 const DEFAULT_MAX_USAGE = 1024 * Math.pow(1024, 2);
 const DEFAULT_MAX_FILE_SIZE = 25 * Math.pow(1024, 2);
 
-const concatUint8Arrays = (a: Uint8Array, b: Uint8Array) => {
-  const c = new Uint8Array(a.length + b.length);
-  c.set(a, 0);
-  c.set(b, a.length);
-  return c;
-};
 
 export class MediaGalleryService extends Service {
   @Inject() private userService: UserService;
@@ -126,25 +120,7 @@ export class MediaGalleryService extends Service {
   }
 
   async downloadFile(filename: string, file: IMediaGalleryFile): Promise<void> {
-    return fetch(file.href).then(({ body }: { body: ReadableStream }) => {
-      const reader = body.getReader();
-      let result = new Uint8Array(0);
-      const readStream = ({
-        done,
-        value
-      }: {
-        done: boolean;
-        value: Uint8Array;
-      }) => {
-        if (done) {
-          fs.writeFileSync(filename, result);
-        } else {
-          result = concatUint8Arrays(result, value);
-          reader.read().then(readStream);
-        }
-      };
-      return reader.read().then(readStream);
-    });
+    return downloadFile(file.href, filename);
   }
 
   async deleteFile(file: IMediaGalleryFile): Promise<IMediaGalleryInfo> {

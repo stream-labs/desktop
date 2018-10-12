@@ -15,7 +15,6 @@ import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
 import { NotificationsService } from './services/notifications';
-import { ObsApiService } from './services/obs-api';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
@@ -24,7 +23,7 @@ import { SettingsService } from './services/settings';
 import { SourcesService, Source } from './services/sources';
 import { UserService } from './services/user';
 import { VideoService } from './services/video';
-import { WidgetsService } from './services/widgets';
+import { WidgetsService, WidgetSource } from './services/widgets';
 import { WidgetTester } from './services/widgets';
 import { WindowsService } from './services/windows';
 import { StatefulService } from './services/stateful-service';
@@ -40,6 +39,8 @@ import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
+import { PlatformAppsService } from 'services/platform-apps';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -79,21 +80,22 @@ import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
-import { BitGoalService } from 'services/widget-settings/bit-goal';
-import { ChatBoxService } from 'services/widget-settings/chat-box';
-import { DonationGoalService } from 'services/widget-settings/donation-goal';
-import { FollowerGoalService } from 'services/widget-settings/follower-goal';
-import { ViewerCountService } from 'services/widget-settings/viewer-count';
-import { StreamBossService } from 'services/widget-settings/stream-boss';
-import { DonationTickerService } from 'services/widget-settings/donation-ticker';
-import { CreditsService } from 'services/widget-settings/credits';
-import { EventListService } from 'services/widget-settings/event-list';
-import { TipJarService } from 'services/widget-settings/tip-jar';
-import { SponsorBannerService } from 'services/widget-settings/sponsor-banner';
-import { SubGoalService } from 'services/widget-settings/sub-goal';
-import { MediaShareService } from 'services/widget-settings/media-share';
-import { ChatbotWidgetService } from 'services/widget-settings/chatbot';
+import { BitGoalService } from 'services/widgets/settings/bit-goal';
+import { ChatBoxService } from 'services/widgets/settings/chat-box';
+import { DonationGoalService } from 'services/widgets/settings/donation-goal';
+import { FollowerGoalService } from 'services/widgets/settings/follower-goal';
+import { ViewerCountService } from 'services/widgets/settings/viewer-count';
+import { StreamBossService } from 'services/widgets/settings/stream-boss';
+import { DonationTickerService } from 'services/widgets/settings/donation-ticker';
+import { CreditsService } from 'services/widgets/settings/credits';
+import { EventListService } from 'services/widgets/settings/event-list';
+import { TipJarService } from 'services/widgets/settings/tip-jar';
+import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
+import { SubGoalService } from 'services/widgets/settings/sub-goal';
+import { MediaShareService } from 'services/widgets/settings/media-share';
+import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 
 const { ipcRenderer } = electron;
 
@@ -123,7 +125,6 @@ export class ServicesManager extends Service {
     KeyListenerService,
     NavigationService,
     NotificationsService,
-    ObsApiService,
     OnboardingService,
     PerformanceService,
     PerformanceMonitorService,
@@ -136,6 +137,7 @@ export class ServicesManager extends Service {
     UserService,
     VideoService,
     WidgetsService,
+    WidgetSource,
     WidgetTester,
     WindowsService,
     FontLibraryService,
@@ -149,6 +151,8 @@ export class ServicesManager extends Service {
     TcpServerService,
     StreamInfoService,
     StreamlabelsService,
+    PlatformAppsService,
+    PlatformAppStoreService,
     GuestApiService,
     VideoEncodingOptimizationService,
     CrashReporterService,
@@ -189,7 +193,8 @@ export class ServicesManager extends Service {
     IncrementalRolloutService,
     AnnouncementsService,
     MediaShareService,
-    ChatbotWidgetService
+    ChatbotWidgetService,
+    BrandDeviceService
   };
 
   private instances: Dictionary<Service> = {};

@@ -20,9 +20,11 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
+import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
@@ -45,10 +47,11 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() windowsService: WindowsService;
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static initialState: IAppState = {
     loading: true,
-    argv: []
+    argv: electron.remote.process.argv
   };
 
   private autosaveInterval: number;
@@ -70,6 +73,9 @@ export class AppService extends StatefulService<IAppState> {
   async load() {
     this.START_LOADING();
 
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
+
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
@@ -80,7 +86,11 @@ export class AppService extends StatefulService<IAppState> {
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    await this.sceneCollectionsService.initialize();
+    // Initialize any apps before loading the scene collection.  This allows
+    // the apps to already be in place when their sources are created.
+    await this.platformAppsService.initialize();
+
+    await this.sceneCollectionsService.initialize()
 
     const onboarded = this.onboardingService.startOnboardingIfRequired();
 
@@ -109,14 +119,7 @@ export class AppService extends StatefulService<IAppState> {
     this.crashReporterService.endStartup();
 
     this.FINISH_LOADING();
-  }
-
-  /**
-   * the main process sends argv string here
-   */
-  setArgv(argv: string[]) {
-    this.SET_ARGV(argv);
-    this.protocolLinksService.start(argv);
+    this.protocolLinksService.start(this.state.argv);
   }
 
   @track('app_close')
@@ -135,6 +138,8 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

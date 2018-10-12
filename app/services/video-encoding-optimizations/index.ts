@@ -83,7 +83,9 @@ export class VideoEncodingOptimizationService extends Service {
       });
 
       profiles = Presets.filter(profile => {
-        return profile.game === game && profile.encoder === StreamEncoder.value;
+        return profile.game === game && profile.encoder.find(encoder => {
+          return encoder === StreamEncoder.value
+        });
       });
     }
 

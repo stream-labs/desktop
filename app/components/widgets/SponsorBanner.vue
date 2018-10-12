@@ -1,34 +1,25 @@
 <template>
-<widget-window :requestState="requestState" :loaded="loaded"  ref="layout" v-model="tabName">
-  <div slot="settings" >
-    <h-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
-      <timer-input v-model="wData.settings.hide_duration_in_seconds" :metadata="{}" />
-    </h-form-group>
-    <h-form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
-      <timer-input v-model="wData.settings.show_duration_in_seconds" :metadata="{}" />
-    </h-form-group>
-
-    <h-form-group :title="$t('Banner Width')">
-      <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
-    </h-form-group>
-    <h-form-group :title="$t('Banner Height')">
-      <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
-    </h-form-group>
-    <h-form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
-      <animation-input v-model="wData.settings.show_animation" />
-    </h-form-group>
-    <h-form-group :title="$t('Background Color')">
-      <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
-      <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
-    </h-form-group>
-    <h-form-group :title="$t('Placement')">
+<widget-editor
+  :slots="[{ value: 'layout', label: $t('Ad Layout') }]"
+  :navItems="navItems"
+>
+  <validated-form slot="layout" @input="save()" v-if="loaded">
+    <v-form-group :title="$t('Placement')">
       <list-input v-model="wData.settings.placement_options" :metadata="{ options: placementOptions }" />
-    </h-form-group>
-    <h-form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
+    </v-form-group>
+    <v-form-group v-if="wData.settings.placement_options === 'double'" :title="$t('Image Layout')">
       <image-layout-input v-model="wData.settings.layout" />
-    </h-form-group>
+    </v-form-group>
+  </validated-form>
 
-    <h-form-group v-for="position in positions" :key="position" :title="`${$t('Placement')} ${position} ${$t('Images')}`">
+  <validated-form
+    @input="save()"
+    v-if="loaded"
+    v-for="position in positions"
+    :key="position"
+    :slot="`set-${position}-properties`"
+  >
+    <v-form-group :title="`${$t('Placement')} ${position} ${$t('Images')}`">
       <div v-for="image in wData.settings[`placement_${position}_images`]" :key="image.href" class="media-container">
         <media-gallery-input v-model="image.href" :metadata="{ fileName: fileNameFromHref(image.href) }" />
         <button class="close-button" @click="removeImage(image.href, position)"><i class="icon-close" /></button>
@@ -37,22 +28,32 @@
         <span>{{ $t('Seconds') }}</span>
       </div>
       <button class="button button--default" @click="addImage(position)" >{{ $t('Add Image') }}</button>
-    </h-form-group>
-  </div>
+    </v-form-group>
+  </validated-form>
 
-  <div slot="HTML" >
-    <code-editor v-model="wData" :metadata="{ type: 'html' }"/>
-  </div>
+  <validated-form slot="visual-properties" @input="save()" v-if="loaded">
+    <v-form-group :title="$t('Widget Hide Duration')" :metadata="{ tooltip: hideDurationTooltip }">
+      <timer-input v-model="wData.settings.hide_duration_in_seconds" :metadata="{}" />
+    </v-form-group>
+    <v-form-group :title="$t('Widget Show Duration')" :metadata="{ tooltip: showDurationTooltip }">
+      <timer-input v-model="wData.settings.show_duration_in_seconds" :metadata="{}" />
+    </v-form-group>
+    <v-form-group :title="$t('Banner Width')">
+      <slider-input v-model="wData.settings.banner_width" :metadata="{ max: 720, interval: 5 }" />
+    </v-form-group>
+    <v-form-group :title="$t('Banner Height')">
+      <slider-input v-model="wData.settings.banner_height" :metadata="{ max: 720, interval: 5 }" />
+    </v-form-group>
+    <v-form-group :title="$t('Image Animation')" :metadata="{ tooltip: animationTooltip }">
+      <animation-input v-model="wData.settings.show_animation" />
+    </v-form-group>
+    <v-form-group :title="$t('Background Color')">
+      <bool-input v-model="wData.settings.background_color_option" :metadata="{ title: $t('Transparent') }" />
+      <color-input v-if="!wData.settings.background_color_option" v-model="wData.settings.background_container_color" />
+    </v-form-group>
+  </validated-form>
 
-  <div slot="CSS" >
-    <code-editor v-model="wData" :metadata="{ type: 'css' }"/>
-  </div>
-
-  <div slot="JS" >
-    <code-editor v-model="wData" :metadata="{ type: 'js' }"/>
-  </div>
-
-</widget-window>
+</widget-editor>
 </template>
 
 <script lang="ts" src="./SponsorBanner.vue.ts"></script>

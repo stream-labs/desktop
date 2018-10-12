@@ -68,11 +68,34 @@
             <i class="icon-settings" />
           </a>
         </div>
-        <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+        <div class="flex">
+          <div v-if="hasChatApps" class="live-dock-chat-apps__list-input flex">
+            <i
+              class="live-dock-chat-apps__popout icon-pop-out-1"
+              v-tooltip.left="$t('Pop out to new window')"
+              v-if="isPopOutAllowed"
+              @click="popOut"
+            />
+            <list-input
+              v-model="selectedChat"
+              :metadata="chatAppsListMetadata"
+            />
+          </div>
+          <a @click="refreshChat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">{{ $t('Refresh Chat') }}</a>
+        </div>
       </div>
 
       <div class="live-dock-chat" v-if="isTwitch || isMixer || (isYoutube && isStreaming)">
-        <chat ref="chat" />
+        <chat :style="chatStyles()" ref="chat" />
+        <PlatformAppWebview
+          v-for="app in chatApps"
+          v-if="(app.id === selectedChat) || isAppPersistent(app.id)"
+          :style="chatStyles(app.id)"
+          :key="app.id"
+          class="live-dock-platform-app-webview"
+          :appId="app.id"
+          :pageSlot="slot"
+        />
       </div>
       <div class="flex flex--center flex--column live-dock-chat--offline" v-else >
         <img class="live-dock-chat__img--offline live-dock-chat__img--offline-day" src="../../media/images/sleeping-kevin-day.png">
@@ -203,6 +226,7 @@
 .live-dock-chat {
   flex-grow: 1;
   position: relative;
+  .flex();
 }
 
 .live-dock-chat--offline {
@@ -238,6 +262,20 @@
 .live-dock-platform-tools {
   .flex();
 }
+
+.live-dock-chat-apps__list-input {
+  .margin-right();
+}
+
+.live-dock-chat-apps__popout {
+  .padding();
+  .cursor--pointer();
+}
+
+.live-dock-platform-app-webview {
+  .flex--grow();
+}
+
 
 .night-theme {
   .live-dock {

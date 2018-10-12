@@ -18,14 +18,15 @@
 @import "../../../styles/index";
 
 .container {
-  width: 370px;
+  width: 100%;
+  max-width: 370px;
   display: flex;
   flex-wrap: wrap;
 }
 
 .image-container {
-  width: 80px;
-  height: 80px;
+  width: 56px;
+  height: 56px;
   border: 1px solid @day-input-border;
   margin: 2px;
   .transition();
@@ -38,7 +39,7 @@
   }
 
   img {
-    height: 70px;
+    height: 48px;
     width: auto;
     position: absolute;
     top: 50%;
