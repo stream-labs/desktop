@@ -54,12 +54,13 @@
   margin-bottom: 4px;
 
   i {
-    margin-right: 8px;
+    margin-right: 4px;
   }
 }
 .optimize-setting-list {
   list-style: none;
-  background-color: #262a35;
+  background: @padding-color;
+  .radius;
   margin: 0;
   padding: 8px;
 }
