@@ -82,7 +82,7 @@ export default class AppPlatformDeveloperSettings extends Vue {
   }
 
   unloadApp() {
-    this.platformAppsService.unloadApps();
+    this.platformAppsService.unloadApp(this.currentlyLoadedUnpackedApp.id);
   }
 
 }
