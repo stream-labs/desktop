@@ -1,5 +1,5 @@
 import electron from 'electron';
-import { nodeObs } from '../obs-api';
+import * as obs from '../../../obs-api';
 import { execSync } from 'child_process';
 import { mutation, StatefulService } from '../stateful-service';
 import { Inject } from '../../util/injector';
@@ -106,8 +106,8 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       }
 
       // force SLOBS to reload config files
-      nodeObs.OBS_service_resetVideoContext();
-      nodeObs.OBS_service_resetAudioContext();
+      obs.NodeObs.OBS_service_resetVideoContext();
+      obs.NodeObs.OBS_service_resetAudioContext();
 
       return true;
     } catch (e) {
