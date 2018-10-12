@@ -543,14 +543,14 @@ export class SceneCollectionsService extends Service
    */
   private setupDefaultAudio() {
     this.sourcesService.createSource(
-      'Desktop Audio',
+      $t('sources.desktopAudio'),
       'wasapi_output_capture',
       {},
       { channel: E_AUDIO_CHANNELS.OUTPUT_1 }
     );
 
     this.sourcesService.createSource(
-      'Mic/Aux',
+      $t('sources.micAux'),
       'wasapi_input_capture',
       {},
       { channel: E_AUDIO_CHANNELS.INPUT_1 }

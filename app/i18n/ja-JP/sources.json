@@ -58,5 +58,7 @@
   "unhideAll": "すべて表示する",
   "interactiveCrop": "領域を指定してキャプチャする（実験的機能）",
   "selectCroppingArea": "キャプチャする領域をドラッグして指定してください",
-  "pressEscapeToCancel": "Escキーでキャンセルします"
+  "pressEscapeToCancel": "Escキーでキャンセルします",
+  "desktopAudio": "デスクトップ音声",
+  "micAux": "マイク"
 }

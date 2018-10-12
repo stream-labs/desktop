@@ -27,8 +27,6 @@ const sourceTypes = [
 ];
 
 test('Adding and removing some sources', async t => {
-  const app = t.context.app;
-
   for (const sourceType of sourceTypes) {
     const sourceName = `Example ${sourceType}`;
 

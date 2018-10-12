@@ -1,5 +1,10 @@
 <template>
-<div class="mixer-item" :class="{ muted: audioSource.muted}">
+<div
+  class="mixer-item"
+  :class="{ muted: audioSource.muted }"
+  :data-test-source-name="audioSource.source.name"
+  :data-test-source-type="audioSource.source.type"
+>
 
   <div class="flex">
     <div class="source-name">{{ audioSource.source.name }}</div>

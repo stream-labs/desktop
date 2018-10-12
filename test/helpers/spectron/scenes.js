@@ -58,3 +58,9 @@ export async function openRenameWindow(t, sceneName) {
   await contextMenuClick(t, 'Rename');
   await focusChild(t);
 }
+
+export async function sceneIsExisting(t, sceneName) {
+  return t.context.app.client
+    .$('[data-test="SceneSelector"]')
+    .isExisting(`[data-test="${sceneName}"]`);
+}
