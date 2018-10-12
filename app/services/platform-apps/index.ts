@@ -152,9 +152,7 @@ export class PlatformAppsService extends
    * Using initialize because it needs to be async
    */
   async initialize() {
-    alert('initializing');
     this.userService.userLogin.subscribe(async () => {
-      alert('logging in');
       this.unloadApps();
       this.installProductionApps();
       this.SET_APP_STORE_VISIBILITY(await this.fetchAppStoreVisibility());
@@ -197,7 +195,6 @@ export class PlatformAppsService extends
    * Install production apps
    */
   async installProductionApps() {
-    alert('installing prod apps');
     const productionApps = await this.fetchProductionApps();
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
