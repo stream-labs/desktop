@@ -11,7 +11,7 @@ async function main() {
     files: './app/fonts/glyphs/*.svg',
     fontName: 'n-air',
     formats: ['woff'],
-    template: './app/styles/custom-icons.less.template',
+    template: './app/styles/custom-icons.less.njk',
     templateFontPath: './app/fonts/',
     templateClassName: 'icon',
     fontHeight: 1024,

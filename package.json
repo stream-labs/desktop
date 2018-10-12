@@ -90,7 +90,7 @@
     "app/i18n/*/*.json": [
       "node ./bin/i18n-early-check.js"
     ],
-    "{app/fonts/glyphs/*.svg,app/styles/custom-icons.less.template}": [
+    "{app/fonts/glyphs/*.svg,app/styles/custom-icons.less.njk}": [
       "yarn webfont",
       "git add app/fonts/n-air.woff app/styles/custom-icons.less"
     ]
