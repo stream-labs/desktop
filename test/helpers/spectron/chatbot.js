@@ -11,11 +11,10 @@ export async function navigateToCustomCommandsTab(t) {
   await app.client.click('.nav-item.Commands');
   await app.client.click('.nav-item.Custom_Commands');
   await sleep(1000);
-  await app.client.click('.button--add-command');
 }
 
 export async function openCustomCommandWindow(t) {
   const app = t.context.app;
-
+  await app.client.click('.button--add-command');
 }
 
