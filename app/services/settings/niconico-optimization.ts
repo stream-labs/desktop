@@ -292,9 +292,6 @@ export class NiconicoOptimizer {
     getCategory(category: CategoryName, reload: boolean = false): ISettingsSubCategory[] {
         if (reload || !this.categoryCache.has(category)) {
             this.categoryCache.set(category, this.accessor.getSettingsFormData(category));
-            /* console.log(`load category ${category} ->
-${JSON.stringify(this.categoryCache.get(category), null, 2)}`
-            ); // DEBUG */
         }
         return this.categoryCache.get(category);
     }
@@ -316,13 +313,14 @@ ${JSON.stringify(this.categoryCache.get(category), null, 2)}`
     }
 
     setValues(kvs: { key: OptimizationKey, value: any }[]) {
+        // outputMode must be processed first
         const om = kvs.find(i => i.key == OptimizationKey.outputMode);
         if (om !== undefined) {
             kvs = kvs.filter(i => i.key != OptimizationKey.outputMode);
             kvs.unshift(om);
         }
 
-        let modifiedCategories = new Set<CategoryName>();
+        const modifiedCategories = new Set<CategoryName>();
 
         for (const kv of kvs) {
             const setting = this.findSetting(kv.key);
