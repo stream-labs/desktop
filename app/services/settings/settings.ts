@@ -27,10 +27,11 @@ import { $t } from 'services/i18n';
 import fs from 'fs';
 import {
   ISettingsAccessor,
-  NiconicoOptimizer,
   OptimizeSettings,
-  OptimizedSettings
-} from './niconico-optimization';
+  OptimizedSettings,
+  Optimizer
+} from './optimizer';
+import { getBestSettingsForNiconico } from './niconico-optimization';
 
 
 export interface ISettingsState {
@@ -440,8 +441,8 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
-    const best = NiconicoOptimizer.bestSettings({bitrate});
-    const opt = new NiconicoOptimizer(this);
+    const best = getBestSettingsForNiconico({bitrate});
+    const opt = new Optimizer(this);
 
     const current = opt.getCurrentSettings();
 
@@ -461,7 +462,7 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   optimizeForNiconico(delta: OptimizeSettings) {
-    const opt = new NiconicoOptimizer(this);
+    const opt = new Optimizer(this);
     opt.optimize(delta);
   }
 

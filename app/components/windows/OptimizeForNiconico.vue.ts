@@ -10,7 +10,7 @@ import { StreamingService } from '../../services/streaming';
 import { WindowsService } from '../../services/windows';
 import { SettingsService } from '../../services/settings';
 import { $t } from '../../services/i18n';
-import { OptimizedSettings } from 'services/settings/niconico-optimization';
+import { OptimizedSettings } from 'services/settings/optimizer';
 import { CategoryIcons } from './CategoryIcons';
 
 @Component({
