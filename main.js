@@ -318,7 +318,7 @@ app.on('ready', () => {
       version: pjson.version,
       exec: process.argv,
       cwd: process.cwd(),
-      waitPid: [ process.pid ],
+      waitPids: [ process.pid ],
       appDir: path.dirname(app.getPath('exe')),
       tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
       cacheDir: app.getPath('userData'),
