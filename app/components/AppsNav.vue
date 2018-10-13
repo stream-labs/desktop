@@ -22,7 +22,7 @@
         :key="index"
         @click="navigateApp(app.id)"
         class="app-tab"
-        :class="{ 'is-active': page === 'PlatformAppContainer' && navigationService.state.params.appId === app.id }">
+        :class="{ 'is-active': page === 'PlatformAppContainer' && isSelectedApp(app.id) }">
         <span> {{index}}-{{ app.manifest.name }}</span>
       </span>
     </div>
@@ -52,6 +52,7 @@
   background-color: @day-secondary;
   border-bottom: 1px solid @day-border;
   flex: 0 0 35px;
+  height: 35px;
   z-index: 1;
 }
 
@@ -60,7 +61,7 @@
   overflow-x: auto;
   white-space: nowrap;
   overflow-y: hidden;
-  margin-bottom: -4px;
+  // margin-bottom: -4px;
 
   &.has-prev {
     margin-left: 15px;

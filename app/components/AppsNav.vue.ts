@@ -6,12 +6,14 @@ import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
 
 @Component({})
 export default class AppsNav extends Vue {
-  @Inject() platformAppsService: PlatformAppsService;
-  @Inject() navigationService: NavigationService;
+  @Inject()
+  platformAppsService: PlatformAppsService;
+  @Inject()
+  navigationService: NavigationService;
 
   $refs: {
-    app_tabs: HTMLDivElement
-  }
+    app_tabs: HTMLDivElement;
+  };
 
   isMounted = false;
 
@@ -37,29 +39,53 @@ export default class AppsNav extends Vue {
   }
 
   scrollLeft() {
-    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft - this.scrollIncrement;
+    this.appTabsContainer.scrollLeft =
+      this.appTabsContainer.scrollLeft - this.scrollIncrement;
   }
 
   scrollRight() {
-    this.appTabsContainer.scrollLeft = this.appTabsContainer.scrollLeft + this.scrollIncrement;
+    this.appTabsContainer.scrollLeft =
+      this.appTabsContainer.scrollLeft + this.scrollIncrement;
   }
 
   calculateScrolls() {
     if (!this.isMounted) return false;
-    this.canScroll = this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
+    this.canScroll =
+      this.appTabsContainer.scrollWidth > this.appTabsContainer.clientWidth;
     this.hasPrev = this.appTabsContainer.scrollLeft > 0;
-    let scrollRight = this.appTabsContainer.scrollWidth -
+    let scrollRight =
+      this.appTabsContainer.scrollWidth -
       (this.appTabsContainer.scrollLeft + this.appTabsContainer.clientWidth);
 
     this.hasNext = scrollRight > 0;
   }
 
+  isSelectedApp(appId: string) {
+    return this.navigationService.state.params.appId === appId;
+  }
+
+  // get topNavApps() {
+  //   return this.platformAppsService.enabledApps.filter(app => {
+  //     return !!app.manifest.pages.find(page => {
+  //       return page.slot === EAppPageSlot.TopNav;
+  //     });
+  //   });
+  // }
+
   get topNavApps() {
-    return this.platformAppsService.enabledApps.filter(app => {
-      return !!app.manifest.pages.find(page => {
-        return page.slot === EAppPageSlot.TopNav;
-      });
-    });
+    let x: any[] = [];
+    let i = 10;
+
+    while (i > 0) {
+      x = x.concat(this.platformAppsService.enabledApps.filter(app => {
+        return !!app.manifest.pages.find(page => {
+          return page.slot === EAppPageSlot.TopNav;
+        });
+      }));
+      i--;
+    }
+
+    return x;
   }
 
   get page() {
@@ -69,5 +95,4 @@ export default class AppsNav extends Vue {
   navigateApp(appId: string) {
     this.navigationService.navigate('PlatformAppContainer', { appId });
   }
-
 }
