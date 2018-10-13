@@ -11,11 +11,6 @@ export {
 } from './optimizer';
 
 export class NiconicoOptimizer extends Optimizer {
-    constructor(accessor: ISettingsAccessor) {
-        const bestSample = NiconicoOptimizer.bestSettings({bitrate: 2000});
-        super(accessor, bestSample);
-    }
-
     /**
      * niconicoに最適な設定値を返す。
      * @param options ビットレート

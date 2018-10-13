@@ -277,19 +277,9 @@ export class Optimizer {
     private accessor: ISettingsAccessor;
     private definitions: DefinitionParam[];
 
-    constructor(accessor: ISettingsAccessor, prototype: OptimizeSettings = null) {
+    constructor(accessor: ISettingsAccessor) {
         this.accessor = accessor;
         this.definitions = definitionParams;
-        if (prototype) {
-            const validKeys = new Set<string>(Array.from(
-                iterateDefinitions(definitionParams)).map(i => i.key)
-            );
-            const invalidKeys = Object.getOwnPropertyNames(prototype).filter(key => !validKeys.has(key));
-            if (invalidKeys.length > 0) {
-                console.error(`Optimizer: invalid key: ${invalidKeys}`);
-                console.info(`valid keys: ${validKeys.keys()}`);
-            }
-        }
     }
 
     private categoryCache = new Map<CategoryName, ISettingsSubCategory[]>();
