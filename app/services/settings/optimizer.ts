@@ -16,6 +16,22 @@ export enum OptimizationKey {
     audioTrackIndex = 'audioTrackIndex',
 }
 
+// OptimizationKey のキーと完全対応していること
+export type OptimizeSettings = {
+    outputMode?: string
+    videoBitrate?: number
+    audioBitrate?: string
+    quality?: string
+    colorSpace?: string
+    fps?: string
+    encoder?: string
+    keyframeInterval?: number
+    encoderPreset?: string
+    profile?: string
+    tune?: string
+    audioTrackIndex?: string
+};
+
 enum CategoryName {
     output = 'Output',
     video = 'Video',
@@ -129,8 +145,6 @@ const definitionParams: DefinitionParam[] = [
     },
 ];
 
-export type OptimizeSettings = {};
-
 export interface OptimizedSettings {
     delta: OptimizeSettings;
     current: OptimizeSettings;
@@ -222,7 +236,7 @@ function* iterateDefinitions(params: DefinitionParam[]): IterableIterator<Defini
     }
 }
 
-function isDependValues(values: {}, items: DefinitionParam[]): boolean {
+function isDependValues(values: OptimizeSettings, items: DefinitionParam[]): boolean {
     for (const item of items) {
         if (values.hasOwnProperty(item.key)) {
             return true;
@@ -263,7 +277,7 @@ export class Optimizer {
     private accessor: ISettingsAccessor;
     private definitions: DefinitionParam[];
 
-    constructor(accessor: ISettingsAccessor, prototype: {} = null) {
+    constructor(accessor: ISettingsAccessor, prototype: OptimizeSettings = null) {
         this.accessor = accessor;
         this.definitions = definitionParams;
         if (prototype) {
@@ -373,7 +387,7 @@ export class Optimizer {
         }
     }
 
-    private setValues(values: {}, definitions: DefinitionParam[]) {
+    private setValues(values: OptimizeSettings, definitions: DefinitionParam[]) {
         for (const item of definitions) {
             const key = item.key;
             if (item.dependents) {
