@@ -192,6 +192,54 @@ async function getVersion(info) {
     return response.body.version;
 }
 
+async function start(info, latestVersion) {
+    /* App directory is required to be present!
+     * The temporary directory may not exist though. */
+    ensureDir(info.tempDir);
+
+    /* We're not what latest specifies. Download
+    * updater, generate updater config, start the
+    * updater, and tell application to finish. */
+    const updaterPath = await fetchUpdater(info, (progress) => {
+        if (!statusWindow) return;
+        statusWindow.webContents.send('bootstrap-progress', progress);
+    });
+
+    /* Node, for whatever reason, decided that when you execute via
+     * shell, all arguments shouldn't be quoted... it still does
+     * spacing for us I guess */
+    const updaterArgs = [
+        '--base-url', `"${info.baseUrl}"`,
+        '--version', `"${latestVersion}"`,
+        '--exec', `"${info.exec}"`,
+        '--cwd', `"${info.cwd}"`,
+        '--app-dir', `"${info.appDir}"`,
+        '--force-temp'
+    ];
+
+    info.waitPids.forEach((pid) => {
+        updaterArgs.push('-p');
+        updaterArgs.push(pid);
+    });
+
+    if (statusWindow) {
+        updaterArgs.push('-p');
+        updaterArgs.push(statusWindow.webContents.getOSProcessId());
+    }
+
+    console.log(updaterArgs);
+
+    cp.spawn(`${updaterPath}`, updaterArgs, {
+        cwd: info.tempDir,
+        detached: true,
+        stdio: 'ignore',
+        shell: true
+    });
+
+    if (statusWindow) statusWindow.close();
+    return true;
+}
+
 /* Note that we return true when we fail to fetch
  * version correctly! This is to make sure we don't
  * bork the user due to update error. It's better to
@@ -235,56 +283,31 @@ async function entry(info) {
             show: false
         });
 
-        statusWindow.on('ready-to-show', () => {
-            statusWindow.show();
+        statusWindow.on('closed', () => {
+            statusWindow = null;
+        });
+
+        /* 20 minutes in documentation and I still can't
+         * tell if this does what I'm wanting */
+        statusWindow.webContents.on('destroyed', () => {
+            statusWindow = null;
+        });
+
+        const retPromise = new Promise((resolve, reject) => {
+            statusWindow.on('ready-to-show', () => {
+                statusWindow.show();
+                resolve(start(info, latestVersion));
+            });
         });
 
         statusWindow.loadURL('file://' + __dirname + '/index.html');
+
+        return retPromise;
     } catch (error) {
         if (statusWindow) statusWindow.close();
         statusWindow = null;
+        return start(info, latestVersion);
     }
-
-    /* App directory is required to be present!
-     * The temporary directory may not exist though. */
-    ensureDir(info.tempDir);
-
-    /* We're not what latest specifies. Download
-    * updater, generate updater config, start the
-    * updater, and tell application to finish. */
-    const updaterPath = await fetchUpdater(info, (progress) => {
-        if (!statusWindow) return;
-        statusWindow.webContents.send('bootstrap-progress', progress);
-    });
-
-    /* Node, for whatever reason, decided that when you execute via
-     * shell, all arguments shouldn't be quoted... it still does
-     * spacing for us I guess */
-    const updaterArgs = [
-        '--base-url', `"${info.baseUrl}"`,
-        '--version', `"${latestVersion}"`,
-        '--exec', `"${info.exec}"`,
-        '--cwd', `"${info.cwd}"`,
-        '--app-dir', `"${info.appDir}"`,
-        '--force-temp'
-    ];
-
-    for (pid in info.waitPids) {
-        updaterArgs.push_back('-p');
-        updaterArgs.push_back(pid);
-    }
-
-    console.log(updaterArgs);
-
-    cp.spawn(`${updaterPath}`, updaterArgs, {
-        cwd: info.tempDir,
-        detached: true,
-        stdio: 'ignore',
-        shell: true
-    });
-
-    if (statusWindow) statusWindow.close();
-    return true;
 }
 
 module.exports = async (info) => {
