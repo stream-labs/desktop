@@ -100,11 +100,6 @@
   opacity: 0.8;
   font-weight: bold;
   cursor: pointer;
-  // width: 150px;
-  overflow:  hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: inline-block;
 
   &.is-active {
     opacity: 1;

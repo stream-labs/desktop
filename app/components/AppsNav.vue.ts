@@ -55,28 +55,12 @@ export default class AppsNav extends Vue {
   }
 
   get topNavApps() {
-    let x: any[] = [];
-    let i = 10;
-
-    while (i > 0) {
-      x = x.concat(this.platformAppsService.enabledApps.filter(app => {
-        return !!app.manifest.pages.find(page => {
-          return page.slot === EAppPageSlot.TopNav;
-        });
-      }));
-      i--;
-    }
-
-    return x;
+    return this.platformAppsService.enabledApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    });
   }
-
-  // get topNavApps() {
-  //   return this.platformAppsService.enabledApps.filter(app => {
-  //     return !!app.manifest.pages.find(page => {
-  //       return page.slot === EAppPageSlot.TopNav;
-  //     });
-  //   });
-  // }
 
   get page() {
     return this.navigationService.state.currentPage;
