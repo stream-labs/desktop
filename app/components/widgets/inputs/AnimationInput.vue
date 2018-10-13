@@ -2,7 +2,7 @@
   <list-input
       :value="value"
       :metadata="listInputMetadata"
-      @input="value => emitInput(value)"
+      @input="(value, event) => emitInput(value, event)"
   />
 </template>
 

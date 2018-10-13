@@ -45,7 +45,7 @@
     <v-form-group
       :title="$t('Font Family')"
       type="fontFamily"
-      :value="wData.settings.font"
+      v-model="wData.settings.font"
       :metadata="{ tooltip: fontFamilyTooltip }"
     />
   </validated-form>
