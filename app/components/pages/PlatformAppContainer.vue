@@ -8,6 +8,7 @@
       Pop Out
     </button>
     <button
+      v-if="isUnpacked"
       @click="refreshApp"
       class="button button--default">
       Reload
