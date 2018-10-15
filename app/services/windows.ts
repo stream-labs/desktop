@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 
 import Main from 'components/windows/Main.vue';
 import Settings from 'components/windows/Settings.vue';
+import FFZSettings from 'components/windows/FFZSettings.vue';
 import SourcesShowcase from 'components/windows/SourcesShowcase.vue';
 import SceneTransitions from 'components/windows/SceneTransitions.vue';
 import AddSource from 'components/windows/AddSource.vue';
@@ -23,6 +24,7 @@ import ManageSceneCollections from 'components/windows/ManageSceneCollections.vu
 import RecentEvents from 'components/windows/RecentEvents.vue';
 import Projector from 'components/windows/Projector.vue';
 import MediaGallery from 'components/windows/MediaGallery.vue';
+import PlatformAppPopOut from 'components/windows/PlatformAppPopOut.vue';
 import { mutation, StatefulService } from 'services/stateful-service';
 import electron from 'electron';
 import Vue from 'vue';
@@ -31,6 +33,7 @@ import { Subject } from 'rxjs/Subject';
 
 import BitGoal from 'components/widgets/goal/BitGoal.vue';
 import DonationGoal from 'components/widgets/goal/DonationGoal.vue';
+import SubGoal from 'components/widgets/goal/SubGoal.vue';
 import ChatBox from 'components/widgets/ChatBox.vue';
 import FollowerGoal from 'components/widgets/goal/FollowerGoal.vue';
 import ViewerCount from 'components/widgets/ViewerCount.vue';
@@ -53,10 +56,17 @@ import ChatbotWordProtectionWindow
 import ChatbotQuoteWindow from 'components/page-components/Chatbot/windows/ChatbotQuoteWindow.vue';
 import ChatbotQuotePreferencesWindow
   from 'components/page-components/Chatbot/windows/ChatbotQuotePreferencesWindow.vue';
+import ChatbotQueuePreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotQueuePreferencesWindow.vue';
+import ChatbotSongRequestPreferencesWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSongRequestPreferencesWindow.vue';
+import ChatbotSongRequestOnboardingWindow
+  from 'components/page-components/Chatbot/windows/ChatbotSongRequestOnboardingWindow.vue';
 
 import TipJar from 'components/widgets/TipJar.vue';
 import SponsorBanner from 'components/widgets/SponsorBanner.vue';
 import ExecuteInCurrentWindow from '../util/execute-in-current-window';
+import MediaShare from 'components/widgets/MediaShare.vue';
 
 const { ipcRenderer, remote } = electron;
 const BrowserWindow = remote.BrowserWindow;
@@ -68,6 +78,7 @@ export function getComponents() {
   return {
     Main,
     Settings,
+    FFZSettings,
     SceneTransitions,
     SourcesShowcase,
     RenameSource,
@@ -87,6 +98,7 @@ export function getComponents() {
     Projector,
     RecentEvents,
     MediaGallery,
+    PlatformAppPopOut,
 
     BitGoal,
     DonationGoal,
@@ -99,6 +111,8 @@ export function getComponents() {
     TipJar,
     SponsorBanner,
     StreamBoss,
+    SubGoal,
+    MediaShare,
 
     ChatbotCustomCommandWindow,
     ChatbotDefaultCommandWindow,
@@ -110,6 +124,9 @@ export function getComponents() {
     ChatbotWordProtectionWindow,
     ChatbotQuoteWindow,
     ChatbotQuotePreferencesWindow,
+    ChatbotQueuePreferencesWindow,
+    ChatbotSongRequestPreferencesWindow,
+    ChatbotSongRequestOnboardingWindow,
   };
 }
 
@@ -128,6 +145,7 @@ export interface IWindowOptions {
   isPreserved?: boolean;
   preservePrevWindow?: boolean;
   prevWindowOptions? : IWindowOptions;
+  isFullScreen?: boolean;
 }
 
 interface IWindowsState {
@@ -166,6 +184,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   components = getComponents();
 
   windowUpdated = new Subject<{windowId: string, options: IWindowOptions}>();
+  windowDestroyed = new Subject<string>();
   private windows: Dictionary<Electron.BrowserWindow> = {};
 
 
@@ -255,6 +274,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
 
     newWindow.setMenu(null);
     newWindow.on('closed', () => {
+      this.windowDestroyed.next(windowId);
       delete this.windows[windowId];
       this.DELETE_ONE_OFF_WINDOW(windowId);
     });
@@ -269,6 +289,10 @@ export class WindowsService extends StatefulService<IWindowsState> {
     return windowId;
   }
 
+  setOneOffFullscreen(windowId: string, fullscreen: boolean) {
+    this.UPDATE_ONE_OFF_WINDOW(windowId, { isFullScreen: fullscreen });
+  }
+
   /**
    * Closes all one-off windows
    */
@@ -276,12 +300,16 @@ export class WindowsService extends StatefulService<IWindowsState> {
     Object.keys(this.windows).forEach(windowId => {
       if (windowId === 'main') return;
       if (windowId === 'child') return;
-      if (this.windows[windowId]) {
-        if (!this.windows[windowId].isDestroyed()) {
-          this.windows[windowId].destroy();
-        }
-      }
+      this.closeOneOffWindow(windowId);
     });
+  }
+
+  closeOneOffWindow(windowId: string) {
+    if (this.windows[windowId]) {
+      if (!this.windows[windowId].isDestroyed()) {
+        this.windows[windowId].destroy();
+      }
+    }
   }
 
 
@@ -291,7 +319,7 @@ export class WindowsService extends StatefulService<IWindowsState> {
   }
 
   // @ExecuteInCurrentWindow()
-  getChildWindowQueryParams(): Dictionary<string> {
+  getChildWindowQueryParams(): Dictionary<any> {
     return this.getChildWindowOptions().queryParams || {};
   }
 
@@ -349,6 +377,12 @@ export class WindowsService extends StatefulService<IWindowsState> {
     };
 
     Vue.set(this.state, windowId, opts);
+  }
+
+  @mutation()
+  private UPDATE_ONE_OFF_WINDOW(windowId: string, options: Partial<IWindowOptions>) {
+    const oldOpts = this.state[windowId];
+    Vue.set(this.state, windowId, { ...oldOpts, ...options })
   }
 
   @mutation()

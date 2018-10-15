@@ -1,13 +1,10 @@
 <template>
-<modal-layout
-  :title="windowTitle"
-  v-if="widget.previewSourceId"
->
+<modal-layout v-if="widget.previewSourceId">
   <div class="container" slot="content">
     <div class="top-settings" v-if="properties">
       <generic-form v-model="topProperties" @input="onPropsInputHandler"/>
       <div v-if="apiSettings.testers" class="button button--action test-button">
-        <test-widgets />
+        <test-widgets :testers="apiSettings.testers" />
       </div>
     </div>
 
@@ -16,7 +13,7 @@
         <tabs
           :hideContent="true"
           className="widget-editor__top-tabs"
-          :tabs="[{ value: 'editor', name: $t('Widget Editor') }, { value: 'code', name: $t('HTML CSS') }]"
+          :tabs="topTabs"
           @input="value => updateTopTab(value)"
           :value="currentTopTab"
         />
@@ -28,12 +25,14 @@
         <div class="custom-code__alert" :class="{ active: customCodeIsEnabled }" />
       </div>
 
-      <div class="content-container" ref="content">
-        <display class="display" :sourceId="widget.previewSourceId" @click="createProjector"/>
-        <div class="sidebar" ref="sidebar">
+      <div class="content-container" :class="{ vertical: currentTopTab === 'code' }">
+        <div class="display">
+          <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
+        </div>
+        <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>
-            <div class="subsection__content"><slot :name="slot.value" /></div>
+            <div class="subsection__content custom"><slot :name="slot.value" /></div>
           </div>
           <div class="subsection">
             <span class="subsection__title">{{ $t('Sources and Settings') }}</span>
@@ -52,7 +51,8 @@
             <div class="subsection__content" v-if="currentSetting !== 'source'">
               <slot :name="`${currentSetting}-properties`" v-if="!loadingFailed"/>
               <div v-else>
-                {{ $t('Failed to load settings') }}
+                <div>{{ $t('Failed to load settings') }}</div>
+                <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
               </div>
             </div>
             <div class="subsection__content" v-if="currentSetting === 'source'">
@@ -61,8 +61,8 @@
           </div>
         </div>
 
-        <div class="code-editor hidden" ref="code" v-if="loaded">
-          <div v-if="customCodeIsEnabled">
+        <div class="code-editor" v-if="loaded">
+          <div v-if="customCodeIsEnabled && !loadingFailed">
             <tabs
               :hideConent="true"
               className="widget-editor__top-tabs"
@@ -94,6 +94,10 @@
               :value="wData"
             />
           </div>
+          <div v-else-if="loadingFailed" style="padding: 8px;">
+            <div>{{ $t('Failed to load settings') }}</div>
+            <button class="button button--warn retry-button" @click="retryDataFetch()">{{ $t('Retry') }}</button>
+          </div>
         </div>
 
       </div>
@@ -124,7 +128,7 @@
   .night-theme {
     .widget-editor__top-tabs {
       background-color: @night-section !important;
-      border-bottom: 1px solid @night-editor-border !important;
+      border-bottom: 1px solid @night-slider-bg !important;
     }
   }
 
@@ -167,7 +171,7 @@
   }
 
   .window-container {
-    border: 1px solid @day-editor-border;
+    border: 1px solid @day-border;
   }
 
   .top-settings {
@@ -209,33 +213,54 @@
     display: flex;
     width: 100%;
     height: calc(~"100% - 36px");
+    position: relative;
+    background-color: @day-section;
+    overflow: hidden;
+
+    .code-editor {
+      transform: translate(0, 100%);
+    }
+    .display {
+      transform: scale(0.82, .8) translate(-10%);
+    }
   }
 
   .content-container.vertical {
-    flex-direction: column;
+    .sidebar {
+      transform: translate(100%);
+      transition-delay: 0ms;
+    }
+    .code-editor {
+      transform: translate(0, 0);
+      transition-delay: 300ms;
+    }
+    .display {
+      transform: scale(1, 0.63) translate(0, -29%);
+    }
   }
 
   .display {
     width: 100%;
     height: 100%;
-    flex-shrink: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: @day-section;
   }
 
   .sidebar {
-    width: 35%;
+    width: 30%;
     height: 100%;
     font-size: 12px;
+    position: absolute;
+    right: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid @day-editor-border;
+    border-left: 1px solid @day-border;
     background-color: @day-section;
     .transition();
-  }
-
-  .sidebar.hidden {
-    width: 0;
-    height: 0;
+    transition-delay: 300ms;
   }
 
   .subsection {
@@ -251,7 +276,7 @@
   }
 
   .subsection:not(:first-of-type) .subsection__title {
-    border-top: 1px solid @day-editor-border;
+    border-top: 1px solid @day-border;
   }
 
   .subsection__title {
@@ -259,14 +284,21 @@
     width: 100%;
     padding: 8px;
     text-transform: uppercase;
-    background-color: @day-editor-accent;
-    border-bottom: 1px solid @day-editor-border;
+    background-color: @light-2;
+    border-bottom: 1px solid @day-border;
+    white-space: nowrap;
   }
 
   .subsection__content {
     padding: 8px;
     overflow: hidden;
     overflow-y: auto;
+    width: 100%;
+    min-width: 260px;
+  }
+
+  .subsection__content.custom {
+    overflow: visible;
   }
 
   .source-property {
@@ -289,15 +321,11 @@
   .code-editor {
     height: 60%;
     width: 100%;
-    border-top: 1px solid @day-editor-border;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid @day-border;
     background-color: @day-section;
     .transition();
-  }
-
-  .code-editor.hidden {
-    height: 0;
-    width: 0;
-    visibility: collapse;
   }
 
   .custom-code {
@@ -310,6 +338,7 @@
     align-items: center;
     height: 24px;
     .transition();
+    transition-delay: 600ms;
 
     span {
       padding-left: 8px;
@@ -321,21 +350,24 @@
     opacity: 0;
     border-left: none;
     transition: none;
+    transition-delay: 0ms;
   }
 
   .custom-code__divider {
     position: absolute;
     left: 100px;
-    border-right: 1px solid @day-editor-border;
+    border-right: 1px solid @day-border;
     width: 100px;
     margin: 8px;
     height: 24px;
     top: 0;
-    background-color: @day-section;
+    background-color: @white;
+    transition-delay: 600ms;
   }
 
   .custom-code__divider.hidden {
     border-right: none;
+    transition-delay: 0ms;
   }
 
   .custom-code__alert {
@@ -353,34 +385,41 @@
     background-color: @teal;
   }
 
+  .retry-button {
+    margin-top: 16px;
+  }
+
   .night-theme {
     .window-container {
       border-color: @night-slider-bg;
     }
+    .display, .content-container {
+      background-color: @night-section-bg;
+    }
     .custom-code__divider {
       background-color: @night-section;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .sidebar {
       background-color: @night-section;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .subsection:not(:first-of-type) .subsection__title {
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .subsection__title {
       background-color: @night-accent-dark;
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
     }
     .settings-title {
       border-color: @night-accent-dark;
       &:hover,
       &.active {
-        background-color: @night-editor-accent;
+        background-color: @night-primary;
       }
     }
     .code-editor {
-      border-color: @night-editor-border;
+      border-color: @night-slider-bg;
       background-color: @night-section-bg;
     }
     .custom-code__alert {

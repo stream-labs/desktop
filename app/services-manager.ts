@@ -15,7 +15,6 @@ import { Hotkey, HotkeysService } from './services/hotkeys';
 import { KeyListenerService } from './services/key-listener';
 import { NavigationService } from './services/navigation';
 import { NotificationsService } from './services/notifications';
-import { ObsApiService } from './services/obs-api';
 import { OnboardingService } from './services/onboarding';
 import { PerformanceService } from './services/performance';
 import { PerformanceMonitorService } from './services/performance-monitor';
@@ -40,6 +39,8 @@ import { UsageStatisticsService } from './services/usage-statistics';
 import { StreamInfoService } from './services/stream-info';
 import { StreamingService } from './services/streaming';
 import { StreamlabelsService } from './services/streamlabels';
+import { PlatformAppsService } from 'services/platform-apps';
+import { PlatformAppStoreService } from 'services/platform-app-store';
 import Utils from './services/utils';
 import { commitMutation } from './store';
 import traverse from 'traverse';
@@ -57,6 +58,7 @@ import { SelectionService, Selection } from 'services/selection';
 import { OverlaysPersistenceService } from 'services/scene-collections/overlays';
 import { SceneCollectionsStateService } from 'services/scene-collections/state';
 import { ChatbotApiService, ChatbotCommonService } from 'services/chatbot';
+import { IncrementalRolloutService } from 'services/incremental-rollout';
 import {
   IJsonRpcResponse,
   IJsonRpcEvent,
@@ -78,6 +80,7 @@ import { MediaBackupService } from 'services/media-backup';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { MediaGalleryService } from 'services/media-gallery';
 import { AnnouncementsService } from 'services/announcements';
+import { BrandDeviceService } from 'services/auto-config/brand-device';
 
 import { BitGoalService } from 'services/widgets/settings/bit-goal';
 import { ChatBoxService } from 'services/widgets/settings/chat-box';
@@ -90,6 +93,9 @@ import { CreditsService } from 'services/widgets/settings/credits';
 import { EventListService } from 'services/widgets/settings/event-list';
 import { TipJarService } from 'services/widgets/settings/tip-jar';
 import { SponsorBannerService } from 'services/widgets/settings/sponsor-banner';
+import { SubGoalService } from 'services/widgets/settings/sub-goal';
+import { MediaShareService } from 'services/widgets/settings/media-share';
+import { ChatbotWidgetService } from 'services/widgets/settings/chatbot';
 
 const { ipcRenderer } = electron;
 
@@ -119,7 +125,6 @@ export class ServicesManager extends Service {
     KeyListenerService,
     NavigationService,
     NotificationsService,
-    ObsApiService,
     OnboardingService,
     PerformanceService,
     PerformanceMonitorService,
@@ -146,6 +151,8 @@ export class ServicesManager extends Service {
     TcpServerService,
     StreamInfoService,
     StreamlabelsService,
+    PlatformAppsService,
+    PlatformAppStoreService,
     GuestApiService,
     VideoEncodingOptimizationService,
     CrashReporterService,
@@ -181,8 +188,13 @@ export class ServicesManager extends Service {
     EventListService,
     TipJarService,
     SponsorBannerService,
+    SubGoalService,
     MediaGalleryService,
-    AnnouncementsService
+    IncrementalRolloutService,
+    AnnouncementsService,
+    MediaShareService,
+    ChatbotWidgetService,
+    BrandDeviceService
   };
 
   private instances: Dictionary<Service> = {};

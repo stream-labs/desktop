@@ -56,7 +56,7 @@
 
 .slider {
   background: transparent;
-  padding: 8px 0 !important;
+  padding: 8px;
   margin: 0;
   flex-grow: 1;
   height: auto;

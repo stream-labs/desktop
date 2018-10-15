@@ -13,17 +13,20 @@ import { DefaultManager } from './properties-managers/default-manager';
 import { WidgetManager } from './properties-managers/widget-manager';
 import { ScenesService, ISceneItem } from 'services/scenes';
 import { StreamlabelsManager } from './properties-managers/streamlabels-manager';
-import { CustomizationService } from 'services/customization';
+import { PlatformAppManager } from './properties-managers/platform-app-manager';
 import { UserService } from 'services/user';
 import {
   IActivePropertyManager, ISource, ISourceCreateOptions, ISourcesServiceApi, ISourcesState,
   TSourceType,
   Source,
-  TPropertiesManager
+  TPropertiesManager,
+  ISourceAddOptions
 } from './index';
 import uuid from 'uuid/v4';
 import { $t } from 'services/i18n';
 import { SourceDisplayData } from './sources-data';
+import { NavigationService } from 'services/navigation';
+import { PlatformAppsService } from 'services/platform-apps';
 
 
 const SOURCES_UPDATE_INTERVAL = 1000;
@@ -38,13 +41,15 @@ const DoNotDuplicateFlag = obs.ESourceOutputFlags.DoNotDuplicate;
 export const PROPERTIES_MANAGER_TYPES = {
   default: DefaultManager,
   widget: WidgetManager,
-  streamlabels: StreamlabelsManager
+  streamlabels: StreamlabelsManager,
+  platformApp: PlatformAppManager
 };
 
 export class SourcesService extends StatefulService<ISourcesState> implements ISourcesServiceApi {
 
   static initialState = {
-    sources: {}
+    sources: {},
+    temporarySources: {} // don't save temporarySources in the config file
   } as ISourcesState;
 
   sourceAdded = new Subject<ISource>();
@@ -55,7 +60,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   @Inject() private windowsService: WindowsService;
   @Inject() private widgetsService: WidgetsService;
   @Inject() private userService: UserService;
-  @Inject() private customizationService: CustomizationService;
+  @Inject() private navigationService: NavigationService;
+  @Inject() private platformAppsService: PlatformAppsService;
 
   /**
    * Maps a source id to a property manager
@@ -65,21 +71,6 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   protected init() {
     setInterval(() => this.requestSourceSizes(), SOURCES_UPDATE_INTERVAL);
-
-    ipcRenderer.on('notifySourceAttributes', (e: Electron.Event, data: obs.ISourceSize[]) => {
-      data.forEach(update => {
-        const source = this.getSource(update.name);
-
-        if (!source) return;
-
-        if ((source.width !== update.width) || (source.height !== update.height)) {
-          const size = { id: source.sourceId, width: update.width,
-            height: update.height };
-          this.UPDATE_SOURCE(size);
-        }
-        this.updateSourceFlags(source, update.outputFlags);
-      });
-    });
 
     this.scenesService.itemRemoved.subscribe(
       (sceneSourceModel) => this.onSceneItemRemovedHandler(sceneSourceModel)
@@ -96,7 +87,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
   @mutation()
-  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number) {
+  private ADD_SOURCE(id: string, name: string, type: TSourceType, channel?: number, isTemporary?: boolean) {
     const sourceModel: ISource = {
       sourceId: id,
       name,
@@ -118,7 +109,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       channel
     };
 
-    Vue.set(this.state.sources, id, sourceModel);
+    if (isTemporary) {
+      Vue.set(this.state.temporarySources, id, sourceModel);
+    } else {
+      Vue.set(this.state.sources, id, sourceModel);
+    }
   }
 
   @mutation()
@@ -163,7 +158,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
     }
     const id = obsInput.name;
     const type: TSourceType = obsInput.id as TSourceType;
-    this.ADD_SOURCE(id, name, type, options.channel);
+    this.ADD_SOURCE(id, name, type, options.channel, options.isTemporary);
     const source = this.getSource(id);
     const muted = obsInput.muted;
     this.UPDATE_SOURCE({ id, muted });
@@ -183,6 +178,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   removeSource(id: string) {
     const source = this.getSource(id);
 
+    if (!source) throw  new Error(`Source ${id} not found`);
+
     /* When we release sources, we need to make
      * sure we reset the channel it's set to,
      * otherwise OBS thinks it's still attached
@@ -191,13 +188,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       obs.Global.setOutputSource(source.channel, null);
     }
 
-    if (!source) throw  new Error(`Source ${id} not found`);
-
-    source.getObsInput().release();
     this.REMOVE_SOURCE(id);
     this.propertiesManagers[id].manager.destroy();
     delete this.propertiesManagers[id];
     this.sourceRemoved.next(source.sourceState);
+    source.getObsInput().release();
   }
 
   addFile(path: string): Source {
@@ -271,7 +266,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       { description: 'Blackmagic Device', value: 'decklink-input' },
       { description: 'NDI Source', value: 'ndi_source' },
       { description: 'OpenVR Capture', value: 'openvr_capture' },
-      { description: 'LIV Client Capture', value: 'liv_capture' }
+      { description: 'LIV Client Capture', value: 'liv_capture' },
+      { description: 'OvrStream', value: 'ovrstream_dc_source' }
     ];
 
     const availableWhitelistedType = whitelistedTypes.filter(type => obsAvailableTypes.includes(type.value));
@@ -316,7 +312,20 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       activeItems.forEach(activeItem => {
         sourcesNames.push(activeItem.sourceId);
       });
-      ipcRenderer.send('requestSourceAttributes', sourcesNames);
+
+      const sizes: obs.ISourceSize[] = obs.getSourcesSize(sourcesNames);
+      sizes.forEach(update => {
+        const source = this.getSource(update.name);
+
+        if (!source) return;
+
+        if ((source.width !== update.width) || (source.height !== update.height)) {
+          const size = { id: source.sourceId, width: update.width,
+            height: update.height };
+          this.UPDATE_SOURCE(size);
+        }
+        this.updateSourceFlags(source, update.outputFlags);
+      });      
     }
   }
 
@@ -367,7 +376,7 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
 
   getSource(id: string): Source {
-    return this.state.sources[id] ? new Source(id) : void 0;
+    return this.state.sources[id] || this.state.temporarySources[id] ? new Source(id) : void 0;
   }
 
 
@@ -378,7 +387,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
 
   showSourceProperties(sourceId: string) {
     const source = this.getSource(sourceId);
-    const isWidget = source.getPropertiesManagerType() === 'widget';
+    const propertiesManagerType = source.getPropertiesManagerType();
+    const isWidget = propertiesManagerType === 'widget';
 
     // show a custom component for widgets below
     const widgetsWhitelist = [
@@ -392,6 +402,8 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
       WidgetType.EventList,
       WidgetType.StreamBoss,
       WidgetType.TipJar,
+      WidgetType.SubGoal,
+      WidgetType.MediaShare,
       WidgetType.SponsorBanner
     ];
 
@@ -413,7 +425,30 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
         return;
       }
     }
-    console.log(sourceId);
+
+    // Figure out if we should redirect to settings
+    if (propertiesManagerType === 'platformApp') {
+      const settings = source.getPropertiesManagerSettings();
+      const app = this.platformAppsService.getApp(settings.appId);
+
+      if (app) {
+        const page = app.manifest.sources.find(appSource => {
+          return appSource.id === settings.appSourceId;
+        });
+
+        if (page && page.redirectPropertiesToTopNavSlot) {
+          this.navigationService.navigate('PlatformAppContainer', {
+            appId: app.id,
+            sourceId: source.sourceId
+          });
+
+          // If we navigated, we don't want to open source properties,
+          // and should close any open child windows instead
+          this.windowsService.closeChildWindow();
+          return;
+        }
+      }
+    }
 
     this.windowsService.showWindow({
       componentName: 'SourceProperties',
@@ -439,11 +474,11 @@ export class SourcesService extends StatefulService<ISourcesState> implements IS
   }
 
 
-  showAddSource(sourceType: TSourceType, propertiesManager?: TPropertiesManager, widgetType?: WidgetType) {
+  showAddSource(sourceType: TSourceType, sourceAddOptions?: ISourceAddOptions) {
     this.windowsService.showWindow({
       componentName: 'AddSource',
       title: $t('Add Source'),
-      queryParams: { sourceType, propertiesManager, widgetType },
+      queryParams: { sourceType, sourceAddOptions },
       size: {
         width: 600,
         height: 540

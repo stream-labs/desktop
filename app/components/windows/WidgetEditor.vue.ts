@@ -63,6 +63,7 @@ export default class WidgetEditor extends Vue {
   currentCodeTab = 'HTML';
   currentSetting = this.navItems[0].value;
   readonly settingsState = this.widget.getSettingsService().state;
+  animating = false;
 
   get loaded() {
     return !!this.settingsState.data;
@@ -101,7 +102,6 @@ export default class WidgetEditor extends Vue {
   get windowTitle() {
     const source = this.widget.getSource();
     return $t('Settings for ') + source.name;
-
   }
 
   get sourceProperties() {
@@ -116,6 +116,11 @@ export default class WidgetEditor extends Vue {
     this.projectorService.createProjector(this.widget.previewSourceId);
   }
 
+  retryDataFetch() {
+    const service = this.widget.getSettingsService()
+    service.fetchData();
+  }
+
   onPropsInputHandler(properties: TObsFormData, changedIndex: number) {
     const source = this.widget.getSource();
     source.setPropertiesFormData(
@@ -124,22 +129,17 @@ export default class WidgetEditor extends Vue {
     this.properties = this.widget.getSource().getPropertiesFormData();
   }
 
+  get topTabs() {
+    const firstTab = [{ value: 'editor', name: $t('Widget Editor') }];
+    return this.apiSettings.customCodeAllowed ? firstTab.concat([{ value: 'code', name: $t('HTML CSS') }]) : firstTab;
+  }
+
   updateTopTab(value: string) {
-    // We do animations in JS here because flex-direction is not an animate-able attribute
-    if (value === 'code') {
-      this.$refs.sidebar.classList.toggle('hidden');
-      setTimeout( () => {
-        this.$refs.content.classList.toggle('vertical');
-        this.$refs.code.classList.toggle('hidden');
-      }, 300);
-    } else if (this.$refs.content.classList.contains('vertical')) {
-      this.$refs.code.classList.toggle('hidden');
-      setTimeout( () => {
-        this.$refs.content.classList.toggle('vertical');
-        this.$refs.sidebar.classList.toggle('hidden');
-      }, 300);
-    }
+    if (value === this.currentTopTab) return;
+    this.animating = true;
     this.currentTopTab = value;
+    // Animation takes 600ms to complete before we can re-render the OBS display
+    setTimeout(() => this.animating = false, 600);
   }
 
   updateCodeTab(value: string) {

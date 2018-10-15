@@ -20,9 +20,11 @@ import { FileManagerService } from 'services/file-manager';
 import { PatchNotesService } from 'services/patch-notes';
 import { ProtocolLinksService } from 'services/protocol-links';
 import { WindowsService } from 'services/windows';
+import * as obs from '../../../obs-api';
 import { FacemasksService } from 'services/facemasks';
 import { OutageNotificationsService } from 'services/outage-notifications';
 import { CrashReporterService } from 'services/crash-reporter';
+import { PlatformAppsService } from 'services/platform-apps';
 import { AnnouncementsService } from 'services/announcements';
 
 interface IAppState {
@@ -45,6 +47,7 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() windowsService: WindowsService;
   @Inject() facemasksService: FacemasksService;
   @Inject() outageNotificationsService: OutageNotificationsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   static initialState: IAppState = {
     loading: true,
@@ -67,48 +70,56 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private announcementsService: AnnouncementsService;
 
   @track('app_start')
-  load() {
+  async load() {
     this.START_LOADING();
+
+    // Initialize OBS
+    obs.NodeObs.OBS_API_initAPI('en-US', electron.remote.process.env.SLOBS_IPC_USERDATA);
 
     // We want to start this as early as possible so that any
     // exceptions raised while loading the configuration are
     // associated with the user in sentry.
-    this.userService;
+    await this.userService.initialize();
 
     // Second, we want to start the crash reporter service.  We do this
     // after the user service because we want crashes to be associated
     // with a particular user if possible.
     this.crashReporterService.beginStartup();
 
-    this.sceneCollectionsService.initialize().then(() => {
-      const onboarded = this.onboardingService.startOnboardingIfRequired();
+    // Initialize any apps before loading the scene collection.  This allows
+    // the apps to already be in place when their sources are created.
+    await this.platformAppsService.initialize();
 
-      electron.ipcRenderer.on('shutdown', () => {
-        electron.ipcRenderer.send('acknowledgeShutdown');
-        this.shutdownHandler();
-      });
+    await this.sceneCollectionsService.initialize()
 
-      this.facemasksService;
+    const onboarded = this.onboardingService.startOnboardingIfRequired();
 
-      this.shortcutsService;
-      this.streamlabelsService;
-
-      // Pre-fetch stream info
-      this.streamInfoService;
-
-      this.performanceMonitorService.start();
-
-      this.ipcServerService.listen();
-      this.tcpServerService.listen();
-
-      this.patchNotesService.showPatchNotesIfRequired(onboarded);
-      this.announcementsService.updateBanner();
-      this.outageNotificationsService;
-
-      this.crashReporterService.endStartup();
-
-      this.FINISH_LOADING();
+    electron.ipcRenderer.on('shutdown', () => {
+      electron.ipcRenderer.send('acknowledgeShutdown');
+      this.shutdownHandler();
     });
+
+    this.facemasksService;
+
+    this.shortcutsService;
+    this.streamlabelsService;
+
+    // Pre-fetch stream info
+    this.streamInfoService;
+
+    this.performanceMonitorService.start();
+
+    this.ipcServerService.listen();
+    this.tcpServerService.listen();
+
+    this.patchNotesService.showPatchNotesIfRequired(onboarded);
+    this.announcementsService.updateBanner();
+    this.outageNotificationsService;
+
+    this.crashReporterService.endStartup();
+
+    this.FINISH_LOADING();
+    this.protocolLinksService.start(this.state.argv);
   }
 
   @track('app_close')
@@ -127,6 +138,8 @@ export class AppService extends StatefulService<IAppState> {
       this.windowsService.closeAllOneOffs();
       await this.fileManagerService.flushAll();
       this.crashReporterService.endShutdown();
+      obs.NodeObs.OBS_service_removeCallback();
+      obs.NodeObs.OBS_API_destroyOBS_API();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }
@@ -147,5 +160,10 @@ export class AppService extends StatefulService<IAppState> {
   @mutation()
   private FINISH_LOADING() {
     this.state.loading = false;
+  }
+
+  @mutation()
+  private SET_ARGV(argv: string[]) {
+    this.state.argv = argv;
   }
 }

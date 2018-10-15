@@ -5,15 +5,18 @@ import { UserService } from 'services/user';
 import { Inject } from 'util/injector';
 import { getPlatformService } from 'services/platforms';
 import { CustomizationService } from 'services/customization';
+import { $t } from 'services/i18n';
 import url from 'url';
 import electron from 'electron';
 import { ICustomizationSettings } from 'services/customization/customization-api';
 import { YoutubeService } from 'services/platforms/youtube';
+import { WindowsService } from 'services/windows';
 
 @Component({})
 export default class Chat extends Vue {
   @Inject() userService: UserService;
   @Inject() customizationService: CustomizationService;
+  @Inject() windowsService: WindowsService;
 
   chatUrl: string = '';
 
@@ -44,10 +47,28 @@ export default class Chat extends Vue {
 
 
     webview.addEventListener('new-window', e => {
-      const protocol = url.parse(e.url).protocol;
+      const parsedUrl = url.parse(e.url);
+      const protocol = parsedUrl.protocol;
 
       if (protocol === 'http:' || protocol === 'https:') {
-        electron.remote.shell.openExternal(e.url);
+        if (
+          parsedUrl.host &&
+          parsedUrl.query &&
+          (parsedUrl.host === 'twitch.tv' || parsedUrl.host.endsWith('.twitch.tv')) &&
+          parsedUrl.query.includes('ffz-settings')
+        ) {
+          this.windowsService.createOneOffWindow({
+            componentName: 'FFZSettings',
+            title: $t('FrankerFaceZ Settings'),
+            queryParams: {},
+            size: {
+              width: 800,
+              height: 800
+            }
+          }, 'ffz-settings');
+        } else {
+          electron.remote.shell.openExternal(e.url);
+        }
       }
     });
 

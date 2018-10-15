@@ -8,13 +8,16 @@ import { SourcesService, TSourceType, TPropertiesManager, SourceDisplayData } fr
 import { ScenesService } from 'services/scenes';
 import { UserService } from 'services/user';
 import { WidgetsService, WidgetType, WidgetDisplayData } from 'services/widgets';
+import { PlatformAppsService, IAppSource } from 'services/platform-apps'
+import { omit } from 'lodash';
 
-
-type TInspectableSource = TSourceType | WidgetType | 'streamlabel';
+type TInspectableSource = TSourceType | WidgetType | 'streamlabel' | 'app_source';
 
 interface ISelectSourceOptions {
   propertiesManager?: TPropertiesManager;
   widgetType?: WidgetType;
+  appId?: string;
+  appSourceId?: string;
 }
 
 @Component({
@@ -29,6 +32,7 @@ export default class SourcesShowcase extends Vue {
   @Inject() widgetsService: WidgetsService;
   @Inject() scenesService: ScenesService;
   @Inject() windowsService: WindowsService;
+  @Inject() platformAppsService: PlatformAppsService;
 
   widgetTypes = WidgetType;
   essentialWidgetTypes = new Set([this.widgetTypes.AlertBox]);
@@ -42,7 +46,13 @@ export default class SourcesShowcase extends Vue {
 
   selectSource(sourceType: TSourceType, options: ISelectSourceOptions = {}) {
     const managerType = options.propertiesManager || 'default';
-    this.sourcesService.showAddSource(sourceType, managerType, options.widgetType);
+    const propertiesManagerSettings: Dictionary<any> =
+      { ...omit(options, 'propertiesManager') };
+
+    this.sourcesService.showAddSource(sourceType, {
+      propertiesManager: managerType,
+      propertiesManagerSettings
+    });
   }
 
   getSrc(type: string, theme: string) {
@@ -57,8 +67,13 @@ export default class SourcesShowcase extends Vue {
     });
   }
 
-  widgetData(type: string) {
-    return WidgetDisplayData()[this.widgetTypes[type]];
+  selectAppSource(appId: string, appSourceId: string) {
+    // TODO: Could be other source type
+    this.selectSource('browser_source', {
+      propertiesManager: 'platformApp',
+      appId,
+      appSourceId
+    });
   }
 
   sourceData(type: string) {
@@ -66,9 +81,13 @@ export default class SourcesShowcase extends Vue {
   }
 
   inspectedSource: TInspectableSource = null;
+  inspectedAppId: string = '';
+  inspectedAppSourceId: string = '';
 
-  inspectSource(inspectedSource: TInspectableSource) {
+  inspectSource(inspectedSource: TInspectableSource, appId?: string, appSourceId?: string) {
     this.inspectedSource = inspectedSource;
+    if (appId) this.inspectedAppId = appId;
+    if (appSourceId) this.inspectedAppSourceId = appSourceId;
   }
 
   get loggedIn() {
@@ -76,7 +95,12 @@ export default class SourcesShowcase extends Vue {
   }
 
   get platform() {
+    if (!this.loggedIn) return null;
     return this.userService.platform.type;
+  }
+
+  widgetData(type: string) {
+    return WidgetDisplayData(this.platform)[this.widgetTypes[type]];
   }
 
   selectInspectedSource() {
@@ -84,6 +108,8 @@ export default class SourcesShowcase extends Vue {
       this.selectSource(this.inspectedSource as TSourceType);
     } else if (this.inspectedSource === 'streamlabel') {
       this.selectSource('text_gdiplus', { propertiesManager: 'streamlabels' });
+    } else if (this.inspectedSource === 'app_source') {
+      this.selectAppSource(this.inspectedAppId, this.inspectedAppSourceId);
     } else {
       this.selectWidget(this.inspectedSource as WidgetType);
     }
@@ -95,6 +121,32 @@ export default class SourcesShowcase extends Vue {
       if (type.value === 'scene' && this.scenesService.scenes.length <= 1) return false;
       return true;
     });
+  }
+
+  get availableAppSources(): {
+    appId: string;
+    source: IAppSource;
+  }[] {
+    return this.platformAppsService.enabledApps.reduce((sources, app) => {
+      if (app.manifest.sources) {
+        app.manifest.sources.forEach(source => {
+          sources.push({
+            appId: app.id,
+            source
+          });
+        });
+      }
+
+      return sources;
+    }, []);
+  }
+
+  get showAppSources() {
+    return this.availableAppSources.length > 0;
+  }
+
+  getAppAssetUrl(appId: string, asset: string) {
+    return this.platformAppsService.getAssetUrl(appId, asset);
   }
 
 }

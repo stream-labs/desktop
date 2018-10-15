@@ -14,19 +14,6 @@ import {
   EInputType,
 } from 'components/shared/inputs/index';
 
-
-interface IDefaultCommandMetadata {
-  command: ITextMetadata;
-  response: ITextMetadata;
-  new_alias: ITextMetadata;
-  success_response: ITextMetadata;
-  failed_response: ITextMetadata;
-  enabled_response: ITextMetadata;
-  disabled_response: ITextMetadata;
-  response_type: IListMetadata<string>;
-}
-
-
 @Component({
   components: {
     ChatbotAliases,
@@ -72,13 +59,27 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
     )
   }
 
+  get isQueueJoinCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'queue' &&
+      this.defaultCommandToUpdate.commandName === 'join'
+    )
+  }
+
+  get isSongRequestCommand() {
+    return (
+      this.defaultCommandToUpdate.slugName === 'songrequest' &&
+      this.defaultCommandToUpdate.commandName === 'songrequest'
+    )
+  }
+
   get defaultCommandToUpdate() {
     return this.chatbotCommonService.state.defaultCommandToUpdate;
   }
 
   // metadata
   get metadata() {
-    let metadata: IDefaultCommandMetadata = {
+    return {
       command: metadataHelper.text({
         required: true,
         type: EInputType.text,
@@ -125,9 +126,57 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
           'The phrase that will appear after a command is disabled'
         )
       }),
+      duration_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          "The phrase that will appear when a song's duration is too long"
+        )
+      }),
+      rating_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          "The phrase that will appear when a song's rating is too low"
+        )
+      }),
+      views_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          "The phrase that will appear when a song's view count is too low"
+        )
+      }),
+      banned_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear when the user requested a banned song'
+        )
+      }),
+      music_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear when the song is not in the music category'
+        )
+      }),
+      max_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear when the user already maxed their request limit'
+        )
+      }),
+      full_response: metadataHelper.text({
+        required: true,
+        type: EInputType.textArea,
+        placeholder: $t(
+          'The phrase that will appear if your song queue is currently full'
+        )
+      }),
       response_type: this.responseTypeMetadata
     };
-    return metadata;
   }
 
   get responseTypeMetadata() {
@@ -141,10 +190,6 @@ export default class ChatbotDefaultCommandWindow extends ChatbotWindowsBase {
   // methods
   onSelectTabHandler(tab: string) {
     this.selectedTab = tab;
-  }
-
-  onCancelHandler() {
-    this.chatbotCommonService.closeChildWindow();
   }
 
   async onResetCommandHandler() {

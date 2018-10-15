@@ -10,16 +10,12 @@ import { inputComponents } from 'components/shared/inputs';
 import { AnimationInput } from './inputs';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n';
-import CodeEditor from './CodeEditor.vue';
-import TestButtons from './TestButtons.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetEditor,
     VFormGroup,
-    CodeEditor,
-    TestButtons,
     AnimationInput,
     ValidatedForm,
     ...inputComponents

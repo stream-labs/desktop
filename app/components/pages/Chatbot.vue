@@ -3,7 +3,7 @@
     <div class="chatbot__side-menu">
       <div class="flex flex--space-between chatbot__side-menu__global-toggle">
         <span>
-          {{ $t(`Chatbot ${globallyEnabled ? 'Enabled' : 'Disabled'}`) }}
+          {{ globallyEnabled ? $t('Chatbot Enabled') : $t('Chatbot Disabled') }}
         </span>
         <ToggleInput
           :value="globallyEnabled"
@@ -17,20 +17,35 @@
           :to="tab.title"
           :ico="icons[tab.title]"
           :enabled="tab.enabled"
-          class="padding--10 text-transform--capitalize chatbot__side-menu__tab"
+          class="padding--10 text-transform chatbot__side-menu__tab"
         >
-          <div>{{ $t(tab.title) }}</div>
+          <div>{{ tab.title }}</div>
           <label class="chatbot__side-menu__tab__description" v-if="!tab.enabled" for="coming soon">Coming Soon</label>
+
+          <NavMenu v-if="tab.children && tab.children.length" slot="children">
+            <NavItem
+              v-for="child in tab.children"
+              :key="child.title"
+              :to="child.title"
+            >
+              <div>{{ child.title }}</div>
+            </NavItem>
+          </NavMenu>
+
         </NavItem>
       </NavMenu>
     </div>
     <div v-if="authenticated" class="small-10 overflow--auto chatbot__content">
+      <ChatbotBanner />
       <transition name="fade" mode="out-in" appear>
         <ChatbotModules v-if="selectedTab === 'Modules'"/>
-        <ChatbotCommands v-if="selectedTab === 'Commands'"/>
+        <ChatbotCustomCommands v-if="selectedTab === 'Custom Commands'"/>
+        <ChatbotDefaultCommands v-if="selectedTab === 'Default Commands'"/>
+        <ChatbotCommandVariables v-if="selectedTab === 'Variables'"/>
         <ChatbotTimers v-if="selectedTab === 'Timers'"/>
         <ChatbotModTools v-if="selectedTab === 'Mod Tools'"/>
         <ChatbotQuotes v-if="selectedTab === 'Quotes'"/>
+        <ChatbotQueue v-if="selectedTab === 'Queue'"/>
       </transition>
     </div>
   </div>
@@ -43,10 +58,10 @@
 
 
 .chatbot__content {
-  width: calc(~"100% - 250px");
+  width: calc(~"100% - 200px");
 }
 .chatbot__side-menu {
-  width: 250px;
+  width: 200px;
   background: @day-secondary;
   border-right: 1px solid @day-border;
 
@@ -57,10 +72,11 @@
   }
   .side-menu {
     margin-top: 0;
+    padding-right: 5px !important;
   }
 
   .chatbot__side-menu__tab {
-    padding: 5px 40px;
+    padding: 5px 0 5px 40px;
 
     .chatbot__side-menu__tab__description {
       font-size: 12px;

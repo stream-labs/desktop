@@ -20,13 +20,17 @@ export default class Dashboard extends Vue {
   };
 
   mounted() {
-    this.guestApiService.exposeApi(this.$refs.dashboard, {
-      testAudio: this.testAudio,
-      getStatus: this.getStatus,
-      getDevices: this.getDevices,
-      enableMask: this.enableMask,
-      updateSettings: this.updateSettings,
+    this.$refs.dashboard.addEventListener('dom-ready', () => {
+      this.guestApiService.exposeApi(this.$refs.dashboard.getWebContents().id, {
+        testAudio: this.testAudio,
+        getStatus: this.getStatus,
+        getDevices: this.getDevices,
+        enableMask: this.enableMask,
+        updateSettings: this.updateSettings,
+        getDownloadProgress: this.getDownloadProgress
+      });
     });
+
     this.i18nService.setWebviewLocale(this.$refs.dashboard);
     this.$refs.dashboard.addEventListener('new-window', e => {
       electron.remote.shell.openExternal(e.url);
@@ -57,8 +61,12 @@ export default class Dashboard extends Vue {
     return this.facemasksService.enableMask(uuid);
   }
 
-  async updateSettings(settings: any) {
-    return this.facemasksService.updateSettings(settings);
+  async updateSettings() {
+    return this.facemasksService.startup();
+  }
+
+  async getDownloadProgress() {
+    return this.facemasksService.getDownloadProgress();
   }
 
   async testAudio(volume: number) {

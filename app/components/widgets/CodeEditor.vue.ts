@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import { cloneDeep } from 'lodash';
 import { Component, Prop } from 'vue-property-decorator';
-import { codemirror } from 'vue-codemirror';
 import { CodeInput, BoolInput } from 'components/shared/inputs/inputs';
 import { IWidgetData, WidgetSettingsService } from 'services/widgets';
 import { Inject } from '../../util/injector';
 import { WidgetsService } from 'services/widgets';
 import { $t } from 'services/i18n/index';
 import { IInputMetadata } from 'components/shared/inputs';
+import { debounce } from 'lodash-decorators';
 
 
 @Component({
@@ -51,6 +51,7 @@ export default class CodeEditor extends Vue {
     return !!this.value.custom_defaults;
   }
 
+  @debounce(2000)
   async save() {
     if (!this.canSave) return;
     this.isLoading = true;
@@ -70,18 +71,10 @@ export default class CodeEditor extends Vue {
     this.isLoading = false;
   }
 
-  discardChanges() {
-    const type = this.metadata.type;
-    const newData = cloneDeep(this.value);
-    newData.settings['custom_' + type] = this.initialInputValue;
-    this.editorInputValue = newData.settings['custom_' + this.metadata.type];
-  }
-
   restoreDefaults() {
     if (!this.hasDefaults) return;
     const type = this.metadata.type;
     const newData = cloneDeep(this.value);
     newData.settings['custom_' + type] = this.value.custom_defaults[type];
   }
-
 }

@@ -1,9 +1,8 @@
 <template>
-  <span class="number-input slobs-input" :data-name="options.name">
+  <span class="number-input">
     <input
-        type="text"
-        ref="input"
-        :placeholder="metadata.placeholder"
+        type="number"
+        :placeholder="options.placeholder"
         :value="value"
         @input="emitInput($event.target.value)"
         :name="uuid"

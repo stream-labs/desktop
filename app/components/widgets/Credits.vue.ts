@@ -9,14 +9,12 @@ import WidgetEditor from 'components/windows/WidgetEditor.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import VFormGroup from 'components/shared/inputs/VFormGroup.vue';
 import { $t } from 'services/i18n/index';
-import CodeEditor from './CodeEditor.vue';
 import ValidatedForm from 'components/shared/inputs/ValidatedForm.vue';
 
 @Component({
   components: {
     WidgetEditor,
     VFormGroup,
-    CodeEditor,
     ValidatedForm,
     ...inputComponents
   }

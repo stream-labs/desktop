@@ -8,7 +8,7 @@ import { $t } from 'services/i18n';
 
 import {
   IAlertMessage,
-  ChatbotAlertTypes,
+  ChatbotAlertType,
   NEW_ALERT_MODAL_ID
 } from 'services/chatbot';
 
@@ -20,7 +20,7 @@ import {
   }
 })
 export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
-  selectedType: ChatbotAlertTypes = 'follow';
+  selectedType: ChatbotAlertType = 'follow';
 
   get selectedTypeData() {
     return this.alertTypes[this.selectedType];
@@ -41,12 +41,13 @@ export default class ChatbotAlertsWindow extends ChatbotAlertsBase {
     return [];
   }
 
-  alertTypeFormattedName(type: ChatbotAlertTypes) {
+  alertTypeFormattedName(type: ChatbotAlertType) {
     if (type === 'tip') return 'donation';
+    if (type === 'sub_mystery_gift') return 'sub mystery gift';
     return type;
   };
 
-  isEnabled(type: ChatbotAlertTypes) {
+  isEnabled(type: ChatbotAlertType) {
     return this.alertTypes[type].enabled;
   }
 

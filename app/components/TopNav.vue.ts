@@ -10,6 +10,8 @@ import { SettingsService } from 'services/settings';
 import { WindowsService } from 'services/windows';
 import Utils from 'services/utils';
 import { TransitionsService } from 'services/transitions';
+import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { IncrementalRolloutService, EAvailableFeatures } from 'services/incremental-rollout';
 
 @Component({
   components: {
@@ -23,12 +25,19 @@ export default class TopNav extends Vue {
   @Inject() userService: UserService;
   @Inject() transitionsService: TransitionsService;
   @Inject() windowsService: WindowsService;
+  @Inject() platformAppsService: PlatformAppsService;
+  @Inject() incrementalRolloutService: IncrementalRolloutService;
 
   slideOpen = false;
 
   studioModeTooltip = 'Studio Mode';
 
-  @Prop() locked: boolean;
+  get availableFeatures() {
+    return EAvailableFeatures;
+  }
+
+  @Prop()
+  locked: boolean;
 
   navigateStudio() {
     this.navigationService.navigate('Studio');
@@ -40,6 +49,10 @@ export default class TopNav extends Vue {
 
   navigateDashboard() {
     this.navigationService.navigate('Dashboard');
+  }
+
+  navigatePlatformAppStore() {
+    this.navigationService.navigate('PlatformAppStore');
   }
 
   navigateOverlays() {
@@ -56,6 +69,10 @@ export default class TopNav extends Vue {
 
   navigateDesignSystem() {
     this.navigationService.navigate('DesignSystem');
+  }
+
+  featureIsEnabled(feature: EAvailableFeatures) {
+    return this.incrementalRolloutService.featureIsEnabled(feature);
   }
 
   studioMode() {
@@ -82,6 +99,18 @@ export default class TopNav extends Vue {
     electron.remote.shell.openExternal('https://discordapp.com/invite/stream');
   }
 
+  get topNavApps() {
+    return this.platformAppsService.enabledApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    });
+  }
+
+  navigateApp(appId: string) {
+    this.navigationService.navigate('PlatformAppContainer', { appId });
+  }
+
   get isDevMode() {
     return Utils.isDevMode();
   }
@@ -95,6 +124,10 @@ export default class TopNav extends Vue {
   }
 
   get isUserLoggedIn() {
-    return this.userService.isLoggedIn();
+    return this.userService.state.auth;
+  }
+
+  get appStoreVisible() {
+    return this.platformAppsService.state.storeVisible && this.isUserLoggedIn;
   }
 }

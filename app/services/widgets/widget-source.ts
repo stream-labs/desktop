@@ -51,7 +51,8 @@ export class WidgetSource implements IWidgetSource {
     const previewSourceSettings = {
       ...source.getSettings(),
       shutdown: false,
-      url: apiSettings.previewUrl
+      url: apiSettings.previewUrl,
+      isTemporary: true
     };
 
     const previewSource = this.sourcesService.createSource(
