@@ -290,6 +290,10 @@ export class ApiClient {
     });
   }
 
+  waitForEvent(): Promise<any> {
+
+  }
+
 
   private getResourceTypeName(resourceId: string): string {
     return resourceId.split('[')[0];

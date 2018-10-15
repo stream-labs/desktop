@@ -1,5 +1,5 @@
 <template>
-  <span class="text-input slobs-input" :data-name="options.name">
+  <span class="text-input" data-role="input" data-type="text" :data-name="options.name">
     <input
         type="text"
         :placeholder="options.placeholder"

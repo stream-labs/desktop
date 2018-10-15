@@ -71,35 +71,36 @@ useSpectron({ appArgs: '--nosync' });
 test('Stream Boss Manage Battle settings', async t => {
   const client = t.context.app.client;
   await logIn(t);
-  await blankSlate(t);
   await addSource(t, 'Stream Boss', '__Stream Boss', false);
-  //
-  // console.log('wait');
-  // await sleep(5000);
-  console.log('click');
   await client.click('li=Manage Battle');
-  console.log('clicked');
 
-  const formMonkey = new FormMonkey(t);
+  const formMonkey = new FormMonkey(t, true);
 
-  await formMonkey.fill('manage-battle-form', {
-    fade_time: 15
-  });
+  const testSet1 = {
+    boss_heal: false,
+    fade_time: 5,
+    skin: 'noimage',
+    follow_multiplier: 1,
+    bit_multiplier: 2,
+    sub_multiplier: 3,
+    donation_multiplier: 4
+  };
+
+  await formMonkey.fill('manage-battle-form', testSet1);
+  t.true(await formMonkey.contains('manage-battle-form', testSet1));
 
   await sleep(10000);
 
-  // const setButtonSelector = 'button=Set Stream Boss Health';
-  // const resetButtonSelector = 'button=Reset Stream Boss';
-  //
-  // if (await client.isVisible(resetButtonSelector)) {
-  //   await client.click(resetButtonSelector);
-  // }
-  //
-  // await client.waitForVisible(setButtonSelector);
-  // await client.click(setButtonSelector);
-  // await client.waitForVisible('div=fixed'); // 'fixed' is a default streamboss mode
+  const testSet2 = {
+    boss_heal: true,
+    fade_time: 10,
+    skin: 'default',
+    follow_multiplier: 5,
+    bit_multiplier: 1,
+    sub_multiplier: 300,
+    donation_multiplier: 200
+  };
 
-  // await blankSlate(t);
-  // t.pass();
-
+  await formMonkey.fill('manage-battle-form', testSet2);
+  t.true(await formMonkey.contains('manage-battle-form', testSet2));
 });

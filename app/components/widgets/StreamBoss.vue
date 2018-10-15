@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <validated-form slot="manage-battle-properties" @input="save()" v-if="loaded">
+    <validated-form slot="manage-battle-properties" name="manage-battle-form" @input="save()" v-if="loaded">
       <v-form-group v-model="wData.settings.fade_time" :metadata="metadata.fade_time"/>
       <v-form-group>
         <bool-input v-model="wData.settings.boss_heal" :metadata="metadata.boss_heal"/>
@@ -42,7 +42,7 @@
       <v-form-group v-model="wData.settings.donation_multiplier" :metadata="metadata.donation_multiplier"/>
     </validated-form>
 
-    <div slot="visual-properties" @input="save()" v-if="loaded">
+    <div slot="visual-properties" @input="save()" name="visual-settings-form" v-if="loaded">
       <v-form-group v-model="wData.settings.kill_animation" :metadata="metadata.kill_animation"/>
       <v-form-group>
         <bool-input v-model="wData.settings.bg_transparent" :metadata="metadata.bg_transparent"/>

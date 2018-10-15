@@ -1,5 +1,12 @@
 <template>
-  <slider-input :metadata="sliderOptions" :value="sliderValue" @input="value => updateValue(value)"/>
+  <slider-input
+    data-role="input"
+    data-type="font"
+    :data-name="options.name"
+    :metadata="sliderOptions"
+    :value="sliderValue"
+    @input="value => updateValue(value)"
+  />
 </template>
 
 <script lang="ts" src="./FontSize.vue.ts"></script>

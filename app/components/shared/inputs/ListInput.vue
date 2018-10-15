@@ -1,5 +1,5 @@
 <template>
-<div class="list-input slobs-input" :data-name="options.name">
+<div class="list-input" data-role="input" data-type="list" :data-name="options.name">
   <label>{{ title }}</label>
   <multiselect
     :value="currentMultiselectValue"
