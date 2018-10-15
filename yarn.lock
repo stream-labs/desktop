@@ -313,10 +313,10 @@
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
   integrity sha512-MDQLxNFRLasqS4UlkWMSACMKeSm1x4Q3TxzUC7KQUsh6RK1ZrQ0VEyE3yzXcBu+K8ejVj4wuX32eUG02yNp+YQ==
 
-"@types/urijs@1.15.37":
-  version "1.15.37"
-  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.37.tgz#42cd9d5af585053e9af5d009d77bfeb6b0b4cfe6"
-  integrity sha512-rlYmnD83NTjOYwIyS1MZ30MWy1mvKPY4iFX0n33hCR72RgHkR5pYoNuxcP2Ao+tBx16QYzd+gdMWixrVZYyVWQ==
+"@types/urijs@1.15.38":
+  version "1.15.38"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.15.38.tgz#733ff7f18d42de60d0cdba40d8e92673b27cd5a4"
+  integrity sha512-5VWXqu6V2IxXsPuSXYwCZHbh25U7pE+UJTFtKnNQRJLZA7o0D7fOQRJdgwBTMLNY0uc5F9GsFSang1VwNcPguA==
   dependencies:
     "@types/jquery" "*"
 
@@ -10935,10 +10935,10 @@ uri-js@^4.2.1:
   dependencies:
     punycode "^2.1.0"
 
-urijs@1.18.8:
-  version "1.18.8"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.18.8.tgz#9d8e4c57f2568b870523ae4ad75a5d3a5678ecd0"
-  integrity sha1-nY5MV/JWi4cFI65K11pdOlZ47NA=
+urijs@1.19.1:
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.1.tgz#5b0ff530c0cbde8386f6342235ba5ca6e995d25a"
+  integrity sha512-xVrGVi94ueCJNrBSTjWqjvtgvl3cyOTThp2zaMaFNGp3F542TR6sM3f2o8RqZl+AwteClSVmoCyt0ka4RjQOQg==
 
 urix@^0.1.0, urix@~0.1.0:
   version "0.1.0"
