@@ -62,7 +62,7 @@ export class PlatformAppManager extends PropertiesManager {
   }
 
   updateUrl() {
-    let url = this.platformAppsService.getPageUrlForSource(
+    const url = this.platformAppsService.getPageUrlForSource(
       this.settings.appId,
       this.settings.appSourceId
     );
@@ -71,11 +71,6 @@ export class PlatformAppManager extends PropertiesManager {
     if (!url) {
       this.obsSource.update({ url: '' });
       return;
-    }
-
-    // Append app settings to URL
-    if (this.settings.appSettings) {
-      url = `${url}&settings=${encodeURIComponent(this.settings.appSettings)}`
     }
 
     if (this.obsSource.settings['url'] !== url) {
