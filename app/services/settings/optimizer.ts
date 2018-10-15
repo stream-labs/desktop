@@ -45,7 +45,7 @@ export type DefinitionParam = {
     setting: string,
     label?: string,
     lookupValueName?: boolean,
-    dependents?: [{ value: any, params: DefinitionParam[] }],
+    dependents?: { value: any, params: DefinitionParam[] }[],
 };
 
 const definitionParams: DefinitionParam[] = [
@@ -337,6 +337,8 @@ export class Optimizer {
         if (setting) {
             if (setting.value !== value) {
                 if (item.dependents) {
+                    // dependents は item の値に依存して出現したり消滅したりする。
+                    // 存在するときの修正は item 変更前に書き戻さないと反映されないため、事前に書き戻す。
                     for (const dependent of item.dependents) {
                         for (const subItem of dependent.params) {
                             this.writeBackCategory(subItem.category);
@@ -348,6 +350,9 @@ export class Optimizer {
                 const category = item.category;
                 this.modifiedCategories.add(category);
                 if (item.dependents) {
+                    // itemを変更すると、それに従って dependents全体が切り替わるため、
+                    // item自体の変更は即時で送信し、以後 dependentsを参照するときには読み直させるために
+                    // キャッシュを破棄する。(事前に上で変更は書き戻しているので単純破棄)
                     this.writeBackCategory(category);
                     for (const dependent of item.dependents) {
                         for (const subItem of dependent.params) {
