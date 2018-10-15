@@ -62,22 +62,99 @@ function openDevTools() {
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 }
 
+function tryConnect(buffer, attempt = 5, waitMs = 100) {
+  const net = require('net');
+  const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler');
+   socket.on('connect', () => {
+    socket.write(buffer);
+    socket.destroy();
+    socket.unref();
+  });
+   socket.on('error', () => {
+    socket.destroy();
+    socket.unref();
+    if (attempt > 0) {
+      setTimeout(() => {
+        tryConnect(buffer, attempt - 1, waitMs * 2);
+      }, waitMs);
+    }
+  });
+}
+
+function registerCurrentProcess(isCritial = false) {
+  // Register process
+  // Create buffer
+  const action = 0;
+  const sizeOfInt = 8;
+  const pid = require('process').pid;
+  const buffer = new Buffer(512);
+  let offset = 0;
+  buffer.writeUInt32LE(action, offset++);
+  buffer.writeUInt32LE(sizeOfInt, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(0, offset++);
+  buffer.writeUInt32LE(isCritial, offset++);
+  buffer.writeUInt32LE(pid, offset++);
+
+  tryConnect(buffer);
+
+  const EventEmitter = require('events');
+  const event = new EventEmitter();
+  const net = require('net');
+  const ref = setTimeout(() => {
+    try {
+      const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler', () => {
+        console.log('Writting into the socket');
+        socket.write(buffer);
+        // socket.end();
+        event.emit('connected');
+      });
+    } catch (error) {
+      
+    }
+  }, 100);
+   event.on('connected', () => { 
+    clearTimeout(ref); 
+  });
+}
+
+function exitProcess() {
+  const action = 2;
+  const buffer = new Buffer(512);
+   buffer.writeUInt32LE(action, 0);
+  
+  tryConnect(buffer);
+}
+
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
-  { // Initialize obs-studio-server
-    // Set up environment variables for IPC.
-    process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
-    process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
-    // Host a new IPC Server and connect to it.
-    obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
-    obs.NodeObs.SetWorkingDirectory(path.join(
-      app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
-      'node_modules',
-      'obs-studio-node')
-    );
-  }
+  // Spawn crash-handler process
+  const { spawn } = require('child_process');
+  const subprocess = spawn('./crash-handler.exe', {
+    detached: true,
+    stdio: 'ignore'
+  });
+  subprocess.unref();
+  registerCurrentProcess(false);
 
+  // Initialize obs-studio-server
+  // Set up environment variables for IPC.
+  process.env.SLOBS_IPC_PATH = "slobs-".concat(uuid());
+  process.env.SLOBS_IPC_USERDATA = app.getPath('userData');
+  // Host a new IPC Server and connect to it.
+  obs.IPC.ConnectOrHost(process.env.SLOBS_IPC_PATH);
+  obs.NodeObs.SetWorkingDirectory(path.join(
+    app.getAppPath().replace('app.asar', 'app.asar.unpacked'),
+    'node_modules',
+    'obs-studio-node')
+  );
+  
   const bt = require('backtrace-node');
 
   function handleFinishedReport() {

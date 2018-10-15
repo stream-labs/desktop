@@ -85,10 +85,11 @@ export class KeyListenerService extends Service {
     // TODO: Node-libuiohook unbinding of individual keys does not work.
     // When that is fixed, this can be uncommented for efficiency.
 
-    // if (Object.keys(this.bindings[keystr]).length === 0) {
-    //   delete this.bindings[keystr];
-    //   this.libuiohook.unregisterCallback(binding);
-    // }
+    if (Object.keys(this.bindings[keystr]).length === 0) {
+      delete this.bindings[keystr];
+      console.log(binding);
+      this.libuiohook.unregisterCallback(binding);
+    }
   }
 
   // Returns a string used for fast lookup of this keybinding

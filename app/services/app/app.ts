@@ -69,8 +69,78 @@ export class AppService extends StatefulService<IAppState> {
   @Inject() private crashReporterService: CrashReporterService;
   @Inject() private announcementsService: AnnouncementsService;
 
+  tryConnect(buffer: Buffer, attempt:number = 5, waitMs:number = 100) {
+    const net = require('net');
+    let socket = net.connect('\\\\.\\pipe\\slobs-crash-handler');
+  
+    socket.on('connect', () => {
+      socket.write(buffer);
+      socket.destroy();
+      socket.unref();
+    });
+  
+    socket.once('error', (message: string) => {
+      socket.destroy();
+      socket.unref();
+      if (attempt > 0) {
+        setTimeout(() => {
+          this.tryConnect(buffer, attempt - 1, waitMs * 2);
+        }, waitMs);
+      }
+    });
+  }
+
+  registerCurrentProcess(isCritial:boolean = false) {
+    // Register process
+  
+    // Create buffer
+    const action = 0;
+    const sizeOfInt = 8;
+  
+    const pid = require('process').pid;
+  
+    const buffer = new Buffer(512);
+    let offset = 0;
+    buffer.writeUInt32LE(action, offset++);
+    buffer.writeUInt32LE(sizeOfInt, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(0, offset++);
+    buffer.writeUInt32LE(isCritial ? 1 : 0, offset++);
+    buffer.writeUInt32LE(pid, offset++);
+  
+    this.tryConnect(buffer);
+
+    const EventEmitter = require('events');
+    const event = new EventEmitter();
+    
+    const net = require('net');
+    const ref = setTimeout(() => {
+      try {
+        const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler', () => {
+          console.log('Writting into the socket');
+          socket.write(buffer);
+          socket.end();
+          event.emit('connected');
+        });
+        // debugger;
+      } catch (error) {
+        
+      }
+    }, 100);
+  
+    event.on('connected', () => { 
+      clearTimeout(ref); 
+    });
+  }
+
   @track('app_start')
   async load() {
+    this.registerCurrentProcess(false);
     this.START_LOADING();
 
     // Initialize OBS
