@@ -22,8 +22,18 @@
         :key="index"
         @click="navigateApp(app.id)"
         class="app-tab"
-        :class="{ 'is-active': page === 'PlatformAppContainer' && isSelectedApp(app.id) }">
-        <span> {{index}}-{{ app.manifest.name }}</span>
+        :class="{ 'is-active': isSelectedApp(app.id) }">
+        <span> {{ app.manifest.name }} </span>
+        <span v-if="isSelectedApp(app.id)">
+          <i
+            v-if="app.unpacked"
+            @click="refreshApp(app.id)"
+            class="app-tab-icon icon-repeat"></i>
+          <i
+            v-if="isPopOutAllowed(app)"
+            @click="popOut(app.id)"
+            class="app-tab-icon icon-pop-out-1"></i>
+        </span>
       </span>
     </div>
     <div
@@ -105,6 +115,10 @@
   &.is-active {
     opacity: 1;
   }
+}
+
+.app-tab-icon {
+  margin-left: 4px;
 }
 
 .night-theme {

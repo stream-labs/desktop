@@ -2,7 +2,7 @@ import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 import { Inject } from 'util/injector';
 import { NavigationService } from 'services/navigation';
-import { PlatformAppsService, EAppPageSlot } from 'services/platform-apps';
+import { PlatformAppsService, EAppPageSlot, ILoadedApp } from 'services/platform-apps';
 
 @Component({})
 export default class AppsNav extends Vue {
@@ -61,32 +61,48 @@ export default class AppsNav extends Vue {
   }
 
   isSelectedApp(appId: string) {
-    return this.navigationService.state.params.appId === appId;
+    return this.page === 'PlatformAppContainer' && this.navigationService.state.params.appId === appId;
+  }
+
+  get topNavApps() {
+    return this.platformAppsService.enabledApps.filter(app => {
+      return !!app.manifest.pages.find(page => {
+        return page.slot === EAppPageSlot.TopNav;
+      });
+    });
+  }
+
+  isPopOutAllowed(app: ILoadedApp) {
+    const topNavPage = app.manifest.pages.find(page => page.slot === EAppPageSlot.TopNav);
+    if (!topNavPage) return false;
+
+    // Default result is true
+    return topNavPage.allowPopout == null ? true : topNavPage.allowPopout;
+  }
+
+  popOut(appId: string) {
+    this.platformAppsService.popOutAppPage(appId, EAppPageSlot.TopNav);
+  }
+
+  refreshApp(appId: string) {
+    this.platformAppsService.reloadApp(appId);
   }
 
   // get topNavApps() {
-  //   return this.platformAppsService.enabledApps.filter(app => {
-  //     return !!app.manifest.pages.find(page => {
-  //       return page.slot === EAppPageSlot.TopNav;
-  //     });
-  //   });
+  //   let x: any[] = [];
+  //   let i = 10;
+
+  //   while (i > 0) {
+  //     x = x.concat(this.platformAppsService.enabledApps.filter(app => {
+  //       return !!app.manifest.pages.find(page => {
+  //         return page.slot === EAppPageSlot.TopNav;
+  //       });
+  //     }));
+  //     i--;
+  //   }
+
+  //   return x;
   // }
-
-  get topNavApps() {
-    let x: any[] = [];
-    let i = 10;
-
-    while (i > 0) {
-      x = x.concat(this.platformAppsService.enabledApps.filter(app => {
-        return !!app.manifest.pages.find(page => {
-          return page.slot === EAppPageSlot.TopNav;
-        });
-      }));
-      i--;
-    }
-
-    return x;
-  }
 
   get page() {
     return this.navigationService.state.currentPage;
