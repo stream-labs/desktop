@@ -196,7 +196,6 @@ export class PlatformAppsService extends
    */
   async installProductionApps() {
     const productionApps = await this.fetchProductionApps();
-    console.log(productionApps);
     productionApps.forEach(app => {
       if (app.is_beta && !app.manifest) return;
       const unpackedVersionLoaded = this.state.loadedApps.find(loadedApp => loadedApp.id === app.id_hash);
@@ -288,7 +287,6 @@ export class PlatformAppsService extends
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
-    console.log(app);
     if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked)) return;
 
     this.ADD_APP(app);
@@ -403,7 +401,6 @@ export class PlatformAppsService extends
   }
 
   unloadApp(appId: string) {
-    debugger;
     this.REMOVE_APP(appId);
     this.appUnload.next(appId);
   }
