@@ -18,7 +18,7 @@ export class FormMonkey {
     this.client = t.context.app.client;
   }
 
-  async fill(formName: string, formData: Dictionary<any>, options = {}) {
+  async fill(formName: string, formData: Dictionary<any>, options: IFormMonkeyFillOptions = {}) {
     const $form = await this.client.$(`[name=${formName}`);
 
     if (!$form) throw new Error(`form not found: ${formName}`);
@@ -33,65 +33,89 @@ export class FormMonkey {
       const name = (await this.client.elementIdAttribute(id, 'data-name')).value;
 
       if (!(name in formData)) continue;
-      console.log('found ', name);
 
       const type = (await this.client.elementIdAttribute(id, 'data-type')).value;
       const value = formData[name];
       const selector = `form[name=${formName}] [data-name="${name}"]`;
 
-
-      console.log('name', name, 'value', value);
-
-      if (['number', 'text'].includes(type)) {
-        const inputSelector = selector + ' input';
-        console.log('click');
-        await this.client.click(inputSelector);
-
-        console.log('clear');
-        await this.client.clearElement(selector + ' input');
-        console.log('type');
-        await this.client.setValue(selector + ' input', value);
-
-      } else if (type === 'list') {
-
-        await this.client
-          .elementIdElement(id, '../..')
-          .click('.multiselect');
-
-        await this.client
-          .elementIdElement(id, '../..')
-          .click(`[data-option-value="${value}"]`);
-      } else if (type === 'slider') {
-
-        // console.log('try to swipe');
-        // await this.client
-        //   .elementIdElement(id, '../..')
-        //   .swipe('.vue-slider-dot', 100, 0, 1);
-        //
-
-        const dotSelector = `${selector} .vue-slider-dot`;
-
-        console.log('move slider');
-
-        await this.client.moveToObject(dotSelector);
-        await this.client.buttonDown(0);
-        let i = 10;
-        while (i--) {
-          console.log('move')
-          await this.client.moveTo(null, 5, 0);
-          await sleep(1000);
-        }
-        await this.client.buttonUp(0);
-        console.log('move done');
-
+      switch (type) {
+        case 'text':
+        case 'number':
+          await this.setTextValue(selector, value);
+          break;
+        case 'boolean':
+          await
+        case 'list':
+          await this.setListValue(selector, value);
+          break;
+        case 'slider':
+        case 'font-size':
+        case 'font-weight':
+          await this.setSliderValue(selector, value);
+          break;
+        default:
+          throw new Error(`No setter found for input type = ${type}`);
       }
-
-
     }
 
   }
 
+  async setTextValue(selector: string, value: string) {
+    const inputSelector = selector + ' input';
+    await this.client.click(inputSelector);
+    await this.client.clearElement(selector + ' input');
+    await this.client.setValue(selector + ' input', value);
+  }
+
+  async setListValue(selector: string, value: string) {
+    await this.client.click(`${selector} .multiselect`);
+    await this.client.click(`${selector} [data-option-value="${value}"]`);
+  }
+
+  async setBoolValue(selector: string, value: string) {
+    const checkboxSelector = `${selector} input`;
+
+  }
+
+  async setSliderValue(sliderInputSelector: string, goalValue: number) {
+    const dotSelector = `${sliderInputSelector} .vue-slider-dot`;
+    const sliderWidth = await this.client.getElementSize(`${sliderInputSelector} .vue-slider-wrap`, 'width');
+    let moveOffset = sliderWidth;
+
+    // reset slider by moving a dot to the left edge
+    await this.client.moveToObject(dotSelector);
+    await this.client.buttonDown(0);
+    await this.client.moveTo(null, -99999, 0);
+    await this.client.buttonUp(0);
+
+    // press slider dot
+    await this.client.moveToObject(dotSelector);
+    await this.client.buttonDown(0);
+
+    // use a bisection method to find the correct slider position
+    while (true) {
+      let currentValue = await this.getSliderValue(sliderInputSelector);
+
+      if (currentValue === goalValue) {
+        // we've found it
+        await this.client.buttonUp(0);
+        return;
+      }
+
+      if (goalValue < currentValue) {
+        await this.client.moveTo(null, -Math.round(moveOffset), 0);
+      } else {
+        await this.client.moveTo(null, Math.round(moveOffset), 0);
+      }
+
+      moveOffset = moveOffset / 2;
+      if (moveOffset < 0.5) throw new Error('Slider position setup failed');
+    }
+  }
+
+  async getSliderValue(sliderInputSelector: string): Promise<number> {
+    // fetch the value from the slider's tooltip
+    return Number(await this.client.getText(`${sliderInputSelector} .vue-slider-tooltip`));
+  }
 
 }
-
-
