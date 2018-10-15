@@ -32,7 +32,7 @@
       "vendor",
       "app/i18n",
       "updater/index.html",
-      "updater/bootstrap.js",
+      "updater/Updater.js",
       "index.html",
       "main.js",
       "obs-api"
@@ -72,6 +72,7 @@
   "dependencies": {
     "aws-sdk": "^2.43.0",
     "backtrace-node": "^0.7.3",
+    "electron-updater": "^3.0.1",
     "electron-window-state": "^4.1.1",
     "font-manager": "https://github.com/stream-labs/font-manager/releases/download/v1.0.2/iojs-v2.0.5-font-manager.tar.gz",
     "node-fontinfo": "https://github.com/stream-labs/node-fontinfo/releases/download/v0.0.5/iojs-v2.0.5-node-fontinfo.tar.gz",
@@ -80,7 +81,6 @@
     "recursive-readdir": "^2.2.2",
     "request": "^2.85.0",
     "rimraf": "^2.6.1",
-    "semver": "^5.5.1",
     "socket.io-client": "2.1.1",
     "uuid": "^3.0.1",
     "vee-validate": "^2.1.0-beta.6",
