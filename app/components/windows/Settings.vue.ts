@@ -19,6 +19,7 @@ import NotificationsSettings from 'components/NotificationsSettings.vue';
 import AppearanceSettings from 'components/AppearanceSettings.vue';
 import ExperimentalSettings from 'components/ExperimentalSettings.vue';
 import LanguageSettings from 'components/LanguageSettings.vue';
+import { CategoryIcons } from './CategoryIcons';
 
 @Component({
   components: {
@@ -46,15 +47,7 @@ export default class Settings extends Vue {
   settingsData = this.settingsService.getSettingsFormData(this.categoryName);
   categoryNames = this.settingsService.getCategories();
   userSubscription: Subscription;
-  icons: Dictionary<string> = {
-    General: 'icon-settings',
-    Stream: 'icon-video',
-    Output: 'icon-output',
-    Video: 'icon-video',
-    Audio: 'icon-speaker',
-    Hotkeys: 'icon-keyborad',
-    Advanced: 'icon-details-setting',
-  };
+  icons = CategoryIcons;
 
   mounted() {
     // Categories depend on whether the user is logged in or not.

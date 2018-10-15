@@ -340,6 +340,42 @@
       "x264opts": {
         "name": "@:settings.Output.Streaming.x264opts.name"
       }
+    },
+    "Audio - Track 1": {
+      "name": "音声トラック1",
+      "Track1Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 2": {
+      "name": "音声トラック2",
+      "Track2Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 3": {
+      "name": "音声トラック3",
+      "Track3Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 4": {
+      "name": "音声トラック4",
+      "Track4Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 5": {
+      "name": "音声トラック5",
+      "Track5Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 6": {
+      "name": "音声トラック6",
+      "Track6Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
     }
   },
   "Audio": {
@@ -522,5 +558,9 @@
   "fontStyle": "フォントスタイル",
   "fontSize": "フォントサイズ",
   "optimizeForNiconico": "配信開始時に配信設定をニコニコ生放送に最適化する",
-  "showOptimizationDialogForNiconico": "配信開始時に最適化の確認ダイアログを表示する"
+  "showOptimizationDialogForNiconico": "配信開始時に最適化の確認ダイアログを表示する",
+  "videoBitrate": "映像ビットレート  (kbps)",
+  "audioBitrate": "音声ビットレート  (kbps)",
+  "keyframeInterval": "キーフレーム間隔(秒)",
+  "encoderPreset": "エンコーダープリセット"
 }

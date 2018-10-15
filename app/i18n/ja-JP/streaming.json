@@ -43,6 +43,7 @@
     "done": "配信する番組を決定する"
   },
   "FPS": "フレームレート",
+  "resolution": "解像度",
   "optimizeAndGoLive": "最適化して配信を開始する",
   "skipOptimization": "最適化しないで配信を開始する",
   "doNotShowAgainOptimizationDialog": "今後、このダイアログを表示しない"

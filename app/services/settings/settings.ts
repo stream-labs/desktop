@@ -22,10 +22,16 @@ import {
 import {
   ISettingsSubCategory,
   ISettingsServiceApi,
-  OptimizedSettings
 } from './settings-api';
 import { $t } from 'services/i18n';
 import fs from 'fs';
+import {
+  ISettingsAccessor,
+  OptimizeSettings,
+  OptimizedSettings,
+  Optimizer
+} from './optimizer';
+import { getBestSettingsForNiconico } from './niconico-optimization';
 
 
 export interface ISettingsState {
@@ -91,7 +97,7 @@ const niconicoAudioBitrateOptions = niconicoAudioBitrates.map(res => ({
 }));
 
 export class SettingsService extends StatefulService<ISettingsState>
-  implements ISettingsServiceApi {
+  implements ISettingsServiceApi, ISettingsAccessor {
   static initialState = {};
 
   static convertFormDataToState(
@@ -435,136 +441,29 @@ export class SettingsService extends StatefulService<ISettingsState>
   }
 
   diffOptimizedSettings(bitrate: number): OptimizedSettings {
-    let audioBitrate: number;
-    let quality: string;
-    if (bitrate >= 6000) {
-      audioBitrate = 192;
-      quality = '1280x720';
-    } else if (bitrate >= 2000) {
-      audioBitrate = 192;
-      quality = '800x450';
-    } else if (bitrate >= 1000) {
-      audioBitrate = 96;
-      quality = '800x450';
-    } else if (bitrate >= 384) {
-      audioBitrate = 48;
-      quality = '512x288';
-    } else {
-      audioBitrate = 48;
-      quality = '512x288';
-    }
-    const videoBitrate = bitrate - audioBitrate;
-    const colorSpace = '709';
-    const fps = '30';
-    const outputMode = 'Simple';
+    const best = getBestSettingsForNiconico({bitrate});
+    const opt = new Optimizer(this);
 
-    // 出力モードが Simple でないときは Simpleに戻した上で現在の値を取得する
-    let output = this.getSettingsFormData('Output');
-    const lastMode = this.findSettingValue(output, 'Untitled', 'Mode');
-    if (lastMode !== outputMode) {
-      const mode = this.findSetting(output, 'Untitled', 'Mode');
-      if (mode) {
-        mode.value = outputMode;
-        this.setSettings('Output', output);
-        output = this.getSettingsFormData('Output');
+    const current = opt.getCurrentSettings();
+
+    // 最適化の必要な値を抽出する
+    let delta: OptimizeSettings = {}
+    for (const key of Object.getOwnPropertyNames(best)) {
+      if (current[key] !== best[key]) {
+        delta[key] = best[key];
       }
     }
 
-    const video = this.getSettingsFormData('Video');
-    const advanced = this.getSettingsFormData('Advanced');
-
-    const settings: OptimizedSettings = {
-      currentVideoBitrate: this.findSettingValue(output, 'Streaming', 'VBitrate'),
-      currentAudioBitrate: this.findSettingValue(output, 'Streaming', 'ABitrate'),
-      currentQuality: this.findSettingValue(video, 'Untitled', 'Output'),
-      currentColorSpace: this.findSettingValue(advanced, 'Video', 'ColorSpace'),
-      currentFps: this.findSettingValue(video, 'Untitled', 'FPSCommon'),
-      currentOutputMode: lastMode
-    };
-    const length = Object.keys(settings).length;
-
-    // 出力モードを元に戻す
-    if (lastMode !== outputMode) {
-      const mode = this.findSetting(output, 'Untitled', 'Mode');
-      if (mode) {
-        mode.value = lastMode;
-        this.setSettings('Output', output);
-      }
-    }
-
-    if (videoBitrate !== settings.currentVideoBitrate) {
-      settings.optimizedVideoBitrate = videoBitrate;
-    }
-    // aBitrateは文字列にする必要がある
-    const audioBitrateValue = audioBitrate.toString(10);
-    if (audioBitrateValue !== settings.currentAudioBitrate) {
-      settings.optimizedAudioBitrate = audioBitrateValue;
-    }
-    if (quality !== settings.currentQuality) {
-      settings.optimizedQuality = quality;
-    }
-    if (colorSpace !== settings.currentColorSpace) {
-      settings.optimizedColorSpace = colorSpace;
-    }
-    if (fps !== settings.currentFps) {
-      settings.optimizedFps = fps;
-    }
-    if (outputMode !== settings.currentOutputMode) {
-      settings.optimizedOutputMode = outputMode;
-    }
-    return Object.keys(settings).length > length ? settings : undefined;
+    return Object.keys(delta).length > 0 ? {
+      current,
+      delta,
+      info: opt.optimizeInfo(current, delta)
+    } : undefined;
   }
 
-  optimizeForNiconico(settings: OptimizedSettings) {
-    let output = this.getSettingsFormData('Output');
-    if ('optimizedOutputMode' in settings) {
-      const anOutputMode = this.findSetting(output, 'Untitled', 'Mode');
-      if (anOutputMode) {
-        anOutputMode.value = settings.optimizedOutputMode;
-      }
-      this.setSettings('Output', output);
-      output = this.getSettingsFormData('Output');
-    }
-
-    // https://github.com/n-air-app/n-air-app/issues/3
-    if ('optimizedColorSpace' in settings) {
-      const advanced = this.getSettingsFormData('Advanced');
-      const colorSpaceSetting = this.findSetting(advanced, 'Video', 'ColorSpace');
-      if (colorSpaceSetting) {
-        colorSpaceSetting.value = settings.optimizedColorSpace;
-      }
-      this.setSettings('Advanced', advanced);
-    }
-
-    // https://github.com/n-air-app/n-air-app/issues/13
-    if ('optimizedVideoBitrate' in settings) {
-      const vBitrateSetting = this.findSetting(output, 'Streaming', 'VBitrate');
-      if (vBitrateSetting) {
-        vBitrateSetting.value = settings.optimizedVideoBitrate;
-      }
-    }
-    if ('optimizedAudioBitrate' in settings) {
-      const aBitrateSetting = this.findSetting(output, 'Streaming', 'ABitrate');
-      if (aBitrateSetting) {
-        aBitrateSetting.value = settings.optimizedAudioBitrate;
-      }
-    }
-    this.setSettings('Output', output);
-
-    const video = this.getSettingsFormData('Video');
-    if ('optimizedQuality' in settings) {
-      const outputSetting = this.findSetting(video, 'Untitled', 'Output');
-      if (outputSetting) {
-        outputSetting.value = settings.optimizedQuality;
-      }
-    }
-    if ('optimizedFps' in settings) {
-      const fpsSetting = this.findSetting(video, 'Untitled', 'FPSCommon');
-      if (fpsSetting) {
-        fpsSetting.value = settings.optimizedFps;
-      }
-    }
-    this.setSettings('Video', video);
+  optimizeForNiconico(delta: OptimizeSettings) {
+    const opt = new Optimizer(this);
+    opt.optimize(delta);
   }
 
   private findSubCategory(settings: ISettingsSubCategory[], category: string): ISettingsSubCategory[] {
@@ -572,7 +471,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     return settings.filter(subCategory => subCategory.nameSubCategory === category);
   }
 
-  private findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
+  findSetting(settings: ISettingsSubCategory[], category: string, setting: string) {
     for (const subCategory of this.findSubCategory(settings, category)) {
       const found = subCategory.parameters.find(param => param.name === setting) as any;
       if (found) {
@@ -582,7 +481,7 @@ export class SettingsService extends StatefulService<ISettingsState>
     return undefined;
   }
 
-  private findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
+  findSettingValue(settings: ISettingsSubCategory[], category: string, setting: string) {
     const param = this.findSetting(settings, category, setting);
     if (param) {
       if (typeof param.value !== 'undefined') {

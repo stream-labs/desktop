@@ -240,11 +240,11 @@ export class StreamingService extends StatefulService<IStreamingServiceState>
           queryParams: settings,
           size: {
             width: 500,
-            height: 400
+            height: 575
           }
         });
       } else {
-        this.settingsService.optimizeForNiconico(settings);
+        this.settingsService.optimizeForNiconico(settings.delta);
         this.toggleStreaming();
       }
     } else {

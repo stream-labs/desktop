@@ -24,6 +24,7 @@
     "allowJs": false,
     "strictNullChecks": false,
     "emitDecoratorMetadata": true,
+    "downlevelIteration": true,
     "baseUrl": "./app"
   },
   "exclude": [

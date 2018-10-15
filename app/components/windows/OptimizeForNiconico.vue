@@ -5,31 +5,16 @@
   :customControls="true">
   <div slot="content">
 
-    {{ $t('streaming.optimizationForNiconico.description') }}
-    <ul>
-      <li>
-        {{ $t('settings.Output.Streaming.VBitrate.name') }}: {{ settings.currentVideoBitrate }}
-        <span v-if="settings.optimizedVideoBitrate"> -&gt; {{ settings.optimizedVideoBitrate }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.Streaming.ABitrate.name') }}: {{ settings.currentAudioBitrate }}
-        <span v-if="settings.optimizedAudioBitrate"> -&gt; {{ settings.optimizedAudioBitrate }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.name') }}: {{ qualityName(settings.currentQuality) }}
-        <span v-if="settings.optimizedQuality"> -&gt; {{ qualityName(settings.optimizedQuality) }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Advanced.Video.ColorSpace.name') }}: {{ settings.currentColorSpace }}
-        <span v-if="settings.optimizedColorSpace"> -&gt; {{ settings.optimizedColorSpace }}</span>
-      </li>
-      <li>
-        {{ $t('streaming.FPS') }}: {{ settings.currentFps }}
-        <span v-if="settings.optimizedFps"> -&gt; {{ settings.optimizedFps }}</span>
-      </li>
-      <li>
-        {{ $t('settings.Output.Untitled.Mode.name') }}: {{ outputModeName(settings.currentOutputMode) }}
-        <span v-if="settings.optimizedOutputMode"> -&gt; {{ outputModeName(settings.optimizedOutputMode) }}</span>
+    <p class="optimize-title">{{ $t('streaming.optimizationForNiconico.description') }}</p>
+    <ul class="optimize-category-list">
+      <li class="optimize-category-list-item" v-for="category in settings.info" :key="category[0]">
+        <p class="optimize-category-name"><i :class="icons[category[0]]" />{{ $t(`settings.${category[0]}.name`, { fallback: category[0] }) }}</p>
+        <ul class="optimize-setting-list">
+          <li class="optimize-setting-list-item" v-for="o in category[1]" :key="o.key">
+            <span class="item-name">{{ o.name }}: </span><span class="item-value">{{ o.currentValue }}
+            <span class="item-new-value" v-if="o.newValue"> -&gt; {{ o.newValue }}</span></span>
+          </li>
+        </ul>
       </li>
     </ul>
     <BoolInput :value="doNotShowAgain" @input="setDoNotShowAgain" />
@@ -52,8 +37,31 @@
 <script lang="ts" src="./OptimizeForNiconico.vue.ts"></script>
 
 <style lang="less" scoped>
+@import "../../styles/index";
+
 .input-container {
-  margin-top: 12px;
   flex-direction: column;
+}
+.optimize-category-list {
+  list-style: none;
+  margin: 0;
+}
+.optimize-category-list-item {
+  margin-bottom: 12px;
+  list-style: none;
+}
+.optimize-category-name {
+  margin-bottom: 4px;
+
+  i {
+    margin-right: 8px;
+  }
+}
+.optimize-setting-list {
+  list-style: none;
+  background: @padding-color;
+  .radius;
+  margin: 0;
+  padding: 8px;
 }
 </style>

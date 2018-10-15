@@ -109,9 +109,9 @@
         "name": null
       },
       "StreamEncoder": {
-        "name": null,
-        "obs_x264": null,
-        "obs_qsv11": null
+        "name": "Encoder",
+        "obs_x264": "Software (x264)",
+        "obs_qsv11": "Hardware (QSV)"
       },
       "ABitrate": {
         "name": null
@@ -340,6 +340,42 @@
       "x264opts": {
         "name": "@:settings.Output.Streaming.x264opts.name"
       }
+    },
+    "Audio - Track 1": {
+      "name": "Audio - Track 1",
+      "Track1Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 2": {
+      "name": "Audio - Track 2",
+      "Track2Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 3": {
+      "name": "Audio - Track 3",
+      "Track3Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 4": {
+      "name": "Audio - Track 4",
+      "Track4Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 5": {
+      "name": "Audio - Track 5",
+      "Track5Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
+    },
+    "Audio - Track 6": {
+      "name": "Audio - Track 6",
+      "Track6Bitrate": {
+        "name": "@:settings.audioBitrate"
+      }
     }
   },
   "Audio": {
@@ -522,5 +558,9 @@
   "fontStyle": "Font Style",
   "fontSize": "Font Size",
   "optimizeForNiconico": "optimize settings for niconico live service",
-  "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams"
+  "showOptimizationDialogForNiconico": "show confirmation dialog to check the optimization when starting streams",
+  "videoBitrate": "Video Bitrate (kbps)",
+  "audioBitrate": "Audio Bitrate (kbps)",
+  "keyframeInterval": "Keyframe Interval (in seconds)",
+  "encoderPreset": "Encoder Preset"
 }
