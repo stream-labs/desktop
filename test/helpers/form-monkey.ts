@@ -44,7 +44,8 @@ export class FormMonkey {
           await this.setTextValue(selector, value);
           break;
         case 'boolean':
-          await
+          await this.setBoolValue(selector, value);
+          break;
         case 'list':
           await this.setListValue(selector, value);
           break;
@@ -72,9 +73,18 @@ export class FormMonkey {
     await this.client.click(`${selector} [data-option-value="${value}"]`);
   }
 
-  async setBoolValue(selector: string, value: string) {
+  async setBoolValue(selector: string, value: boolean) {
     const checkboxSelector = `${selector} input`;
+    this.client.click(checkboxSelector);
 
+    if (!value && await this.client.isSelected(checkboxSelector)) {
+      await this.client.click(checkboxSelector);
+    }
+  }
+
+  async getBoolValue(selector: string): Promise<boolean> {
+    const checkboxSelector = `${selector} input`;
+    return await this.client.isSelected(checkboxSelector);
   }
 
   async setSliderValue(sliderInputSelector: string, goalValue: number) {
