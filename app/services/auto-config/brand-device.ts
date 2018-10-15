@@ -50,8 +50,11 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     return true;
   }
 
-  async init() {
 
+  /**
+   * fetch SystemInformation and download configuration links if we have ones
+   */
+  async fetchDeviceInfo() {
     if (!this.serviceEnabled()) return;
 
     // fetch system info via PowerShell
@@ -63,14 +66,17 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     msSystemInformation.forEach(record => {
       const [key, value] = record.split(':').map(item => item.trim());
       if (!key) return;
-      if (this.state[key] !== void 0) this.SET_SYSTEM_PARAM(key, value);
+      if (this.state[key] !== void 0) this.SET_SYSTEM_PARAM(key as keyof IMsSystemInfo, value);
     });
 
-    this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
-  }
+    // uncomment the code below to test brand device steps
+    // this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
+    // this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
+    // this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
+    // this.SET_SYSTEM_PARAM('SystemVersion', '1');
 
-  get hasOptimizedSettings() {
-    return !!this.state.urls;
+
+    this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
   }
 
   async startAutoConfig(): Promise<boolean> {
@@ -132,7 +138,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   }
 
   @mutation()
-  private SET_SYSTEM_PARAM(key: string, value: string) {
+  private SET_SYSTEM_PARAM(key: keyof IBrandDeviceState, value: string) {
     this.state[key] = value;
   }
 

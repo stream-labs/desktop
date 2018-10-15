@@ -66,11 +66,11 @@ const ONBOARDING_STEPS: Dictionary<IOnboardingStep> = {
       if (service.options.isLogin) return false;
       return service.userService.isLoggedIn();
     },
-    next: 'OptimizeA'
+    next: 'OptimizeBrandDevice'
   },
 
   OptimizeBrandDevice: {
-    isEligible: service => service.brandDeviceService.hasOptimizedSettings,
+    isEligible: () => true,
     next: 'OptimizeA',
   },
 
@@ -212,10 +212,10 @@ export class OnboardingService extends StatefulService<
   }
 
   startOnboardingIfRequired() {
-    if (localStorage.getItem(this.localStorageKey)) {
-      this.forceLoginForSecurityUpgradeIfRequired();
-      return false;
-    }
+    // if (localStorage.getItem(this.localStorageKey)) {
+    //   this.forceLoginForSecurityUpgradeIfRequired();
+    //   return false;
+    // }
 
     this.start();
     return true;
