@@ -353,6 +353,7 @@ export class Optimizer {
                     // itemを変更すると、それに従って dependents全体が切り替わるため、
                     // item自体の変更は即時で送信し、以後 dependentsを参照するときには読み直させるために
                     // キャッシュを破棄する。(事前に上で変更は書き戻しているので単純破棄)
+                    // 変更後に破棄するのは、この破棄対象カテゴリがこのitem自身と同じケースがあるため。
                     this.writeBackCategory(category);
                     for (const dependent of item.dependents) {
                         for (const subItem of dependent.params) {
