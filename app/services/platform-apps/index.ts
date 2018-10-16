@@ -287,6 +287,8 @@ export class PlatformAppsService extends
 
   addApp(app: ILoadedApp) {
     const { id, appToken } = app;
+    if (this.state.loadedApps.find(loadedApp => loadedApp.id === app.id && loadedApp.unpacked === app.unpacked)) return;
+
     this.ADD_APP(app);
     if (app.unpacked && app.appPath) {
       // store app in local storage
@@ -723,8 +725,8 @@ export class PlatformAppsService extends
     // edge case for when there are 2 apps with same id
     // when one is unpacked and one is prod
     // generally we want to do actions with enabled one first
-    if (this.state.loadedApps.find(app => app.id === appId && app.unpacked)) {
-      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId && app.unpacked);
+    if (this.state.loadedApps.find(app => app.id === appId && app.enabled)) {
+      this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId || !app.enabled);
     } else {
       this.state.loadedApps = this.state.loadedApps.filter(app => app.id !== appId);
     }

@@ -66,8 +66,9 @@ import uuid from 'uuid/v4';
     () => ready()
   );
 
-  // TODO: Assuming the main window is always contents id 1 may not be safe.
-  const mainWindowContents = electron.remote.webContents.fromId(1);
+  const mainWindowContents = electron.remote.webContents.fromId(
+    electron.ipcRenderer.sendSync('getMainWindowWebContentsId')
+  );
   const webContentsId = electron.remote.getCurrentWebContents().id;
 
   /**
