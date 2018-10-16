@@ -111,6 +111,15 @@ export class AppService extends StatefulService<IAppState> {
     this.tryConnect(buffer);
   }
 
+  terminateCrashHandler() {
+    const buffer = new Buffer(512);
+    let offset = 0;
+    buffer.writeUInt32LE(2, offset++);
+    buffer.writeUInt32LE(this.pid, offset++);
+
+    this.tryConnect(buffer);
+  }
+
   @track('app_start')
   async load() {
     this.registerProcess(false);
@@ -184,6 +193,7 @@ export class AppService extends StatefulService<IAppState> {
       this.crashReporterService.endShutdown();
       obs.NodeObs.OBS_service_removeCallback();
       obs.NodeObs.OBS_API_destroyOBS_API();
+      this.terminateCrashHandler();
       electron.ipcRenderer.send('shutdownComplete');
     }, 300);
   }

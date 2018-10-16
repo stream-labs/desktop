@@ -104,15 +104,6 @@ function unregisterProcess() {
   tryConnect(buffer);
 }
 
-function terminateCrashHandler() {
-  const buffer = new Buffer(512);
-  let offset = 0;
-  buffer.writeUInt32LE(2, offset++);
-  buffer.writeUInt32LE(pid, offset++);
-  
-  tryConnect(buffer);
-}
-
 function startApp() {
   const isDevMode = (process.env.NODE_ENV !== 'production') && (process.env.NODE_ENV !== 'test');
 
@@ -213,8 +204,8 @@ function startApp() {
 
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
-      shutdownStarted = true;
       unregisterProcess();
+      shutdownStarted = true;
       childWindow.destroy();
       mainWindow.send('shutdown');
 
@@ -226,7 +217,6 @@ function startApp() {
       }, 10 * 1000);
     }
 
-    terminateCrashHandler();
     if (!allowMainWindowClose) e.preventDefault();
   });
 
