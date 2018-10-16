@@ -1,18 +1,19 @@
 import { IPatchNotes } from '.';
 
 export const notes: IPatchNotes = {
-  version: '0.11.0',
-  title: 'Cloud Chatbot, Face Masks, and more!',
-  showChest: true,
+  version: '0.11.1',
+  title: 'New Widget Settings, Bug Fixes 🔧',
+  showChest: false,
   notes: [
-    'We are releasing a new chatbot that runs in the cloud and is fully integrated into Streamlabs OBS. ' +
-      'This feature is being rolled out slowly, so keep an eye out for it over the coming days.',
-    'Face masks are here!  Your viewers can put a variety of funny masks on your face on stream directly ' +
-      'from your donation page.  Keep an eye on the dashboard as we roll this feature out.',
-    'Added support for FrankerFaceZ settings',
-    'Added integrated settings for Sub Goal and Media Share widgets',
-    'Re-enabled the QSV encoder',
-    'Fixed advanced AMD settings not saving properly',
-    'Fixed an issue where the OBS importer would sometimes not correctly import'
+    'Improved the design of widget settings windows',
+    'Fixed stream settings not correctly saving when unicode is present in the username',
+    'Fixed bitrate/settings visually not changing when going live',
+    'Fixed optimized game encoder not being detected in certain cases ',
+    'Fixed a potential crash when ending the stream',
+    'Fixed adding new transition properties window when changing transition type',
+    'Fixed scene collections failing to load and being erased in some cases',
+    'Fixed projectors showing a titlebar when in fullscreen',
+    'Fixed an issue where you could not duplicate a scene',
+    'Improve overall application responsiveness (most notably in loading scene collections)'
   ]
 };
