@@ -8,6 +8,13 @@ import { InitAfter } from '../../util/service-observer';
 import { downloadFile, handleErrors } from '../../util/requests';
 import { AppService } from 'services/app';
 import { SceneCollectionsService } from 'services/scene-collections';
+import { TSourceType } from '../sources';
+import { IScenesServiceApi, ScenesService } from '../scenes';
+import { cloneDeep } from 'lodash';
+import { IObsListInput } from '../../components/obs/inputs/ObsInput';
+import {IpcServerService} from '../ipc-server';
+import {IJsonRpcRequest} from '../jsonrpc';
+import {AudioService, IAudioSource} from '../audio';
 
 interface IBrandDeviceUrls {
   system_sku: string;
@@ -44,6 +51,9 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private hostsService: HostsService;
   @Inject() private appService: AppService;
   @Inject() private sceneCollectionsService: SceneCollectionsService;
+  @Inject() private scenesService: ScenesService;
+  @Inject() private audioService: AudioService;
+  @Inject() private ipcServerService: IpcServerService;
 
 
   serviceEnabled() {
@@ -70,10 +80,10 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     });
 
     // uncomment the code below to test brand device steps
-    // this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
-    // this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
-    // this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
-    // this.SET_SYSTEM_PARAM('SystemVersion', '1');
+    this.SET_SYSTEM_PARAM('SystemManufacturer', 'Intel Corporation');
+    this.SET_SYSTEM_PARAM('SystemProductName', 'NUC7i5DNHE');
+    this.SET_SYSTEM_PARAM('SystemSKU', '909-0020-010');
+    this.SET_SYSTEM_PARAM('SystemVersion', '1');
 
 
     this.SET_DEVICE_URLS(await this.fetchDeviceUrls());
@@ -84,8 +94,10 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
     try {
 
       const deviceUrls = await this.fetchDeviceUrls();
+      const deviceName = deviceUrls.name;
       const cacheDir = electron.remote.app.getPath('userData');
       const tempDir = electron.remote.app.getPath('temp');
+      let newSceneCollectionCreated = false;
 
       // download all files
 
@@ -108,17 +120,103 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       if (deviceUrls.overlay_url) {
         const overlayPath = `${tempDir}/slobs-brand-device.overlay`;
         await downloadFile(deviceUrls.overlay_url, overlayPath);
-        await this.sceneCollectionsService.loadOverlay(overlayPath, this.state.urls.name);
+        await this.sceneCollectionsService.loadOverlay(overlayPath, deviceName);
+        newSceneCollectionCreated = true;
       }
 
       // force SLOBS to reload config files
       obs.NodeObs.OBS_service_resetVideoContext();
       obs.NodeObs.OBS_service_resetAudioContext();
 
+      // configure the scene
+      if (!newSceneCollectionCreated) {
+        await this.sceneCollectionsService.create({ name: deviceName });
+      }
+
+      const initialCmds: IJsonRpcRequest[] = [
+        {
+          "id": '1',
+          "jsonrpc": "2.0",
+          "method": "addSceneItem",
+          "params": {
+            "resource": 'BrandDeviceService',
+            "args": [
+              "Capture Card",
+              "dshow_input",
+              {
+                "sourceSettings": {
+                  "use_custom_audio_device": true,
+                },
+                "sourceFuzzySettings": {
+                  "audio_device_id": "Stereo Mix"
+                },
+                "audioSettings": {
+                  "monitoringType": 2
+                }
+              }
+            ]
+          }
+        }
+      ];
+
+      this.ipcServerService.exec(initialCmds[0]);
+
+
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  /**
+   * The same type of audio and video devices has different id for each PC
+   * This method allows to add devices by part of its name instead of id
+   * @Example
+   * addSceneItem(
+   *  'camera',
+   *  'dshow_input',
+   *  {
+   *   sourceSetting: {use_custom_audio_device: true}
+   *   fuzzySourceSettings: { audio_device_id: 'Microphone (Realtek(R) Audio)' }} // use description instead of id here
+   * )
+   */
+  addSceneItem(
+    name: string,
+    type: TSourceType,
+    options: {
+      sourceSettings?: Dictionary<any>,
+      sourceFuzzySettings?: Dictionary<any>,
+      audioSettings: Partial<IAudioSource>
+    })
+  {
+    const sceneItem = this.scenesService.activeScene.createAndAddSource(name, type);
+    const source = sceneItem.getSource();
+
+    if (!options.sourceSettings) return;
+    const settings = cloneDeep(options.sourceSettings);
+    const propsFormData = source.getPropertiesFormData();
+
+    for (const prop of propsFormData) {
+      // handle only LIST props for now
+      if (prop.type !== 'OBS_PROPERTY_LIST') continue;
+      if (!(prop.name in options.sourceFuzzySettings)) continue;
+
+      const searchPattern = options.sourceFuzzySettings[prop.name];
+
+      const option = (prop as IObsListInput<string>).options.find(option => {
+        return (option.value.includes(searchPattern) || option.description.includes(searchPattern))
+      });
+
+      if (!option) continue;
+      settings[prop.name] = option.value;
+    }
+
+    source.updateSettings(settings);
+
+    if (!options.audioSettings) return;
+    const audioSource = this.audioService.getSource(source.sourceId);
+    if (!audioSource) return;
+    audioSource.setSettings(options.audioSettings);
   }
 
   private async fetchDeviceUrls(): Promise<IBrandDeviceUrls> {
