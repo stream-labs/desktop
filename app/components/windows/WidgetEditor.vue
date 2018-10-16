@@ -29,7 +29,7 @@
         <div class="display">
           <display v-if="!animating" :sourceId="widget.previewSourceId" @click="createProjector"/>
         </div>
-        <div v-if="isAlertBox" class="left-toolbar"></div>
+        <div v-if="isAlertBox" class="left-toolbar"><slot name="leftbar" /></div>
         <div class="sidebar">
           <div class="subsection" v-if="slots" v-for="slot in slots" :key="slot.value">
             <span class="subsection__title">{{ slot.label }}</span>

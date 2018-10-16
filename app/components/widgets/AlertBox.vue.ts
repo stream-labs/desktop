@@ -20,13 +20,14 @@ import { Inject } from 'util/injector';
 export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxService> {
   @Inject() alertBoxService: AlertBoxService;
 
+  afterFetch() {
+    this.alertTypes = this.alertTypes.filter((type) => this.wData.settings[type]);
+    console.log(this.wData);
+  }
+
   alertTypes = this.alertBoxService.apiNames();
 
   selectedAlert = 'subs';
-
-  afterFetch() {
-    console.log(this.wData);
-  }
 
   navItems = [
     { value: 'general', label: $t('General Settings') },
@@ -37,4 +38,8 @@ export default class AlertBox extends WidgetSettings<IAlertBoxData, AlertBoxServ
     { value: 'alert', label: $t('Alert Settings') },
     { value: 'source', label: $t('Source') }
   ];
+
+  selectAlert(alertName: string) {
+    this.selectedAlert = alertName;
+  }
 }

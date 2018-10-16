@@ -7,12 +7,14 @@ import { IAlertBoxSettings, IAlertBoxApiSettings, IAlertBoxSetting, IAlertBoxVar
 const API_NAME_MAP =  {
   bit: 'bits',
   donation: 'donations',
-  donordrive: 'donordrive',
+  donordrivedonation: 'donordrive',
   pledge: 'patreon',
   eldonation: 'extraLife',
   justgivingdonation: 'justGiving',
   merch: 'merch',
   resub: 'resubs',
+  gamewispsubscription: 'gamewisp',
+  sub: 'subs',
   tiltifydonation: 'tiltify',
   treat: 'treat',
   follow: 'follows',
@@ -74,18 +76,20 @@ export class AlertBoxService extends WidgetSettingsService<IAlertBoxData> {
 
   private triageSettings(settings: IAlertBoxApiSettings): IAlertBoxSettings {
     const newSettings= {} as IAlertBoxSettings;
-    REGEX_TESTERS.forEach((test) => {
-      Object.keys(settings).forEach((key) => {
-        let newKey = key;
+    Object.keys(settings).forEach((key) => {
+      let testSuccess = false;
+      REGEX_TESTERS.forEach((test) => {
+        const newKey = /^show/.test(key) ? key.replace(test.tester, 'show_') : key.replace(test.tester, '');
         if (test.tester.test(key)) {
-          newKey = /^show/.test(key) ? key.replace(test.tester, 'show_') : key.replace(test.tester, '');
-        }
-        if (!newSettings[test.name]) {
-          newSettings[test.name] = { [newKey]: settings[key] };
-        } else {
-          newSettings[test.name][newKey] = settings[key];
+          testSuccess = true;
+          if (!newSettings[test.name]) {
+            newSettings[test.name] = { [newKey]: settings[key] };
+          } else {
+            newSettings[test.name][newKey] = settings[key];
+          }
         }
       });
+      if (!testSuccess && !/smfredemption/.test(key)) newSettings[key] = settings[key];
     });
 
     return newSettings;
