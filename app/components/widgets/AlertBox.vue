@@ -4,6 +4,7 @@
     :isAlertBox="true"
     :slots="[{ value: 'layout', label: $t('Layout') }]"
   >
+    <!-- Left Toolbar -->
     <div slot="leftbar">
       <div class="left-accordion__button">
         <span class="left-accordion__title" :class="{ active: selectedAlert === alert }">
@@ -35,6 +36,11 @@
       </div>
     </div>
 
+    <div slot="layout">
+      <alert-layout-input v-model="wData.settings.layout" />
+    </div>
+
+    <!-- Settings Inputs -->
     <validated-form slot="general-properties" v-if="wData">
       <v-form-group type="color" v-model="wData.settings.background_color" :title="$t('Background Color')" />
       <v-form-group type="slider" v-model="wData.settings.alert_delay" :title="$t('Global Alert Delay')" :metadata="{ min: 0, max: 30 }" />
@@ -94,6 +100,7 @@
   width: 90%;
   margin: 8px auto;
   box-shadow: 0 2px @day-shadow;
+  border: 1px solid @day-border;
   height: 100px;
   position: relative;
   padding: 6px;
@@ -133,6 +140,7 @@
   .variation-tile {
     background-color: @night-section-alt;
     box-shadow: 0 2px @night-shadow;
+    border-color: @night-border;
   }
   .variation-tile__image-box {
     background-color: @night-secondary;
