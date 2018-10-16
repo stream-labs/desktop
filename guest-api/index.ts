@@ -61,7 +61,7 @@ import uuid from 'uuid/v4';
     }
   );
 
-  let mainWindowContents: any; //electron.remote.webContents.fromId(1);
+  let mainWindowContents: Electron.WebContents;
 
   electron.ipcRenderer.on(
     'guestApiReady',
