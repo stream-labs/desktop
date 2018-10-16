@@ -80,7 +80,7 @@ export const SourceDisplayData = (): { [key: string]: ISourceDisplayData } => ({
     demoFilename: 'sources.png',
     supportList: [$t('Works with most of the recent Blackmagic cards.')]
   },
-  open_vr_capture: {
+  openvr_capture: {
     name: $t('OpenVR Capture'),
     description: $t('Directly capture the OpenVR monitoring video buffer of your HMD.'),
     demoFilename: 'vr-capture.png',
