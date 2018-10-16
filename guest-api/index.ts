@@ -61,13 +61,16 @@ import uuid from 'uuid/v4';
     }
   );
 
+  let mainWindowContents: Electron.WebContents;
+
   electron.ipcRenderer.on(
     'guestApiReady',
-    () => ready()
+    (e: any, id: number) => {
+      mainWindowContents = electron.remote.webContents.fromId(id);
+      ready();
+    }
   );
 
-  // TODO: Assuming the main window is always contents id 1 may not be safe.
-  const mainWindowContents = electron.remote.webContents.fromId(1);
   const webContentsId = electron.remote.getCurrentWebContents().id;
 
   /**

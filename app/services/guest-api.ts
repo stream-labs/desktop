@@ -142,7 +142,7 @@ export class GuestApiService extends Service {
       }
     }
 
-    webContents.send('guestApiReady');
+    webContents.send('guestApiReady', electron.remote.getCurrentWebContents().id);
   }
 
   private safeSend(contents: Electron.WebContents, channel: string, msg: any) {
