@@ -387,11 +387,6 @@ export class PlatformAppsService extends
 
   unloadApps() {
     this.state.loadedApps.forEach(app => this.unloadApp(app));
-
-    if (this.devServer) {
-      this.devServer.stopListening();
-      this.devServer = null;
-    }
   }
 
   unloadApp(app: ILoadedApp) {
@@ -399,6 +394,10 @@ export class PlatformAppsService extends
     this.appUnload.next(app.id);
     if (app.unpacked) {
       localStorage.removeItem(this.localStorageKey);
+      if (this.devServer) {
+        this.devServer.stopListening();
+        this.devServer = null;
+      }
     }
   }
 
