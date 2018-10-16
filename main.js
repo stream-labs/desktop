@@ -26,6 +26,7 @@ const rimraf = require('rimraf');
 const path = require('path');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
+const pid = require('process').pid;
 
 app.disableHardwareAcceleration();
 
@@ -63,14 +64,17 @@ function openDevTools() {
 }
 
 function tryConnect(buffer, attempt = 5, waitMs = 100) {
+  console.log('Trying to connect');
   const net = require('net');
   const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler');
    socket.on('connect', () => {
+    console.log('Connected');
     socket.write(buffer);
     socket.destroy();
     socket.unref();
   });
    socket.on('error', () => {
+    console.log('Error connecting');
     socket.destroy();
     socket.unref();
     if (attempt > 0) {
@@ -81,52 +85,30 @@ function tryConnect(buffer, attempt = 5, waitMs = 100) {
   });
 }
 
-function registerCurrentProcess(isCritial = false) {
-  // Register process
-  // Create buffer
-  const action = 0;
-  const sizeOfInt = 8;
-  const pid = require('process').pid;
+function registerProcess(isCritial = false) {
   const buffer = new Buffer(512);
   let offset = 0;
-  buffer.writeUInt32LE(action, offset++);
-  buffer.writeUInt32LE(sizeOfInt, offset++);
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(0, offset++);
-  buffer.writeUInt32LE(0, offset++);
   buffer.writeUInt32LE(0, offset++);
   buffer.writeUInt32LE(isCritial, offset++);
   buffer.writeUInt32LE(pid, offset++);
 
   tryConnect(buffer);
-
-  const EventEmitter = require('events');
-  const event = new EventEmitter();
-  const net = require('net');
-  const ref = setTimeout(() => {
-    try {
-      const socket = net.connect('\\\\.\\pipe\\slobs-crash-handler', () => {
-        console.log('Writting into the socket');
-        socket.write(buffer);
-        // socket.end();
-        event.emit('connected');
-      });
-    } catch (error) {
-      
-    }
-  }, 100);
-   event.on('connected', () => { 
-    clearTimeout(ref); 
-  });
 }
 
-function exitProcess() {
-  const action = 2;
+function unregisterProcess() {
   const buffer = new Buffer(512);
-   buffer.writeUInt32LE(action, 0);
+  let offset = 0;
+  buffer.writeUInt32LE(1, offset++);
+  buffer.writeUInt32LE(pid, offset++);
+  
+  tryConnect(buffer);
+}
+
+function terminateCrashHandler() {
+  const buffer = new Buffer(512);
+  let offset = 0;
+  buffer.writeUInt32LE(2, offset++);
+  buffer.writeUInt32LE(pid, offset++);
   
   tryConnect(buffer);
 }
@@ -141,7 +123,7 @@ function startApp() {
     stdio: 'ignore'
   });
   subprocess.unref();
-  registerCurrentProcess(false);
+  registerProcess(false);
 
   // Initialize obs-studio-server
   // Set up environment variables for IPC.
@@ -232,6 +214,7 @@ function startApp() {
   mainWindow.on('close', e => {
     if (!shutdownStarted) {
       shutdownStarted = true;
+      unregisterProcess();
       childWindow.destroy();
       mainWindow.send('shutdown');
 
@@ -243,6 +226,7 @@ function startApp() {
       }, 10 * 1000);
     }
 
+    terminateCrashHandler();
     if (!allowMainWindowClose) e.preventDefault();
   });
 
