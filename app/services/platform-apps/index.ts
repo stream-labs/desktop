@@ -168,9 +168,6 @@ export class PlatformAppsService extends
 
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
-
-      console.log(data);
-      console.log('hey');
       if (data.appPath && data.appToken) {
         this.installUnpackedApp(data.appPath, data.appToken);
       }
@@ -401,9 +398,6 @@ export class PlatformAppsService extends
     this.REMOVE_APP(app.id);
     this.appUnload.next(app.id);
     if (app.unpacked) {
-      console.log(app);
-      console.log(localStorage);
-      debugger;
       localStorage.removeItem(this.localStorageKey);
     }
   }
