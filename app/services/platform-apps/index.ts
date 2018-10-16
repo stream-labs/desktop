@@ -169,6 +169,8 @@ export class PlatformAppsService extends
     if (this.state.devMode && localStorage.getItem(this.localStorageKey)) {
       const data = JSON.parse(localStorage.getItem(this.localStorageKey));
 
+      console.log(data);
+      console.log('hey');
       if (data.appPath && data.appToken) {
         this.installUnpackedApp(data.appPath, data.appToken);
       }
@@ -387,12 +389,7 @@ export class PlatformAppsService extends
   }
 
   unloadApps() {
-    this.state.loadedApps.forEach(app => {
-      this.REMOVE_APP(app.id);
-      this.appUnload.next(app.id);
-    });
-    localStorage.removeItem(this.localStorageKey);
-    // TODO: navigate to live if on that topnav tab
+    this.state.loadedApps.forEach(app => this.unloadApp(app));
 
     if (this.devServer) {
       this.devServer.stopListening();
@@ -400,9 +397,15 @@ export class PlatformAppsService extends
     }
   }
 
-  unloadApp(appId: string) {
-    this.REMOVE_APP(appId);
-    this.appUnload.next(appId);
+  unloadApp(app: ILoadedApp) {
+    this.REMOVE_APP(app.id);
+    this.appUnload.next(app.id);
+    if (app.unpacked) {
+      console.log(app);
+      console.log(localStorage);
+      debugger;
+      localStorage.removeItem(this.localStorageKey);
+    }
   }
 
   async reloadApp(appId: string) {
@@ -415,7 +418,7 @@ export class PlatformAppsService extends
     const manifestPath = path.join(app.appPath, 'manifest.json');
 
     if (!await this.fileExists(manifestPath)) {
-      this.unloadApp(appId);
+      this.unloadApp(app);
       return 'Error: manifest.json is missing!';
     }
 
