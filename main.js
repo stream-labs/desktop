@@ -20,11 +20,10 @@ process.env.SLOBS_VERSION = pjson.version;
 ////////////////////////////////////////////////////////////////////////////////
 const { app, BrowserWindow, ipcMain, session, crashReporter, dialog, webContents } = require('electron');
 const fs = require('fs');
-const bootstrap = require('./updater/bootstrap.js');
+const { Updater } = require('./updater/Updater.js');
 const uuid = require('uuid/v4');
 const rimraf = require('rimraf');
 const path = require('path');
-const semver = require('semver');
 const windowStateKeeper = require('electron-window-state');
 const obs = require('obs-studio-node');
 
@@ -33,17 +32,6 @@ app.disableHardwareAcceleration();
 if (process.argv.includes('--clearCacheDir')) {
   rimraf.sync(app.getPath('userData'));
 }
-
-/* Determine the current release channel we're
- * on based on name. The channel will always be
- * the premajor identifier, if it exists.
- * Otherwise, default to latest. */
-const releaseChannel = (() => {
-  const components = semver.prerelease(pjson.version);
-
-  if (components) return components[0];
-  return 'latest';
-})();
 
 ////////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -67,6 +55,7 @@ let shutdownStarted = false;
 let appShutdownTimeout;
 
 global.indexUrl = 'file://' + __dirname + '/index.html';
+
 
 function openDevTools() {
   childWindow.webContents.openDevTools({ mode: 'undocked' });
@@ -313,27 +302,7 @@ if (shouldQuit) {
 
 app.on('ready', () => {
   if ((process.env.NODE_ENV === 'production') || process.env.SLOBS_FORCE_AUTO_UPDATE) {
-    const updateInfo = {
-      baseUrl: 'https://d1g6eog1uhe0xm.cloudfront.net',
-      version: pjson.version,
-      exec: process.argv,
-      cwd: process.cwd(),
-      waitPid: [ process.pid ],
-      appDir: path.dirname(app.getPath('exe')),
-      tempDir: path.join(app.getPath('temp'), 'slobs-updater'),
-      cacheDir: app.getPath('userData'),
-      versionFileName: `${releaseChannel}.json`
-    };
-
-    console.log(updateInfo);
-    bootstrap(updateInfo).then((updating) => {
-      if (updating) {
-        console.log('Closing for update...');
-        app.exit();
-      } else {
-        startApp();
-      }
-    });
+    (new Updater(startApp)).run();
   } else {
     startApp();
   }
@@ -469,4 +438,8 @@ ipcMain.on('webContents-preventNavigation', (e, id) => {
   webContents.fromId(id).on('will-navigate', e => {
     e.preventDefault();
   });
+});
+
+ipcMain.on('getMainWindowWebContentsId', e => {
+  e.returnValue = mainWindow.webContents.id;
 });
