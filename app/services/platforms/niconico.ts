@@ -230,7 +230,8 @@ export class NiconicoService extends StatefulService<INiconicoServiceState> impl
     }
 
     try {
-      return this._setupStreamSettings(programId);
+      const result = await this._setupStreamSettings(programId);
+      return result;
     } catch (e) {
       // リトライは1回だけ
       return NiconicoService.emptyStreamingSetting(false);
