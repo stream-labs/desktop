@@ -15,6 +15,8 @@ import { IObsListInput } from '../../components/obs/inputs/ObsInput';
 import {IpcServerService} from '../ipc-server';
 import {IJsonRpcRequest} from '../jsonrpc';
 import {AudioService, IAudioSource} from '../audio';
+import {FileManagerService} from '../file-manager';
+import * as fs from 'fs';
 
 interface IBrandDeviceUrls {
   system_sku: string;
@@ -22,6 +24,7 @@ interface IBrandDeviceUrls {
   global_ini_url: string;
   stream_encoder_url: string;
   record_encoder_url: string;
+  onboarding_cmds_url: string;
   overlay_url: string;
   name: string;
 }
@@ -54,6 +57,7 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
   @Inject() private scenesService: ScenesService;
   @Inject() private audioService: AudioService;
   @Inject() private ipcServerService: IpcServerService;
+  @Inject() private fileManagerService: FileManagerService;
 
 
   serviceEnabled() {
@@ -128,38 +132,46 @@ export class BrandDeviceService extends StatefulService<IBrandDeviceState> {
       obs.NodeObs.OBS_service_resetVideoContext();
       obs.NodeObs.OBS_service_resetAudioContext();
 
-      // configure the scene
-      if (!newSceneCollectionCreated) {
-        await this.sceneCollectionsService.create({ name: deviceName });
+
+      // process API additional commands, some sources can be setup here
+      if (deviceUrls.onboarding_cmds_url) {
+        const cmdsPath = `${tempDir}/onboarding_cmds.json`;
+        await downloadFile(deviceUrls.overlay_url, cmdsPath);
+        const cmds =  JSON.parse(fs.readFileSync(cmdsPath, 'utf8'));
+        if (!newSceneCollectionCreated) await this.sceneCollectionsService.create({ name: deviceName });
+        for (const cmd of cmds) this.ipcServerService.exec(cmd);
       }
 
-      const initialCmds: IJsonRpcRequest[] = [
-        {
-          "id": '1',
-          "jsonrpc": "2.0",
-          "method": "addSceneItem",
-          "params": {
-            "resource": 'BrandDeviceService',
-            "args": [
-              "Capture Card",
-              "dshow_input",
-              {
-                "sourceSettings": {
-                  "use_custom_audio_device": true,
-                },
-                "sourceFuzzySettings": {
-                  "audio_device_id": "Stereo Mix"
-                },
-                "audioSettings": {
-                  "monitoringType": 2
-                }
-              }
-            ]
-          }
-        }
-      ];
-
-      this.ipcServerService.exec(initialCmds[0]);
+      //
+      // const initialCmds: IJsonRpcRequest[] = [
+      //   {
+      //     "id": '1',
+      //     "jsonrpc": "2.0",
+      //     "method": "addSceneItem",
+      //     "params": {
+      //       "resource": 'BrandDeviceService',
+      //       "args": [
+      //         "Capture Card",
+      //         "dshow_input",
+      //         {
+      //           "sourceSettings": {
+      //             "res_type": 1
+      //             "resolution": "1920x1080",
+      //             "use_custom_audio_device": true
+      //           },
+      //           "sourceFuzzySettings": {
+      //             "audio_device_id": "MZ03080 PCI, Analog 01 WaveIn"
+      //           },
+      //           "audioSettings": {
+      //             "monitoringType": 2
+      //           }
+      //         }
+      //       ]
+      //     }
+      //   }
+      // ];
+      //
+      // this.ipcServerService.exec(initialCmds[0]);
 
 
       return true;
